@@ -27,7 +27,7 @@
     "directory": "packages/opengl32"
   },
   "type": "module",
-  "version": "1.4.5",
+  "version": "1.4.6",
   "main": "./index.ts",
   "keywords": [
     "bun",

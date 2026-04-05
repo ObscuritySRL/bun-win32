@@ -27,7 +27,7 @@
     "directory": "packages/advapi32"
   },
   "type": "module",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "main": "./index.ts",
   "keywords": [
     "bun",
