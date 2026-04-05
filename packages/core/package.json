@@ -24,7 +24,7 @@
     "directory": "packages/core"
   },
   "type": "module",
-  "version": "1.0.1",
+  "version": "1.0.0",
   "main": "./index.ts",
   "keywords": [
     "bun",
