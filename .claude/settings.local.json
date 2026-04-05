@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(for dir:*)",
+      "Bash(do echo:*)",
+      "Read(//d/Projects/bun-win32/$dir/**)",
+      "Bash(done)"
+    ]
+  }
+}

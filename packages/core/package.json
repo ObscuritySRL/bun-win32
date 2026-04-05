@@ -1,0 +1,50 @@
+{
+  "author": "Stev Peifer <stev@bell.net>",
+  "description": "Shared base class, runtime extensions, and fundamental Win32 types for @bun-win32 packages.",
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "exports": {
+    ".": "./index.ts"
+  },
+  "license": "MIT",
+  "module": "index.ts",
+  "name": "@bun-win32/core",
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "private": false,
+  "bugs": {
+    "url": "https://github.com/ObscuritySRL/bun-win32/issues"
+  },
+  "homepage": "https://github.com/ObscuritySRL/bun-win32#readme",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/ObscuritySRL/bun-win32.git",
+    "directory": "packages/core"
+  },
+  "type": "module",
+  "version": "1.0.1",
+  "main": "./index.ts",
+  "keywords": [
+    "bun",
+    "ffi",
+    "win32",
+    "windows",
+    "bindings",
+    "typescript",
+    "dll",
+    "core"
+  ],
+  "files": [
+    "index.ts",
+    "runtime/*.ts",
+    "structs/*.ts",
+    "types/*.ts",
+    "README.md"
+  ],
+  "sideEffects": false,
+  "engines": {
+    "bun": ">=1.1.0"
+  }
+}

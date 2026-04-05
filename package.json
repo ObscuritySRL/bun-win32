@@ -1,0 +1,5 @@
+{
+  "name": "bun-win32",
+  "private": true,
+  "workspaces": ["packages/*"]
+}

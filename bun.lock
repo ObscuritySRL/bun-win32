@@ -1,0 +1,182 @@
+{
+  "lockfileVersion": 1,
+  "configVersion": 1,
+  "workspaces": {
+    "": {
+      "name": "bun-win32",
+    },
+    "packages/advapi32": {
+      "name": "@bun-win32/advapi32",
+      "version": "1.0.5",
+      "dependencies": {
+        "@bun-win32/core": "workspace:*",
+      },
+      "devDependencies": {
+        "@types/bun": "latest",
+      },
+      "peerDependencies": {
+        "typescript": "^5",
+      },
+    },
+    "packages/core": {
+      "name": "@bun-win32/core",
+      "version": "1.0.0",
+      "devDependencies": {
+        "@types/bun": "latest",
+      },
+      "peerDependencies": {
+        "typescript": "^5",
+      },
+    },
+    "packages/gdi32": {
+      "name": "@bun-win32/gdi32",
+      "version": "1.0.6",
+      "dependencies": {
+        "@bun-win32/core": "workspace:*",
+      },
+      "devDependencies": {
+        "@types/bun": "latest",
+      },
+      "peerDependencies": {
+        "typescript": "^5",
+      },
+    },
+    "packages/glu32": {
+      "name": "@bun-win32/glu32",
+      "version": "1.0.6",
+      "dependencies": {
+        "@bun-win32/core": "workspace:*",
+      },
+      "devDependencies": {
+        "@types/bun": "latest",
+      },
+      "peerDependencies": {
+        "typescript": "^5",
+      },
+    },
+    "packages/kernel32": {
+      "name": "@bun-win32/kernel32",
+      "version": "1.0.15",
+      "dependencies": {
+        "@bun-win32/core": "workspace:*",
+      },
+      "devDependencies": {
+        "@types/bun": "latest",
+      },
+      "peerDependencies": {
+        "typescript": "^5",
+      },
+    },
+    "packages/ntdll": {
+      "name": "@bun-win32/ntdll",
+      "version": "1.0.0",
+      "dependencies": {
+        "@bun-win32/core": "workspace:*",
+      },
+      "devDependencies": {
+        "@types/bun": "latest",
+      },
+      "peerDependencies": {
+        "typescript": "^5",
+      },
+    },
+    "packages/opengl32": {
+      "name": "@bun-win32/opengl32",
+      "version": "1.4.4",
+      "dependencies": {
+        "@bun-win32/core": "workspace:*",
+      },
+      "devDependencies": {
+        "@types/bun": "latest",
+      },
+      "peerDependencies": {
+        "typescript": "^5",
+      },
+    },
+    "packages/psapi": {
+      "name": "@bun-win32/psapi",
+      "version": "2.0.2",
+      "dependencies": {
+        "@bun-win32/core": "workspace:*",
+      },
+      "devDependencies": {
+        "@types/bun": "latest",
+      },
+      "peerDependencies": {
+        "typescript": "^5",
+      },
+    },
+    "packages/shell32": {
+      "name": "@bun-win32/shell32",
+      "version": "1.0.0",
+      "dependencies": {
+        "@bun-win32/core": "workspace:*",
+      },
+      "devDependencies": {
+        "@types/bun": "latest",
+      },
+      "peerDependencies": {
+        "typescript": "^5",
+      },
+    },
+    "packages/shlwapi": {
+      "name": "@bun-win32/shlwapi",
+      "version": "1.0.3",
+      "dependencies": {
+        "@bun-win32/core": "workspace:*",
+      },
+      "devDependencies": {
+        "@types/bun": "latest",
+      },
+      "peerDependencies": {
+        "typescript": "^5",
+      },
+    },
+    "packages/user32": {
+      "name": "@bun-win32/user32",
+      "version": "3.0.14",
+      "dependencies": {
+        "@bun-win32/core": "workspace:*",
+      },
+      "devDependencies": {
+        "@types/bun": "latest",
+      },
+      "peerDependencies": {
+        "typescript": "^5",
+      },
+    },
+  },
+  "packages": {
+    "@bun-win32/advapi32": ["@bun-win32/advapi32@workspace:packages/advapi32"],
+
+    "@bun-win32/core": ["@bun-win32/core@workspace:packages/core"],
+
+    "@bun-win32/gdi32": ["@bun-win32/gdi32@workspace:packages/gdi32"],
+
+    "@bun-win32/glu32": ["@bun-win32/glu32@workspace:packages/glu32"],
+
+    "@bun-win32/kernel32": ["@bun-win32/kernel32@workspace:packages/kernel32"],
+
+    "@bun-win32/ntdll": ["@bun-win32/ntdll@workspace:packages/ntdll"],
+
+    "@bun-win32/opengl32": ["@bun-win32/opengl32@workspace:packages/opengl32"],
+
+    "@bun-win32/psapi": ["@bun-win32/psapi@workspace:packages/psapi"],
+
+    "@bun-win32/shell32": ["@bun-win32/shell32@workspace:packages/shell32"],
+
+    "@bun-win32/shlwapi": ["@bun-win32/shlwapi@workspace:packages/shlwapi"],
+
+    "@bun-win32/user32": ["@bun-win32/user32@workspace:packages/user32"],
+
+    "@types/bun": ["@types/bun@1.3.11", "", { "dependencies": { "bun-types": "1.3.11" } }, "sha512-5vPne5QvtpjGpsGYXiFyycfpDF2ECyPcTSsFBMa0fraoxiQyMJ3SmuQIGhzPg2WJuWxVBoxWJ2kClYTcw/4fAg=="],
+
+    "@types/node": ["@types/node@25.5.2", "", { "dependencies": { "undici-types": "~7.18.0" } }, "sha512-tO4ZIRKNC+MDWV4qKVZe3Ql/woTnmHDr5JD8UI5hn2pwBrHEwOEMZK7WlNb5RKB6EoJ02gwmQS9OrjuFnZYdpg=="],
+
+    "bun-types": ["bun-types@1.3.11", "", { "dependencies": { "@types/node": "*" } }, "sha512-1KGPpoxQWl9f6wcZh57LvrPIInQMn2TQ7jsgxqpRzg+l0QPOFvJVH7HmvHo/AiPgwXy+/Thf6Ov3EdVn1vOabg=="],
+
+    "typescript": ["typescript@5.9.3", "", { "bin": { "tsc": "bin/tsc", "tsserver": "bin/tsserver" } }, "sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw=="],
+
+    "undici-types": ["undici-types@7.18.2", "", {}, "sha512-AsuCzffGHJybSaRrmr5eHr81mwJU3kjw6M+uprWvCXiNeN9SOGwQ3Jn8jb8m3Z6izVgknn1R0FTCEAP2QrLY/w=="],
+  }
+}
