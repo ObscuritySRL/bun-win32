@@ -77,6 +77,20 @@ const hwnd = User32.FindWindowExW(0n, 0n, null, null);
 User32.Preload(['GetForegroundWindow', 'GetWindowTextW']);
 ```
 
+## Generating a New Package
+
+All packages in this repo are AI-generated using Claude Code. To add bindings for a new DLL:
+
+1. Open the repo in Claude Code.
+2. Set the model to **max effort** with **extended thinking** enabled.
+3. Send:
+
+```
+Execute @PROMPT.md for `crypt32`.
+```
+
+Replace `crypt32` with whatever DLL you're targeting. `PROMPT.md` is the complete specification — it walks the model through dumping exports, reading Microsoft Docs, scaffolding from the template, writing every FFI declaration, and testing each one. No further prompting is needed.
+
 ## License
 
 MIT
