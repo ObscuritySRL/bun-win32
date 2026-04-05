@@ -3,7 +3,6 @@ AGENTS.*.md
 ignore*
 
 # tools
-bin
 
 # dependencies (bun install)
 node_modules
