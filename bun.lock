@@ -145,6 +145,19 @@
         "typescript": "^5",
       },
     },
+    "packages/pdh": {
+      "name": "@bun-win32/pdh",
+      "version": "1.0.0",
+      "dependencies": {
+        "@bun-win32/core": "workspace:*",
+      },
+      "devDependencies": {
+        "@types/bun": "latest",
+      },
+      "peerDependencies": {
+        "typescript": "^5",
+      },
+    },
     "packages/psapi": {
       "name": "@bun-win32/psapi",
       "version": "2.0.4",
@@ -259,6 +272,8 @@
     "@bun-win32/ntdll": ["@bun-win32/ntdll@workspace:packages/ntdll"],
 
     "@bun-win32/opengl32": ["@bun-win32/opengl32@workspace:packages/opengl32"],
+
+    "@bun-win32/pdh": ["@bun-win32/pdh@workspace:packages/pdh"],
 
     "@bun-win32/psapi": ["@bun-win32/psapi@workspace:packages/psapi"],
 

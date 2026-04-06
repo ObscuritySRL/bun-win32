@@ -3,6 +3,8 @@ AGENTS.*.md
 ignore*
 
 # tools
+cloc-2.08.exe
+MISSING_APIS.md
 
 # dependencies (bun install)
 node_modules

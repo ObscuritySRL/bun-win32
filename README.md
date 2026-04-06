@@ -27,6 +27,7 @@ All type definitions are provided by [`@bun-win32/core`](./packages/core).
 
 - [`kernel32`](./packages/kernel32) — processes, memory, files, console, threads
 - [`ntdll`](./packages/ntdll) — native NT API
+- [`pdh`](./packages/pdh) — performance counter queries, logs, and enumeration
 - [`psapi`](./packages/psapi) — process status and module enumeration
 - [`shell32`](./packages/shell32) — shell operations and file management
 - [`shlwapi`](./packages/shlwapi) — shell lightweight utility functions
