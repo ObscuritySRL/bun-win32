@@ -8,7 +8,6 @@
  * This example shows a countdown timer dialog that dismisses itself.
  */
 
-import '../runtime/extensions';
 import User32 from '../structs/User32';
 import { MessageBoxType } from '../types/User32';
 

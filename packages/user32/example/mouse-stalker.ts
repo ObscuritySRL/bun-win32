@@ -14,7 +14,6 @@
  * Press Ctrl+C in the terminal to exit.
  */
 
-import '../runtime/extensions';
 import User32 from '../structs/User32';
 import { ExtendedWindowStyles, ShowWindowCommand, WindowStyles } from '../types/User32';
 
@@ -46,7 +45,7 @@ const hwnd = User32.CreateWindowExW(
   0, // X - will be updated
   0, // Y - will be updated
   200, // Width
-  40, // Height
+  25, // Height
   NULL, // No parent
   NULL, // No menu
   NULL, // Default instance
@@ -85,8 +84,8 @@ const updatePosition = () => {
   // Only update if position changed
   if (x !== prevX || y !== prevY) {
     // Offset window slightly from cursor
-    const windowX = x + 20;
-    const windowY = y + 20;
+    const windowX = x + 10;
+    const windowY = y + 10;
 
     // Move the window (SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE = 0x0001 | 0x0004 | 0x0010)
     User32.SetWindowPos(hwnd, NULL, windowX, windowY, 0, 0, 0x0015);

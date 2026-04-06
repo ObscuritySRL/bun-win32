@@ -5,7 +5,6 @@
  * to display a Windows message box.
  */
 
-import '../runtime/extensions';
 import User32 from '../structs/User32';
 import { MessageBoxType } from '../types/User32';
 
