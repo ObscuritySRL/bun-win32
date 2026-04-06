@@ -1,21 +1,21 @@
-# PROMPT.md — Generating a New Win32 API Package
+# PROMPT.md - Generating a New Win32 API Package
 
-You are creating a new `@bun-win32/{name}` package — a zero-dependency, zero-overhead FFI binding for `{name}.dll` using Bun on Windows.
+You are creating a new `@bun-win32/{name}` package - a zero-dependency, zero-overhead FFI binding for `{name}.dll` using Bun on Windows.
 
 This document is your **complete specification**. Follow it exactly. The result must be indistinguishable from the existing packages (`kernel32`, `user32`, `advapi32`, `gdi32`, `psapi`, `shlwapi`, `opengl32`, `glu32`).
 
 ---
 
-## 0. Mindset — Read This First
+## 0. Mindset - Read This First
 
-This package will be downloaded millions of times. It will be used in production systems where correctness is not a preference — it is a hard requirement. People will build security tools, system utilities, and critical infrastructure on top of these bindings. **Lives may depend on the correctness of your work.**
+This package will be downloaded millions of times. It will be used in production systems where correctness is not a preference - it is a hard requirement. People will build security tools, system utilities, and critical infrastructure on top of these bindings. **Lives may depend on the correctness of your work.**
 
 Act like it.
 
-- **Never take the easy way out.** If something is ambiguous, do not guess and move on. Stop. Read the Microsoft documentation. Read the existing packages. Test it. Then test it again. The lazy path — assuming a type, skipping a nullable annotation, eyeballing a parameter name — is not available to you.
+- **Never take the easy way out.** If something is ambiguous, do not guess and move on. Stop. Read the Microsoft documentation. Read the existing packages. Test it. Then test it again. The lazy path - assuming a type, skipping a nullable annotation, eyeballing a parameter name - is not available to you.
 - **Never assume. Ever.** Do not assume a parameter is a pointer because it "looks like one." Do not assume a function exists in a DLL because the docs mention it. Do not assume a handle is 32-bit because another API's handle was. Do not assume a parameter is non-nullable because "most parameters aren't." Verify every single claim against the docs, against dumpbin, against the runtime. Assumptions are bugs you haven't found yet.
 - **Correctness over speed.** It does not matter how long this takes. What matters is that every type is right, every parameter name matches the docs character-for-character, every nullable annotation reflects reality, and every FFI declaration has been tested against a live call. A binding that is 99% correct is a binding that will crash in production for 1% of users.
-- **If you are unsure, do not ship it.** Investigate until you are sure. Read the C header. Read the existing `kernel32` or `user32` bindings for the same type. Write a test. Change the type, run it again. Cross-reference two independent sources. Only commit a declaration when you are confident it is correct — not when you are tired of looking.
+- **If you are unsure, do not ship it.** Investigate until you are sure. Read the C header. Read the existing `kernel32` or `user32` bindings for the same type. Write a test. Change the type, run it again. Cross-reference two independent sources. Only commit a declaration when you are confident it is correct - not when you are tired of looking.
 
 This is not a prototype. This is not a demo. This is infrastructure. Treat it accordingly.
 
@@ -23,23 +23,23 @@ This is not a prototype. This is not a demo. This is infrastructure. Treat it ac
 
 ## Table of Contents
 
-1. [Prerequisites — Before You Write a Single Line](#1-prerequisites--before-you-write-a-single-line)
+1. [Prerequisites - Before You Write a Single Line](#1-prerequisites--before-you-write-a-single-line)
 2. [Directory Structure](#2-directory-structure)
 3. [Step-by-Step Creation Process](#3-step-by-step-creation-process)
 4. [File Specifications](#4-file-specifications)
-5. [FFI Type Mapping — The Critical Rules](#5-ffi-type-mapping--the-critical-rules)
-6. [Nullability — `| NULL` and `| 0n`](#6-nullability--null-and--0n)
+5. [FFI Type Mapping - The Critical Rules](#5-ffi-type-mapping--the-critical-rules)
+6. [Nullability - `| NULL` and `| 0n`](#6-nullability--null-and--0n)
 7. [Symbol Declarations](#7-symbol-declarations)
 8. [Public Method Signatures](#8-public-method-signatures)
 9. [Type Aliases and Enums](#9-type-aliases-and-enums)
-10. [Testing — Non-Negotiable](#10-testing--non-negotiable)
+10. [Testing - Non-Negotiable](#10-testing--non-negotiable)
 11. [Completeness Checklist](#11-completeness-checklist)
 12. [Common Mistakes to Avoid](#12-common-mistakes-to-avoid)
 13. [Reference Commands](#13-reference-commands)
 
 ---
 
-## 1. Prerequisites — Before You Write a Single Line
+## 1. Prerequisites - Before You Write a Single Line
 
 ### 1a. Read the template directory
 
@@ -47,21 +47,24 @@ Read **every file** in `template/`:
 
 ```
 template/
-├── README.md
-├── index.ts
-├── package.json
-├── tsconfig.json
-├── structs/
-│   └── {Class}.ts
-└── types/
-    └── {Class}.ts
+|-- AI.md
+|-- README.md
+|-- index.ts
+|-- package.json
+|-- tsconfig.json
+|-- structs/
+|   `-- {Class}.ts
+`-- types/
+    `-- {Class}.ts
 ```
+
+This includes `AI.md`. It is part of the package contract and must be filled in, not omitted.
 
 The template files contain `{name}`, `{Name}`, `{Class}`, `{NAME}`, `{description}`, `{quickstart}`, and `{examples}` placeholders. You will replace these with the actual values for the target DLL.
 
 - `{name}` = lowercase DLL name without `.dll` (e.g., `shell32`, `kernel32`)
 - `{Name}` = title-case DLL name (e.g., `Shell32`, `Kernel32`)
-- `{Class}` = PascalCase class name — usually same as `{Name}` (e.g., `Shell32`, `Kernel32`, `GDI32`, `OpenGL32`, `Psapi`, `Shlwapi`)
+- `{Class}` = PascalCase class name - usually same as `{Name}` (e.g., `Shell32`, `Kernel32`, `GDI32`, `OpenGL32`, `Psapi`, `Shlwapi`)
 - `{NAME}` = uppercase DLL name (e.g., `SHELL32`, `KERNEL32`)
 - `{description}` = a short phrase describing what the DLL covers (e.g., `process, memory, files, console, time, and more`)
 - `{quickstart}` = a short TypeScript code example for the README
@@ -77,7 +80,7 @@ Use `dumpbin.exe` from the `bin/` directory to get the **authoritative list** of
 
 > **Shell escaping:** Use single quotes around the Windows path. Double backslashes (`C:\\Windows\\`) get consumed by the shell and produce an invalid path.
 
-This gives you every exported function name. **This is your source of truth for what functions exist.** Do not guess — if a function is not in the dumpbin output, it is not exported from that DLL and must not be included.
+This gives you every exported function name. **This is your source of truth for what functions exist.** Do not guess - if a function is not in the dumpbin output, it is not exported from that DLL and must not be included.
 
 Save this list. You will cross-reference it against Microsoft documentation for each function's signature.
 
@@ -113,15 +116,18 @@ The final package must have this exact structure:
 
 ```
 packages/{name}/
-├── README.md
-├── index.ts
-├── package.json
-├── tsconfig.json
-├── structs/
-│   └── {Class}.ts
-└── types/
-    └── {Class}.ts
+|-- AI.md
+|-- README.md
+|-- index.ts
+|-- package.json
+|-- tsconfig.json
+|-- structs/
+|   `-- {Class}.ts
+`-- types/
+    `-- {Class}.ts
 ```
+
+Include `AI.md` alongside `README.md` in the package root.
 
 Note: `.gitignore`, `.prettierrc.json`, and `AGENTS.md` live at the **repo root** and apply to all packages. Do not duplicate them per-package.
 
@@ -139,7 +145,7 @@ Follow this order exactly. **Test at every step.** Do not proceed to the next st
 2. Copy every template file from `template/` into `packages/{name}/`.
 3. Replace all placeholders (`{name}`, `{Name}`, `{Class}`, `{NAME}`, etc.) in every file.
 4. Run `bun install` in the new directory.
-5. Run `bun run index.ts` — it should import without errors (even though no symbols are defined yet).
+5. Run `bun run index.ts` - it should import without errors (even though no symbols are defined yet).
 
 ### Step 2: Dump and catalog the exports
 
@@ -185,14 +191,14 @@ After all methods are written, perform a **dedicated review pass** over every me
 
 1. Extract every public method signature from `structs/{Class}.ts`.
 2. For each method that has pointer parameters (`LP*`, `P*`, `Pointer` types) or handle parameters (`HANDLE`, `HWND`, `WSAEVENT`, etc.), open the Microsoft Docs page (the URL is in the comment above the method).
-3. On the docs page, check **all four** of these locations for nullability signals — they are not always in the same place:
-   - **The C prototype** — look for `[in, optional]`, `[out, optional]`, or `_In_opt_`, `_Out_opt_` SAL annotations.
-   - **The Parameters section** — look for "This parameter can be **NULL**", "This parameter is optional", "If this parameter is **NULL**", or "set to **NULL**".
-   - **The Return value section** — look for sizing-call patterns: "If the buffer is **NULL**", "`ERROR_INSUFFICIENT_BUFFER`", "`ERROR_BUFFER_OVERFLOW`".
-   - **The Remarks section and Example code** — nullability is sometimes only documented here.
+3. On the docs page, check **all four** of these locations for nullability signals - they are not always in the same place:
+   - **The C prototype** - look for `[in, optional]`, `[out, optional]`, or `_In_opt_`, `_Out_opt_` SAL annotations.
+   - **The Parameters section** - look for "This parameter can be **NULL**", "This parameter is optional", "If this parameter is **NULL**", or "set to **NULL**".
+   - **The Return value section** - look for sizing-call patterns: "If the buffer is **NULL**", "`ERROR_INSUFFICIENT_BUFFER`", "`ERROR_BUFFER_OVERFLOW`".
+   - **The Remarks section and Example code** - nullability is sometimes only documented here.
 4. For every parameter confirmed as optional/nullable:
-   - Pointer types (`LP*`, `P*`) → must have `| NULL`
-   - Handle types (`HANDLE`, `HWND`, `WSAEVENT`, etc.) → must have `| 0n`
+   - Pointer types (`LP*`, `P*`) -> must have `| NULL`
+   - Handle types (`HANDLE`, `HWND`, `WSAEVENT`, etc.) -> must have `| 0n`
 5. For parameters where the docs do **not** mention nullability in any of the four locations, do **not** add a union.
 
 #### Why this step exists
@@ -200,7 +206,7 @@ After all methods are written, perform a **dedicated review pass** over every me
 In practice, the most common category of bugs in these bindings is missing `| NULL` or `| 0n` annotations. They are easy to miss during bulk writing because:
 - The C prototype may say `[in]` but the Remarks section says "pass NULL to query the required size."
 - Some parameters are nullable only in specific overload patterns (e.g., overlapped I/O makes `lpcbBytesReturned` nullable).
-- `proto` parameters on `getservbyname`-family functions are nullable but marked `[in]` (not `[in, optional]`) in the prototype — the nullability is only mentioned in the parameter description text.
+- `proto` parameters on `getservbyname`-family functions are nullable but marked `[in]` (not `[in, optional]`) in the prototype - the nullability is only mentioned in the parameter description text.
 - Handle parameters like `hEventObject` on `WSAEnumNetworkEvents` are described as "optional" in the text but have no SAL annotation.
 
 A dedicated audit pass catches these. It is not optional.
@@ -208,16 +214,22 @@ A dedicated audit pass catches these. It is not optional.
 ### Step 7: Write the README and update the root README
 
 1. Fill in the package README template with a real quick-start example.
-2. Add any example scripts if appropriate.
-3. Update the **root `README.md`** to include the new package:
+   - Keep the README human-facing.
+   - Preserve the short note that points coding agents to `AI.md`.
+2. Fill in `AI.md`.
+   - `AI.md` documents how the package works as a 1:1 TypeScript-to-FFI binding.
+   - Keep it package-agnostic aside from the package name, class name, DLL name, and file paths.
+   - It should explain the role of `index.ts`, `structs/{Class}.ts`, and `types/{Class}.ts`, especially that the types file contains the aliases, enums, constants, flags, and sentinels used by the method signatures.
+3. Add any example scripts if appropriate.
+4. Update the **root `README.md`** to include the new package:
    - Add a row to the **Packages table** (alphabetized by package name).
-   - Add an entry to the **Project Structure** tree (alphabetized, update `└──` / `├──` connectors as needed).
+   - Add an entry to the **Project Structure** tree (alphabetized, updating the tree connectors as needed).
 
 ### Step 8: Final verification
 
 1. Run `bun run index.ts`.
 2. Run `bunx prettier --write "packages/{name}/**/*.ts"` to format all files in the new package. The repo-root `.prettierrc.json` (`printWidth: 240`, `singleQuote: true`) applies automatically.
-3. Type-check with `bunx tsc --noEmit` — verify there are **no** TypeScript errors in the library **or** the examples. If you created an `example/` directory, the example files must also pass the type-checker. A type error in an example means a method signature is wrong (e.g., missing `| NULL` on a parameter that callers pass `null` to).
+3. Type-check with `bunx tsc --noEmit` - verify there are **no** TypeScript errors in the library **or** the examples. If you created an `example/` directory, the example files must also pass the type-checker. A type error in an example means a method signature is wrong (e.g., missing `| NULL` on a parameter that callers pass `null` to).
 4. Run a real integration test that calls several functions and verifies results.
 5. Verify that the number of public methods matches the number of dumpbin exports you chose to bind.
 
@@ -256,11 +268,37 @@ Copy from template and replace placeholders. Key fields:
   "devDependencies": { "@types/bun": "latest" },
   "engines": { "bun": ">=1.1.0" },
   "sideEffects": false,
-  "files": ["index.ts", "structs/*.ts", "types/*.ts", "README.md"]
+  "files": ["AI.md", "README.md", "index.ts", "structs/*.ts", "types/*.ts"]
 }
 ```
 
 Add `scripts` entries for any examples you create.
+
+### `AI.md`
+
+This file is for coding agents. It should be almost entirely reusable across packages by changing only the package name, class name, DLL name, and referenced file paths.
+
+It should explain:
+
+- the package exports a single class with static methods
+- each static method is a thin 1:1 binding to the matching DLL export
+- method names, parameter names, and parameter order follow Microsoft Docs
+- `Preload()` only changes bind timing
+- `index.ts` re-exports the package surface
+- `structs/{Class}.ts` is the method index
+- `types/{Class}.ts` contains the aliases, enums, constants, flags, and sentinels used by the method signatures
+- pointer arguments are passed via `.ptr`
+- out parameters are caller-allocated memory
+- return values are raw native results
+- cleanup responsibilities are unchanged from the underlying API
+
+### `README.md`
+
+Keep the README short and human-facing.
+
+- Include the quick-start example.
+- Include the short note pointing coding agents to `AI.md`.
+- Do not turn the README into a full binding-contract document.
 
 ### `tsconfig.json`
 
@@ -292,10 +330,10 @@ export default {Class};
 ```
 
 Key points:
-- **`extends Win32`** — inherits `Load()` and `Preload()` from the base class in `@bun-win32/core`.
-- **`protected static override name`** — tells the base class which DLL to open. Must include `.dll`.
-- **`protected static override readonly Symbols`** — the FFI symbol table. Must use `override` (the root tsconfig sets `noImplicitOverride: true`).
-- **Do not re-implement `Load()` or `Preload()`** — they are inherited from `Win32`.
+- **`extends Win32`** - inherits `Load()` and `Preload()` from the base class in `@bun-win32/core`.
+- **`protected static override name`** - tells the base class which DLL to open. Must include `.dll`.
+- **`protected static override readonly Symbols`** - the FFI symbol table. Must use `override` (the root tsconfig sets `noImplicitOverride: true`).
+- **Do not re-implement `Load()` or `Preload()`** - they are inherited from `Win32`.
 
 See Sections 5-8 for detailed specification of the symbols and methods.
 
@@ -305,7 +343,7 @@ This is the type definitions file. See Section 9 for the detailed specification.
 
 ---
 
-## 5. FFI Type Mapping — The Critical Rules
+## 5. FFI Type Mapping - The Critical Rules
 
 This is the section where most AI make mistakes. Read it carefully.
 
@@ -315,36 +353,36 @@ In Bun's FFI (`bun:ffi`), there are two ways to represent pointer-sized values:
 
 | FFIType       | TypeScript type | When to use                                                                                                                                                                                                                                                     |
 | ------------- | --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `FFIType.ptr` | `Pointer`       | When you are **passing a buffer/memory address from your local process** — i.e., a pointer to data you allocated (a `Buffer`, `TypedArray`, struct, string buffer, etc.). The caller passes `buffer.ptr` or a `Pointer` value.                                  |
+| `FFIType.ptr` | `Pointer`       | When you are **passing a buffer/memory address from your local process** - i.e., a pointer to data you allocated (a `Buffer`, `TypedArray`, struct, string buffer, etc.). The caller passes `buffer.ptr` or a `Pointer` value.                                  |
 | `FFIType.u64` | `bigint`        | When the value is a **handle** (HANDLE, HWND, HMODULE, HDC, HKEY, etc.) or a **64-bit integer** (SIZE_T, ULONGLONG, DWORD_PTR, LONG_PTR, UINT_PTR, etc.) or a **remote pointer** (an address in another process's space that you must not dereference locally). |
 
 ### Concrete rules
 
-1. **All HANDLE types use `FFIType.u64`** — returns `bigint` in TypeScript.
-   - HANDLE, HWND, HINSTANCE, HMODULE, HDC, HKEY, HICON, HCURSOR, HMENU, HBRUSH, HPEN, HFONT, HRGN, HBITMAP, HPALETTE, HGLOBAL, HLOCAL, HDESK, HWINSTA, HHOOK, HDWP, HMONITOR, HACCEL, HCONV, HCONVLIST, HDDEDATA, HSZ, HPCON, HRSRC, HCRYPTHASH, HCRYPTKEY, HCRYPTPROV, HUSKEY, HGLRC, SC_HANDLE — **all `FFIType.u64`**.
+1. **All HANDLE types use `FFIType.u64`** - returns `bigint` in TypeScript.
+   - HANDLE, HWND, HINSTANCE, HMODULE, HDC, HKEY, HICON, HCURSOR, HMENU, HBRUSH, HPEN, HFONT, HRGN, HBITMAP, HPALETTE, HGLOBAL, HLOCAL, HDESK, HWINSTA, HHOOK, HDWP, HMONITOR, HACCEL, HCONV, HCONVLIST, HDDEDATA, HSZ, HPCON, HRSRC, HCRYPTHASH, HCRYPTKEY, HCRYPTPROV, HUSKEY, HGLRC, SC_HANDLE - **all `FFIType.u64`**.
    - In TypeScript: `export type HWND = bigint;`
 
-2. **All pointer-to-data parameters use `FFIType.ptr`** — typed as `Pointer` in TypeScript.
+2. **All pointer-to-data parameters use `FFIType.ptr`** - typed as `Pointer` in TypeScript.
    - LP\* types: LPVOID, LPSTR, LPWSTR, LPCSTR, LPCWSTR, LPBYTE, LPDWORD, LPHANDLE, LPRECT, LPPOINT, LPMSG, etc.
    - P\* types: PVOID, PBYTE, PDWORD, PSECURITY_ATTRIBUTES, PSID, etc.
    - Callback pointers: WNDPROC, DLGPROC, HOOKPROC, TIMERPROC, etc.
    - Structure pointers passed by reference: DEVMODEW, BITMAPINFO, etc.
    - In TypeScript: `export type LPVOID = Pointer;`
 
-3. **64-bit integer types use `FFIType.u64`** — typed as `bigint`.
+3. **64-bit integer types use `FFIType.u64`** - typed as `bigint`.
    - SIZE_T, DWORD_PTR, UINT_PTR, INT_PTR, LONG_PTR, ULONG_PTR, ULONGLONG, DWORDLONG, LARGE_INTEGER, ULARGE_INTEGER
    - LPARAM and WPARAM are special: LPARAM = LONG_PTR (bigint via `FFIType.i64`), WPARAM = UINT_PTR (bigint via `FFIType.u64`)
 
-4. **32-bit types use `FFIType.u32` or `FFIType.i32`** — typed as `number`.
-   - DWORD, UINT, ULONG → `FFIType.u32`
-   - BOOL, INT, LONG → `FFIType.i32`
-   - WORD, USHORT, SHORT → `FFIType.u16` / `FFIType.i16`
-   - BYTE → `FFIType.u8`
-   - ATOM → `FFIType.u16`
+4. **32-bit types use `FFIType.u32` or `FFIType.i32`** - typed as `number`.
+   - DWORD, UINT, ULONG -> `FFIType.u32`
+   - BOOL, INT, LONG -> `FFIType.i32`
+   - WORD, USHORT, SHORT -> `FFIType.u16` / `FFIType.i16`
+   - BYTE -> `FFIType.u8`
+   - ATOM -> `FFIType.u16`
 
 5. **`FFIType.void`** for functions that return nothing.
 
-6. **PACKED structs passed by value** — some Win32 functions take small structs by value (not by pointer). For example, `POINT` (8 bytes: two INT32s) is passed by value to functions like `WindowFromPoint`. In Bun FFI, you must pack these into a `u64` (bigint) and use `FFIType.u64` in the symbol declaration. See the `packPOINT` helper in `user32/types/User32.ts` for an example. If the target DLL has similar by-value struct parameters, follow the same pattern.
+6. **PACKED structs passed by value** - some Win32 functions take small structs by value (not by pointer). For example, `POINT` (8 bytes: two INT32s) is passed by value to functions like `WindowFromPoint`. In Bun FFI, you must pack these into a `u64` (bigint) and use `FFIType.u64` in the symbol declaration. See the `packPOINT` helper in `user32/types/User32.ts` for an example. If the target DLL has similar by-value struct parameters, follow the same pattern.
 
 7. **COLORREF** is a `DWORD` (`FFIType.u32`, typed as `number`).
 
@@ -353,16 +391,16 @@ In Bun's FFI (`bun:ffi`), there are two ways to represent pointer-sized values:
 ### When in doubt
 
 - **Read the Microsoft docs** for the function. Look at the parameter type in the C declaration.
-- **Check `kernel32` or `user32`** — search for the same type or a similar function.
-- **Test it with both.** Try `FFIType.u64` (bigint) first, then try `FFIType.ptr` (Pointer). Test both — observe which crashes, which returns sensible values, and which matches the MS docs and the patterns in `kernel32`/`user32`. Then make the judgment call.
+- **Check `kernel32` or `user32`** - search for the same type or a similar function.
+- **Test it with both.** Try `FFIType.u64` (bigint) first, then try `FFIType.ptr` (Pointer). Test both - observe which crashes, which returns sensible values, and which matches the MS docs and the patterns in `kernel32`/`user32`. Then make the judgment call.
 
 ---
 
-## 6. Nullability — `| NULL` and `| 0n`
+## 6. Nullability - `| NULL` and `| 0n`
 
 Microsoft documentation explicitly marks certain parameters as optional. These must be reflected in the TypeScript signatures.
 
-### `| NULL` — for pointer parameters that accept null
+### `| NULL` - for pointer parameters that accept null
 
 When the MS docs say a pointer parameter can be `NULL`, add `| NULL` to the TypeScript type:
 
@@ -394,7 +432,7 @@ Common nullable pointer parameters include:
 - `LPVOID` (when the docs say "This parameter can be NULL")
 - Any `LP*` or `P*` parameter the docs explicitly mark as optional
 
-### `| 0n` — for handle parameters that accept zero/null
+### `| 0n` - for handle parameters that accept zero/null
 
 When the MS docs say a handle parameter can be `NULL` or zero, add `| 0n` to the TypeScript type:
 
@@ -430,12 +468,12 @@ Common nullable handle parameters include:
 ### How to decide
 
 1. Read the **Parameters** section of the Microsoft Docs page for the function.
-2. Read the **Return value** section — many sizing-call functions document that `ERROR_INSUFFICIENT_BUFFER` or `ERROR_BUFFER_OVERFLOW` is returned "if the buffer parameter is **NULL**." This is explicit confirmation that the buffer is nullable.
-3. Read the **Remarks** section and any **Example code** — nullability is sometimes only documented here (e.g., `GetInterfaceInfo` documents its NULL-first-call pattern in Remarks, not Parameters).
-4. For **callback registration functions** (e.g., `Notify*Change`, `Register*`), the `CallerContext` parameter (typed `PVOID`) is a pass-through to the callback. These are always nullable — the docs never list `CallerContext = NULL` as an error condition.
+2. Read the **Return value** section - many sizing-call functions document that `ERROR_INSUFFICIENT_BUFFER` or `ERROR_BUFFER_OVERFLOW` is returned "if the buffer parameter is **NULL**." This is explicit confirmation that the buffer is nullable.
+3. Read the **Remarks** section and any **Example code** - nullability is sometimes only documented here (e.g., `GetInterfaceInfo` documents its NULL-first-call pattern in Remarks, not Parameters).
+4. For **callback registration functions** (e.g., `Notify*Change`, `Register*`), the `CallerContext` parameter (typed `PVOID`) is a pass-through to the callback. These are always nullable - the docs never list `CallerContext = NULL` as an error condition.
 5. If a parameter says "This parameter can be NULL", "If this parameter is NULL", or "This parameter is optional":
-   - For pointer types (`LP*`, `P*`) → add `| NULL`
-   - For handle types (`H*`, `HANDLE`) → add `| 0n`
+   - For pointer types (`LP*`, `P*`) -> add `| NULL`
+   - For handle types (`H*`, `HANDLE`) -> add `| 0n`
 6. If the docs do **not** mention the parameter being optional anywhere (Parameters, Return value, Remarks, or Examples), do **not** add a union. Not every pointer parameter is nullable.
 
 ### The sizing-call pattern
@@ -479,8 +517,8 @@ protected static override readonly Symbols = {
 1. **Alphabetize** all entries (ASCIIbetical: uppercase before lowercase).
 2. **One entry per line** unless the args array is very long. If it exceeds the 240-char print width, break it across lines.
 3. **Every function from dumpbin** that has a documented signature should be included. Do not cherry-pick.
-4. **Do not include** forwarded functions (shown as `(forwarded to ...)` in dumpbin) unless they are also documented as direct exports. Some forwarded functions still work via dlopen — test if unsure.
-5. **Do not include** undocumented internal functions (e.g., names starting with underscore that have no MS docs page — unless they are legacy APIs like `_hread`, `_lclose`, etc. that are documented).
+4. **Do not include** forwarded functions (shown as `(forwarded to ...)` in dumpbin) unless they are also documented as direct exports. Some forwarded functions still work via dlopen - test if unsure.
+5. **Do not include** undocumented internal functions (e.g., names starting with underscore that have no MS docs page - unless they are legacy APIs like `_hread`, `_lclose`, etc. that are documented).
 6. Use the **exact export name** from dumpbin. Capitalization matters. If dumpbin says `GetModuleHandleW`, the symbol key is `GetModuleHandleW`, not `getModuleHandleW`.
 
 ---
@@ -522,7 +560,7 @@ import type { Pointer } from 'bun:ffi';
 export type { BOOL, DWORD, HANDLE, LPCWSTR, LPVOID, LPWSTR } from '@bun-win32/core';
 ```
 
-**No comment blocks or section headers.** The existing packages (`kernel32`, `user32`, `advapi32`, `gdi32`, `psapi`) do not have them. Do not add `// Re-export shared Win32 types from core`, `// ── Scalar types`, `// ── Pointer types`, or any similar decorative comments. The type file should be clean: imports, re-exports, constants, enums, types.
+**No comment blocks or section headers.** The existing packages (`kernel32`, `user32`, `advapi32`, `gdi32`, `psapi`) do not have them. Do not add decorative comment headers like `// Re-export shared Win32 types from core`, `// Scalar types`, or `// Pointer types`. The type file should be clean: imports, re-exports, constants, enums, types.
 
 **Important:** `export type { X } from '@bun-win32/core'` re-exports `X` for consumers of this package but does **not** make `X` available for use within this same file. If you need a core type locally (e.g., to define a constant like `export const INVALID_HANDLE_VALUE = -1n as HANDLE`), you must also add a separate import:
 
@@ -537,26 +575,26 @@ Place this `import type` line **before** the `export type` re-export line.
 The file must follow this exact order:
 
 1. `import type { Pointer } from 'bun:ffi';`
-2. (Optional) `import type { ... } from '@bun-win32/core';` — only if you need core types locally (for constants)
-3. `export type { ... } from '@bun-win32/core';` — re-export shared types
+2. (Optional) `import type { ... } from '@bun-win32/core';` - only if you need core types locally (for constants)
+3. `export type { ... } from '@bun-win32/core';` - re-export shared types
 4. (Optional) Exported constants (`INVALID_HANDLE_VALUE`, `HKEY_*`, `HWND_ZORDER`, etc.)
-5. Enums — alphabetized by enum name, members alphabetized within each enum
-6. Type aliases — **all types mixed together** (scalars and pointers interleaved), alphabetized
+5. Enums - alphabetized by enum name, members alphabetized within each enum
+6. Type aliases - **all types mixed together** (scalars and pointers interleaved), alphabetized
 
 **Do not group types into separate sections** (e.g., "scalar types" vs "pointer types"). They are all interleaved in one alphabetized block, matching `kernel32`, `user32`, `advapi32`, and `gdi32`.
 
 ### Type alias rules
 
 1. **Alphabetize** all type aliases.
-2. **Re-export shared types from `@bun-win32/core`** — check `packages/core/types/Win32.ts` for the full list of available shared types. Do not redefine types that already exist in core.
+2. **Re-export shared types from `@bun-win32/core`** - check `packages/core/types/Win32.ts` for the full list of available shared types. Do not redefine types that already exist in core.
 3. **Only define package-specific types** below the re-export. For example, if your DLL uses `HKEY` (not in core), define it: `export type HKEY = bigint;`
-4. **Handles → `bigint`**: `export type HKEY = bigint;`
-5. **Pointers → `Pointer`**: `export type LPSECURITY_ATTRIBUTES = Pointer;`
-6. **32-bit unsigned → `number`**: `export type REGSAM = number;`
-7. **32-bit signed → `number`**: `export type LSTATUS = number;`
-8. **64-bit integers → `bigint`**: `export type SIZE_T = bigint;`
-9. **`void` → `void`**: `export type VOID = void;`
-10. **NULL → `null`**: `export type NULL = null;` (already in core — re-export it)
+4. **Handles -> `bigint`**: `export type HKEY = bigint;`
+5. **Pointers -> `Pointer`**: `export type LPSECURITY_ATTRIBUTES = Pointer;`
+6. **32-bit unsigned -> `number`**: `export type REGSAM = number;`
+7. **32-bit signed -> `number`**: `export type LSTATUS = number;`
+8. **64-bit integers -> `bigint`**: `export type SIZE_T = bigint;`
+9. **`void` -> `void`**: `export type VOID = void;`
+10. **NULL -> `null`**: `export type NULL = null;` (already in core - re-export it)
 11. Only define types that are **actually used** by the functions you are binding. Do not speculatively define unused types.
 
 ### Enum rules
@@ -593,11 +631,11 @@ export const HKEY_CURRENT_USER = 0x8000_0001n as HKEY;
 
 ---
 
-## 10. Testing — Non-Negotiable
+## 10. Testing - Non-Negotiable
 
 ### Test at every step
 
-After every batch of symbols/methods you add, test them. Not a type-check — a **real call** to the FFI function.
+After every batch of symbols/methods you add, test them. Not a type-check - a **real call** to the FFI function.
 
 ### What a real test looks like
 
@@ -619,10 +657,10 @@ console.log('PASS');
 
 ### Testing `.ptr` vs `.u64` decisions
 
-If you are uncertain whether a parameter should be `FFIType.ptr` or `FFIType.u64`, **test both** — try `u64` first:
+If you are uncertain whether a parameter should be `FFIType.ptr` or `FFIType.u64`, **test both** - try `u64` first:
 
 ```typescript
-// Test 1: Try with FFIType.u64 (passing a bigint) — try this first
+// Test 1: Try with FFIType.u64 (passing a bigint) - try this first
 try {
   const result = { Class }.SomeFunction(0n);
   console.log('u64 works:', result);
@@ -640,7 +678,7 @@ try {
 }
 ```
 
-**Always test both**, even if the first one works. Then make a judgment call based on: (1) the MS docs for that parameter's C type, (2) how `kernel32` and `user32` handle the same or analogous types, and (3) your gut. The runtime results inform the decision — they don't make it for you.
+**Always test both**, even if the first one works. Then make a judgment call based on: (1) the MS docs for that parameter's C type, (2) how `kernel32` and `user32` handle the same or analogous types, and (3) your gut. The runtime results inform the decision - they don't make it for you.
 
 ### Test categories
 
@@ -680,7 +718,8 @@ Before you are done, verify:
 - [ ] **Hex literals with numeric separators** are used for all constants (`0x0000_0001`, not `1`).
 - [ ] **`bunx prettier --write`** has been run on the new package (enforces single quotes, 240-char print width from `.prettierrc.json`).
 - [ ] **At least one real integration test** passes (calling actual FFI functions, not just type-checking).
-- [ ] **README** has a working quick-start example.
+- [ ] **README** has a working quick-start example and points coding agents to `AI.md`.
+- [ ] **AI.md** exists and correctly describes the package as a 1:1 binding layer.
 - [ ] **Root `README.md`** has been updated with the new package (Packages table and Project Structure tree).
 - [ ] **`package.json`** has correct metadata, keywords, files, and scripts.
 
@@ -727,8 +766,8 @@ Buffer pointers (where you pass `buffer.ptr`) must use `FFIType.ptr`. Using `.u6
 
 On 64-bit Windows, `LPARAM` is `LONG_PTR` (signed 64-bit) and `WPARAM` is `UINT_PTR` (unsigned 64-bit). In FFI:
 
-- LPARAM → `FFIType.i64` (signed)
-- WPARAM → `FFIType.u64` (unsigned)
+- LPARAM -> `FFIType.i64` (signed)
+- WPARAM -> `FFIType.u64` (unsigned)
 
 ### Mistake 4: Forgetting A/W variants
 
@@ -740,7 +779,7 @@ Never assume a function exists in a DLL. The Microsoft docs may document a funct
 
 ### Mistake 6: Inventing parameter names
 
-The MS docs say `hWnd` — you write `hWnd`. Not `windowHandle`, not `handle`, not `hwnd` (lowercase). The **exact** casing and naming from the docs.
+The MS docs say `hWnd` - you write `hWnd`. Not `windowHandle`, not `handle`, not `hwnd` (lowercase). The **exact** casing and naming from the docs.
 
 ### Mistake 7: Missing nullability
 
@@ -798,17 +837,17 @@ cd packages/{name} && bun run example/{name}.ts
 
 ---
 
-## Appendix A: Complete Example — Small DLL (Psapi)
+## Appendix A: Complete Example - Small DLL (Psapi)
 
 For a concrete example of a small, complete binding, read `packages/psapi/`. It has 28 functions and demonstrates every pattern:
 
-- `packages/psapi/types/Psapi.ts` — 1 enum, handle types, pointer types, scalar types
-- `packages/psapi/structs/Psapi.ts` — 28 symbols, 28 methods, full docs URLs
-- `packages/psapi/index.ts` — standard entry point
+- `packages/psapi/types/Psapi.ts` - 1 enum, handle types, pointer types, scalar types
+- `packages/psapi/structs/Psapi.ts` - 28 symbols, 28 methods, full docs URLs
+- `packages/psapi/index.ts` - standard entry point
 
 This is your best reference for understanding the complete flow without being overwhelmed by 1,000+ functions.
 
-## Appendix B: Complete Example — Large DLL (Kernel32)
+## Appendix B: Complete Example - Large DLL (Kernel32)
 
 For the most comprehensive example, read `packages/kernel32/`. It has 1,400+ functions and demonstrates:
 
@@ -839,7 +878,7 @@ If the DLL uses non-Win32 naming conventions (like OpenGL's `glBegin`, `gluSpher
 
 Most Win32 structs are passed by pointer (`FFIType.ptr`). The caller allocates a `Buffer`, writes fields into it, and passes `buffer.ptr`.
 
-A few small structs (notably `POINT` — 8 bytes) are passed **by value**. In Bun FFI, this means packing the struct into a `bigint` and using `FFIType.u64`. The `user32` package has a `packPOINT` function that demonstrates this pattern. If your DLL has similar by-value struct parameters, follow the same approach:
+A few small structs (notably `POINT` - 8 bytes) are passed **by value**. In Bun FFI, this means packing the struct into a `bigint` and using `FFIType.u64`. The `user32` package has a `packPOINT` function that demonstrates this pattern. If your DLL has similar by-value struct parameters, follow the same approach:
 
 ```typescript
 // In types/{Class}.ts

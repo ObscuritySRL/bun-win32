@@ -23,6 +23,9 @@ bun add @bun-win32/core
 
 > You typically do not need to install this directly — it is pulled in as a dependency of each DLL package.
 
+> [!NOTE]
+> AI agents: see `AI.md` for the package contract and runtime behavior. It explains how `@bun-win32/core` differs from the DLL binding packages.
+
 ## Usage
 
 ### Extending `Win32` for a new DLL

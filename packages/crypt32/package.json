@@ -27,7 +27,7 @@
     "directory": "packages/crypt32"
   },
   "type": "module",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "main": "./index.ts",
   "keywords": [
     "bun",
@@ -42,10 +42,11 @@
     "dll"
   ],
   "files": [
+    "AI.md",
+    "README.md",
     "index.ts",
     "structs/*.ts",
-    "types/*.ts",
-    "README.md"
+    "types/*.ts"
   ],
   "sideEffects": false,
   "engines": {

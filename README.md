@@ -68,6 +68,8 @@ bun add @bun-win32/kernel32
 
 Requires Bun >= 1.1.0 and Windows 10+.
 
+Published packages are AI-friendly. Alongside the README, each package includes an `AI.md` file that documents the binding contract, type surface, and source layout so coding agents can use the package correctly.
+
 ## Generating a New Package
 
 All packages in this repo are AI-generated using Claude Code. To add bindings for a new DLL:

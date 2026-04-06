@@ -53,6 +53,9 @@ console.log('Color:', '0x' + colorBuf.readUInt32LE(0).toString(16));
 // Dwmapi.DwmSetWindowAttribute(hwnd, WindowAttribute.DWMWA_USE_IMMERSIVE_DARK_MODE, darkMode.ptr, 4);
 ```
 
+> [!NOTE]
+> AI agents: see `AI.md` for the package binding contract and source-navigation guidance. It explains how to use the package without scanning the entire implementation.
+
 ## Examples
 
 Run the included example:

@@ -48,6 +48,9 @@ console.log('Found %d certificates in MY store', count);
 Crypt32.CertCloseStore(store, 0);
 ```
 
+> [!NOTE]
+> AI agents: see `AI.md` for the package binding contract and source-navigation guidance. It explains how to use the package without scanning the entire implementation.
+
 ## Examples
 
 Run the included examples:

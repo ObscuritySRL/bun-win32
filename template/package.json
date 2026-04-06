@@ -40,10 +40,11 @@
     "dll"
   ],
   "files": [
+    "AI.md",
+    "README.md",
     "index.ts",
     "structs/*.ts",
-    "types/*.ts",
-    "README.md"
+    "types/*.ts"
   ],
   "sideEffects": false,
   "engines": {

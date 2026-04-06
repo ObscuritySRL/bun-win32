@@ -46,6 +46,9 @@ Shell32.SHGetFolderPathW(0n, 0x001a, 0n, 0, pathBuf.ptr);
 console.log('APPDATA:', pathBuf.toString('utf16le').replace(/\0+$/, ''));
 ```
 
+> [!NOTE]
+> AI agents: see `AI.md` for the package binding contract and source-navigation guidance. It explains how to use the package without scanning the entire implementation.
+
 ## Examples
 
 Run the included example:

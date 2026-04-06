@@ -74,6 +74,9 @@ OpenGL32.wglSwapIntervalEXT(1); // Enable VSync
 - **VAO** (OpenGL 3.0+): `glGenVertexArrays`, `glBindVertexArray`, `glDeleteVertexArrays`
 - **FBO** (OpenGL 3.0+): `glGenFramebuffers`, `glBindFramebuffer`, `glFramebufferTexture2D`, `glCheckFramebufferStatus`, etc.
 
+> [!NOTE]
+> AI agents: see `AI.md` for the package binding contract and source-navigation guidance. It explains how to use the package without scanning the entire implementation.
+
 ## Examples
 
 Run the included examples:

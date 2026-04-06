@@ -27,7 +27,7 @@
     "directory": "packages/psapi"
   },
   "type": "module",
-  "version": "2.0.4",
+  "version": "2.0.5",
   "main": "./index.ts",
   "keywords": [
     "bun",
@@ -40,10 +40,11 @@
     "dll"
   ],
   "files": [
+    "AI.md",
+    "README.md",
     "index.ts",
     "structs/*.ts",
-    "types/*.ts",
-    "README.md"
+    "types/*.ts"
   ],
   "sideEffects": false,
   "engines": {

@@ -47,6 +47,9 @@ if (status === NERR_Success) {
 Netapi32.NetApiBufferFree(buf.ptr);
 ```
 
+> [!NOTE]
+> AI agents: see `AI.md` for the package binding contract and source-navigation guidance. It explains how to use the package without scanning the entire implementation.
+
 ## Examples
 
 Run the included examples:

@@ -42,6 +42,9 @@ const ticks = Kernel32.GetTickCount64();
 console.log('PID=%s Ticks=%s', pid, ticks.toString());
 ```
 
+> [!NOTE]
+> AI agents: see `AI.md` for the package binding contract and source-navigation guidance. It explains how to use the package without scanning the entire implementation.
+
 ## Examples
 
 Run the included examples:

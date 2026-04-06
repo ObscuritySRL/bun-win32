@@ -46,6 +46,9 @@ const username = String.fromCharCode(...buf.subarray(0, size[0]! - 1));
 console.log('User: %s', username);
 ```
 
+> [!NOTE]
+> AI agents: see `AI.md` for the package binding contract and source-navigation guidance. It explains how to use the package without scanning the entire implementation.
+
 ## Examples
 
 Run the included examples:
