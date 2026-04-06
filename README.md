@@ -16,6 +16,7 @@ Bindings are lazy by default — native symbols are bound on first call. For hot
 | [`@bun-win32/advapi32`](./packages/advapi32) | `advapi32.dll` | Registry, security, and service management |
 | [`@bun-win32/gdi32`](./packages/gdi32) | `gdi32.dll` | Graphics device interface |
 | [`@bun-win32/glu32`](./packages/glu32) | `glu32.dll` | OpenGL utility functions |
+| [`@bun-win32/iphlpapi`](./packages/iphlpapi) | `iphlpapi.dll` | IP Helper: network adapters, TCP/UDP tables, routing |
 | [`@bun-win32/kernel32`](./packages/kernel32) | `kernel32.dll` | Process, memory, files, console, and more |
 | [`@bun-win32/ntdll`](./packages/ntdll) | `ntdll.dll` | Native NT API |
 | [`@bun-win32/opengl32`](./packages/opengl32) | `opengl32.dll` | OpenGL rendering |
@@ -53,6 +54,7 @@ bun-win32/
 │   ├── advapi32/      advapi32.dll bindings
 │   ├── gdi32/         gdi32.dll bindings
 │   ├── glu32/         glu32.dll bindings
+│   ├── iphlpapi/      iphlpapi.dll bindings
 │   ├── kernel32/      kernel32.dll bindings
 │   ├── ntdll/         ntdll.dll bindings
 │   ├── opengl32/      opengl32.dll bindings
