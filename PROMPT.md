@@ -177,17 +177,49 @@ Follow this order exactly. **Test at every step.** Do not proceed to the next st
 6. Alphabetize all methods.
 7. **Test after each batch.**
 
-### Step 6: Write the README
+### Step 6: Nullable parameter audit
 
-1. Fill in the README template with a real quick-start example.
+After all methods are written, perform a **dedicated review pass** over every method signature to verify nullable annotations. This step is separate from the initial writing because bulk-writing 100+ methods inevitably causes missed annotations. Do not skip this step.
+
+#### Procedure
+
+1. Extract every public method signature from `structs/{Class}.ts`.
+2. For each method that has pointer parameters (`LP*`, `P*`, `Pointer` types) or handle parameters (`HANDLE`, `HWND`, `WSAEVENT`, etc.), open the Microsoft Docs page (the URL is in the comment above the method).
+3. On the docs page, check **all four** of these locations for nullability signals — they are not always in the same place:
+   - **The C prototype** — look for `[in, optional]`, `[out, optional]`, or `_In_opt_`, `_Out_opt_` SAL annotations.
+   - **The Parameters section** — look for "This parameter can be **NULL**", "This parameter is optional", "If this parameter is **NULL**", or "set to **NULL**".
+   - **The Return value section** — look for sizing-call patterns: "If the buffer is **NULL**", "`ERROR_INSUFFICIENT_BUFFER`", "`ERROR_BUFFER_OVERFLOW`".
+   - **The Remarks section and Example code** — nullability is sometimes only documented here.
+4. For every parameter confirmed as optional/nullable:
+   - Pointer types (`LP*`, `P*`) → must have `| NULL`
+   - Handle types (`HANDLE`, `HWND`, `WSAEVENT`, etc.) → must have `| 0n`
+5. For parameters where the docs do **not** mention nullability in any of the four locations, do **not** add a union.
+
+#### Why this step exists
+
+In practice, the most common category of bugs in these bindings is missing `| NULL` or `| 0n` annotations. They are easy to miss during bulk writing because:
+- The C prototype may say `[in]` but the Remarks section says "pass NULL to query the required size."
+- Some parameters are nullable only in specific overload patterns (e.g., overlapped I/O makes `lpcbBytesReturned` nullable).
+- `proto` parameters on `getservbyname`-family functions are nullable but marked `[in]` (not `[in, optional]`) in the prototype — the nullability is only mentioned in the parameter description text.
+- Handle parameters like `hEventObject` on `WSAEnumNetworkEvents` are described as "optional" in the text but have no SAL annotation.
+
+A dedicated audit pass catches these. It is not optional.
+
+### Step 7: Write the README and update the root README
+
+1. Fill in the package README template with a real quick-start example.
 2. Add any example scripts if appropriate.
+3. Update the **root `README.md`** to include the new package:
+   - Add a row to the **Packages table** (alphabetized by package name).
+   - Add an entry to the **Project Structure** tree (alphabetized, update `└──` / `├──` connectors as needed).
 
-### Step 7: Final verification
+### Step 8: Final verification
 
 1. Run `bun run index.ts`.
-2. Type-check with `npx tsc --noEmit` — verify there are **no** TypeScript errors in the library **or** the examples. If you created an `example/` directory, the example files must also pass the type-checker. A type error in an example means a method signature is wrong (e.g., missing `| NULL` on a parameter that callers pass `null` to).
-3. Run a real integration test that calls several functions and verifies results.
-4. Verify that the number of public methods matches the number of dumpbin exports you chose to bind.
+2. Run `bunx prettier --write "packages/{name}/**/*.ts"` to format all files in the new package. The repo-root `.prettierrc.json` (`printWidth: 240`, `singleQuote: true`) applies automatically.
+3. Type-check with `bunx tsc --noEmit` — verify there are **no** TypeScript errors in the library **or** the examples. If you created an `example/` directory, the example files must also pass the type-checker. A type error in an example means a method signature is wrong (e.g., missing `| NULL` on a parameter that callers pass `null` to).
+4. Run a real integration test that calls several functions and verifies results.
+5. Verify that the number of public methods matches the number of dumpbin exports you chose to bind.
 
 ---
 
@@ -248,6 +280,7 @@ import type { BOOL, DWORD, HANDLE, LPCWSTR, LPVOID, LPWSTR } from '../types/{Cla
 class {Class} extends Win32 {
   protected static override name = '{name}.dll';
 
+  /** @inheritdoc */
   protected static override readonly Symbols = {
     // ... (see Section 7)
   } as const satisfies Record<string, FFIFunction>;
@@ -433,6 +466,7 @@ The `Symbols` object is a `protected static override readonly` field on the clas
 ### Format
 
 ```typescript
+/** @inheritdoc */
 protected static override readonly Symbols = {
   FunctionNameA: { args: [FFIType.ptr, FFIType.u32], returns: FFIType.i32 },
   FunctionNameW: { args: [FFIType.ptr, FFIType.u32], returns: FFIType.i32 },
@@ -448,26 +482,6 @@ protected static override readonly Symbols = {
 4. **Do not include** forwarded functions (shown as `(forwarded to ...)` in dumpbin) unless they are also documented as direct exports. Some forwarded functions still work via dlopen — test if unsure.
 5. **Do not include** undocumented internal functions (e.g., names starting with underscore that have no MS docs page — unless they are legacy APIs like `_hread`, `_lclose`, etc. that are documented).
 6. Use the **exact export name** from dumpbin. Capitalization matters. If dumpbin says `GetModuleHandleW`, the symbol key is `GetModuleHandleW`, not `getModuleHandleW`.
-
-### The comment header above Symbols
-
-Include this exact comment block (adjusted for your DLL) above the Symbols object:
-
-```typescript
-// ---------------------------------------------------------------------------
-// FFI symbol declarations — alphabetized
-//
-// FFIType reference:
-//   FFIType.i32   → BOOL, int, LONG
-//   FFIType.u32   → DWORD, UINT, ULONG
-//   FFIType.u64   → HANDLE, HWND, HMODULE (returned as bigint)
-//   FFIType.ptr   → any pointer parameter (LPVOID, LPWSTR, LPCWSTR, etc.)
-//   FFIType.void  → void return
-//
-// Consult the Win32 docs for each function's exact signature:
-//   https://learn.microsoft.com/en-us/windows/win32/api/{header}/nf-{header}-{functionname}
-// ---------------------------------------------------------------------------
-```
 
 ---
 
@@ -493,22 +507,6 @@ public static FunctionNameW(paramOne: TYPE1, paramTwo: TYPE2 | NULL, paramThree:
 5. **Alphabetize** all methods (ASCIIbetical).
 6. **The method body is always a single line**: `return {Class}.Load('MethodName')(args);`
 7. If a method has many parameters and exceeds the 240-char print width, break the parameter list across multiple lines (one param per line, indented). The body remains a single-line return.
-
-### The comment header above methods
-
-Include this exact comment block above the methods section:
-
-```typescript
-// ---------------------------------------------------------------------------
-// Public methods — alphabetized, one per symbol
-//
-// Each method:
-//   1. Has a Microsoft Docs link as a comment above it.
-//   2. Uses Win32 parameter names as-is (hWnd, lpBuffer, dwSize, etc.).
-//   3. Delegates to Load() which lazy-binds on first call.
-//   4. Is typed with aliases from ../types/{Class}.ts.
-// ---------------------------------------------------------------------------
-```
 
 ---
 
@@ -680,10 +678,10 @@ Before you are done, verify:
 - [ ] **`| 0n` is used** on every handle parameter that the docs say can be NULL/zero.
 - [ ] **No `as unknown as T`** or `as any` casts anywhere.
 - [ ] **Hex literals with numeric separators** are used for all constants (`0x0000_0001`, not `1`).
-- [ ] **Single quotes** for all strings (per `.prettierrc.json`).
-- [ ] **Print width 240** is respected (per `.prettierrc.json`).
+- [ ] **`bunx prettier --write`** has been run on the new package (enforces single quotes, 240-char print width from `.prettierrc.json`).
 - [ ] **At least one real integration test** passes (calling actual FFI functions, not just type-checking).
 - [ ] **README** has a working quick-start example.
+- [ ] **Root `README.md`** has been updated with the new package (Packages table and Project Structure tree).
 - [ ] **`package.json`** has correct metadata, keywords, files, and scripts.
 
 ---

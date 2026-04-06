@@ -24,6 +24,7 @@ Bindings are lazy by default — native symbols are bound on first call. For hot
 | [`@bun-win32/shell32`](./packages/shell32) | `shell32.dll` | Shell operations and file management |
 | [`@bun-win32/shlwapi`](./packages/shlwapi) | `shlwapi.dll` | Shell lightweight utility functions |
 | [`@bun-win32/user32`](./packages/user32) | `user32.dll` | Windows, messages, input, and UI |
+| [`@bun-win32/ws2_32`](./packages/ws2_32) | `ws2_32.dll` | Winsock 2: BSD sockets, DNS, and network I/O |
 
 ## Requirements
 
@@ -61,7 +62,8 @@ bun-win32/
 │   ├── psapi/         psapi.dll bindings
 │   ├── shell32/       shell32.dll bindings
 │   ├── shlwapi/       shlwapi.dll bindings
-│   └── user32/        user32.dll bindings
+│   ├── user32/        user32.dll bindings
+│   └── ws2_32/        ws2_32.dll bindings
 └── template/          Template for new DLL packages
 ```
 
