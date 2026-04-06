@@ -42,6 +42,7 @@ All packages now live in a single monorepo and share a common base class via `@b
 - **Mouse stalker** — a window that follows your cursor around
 - **Console rainbow** — colorful terminal output via kernel32 console APIs
 - **Process explorer** — enumerate running processes with psapi + kernel32
+- **Network adapter scanner** — enumerate adapters and MAC addresses with iphlpapi
 - **File watcher** — native `ReadDirectoryChangesW` without any npm packages
 - **Registry reader** — read/write Windows registry keys with advapi32
 
