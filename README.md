@@ -17,7 +17,14 @@ For hot paths, `Preload()` resolves symbols eagerly so even the first call pays 
 import User32 from '@bun-win32/user32';
 
 User32.Preload(['GetForegroundWindow', 'SetWindowPos']);
+
+const { GetForegroundWindow, SetWindowPos } = User32;
+
+SetWindowPos(hWnd, 0n, x, y, width, height, flags);
 ```
+
+> [!NOTE]
+> If you destructure before binding, you capture the lazy wrapper instead of the native function.
 
 ## Packages
 

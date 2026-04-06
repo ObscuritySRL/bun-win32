@@ -53,16 +53,16 @@ export class Win32 {
   /**
    * Eagerly binds multiple DLL exports at once.
    *
-   * Pass a subset of method names to bind only what you need for hot paths; when omitted,
+   * Pass an export name or subset of method names to bind only what you need for hot paths; when omitted,
    * all symbols declared in `Symbols` are bound. Already-bound symbols are skipped.
    *
-   * @param methods Optional list of export names to bind.
+   * @param methods Optional export name or list of export names to bind.
    */
-  public static Preload(methods?: string[]): void {
-    methods ??= Object.keys(this.Symbols);
+  public static Preload(methods?: string | string[]): void {
+    const methodNames = methods === undefined ? Object.keys(this.Symbols) : typeof methods === 'string' ? [methods] : methods;
 
     const symbols = Object.fromEntries(
-      methods.filter((method) => Object.getOwnPropertyDescriptor(this, method)?.configurable !== false).map((method) => [method, this.Symbols[method]!]), //
+      methodNames.filter((method) => Object.getOwnPropertyDescriptor(this, method)?.configurable !== false).map((method) => [method, this.Symbols[method]!]), //
     );
 
     const library = dlopen(this.name, symbols);
