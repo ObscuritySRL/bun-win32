@@ -20,7 +20,7 @@ const status = Advapi32.RegOpenKeyExW(
   Buffer.from('SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\0', 'utf16le').ptr,
   0,
   0x0002_0019, // KEY_READ
-  hkeyOut.ptr
+  hkeyOut.ptr,
 );
 
 if (status !== 0) {
@@ -36,11 +36,7 @@ console.log('RegCloseKey: closed');
 
 // Smoke test 3: LookupPrivilegeValueW
 const luid = Buffer.alloc(8);
-const privResult = Advapi32.LookupPrivilegeValueW(
-  Buffer.from('\0\0', 'utf16le').ptr,
-  Buffer.from('SeDebugPrivilege\0', 'utf16le').ptr,
-  luid.ptr
-);
+const privResult = Advapi32.LookupPrivilegeValueW(Buffer.from('\0\0', 'utf16le').ptr, Buffer.from('SeDebugPrivilege\0', 'utf16le').ptr, luid.ptr);
 const luidValue = luid.readBigInt64LE(0);
 console.log(`LookupPrivilegeValueW(SeDebugPrivilege): ${privResult ? `LUID=${luidValue}` : 'FAILED'}`);
 

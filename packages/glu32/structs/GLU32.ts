@@ -1,7 +1,26 @@
 import { type FFIFunction, FFIType } from 'bun:ffi';
 import { Win32 } from '@bun-win32/core';
 
-import type { GLUquadric, GLUquadricErrorProc, GLUnurbs, GLUnurbsErrorProc, GLUtessCallbackProc, GLUtesselator, GLboolean, GLdouble, GLdouble_, GLenum, GLfloat, GLfloat_, GLint, GLint_, GLubyte_, GLvoid_, GLWChar_, NULL } from '../types/GLU32';
+import type {
+  GLUquadric,
+  GLUquadricErrorProc,
+  GLUnurbs,
+  GLUnurbsErrorProc,
+  GLUtessCallbackProc,
+  GLUtesselator,
+  GLboolean,
+  GLdouble,
+  GLdouble_,
+  GLenum,
+  GLfloat,
+  GLfloat_,
+  GLint,
+  GLint_,
+  GLubyte_,
+  GLvoid_,
+  GLWChar_,
+  NULL,
+} from '../types/GLU32';
 
 /**
  * Thin, lazy-loaded FFI bindings for `glu32.dll`.

@@ -128,23 +128,7 @@ import type {
 class Iphlpapi extends Win32 {
   protected static override name = 'iphlpapi.dll';
 
-  // ---------------------------------------------------------------------------
-  // FFI symbol declarations — alphabetized
-  //
-  // FFIType reference:
-  //   FFIType.i32   → BOOL, int, LONG
-  //   FFIType.u32   → DWORD, UINT, ULONG, IPAddr, IPMask
-  //   FFIType.u64   → HANDLE, HIFTIMESTAMPCHANGE, SIZE_T (returned as bigint)
-  //   FFIType.u16   → USHORT, WORD, ADDRESS_FAMILY
-  //   FFIType.u8    → BOOLEAN
-  //   FFIType.ptr   → any pointer parameter (LPVOID, LPWSTR, PMIB_*, PIP_*, etc.)
-  //   FFIType.void  → void return
-  //
-  // Consult the Win32 docs for each function's exact signature:
-  //   https://learn.microsoft.com/en-us/windows/win32/api/iphlpapi/nf-iphlpapi-{functionname}
-  //   https://learn.microsoft.com/en-us/windows/win32/api/netioapi/nf-netioapi-{functionname}
-  //   https://learn.microsoft.com/en-us/windows/win32/api/icmpapi/nf-icmpapi-{functionname}
-  // ---------------------------------------------------------------------------
+  /** @inheritdoc */
   protected static override readonly Symbols = {
     AddIPAddress: { args: [FFIType.u32, FFIType.u32, FFIType.u32, FFIType.ptr, FFIType.ptr], returns: FFIType.u32 },
     CancelIPChangeNotify: { args: [FFIType.ptr], returns: FFIType.i32 },
@@ -314,16 +298,6 @@ class Iphlpapi extends Win32 {
     if_nametoindex: { args: [FFIType.ptr], returns: FFIType.u32 },
   } as const satisfies Record<string, FFIFunction>;
 
-  // ---------------------------------------------------------------------------
-  // Public methods — alphabetized, one per symbol
-  //
-  // Each method:
-  //   1. Has a Microsoft Docs link as a comment above it.
-  //   2. Uses Win32 parameter names as-is (hWnd, lpBuffer, dwSize, etc.).
-  //   3. Delegates to Load() which lazy-binds on first call.
-  //   4. Is typed with aliases from ../types/Iphlpapi.ts.
-  // ---------------------------------------------------------------------------
-
   // https://learn.microsoft.com/en-us/windows/win32/api/iphlpapi/nf-iphlpapi-addipaddress
   public static AddIPAddress(Address: IPAddr, IpMask: IPMask, IfIndex: DWORD, NTEContext: PULONG, NTEInstance: PULONG): DWORD {
     return Iphlpapi.Load('AddIPAddress')(Address, IpMask, IfIndex, NTEContext, NTEInstance);
@@ -445,7 +419,15 @@ class Iphlpapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/netioapi/nf-netioapi-createsortedaddresspairs
-  public static CreateSortedAddressPairs(SourceAddressList: PSOCKADDR_IN6 | NULL, SourceAddressCount: ULONG, DestinationAddressList: PSOCKADDR_IN6, DestinationAddressCount: ULONG, AddressSortOptions: ULONG, SortedAddressPairList: PVOID, SortedAddressPairCount: PULONG): DWORD {
+  public static CreateSortedAddressPairs(
+    SourceAddressList: PSOCKADDR_IN6 | NULL,
+    SourceAddressCount: ULONG,
+    DestinationAddressList: PSOCKADDR_IN6,
+    DestinationAddressCount: ULONG,
+    AddressSortOptions: ULONG,
+    SortedAddressPairList: PVOID,
+    SortedAddressPairCount: PULONG,
+  ): DWORD {
     return Iphlpapi.Load('CreateSortedAddressPairs')(SourceAddressList, SourceAddressCount, DestinationAddressList, DestinationAddressCount, AddressSortOptions, SortedAddressPairList, SortedAddressPairCount);
   }
 
@@ -575,7 +557,15 @@ class Iphlpapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/netioapi/nf-netioapi-getbestroute2
-  public static GetBestRoute2(InterfaceLuid: PNET_LUID | NULL, InterfaceIndex: NET_IFINDEX, SourceAddress: PSOCKADDR_INET | NULL, DestinationAddress: PSOCKADDR_INET, AddressSortOptions: ULONG, BestRoute: PMIB_IPFORWARD_ROW2, BestSourceAddress: PSOCKADDR_INET): DWORD {
+  public static GetBestRoute2(
+    InterfaceLuid: PNET_LUID | NULL,
+    InterfaceIndex: NET_IFINDEX,
+    SourceAddress: PSOCKADDR_INET | NULL,
+    DestinationAddress: PSOCKADDR_INET,
+    AddressSortOptions: ULONG,
+    BestRoute: PMIB_IPFORWARD_ROW2,
+    BestSourceAddress: PSOCKADDR_INET,
+  ): DWORD {
     return Iphlpapi.Load('GetBestRoute2')(InterfaceLuid, InterfaceIndex, SourceAddress, DestinationAddress, AddressSortOptions, BestRoute, BestSourceAddress);
   }
 
@@ -811,14 +801,34 @@ class Iphlpapi extends Win32 {
 
   // https://learn.microsoft.com/en-us/windows/win32/api/iphlpapi/nf-iphlpapi-getpertcp6connectionestats
   public static GetPerTcp6ConnectionEStats(
-    Row: PMIB_TCP6ROW, EstatsType: TCP_ESTATS_TYPE, Rw: PUCHAR | NULL, RwVersion: ULONG, RwSize: ULONG, Ros: PUCHAR | NULL, RosVersion: ULONG, RosSize: ULONG, Rod: PUCHAR | NULL, RodVersion: ULONG, RodSize: ULONG
+    Row: PMIB_TCP6ROW,
+    EstatsType: TCP_ESTATS_TYPE,
+    Rw: PUCHAR | NULL,
+    RwVersion: ULONG,
+    RwSize: ULONG,
+    Ros: PUCHAR | NULL,
+    RosVersion: ULONG,
+    RosSize: ULONG,
+    Rod: PUCHAR | NULL,
+    RodVersion: ULONG,
+    RodSize: ULONG,
   ): ULONG {
     return Iphlpapi.Load('GetPerTcp6ConnectionEStats')(Row, EstatsType, Rw, RwVersion, RwSize, Ros, RosVersion, RosSize, Rod, RodVersion, RodSize);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/iphlpapi/nf-iphlpapi-getpertcpconnectionestats
   public static GetPerTcpConnectionEStats(
-    Row: PMIB_TCPROW, EstatsType: TCP_ESTATS_TYPE, Rw: PUCHAR | NULL, RwVersion: ULONG, RwSize: ULONG, Ros: PUCHAR | NULL, RosVersion: ULONG, RosSize: ULONG, Rod: PUCHAR | NULL, RodVersion: ULONG, RodSize: ULONG
+    Row: PMIB_TCPROW,
+    EstatsType: TCP_ESTATS_TYPE,
+    Rw: PUCHAR | NULL,
+    RwVersion: ULONG,
+    RwSize: ULONG,
+    Ros: PUCHAR | NULL,
+    RosVersion: ULONG,
+    RosSize: ULONG,
+    Rod: PUCHAR | NULL,
+    RodVersion: ULONG,
+    RodSize: ULONG,
   ): ULONG {
     return Iphlpapi.Load('GetPerTcpConnectionEStats')(Row, EstatsType, Rw, RwVersion, RwSize, Ros, RosVersion, RosSize, Rod, RodVersion, RodSize);
   }
@@ -925,7 +935,18 @@ class Iphlpapi extends Win32 {
 
   // https://learn.microsoft.com/en-us/windows/win32/api/icmpapi/nf-icmpapi-icmp6sendecho2
   public static Icmp6SendEcho2(
-    IcmpHandle: HANDLE, Event: HANDLE | 0n, ApcRoutine: PIO_APC_ROUTINE | NULL, ApcContext: PVOID | NULL, SourceAddress: PSOCKADDR_IN6, DestinationAddress: PSOCKADDR_IN6, RequestData: LPVOID, RequestSize: WORD, RequestOptions: PIP_OPTION_INFORMATION | NULL, ReplyBuffer: LPVOID, ReplySize: DWORD, Timeout: DWORD
+    IcmpHandle: HANDLE,
+    Event: HANDLE | 0n,
+    ApcRoutine: PIO_APC_ROUTINE | NULL,
+    ApcContext: PVOID | NULL,
+    SourceAddress: PSOCKADDR_IN6,
+    DestinationAddress: PSOCKADDR_IN6,
+    RequestData: LPVOID,
+    RequestSize: WORD,
+    RequestOptions: PIP_OPTION_INFORMATION | NULL,
+    ReplyBuffer: LPVOID,
+    ReplySize: DWORD,
+    Timeout: DWORD,
   ): DWORD {
     return Iphlpapi.Load('Icmp6SendEcho2')(IcmpHandle, Event, ApcRoutine, ApcContext, SourceAddress, DestinationAddress, RequestData, RequestSize, RequestOptions, ReplyBuffer, ReplySize, Timeout);
   }
@@ -952,14 +973,35 @@ class Iphlpapi extends Win32 {
 
   // https://learn.microsoft.com/en-us/windows/win32/api/icmpapi/nf-icmpapi-icmpsendecho2
   public static IcmpSendEcho2(
-    IcmpHandle: HANDLE, Event: HANDLE | 0n, ApcRoutine: PIO_APC_ROUTINE | NULL, ApcContext: PVOID | NULL, DestinationAddress: IPAddr, RequestData: LPVOID, RequestSize: WORD, RequestOptions: PIP_OPTION_INFORMATION | NULL, ReplyBuffer: LPVOID, ReplySize: DWORD, Timeout: DWORD
+    IcmpHandle: HANDLE,
+    Event: HANDLE | 0n,
+    ApcRoutine: PIO_APC_ROUTINE | NULL,
+    ApcContext: PVOID | NULL,
+    DestinationAddress: IPAddr,
+    RequestData: LPVOID,
+    RequestSize: WORD,
+    RequestOptions: PIP_OPTION_INFORMATION | NULL,
+    ReplyBuffer: LPVOID,
+    ReplySize: DWORD,
+    Timeout: DWORD,
   ): DWORD {
     return Iphlpapi.Load('IcmpSendEcho2')(IcmpHandle, Event, ApcRoutine, ApcContext, DestinationAddress, RequestData, RequestSize, RequestOptions, ReplyBuffer, ReplySize, Timeout);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/icmpapi/nf-icmpapi-icmpsendecho2ex
   public static IcmpSendEcho2Ex(
-    IcmpHandle: HANDLE, Event: HANDLE | 0n, ApcRoutine: PIO_APC_ROUTINE | NULL, ApcContext: PVOID | NULL, SourceAddress: IPAddr, DestinationAddress: IPAddr, RequestData: LPVOID, RequestSize: WORD, RequestOptions: PIP_OPTION_INFORMATION | NULL, ReplyBuffer: LPVOID, ReplySize: DWORD, Timeout: DWORD
+    IcmpHandle: HANDLE,
+    Event: HANDLE | 0n,
+    ApcRoutine: PIO_APC_ROUTINE | NULL,
+    ApcContext: PVOID | NULL,
+    SourceAddress: IPAddr,
+    DestinationAddress: IPAddr,
+    RequestData: LPVOID,
+    RequestSize: WORD,
+    RequestOptions: PIP_OPTION_INFORMATION | NULL,
+    ReplyBuffer: LPVOID,
+    ReplySize: DWORD,
+    Timeout: DWORD,
   ): DWORD {
     return Iphlpapi.Load('IcmpSendEcho2Ex')(IcmpHandle, Event, ApcRoutine, ApcContext, SourceAddress, DestinationAddress, RequestData, RequestSize, RequestOptions, ReplyBuffer, ReplySize, Timeout);
   }

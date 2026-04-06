@@ -1153,7 +1153,20 @@ class User32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-createwindowexw
-  public static CreateWindowExW(dwExStyle: DWORD, lpClassName: LPCWSTR, lpWindowName: LPCWSTR | NULL, dwStyle: DWORD, X: int, Y: int, nWidth: int, nHeight: int, hWndParent: HWND | 0n, hMenu: HMENU | 0n, hInstance: HINSTANCE | 0n, lpParam: LPVOID | NULL): HWND {
+  public static CreateWindowExW(
+    dwExStyle: DWORD,
+    lpClassName: LPCWSTR,
+    lpWindowName: LPCWSTR | NULL,
+    dwStyle: DWORD,
+    X: int,
+    Y: int,
+    nWidth: int,
+    nHeight: int,
+    hWndParent: HWND | 0n,
+    hMenu: HMENU | 0n,
+    hInstance: HINSTANCE | 0n,
+    lpParam: LPVOID | NULL,
+  ): HWND {
     return User32.Load('CreateWindowExW')(dwExStyle, lpClassName, lpWindowName, dwStyle, X, Y, nWidth, nHeight, hWndParent, hMenu, hInstance, lpParam);
   }
 
@@ -2934,7 +2947,7 @@ class User32 extends Win32 {
     pathArray: DISPLAYCONFIG_PATH_INFO,
     numModeInfoArrayElements: PUINT,
     modeInfoArray: DISPLAYCONFIG_MODE_INFO,
-    currentTopologyId: DISPLAYCONFIG_TOPOLOGY_ID
+    currentTopologyId: DISPLAYCONFIG_TOPOLOGY_ID,
   ): LONG {
     return User32.Load('QueryDisplayConfig')(flags, numPathArrayElements, pathArray, numModeInfoArrayElements, modeInfoArray, currentTopologyId);
   }
@@ -3700,12 +3713,41 @@ class User32 extends Win32 {
   }
 
   // Undocumented: Internal API for creating windows in specific bands
-  public static CreateWindowInBand(dwExStyle: DWORD, lpClassName: LPCWSTR, lpWindowName: LPCWSTR | NULL, dwStyle: DWORD, X: int, Y: int, nWidth: int, nHeight: int, hWndParent: HWND | 0n, hMenu: HMENU | 0n, hInstance: HINSTANCE | 0n, lpParam: LPVOID | NULL, dwBand: DWORD): HWND {
+  public static CreateWindowInBand(
+    dwExStyle: DWORD,
+    lpClassName: LPCWSTR,
+    lpWindowName: LPCWSTR | NULL,
+    dwStyle: DWORD,
+    X: int,
+    Y: int,
+    nWidth: int,
+    nHeight: int,
+    hWndParent: HWND | 0n,
+    hMenu: HMENU | 0n,
+    hInstance: HINSTANCE | 0n,
+    lpParam: LPVOID | NULL,
+    dwBand: DWORD,
+  ): HWND {
     return User32.Load('CreateWindowInBand')(dwExStyle, lpClassName, lpWindowName, dwStyle, X, Y, nWidth, nHeight, hWndParent, hMenu, hInstance, lpParam, dwBand);
   }
 
   // Undocumented: Extended version of CreateWindowInBand
-  public static CreateWindowInBandEx(dwExStyle: DWORD, lpClassName: LPCWSTR, lpWindowName: LPCWSTR | NULL, dwStyle: DWORD, X: int, Y: int, nWidth: int, nHeight: int, hWndParent: HWND | 0n, hMenu: HMENU | 0n, hInstance: HINSTANCE | 0n, lpParam: LPVOID | NULL, dwBand: DWORD, dwTypeFlags: DWORD): HWND {
+  public static CreateWindowInBandEx(
+    dwExStyle: DWORD,
+    lpClassName: LPCWSTR,
+    lpWindowName: LPCWSTR | NULL,
+    dwStyle: DWORD,
+    X: int,
+    Y: int,
+    nWidth: int,
+    nHeight: int,
+    hWndParent: HWND | 0n,
+    hMenu: HMENU | 0n,
+    hInstance: HINSTANCE | 0n,
+    lpParam: LPVOID | NULL,
+    dwBand: DWORD,
+    dwTypeFlags: DWORD,
+  ): HWND {
     return User32.Load('CreateWindowInBandEx')(dwExStyle, lpClassName, lpWindowName, dwStyle, X, Y, nWidth, nHeight, hWndParent, hMenu, hInstance, lpParam, dwBand, dwTypeFlags);
   }
 

@@ -2,8 +2,8 @@ import Ntdll, { STATUS_SUCCESS } from '../index';
 
 // ---- OS version via RtlGetVersion -------------------------------------------
 
-const versionInfo = Buffer.alloc(0x11C); // RTL_OSVERSIONINFOW
-versionInfo.writeUInt32LE(0x11C, 0);     // dwOSVersionInfoSize
+const versionInfo = Buffer.alloc(0x11c); // RTL_OSVERSIONINFOW
+versionInfo.writeUInt32LE(0x11c, 0); // dwOSVersionInfoSize
 
 const versionStatus = Ntdll.RtlGetVersion(versionInfo.ptr);
 

@@ -16,11 +16,6 @@ const NULL = 0n;
 const encode = (str: string) => Buffer.from(`${str}\0`, 'utf16le');
 
 // Show a simple message box
-const result = User32.MessageBoxW(
-  NULL,
-  encode('Hello from @bun-win32/user32! 🎉').ptr,
-  encode('Welcome').ptr,
-  MessageBoxType.MB_OK | MessageBoxType.MB_ICONINFORMATION
-);
+const result = User32.MessageBoxW(NULL, encode('Hello from @bun-win32/user32! 🎉').ptr, encode('Welcome').ptr, MessageBoxType.MB_OK | MessageBoxType.MB_ICONINFORMATION);
 
 console.log(`MessageBox returned: ${result}`);

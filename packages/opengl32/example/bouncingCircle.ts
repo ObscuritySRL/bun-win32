@@ -102,7 +102,7 @@ const createWndProc = () => {
       }
       return BigInt(user32.symbols.DefWindowProcW(hwnd, msg, wParam, lParam));
     },
-    { args: [FFIType.u64, FFIType.u32, FFIType.u64, FFIType.i64], returns: FFIType.i64 }
+    { args: [FFIType.u64, FFIType.u32, FFIType.u64, FFIType.i64], returns: FFIType.i64 },
   );
   wndProcCallback = cb;
   if (!cb.ptr) throw new Error('Failed to create window procedure callback');
@@ -152,7 +152,7 @@ function createWindow(): { hwnd: bigint; hdc: bigint } {
     0n, // hWndParent
     0n, // hMenu
     hInstance,
-    null
+    null,
   );
   if (!hwnd) throw new Error(`CreateWindowExW failed: ${kernel32.symbols.GetLastError()}`);
 

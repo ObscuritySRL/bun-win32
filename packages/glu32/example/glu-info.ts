@@ -166,19 +166,26 @@ console.log('─'.repeat(44));
 
 // Identity model-view matrix (4x4)
 const modelMatrix = new Float64Array([
-  1, 0, 0, 0,
-  0, 1, 0, 0,
-  0, 0, 1, 0,
-  0, 0, -5, 1  // Translate back 5 units
+  1,
+  0,
+  0,
+  0,
+  0,
+  1,
+  0,
+  0,
+  0,
+  0,
+  1,
+  0,
+  0,
+  0,
+  -5,
+  1, // Translate back 5 units
 ]);
 
 // Simple perspective projection matrix
-const projMatrix = new Float64Array([
-  1, 0, 0, 0,
-  0, 1, 0, 0,
-  0, 0, -1.02, -1,
-  0, 0, -2.02, 0
-]);
+const projMatrix = new Float64Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, -1.02, -1, 0, 0, -2.02, 0]);
 
 // Viewport: 800x600 starting at origin
 const viewport = new Int32Array([0, 0, 800, 600]);
@@ -189,17 +196,11 @@ const winY = new Float64Array(1);
 const winZ = new Float64Array(1);
 
 // Project a 3D point to screen coordinates
-const objX = 0.0, objY = 0.0, objZ = 0.0; // Origin in object space
+const objX = 0.0,
+  objY = 0.0,
+  objZ = 0.0; // Origin in object space
 
-const result = GLU32.gluProject(
-  objX, objY, objZ,
-  modelMatrix.ptr,
-  projMatrix.ptr,
-  viewport.ptr,
-  winX.ptr,
-  winY.ptr,
-  winZ.ptr
-);
+const result = GLU32.gluProject(objX, objY, objZ, modelMatrix.ptr, projMatrix.ptr, viewport.ptr, winX.ptr, winY.ptr, winZ.ptr);
 
 console.log(`    Object coords:  (${objX}, ${objY}, ${objZ})`);
 console.log(`    Projection:     ${result ? 'SUCCESS' : 'FAILED'}`);
@@ -212,15 +213,7 @@ const objXOut = new Float64Array(1);
 const objYOut = new Float64Array(1);
 const objZOut = new Float64Array(1);
 
-const unprojectResult = GLU32.gluUnProject(
-  winX[0], winY[0], winZ[0],
-  modelMatrix.ptr,
-  projMatrix.ptr,
-  viewport.ptr,
-  objXOut.ptr,
-  objYOut.ptr,
-  objZOut.ptr
-);
+const unprojectResult = GLU32.gluUnProject(winX[0], winY[0], winZ[0], modelMatrix.ptr, projMatrix.ptr, viewport.ptr, objXOut.ptr, objYOut.ptr, objZOut.ptr);
 
 console.log(`    Unproject:      ${unprojectResult ? 'SUCCESS' : 'FAILED'}`);
 if (unprojectResult) {

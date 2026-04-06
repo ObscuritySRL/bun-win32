@@ -48,7 +48,12 @@ if (err === 111) {
       const macBytes: string[] = [];
 
       for (let i = 0; i < addrLen; i++) {
-        macBytes.push(infoBuf.readUInt8(offset + 0x198 + i).toString(16).padStart(2, '0'));
+        macBytes.push(
+          infoBuf
+            .readUInt8(offset + 0x198 + i)
+            .toString(16)
+            .padStart(2, '0'),
+        );
       }
 
       console.log(`\nAdapter ${adapterIndex}:`);

@@ -8,13 +8,7 @@ import { ptr } from 'bun:ffi';
 import Kernel32, { FileNotifyChangeFlags, WaitResult, INVALID_HANDLE_VALUE } from '@bun-win32/kernel32';
 
 // Preload required APIs
-Kernel32.Preload([
-  'FindFirstChangeNotificationW',
-  'FindNextChangeNotification',
-  'FindCloseChangeNotification',
-  'WaitForSingleObject',
-  'GetLastError',
-]);
+Kernel32.Preload(['FindFirstChangeNotificationW', 'FindNextChangeNotification', 'FindCloseChangeNotification', 'WaitForSingleObject', 'GetLastError']);
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Configuration
@@ -49,7 +43,7 @@ function toWideString(str: string): Uint8Array {
 
 function formatTime(): string {
   const now = new Date();
-  return now.toTimeString().split(' ')[0] ?? ''
+  return now.toTimeString().split(' ')[0] ?? '';
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -73,11 +67,7 @@ console.log(`
 const pathBuffer = toWideString(WATCH_PATH);
 
 // Create change notification handle
-const hChange = Kernel32.FindFirstChangeNotificationW(
-  ptr(pathBuffer),
-  WATCH_SUBTREE ? 1 : 0,
-  NOTIFY_FLAGS
-);
+const hChange = Kernel32.FindFirstChangeNotificationW(ptr(pathBuffer), WATCH_SUBTREE ? 1 : 0, NOTIFY_FLAGS);
 
 if (hChange === INVALID_HANDLE_VALUE || hChange === null) {
   const error = Kernel32.GetLastError();

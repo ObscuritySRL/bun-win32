@@ -365,16 +365,6 @@ class Shell32 extends Win32 {
     WriteCabinetState: { args: [FFIType.ptr], returns: FFIType.i32 },
   } as const satisfies Record<string, FFIFunction>;
 
-  // ---------------------------------------------------------------------------
-  // Public methods — alphabetized, one per symbol
-  //
-  // Each method:
-  //   1. Has a Microsoft Docs link as a comment above it.
-  //   2. Uses Win32 parameter names as-is (hWnd, lpBuffer, dwSize, etc.).
-  //   3. Delegates to Load() which lazy-binds on first call.
-  //   4. Is typed with aliases from ../types/Shell32.ts.
-  // ---------------------------------------------------------------------------
-
   // https://learn.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-assoccreateforclasses
   public static AssocCreateForClasses(rgClasses: LPVOID, cClasses: ULONG, riid: LPVOID, ppv: LPVOID): HRESULT {
     return Shell32.Load('AssocCreateForClasses')(rgClasses, cClasses, riid, ppv);
@@ -386,7 +376,17 @@ class Shell32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-cdeffoldeMenu_create2
-  public static CDefFolderMenu_Create2(pidlFolder: PCIDLIST_ABSOLUTE | NULL, hwnd: HWND | 0n, cidl: UINT, apidl: PCUITEMID_CHILD_ARRAY, psf: LPVOID | NULL, pfn: LPFNDFMCALLBACK | NULL, nKeys: UINT, ahkeys: LPVOID | NULL, ppcm: LPVOID): HRESULT {
+  public static CDefFolderMenu_Create2(
+    pidlFolder: PCIDLIST_ABSOLUTE | NULL,
+    hwnd: HWND | 0n,
+    cidl: UINT,
+    apidl: PCUITEMID_CHILD_ARRAY,
+    psf: LPVOID | NULL,
+    pfn: LPFNDFMCALLBACK | NULL,
+    nKeys: UINT,
+    ahkeys: LPVOID | NULL,
+    ppcm: LPVOID,
+  ): HRESULT {
     return Shell32.Load('CDefFolderMenu_Create2')(pidlFolder, hwnd, cidl, apidl, psf, pfn, nKeys, ahkeys, ppcm);
   }
 

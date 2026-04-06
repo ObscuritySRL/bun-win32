@@ -39,10 +39,7 @@ console.log('   Press Ctrl+C to exit\n');
 
 // Create a layered, topmost, tool window that doesn't show in taskbar
 const hwnd = User32.CreateWindowExW(
-  ExtendedWindowStyles.WS_EX_LAYERED |
-    ExtendedWindowStyles.WS_EX_TOPMOST |
-    ExtendedWindowStyles.WS_EX_TOOLWINDOW |
-    ExtendedWindowStyles.WS_EX_NOACTIVATE,
+  ExtendedWindowStyles.WS_EX_LAYERED | ExtendedWindowStyles.WS_EX_TOPMOST | ExtendedWindowStyles.WS_EX_TOOLWINDOW | ExtendedWindowStyles.WS_EX_NOACTIVATE,
   encode('STATIC').ptr, // Use built-in STATIC class
   windowTitle.ptr,
   WindowStyles.WS_POPUP | WindowStyles.WS_VISIBLE,
@@ -53,7 +50,7 @@ const hwnd = User32.CreateWindowExW(
   NULL, // No parent
   NULL, // No menu
   NULL, // Default instance
-  NULL_PTR // No extra params (lpParam is a Pointer, not a handle)
+  NULL_PTR, // No extra params (lpParam is a Pointer, not a handle)
 );
 
 if (!hwnd) {
@@ -68,7 +65,7 @@ User32.SetLayeredWindowAttributes(
   hwnd,
   0, // Color key (unused with LWA_ALPHA)
   220, // Alpha (0-255)
-  0x02 // LWA_ALPHA flag
+  0x02, // LWA_ALPHA flag
 );
 
 // Show the window

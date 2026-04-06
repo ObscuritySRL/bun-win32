@@ -1,42 +1,27 @@
 import type { Pointer } from 'bun:ffi';
 import type { HANDLE } from '@bun-win32/core';
 
-export type {
-  ACCESS_MASK,
-  BOOLEAN,
-  DWORD,
-  HANDLE,
-  LONG,
-  NULL,
-  PHANDLE,
-  PULONG,
-  PVOID,
-  SIZE_T,
-  ULONG,
-  ULONG_PTR,
-  USHORT,
-  VOID,
-} from '@bun-win32/core';
+export type { ACCESS_MASK, BOOLEAN, DWORD, HANDLE, LONG, NULL, PHANDLE, PULONG, PVOID, SIZE_T, ULONG, ULONG_PTR, USHORT, VOID } from '@bun-win32/core';
 
 export type NTSTATUS = number;
 
-export const STATUS_ACCESS_DENIED: NTSTATUS = 0xC000_0022 | 0;
+export const STATUS_ACCESS_DENIED: NTSTATUS = 0xc000_0022 | 0;
 export const STATUS_BUFFER_OVERFLOW: NTSTATUS = 0x8000_0005 | 0;
-export const STATUS_BUFFER_TOO_SMALL: NTSTATUS = 0xC000_0023 | 0;
-export const STATUS_INFO_LENGTH_MISMATCH: NTSTATUS = 0xC000_0004 | 0;
-export const STATUS_INVALID_HANDLE: NTSTATUS = 0xC000_0008 | 0;
-export const STATUS_INVALID_PARAMETER: NTSTATUS = 0xC000_000D | 0;
-export const STATUS_NOT_IMPLEMENTED: NTSTATUS = 0xC000_0002 | 0;
-export const STATUS_NO_MEMORY: NTSTATUS = 0xC000_0017 | 0;
-export const STATUS_NO_MORE_ENTRIES: NTSTATUS = 0x8000_001A | 0;
-export const STATUS_OBJECT_NAME_COLLISION: NTSTATUS = 0xC000_0035 | 0;
-export const STATUS_OBJECT_NAME_NOT_FOUND: NTSTATUS = 0xC000_0034 | 0;
-export const STATUS_OBJECT_PATH_NOT_FOUND: NTSTATUS = 0xC000_003A | 0;
-export const STATUS_OBJECT_TYPE_MISMATCH: NTSTATUS = 0xC000_0024 | 0;
+export const STATUS_BUFFER_TOO_SMALL: NTSTATUS = 0xc000_0023 | 0;
+export const STATUS_INFO_LENGTH_MISMATCH: NTSTATUS = 0xc000_0004 | 0;
+export const STATUS_INVALID_HANDLE: NTSTATUS = 0xc000_0008 | 0;
+export const STATUS_INVALID_PARAMETER: NTSTATUS = 0xc000_000d | 0;
+export const STATUS_NOT_IMPLEMENTED: NTSTATUS = 0xc000_0002 | 0;
+export const STATUS_NO_MEMORY: NTSTATUS = 0xc000_0017 | 0;
+export const STATUS_NO_MORE_ENTRIES: NTSTATUS = 0x8000_001a | 0;
+export const STATUS_OBJECT_NAME_COLLISION: NTSTATUS = 0xc000_0035 | 0;
+export const STATUS_OBJECT_NAME_NOT_FOUND: NTSTATUS = 0xc000_0034 | 0;
+export const STATUS_OBJECT_PATH_NOT_FOUND: NTSTATUS = 0xc000_003a | 0;
+export const STATUS_OBJECT_TYPE_MISMATCH: NTSTATUS = 0xc000_0024 | 0;
 export const STATUS_PENDING: NTSTATUS = 0x0000_0103;
 export const STATUS_SUCCESS: NTSTATUS = 0x0000_0000;
 export const STATUS_TIMEOUT: NTSTATUS = 0x0000_0102;
-export const STATUS_UNSUCCESSFUL: NTSTATUS = 0xC000_0001 | 0;
+export const STATUS_UNSUCCESSFUL: NTSTATUS = 0xc000_0001 | 0;
 
 export const NT_CURRENT_PROCESS = -1n as HANDLE;
 export const NT_CURRENT_THREAD = -2n as HANDLE;
@@ -56,12 +41,12 @@ export enum FileInformationClass {
   FileEaInformation = 0x0000_0007,
   FileAccessInformation = 0x0000_0008,
   FileNameInformation = 0x0000_0009,
-  FileRenameInformation = 0x0000_000A,
-  FileLinkInformation = 0x0000_000B,
-  FileNamesInformation = 0x0000_000C,
-  FileDispositionInformation = 0x0000_000D,
-  FilePositionInformation = 0x0000_000E,
-  FileFullEaInformation = 0x0000_000F,
+  FileRenameInformation = 0x0000_000a,
+  FileLinkInformation = 0x0000_000b,
+  FileNamesInformation = 0x0000_000c,
+  FileDispositionInformation = 0x0000_000d,
+  FilePositionInformation = 0x0000_000e,
+  FileFullEaInformation = 0x0000_000f,
   FileModeInformation = 0x0000_0010,
   FileAlignmentInformation = 0x0000_0011,
   FileAllInformation = 0x0000_0012,
@@ -72,12 +57,12 @@ export enum FileInformationClass {
   FilePipeInformation = 0x0000_0017,
   FilePipeLocalInformation = 0x0000_0018,
   FilePipeRemoteInformation = 0x0000_0019,
-  FileMailslotQueryInformation = 0x0000_001A,
-  FileMailslotSetInformation = 0x0000_001B,
-  FileCompressionInformation = 0x0000_001C,
-  FileObjectIdInformation = 0x0000_001D,
-  FileCompletionInformation = 0x0000_001E,
-  FileMoveClusterInformation = 0x0000_001F,
+  FileMailslotQueryInformation = 0x0000_001a,
+  FileMailslotSetInformation = 0x0000_001b,
+  FileCompressionInformation = 0x0000_001c,
+  FileObjectIdInformation = 0x0000_001d,
+  FileCompletionInformation = 0x0000_001e,
+  FileMoveClusterInformation = 0x0000_001f,
   FileQuotaInformation = 0x0000_0020,
   FileReparsePointInformation = 0x0000_0021,
   FileNetworkOpenInformation = 0x0000_0022,
@@ -88,12 +73,12 @@ export enum FileInformationClass {
   FileValidDataLengthInformation = 0x0000_0027,
   FileShortNameInformation = 0x0000_0028,
   FileIoCompletionNotificationInformation = 0x0000_0029,
-  FileIoStatusBlockRangeInformation = 0x0000_002A,
-  FileIoPriorityHintInformation = 0x0000_002B,
-  FileSfioReserveInformation = 0x0000_002C,
-  FileSfioVolumeInformation = 0x0000_002D,
-  FileHardLinkInformation = 0x0000_002E,
-  FileProcessIdsUsingFileInformation = 0x0000_002F,
+  FileIoStatusBlockRangeInformation = 0x0000_002a,
+  FileIoPriorityHintInformation = 0x0000_002b,
+  FileSfioReserveInformation = 0x0000_002c,
+  FileSfioVolumeInformation = 0x0000_002d,
+  FileHardLinkInformation = 0x0000_002e,
+  FileProcessIdsUsingFileInformation = 0x0000_002f,
   FileNormalizedNameInformation = 0x0000_0030,
   FileNetworkPhysicalNameInformation = 0x0000_0031,
   FileIdGlobalTxDirectoryInformation = 0x0000_0032,
@@ -104,12 +89,12 @@ export enum FileInformationClass {
   FileRemoteProtocolInformation = 0x0000_0037,
   FileRenameInformationBypassAccessCheck = 0x0000_0038,
   FileLinkInformationBypassAccessCheck = 0x0000_0039,
-  FileVolumeNameInformation = 0x0000_003A,
-  FileIdInformation = 0x0000_003B,
-  FileIdExtdDirectoryInformation = 0x0000_003C,
-  FileReplaceCompletionInformation = 0x0000_003D,
-  FileHardLinkFullIdInformation = 0x0000_003E,
-  FileIdExtdBothDirectoryInformation = 0x0000_003F,
+  FileVolumeNameInformation = 0x0000_003a,
+  FileIdInformation = 0x0000_003b,
+  FileIdExtdDirectoryInformation = 0x0000_003c,
+  FileReplaceCompletionInformation = 0x0000_003d,
+  FileHardLinkFullIdInformation = 0x0000_003e,
+  FileIdExtdBothDirectoryInformation = 0x0000_003f,
   FileDispositionInformationEx = 0x0000_0040,
   FileRenameInformationEx = 0x0000_0041,
   FileRenameInformationExBypassAccessCheck = 0x0000_0042,
@@ -120,8 +105,8 @@ export enum FileInformationClass {
   FileCaseSensitiveInformation = 0x0000_0047,
   FileLinkInformationEx = 0x0000_0048,
   FileLinkInformationExBypassAccessCheck = 0x0000_0049,
-  FileStorageReserveIdInformation = 0x0000_004A,
-  FileCaseSensitiveInformationForceAccessCheck = 0x0000_004B,
+  FileStorageReserveIdInformation = 0x0000_004a,
+  FileCaseSensitiveInformationForceAccessCheck = 0x0000_004b,
 }
 
 export enum FsInformationClass {
@@ -174,10 +159,10 @@ export enum ObjectInformationClass {
 export enum ProcessInformationClass {
   ProcessBasicInformation = 0x0000_0000,
   ProcessDebugPort = 0x0000_0007,
-  ProcessWow64Information = 0x0000_001A,
-  ProcessImageFileName = 0x0000_001B,
-  ProcessBreakOnTermination = 0x0000_001D,
-  ProcessSubsystemInformation = 0x0000_004B,
+  ProcessWow64Information = 0x0000_001a,
+  ProcessImageFileName = 0x0000_001b,
+  ProcessBreakOnTermination = 0x0000_001d,
+  ProcessSubsystemInformation = 0x0000_004b,
 }
 
 export enum SectionInformationClass {
@@ -201,22 +186,22 @@ export enum SystemInformationClass {
   SystemDeviceInformation = 0x0000_0007,
   SystemProcessorPerformanceInformation = 0x0000_0008,
   SystemFlagsInformation = 0x0000_0009,
-  SystemCallTimeInformation = 0x0000_000A,
-  SystemModuleInformation = 0x0000_000B,
+  SystemCallTimeInformation = 0x0000_000a,
+  SystemModuleInformation = 0x0000_000b,
   SystemHandleInformation = 0x0000_0010,
   SystemObjectInformation = 0x0000_0011,
   SystemPagefileInformation = 0x0000_0012,
   SystemInterruptInformation = 0x0000_0017,
   SystemExceptionInformation = 0x0000_0021,
   SystemRegistryQuotaInformation = 0x0000_0025,
-  SystemLookasideInformation = 0x0000_002D,
+  SystemLookasideInformation = 0x0000_002d,
   SystemCodeIntegrityInformation = 0x0000_0067,
   SystemPolicyInformation = 0x0000_0086,
   SystemKernelDebuggerInformation = 0x0000_0023,
   SystemKernelDebuggerInformationEx = 0x0000_0095,
   SystemExtendedHandleInformation = 0x0000_0040,
   SystemProcessIdInformation = 0x0000_0058,
-  SystemFirmwareTableInformation = 0x0000_004C,
+  SystemFirmwareTableInformation = 0x0000_004c,
 }
 
 export enum ThreadInformationClass {
@@ -230,12 +215,12 @@ export enum ThreadInformationClass {
   ThreadEnableAlignmentFaultFixup = 0x0000_0007,
   ThreadEventPair = 0x0000_0008,
   ThreadQuerySetWin32StartAddress = 0x0000_0009,
-  ThreadZeroTlsCell = 0x0000_000A,
-  ThreadPerformanceCount = 0x0000_000B,
-  ThreadAmILastThread = 0x0000_000C,
-  ThreadIdealProcessor = 0x0000_000D,
-  ThreadPriorityBoost = 0x0000_000E,
-  ThreadSetTlsArrayAddress = 0x0000_000F,
+  ThreadZeroTlsCell = 0x0000_000a,
+  ThreadPerformanceCount = 0x0000_000b,
+  ThreadAmILastThread = 0x0000_000c,
+  ThreadIdealProcessor = 0x0000_000d,
+  ThreadPriorityBoost = 0x0000_000e,
+  ThreadSetTlsArrayAddress = 0x0000_000f,
   ThreadIsIoPending = 0x0000_0010,
   ThreadHideFromDebugger = 0x0000_0011,
   ThreadBreakOnTermination = 0x0000_0012,
@@ -259,12 +244,12 @@ export enum TokenInformationClass {
   TokenSource = 0x0000_0007,
   TokenType = 0x0000_0008,
   TokenImpersonationLevel = 0x0000_0009,
-  TokenStatistics = 0x0000_000A,
-  TokenRestrictedSids = 0x0000_000B,
-  TokenSessionId = 0x0000_000C,
-  TokenGroupsAndPrivileges = 0x0000_000D,
-  TokenSessionReference = 0x0000_000E,
-  TokenSandBoxInert = 0x0000_000F,
+  TokenStatistics = 0x0000_000a,
+  TokenRestrictedSids = 0x0000_000b,
+  TokenSessionId = 0x0000_000c,
+  TokenGroupsAndPrivileges = 0x0000_000d,
+  TokenSessionReference = 0x0000_000e,
+  TokenSandBoxInert = 0x0000_000f,
   TokenElevationType = 0x0000_0012,
   TokenLinkedToken = 0x0000_0013,
   TokenElevation = 0x0000_0014,

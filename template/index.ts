@@ -1,4 +1,4 @@
-import {Class} from './structs/{Class}';
+import { Class } from './structs/{Class}';
 
 export * from './types/{Class}';
-export default {Class};
+export default { Class };

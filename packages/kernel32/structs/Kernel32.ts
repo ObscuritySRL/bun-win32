@@ -2233,7 +2233,7 @@ class Kernel32 extends Win32 {
     hTemplateFile: HANDLE,
     hTransaction: HANDLE,
     pusMiniVersion: LPVOID,
-    lpExtendedParameter: LPVOID
+    lpExtendedParameter: LPVOID,
   ): HANDLE {
     return Kernel32.Load('CreateFileTransactedA')(lpFileName, dwDesiredAccess, dwShareMode, lpSecurityAttributes, dwCreationDisposition, dwFlagsAndAttributes, hTemplateFile, hTransaction, pusMiniVersion, lpExtendedParameter);
   }
@@ -2249,7 +2249,7 @@ class Kernel32 extends Win32 {
     hTemplateFile: HANDLE,
     hTransaction: HANDLE,
     pusMiniVersion: LPVOID,
-    lpExtendedParameter: LPVOID
+    lpExtendedParameter: LPVOID,
   ): HANDLE {
     return Kernel32.Load('CreateFileTransactedW')(lpFileName, dwDesiredAccess, dwShareMode, lpSecurityAttributes, dwCreationDisposition, dwFlagsAndAttributes, hTemplateFile, hTransaction, pusMiniVersion, lpExtendedParameter);
   }
@@ -2375,7 +2375,7 @@ class Kernel32 extends Win32 {
     lpEnvironment: LPVOID,
     lpCurrentDirectory: LPCSTR,
     lpStartupInfo: LPSTARTUPINFOA,
-    lpProcessInformation: LPPROCESS_INFORMATION
+    lpProcessInformation: LPPROCESS_INFORMATION,
   ): BOOL {
     return Kernel32.Load('CreateProcessA')(lpApplicationName, lpCommandLine, lpProcessAttributes, lpThreadAttributes, bInheritHandles, dwCreationFlags, lpEnvironment, lpCurrentDirectory, lpStartupInfo, lpProcessInformation);
   }
@@ -2391,7 +2391,7 @@ class Kernel32 extends Win32 {
     lpEnvironment: LPVOID,
     lpCurrentDirectory: LPCWSTR,
     lpStartupInfo: LPSTARTUPINFOW,
-    lpProcessInformation: LPPROCESS_INFORMATION
+    lpProcessInformation: LPPROCESS_INFORMATION,
   ): BOOL {
     return Kernel32.Load('CreateProcessW')(lpApplicationName, lpCommandLine, lpProcessAttributes, lpThreadAttributes, bInheritHandles, dwCreationFlags, lpEnvironment, lpCurrentDirectory, lpStartupInfo, lpProcessInformation);
   }
@@ -2402,7 +2402,15 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-createremotethread
-  public static CreateRemoteThread(hProcess: HANDLE, lpThreadAttributes: LPSECURITY_ATTRIBUTES | NULL, dwStackSize: SIZE_T, lpStartAddress: LPTHREAD_START_ROUTINE, lpParameter: bigint, dwCreationFlags: DWORD, lpThreadId: LPDWORD | NULL): HANDLE {
+  public static CreateRemoteThread(
+    hProcess: HANDLE,
+    lpThreadAttributes: LPSECURITY_ATTRIBUTES | NULL,
+    dwStackSize: SIZE_T,
+    lpStartAddress: LPTHREAD_START_ROUTINE,
+    lpParameter: bigint,
+    dwCreationFlags: DWORD,
+    lpThreadId: LPDWORD | NULL,
+  ): HANDLE {
     return Kernel32.Load('CreateRemoteThread')(hProcess, lpThreadAttributes, dwStackSize, lpStartAddress, lpParameter, dwCreationFlags, lpThreadId);
   }
 
@@ -2415,7 +2423,7 @@ class Kernel32 extends Win32 {
     lpParameter: bigint,
     dwCreationFlags: DWORD,
     lpAttributeList: LPPROC_THREAD_ATTRIBUTE_LIST,
-    lpThreadId: LPDWORD
+    lpThreadId: LPDWORD,
   ): HANDLE {
     return Kernel32.Load('CreateRemoteThreadEx')(hProcess, lpThreadAttributes, dwStackSize, lpStartAddress, lpParameter, dwCreationFlags, lpAttributeList, lpThreadId);
   }
@@ -3271,7 +3279,7 @@ class Kernel32 extends Win32 {
     pcchFound: LPVOID,
     lpVersionInformation: LPVOID,
     lpReserved: LPVOID,
-    sortHandle: DWORD
+    sortHandle: DWORD,
   ): INT {
     return Kernel32.Load('FindNLSStringEx')(lpLocaleName, dwFindNLSStringFlags, lpStringSource, cchSource, lpStringValue, cchValue, pcchFound, lpVersionInformation, lpReserved, sortHandle);
   }
@@ -5207,7 +5215,7 @@ class Kernel32 extends Win32 {
     lpMaximumComponentLength: LPVOID,
     lpFileSystemFlags: LPVOID,
     lpFileSystemNameBuffer: LPSTR,
-    nFileSystemNameSize: DWORD
+    nFileSystemNameSize: DWORD,
   ): BOOL {
     return Kernel32.Load('GetVolumeInformationA')(lpRootPathName, lpVolumeNameBuffer, nVolumeNameSize, lpVolumeSerialNumber, lpMaximumComponentLength, lpFileSystemFlags, lpFileSystemNameBuffer, nFileSystemNameSize);
   }
@@ -5221,7 +5229,7 @@ class Kernel32 extends Win32 {
     lpMaximumComponentLength: LPVOID,
     lpFileSystemFlags: LPVOID,
     lpFileSystemNameBuffer: LPWSTR,
-    nFileSystemNameSize: DWORD
+    nFileSystemNameSize: DWORD,
   ): BOOL {
     return Kernel32.Load('GetVolumeInformationByHandleW')(hFile, lpVolumeNameBuffer, nVolumeNameSize, lpVolumeSerialNumber, lpMaximumComponentLength, lpFileSystemFlags, lpFileSystemNameBuffer, nFileSystemNameSize);
   }
@@ -5235,7 +5243,7 @@ class Kernel32 extends Win32 {
     lpMaximumComponentLength: LPVOID,
     lpFileSystemFlags: LPVOID,
     lpFileSystemNameBuffer: LPWSTR,
-    nFileSystemNameSize: DWORD
+    nFileSystemNameSize: DWORD,
   ): BOOL {
     return Kernel32.Load('GetVolumeInformationW')(lpRootPathName, lpVolumeNameBuffer, nVolumeNameSize, lpVolumeSerialNumber, lpMaximumComponentLength, lpFileSystemFlags, lpFileSystemNameBuffer, nFileSystemNameSize);
   }
@@ -6704,7 +6712,7 @@ class Kernel32 extends Win32 {
     lpBytesReturned: LPVOID,
     lpOverlapped: LPVOID,
     lpCompletionRoutine: DWORD,
-    ReadDirectoryNotifyInformationClass: DWORD
+    ReadDirectoryNotifyInformationClass: DWORD,
   ): BOOL {
     return Kernel32.Load('ReadDirectoryChangesExW')(hDirectory, lpBuffer, nBufferLength, bWatchSubtree, dwNotifyFilter, lpBytesReturned, lpOverlapped, lpCompletionRoutine, ReadDirectoryNotifyInformationClass);
   }
@@ -6779,7 +6787,7 @@ class Kernel32 extends Win32 {
     lpStateLength: LPVOID,
     lpState: LPVOID,
     VDMBufferSize: DWORD,
-    lpVDMBuffer: LPVOID
+    lpVDMBuffer: LPVOID,
   ): BOOL {
     return Kernel32.Load('RegisterConsoleVDM')(dwRegisterFlags, hStartHardwareEvent, hEndHardwareEvent, hErrorhardwareEvent, Reserved, lpStateLength, lpState, VDMBufferSize, lpVDMBuffer);
   }

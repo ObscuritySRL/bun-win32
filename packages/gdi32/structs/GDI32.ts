@@ -701,7 +701,7 @@ class GDI32 extends Win32 {
     iClipPrecision: DWORD,
     iQuality: DWORD,
     iPitchAndFamily: DWORD,
-    pszFaceName: LPCSTR
+    pszFaceName: LPCSTR,
   ): HFONT {
     return GDI32.Load('CreateFontA')(cHeight, cWidth, cEscapement, cOrientation, cWeight, bItalic, bUnderline, bStrikeOut, iCharSet, iOutPrecision, iClipPrecision, iQuality, iPitchAndFamily, pszFaceName);
   }
@@ -741,7 +741,7 @@ class GDI32 extends Win32 {
     iClipPrecision: DWORD,
     iQuality: DWORD,
     iPitchAndFamily: DWORD,
-    pszFaceName: LPCWSTR
+    pszFaceName: LPCWSTR,
   ): HFONT {
     return GDI32.Load('CreateFontW')(cHeight, cWidth, cEscapement, cOrientation, cWeight, bItalic, bUnderline, bStrikeOut, iCharSet, iOutPrecision, iClipPrecision, iQuality, iPitchAndFamily, pszFaceName);
   }

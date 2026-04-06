@@ -99,14 +99,7 @@ function writeConsole(text: string): void {
 // ─────────────────────────────────────────────────────────────────────────────
 
 function rainbowText(text: string): void {
-  const colors = [
-    FG.RED | FG.INTENSE,
-    FG.YELLOW | FG.INTENSE,
-    FG.GREEN | FG.INTENSE,
-    FG.CYAN | FG.INTENSE,
-    FG.BLUE | FG.INTENSE,
-    FG.MAGENTA | FG.INTENSE,
-  ];
+  const colors = [FG.RED | FG.INTENSE, FG.YELLOW | FG.INTENSE, FG.GREEN | FG.INTENSE, FG.CYAN | FG.INTENSE, FG.BLUE | FG.INTENSE, FG.MAGENTA | FG.INTENSE];
 
   for (let i = 0; i < text.length; i++) {
     setColor(colors[i % colors.length]!);

@@ -8,16 +8,7 @@ import { ptr } from 'bun:ffi';
 import Kernel32, { ToolhelpSnapshotFlags, INVALID_HANDLE_VALUE } from '@bun-win32/kernel32';
 
 // Preload required APIs
-Kernel32.Preload([
-  'CreateToolhelp32Snapshot',
-  'Process32FirstW',
-  'Process32NextW',
-  'CloseHandle',
-  'OpenProcess',
-  'GetProcessTimes',
-  'GetCurrentProcessId',
-  'GetLastError',
-]);
+Kernel32.Preload(['CreateToolhelp32Snapshot', 'Process32FirstW', 'Process32NextW', 'CloseHandle', 'OpenProcess', 'GetProcessTimes', 'GetCurrentProcessId', 'GetLastError']);
 
 // ─────────────────────────────────────────────────────────────────────────────
 // PROCESSENTRY32W struct layout (568 bytes on Windows)
