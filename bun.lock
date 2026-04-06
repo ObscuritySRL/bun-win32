@@ -197,6 +197,19 @@
         "typescript": "^5",
       },
     },
+    "packages/sspicli": {
+      "name": "@bun-win32/sspicli",
+      "version": "1.0.0",
+      "dependencies": {
+        "@bun-win32/core": "workspace:*",
+      },
+      "devDependencies": {
+        "@types/bun": "latest",
+      },
+      "peerDependencies": {
+        "typescript": "^5",
+      },
+    },
     "packages/user32": {
       "name": "@bun-win32/user32",
       "version": "3.0.16",
@@ -254,6 +267,8 @@
     "@bun-win32/shell32": ["@bun-win32/shell32@workspace:packages/shell32"],
 
     "@bun-win32/shlwapi": ["@bun-win32/shlwapi@workspace:packages/shlwapi"],
+
+    "@bun-win32/sspicli": ["@bun-win32/sspicli@workspace:packages/sspicli"],
 
     "@bun-win32/user32": ["@bun-win32/user32@workspace:packages/user32"],
 
