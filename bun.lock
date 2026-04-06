@@ -28,6 +28,19 @@
         "typescript": "^5",
       },
     },
+    "packages/crypt32": {
+      "name": "@bun-win32/crypt32",
+      "version": "1.0.0",
+      "dependencies": {
+        "@bun-win32/core": "workspace:*",
+      },
+      "devDependencies": {
+        "@types/bun": "latest",
+      },
+      "peerDependencies": {
+        "typescript": "^5",
+      },
+    },
     "packages/gdi32": {
       "name": "@bun-win32/gdi32",
       "version": "1.0.8",
@@ -70,6 +83,19 @@
     "packages/kernel32": {
       "name": "@bun-win32/kernel32",
       "version": "1.0.17",
+      "dependencies": {
+        "@bun-win32/core": "workspace:*",
+      },
+      "devDependencies": {
+        "@types/bun": "latest",
+      },
+      "peerDependencies": {
+        "typescript": "^5",
+      },
+    },
+    "packages/netapi32": {
+      "name": "@bun-win32/netapi32",
+      "version": "1.0.0",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -177,6 +203,8 @@
 
     "@bun-win32/core": ["@bun-win32/core@workspace:packages/core"],
 
+    "@bun-win32/crypt32": ["@bun-win32/crypt32@workspace:packages/crypt32"],
+
     "@bun-win32/gdi32": ["@bun-win32/gdi32@workspace:packages/gdi32"],
 
     "@bun-win32/glu32": ["@bun-win32/glu32@workspace:packages/glu32"],
@@ -184,6 +212,8 @@
     "@bun-win32/iphlpapi": ["@bun-win32/iphlpapi@workspace:packages/iphlpapi"],
 
     "@bun-win32/kernel32": ["@bun-win32/kernel32@workspace:packages/kernel32"],
+
+    "@bun-win32/netapi32": ["@bun-win32/netapi32@workspace:packages/netapi32"],
 
     "@bun-win32/ntdll": ["@bun-win32/ntdll@workspace:packages/ntdll"],
 
