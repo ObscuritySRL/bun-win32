@@ -72,8 +72,10 @@ The template files contain `{name}`, `{Name}`, `{Class}`, `{NAME}`, `{descriptio
 Use `dumpbin.exe` from the `bin/` directory to get the **authoritative list** of exported symbols:
 
 ```bash
-./bin/dumpbin.exe //EXPORTS C:\\Windows\\System32\\{name}.dll
+./bin/dumpbin.exe //EXPORTS 'C:\Windows\System32\{name}.dll'
 ```
+
+> **Shell escaping:** Use single quotes around the Windows path. Double backslashes (`C:\\Windows\\`) get consumed by the shell and produce an invalid path.
 
 This gives you every exported function name. **This is your source of truth for what functions exist.** Do not guess — if a function is not in the dumpbin output, it is not exported from that DLL and must not be included.
 
@@ -141,7 +143,7 @@ Follow this order exactly. **Test at every step.** Do not proceed to the next st
 
 ### Step 2: Dump and catalog the exports
 
-1. Run `dumpbin.exe //EXPORTS C:\\Windows\\System32\\{name}.dll`.
+1. Run `dumpbin.exe //EXPORTS 'C:\Windows\System32\{name}.dll'`.
 2. Record the complete list of exported function names.
 3. For each function, find the Microsoft Docs page and note:
    - The header file it belongs to (for the URL)
@@ -183,7 +185,7 @@ Follow this order exactly. **Test at every step.** Do not proceed to the next st
 ### Step 7: Final verification
 
 1. Run `bun run index.ts`.
-2. Type-check: verify there are no TypeScript errors.
+2. Type-check with `npx tsc --noEmit` — verify there are **no** TypeScript errors in the library **or** the examples. If you created an `example/` directory, the example files must also pass the type-checker. A type error in an example means a method signature is wrong (e.g., missing `| NULL` on a parameter that callers pass `null` to).
 3. Run a real integration test that calls several functions and verifies results.
 4. Verify that the number of public methods matches the number of dumpbin exports you chose to bind.
 
@@ -395,10 +397,32 @@ Common nullable handle parameters include:
 ### How to decide
 
 1. Read the **Parameters** section of the Microsoft Docs page for the function.
-2. If a parameter says "This parameter can be NULL", "If this parameter is NULL", or "This parameter is optional":
+2. Read the **Return value** section — many sizing-call functions document that `ERROR_INSUFFICIENT_BUFFER` or `ERROR_BUFFER_OVERFLOW` is returned "if the buffer parameter is **NULL**." This is explicit confirmation that the buffer is nullable.
+3. Read the **Remarks** section and any **Example code** — nullability is sometimes only documented here (e.g., `GetInterfaceInfo` documents its NULL-first-call pattern in Remarks, not Parameters).
+4. For **callback registration functions** (e.g., `Notify*Change`, `Register*`), the `CallerContext` parameter (typed `PVOID`) is a pass-through to the callback. These are always nullable — the docs never list `CallerContext = NULL` as an error condition.
+5. If a parameter says "This parameter can be NULL", "If this parameter is NULL", or "This parameter is optional":
    - For pointer types (`LP*`, `P*`) → add `| NULL`
    - For handle types (`H*`, `HANDLE`) → add `| 0n`
-3. If the docs do **not** mention the parameter being optional, do **not** add a union. Not every pointer parameter is nullable.
+6. If the docs do **not** mention the parameter being optional anywhere (Parameters, Return value, Remarks, or Examples), do **not** add a union. Not every pointer parameter is nullable.
+
+### The sizing-call pattern
+
+Many Win32 functions follow a two-call pattern: the first call passes `NULL` for the output buffer to get the required size, the second call passes an allocated buffer. These buffer parameters **must** be marked `| NULL`:
+
+```typescript
+// GetAdaptersInfo: first call with NULL to get required buffer size
+public static GetAdaptersInfo(AdapterInfo: PIP_ADAPTER_INFO | NULL, SizePointer: PULONG): ULONG { ... }
+
+// GetExtendedTcpTable: same pattern
+public static GetExtendedTcpTable(pTcpTable: PVOID | NULL, pdwSize: PDWORD, ...): DWORD { ... }
+```
+
+Look for these signals in the docs:
+- Return value mentions `ERROR_INSUFFICIENT_BUFFER` or `ERROR_BUFFER_OVERFLOW` when the buffer is `NULL`
+- Remarks describe calling the function "first with a NULL pointer" to determine the required size
+- Example code shows `FunctionName(NULL, &size)`
+
+If you miss `| NULL` on these parameters, callers cannot use the standard sizing pattern without a type error.
 
 ---
 
@@ -497,23 +521,10 @@ Many common Win32 types (BOOL, DWORD, HANDLE, HWND, LPVOID, LPWSTR, LPCWSTR, NUL
 ```typescript
 import type { Pointer } from 'bun:ffi';
 
-// Re-export shared Win32 types from core.
-// Only include types that are actually used by this package.
 export type { BOOL, DWORD, HANDLE, LPCWSTR, LPVOID, LPWSTR } from '@bun-win32/core';
-
-// ---------------------------------------------------------------------------
-// Package-specific Win32 type aliases
-//
-// These map Win32 C types to their Bun FFI equivalents:
-//   - Handles (HANDLE, HWND, HMODULE, etc.) → bigint (FFIType.u64)
-//   - Booleans (BOOL) → number (FFIType.i32)
-//   - Unsigned 32-bit (DWORD, UINT) → number (FFIType.u32)
-//   - Pointers (LP*, P*) → Pointer (FFIType.ptr)
-//
-// Add types here in alphabetical order as needed by structs/{Class}.ts.
-// Export enums for flag/constant groups used by callers.
-// ---------------------------------------------------------------------------
 ```
+
+**No comment blocks or section headers.** The existing packages (`kernel32`, `user32`, `advapi32`, `gdi32`, `psapi`) do not have them. Do not add `// Re-export shared Win32 types from core`, `// ── Scalar types`, `// ── Pointer types`, or any similar decorative comments. The type file should be clean: imports, re-exports, constants, enums, types.
 
 **Important:** `export type { X } from '@bun-win32/core'` re-exports `X` for consumers of this package but does **not** make `X` available for use within this same file. If you need a core type locally (e.g., to define a constant like `export const INVALID_HANDLE_VALUE = -1n as HANDLE`), you must also add a separate import:
 
@@ -522,6 +533,19 @@ import type { DWORD, HANDLE } from '@bun-win32/core';
 ```
 
 Place this `import type` line **before** the `export type` re-export line.
+
+### File ordering
+
+The file must follow this exact order:
+
+1. `import type { Pointer } from 'bun:ffi';`
+2. (Optional) `import type { ... } from '@bun-win32/core';` — only if you need core types locally (for constants)
+3. `export type { ... } from '@bun-win32/core';` — re-export shared types
+4. (Optional) Exported constants (`INVALID_HANDLE_VALUE`, `HKEY_*`, `HWND_ZORDER`, etc.)
+5. Enums — alphabetized by enum name, members alphabetized within each enum
+6. Type aliases — **all types mixed together** (scalars and pointers interleaved), alphabetized
+
+**Do not group types into separate sections** (e.g., "scalar types" vs "pointer types"). They are all interleaved in one alphabetized block, matching `kernel32`, `user32`, `advapi32`, and `gdi32`.
 
 ### Type alias rules
 
@@ -747,7 +771,7 @@ The Symbols object must end with `as const satisfies Record<string, FFIFunction>
 ### Dump DLL exports
 
 ```bash
-./bin/dumpbin.exe //EXPORTS C:\\Windows\\System32\\{name}.dll
+./bin/dumpbin.exe //EXPORTS 'C:\Windows\System32\{name}.dll'
 ```
 
 ### Install dependencies

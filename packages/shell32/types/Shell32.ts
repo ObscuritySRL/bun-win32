@@ -2,22 +2,6 @@ import type { Pointer } from 'bun:ffi';
 
 export type { ACCESS_MASK, BOOL, BOOLEAN, BYTE, CHAR, DWORD, DWORD_PTR, HANDLE, HINSTANCE, HMODULE, HRESULT, HWND, INT, INT_PTR, LONG, LONG_PTR, LPARAM, LPBOOL, LPBYTE, LPCSTR, LPCVOID, LPCWSTR, LPDWORD, LPHANDLE, LPSECURITY_ATTRIBUTES, LPSTR, LPVOID, LPWSTR, LRESULT, NULL, PBYTE, PDWORD, PHANDLE, PULONG, PVOID, SHORT, SIZE_T, UINT, UINT_PTR, ULONG, ULONG_PTR, USHORT, VOID, WCHAR, WORD, WPARAM } from '@bun-win32/core';
 
-// ---------------------------------------------------------------------------
-// Win32 type aliases
-//
-// These map Win32 C types to their Bun FFI equivalents:
-//   - Handles (HANDLE, HWND, HICON, HDROP, etc.) → bigint (FFIType.u64)
-//   - Booleans (BOOL) → number (FFIType.i32)
-//   - Unsigned 32-bit (DWORD, UINT) → number (FFIType.u32)
-//   - Signed 32-bit (HRESULT, INT, LONG) → number (FFIType.i32)
-//   - 64-bit integers (SIZE_T, DWORD_PTR, UINT_PTR) → bigint (FFIType.u64)
-//   - Signed 64-bit (INT_PTR, LPARAM, LRESULT) → bigint (FFIType.i64)
-//   - Pointers (LP*, P*, PCIDLIST_*, PIDLIST_*) → Pointer (FFIType.ptr)
-//
-// Add types here in alphabetical order as needed by structs/Shell32.ts.
-// Export enums for flag/constant groups used by callers.
-// ---------------------------------------------------------------------------
-
 export enum AppBarEdge {
   ABE_BOTTOM = 3,
   ABE_LEFT = 0,

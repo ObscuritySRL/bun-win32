@@ -18,23 +18,6 @@ export type {
   VOID,
 } from '@bun-win32/core';
 
-// ---------------------------------------------------------------------------
-// Win32 type aliases
-//
-// These map Win32 C types to their Bun FFI equivalents:
-//   - Handles (HANDLE) → bigint (FFIType.u64)
-//   - Booleans (BOOLEAN) → number (FFIType.u8)
-//   - Unsigned 32-bit (DWORD, UINT, ULONG, ACCESS_MASK) → number (FFIType.u32)
-//   - Signed 32-bit (LONG, NTSTATUS) → number (FFIType.i32)
-//   - 64-bit integers (SIZE_T, ULONG_PTR, ULONGLONG) → bigint (FFIType.u64)
-//   - Pointers (P*, LP*) → Pointer (FFIType.ptr)
-//
-// Add types here in alphabetical order as needed by structs/Ntdll.ts.
-// Export enums for flag/constant groups used by callers.
-// ---------------------------------------------------------------------------
-
-// ---- NTSTATUS constants ---------------------------------------------------
-
 export type NTSTATUS = number;
 
 export const STATUS_ACCESS_DENIED: NTSTATUS = 0xC000_0022 | 0;
@@ -55,12 +38,8 @@ export const STATUS_SUCCESS: NTSTATUS = 0x0000_0000;
 export const STATUS_TIMEOUT: NTSTATUS = 0x0000_0102;
 export const STATUS_UNSUCCESSFUL: NTSTATUS = 0xC000_0001 | 0;
 
-// ---- Special handle constants ---------------------------------------------
-
 export const NT_CURRENT_PROCESS = -1n as HANDLE;
 export const NT_CURRENT_THREAD = -2n as HANDLE;
-
-// ---- Enums ----------------------------------------------------------------
 
 export enum EventType {
   NotificationEvent = 0x0000_0000,
@@ -297,14 +276,10 @@ export enum WaitType {
   WaitAny = 0x0000_0001,
 }
 
-// ---- Scalar type aliases (alphabetized) -----------------------------------
-
 export type LANGID = number;
 export type LARGE_INTEGER = bigint;
 export type UCHAR = number;
 export type ULONGLONG = bigint;
-
-// ---- Pointer type aliases (alphabetized) ----------------------------------
 
 export type PACCESS_MASK = Pointer;
 export type PACL = Pointer;
