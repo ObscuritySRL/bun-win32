@@ -7,7 +7,7 @@
     },
     "packages/advapi32": {
       "name": "@bun-win32/advapi32",
-      "version": "1.0.5",
+      "version": "1.0.7",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -30,7 +30,7 @@
     },
     "packages/gdi32": {
       "name": "@bun-win32/gdi32",
-      "version": "1.0.6",
+      "version": "1.0.8",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -43,7 +43,20 @@
     },
     "packages/glu32": {
       "name": "@bun-win32/glu32",
-      "version": "1.0.6",
+      "version": "1.0.8",
+      "dependencies": {
+        "@bun-win32/core": "workspace:*",
+      },
+      "devDependencies": {
+        "@types/bun": "latest",
+      },
+      "peerDependencies": {
+        "typescript": "^5",
+      },
+    },
+    "packages/iphlpapi": {
+      "name": "@bun-win32/iphlpapi",
+      "version": "1.0.0",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -56,7 +69,7 @@
     },
     "packages/kernel32": {
       "name": "@bun-win32/kernel32",
-      "version": "1.0.15",
+      "version": "1.0.17",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -69,7 +82,7 @@
     },
     "packages/ntdll": {
       "name": "@bun-win32/ntdll",
-      "version": "1.0.0",
+      "version": "1.0.2",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -82,7 +95,7 @@
     },
     "packages/opengl32": {
       "name": "@bun-win32/opengl32",
-      "version": "1.4.4",
+      "version": "1.4.6",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -95,7 +108,7 @@
     },
     "packages/psapi": {
       "name": "@bun-win32/psapi",
-      "version": "2.0.2",
+      "version": "2.0.4",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -108,7 +121,7 @@
     },
     "packages/shell32": {
       "name": "@bun-win32/shell32",
-      "version": "1.0.0",
+      "version": "1.0.2",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -121,7 +134,7 @@
     },
     "packages/shlwapi": {
       "name": "@bun-win32/shlwapi",
-      "version": "1.0.3",
+      "version": "1.0.5",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -134,7 +147,7 @@
     },
     "packages/user32": {
       "name": "@bun-win32/user32",
-      "version": "3.0.14",
+      "version": "3.0.16",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -154,6 +167,8 @@
     "@bun-win32/gdi32": ["@bun-win32/gdi32@workspace:packages/gdi32"],
 
     "@bun-win32/glu32": ["@bun-win32/glu32@workspace:packages/glu32"],
+
+    "@bun-win32/iphlpapi": ["@bun-win32/iphlpapi@workspace:packages/iphlpapi"],
 
     "@bun-win32/kernel32": ["@bun-win32/kernel32@workspace:packages/kernel32"],
 
