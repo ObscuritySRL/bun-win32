@@ -41,6 +41,19 @@
         "typescript": "^5",
       },
     },
+    "packages/dwmapi": {
+      "name": "@bun-win32/dwmapi",
+      "version": "1.0.0",
+      "dependencies": {
+        "@bun-win32/core": "workspace:*",
+      },
+      "devDependencies": {
+        "@types/bun": "latest",
+      },
+      "peerDependencies": {
+        "typescript": "^5",
+      },
+    },
     "packages/gdi32": {
       "name": "@bun-win32/gdi32",
       "version": "1.0.8",
@@ -145,6 +158,19 @@
         "typescript": "^5",
       },
     },
+    "packages/secur32": {
+      "name": "@bun-win32/secur32",
+      "version": "1.0.0",
+      "dependencies": {
+        "@bun-win32/core": "workspace:*",
+      },
+      "devDependencies": {
+        "@types/bun": "latest",
+      },
+      "peerDependencies": {
+        "typescript": "^5",
+      },
+    },
     "packages/shell32": {
       "name": "@bun-win32/shell32",
       "version": "1.0.2",
@@ -205,6 +231,8 @@
 
     "@bun-win32/crypt32": ["@bun-win32/crypt32@workspace:packages/crypt32"],
 
+    "@bun-win32/dwmapi": ["@bun-win32/dwmapi@workspace:packages/dwmapi"],
+
     "@bun-win32/gdi32": ["@bun-win32/gdi32@workspace:packages/gdi32"],
 
     "@bun-win32/glu32": ["@bun-win32/glu32@workspace:packages/glu32"],
@@ -220,6 +248,8 @@
     "@bun-win32/opengl32": ["@bun-win32/opengl32@workspace:packages/opengl32"],
 
     "@bun-win32/psapi": ["@bun-win32/psapi@workspace:packages/psapi"],
+
+    "@bun-win32/secur32": ["@bun-win32/secur32@workspace:packages/secur32"],
 
     "@bun-win32/shell32": ["@bun-win32/shell32@workspace:packages/shell32"],
 
