@@ -32,6 +32,7 @@ All type definitions are provided by [`@bun-win32/core`](./packages/core).
 
 #### System
 
+- [`hid`](./packages/hid) — HID device access, feature reports, preparsed data parsing
 - [`kernel32`](./packages/kernel32) — processes, memory, files, console, threads
 - [`ntdll`](./packages/ntdll) — native NT API
 - [`pdh`](./packages/pdh) — performance counter queries, logs, and enumeration

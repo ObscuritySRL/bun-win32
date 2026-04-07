@@ -80,6 +80,19 @@
         "typescript": "^5",
       },
     },
+    "packages/hid": {
+      "name": "@bun-win32/hid",
+      "version": "1.0.0",
+      "dependencies": {
+        "@bun-win32/core": "workspace:*",
+      },
+      "devDependencies": {
+        "@types/bun": "latest",
+      },
+      "peerDependencies": {
+        "typescript": "^5",
+      },
+    },
     "packages/iphlpapi": {
       "name": "@bun-win32/iphlpapi",
       "version": "1.0.1",
@@ -262,6 +275,8 @@
     "@bun-win32/gdi32": ["@bun-win32/gdi32@workspace:packages/gdi32"],
 
     "@bun-win32/glu32": ["@bun-win32/glu32@workspace:packages/glu32"],
+
+    "@bun-win32/hid": ["@bun-win32/hid@workspace:packages/hid"],
 
     "@bun-win32/iphlpapi": ["@bun-win32/iphlpapi@workspace:packages/iphlpapi"],
 
