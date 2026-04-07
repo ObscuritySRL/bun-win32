@@ -275,6 +275,19 @@
         "typescript": "^5",
       },
     },
+    "packages/wlanapi": {
+      "name": "@bun-win32/wlanapi",
+      "version": "1.0.0",
+      "dependencies": {
+        "@bun-win32/core": "workspace:*",
+      },
+      "devDependencies": {
+        "@types/bun": "latest",
+      },
+      "peerDependencies": {
+        "typescript": "^5",
+      },
+    },
     "packages/ws2_32": {
       "name": "@bun-win32/ws2_32",
       "version": "1.0.2",
@@ -329,6 +342,8 @@
     "@bun-win32/user32": ["@bun-win32/user32@workspace:packages/user32"],
 
     "@bun-win32/winspool": ["@bun-win32/winspool@workspace:packages/winspool"],
+
+    "@bun-win32/wlanapi": ["@bun-win32/wlanapi@workspace:packages/wlanapi"],
 
     "@bun-win32/ws2_32": ["@bun-win32/ws2_32@workspace:packages/ws2_32"],
 
