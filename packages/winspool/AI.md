@@ -1,34 +1,34 @@
-# AI Guide for @bun-win32/shlwapi
+# AI Guide for @bun-win32/winspool
 
 How to use this package, not what the Win32 API does.
 
 ## Usage
 
 ```ts
-import Shlwapi, { SomeFlag } from '@bun-win32/shlwapi';
+import Winspool, { SomeFlag } from '@bun-win32/winspool';
 
 // Methods bind lazily on first call
-const result = Shlwapi.SomeFunctionW(arg1, arg2);
+const result = Winspool.SomeFunctionW(arg1, arg2);
 
 // Preload: array, single string, or no args (all symbols)
-Shlwapi.Preload(['SomeFunctionW', 'AnotherFunction']);
-Shlwapi.Preload('SomeFunctionW');
-Shlwapi.Preload();
+Winspool.Preload(['SomeFunctionW', 'AnotherFunction']);
+Winspool.Preload('SomeFunctionW');
+Winspool.Preload();
 ```
 
 ## Where To Look
 
-| Need                              | Read                 |
-| --------------------------------- | -------------------- |
-| Find a method or its MS Docs link | `structs/Shlwapi.ts` |
-| Find types, enums, constants      | `types/Shlwapi.ts`   |
-| Quick examples                    | `README.md`          |
+| Need                              | Read                  |
+| --------------------------------- | --------------------- |
+| Find a method or its MS Docs link | `structs/Winspool.ts` |
+| Find types, enums, constants      | `types/Winspool.ts`   |
+| Quick examples                    | `README.md`           |
 
-`index.ts` re-exports the class and all types — import from `@bun-win32/shlwapi` directly.
+`index.ts` re-exports the class and all types — import from `@bun-win32/winspool` directly.
 
 ## Calling Convention
 
-All documented `shlwapi.dll` exports are bound. Each method maps 1:1 to its DLL export. Names, parameter names, and order match Microsoft Docs.
+All documented `winspool.drv` exports are bound. Each method maps 1:1 to its DLL export. Names, parameter names, and order match Microsoft Docs.
 
 ### Strings
 
@@ -36,7 +36,7 @@ All documented `shlwapi.dll` exports are bound. Each method maps 1:1 to its DLL 
 
 ```ts
 const wide = Buffer.from('Hello\0', 'utf16le'); // LPCWSTR
-Shlwapi.SomeFunctionW(wide.ptr);
+Winspool.SomeFunctionW(wide.ptr);
 
 // Reading a wide string back from a buffer:
 const text = new TextDecoder('utf-16').decode(buf).replace(/\0.*$/, '');
@@ -57,7 +57,7 @@ const text = new TextDecoder('utf-16').decode(buf).replace(/\0.*$/, '');
 
 ```ts
 const out = Buffer.alloc(4);
-Shlwapi.SomeFunction(out.ptr);
+Winspool.SomeFunction(out.ptr);
 const value = out.readUInt32LE(0);
 ```
 

@@ -18,11 +18,11 @@ Ws2_32.Preload();
 
 ## Where To Look
 
-| Need                              | Read                   |
-| --------------------------------- | ---------------------- |
-| Find a method or its MS Docs link | `structs/Ws2_32.ts`    |
-| Find types, enums, constants      | `types/Ws2_32.ts`      |
-| Quick examples                    | `README.md`            |
+| Need                              | Read                |
+| --------------------------------- | ------------------- |
+| Find a method or its MS Docs link | `structs/Ws2_32.ts` |
+| Find types, enums, constants      | `types/Ws2_32.ts`   |
+| Quick examples                    | `README.md`         |
 
 `index.ts` re-exports the class and all types — import from `@bun-win32/ws2_32` directly.
 
@@ -35,11 +35,11 @@ All documented `ws2_32.dll` exports are bound. Each method maps 1:1 to its DLL e
 `W` methods take UTF-16LE NUL-terminated buffers. `A` methods take ANSI strings.
 
 ```ts
-const wide = Buffer.from('Hello\0', 'utf16le');  // LPCWSTR
+const wide = Buffer.from('Hello\0', 'utf16le'); // LPCWSTR
 Ws2_32.SomeFunctionW(wide.ptr);
 
 // Reading a wide string back from a buffer:
-const text = new TextDecoder('utf-16le').decode(buf).replace(/\0.*$/, '');
+const text = new TextDecoder('utf-16').decode(buf).replace(/\0.*$/, '');
 ```
 
 ### Return types

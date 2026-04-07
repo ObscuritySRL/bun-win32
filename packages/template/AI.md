@@ -18,11 +18,11 @@ const result = {Class}.SomeFunctionW(arg1, arg2);
 
 ## Where To Look
 
-| Need                              | Read                   |
-| --------------------------------- | ---------------------- |
-| Find a method or its MS Docs link | `structs/{Class}.ts`   |
-| Find types, enums, constants      | `types/{Class}.ts`     |
-| Quick examples                    | `README.md`            |
+| Need                              | Read                 |
+| --------------------------------- | -------------------- |
+| Find a method or its MS Docs link | `structs/{Class}.ts` |
+| Find types, enums, constants      | `types/{Class}.ts`   |
+| Quick examples                    | `README.md`          |
 
 `index.ts` re-exports the class and all types — import from `@bun-win32/{name}` directly.
 
@@ -39,7 +39,7 @@ const wide = Buffer.from('Hello\0', 'utf16le');  // LPCWSTR
 {Class}.SomeFunctionW(wide.ptr);
 
 // Reading a wide string back from a buffer:
-const text = new TextDecoder('utf-16le').decode(buf).replace(/\0.*$/, '');
+const text = new TextDecoder('utf-16').decode(buf).replace(/\0.*$/, '');
 ```
 
 ### Return types

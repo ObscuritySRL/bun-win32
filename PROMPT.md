@@ -59,7 +59,56 @@ Match the documentation **exactly** for: function name (including A/W suffix), p
 
 ---
 
-## 3. Directory Structure
+## 3. The `Win32` Base Class
+
+Every package subclass extends `Win32` from `@bun-win32/core`. You do **not** need to read the base class — everything you need is here.
+
+### Architecture
+
+```
+Win32 (base, in @bun-win32/core)
+ ├── name: string              — the DLL filename, e.g. 'kernel32.dll'
+ ├── Symbols: Record<string, FFIFunction>  — FFI signatures; subclasses override
+ ├── Load(method): NativeFunction          — lazily binds one export
+ └── Preload(methods?): void               — eagerly binds multiple exports
+```
+
+Each package subclass does three things:
+
+1. Sets `protected static override readonly name = '{name}.dll';`
+2. Overrides `Symbols` with its FFI declarations.
+3. Exposes public static methods that call `{Class}.Load('ExportName')(args)`.
+
+### How `Load` works (lazy binding)
+
+`Load(method)` is the only way methods invoke DLL functions. On **first call**:
+
+1. Checks if the method is already bound (non-configurable own property).
+2. If not, calls `dlopen(this.name, { [method]: this.Symbols[method] })` to load **only that one export**.
+3. Memoizes the result with `Object.defineProperty` (non-configurable) so subsequent calls skip dlopen entirely.
+4. Returns the native function for immediate invocation.
+
+This means startup cost is zero — no DLL is loaded until a method is actually called, and each export is bound at most once.
+
+### How `Preload` works (eager binding)
+
+`Preload()` binds all symbols at once. `Preload('Foo')` or `Preload(['Foo', 'Bar'])` binds a subset. It skips already-bound symbols. Use it for hot paths where you want to pay the binding cost upfront.
+
+### What this means for subclass code
+
+Every public method body is always one line:
+
+```typescript
+public static FunctionNameW(hWnd: HWND, lpBuffer: LPWSTR): BOOL {
+  return Kernel32.Load('FunctionNameW')(hWnd, lpBuffer);
+}
+```
+
+You never call `dlopen` directly. You never manage caching. You never import `dlopen`. The base class handles all of it through `Load`.
+
+---
+
+## 4. Directory Structure
 
 ```
 packages/{name}/
@@ -79,7 +128,7 @@ No other files or directories. `.gitignore` and `.prettierrc.json` live at the r
 
 ---
 
-## 4. FFI Type Mapping — The Critical Rules
+## 5. FFI Type Mapping — The Critical Rules
 
 This is where most mistakes happen. Read this section carefully, then read it again.
 
@@ -177,7 +226,7 @@ A function returning `HANDLE` → `returns: FFIType.u64`. Returning `LPVOID` →
 
 ---
 
-## 5. Nullability — `| NULL` and `| 0n`
+## 6. Nullability — `| NULL` and `| 0n`
 
 ### `| NULL` — pointer parameters that accept null
 
@@ -231,7 +280,7 @@ This step exists because bulk-writing 100+ methods inevitably misses annotations
 
 ---
 
-## 6. Symbol Declarations
+## 7. Symbol Declarations
 
 ```typescript
 /** @inheritdoc */
@@ -249,7 +298,7 @@ Rules:
 
 ---
 
-## 7. Public Method Signatures
+## 8. Public Method Signatures
 
 ```typescript
 // https://learn.microsoft.com/en-us/windows/win32/api/{header}/nf-{header}-{functionname}
@@ -262,13 +311,13 @@ Rules:
 1. **One MS Docs URL comment** above each method.
 2. **Exact Win32 parameter names** — `hWnd`, `lpBuffer`, `dwSize`, not renamed.
 3. **Type using aliases** from `types/{Class}.ts`.
-4. **Add `| NULL` / `| 0n`** per Section 5.
+4. **Add `| NULL` / `| 0n`** per Section 6.
 5. **Alphabetize** all methods.
 6. **Body is always one line**: `return {Class}.Load('MethodName')(args);`
 
 ---
 
-## 8. Type Aliases and Enums
+## 9. Type Aliases and Enums
 
 ### `types/{Class}.ts` structure
 
@@ -305,7 +354,7 @@ export type { BOOL, DWORD, HANDLE, LPCWSTR, LPVOID, LPWSTR, NULL } from '@bun-wi
 
 ---
 
-## 9. Process
+## 10. Process
 
 Follow this order. **Test at every step.**
 
@@ -327,7 +376,7 @@ Follow this order. **Test at every step.**
 
 ---
 
-## 10. Completeness Checklist
+## 11. Completeness Checklist
 
 - [ ] Every template file exists with placeholders replaced
 - [ ] `bun install` and `bun run index.ts` succeed
@@ -348,7 +397,7 @@ Follow this order. **Test at every step.**
 
 ---
 
-## 11. Reference Commands
+## 12. Reference Commands
 
 ```bash
 # Dump DLL exports
@@ -372,7 +421,7 @@ cd packages/{name} && bun run example/{name}.ts
 
 ---
 
-## 12. Reference Packages
+## 13. Reference Packages
 
 - **Small DLL example:** `packages/psapi` — ~28 functions, demonstrates every pattern concisely.
 - **Large DLL example:** `packages/kernel32` — 1,000+ functions, massive Symbols table, 26+ enums, exported constants.

@@ -65,6 +65,10 @@ All type definitions are provided by [`@bun-win32/core`](./packages/core).
 - [`opengl32`](./packages/opengl32) — OpenGL rendering context
 - [`glu32`](./packages/glu32) — OpenGL utility functions
 
+#### Printing
+
+- [`winspool`](./packages/winspool) — printer management, print jobs, spooler control, drivers
+
 #### Networking
 
 - [`ws2_32`](./packages/ws2_32) — Winsock 2: BSD sockets, DNS, network I/O
