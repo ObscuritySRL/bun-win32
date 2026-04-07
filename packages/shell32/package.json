@@ -27,7 +27,7 @@
     "directory": "packages/shell32"
   },
   "type": "module",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "main": "./index.ts",
   "keywords": [
     "bun",

@@ -27,7 +27,7 @@
     "directory": "packages/kernel32"
   },
   "type": "module",
-  "version": "1.0.18",
+  "version": "1.0.19",
   "main": "./index.ts",
   "keywords": [
     "bun",

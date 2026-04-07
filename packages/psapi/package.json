@@ -27,7 +27,7 @@
     "directory": "packages/psapi"
   },
   "type": "module",
-  "version": "2.0.5",
+  "version": "2.0.6",
   "main": "./index.ts",
   "keywords": [
     "bun",

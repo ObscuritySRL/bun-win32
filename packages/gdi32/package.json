@@ -27,7 +27,7 @@
     "directory": "packages/gdi32"
   },
   "type": "module",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "main": "./index.ts",
   "keywords": [
     "bun",
