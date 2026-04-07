@@ -1,36 +1,71 @@
 # AI Guide for @bun-win32/kernel32
 
-This file documents the binding contract of this package, not the Windows API itself.
+How to use this package, not what the Win32 API does.
 
-## What This Package Is
+## Usage
 
-- The package exports one class: `Kernel32`.
-- Every `Kernel32.MethodName(...)` call is a thin 1:1 binding to `kernel32.dll!MethodName`.
-- Method names, parameter names, and parameter order follow Microsoft Docs.
-- `Kernel32.Preload()` is only a bind-time optimization. It does not change signatures, return values, or semantics.
-- The package does not add wrappers, helper objects, automatic conversions, error translation, or cleanup.
+```ts
+import Kernel32, { SomeFlag } from '@bun-win32/kernel32';
 
-## How To Read It
+// Methods bind lazily on first call
+const result = Kernel32.SomeFunctionW(arg1, arg2);
 
-- `index.ts` exports the default `Kernel32` class and re-exports everything from `types/Kernel32.ts`.
-- `structs/Kernel32.ts` is the method index. Each static method maps to one export and has a Microsoft Docs URL comment above it.
-- `types/Kernel32.ts` contains the aliases, enums, constants, flags, and sentinels used by the method signatures.
-- `README.md` contains quick examples and package-level notes.
+// Preload: array, single string, or no args (all symbols)
+Kernel32.Preload(['SomeFunctionW', 'AnotherFunction']);
+Kernel32.Preload('SomeFunctionW');
+Kernel32.Preload();
+```
+
+## Where To Look
+
+| Need                              | Read                   |
+| --------------------------------- | ---------------------- |
+| Find a method or its MS Docs link | `structs/Kernel32.ts`  |
+| Find types, enums, constants      | `types/Kernel32.ts`    |
+| Quick examples                    | `README.md`            |
+
+`index.ts` re-exports the class and all types — import from `@bun-win32/kernel32` directly.
 
 ## Calling Convention
 
-- If the DLL exposes both `A` and `W` variants, they are exposed as separate methods.
-- `W` methods expect UTF-16LE NUL-terminated buffers from the caller.
-- Pointer arguments are passed as `.ptr` from caller-owned buffers or structs.
-- Out parameters are caller-allocated memory passed by pointer.
-- Optional pointers are `null`.
-- Optional handles are usually `0n`.
-- Handles and pointer-sized integers are usually `bigint`.
-- Flags, enums, constants, and sentinels should be imported from `@bun-win32/kernel32` when available.
+All documented `kernel32.dll` exports are bound. Each method maps 1:1 to its DLL export. Names, parameter names, and order match Microsoft Docs.
 
-## Errors And Lifetime
+### Strings
 
-- Return values are raw native results.
-- Failure sentinels and error sources follow the underlying API contract.
-- When the native API uses Win32 last-error semantics, read the error through the corresponding API, such as `Kernel32.GetLastError()`.
-- Resource ownership is unchanged from Win32. If the native API requires cleanup, you must still do it here.
+`W` methods take UTF-16LE NUL-terminated buffers. `A` methods take ANSI strings.
+
+```ts
+const wide = Buffer.from('Hello\0', 'utf16le');  // LPCWSTR
+Kernel32.SomeFunctionW(wide.ptr);
+
+// Reading a wide string back from a buffer:
+const text = new TextDecoder('utf-16le').decode(buf).replace(/\0.*$/, '');
+```
+
+### Return types
+
+- `HANDLE`, `HWND`, etc. → `bigint`
+- `DWORD`, `UINT`, `BOOL`, `INT`, `LONG` → `number`
+- `LPVOID`, `LPWSTR`, etc. → `Pointer`
+- Win32 `BOOL` is `number` (0 or non-zero), **not** JS `boolean`. Do not compare with `=== true`.
+
+### Pointers, handles, out-parameters
+
+- **Pointer** params (`LP*`, `P*`, `Pointer`): pass `buffer.ptr` from a caller-allocated `Buffer`.
+- **Handle** params (`HANDLE`, `HWND`, etc.): pass a `bigint` value.
+- **Out-parameters**: allocate a `Buffer`, pass `.ptr`, read the result after the call.
+
+```ts
+const out = Buffer.alloc(4);
+Kernel32.SomeFunction(out.ptr);
+const value = out.readUInt32LE(0);
+```
+
+### Nullability
+
+- `| NULL` in a signature → pass `null` (optional pointer).
+- `| 0n` in a signature → pass `0n` (optional handle).
+
+## Errors and Cleanup
+
+Return values are raw. If the Win32 function uses last-error semantics, read via `GetLastError()`. Resource cleanup is your responsibility — same as raw Win32.

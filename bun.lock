@@ -236,6 +236,19 @@
         "typescript": "^5",
       },
     },
+    "packages/template": {
+      "name": "@bun-win32/{name}",
+      "version": "1.0.0",
+      "dependencies": {
+        "@bun-win32/core": "workspace:*",
+      },
+      "devDependencies": {
+        "@types/bun": "latest",
+      },
+      "peerDependencies": {
+        "typescript": "^5",
+      },
+    },
     "packages/user32": {
       "name": "@bun-win32/user32",
       "version": "3.0.17",
@@ -303,6 +316,8 @@
     "@bun-win32/user32": ["@bun-win32/user32@workspace:packages/user32"],
 
     "@bun-win32/ws2_32": ["@bun-win32/ws2_32@workspace:packages/ws2_32"],
+
+    "@bun-win32/{name}": ["@bun-win32/{name}@workspace:packages/template"],
 
     "@types/bun": ["@types/bun@1.3.11", "", { "dependencies": { "bun-types": "1.3.11" } }, "sha512-5vPne5QvtpjGpsGYXiFyycfpDF2ECyPcTSsFBMa0fraoxiQyMJ3SmuQIGhzPg2WJuWxVBoxWJ2kClYTcw/4fAg=="],
 
