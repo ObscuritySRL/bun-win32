@@ -8,6 +8,7 @@
   },
   "description": "Zero-dependency, zero-overhead Win32 CRYPT32 bindings for Bun (FFI) on Windows.",
   "devDependencies": {
+    "@bun-win32/kernel32": "workspace:*",
     "@types/bun": "latest"
   },
   "exports": {
@@ -27,7 +28,7 @@
     "directory": "packages/crypt32"
   },
   "type": "module",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "main": "./index.ts",
   "keywords": [
     "bun",
@@ -53,6 +54,7 @@
     "bun": ">=1.1.0"
   },
   "scripts": {
-    "example": "bun ./example/crypt32.ts"
+    "example:secret-vault": "bun ./example/secret-vault.ts",
+    "example:certificate-inspector": "bun ./example/certificate-inspector.ts"
   }
 }

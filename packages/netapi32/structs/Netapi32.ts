@@ -950,7 +950,7 @@ class Netapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/lmwksta/nf-lmwksta-netwkstauserenum
-  public static NetWkstaUserEnum(servername: LMSTR | NULL, level: DWORD, bufptr: LPBYTE, prefmaxlen: DWORD, entriesread: LPDWORD, totalentries: LPDWORD, resumehandle: LPDWORD | NULL): NET_API_STATUS {
+  public static NetWkstaUserEnum(servername: LMSTR | NULL, level: DWORD, bufptr: LPBYTE | NULL, prefmaxlen: DWORD, entriesread: LPDWORD | NULL, totalentries: LPDWORD, resumehandle: LPDWORD | NULL): NET_API_STATUS {
     return Netapi32.Load('NetWkstaUserEnum')(servername, level, bufptr, prefmaxlen, entriesread, totalentries, resumehandle);
   }
 

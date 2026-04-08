@@ -391,7 +391,7 @@ class Shell32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj/nf-shlobj-cidldata_createfromidarray
-  public static CIDLData_CreateFromIDArray(pidlFolder: PCIDLIST_ABSOLUTE, cidl: UINT, apidl: PCUIDLIST_RELATIVE_ARRAY, ppdtobj: LPVOID): HRESULT {
+  public static CIDLData_CreateFromIDArray(pidlFolder: PCIDLIST_ABSOLUTE, cidl: UINT, apidl: PCUIDLIST_RELATIVE_ARRAY | NULL, ppdtobj: LPVOID): HRESULT {
     return Shell32.Load('CIDLData_CreateFromIDArray')(pidlFolder, cidl, apidl, ppdtobj);
   }
 
@@ -736,7 +736,7 @@ class Shell32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-shbindtoobject
-  public static SHBindToObject(psf: LPVOID, pidl: PCUIDLIST_RELATIVE, pbc: LPVOID | NULL, riid: LPVOID, ppv: LPVOID): HRESULT {
+  public static SHBindToObject(psf: LPVOID | NULL, pidl: PCUIDLIST_RELATIVE, pbc: LPVOID | NULL, riid: LPVOID, ppv: LPVOID): HRESULT {
     return Shell32.Load('SHBindToObject')(psf, pidl, pbc, riid, ppv);
   }
 
@@ -926,7 +926,7 @@ class Shell32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-shdodragdrop
-  public static SHDoDragDrop(hwnd: HWND, pdata: LPVOID, pdsrc: LPVOID | NULL, dwEffect: DWORD, pdwEffect: LPDWORD): HRESULT {
+  public static SHDoDragDrop(hwnd: HWND | 0n, pdata: LPVOID, pdsrc: LPVOID | NULL, dwEffect: DWORD, pdwEffect: LPDWORD): HRESULT {
     return Shell32.Load('SHDoDragDrop')(hwnd, pdata, pdsrc, dwEffect, pdwEffect);
   }
 
@@ -986,7 +986,7 @@ class Shell32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-shgetattributesfromdataobject
-  public static SHGetAttributesFromDataObject(pdo: LPVOID, dwAttributeMask: DWORD, pdwAttributes: LPDWORD, pcItems: LPVOID): HRESULT {
+  public static SHGetAttributesFromDataObject(pdo: LPVOID | NULL, dwAttributeMask: DWORD, pdwAttributes: LPDWORD | NULL, pcItems: LPVOID | NULL): HRESULT {
     return Shell32.Load('SHGetAttributesFromDataObject')(pdo, dwAttributeMask, pdwAttributes, pcItems);
   }
 
@@ -1051,12 +1051,12 @@ class Shell32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-shgetfolderpathandsubdira
-  public static SHGetFolderPathAndSubDirA(hwnd: HWND | 0n, csidl: INT, hToken: HANDLE | 0n, dwFlags: DWORD, pszSubDir: LPCSTR, pszPath: LPSTR): HRESULT {
+  public static SHGetFolderPathAndSubDirA(hwnd: HWND | 0n, csidl: INT, hToken: HANDLE | 0n, dwFlags: DWORD, pszSubDir: LPCSTR | NULL, pszPath: LPSTR): HRESULT {
     return Shell32.Load('SHGetFolderPathAndSubDirA')(hwnd, csidl, hToken, dwFlags, pszSubDir, pszPath);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-shgetfolderpathandsubdirw
-  public static SHGetFolderPathAndSubDirW(hwnd: HWND | 0n, csidl: INT, hToken: HANDLE | 0n, dwFlags: DWORD, pszSubDir: LPCWSTR, pszPath: LPWSTR): HRESULT {
+  public static SHGetFolderPathAndSubDirW(hwnd: HWND | 0n, csidl: INT, hToken: HANDLE | 0n, dwFlags: DWORD, pszSubDir: LPCWSTR | NULL, pszPath: LPWSTR): HRESULT {
     return Shell32.Load('SHGetFolderPathAndSubDirW')(hwnd, csidl, hToken, dwFlags, pszSubDir, pszPath);
   }
 
@@ -1426,7 +1426,7 @@ class Shell32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-shstartnetconnectiondialogw
-  public static SHStartNetConnectionDialogW(hwnd: HWND | 0n, pszRemoteName: LPCWSTR, dwType: DWORD): HRESULT {
+  public static SHStartNetConnectionDialogW(hwnd: HWND | 0n, pszRemoteName: LPCWSTR | NULL, dwType: DWORD): HRESULT {
     return Shell32.Load('SHStartNetConnectionDialogW')(hwnd, pszRemoteName, dwType);
   }
 

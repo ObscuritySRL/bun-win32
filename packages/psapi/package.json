@@ -8,6 +8,7 @@
   },
   "description": "Zero-dependency, zero-overhead Win32 PSAPI bindings for Bun (FFI) on Windows.",
   "devDependencies": {
+    "@bun-win32/kernel32": "workspace:*",
     "@types/bun": "latest"
   },
   "exports": {
@@ -27,7 +28,7 @@
     "directory": "packages/psapi"
   },
   "type": "module",
-  "version": "2.0.7",
+  "version": "2.0.8",
   "main": "./index.ts",
   "keywords": [
     "bun",
@@ -51,6 +52,7 @@
     "bun": ">=1.1.0"
   },
   "scripts": {
-    "example": "bun ./example/psapi.ts"
+    "example:memory-heatmap": "bun ./example/memory-heatmap.ts",
+    "example:process-forensics": "bun ./example/process-forensics.ts"
   }
 }

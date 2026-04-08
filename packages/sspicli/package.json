@@ -8,6 +8,7 @@
   },
   "description": "Zero-dependency, zero-overhead Win32 SSPICLI bindings for Bun (FFI) on Windows.",
   "devDependencies": {
+    "@bun-win32/secur32": "workspace:*",
     "@types/bun": "latest"
   },
   "exports": {
@@ -27,7 +28,7 @@
     "directory": "packages/sspicli"
   },
   "type": "module",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "main": "./index.ts",
   "keywords": [
     "bun",
@@ -54,6 +55,7 @@
     "bun": ">=1.1.0"
   },
   "scripts": {
-    "example": "bun ./example/sspicli.ts"
+    "example:credential-check": "bun ./example/credential-check.ts",
+    "example:sspi-diagnostics": "bun ./example/sspi-diagnostics.ts"
   }
 }

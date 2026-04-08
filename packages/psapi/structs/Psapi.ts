@@ -144,22 +144,22 @@ class Psapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/psapi/nf-psapi-getmodulebasenamea
-  public static GetModuleBaseNameA(hProcess: HANDLE, hModule: HMODULE, lpBaseName: LPSTR, nSize: DWORD): DWORD {
+  public static GetModuleBaseNameA(hProcess: HANDLE, hModule: HMODULE | 0n, lpBaseName: LPSTR, nSize: DWORD): DWORD {
     return Psapi.Load('GetModuleBaseNameA')(hProcess, hModule, lpBaseName, nSize);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/psapi/nf-psapi-getmodulebasenamew
-  public static GetModuleBaseNameW(hProcess: HANDLE, hModule: HMODULE, lpBaseName: LPWSTR, nSize: DWORD): DWORD {
+  public static GetModuleBaseNameW(hProcess: HANDLE, hModule: HMODULE | 0n, lpBaseName: LPWSTR, nSize: DWORD): DWORD {
     return Psapi.Load('GetModuleBaseNameW')(hProcess, hModule, lpBaseName, nSize);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/psapi/nf-psapi-getmodulefilenameexa
-  public static GetModuleFileNameExA(hProcess: HANDLE, hModule: HMODULE, lpFilename: LPSTR, nSize: DWORD): DWORD {
+  public static GetModuleFileNameExA(hProcess: HANDLE | 0n, hModule: HMODULE | 0n, lpFilename: LPSTR, nSize: DWORD): DWORD {
     return Psapi.Load('GetModuleFileNameExA')(hProcess, hModule, lpFilename, nSize);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/psapi/nf-psapi-getmodulefilenameexw
-  public static GetModuleFileNameExW(hProcess: HANDLE, hModule: HMODULE, lpFilename: LPWSTR, nSize: DWORD): DWORD {
+  public static GetModuleFileNameExW(hProcess: HANDLE | 0n, hModule: HMODULE | 0n, lpFilename: LPWSTR, nSize: DWORD): DWORD {
     return Psapi.Load('GetModuleFileNameExW')(hProcess, hModule, lpFilename, nSize);
   }
 

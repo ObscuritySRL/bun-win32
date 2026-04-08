@@ -448,7 +448,7 @@ class PowrProf extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/powersetting/nf-powersetting-powersetactivescheme
-  public static PowerSetActiveScheme(UserRootPowerKey: HKEY | 0n, SchemeGuid: LPCGUID): DWORD {
+  public static PowerSetActiveScheme(UserRootPowerKey: HKEY | 0n, SchemeGuid: LPCGUID | NULL): DWORD {
     return PowrProf.Load('PowerSetActiveScheme')(UserRootPowerKey, SchemeGuid);
   }
 
@@ -543,7 +543,7 @@ class PowrProf extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/powrprof/nf-powrprof-powerwritesettingattributes
-  public static PowerWriteSettingAttributes(SubGroupGuid: LPCGUID, PowerSettingGuid: LPCGUID | NULL, Attributes: DWORD): DWORD {
+  public static PowerWriteSettingAttributes(SubGroupGuid: LPCGUID | NULL, PowerSettingGuid: LPCGUID | NULL, Attributes: DWORD): DWORD {
     return PowrProf.Load('PowerWriteSettingAttributes')(SubGroupGuid, PowerSettingGuid, Attributes);
   }
 
@@ -593,7 +593,7 @@ class PowrProf extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/powrprof/nf-powrprof-validatepowerpolicies
-  public static ValidatePowerPolicies(pGlobalPowerPolicy: PGLOBAL_POWER_POLICY, pPowerPolicy: PPOWER_POLICY): BOOLEAN {
+  public static ValidatePowerPolicies(pGlobalPowerPolicy: PGLOBAL_POWER_POLICY | NULL, pPowerPolicy: PPOWER_POLICY | NULL): BOOLEAN {
     return PowrProf.Load('ValidatePowerPolicies')(pGlobalPowerPolicy, pPowerPolicy);
   }
 

@@ -27,7 +27,7 @@
     "directory": "packages/bluetoothapis"
   },
   "type": "module",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "main": "./index.ts",
   "keywords": [
     "bun",
@@ -54,6 +54,7 @@
     "bun": ">=1.1.0"
   },
   "scripts": {
-    "example": "bun ./example/bluetoothapis.ts"
+    "example:device-scanner": "bun ./example/device-scanner.ts",
+    "example:radio-inspector": "bun ./example/radio-inspector.ts"
   }
 }

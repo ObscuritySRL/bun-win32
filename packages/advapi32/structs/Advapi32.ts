@@ -535,10 +535,10 @@ class Advapi32 extends Win32 {
     GetLocalManagedApplications: { args: [FFIType.i32, FFIType.ptr, FFIType.ptr], returns: FFIType.u32 },
     GetManagedApplicationCategories: { args: [FFIType.u32, FFIType.ptr], returns: FFIType.u32 },
     GetManagedApplications: { args: [FFIType.ptr, FFIType.u32, FFIType.u32, FFIType.ptr, FFIType.ptr], returns: FFIType.u32 },
-    GetMultipleTrusteeA: { args: [FFIType.ptr], returns: FFIType.u64 },
+    GetMultipleTrusteeA: { args: [FFIType.ptr], returns: FFIType.ptr },
     GetMultipleTrusteeOperationA: { args: [FFIType.ptr], returns: FFIType.u32 },
     GetMultipleTrusteeOperationW: { args: [FFIType.ptr], returns: FFIType.u32 },
-    GetMultipleTrusteeW: { args: [FFIType.ptr], returns: FFIType.u64 },
+    GetMultipleTrusteeW: { args: [FFIType.ptr], returns: FFIType.ptr },
     GetNamedSecurityInfoA: { args: [FFIType.ptr, FFIType.u32, FFIType.u32, FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.u32 },
     GetNamedSecurityInfoExA: { args: [FFIType.ptr, FFIType.u32, FFIType.u32, FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.u32 },
     GetNamedSecurityInfoExW: { args: [FFIType.ptr, FFIType.u32, FFIType.u32, FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.u32 },
@@ -997,12 +997,12 @@ class Advapi32 extends Win32 {
   } as const satisfies Record<string, FFIFunction>;
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-abortsystemshutdowna
-  public static AbortSystemShutdownA(lpMachineName: LPCSTR): BOOL {
+  public static AbortSystemShutdownA(lpMachineName: LPCSTR | NULL): BOOL {
     return Advapi32.Load('AbortSystemShutdownA')(lpMachineName);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-abortsystemshutdownw
-  public static AbortSystemShutdownW(lpMachineName: LPCWSTR): BOOL {
+  public static AbortSystemShutdownW(lpMachineName: LPCWSTR | NULL): BOOL {
     return Advapi32.Load('AbortSystemShutdownW')(lpMachineName);
   }
 
@@ -1388,7 +1388,7 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/securitybaseapi/nf-securitybaseapi-addaccessdeniedobjectace
-  public static AddAccessDeniedObjectAce(pAcl: PACL, dwAceRevision: DWORD, AceFlags: DWORD, AccessMask: DWORD, ObjectTypeGuid: PVOID, InheritedObjectTypeGuid: PVOID, pSid: PSID): BOOL {
+  public static AddAccessDeniedObjectAce(pAcl: PACL, dwAceRevision: DWORD, AceFlags: DWORD, AccessMask: DWORD, ObjectTypeGuid: PVOID | NULL, InheritedObjectTypeGuid: PVOID | NULL, pSid: PSID): BOOL {
     return Advapi32.Load('AddAccessDeniedObjectAce')(pAcl, dwAceRevision, AceFlags, AccessMask, ObjectTypeGuid, InheritedObjectTypeGuid, pSid);
   }
 
@@ -1408,7 +1408,7 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/securitybaseapi/nf-securitybaseapi-addauditaccessobjectace
-  public static AddAuditAccessObjectAce(pAcl: PACL, dwAceRevision: DWORD, AceFlags: DWORD, AccessMask: DWORD, ObjectTypeGuid: PVOID, InheritedObjectTypeGuid: PVOID, pSid: PSID, bAuditSuccess: BOOL, bAuditFailure: BOOL): BOOL {
+  public static AddAuditAccessObjectAce(pAcl: PACL, dwAceRevision: DWORD, AceFlags: DWORD, AccessMask: DWORD, ObjectTypeGuid: PVOID | NULL, InheritedObjectTypeGuid: PVOID | NULL, pSid: PSID, bAuditSuccess: BOOL, bAuditFailure: BOOL): BOOL {
     return Advapi32.Load('AddAuditAccessObjectAce')(pAcl, dwAceRevision, AceFlags, AccessMask, ObjectTypeGuid, InheritedObjectTypeGuid, pSid, bAuditSuccess, bAuditFailure);
   }
 
@@ -1666,32 +1666,32 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/aclapi/nf-aclapi-buildexplicitaccesswithnamea
-  public static BuildExplicitAccessWithNameA(pExplicitAccess: PEXPLICIT_ACCESSA, pTrusteeName: LPSTR, AccessPermissions: DWORD, AccessMode: DWORD, Inheritance: DWORD): VOID {
+  public static BuildExplicitAccessWithNameA(pExplicitAccess: PEXPLICIT_ACCESSA, pTrusteeName: LPSTR | NULL, AccessPermissions: DWORD, AccessMode: DWORD, Inheritance: DWORD): VOID {
     return Advapi32.Load('BuildExplicitAccessWithNameA')(pExplicitAccess, pTrusteeName, AccessPermissions, AccessMode, Inheritance);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/aclapi/nf-aclapi-buildexplicitaccesswithnamew
-  public static BuildExplicitAccessWithNameW(pExplicitAccess: PEXPLICIT_ACCESSW, pTrusteeName: LPWSTR, AccessPermissions: DWORD, AccessMode: DWORD, Inheritance: DWORD): VOID {
+  public static BuildExplicitAccessWithNameW(pExplicitAccess: PEXPLICIT_ACCESSW, pTrusteeName: LPWSTR | NULL, AccessPermissions: DWORD, AccessMode: DWORD, Inheritance: DWORD): VOID {
     return Advapi32.Load('BuildExplicitAccessWithNameW')(pExplicitAccess, pTrusteeName, AccessPermissions, AccessMode, Inheritance);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/aclapi/nf-aclapi-buildimpersonateexplicitaccesswithnamea
-  public static BuildImpersonateExplicitAccessWithNameA(pExplicitAccess: PEXPLICIT_ACCESSA, pTrusteeName: LPSTR, pTrustee: PTRUSTEE, AccessPermissions: DWORD, AccessMode: DWORD, Inheritance: DWORD): VOID {
+  public static BuildImpersonateExplicitAccessWithNameA(pExplicitAccess: PEXPLICIT_ACCESSA, pTrusteeName: LPSTR | NULL, pTrustee: PTRUSTEE | NULL, AccessPermissions: DWORD, AccessMode: DWORD, Inheritance: DWORD): VOID {
     return Advapi32.Load('BuildImpersonateExplicitAccessWithNameA')(pExplicitAccess, pTrusteeName, pTrustee, AccessPermissions, AccessMode, Inheritance);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/aclapi/nf-aclapi-buildimpersonateexplicitaccesswithnamew
-  public static BuildImpersonateExplicitAccessWithNameW(pExplicitAccess: PEXPLICIT_ACCESSW, pTrusteeName: LPWSTR, pTrustee: PTRUSTEE, AccessPermissions: DWORD, AccessMode: DWORD, Inheritance: DWORD): VOID {
+  public static BuildImpersonateExplicitAccessWithNameW(pExplicitAccess: PEXPLICIT_ACCESSW, pTrusteeName: LPWSTR | NULL, pTrustee: PTRUSTEE | NULL, AccessPermissions: DWORD, AccessMode: DWORD, Inheritance: DWORD): VOID {
     return Advapi32.Load('BuildImpersonateExplicitAccessWithNameW')(pExplicitAccess, pTrusteeName, pTrustee, AccessPermissions, AccessMode, Inheritance);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/aclapi/nf-aclapi-buildimpersonatetrusteea
-  public static BuildImpersonateTrusteeA(pTrustee: PTRUSTEE, pImpersonateTrustee: PTRUSTEE): VOID {
+  public static BuildImpersonateTrusteeA(pTrustee: PTRUSTEE, pImpersonateTrustee: PTRUSTEE | NULL): VOID {
     return Advapi32.Load('BuildImpersonateTrusteeA')(pTrustee, pImpersonateTrustee);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/aclapi/nf-aclapi-buildimpersonatetrusteew
-  public static BuildImpersonateTrusteeW(pTrustee: PTRUSTEE, pImpersonateTrustee: PTRUSTEE): VOID {
+  public static BuildImpersonateTrusteeW(pTrustee: PTRUSTEE, pImpersonateTrustee: PTRUSTEE | NULL): VOID {
     return Advapi32.Load('BuildImpersonateTrusteeW')(pTrustee, pImpersonateTrustee);
   }
 
@@ -1726,42 +1726,42 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/aclapi/nf-aclapi-buildtrusteewithnamea
-  public static BuildTrusteeWithNameA(pTrustee: PTRUSTEE, pName: LPSTR): VOID {
+  public static BuildTrusteeWithNameA(pTrustee: PTRUSTEE, pName: LPSTR | NULL): VOID {
     return Advapi32.Load('BuildTrusteeWithNameA')(pTrustee, pName);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/aclapi/nf-aclapi-buildtrusteewithnamew
-  public static BuildTrusteeWithNameW(pTrustee: PTRUSTEE, pName: LPWSTR): VOID {
+  public static BuildTrusteeWithNameW(pTrustee: PTRUSTEE, pName: LPWSTR | NULL): VOID {
     return Advapi32.Load('BuildTrusteeWithNameW')(pTrustee, pName);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/aclapi/nf-aclapi-buildtrusteewithobjectsandnamea
-  public static BuildTrusteeWithObjectsAndNameA(pTrustee: PTRUSTEE, pObjName: PVOID, ObjectType: DWORD, ObjectTypeName: LPSTR, InheritedObjectTypeName: LPSTR, Name: LPSTR): VOID {
+  public static BuildTrusteeWithObjectsAndNameA(pTrustee: PTRUSTEE, pObjName: PVOID | NULL, ObjectType: DWORD, ObjectTypeName: LPSTR | NULL, InheritedObjectTypeName: LPSTR | NULL, Name: LPSTR | NULL): VOID {
     return Advapi32.Load('BuildTrusteeWithObjectsAndNameA')(pTrustee, pObjName, ObjectType, ObjectTypeName, InheritedObjectTypeName, Name);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/aclapi/nf-aclapi-buildtrusteewithobjectsandnamew
-  public static BuildTrusteeWithObjectsAndNameW(pTrustee: PTRUSTEE, pObjName: PVOID, ObjectType: DWORD, ObjectTypeName: LPWSTR, InheritedObjectTypeName: LPWSTR, Name: LPWSTR): VOID {
+  public static BuildTrusteeWithObjectsAndNameW(pTrustee: PTRUSTEE, pObjName: PVOID | NULL, ObjectType: DWORD, ObjectTypeName: LPWSTR | NULL, InheritedObjectTypeName: LPWSTR | NULL, Name: LPWSTR | NULL): VOID {
     return Advapi32.Load('BuildTrusteeWithObjectsAndNameW')(pTrustee, pObjName, ObjectType, ObjectTypeName, InheritedObjectTypeName, Name);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/aclapi/nf-aclapi-buildtrusteewithobjectsandsida
-  public static BuildTrusteeWithObjectsAndSidA(pTrustee: PTRUSTEE, pObjSid: PVOID, pObjectGuid: PVOID, pInheritedObjectGuid: PVOID, pSid: PSID): VOID {
+  public static BuildTrusteeWithObjectsAndSidA(pTrustee: PTRUSTEE, pObjSid: PVOID | NULL, pObjectGuid: PVOID | NULL, pInheritedObjectGuid: PVOID | NULL, pSid: PSID | NULL): VOID {
     return Advapi32.Load('BuildTrusteeWithObjectsAndSidA')(pTrustee, pObjSid, pObjectGuid, pInheritedObjectGuid, pSid);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/aclapi/nf-aclapi-buildtrusteewithobjectsandsidw
-  public static BuildTrusteeWithObjectsAndSidW(pTrustee: PTRUSTEE, pObjSid: PVOID, pObjectGuid: PVOID, pInheritedObjectGuid: PVOID, pSid: PSID): VOID {
+  public static BuildTrusteeWithObjectsAndSidW(pTrustee: PTRUSTEE, pObjSid: PVOID | NULL, pObjectGuid: PVOID | NULL, pInheritedObjectGuid: PVOID | NULL, pSid: PSID | NULL): VOID {
     return Advapi32.Load('BuildTrusteeWithObjectsAndSidW')(pTrustee, pObjSid, pObjectGuid, pInheritedObjectGuid, pSid);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/aclapi/nf-aclapi-buildtrusteewithsida
-  public static BuildTrusteeWithSidA(pTrustee: PTRUSTEE, pSid: PSID): VOID {
+  public static BuildTrusteeWithSidA(pTrustee: PTRUSTEE, pSid: PSID | NULL): VOID {
     return Advapi32.Load('BuildTrusteeWithSidA')(pTrustee, pSid);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/aclapi/nf-aclapi-buildtrusteewithsidw
-  public static BuildTrusteeWithSidW(pTrustee: PTRUSTEE, pSid: PSID): VOID {
+  public static BuildTrusteeWithSidW(pTrustee: PTRUSTEE, pSid: PSID | NULL): VOID {
     return Advapi32.Load('BuildTrusteeWithSidW')(pTrustee, pSid);
   }
 
@@ -1771,12 +1771,12 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsvc/nf-winsvc-changeserviceconfig2a
-  public static ChangeServiceConfig2A(hService: SC_HANDLE, dwInfoLevel: DWORD, lpInfo: LPVOID): BOOL {
+  public static ChangeServiceConfig2A(hService: SC_HANDLE, dwInfoLevel: DWORD, lpInfo: LPVOID | NULL): BOOL {
     return Advapi32.Load('ChangeServiceConfig2A')(hService, dwInfoLevel, lpInfo);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsvc/nf-winsvc-changeserviceconfig2w
-  public static ChangeServiceConfig2W(hService: SC_HANDLE, dwInfoLevel: DWORD, lpInfo: LPVOID): BOOL {
+  public static ChangeServiceConfig2W(hService: SC_HANDLE, dwInfoLevel: DWORD, lpInfo: LPVOID | NULL): BOOL {
     return Advapi32.Load('ChangeServiceConfig2W')(hService, dwInfoLevel, lpInfo);
   }
 
@@ -1825,12 +1825,12 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-cleareventloga
-  public static ClearEventLogA(hEventLog: HANDLE, lpBackupFileName: LPCSTR): BOOL {
+  public static ClearEventLogA(hEventLog: HANDLE, lpBackupFileName: LPCSTR | NULL): BOOL {
     return Advapi32.Load('ClearEventLogA')(hEventLog, lpBackupFileName);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-cleareventlogw
-  public static ClearEventLogW(hEventLog: HANDLE, lpBackupFileName: LPCWSTR): BOOL {
+  public static ClearEventLogW(hEventLog: HANDLE, lpBackupFileName: LPCWSTR | NULL): BOOL {
     return Advapi32.Load('ClearEventLogW')(hEventLog, lpBackupFileName);
   }
 
@@ -2741,7 +2741,7 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/securitybaseapi/nf-securitybaseapi-duplicatetokenex
-  public static DuplicateTokenEx(hExistingToken: HANDLE, dwDesiredAccess: DWORD, lpTokenAttributes: PVOID, ImpersonationLevel: SECURITY_IMPERSONATION_LEVEL, TokenType: TOKEN_TYPE, phNewToken: PHANDLE): BOOL {
+  public static DuplicateTokenEx(hExistingToken: HANDLE, dwDesiredAccess: DWORD, lpTokenAttributes: PVOID | NULL, ImpersonationLevel: SECURITY_IMPERSONATION_LEVEL, TokenType: TOKEN_TYPE, phNewToken: PHANDLE): BOOL {
     return Advapi32.Load('DuplicateTokenEx')(hExistingToken, dwDesiredAccess, lpTokenAttributes, ImpersonationLevel, TokenType, phNewToken);
   }
 
@@ -2781,12 +2781,12 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsvc/nf-winsvc-enumdependentservicesa
-  public static EnumDependentServicesA(hService: SC_HANDLE, dwServiceState: DWORD, lpServices: LPBYTE, cbBufSize: DWORD, pcbBytesNeeded: LPDWORD, lpServicesReturned: LPDWORD): BOOL {
+  public static EnumDependentServicesA(hService: SC_HANDLE, dwServiceState: DWORD, lpServices: LPBYTE | NULL, cbBufSize: DWORD, pcbBytesNeeded: LPDWORD, lpServicesReturned: LPDWORD): BOOL {
     return Advapi32.Load('EnumDependentServicesA')(hService, dwServiceState, lpServices, cbBufSize, pcbBytesNeeded, lpServicesReturned);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsvc/nf-winsvc-enumdependentservicesw
-  public static EnumDependentServicesW(hService: SC_HANDLE, dwServiceState: DWORD, lpServices: LPBYTE, cbBufSize: DWORD, pcbBytesNeeded: LPDWORD, lpServicesReturned: LPDWORD): BOOL {
+  public static EnumDependentServicesW(hService: SC_HANDLE, dwServiceState: DWORD, lpServices: LPBYTE | NULL, cbBufSize: DWORD, pcbBytesNeeded: LPDWORD, lpServicesReturned: LPDWORD): BOOL {
     return Advapi32.Load('EnumDependentServicesW')(hService, dwServiceState, lpServices, cbBufSize, pcbBytesNeeded, lpServicesReturned);
   }
 
@@ -2848,7 +2848,7 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsvc/nf-winsvc-enumservicesstatusw
-  public static EnumServicesStatusW(hSCManager: SC_HANDLE, dwServiceType: DWORD, dwServiceState: DWORD, lpServices: LPBYTE, cbBufSize: DWORD, pcbBytesNeeded: LPDWORD, lpServicesReturned: LPDWORD, lpResumeHandle: LPDWORD): BOOL {
+  public static EnumServicesStatusW(hSCManager: SC_HANDLE, dwServiceType: DWORD, dwServiceState: DWORD, lpServices: LPBYTE | NULL, cbBufSize: DWORD, pcbBytesNeeded: LPDWORD, lpServicesReturned: LPDWORD, lpResumeHandle: LPDWORD | NULL): BOOL {
     return Advapi32.Load('EnumServicesStatusW')(hSCManager, dwServiceType, dwServiceState, lpServices, cbBufSize, pcbBytesNeeded, lpServicesReturned, lpResumeHandle);
   }
 
@@ -2938,7 +2938,7 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/aclapi/nf-aclapi-freeinheritedfromarray
-  public static FreeInheritedFromArray(pInheritArray: PVOID, AceCnt: USHORT, pfnArray: PVOID): DWORD {
+  public static FreeInheritedFromArray(pInheritArray: PVOID, AceCnt: USHORT, pfnArray: PVOID | NULL): DWORD {
     return Advapi32.Load('FreeInheritedFromArray')(pInheritArray, AceCnt, pfnArray);
   }
 
@@ -3043,7 +3043,7 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/securitybaseapi/nf-securitybaseapi-getfilesecuritya
-  public static GetFileSecurityA(lpFileName: LPCSTR, RequestedInformation: SECURITY_INFORMATION, pSecurityDescriptor: PSECURITY_DESCRIPTOR, nLength: DWORD, lpnLengthNeeded: LPDWORD): BOOL {
+  public static GetFileSecurityA(lpFileName: LPCSTR, RequestedInformation: SECURITY_INFORMATION, pSecurityDescriptor: PSECURITY_DESCRIPTOR | NULL, nLength: DWORD, lpnLengthNeeded: LPDWORD): BOOL {
     return Advapi32.Load('GetFileSecurityA')(lpFileName, RequestedInformation, pSecurityDescriptor, nLength, lpnLengthNeeded);
   }
 
@@ -3125,22 +3125,22 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/aclapi/nf-aclapi-getmultipletrusteea
-  public static GetMultipleTrusteeA(pTrustee: PTRUSTEE): PVOID {
+  public static GetMultipleTrusteeA(pTrustee: PTRUSTEE | NULL): PVOID {
     return Advapi32.Load('GetMultipleTrusteeA')(pTrustee);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/aclapi/nf-aclapi-getmultipletrusteeoperationa
-  public static GetMultipleTrusteeOperationA(pTrustee: PTRUSTEE): DWORD {
+  public static GetMultipleTrusteeOperationA(pTrustee: PTRUSTEE | NULL): DWORD {
     return Advapi32.Load('GetMultipleTrusteeOperationA')(pTrustee);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/aclapi/nf-aclapi-getmultipletrusteeoperationw
-  public static GetMultipleTrusteeOperationW(pTrustee: PTRUSTEE): DWORD {
+  public static GetMultipleTrusteeOperationW(pTrustee: PTRUSTEE | NULL): DWORD {
     return Advapi32.Load('GetMultipleTrusteeOperationW')(pTrustee);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/aclapi/nf-aclapi-getmultipletrusteew
-  public static GetMultipleTrusteeW(pTrustee: PTRUSTEE): PVOID {
+  public static GetMultipleTrusteeW(pTrustee: PTRUSTEE | NULL): LPVOID {
     return Advapi32.Load('GetMultipleTrusteeW')(pTrustee);
   }
 
@@ -3160,7 +3160,7 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/aclapi/nf-aclapi-getnamedsecurityinfow
-  public static GetNamedSecurityInfoW(pObjectName: LPCWSTR, ObjectType: DWORD, SecurityInfo: SECURITY_INFORMATION, ppsidOwner: PVOID, ppsidGroup: PVOID, ppDacl: PVOID, ppSacl: PVOID, ppSecurityDescriptor: PVOID): DWORD {
+  public static GetNamedSecurityInfoW(pObjectName: LPCWSTR, ObjectType: DWORD, SecurityInfo: SECURITY_INFORMATION, ppsidOwner: PVOID | NULL, ppsidGroup: PVOID | NULL, ppDacl: PVOID | NULL, ppSacl: PVOID | NULL, ppSecurityDescriptor: PVOID): DWORD {
     return Advapi32.Load('GetNamedSecurityInfoW')(pObjectName, ObjectType, SecurityInfo, ppsidOwner, ppsidGroup, ppDacl, ppSacl, ppSecurityDescriptor);
   }
 
@@ -3220,7 +3220,7 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/aclapi/nf-aclapi-getsecurityinfo
-  public static GetSecurityInfo(handle: HANDLE, ObjectType: DWORD, SecurityInfo: SECURITY_INFORMATION, ppsidOwner: PVOID, ppsidGroup: PVOID, ppDacl: PVOID, ppSacl: PVOID, ppSecurityDescriptor: PVOID): DWORD {
+  public static GetSecurityInfo(handle: HANDLE, ObjectType: DWORD, SecurityInfo: SECURITY_INFORMATION, ppsidOwner: PVOID | NULL, ppsidGroup: PVOID | NULL, ppDacl: PVOID | NULL, ppSacl: PVOID | NULL, ppSecurityDescriptor: PVOID | NULL): DWORD {
     return Advapi32.Load('GetSecurityInfo')(handle, ObjectType, SecurityInfo, ppsidOwner, ppsidGroup, ppDacl, ppSacl, ppSecurityDescriptor);
   }
 
@@ -3235,22 +3235,22 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsvc/nf-winsvc-getservicedisplaynamea
-  public static GetServiceDisplayNameA(hSCManager: SC_HANDLE, lpServiceName: LPCSTR, lpDisplayName: LPSTR, lpcchBuffer: LPDWORD): BOOL {
+  public static GetServiceDisplayNameA(hSCManager: SC_HANDLE, lpServiceName: LPCSTR, lpDisplayName: LPSTR | NULL, lpcchBuffer: LPDWORD): BOOL {
     return Advapi32.Load('GetServiceDisplayNameA')(hSCManager, lpServiceName, lpDisplayName, lpcchBuffer);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsvc/nf-winsvc-getservicedisplaynamew
-  public static GetServiceDisplayNameW(hSCManager: SC_HANDLE, lpServiceName: LPCWSTR, lpDisplayName: LPWSTR, lpcchBuffer: LPDWORD): BOOL {
+  public static GetServiceDisplayNameW(hSCManager: SC_HANDLE, lpServiceName: LPCWSTR, lpDisplayName: LPWSTR | NULL, lpcchBuffer: LPDWORD): BOOL {
     return Advapi32.Load('GetServiceDisplayNameW')(hSCManager, lpServiceName, lpDisplayName, lpcchBuffer);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsvc/nf-winsvc-getservicekeynamea
-  public static GetServiceKeyNameA(hSCManager: SC_HANDLE, lpDisplayName: LPCSTR, lpServiceName: LPSTR, lpcchBuffer: LPDWORD): BOOL {
+  public static GetServiceKeyNameA(hSCManager: SC_HANDLE, lpDisplayName: LPCSTR, lpServiceName: LPSTR | NULL, lpcchBuffer: LPDWORD): BOOL {
     return Advapi32.Load('GetServiceKeyNameA')(hSCManager, lpDisplayName, lpServiceName, lpcchBuffer);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsvc/nf-winsvc-getservicekeynamew
-  public static GetServiceKeyNameW(hSCManager: SC_HANDLE, lpDisplayName: LPCWSTR, lpServiceName: LPWSTR, lpcchBuffer: LPDWORD): BOOL {
+  public static GetServiceKeyNameW(hSCManager: SC_HANDLE, lpDisplayName: LPCWSTR, lpServiceName: LPWSTR | NULL, lpcchBuffer: LPDWORD): BOOL {
     return Advapi32.Load('GetServiceKeyNameW')(hSCManager, lpDisplayName, lpServiceName, lpcchBuffer);
   }
 
@@ -3285,7 +3285,7 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/securitybaseapi/nf-securitybaseapi-gettokeninformation
-  public static GetTokenInformation(TokenHandle: HANDLE, TokenInformationClass: TOKEN_INFORMATION_CLASS, TokenInformation: LPVOID, TokenInformationLength: DWORD, ReturnLength: LPDWORD): BOOL {
+  public static GetTokenInformation(TokenHandle: HANDLE, TokenInformationClass: TOKEN_INFORMATION_CLASS, TokenInformation: LPVOID | NULL, TokenInformationLength: DWORD, ReturnLength: LPDWORD): BOOL {
     return Advapi32.Load('GetTokenInformation')(TokenHandle, TokenInformationClass, TokenInformation, TokenInformationLength, ReturnLength);
   }
 
@@ -3310,22 +3310,22 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/aclapi/nf-aclapi-gettrusteetypea
-  public static GetTrusteeTypeA(pTrustee: PTRUSTEE): DWORD {
+  public static GetTrusteeTypeA(pTrustee: PTRUSTEE | NULL): DWORD {
     return Advapi32.Load('GetTrusteeTypeA')(pTrustee);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/aclapi/nf-aclapi-gettrusteetypew
-  public static GetTrusteeTypeW(pTrustee: PTRUSTEE): DWORD {
+  public static GetTrusteeTypeW(pTrustee: PTRUSTEE | NULL): DWORD {
     return Advapi32.Load('GetTrusteeTypeW')(pTrustee);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-getusernamea
-  public static GetUserNameA(lpBuffer: LPSTR, pcbBuffer: LPDWORD): BOOL {
+  public static GetUserNameA(lpBuffer: LPSTR | NULL, pcbBuffer: LPDWORD): BOOL {
     return Advapi32.Load('GetUserNameA')(lpBuffer, pcbBuffer);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-getusernamew
-  public static GetUserNameW(lpBuffer: LPWSTR, pcbBuffer: LPDWORD): BOOL {
+  public static GetUserNameW(lpBuffer: LPWSTR | NULL, pcbBuffer: LPDWORD): BOOL {
     return Advapi32.Load('GetUserNameW')(lpBuffer, pcbBuffer);
   }
 
@@ -3395,12 +3395,12 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-initiateshutdowna
-  public static InitiateShutdownA(lpMachineName: LPSTR, lpMessage: LPSTR, dwGracePeriod: DWORD, dwShutdownFlags: DWORD, dwReason: DWORD): DWORD {
+  public static InitiateShutdownA(lpMachineName: LPSTR | NULL, lpMessage: LPSTR | NULL, dwGracePeriod: DWORD, dwShutdownFlags: DWORD, dwReason: DWORD): DWORD {
     return Advapi32.Load('InitiateShutdownA')(lpMachineName, lpMessage, dwGracePeriod, dwShutdownFlags, dwReason);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-initiateshutdownw
-  public static InitiateShutdownW(lpMachineName: LPWSTR, lpMessage: LPWSTR, dwGracePeriod: DWORD, dwShutdownFlags: DWORD, dwReason: DWORD): DWORD {
+  public static InitiateShutdownW(lpMachineName: LPWSTR | NULL, lpMessage: LPWSTR | NULL, dwGracePeriod: DWORD, dwShutdownFlags: DWORD, dwReason: DWORD): DWORD {
     return Advapi32.Load('InitiateShutdownW')(lpMachineName, lpMessage, dwGracePeriod, dwShutdownFlags, dwReason);
   }
 
@@ -3430,7 +3430,7 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-istextunicode
-  public static IsTextUnicode(lpv: LPCVOID, iSize: INT, lpiResult: LPVOID): BOOL {
+  public static IsTextUnicode(lpv: LPCVOID, iSize: INT, lpiResult: LPVOID | NULL): BOOL {
     return Advapi32.Load('IsTextUnicode')(lpv, iSize, lpiResult);
   }
 
@@ -3529,7 +3529,7 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-logonuserw
-  public static LogonUserW(lpszUsername: LPCWSTR, lpszDomain: LPCWSTR, lpszPassword: LPCWSTR, dwLogonType: DWORD, dwLogonProvider: DWORD, phToken: PHANDLE): BOOL {
+  public static LogonUserW(lpszUsername: LPCWSTR, lpszDomain: LPCWSTR | NULL, lpszPassword: LPCWSTR | NULL, dwLogonType: DWORD, dwLogonProvider: DWORD, phToken: PHANDLE): BOOL {
     return Advapi32.Load('LogonUserW')(lpszUsername, lpszDomain, lpszPassword, dwLogonType, dwLogonProvider, phToken);
   }
 
@@ -3584,12 +3584,12 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/aclapi/nf-aclapi-lookupsecuritydescriptorpartsa
-  public static LookupSecurityDescriptorPartsA(pOwner: PVOID, pGroup: PVOID, cCountOfAccessEntries: PULONG, pListOfAccessEntries: PVOID, cCountOfAuditEntries: PULONG, pListOfAuditEntries: PVOID, pSD: PSECURITY_DESCRIPTOR): DWORD {
+  public static LookupSecurityDescriptorPartsA(pOwner: PVOID | NULL, pGroup: PVOID | NULL, cCountOfAccessEntries: PULONG | NULL, pListOfAccessEntries: PVOID, cCountOfAuditEntries: PULONG | NULL, pListOfAuditEntries: PVOID, pSD: PSECURITY_DESCRIPTOR): DWORD {
     return Advapi32.Load('LookupSecurityDescriptorPartsA')(pOwner, pGroup, cCountOfAccessEntries, pListOfAccessEntries, cCountOfAuditEntries, pListOfAuditEntries, pSD);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/aclapi/nf-aclapi-lookupsecuritydescriptorpartsw
-  public static LookupSecurityDescriptorPartsW(pOwner: PVOID, pGroup: PVOID, cCountOfAccessEntries: PULONG, pListOfAccessEntries: PVOID, cCountOfAuditEntries: PULONG, pListOfAuditEntries: PVOID, pSD: PSECURITY_DESCRIPTOR): DWORD {
+  public static LookupSecurityDescriptorPartsW(pOwner: PVOID | NULL, pGroup: PVOID | NULL, cCountOfAccessEntries: PULONG | NULL, pListOfAccessEntries: PVOID, cCountOfAuditEntries: PULONG | NULL, pListOfAuditEntries: PVOID, pSD: PSECURITY_DESCRIPTOR): DWORD {
     return Advapi32.Load('LookupSecurityDescriptorPartsW')(pOwner, pGroup, cCountOfAccessEntries, pListOfAccessEntries, cCountOfAuditEntries, pListOfAuditEntries, pSD);
   }
 
@@ -4155,7 +4155,7 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-openbackupeventlogw
-  public static OpenBackupEventLogW(lpUNCServerName: LPCWSTR, lpFileName: LPCWSTR): HANDLE {
+  public static OpenBackupEventLogW(lpUNCServerName: LPCWSTR | NULL, lpFileName: LPCWSTR): HANDLE {
     return Advapi32.Load('OpenBackupEventLogW')(lpUNCServerName, lpFileName);
   }
 
@@ -4170,12 +4170,12 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-openeventloga
-  public static OpenEventLogA(lpUNCServerName: LPCSTR, lpSourceName: LPCSTR): HANDLE {
+  public static OpenEventLogA(lpUNCServerName: LPCSTR | NULL, lpSourceName: LPCSTR): HANDLE {
     return Advapi32.Load('OpenEventLogA')(lpUNCServerName, lpSourceName);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-openeventlogw
-  public static OpenEventLogW(lpUNCServerName: LPCWSTR, lpSourceName: LPCWSTR): HANDLE {
+  public static OpenEventLogW(lpUNCServerName: LPCWSTR | NULL, lpSourceName: LPCWSTR): HANDLE {
     return Advapi32.Load('OpenEventLogW')(lpUNCServerName, lpSourceName);
   }
 
@@ -4190,7 +4190,7 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsvc/nf-winsvc-openscmanagerw
-  public static OpenSCManagerW(lpMachineName: LPCWSTR, lpDatabaseName: LPCWSTR, dwDesiredAccess: DWORD): SC_HANDLE {
+  public static OpenSCManagerW(lpMachineName: LPCWSTR | NULL, lpDatabaseName: LPCWSTR | NULL, dwDesiredAccess: DWORD): SC_HANDLE {
     return Advapi32.Load('OpenSCManagerW')(lpMachineName, lpDatabaseName, dwDesiredAccess);
   }
 
@@ -4388,12 +4388,12 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsvc/nf-winsvc-queryserviceconfiga
-  public static QueryServiceConfigA(hService: SC_HANDLE, lpServiceConfig: PVOID, cbBufSize: DWORD, pcbBytesNeeded: LPDWORD): BOOL {
+  public static QueryServiceConfigA(hService: SC_HANDLE, lpServiceConfig: PVOID | NULL, cbBufSize: DWORD, pcbBytesNeeded: LPDWORD): BOOL {
     return Advapi32.Load('QueryServiceConfigA')(hService, lpServiceConfig, cbBufSize, pcbBytesNeeded);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsvc/nf-winsvc-queryserviceconfigw
-  public static QueryServiceConfigW(hService: SC_HANDLE, lpServiceConfig: PVOID, cbBufSize: DWORD, pcbBytesNeeded: LPDWORD): BOOL {
+  public static QueryServiceConfigW(hService: SC_HANDLE, lpServiceConfig: PVOID | NULL, cbBufSize: DWORD, pcbBytesNeeded: LPDWORD): BOOL {
     return Advapi32.Load('QueryServiceConfigW')(hService, lpServiceConfig, cbBufSize, pcbBytesNeeded);
   }
 
@@ -4408,7 +4408,7 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsvc/nf-winsvc-queryservicelockstatusw
-  public static QueryServiceLockStatusW(hSCManager: SC_HANDLE, lpLockStatus: PVOID, cbBufSize: DWORD, pcbBytesNeeded: LPDWORD): BOOL {
+  public static QueryServiceLockStatusW(hSCManager: SC_HANDLE, lpLockStatus: PVOID | NULL, cbBufSize: DWORD, pcbBytesNeeded: LPDWORD): BOOL {
     return Advapi32.Load('QueryServiceLockStatusW')(hSCManager, lpLockStatus, cbBufSize, pcbBytesNeeded);
   }
 
@@ -4423,7 +4423,7 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsvc/nf-winsvc-queryservicestatusex
-  public static QueryServiceStatusEx(hService: SC_HANDLE, InfoLevel: DWORD, lpBuffer: LPBYTE, cbBufSize: DWORD, pcbBytesNeeded: LPDWORD): BOOL {
+  public static QueryServiceStatusEx(hService: SC_HANDLE, InfoLevel: DWORD, lpBuffer: LPBYTE | NULL, cbBufSize: DWORD, pcbBytesNeeded: LPDWORD): BOOL {
     return Advapi32.Load('QueryServiceStatusEx')(hService, InfoLevel, lpBuffer, cbBufSize, pcbBytesNeeded);
   }
 
@@ -4458,7 +4458,7 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-readencryptedfileraw
-  public static ReadEncryptedFileRaw(pfExportCallback: PVOID, pvCallbackContext: PVOID, pvContext: PVOID): DWORD {
+  public static ReadEncryptedFileRaw(pfExportCallback: PVOID, pvCallbackContext: PVOID | NULL, pvContext: PVOID): DWORD {
     return Advapi32.Load('ReadEncryptedFileRaw')(pfExportCallback, pvCallbackContext, pvContext);
   }
 
@@ -4478,7 +4478,7 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regconnectregistrya
-  public static RegConnectRegistryA(lpMachineName: LPCSTR, hKey: HKEY, phkResult: PHKEY): LSTATUS {
+  public static RegConnectRegistryA(lpMachineName: LPCSTR | NULL, hKey: HKEY, phkResult: PHKEY): LSTATUS {
     return Advapi32.Load('RegConnectRegistryA')(lpMachineName, hKey, phkResult);
   }
 
@@ -4488,17 +4488,17 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regconnectregistryexw
-  public static RegConnectRegistryExW(lpMachineName: LPCWSTR, hKey: HKEY, Flags: ULONG, phkResult: PHKEY): LSTATUS {
+  public static RegConnectRegistryExW(lpMachineName: LPCWSTR | NULL, hKey: HKEY, Flags: ULONG, phkResult: PHKEY): LSTATUS {
     return Advapi32.Load('RegConnectRegistryExW')(lpMachineName, hKey, Flags, phkResult);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regconnectregistryw
-  public static RegConnectRegistryW(lpMachineName: LPCWSTR, hKey: HKEY, phkResult: PHKEY): LSTATUS {
+  public static RegConnectRegistryW(lpMachineName: LPCWSTR | NULL, hKey: HKEY, phkResult: PHKEY): LSTATUS {
     return Advapi32.Load('RegConnectRegistryW')(lpMachineName, hKey, phkResult);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regcopytreea
-  public static RegCopyTreeA(hKeySrc: HKEY, lpSubKey: LPCSTR, hKeyDest: HKEY): LSTATUS {
+  public static RegCopyTreeA(hKeySrc: HKEY, lpSubKey: LPCSTR | NULL, hKeyDest: HKEY): LSTATUS {
     return Advapi32.Load('RegCopyTreeA')(hKeySrc, lpSubKey, hKeyDest);
   }
 
@@ -4513,12 +4513,12 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regcreatekeyexa
-  public static RegCreateKeyExA(hKey: HKEY, lpSubKey: LPCSTR, Reserved: DWORD, lpClass: LPSTR, dwOptions: DWORD, samDesired: REGSAM, lpSecurityAttributes: PVOID, phkResult: PHKEY, lpdwDisposition: LPDWORD): LSTATUS {
+  public static RegCreateKeyExA(hKey: HKEY, lpSubKey: LPCSTR, Reserved: DWORD, lpClass: LPSTR | NULL, dwOptions: DWORD, samDesired: REGSAM, lpSecurityAttributes: PVOID | NULL, phkResult: PHKEY, lpdwDisposition: LPDWORD | NULL): LSTATUS {
     return Advapi32.Load('RegCreateKeyExA')(hKey, lpSubKey, Reserved, lpClass, dwOptions, samDesired, lpSecurityAttributes, phkResult, lpdwDisposition);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regcreatekeyexw
-  public static RegCreateKeyExW(hKey: HKEY, lpSubKey: LPCWSTR, Reserved: DWORD, lpClass: LPWSTR, dwOptions: DWORD, samDesired: REGSAM, lpSecurityAttributes: PVOID, phkResult: PHKEY, lpdwDisposition: LPDWORD): LSTATUS {
+  public static RegCreateKeyExW(hKey: HKEY, lpSubKey: LPCWSTR, Reserved: DWORD, lpClass: LPWSTR | NULL, dwOptions: DWORD, samDesired: REGSAM, lpSecurityAttributes: PVOID | NULL, phkResult: PHKEY, lpdwDisposition: LPDWORD | NULL): LSTATUS {
     return Advapi32.Load('RegCreateKeyExW')(hKey, lpSubKey, Reserved, lpClass, dwOptions, samDesired, lpSecurityAttributes, phkResult, lpdwDisposition);
   }
 
@@ -4557,7 +4557,7 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regcreatekeyw
-  public static RegCreateKeyW(hKey: HKEY, lpSubKey: LPCWSTR, phkResult: PHKEY): LSTATUS {
+  public static RegCreateKeyW(hKey: HKEY, lpSubKey: LPCWSTR | NULL, phkResult: PHKEY): LSTATUS {
     return Advapi32.Load('RegCreateKeyW')(hKey, lpSubKey, phkResult);
   }
 
@@ -4577,22 +4577,22 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regdeletekeytransacteda
-  public static RegDeleteKeyTransactedA(hKey: HKEY, lpSubKey: LPCSTR, samDesired: REGSAM, Reserved: DWORD, hTransaction: HANDLE, pExtendedParameter: PVOID): LSTATUS {
+  public static RegDeleteKeyTransactedA(hKey: HKEY, lpSubKey: LPCSTR, samDesired: REGSAM, Reserved: DWORD, hTransaction: HANDLE, pExtendedParameter: PVOID | NULL): LSTATUS {
     return Advapi32.Load('RegDeleteKeyTransactedA')(hKey, lpSubKey, samDesired, Reserved, hTransaction, pExtendedParameter);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regdeletekeytransactedw
-  public static RegDeleteKeyTransactedW(hKey: HKEY, lpSubKey: LPCWSTR, samDesired: REGSAM, Reserved: DWORD, hTransaction: HANDLE, pExtendedParameter: PVOID): LSTATUS {
+  public static RegDeleteKeyTransactedW(hKey: HKEY, lpSubKey: LPCWSTR, samDesired: REGSAM, Reserved: DWORD, hTransaction: HANDLE, pExtendedParameter: PVOID | NULL): LSTATUS {
     return Advapi32.Load('RegDeleteKeyTransactedW')(hKey, lpSubKey, samDesired, Reserved, hTransaction, pExtendedParameter);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regdeletekeyvaluea
-  public static RegDeleteKeyValueA(hKey: HKEY, lpSubKey: LPCSTR, lpValueName: LPCSTR): LSTATUS {
+  public static RegDeleteKeyValueA(hKey: HKEY, lpSubKey: LPCSTR | NULL, lpValueName: LPCSTR | NULL): LSTATUS {
     return Advapi32.Load('RegDeleteKeyValueA')(hKey, lpSubKey, lpValueName);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regdeletekeyvaluew
-  public static RegDeleteKeyValueW(hKey: HKEY, lpSubKey: LPCWSTR, lpValueName: LPCWSTR): LSTATUS {
+  public static RegDeleteKeyValueW(hKey: HKEY, lpSubKey: LPCWSTR | NULL, lpValueName: LPCWSTR | NULL): LSTATUS {
     return Advapi32.Load('RegDeleteKeyValueW')(hKey, lpSubKey, lpValueName);
   }
 
@@ -4602,12 +4602,12 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regdeletetreea
-  public static RegDeleteTreeA(hKey: HKEY, lpSubKey: LPCSTR): LSTATUS {
+  public static RegDeleteTreeA(hKey: HKEY, lpSubKey: LPCSTR | NULL): LSTATUS {
     return Advapi32.Load('RegDeleteTreeA')(hKey, lpSubKey);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regdeletetreew
-  public static RegDeleteTreeW(hKey: HKEY, lpSubKey: LPCWSTR): LSTATUS {
+  public static RegDeleteTreeW(hKey: HKEY, lpSubKey: LPCWSTR | NULL): LSTATUS {
     return Advapi32.Load('RegDeleteTreeW')(hKey, lpSubKey);
   }
 
@@ -4617,7 +4617,7 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regdeletevaluew
-  public static RegDeleteValueW(hKey: HKEY, lpValueName: LPCWSTR): LSTATUS {
+  public static RegDeleteValueW(hKey: HKEY, lpValueName: LPCWSTR | NULL): LSTATUS {
     return Advapi32.Load('RegDeleteValueW')(hKey, lpValueName);
   }
 
@@ -4642,32 +4642,32 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regenumkeya
-  public static RegEnumKeyA(hKey: HKEY, dwIndex: DWORD, lpName: LPSTR, cchName: DWORD): LSTATUS {
+  public static RegEnumKeyA(hKey: HKEY, dwIndex: DWORD, lpName: LPSTR | NULL, cchName: DWORD): LSTATUS {
     return Advapi32.Load('RegEnumKeyA')(hKey, dwIndex, lpName, cchName);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regenumkeyexa
-  public static RegEnumKeyExA(hKey: HKEY, dwIndex: DWORD, lpName: LPSTR, lpcchName: LPDWORD, lpReserved: LPDWORD, lpClass: LPSTR, lpcchClass: LPDWORD, lpftLastWriteTime: PVOID): LSTATUS {
+  public static RegEnumKeyExA(hKey: HKEY, dwIndex: DWORD, lpName: LPSTR | NULL, lpcchName: LPDWORD, lpReserved: LPDWORD | NULL, lpClass: LPSTR | NULL, lpcchClass: LPDWORD | NULL, lpftLastWriteTime: PVOID | NULL): LSTATUS {
     return Advapi32.Load('RegEnumKeyExA')(hKey, dwIndex, lpName, lpcchName, lpReserved, lpClass, lpcchClass, lpftLastWriteTime);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regenumkeyexw
-  public static RegEnumKeyExW(hKey: HKEY, dwIndex: DWORD, lpName: LPWSTR, lpcchName: LPDWORD, lpReserved: LPDWORD, lpClass: LPWSTR, lpcchClass: LPDWORD, lpftLastWriteTime: PVOID): LSTATUS {
+  public static RegEnumKeyExW(hKey: HKEY, dwIndex: DWORD, lpName: LPWSTR | NULL, lpcchName: LPDWORD, lpReserved: LPDWORD | NULL, lpClass: LPWSTR | NULL, lpcchClass: LPDWORD | NULL, lpftLastWriteTime: PVOID | NULL): LSTATUS {
     return Advapi32.Load('RegEnumKeyExW')(hKey, dwIndex, lpName, lpcchName, lpReserved, lpClass, lpcchClass, lpftLastWriteTime);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regenumkeyw
-  public static RegEnumKeyW(hKey: HKEY, dwIndex: DWORD, lpName: LPWSTR, cchName: DWORD): LSTATUS {
+  public static RegEnumKeyW(hKey: HKEY, dwIndex: DWORD, lpName: LPWSTR | NULL, cchName: DWORD): LSTATUS {
     return Advapi32.Load('RegEnumKeyW')(hKey, dwIndex, lpName, cchName);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regenumvaluea
-  public static RegEnumValueA(hKey: HKEY, dwIndex: DWORD, lpValueName: LPSTR, lpcchValueName: LPDWORD, lpReserved: LPDWORD, lpType: LPDWORD, lpData: LPBYTE, lpcbData: LPDWORD): LSTATUS {
+  public static RegEnumValueA(hKey: HKEY, dwIndex: DWORD, lpValueName: LPSTR | NULL, lpcchValueName: LPDWORD, lpReserved: LPDWORD | NULL, lpType: LPDWORD | NULL, lpData: LPBYTE | NULL, lpcbData: LPDWORD | NULL): LSTATUS {
     return Advapi32.Load('RegEnumValueA')(hKey, dwIndex, lpValueName, lpcchValueName, lpReserved, lpType, lpData, lpcbData);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regenumvaluew
-  public static RegEnumValueW(hKey: HKEY, dwIndex: DWORD, lpValueName: LPWSTR, lpcchValueName: LPDWORD, lpReserved: LPDWORD, lpType: LPDWORD, lpData: LPBYTE, lpcbData: LPDWORD): LSTATUS {
+  public static RegEnumValueW(hKey: HKEY, dwIndex: DWORD, lpValueName: LPWSTR | NULL, lpcchValueName: LPDWORD, lpReserved: LPDWORD | NULL, lpType: LPDWORD | NULL, lpData: LPBYTE | NULL, lpcbData: LPDWORD | NULL): LSTATUS {
     return Advapi32.Load('RegEnumValueW')(hKey, dwIndex, lpValueName, lpcchValueName, lpReserved, lpType, lpData, lpcbData);
   }
 
@@ -4677,7 +4677,7 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-reggetkeysecurity
-  public static RegGetKeySecurity(hKey: HKEY, SecurityInformation: SECURITY_INFORMATION, pSecurityDescriptor: PSECURITY_DESCRIPTOR, lpcbSecurityDescriptor: LPDWORD): LSTATUS {
+  public static RegGetKeySecurity(hKey: HKEY, SecurityInformation: SECURITY_INFORMATION, pSecurityDescriptor: PSECURITY_DESCRIPTOR | NULL, lpcbSecurityDescriptor: LPDWORD): LSTATUS {
     return Advapi32.Load('RegGetKeySecurity')(hKey, SecurityInformation, pSecurityDescriptor, lpcbSecurityDescriptor);
   }
 
@@ -4687,7 +4687,7 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-reggetvaluew
-  public static RegGetValueW(hkey: HKEY, lpSubKey: LPCWSTR, lpValue: LPCWSTR, dwFlags: DWORD, pdwType: LPDWORD, pvData: PVOID, pcbData: LPDWORD): LSTATUS {
+  public static RegGetValueW(hkey: HKEY, lpSubKey: LPCWSTR | NULL, lpValue: LPCWSTR | NULL, dwFlags: DWORD, pdwType: LPDWORD | NULL, pvData: PVOID | NULL, pcbData: LPDWORD | NULL): LSTATUS {
     return Advapi32.Load('RegGetValueW')(hkey, lpSubKey, lpValue, dwFlags, pdwType, pvData, pcbData);
   }
 
@@ -4702,27 +4702,27 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regloadkeya
-  public static RegLoadKeyA(hKey: HKEY, lpSubKey: LPCSTR, lpFile: LPCSTR): LSTATUS {
+  public static RegLoadKeyA(hKey: HKEY, lpSubKey: LPCSTR | NULL, lpFile: LPCSTR): LSTATUS {
     return Advapi32.Load('RegLoadKeyA')(hKey, lpSubKey, lpFile);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regloadkeyw
-  public static RegLoadKeyW(hKey: HKEY, lpSubKey: LPCWSTR, lpFile: LPCWSTR): LSTATUS {
+  public static RegLoadKeyW(hKey: HKEY, lpSubKey: LPCWSTR | NULL, lpFile: LPCWSTR): LSTATUS {
     return Advapi32.Load('RegLoadKeyW')(hKey, lpSubKey, lpFile);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regloadmuistringa
-  public static RegLoadMUIStringA(hKey: HKEY, pszValue: LPCSTR, pszOutBuf: LPSTR, cbOutBuf: DWORD, pcbData: LPDWORD, Flags: DWORD, pszDirectory: LPCSTR): LSTATUS {
+  public static RegLoadMUIStringA(hKey: HKEY, pszValue: LPCSTR | NULL, pszOutBuf: LPSTR | NULL, cbOutBuf: DWORD, pcbData: LPDWORD | NULL, Flags: DWORD, pszDirectory: LPCSTR | NULL): LSTATUS {
     return Advapi32.Load('RegLoadMUIStringA')(hKey, pszValue, pszOutBuf, cbOutBuf, pcbData, Flags, pszDirectory);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regloadmuistringw
-  public static RegLoadMUIStringW(hKey: HKEY, pszValue: LPCWSTR, pszOutBuf: LPWSTR, cbOutBuf: DWORD, pcbData: LPDWORD, Flags: DWORD, pszDirectory: LPCWSTR): LSTATUS {
+  public static RegLoadMUIStringW(hKey: HKEY, pszValue: LPCWSTR | NULL, pszOutBuf: LPWSTR | NULL, cbOutBuf: DWORD, pcbData: LPDWORD | NULL, Flags: DWORD, pszDirectory: LPCWSTR | NULL): LSTATUS {
     return Advapi32.Load('RegLoadMUIStringW')(hKey, pszValue, pszOutBuf, cbOutBuf, pcbData, Flags, pszDirectory);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regnotifychangekeyvalue
-  public static RegNotifyChangeKeyValue(hKey: HKEY, bWatchSubtree: BOOL, dwNotifyFilter: DWORD, hEvent: HANDLE, fAsynchronous: BOOL): LSTATUS {
+  public static RegNotifyChangeKeyValue(hKey: HKEY, bWatchSubtree: BOOL, dwNotifyFilter: DWORD, hEvent: HANDLE | 0n, fAsynchronous: BOOL): LSTATUS {
     return Advapi32.Load('RegNotifyChangeKeyValue')(hKey, bWatchSubtree, dwNotifyFilter, hEvent, fAsynchronous);
   }
 
@@ -4737,27 +4737,27 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regopenkeyexa
-  public static RegOpenKeyExA(hKey: HKEY, lpSubKey: LPCSTR, ulOptions: DWORD, samDesired: REGSAM, phkResult: PHKEY): LSTATUS {
+  public static RegOpenKeyExA(hKey: HKEY, lpSubKey: LPCSTR | NULL, ulOptions: DWORD, samDesired: REGSAM, phkResult: PHKEY): LSTATUS {
     return Advapi32.Load('RegOpenKeyExA')(hKey, lpSubKey, ulOptions, samDesired, phkResult);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regopenkeyexw
-  public static RegOpenKeyExW(hKey: HKEY, lpSubKey: LPCWSTR, ulOptions: DWORD, samDesired: REGSAM, phkResult: PHKEY): LSTATUS {
+  public static RegOpenKeyExW(hKey: HKEY, lpSubKey: LPCWSTR | NULL, ulOptions: DWORD, samDesired: REGSAM, phkResult: PHKEY): LSTATUS {
     return Advapi32.Load('RegOpenKeyExW')(hKey, lpSubKey, ulOptions, samDesired, phkResult);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regopenkeytransacteda
-  public static RegOpenKeyTransactedA(hKey: HKEY, lpSubKey: LPCSTR, ulOptions: DWORD, samDesired: REGSAM, phkResult: PHKEY, hTransaction: HANDLE, pExtendedParemeter: PVOID): LSTATUS {
+  public static RegOpenKeyTransactedA(hKey: HKEY, lpSubKey: LPCSTR, ulOptions: DWORD, samDesired: REGSAM, phkResult: PHKEY, hTransaction: HANDLE, pExtendedParemeter: PVOID | NULL): LSTATUS {
     return Advapi32.Load('RegOpenKeyTransactedA')(hKey, lpSubKey, ulOptions, samDesired, phkResult, hTransaction, pExtendedParemeter);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regopenkeytransactedw
-  public static RegOpenKeyTransactedW(hKey: HKEY, lpSubKey: LPCWSTR, ulOptions: DWORD, samDesired: REGSAM, phkResult: PHKEY, hTransaction: HANDLE, pExtendedParemeter: PVOID): LSTATUS {
+  public static RegOpenKeyTransactedW(hKey: HKEY, lpSubKey: LPCWSTR | NULL, ulOptions: DWORD, samDesired: REGSAM, phkResult: PHKEY, hTransaction: HANDLE, pExtendedParemeter: PVOID | NULL): LSTATUS {
     return Advapi32.Load('RegOpenKeyTransactedW')(hKey, lpSubKey, ulOptions, samDesired, phkResult, hTransaction, pExtendedParemeter);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regopenkeyw
-  public static RegOpenKeyW(hKey: HKEY, lpSubKey: LPCWSTR, phkResult: PHKEY): LSTATUS {
+  public static RegOpenKeyW(hKey: HKEY, lpSubKey: LPCWSTR | NULL, phkResult: PHKEY): LSTATUS {
     return Advapi32.Load('RegOpenKeyW')(hKey, lpSubKey, phkResult);
   }
 
@@ -4813,7 +4813,7 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regquerymultiplevaluesw
-  public static RegQueryMultipleValuesW(hKey: HKEY, val_list: PVALENTW, num_vals: DWORD, lpValueBuf: LPWSTR, ldwTotsize: LPDWORD): LSTATUS {
+  public static RegQueryMultipleValuesW(hKey: HKEY, val_list: PVALENTW, num_vals: DWORD, lpValueBuf: LPWSTR | NULL, ldwTotsize: LPDWORD | NULL): LSTATUS {
     return Advapi32.Load('RegQueryMultipleValuesW')(hKey, val_list, num_vals, lpValueBuf, ldwTotsize);
   }
 
@@ -4828,17 +4828,17 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regqueryvalueexa
-  public static RegQueryValueExA(hKey: HKEY, lpValueName: LPCSTR, lpReserved: LPDWORD, lpType: LPDWORD, lpData: LPBYTE, lpcbData: LPDWORD): LSTATUS {
+  public static RegQueryValueExA(hKey: HKEY, lpValueName: LPCSTR | NULL, lpReserved: LPDWORD | NULL, lpType: LPDWORD | NULL, lpData: LPBYTE | NULL, lpcbData: LPDWORD | NULL): LSTATUS {
     return Advapi32.Load('RegQueryValueExA')(hKey, lpValueName, lpReserved, lpType, lpData, lpcbData);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regqueryvalueexw
-  public static RegQueryValueExW(hKey: HKEY, lpValueName: LPCWSTR, lpReserved: LPDWORD, lpType: LPDWORD, lpData: LPBYTE, lpcbData: LPDWORD): LSTATUS {
+  public static RegQueryValueExW(hKey: HKEY, lpValueName: LPCWSTR | NULL, lpReserved: LPDWORD | NULL, lpType: LPDWORD | NULL, lpData: LPBYTE | NULL, lpcbData: LPDWORD | NULL): LSTATUS {
     return Advapi32.Load('RegQueryValueExW')(hKey, lpValueName, lpReserved, lpType, lpData, lpcbData);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regqueryvaluew
-  public static RegQueryValueW(hKey: HKEY, lpSubKey: LPCWSTR, lpData: LPWSTR, lpcbData: PLONG): LSTATUS {
+  public static RegQueryValueW(hKey: HKEY, lpSubKey: LPCWSTR | NULL, lpData: LPWSTR | NULL, lpcbData: PLONG | NULL): LSTATUS {
     return Advapi32.Load('RegQueryValueW')(hKey, lpSubKey, lpData, lpcbData);
   }
 
@@ -4853,7 +4853,7 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regreplacekeyw
-  public static RegReplaceKeyW(hKey: HKEY, lpSubKey: LPCWSTR, lpNewFile: LPCWSTR, lpOldFile: LPCWSTR): LSTATUS {
+  public static RegReplaceKeyW(hKey: HKEY, lpSubKey: LPCWSTR | NULL, lpNewFile: LPCWSTR, lpOldFile: LPCWSTR): LSTATUS {
     return Advapi32.Load('RegReplaceKeyW')(hKey, lpSubKey, lpNewFile, lpOldFile);
   }
 
@@ -4878,12 +4878,12 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regsavekeyexw
-  public static RegSaveKeyExW(hKey: HKEY, lpFile: LPCWSTR, lpSecurityAttributes: PVOID, Flags: DWORD): LSTATUS {
+  public static RegSaveKeyExW(hKey: HKEY, lpFile: LPCWSTR, lpSecurityAttributes: PVOID | NULL, Flags: DWORD): LSTATUS {
     return Advapi32.Load('RegSaveKeyExW')(hKey, lpFile, lpSecurityAttributes, Flags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regsavekeyw
-  public static RegSaveKeyW(hKey: HKEY, lpFile: LPCWSTR, lpSecurityAttributes: PVOID): LSTATUS {
+  public static RegSaveKeyW(hKey: HKEY, lpFile: LPCWSTR, lpSecurityAttributes: PVOID | NULL): LSTATUS {
     return Advapi32.Load('RegSaveKeyW')(hKey, lpFile, lpSecurityAttributes);
   }
 
@@ -4893,17 +4893,17 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regsetkeyvaluea
-  public static RegSetKeyValueA(hKey: HKEY, lpSubKey: LPCSTR, lpValueName: LPCSTR, dwType: DWORD, lpData: LPCVOID, cbData: DWORD): LSTATUS {
+  public static RegSetKeyValueA(hKey: HKEY, lpSubKey: LPCSTR | NULL, lpValueName: LPCSTR | NULL, dwType: DWORD, lpData: LPCVOID | NULL, cbData: DWORD): LSTATUS {
     return Advapi32.Load('RegSetKeyValueA')(hKey, lpSubKey, lpValueName, dwType, lpData, cbData);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regsetkeyvaluew
-  public static RegSetKeyValueW(hKey: HKEY, lpSubKey: LPCWSTR, lpValueName: LPCWSTR, dwType: DWORD, lpData: LPCVOID, cbData: DWORD): LSTATUS {
+  public static RegSetKeyValueW(hKey: HKEY, lpSubKey: LPCWSTR | NULL, lpValueName: LPCWSTR | NULL, dwType: DWORD, lpData: LPCVOID | NULL, cbData: DWORD): LSTATUS {
     return Advapi32.Load('RegSetKeyValueW')(hKey, lpSubKey, lpValueName, dwType, lpData, cbData);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regsetvaluea
-  public static RegSetValueA(hKey: HKEY, lpSubKey: LPCSTR, dwType: DWORD, lpData: LPCSTR, cbData: DWORD): LSTATUS {
+  public static RegSetValueA(hKey: HKEY, lpSubKey: LPCSTR | NULL, dwType: DWORD, lpData: LPCSTR | NULL, cbData: DWORD): LSTATUS {
     return Advapi32.Load('RegSetValueA')(hKey, lpSubKey, dwType, lpData, cbData);
   }
 
@@ -4913,12 +4913,12 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regsetvalueexw
-  public static RegSetValueExW(hKey: HKEY, lpValueName: LPCWSTR, Reserved: DWORD, dwType: DWORD, lpData: LPBYTE, cbData: DWORD): LSTATUS {
+  public static RegSetValueExW(hKey: HKEY, lpValueName: LPCWSTR | NULL, Reserved: DWORD, dwType: DWORD, lpData: LPBYTE | NULL, cbData: DWORD): LSTATUS {
     return Advapi32.Load('RegSetValueExW')(hKey, lpValueName, Reserved, dwType, lpData, cbData);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regsetvaluew
-  public static RegSetValueW(hKey: HKEY, lpSubKey: LPCWSTR, dwType: DWORD, lpData: LPCWSTR, cbData: DWORD): LSTATUS {
+  public static RegSetValueW(hKey: HKEY, lpSubKey: LPCWSTR | NULL, dwType: DWORD, lpData: LPCWSTR | NULL, cbData: DWORD): LSTATUS {
     return Advapi32.Load('RegSetValueW')(hKey, lpSubKey, dwType, lpData, cbData);
   }
 
@@ -4928,7 +4928,7 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regunloadkeyw
-  public static RegUnLoadKeyW(hKey: HKEY, lpSubKey: LPCWSTR): LSTATUS {
+  public static RegUnLoadKeyW(hKey: HKEY, lpSubKey: LPCWSTR | NULL): LSTATUS {
     return Advapi32.Load('RegUnLoadKeyW')(hKey, lpSubKey);
   }
 
@@ -4938,7 +4938,7 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-registereventsourcew
-  public static RegisterEventSourceW(lpUNCServerName: LPCWSTR, lpSourceName: LPCWSTR): HANDLE {
+  public static RegisterEventSourceW(lpUNCServerName: LPCWSTR | NULL, lpSourceName: LPCWSTR): HANDLE {
     return Advapi32.Load('RegisterEventSourceW')(lpUNCServerName, lpSourceName);
   }
 
@@ -4953,12 +4953,12 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsvc/nf-winsvc-registerservicectrlhandlerexa
-  public static RegisterServiceCtrlHandlerExA(lpServiceName: LPCSTR, lpHandlerProc: PVOID, lpContext: LPVOID): SERVICE_STATUS_HANDLE {
+  public static RegisterServiceCtrlHandlerExA(lpServiceName: LPCSTR, lpHandlerProc: PVOID, lpContext: LPVOID | NULL): SERVICE_STATUS_HANDLE {
     return Advapi32.Load('RegisterServiceCtrlHandlerExA')(lpServiceName, lpHandlerProc, lpContext);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsvc/nf-winsvc-registerservicectrlhandlerexw
-  public static RegisterServiceCtrlHandlerExW(lpServiceName: LPCWSTR, lpHandlerProc: PVOID, lpContext: LPVOID): SERVICE_STATUS_HANDLE {
+  public static RegisterServiceCtrlHandlerExW(lpServiceName: LPCWSTR, lpHandlerProc: PVOID, lpContext: LPVOID | NULL): SERVICE_STATUS_HANDLE {
     return Advapi32.Load('RegisterServiceCtrlHandlerExW')(lpServiceName, lpHandlerProc, lpContext);
   }
 
@@ -5026,7 +5026,7 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-reporteventw
-  public static ReportEventW(hEventLog: HANDLE, wType: WORD, wCategory: WORD, dwEventID: DWORD, lpUserSid: PSID, wNumStrings: WORD, dwDataSize: DWORD, lpStrings: PVOID, lpRawData: LPVOID): BOOL {
+  public static ReportEventW(hEventLog: HANDLE, wType: WORD, wCategory: WORD, dwEventID: DWORD, lpUserSid: PSID | NULL, wNumStrings: WORD, dwDataSize: DWORD, lpStrings: PVOID | NULL, lpRawData: LPVOID | NULL): BOOL {
     return Advapi32.Load('ReportEventW')(hEventLog, wType, wCategory, dwEventID, lpUserSid, wNumStrings, dwDataSize, lpStrings, lpRawData);
   }
 
@@ -5141,12 +5141,12 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/aclapi/nf-aclapi-setentriesinacla
-  public static SetEntriesInAclA(cCountOfExplicitEntries: ULONG, pListOfExplicitEntries: PEXPLICIT_ACCESSA, OldAcl: PACL, NewAcl: PVOID): DWORD {
+  public static SetEntriesInAclA(cCountOfExplicitEntries: ULONG, pListOfExplicitEntries: PEXPLICIT_ACCESSA | NULL, OldAcl: PACL | NULL, NewAcl: PVOID): DWORD {
     return Advapi32.Load('SetEntriesInAclA')(cCountOfExplicitEntries, pListOfExplicitEntries, OldAcl, NewAcl);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/aclapi/nf-aclapi-setentriesinaclw
-  public static SetEntriesInAclW(cCountOfExplicitEntries: ULONG, pListOfExplicitEntries: PEXPLICIT_ACCESSW, OldAcl: PACL, NewAcl: PVOID): DWORD {
+  public static SetEntriesInAclW(cCountOfExplicitEntries: ULONG, pListOfExplicitEntries: PEXPLICIT_ACCESSW | NULL, OldAcl: PACL | NULL, NewAcl: PVOID): DWORD {
     return Advapi32.Load('SetEntriesInAclW')(cCountOfExplicitEntries, pListOfExplicitEntries, OldAcl, NewAcl);
   }
 
@@ -5186,7 +5186,7 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/aclapi/nf-aclapi-setnamedsecurityinfoa
-  public static SetNamedSecurityInfoA(pObjectName: LPSTR, ObjectType: DWORD, SecurityInfo: SECURITY_INFORMATION, psidOwner: PSID, psidGroup: PSID, pDacl: PACL, pSacl: PACL): DWORD {
+  public static SetNamedSecurityInfoA(pObjectName: LPSTR, ObjectType: DWORD, SecurityInfo: SECURITY_INFORMATION, psidOwner: PSID | NULL, psidGroup: PSID | NULL, pDacl: PACL | NULL, pSacl: PACL | NULL): DWORD {
     return Advapi32.Load('SetNamedSecurityInfoA')(pObjectName, ObjectType, SecurityInfo, psidOwner, psidGroup, pDacl, pSacl);
   }
 
@@ -5201,7 +5201,7 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/aclapi/nf-aclapi-setnamedsecurityinfow
-  public static SetNamedSecurityInfoW(pObjectName: LPWSTR, ObjectType: DWORD, SecurityInfo: SECURITY_INFORMATION, psidOwner: PSID, psidGroup: PSID, pDacl: PACL, pSacl: PACL): DWORD {
+  public static SetNamedSecurityInfoW(pObjectName: LPWSTR, ObjectType: DWORD, SecurityInfo: SECURITY_INFORMATION, psidOwner: PSID | NULL, psidGroup: PSID | NULL, pDacl: PACL | NULL, pSacl: PACL | NULL): DWORD {
     return Advapi32.Load('SetNamedSecurityInfoW')(pObjectName, ObjectType, SecurityInfo, psidOwner, psidGroup, pDacl, pSacl);
   }
 
@@ -5233,32 +5233,32 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/securitybaseapi/nf-securitybaseapi-setsecuritydescriptordacl
-  public static SetSecurityDescriptorDacl(pSecurityDescriptor: PSECURITY_DESCRIPTOR, bDaclPresent: BOOL, pDacl: PACL, bDaclDefaulted: BOOL): BOOL {
+  public static SetSecurityDescriptorDacl(pSecurityDescriptor: PSECURITY_DESCRIPTOR, bDaclPresent: BOOL, pDacl: PACL | NULL, bDaclDefaulted: BOOL): BOOL {
     return Advapi32.Load('SetSecurityDescriptorDacl')(pSecurityDescriptor, bDaclPresent, pDacl, bDaclDefaulted);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/securitybaseapi/nf-securitybaseapi-setsecuritydescriptorgroup
-  public static SetSecurityDescriptorGroup(pSecurityDescriptor: PSECURITY_DESCRIPTOR, pGroup: PSID, bGroupDefaulted: BOOL): BOOL {
+  public static SetSecurityDescriptorGroup(pSecurityDescriptor: PSECURITY_DESCRIPTOR, pGroup: PSID | NULL, bGroupDefaulted: BOOL): BOOL {
     return Advapi32.Load('SetSecurityDescriptorGroup')(pSecurityDescriptor, pGroup, bGroupDefaulted);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/securitybaseapi/nf-securitybaseapi-setsecuritydescriptorowner
-  public static SetSecurityDescriptorOwner(pSecurityDescriptor: PSECURITY_DESCRIPTOR, pOwner: PSID, bOwnerDefaulted: BOOL): BOOL {
+  public static SetSecurityDescriptorOwner(pSecurityDescriptor: PSECURITY_DESCRIPTOR, pOwner: PSID | NULL, bOwnerDefaulted: BOOL): BOOL {
     return Advapi32.Load('SetSecurityDescriptorOwner')(pSecurityDescriptor, pOwner, bOwnerDefaulted);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/securitybaseapi/nf-securitybaseapi-setsecuritydescriptorrmcontrol
-  public static SetSecurityDescriptorRMControl(SecurityDescriptor: PSECURITY_DESCRIPTOR, RMControl: PUCHAR): DWORD {
+  public static SetSecurityDescriptorRMControl(SecurityDescriptor: PSECURITY_DESCRIPTOR, RMControl: PUCHAR | NULL): DWORD {
     return Advapi32.Load('SetSecurityDescriptorRMControl')(SecurityDescriptor, RMControl);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/securitybaseapi/nf-securitybaseapi-setsecuritydescriptorsacl
-  public static SetSecurityDescriptorSacl(pSecurityDescriptor: PSECURITY_DESCRIPTOR, bSaclPresent: BOOL, pSacl: PACL, bSaclDefaulted: BOOL): BOOL {
+  public static SetSecurityDescriptorSacl(pSecurityDescriptor: PSECURITY_DESCRIPTOR, bSaclPresent: BOOL, pSacl: PACL | NULL, bSaclDefaulted: BOOL): BOOL {
     return Advapi32.Load('SetSecurityDescriptorSacl')(pSecurityDescriptor, bSaclPresent, pSacl, bSaclDefaulted);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/aclapi/nf-aclapi-setsecurityinfo
-  public static SetSecurityInfo(handle: HANDLE, ObjectType: DWORD, SecurityInfo: SECURITY_INFORMATION, psidOwner: PSID, psidGroup: PSID, pDacl: PACL, pSacl: PACL): DWORD {
+  public static SetSecurityInfo(handle: HANDLE, ObjectType: DWORD, SecurityInfo: SECURITY_INFORMATION, psidOwner: PSID | NULL, psidGroup: PSID | NULL, pDacl: PACL | NULL, pSacl: PACL | NULL): DWORD {
     return Advapi32.Load('SetSecurityInfo')(handle, ObjectType, SecurityInfo, psidOwner, psidGroup, pDacl, pSacl);
   }
 
@@ -5308,7 +5308,7 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsvc/nf-winsvc-startservicea
-  public static StartServiceA(hService: SC_HANDLE, dwNumServiceArgs: DWORD, lpServiceArgVectors: PVOID): BOOL {
+  public static StartServiceA(hService: SC_HANDLE, dwNumServiceArgs: DWORD, lpServiceArgVectors: PVOID | NULL): BOOL {
     return Advapi32.Load('StartServiceA')(hService, dwNumServiceArgs, lpServiceArgVectors);
   }
 
@@ -5323,7 +5323,7 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsvc/nf-winsvc-startservicew
-  public static StartServiceW(hService: SC_HANDLE, dwNumServiceArgs: DWORD, lpServiceArgVectors: PVOID): BOOL {
+  public static StartServiceW(hService: SC_HANDLE, dwNumServiceArgs: DWORD, lpServiceArgVectors: PVOID | NULL): BOOL {
     return Advapi32.Load('StartServiceW')(hService, dwNumServiceArgs, lpServiceArgVectors);
   }
 
@@ -5476,7 +5476,7 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsvc/nf-winsvc-waitservicestate
-  public static WaitServiceState(hService: SC_HANDLE, dwNotify: DWORD, dwTimeout: DWORD, hCancelEvent: HANDLE): DWORD {
+  public static WaitServiceState(hService: SC_HANDLE, dwNotify: DWORD, dwTimeout: DWORD, hCancelEvent: HANDLE | 0n): DWORD {
     return Advapi32.Load('WaitServiceState')(hService, dwNotify, dwTimeout, hCancelEvent);
   }
 
@@ -5626,7 +5626,7 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-writeencryptedfileraw
-  public static WriteEncryptedFileRaw(pfImportCallback: PVOID, pvCallbackContext: PVOID, pvContext: PVOID): DWORD {
+  public static WriteEncryptedFileRaw(pfImportCallback: PVOID, pvCallbackContext: PVOID | NULL, pvContext: PVOID): DWORD {
     return Advapi32.Load('WriteEncryptedFileRaw')(pfImportCallback, pvCallbackContext, pvContext);
   }
 }

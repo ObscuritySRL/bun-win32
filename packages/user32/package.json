@@ -27,7 +27,7 @@
     "directory": "packages/user32"
   },
   "type": "module",
-  "version": "3.0.19",
+  "version": "3.0.20",
   "main": "./index.ts",
   "keywords": [
     "bun",
@@ -51,9 +51,7 @@
     "bun": ">=1.1.0"
   },
   "scripts": {
-    "example": "bun ./example/user32.ts",
-    "example:mouse": "bun ./example/mouse-stalker.ts",
-    "example:hotkey": "bun ./example/hotkey-demo.ts",
-    "example:countdown": "bun ./example/countdown-dialog.ts"
+    "example:mouse-trail": "bun ./example/mouse-trail.ts",
+    "example:desktop-audit": "bun ./example/desktop-audit.ts"
   }
 }

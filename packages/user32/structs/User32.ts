@@ -74,6 +74,7 @@ import type {
   LPCWSTR,
   LPDRAWTEXTPARAMS,
   LPDWORD,
+  LPHANDLE,
   LPINPUT,
   LPINT,
   LPMENUINFO,
@@ -472,12 +473,12 @@ class User32 extends Win32 {
     GetPointerDeviceRects: { args: [FFIType.u64, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
     GetPointerDevices: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
     GetPointerFrameInfo: { args: [FFIType.u32, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
-    GetPointerFrameInfoHistory: { args: [FFIType.u32, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
+    GetPointerFrameInfoHistory: { args: [FFIType.u32, FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
     GetPointerFramePenInfo: { args: [FFIType.u32, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
-    GetPointerFramePenInfoHistory: { args: [FFIType.u32, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
+    GetPointerFramePenInfoHistory: { args: [FFIType.u32, FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
     GetPointerFrameTimes: { args: [FFIType.u32, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
     GetPointerFrameTouchInfo: { args: [FFIType.u32, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
-    GetPointerFrameTouchInfoHistory: { args: [FFIType.u32, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
+    GetPointerFrameTouchInfoHistory: { args: [FFIType.u32, FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
     GetPointerInfo: { args: [FFIType.u32, FFIType.ptr], returns: FFIType.i32 },
     GetPointerInfoHistory: { args: [FFIType.u32, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
     GetPointerInputTransform: { args: [FFIType.u32, FFIType.u32, FFIType.ptr], returns: FFIType.i32 },
@@ -913,7 +914,7 @@ class User32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-cascadewindows
-  public static CascadeWindows(hwndParent: HWND | 0n, wHow: UINT, lpRect: LPRECT | NULL, cKids: UINT, lpKids: HWND | 0n): WORD {
+  public static CascadeWindows(hwndParent: HWND | 0n, wHow: UINT, lpRect: LPRECT | NULL, cKids: UINT, lpKids: LPVOID): WORD {
     return User32.Load('CascadeWindows')(hwndParent, wHow, lpRect, cKids, lpKids);
   }
 
@@ -1088,7 +1089,7 @@ class User32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-createcursor
-  public static CreateCursor(hInst: HINSTANCE, xHotSpot: int, yHotSpot: int, nWidth: int, nHeight: int, pvANDPlane: PBYTE, pvXORPlane: PBYTE): HCURSOR {
+  public static CreateCursor(hInst: HINSTANCE | 0n, xHotSpot: int, yHotSpot: int, nWidth: int, nHeight: int, pvANDPlane: PBYTE, pvXORPlane: PBYTE): HCURSOR {
     return User32.Load('CreateCursor')(hInst, xHotSpot, yHotSpot, nWidth, nHeight, pvANDPlane, pvXORPlane);
   }
 
@@ -1103,17 +1104,17 @@ class User32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-createdialogindirectparamw
-  public static CreateDialogIndirectParamW(hInstance: HINSTANCE, lpTemplate: LPCDLGTEMPLATEW, hWndParent: HWND | 0n, lpDialogFunc: DLGPROC | NULL, dwInitParam: LPARAM): HWND {
+  public static CreateDialogIndirectParamW(hInstance: HINSTANCE | 0n, lpTemplate: LPCDLGTEMPLATEW, hWndParent: HWND | 0n, lpDialogFunc: DLGPROC | NULL, dwInitParam: LPARAM): HWND {
     return User32.Load('CreateDialogIndirectParamW')(hInstance, lpTemplate, hWndParent, lpDialogFunc, dwInitParam);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-createdialogparamw
-  public static CreateDialogParamW(hInstance: HINSTANCE, lpTemplateName: LPCWSTR, hWndParent: HWND | 0n, lpDialogFunc: DLGPROC | NULL, dwInitParam: LPARAM): HWND {
+  public static CreateDialogParamW(hInstance: HINSTANCE | 0n, lpTemplateName: LPCWSTR, hWndParent: HWND | 0n, lpDialogFunc: DLGPROC | NULL, dwInitParam: LPARAM): HWND {
     return User32.Load('CreateDialogParamW')(hInstance, lpTemplateName, hWndParent, lpDialogFunc, dwInitParam);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-createicon
-  public static CreateIcon(hInstance: HINSTANCE, nWidth: int, nHeight: int, cPlanes: BYTE, cBitsPixel: BYTE, lpbANDbits: BYTE, lpbXORbits: BYTE): HICON {
+  public static CreateIcon(hInstance: HINSTANCE | 0n, nWidth: int, nHeight: int, cPlanes: BYTE, cBitsPixel: BYTE, lpbANDbits: LPBYTE, lpbXORbits: LPBYTE): HICON {
     return User32.Load('CreateIcon')(hInstance, nWidth, nHeight, cPlanes, cBitsPixel, lpbANDbits, lpbXORbits);
   }
 
@@ -1133,7 +1134,7 @@ class User32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-createmdiwindoww
-  public static CreateMDIWindowW(lpClassName: LPCWSTR, lpWindowName: LPCWSTR, dwStyle: DWORD, X: int, Y: int, nWidth: int, nHeight: int, hWndParent: HWND, hInstance: HINSTANCE, lParam: LPARAM): HWND {
+  public static CreateMDIWindowW(lpClassName: LPCWSTR, lpWindowName: LPCWSTR, dwStyle: DWORD, X: int, Y: int, nWidth: int, nHeight: int, hWndParent: HWND | 0n, hInstance: HINSTANCE | 0n, lParam: LPARAM): HWND {
     return User32.Load('CreateMDIWindowW')(lpClassName, lpWindowName, dwStyle, X, Y, nWidth, nHeight, hWndParent, hInstance, lParam);
   }
 
@@ -1155,7 +1156,7 @@ class User32 extends Win32 {
   // https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-createwindowexw
   public static CreateWindowExW(
     dwExStyle: DWORD,
-    lpClassName: LPCWSTR,
+    lpClassName: LPCWSTR | NULL,
     lpWindowName: LPCWSTR | NULL,
     dwStyle: DWORD,
     X: int,
@@ -1165,8 +1166,7 @@ class User32 extends Win32 {
     hWndParent: HWND | 0n,
     hMenu: HMENU | 0n,
     hInstance: HINSTANCE | 0n,
-    lpParam: LPVOID | NULL,
-  ): HWND {
+    lpParam: LPVOID | NULL): HWND {
     return User32.Load('CreateWindowExW')(dwExStyle, lpClassName, lpWindowName, dwStyle, X, Y, nWidth, nHeight, hWndParent, hMenu, hInstance, lpParam);
   }
 
@@ -1301,7 +1301,7 @@ class User32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-defframeprocw
-  public static DefFrameProcW(hWnd: HWND, hWndMDIClient: HWND, uMsg: UINT, wParam: WPARAM, lParam: LPARAM): LRESULT {
+  public static DefFrameProcW(hWnd: HWND, hWndMDIClient: HWND | 0n, uMsg: UINT, wParam: WPARAM, lParam: LPARAM): LRESULT {
     return User32.Load('DefFrameProcW')(hWnd, hWndMDIClient, uMsg, wParam, lParam);
   }
 
@@ -1366,12 +1366,12 @@ class User32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-dialogboxindirectparamw
-  public static DialogBoxIndirectParamW(hInstance: HINSTANCE, hDialogTemplate: LPCDLGTEMPLATEW, hWndParent: HWND | 0n, lpDialogFunc: DLGPROC, dwInitParam: LPARAM): INT_PTR {
+  public static DialogBoxIndirectParamW(hInstance: HINSTANCE | 0n, hDialogTemplate: LPCDLGTEMPLATEW, hWndParent: HWND | 0n, lpDialogFunc: DLGPROC | NULL, dwInitParam: LPARAM): INT_PTR {
     return User32.Load('DialogBoxIndirectParamW')(hInstance, hDialogTemplate, hWndParent, lpDialogFunc, dwInitParam);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-dialogboxparamw
-  public static DialogBoxParamW(hInstance: HINSTANCE, lpTemplateName: LPCWSTR, hWndParent: HWND | 0n, lpDialogFunc: DLGPROC, dwInitParam: LPARAM): INT_PTR {
+  public static DialogBoxParamW(hInstance: HINSTANCE | 0n, lpTemplateName: LPCWSTR, hWndParent: HWND | 0n, lpDialogFunc: DLGPROC | NULL, dwInitParam: LPARAM): INT_PTR {
     return User32.Load('DialogBoxParamW')(hInstance, lpTemplateName, hWndParent, lpDialogFunc, dwInitParam);
   }
 
@@ -1541,7 +1541,7 @@ class User32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-enumdesktopsw
-  public static EnumDesktopsW(hwinsta: HWINSTA, lpEnumFunc: DESKTOPENUMPROCW, lParam: LPARAM): BOOL {
+  public static EnumDesktopsW(hwinsta: HWINSTA | 0n, lpEnumFunc: DESKTOPENUMPROCW, lParam: LPARAM): BOOL {
     return User32.Load('EnumDesktopsW')(hwinsta, lpEnumFunc, lParam);
   }
 
@@ -1841,7 +1841,7 @@ class User32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getdlgitem
-  public static GetDlgItem(hDlg: HWND, nIDDlgItem: int): HWND {
+  public static GetDlgItem(hDlg: HWND | 0n, nIDDlgItem: int): HWND {
     return User32.Load('GetDlgItem')(hDlg, nIDDlgItem);
   }
 
@@ -1931,7 +1931,7 @@ class User32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getkeyboardlayoutlist
-  public static GetKeyboardLayoutList(nBuff: int, lpList: HKL): int {
+  public static GetKeyboardLayoutList(nBuff: int, lpList: LPVOID): int {
     return User32.Load('GetKeyboardLayoutList')(nBuff, lpList);
   }
 
@@ -2011,7 +2011,7 @@ class User32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getmenuitemcount
-  public static GetMenuItemCount(hMenu: HMENU): int {
+  public static GetMenuItemCount(hMenu: HMENU | 0n): int {
     return User32.Load('GetMenuItemCount')(hMenu);
   }
 
@@ -2106,12 +2106,12 @@ class User32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getpointerdevicecursors
-  public static GetPointerDeviceCursors(device: HANDLE, cursorCount: UINT32, deviceCursors: POINTER_DEVICE_CURSOR_INFO): BOOL {
+  public static GetPointerDeviceCursors(device: HANDLE, cursorCount: LPVOID, deviceCursors: POINTER_DEVICE_CURSOR_INFO | NULL): BOOL {
     return User32.Load('GetPointerDeviceCursors')(device, cursorCount, deviceCursors);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getpointerdeviceproperties
-  public static GetPointerDeviceProperties(device: HANDLE, propertyCount: UINT32, pointerProperties: POINTER_DEVICE_PROPERTY): BOOL {
+  public static GetPointerDeviceProperties(device: HANDLE, propertyCount: LPVOID, pointerProperties: POINTER_DEVICE_PROPERTY | NULL): BOOL {
     return User32.Load('GetPointerDeviceProperties')(device, propertyCount, pointerProperties);
   }
 
@@ -2121,37 +2121,37 @@ class User32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getpointerdevices
-  public static GetPointerDevices(deviceCount: UINT32, pointerDevices: POINTER_DEVICE_INFO | NULL): BOOL {
+  public static GetPointerDevices(deviceCount: LPVOID, pointerDevices: POINTER_DEVICE_INFO | NULL): BOOL {
     return User32.Load('GetPointerDevices')(deviceCount, pointerDevices);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getpointerframeinfo
-  public static GetPointerFrameInfo(pointerId: UINT32, pointerCount: PUINT, pointerInfo: POINTER_INFO): BOOL {
+  public static GetPointerFrameInfo(pointerId: UINT32, pointerCount: PUINT, pointerInfo: POINTER_INFO | NULL): BOOL {
     return User32.Load('GetPointerFrameInfo')(pointerId, pointerCount, pointerInfo);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getpointerframeinfohistory
-  public static GetPointerFrameInfoHistory(pointerId: UINT32, entriesCount: UINT32, pointerCount: UINT32, pointerInfo: POINTER_INFO): BOOL {
+  public static GetPointerFrameInfoHistory(pointerId: UINT32, entriesCount: LPVOID, pointerCount: LPVOID, pointerInfo: POINTER_INFO | NULL): BOOL {
     return User32.Load('GetPointerFrameInfoHistory')(pointerId, entriesCount, pointerCount, pointerInfo);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getpointerframepeninfo
-  public static GetPointerFramePenInfo(pointerId: UINT32, pointerCount: UINT32, penInfo: POINTER_PEN_INFO): BOOL {
+  public static GetPointerFramePenInfo(pointerId: UINT32, pointerCount: LPVOID, penInfo: POINTER_PEN_INFO | NULL): BOOL {
     return User32.Load('GetPointerFramePenInfo')(pointerId, pointerCount, penInfo);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getpointerframepeninfohistory
-  public static GetPointerFramePenInfoHistory(pointerId: UINT32, entriesCount: UINT32, pointerCount: UINT32, penInfo: POINTER_PEN_INFO): BOOL {
+  public static GetPointerFramePenInfoHistory(pointerId: UINT32, entriesCount: LPVOID, pointerCount: LPVOID, penInfo: POINTER_PEN_INFO | NULL): BOOL {
     return User32.Load('GetPointerFramePenInfoHistory')(pointerId, entriesCount, pointerCount, penInfo);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getpointerframetouchinfo
-  public static GetPointerFrameTouchInfo(pointerId: UINT32, pointerCount: UINT32, touchInfo: POINTER_TOUCH_INFO): BOOL {
+  public static GetPointerFrameTouchInfo(pointerId: UINT32, pointerCount: LPVOID, touchInfo: POINTER_TOUCH_INFO | NULL): BOOL {
     return User32.Load('GetPointerFrameTouchInfo')(pointerId, pointerCount, touchInfo);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getpointerframetouchinfohistory
-  public static GetPointerFrameTouchInfoHistory(pointerId: UINT32, entriesCount: UINT32, pointerCount: UINT32, touchInfo: POINTER_TOUCH_INFO): BOOL {
+  public static GetPointerFrameTouchInfoHistory(pointerId: UINT32, entriesCount: LPVOID, pointerCount: LPVOID, touchInfo: POINTER_TOUCH_INFO | NULL): BOOL {
     return User32.Load('GetPointerFrameTouchInfoHistory')(pointerId, entriesCount, pointerCount, touchInfo);
   }
 
@@ -2161,7 +2161,7 @@ class User32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getpointerinfohistory
-  public static GetPointerInfoHistory(pointerId: UINT32, entriesCount: UINT32, pointerInfo: POINTER_INFO): BOOL {
+  public static GetPointerInfoHistory(pointerId: UINT32, entriesCount: LPVOID, pointerInfo: POINTER_INFO | NULL): BOOL {
     return User32.Load('GetPointerInfoHistory')(pointerId, entriesCount, pointerInfo);
   }
 
@@ -2181,12 +2181,12 @@ class User32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getpointertype
-  public static GetPointerType(pointerId: UINT32, pointerType: POINTER_INPUT_TYPE): BOOL {
+  public static GetPointerType(pointerId: UINT32, pointerType: LPVOID): BOOL {
     return User32.Load('GetPointerType')(pointerId, pointerType);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getpriorityclipboardformat
-  public static GetPriorityClipboardFormat(paFormatPriorityList: UINT, cFormats: int): int {
+  public static GetPriorityClipboardFormat(paFormatPriorityList: LPVOID, cFormats: int): int {
     return User32.Load('GetPriorityClipboardFormat')(paFormatPriorityList, cFormats);
   }
 
@@ -2226,7 +2226,7 @@ class User32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getrawinputdeviceinfow
-  public static GetRawInputDeviceInfoW(hDevice: HANDLE, uiCommand: UINT, pData: LPVOID | NULL, pcbSize: PUINT): UINT {
+  public static GetRawInputDeviceInfoW(hDevice: HANDLE | 0n, uiCommand: UINT, pData: LPVOID | NULL, pcbSize: PUINT): UINT {
     return User32.Load('GetRawInputDeviceInfoW')(hDevice, uiCommand, pData, pcbSize);
   }
 
@@ -2306,7 +2306,7 @@ class User32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-gettabbedtextextentw
-  public static GetTabbedTextExtentW(hdc: HDC, lpString: LPCWSTR, chCount: int, nTabPositions: int, lpnTabStopPositions: LPINT): DWORD {
+  public static GetTabbedTextExtentW(hdc: HDC, lpString: LPCWSTR, chCount: int, nTabPositions: int, lpnTabStopPositions: LPINT | NULL): DWORD {
     return User32.Load('GetTabbedTextExtentW')(hdc, lpString, chCount, nTabPositions, lpnTabStopPositions);
   }
 
@@ -2366,7 +2366,7 @@ class User32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getuserobjectsecurity
-  public static GetUserObjectSecurity(hObj: HANDLE, pSIRequested: PSECURITY_INFORMATION, pSID: PSECURITY_DESCRIPTOR, nLength: DWORD, lpnLengthNeeded: LPDWORD): BOOL {
+  public static GetUserObjectSecurity(hObj: HANDLE, pSIRequested: PSECURITY_INFORMATION, pSID: PSECURITY_DESCRIPTOR | NULL, nLength: DWORD, lpnLengthNeeded: LPDWORD): BOOL {
     return User32.Load('GetUserObjectSecurity')(hObj, pSIRequested, pSID, nLength, lpnLengthNeeded);
   }
 
@@ -2401,7 +2401,7 @@ class User32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getwindowfeedbacksetting
-  public static GetWindowFeedbackSetting(hwnd: HWND, feedback: FEEDBACK_TYPE, dwFlags: DWORD, pSize: PUINT, config: PVOID | NULL): BOOL {
+  public static GetWindowFeedbackSetting(hwnd: HWND, feedback: FEEDBACK_TYPE, dwFlags: LPVOID, pSize: PUINT, config: PVOID | NULL): BOOL {
     return User32.Load('GetWindowFeedbackSetting')(hwnd, feedback, dwFlags, pSize, config);
   }
 
@@ -2466,7 +2466,7 @@ class User32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-graystringw
-  public static GrayStringW(hDC: HDC, hBrush: HBRUSH, lpOutputFunc: GRAYSTRINGPROC | NULL, lpData: LPARAM, nCount: int, X: int, Y: int, nWidth: int, nHeight: int): BOOL {
+  public static GrayStringW(hDC: HDC, hBrush: HBRUSH | 0n, lpOutputFunc: GRAYSTRINGPROC | NULL, lpData: LPARAM, nCount: int, X: int, Y: int, nWidth: int, nHeight: int): BOOL {
     return User32.Load('GrayStringW')(hDC, hBrush, lpOutputFunc, lpData, nCount, X, Y, nWidth, nHeight);
   }
 
@@ -2631,7 +2631,7 @@ class User32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-iswindow
-  public static IsWindow(hWnd: HWND): BOOL {
+  public static IsWindow(hWnd: HWND | 0n): BOOL {
     return User32.Load('IsWindow')(hWnd);
   }
 
@@ -2676,7 +2676,7 @@ class User32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-loadacceleratorsw
-  public static LoadAcceleratorsW(hInstance: HINSTANCE, lpTableName: LPCWSTR): HACCEL {
+  public static LoadAcceleratorsW(hInstance: HINSTANCE | 0n, lpTableName: LPCWSTR): HACCEL {
     return User32.Load('LoadAcceleratorsW')(hInstance, lpTableName);
   }
 
@@ -2716,12 +2716,12 @@ class User32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-loadmenuw
-  public static LoadMenuW(hInstance: HINSTANCE, lpMenuName: LPCWSTR): HMENU {
+  public static LoadMenuW(hInstance: HINSTANCE | 0n, lpMenuName: LPCWSTR): HMENU {
     return User32.Load('LoadMenuW')(hInstance, lpMenuName);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-loadstringw
-  public static LoadStringW(hInstance: HINSTANCE, uID: UINT, lpBuffer: LPWSTR, cchBufferMax: int): int {
+  public static LoadStringW(hInstance: HINSTANCE | 0n, uID: UINT, lpBuffer: LPWSTR, cchBufferMax: int): int {
     return User32.Load('LoadStringW')(hInstance, uID, lpBuffer, cchBufferMax);
   }
 
@@ -2746,7 +2746,7 @@ class User32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-logicaltophysicalpointforpermonitordpi
-  public static LogicalToPhysicalPointForPerMonitorDPI(hWnd: HWND, lpPoint: LPPOINT): BOOL {
+  public static LogicalToPhysicalPointForPerMonitorDPI(hWnd: HWND | 0n, lpPoint: LPPOINT): BOOL {
     return User32.Load('LogicalToPhysicalPointForPerMonitorDPI')(hWnd, lpPoint);
   }
 
@@ -2766,7 +2766,7 @@ class User32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-mapvirtualkeyexw
-  public static MapVirtualKeyExW(uCode: UINT, uMapType: UINT, dwhkl: HKL): UINT {
+  public static MapVirtualKeyExW(uCode: UINT, uMapType: UINT, dwhkl: HKL | 0n): UINT {
     return User32.Load('MapVirtualKeyExW')(uCode, uMapType, dwhkl);
   }
 
@@ -2791,7 +2791,7 @@ class User32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-messageboxexw
-  public static MessageBoxExW(hWnd: HWND | 0n, lpText: LPCWSTR, lpCaption: LPCWSTR, uType: UINT, wLanguageId: WORD): int {
+  public static MessageBoxExW(hWnd: HWND | 0n, lpText: LPCWSTR | NULL, lpCaption: LPCWSTR | NULL, uType: UINT, wLanguageId: WORD): int {
     return User32.Load('MessageBoxExW')(hWnd, lpText, lpCaption, uType, wLanguageId);
   }
 
@@ -2801,7 +2801,7 @@ class User32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-messageboxw
-  public static MessageBoxW(hWnd: HWND | 0n, lpText: LPCWSTR, lpCaption: LPCWSTR, uType: UINT): int {
+  public static MessageBoxW(hWnd: HWND | 0n, lpText: LPCWSTR | NULL, lpCaption: LPCWSTR | NULL, uType: UINT): int {
     return User32.Load('MessageBoxW')(hWnd, lpText, lpCaption, uType);
   }
 
@@ -2831,12 +2831,12 @@ class User32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-msgwaitformultipleobjects
-  public static MsgWaitForMultipleObjects(nCount: DWORD, pHandles: HANDLE, fWaitAll: BOOL, dwMilliseconds: DWORD, dwWakeMask: DWORD): DWORD {
+  public static MsgWaitForMultipleObjects(nCount: DWORD, pHandles: LPHANDLE, fWaitAll: BOOL, dwMilliseconds: DWORD, dwWakeMask: DWORD): DWORD {
     return User32.Load('MsgWaitForMultipleObjects')(nCount, pHandles, fWaitAll, dwMilliseconds, dwWakeMask);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-msgwaitformultipleobjectsex
-  public static MsgWaitForMultipleObjectsEx(nCount: DWORD, pHandles: HANDLE, dwMilliseconds: DWORD, dwWakeMask: DWORD, dwFlags: DWORD): DWORD {
+  public static MsgWaitForMultipleObjectsEx(nCount: DWORD, pHandles: LPHANDLE, dwMilliseconds: DWORD, dwWakeMask: DWORD, dwFlags: DWORD): DWORD {
     return User32.Load('MsgWaitForMultipleObjectsEx')(nCount, pHandles, dwMilliseconds, dwWakeMask, dwFlags);
   }
 
@@ -2906,7 +2906,7 @@ class User32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-physicaltologicalpointforpermonitordpi
-  public static PhysicalToLogicalPointForPerMonitorDPI(hWnd: HWND, lpPoint: LPPOINT): BOOL {
+  public static PhysicalToLogicalPointForPerMonitorDPI(hWnd: HWND | 0n, lpPoint: LPPOINT): BOOL {
     return User32.Load('PhysicalToLogicalPointForPerMonitorDPI')(hWnd, lpPoint);
   }
 
@@ -2931,7 +2931,7 @@ class User32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-privateextracticonsw
-  public static PrivateExtractIconsW(szFileName: LPCWSTR, nIconIndex: int, cxIcon: int, cyIcon: int, phicon: HICON, piconid: UINT, nIcons: UINT, flags: UINT): UINT {
+  public static PrivateExtractIconsW(szFileName: LPCWSTR, nIconIndex: int, cxIcon: int, cyIcon: int, phicon: LPVOID, piconid: LPDWORD, nIcons: UINT, flags: UINT): UINT {
     return User32.Load('PrivateExtractIconsW')(szFileName, nIconIndex, cxIcon, cyIcon, phicon, piconid, nIcons, flags);
   }
 
@@ -3433,7 +3433,7 @@ class User32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-setwindowtextw
-  public static SetWindowTextW(hWnd: HWND, lpString: LPCWSTR): BOOL {
+  public static SetWindowTextW(hWnd: HWND, lpString: LPCWSTR | NULL): BOOL {
     return User32.Load('SetWindowTextW')(hWnd, lpString);
   }
 
@@ -3483,7 +3483,7 @@ class User32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-shutdownblockreasonquery
-  public static ShutdownBlockReasonQuery(hWnd: HWND, pwszBuff: LPWSTR | NULL, pcchBuff: DWORD): BOOL {
+  public static ShutdownBlockReasonQuery(hWnd: HWND, pwszBuff: LPWSTR | NULL, pcchBuff: LPVOID): BOOL {
     return User32.Load('ShutdownBlockReasonQuery')(hWnd, pwszBuff, pcchBuff);
   }
 
@@ -3528,27 +3528,27 @@ class User32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-tilewindows
-  public static TileWindows(hwndParent: HWND | 0n, wHow: UINT, lpRect: LPRECT | NULL, cKids: UINT, lpKids: HWND | 0n): WORD {
+  public static TileWindows(hwndParent: HWND | 0n, wHow: UINT, lpRect: LPRECT | NULL, cKids: UINT, lpKids: LPVOID): WORD {
     return User32.Load('TileWindows')(hwndParent, wHow, lpRect, cKids, lpKids);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-toascii
-  public static ToAscii(uVirtKey: UINT, uScanCode: UINT, lpKeyState: BYTE, lpChar: LPWORD, uFlags: UINT): int {
+  public static ToAscii(uVirtKey: UINT, uScanCode: UINT, lpKeyState: LPBYTE, lpChar: LPWORD, uFlags: UINT): int {
     return User32.Load('ToAscii')(uVirtKey, uScanCode, lpKeyState, lpChar, uFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-toasciiex
-  public static ToAsciiEx(uVirtKey: UINT, uScanCode: UINT, lpKeyState: BYTE, lpChar: LPWORD, uFlags: UINT, dwhkl: HKL): int {
+  public static ToAsciiEx(uVirtKey: UINT, uScanCode: UINT, lpKeyState: LPBYTE, lpChar: LPWORD, uFlags: UINT, dwhkl: HKL | 0n): int {
     return User32.Load('ToAsciiEx')(uVirtKey, uScanCode, lpKeyState, lpChar, uFlags, dwhkl);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-tounicode
-  public static ToUnicode(wVirtKey: UINT, wScanCode: UINT, lpKeyState: BYTE, pwszBuff: LPWSTR, cchBuff: int, wFlags: UINT): int {
+  public static ToUnicode(wVirtKey: UINT, wScanCode: UINT, lpKeyState: LPBYTE, pwszBuff: LPWSTR, cchBuff: int, wFlags: UINT): int {
     return User32.Load('ToUnicode')(wVirtKey, wScanCode, lpKeyState, pwszBuff, cchBuff, wFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-tounicodeex
-  public static ToUnicodeEx(wVirtKey: UINT, wScanCode: UINT, lpKeyState: BYTE, pwszBuff: LPWSTR, cchBuff: int, wFlags: UINT, dwhkl: HKL): int {
+  public static ToUnicodeEx(wVirtKey: UINT, wScanCode: UINT, lpKeyState: LPBYTE, pwszBuff: LPWSTR, cchBuff: int, wFlags: UINT, dwhkl: HKL | 0n): int {
     return User32.Load('ToUnicodeEx')(wVirtKey, wScanCode, lpKeyState, pwszBuff, cchBuff, wFlags, dwhkl);
   }
 
@@ -3603,7 +3603,7 @@ class User32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-unregisterclassw
-  public static UnregisterClassW(lpClassName: LPCWSTR, hInstance: HINSTANCE): BOOL {
+  public static UnregisterClassW(lpClassName: LPCWSTR, hInstance: HINSTANCE | 0n): BOOL {
     return User32.Load('UnregisterClassW')(lpClassName, hInstance);
   }
 
@@ -3693,7 +3693,7 @@ class User32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-winhelpw
-  public static WinHelpW(hWndMain: HWND, lpszHelp: LPCWSTR | NULL, uCommand: UINT, dwData: ULONG_PTR): BOOL {
+  public static WinHelpW(hWndMain: HWND | 0n, lpszHelp: LPCWSTR | NULL, uCommand: UINT, dwData: ULONG_PTR): BOOL {
     return User32.Load('WinHelpW')(hWndMain, lpszHelp, uCommand, dwData);
   }
 
@@ -3752,7 +3752,7 @@ class User32 extends Win32 {
   }
 
   // Undocumented: Internal helper for drawing captions
-  public static DrawCaptionTempW(hwnd: HWND, hdc: HDC, lprect: LPRECT, hFont: HANDLE | 0n, hIcon: HICON | 0n, lpszText: UINT): BOOL {
+  public static DrawCaptionTempW(hwnd: HWND, hdc: HDC, lprect: LPRECT, hFont: HANDLE | 0n, hIcon: LPVOID, lpszText: UINT): BOOL {
     return User32.Load('DrawCaptionTempW')(hwnd, hdc, lprect, hFont, hIcon, lpszText);
   }
 

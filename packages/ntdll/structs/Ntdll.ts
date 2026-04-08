@@ -1157,7 +1157,7 @@ class Ntdll extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-zwquerymultiplevaluekey
-  public static NtQueryMultipleValueKey(KeyHandle: HANDLE, ValueEntries: PKEY_VALUE_ENTRY, EntryCount: ULONG, ValueBuffer: PVOID, BufferLength: PULONG, RequiredBufferLength: PULONG): NTSTATUS {
+  public static NtQueryMultipleValueKey(KeyHandle: HANDLE, ValueEntries: PKEY_VALUE_ENTRY, EntryCount: ULONG, ValueBuffer: PVOID, BufferLength: PULONG, RequiredBufferLength: PULONG | NULL): NTSTATUS {
     return Ntdll.Load('NtQueryMultipleValueKey')(KeyHandle, ValueEntries, EntryCount, ValueBuffer, BufferLength, RequiredBufferLength);
   }
 
@@ -1167,7 +1167,7 @@ class Ntdll extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winternl/nf-winternl-ntqueryobject
-  public static NtQueryObject(Handle: HANDLE, ObjectInformationClass: ULONG, ObjectInformation: PVOID | NULL, ObjectInformationLength: ULONG, ReturnLength: PULONG | NULL): NTSTATUS {
+  public static NtQueryObject(Handle: HANDLE | 0n, ObjectInformationClass: ULONG, ObjectInformation: PVOID | NULL, ObjectInformationLength: ULONG, ReturnLength: PULONG | NULL): NTSTATUS {
     return Ntdll.Load('NtQueryObject')(Handle, ObjectInformationClass, ObjectInformation, ObjectInformationLength, ReturnLength);
   }
 

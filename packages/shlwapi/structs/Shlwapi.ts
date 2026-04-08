@@ -665,7 +665,7 @@ class Shlwapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-iunknown_queryservice
-  public static IUnknown_QueryService(punk: HANDLE, guidService: REFIID, riid: REFIID, ppvOut: LPVOID): HRESULT {
+  public static IUnknown_QueryService(punk: HANDLE | 0n, guidService: REFIID, riid: REFIID, ppvOut: LPVOID): HRESULT {
     return Shlwapi.Load('IUnknown_QueryService')(punk, guidService, riid, ppvOut);
   }
 
@@ -680,7 +680,7 @@ class Shlwapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-iunknown_setsite
-  public static IUnknown_SetSite(punk: HANDLE, punkSite: HANDLE): HRESULT {
+  public static IUnknown_SetSite(punk: HANDLE, punkSite: HANDLE | 0n): HRESULT {
     return Shlwapi.Load('IUnknown_SetSite')(punk, punkSite);
   }
 
@@ -1740,7 +1740,7 @@ class Shlwapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-shsetthreadref
-  public static SHSetThreadRef(punk: HANDLE): HRESULT {
+  public static SHSetThreadRef(punk: HANDLE | 0n): HRESULT {
     return Shlwapi.Load('SHSetThreadRef')(punk);
   }
 
@@ -2176,12 +2176,12 @@ class Shlwapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-urlcombinea
-  public static UrlCombineA(pszBase: LPCSTR, pszRelative: LPCSTR, pszCombined: LPSTR, pcchCombined: LPDWORD, dwFlags: DWORD): HRESULT {
+  public static UrlCombineA(pszBase: LPCSTR, pszRelative: LPCSTR, pszCombined: LPSTR | NULL, pcchCombined: LPDWORD, dwFlags: DWORD): HRESULT {
     return Shlwapi.Load('UrlCombineA')(pszBase, pszRelative, pszCombined, pcchCombined, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-urlcombinew
-  public static UrlCombineW(pszBase: LPCWSTR, pszRelative: LPCWSTR, pszCombined: LPWSTR, pcchCombined: LPDWORD, dwFlags: DWORD): HRESULT {
+  public static UrlCombineW(pszBase: LPCWSTR, pszRelative: LPCWSTR, pszCombined: LPWSTR | NULL, pcchCombined: LPDWORD, dwFlags: DWORD): HRESULT {
     return Shlwapi.Load('UrlCombineW')(pszBase, pszRelative, pszCombined, pcchCombined, dwFlags);
   }
 

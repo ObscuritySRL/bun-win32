@@ -27,7 +27,7 @@
     "directory": "packages/secur32"
   },
   "type": "module",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "main": "./index.ts",
   "keywords": [
     "bun",
@@ -54,6 +54,7 @@
     "bun": ">=1.1.0"
   },
   "scripts": {
-    "example": "bun ./example/secur32.ts"
+    "example:identity-card": "bun ./example/identity-card.ts",
+    "example:security-packages": "bun ./example/security-packages.ts"
   }
 }

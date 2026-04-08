@@ -218,6 +218,18 @@ A few small structs (notably `POINT` — 8 bytes) are passed **by value**, not b
 
 A function returning `HANDLE` → `returns: FFIType.u64`. Returning `LPVOID` → `returns: FFIType.ptr`. Returning `DWORD` → `returns: FFIType.u32`.
 
+### How NULL returns behave at runtime
+
+The FFI return type determines the JS representation of a null/zero return:
+
+| FFI return type | NULL value at runtime | JS type    |
+| --------------- | --------------------- | ---------- |
+| `FFIType.u64`   | `0n`                  | `bigint`   |
+| `FFIType.ptr`   | `null`                | `null`     |
+| `FFIType.u32`   | `0`                   | `number`   |
+
+When a function "returns NULL on success" (e.g., `LocalFree` returns `HLOCAL`), the return type is **not** `null` — it is `0n` because `HLOCAL` maps to `FFIType.u64`. The TypeScript return type should be the proper type alias (e.g., `HLOCAL`), not `DWORD` or `void`. The caller checks `result === 0n`.
+
 ### When in doubt
 
 1. Read the C declaration on the MS docs page.
@@ -246,6 +258,31 @@ hWndParent: HWND | 0n,
 
 ### How to decide
 
+Use a **header-first** workflow. Do not rely on memory or English prose alone.
+
+1. **Inspect the Windows SDK header prototype first.**
+   - Open the real header for the function (`libloaderapi.h`, `fileapi.h`, `processthreadsapi.h`, etc.).
+   - Treat SAL annotations as the primary source of truth for parameter optionality.
+   - Any parameter annotation containing `_opt_` is nullable for bindings purposes:
+     - `_In_opt_`
+     - `_Inout_opt_`
+     - `_Out_opt_`
+     - `_Outptr_opt_`
+     - `_Out_writes_opt_`
+     - `_Out_writes_to_opt_`
+     - `_In_reads_opt_`
+     - `_In_reads_bytes_opt_`
+     - and the related `_opt_` SAL families
+   - Also treat parameters annotated with `OPTIONAL` as nullable.
+   - Treat `_Reserved_` pointer and handle parameters as nullable too when the Windows API expects callers to pass `NULL`.
+
+2. **Map optionality to the TypeScript union mechanically.**
+   - Optional or reserved pointer-like parameters (`LP*`, `LPC*`, `P*`, callback pointers, struct pointers) → add `| NULL`
+   - Optional or reserved handle-like parameters (`HANDLE`, `HMODULE`, `HWND`, any `H*` handle typedef) → add `| 0n`
+   - Do **not** change the FFI symbol type because of nullability alone. `FFIType.ptr` and `FFIType.u64` stay the same; only the TS method signature gets the nullable union.
+
+3. **Then cross-check the docs page in all four locations below.**
+
 Check **all four** locations on the docs page — they don't always agree:
 
 1. **C prototype** — `[in, optional]`, `_In_opt_`, `_Out_opt_` SAL annotations.
@@ -269,12 +306,26 @@ Look for: `ERROR_INSUFFICIENT_BUFFER`, `ERROR_BUFFER_OVERFLOW`, "first with a NU
 
 ### Nullable parameter audit (mandatory)
 
-After all methods are written, perform a **dedicated review pass** over every method:
+After all methods are written, perform a **dedicated review pass** over every method. This is a mechanical audit, not an intuition-based one:
 
-1. For each method with pointer or handle parameters, open its MS docs page.
-2. Check all four locations above.
-3. Add missing `| NULL` or `| 0n`.
-4. Remove incorrect unions where the docs don't confirm nullability.
+1. For each method with pointer or handle parameters, inspect the Windows SDK header prototype and locate the exact parameter annotation.
+2. If the parameter SAL annotation contains `_opt_`, `OPTIONAL`, or `_Reserved_`, mark pointer and handle parameters nullable.
+3. Map pointer-like parameters to `| NULL` and handle-like parameters to `| 0n`.
+4. Open the Microsoft Learn page and verify the docs do not contradict the header.
+5. Add missing `| NULL` or `| 0n`.
+6. Remove incorrect unions where neither the header nor docs confirm nullability.
+
+If you are auditing a large package, script this pass:
+- Parse each generated method signature in `structs/{Class}.ts`
+- Resolve the corresponding SDK prototype
+- Match parameters by exact Win32 name
+- Compare the existing TS type to the SAL-derived expectation
+- Patch only the method signature unions
+
+This audit should catch cases like:
+- `GetModuleHandleW(lpModuleName)` → `lpModuleName: LPCWSTR | NULL`
+- `GetModuleFileNameW(hModule)` → `hModule: HMODULE | 0n`
+- `CreateFileW(lpSecurityAttributes, hTemplateFile)` → `lpSecurityAttributes: LPSECURITY_ATTRIBUTES | NULL`, `hTemplateFile: HANDLE | 0n`
 
 This step exists because bulk-writing 100+ methods inevitably misses annotations. It is not optional.
 
@@ -368,11 +419,35 @@ Follow this order. **Test at every step.**
 
 5. **Build methods** (`structs/{Class}.ts`). Add public static methods in batches. Each has a MS docs URL, exact parameter names, type aliases, `| NULL` / `| 0n`. Test after each batch.
 
-6. **Nullable audit.** Dedicated pass over every method — see Section 5.
+6. **Nullable audit.** Dedicated pass over every method — see Section 6.
 
-7. **README, AI.md, examples.** Fill in the README template. Fill in AI.md (change only class/DLL/package names). Add example scripts. Update the **root README.md** (Packages table and Project Structure tree).
+7. **Type consistency audit.** Run the automated audit and fix every issue before proceeding:
 
-8. **Final verification.** Run `bun run index.ts`. Run `bunx prettier --write "packages/{name}/**/*.ts"`. Run `bunx tsc --noEmit`. Run a real integration test.
+   ```bash
+   bun run scripts/audit.ts {name}
+   ```
+
+   The script cross-references three sources for every bound function:
+   - The **FFI symbol type** (`FFIType.u64`, `FFIType.ptr`, etc.) — determines runtime behavior.
+   - The **TypeScript method type** (`HANDLE`, `DWORD`, `LPVOID`, etc.) — what the caller sees.
+   - The **Windows SDK header** (when available) — the authoritative C prototype.
+
+   It flags any mismatch. Common mistakes it catches:
+   - `DWORD` (number) used where the FFI symbol is `u64` (bigint) — should be a HANDLE type.
+   - `LPVOID` (Pointer) used where the FFI symbol is `u64` (bigint) — should be `SIZE_T` or a HANDLE.
+   - `HANDLE` (bigint) used where the FFI symbol is `ptr` (Pointer) — the FFI symbol or the type is wrong.
+   - `DWORD` (number) used where the FFI symbol is `ptr` (Pointer) — should be a pointer/callback type.
+
+   **The audit must report zero mismatches.** If both the FFI symbol and TS type are wrong in the same direction (both say `number` when the SDK says `bigint`), the script won't catch it — you must still verify against the C prototype during step 5.
+
+   Use `--fix` for automatic method-signature repair, then manually review changes:
+   ```bash
+   bun run scripts/audit.ts {name} --fix
+   ```
+
+8. **README, AI.md, examples.** Fill in the README template. Fill in AI.md (change only class/DLL/package names). Add example scripts. Update the **root README.md** (Packages table and Project Structure tree).
+
+9. **Final verification.** Run `bun run index.ts`. Run `bunx prettier --write "packages/{name}/**/*.ts"`. Run `bunx tsc --noEmit`. Run a real integration test.
 
 ---
 
@@ -386,6 +461,7 @@ Follow this order. **Test at every step.**
 - [ ] Every method has a MS Docs URL comment
 - [ ] Every method uses exact Win32 parameter names
 - [ ] `| NULL` on every nullable pointer; `| 0n` on every nullable handle
+- [ ] `bun run scripts/audit.ts {name}` reports zero mismatches
 - [ ] No `as unknown as T` or `as any` casts
 - [ ] Hex literals use numeric separators (`0x0000_0001`)
 - [ ] Prettier formatted, tsc passes with no errors
@@ -414,6 +490,15 @@ cd packages/{name} && bunx tsc --noEmit
 
 # Format
 cd packages/{name} && bunx prettier --write "**/*.ts"
+
+# Type consistency audit (must report 0 mismatches)
+bun run scripts/audit.ts {name}
+
+# Auto-fix method signatures (review changes after)
+bun run scripts/audit.ts {name} --fix
+
+# Audit all packages at once
+bun run scripts/audit.ts --all
 
 # Run example
 cd packages/{name} && bun run example/{name}.ts

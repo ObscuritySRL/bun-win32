@@ -620,7 +620,7 @@ class Iphlpapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/iphlpapi/nf-iphlpapi-getiftable
-  public static GetIfTable(pIfTable: PMIB_IFTABLE, pdwSize: PULONG, bOrder: BOOL): DWORD {
+  public static GetIfTable(pIfTable: PMIB_IFTABLE | NULL, pdwSize: PULONG, bOrder: BOOL): DWORD {
     return Iphlpapi.Load('GetIfTable')(pIfTable, pdwSize, bOrder);
   }
 
@@ -665,12 +665,12 @@ class Iphlpapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/iphlpapi/nf-iphlpapi-getipaddrtable
-  public static GetIpAddrTable(pIpAddrTable: PMIB_IPADDRTABLE, pdwSize: PULONG, bOrder: BOOL): DWORD {
+  public static GetIpAddrTable(pIpAddrTable: PMIB_IPADDRTABLE | NULL, pdwSize: PULONG, bOrder: BOOL): DWORD {
     return Iphlpapi.Load('GetIpAddrTable')(pIpAddrTable, pdwSize, bOrder);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/iphlpapi/nf-iphlpapi-getiperrorstring
-  public static GetIpErrorString(ErrorCode: IP_STATUS, Buffer: LPWSTR, Size: PDWORD): DWORD {
+  public static GetIpErrorString(ErrorCode: IP_STATUS, Buffer: LPWSTR | NULL, Size: PDWORD): DWORD {
     return Iphlpapi.Load('GetIpErrorString')(ErrorCode, Buffer, Size);
   }
 
@@ -680,7 +680,7 @@ class Iphlpapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/iphlpapi/nf-iphlpapi-getipforwardtable
-  public static GetIpForwardTable(pIpForwardTable: PMIB_IPFORWARDTABLE, pdwSize: PULONG, bOrder: BOOL): DWORD {
+  public static GetIpForwardTable(pIpForwardTable: PMIB_IPFORWARDTABLE | NULL, pdwSize: PULONG, bOrder: BOOL): DWORD {
     return Iphlpapi.Load('GetIpForwardTable')(pIpForwardTable, pdwSize, bOrder);
   }
 
@@ -705,7 +705,7 @@ class Iphlpapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/iphlpapi/nf-iphlpapi-getipnettable
-  public static GetIpNetTable(IpNetTable: PMIB_IPNETTABLE, SizePointer: PULONG, Order: BOOL): ULONG {
+  public static GetIpNetTable(IpNetTable: PMIB_IPNETTABLE | NULL, SizePointer: PULONG, Order: BOOL): ULONG {
     return Iphlpapi.Load('GetIpNetTable')(IpNetTable, SizePointer, Order);
   }
 
@@ -795,7 +795,7 @@ class Iphlpapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/iphlpapi/nf-iphlpapi-getperadapterinfo
-  public static GetPerAdapterInfo(IfIndex: ULONG, pPerAdapterInfo: PIP_PER_ADAPTER_INFO, pOutBufLen: PULONG): DWORD {
+  public static GetPerAdapterInfo(IfIndex: ULONG, pPerAdapterInfo: PIP_PER_ADAPTER_INFO | NULL, pOutBufLen: PULONG): DWORD {
     return Iphlpapi.Load('GetPerAdapterInfo')(IfIndex, pPerAdapterInfo, pOutBufLen);
   }
 
@@ -884,7 +884,7 @@ class Iphlpapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/iphlpapi/nf-iphlpapi-getudp6table
-  public static GetUdp6Table(Udp6Table: PMIB_UDP6TABLE, SizePointer: PULONG, Order: BOOL): ULONG {
+  public static GetUdp6Table(Udp6Table: PMIB_UDP6TABLE | NULL, SizePointer: PULONG, Order: BOOL): ULONG {
     return Iphlpapi.Load('GetUdp6Table')(Udp6Table, SizePointer, Order);
   }
 
@@ -909,7 +909,7 @@ class Iphlpapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/iphlpapi/nf-iphlpapi-getunidirectionaladapterinfo
-  public static GetUniDirectionalAdapterInfo(pIPIfInfo: PIP_UNIDIRECTIONAL_ADAPTER_ADDRESS, dwOutBufLen: PULONG): DWORD {
+  public static GetUniDirectionalAdapterInfo(pIPIfInfo: PIP_UNIDIRECTIONAL_ADAPTER_ADDRESS | NULL, dwOutBufLen: PULONG): DWORD {
     return Iphlpapi.Load('GetUniDirectionalAdapterInfo')(pIPIfInfo, dwOutBufLen);
   }
 

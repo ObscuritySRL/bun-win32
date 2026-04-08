@@ -27,7 +27,7 @@
     "directory": "packages/winspool"
   },
   "type": "module",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "main": "./index.ts",
   "keywords": [
     "bun",
@@ -53,6 +53,7 @@
     "bun": ">=1.1.0"
   },
   "scripts": {
-    "example": "bun ./example/winspool.ts"
+    "example:printer-showdown": "bun ./example/printer-showdown.ts",
+    "example:printer-audit": "bun ./example/printer-audit.ts"
   }
 }

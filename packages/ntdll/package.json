@@ -8,6 +8,7 @@
   },
   "description": "Zero-dependency, zero-overhead Win32 NTDLL bindings for Bun (FFI) on Windows.",
   "devDependencies": {
+    "@bun-win32/kernel32": "workspace:*",
     "@types/bun": "latest"
   },
   "exports": {
@@ -27,7 +28,7 @@
     "directory": "packages/ntdll"
   },
   "type": "module",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "main": "./index.ts",
   "keywords": [
     "bun",
@@ -51,6 +52,7 @@
     "bun": ">=1.1.0"
   },
   "scripts": {
-    "example": "bun ./example/ntdll.ts"
+    "example:timing-showdown": "bun ./example/timing-showdown.ts",
+    "example:system-internals": "bun ./example/system-internals.ts"
   }
 }

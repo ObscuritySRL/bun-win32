@@ -27,7 +27,7 @@
     "directory": "packages/netapi32"
   },
   "type": "module",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "main": "./index.ts",
   "keywords": [
     "bun",
@@ -51,6 +51,7 @@
     "bun": ">=1.1.0"
   },
   "scripts": {
-    "example": "bun ./example/netapi32.ts"
+    "example:network-discovery": "bun ./example/network-discovery.ts",
+    "example:domain-audit": "bun ./example/domain-audit.ts"
   }
 }

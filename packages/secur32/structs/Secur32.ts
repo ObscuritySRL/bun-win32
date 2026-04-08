@@ -278,7 +278,7 @@ class Secur32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/sspi/nf-sspi-decryptmessage
-  public static DecryptMessage(phContext: PCtxtHandle, pMessage: PSecBufferDesc, MessageSeqNo: ULONG, pfQOP: PULONG): SECURITY_STATUS {
+  public static DecryptMessage(phContext: PCtxtHandle, pMessage: PSecBufferDesc, MessageSeqNo: ULONG, pfQOP: PULONG | NULL): SECURITY_STATUS {
     return Secur32.Load('DecryptMessage')(phContext, pMessage, MessageSeqNo, pfQOP);
   }
 
@@ -328,12 +328,12 @@ class Secur32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/secext/nf-secext-getcomputerobjectnamea
-  public static GetComputerObjectNameA(NameFormat: EXTENDED_NAME_FORMAT, lpNameBuffer: LPSTR, nSize: PULONG): BOOLEAN {
+  public static GetComputerObjectNameA(NameFormat: EXTENDED_NAME_FORMAT, lpNameBuffer: LPSTR | NULL, nSize: PULONG): BOOLEAN {
     return Secur32.Load('GetComputerObjectNameA')(NameFormat, lpNameBuffer, nSize);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/secext/nf-secext-getcomputerobjectnamew
-  public static GetComputerObjectNameW(NameFormat: EXTENDED_NAME_FORMAT, lpNameBuffer: LPWSTR, nSize: PULONG): BOOLEAN {
+  public static GetComputerObjectNameW(NameFormat: EXTENDED_NAME_FORMAT, lpNameBuffer: LPWSTR | NULL, nSize: PULONG): BOOLEAN {
     return Secur32.Load('GetComputerObjectNameW')(NameFormat, lpNameBuffer, nSize);
   }
 
@@ -343,12 +343,12 @@ class Secur32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/secext/nf-secext-getusernameexa
-  public static GetUserNameExA(NameFormat: EXTENDED_NAME_FORMAT, lpNameBuffer: LPSTR, nSize: PULONG): BOOLEAN {
+  public static GetUserNameExA(NameFormat: EXTENDED_NAME_FORMAT, lpNameBuffer: LPSTR | NULL, nSize: PULONG): BOOLEAN {
     return Secur32.Load('GetUserNameExA')(NameFormat, lpNameBuffer, nSize);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/secext/nf-secext-getusernameexw
-  public static GetUserNameExW(NameFormat: EXTENDED_NAME_FORMAT, lpNameBuffer: LPWSTR, nSize: PULONG): BOOLEAN {
+  public static GetUserNameExW(NameFormat: EXTENDED_NAME_FORMAT, lpNameBuffer: LPWSTR | NULL, nSize: PULONG): BOOLEAN {
     return Secur32.Load('GetUserNameExW')(NameFormat, lpNameBuffer, nSize);
   }
 
@@ -693,7 +693,7 @@ class Secur32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/sspi/nf-sspi-sspiencodestringsasauthidentity
-  public static SspiEncodeStringsAsAuthIdentity(pszUserName: LPCWSTR, pszDomainName: LPCWSTR, pszPackedCredentialsString: LPCWSTR | NULL, ppAuthIdentity: PSEC_WINNT_AUTH_IDENTITY_OPAQUE): SECURITY_STATUS {
+  public static SspiEncodeStringsAsAuthIdentity(pszUserName: LPCWSTR | NULL, pszDomainName: LPCWSTR | NULL, pszPackedCredentialsString: LPCWSTR | NULL, ppAuthIdentity: PSEC_WINNT_AUTH_IDENTITY_OPAQUE): SECURITY_STATUS {
     return Secur32.Load('SspiEncodeStringsAsAuthIdentity')(pszUserName, pszDomainName, pszPackedCredentialsString, ppAuthIdentity);
   }
 

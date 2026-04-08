@@ -539,12 +539,12 @@ class Ws2_32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-wsaenumprotocolsa
-  public static WSAEnumProtocolsA(lpiProtocols: LPINT | NULL, lpProtocolBuffer: LPWSAPROTOCOL_INFOA, lpdwBufferLength: LPDWORD): INT {
+  public static WSAEnumProtocolsA(lpiProtocols: LPINT | NULL, lpProtocolBuffer: LPWSAPROTOCOL_INFOA | NULL, lpdwBufferLength: LPDWORD): INT {
     return Ws2_32.Load('WSAEnumProtocolsA')(lpiProtocols, lpProtocolBuffer, lpdwBufferLength);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-wsaenumprotocolsw
-  public static WSAEnumProtocolsW(lpiProtocols: LPINT | NULL, lpProtocolBuffer: LPWSAPROTOCOL_INFOW, lpdwBufferLength: LPDWORD): INT {
+  public static WSAEnumProtocolsW(lpiProtocols: LPINT | NULL, lpProtocolBuffer: LPWSAPROTOCOL_INFOW | NULL, lpdwBufferLength: LPDWORD): INT {
     return Ws2_32.Load('WSAEnumProtocolsW')(lpiProtocols, lpProtocolBuffer, lpdwBufferLength);
   }
 
@@ -654,7 +654,7 @@ class Ws2_32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-wsalookupservicenextw
-  public static WSALookupServiceNextW(hLookup: HANDLE, dwControlFlags: DWORD, lpdwBufferLength: LPDWORD, lpqsResults: LPWSAQUERYSETW): INT {
+  public static WSALookupServiceNextW(hLookup: HANDLE, dwControlFlags: DWORD, lpdwBufferLength: LPDWORD, lpqsResults: LPWSAQUERYSETW | NULL): INT {
     return Ws2_32.Load('WSALookupServiceNextW')(hLookup, dwControlFlags, lpdwBufferLength, lpqsResults);
   }
 
@@ -1152,7 +1152,7 @@ class Ws2_32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-setsockopt
-  public static setsockopt(s: SOCKET, level: INT, optname: INT, optval: LPCSTR, optlen: INT): INT {
+  public static setsockopt(s: SOCKET, level: INT, optname: INT, optval: LPCSTR | NULL, optlen: INT): INT {
     return Ws2_32.Load('setsockopt')(s, level, optname, optval, optlen);
   }
 

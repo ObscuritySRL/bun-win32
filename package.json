@@ -1,5 +1,8 @@
 {
   "name": "bun-win32",
   "private": true,
-  "workspaces": ["packages/*"]
+  "workspaces": ["packages/*"],
+  "devDependencies": {
+    "@types/bun": "latest"
+  }
 }

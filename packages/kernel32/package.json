@@ -27,7 +27,7 @@
     "directory": "packages/kernel32"
   },
   "type": "module",
-  "version": "1.0.20",
+  "version": "1.0.21",
   "main": "./index.ts",
   "keywords": [
     "bun",
@@ -51,11 +51,7 @@
     "bun": ">=1.1.0"
   },
   "scripts": {
-    "example": "bun ./example/kernel32.ts",
-    "example:sysinfo": "bun ./example/system-info.ts",
-    "example:watcher": "bun ./example/file-watcher.ts",
-    "example:processes": "bun ./example/process-explorer.ts",
-    "example:processes:tree": "bun ./example/process-explorer.ts tree",
-    "example:console": "bun ./example/console-rainbow.ts"
+    "example:matrix-rain": "bun ./example/matrix-rain.ts",
+    "example:system-diagnostic": "bun ./example/system-diagnostic.ts"
   }
 }

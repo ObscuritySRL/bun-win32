@@ -27,7 +27,7 @@
     "directory": "packages/shlwapi"
   },
   "type": "module",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "main": "./index.ts",
   "keywords": [
     "bun",
@@ -51,6 +51,7 @@
     "bun": ">=1.1.0"
   },
   "scripts": {
-    "example": "bun ./example/shlwapi.ts"
+    "example:path-wizard": "bun ./example/path-wizard.ts",
+    "example:url-dissector": "bun ./example/url-dissector.ts"
   }
 }

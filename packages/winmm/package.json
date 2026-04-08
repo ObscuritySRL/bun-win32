@@ -27,7 +27,7 @@
     "directory": "packages/winmm"
   },
   "type": "module",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "main": "./index.ts",
   "keywords": [
     "bun",
@@ -51,9 +51,7 @@
     "bun": ">=1.1.0"
   },
   "scripts": {
-    "example": "bun ./example/winmm.ts",
-    "example:joystick": "bun ./example/joystick.ts",
-    "example:seq": "bun ./example/seq.ts",
-    "example:synth": "bun ./example/synth.ts"
+    "example:synth": "bun ./example/synth.ts",
+    "example:device-audit": "bun ./example/device-audit.ts"
   }
 }

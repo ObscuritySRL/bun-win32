@@ -277,12 +277,12 @@ class Pdh extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/pdh/nf-pdh-pdhenummachinesha
-  public static PdhEnumMachinesHA(hDataSource: PDH_HLOG, mszMachineList: LPSTR | NULL, pcchBufferSize: LPDWORD): PDH_STATUS {
+  public static PdhEnumMachinesHA(hDataSource: PDH_HLOG | 0n, mszMachineList: LPSTR | NULL, pcchBufferSize: LPDWORD): PDH_STATUS {
     return Pdh.Load('PdhEnumMachinesHA')(hDataSource, mszMachineList, pcchBufferSize);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/pdh/nf-pdh-pdhenummachineshw
-  public static PdhEnumMachinesHW(hDataSource: PDH_HLOG, mszMachineList: LPWSTR | NULL, pcchBufferSize: LPDWORD): PDH_STATUS {
+  public static PdhEnumMachinesHW(hDataSource: PDH_HLOG | 0n, mszMachineList: LPWSTR | NULL, pcchBufferSize: LPDWORD): PDH_STATUS {
     return Pdh.Load('PdhEnumMachinesHW')(hDataSource, mszMachineList, pcchBufferSize);
   }
 
@@ -308,7 +308,7 @@ class Pdh extends Win32 {
 
   // https://learn.microsoft.com/en-us/windows/win32/api/pdh/nf-pdh-pdhenumobjectitemsha
   public static PdhEnumObjectItemsHA(
-    hDataSource: PDH_HLOG,
+    hDataSource: PDH_HLOG | 0n,
     szMachineName: LPCSTR | NULL,
     szObjectName: LPCSTR,
     mszCounterList: LPSTR | NULL,
@@ -323,7 +323,7 @@ class Pdh extends Win32 {
 
   // https://learn.microsoft.com/en-us/windows/win32/api/pdh/nf-pdh-pdhenumobjectitemshw
   public static PdhEnumObjectItemsHW(
-    hDataSource: PDH_HLOG,
+    hDataSource: PDH_HLOG | 0n,
     szMachineName: LPCWSTR | NULL,
     szObjectName: LPCWSTR,
     mszCounterList: LPWSTR | NULL,
@@ -357,12 +357,12 @@ class Pdh extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/pdh/nf-pdh-pdhenumobjectsha
-  public static PdhEnumObjectsHA(hDataSource: PDH_HLOG, szMachineName: LPCSTR | NULL, mszObjectList: LPSTR | NULL, pcchBufferSize: LPDWORD, dwDetailLevel: DWORD, bRefresh: BOOL): PDH_STATUS {
+  public static PdhEnumObjectsHA(hDataSource: PDH_HLOG | 0n, szMachineName: LPCSTR | NULL, mszObjectList: LPSTR | NULL, pcchBufferSize: LPDWORD, dwDetailLevel: DWORD, bRefresh: BOOL): PDH_STATUS {
     return Pdh.Load('PdhEnumObjectsHA')(hDataSource, szMachineName, mszObjectList, pcchBufferSize, dwDetailLevel, bRefresh);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/pdh/nf-pdh-pdhenumobjectshw
-  public static PdhEnumObjectsHW(hDataSource: PDH_HLOG, szMachineName: LPCWSTR | NULL, mszObjectList: LPWSTR | NULL, pcchBufferSize: LPDWORD, dwDetailLevel: DWORD, bRefresh: BOOL): PDH_STATUS {
+  public static PdhEnumObjectsHW(hDataSource: PDH_HLOG | 0n, szMachineName: LPCWSTR | NULL, mszObjectList: LPWSTR | NULL, pcchBufferSize: LPDWORD, dwDetailLevel: DWORD, bRefresh: BOOL): PDH_STATUS {
     return Pdh.Load('PdhEnumObjectsHW')(hDataSource, szMachineName, mszObjectList, pcchBufferSize, dwDetailLevel, bRefresh);
   }
 
@@ -387,12 +387,12 @@ class Pdh extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/pdh/nf-pdh-pdhexpandwildcardpathha
-  public static PdhExpandWildCardPathHA(hDataSource: PDH_HLOG, szWildCardPath: LPCSTR, mszExpandedPathList: LPSTR | NULL, pcchPathListLength: LPDWORD, dwFlags: DWORD): PDH_STATUS {
+  public static PdhExpandWildCardPathHA(hDataSource: PDH_HLOG | 0n, szWildCardPath: LPCSTR, mszExpandedPathList: LPSTR | NULL, pcchPathListLength: LPDWORD, dwFlags: DWORD): PDH_STATUS {
     return Pdh.Load('PdhExpandWildCardPathHA')(hDataSource, szWildCardPath, mszExpandedPathList, pcchPathListLength, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/pdh/nf-pdh-pdhexpandwildcardpathhw
-  public static PdhExpandWildCardPathHW(hDataSource: PDH_HLOG, szWildCardPath: LPCWSTR, mszExpandedPathList: LPWSTR | NULL, pcchPathListLength: LPDWORD, dwFlags: DWORD): PDH_STATUS {
+  public static PdhExpandWildCardPathHW(hDataSource: PDH_HLOG | 0n, szWildCardPath: LPCWSTR, mszExpandedPathList: LPWSTR | NULL, pcchPathListLength: LPDWORD, dwFlags: DWORD): PDH_STATUS {
     return Pdh.Load('PdhExpandWildCardPathHW')(hDataSource, szWildCardPath, mszExpandedPathList, pcchPathListLength, dwFlags);
   }
 
@@ -402,7 +402,7 @@ class Pdh extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/pdh/nf-pdh-pdhformatfromrawvalue
-  public static PdhFormatFromRawValue(dwCounterType: DWORD, dwFormat: DWORD, pTimeBase: PLONGLONG, pRawValue1: PPDH_RAW_COUNTER, pRawValue2: PPDH_RAW_COUNTER | NULL, pFmtValue: PPDH_FMT_COUNTERVALUE): PDH_STATUS {
+  public static PdhFormatFromRawValue(dwCounterType: DWORD, dwFormat: DWORD, pTimeBase: PLONGLONG | NULL, pRawValue1: PPDH_RAW_COUNTER, pRawValue2: PPDH_RAW_COUNTER | NULL, pFmtValue: PPDH_FMT_COUNTERVALUE): PDH_STATUS {
     return Pdh.Load('PdhFormatFromRawValue')(dwCounterType, dwFormat, pTimeBase, pRawValue1, pRawValue2, pFmtValue);
   }
 
@@ -422,17 +422,17 @@ class Pdh extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/pdh/nf-pdh-pdhgetdatasourcetimerangea
-  public static PdhGetDataSourceTimeRangeA(szDataSource: LPCSTR, pdwNumEntries: LPDWORD, pInfo: PPDH_TIME_INFO, pdwBufferSize: LPDWORD): PDH_STATUS {
+  public static PdhGetDataSourceTimeRangeA(szDataSource: LPCSTR | NULL, pdwNumEntries: LPDWORD, pInfo: PPDH_TIME_INFO, pdwBufferSize: LPDWORD): PDH_STATUS {
     return Pdh.Load('PdhGetDataSourceTimeRangeA')(szDataSource, pdwNumEntries, pInfo, pdwBufferSize);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/pdh/nf-pdh-pdhgetdatasourcetimerangeh
-  public static PdhGetDataSourceTimeRangeH(hDataSource: PDH_HLOG, pdwNumEntries: LPDWORD, pInfo: PPDH_TIME_INFO, pdwBufferSize: LPDWORD): PDH_STATUS {
+  public static PdhGetDataSourceTimeRangeH(hDataSource: PDH_HLOG | 0n, pdwNumEntries: LPDWORD, pInfo: PPDH_TIME_INFO, pdwBufferSize: LPDWORD): PDH_STATUS {
     return Pdh.Load('PdhGetDataSourceTimeRangeH')(hDataSource, pdwNumEntries, pInfo, pdwBufferSize);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/pdh/nf-pdh-pdhgetdatasourcetimerangew
-  public static PdhGetDataSourceTimeRangeW(szDataSource: LPCWSTR, pdwNumEntries: LPDWORD, pInfo: PPDH_TIME_INFO, pdwBufferSize: LPDWORD): PDH_STATUS {
+  public static PdhGetDataSourceTimeRangeW(szDataSource: LPCWSTR | NULL, pdwNumEntries: LPDWORD, pInfo: PPDH_TIME_INFO, pdwBufferSize: LPDWORD): PDH_STATUS {
     return Pdh.Load('PdhGetDataSourceTimeRangeW')(szDataSource, pdwNumEntries, pInfo, pdwBufferSize);
   }
 
@@ -477,7 +477,7 @@ class Pdh extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/pdh/nf-pdh-pdhgetdllversion
-  public static PdhGetDllVersion(lpdwVersion: LPDWORD): PDH_STATUS {
+  public static PdhGetDllVersion(lpdwVersion: LPDWORD | NULL): PDH_STATUS {
     return Pdh.Load('PdhGetDllVersion')(lpdwVersion);
   }
 
@@ -572,7 +572,7 @@ class Pdh extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/pdh/nf-pdh-pdhopenqueryh
-  public static PdhOpenQueryH(hDataSource: PDH_HLOG, dwUserData: DWORD_PTR, phQuery: PPDH_HQUERY): PDH_STATUS {
+  public static PdhOpenQueryH(hDataSource: PDH_HLOG | 0n, dwUserData: DWORD_PTR, phQuery: PPDH_HQUERY): PDH_STATUS {
     return Pdh.Load('PdhOpenQueryH')(hDataSource, dwUserData, phQuery);
   }
 
@@ -637,7 +637,7 @@ class Pdh extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/pdh/nf-pdh-pdhupdateloga
-  public static PdhUpdateLogA(hLog: PDH_HLOG, szUserString: LPCSTR): PDH_STATUS {
+  public static PdhUpdateLogA(hLog: PDH_HLOG, szUserString: LPCSTR | NULL): PDH_STATUS {
     return Pdh.Load('PdhUpdateLogA')(hLog, szUserString);
   }
 
@@ -647,7 +647,7 @@ class Pdh extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/pdh/nf-pdh-pdhupdatelogw
-  public static PdhUpdateLogW(hLog: PDH_HLOG, szUserString: LPCWSTR): PDH_STATUS {
+  public static PdhUpdateLogW(hLog: PDH_HLOG, szUserString: LPCWSTR | NULL): PDH_STATUS {
     return Pdh.Load('PdhUpdateLogW')(hLog, szUserString);
   }
 

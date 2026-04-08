@@ -27,7 +27,7 @@
     "directory": "packages/wlanapi"
   },
   "type": "module",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "main": "./index.ts",
   "keywords": [
     "bun",
@@ -54,6 +54,7 @@
     "bun": ">=1.1.0"
   },
   "scripts": {
-    "example": "bun ./example/wlanapi.ts"
+    "example:signal-monitor": "bun ./example/signal-monitor.ts",
+    "example:wifi-diagnostic": "bun ./example/wifi-diagnostic.ts"
   }
 }

@@ -4,6 +4,9 @@
   "workspaces": {
     "": {
       "name": "bun-win32",
+      "devDependencies": {
+        "@types/bun": "latest",
+      },
     },
     "packages/advapi32": {
       "name": "@bun-win32/advapi32",
@@ -12,6 +15,7 @@
         "@bun-win32/core": "workspace:*",
       },
       "devDependencies": {
+        "@bun-win32/kernel32": "workspace:*",
         "@types/bun": "latest",
       },
       "peerDependencies": {
@@ -48,6 +52,7 @@
         "@bun-win32/core": "workspace:*",
       },
       "devDependencies": {
+        "@bun-win32/kernel32": "workspace:*",
         "@types/bun": "latest",
       },
       "peerDependencies": {
@@ -61,6 +66,8 @@
         "@bun-win32/core": "workspace:*",
       },
       "devDependencies": {
+        "@bun-win32/advapi32": "workspace:*",
+        "@bun-win32/user32": "workspace:*",
         "@types/bun": "latest",
       },
       "peerDependencies": {
@@ -74,6 +81,8 @@
         "@bun-win32/core": "workspace:*",
       },
       "devDependencies": {
+        "@bun-win32/kernel32": "workspace:*",
+        "@bun-win32/user32": "workspace:*",
         "@types/bun": "latest",
       },
       "peerDependencies": {
@@ -87,6 +96,10 @@
         "@bun-win32/core": "workspace:*",
       },
       "devDependencies": {
+        "@bun-win32/gdi32": "workspace:*",
+        "@bun-win32/kernel32": "workspace:*",
+        "@bun-win32/opengl32": "workspace:*",
+        "@bun-win32/user32": "workspace:*",
         "@types/bun": "latest",
       },
       "peerDependencies": {
@@ -100,6 +113,7 @@
         "@bun-win32/core": "workspace:*",
       },
       "devDependencies": {
+        "@bun-win32/kernel32": "workspace:*",
         "@types/bun": "latest",
       },
       "peerDependencies": {
@@ -152,6 +166,7 @@
         "@bun-win32/core": "workspace:*",
       },
       "devDependencies": {
+        "@bun-win32/kernel32": "workspace:*",
         "@types/bun": "latest",
       },
       "peerDependencies": {
@@ -165,6 +180,9 @@
         "@bun-win32/core": "workspace:*",
       },
       "devDependencies": {
+        "@bun-win32/gdi32": "workspace:*",
+        "@bun-win32/kernel32": "workspace:*",
+        "@bun-win32/user32": "workspace:*",
         "@types/bun": "latest",
       },
       "peerDependencies": {
@@ -191,6 +209,7 @@
         "@bun-win32/core": "workspace:*",
       },
       "devDependencies": {
+        "@bun-win32/kernel32": "workspace:*",
         "@types/bun": "latest",
       },
       "peerDependencies": {
@@ -204,6 +223,7 @@
         "@bun-win32/core": "workspace:*",
       },
       "devDependencies": {
+        "@bun-win32/kernel32": "workspace:*",
         "@types/bun": "latest",
       },
       "peerDependencies": {
@@ -230,6 +250,7 @@
         "@bun-win32/core": "workspace:*",
       },
       "devDependencies": {
+        "@bun-win32/kernel32": "workspace:*",
         "@types/bun": "latest",
       },
       "peerDependencies": {
@@ -256,6 +277,7 @@
         "@bun-win32/core": "workspace:*",
       },
       "devDependencies": {
+        "@bun-win32/secur32": "workspace:*",
         "@types/bun": "latest",
       },
       "peerDependencies": {

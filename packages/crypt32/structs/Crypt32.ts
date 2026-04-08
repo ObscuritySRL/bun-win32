@@ -364,7 +364,7 @@ class Crypt32 extends Win32 {
   } as const satisfies Record<string, FFIFunction>;
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincrypt/nf-wincrypt-certaddcrlcontexttostore
-  public static CertAddCRLContextToStore(hCertStore: HCERTSTORE, pCrlContext: PCCRL_CONTEXT, dwAddDisposition: DWORD, ppStoreContext: PVOID | NULL): BOOL {
+  public static CertAddCRLContextToStore(hCertStore: HCERTSTORE | 0n, pCrlContext: PCCRL_CONTEXT, dwAddDisposition: DWORD, ppStoreContext: PVOID | NULL): BOOL {
     return Crypt32.Load('CertAddCRLContextToStore')(hCertStore, pCrlContext, dwAddDisposition, ppStoreContext);
   }
 
@@ -374,7 +374,7 @@ class Crypt32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincrypt/nf-wincrypt-certaddctlcontexttostore
-  public static CertAddCTLContextToStore(hCertStore: HCERTSTORE, pCtlContext: PCCTL_CONTEXT, dwAddDisposition: DWORD, ppStoreContext: PVOID | NULL): BOOL {
+  public static CertAddCTLContextToStore(hCertStore: HCERTSTORE | 0n, pCtlContext: PCCTL_CONTEXT, dwAddDisposition: DWORD, ppStoreContext: PVOID | NULL): BOOL {
     return Crypt32.Load('CertAddCTLContextToStore')(hCertStore, pCtlContext, dwAddDisposition, ppStoreContext);
   }
 
@@ -384,7 +384,7 @@ class Crypt32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincrypt/nf-wincrypt-certaddcertificatecontexttostore
-  public static CertAddCertificateContextToStore(hCertStore: HCERTSTORE, pCertContext: PCCERT_CONTEXT, dwAddDisposition: DWORD, ppStoreContext: PVOID | NULL): BOOL {
+  public static CertAddCertificateContextToStore(hCertStore: HCERTSTORE | 0n, pCertContext: PCCERT_CONTEXT, dwAddDisposition: DWORD, ppStoreContext: PVOID | NULL): BOOL {
     return Crypt32.Load('CertAddCertificateContextToStore')(hCertStore, pCertContext, dwAddDisposition, ppStoreContext);
   }
 
@@ -394,17 +394,17 @@ class Crypt32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincrypt/nf-wincrypt-certaddencodedcrltostore
-  public static CertAddEncodedCRLToStore(hCertStore: HCERTSTORE, dwCertEncodingType: DWORD, pbCrlEncoded: PBYTE, cbCrlEncoded: DWORD, dwAddDisposition: DWORD, ppCrlContext: PVOID | NULL): BOOL {
+  public static CertAddEncodedCRLToStore(hCertStore: HCERTSTORE | 0n, dwCertEncodingType: DWORD, pbCrlEncoded: PBYTE, cbCrlEncoded: DWORD, dwAddDisposition: DWORD, ppCrlContext: PVOID | NULL): BOOL {
     return Crypt32.Load('CertAddEncodedCRLToStore')(hCertStore, dwCertEncodingType, pbCrlEncoded, cbCrlEncoded, dwAddDisposition, ppCrlContext);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincrypt/nf-wincrypt-certaddencodedctltostore
-  public static CertAddEncodedCTLToStore(hCertStore: HCERTSTORE, dwMsgAndCertEncodingType: DWORD, pbCtlEncoded: PBYTE, cbCtlEncoded: DWORD, dwAddDisposition: DWORD, ppCtlContext: PVOID | NULL): BOOL {
+  public static CertAddEncodedCTLToStore(hCertStore: HCERTSTORE | 0n, dwMsgAndCertEncodingType: DWORD, pbCtlEncoded: PBYTE, cbCtlEncoded: DWORD, dwAddDisposition: DWORD, ppCtlContext: PVOID | NULL): BOOL {
     return Crypt32.Load('CertAddEncodedCTLToStore')(hCertStore, dwMsgAndCertEncodingType, pbCtlEncoded, cbCtlEncoded, dwAddDisposition, ppCtlContext);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincrypt/nf-wincrypt-certaddencodedcertificatetostore
-  public static CertAddEncodedCertificateToStore(hCertStore: HCERTSTORE, dwCertEncodingType: DWORD, pbCertEncoded: PBYTE, cbCertEncoded: DWORD, dwAddDisposition: DWORD, ppCertContext: PVOID | NULL): BOOL {
+  public static CertAddEncodedCertificateToStore(hCertStore: HCERTSTORE | 0n, dwCertEncodingType: DWORD, pbCertEncoded: PBYTE, cbCertEncoded: DWORD, dwAddDisposition: DWORD, ppCertContext: PVOID | NULL): BOOL {
     return Crypt32.Load('CertAddEncodedCertificateToStore')(hCertStore, dwCertEncodingType, pbCertEncoded, cbCertEncoded, dwAddDisposition, ppCertContext);
   }
 
@@ -424,7 +424,7 @@ class Crypt32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincrypt/nf-wincrypt-certaddrefserverocspresponse
-  public static CertAddRefServerOcspResponse(hServerOcspResponse: HCERT_SERVER_OCSP_RESPONSE): void {
+  public static CertAddRefServerOcspResponse(hServerOcspResponse: HCERT_SERVER_OCSP_RESPONSE | 0n): void {
     return Crypt32.Load('CertAddRefServerOcspResponse')(hServerOcspResponse);
   }
 
@@ -560,12 +560,12 @@ class Crypt32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincrypt/nf-wincrypt-certduplicatecrlcontext
-  public static CertDuplicateCRLContext(pCrlContext: PCCRL_CONTEXT): PCCRL_CONTEXT {
+  public static CertDuplicateCRLContext(pCrlContext: PCCRL_CONTEXT | NULL): PCCRL_CONTEXT {
     return Crypt32.Load('CertDuplicateCRLContext')(pCrlContext);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincrypt/nf-wincrypt-certduplicatectlcontext
-  public static CertDuplicateCTLContext(pCtlContext: PCCTL_CONTEXT): PCCTL_CONTEXT {
+  public static CertDuplicateCTLContext(pCtlContext: PCCTL_CONTEXT | NULL): PCCTL_CONTEXT {
     return Crypt32.Load('CertDuplicateCTLContext')(pCtlContext);
   }
 
@@ -769,12 +769,12 @@ class Crypt32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincrypt/nf-wincrypt-certgetnamestringA
-  public static CertGetNameStringA(pCertContext: PCCERT_CONTEXT, dwType: DWORD, dwFlags: DWORD, pvTypePara: PVOID | NULL, pszNameString: LPSTR, cchNameString: DWORD): DWORD {
+  public static CertGetNameStringA(pCertContext: PCCERT_CONTEXT, dwType: DWORD, dwFlags: DWORD, pvTypePara: PVOID | NULL, pszNameString: LPSTR | NULL, cchNameString: DWORD): DWORD {
     return Crypt32.Load('CertGetNameStringA')(pCertContext, dwType, dwFlags, pvTypePara, pszNameString, cchNameString);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincrypt/nf-wincrypt-certgetnamestringw
-  public static CertGetNameStringW(pCertContext: PCCERT_CONTEXT, dwType: DWORD, dwFlags: DWORD, pvTypePara: PVOID | NULL, pszNameString: LPWSTR, cchNameString: DWORD): DWORD {
+  public static CertGetNameStringW(pCertContext: PCCERT_CONTEXT, dwType: DWORD, dwFlags: DWORD, pvTypePara: PVOID | NULL, pszNameString: LPWSTR | NULL, cchNameString: DWORD): DWORD {
     return Crypt32.Load('CertGetNameStringW')(pCertContext, dwType, dwFlags, pvTypePara, pszNameString, cchNameString);
   }
 
@@ -869,7 +869,7 @@ class Crypt32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincrypt/nf-wincrypt-certregisterphysicalstore
-  public static CertRegisterPhysicalStore(pvSystemStore: PVOID, dwFlags: DWORD, pwszStoreName: LPCWSTR, pStoreInfo: PVOID, pvReserved: PVOID | NULL): BOOL {
+  public static CertRegisterPhysicalStore(pvSystemStore: PVOID, dwFlags: DWORD, pwszStoreName: LPCWSTR, pStoreInfo: PVOID, pvReserved: DWORD): BOOL {
     return Crypt32.Load('CertRegisterPhysicalStore')(pvSystemStore, dwFlags, pwszStoreName, pStoreInfo, pvReserved);
   }
 
@@ -1056,7 +1056,7 @@ class Crypt32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincrypt/nf-wincrypt-cryptcloseasynchandle
-  public static CryptCloseAsyncHandle(hAsync: HCRYPTASYNC): BOOL {
+  public static CryptCloseAsyncHandle(hAsync: HCRYPTASYNC | 0n): BOOL {
     return Crypt32.Load('CryptCloseAsyncHandle')(hAsync);
   }
 
@@ -1223,7 +1223,7 @@ class Crypt32 extends Win32 {
     dwFormatType: DWORD,
     dwFormatStrType: DWORD,
     pFormatStruct: PVOID | NULL,
-    lpszStructType: LPCSTR,
+    lpszStructType: LPCSTR | NULL,
     pbEncoded: PBYTE,
     cbEncoded: DWORD,
     pbFormat: PVOID | NULL,
@@ -1238,7 +1238,7 @@ class Crypt32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincrypt/nf-wincrypt-cryptgetasyncparam
-  public static CryptGetAsyncParam(hAsync: HCRYPTASYNC, pszParamOid: LPCSTR, ppvParam: PVOID, ppfnFree: PVOID): BOOL {
+  public static CryptGetAsyncParam(hAsync: HCRYPTASYNC, pszParamOid: LPCSTR, ppvParam: PVOID | NULL, ppfnFree: PVOID | NULL): BOOL {
     return Crypt32.Load('CryptGetAsyncParam')(hAsync, pszParamOid, ppvParam, ppfnFree);
   }
 
@@ -1283,7 +1283,7 @@ class Crypt32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincrypt/nf-wincrypt-crypthashcertificate2
-  public static CryptHashCertificate2(pwszCNGHashAlgid: LPCWSTR, dwFlags: DWORD, pvReserved: PVOID | NULL, pbEncoded: PBYTE, cbEncoded: DWORD, pbComputedHash: PBYTE | NULL, pcbComputedHash: PDWORD): BOOL {
+  public static CryptHashCertificate2(pwszCNGHashAlgid: LPCWSTR, dwFlags: DWORD, pvReserved: PVOID | NULL, pbEncoded: PBYTE | NULL, cbEncoded: DWORD, pbComputedHash: PBYTE | NULL, pcbComputedHash: PDWORD): BOOL {
     return Crypt32.Load('CryptHashCertificate2')(pwszCNGHashAlgid, dwFlags, pvReserved, pbEncoded, cbEncoded, pbComputedHash, pcbComputedHash);
   }
 
@@ -1295,7 +1295,7 @@ class Crypt32 extends Win32 {
     rgpbToBeHashed: PVOID,
     rgcbToBeHashed: PDWORD,
     pbHashedBlob: PBYTE | NULL,
-    pcbHashedBlob: PDWORD,
+    pcbHashedBlob: PDWORD | NULL,
     pbComputedHash: PBYTE | NULL,
     pcbComputedHash: PDWORD | NULL,
   ): BOOL {
@@ -1313,7 +1313,7 @@ class Crypt32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincrypt/nf-wincrypt-cryptimportpkcs8
-  public static CryptImportPKCS8(sPrivateKeyAndParams: PVOID, dwFlags: DWORD, phCryptProv: PVOID, pvAuxInfo: PVOID | NULL, pvReserved: PVOID | NULL): BOOL {
+  public static CryptImportPKCS8(sPrivateKeyAndParams: PVOID, dwFlags: DWORD, phCryptProv: PVOID | NULL, pvAuxInfo: PVOID | NULL, pvReserved: PVOID | NULL): BOOL {
     return Crypt32.Load('CryptImportPKCS8')(sPrivateKeyAndParams, dwFlags, phCryptProv, pvAuxInfo, pvReserved);
   }
 
@@ -1602,7 +1602,7 @@ class Crypt32 extends Win32 {
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincrypt/nf-wincrypt-cryptsignandencodecertificate
   public static CryptSignAndEncodeCertificate(
-    hCryptProvOrNCryptKey: HCRYPTPROV_OR_NCRYPT_KEY_HANDLE,
+    hCryptProvOrNCryptKey: HCRYPTPROV_OR_NCRYPT_KEY_HANDLE | 0n,
     dwKeySpec: DWORD,
     dwCertEncodingType: DWORD,
     lpszStructType: LPCSTR,
@@ -1631,7 +1631,7 @@ class Crypt32 extends Win32 {
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincrypt/nf-wincrypt-cryptsigncertificate
   public static CryptSignCertificate(
-    hCryptProvOrNCryptKey: HCRYPTPROV_OR_NCRYPT_KEY_HANDLE,
+    hCryptProvOrNCryptKey: HCRYPTPROV_OR_NCRYPT_KEY_HANDLE | 0n,
     dwKeySpec: DWORD,
     dwCertEncodingType: DWORD,
     pbEncodedToBeSigned: PBYTE,
@@ -1645,7 +1645,7 @@ class Crypt32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincrypt/nf-wincrypt-cryptsignmessage
-  public static CryptSignMessage(pSignPara: PCRYPT_SIGN_MESSAGE_PARA, fDetachedSignature: BOOL, cToBeSigned: DWORD, rgpbToBeSigned: PVOID, rgcbToBeSigned: PDWORD, pbSignedBlob: PBYTE | NULL, pcbSignedBlob: PDWORD): BOOL {
+  public static CryptSignMessage(pSignPara: PCRYPT_SIGN_MESSAGE_PARA, fDetachedSignature: BOOL, cToBeSigned: DWORD, rgpbToBeSigned: PVOID | NULL, rgcbToBeSigned: PDWORD, pbSignedBlob: PBYTE | NULL, pcbSignedBlob: PDWORD): BOOL {
     return Crypt32.Load('CryptSignMessage')(pSignPara, fDetachedSignature, cToBeSigned, rgpbToBeSigned, rgcbToBeSigned, pbSignedBlob, pcbSignedBlob);
   }
 
@@ -1665,7 +1665,7 @@ class Crypt32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincrypt/nf-wincrypt-cryptuninstalldefaultcontext
-  public static CryptUninstallDefaultContext(hDefaultContext: HCRYPTDEFAULTCONTEXT, dwFlags: DWORD, pvReserved: PVOID | NULL): BOOL {
+  public static CryptUninstallDefaultContext(hDefaultContext: HCRYPTDEFAULTCONTEXT | 0n, dwFlags: DWORD, pvReserved: PVOID | NULL): BOOL {
     return Crypt32.Load('CryptUninstallDefaultContext')(hDefaultContext, dwFlags, pvReserved);
   }
 

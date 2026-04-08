@@ -5,6 +5,7 @@ import { Win32 } from '@bun-win32/core';
 import type {
   BOOL,
   BOOLEAN,
+  BYTE,
   CODEPAGE_ENUMPROC,
   COORD,
   DWORD,
@@ -18,11 +19,14 @@ import type {
   GEO_ENUMPROC,
   HANDLE,
   HGLOBAL,
+  HLOCAL,
   HMODULE,
+  HPCON,
   HRESULT,
   HRSRC,
   HWND,
   INT,
+  LARGE_INTEGER,
   LANGUAGEGROUP_ENUMPROCA,
   LANGUAGEGROUP_ENUMPROCW,
   LCID,
@@ -62,8 +66,10 @@ import type {
   PCONSOLE_SCREEN_BUFFER_INFOEX,
   PCONSOLE_SELECTION_INFO,
   PHANDLE,
+  PHANDLER_ROUTINE,
   PHPCON,
   PULONG,
+  PVOID,
   SIZE_T,
   TIMEFMT_ENUMPROCA,
   TIMEFMT_ENUMPROCEX,
@@ -74,6 +80,7 @@ import type {
   ULONGLONG,
   USHORT,
   VOID,
+  WORD,
 } from '../types/Kernel32';
 
 /**
@@ -135,16 +142,16 @@ class Kernel32 extends Win32 {
     AllocConsoleWithOptions: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.u32 },
     ApplicationRecoveryFinished: { args: [FFIType.i32], returns: FFIType.void },
     ApplicationRecoveryInProgress: { args: [FFIType.ptr], returns: FFIType.u32 },
-    AppPolicyGetClrCompat: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.u32 },
-    AppPolicyGetCreateFileAccess: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.u32 },
-    AppPolicyGetLifecycleManagement: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.u32 },
-    AppPolicyGetMediaFoundationCodecLoading: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.u32 },
-    AppPolicyGetProcessTerminationMethod: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.u32 },
-    AppPolicyGetShowDeveloperDiagnostic: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.u32 },
-    AppPolicyGetThreadInitializationType: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.u32 },
-    AppPolicyGetWindowingModel: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.u32 },
+    AppPolicyGetClrCompat: { args: [FFIType.u64, FFIType.ptr], returns: FFIType.u32 },
+    AppPolicyGetCreateFileAccess: { args: [FFIType.u64, FFIType.ptr], returns: FFIType.u32 },
+    AppPolicyGetLifecycleManagement: { args: [FFIType.u64, FFIType.ptr], returns: FFIType.u32 },
+    AppPolicyGetMediaFoundationCodecLoading: { args: [FFIType.u64, FFIType.ptr], returns: FFIType.u32 },
+    AppPolicyGetProcessTerminationMethod: { args: [FFIType.u64, FFIType.ptr], returns: FFIType.u32 },
+    AppPolicyGetShowDeveloperDiagnostic: { args: [FFIType.u64, FFIType.ptr], returns: FFIType.u32 },
+    AppPolicyGetThreadInitializationType: { args: [FFIType.u64, FFIType.ptr], returns: FFIType.u32 },
+    AppPolicyGetWindowingModel: { args: [FFIType.u64, FFIType.ptr], returns: FFIType.u32 },
     AreFileApisANSI: { args: [], returns: FFIType.i32 },
-    AreShortNamesEnabled: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
+    AreShortNamesEnabled: { args: [FFIType.u64, FFIType.ptr], returns: FFIType.i32 },
     AssignProcessToJobObject: { args: [FFIType.u64, FFIType.u64], returns: FFIType.i32 },
     AttachConsole: { args: [FFIType.u32], returns: FFIType.i32 },
     BackupRead: { args: [FFIType.u64, FFIType.ptr, FFIType.u32, FFIType.ptr, FFIType.i32, FFIType.i32, FFIType.ptr], returns: FFIType.i32 },
@@ -320,7 +327,7 @@ class Kernel32 extends Win32 {
     DeleteFile2W: { args: [FFIType.ptr, FFIType.u32], returns: FFIType.i32 },
     DeleteFileA: { args: [FFIType.ptr], returns: FFIType.i32 },
     DeleteFileTransactedA: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
-    DeleteFileTransactedW: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
+    DeleteFileTransactedW: { args: [FFIType.ptr, FFIType.u64], returns: FFIType.i32 },
     DeleteFileW: { args: [FFIType.ptr], returns: FFIType.i32 },
     DeleteProcThreadAttributeList: { args: [FFIType.ptr], returns: FFIType.void },
     DeleteSynchronizationBarrier: { args: [FFIType.ptr], returns: FFIType.i32 },
@@ -367,16 +374,16 @@ class Kernel32 extends Win32 {
     EnumLanguageGroupLocalesA: { args: [FFIType.ptr, FFIType.u32, FFIType.u32, FFIType.u64], returns: FFIType.i32 },
     EnumLanguageGroupLocalesW: { args: [FFIType.ptr, FFIType.u32, FFIType.u32, FFIType.u64], returns: FFIType.i32 },
     EnumResourceLanguagesA: { args: [FFIType.u64, FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
-    EnumResourceLanguagesExA: { args: [FFIType.u64, FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.u32, FFIType.u16], returns: FFIType.i32 },
-    EnumResourceLanguagesExW: { args: [FFIType.u64, FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.u32, FFIType.u16], returns: FFIType.i32 },
+    EnumResourceLanguagesExA: { args: [FFIType.u64, FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.i64, FFIType.u32, FFIType.u16], returns: FFIType.i32 },
+    EnumResourceLanguagesExW: { args: [FFIType.u64, FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.i64, FFIType.u32, FFIType.u16], returns: FFIType.i32 },
     EnumResourceLanguagesW: { args: [FFIType.u64, FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
     EnumResourceNamesA: { args: [FFIType.u64, FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
-    EnumResourceNamesExA: { args: [FFIType.u64, FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.u32, FFIType.u16], returns: FFIType.i32 },
-    EnumResourceNamesExW: { args: [FFIType.u64, FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.u32, FFIType.u16], returns: FFIType.i32 },
+    EnumResourceNamesExA: { args: [FFIType.u64, FFIType.ptr, FFIType.ptr, FFIType.i64, FFIType.u32, FFIType.u16], returns: FFIType.i32 },
+    EnumResourceNamesExW: { args: [FFIType.u64, FFIType.ptr, FFIType.ptr, FFIType.i64, FFIType.u32, FFIType.u16], returns: FFIType.i32 },
     EnumResourceNamesW: { args: [FFIType.u64, FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
     EnumResourceTypesA: { args: [FFIType.u64, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
-    EnumResourceTypesExA: { args: [FFIType.u64, FFIType.ptr, FFIType.ptr, FFIType.u32, FFIType.u16], returns: FFIType.i32 },
-    EnumResourceTypesExW: { args: [FFIType.u64, FFIType.ptr, FFIType.ptr, FFIType.u32, FFIType.u16], returns: FFIType.i32 },
+    EnumResourceTypesExA: { args: [FFIType.u64, FFIType.ptr, FFIType.i64, FFIType.u32, FFIType.u16], returns: FFIType.i32 },
+    EnumResourceTypesExW: { args: [FFIType.u64, FFIType.ptr, FFIType.i64, FFIType.u32, FFIType.u16], returns: FFIType.i32 },
     EnumResourceTypesW: { args: [FFIType.u64, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
     EnumSystemCodePagesA: { args: [FFIType.ptr, FFIType.u32], returns: FFIType.i32 },
     EnumSystemCodePagesW: { args: [FFIType.ptr, FFIType.u32], returns: FFIType.i32 },
@@ -489,7 +496,7 @@ class Kernel32 extends Win32 {
     GetAtomNameW: { args: [FFIType.u16, FFIType.ptr, FFIType.i32], returns: FFIType.u32 },
     GetBinaryTypeA: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
     GetBinaryTypeW: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
-    GetCachedSigningLevel: { args: [FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
+    GetCachedSigningLevel: { args: [FFIType.u64, FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
     GetCalendarDateFormatEx: { args: [FFIType.ptr, FFIType.u32, FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.i32], returns: FFIType.i32 },
     GetCalendarInfoA: { args: [FFIType.u32, FFIType.u32, FFIType.u32, FFIType.ptr, FFIType.i32, FFIType.ptr], returns: FFIType.i32 },
     GetCalendarInfoEx: { args: [FFIType.ptr, FFIType.u32, FFIType.ptr, FFIType.u32, FFIType.ptr, FFIType.i32, FFIType.ptr], returns: FFIType.i32 },
@@ -505,7 +512,7 @@ class Kernel32 extends Win32 {
     GetCommTimeouts: { args: [FFIType.u64, FFIType.ptr], returns: FFIType.i32 },
     GetCompressedFileSizeA: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.u32 },
     GetCompressedFileSizeTransactedA: { args: [FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.u32 },
-    GetCompressedFileSizeTransactedW: { args: [FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.u32 },
+    GetCompressedFileSizeTransactedW: { args: [FFIType.ptr, FFIType.ptr, FFIType.u64], returns: FFIType.u32 },
     GetCompressedFileSizeW: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.u32 },
     GetComputerNameA: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
     GetComputerNameExA: { args: [FFIType.u32, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
@@ -697,9 +704,9 @@ class Kernel32 extends Win32 {
     GetOverlappedResult: { args: [FFIType.u64, FFIType.ptr, FFIType.ptr, FFIType.i32], returns: FFIType.i32 },
     GetOverlappedResultEx: { args: [FFIType.u64, FFIType.ptr, FFIType.ptr, FFIType.u32, FFIType.i32], returns: FFIType.i32 },
     GetPackageApplicationIds: { args: [FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.u32 },
-    GetPackageFamilyName: { args: [FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.u32 },
-    GetPackageFullName: { args: [FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.u32 },
-    GetPackageId: { args: [FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.u32 },
+    GetPackageFamilyName: { args: [FFIType.u64, FFIType.ptr, FFIType.ptr], returns: FFIType.u32 },
+    GetPackageFullName: { args: [FFIType.u64, FFIType.ptr, FFIType.ptr], returns: FFIType.u32 },
+    GetPackageId: { args: [FFIType.u64, FFIType.ptr, FFIType.ptr], returns: FFIType.u32 },
     GetPackageInfo: { args: [FFIType.ptr, FFIType.u32, FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.u32 },
     GetPackagePath: { args: [FFIType.ptr, FFIType.u32, FFIType.ptr, FFIType.ptr], returns: FFIType.u32 },
     GetPackagePathByFullName: { args: [FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.u32 },
@@ -718,9 +725,9 @@ class Kernel32 extends Win32 {
     GetPrivateProfileStructW: { args: [FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.u32, FFIType.ptr], returns: FFIType.i32 },
     GetProcAddress: { args: [FFIType.u64, FFIType.ptr], returns: FFIType.ptr },
     GetProcessAffinityMask: { args: [FFIType.u64, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
-    GetProcessDefaultCpuSetMasks: { args: [FFIType.ptr, FFIType.ptr, FFIType.u16, FFIType.ptr], returns: FFIType.i32 },
-    GetProcessDefaultCpuSets: { args: [FFIType.ptr, FFIType.ptr, FFIType.u32, FFIType.ptr], returns: FFIType.i32 },
-    GetProcessDEPPolicy: { args: [FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
+    GetProcessDefaultCpuSetMasks: { args: [FFIType.u64, FFIType.ptr, FFIType.u16, FFIType.ptr], returns: FFIType.i32 },
+    GetProcessDefaultCpuSets: { args: [FFIType.u64, FFIType.ptr, FFIType.u32, FFIType.ptr], returns: FFIType.i32 },
+    GetProcessDEPPolicy: { args: [FFIType.u64, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
     GetProcessesInVirtualizationContext: { args: [FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.u32 },
     GetProcessGroupAffinity: { args: [FFIType.u64, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
     GetProcessHandleCount: { args: [FFIType.u64, FFIType.ptr], returns: FFIType.i32 },
@@ -759,7 +766,7 @@ class Kernel32 extends Win32 {
     GetStringTypeExA: { args: [FFIType.u32, FFIType.u32, FFIType.ptr, FFIType.i32, FFIType.ptr], returns: FFIType.i32 },
     GetStringTypeExW: { args: [FFIType.u32, FFIType.u32, FFIType.ptr, FFIType.i32, FFIType.ptr], returns: FFIType.i32 },
     GetStringTypeW: { args: [FFIType.u32, FFIType.ptr, FFIType.i32, FFIType.ptr], returns: FFIType.i32 },
-    GetSystemCpuSetInformation: { args: [FFIType.ptr, FFIType.u32, FFIType.ptr, FFIType.ptr, FFIType.u32], returns: FFIType.i32 },
+    GetSystemCpuSetInformation: { args: [FFIType.ptr, FFIType.u32, FFIType.ptr, FFIType.u64, FFIType.u32], returns: FFIType.i32 },
     GetSystemDefaultLangID: { args: [], returns: FFIType.u16 },
     GetSystemDefaultLCID: { args: [], returns: FFIType.u32 },
     GetSystemDefaultLocaleName: { args: [FFIType.ptr, FFIType.i32], returns: FFIType.i32 },
@@ -819,7 +826,7 @@ class Kernel32 extends Win32 {
     GetTimeZoneInformationForYear: { args: [FFIType.u16, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
     GetUILanguageInfo: { args: [FFIType.u32, FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
     GetUmsCompletionListEvent: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
-    GetUmsSystemThreadInformation: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
+    GetUmsSystemThreadInformation: { args: [FFIType.u64, FFIType.ptr], returns: FFIType.i32 },
     GetUserDefaultGeoName: { args: [FFIType.ptr, FFIType.i32], returns: FFIType.i32 },
     GetUserDefaultLangID: { args: [], returns: FFIType.u16 },
     GetUserDefaultLCID: { args: [], returns: FFIType.u32 },
@@ -902,7 +909,7 @@ class Kernel32 extends Win32 {
     InitOnceComplete: { args: [FFIType.ptr, FFIType.u32, FFIType.ptr], returns: FFIType.i32 },
     InitOnceExecuteOnce: { args: [FFIType.ptr, FFIType.u32, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
     InitOnceInitialize: { args: [FFIType.ptr], returns: FFIType.void },
-    InstallELAMCertificateInfo: { args: [FFIType.ptr], returns: FFIType.i32 },
+    InstallELAMCertificateInfo: { args: [FFIType.u64], returns: FFIType.i32 },
     InterlockedFlushSList: { args: [FFIType.ptr], returns: FFIType.ptr },
     InterlockedPopEntrySList: { args: [FFIType.ptr], returns: FFIType.ptr },
     InterlockedPushEntrySList: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.ptr },
@@ -973,8 +980,8 @@ class Kernel32 extends Win32 {
     LeaveCriticalSectionWhenCallbackReturns: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.void },
     LoadEnclaveData: { args: [FFIType.u64, FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.u32, FFIType.ptr, FFIType.u32, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
     LoadLibraryA: { args: [FFIType.ptr], returns: FFIType.u64 },
-    LoadLibraryExA: { args: [FFIType.ptr, FFIType.ptr, FFIType.u32], returns: FFIType.u64 },
-    LoadLibraryExW: { args: [FFIType.ptr, FFIType.ptr, FFIType.u32], returns: FFIType.u64 },
+    LoadLibraryExA: { args: [FFIType.ptr, FFIType.u64, FFIType.u32], returns: FFIType.u64 },
+    LoadLibraryExW: { args: [FFIType.ptr, FFIType.u64, FFIType.u32], returns: FFIType.u64 },
     LoadLibraryW: { args: [FFIType.ptr], returns: FFIType.u64 },
     LoadModule: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.u32 },
     LoadPackagedLibrary: { args: [FFIType.ptr, FFIType.u32], returns: FFIType.u64 },
@@ -1086,8 +1093,8 @@ class Kernel32 extends Win32 {
     PssWalkSnapshot: { args: [FFIType.u64, FFIType.u32, FFIType.u64, FFIType.ptr, FFIType.u32], returns: FFIType.u32 },
     PulseEvent: { args: [FFIType.u64], returns: FFIType.i32 },
     PurgeComm: { args: [FFIType.u64, FFIType.u32], returns: FFIType.i32 },
-    QueryActCtxSettingsW: { args: [FFIType.u32, FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
-    QueryActCtxW: { args: [FFIType.u32, FFIType.ptr, FFIType.ptr, FFIType.u32, FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
+    QueryActCtxSettingsW: { args: [FFIType.u32, FFIType.u64, FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
+    QueryActCtxW: { args: [FFIType.u32, FFIType.u64, FFIType.ptr, FFIType.u32, FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
     QueryDepthSList: { args: [FFIType.ptr], returns: FFIType.u16 },
     QueryDosDeviceA: { args: [FFIType.ptr, FFIType.ptr, FFIType.u32], returns: FFIType.u32 },
     QueryDosDeviceW: { args: [FFIType.ptr, FFIType.ptr, FFIType.u32], returns: FFIType.u32 },
@@ -1153,7 +1160,7 @@ class Kernel32 extends Win32 {
     RemoveDirectory2W: { args: [FFIType.ptr, FFIType.u32], returns: FFIType.i32 },
     RemoveDirectoryA: { args: [FFIType.ptr], returns: FFIType.i32 },
     RemoveDirectoryTransactedA: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
-    RemoveDirectoryTransactedW: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
+    RemoveDirectoryTransactedW: { args: [FFIType.ptr, FFIType.u64], returns: FFIType.i32 },
     RemoveDirectoryW: { args: [FFIType.ptr], returns: FFIType.i32 },
     RemoveDllDirectory: { args: [FFIType.ptr], returns: FFIType.i32 },
     RemoveSecureMemoryCacheCallback: { args: [FFIType.ptr], returns: FFIType.i32 },
@@ -1189,7 +1196,7 @@ class Kernel32 extends Win32 {
     ScrollConsoleScreenBufferW: { args: [FFIType.u64, FFIType.ptr, FFIType.ptr, FFIType.u32, FFIType.ptr], returns: FFIType.i32 },
     SearchPathA: { args: [FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.u32, FFIType.ptr, FFIType.ptr], returns: FFIType.u32 },
     SearchPathW: { args: [FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.u32, FFIType.ptr, FFIType.ptr], returns: FFIType.u32 },
-    SetCachedSigningLevel: { args: [FFIType.ptr, FFIType.u32, FFIType.u32, FFIType.ptr], returns: FFIType.i32 },
+    SetCachedSigningLevel: { args: [FFIType.ptr, FFIType.u32, FFIType.u32, FFIType.u64], returns: FFIType.i32 },
     SetCalendarInfoA: { args: [FFIType.u32, FFIType.u32, FFIType.u32, FFIType.ptr], returns: FFIType.i32 },
     SetCalendarInfoW: { args: [FFIType.u32, FFIType.u32, FFIType.u32, FFIType.ptr], returns: FFIType.i32 },
     SetCommBreak: { args: [FFIType.u64], returns: FFIType.i32 },
@@ -1254,7 +1261,7 @@ class Kernel32 extends Win32 {
     SetFileApisToOEM: { args: [], returns: FFIType.void },
     SetFileAttributesA: { args: [FFIType.ptr, FFIType.u32], returns: FFIType.i32 },
     SetFileAttributesTransactedA: { args: [FFIType.ptr, FFIType.u32, FFIType.ptr], returns: FFIType.i32 },
-    SetFileAttributesTransactedW: { args: [FFIType.ptr, FFIType.u32, FFIType.ptr], returns: FFIType.i32 },
+    SetFileAttributesTransactedW: { args: [FFIType.ptr, FFIType.u32, FFIType.u64], returns: FFIType.i32 },
     SetFileAttributesW: { args: [FFIType.ptr, FFIType.u32], returns: FFIType.i32 },
     SetFileBandwidthReservation: { args: [FFIType.u64, FFIType.u32, FFIType.u32, FFIType.i32, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
     SetFileCompletionNotificationModes: { args: [FFIType.u64, FFIType.ptr], returns: FFIType.i32 },
@@ -1391,12 +1398,12 @@ class Kernel32 extends Win32 {
     UnregisterBadMemoryNotification: { args: [FFIType.ptr], returns: FFIType.i32 },
     UnregisterConsoleIME: { args: [], returns: FFIType.i32 },
     UnregisterWait: { args: [FFIType.u64], returns: FFIType.i32 },
-    UnregisterWaitEx: { args: [FFIType.u64, FFIType.ptr], returns: FFIType.i32 },
+    UnregisterWaitEx: { args: [FFIType.u64, FFIType.u64], returns: FFIType.i32 },
     UnregisterWaitUntilOOBECompleted: { args: [FFIType.ptr], returns: FFIType.i32 },
     UpdateCalendarDayOfWeek: { args: [FFIType.ptr], returns: FFIType.i32 },
     UpdateProcThreadAttribute: { args: [FFIType.ptr, FFIType.u32, FFIType.u64, FFIType.ptr, FFIType.u64, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
     UpdateResourceA: { args: [FFIType.u64, FFIType.ptr, FFIType.ptr, FFIType.u16, FFIType.ptr, FFIType.u32], returns: FFIType.i32 },
-    UpdateResourceW: { args: [FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.u16, FFIType.ptr, FFIType.u32], returns: FFIType.i32 },
+    UpdateResourceW: { args: [FFIType.u64, FFIType.ptr, FFIType.ptr, FFIType.u16, FFIType.ptr, FFIType.u32], returns: FFIType.i32 },
     VDMConsoleOperation: { args: [FFIType.u32, FFIType.ptr], returns: FFIType.i32 },
     VerifyConsoleIoHandle: { args: [FFIType.u64], returns: FFIType.i32 },
     VerifyScripts: { args: [FFIType.u32, FFIType.ptr, FFIType.i32, FFIType.ptr, FFIType.i32], returns: FFIType.i32 },
@@ -1562,7 +1569,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-activatepackagevirtualizationcontext
-  public static ActivatePackageVirtualizationContext(context: DWORD, cookie: LPVOID): DWORD {
+  public static ActivatePackageVirtualizationContext(context: HANDLE, cookie: LPVOID): DWORD {
     return Kernel32.Load('ActivatePackageVirtualizationContext')(context, cookie);
   }
 
@@ -1587,7 +1594,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-adddlldirectory
-  public static AddDllDirectory(NewDirectory: LPWSTR): LPVOID {
+  public static AddDllDirectory(NewDirectory: LPWSTR): HANDLE {
     return Kernel32.Load('AddDllDirectory')(NewDirectory);
   }
 
@@ -1602,32 +1609,32 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-addresourceattributeace
-  public static AddResourceAttributeAce(pAcl: LPVOID, dwAceRevision: DWORD, AceFlags: DWORD, AccessMask: DWORD, pSid: DWORD, pAttributeInfo: LPVOID, pReturnLength: LPVOID): BOOL {
+  public static AddResourceAttributeAce(pAcl: LPVOID, dwAceRevision: DWORD, AceFlags: DWORD, AccessMask: DWORD, pSid: LPVOID, pAttributeInfo: LPVOID, pReturnLength: LPVOID): BOOL {
     return Kernel32.Load('AddResourceAttributeAce')(pAcl, dwAceRevision, AceFlags, AccessMask, pSid, pAttributeInfo, pReturnLength);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-addscopedpolicyidace
-  public static AddScopedPolicyIDAce(pAcl: LPVOID, dwAceRevision: DWORD, AceFlags: DWORD, AccessMask: DWORD, pSid: DWORD): BOOL {
+  public static AddScopedPolicyIDAce(pAcl: LPVOID, dwAceRevision: DWORD, AceFlags: DWORD, AccessMask: DWORD, pSid: LPVOID): BOOL {
     return Kernel32.Load('AddScopedPolicyIDAce')(pAcl, dwAceRevision, AceFlags, AccessMask, pSid);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-addsecurememorycachecallback
-  public static AddSecureMemoryCacheCallback(pfnCallBack: DWORD): BOOL {
+  public static AddSecureMemoryCacheCallback(pfnCallBack: LPVOID): BOOL {
     return Kernel32.Load('AddSecureMemoryCacheCallback')(pfnCallBack);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-addsidtoboundarydescriptor
-  public static AddSIDToBoundaryDescriptor(BoundaryDescriptor: LPVOID, RequiredSid: DWORD): BOOL {
+  public static AddSIDToBoundaryDescriptor(BoundaryDescriptor: LPVOID, RequiredSid: LPVOID): BOOL {
     return Kernel32.Load('AddSIDToBoundaryDescriptor')(BoundaryDescriptor, RequiredSid);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/errhandlingapi/nf-errhandlingapi-addvectoredcontinuehandler
-  public static AddVectoredContinueHandler(First: DWORD, Handler: DWORD): LPVOID {
+  public static AddVectoredContinueHandler(First: DWORD, Handler: LPVOID): LPVOID {
     return Kernel32.Load('AddVectoredContinueHandler')(First, Handler);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/errhandlingapi/nf-errhandlingapi-addvectoredexceptionhandler
-  public static AddVectoredExceptionHandler(First: DWORD, Handler: DWORD): LPVOID {
+  public static AddVectoredExceptionHandler(First: DWORD, Handler: LPVOID): LPVOID {
     return Kernel32.Load('AddVectoredExceptionHandler')(First, Handler);
   }
 
@@ -1756,7 +1763,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ioapiset/nf-ioapiset-bindiocompletioncallback
-  public static BindIoCompletionCallback(FileHandle: HANDLE, _Function: DWORD, Flags: DWORD): BOOL {
+  public static BindIoCompletionCallback(FileHandle: HANDLE, _Function: LPVOID, Flags: DWORD): BOOL {
     return Kernel32.Load('BindIoCompletionCallback')(FileHandle, _Function, Flags);
   }
 
@@ -1801,7 +1808,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-callbackmayrunlong
-  public static CallbackMayRunLong(pci: DWORD): BOOL {
+  public static CallbackMayRunLong(pci: LPVOID): BOOL {
     return Kernel32.Load('CallbackMayRunLong')(pci);
   }
 
@@ -1836,7 +1843,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/threadpoolapiset/nf-threadpoolapiset-cancelthreadpoolio
-  public static CancelThreadpoolIo(pio: DWORD): VOID {
+  public static CancelThreadpoolIo(pio: LPVOID): VOID {
     return Kernel32.Load('CancelThreadpoolIo')(pio);
   }
 
@@ -1880,12 +1887,12 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-checktokencapability
-  public static CheckTokenCapability(TokenHandle: HANDLE, CapabilitySidToCheck: DWORD, HasCapability: LPVOID): BOOL {
+  public static CheckTokenCapability(TokenHandle: HANDLE, CapabilitySidToCheck: LPVOID, HasCapability: LPVOID): BOOL {
     return Kernel32.Load('CheckTokenCapability')(TokenHandle, CapabilitySidToCheck, HasCapability);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-checktokenmembershipex
-  public static CheckTokenMembershipEx(TokenHandle: HANDLE, SidToCheck: DWORD, Flags: DWORD, IsMember: LPVOID): BOOL {
+  public static CheckTokenMembershipEx(TokenHandle: HANDLE, SidToCheck: LPVOID, Flags: DWORD, IsMember: LPVOID): BOOL {
     return Kernel32.Load('CheckTokenMembershipEx')(TokenHandle, SidToCheck, Flags, IsMember);
   }
 
@@ -1920,52 +1927,52 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/console/closepseudoconsole
-  public static ClosePseudoConsole(hPC: DWORD): VOID {
+  public static ClosePseudoConsole(hPC: HPCON): VOID {
     return Kernel32.Load('ClosePseudoConsole')(hPC);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/threadpoolapiset/nf-threadpoolapiset-closethreadpool
-  public static CloseThreadpool(ptpp: DWORD): VOID {
+  public static CloseThreadpool(ptpp: LPVOID): VOID {
     return Kernel32.Load('CloseThreadpool')(ptpp);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-closethreadpoolcleanupgroup
-  public static CloseThreadpoolCleanupGroup(ptpcg: DWORD): VOID {
+  public static CloseThreadpoolCleanupGroup(ptpcg: LPVOID): VOID {
     return Kernel32.Load('CloseThreadpoolCleanupGroup')(ptpcg);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-closethreadpoolcleanupgroupmembers
-  public static CloseThreadpoolCleanupGroupMembers(ptpcg: DWORD, fCancelPendingCallbacks: BOOL, pvCleanupContext: LPVOID): VOID {
+  public static CloseThreadpoolCleanupGroupMembers(ptpcg: LPVOID, fCancelPendingCallbacks: BOOL, pvCleanupContext: LPVOID): VOID {
     return Kernel32.Load('CloseThreadpoolCleanupGroupMembers')(ptpcg, fCancelPendingCallbacks, pvCleanupContext);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-closethreadpoolio
-  public static CloseThreadpoolIo(pio: DWORD): VOID {
+  public static CloseThreadpoolIo(pio: LPVOID): VOID {
     return Kernel32.Load('CloseThreadpoolIo')(pio);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-closethreadpooltimer
-  public static CloseThreadpoolTimer(pti: DWORD): VOID {
+  public static CloseThreadpoolTimer(pti: LPVOID): VOID {
     return Kernel32.Load('CloseThreadpoolTimer')(pti);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-closethreadpoolwait
-  public static CloseThreadpoolWait(pwa: DWORD): VOID {
+  public static CloseThreadpoolWait(pwa: LPVOID): VOID {
     return Kernel32.Load('CloseThreadpoolWait')(pwa);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-closethreadpoolwork
-  public static CloseThreadpoolWork(pwk: DWORD): VOID {
+  public static CloseThreadpoolWork(pwk: LPVOID): VOID {
     return Kernel32.Load('CloseThreadpoolWork')(pwk);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-commconfigdialoga
-  public static CommConfigDialogA(lpszName: LPSTR, hWnd: DWORD, lpCC: LPVOID): BOOL {
+  public static CommConfigDialogA(lpszName: LPSTR, hWnd: LPVOID, lpCC: LPVOID): BOOL {
     return Kernel32.Load('CommConfigDialogA')(lpszName, hWnd, lpCC);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-commconfigdialogw
-  public static CommConfigDialogW(lpszName: LPWSTR, hWnd: DWORD, lpCC: LPVOID): BOOL {
+  public static CommConfigDialogW(lpszName: LPWSTR, hWnd: HWND, lpCC: LPVOID): BOOL {
     return Kernel32.Load('CommConfigDialogW')(lpszName, hWnd, lpCC);
   }
 
@@ -1980,7 +1987,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winnls/nf-winnls-comparestringex
-  public static CompareStringEx(lpLocaleName: LPCWSTR, dwCmpFlags: DWORD, lpString1: LPCWSTR, cchCount1: INT, lpString2: LPCWSTR, cchCount2: INT, lpVersionInformation: LPNLSVERSIONINFO, lpReserved: LPVOID, lParam: LPARAM): INT {
+  public static CompareStringEx(lpLocaleName: LPCWSTR, dwCmpFlags: DWORD, lpString1: LPCWSTR, cchCount1: INT, lpString2: LPCWSTR, cchCount2: INT, lpVersionInformation: LPNLSVERSIONINFO, lpReserved: LPVOID, lParam: DWORD): INT {
     return Kernel32.Load('CompareStringEx')(lpLocaleName, dwCmpFlags, lpString1, cchCount1, lpString2, cchCount2, lpVersionInformation, lpReserved, lParam);
   }
 
@@ -2030,12 +2037,12 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-convertthreadtofiber
-  public static ConvertThreadToFiber(lpParameter: LPVOID): LPVOID {
+  public static ConvertThreadToFiber(lpParameter: LPVOID): HANDLE {
     return Kernel32.Load('ConvertThreadToFiber')(lpParameter);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-convertthreadtofiberex
-  public static ConvertThreadToFiberEx(lpParameter: LPVOID, dwFlags: DWORD): LPVOID {
+  public static ConvertThreadToFiberEx(lpParameter: LPVOID, dwFlags: DWORD): HANDLE {
     return Kernel32.Load('ConvertThreadToFiberEx')(lpParameter, dwFlags);
   }
 
@@ -2055,22 +2062,22 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-copyfileexa
-  public static CopyFileExA(lpExistingFileName: LPSTR, lpNewFileName: LPSTR, lpProgressRoutine: DWORD, lpData: LPVOID, pbCancel: LPVOID, dwCopyFlags: DWORD): BOOL {
+  public static CopyFileExA(lpExistingFileName: LPSTR, lpNewFileName: LPSTR, lpProgressRoutine: LPVOID, lpData: LPVOID, pbCancel: LPVOID, dwCopyFlags: DWORD): BOOL {
     return Kernel32.Load('CopyFileExA')(lpExistingFileName, lpNewFileName, lpProgressRoutine, lpData, pbCancel, dwCopyFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-copyfileexw
-  public static CopyFileExW(lpExistingFileName: LPWSTR, lpNewFileName: LPWSTR, lpProgressRoutine: DWORD, lpData: LPVOID, pbCancel: LPVOID, dwCopyFlags: DWORD): BOOL {
+  public static CopyFileExW(lpExistingFileName: LPWSTR, lpNewFileName: LPWSTR, lpProgressRoutine: LPVOID, lpData: LPVOID, pbCancel: LPVOID, dwCopyFlags: DWORD): BOOL {
     return Kernel32.Load('CopyFileExW')(lpExistingFileName, lpNewFileName, lpProgressRoutine, lpData, pbCancel, dwCopyFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-copyfiletransacteda
-  public static CopyFileTransactedA(lpExistingFileName: LPSTR, lpNewFileName: LPSTR, lpProgressRoutine: DWORD, lpData: LPVOID, pbCancel: LPVOID, dwCopyFlags: DWORD, hTransaction: HANDLE): BOOL {
+  public static CopyFileTransactedA(lpExistingFileName: LPSTR, lpNewFileName: LPSTR, lpProgressRoutine: LPVOID, lpData: LPVOID, pbCancel: LPVOID, dwCopyFlags: DWORD, hTransaction: LPVOID): BOOL {
     return Kernel32.Load('CopyFileTransactedA')(lpExistingFileName, lpNewFileName, lpProgressRoutine, lpData, pbCancel, dwCopyFlags, hTransaction);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-copyfiletransactedw
-  public static CopyFileTransactedW(lpExistingFileName: LPWSTR, lpNewFileName: LPWSTR, lpProgressRoutine: DWORD, lpData: LPVOID, pbCancel: LPVOID, dwCopyFlags: DWORD, hTransaction: HANDLE): BOOL {
+  public static CopyFileTransactedW(lpExistingFileName: LPWSTR, lpNewFileName: LPWSTR, lpProgressRoutine: LPVOID, lpData: LPVOID, pbCancel: LPVOID, dwCopyFlags: DWORD, hTransaction: LPVOID): BOOL {
     return Kernel32.Load('CopyFileTransactedW')(lpExistingFileName, lpNewFileName, lpProgressRoutine, lpData, pbCancel, dwCopyFlags, hTransaction);
   }
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-copyfilew
@@ -2148,7 +2155,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-createenclave
-  public static CreateEnclave(hProcess: HANDLE, lpAddress: LPVOID, dwSize: LPVOID, dwInitialCommitment: LPVOID, flEnclaveType: DWORD, lpEnclaveInformation: LPVOID, dwInfoLength: DWORD, lpEnclaveError: LPVOID): LPVOID {
+  public static CreateEnclave(hProcess: HANDLE, lpAddress: HANDLE, dwSize: SIZE_T, dwInitialCommitment: SIZE_T, flEnclaveType: DWORD, lpEnclaveInformation: LPVOID, dwInfoLength: DWORD, lpEnclaveError: LPVOID): HANDLE {
     return Kernel32.Load('CreateEnclave')(hProcess, lpAddress, dwSize, dwInitialCommitment, flEnclaveType, lpEnclaveInformation, dwInfoLength, lpEnclaveError);
   }
 
@@ -2173,12 +2180,12 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-createfiber
-  public static CreateFiber(dwStackSize: LPVOID, lpStartAddress: DWORD, lpParameter: LPVOID): LPVOID {
+  public static CreateFiber(dwStackSize: SIZE_T, lpStartAddress: LPVOID, lpParameter: LPVOID): HANDLE {
     return Kernel32.Load('CreateFiber')(dwStackSize, lpStartAddress, lpParameter);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-createfiberex
-  public static CreateFiberEx(dwStackCommitSize: LPVOID, dwStackReserveSize: LPVOID, dwFlags: DWORD, lpStartAddress: DWORD, lpParameter: LPVOID): LPVOID {
+  public static CreateFiberEx(dwStackCommitSize: SIZE_T, dwStackReserveSize: SIZE_T, dwFlags: DWORD, lpStartAddress: LPVOID, lpParameter: LPVOID): HANDLE {
     return Kernel32.Load('CreateFiberEx')(dwStackCommitSize, dwStackReserveSize, dwFlags, lpStartAddress, lpParameter);
   }
 
@@ -2397,7 +2404,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/console/createpseudoconsole
-  public static CreatePseudoConsole(size: COORD, hInput: HANDLE, hOutput: HANDLE, dwFlags: DWORD, phPC: PHPCON): HRESULT {
+  public static CreatePseudoConsole(size: DWORD, hInput: HANDLE, hOutput: HANDLE, dwFlags: DWORD, phPC: PHPCON): HRESULT {
     return Kernel32.Load('CreatePseudoConsole')(size, hInput, hOutput, dwFlags, phPC);
   }
 
@@ -2479,32 +2486,32 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-createthreadpool
-  public static CreateThreadpool(reserved: LPVOID): DWORD {
+  public static CreateThreadpool(reserved: LPVOID): LPVOID {
     return Kernel32.Load('CreateThreadpool')(reserved);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-createthreadpoolcleanupgroup
-  public static CreateThreadpoolCleanupGroup(): DWORD {
+  public static CreateThreadpoolCleanupGroup(): LPVOID {
     return Kernel32.Load('CreateThreadpoolCleanupGroup')();
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-createthreadpoolio
-  public static CreateThreadpoolIo(fl: HANDLE, pfnio: DWORD, pv: LPVOID, pcbe: LPVOID): DWORD {
+  public static CreateThreadpoolIo(fl: HANDLE, pfnio: PVOID, pv: LPVOID, pcbe: LPVOID): LPVOID {
     return Kernel32.Load('CreateThreadpoolIo')(fl, pfnio, pv, pcbe);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-createthreadpooltimer
-  public static CreateThreadpoolTimer(pfnti: DWORD, pv: LPVOID, pcbe: LPVOID): DWORD {
+  public static CreateThreadpoolTimer(pfnti: LPVOID, pv: LPVOID, pcbe: LPVOID): LPVOID {
     return Kernel32.Load('CreateThreadpoolTimer')(pfnti, pv, pcbe);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-createthreadpoolwait
-  public static CreateThreadpoolWait(pfnwa: DWORD, pv: LPVOID, pcbe: LPVOID): DWORD {
+  public static CreateThreadpoolWait(pfnwa: LPVOID, pv: LPVOID, pcbe: LPVOID): LPVOID {
     return Kernel32.Load('CreateThreadpoolWait')(pfnwa, pv, pcbe);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-createthreadpoolwork
-  public static CreateThreadpoolWork(pfnwk: DWORD, pv: LPVOID, pcbe: LPVOID): DWORD {
+  public static CreateThreadpoolWork(pfnwk: LPVOID, pv: LPVOID, pcbe: LPVOID): LPVOID {
     return Kernel32.Load('CreateThreadpoolWork')(pfnwk, pv, pcbe);
   }
 
@@ -2514,7 +2521,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-createtimerqueuetimer
-  public static CreateTimerQueueTimer(phNewTimer: LPVOID, TimerQueue: HANDLE, Callback: DWORD, Parameter: LPVOID, DueTime: DWORD, Period: DWORD, Flags: DWORD): BOOL {
+  public static CreateTimerQueueTimer(phNewTimer: LPVOID, TimerQueue: HANDLE, Callback: LPVOID, Parameter: LPVOID, DueTime: DWORD, Period: DWORD, Flags: DWORD): BOOL {
     return Kernel32.Load('CreateTimerQueueTimer')(phNewTimer, TimerQueue, Callback, Parameter, DueTime, Period, Flags);
   }
 
@@ -2554,7 +2561,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-deactivateactctx
-  public static DeactivateActCtx(dwFlags: DWORD, ulCookie: LPVOID): BOOL {
+  public static DeactivateActCtx(dwFlags: DWORD, ulCookie: HANDLE): BOOL {
     return Kernel32.Load('DeactivateActCtx')(dwFlags, ulCookie);
   }
 
@@ -2624,7 +2631,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-deletefiber
-  public static DeleteFiber(lpFiber: LPVOID): VOID {
+  public static DeleteFiber(lpFiber: HANDLE): VOID {
     return Kernel32.Load('DeleteFiber')(lpFiber);
   }
 
@@ -2644,7 +2651,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-deletefiletransacteda
-  public static DeleteFileTransactedA(lpFileName: LPSTR, hTransaction: HANDLE): BOOL {
+  public static DeleteFileTransactedA(lpFileName: LPSTR, hTransaction: LPVOID): BOOL {
     return Kernel32.Load('DeleteFileTransactedA')(lpFileName, hTransaction);
   }
 
@@ -2659,7 +2666,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-deleteprocthreadattributelist
-  public static DeleteProcThreadAttributeList(lpAttributeList: DWORD): VOID {
+  public static DeleteProcThreadAttributeList(lpAttributeList: LPVOID): VOID {
     return Kernel32.Load('DeleteProcThreadAttributeList')(lpAttributeList);
   }
 
@@ -2724,7 +2731,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-disassociatecurrentthreadfromcallback
-  public static DisassociateCurrentThreadFromCallback(pci: DWORD): VOID {
+  public static DisassociateCurrentThreadFromCallback(pci: LPVOID): VOID {
     return Kernel32.Load('DisassociateCurrentThreadFromCallback')(pci);
   }
 
@@ -2769,7 +2776,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-duplicatepackagevirtualizationcontext
-  public static DuplicatePackageVirtualizationContext(sourceContext: DWORD, destContext: LPVOID): DWORD {
+  public static DuplicatePackageVirtualizationContext(sourceContext: HANDLE, destContext: LPVOID): DWORD {
     return Kernel32.Load('DuplicatePackageVirtualizationContext')(sourceContext, destContext);
   }
 
@@ -2819,67 +2826,67 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winnls/nf-winnls-enumcalendarinfoa
-  public static EnumCalendarInfoA(lpCalInfoEnumProc: DWORD, Locale: DWORD, Calendar: DWORD, CalType: DWORD): BOOL {
+  public static EnumCalendarInfoA(lpCalInfoEnumProc: LPVOID, Locale: DWORD, Calendar: DWORD, CalType: DWORD): BOOL {
     return Kernel32.Load('EnumCalendarInfoA')(lpCalInfoEnumProc, Locale, Calendar, CalType);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-enumcalendarinfoexa
-  public static EnumCalendarInfoExA(lpCalInfoEnumProcEx: DWORD, Locale: DWORD, Calendar: DWORD, CalType: DWORD): BOOL {
+  public static EnumCalendarInfoExA(lpCalInfoEnumProcEx: LPVOID, Locale: DWORD, Calendar: DWORD, CalType: DWORD): BOOL {
     return Kernel32.Load('EnumCalendarInfoExA')(lpCalInfoEnumProcEx, Locale, Calendar, CalType);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-enumcalendarinfoexex
-  public static EnumCalendarInfoExEx(pCalInfoEnumProcExEx: DWORD, lpLocaleName: LPWSTR, Calendar: DWORD, lpReserved: LPWSTR, CalType: DWORD, lParam: DWORD): BOOL {
+  public static EnumCalendarInfoExEx(pCalInfoEnumProcExEx: LPCWSTR, lpLocaleName: LPWSTR, Calendar: DWORD, lpReserved: LPWSTR, CalType: DWORD, lParam: HANDLE): BOOL {
     return Kernel32.Load('EnumCalendarInfoExEx')(pCalInfoEnumProcExEx, lpLocaleName, Calendar, lpReserved, CalType, lParam);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-enumcalendarinfoexw
-  public static EnumCalendarInfoExW(lpCalInfoEnumProcEx: DWORD, Locale: DWORD, Calendar: DWORD, CalType: DWORD): BOOL {
+  public static EnumCalendarInfoExW(lpCalInfoEnumProcEx: LPVOID, Locale: DWORD, Calendar: DWORD, CalType: DWORD): BOOL {
     return Kernel32.Load('EnumCalendarInfoExW')(lpCalInfoEnumProcEx, Locale, Calendar, CalType);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winnls/nf-winnls-enumcalendarinfow
-  public static EnumCalendarInfoW(lpCalInfoEnumProc: DWORD, Locale: DWORD, Calendar: DWORD, CalType: DWORD): BOOL {
+  public static EnumCalendarInfoW(lpCalInfoEnumProc: LPVOID, Locale: DWORD, Calendar: DWORD, CalType: DWORD): BOOL {
     return Kernel32.Load('EnumCalendarInfoW')(lpCalInfoEnumProc, Locale, Calendar, CalType);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winnls/nf-winnls-enumdateformatsa
-  public static EnumDateFormatsA(lpDateFmtEnumProc: DWORD, Locale: DWORD, dwFlags: DWORD): BOOL {
+  public static EnumDateFormatsA(lpDateFmtEnumProc: LPVOID, Locale: DWORD, dwFlags: DWORD): BOOL {
     return Kernel32.Load('EnumDateFormatsA')(lpDateFmtEnumProc, Locale, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-enumdateformatsexa
-  public static EnumDateFormatsExA(lpDateFmtEnumProcEx: DWORD, Locale: DWORD, dwFlags: DWORD): BOOL {
+  public static EnumDateFormatsExA(lpDateFmtEnumProcEx: LPVOID, Locale: DWORD, dwFlags: DWORD): BOOL {
     return Kernel32.Load('EnumDateFormatsExA')(lpDateFmtEnumProcEx, Locale, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-enumdateformatsexex
-  public static EnumDateFormatsExEx(lpDateFmtEnumProcExEx: DWORD, lpLocaleName: LPWSTR, dwFlags: DWORD, lParam: DWORD): BOOL {
+  public static EnumDateFormatsExEx(lpDateFmtEnumProcExEx: LPCWSTR, lpLocaleName: LPWSTR, dwFlags: DWORD, lParam: HANDLE): BOOL {
     return Kernel32.Load('EnumDateFormatsExEx')(lpDateFmtEnumProcExEx, lpLocaleName, dwFlags, lParam);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-enumdateformatsexw
-  public static EnumDateFormatsExW(lpDateFmtEnumProcEx: DWORD, Locale: DWORD, dwFlags: DWORD): BOOL {
+  public static EnumDateFormatsExW(lpDateFmtEnumProcEx: LPVOID, Locale: DWORD, dwFlags: DWORD): BOOL {
     return Kernel32.Load('EnumDateFormatsExW')(lpDateFmtEnumProcEx, Locale, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winnls/nf-winnls-enumdateformatsw
-  public static EnumDateFormatsW(lpDateFmtEnumProc: DWORD, Locale: DWORD, dwFlags: DWORD): BOOL {
+  public static EnumDateFormatsW(lpDateFmtEnumProc: LPVOID, Locale: DWORD, dwFlags: DWORD): BOOL {
     return Kernel32.Load('EnumDateFormatsW')(lpDateFmtEnumProc, Locale, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-enumlanguagegrouplocalesa
-  public static EnumLanguageGroupLocalesA(lpLangGroupLocaleEnumProc: DWORD, LanguageGroup: DWORD, dwFlags: DWORD, lParam: LPVOID): BOOL {
+  public static EnumLanguageGroupLocalesA(lpLangGroupLocaleEnumProc: LPVOID, LanguageGroup: DWORD, dwFlags: DWORD, lParam: HANDLE): BOOL {
     return Kernel32.Load('EnumLanguageGroupLocalesA')(lpLangGroupLocaleEnumProc, LanguageGroup, dwFlags, lParam);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-enumlanguagegrouplocalesw
-  public static EnumLanguageGroupLocalesW(lpLangGroupLocaleEnumProc: DWORD, LanguageGroup: DWORD, dwFlags: DWORD, lParam: LPVOID): BOOL {
+  public static EnumLanguageGroupLocalesW(lpLangGroupLocaleEnumProc: LPVOID, LanguageGroup: DWORD, dwFlags: DWORD, lParam: HANDLE): BOOL {
     return Kernel32.Load('EnumLanguageGroupLocalesW')(lpLangGroupLocaleEnumProc, LanguageGroup, dwFlags, lParam);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-enumresourcelanguagesa
-  public static EnumResourceLanguagesA(hModule: HMODULE, lpType: LPCSTR, lpName: LPCSTR, lpEnumFunc: ENUMRESLANGPROCA, lParam: LONG_PTR): BOOL {
+  public static EnumResourceLanguagesA(hModule: HMODULE, lpType: LPCSTR, lpName: LPCSTR, lpEnumFunc: ENUMRESLANGPROCA, lParam: LPVOID): BOOL {
     return Kernel32.Load('EnumResourceLanguagesA')(hModule, lpType, lpName, lpEnumFunc, lParam);
   }
 
@@ -2894,12 +2901,12 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-enumresourcelanguagesw
-  public static EnumResourceLanguagesW(hModule: HMODULE, lpType: LPCWSTR, lpName: LPCWSTR, lpEnumFunc: ENUMRESLANGPROCW, lParam: LONG_PTR): BOOL {
+  public static EnumResourceLanguagesW(hModule: HMODULE, lpType: LPCWSTR, lpName: LPCWSTR, lpEnumFunc: ENUMRESLANGPROCW, lParam: LPVOID): BOOL {
     return Kernel32.Load('EnumResourceLanguagesW')(hModule, lpType, lpName, lpEnumFunc, lParam);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-enumresourcenamesa
-  public static EnumResourceNamesA(hModule: HMODULE, lpType: LPCSTR, lpEnumFunc: ENUMRESNAMEPROCA, lParam: LONG_PTR): BOOL {
+  public static EnumResourceNamesA(hModule: HMODULE, lpType: LPCSTR, lpEnumFunc: ENUMRESNAMEPROCA, lParam: LPVOID): BOOL {
     return Kernel32.Load('EnumResourceNamesA')(hModule, lpType, lpEnumFunc, lParam);
   }
 
@@ -2914,12 +2921,12 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-enumresourcenamesw
-  public static EnumResourceNamesW(hModule: HMODULE, lpType: LPCWSTR, lpEnumFunc: ENUMRESNAMEPROCW, lParam: LONG_PTR): BOOL {
+  public static EnumResourceNamesW(hModule: HMODULE, lpType: LPCWSTR, lpEnumFunc: ENUMRESNAMEPROCW, lParam: LPVOID): BOOL {
     return Kernel32.Load('EnumResourceNamesW')(hModule, lpType, lpEnumFunc, lParam);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-enumresourcetypesa
-  public static EnumResourceTypesA(hModule: HMODULE, lpEnumFunc: ENUMRESTYPEPROCA, lParam: LONG_PTR): BOOL {
+  public static EnumResourceTypesA(hModule: HMODULE, lpEnumFunc: ENUMRESTYPEPROCA, lParam: LPVOID): BOOL {
     return Kernel32.Load('EnumResourceTypesA')(hModule, lpEnumFunc, lParam);
   }
 
@@ -2934,7 +2941,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-enumresourcetypesw
-  public static EnumResourceTypesW(hModule: HMODULE, lpEnumFunc: ENUMRESTYPEPROCW, lParam: LONG_PTR): BOOL {
+  public static EnumResourceTypesW(hModule: HMODULE, lpEnumFunc: ENUMRESTYPEPROCW, lParam: LPVOID): BOOL {
     return Kernel32.Load('EnumResourceTypesW')(hModule, lpEnumFunc, lParam);
   }
 
@@ -3099,7 +3106,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/console/fillconsoleoutputcharacter
-  public static FillConsoleOutputCharacterW(hConsoleOutput: HANDLE, cCharacter: LPVOID, nLength: DWORD, dwWriteCoord: DWORD, lpNumberOfCharsWritten: LPVOID): BOOL {
+  public static FillConsoleOutputCharacterW(hConsoleOutput: HANDLE, cCharacter: WORD, nLength: DWORD, dwWriteCoord: DWORD, lpNumberOfCharsWritten: LPVOID): BOOL {
     return Kernel32.Load('FillConsoleOutputCharacterW')(hConsoleOutput, cCharacter, nLength, dwWriteCoord, lpNumberOfCharsWritten);
   }
 
@@ -3325,7 +3332,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-flsalloc
-  public static FlsAlloc(lpCallback: DWORD): DWORD {
+  public static FlsAlloc(lpCallback: LPVOID): DWORD {
     return Kernel32.Load('FlsAlloc')(lpCallback);
   }
 
@@ -3355,7 +3362,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-flushinstructioncache
-  public static FlushInstructionCache(hProcess: HANDLE, lpBaseAddress: LPVOID, dwSize: LPVOID): BOOL {
+  public static FlushInstructionCache(hProcess: HANDLE, lpBaseAddress: LPVOID, dwSize: HANDLE): BOOL {
     return Kernel32.Load('FlushInstructionCache')(hProcess, lpBaseAddress, dwSize);
   }
 
@@ -3365,7 +3372,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/memoryapi/nf-memoryapi-flushviewoffile
-  public static FlushViewOfFile(lpBaseAddress: LPVOID, dwNumberOfBytesToFlush: LPVOID): BOOL {
+  public static FlushViewOfFile(lpBaseAddress: LPVOID, dwNumberOfBytesToFlush: HANDLE): BOOL {
     return Kernel32.Load('FlushViewOfFile')(lpBaseAddress, dwNumberOfBytesToFlush);
   }
 
@@ -3420,7 +3427,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-freelibrarywhencallbackreturns
-  public static FreeLibraryWhenCallbackReturns(pci: DWORD, mod: HMODULE): VOID {
+  public static FreeLibraryWhenCallbackReturns(pci: LPVOID, mod: HMODULE): VOID {
     return Kernel32.Load('FreeLibraryWhenCallbackReturns')(pci, mod);
   }
 
@@ -3430,7 +3437,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-freeresource
-  public static FreeResource(hResData: DWORD): BOOL {
+  public static FreeResource(hResData: HGLOBAL): BOOL {
     return Kernel32.Load('FreeResource')(hResData);
   }
 
@@ -3580,7 +3587,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-getcompressedfilesizetransacteda
-  public static GetCompressedFileSizeTransactedA(lpFileName: LPSTR, lpFileSizeHigh: LPVOID, hTransaction: HANDLE): DWORD {
+  public static GetCompressedFileSizeTransactedA(lpFileName: LPSTR, lpFileSizeHigh: LPVOID, hTransaction: LPVOID): DWORD {
     return Kernel32.Load('GetCompressedFileSizeTransactedA')(lpFileName, lpFileSizeHigh, hTransaction);
   }
 
@@ -3715,7 +3722,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/console/getconsolefontsize
-  public static GetConsoleFontSize(hConsoleOutput: HANDLE, nFont: DWORD): COORD {
+  public static GetConsoleFontSize(hConsoleOutput: HANDLE, nFont: DWORD): DWORD {
     return Kernel32.Load('GetConsoleFontSize')(hConsoleOutput, nFont);
   }
 
@@ -4238,7 +4245,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/memoryapi/nf-memoryapi-getlargepageminimum
-  public static GetLargePageMinimum(): LPVOID {
+  public static GetLargePageMinimum(): HANDLE {
     return Kernel32.Load('GetLargePageMinimum')();
   }
 
@@ -4708,7 +4715,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-getprocessmitigationpolicy
-  public static GetProcessMitigationPolicy(hProcess: HANDLE, MitigationPolicy: DWORD, lpBuffer: LPVOID, dwLength: LPVOID): BOOL {
+  public static GetProcessMitigationPolicy(hProcess: HANDLE, MitigationPolicy: DWORD, lpBuffer: LPVOID, dwLength: HANDLE): BOOL {
     return Kernel32.Load('GetProcessMitigationPolicy')(hProcess, MitigationPolicy, lpBuffer, dwLength);
   }
 
@@ -5289,7 +5296,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-getwritewatch
-  public static GetWriteWatch(dwFlags: DWORD, lpBaseAddress: LPVOID, dwRegionSize: LPVOID, lpAddresses: LPVOID, lpdwCount: LPVOID, lpdwGranularity: LPVOID): DWORD {
+  public static GetWriteWatch(dwFlags: DWORD, lpBaseAddress: LPVOID, dwRegionSize: HANDLE, lpAddresses: LPVOID, lpdwCount: LPVOID, lpdwGranularity: LPVOID): DWORD {
     return Kernel32.Load('GetWriteWatch')(dwFlags, lpBaseAddress, dwRegionSize, lpAddresses, lpdwCount, lpdwGranularity);
   }
 
@@ -5319,7 +5326,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-globalalloc
-  public static GlobalAlloc(uFlags: DWORD, dwBytes: LPVOID): DWORD {
+  public static GlobalAlloc(uFlags: DWORD, dwBytes: HANDLE): HGLOBAL {
     return Kernel32.Load('GlobalAlloc')(uFlags, dwBytes);
   }
 
@@ -5344,17 +5351,17 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-globalfix
-  public static GlobalFix(hMem: DWORD): VOID {
+  public static GlobalFix(hMem: HANDLE): VOID {
     return Kernel32.Load('GlobalFix')(hMem);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-globalflags
-  public static GlobalFlags(hMem: DWORD): DWORD {
+  public static GlobalFlags(hMem: HANDLE): DWORD {
     return Kernel32.Load('GlobalFlags')(hMem);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-globalfree
-  public static GlobalFree(hMem: DWORD): DWORD {
+  public static GlobalFree(hMem: HGLOBAL): HGLOBAL {
     return Kernel32.Load('GlobalFree')(hMem);
   }
 
@@ -5369,12 +5376,12 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-globalhandle
-  public static GlobalHandle(pMem: LPVOID): DWORD {
+  public static GlobalHandle(pMem: LPVOID): HANDLE {
     return Kernel32.Load('GlobalHandle')(pMem);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-globallock
-  public static GlobalLock(hMem: DWORD): LPVOID {
+  public static GlobalLock(hMem: HANDLE): LPVOID {
     return Kernel32.Load('GlobalLock')(hMem);
   }
 
@@ -5389,37 +5396,37 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-globalrealloc
-  public static GlobalReAlloc(hMem: DWORD, dwBytes: LPVOID, uFlags: DWORD): DWORD {
+  public static GlobalReAlloc(hMem: HANDLE, dwBytes: HANDLE, uFlags: DWORD): HANDLE {
     return Kernel32.Load('GlobalReAlloc')(hMem, dwBytes, uFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-globalsize
-  public static GlobalSize(hMem: DWORD): LPVOID {
+  public static GlobalSize(hMem: HANDLE): HANDLE {
     return Kernel32.Load('GlobalSize')(hMem);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-globalunfix
-  public static GlobalUnfix(hMem: DWORD): VOID {
+  public static GlobalUnfix(hMem: HANDLE): VOID {
     return Kernel32.Load('GlobalUnfix')(hMem);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-globalunlock
-  public static GlobalUnlock(hMem: DWORD): BOOL {
+  public static GlobalUnlock(hMem: HGLOBAL): BOOL {
     return Kernel32.Load('GlobalUnlock')(hMem);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-globalunwire
-  public static GlobalUnWire(hMem: DWORD): BOOL {
+  public static GlobalUnWire(hMem: HANDLE): BOOL {
     return Kernel32.Load('GlobalUnWire')(hMem);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-globalwire
-  public static GlobalWire(hMem: DWORD): LPVOID {
+  public static GlobalWire(hMem: HANDLE): LPVOID {
     return Kernel32.Load('GlobalWire')(hMem);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heap32first
-  public static Heap32First(lphe: LPVOID, th32ProcessID: DWORD, th32HeapID: LPVOID): BOOL {
+  public static Heap32First(lphe: LPVOID, th32ProcessID: DWORD, th32HeapID: HANDLE): BOOL {
     return Kernel32.Load('Heap32First')(lphe, th32ProcessID, th32HeapID);
   }
 
@@ -5439,7 +5446,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapalloc
-  public static HeapAlloc(hHeap: HANDLE, dwFlags: DWORD, dwBytes: LPVOID): LPVOID {
+  public static HeapAlloc(hHeap: HANDLE, dwFlags: DWORD, dwBytes: HANDLE): LPVOID {
     return Kernel32.Load('HeapAlloc')(hHeap, dwFlags, dwBytes);
   }
 
@@ -5449,7 +5456,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapcreate
-  public static HeapCreate(flOptions: DWORD, dwInitialSize: LPVOID, dwMaximumSize: LPVOID): HANDLE {
+  public static HeapCreate(flOptions: DWORD, dwInitialSize: HANDLE, dwMaximumSize: HANDLE): HANDLE {
     return Kernel32.Load('HeapCreate')(flOptions, dwInitialSize, dwMaximumSize);
   }
 
@@ -5469,22 +5476,22 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapqueryinformation
-  public static HeapQueryInformation(HeapHandle: HANDLE, HeapInformationClass: DWORD, HeapInformation: LPVOID, HeapInformationLength: LPVOID, ReturnLength: LPVOID): BOOL {
+  public static HeapQueryInformation(HeapHandle: HANDLE, HeapInformationClass: DWORD, HeapInformation: LPVOID, HeapInformationLength: HANDLE, ReturnLength: LPVOID): BOOL {
     return Kernel32.Load('HeapQueryInformation')(HeapHandle, HeapInformationClass, HeapInformation, HeapInformationLength, ReturnLength);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heaprealloc
-  public static HeapReAlloc(hHeap: HANDLE, dwFlags: DWORD, lpMem: LPVOID, dwBytes: LPVOID): LPVOID {
+  public static HeapReAlloc(hHeap: HANDLE, dwFlags: DWORD, lpMem: LPVOID, dwBytes: HANDLE): LPVOID {
     return Kernel32.Load('HeapReAlloc')(hHeap, dwFlags, lpMem, dwBytes);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapsetinformation
-  public static HeapSetInformation(HeapHandle: HANDLE, HeapInformationClass: DWORD, HeapInformation: LPVOID, HeapInformationLength: LPVOID): BOOL {
+  public static HeapSetInformation(HeapHandle: HANDLE, HeapInformationClass: DWORD, HeapInformation: LPVOID, HeapInformationLength: HANDLE): BOOL {
     return Kernel32.Load('HeapSetInformation')(HeapHandle, HeapInformationClass, HeapInformation, HeapInformationLength);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapsize
-  public static HeapSize(hHeap: HANDLE, dwFlags: DWORD, lpMem: LPVOID): LPVOID {
+  public static HeapSize(hHeap: HANDLE, dwFlags: DWORD, lpMem: LPVOID): HANDLE {
     return Kernel32.Load('HeapSize')(hHeap, dwFlags, lpMem);
   }
 
@@ -5554,7 +5561,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-initializeprocthreadattributelist
-  public static InitializeProcThreadAttributeList(lpAttributeList: DWORD, dwAttributeCount: DWORD, dwFlags: DWORD, lpSize: LPVOID): BOOL {
+  public static InitializeProcThreadAttributeList(lpAttributeList: LPVOID, dwAttributeCount: DWORD, dwFlags: DWORD, lpSize: LPVOID): BOOL {
     return Kernel32.Load('InitializeProcThreadAttributeList')(lpAttributeList, dwAttributeCount, dwFlags, lpSize);
   }
 
@@ -5644,12 +5651,12 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-isbadstringptra
-  public static IsBadStringPtrA(lpsz: LPSTR, ucchMax: LPVOID): BOOL {
+  public static IsBadStringPtrA(lpsz: LPSTR, ucchMax: HANDLE): BOOL {
     return Kernel32.Load('IsBadStringPtrA')(lpsz, ucchMax);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-isbadstringptrw
-  public static IsBadStringPtrW(lpsz: LPWSTR, ucchMax: LPVOID): BOOL {
+  public static IsBadStringPtrW(lpsz: LPWSTR, ucchMax: HANDLE): BOOL {
     return Kernel32.Load('IsBadStringPtrW')(lpsz, ucchMax);
   }
 
@@ -5664,12 +5671,12 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-isdbcsleadbyte
-  public static IsDBCSLeadByte(TestChar: LPVOID): BOOL {
+  public static IsDBCSLeadByte(TestChar: BYTE): BOOL {
     return Kernel32.Load('IsDBCSLeadByte')(TestChar);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-isdbcsleadbyteex
-  public static IsDBCSLeadByteEx(CodePage: DWORD, TestChar: LPVOID): BOOL {
+  public static IsDBCSLeadByteEx(CodePage: DWORD, TestChar: BYTE): BOOL {
     return Kernel32.Load('IsDBCSLeadByteEx')(CodePage, TestChar);
   }
 
@@ -5724,7 +5731,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-isthreadpooltimerset
-  public static IsThreadpoolTimerSet(pti: DWORD): BOOL {
+  public static IsThreadpoolTimerSet(pti: LPVOID): BOOL {
     return Kernel32.Load('IsThreadpoolTimerSet')(pti);
   }
 
@@ -5784,12 +5791,12 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-k32enumpagefilesa
-  public static K32EnumPageFilesA(pCallBackRoutine: DWORD, pContext: LPVOID): BOOL {
+  public static K32EnumPageFilesA(pCallBackRoutine: LPVOID, pContext: LPVOID): BOOL {
     return Kernel32.Load('K32EnumPageFilesA')(pCallBackRoutine, pContext);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-k32enumpagefilesw
-  public static K32EnumPageFilesW(pCallBackRoutine: DWORD, pContext: LPVOID): BOOL {
+  public static K32EnumPageFilesW(pCallBackRoutine: LPVOID, pContext: LPVOID): BOOL {
     return Kernel32.Load('K32EnumPageFilesW')(pCallBackRoutine, pContext);
   }
 
@@ -5919,7 +5926,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winnls/nf-winnls-lcmapstringex
-  public static LCMapStringEx(lpLocaleName: LPCWSTR, dwMapFlags: DWORD, lpSrcStr: LPCWSTR, cchSrc: INT, lpDestStr: LPWSTR, cchDest: INT, lpVersionInformation: LPNLSVERSIONINFO, lpReserved: LPVOID, sortHandle: LPARAM): INT {
+  public static LCMapStringEx(lpLocaleName: LPCWSTR, dwMapFlags: DWORD, lpSrcStr: LPCWSTR, cchSrc: INT, lpDestStr: LPWSTR, cchDest: INT, lpVersionInformation: LPNLSVERSIONINFO, lpReserved: LPVOID, sortHandle: DWORD): INT {
     return Kernel32.Load('LCMapStringEx')(lpLocaleName, dwMapFlags, lpSrcStr, cchSrc, lpDestStr, cchDest, lpVersionInformation, lpReserved, sortHandle);
   }
 
@@ -5934,7 +5941,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-leavecriticalsectionwhencallbackreturns
-  public static LeaveCriticalSectionWhenCallbackReturns(pci: DWORD, pcs: LPVOID): VOID {
+  public static LeaveCriticalSectionWhenCallbackReturns(pci: LPVOID, pcs: LPVOID): VOID {
     return Kernel32.Load('LeaveCriticalSectionWhenCallbackReturns')(pci, pcs);
   }
 
@@ -5979,7 +5986,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-localalloc
-  public static LocalAlloc(uFlags: DWORD, uBytes: LPVOID): DWORD {
+  public static LocalAlloc(uFlags: DWORD, uBytes: HANDLE): HLOCAL {
     return Kernel32.Load('LocalAlloc')(uFlags, uBytes);
   }
 
@@ -6004,37 +6011,37 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-localflags
-  public static LocalFlags(hMem: DWORD): DWORD {
+  public static LocalFlags(hMem: HLOCAL): DWORD {
     return Kernel32.Load('LocalFlags')(hMem);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-localfree
-  public static LocalFree(hMem: DWORD): DWORD {
+  public static LocalFree(hMem: HLOCAL): HLOCAL {
     return Kernel32.Load('LocalFree')(hMem);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-localhandle
-  public static LocalHandle(pMem: LPVOID): DWORD {
+  public static LocalHandle(pMem: LPVOID): HLOCAL {
     return Kernel32.Load('LocalHandle')(pMem);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-locallock
-  public static LocalLock(hMem: DWORD): LPVOID {
+  public static LocalLock(hMem: HLOCAL): LPVOID {
     return Kernel32.Load('LocalLock')(hMem);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-localrealloc
-  public static LocalReAlloc(hMem: DWORD, uBytes: LPVOID, uFlags: DWORD): DWORD {
+  public static LocalReAlloc(hMem: HLOCAL, uBytes: SIZE_T, uFlags: DWORD): HLOCAL {
     return Kernel32.Load('LocalReAlloc')(hMem, uBytes, uFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-localshrink
-  public static LocalShrink(hMem: DWORD, cbNewSize: DWORD): LPVOID {
+  public static LocalShrink(hMem: HANDLE, cbNewSize: DWORD): HANDLE {
     return Kernel32.Load('LocalShrink')(hMem, cbNewSize);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-localsize
-  public static LocalSize(hMem: DWORD): LPVOID {
+  public static LocalSize(hMem: HLOCAL): SIZE_T {
     return Kernel32.Load('LocalSize')(hMem);
   }
 
@@ -6044,7 +6051,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-localunlock
-  public static LocalUnlock(hMem: DWORD): BOOL {
+  public static LocalUnlock(hMem: HLOCAL): BOOL {
     return Kernel32.Load('LocalUnlock')(hMem);
   }
 
@@ -6178,12 +6185,12 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-movefiletransacteda
-  public static MoveFileTransactedA(lpExistingFileName: LPSTR, lpNewFileName: LPSTR, lpProgressRoutine: DWORD, lpData: LPVOID, dwFlags: DWORD, hTransaction: HANDLE): BOOL {
+  public static MoveFileTransactedA(lpExistingFileName: LPSTR, lpNewFileName: LPSTR, lpProgressRoutine: LPVOID, lpData: LPVOID, dwFlags: DWORD, hTransaction: LPVOID): BOOL {
     return Kernel32.Load('MoveFileTransactedA')(lpExistingFileName, lpNewFileName, lpProgressRoutine, lpData, dwFlags, hTransaction);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-movefiletransactedw
-  public static MoveFileTransactedW(lpExistingFileName: LPWSTR, lpNewFileName: LPWSTR, lpProgressRoutine: DWORD, lpData: LPVOID, dwFlags: DWORD, hTransaction: HANDLE): BOOL {
+  public static MoveFileTransactedW(lpExistingFileName: LPWSTR, lpNewFileName: LPWSTR, lpProgressRoutine: LPVOID, lpData: LPVOID, dwFlags: DWORD, hTransaction: LPVOID): BOOL {
     return Kernel32.Load('MoveFileTransactedW')(lpExistingFileName, lpNewFileName, lpProgressRoutine, lpData, dwFlags, hTransaction);
   }
 
@@ -6193,12 +6200,12 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-movefilewithprogressa
-  public static MoveFileWithProgressA(lpExistingFileName: LPSTR, lpNewFileName: LPSTR, lpProgressRoutine: DWORD, lpData: LPVOID, dwFlags: DWORD): BOOL {
+  public static MoveFileWithProgressA(lpExistingFileName: LPSTR, lpNewFileName: LPSTR, lpProgressRoutine: LPVOID, lpData: LPVOID, dwFlags: DWORD): BOOL {
     return Kernel32.Load('MoveFileWithProgressA')(lpExistingFileName, lpNewFileName, lpProgressRoutine, lpData, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-movefilewithprogressw
-  public static MoveFileWithProgressW(lpExistingFileName: LPWSTR, lpNewFileName: LPWSTR, lpProgressRoutine: DWORD, lpData: LPVOID, dwFlags: DWORD): BOOL {
+  public static MoveFileWithProgressW(lpExistingFileName: LPWSTR, lpNewFileName: LPWSTR, lpProgressRoutine: LPVOID, lpData: LPVOID, dwFlags: DWORD): BOOL {
     return Kernel32.Load('MoveFileWithProgressW')(lpExistingFileName, lpNewFileName, lpProgressRoutine, lpData, dwFlags);
   }
 
@@ -6458,17 +6465,17 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-pssduplicatesnapshot
-  public static PssDuplicateSnapshot(SourceProcessHandle: HANDLE, SnapshotHandle: DWORD, TargetProcessHandle: HANDLE, TargetSnapshotHandle: LPVOID, Flags: DWORD): DWORD {
+  public static PssDuplicateSnapshot(SourceProcessHandle: HANDLE, SnapshotHandle: HANDLE, TargetProcessHandle: HANDLE, TargetSnapshotHandle: LPVOID, Flags: DWORD): DWORD {
     return Kernel32.Load('PssDuplicateSnapshot')(SourceProcessHandle, SnapshotHandle, TargetProcessHandle, TargetSnapshotHandle, Flags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-pssfreesnapshot
-  public static PssFreeSnapshot(ProcessHandle: HANDLE, SnapshotHandle: DWORD): DWORD {
+  public static PssFreeSnapshot(ProcessHandle: HANDLE, SnapshotHandle: HANDLE): DWORD {
     return Kernel32.Load('PssFreeSnapshot')(ProcessHandle, SnapshotHandle);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-pssquerysnapshot
-  public static PssQuerySnapshot(SnapshotHandle: DWORD, InformationClass: DWORD, Buffer: LPVOID, BufferLength: DWORD): DWORD {
+  public static PssQuerySnapshot(SnapshotHandle: HANDLE, InformationClass: DWORD, Buffer: LPVOID, BufferLength: DWORD): DWORD {
     return Kernel32.Load('PssQuerySnapshot')(SnapshotHandle, InformationClass, Buffer, BufferLength);
   }
 
@@ -6478,27 +6485,27 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-psswalkmarkerfree
-  public static PssWalkMarkerFree(WalkMarkerHandle: DWORD): DWORD {
+  public static PssWalkMarkerFree(WalkMarkerHandle: HANDLE): DWORD {
     return Kernel32.Load('PssWalkMarkerFree')(WalkMarkerHandle);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-psswalkmarkergetposition
-  public static PssWalkMarkerGetPosition(WalkMarkerHandle: DWORD, Position: LPVOID): DWORD {
+  public static PssWalkMarkerGetPosition(WalkMarkerHandle: HANDLE, Position: LPVOID): DWORD {
     return Kernel32.Load('PssWalkMarkerGetPosition')(WalkMarkerHandle, Position);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-psswalkmarkerseektobeginning
-  public static PssWalkMarkerSeekToBeginning(WalkMarkerHandle: DWORD): DWORD {
+  public static PssWalkMarkerSeekToBeginning(WalkMarkerHandle: HANDLE): DWORD {
     return Kernel32.Load('PssWalkMarkerSeekToBeginning')(WalkMarkerHandle);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-psswalkmarkersetposition
-  public static PssWalkMarkerSetPosition(WalkMarkerHandle: DWORD, Position: LPVOID): DWORD {
+  public static PssWalkMarkerSetPosition(WalkMarkerHandle: HANDLE, Position: LPVOID): DWORD {
     return Kernel32.Load('PssWalkMarkerSetPosition')(WalkMarkerHandle, Position);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-psswalksnapshot
-  public static PssWalkSnapshot(SnapshotHandle: DWORD, InformationClass: DWORD, WalkMarkerHandle: DWORD, Buffer: LPVOID, BufferLength: DWORD): DWORD {
+  public static PssWalkSnapshot(SnapshotHandle: HANDLE, InformationClass: DWORD, WalkMarkerHandle: HANDLE, Buffer: LPVOID, BufferLength: DWORD): DWORD {
     return Kernel32.Load('PssWalkSnapshot')(SnapshotHandle, InformationClass, WalkMarkerHandle, Buffer, BufferLength);
   }
 
@@ -6603,7 +6610,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-querythreadpoolstackinformation
-  public static QueryThreadpoolStackInformation(ptpp: DWORD, ptpsi: LPVOID): BOOL {
+  public static QueryThreadpoolStackInformation(ptpp: LPVOID, ptpsi: LPVOID): BOOL {
     return Kernel32.Load('QueryThreadpoolStackInformation')(ptpp, ptpsi);
   }
 
@@ -6623,17 +6630,17 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-queueuserapc
-  public static QueueUserAPC(pfnAPC: DWORD, hThread: HANDLE, dwData: LPVOID): DWORD {
+  public static QueueUserAPC(pfnAPC: LPVOID, hThread: HANDLE, dwData: HANDLE): DWORD {
     return Kernel32.Load('QueueUserAPC')(pfnAPC, hThread, dwData);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-queueuserapc2
-  public static QueueUserAPC2(ApcRoutine: DWORD, Thread: HANDLE, Data: LPVOID, Flags: DWORD): BOOL {
+  public static QueueUserAPC2(ApcRoutine: LPVOID, Thread: HANDLE, Data: HANDLE, Flags: DWORD): BOOL {
     return Kernel32.Load('QueueUserAPC2')(ApcRoutine, Thread, Data, Flags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-queueuserworkitem
-  public static QueueUserWorkItem(_Function: DWORD, Context: LPVOID, Flags: DWORD): BOOL {
+  public static QueueUserWorkItem(_Function: PVOID, Context: LPVOID, Flags: DWORD): BOOL {
     return Kernel32.Load('QueueUserWorkItem')(_Function, Context, Flags);
   }
 
@@ -6718,7 +6725,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-readdirectorychangesw
-  public static ReadDirectoryChangesW(hDirectory: HANDLE, lpBuffer: LPVOID, nBufferLength: DWORD, bWatchSubtree: BOOL, dwNotifyFilter: DWORD, lpBytesReturned: LPVOID, lpOverlapped: LPVOID, lpCompletionRoutine: DWORD): BOOL {
+  public static ReadDirectoryChangesW(hDirectory: HANDLE, lpBuffer: LPVOID, nBufferLength: DWORD, bWatchSubtree: BOOL, dwNotifyFilter: DWORD, lpBytesReturned: LPVOID, lpOverlapped: LPVOID, lpCompletionRoutine: LPVOID): BOOL {
     return Kernel32.Load('ReadDirectoryChangesW')(hDirectory, lpBuffer, nBufferLength, bWatchSubtree, dwNotifyFilter, lpBytesReturned, lpOverlapped, lpCompletionRoutine);
   }
 
@@ -6728,7 +6735,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-readfileex
-  public static ReadFileEx(hFile: HANDLE, lpBuffer: LPVOID, nNumberOfBytesToRead: DWORD, lpOverlapped: LPVOID, lpCompletionRoutine: DWORD): BOOL {
+  public static ReadFileEx(hFile: HANDLE, lpBuffer: LPVOID, nNumberOfBytesToRead: DWORD, lpOverlapped: LPVOID, lpCompletionRoutine: LPVOID): BOOL {
     return Kernel32.Load('ReadFileEx')(hFile, lpBuffer, nNumberOfBytesToRead, lpOverlapped, lpCompletionRoutine);
   }
 
@@ -6753,7 +6760,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-registerapplicationrecoverycallback
-  public static RegisterApplicationRecoveryCallback(pRecoveyCallback: DWORD, pvParameter: LPVOID, dwPingInterval: DWORD, dwFlags: DWORD): DWORD {
+  public static RegisterApplicationRecoveryCallback(pRecoveyCallback: PVOID, pvParameter: LPVOID, dwPingInterval: DWORD, dwFlags: DWORD): DWORD {
     return Kernel32.Load('RegisterApplicationRecoveryCallback')(pRecoveyCallback, pvParameter, dwPingInterval, dwFlags);
   }
 
@@ -6763,12 +6770,12 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-registerbadmemorynotification
-  public static RegisterBadMemoryNotification(Callback: DWORD): LPVOID {
+  public static RegisterBadMemoryNotification(Callback: LPVOID): HANDLE {
     return Kernel32.Load('RegisterBadMemoryNotification')(Callback);
   }
 
   // https://learn.microsoft.com/en-us/windows/console/registerconsoleime
-  public static RegisterConsoleIME(hWndConsoleIME: DWORD, lpdwConsoleThreadId: LPVOID): BOOL {
+  public static RegisterConsoleIME(hWndConsoleIME: HANDLE, lpdwConsoleThreadId: LPVOID): BOOL {
     return Kernel32.Load('RegisterConsoleIME')(hWndConsoleIME, lpdwConsoleThreadId);
   }
 
@@ -6793,12 +6800,12 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-registerwaitforsingleobject
-  public static RegisterWaitForSingleObject(phNewWaitObject: LPVOID, hObject: HANDLE, Callback: DWORD, Context: LPVOID, dwMilliseconds: DWORD, dwFlags: DWORD): BOOL {
+  public static RegisterWaitForSingleObject(phNewWaitObject: LPVOID, hObject: HANDLE, Callback: LPVOID, Context: LPVOID, dwMilliseconds: DWORD, dwFlags: DWORD): BOOL {
     return Kernel32.Load('RegisterWaitForSingleObject')(phNewWaitObject, hObject, Callback, Context, dwMilliseconds, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-registerwaituntiloobecompleted
-  public static RegisterWaitUntilOOBECompleted(OOBECompletedCallback: DWORD, CallbackContext: LPVOID, WaitHandle: LPVOID): BOOL {
+  public static RegisterWaitUntilOOBECompleted(OOBECompletedCallback: PVOID, CallbackContext: LPVOID, WaitHandle: LPVOID): BOOL {
     return Kernel32.Load('RegisterWaitUntilOOBECompleted')(OOBECompletedCallback, CallbackContext, WaitHandle);
   }
 
@@ -6813,17 +6820,17 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-releasemutexwhencallbackreturns
-  public static ReleaseMutexWhenCallbackReturns(pci: DWORD, mut: HANDLE): VOID {
+  public static ReleaseMutexWhenCallbackReturns(pci: LPVOID, mut: HANDLE): VOID {
     return Kernel32.Load('ReleaseMutexWhenCallbackReturns')(pci, mut);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-releasepackagevirtualizationcontext
-  public static ReleasePackageVirtualizationContext(context: DWORD): VOID {
+  public static ReleasePackageVirtualizationContext(context: HANDLE): VOID {
     return Kernel32.Load('ReleasePackageVirtualizationContext')(context);
   }
 
   // https://learn.microsoft.com/en-us/windows/console/releasepseudoconsole
-  public static ReleasePseudoConsole(hPC: DWORD): DWORD {
+  public static ReleasePseudoConsole(hPC: HANDLE): DWORD {
     return Kernel32.Load('ReleasePseudoConsole')(hPC);
   }
 
@@ -6833,7 +6840,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-releasesemaphorewhencallbackreturns
-  public static ReleaseSemaphoreWhenCallbackReturns(pci: DWORD, sem: HANDLE, crel: DWORD): VOID {
+  public static ReleaseSemaphoreWhenCallbackReturns(pci: LPVOID, sem: HANDLE, crel: DWORD): VOID {
     return Kernel32.Load('ReleaseSemaphoreWhenCallbackReturns')(pci, sem, crel);
   }
 
@@ -6863,7 +6870,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-removedirectorytransacteda
-  public static RemoveDirectoryTransactedA(lpPathName: LPSTR, hTransaction: HANDLE): BOOL {
+  public static RemoveDirectoryTransactedA(lpPathName: LPSTR, hTransaction: LPVOID): BOOL {
     return Kernel32.Load('RemoveDirectoryTransactedA')(lpPathName, hTransaction);
   }
 
@@ -6883,7 +6890,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-removesecurememorycachecallback
-  public static RemoveSecureMemoryCacheCallback(pfnCallBack: DWORD): BOOL {
+  public static RemoveSecureMemoryCacheCallback(pfnCallBack: LPVOID): BOOL {
     return Kernel32.Load('RemoveSecureMemoryCacheCallback')(pfnCallBack);
   }
 
@@ -6938,7 +6945,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/console/resizepseudoconsole
-  public static ResizePseudoConsole(hPC: DWORD, size: DWORD): DWORD {
+  public static ResizePseudoConsole(hPC: HANDLE, size: DWORD): DWORD {
     return Kernel32.Load('ResizePseudoConsole')(hPC, size);
   }
 
@@ -6986,7 +6993,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-rtlinstallfunctiontablecallback
-  public static RtlInstallFunctionTableCallback(TableIdentifier: ULONGLONG, BaseAddress: ULONGLONG, Length: DWORD, Callback: DWORD, Context: LPVOID, OutOfProcessCallbackDll: LPWSTR): DWORD {
+  public static RtlInstallFunctionTableCallback(TableIdentifier: ULONGLONG, BaseAddress: ULONGLONG, Length: DWORD, Callback: PVOID, Context: LPVOID, OutOfProcessCallbackDll: LPWSTR): DWORD {
     return Kernel32.Load('RtlInstallFunctionTableCallback')(TableIdentifier, BaseAddress, Length, Callback, Context, OutOfProcessCallbackDll);
   }
 
@@ -7021,7 +7028,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-rtlvirtualunwind
-  public static RtlVirtualUnwind(HandlerType: DWORD, ImageBase: ULONGLONG, ControlPc: ULONGLONG, FunctionEntry: LPVOID, ContextRecord: LPVOID, HandlerData: LPVOID, EstablisherFrame: LPVOID, ContextPointers: LPVOID): DWORD {
+  public static RtlVirtualUnwind(HandlerType: DWORD, ImageBase: ULONGLONG, ControlPc: ULONGLONG, FunctionEntry: LPVOID, ContextRecord: LPVOID, HandlerData: LPVOID, EstablisherFrame: LPVOID, ContextPointers: LPVOID): LPVOID {
     return Kernel32.Load('RtlVirtualUnwind')(HandlerType, ImageBase, ControlPc, FunctionEntry, ContextRecord, HandlerData, EstablisherFrame, ContextPointers);
   }
 
@@ -7121,7 +7128,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/console/setconsolectrlhandler
-  public static SetConsoleCtrlHandler(HandlerRoutine: DWORD, Add: BOOL): BOOL {
+  public static SetConsoleCtrlHandler(HandlerRoutine: PHANDLER_ROUTINE, Add: BOOL): BOOL {
     return Kernel32.Load('SetConsoleCtrlHandler')(HandlerRoutine, Add);
   }
 
@@ -7166,7 +7173,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/console/setconsoleicon
-  public static SetConsoleIcon(hIcon: DWORD): BOOL {
+  public static SetConsoleIcon(hIcon: HANDLE): BOOL {
     return Kernel32.Load('SetConsoleIcon')(hIcon);
   }
 
@@ -7186,7 +7193,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/console/setconsolelocaleudc
-  public static SetConsoleLocalEUDC(hConsoleHandle: HANDLE, wCodePoint: USHORT, cFontSize: DWORD, lpSB: LPSTR): BOOL {
+  public static SetConsoleLocalEUDC(hConsoleHandle: LPVOID, wCodePoint: USHORT, cFontSize: DWORD, lpSB: DWORD): BOOL {
     return Kernel32.Load('SetConsoleLocalEUDC')(hConsoleHandle, wCodePoint, cFontSize, lpSB);
   }
 
@@ -7346,7 +7353,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-seteventwhencallbackreturns
-  public static SetEventWhenCallbackReturns(pci: DWORD, evt: HANDLE): VOID {
+  public static SetEventWhenCallbackReturns(pci: LPVOID, evt: HANDLE): VOID {
     return Kernel32.Load('SetEventWhenCallbackReturns')(pci, evt);
   }
 
@@ -7366,7 +7373,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-setfileattributestransacteda
-  public static SetFileAttributesTransactedA(lpFileName: LPSTR, dwFileAttributes: DWORD, hTransaction: HANDLE): BOOL {
+  public static SetFileAttributesTransactedA(lpFileName: LPSTR, dwFileAttributes: DWORD, hTransaction: LPVOID): BOOL {
     return Kernel32.Load('SetFileAttributesTransactedA')(lpFileName, dwFileAttributes, hTransaction);
   }
 
@@ -7406,7 +7413,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-setfilepointerex
-  public static SetFilePointerEx(hFile: HANDLE, liDistanceToMove: LPVOID, lpNewFilePointer: LPVOID, dwMoveMethod: DWORD): BOOL {
+  public static SetFilePointerEx(hFile: HANDLE, liDistanceToMove: LARGE_INTEGER, lpNewFilePointer: LPVOID, dwMoveMethod: DWORD): BOOL {
     return Kernel32.Load('SetFilePointerEx')(hFile, liDistanceToMove, lpNewFilePointer, dwMoveMethod);
   }
 
@@ -7426,7 +7433,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-setfilevaliddata
-  public static SetFileValidData(hFile: HANDLE, ValidDataLength: LPVOID): BOOL {
+  public static SetFileValidData(hFile: HANDLE, ValidDataLength: LONG_PTR): BOOL {
     return Kernel32.Load('SetFileValidData')(hFile, ValidDataLength);
   }
 
@@ -7686,37 +7693,37 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-setthreadpoolstackinformation
-  public static SetThreadpoolStackInformation(ptpp: DWORD, ptpsi: LPVOID): BOOL {
+  public static SetThreadpoolStackInformation(ptpp: LPVOID, ptpsi: LPVOID): BOOL {
     return Kernel32.Load('SetThreadpoolStackInformation')(ptpp, ptpsi);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/threadpoolapiset/nf-threadpoolapiset-setthreadpoolthreadmaximum
-  public static SetThreadpoolThreadMaximum(ptpp: DWORD, cthrdMost: DWORD): VOID {
+  public static SetThreadpoolThreadMaximum(ptpp: LPVOID, cthrdMost: DWORD): VOID {
     return Kernel32.Load('SetThreadpoolThreadMaximum')(ptpp, cthrdMost);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/threadpoolapiset/nf-threadpoolapiset-setthreadpoolthreadminimum
-  public static SetThreadpoolThreadMinimum(ptpp: DWORD, cthrdMic: DWORD): BOOL {
+  public static SetThreadpoolThreadMinimum(ptpp: LPVOID, cthrdMic: DWORD): BOOL {
     return Kernel32.Load('SetThreadpoolThreadMinimum')(ptpp, cthrdMic);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/threadpoolapiset/nf-threadpoolapiset-setthreadpooltimer
-  public static SetThreadpoolTimer(pti: DWORD, pftDueTime: LPVOID, msPeriod: DWORD, msWindowLength: DWORD): VOID {
+  public static SetThreadpoolTimer(pti: LPVOID, pftDueTime: LPVOID, msPeriod: DWORD, msWindowLength: DWORD): VOID {
     return Kernel32.Load('SetThreadpoolTimer')(pti, pftDueTime, msPeriod, msWindowLength);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-setthreadpooltimerex
-  public static SetThreadpoolTimerEx(pti: DWORD, pftDueTime: LPVOID, msPeriod: DWORD, msWindowLength: DWORD): BOOL {
+  public static SetThreadpoolTimerEx(pti: LPVOID, pftDueTime: LPVOID, msPeriod: DWORD, msWindowLength: DWORD): BOOL {
     return Kernel32.Load('SetThreadpoolTimerEx')(pti, pftDueTime, msPeriod, msWindowLength);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-setthreadpoolwait
-  public static SetThreadpoolWait(pwa: DWORD, h: HANDLE, pftTimeout: LPVOID): VOID {
+  public static SetThreadpoolWait(pwa: LPVOID, h: HANDLE, pftTimeout: LPVOID): VOID {
     return Kernel32.Load('SetThreadpoolWait')(pwa, h, pftTimeout);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-setthreadpoolwaitex
-  public static SetThreadpoolWaitEx(pwa: DWORD, h: HANDLE, pftTimeout: LPVOID, Reserved: LPVOID): BOOL {
+  public static SetThreadpoolWaitEx(pwa: LPVOID, h: HANDLE, pftTimeout: LPVOID, Reserved: LPVOID): BOOL {
     return Kernel32.Load('SetThreadpoolWaitEx')(pwa, h, pftTimeout, Reserved);
   }
 
@@ -7760,7 +7767,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-settimerqueuetimer
-  public static SetTimerQueueTimer(TimerQueue: HANDLE, Callback: DWORD, Parameter: LPVOID, DueTime: DWORD, Period: DWORD, PreferIo: BOOL): HANDLE {
+  public static SetTimerQueueTimer(TimerQueue: HANDLE, Callback: LPVOID, Parameter: LPVOID, DueTime: DWORD, Period: DWORD, PreferIo: BOOL): HANDLE {
     return Kernel32.Load('SetTimerQueueTimer')(TimerQueue, Callback, Parameter, DueTime, Period, PreferIo);
   }
 
@@ -7775,7 +7782,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-setunhandledexceptionfilter
-  public static SetUnhandledExceptionFilter(lpTopLevelExceptionFilter: DWORD): DWORD {
+  public static SetUnhandledExceptionFilter(lpTopLevelExceptionFilter: LPVOID): LPVOID {
     return Kernel32.Load('SetUnhandledExceptionFilter')(lpTopLevelExceptionFilter);
   }
 
@@ -7815,12 +7822,12 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-setwaitabletimer
-  public static SetWaitableTimer(hTimer: HANDLE, lpDueTime: LPVOID, lPeriod: INT, pfnCompletionRoutine: DWORD, lpArgToCompletionRoutine: LPVOID, fResume: BOOL): BOOL {
+  public static SetWaitableTimer(hTimer: HANDLE, lpDueTime: LPVOID, lPeriod: INT, pfnCompletionRoutine: LPVOID, lpArgToCompletionRoutine: LPVOID, fResume: BOOL): BOOL {
     return Kernel32.Load('SetWaitableTimer')(hTimer, lpDueTime, lPeriod, pfnCompletionRoutine, lpArgToCompletionRoutine, fResume);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-setwaitabletimerex
-  public static SetWaitableTimerEx(hTimer: HANDLE, lpDueTime: LPVOID, lPeriod: INT, pfnCompletionRoutine: DWORD, lpArgToCompletionRoutine: LPVOID, WakeContext: LPVOID, TolerableDelay: DWORD): BOOL {
+  public static SetWaitableTimerEx(hTimer: HANDLE, lpDueTime: LPVOID, lPeriod: INT, pfnCompletionRoutine: LPVOID, lpArgToCompletionRoutine: LPVOID, WakeContext: LPVOID, TolerableDelay: DWORD): BOOL {
     return Kernel32.Load('SetWaitableTimerEx')(hTimer, lpDueTime, lPeriod, pfnCompletionRoutine, lpArgToCompletionRoutine, WakeContext, TolerableDelay);
   }
 
@@ -7840,7 +7847,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-sizeofresource
-  public static SizeofResource(hModule: HMODULE, hResInfo: DWORD): DWORD {
+  public static SizeofResource(hModule: HMODULE, hResInfo: HRSRC): DWORD {
     return Kernel32.Load('SizeofResource')(hModule, hResInfo);
   }
 
@@ -7865,12 +7872,12 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/threadpoolapiset/nf-threadpoolapiset-startthreadpoolio
-  public static StartThreadpoolIo(pio: DWORD): VOID {
+  public static StartThreadpoolIo(pio: LPVOID): VOID {
     return Kernel32.Load('StartThreadpoolIo')(pio);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-submitthreadpoolwork
-  public static SubmitThreadpoolWork(pwk: DWORD): VOID {
+  public static SubmitThreadpoolWork(pwk: LPVOID): VOID {
     return Kernel32.Load('SubmitThreadpoolWork')(pwk);
   }
 
@@ -7880,7 +7887,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-switchtofiber
-  public static SwitchToFiber(lpFiber: LPVOID): VOID {
+  public static SwitchToFiber(lpFiber: HANDLE): VOID {
     return Kernel32.Load('SwitchToFiber')(lpFiber);
   }
 
@@ -7985,7 +7992,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-trysubmitthreadpoolcallback
-  public static TrySubmitThreadpoolCallback(pfns: DWORD, pv: LPVOID, pcbe: LPVOID): BOOL {
+  public static TrySubmitThreadpoolCallback(pfns: PVOID, pv: LPVOID, pcbe: LPVOID): BOOL {
     return Kernel32.Load('TrySubmitThreadpoolCallback')(pfns, pv, pcbe);
   }
 
@@ -8070,7 +8077,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-updateprocthreadattribute
-  public static UpdateProcThreadAttribute(lpAttributeList: DWORD, dwFlags: DWORD, Attribute: LPVOID, lpValue: LPVOID, cbSize: LPVOID, lpPreviousValue: LPVOID, lpReturnSize: LPVOID): BOOL {
+  public static UpdateProcThreadAttribute(lpAttributeList: LPPROC_THREAD_ATTRIBUTE_LIST, dwFlags: DWORD, Attribute: SIZE_T, lpValue: LPVOID, cbSize: HANDLE, lpPreviousValue: LPVOID, lpReturnSize: LPVOID): BOOL {
     return Kernel32.Load('UpdateProcThreadAttribute')(lpAttributeList, dwFlags, Attribute, lpValue, cbSize, lpPreviousValue, lpReturnSize);
   }
 
@@ -8120,7 +8127,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-versetconditionmask
-  public static VerSetConditionMask(ConditionMask: ULONGLONG, TypeMask: DWORD, Condition: LPVOID): ULONGLONG {
+  public static VerSetConditionMask(ConditionMask: ULONGLONG, TypeMask: DWORD, Condition: BYTE): ULONGLONG {
     return Kernel32.Load('VerSetConditionMask')(ConditionMask, TypeMask, Condition);
   }
 
@@ -8214,22 +8221,22 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-waitforthreadpooliocallbacks
-  public static WaitForThreadpoolIoCallbacks(pio: DWORD, fCancelPendingCallbacks: BOOL): VOID {
+  public static WaitForThreadpoolIoCallbacks(pio: LPVOID, fCancelPendingCallbacks: BOOL): VOID {
     return Kernel32.Load('WaitForThreadpoolIoCallbacks')(pio, fCancelPendingCallbacks);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-waitforthreadpooltimercallbacks
-  public static WaitForThreadpoolTimerCallbacks(pti: DWORD, fCancelPendingCallbacks: BOOL): VOID {
+  public static WaitForThreadpoolTimerCallbacks(pti: LPVOID, fCancelPendingCallbacks: BOOL): VOID {
     return Kernel32.Load('WaitForThreadpoolTimerCallbacks')(pti, fCancelPendingCallbacks);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-waitforthreadpoolwaitcallbacks
-  public static WaitForThreadpoolWaitCallbacks(pwa: DWORD, fCancelPendingCallbacks: BOOL): VOID {
+  public static WaitForThreadpoolWaitCallbacks(pwa: LPVOID, fCancelPendingCallbacks: BOOL): VOID {
     return Kernel32.Load('WaitForThreadpoolWaitCallbacks')(pwa, fCancelPendingCallbacks);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-waitforthreadpoolworkcallbacks
-  public static WaitForThreadpoolWorkCallbacks(pwk: DWORD, fCancelPendingCallbacks: BOOL): VOID {
+  public static WaitForThreadpoolWorkCallbacks(pwk: LPVOID, fCancelPendingCallbacks: BOOL): VOID {
     return Kernel32.Load('WaitForThreadpoolWorkCallbacks')(pwk, fCancelPendingCallbacks);
   }
 
@@ -8438,7 +8445,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-writefileex
-  public static WriteFileEx(hFile: HANDLE, lpBuffer: LPVOID, nNumberOfBytesToWrite: DWORD, lpOverlapped: LPVOID, lpCompletionRoutine: DWORD): BOOL {
+  public static WriteFileEx(hFile: HANDLE, lpBuffer: LPVOID, nNumberOfBytesToWrite: DWORD, lpOverlapped: LPVOID, lpCompletionRoutine: LPVOID): BOOL {
     return Kernel32.Load('WriteFileEx')(hFile, lpBuffer, nNumberOfBytesToWrite, lpOverlapped, lpCompletionRoutine);
   }
 
@@ -8513,7 +8520,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-zombifyactctx
-  public static ZombifyActCtx(hActCtx: HANDLE): BOOL {
+  public static ZombifyActCtx(hActCtx: LPVOID): BOOL {
     return Kernel32.Load('ZombifyActCtx')(hActCtx);
   }
 

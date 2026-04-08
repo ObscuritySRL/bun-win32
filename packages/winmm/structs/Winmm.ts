@@ -799,7 +799,7 @@ class Winmm extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-mixeropen
-  public static mixerOpen(phmx: LPHMIXER, uMxId: UINT, dwCallback: DWORD_PTR, dwInstance: DWORD_PTR, fdwOpen: DWORD): MMRESULT {
+  public static mixerOpen(phmx: LPHMIXER | NULL, uMxId: UINT, dwCallback: DWORD_PTR, dwInstance: DWORD_PTR, fdwOpen: DWORD): MMRESULT {
     return Winmm.Load('mixerOpen')(phmx, uMxId, dwCallback, dwInstance, fdwOpen);
   }
 

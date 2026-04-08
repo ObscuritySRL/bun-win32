@@ -517,7 +517,7 @@ class GDI32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-bitblt
-  public static BitBlt(hdc: HDC, x: int, y: int, cx: int, cy: int, hdcSrc: HDC, x1: int, y1: int, rop: DWORD): BOOL {
+  public static BitBlt(hdc: HDC, x: int, y: int, cx: int, cy: int, hdcSrc: HDC | 0n, x1: int, y1: int, rop: DWORD): BOOL {
     return GDI32.Load('BitBlt')(hdc, x, y, cx, cy, hdcSrc, x1, y1, rop);
   }
 
@@ -567,7 +567,7 @@ class GDI32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-combinergn
-  public static CombineRgn(hrgnDst: HRGN, hrgnSrc1: HRGN, hrgnSrc2: HRGN, iMode: int): int {
+  public static CombineRgn(hrgnDst: HRGN | 0n, hrgnSrc1: HRGN | 0n, hrgnSrc2: HRGN | 0n, iMode: int): int {
     return GDI32.Load('CombineRgn')(hrgnDst, hrgnSrc1, hrgnSrc2, iMode);
   }
 
@@ -642,7 +642,7 @@ class GDI32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-createdibitmap
-  public static CreateDIBitmap(hdc: HDC, pbmih: BITMAPINFOHEADER_, flInit: DWORD, pjBits: LPVOID, pbmi: BITMAPINFO_, iUsage: UINT): HBITMAP {
+  public static CreateDIBitmap(hdc: HDC, pbmih: BITMAPINFOHEADER_ | NULL, flInit: DWORD, pjBits: LPVOID | NULL, pbmi: BITMAPINFO_ | NULL, iUsage: UINT): HBITMAP {
     return GDI32.Load('CreateDIBitmap')(hdc, pbmih, flInit, pjBits, pbmi, iUsage);
   }
 
@@ -701,7 +701,7 @@ class GDI32 extends Win32 {
     iClipPrecision: DWORD,
     iQuality: DWORD,
     iPitchAndFamily: DWORD,
-    pszFaceName: LPCSTR,
+    pszFaceName: LPCSTR | NULL,
   ): HFONT {
     return GDI32.Load('CreateFontA')(cHeight, cWidth, cEscapement, cOrientation, cWeight, bItalic, bUnderline, bStrikeOut, iCharSet, iOutPrecision, iClipPrecision, iQuality, iPitchAndFamily, pszFaceName);
   }
@@ -741,13 +741,13 @@ class GDI32 extends Win32 {
     iClipPrecision: DWORD,
     iQuality: DWORD,
     iPitchAndFamily: DWORD,
-    pszFaceName: LPCWSTR,
+    pszFaceName: LPCWSTR | NULL,
   ): HFONT {
     return GDI32.Load('CreateFontW')(cHeight, cWidth, cEscapement, cOrientation, cWeight, bItalic, bUnderline, bStrikeOut, iCharSet, iOutPrecision, iClipPrecision, iQuality, iPitchAndFamily, pszFaceName);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-createhalftonepalette
-  public static CreateHalftonePalette(hdc: HDC): HPALETTE {
+  public static CreateHalftonePalette(hdc: HDC | 0n): HPALETTE {
     return GDI32.Load('CreateHalftonePalette')(hdc);
   }
 
@@ -757,12 +757,12 @@ class GDI32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-createica
-  public static CreateICA(pszDriver: LPCSTR, pszDevice: LPCSTR, pszPort: LPCSTR | NULL, pdm: DEVMODEA_ | NULL): HDC {
+  public static CreateICA(pszDriver: LPCSTR | NULL, pszDevice: LPCSTR | NULL, pszPort: LPCSTR | NULL, pdm: DEVMODEA_ | NULL): HDC {
     return GDI32.Load('CreateICA')(pszDriver, pszDevice, pszPort, pdm);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-createicw
-  public static CreateICW(pszDriver: LPCWSTR, pszDevice: LPCWSTR, pszPort: LPCWSTR | NULL, pdm: DEVMODEW_ | NULL): HDC {
+  public static CreateICW(pszDriver: LPCWSTR | NULL, pszDevice: LPCWSTR | NULL, pszPort: LPCWSTR | NULL, pdm: DEVMODEW_ | NULL): HDC {
     return GDI32.Load('CreateICW')(pszDriver, pszDevice, pszPort, pdm);
   }
 
@@ -847,7 +847,7 @@ class GDI32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-deleteenhmetafile
-  public static DeleteEnhMetaFile(hmf: HENHMETAFILE): BOOL {
+  public static DeleteEnhMetaFile(hmf: HENHMETAFILE | 0n): BOOL {
     return GDI32.Load('DeleteEnhMetaFile')(hmf);
   }
 
@@ -872,7 +872,7 @@ class GDI32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-drawescape
-  public static DrawEscape(hdc: HDC, iEscape: int, cjIn: int, lpIn: LPCSTR): int {
+  public static DrawEscape(hdc: HDC, iEscape: int, cjIn: int, lpIn: LPCSTR | NULL): int {
     return GDI32.Load('DrawEscape')(hdc, iEscape, cjIn, lpIn);
   }
 
@@ -902,47 +902,47 @@ class GDI32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-enumfontfamiliesa
-  public static EnumFontFamiliesA(hdc: HDC, lpLogfont: LPCSTR | NULL, lpProc: FONTENUMPROCA, lParam: LPARAM): int {
+  public static EnumFontFamiliesA(hdc: HDC, lpLogfont: LPCSTR | NULL, lpProc: FONTENUMPROCA, lParam: LPVOID): int {
     return GDI32.Load('EnumFontFamiliesA')(hdc, lpLogfont, lpProc, lParam);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-enumfontfamiliesexa
-  public static EnumFontFamiliesExA(hdc: HDC, lpLogfont: LPLOGFONTA, lpProc: FONTENUMPROCA, lParam: LPARAM, dwFlags: DWORD): int {
+  public static EnumFontFamiliesExA(hdc: HDC, lpLogfont: LPLOGFONTA, lpProc: FONTENUMPROCA, lParam: LPVOID, dwFlags: DWORD): int {
     return GDI32.Load('EnumFontFamiliesExA')(hdc, lpLogfont, lpProc, lParam, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-enumfontfamiliesexw
-  public static EnumFontFamiliesExW(hdc: HDC, lpLogfont: LPLOGFONTW, lpProc: FONTENUMPROCW, lParam: LPARAM, dwFlags: DWORD): int {
+  public static EnumFontFamiliesExW(hdc: HDC, lpLogfont: LPLOGFONTW, lpProc: FONTENUMPROCW, lParam: LPVOID, dwFlags: DWORD): int {
     return GDI32.Load('EnumFontFamiliesExW')(hdc, lpLogfont, lpProc, lParam, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-enumfontfamiliesw
-  public static EnumFontFamiliesW(hdc: HDC, lpLogfont: LPCWSTR | NULL, lpProc: FONTENUMPROCW, lParam: LPARAM): int {
+  public static EnumFontFamiliesW(hdc: HDC, lpLogfont: LPCWSTR | NULL, lpProc: FONTENUMPROCW, lParam: LPVOID): int {
     return GDI32.Load('EnumFontFamiliesW')(hdc, lpLogfont, lpProc, lParam);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-enumfontsa
-  public static EnumFontsA(hdc: HDC, lpLogfont: LPCSTR | NULL, lpProc: FONTENUMPROCA, lParam: LPARAM): int {
+  public static EnumFontsA(hdc: HDC, lpLogfont: LPCSTR | NULL, lpProc: FONTENUMPROCA, lParam: LPVOID): int {
     return GDI32.Load('EnumFontsA')(hdc, lpLogfont, lpProc, lParam);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-enumfontsw
-  public static EnumFontsW(hdc: HDC, lpLogfont: LPCWSTR | NULL, lpProc: FONTENUMPROCW, lParam: LPARAM): int {
+  public static EnumFontsW(hdc: HDC, lpLogfont: LPCWSTR | NULL, lpProc: FONTENUMPROCW, lParam: LPVOID): int {
     return GDI32.Load('EnumFontsW')(hdc, lpLogfont, lpProc, lParam);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-enumicmprofilesa
-  public static EnumICMProfilesA(hdc: HDC, proc: ICMENUMPROCA, param: LPARAM): int {
+  public static EnumICMProfilesA(hdc: HDC, proc: ICMENUMPROCA, param: LPVOID): int {
     return GDI32.Load('EnumICMProfilesA')(hdc, proc, param);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-enumicmprofilesw
-  public static EnumICMProfilesW(hdc: HDC, proc: ICMENUMPROCW, param: LPARAM): int {
+  public static EnumICMProfilesW(hdc: HDC, proc: ICMENUMPROCW, param: LPVOID): int {
     return GDI32.Load('EnumICMProfilesW')(hdc, proc, param);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-enummetafile
-  public static EnumMetaFile(hdc: HDC, hmf: HMETAFILE, proc: MFENUMPROC, param: LPARAM): BOOL {
+  public static EnumMetaFile(hdc: HDC, hmf: HMETAFILE, proc: MFENUMPROC, param: LPVOID): BOOL {
     return GDI32.Load('EnumMetaFile')(hdc, hmf, proc, param);
   }
 
@@ -957,7 +957,7 @@ class GDI32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-escape
-  public static Escape(hdc: HDC, iEscape: int, cjIn: int, pvIn: LPCSTR, pvOut: LPVOID | NULL): int {
+  public static Escape(hdc: HDC, iEscape: int, cjIn: int, pvIn: LPCSTR | NULL, pvOut: LPVOID | NULL): int {
     return GDI32.Load('Escape')(hdc, iEscape, cjIn, pvIn, pvOut);
   }
 
@@ -977,7 +977,7 @@ class GDI32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-extescape
-  public static ExtEscape(hdc: HDC, iEscape: int, cjInput: int, lpInData: LPCSTR, cjOutput: int, lpOutData: LPSTR): int {
+  public static ExtEscape(hdc: HDC, iEscape: int, cjInput: int, lpInData: LPCSTR | NULL, cjOutput: int, lpOutData: LPSTR | NULL): int {
     return GDI32.Load('ExtEscape')(hdc, iEscape, cjInput, lpInData, cjOutput, lpOutData);
   }
 
@@ -992,12 +992,12 @@ class GDI32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-exttextouta
-  public static ExtTextOutA(hdc: HDC, x: int, y: int, options: UINT, lprect: RECT_ | NULL, lpString: LPCSTR, c: UINT, lpDx: INT_ | NULL): BOOL {
+  public static ExtTextOutA(hdc: HDC, x: int, y: int, options: UINT, lprect: RECT_ | NULL, lpString: LPCSTR | NULL, c: UINT, lpDx: INT_ | NULL): BOOL {
     return GDI32.Load('ExtTextOutA')(hdc, x, y, options, lprect, lpString, c, lpDx);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-exttextoutw
-  public static ExtTextOutW(hdc: HDC, x: int, y: int, options: UINT, lprect: RECT_ | NULL, lpString: LPCWSTR, c: UINT, lpDx: INT_ | NULL): BOOL {
+  public static ExtTextOutW(hdc: HDC, x: int, y: int, options: UINT, lprect: RECT_ | NULL, lpString: LPCWSTR | NULL, c: UINT, lpDx: INT_ | NULL): BOOL {
     return GDI32.Load('ExtTextOutW')(hdc, x, y, options, lprect, lpString, c, lpDx);
   }
 
@@ -1012,7 +1012,7 @@ class GDI32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-fixbrushorgex
-  public static FixBrushOrgEx(hdc: HDC, x: int, y: int, ptl: LPPOINT): BOOL {
+  public static FixBrushOrgEx(hdc: HDC, x: int, y: int, ptl: LPPOINT | NULL): BOOL {
     return GDI32.Load('FixBrushOrgEx')(hdc, x, y, ptl);
   }
 
@@ -1192,7 +1192,7 @@ class GDI32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getdevicecaps
-  public static GetDeviceCaps(hdc: HDC, index: int): int {
+  public static GetDeviceCaps(hdc: HDC | 0n, index: int): int {
     return GDI32.Load('GetDeviceCaps')(hdc, index);
   }
 
@@ -1242,7 +1242,7 @@ class GDI32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getenhmetafilepixelformat
-  public static GetEnhMetaFilePixelFormat(hemf: HENHMETAFILE, cbBuffer: UINT, ppfd: PIXELFORMATDESCRIPTOR_): UINT {
+  public static GetEnhMetaFilePixelFormat(hemf: HENHMETAFILE, cbBuffer: UINT, ppfd: PIXELFORMATDESCRIPTOR_ | NULL): UINT {
     return GDI32.Load('GetEnhMetaFilePixelFormat')(hemf, cbBuffer, ppfd);
   }
 
@@ -1292,12 +1292,12 @@ class GDI32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-geticmprofilea
-  public static GetICMProfileA(hdc: HDC, pBufSize: LPDWORD, pszFilename: LPSTR): BOOL {
+  public static GetICMProfileA(hdc: HDC, pBufSize: LPDWORD, pszFilename: LPSTR | NULL): BOOL {
     return GDI32.Load('GetICMProfileA')(hdc, pBufSize, pszFilename);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-geticmprofilew
-  public static GetICMProfileW(hdc: HDC, pBufSize: LPDWORD, pszFilename: LPWSTR): BOOL {
+  public static GetICMProfileW(hdc: HDC, pBufSize: LPDWORD, pszFilename: LPWSTR | NULL): BOOL {
     return GDI32.Load('GetICMProfileW')(hdc, pBufSize, pszFilename);
   }
 
@@ -1387,7 +1387,7 @@ class GDI32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getpath
-  public static GetPath(hdc: HDC, apt: LPPOINT, aj: LPBYTE, cpt: int): int {
+  public static GetPath(hdc: HDC, apt: LPPOINT | NULL, aj: LPBYTE | NULL, cpt: int): int {
     return GDI32.Load('GetPath')(hdc, apt, aj, cpt);
   }
 
@@ -1487,12 +1487,12 @@ class GDI32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-gettextfacea
-  public static GetTextFaceA(hdc: HDC, c: int, lpName: LPSTR): int {
+  public static GetTextFaceA(hdc: HDC, c: int, lpName: LPSTR | NULL): int {
     return GDI32.Load('GetTextFaceA')(hdc, c, lpName);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-gettextfacew
-  public static GetTextFaceW(hdc: HDC, c: int, lpName: LPWSTR): int {
+  public static GetTextFaceW(hdc: HDC, c: int, lpName: LPWSTR | NULL): int {
     return GDI32.Load('GetTextFaceW')(hdc, c, lpName);
   }
 
@@ -1547,7 +1547,7 @@ class GDI32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-linedda
-  public static LineDDA(xStart: int, yStart: int, xEnd: int, yEnd: int, lpProc: LINEDDAPROC, data: LPARAM): BOOL {
+  public static LineDDA(xStart: int, yStart: int, xEnd: int, yEnd: int, lpProc: LINEDDAPROC, data: LPVOID): BOOL {
     return GDI32.Load('LineDDA')(xStart, yStart, xEnd, yEnd, lpProc, data);
   }
 
@@ -1877,7 +1877,7 @@ class GDI32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-setdibits
-  public static SetDIBits(hdc: HDC, hbm: HBITMAP, start: UINT, cLines: UINT, lpBits: LPVOID, lpbmi: BITMAPINFO_, ColorUse: UINT): int {
+  public static SetDIBits(hdc: HDC | 0n, hbm: HBITMAP, start: UINT, cLines: UINT, lpBits: LPVOID, lpbmi: BITMAPINFO_, ColorUse: UINT): int {
     return GDI32.Load('SetDIBits')(hdc, hbm, start, cLines, lpBits, lpbmi, ColorUse);
   }
 
@@ -2052,12 +2052,12 @@ class GDI32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-stretchblt
-  public static StretchBlt(hdcDest: HDC, xDest: int, yDest: int, wDest: int, hDest: int, hdcSrc: HDC, xSrc: int, ySrc: int, wSrc: int, hSrc: int, rop: DWORD): BOOL {
+  public static StretchBlt(hdcDest: HDC, xDest: int, yDest: int, wDest: int, hDest: int, hdcSrc: HDC | 0n, xSrc: int, ySrc: int, wSrc: int, hSrc: int, rop: DWORD): BOOL {
     return GDI32.Load('StretchBlt')(hdcDest, xDest, yDest, wDest, hDest, hdcSrc, xSrc, ySrc, wSrc, hSrc, rop);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-stretchdibits
-  public static StretchDIBits(hdc: HDC, xDest: int, yDest: int, DestWidth: int, DestHeight: int, xSrc: int, ySrc: int, SrcWidth: int, SrcHeight: int, lpBits: LPVOID, lpbmi: BITMAPINFO_, iUsage: UINT, rop: DWORD): int {
+  public static StretchDIBits(hdc: HDC, xDest: int, yDest: int, DestWidth: int, DestHeight: int, xSrc: int, ySrc: int, SrcWidth: int, SrcHeight: int, lpBits: LPVOID | NULL, lpbmi: BITMAPINFO_, iUsage: UINT, rop: DWORD): int {
     return GDI32.Load('StretchDIBits')(hdc, xDest, yDest, DestWidth, DestHeight, xSrc, ySrc, SrcWidth, SrcHeight, lpBits, lpbmi, iUsage, rop);
   }
 

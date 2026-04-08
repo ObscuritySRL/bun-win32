@@ -295,7 +295,7 @@ class SspiCli extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/sspicli/nf-sspicli-decryptmessage
-  public static DecryptMessage(phContext: PCtxtHandle, pMessage: PSecBufferDesc, MessageSeqNo: ULONG, pfQOP: PULONG): SECURITY_STATUS {
+  public static DecryptMessage(phContext: PCtxtHandle, pMessage: PSecBufferDesc, MessageSeqNo: ULONG, pfQOP: PULONG | NULL): SECURITY_STATUS {
     return SspiCli.Load('DecryptMessage')(phContext, pMessage, MessageSeqNo, pfQOP);
   }
 
@@ -350,12 +350,12 @@ class SspiCli extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/secext/nf-secext-getusernameexa
-  public static GetUserNameExA(NameFormat: EXTENDED_NAME_FORMAT, lpNameBuffer: LPSTR, nSize: PULONG): BOOLEAN {
+  public static GetUserNameExA(NameFormat: EXTENDED_NAME_FORMAT, lpNameBuffer: LPSTR | NULL, nSize: PULONG): BOOLEAN {
     return SspiCli.Load('GetUserNameExA')(NameFormat, lpNameBuffer, nSize);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/secext/nf-secext-getusernameexw
-  public static GetUserNameExW(NameFormat: EXTENDED_NAME_FORMAT, lpNameBuffer: LPWSTR, nSize: PULONG): BOOLEAN {
+  public static GetUserNameExW(NameFormat: EXTENDED_NAME_FORMAT, lpNameBuffer: LPWSTR | NULL, nSize: PULONG): BOOLEAN {
     return SspiCli.Load('GetUserNameExW')(NameFormat, lpNameBuffer, nSize);
   }
 
@@ -745,7 +745,7 @@ class SspiCli extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/sspi/nf-sspi-sspifreeauthidentity
-  public static SspiFreeAuthIdentity(AuthData: PSEC_WINNT_AUTH_IDENTITY_OPAQUE): VOID {
+  public static SspiFreeAuthIdentity(AuthData: PSEC_WINNT_AUTH_IDENTITY_OPAQUE | NULL): VOID {
     return SspiCli.Load('SspiFreeAuthIdentity')(AuthData);
   }
 
@@ -760,7 +760,7 @@ class SspiCli extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/sspi/nf-sspi-sspilocalfree
-  public static SspiLocalFree(DataBuffer: PVOID): VOID {
+  public static SspiLocalFree(DataBuffer: PVOID | NULL): VOID {
     return SspiCli.Load('SspiLocalFree')(DataBuffer);
   }
 
@@ -798,7 +798,7 @@ class SspiCli extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/sspi/nf-sspi-sspizeroauthidentity
-  public static SspiZeroAuthIdentity(AuthData: PSEC_WINNT_AUTH_IDENTITY_OPAQUE): VOID {
+  public static SspiZeroAuthIdentity(AuthData: PSEC_WINNT_AUTH_IDENTITY_OPAQUE | NULL): VOID {
     return SspiCli.Load('SspiZeroAuthIdentity')(AuthData);
   }
 

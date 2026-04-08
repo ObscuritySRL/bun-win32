@@ -48,6 +48,11 @@ Run the included examples:
 
 ```sh
 bun run example/winmm.ts
+bun run example/synth.ts
+bun run example/seq.ts
+bun run example/joystick.ts --duration-ms=10000
+# or continuous polling
+bun run example/joystick.ts --live
 ```
 
 ## Notes
