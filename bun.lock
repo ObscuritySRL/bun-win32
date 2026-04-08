@@ -262,6 +262,19 @@
         "typescript": "^5",
       },
     },
+    "packages/winmm": {
+      "name": "@bun-win32/winmm",
+      "version": "1.0.0",
+      "dependencies": {
+        "@bun-win32/core": "workspace:*",
+      },
+      "devDependencies": {
+        "@types/bun": "latest",
+      },
+      "peerDependencies": {
+        "typescript": "^5",
+      },
+    },
     "packages/winspool": {
       "name": "@bun-win32/winspool",
       "version": "1.0.0",
@@ -340,6 +353,8 @@
     "@bun-win32/sspicli": ["@bun-win32/sspicli@workspace:packages/sspicli"],
 
     "@bun-win32/user32": ["@bun-win32/user32@workspace:packages/user32"],
+
+    "@bun-win32/winmm": ["@bun-win32/winmm@workspace:packages/winmm"],
 
     "@bun-win32/winspool": ["@bun-win32/winspool@workspace:packages/winspool"],
 
