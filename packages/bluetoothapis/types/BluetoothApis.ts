@@ -1,0 +1,52 @@
+import type { Pointer } from 'bun:ffi';
+
+export type { BOOL, DWORD, HANDLE, HRESULT, LPBYTE, LPCWSTR, LPDWORD, LPVOID, LPWSTR, NULL, PHANDLE, PULONG, PVOID, ULONG, USHORT } from '@bun-win32/core';
+
+export const BLUETOOTH_GATT_FLAG_CONNECTION_AUTHENTICATED = 0x0000_0002;
+export const BLUETOOTH_GATT_FLAG_CONNECTION_ENCRYPTED = 0x0000_0001;
+export const BLUETOOTH_GATT_FLAG_FORCE_READ_FROM_CACHE = 0x0000_0008;
+export const BLUETOOTH_GATT_FLAG_FORCE_READ_FROM_DEVICE = 0x0000_0004;
+export const BLUETOOTH_GATT_FLAG_NONE = 0x0000_0000;
+export const BLUETOOTH_GATT_FLAG_RETURN_ALL = 0x0000_0040;
+export const BLUETOOTH_GATT_FLAG_SIGNED_WRITE = 0x0000_0010;
+export const BLUETOOTH_GATT_FLAG_WRITE_WITHOUT_RESPONSE = 0x0000_0020;
+export const BLUETOOTH_MAX_NAME_SIZE = 248;
+export const BLUETOOTH_MAX_PASSKEY_SIZE = 16;
+export const BLUETOOTH_MAX_SERVICE_NAME_SIZE = 256;
+export const BLUETOOTH_SERVICE_DISABLE = 0x00;
+export const BLUETOOTH_SERVICE_ENABLE = 0x01;
+
+export enum BTH_LE_GATT_EVENT_TYPE {
+  CharacteristicValueChangedEvent = 0,
+}
+
+export type BLUETOOTH_GATT_EVENT_HANDLE = bigint;
+export type BTH_LE_GATT_RELIABLE_WRITE_CONTEXT = bigint;
+export type HBLUETOOTH_AUTHENTICATION_REGISTRATION = bigint;
+export type HBLUETOOTH_DEVICE_FIND = bigint;
+export type HBLUETOOTH_RADIO_FIND = bigint;
+export type PBLUETOOTH_ADDRESS = Pointer;
+export type PBLUETOOTH_AUTHENTICATE_RESPONSE = Pointer;
+export type PBLUETOOTH_DEVICE_INFO = Pointer;
+export type PBLUETOOTH_DEVICE_SEARCH_PARAMS = Pointer;
+export type PBLUETOOTH_FIND_RADIO_PARAMS = Pointer;
+export type PBLUETOOTH_GATT_EVENT_HANDLE = Pointer;
+export type PBLUETOOTH_LOCAL_SERVICE_INFO = Pointer;
+export type PBLUETOOTH_RADIO_INFO = Pointer;
+export type PBTH_LE_GATT_CHARACTERISTIC = Pointer;
+export type PBTH_LE_GATT_CHARACTERISTIC_VALUE = Pointer;
+export type PBTH_LE_GATT_DESCRIPTOR = Pointer;
+export type PBTH_LE_GATT_DESCRIPTOR_VALUE = Pointer;
+export type PBTH_LE_GATT_RELIABLE_WRITE_CONTEXT = Pointer;
+export type PBTH_LE_GATT_SERVICE = Pointer;
+export type PFNBLUETOOTH_GATT_EVENT_CALLBACK = Pointer;
+export type PFN_AUTHENTICATION_CALLBACK = Pointer;
+export type PFN_AUTHENTICATION_CALLBACK_EX = Pointer;
+export type PFN_BLUETOOTH_ENUM_ATTRIBUTES_CALLBACK = Pointer;
+export type PGUID = Pointer;
+export type PHBLUETOOTH_AUTHENTICATION_REGISTRATION = Pointer;
+export type PHBLUETOOTH_CONTAINER_ELEMENT = Pointer;
+export type PSDP_ELEMENT_DATA = Pointer;
+export type PSDP_STRING_TYPE_DATA = Pointer;
+export type PUSHORT = Pointer;
+export type UCHAR = number;
