@@ -27,7 +27,7 @@
     "directory": "packages/glu32"
   },
   "type": "module",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "main": "./index.ts",
   "keywords": [
     "bun",
