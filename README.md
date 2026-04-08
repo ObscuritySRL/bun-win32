@@ -26,18 +26,6 @@ SetWindowPos(hWnd, 0n, x, y, width, height, flags);
 > [!NOTE]
 > If you destructure before binding, you capture the lazy wrapper instead of the native function.
 
-## Why this matters
-
-| Package      | What it unlocks                                                                                                                                                |
-| ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **user32**   | Native Windows UI from TypeScript. Create windows, register global hotkeys, track cursors, pump message loops. No Electron, no Tauri, no native addon.         |
-| **opengl32** | Real-time OpenGL rendering from Bun. Physics simulations, games, visualizations — straight to a GPU context from a `.ts` file.                                 |
-| **hid**      | Talk to USB devices. Game controllers, barcode scanners, custom hardware. Node needs `node-hid` (C++ addon with build step). This is pure FFI.                 |
-| **winmm**    | Wave audio, MIDI, mixers, timers, joysticks, and MCI from Bun. Play sounds, stream audio buffers, and talk to MIDI hardware without a native addon.            |
-| **ws2_32**   | Raw TCP/UDP sockets. Build your own protocols, bind to ports, resolve DNS — the full Winsock 2 surface. `fetch` can't do this.                                 |
-| **wlanapi**  | Scan Wi-Fi networks, inspect signal strength, manage profiles, and work with Wi-Fi Direct from Bun. There is no equivalent JS runtime surface for this today.  |
-| **crypt32**  | DPAPI encryption and certificate store access. Encrypt secrets with the current user's Windows credentials in two function calls. No OpenSSL, no shelling out. |
-
 ## Packages
 
 All type definitions are provided by [`@bun-win32/core`](./packages/core).
@@ -48,6 +36,7 @@ All type definitions are provided by [`@bun-win32/core`](./packages/core).
 - [`kernel32`](./packages/kernel32) — processes, memory, files, console, threads
 - [`ntdll`](./packages/ntdll) — native NT API
 - [`pdh`](./packages/pdh) — performance counter queries, logs, and enumeration
+- [`powrprof`](./packages/powrprof) — power schemes, policies, sleep states, battery management
 - [`psapi`](./packages/psapi) — process status and module enumeration
 - [`shell32`](./packages/shell32) — shell operations and file management
 - [`shlwapi`](./packages/shlwapi) — shell lightweight utility functions
@@ -77,6 +66,7 @@ All type definitions are provided by [`@bun-win32/core`](./packages/core).
 
 #### Networking
 
+- [`bluetoothapis`](./packages/bluetoothapis) — Bluetooth Classic radio/device discovery, BLE GATT, SDP, authentication
 - [`ws2_32`](./packages/ws2_32) — Winsock 2: BSD sockets, DNS, network I/O
 - [`iphlpapi`](./packages/iphlpapi) — network adapters, TCP/UDP tables, routing
 - [`netapi32`](./packages/netapi32) — users, groups, shares, domain joins

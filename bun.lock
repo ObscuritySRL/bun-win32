@@ -7,7 +7,20 @@
     },
     "packages/advapi32": {
       "name": "@bun-win32/advapi32",
-      "version": "1.0.9",
+      "version": "1.0.10",
+      "dependencies": {
+        "@bun-win32/core": "workspace:*",
+      },
+      "devDependencies": {
+        "@types/bun": "latest",
+      },
+      "peerDependencies": {
+        "typescript": "^5",
+      },
+    },
+    "packages/bluetoothapis": {
+      "name": "@bun-win32/bluetoothapis",
+      "version": "1.0.0",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -30,7 +43,7 @@
     },
     "packages/crypt32": {
       "name": "@bun-win32/crypt32",
-      "version": "1.0.2",
+      "version": "1.0.3",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -43,7 +56,7 @@
     },
     "packages/dwmapi": {
       "name": "@bun-win32/dwmapi",
-      "version": "1.0.2",
+      "version": "1.0.3",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -56,7 +69,7 @@
     },
     "packages/gdi32": {
       "name": "@bun-win32/gdi32",
-      "version": "1.0.10",
+      "version": "1.0.11",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -69,7 +82,7 @@
     },
     "packages/glu32": {
       "name": "@bun-win32/glu32",
-      "version": "1.0.10",
+      "version": "1.0.11",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -82,7 +95,7 @@
     },
     "packages/hid": {
       "name": "@bun-win32/hid",
-      "version": "1.0.1",
+      "version": "1.0.2",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -95,7 +108,7 @@
     },
     "packages/iphlpapi": {
       "name": "@bun-win32/iphlpapi",
-      "version": "1.0.2",
+      "version": "1.0.3",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -108,7 +121,7 @@
     },
     "packages/kernel32": {
       "name": "@bun-win32/kernel32",
-      "version": "1.0.19",
+      "version": "1.0.20",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -121,7 +134,7 @@
     },
     "packages/netapi32": {
       "name": "@bun-win32/netapi32",
-      "version": "1.0.2",
+      "version": "1.0.3",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -134,7 +147,7 @@
     },
     "packages/ntdll": {
       "name": "@bun-win32/ntdll",
-      "version": "1.0.4",
+      "version": "1.0.5",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -147,7 +160,7 @@
     },
     "packages/opengl32": {
       "name": "@bun-win32/opengl32",
-      "version": "1.4.8",
+      "version": "1.4.9",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -160,7 +173,20 @@
     },
     "packages/pdh": {
       "name": "@bun-win32/pdh",
-      "version": "1.0.2",
+      "version": "1.0.3",
+      "dependencies": {
+        "@bun-win32/core": "workspace:*",
+      },
+      "devDependencies": {
+        "@types/bun": "latest",
+      },
+      "peerDependencies": {
+        "typescript": "^5",
+      },
+    },
+    "packages/powrprof": {
+      "name": "@bun-win32/powrprof",
+      "version": "1.0.0",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -173,7 +199,7 @@
     },
     "packages/psapi": {
       "name": "@bun-win32/psapi",
-      "version": "2.0.6",
+      "version": "2.0.7",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -186,7 +212,7 @@
     },
     "packages/secur32": {
       "name": "@bun-win32/secur32",
-      "version": "1.0.2",
+      "version": "1.0.3",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -199,7 +225,7 @@
     },
     "packages/shell32": {
       "name": "@bun-win32/shell32",
-      "version": "1.0.4",
+      "version": "1.0.5",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -212,7 +238,7 @@
     },
     "packages/shlwapi": {
       "name": "@bun-win32/shlwapi",
-      "version": "1.0.7",
+      "version": "1.0.8",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -225,7 +251,7 @@
     },
     "packages/sspicli": {
       "name": "@bun-win32/sspicli",
-      "version": "1.0.2",
+      "version": "1.0.3",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -251,7 +277,7 @@
     },
     "packages/user32": {
       "name": "@bun-win32/user32",
-      "version": "3.0.18",
+      "version": "3.0.19",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -264,7 +290,7 @@
     },
     "packages/winmm": {
       "name": "@bun-win32/winmm",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -290,7 +316,7 @@
     },
     "packages/wlanapi": {
       "name": "@bun-win32/wlanapi",
-      "version": "1.0.0",
+      "version": "1.0.2",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -303,7 +329,7 @@
     },
     "packages/ws2_32": {
       "name": "@bun-win32/ws2_32",
-      "version": "1.0.2",
+      "version": "1.0.3",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -317,6 +343,8 @@
   },
   "packages": {
     "@bun-win32/advapi32": ["@bun-win32/advapi32@workspace:packages/advapi32"],
+
+    "@bun-win32/bluetoothapis": ["@bun-win32/bluetoothapis@workspace:packages/bluetoothapis"],
 
     "@bun-win32/core": ["@bun-win32/core@workspace:packages/core"],
 
@@ -341,6 +369,8 @@
     "@bun-win32/opengl32": ["@bun-win32/opengl32@workspace:packages/opengl32"],
 
     "@bun-win32/pdh": ["@bun-win32/pdh@workspace:packages/pdh"],
+
+    "@bun-win32/powrprof": ["@bun-win32/powrprof@workspace:packages/powrprof"],
 
     "@bun-win32/psapi": ["@bun-win32/psapi@workspace:packages/psapi"],
 
