@@ -271,6 +271,20 @@
         "typescript": "^5",
       },
     },
+    "packages/rstrtmgr": {
+      "name": "@bun-win32/rstrtmgr",
+      "version": "1.0.0",
+      "dependencies": {
+        "@bun-win32/core": "workspace:*",
+      },
+      "devDependencies": {
+        "@bun-win32/kernel32": "workspace:*",
+        "@types/bun": "latest",
+      },
+      "peerDependencies": {
+        "typescript": "^5",
+      },
+    },
     "packages/secur32": {
       "name": "@bun-win32/secur32",
       "version": "1.0.4",
@@ -278,6 +292,20 @@
         "@bun-win32/core": "workspace:*",
       },
       "devDependencies": {
+        "@types/bun": "latest",
+      },
+      "peerDependencies": {
+        "typescript": "^5",
+      },
+    },
+    "packages/setupapi": {
+      "name": "@bun-win32/setupapi",
+      "version": "1.0.0",
+      "dependencies": {
+        "@bun-win32/core": "workspace:*",
+      },
+      "devDependencies": {
+        "@bun-win32/kernel32": "workspace:*",
         "@types/bun": "latest",
       },
       "peerDependencies": {
@@ -511,7 +539,11 @@
 
     "@bun-win32/psapi": ["@bun-win32/psapi@workspace:packages/psapi"],
 
+    "@bun-win32/rstrtmgr": ["@bun-win32/rstrtmgr@workspace:packages/rstrtmgr"],
+
     "@bun-win32/secur32": ["@bun-win32/secur32@workspace:packages/secur32"],
+
+    "@bun-win32/setupapi": ["@bun-win32/setupapi@workspace:packages/setupapi"],
 
     "@bun-win32/shell32": ["@bun-win32/shell32@workspace:packages/shell32"],
 

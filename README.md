@@ -89,6 +89,7 @@ Published packages are AI-friendly. Alongside the `README.md`, each package incl
 - [`pdh`](./packages/pdh) - performance counter queries, logs, and enumeration
 - [`powrprof`](./packages/powrprof) - power schemes, policies, sleep states, battery management
 - [`psapi`](./packages/psapi) - process status and module enumeration
+- [`rstrtmgr`](./packages/rstrtmgr) - Restart Manager sessions, lock discovery, shutdown, and restart orchestration
 - [`shell32`](./packages/shell32) - shell operations and file management
 - [`shlwapi`](./packages/shlwapi) - shell lightweight utility functions
 - [`version`](./packages/version) - file version resources, string tables, installer version helpers
@@ -103,6 +104,7 @@ bun-win32/
 |-- packages/
 |   |-- core/
 |   |-- template/
+|   |-- rstrtmgr/
 |   |-- advapi32/
 |   |-- ...
 |   `-- wtsapi32/

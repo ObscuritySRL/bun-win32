@@ -529,8 +529,9 @@ function buildSdkIndex(functionNames: string[]): Map<string, SdkProto> {
               .map((p) => p.trim())
               .filter(Boolean);
             for (const pl of paramParts) {
-              const cleaned = pl.trim();
-              const paramMatch = cleaned.match(/^(.*?)([A-Za-z_]\w*)$/);
+              const cleaned = pl.trim().replace(/\s+/g, ' ');
+              const normalized = cleaned.replace(/\s*\[\s*\]\s*$/, '');
+              const paramMatch = normalized.match(/^(.*?)([A-Za-z_]\w*)$/);
               if (!paramMatch) continue;
 
               const paramName = paramMatch[2];
