@@ -42,6 +42,7 @@ All type definitions are provided by [`@bun-win32/core`](./packages/core).
 - [`shell32`](./packages/shell32) — shell operations and file management
 - [`shlwapi`](./packages/shlwapi) — shell lightweight utility functions
 - [`version`](./packages/version) — file version resources, string tables, installer version helpers
+- [`wevtapi`](./packages/wevtapi) — Windows Event Log queries, rendering, subscriptions, channel configuration, publisher metadata
 
 #### Multimedia
 
@@ -56,6 +57,7 @@ All type definitions are provided by [`@bun-win32/core`](./packages/core).
 
 #### Graphics & Windowing
 
+- [`uxtheme`](./packages/uxtheme) — visual styles, themed controls, buffered painting
 - [`user32`](./packages/user32) — windows, messages, input, UI
 - [`gdi32`](./packages/gdi32) — graphics device interface
 - [`dwmapi`](./packages/dwmapi) — DWM composition, blur, thumbnails
@@ -74,6 +76,10 @@ All type definitions are provided by [`@bun-win32/core`](./packages/core).
 - [`netapi32`](./packages/netapi32) — users, groups, shares, domain joins
 - [`wlanapi`](./packages/wlanapi) — Native Wifi: interface enumeration, scans, profiles, Wi-Fi Direct
 
+#### Remote Desktop & Terminal Services
+
+- [`wtsapi32`](./packages/wtsapi32) — Terminal Services sessions, processes, virtual channels, remote desktop
+
 ## Install
 
 ```sh
@@ -83,6 +89,22 @@ bun add @bun-win32/kernel32
 Requires Bun >= 1.1.0 and Windows 10+.
 
 Published packages are AI-friendly. Alongside the README, each package includes an `AI.md` file that documents the binding contract, type surface, and source layout so coding agents can use the package correctly.
+
+## Project Structure
+
+```text
+bun-win32/
+├─ packages/
+│  ├─ core/
+│  ├─ template/
+│  ├─ uxtheme/
+│  ├─ wevtapi/
+│  ├─ wtsapi32/
+│  └─ ...
+├─ scripts/
+├─ PROMPT.md
+└─ README.md
+```
 
 ## Generating a New Package
 

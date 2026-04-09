@@ -323,8 +323,35 @@
         "typescript": "^5",
       },
     },
+    "packages/uxtheme": {
+      "name": "@bun-win32/uxtheme",
+      "version": "1.0.0",
+      "dependencies": {
+        "@bun-win32/core": "workspace:*",
+      },
+      "devDependencies": {
+        "@types/bun": "latest",
+      },
+      "peerDependencies": {
+        "typescript": "^5",
+      },
+    },
     "packages/version": {
       "name": "@bun-win32/version",
+      "version": "1.0.0",
+      "dependencies": {
+        "@bun-win32/core": "workspace:*",
+      },
+      "devDependencies": {
+        "@bun-win32/kernel32": "workspace:*",
+        "@types/bun": "latest",
+      },
+      "peerDependencies": {
+        "typescript": "^5",
+      },
+    },
+    "packages/wevtapi": {
+      "name": "@bun-win32/wevtapi",
       "version": "1.0.0",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
@@ -363,6 +390,20 @@
         "typescript": "^5",
       },
     },
+    "packages/winusb": {
+      "name": "@bun-win32/winusb",
+      "version": "1.0.0",
+      "dependencies": {
+        "@bun-win32/core": "workspace:*",
+      },
+      "devDependencies": {
+        "@bun-win32/kernel32": "workspace:*",
+        "@types/bun": "latest",
+      },
+      "peerDependencies": {
+        "typescript": "^5",
+      },
+    },
     "packages/wlanapi": {
       "name": "@bun-win32/wlanapi",
       "version": "1.0.3",
@@ -379,6 +420,19 @@
     "packages/ws2_32": {
       "name": "@bun-win32/ws2_32",
       "version": "1.0.4",
+      "dependencies": {
+        "@bun-win32/core": "workspace:*",
+      },
+      "devDependencies": {
+        "@types/bun": "latest",
+      },
+      "peerDependencies": {
+        "typescript": "^5",
+      },
+    },
+    "packages/wtsapi32": {
+      "name": "@bun-win32/wtsapi32",
+      "version": "1.0.0",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -435,15 +489,23 @@
 
     "@bun-win32/user32": ["@bun-win32/user32@workspace:packages/user32"],
 
+    "@bun-win32/uxtheme": ["@bun-win32/uxtheme@workspace:packages/uxtheme"],
+
     "@bun-win32/version": ["@bun-win32/version@workspace:packages/version"],
+
+    "@bun-win32/wevtapi": ["@bun-win32/wevtapi@workspace:packages/wevtapi"],
 
     "@bun-win32/winmm": ["@bun-win32/winmm@workspace:packages/winmm"],
 
     "@bun-win32/winspool": ["@bun-win32/winspool@workspace:packages/winspool"],
 
+    "@bun-win32/winusb": ["@bun-win32/winusb@workspace:packages/winusb"],
+
     "@bun-win32/wlanapi": ["@bun-win32/wlanapi@workspace:packages/wlanapi"],
 
     "@bun-win32/ws2_32": ["@bun-win32/ws2_32@workspace:packages/ws2_32"],
+
+    "@bun-win32/wtsapi32": ["@bun-win32/wtsapi32@workspace:packages/wtsapi32"],
 
     "@bun-win32/{name}": ["@bun-win32/{name}@workspace:packages/template"],
 

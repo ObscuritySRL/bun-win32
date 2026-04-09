@@ -1,0 +1,59 @@
+{
+  "author": "Stev Peifer <stev@bell.net>",
+  "bugs": {
+    "url": "https://github.com/ObscuritySRL/bun-win32/issues"
+  },
+  "dependencies": {
+    "@bun-win32/core": "workspace:*"
+  },
+  "description": "Zero-dependency, zero-overhead Win32 WTSAPI32 bindings for Bun (FFI) on Windows.",
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "exports": {
+    ".": "./index.ts"
+  },
+  "license": "MIT",
+  "module": "index.ts",
+  "name": "@bun-win32/wtsapi32",
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "private": false,
+  "homepage": "https://github.com/ObscuritySRL/bun-win32#readme",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/ObscuritySRL/bun-win32.git",
+    "directory": "packages/wtsapi32"
+  },
+  "type": "module",
+  "version": "1.0.0",
+  "main": "./index.ts",
+  "keywords": [
+    "bun",
+    "ffi",
+    "win32",
+    "windows",
+    "wtsapi32",
+    "terminal-services",
+    "remote-desktop",
+    "bindings",
+    "typescript",
+    "dll"
+  ],
+  "files": [
+    "AI.md",
+    "README.md",
+    "index.ts",
+    "structs/*.ts",
+    "types/*.ts"
+  ],
+  "sideEffects": false,
+  "engines": {
+    "bun": ">=1.1.0"
+  },
+  "scripts": {
+    "example:session-diagnostic": "bun ./example/session-diagnostic.ts",
+    "example:session-monitor": "bun ./example/session-monitor.ts"
+  }
+}
