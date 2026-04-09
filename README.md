@@ -30,6 +30,42 @@ SetWindowPos(hWnd, 0n, x, y, width, height, flags);
 
 All type definitions are provided by [`@bun-win32/core`](./packages/core).
 
+#### Graphics & Windowing
+
+- [`dwmapi`](./packages/dwmapi) — DWM composition, blur, thumbnails
+- [`gdi32`](./packages/gdi32) — graphics device interface
+- [`glu32`](./packages/glu32) — OpenGL utility functions
+- [`opengl32`](./packages/opengl32) — OpenGL rendering context
+- [`user32`](./packages/user32) — windows, messages, input, UI
+- [`uxtheme`](./packages/uxtheme) — visual styles, themed controls, buffered painting
+
+#### Multimedia
+
+- [`winmm`](./packages/winmm) — multimedia audio, MIDI, mixers, timers, joysticks, MCI
+
+#### Networking
+
+- [`bluetoothapis`](./packages/bluetoothapis) — Bluetooth Classic radio/device discovery, BLE GATT, SDP, authentication
+- [`iphlpapi`](./packages/iphlpapi) — network adapters, TCP/UDP tables, routing
+- [`netapi32`](./packages/netapi32) — users, groups, shares, domain joins
+- [`wlanapi`](./packages/wlanapi) — Native Wifi: interface enumeration, scans, profiles, Wi-Fi Direct
+- [`ws2_32`](./packages/ws2_32) — Winsock 2: BSD sockets, DNS, network I/O
+
+#### Printing
+
+- [`winspool`](./packages/winspool) — printer management, print jobs, spooler control, drivers
+
+#### Remote Desktop & Terminal Services
+
+- [`wtsapi32`](./packages/wtsapi32) — Terminal Services sessions, processes, virtual channels, remote desktop
+
+#### Security & Crypto
+
+- [`advapi32`](./packages/advapi32) — registry, security descriptors, service control
+- [`crypt32`](./packages/crypt32) — certificate stores, chains, encoding, DPAPI
+- [`secur32`](./packages/secur32) — SSPI authentication, credentials, LSA
+- [`sspicli`](./packages/sspicli) — SSPI client-side auth and SASL
+
 #### System
 
 - [`hid`](./packages/hid) — HID device access, feature reports, preparsed data parsing
@@ -43,42 +79,6 @@ All type definitions are provided by [`@bun-win32/core`](./packages/core).
 - [`shlwapi`](./packages/shlwapi) — shell lightweight utility functions
 - [`version`](./packages/version) — file version resources, string tables, installer version helpers
 - [`wevtapi`](./packages/wevtapi) — Windows Event Log queries, rendering, subscriptions, channel configuration, publisher metadata
-
-#### Multimedia
-
-- [`winmm`](./packages/winmm) — multimedia audio, MIDI, mixers, timers, joysticks, MCI
-
-#### Security & Crypto
-
-- [`advapi32`](./packages/advapi32) — registry, security descriptors, service control
-- [`crypt32`](./packages/crypt32) — certificate stores, chains, encoding, DPAPI
-- [`secur32`](./packages/secur32) — SSPI authentication, credentials, LSA
-- [`sspicli`](./packages/sspicli) — SSPI client-side auth and SASL
-
-#### Graphics & Windowing
-
-- [`uxtheme`](./packages/uxtheme) — visual styles, themed controls, buffered painting
-- [`user32`](./packages/user32) — windows, messages, input, UI
-- [`gdi32`](./packages/gdi32) — graphics device interface
-- [`dwmapi`](./packages/dwmapi) — DWM composition, blur, thumbnails
-- [`opengl32`](./packages/opengl32) — OpenGL rendering context
-- [`glu32`](./packages/glu32) — OpenGL utility functions
-
-#### Printing
-
-- [`winspool`](./packages/winspool) — printer management, print jobs, spooler control, drivers
-
-#### Networking
-
-- [`bluetoothapis`](./packages/bluetoothapis) — Bluetooth Classic radio/device discovery, BLE GATT, SDP, authentication
-- [`ws2_32`](./packages/ws2_32) — Winsock 2: BSD sockets, DNS, network I/O
-- [`iphlpapi`](./packages/iphlpapi) — network adapters, TCP/UDP tables, routing
-- [`netapi32`](./packages/netapi32) — users, groups, shares, domain joins
-- [`wlanapi`](./packages/wlanapi) — Native Wifi: interface enumeration, scans, profiles, Wi-Fi Direct
-
-#### Remote Desktop & Terminal Services
-
-- [`wtsapi32`](./packages/wtsapi32) — Terminal Services sessions, processes, virtual channels, remote desktop
 
 ## Install
 
