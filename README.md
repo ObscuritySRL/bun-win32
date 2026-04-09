@@ -62,6 +62,7 @@ All type definitions are provided by [`@bun-win32/core`](./packages/core).
 #### Security & Crypto
 
 - [`advapi32`](./packages/advapi32) — registry, security descriptors, service control
+- [`credui`](./packages/credui) — credential prompts, username parsing, auth blobs, and SSPI prompt helpers
 - [`crypt32`](./packages/crypt32) — certificate stores, chains, encoding, DPAPI
 - [`secur32`](./packages/secur32) — SSPI authentication, credentials, LSA
 - [`sspicli`](./packages/sspicli) — SSPI client-side auth and SASL
@@ -97,6 +98,7 @@ Published packages are AI-friendly. Alongside the README, each package includes 
 bun-win32/
 ├─ packages/
 │  ├─ core/
+│  ├─ credui/
 │  ├─ template/
 │  ├─ uxtheme/
 │  ├─ wevtapi/
