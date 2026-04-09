@@ -2,16 +2,26 @@
 
 Zero-dependency Win32 FFI bindings for [Bun](https://bun.sh) on Windows. Each system DLL is a standalone `@bun-win32/*` package with full type definitions.
 
+## Install
+
+```sh
+bun add @bun-win32/kernel32 @bun-win32/user32 # etc...
+```
+
+Requires Bun >= 1.1.0 and Windows 10+.
+
+## Usage
+
+After the first call resolves the symbol via `dlopen`/`dlsym`, the native function pointer is cached directly on the class. Every subsequent call is a straight pointer invocation through Bun's FFI — no marshaling layer, no runtime type checks, no wrapper overhead. It's the same codepath as calling the C function yourself.
+
+For hot paths, `Preload()` resolves symbols eagerly so even the first call pays zero binding cost:
+
 ```ts
 import Kernel32 from '@bun-win32/kernel32';
 
 const pid = Kernel32.GetCurrentProcessId();
 const ticks = Kernel32.GetTickCount64();
 ```
-
-After the first call resolves the symbol via `dlopen`/`dlsym`, the native function pointer is cached directly on the class. Every subsequent call is a straight pointer invocation through Bun's FFI — no marshaling layer, no runtime type checks, no wrapper overhead. It's the same codepath as calling the C function yourself.
-
-For hot paths, `Preload()` resolves symbols eagerly so even the first call pays zero binding cost:
 
 ```ts
 import User32 from '@bun-win32/user32';
@@ -23,7 +33,7 @@ const { GetForegroundWindow, SetWindowPos } = User32;
 SetWindowPos(hWnd, 0n, x, y, width, height, flags);
 ```
 
-> [!NOTE]
+> [!IMPORTANT]
 > If you destructure before binding, you capture the lazy wrapper instead of the native function.
 
 ## Packages
@@ -82,15 +92,7 @@ All type definitions are provided by [`@bun-win32/core`](./packages/core).
 - [`wevtapi`](./packages/wevtapi) — Windows Event Log queries, rendering, subscriptions, channel configuration, publisher metadata
 - [`winusb`](./packages/winusb) — WinUSB device I/O, descriptors, pipes, policies, and isochronous transfers
 
-## Install
-
-```sh
-bun add @bun-win32/kernel32
-```
-
-Requires Bun >= 1.1.0 and Windows 10+.
-
-Published packages are AI-friendly. Alongside the README, each package includes an `AI.md` file that documents the binding contract, type surface, and source layout so coding agents can use the package correctly.
+Published packages are AI-friendly. Alongside the `README.md`, each package includes an `AI.md` file that documents the binding contract, type surface, and source layout so coding agents can use the package correctly.
 
 ## Project Structure
 
@@ -98,14 +100,12 @@ Published packages are AI-friendly. Alongside the README, each package includes 
 bun-win32/
 ├─ packages/
 │  ├─ core/
-│  ├─ credui/
 │  ├─ template/
-│  ├─ uxtheme/
-│  ├─ wevtapi/
-│  ├─ winusb/
-│  ├─ wtsapi32/
-│  └─ ...
+│  ├─ advapi32/
+│  ├─ ...
+│  └─ wtsapi32/
 ├─ scripts/
+├─ AGENTS.md
 ├─ PROMPT.md
 └─ README.md
 ```
