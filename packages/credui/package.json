@@ -9,6 +9,7 @@
   "description": "Zero-dependency, zero-overhead Win32 CREDUI bindings for Bun (FFI) on Windows.",
   "devDependencies": {
     "@bun-win32/kernel32": "workspace:*",
+    "@bun-win32/ole32": "workspace:*",
     "@types/bun": "latest"
   },
   "exports": {

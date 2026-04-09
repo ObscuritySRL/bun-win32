@@ -16,23 +16,21 @@
  *   - CredUIPromptForWindowsCredentialsW (show the Windows credential provider dialog)
  *   - CredUnPackAuthenticationBufferW    (decode the returned credential blob when supported)
  *   - Kernel32.GetLastError              (inspect unpack failures)
- *   - ole32.CoTaskMemFree                (free the credential blob allocated by CredUI)
+ *   - Ole32.CoTaskMemFree                (free the credential blob allocated by CredUI)
  *
  * Run: bun run example/system-credential-dialog.ts
  */
 
-import { dlopen, type FFIFunction, FFIType, read, type Pointer, toArrayBuffer } from 'bun:ffi';
+import { read, type Pointer, toArrayBuffer } from 'bun:ffi';
 
 import Kernel32 from '@bun-win32/kernel32';
+import Ole32 from '@bun-win32/ole32';
 
 import Credui, { CredPackFlags, CredUIWindowsFlags, CREDUI_MAX_PASSWORD_LENGTH, CREDUI_MAX_USERNAME_LENGTH } from '../index';
 
 Credui.Preload(['CredUIPromptForWindowsCredentialsW', 'CredUnPackAuthenticationBufferW']);
 Kernel32.Preload(['GetLastError']);
-
-const Ole32 = dlopen('ole32.dll', {
-  CoTaskMemFree: { args: [FFIType.ptr], returns: FFIType.void },
-} as const satisfies Record<string, FFIFunction>);
+Ole32.Preload(['CoTaskMemFree']);
 
 const BOLD = '\x1b[1m';
 const CYAN = '\x1b[96m';
@@ -253,7 +251,7 @@ try {
 } finally {
   if (outputAuthBufferPointer !== null && outputAuthBufferSize > 0) {
     Buffer.from(toArrayBuffer(outputAuthBufferPointer, 0, outputAuthBufferSize)).fill(0);
-    void Ole32.symbols.CoTaskMemFree(outputAuthBufferPointer);
+    Ole32.CoTaskMemFree(outputAuthBufferPointer);
   }
 }
 

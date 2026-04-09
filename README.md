@@ -12,7 +12,7 @@ Requires Bun >= 1.1.0 and Windows 10+.
 
 ## Usage
 
-After the first call resolves the symbol via `dlopen`/`dlsym`, the native function pointer is cached directly on the class. Every subsequent call is a straight pointer invocation through Bun's FFI — no marshaling layer, no runtime type checks, no wrapper overhead. It's the same codepath as calling the C function yourself.
+After the first call resolves the symbol via `dlopen`/`dlsym`, the native function pointer is cached directly on the class. Every subsequent call is a straight pointer invocation through Bun's FFI - no marshaling layer, no runtime type checks, no wrapper overhead. It's the same codepath as calling the C function yourself.
 
 For hot paths, `Preload()` resolves symbols eagerly so even the first call pays zero binding cost:
 
@@ -40,74 +40,76 @@ SetWindowPos(hWnd, 0n, x, y, width, height, flags);
 
 All type definitions are provided by [`@bun-win32/core`](./packages/core).
 
+Published packages are AI-friendly. Alongside the `README.md`, each package includes an `AI.md` file that documents the binding contract, type surface, and source layout so coding agents can use the package correctly.
+
 #### Graphics & Windowing
 
-- [`dwmapi`](./packages/dwmapi) — DWM composition, blur, thumbnails
-- [`gdi32`](./packages/gdi32) — graphics device interface
-- [`glu32`](./packages/glu32) — OpenGL utility functions
-- [`opengl32`](./packages/opengl32) — OpenGL rendering context
-- [`user32`](./packages/user32) — windows, messages, input, UI
-- [`uxtheme`](./packages/uxtheme) — visual styles, themed controls, buffered painting
+- [`dwmapi`](./packages/dwmapi) - DWM composition, blur, thumbnails
+- [`gdi32`](./packages/gdi32) - graphics device interface
+- [`glu32`](./packages/glu32) - OpenGL utility functions
+- [`opengl32`](./packages/opengl32) - OpenGL rendering context
+- [`user32`](./packages/user32) - windows, messages, input, UI
+- [`uxtheme`](./packages/uxtheme) - visual styles, themed controls, buffered painting
 
 #### Multimedia
 
-- [`winmm`](./packages/winmm) — multimedia audio, MIDI, mixers, timers, joysticks, MCI
+- [`winmm`](./packages/winmm) - multimedia audio, MIDI, mixers, timers, joysticks, MCI
 
 #### Networking
 
-- [`bluetoothapis`](./packages/bluetoothapis) — Bluetooth Classic radio/device discovery, BLE GATT, SDP, authentication
-- [`iphlpapi`](./packages/iphlpapi) — network adapters, TCP/UDP tables, routing
-- [`netapi32`](./packages/netapi32) — users, groups, shares, domain joins
-- [`wlanapi`](./packages/wlanapi) — Native Wifi: interface enumeration, scans, profiles, Wi-Fi Direct
-- [`ws2_32`](./packages/ws2_32) — Winsock 2: BSD sockets, DNS, network I/O
+- [`bluetoothapis`](./packages/bluetoothapis) - Bluetooth Classic radio/device discovery, BLE GATT, SDP, authentication
+- [`iphlpapi`](./packages/iphlpapi) - network adapters, TCP/UDP tables, routing
+- [`netapi32`](./packages/netapi32) - users, groups, shares, domain joins
+- [`wlanapi`](./packages/wlanapi) - Native Wifi: interface enumeration, scans, profiles, Wi-Fi Direct
+- [`ws2_32`](./packages/ws2_32) - Winsock 2: BSD sockets, DNS, network I/O
 
 #### Printing
 
-- [`winspool`](./packages/winspool) — printer management, print jobs, spooler control, drivers
+- [`winspool`](./packages/winspool) - printer management, print jobs, spooler control, drivers
 
 #### Remote Desktop & Terminal Services
 
-- [`wtsapi32`](./packages/wtsapi32) — Terminal Services sessions, processes, virtual channels, remote desktop
+- [`wtsapi32`](./packages/wtsapi32) - Terminal Services sessions, processes, virtual channels, remote desktop
 
 #### Security & Crypto
 
-- [`advapi32`](./packages/advapi32) — registry, security descriptors, service control
-- [`credui`](./packages/credui) — credential prompts, username parsing, auth blobs, and SSPI prompt helpers
-- [`crypt32`](./packages/crypt32) — certificate stores, chains, encoding, DPAPI
-- [`secur32`](./packages/secur32) — SSPI authentication, credentials, LSA
-- [`sspicli`](./packages/sspicli) — SSPI client-side auth and SASL
+- [`advapi32`](./packages/advapi32) - registry, security descriptors, service control
+- [`credui`](./packages/credui) - credential prompts, username parsing, auth blobs, and SSPI prompt helpers
+- [`crypt32`](./packages/crypt32) - certificate stores, chains, encoding, DPAPI
+- [`secur32`](./packages/secur32) - SSPI authentication, credentials, LSA
+- [`sspicli`](./packages/sspicli) - SSPI client-side auth and SASL
 
 #### System
 
-- [`hid`](./packages/hid) — HID device access, feature reports, preparsed data parsing
-- [`kernel32`](./packages/kernel32) — processes, memory, files, console, threads
-- [`msi`](./packages/msi) — Windows Installer: product enumeration, install state, database, patching
-- [`ntdll`](./packages/ntdll) — native NT API
-- [`pdh`](./packages/pdh) — performance counter queries, logs, and enumeration
-- [`powrprof`](./packages/powrprof) — power schemes, policies, sleep states, battery management
-- [`psapi`](./packages/psapi) — process status and module enumeration
-- [`shell32`](./packages/shell32) — shell operations and file management
-- [`shlwapi`](./packages/shlwapi) — shell lightweight utility functions
-- [`version`](./packages/version) — file version resources, string tables, installer version helpers
-- [`wevtapi`](./packages/wevtapi) — Windows Event Log queries, rendering, subscriptions, channel configuration, publisher metadata
-- [`winusb`](./packages/winusb) — WinUSB device I/O, descriptors, pipes, policies, and isochronous transfers
-
-Published packages are AI-friendly. Alongside the `README.md`, each package includes an `AI.md` file that documents the binding contract, type surface, and source layout so coding agents can use the package correctly.
+- [`hid`](./packages/hid) - HID device access, feature reports, preparsed data parsing
+- [`kernel32`](./packages/kernel32) - processes, memory, files, console, threads
+- [`msi`](./packages/msi) - Windows Installer: product enumeration, install state, database, patching
+- [`ntdll`](./packages/ntdll) - native NT API
+- [`ole32`](./packages/ole32) - COM/OLE helpers, monikers, structured storage, clipboard, drag-drop
+- [`pdh`](./packages/pdh) - performance counter queries, logs, and enumeration
+- [`powrprof`](./packages/powrprof) - power schemes, policies, sleep states, battery management
+- [`psapi`](./packages/psapi) - process status and module enumeration
+- [`shell32`](./packages/shell32) - shell operations and file management
+- [`shlwapi`](./packages/shlwapi) - shell lightweight utility functions
+- [`version`](./packages/version) - file version resources, string tables, installer version helpers
+- [`wevtapi`](./packages/wevtapi) - Windows Event Log queries, rendering, subscriptions, channel configuration, publisher metadata
+- [`winusb`](./packages/winusb) - WinUSB device I/O, descriptors, pipes, policies, and isochronous transfers
 
 ## Project Structure
 
 ```text
 bun-win32/
-├─ packages/
-│  ├─ core/
-│  ├─ template/
-│  ├─ advapi32/
-│  ├─ ...
-│  └─ wtsapi32/
-├─ scripts/
-├─ AGENTS.md
-├─ PROMPT.md
-└─ README.md
+|-- bin/
+|-- packages/
+|   |-- core/
+|   |-- template/
+|   |-- advapi32/
+|   |-- ...
+|   `-- wtsapi32/
+|-- scripts/
+|-- AGENTS.md
+|-- PROMPT.md
+`-- README.md
 ```
 
 ## Generating a New Package
@@ -122,7 +124,7 @@ All packages in this repo are AI-generated using Claude Code. To add bindings fo
 Execute @PROMPT.md for `crypt32`.
 ```
 
-Replace `crypt32` with whatever DLL you're targeting. `PROMPT.md` is the complete specification — it walks the model through dumping exports, reading Microsoft Docs, scaffolding from the template, writing every FFI declaration, and testing each one.
+Replace `crypt32` with whatever DLL you're targeting. `PROMPT.md` is the complete specification - it walks the model through dumping exports, reading Microsoft Docs, scaffolding from the template, writing every FFI declaration, and testing each one.
 
 ## License
 

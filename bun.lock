@@ -53,6 +53,7 @@
       },
       "devDependencies": {
         "@bun-win32/kernel32": "workspace:*",
+        "@bun-win32/ole32": "workspace:*",
         "@types/bun": "latest",
       },
       "peerDependencies": {
@@ -194,6 +195,19 @@
       },
       "devDependencies": {
         "@bun-win32/kernel32": "workspace:*",
+        "@types/bun": "latest",
+      },
+      "peerDependencies": {
+        "typescript": "^5",
+      },
+    },
+    "packages/ole32": {
+      "name": "@bun-win32/ole32",
+      "version": "1.0.0",
+      "dependencies": {
+        "@bun-win32/core": "workspace:*",
+      },
+      "devDependencies": {
         "@types/bun": "latest",
       },
       "peerDependencies": {
@@ -486,6 +500,8 @@
     "@bun-win32/netapi32": ["@bun-win32/netapi32@workspace:packages/netapi32"],
 
     "@bun-win32/ntdll": ["@bun-win32/ntdll@workspace:packages/ntdll"],
+
+    "@bun-win32/ole32": ["@bun-win32/ole32@workspace:packages/ole32"],
 
     "@bun-win32/opengl32": ["@bun-win32/opengl32@workspace:packages/opengl32"],
 

@@ -1,0 +1,57 @@
+{
+  "author": "Stev Peifer <stev@bell.net>",
+  "bugs": {
+    "url": "https://github.com/ObscuritySRL/bun-win32/issues"
+  },
+  "dependencies": {
+    "@bun-win32/core": "workspace:*"
+  },
+  "description": "Zero-dependency, zero-overhead Win32 OLE32 bindings for Bun (FFI) on Windows.",
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "engines": {
+    "bun": ">=1.1.0"
+  },
+  "exports": {
+    ".": "./index.ts"
+  },
+  "files": [
+    "AI.md",
+    "README.md",
+    "index.ts",
+    "structs/*.ts",
+    "types/*.ts"
+  ],
+  "homepage": "https://github.com/ObscuritySRL/bun-win32#readme",
+  "keywords": [
+    "bun",
+    "ffi",
+    "win32",
+    "windows",
+    "ole32",
+    "bindings",
+    "typescript",
+    "dll"
+  ],
+  "license": "MIT",
+  "main": "./index.ts",
+  "module": "index.ts",
+  "name": "@bun-win32/ole32",
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "private": false,
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/ObscuritySRL/bun-win32.git",
+    "directory": "packages/ole32"
+  },
+  "scripts": {
+    "example:property-set-galaxy": "bun ./example/property-set-galaxy.ts",
+    "example:storage-audit": "bun ./example/storage-audit.ts"
+  },
+  "sideEffects": false,
+  "type": "module",
+  "version": "1.0.0"
+}
