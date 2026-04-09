@@ -230,6 +230,16 @@ The FFI return type determines the JS representation of a null/zero return:
 
 When a function "returns NULL on success" (e.g., `LocalFree` returns `HLOCAL`), the return type is **not** `null` — it is `0n` because `HLOCAL` maps to `FFIType.u64`. The TypeScript return type should be the proper type alias (e.g., `HLOCAL`), not `DWORD` or `void`. The caller checks `result === 0n`.
 
+### No type casts — ever
+
+**Do not use `as unknown as T`, `as any`, or any forced cast anywhere** — not in struct files, not in type files, not in examples, not in tests. If the types don't line up, the FFI mapping or the type alias is wrong. Fix the root cause:
+
+- FFI says `u64` but TS type says `number`? → Change the TS alias to `bigint`.
+- FFI says `ptr` but you're passing a handle? → The FFI type or the parameter type is wrong. Check the C prototype.
+- Return type mismatch? → Fix the return type alias, don't cast.
+
+If you find yourself reaching for a cast, **stop** and re-read Sections 5 and 6. The type system should agree with the FFI layer without coercion.
+
 ### When in doubt
 
 1. Read the C declaration on the MS docs page.
@@ -405,7 +415,123 @@ export type { BOOL, DWORD, HANDLE, LPCWSTR, LPVOID, LPWSTR, NULL } from '@bun-wi
 
 ---
 
-## 10. Process
+## 10. Examples
+
+Each package must have **at least two example scripts** in `example/`.
+
+### Creative example (WOW factor)
+
+One example should be creative, visually impressive, or surprising — the kind of demo that makes someone say *"you can do that with just FFI?"*
+
+Good creative examples:
+- Animated console effects (Matrix rain, colored heatmaps)
+- Real-time dashboards with live-updating bars
+- Audio synthesis or playback
+- Visual rendering (spirograph, pendulum chaos)
+- Cross-package demos that combine multiple DLLs naturally
+
+### Professional example (thorough diagnostic)
+
+One example should be professional, showing exhaustive, richly-formatted output. Not just counts or booleans — show formatted tables, aligned labels, human-readable sizes, progress bars, and structured data.
+
+Good professional examples:
+- Full system diagnostic with every field labeled and formatted
+- Complete device/adapter/interface enumeration
+- Registry, certificate store, or security deep-dive
+- Network topology, process forensics, or power audit report
+
+### JSDoc header (mandatory)
+
+Every example file must begin with a JSDoc block:
+
+```typescript
+/**
+ * System Diagnostic
+ *
+ * A comprehensive system information dashboard that queries hardware, memory,
+ * storage, and timing details through Kernel32 APIs. Every value is formatted
+ * with aligned labels, human-readable sizes, and progress bars.
+ *
+ * APIs demonstrated:
+ *   - GetNativeSystemInfo          (CPU architecture, core count, page size)
+ *   - GlobalMemoryStatusEx         (physical/virtual memory, page file stats)
+ *   - GetLogicalDrives             (bitmask of mounted drive letters)
+ *   - GetDiskFreeSpaceExW          (per-drive capacity and free space)
+ *
+ * APIs demonstrated (Kernel32, cross-package):
+ *   - OpenProcess                  (obtain process handle)
+ *   - CloseHandle                  (release handle)
+ *
+ * Run: bun run example/system-diagnostic.ts
+ */
+```
+
+Required sections in the JSDoc:
+1. **Title** — short name of what it does
+2. **Description** — how it works, what to expect when running
+3. **APIs demonstrated** — bulleted list of every Win32 function used, with a short parenthetical. Group by package when cross-package.
+4. **Run command** — `Run: bun run example/{filename}.ts`
+
+### Code style
+
+- **Clear variable names** — `processorArchitecture`, not `arch`. `consoleWidth`, not `w`.
+- **Inline comments** on non-obvious Win32 struct layouts, buffer offsets, and bit manipulation.
+- **No section comment blocks** — no `// ========`, `// --------`, or decorative headers.
+- **Cross-package usage encouraged** where natural (e.g., a Psapi memory heatmap importing Kernel32 for `OpenProcess`/`CloseHandle`).
+- **`Preload`** all APIs at the top of the file.
+- **Check return values** where failure would produce confusing or empty output.
+
+### Console output: use ANSI, not WriteConsoleW
+
+For colored or cursor-controlled console output, use **ANSI escape codes** via `console.log` or `process.stdout.write`. Do **not** use `WriteConsoleW` for rendering — it fails silently in ConPTY-based terminals (Windows Terminal, VS Code) and piped environments.
+
+Kernel32 console setup APIs are fine and encouraged:
+- `GetStdHandle` + `GetConsoleMode` + `SetConsoleMode` — enable VT processing
+- `GetConsoleScreenBufferInfo` — query dimensions (with fallback to `process.stdout.columns/rows`)
+- `SetConsoleCursorInfo` — hide/show cursor
+- `SetConsoleTitleW` — set window title
+
+```typescript
+// Enable ANSI escape processing
+const hStdout = Kernel32.GetStdHandle(STD_HANDLE.OUTPUT);
+const modeBuf = Buffer.alloc(4);
+if (Kernel32.GetConsoleMode(hStdout, modeBuf.ptr)) {
+  Kernel32.SetConsoleMode(hStdout, modeBuf.readUInt32LE(0) | 0x0004);
+}
+
+// Then use ANSI for all rendering
+const RED = '\x1b[91m';
+const RESET = '\x1b[0m';
+console.log(`${RED}Error count: 5${RESET}`);
+```
+
+### package.json scripts
+
+Add a named script for each example:
+
+```json
+{
+  "scripts": {
+    "example:matrix-rain": "bun ./example/matrix-rain.ts",
+    "example:system-diagnostic": "bun ./example/system-diagnostic.ts"
+  }
+}
+```
+
+### Type checking
+
+All examples must pass `tsc` with no errors. **No `as unknown as T`, `as any`, or forced casts** — if types don't align, the binding or the type alias is wrong. Fix it at the source.
+
+Allowed narrowing patterns:
+- `!` non-null assertion — `Buffer.ptr!`, `JSCallback.ptr!`, `null!` for nullable params
+- `BigInt()` — converting pointer numbers to handle (`bigint`) parameters
+- Explicit type annotations — breaking circular inference in loops (`const x: Buffer = ...`)
+
+These are **not** casts — they are legitimate narrowing that preserves type safety.
+
+---
+
+## 11. Process
 
 Follow this order. **Test at every step.**
 
@@ -445,13 +571,13 @@ Follow this order. **Test at every step.**
    bun run scripts/audit.ts {name} --fix
    ```
 
-8. **README, AI.md, examples.** Fill in the README template. Fill in AI.md (change only class/DLL/package names). Add example scripts. Update the **root README.md** (Packages table and Project Structure tree).
+8. **README, AI.md, examples.** Fill in the README template. Fill in AI.md (change only class/DLL/package names). Write examples per Section 10 (minimum 2: one creative, one professional, each with JSDoc header and ANSI output). Add `example:*` scripts to `package.json`. Update the **root README.md** (Packages table and Project Structure tree).
 
 9. **Final verification.** Run `bun run index.ts`. Run `bunx prettier --write "packages/{name}/**/*.ts"`. Run `bunx tsc --noEmit`. Run a real integration test.
 
 ---
 
-## 11. Completeness Checklist
+## 12. Completeness Checklist
 
 - [ ] Every template file exists with placeholders replaced
 - [ ] `bun install` and `bun run index.ts` succeed
@@ -465,6 +591,11 @@ Follow this order. **Test at every step.**
 - [ ] No `as unknown as T` or `as any` casts
 - [ ] Hex literals use numeric separators (`0x0000_0001`)
 - [ ] Prettier formatted, tsc passes with no errors
+- [ ] At least two examples: one creative (WOW), one professional (thorough diagnostic)
+- [ ] Every example has JSDoc header (title, description, APIs, run command)
+- [ ] Examples use ANSI escape codes for color, not `WriteConsoleW`
+- [ ] `example:*` scripts in `package.json` for each example
+- [ ] All examples pass `tsc` with no errors
 - [ ] At least one real FFI integration test passes
 - [ ] README points agents to AI.md
 - [ ] AI.md exists
@@ -473,7 +604,7 @@ Follow this order. **Test at every step.**
 
 ---
 
-## 12. Reference Commands
+## 13. Reference Commands
 
 ```bash
 # Dump DLL exports
@@ -506,7 +637,7 @@ cd packages/{name} && bun run example/{name}.ts
 
 ---
 
-## 13. Reference Packages
+## 14. Reference Packages
 
 - **Small DLL example:** `packages/psapi` — ~28 functions, demonstrates every pattern concisely.
 - **Large DLL example:** `packages/kernel32` — 1,000+ functions, massive Symbols table, 26+ enums, exported constants.
