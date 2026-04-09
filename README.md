@@ -79,6 +79,7 @@ All type definitions are provided by [`@bun-win32/core`](./packages/core).
 - [`shlwapi`](./packages/shlwapi) — shell lightweight utility functions
 - [`version`](./packages/version) — file version resources, string tables, installer version helpers
 - [`wevtapi`](./packages/wevtapi) — Windows Event Log queries, rendering, subscriptions, channel configuration, publisher metadata
+- [`winusb`](./packages/winusb) — WinUSB device I/O, descriptors, pipes, policies, and isochronous transfers
 
 ## Install
 
@@ -99,6 +100,7 @@ bun-win32/
 │  ├─ template/
 │  ├─ uxtheme/
 │  ├─ wevtapi/
+│  ├─ winusb/
 │  ├─ wtsapi32/
 │  └─ ...
 ├─ scripts/
