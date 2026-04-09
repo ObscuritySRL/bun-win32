@@ -10,22 +10,24 @@ You are creating `@bun-win32/{name}` — a zero-dependency FFI binding for `{nam
 
 TS files use valid identifiers as placeholders so the template type-checks:
 
-| Placeholder     | Replace with                        | Example                            |
-| --------------- | ----------------------------------- | ---------------------------------- |
-| `WIN32_CLASS`   | PascalCase class name               | `Kernel32`, `GDI32`, `Ws2_32`     |
-| `WIN32_DLL`     | lowercase DLL name (in string only) | `kernel32`, `gdi32`, `ws2_32`     |
+| Placeholder   | Replace with                        | Example                       |
+| ------------- | ----------------------------------- | ----------------------------- |
+| `WIN32_CLASS` | PascalCase class name               | `Kernel32`, `GDI32`, `Ws2_32` |
+| `WIN32_DLL`   | lowercase DLL name (in string only) | `kernel32`, `gdi32`, `ws2_32` |
 
 ### Non-TypeScript files (README.md, package.json, AI.md)
 
-| Placeholder     | Replace with                                 | Example                                              |
-| --------------- | -------------------------------------------- | ---------------------------------------------------- |
-| `{name}`        | lowercase DLL name without `.dll`            | `kernel32`                                           |
-| `{Name}`        | title-case display name                      | `Kernel32`, `GDI32`                                  |
-| `{Class}`       | PascalCase class name (same as `WIN32_CLASS`)| `Kernel32`, `GDI32`, `Ws2_32`                        |
-| `{NAME}`        | uppercase                                    | `KERNEL32`, `GDI32`                                  |
-| `{description}` | short phrase for the README subtitle         | `process, memory, files, console, time, and more`    |
-| `{quickstart}`  | TypeScript quick-start example               |                                                      |
-| `{examples}`    | shell commands to run examples               |                                                      |
+| Placeholder     | Replace with                                  | Example                                           |
+| --------------- | --------------------------------------------- | ------------------------------------------------- |
+| `{name}`        | lowercase DLL name without `.dll`             | `kernel32`                                        |
+| `{Name}`        | title-case display name                       | `Kernel32`, `GDI32`                               |
+| `{Class}`       | PascalCase class name (same as `WIN32_CLASS`) | `Kernel32`, `GDI32`, `Ws2_32`                     |
+| `{NAME}`        | uppercase                                     | `KERNEL32`, `GDI32`                               |
+| `{description}` | short phrase for the README subtitle          | `process, memory, files, console, time, and more` |
+| `{quickstart}`  | TypeScript quick-start example                |                                                   |
+| `{examples}`    | shell commands to run examples                |                                                   |
+
+`AI.md` is intentionally generic. Replace placeholders and package/class/DLL/path names, but do not rewrite it into package-specific guidance beyond those renames.
 
 ---
 
@@ -167,11 +169,12 @@ LARGE_INTEGER, ULARGE_INTEGER
 ```
 
 Special cases:
+
 - `WPARAM` = `UINT_PTR` → `FFIType.u64` (unsigned)
 - `LPARAM` = `LONG_PTR` → `FFIType.i64` (signed)
 - `LRESULT` = `LONG_PTR` → `FFIType.i64` (signed)
 
-**Remote pointers are `FFIType.u64`.** If a parameter is an address in *another process's* address space (e.g., `lpBaseAddress` in `ReadProcessMemory`), you must not dereference it locally. Pass it as `bigint`, not `Pointer`.
+**Remote pointers are `FFIType.u64`.** If a parameter is an address in _another process's_ address space (e.g., `lpBaseAddress` in `ReadProcessMemory`), you must not dereference it locally. Pass it as `bigint`, not `Pointer`.
 
 ### `FFIType.ptr` — local data pointers
 
@@ -199,16 +202,16 @@ The test: **Can the caller construct this value from a `Buffer`, `TypedArray`, o
 
 ### 32-bit and smaller types
 
-| Win32 type                    | FFIType        | TS type  |
-| ----------------------------- | -------------- | -------- |
-| DWORD, UINT, ULONG            | `FFIType.u32`  | `number` |
-| BOOL, INT, LONG               | `FFIType.i32`  | `number` |
-| WORD, USHORT                   | `FFIType.u16`  | `number` |
-| SHORT                          | `FFIType.i16`  | `number` |
-| BYTE                           | `FFIType.u8`   | `number` |
-| ATOM                           | `FFIType.u16`  | `number` |
-| COLORREF                       | `FFIType.u32`  | `number` |
-| void return                    | `FFIType.void` |          |
+| Win32 type         | FFIType        | TS type  |
+| ------------------ | -------------- | -------- |
+| DWORD, UINT, ULONG | `FFIType.u32`  | `number` |
+| BOOL, INT, LONG    | `FFIType.i32`  | `number` |
+| WORD, USHORT       | `FFIType.u16`  | `number` |
+| SHORT              | `FFIType.i16`  | `number` |
+| BYTE               | `FFIType.u8`   | `number` |
+| ATOM               | `FFIType.u16`  | `number` |
+| COLORREF           | `FFIType.u32`  | `number` |
+| void return        | `FFIType.void` |          |
 
 ### By-value structs
 
@@ -222,11 +225,11 @@ A function returning `HANDLE` → `returns: FFIType.u64`. Returning `LPVOID` →
 
 The FFI return type determines the JS representation of a null/zero return:
 
-| FFI return type | NULL value at runtime | JS type    |
-| --------------- | --------------------- | ---------- |
-| `FFIType.u64`   | `0n`                  | `bigint`   |
-| `FFIType.ptr`   | `null`                | `null`     |
-| `FFIType.u32`   | `0`                   | `number`   |
+| FFI return type | NULL value at runtime | JS type  |
+| --------------- | --------------------- | -------- |
+| `FFIType.u64`   | `0n`                  | `bigint` |
+| `FFIType.ptr`   | `null`                | `null`   |
+| `FFIType.u32`   | `0`                   | `number` |
 
 When a function "returns NULL on success" (e.g., `LocalFree` returns `HLOCAL`), the return type is **not** `null` — it is `0n` because `HLOCAL` maps to `FFIType.u64`. The TypeScript return type should be the proper type alias (e.g., `HLOCAL`), not `DWORD` or `void`. The caller checks `result === 0n`.
 
@@ -326,6 +329,7 @@ After all methods are written, perform a **dedicated review pass** over every me
 6. Remove incorrect unions where neither the header nor docs confirm nullability.
 
 If you are auditing a large package, script this pass:
+
 - Parse each generated method signature in `structs/{Class}.ts`
 - Resolve the corresponding SDK prototype
 - Match parameters by exact Win32 name
@@ -333,6 +337,7 @@ If you are auditing a large package, script this pass:
 - Patch only the method signature unions
 
 This audit should catch cases like:
+
 - `GetModuleHandleW(lpModuleName)` → `lpModuleName: LPCWSTR | NULL`
 - `GetModuleFileNameW(hModule)` → `hModule: HMODULE | 0n`
 - `CreateFileW(lpSecurityAttributes, hTemplateFile)` → `lpSecurityAttributes: LPSECURITY_ATTRIBUTES | NULL`, `hTemplateFile: HANDLE | 0n`
@@ -352,6 +357,7 @@ protected static override readonly Symbols = {
 ```
 
 Rules:
+
 1. **Alphabetize** all entries (ASCIIbetical).
 2. **Every documented export from dumpbin** should be included. Bind both A and W variants.
 3. **Do not include** forwarded functions (`(forwarded to ...)`) or undocumented internals.
@@ -369,6 +375,7 @@ public static FunctionNameW(paramOne: TYPE1, paramTwo: TYPE2 | NULL): RETURN_TYP
 ```
 
 Rules:
+
 1. **One MS Docs URL comment** above each method.
 2. **Exact Win32 parameter names** — `hWnd`, `lpBuffer`, `dwSize`, not renamed.
 3. **Type using aliases** from `types/{Class}.ts`.
@@ -421,9 +428,10 @@ Each package must have **at least two example scripts** in `example/`.
 
 ### Creative example (WOW factor)
 
-One example should be creative, visually impressive, or surprising — the kind of demo that makes someone say *"you can do that with just FFI?"*
+One example should be creative, visually impressive, or surprising — the kind of demo that makes someone say _"you can do that with just FFI?"_
 
 Good creative examples:
+
 - Animated console effects (Matrix rain, colored heatmaps)
 - Real-time dashboards with live-updating bars
 - Audio synthesis or playback
@@ -435,6 +443,7 @@ Good creative examples:
 One example should be professional, showing exhaustive, richly-formatted output. Not just counts or booleans — show formatted tables, aligned labels, human-readable sizes, progress bars, and structured data.
 
 Good professional examples:
+
 - Full system diagnostic with every field labeled and formatted
 - Complete device/adapter/interface enumeration
 - Registry, certificate store, or security deep-dive
@@ -467,6 +476,7 @@ Every example file must begin with a JSDoc block:
 ```
 
 Required sections in the JSDoc:
+
 1. **Title** — short name of what it does
 2. **Description** — how it works, what to expect when running
 3. **APIs demonstrated** — bulleted list of every Win32 function used, with a short parenthetical. Group by package when cross-package.
@@ -486,6 +496,7 @@ Required sections in the JSDoc:
 For colored or cursor-controlled console output, use **ANSI escape codes** via `console.log` or `process.stdout.write`. Do **not** use `WriteConsoleW` for rendering — it fails silently in ConPTY-based terminals (Windows Terminal, VS Code) and piped environments.
 
 Kernel32 console setup APIs are fine and encouraged:
+
 - `GetStdHandle` + `GetConsoleMode` + `SetConsoleMode` — enable VT processing
 - `GetConsoleScreenBufferInfo` — query dimensions (with fallback to `process.stdout.columns/rows`)
 - `SetConsoleCursorInfo` — hide/show cursor
@@ -523,6 +534,7 @@ Add a named script for each example:
 All examples must pass `tsc` with no errors. **No `as unknown as T`, `as any`, or forced casts** — if types don't align, the binding or the type alias is wrong. Fix it at the source.
 
 Allowed narrowing patterns:
+
 - `!` non-null assertion — `Buffer.ptr!`, `JSCallback.ptr!`, `null!` for nullable params
 - `BigInt()` — converting pointer numbers to handle (`bigint`) parameters
 - Explicit type annotations — breaking circular inference in loops (`const x: Buffer = ...`)
@@ -567,11 +579,12 @@ Follow this order. **Test at every step.**
    **The audit must report zero mismatches.** If both the FFI symbol and TS type are wrong in the same direction (both say `number` when the SDK says `bigint`), the script won't catch it — you must still verify against the C prototype during step 5.
 
    Use `--fix` for automatic method-signature repair, then manually review changes:
+
    ```bash
    bun run scripts/audit.ts {name} --fix
    ```
 
-8. **README, AI.md, examples.** Fill in the README template. Fill in AI.md (change only class/DLL/package names). Write examples per Section 10 (minimum 2: one creative, one professional, each with JSDoc header and ANSI output). Add `example:*` scripts to `package.json`. Update the **root README.md** (Packages table and Project Structure tree).
+8. **README, AI.md, examples.** Fill in the README template. Fill in AI.md, but keep it generic (change only class/DLL/package names and path references). Write examples per Section 10 (minimum 2: one creative, one professional, each with JSDoc header and ANSI output). Add `example:*` scripts to `package.json`. Update the **root README.md** (Packages table and Project Structure tree).
 
 9. **Final verification.** Run `bun run index.ts`. Run `bunx prettier --write "packages/{name}/**/*.ts"`. Run `bunx tsc --noEmit`. Run a real integration test.
 

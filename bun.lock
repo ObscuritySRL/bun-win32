@@ -45,6 +45,20 @@
         "typescript": "^5",
       },
     },
+    "packages/credui": {
+      "name": "@bun-win32/credui",
+      "version": "1.0.0",
+      "dependencies": {
+        "@bun-win32/core": "workspace:*",
+      },
+      "devDependencies": {
+        "@bun-win32/kernel32": "workspace:*",
+        "@types/bun": "latest",
+      },
+      "peerDependencies": {
+        "typescript": "^5",
+      },
+    },
     "packages/crypt32": {
       "name": "@bun-win32/crypt32",
       "version": "1.0.4",
@@ -450,6 +464,8 @@
     "@bun-win32/bluetoothapis": ["@bun-win32/bluetoothapis@workspace:packages/bluetoothapis"],
 
     "@bun-win32/core": ["@bun-win32/core@workspace:packages/core"],
+
+    "@bun-win32/credui": ["@bun-win32/credui@workspace:packages/credui"],
 
     "@bun-win32/crypt32": ["@bun-win32/crypt32@workspace:packages/crypt32"],
 

@@ -4,6 +4,7 @@ ignore*
 
 # tools
 cloc-2.08.exe
+DISCORD_POST.md
 MISSING_APIS.md
 
 # dependencies (bun install)
