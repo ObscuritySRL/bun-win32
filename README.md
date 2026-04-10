@@ -59,6 +59,7 @@ Published packages are AI-friendly. Alongside the `README.md`, each package incl
 
 - [`bluetoothapis`](./packages/bluetoothapis) - Bluetooth Classic radio/device discovery, BLE GATT, SDP, authentication
 - [`iphlpapi`](./packages/iphlpapi) - network adapters, TCP/UDP tables, routing
+- [`mpr`](./packages/mpr) - network drive mapping, UNC connections, resource enumeration
 - [`netapi32`](./packages/netapi32) - users, groups, shares, domain joins
 - [`wlanapi`](./packages/wlanapi) - Native Wifi: interface enumeration, scans, profiles, Wi-Fi Direct
 - [`ws2_32`](./packages/ws2_32) - Winsock 2: BSD sockets, DNS, network I/O
@@ -78,18 +79,22 @@ Published packages are AI-friendly. Alongside the `README.md`, each package incl
 - [`crypt32`](./packages/crypt32) - certificate stores, chains, encoding, DPAPI
 - [`secur32`](./packages/secur32) - SSPI authentication, credentials, LSA
 - [`sspicli`](./packages/sspicli) - SSPI client-side auth and SASL
+- [`winscard`](./packages/winscard) - smart card resource manager, reader discovery, status changes, and APDU transport
 
 #### System
 
+- [`dbghelp`](./packages/dbghelp) - symbol engine, stack walking, minidumps, image helpers, source-level debugging
 - [`hid`](./packages/hid) - HID device access, feature reports, preparsed data parsing
 - [`kernel32`](./packages/kernel32) - processes, memory, files, console, threads
 - [`msi`](./packages/msi) - Windows Installer: product enumeration, install state, database, patching
 - [`ntdll`](./packages/ntdll) - native NT API
+- [`normaliz`](./packages/normaliz) - internationalized domain names, Nameprep, and Unicode normalization
 - [`ole32`](./packages/ole32) - COM/OLE helpers, monikers, structured storage, clipboard, drag-drop
 - [`pdh`](./packages/pdh) - performance counter queries, logs, and enumeration
 - [`powrprof`](./packages/powrprof) - power schemes, policies, sleep states, battery management
 - [`psapi`](./packages/psapi) - process status and module enumeration
 - [`rstrtmgr`](./packages/rstrtmgr) - Restart Manager sessions, lock discovery, shutdown, and restart orchestration
+- [`setupapi`](./packages/setupapi) - device installation, INF parsing, class and interface enumeration
 - [`shell32`](./packages/shell32) - shell operations and file management
 - [`shlwapi`](./packages/shlwapi) - shell lightweight utility functions
 - [`version`](./packages/version) - file version resources, string tables, installer version helpers
@@ -104,13 +109,13 @@ bun-win32/
 |-- packages/
 |   |-- core/
 |   |-- template/
-|   |-- rstrtmgr/
 |   |-- advapi32/
 |   |-- ...
 |   `-- wtsapi32/
 |-- scripts/
 |-- AGENTS.md
 |-- PROMPT.md
+|-- PROMPT_NEW.md
 `-- README.md
 ```
 
@@ -123,10 +128,10 @@ All packages in this repo are AI-generated using Claude Code. To add bindings fo
 3. Send:
 
 ```
-Execute @PROMPT.md for `crypt32`.
+Execute @PROMPT_NEW.md for `crypt32`.
 ```
 
-Replace `crypt32` with whatever DLL you're targeting. `PROMPT.md` is the complete specification - it walks the model through dumping exports, reading Microsoft Docs, scaffolding from the template, writing every FFI declaration, and testing each one.
+Replace `crypt32` with whatever DLL you're targeting. `PROMPT_NEW.md` is the recommended package-generation prompt. It uses the scaffold, catalog, runtime-probe, and audit scripts to keep the work more mechanical, more resumable, and less error-prone.
 
 ## License
 
