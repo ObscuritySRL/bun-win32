@@ -1,0 +1,291 @@
+import type { Pointer } from 'bun:ffi';
+
+export type { BOOL, BOOLEAN, DWORD, HANDLE, HMODULE, HWND, LPCSTR, LPCWSTR, LPDWORD, LPSTR, LPVOID, LPWSTR, NULL, PDWORD, PULONG, PVOID, SIZE_T, UINT, ULONG, USHORT } from '@bun-win32/core';
+
+export type DWORD64 = bigint;
+export type ULONG64 = bigint;
+
+export type PDWORD64 = Pointer;
+export type PLONG = Pointer;
+
+export type LPAPI_VERSION = Pointer;
+export type LPSTACKFRAME64 = Pointer;
+export type LPSTACKFRAME_EX = Pointer;
+export type PIMAGE_NT_HEADERS = Pointer;
+export type PIMAGE_SECTION_HEADER = Pointer;
+export type PIMAGEHLP_CONTEXT = Pointer;
+export type PIMAGEHLP_GET_TYPE_INFO_PARAMS = Pointer;
+export type PIMAGEHLP_LINE64 = Pointer;
+export type PIMAGEHLP_LINEW64 = Pointer;
+export type PIMAGEHLP_MODULE64 = Pointer;
+export type PIMAGEHLP_MODULEW64 = Pointer;
+export type PIMAGEHLP_STACK_FRAME = Pointer;
+export type PIMAGEHLP_SYMBOL64 = Pointer;
+export type PMINIDUMP_CALLBACK_INFORMATION = Pointer;
+export type PMINIDUMP_DIRECTORY = Pointer;
+export type PMINIDUMP_EXCEPTION_INFORMATION = Pointer;
+export type PMINIDUMP_USER_STREAM_INFORMATION = Pointer;
+export type PMODLOAD_DATA = Pointer;
+export type POMAP = Pointer;
+export type PSYMBOL_INFO = Pointer;
+export type PSYMBOL_INFOW = Pointer;
+export type PSYMSRV_INDEX_INFO = Pointer;
+export type PSYMSRV_INDEX_INFOW = Pointer;
+
+export type PENUMDIRTREE_CALLBACK = Pointer;
+export type PENUMDIRTREE_CALLBACKW = Pointer;
+export type PENUMLOADED_MODULES_CALLBACK64 = Pointer;
+export type PENUMLOADED_MODULES_CALLBACKW64 = Pointer;
+export type PENUMSOURCEFILETOKENSCALLBACK = Pointer;
+export type PFIND_DEBUG_FILE_CALLBACK = Pointer;
+export type PFIND_DEBUG_FILE_CALLBACKW = Pointer;
+export type PFIND_EXE_FILE_CALLBACK = Pointer;
+export type PFIND_EXE_FILE_CALLBACKW = Pointer;
+export type PFINDFILEINPATHCALLBACK = Pointer;
+export type PFINDFILEINPATHCALLBACKW = Pointer;
+export type PFUNCTION_TABLE_ACCESS_ROUTINE64 = Pointer;
+export type PGET_MODULE_BASE_ROUTINE64 = Pointer;
+export type PREAD_PROCESS_MEMORY_ROUTINE64 = Pointer;
+export type PSYM_ENUMLINES_CALLBACK = Pointer;
+export type PSYM_ENUMLINES_CALLBACKW = Pointer;
+export type PSYM_ENUMERATESYMBOLS_CALLBACK = Pointer;
+export type PSYM_ENUMERATESYMBOLS_CALLBACKW = Pointer;
+export type PSYM_ENUMSOURCEFILES_CALLBACK = Pointer;
+export type PSYM_ENUMSOURCEFILES_CALLBACKW = Pointer;
+export type PSYMBOL_FUNCENTRY_CALLBACK64 = Pointer;
+export type PSYMBOL_REGISTERED_CALLBACK64 = Pointer;
+export type PTRANSLATE_ADDRESS_ROUTINE64 = Pointer;
+
+export const MAX_SYM_NAME = 2_000;
+
+export const SLMFLAG_VIRTUAL = 0x0000_0001;
+export const SLMFLAG_ALT_INDEX = 0x0000_0002;
+export const SLMFLAG_NO_SYMBOLS = 0x0000_0004;
+
+export const SYMOPT_CASE_INSENSITIVE = 0x0000_0001;
+export const SYMOPT_UNDNAME = 0x0000_0002;
+export const SYMOPT_DEFERRED_LOADS = 0x0000_0004;
+export const SYMOPT_NO_CPP = 0x0000_0008;
+export const SYMOPT_LOAD_LINES = 0x0000_0010;
+export const SYMOPT_OMAP_FIND_NEAREST = 0x0000_0020;
+export const SYMOPT_LOAD_ANYTHING = 0x0000_0040;
+export const SYMOPT_IGNORE_CVREC = 0x0000_0080;
+export const SYMOPT_NO_UNQUALIFIED_LOADS = 0x0000_0100;
+export const SYMOPT_FAIL_CRITICAL_ERRORS = 0x0000_0200;
+export const SYMOPT_EXACT_SYMBOLS = 0x0000_0400;
+export const SYMOPT_ALLOW_ABSOLUTE_SYMBOLS = 0x0000_0800;
+export const SYMOPT_IGNORE_NT_SYMPATH = 0x0000_1000;
+export const SYMOPT_INCLUDE_32BIT_MODULES = 0x0000_2000;
+export const SYMOPT_PUBLICS_ONLY = 0x0000_4000;
+export const SYMOPT_NO_PUBLICS = 0x0000_8000;
+export const SYMOPT_AUTO_PUBLICS = 0x0001_0000;
+export const SYMOPT_NO_IMAGE_SEARCH = 0x0002_0000;
+export const SYMOPT_SECURE = 0x0004_0000;
+export const SYMOPT_NO_PROMPTS = 0x0008_0000;
+export const SYMOPT_OVERWRITE = 0x0010_0000;
+export const SYMOPT_IGNORE_IMAGEDIR = 0x0020_0000;
+export const SYMOPT_FLAT_DIRECTORY = 0x0040_0000;
+export const SYMOPT_FAVOR_COMPRESSED = 0x0080_0000;
+export const SYMOPT_ALLOW_ZERO_ADDRESS = 0x0100_0000;
+export const SYMOPT_DISABLE_SYMSRV_AUTODETECT = 0x0200_0000;
+export const SYMOPT_READONLY_CACHE = 0x0400_0000;
+export const SYMOPT_SYMPATH_LAST = 0x0800_0000;
+export const SYMOPT_DISABLE_FAST_SYMBOLS = 0x1000_0000;
+export const SYMOPT_DISABLE_SYMSRV_TIMEOUT = 0x2000_0000;
+export const SYMOPT_DISABLE_SRVSTAR_ON_STARTUP = 0x4000_0000;
+export const SYMOPT_DEBUG = 0x8000_0000;
+
+export const UNDNAME_COMPLETE = 0x0000;
+export const UNDNAME_NO_LEADING_UNDERSCORES = 0x0001;
+export const UNDNAME_NO_MS_KEYWORDS = 0x0002;
+export const UNDNAME_NO_FUNCTION_RETURNS = 0x0004;
+export const UNDNAME_NO_ALLOCATION_MODEL = 0x0008;
+export const UNDNAME_NO_ALLOCATION_LANGUAGE = 0x0010;
+export const UNDNAME_NO_MS_THISTYPE = 0x0020;
+export const UNDNAME_NO_CV_THISTYPE = 0x0040;
+export const UNDNAME_NO_THISTYPE = 0x0060;
+export const UNDNAME_NO_ACCESS_SPECIFIERS = 0x0080;
+export const UNDNAME_NO_THROW_SIGNATURES = 0x0100;
+export const UNDNAME_NO_MEMBER_TYPE = 0x0200;
+export const UNDNAME_NO_RETURN_UDT_MODEL = 0x0400;
+export const UNDNAME_32_BIT_DECODE = 0x0800;
+export const UNDNAME_NAME_ONLY = 0x1000;
+export const UNDNAME_NO_ARGUMENTS = 0x2000;
+export const UNDNAME_NO_SPECIAL_SYMS = 0x4000;
+
+export const SYMFLAG_VALUEPRESENT = 0x0000_0001;
+export const SYMFLAG_REGISTER = 0x0000_0008;
+export const SYMFLAG_REGREL = 0x0000_0010;
+export const SYMFLAG_FRAMEREL = 0x0000_0020;
+export const SYMFLAG_PARAMETER = 0x0000_0040;
+export const SYMFLAG_LOCAL = 0x0000_0080;
+export const SYMFLAG_CONSTANT = 0x0000_0100;
+export const SYMFLAG_EXPORT = 0x0000_0200;
+export const SYMFLAG_FORWARDER = 0x0000_0400;
+export const SYMFLAG_FUNCTION = 0x0000_0800;
+export const SYMFLAG_VIRTUAL = 0x0000_1000;
+export const SYMFLAG_THUNK = 0x0000_2000;
+export const SYMFLAG_TLSREL = 0x0000_4000;
+export const SYMFLAG_SLOT = 0x0000_8000;
+export const SYMFLAG_ILREL = 0x0001_0000;
+export const SYMFLAG_METADATA = 0x0002_0000;
+export const SYMFLAG_CLR_TOKEN = 0x0004_0000;
+export const SYMFLAG_NULL = 0x0008_0000;
+export const SYMFLAG_FUNC_NO_RETURN = 0x0010_0000;
+export const SYMFLAG_SYNTHETIC_ZEROBASE = 0x0020_0000;
+export const SYMFLAG_PUBLIC_CODE = 0x0040_0000;
+export const SYMFLAG_REGREL_ALIASINDIR = 0x0080_0000;
+export const SYMFLAG_FIXUP_ARM64X = 0x0100_0000;
+export const SYMFLAG_GLOBAL = 0x0200_0000;
+export const SYMFLAG_RESET = 0x8000_0000;
+
+export const SYM_INLINE_COMP_ERROR = 0;
+export const SYM_INLINE_COMP_IDENTICAL = 1;
+export const SYM_INLINE_COMP_STEPIN = 2;
+export const SYM_INLINE_COMP_STEPOUT = 3;
+export const SYM_INLINE_COMP_STEPOVER = 4;
+export const SYM_INLINE_COMP_DIFFERENT = 5;
+
+export const SYMSEARCH_MASKOBJS = 0x01;
+export const SYMSEARCH_RECURSE = 0x02;
+export const SYMSEARCH_GLOBALSONLY = 0x04;
+export const SYMSEARCH_ALLITEMS = 0x08;
+
+export const SYMENUM_OPTIONS_DEFAULT = 0x0000_0001;
+export const SYMENUM_OPTIONS_INLINE = 0x0000_0002;
+
+export const SYM_STKWALK_DEFAULT = 0x0000_0000;
+export const SYM_STKWALK_FORCE_FRAMEPTR = 0x0000_0001;
+export const SYM_STKWALK_ZEROEXTEND_PTRS = 0x0000_0002;
+
+export const CBA_DEFERRED_SYMBOL_LOAD_START = 0x0000_0001;
+export const CBA_DEFERRED_SYMBOL_LOAD_COMPLETE = 0x0000_0002;
+export const CBA_DEFERRED_SYMBOL_LOAD_FAILURE = 0x0000_0003;
+export const CBA_SYMBOLS_UNLOADED = 0x0000_0004;
+export const CBA_DUPLICATE_SYMBOL = 0x0000_0005;
+export const CBA_READ_MEMORY = 0x0000_0006;
+export const CBA_DEFERRED_SYMBOL_LOAD_CANCEL = 0x0000_0007;
+export const CBA_SET_OPTIONS = 0x0000_0008;
+export const CBA_EVENT = 0x0000_0010;
+export const CBA_DEFERRED_SYMBOL_LOAD_PARTIAL = 0x0000_0020;
+export const CBA_DEBUG_INFO = 0x1000_0000;
+export const CBA_SRCSRV_INFO = 0x2000_0000;
+export const CBA_SRCSRV_EVENT = 0x4000_0000;
+export const CBA_UPDATE_STATUS_BAR = 0x5000_0000;
+export const CBA_ENGINE_PRESENT = 0x6000_0000;
+export const CBA_CHECK_ENGOPT_DISALLOW_NETWORK_PATHS = 0x7000_0000;
+export const CBA_CHECK_ARM_MACHINE_THUMB_TYPE_OVERRIDE = 0x8000_0000;
+export const CBA_XML_LOG = 0x9000_0000;
+export const CBA_MAP_JIT_SYMBOL = 0xa000_0000;
+
+export enum ADDRESS_MODE {
+  AddrMode1616 = 0,
+  AddrMode1632 = 1,
+  AddrModeReal = 2,
+  AddrModeFlat = 3,
+}
+
+export enum IMAGEHLP_EXTENDED_OPTIONS {
+  SYMOPT_EX_DISABLEACCESSTIMEUPDATE = 0,
+  SYMOPT_EX_LASTVALIDDEBUGDIRECTORY = 1,
+  SYMOPT_EX_NOIMPLICITPATTERNSEARCH = 2,
+  SYMOPT_EX_NEVERLOADSYMBOLS = 3,
+  SYMOPT_EX_MAX = 4,
+}
+
+export enum IMAGEHLP_HD_TYPE {
+  hdBase = 0,
+  hdSym = 1,
+  hdSrc = 2,
+  hdMax = 3,
+}
+
+export enum IMAGEHLP_SF_TYPE {
+  sfImage = 0,
+  sfDbg = 1,
+  sfPdb = 2,
+  sfMpd = 3,
+  sfMax = 4,
+}
+
+export enum IMAGEHLP_SYMBOL_TYPE_INFO {
+  TI_GET_SYMTAG = 0,
+  TI_GET_SYMNAME = 1,
+  TI_GET_LENGTH = 2,
+  TI_GET_TYPE = 3,
+  TI_GET_TYPEID = 4,
+  TI_GET_BASETYPE = 5,
+  TI_GET_ARRAYINDEXTYPEID = 6,
+  TI_FINDCHILDREN = 7,
+  TI_GET_DATAKIND = 8,
+  TI_GET_ADDRESSOFFSET = 9,
+  TI_GET_OFFSET = 10,
+  TI_GET_VALUE = 11,
+  TI_GET_COUNT = 12,
+  TI_GET_CHILDRENCOUNT = 13,
+  TI_GET_BITPOSITION = 14,
+  TI_GET_VIRTUALBASECLASS = 15,
+  TI_GET_VIRTUALTABLESHAPEID = 16,
+  TI_GET_VIRTUALBASEPOINTEROFFSET = 17,
+  TI_GET_CLASSPARENTID = 18,
+  TI_GET_NESTED = 19,
+  TI_GET_SYMINDEX = 20,
+  TI_GET_LEXICALPARENT = 21,
+  TI_GET_ADDRESS = 22,
+  TI_GET_THISADJUST = 23,
+  TI_GET_UDTKIND = 24,
+  TI_IS_EQUIV_TO = 25,
+  TI_GET_CALLING_CONVENTION = 26,
+  TI_IS_CLOSE_EQUIV_TO = 27,
+  TI_GTIEX_REQS_VALID = 28,
+  TI_GET_VIRTUALBASEOFFSET = 29,
+  TI_GET_VIRTUALBASEDISPINDEX = 30,
+  TI_GET_IS_REFERENCE = 31,
+  TI_GET_INDIRECTVIRTUALBASECLASS = 32,
+  TI_GET_VIRTUALBASETABLETYPE = 33,
+  TI_GET_OBJECTPOINTERTYPE = 34,
+  IMAGEHLP_SYMBOL_TYPE_INFO_MAX = 35,
+}
+
+export enum MINIDUMP_TYPE {
+  MiniDumpNormal = 0x0000_0000,
+  MiniDumpWithDataSegs = 0x0000_0001,
+  MiniDumpWithFullMemory = 0x0000_0002,
+  MiniDumpWithHandleData = 0x0000_0004,
+  MiniDumpFilterMemory = 0x0000_0008,
+  MiniDumpScanMemory = 0x0000_0010,
+  MiniDumpWithUnloadedModules = 0x0000_0020,
+  MiniDumpWithIndirectlyReferencedMemory = 0x0000_0040,
+  MiniDumpFilterModulePaths = 0x0000_0080,
+  MiniDumpWithProcessThreadData = 0x0000_0100,
+  MiniDumpWithPrivateReadWriteMemory = 0x0000_0200,
+  MiniDumpWithoutOptionalData = 0x0000_0400,
+  MiniDumpWithFullMemoryInfo = 0x0000_0800,
+  MiniDumpWithThreadInfo = 0x0000_1000,
+  MiniDumpWithCodeSegs = 0x0000_2000,
+  MiniDumpWithoutAuxiliaryState = 0x0000_4000,
+  MiniDumpWithFullAuxiliaryState = 0x0000_8000,
+  MiniDumpWithPrivateWriteCopyMemory = 0x0001_0000,
+  MiniDumpIgnoreInaccessibleMemory = 0x0002_0000,
+  MiniDumpWithTokenInformation = 0x0004_0000,
+  MiniDumpWithModuleHeaders = 0x0008_0000,
+  MiniDumpFilterTriage = 0x0010_0000,
+  MiniDumpWithAvxXStateContext = 0x0020_0000,
+  MiniDumpWithIptTrace = 0x0040_0000,
+  MiniDumpScanInaccessiblePartialPages = 0x0080_0000,
+  MiniDumpFilterWriteCombinedMemory = 0x0100_0000,
+  MiniDumpValidTypeFlags = 0x01ff_ffff,
+}
+
+export enum SYM_TYPE {
+  SymNone = 0,
+  SymCoff = 1,
+  SymCv = 2,
+  SymPdb = 3,
+  SymExport = 4,
+  SymDeferred = 5,
+  SymSym = 6,
+  SymDia = 7,
+  SymVirtual = 8,
+  NumSymTypes = 9,
+}
