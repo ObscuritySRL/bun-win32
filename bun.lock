@@ -35,6 +35,19 @@
         "typescript": "^5",
       },
     },
+    "packages/cfgmgr32": {
+      "name": "@bun-win32/cfgmgr32",
+      "version": "1.0.0",
+      "dependencies": {
+        "@bun-win32/core": "workspace:*",
+      },
+      "devDependencies": {
+        "@types/bun": "latest",
+      },
+      "peerDependencies": {
+        "typescript": "^5",
+      },
+    },
     "packages/core": {
       "name": "@bun-win32/core",
       "version": "1.1.2",
@@ -168,6 +181,20 @@
         "@bun-win32/core": "workspace:*",
       },
       "devDependencies": {
+        "@types/bun": "latest",
+      },
+      "peerDependencies": {
+        "typescript": "^5",
+      },
+    },
+    "packages/mi": {
+      "name": "@bun-win32/mi",
+      "version": "1.0.0",
+      "dependencies": {
+        "@bun-win32/core": "workspace:*",
+      },
+      "devDependencies": {
+        "@bun-win32/kernel32": "workspace:*",
         "@types/bun": "latest",
       },
       "peerDependencies": {
@@ -393,6 +420,19 @@
         "typescript": "^5",
       },
     },
+    "packages/taskschd": {
+      "name": "@bun-win32/taskschd",
+      "version": "1.0.0",
+      "dependencies": {
+        "@bun-win32/core": "workspace:*",
+      },
+      "devDependencies": {
+        "@types/bun": "latest",
+      },
+      "peerDependencies": {
+        "typescript": "^5",
+      },
+    },
     "packages/template": {
       "name": "@bun-win32/{name}",
       "version": "1.0.0",
@@ -406,6 +446,20 @@
         "typescript": "^5",
       },
     },
+    "packages/uiautomationcore": {
+      "name": "@bun-win32/uiautomationcore",
+      "version": "1.0.0",
+      "dependencies": {
+        "@bun-win32/core": "workspace:*",
+      },
+      "devDependencies": {
+        "@bun-win32/user32": "workspace:*",
+        "@types/bun": "latest",
+      },
+      "peerDependencies": {
+        "typescript": "^5",
+      },
+    },
     "packages/user32": {
       "name": "@bun-win32/user32",
       "version": "3.0.20",
@@ -413,6 +467,20 @@
         "@bun-win32/core": "workspace:*",
       },
       "devDependencies": {
+        "@types/bun": "latest",
+      },
+      "peerDependencies": {
+        "typescript": "^5",
+      },
+    },
+    "packages/userenv": {
+      "name": "@bun-win32/userenv",
+      "version": "1.0.0",
+      "dependencies": {
+        "@bun-win32/core": "workspace:*",
+      },
+      "devDependencies": {
+        "@bun-win32/kernel32": "workspace:*",
         "@types/bun": "latest",
       },
       "peerDependencies": {
@@ -440,6 +508,19 @@
       },
       "devDependencies": {
         "@bun-win32/kernel32": "workspace:*",
+        "@types/bun": "latest",
+      },
+      "peerDependencies": {
+        "typescript": "^5",
+      },
+    },
+    "packages/virtdisk": {
+      "name": "@bun-win32/virtdisk",
+      "version": "1.0.0",
+      "dependencies": {
+        "@bun-win32/core": "workspace:*",
+      },
+      "devDependencies": {
         "@types/bun": "latest",
       },
       "peerDependencies": {
@@ -558,6 +639,8 @@
 
     "@bun-win32/bluetoothapis": ["@bun-win32/bluetoothapis@workspace:packages/bluetoothapis"],
 
+    "@bun-win32/cfgmgr32": ["@bun-win32/cfgmgr32@workspace:packages/cfgmgr32"],
+
     "@bun-win32/core": ["@bun-win32/core@workspace:packages/core"],
 
     "@bun-win32/credui": ["@bun-win32/credui@workspace:packages/credui"],
@@ -577,6 +660,8 @@
     "@bun-win32/iphlpapi": ["@bun-win32/iphlpapi@workspace:packages/iphlpapi"],
 
     "@bun-win32/kernel32": ["@bun-win32/kernel32@workspace:packages/kernel32"],
+
+    "@bun-win32/mi": ["@bun-win32/mi@workspace:packages/mi"],
 
     "@bun-win32/mpr": ["@bun-win32/mpr@workspace:packages/mpr"],
 
@@ -610,11 +695,19 @@
 
     "@bun-win32/sspicli": ["@bun-win32/sspicli@workspace:packages/sspicli"],
 
+    "@bun-win32/taskschd": ["@bun-win32/taskschd@workspace:packages/taskschd"],
+
+    "@bun-win32/uiautomationcore": ["@bun-win32/uiautomationcore@workspace:packages/uiautomationcore"],
+
     "@bun-win32/user32": ["@bun-win32/user32@workspace:packages/user32"],
+
+    "@bun-win32/userenv": ["@bun-win32/userenv@workspace:packages/userenv"],
 
     "@bun-win32/uxtheme": ["@bun-win32/uxtheme@workspace:packages/uxtheme"],
 
     "@bun-win32/version": ["@bun-win32/version@workspace:packages/version"],
+
+    "@bun-win32/virtdisk": ["@bun-win32/virtdisk@workspace:packages/virtdisk"],
 
     "@bun-win32/wevtapi": ["@bun-win32/wevtapi@workspace:packages/wevtapi"],
 
@@ -643,5 +736,13 @@
     "typescript": ["typescript@5.9.3", "", { "bin": { "tsc": "bin/tsc", "tsserver": "bin/tsserver" } }, "sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw=="],
 
     "undici-types": ["undici-types@7.18.2", "", {}, "sha512-AsuCzffGHJybSaRrmr5eHr81mwJU3kjw6M+uprWvCXiNeN9SOGwQ3Jn8jb8m3Z6izVgknn1R0FTCEAP2QrLY/w=="],
+
+    "@bun-win32/core/@types/bun": ["@types/bun@1.3.12", "", { "dependencies": { "bun-types": "1.3.12" } }, "sha512-DBv81elK+/VSwXHDlnH3Qduw+KxkTIWi7TXkAeh24zpi5l0B2kUg9Ga3tb4nJaPcOFswflgi/yAvMVBPrxMB+A=="],
+
+    "@bun-win32/virtdisk/@types/bun": ["@types/bun@1.3.12", "", { "dependencies": { "bun-types": "1.3.12" } }, "sha512-DBv81elK+/VSwXHDlnH3Qduw+KxkTIWi7TXkAeh24zpi5l0B2kUg9Ga3tb4nJaPcOFswflgi/yAvMVBPrxMB+A=="],
+
+    "@bun-win32/core/@types/bun/bun-types": ["bun-types@1.3.12", "", { "dependencies": { "@types/node": "*" } }, "sha512-HqOLj5PoFajAQciOMRiIZGNoKxDJSr6qigAttOX40vJuSp6DN/CxWp9s3C1Xwm4oH7ybueITwiaOcWXoYVoRkA=="],
+
+    "@bun-win32/virtdisk/@types/bun/bun-types": ["bun-types@1.3.12", "", { "dependencies": { "@types/node": "*" } }, "sha512-HqOLj5PoFajAQciOMRiIZGNoKxDJSr6qigAttOX40vJuSp6DN/CxWp9s3C1Xwm4oH7ybueITwiaOcWXoYVoRkA=="],
   }
 }

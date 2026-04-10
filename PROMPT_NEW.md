@@ -199,6 +199,13 @@ Minimum: 2 real examples
 - 1 creative / wow example
 - 1 professional / diagnostic example
 
+For the creative / wow example:
+
+- "Wow factor" means useful capability, not decorative output
+- A developer should look at it and think, "Holy crap, that's cool!" because it demonstrates something the package genuinely unlocks
+- Fancy ANSI colors, dashboards, or theatrical framing do not count on their own
+- Presentation may support the example, but the substance must be a real end-to-end workflow, insight, or capability showcase
+
 Both examples must:
 
 - start with the required JSDoc block
@@ -286,6 +293,7 @@ You still must verify the header prototype while writing the package.
 - Nullable handles use `| 0n`
 - `bun run scripts/audit.ts {name}` reports zero issues
 - Both examples run successfully
+- The wow example is substantively useful, not just cosmetically polished
 - `AI.md` stayed generic
 - The root `README.md` was updated after the package passed
 

@@ -508,6 +508,7 @@ function buildSdkIndex(functionNames: string[]): Map<string, SdkProto> {
         // Find function declaration line
         for (let i = 0; i < hLines.length; i++) {
           if (!hLines[i].match(new RegExp(`\\b${funcName}\\s*\\(`))) continue;
+          if (isCommentLikeLine(hLines[i])) continue;
 
           const proto = sdkIndex!.get(funcName)!;
 
@@ -600,6 +601,11 @@ function buildSdkIndex(functionNames: string[]): Map<string, SdkProto> {
 function lookupSdk(functionName: string): SdkProto | null {
   if (!sdkIndex) return null;
   return sdkIndex.get(functionName) || null;
+}
+
+function isCommentLikeLine(lineText: string): boolean {
+  const trimmedLine = lineText.trim();
+  return trimmedLine.startsWith('*') || trimmedLine.startsWith('/*') || trimmedLine.startsWith('//');
 }
 
 // ═══════════════════════════════════════════════════════════════════════════

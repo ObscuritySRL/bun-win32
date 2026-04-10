@@ -83,9 +83,11 @@ Published packages are AI-friendly. Alongside the `README.md`, each package incl
 
 #### System
 
+- [`cfgmgr32`](./packages/cfgmgr32) - device tree traversal, configuration management, device properties, interfaces, resources
 - [`dbghelp`](./packages/dbghelp) - symbol engine, stack walking, minidumps, image helpers, source-level debugging
 - [`hid`](./packages/hid) - HID device access, feature reports, preparsed data parsing
 - [`kernel32`](./packages/kernel32) - processes, memory, files, console, threads
+- [`mi`](./packages/mi) - Windows Management Infrastructure client bootstrap and function-table discovery
 - [`msi`](./packages/msi) - Windows Installer: product enumeration, install state, database, patching
 - [`ntdll`](./packages/ntdll) - native NT API
 - [`normaliz`](./packages/normaliz) - internationalized domain names, Nameprep, and Unicode normalization
@@ -97,7 +99,9 @@ Published packages are AI-friendly. Alongside the `README.md`, each package incl
 - [`setupapi`](./packages/setupapi) - device installation, INF parsing, class and interface enumeration
 - [`shell32`](./packages/shell32) - shell operations and file management
 - [`shlwapi`](./packages/shlwapi) - shell lightweight utility functions
+- [`taskschd`](./packages/taskschd) - Task Scheduler COM server entry points, class factory activation, task enumeration
 - [`uiautomationcore`](./packages/uiautomationcore) - UI Automation nodes, pattern objects, provider bridging, and event plumbing
+- [`userenv`](./packages/userenv) - user profiles, environment blocks, and Group Policy
 - [`version`](./packages/version) - file version resources, string tables, installer version helpers
 - [`wevtapi`](./packages/wevtapi) - Windows Event Log queries, rendering, subscriptions, channel configuration, publisher metadata
 - [`winusb`](./packages/winusb) - WinUSB device I/O, descriptors, pipes, policies, and isochronous transfers
