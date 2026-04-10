@@ -74,6 +74,19 @@
         "typescript": "^5",
       },
     },
+    "packages/dbghelp": {
+      "name": "@bun-win32/dbghelp",
+      "version": "1.0.0",
+      "dependencies": {
+        "@bun-win32/core": "workspace:*",
+      },
+      "devDependencies": {
+        "@types/bun": "latest",
+      },
+      "peerDependencies": {
+        "typescript": "^5",
+      },
+    },
     "packages/dwmapi": {
       "name": "@bun-win32/dwmapi",
       "version": "1.0.4",
@@ -161,6 +174,20 @@
         "typescript": "^5",
       },
     },
+    "packages/mpr": {
+      "name": "@bun-win32/mpr",
+      "version": "1.0.0",
+      "dependencies": {
+        "@bun-win32/core": "workspace:*",
+      },
+      "devDependencies": {
+        "@bun-win32/kernel32": "workspace:*",
+        "@types/bun": "latest",
+      },
+      "peerDependencies": {
+        "typescript": "^5",
+      },
+    },
     "packages/msi": {
       "name": "@bun-win32/msi",
       "version": "1.0.0",
@@ -177,6 +204,19 @@
     "packages/netapi32": {
       "name": "@bun-win32/netapi32",
       "version": "1.0.4",
+      "dependencies": {
+        "@bun-win32/core": "workspace:*",
+      },
+      "devDependencies": {
+        "@types/bun": "latest",
+      },
+      "peerDependencies": {
+        "typescript": "^5",
+      },
+    },
+    "packages/normaliz": {
+      "name": "@bun-win32/normaliz",
+      "version": "1.0.0",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -433,6 +473,19 @@
         "typescript": "^5",
       },
     },
+    "packages/winscard": {
+      "name": "@bun-win32/winscard",
+      "version": "1.0.0",
+      "dependencies": {
+        "@bun-win32/core": "workspace:*",
+      },
+      "devDependencies": {
+        "@types/bun": "latest",
+      },
+      "peerDependencies": {
+        "typescript": "^5",
+      },
+    },
     "packages/winspool": {
       "name": "@bun-win32/winspool",
       "version": "1.0.1",
@@ -511,6 +564,8 @@
 
     "@bun-win32/crypt32": ["@bun-win32/crypt32@workspace:packages/crypt32"],
 
+    "@bun-win32/dbghelp": ["@bun-win32/dbghelp@workspace:packages/dbghelp"],
+
     "@bun-win32/dwmapi": ["@bun-win32/dwmapi@workspace:packages/dwmapi"],
 
     "@bun-win32/gdi32": ["@bun-win32/gdi32@workspace:packages/gdi32"],
@@ -523,9 +578,13 @@
 
     "@bun-win32/kernel32": ["@bun-win32/kernel32@workspace:packages/kernel32"],
 
+    "@bun-win32/mpr": ["@bun-win32/mpr@workspace:packages/mpr"],
+
     "@bun-win32/msi": ["@bun-win32/msi@workspace:packages/msi"],
 
     "@bun-win32/netapi32": ["@bun-win32/netapi32@workspace:packages/netapi32"],
+
+    "@bun-win32/normaliz": ["@bun-win32/normaliz@workspace:packages/normaliz"],
 
     "@bun-win32/ntdll": ["@bun-win32/ntdll@workspace:packages/ntdll"],
 
@@ -560,6 +619,8 @@
     "@bun-win32/wevtapi": ["@bun-win32/wevtapi@workspace:packages/wevtapi"],
 
     "@bun-win32/winmm": ["@bun-win32/winmm@workspace:packages/winmm"],
+
+    "@bun-win32/winscard": ["@bun-win32/winscard@workspace:packages/winscard"],
 
     "@bun-win32/winspool": ["@bun-win32/winspool@workspace:packages/winspool"],
 

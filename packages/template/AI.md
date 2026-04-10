@@ -1,11 +1,11 @@
-# AI Guide for @bun-win32/{name}
+# AI Guide for @bun-win32/WIN32_CLASS
 
 How to use this package, not what the Win32 API does.
 
 ## Usage
 
 ```ts
-import {Class}, { SomeFlag } from '@bun-win32/{name}';
+import {Class}, { SomeFlag } from '@bun-win32/WIN32_CLASS';
 
 // Methods bind lazily on first call
 const result = {Class}.SomeFunctionW(arg1, arg2);
@@ -24,11 +24,11 @@ const result = {Class}.SomeFunctionW(arg1, arg2);
 | Find types, enums, constants      | `types/{Class}.ts`   |
 | Quick examples                    | `README.md`          |
 
-`index.ts` re-exports the class and all types — import from `@bun-win32/{name}` directly.
+`index.ts` re-exports the class and all types — import from `@bun-win32/WIN32_CLASS` directly.
 
 ## Calling Convention
 
-All documented `{name}.dll` exports are bound. Each method maps 1:1 to its DLL export. Names, parameter names, and order match Microsoft Docs.
+All documented `WIN32_CLASS.dll` exports are bound. Each method maps 1:1 to its DLL export. Names, parameter names, and order match Microsoft Docs.
 
 ### Strings
 

@@ -19,7 +19,45 @@ import { execSync } from 'child_process';
 
 const ROOT = join(import.meta.dir, '..');
 const PACKAGES = join(ROOT, 'packages');
-const SDK_INCLUDE = 'C:/Program Files (x86)/Windows Kits/10/Include/10.0.22000.0/um';
+const SDK_INCLUDE = resolveWindowsSdkIncludeDirectory();
+
+function resolveWindowsSdkIncludeDirectory(): string {
+  const sdkIncludeRoot = 'C:/Program Files (x86)/Windows Kits/10/Include';
+
+  if (!existsSync(sdkIncludeRoot)) {
+    return join(sdkIncludeRoot, '10.0.22000.0', 'um');
+  }
+
+  const versionDirectoryNames = readdirSync(sdkIncludeRoot).filter((directoryName) => /^\d+\.\d+\.\d+\.\d+$/.test(directoryName));
+  versionDirectoryNames.sort(compareWindowsSdkVersionsDescending);
+
+  for (const versionDirectoryName of versionDirectoryNames) {
+    const candidateDirectory = join(sdkIncludeRoot, versionDirectoryName, 'um');
+
+    if (existsSync(candidateDirectory)) {
+      return candidateDirectory;
+    }
+  }
+
+  return join(sdkIncludeRoot, '10.0.22000.0', 'um');
+}
+
+function compareWindowsSdkVersionsDescending(leftVersion: string, rightVersion: string): number {
+  const leftParts = leftVersion.split('.').map(Number);
+  const rightParts = rightVersion.split('.').map(Number);
+  const maxLength = Math.max(leftParts.length, rightParts.length);
+
+  for (let index = 0; index < maxLength; index++) {
+    const leftPart = leftParts[index] ?? 0;
+    const rightPart = rightParts[index] ?? 0;
+
+    if (leftPart !== rightPart) {
+      return rightPart - leftPart;
+    }
+  }
+
+  return 0;
+}
 
 // ── FFI type → expected JS runtime type ────────────────────────────────────
 
@@ -632,7 +670,7 @@ function auditPackage(pkgName: string, skipSdk: boolean = false): Mismatch[] {
 
     // ── Check return type even if JS types match — SDK might say it's wrong ──
     if (sdkProto?.returnType && expectedReturnJs === actualReturnJs) {
-        const expectedFfi = sdkProto.returnType.endsWith('*') ? 'FFIType.ptr' : C_TYPE_TO_FFI[sdkProto.returnType];
+      const expectedFfi = sdkProto.returnType.endsWith('*') ? 'FFIType.ptr' : C_TYPE_TO_FFI[sdkProto.returnType];
       if (expectedFfi && expectedFfi !== symbol.returns) {
         mismatches.push({
           functionName: method.name,
