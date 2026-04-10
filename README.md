@@ -54,6 +54,8 @@ Published packages are AI-friendly. Alongside the `README.md`, each package incl
 #### Multimedia
 
 - [`winmm`](./packages/winmm) - multimedia audio, MIDI, mixers, timers, joysticks, MCI
+- [`xinput1_4`](./packages/xinput1_4) - XInput 1.4: Xbox controller state, vibration, battery, audio, keystroke
+- [`xinput9_1_0`](./packages/xinput9_1_0) - XInput 9.1.0: legacy Xbox controller state, vibration, DirectSound GUIDs
 
 #### Networking
 
@@ -103,6 +105,7 @@ Published packages are AI-friendly. Alongside the `README.md`, each package incl
 - [`uiautomationcore`](./packages/uiautomationcore) - UI Automation nodes, pattern objects, provider bridging, and event plumbing
 - [`userenv`](./packages/userenv) - user profiles, environment blocks, and Group Policy
 - [`version`](./packages/version) - file version resources, string tables, installer version helpers
+- [`virtdisk`](./packages/virtdisk) - VHD, VHDX, and ISO virtual disk creation, attachment, inspection, and management
 - [`wevtapi`](./packages/wevtapi) - Windows Event Log queries, rendering, subscriptions, channel configuration, publisher metadata
 - [`winusb`](./packages/winusb) - WinUSB device I/O, descriptors, pipes, policies, and isochronous transfers
 

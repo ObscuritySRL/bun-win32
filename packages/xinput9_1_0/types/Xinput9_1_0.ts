@@ -1,0 +1,48 @@
+import type { Pointer } from 'bun:ffi';
+
+export type { DWORD, NULL } from '@bun-win32/core';
+
+export const XUSER_MAX_COUNT = 4;
+export const XUSER_INDEX_ANY = 0x0000_00ff;
+
+export const XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE = 7849;
+export const XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE = 8689;
+export const XINPUT_GAMEPAD_TRIGGER_THRESHOLD = 30;
+
+export enum XInputDevType {
+  XINPUT_DEVTYPE_GAMEPAD = 0x01,
+}
+
+export enum XInputDevSubType {
+  XINPUT_DEVSUBTYPE_GAMEPAD = 0x01,
+}
+
+export enum XInputCapsFlags {
+  XINPUT_CAPS_VOICE_SUPPORTED = 0x0004,
+}
+
+export enum XInputGamepadButtons {
+  XINPUT_GAMEPAD_DPAD_UP = 0x0001,
+  XINPUT_GAMEPAD_DPAD_DOWN = 0x0002,
+  XINPUT_GAMEPAD_DPAD_LEFT = 0x0004,
+  XINPUT_GAMEPAD_DPAD_RIGHT = 0x0008,
+  XINPUT_GAMEPAD_START = 0x0010,
+  XINPUT_GAMEPAD_BACK = 0x0020,
+  XINPUT_GAMEPAD_LEFT_THUMB = 0x0040,
+  XINPUT_GAMEPAD_RIGHT_THUMB = 0x0080,
+  XINPUT_GAMEPAD_LEFT_SHOULDER = 0x0100,
+  XINPUT_GAMEPAD_RIGHT_SHOULDER = 0x0200,
+  XINPUT_GAMEPAD_A = 0x1000,
+  XINPUT_GAMEPAD_B = 0x2000,
+  XINPUT_GAMEPAD_X = 0x4000,
+  XINPUT_GAMEPAD_Y = 0x8000,
+}
+
+export enum XInputGetCapabilitiesFlags {
+  XINPUT_FLAG_GAMEPAD = 0x0000_0001,
+}
+
+export type PGUID = Pointer;
+export type PXINPUT_CAPABILITIES = Pointer;
+export type PXINPUT_STATE = Pointer;
+export type PXINPUT_VIBRATION = Pointer;

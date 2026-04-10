@@ -6,9 +6,8 @@
   "dependencies": {
     "@bun-win32/core": "workspace:*"
   },
-  "description": "Zero-dependency, zero-overhead Win32 HID bindings for Bun (FFI) on Windows.",
+  "description": "Zero-dependency, zero-overhead Win32 XINPUT9_1_0 bindings for Bun (FFI) on Windows.",
   "devDependencies": {
-    "@bun-win32/kernel32": "workspace:*",
     "@types/bun": "latest"
   },
   "exports": {
@@ -16,7 +15,7 @@
   },
   "license": "MIT",
   "module": "index.ts",
-  "name": "@bun-win32/hid",
+  "name": "@bun-win32/xinput9_1_0",
   "peerDependencies": {
     "typescript": "^5"
   },
@@ -25,17 +24,17 @@
   "repository": {
     "type": "git",
     "url": "git://github.com/ObscuritySRL/bun-win32.git",
-    "directory": "packages/hid"
+    "directory": "packages/xinput9_1_0"
   },
   "type": "module",
-  "version": "1.0.3",
+  "version": "1.0.0",
   "main": "./index.ts",
   "keywords": [
     "bun",
     "ffi",
     "win32",
     "windows",
-    "hid",
+    "xinput9_1_0",
     "bindings",
     "typescript",
     "dll"
@@ -52,8 +51,7 @@
     "bun": ">=1.1.0"
   },
   "scripts": {
-    "example:device-detective": "bun ./example/device-detective.ts",
-    "example:dualsense-radar": "bun ./example/dualsense-radar.ts",
-    "example:hid-audit": "bun ./example/hid-audit.ts"
+    "example:gamepad-monitor": "bun ./example/gamepad-monitor.ts",
+    "example:controller-report": "bun ./example/controller-report.ts"
   }
 }
