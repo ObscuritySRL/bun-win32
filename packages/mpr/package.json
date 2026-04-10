@@ -1,0 +1,58 @@
+{
+  "author": "Stev Peifer <stev@bell.net>",
+  "bugs": {
+    "url": "https://github.com/ObscuritySRL/bun-win32/issues"
+  },
+  "dependencies": {
+    "@bun-win32/core": "workspace:*"
+  },
+  "description": "Zero-dependency, zero-overhead Win32 MPR bindings for Bun (FFI) on Windows.",
+  "devDependencies": {
+    "@bun-win32/kernel32": "workspace:*",
+    "@types/bun": "latest"
+  },
+  "exports": {
+    ".": "./index.ts"
+  },
+  "license": "MIT",
+  "module": "index.ts",
+  "name": "@bun-win32/mpr",
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "private": false,
+  "homepage": "https://github.com/ObscuritySRL/bun-win32#readme",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/ObscuritySRL/bun-win32.git",
+    "directory": "packages/mpr"
+  },
+  "type": "module",
+  "version": "1.0.0",
+  "main": "./index.ts",
+  "keywords": [
+    "bun",
+    "ffi",
+    "win32",
+    "windows",
+    "mpr",
+    "bindings",
+    "typescript",
+    "dll"
+  ],
+  "files": [
+    "AI.md",
+    "README.md",
+    "index.ts",
+    "structs/*.ts",
+    "types/*.ts"
+  ],
+  "sideEffects": false,
+  "engines": {
+    "bun": ">=1.1.0"
+  },
+  "scripts": {
+    "example:drive-audit": "bun ./example/drive-audit.ts",
+    "example:net-explorer": "bun ./example/net-explorer.ts"
+  }
+}
