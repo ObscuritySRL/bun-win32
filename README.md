@@ -97,6 +97,7 @@ Published packages are AI-friendly. Alongside the `README.md`, each package incl
 - [`setupapi`](./packages/setupapi) - device installation, INF parsing, class and interface enumeration
 - [`shell32`](./packages/shell32) - shell operations and file management
 - [`shlwapi`](./packages/shlwapi) - shell lightweight utility functions
+- [`uiautomationcore`](./packages/uiautomationcore) - UI Automation nodes, pattern objects, provider bridging, and event plumbing
 - [`version`](./packages/version) - file version resources, string tables, installer version helpers
 - [`wevtapi`](./packages/wevtapi) - Windows Event Log queries, rendering, subscriptions, channel configuration, publisher metadata
 - [`winusb`](./packages/winusb) - WinUSB device I/O, descriptors, pipes, policies, and isochronous transfers
@@ -111,6 +112,7 @@ bun-win32/
 |   |-- template/
 |   |-- advapi32/
 |   |-- ...
+|   |-- uiautomationcore/
 |   `-- wtsapi32/
 |-- scripts/
 |-- AGENTS.md
