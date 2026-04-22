@@ -1,0 +1,355 @@
+import type { Pointer } from 'bun:ffi';
+
+export type { BOOLEAN, DWORD, HANDLE, LPCWSTR, LPVOID, LPWSTR, NULL, PBYTE, PDWORD, PHANDLE, PULONG, PVOID, ULONG, USHORT } from '@bun-win32/core';
+
+// ── BCrypt primitives ───────────────────────────────────────────────────────
+
+export type NTSTATUS = number;
+export type ULONGLONG = bigint;
+
+// ── BCrypt pointer aliases ──────────────────────────────────────────────────
+
+export type PBOOLEAN = Pointer;
+export type PUCHAR = Pointer;
+
+// ── BCrypt handle types (PVOID) ─────────────────────────────────────────────
+
+export type BCRYPT_HANDLE = bigint;
+export type BCRYPT_ALG_HANDLE = bigint;
+export type BCRYPT_HASH_HANDLE = bigint;
+export type BCRYPT_KEY_HANDLE = bigint;
+export type BCRYPT_SECRET_HANDLE = bigint;
+
+export type PBCRYPT_ALG_HANDLE = Pointer;
+export type PBCRYPT_HASH_HANDLE = Pointer;
+export type PBCRYPT_KEY_HANDLE = Pointer;
+export type PBCRYPT_SECRET_HANDLE = Pointer;
+
+// ── BCrypt struct pointers ──────────────────────────────────────────────────
+
+export type PBCryptBufferDesc = Pointer;
+export type PPBCRYPT_ALGORITHM_IDENTIFIER = Pointer;
+export type PPBCRYPT_PROVIDER_NAME = Pointer;
+
+export type PCRYPT_CONTEXT_CONFIG = Pointer;
+export type PCRYPT_CONTEXT_FUNCTION_CONFIG = Pointer;
+export type PPCRYPT_CONTEXT_CONFIG = Pointer;
+export type PPCRYPT_CONTEXT_FUNCTION_CONFIG = Pointer;
+export type PPCRYPT_CONTEXT_FUNCTION_PROVIDERS = Pointer;
+export type PPCRYPT_CONTEXT_FUNCTIONS = Pointer;
+export type PPCRYPT_CONTEXTS = Pointer;
+export type PPCRYPT_PROVIDER_REFS = Pointer;
+export type PPCRYPT_PROVIDER_REG = Pointer;
+export type PPCRYPT_PROVIDERS = Pointer;
+export type PPUCHAR = Pointer;
+
+// ── Enums ───────────────────────────────────────────────────────────────────
+
+export enum BCRYPT_HASH_OPERATION_TYPE {
+  BCRYPT_HASH_OPERATION_HASH_DATA = 1,
+  BCRYPT_HASH_OPERATION_FINISH_HASH = 2,
+}
+
+export enum BCRYPT_MULTI_OPERATION_TYPE {
+  BCRYPT_OPERATION_TYPE_HASH = 1,
+}
+
+export enum BCryptAlgOperationFlags {
+  BCRYPT_CIPHER_OPERATION = 0x0000_0001,
+  BCRYPT_HASH_OPERATION = 0x0000_0002,
+  BCRYPT_ASYMMETRIC_ENCRYPTION_OPERATION = 0x0000_0004,
+  BCRYPT_SECRET_AGREEMENT_OPERATION = 0x0000_0008,
+  BCRYPT_SIGNATURE_OPERATION = 0x0000_0010,
+  BCRYPT_RNG_OPERATION = 0x0000_0020,
+  BCRYPT_KEY_DERIVATION_OPERATION = 0x0000_0040,
+}
+
+export enum BCryptEncryptFlags {
+  BCRYPT_BLOCK_PADDING = 0x0000_0001,
+  BCRYPT_BUFFERS_LOCKED_FLAG = 0x0000_0040,
+}
+
+export enum BCryptGenRandomFlags {
+  BCRYPT_RNG_USE_ENTROPY_IN_BUFFER = 0x0000_0001,
+  BCRYPT_USE_SYSTEM_PREFERRED_RNG = 0x0000_0002,
+}
+
+export enum BCryptInterface {
+  BCRYPT_CIPHER_INTERFACE = 0x0000_0001,
+  BCRYPT_HASH_INTERFACE = 0x0000_0002,
+  BCRYPT_ASYMMETRIC_ENCRYPTION_INTERFACE = 0x0000_0003,
+  BCRYPT_SECRET_AGREEMENT_INTERFACE = 0x0000_0004,
+  BCRYPT_SIGNATURE_INTERFACE = 0x0000_0005,
+  BCRYPT_RNG_INTERFACE = 0x0000_0006,
+  BCRYPT_KEY_DERIVATION_INTERFACE = 0x0000_0007,
+}
+
+export enum BCryptKeyValidationFlags {
+  BCRYPT_NO_KEY_VALIDATION = 0x0000_0008,
+  BCRYPT_KEY_VALIDATION_RANGE = 0x0000_0010,
+  BCRYPT_KEY_VALIDATION_RANGE_AND_ORDER = 0x0000_0018,
+  BCRYPT_KEY_VALIDATION_REGENERATE = 0x0000_0020,
+}
+
+export enum BCryptOpenAlgorithmProviderFlags {
+  BCRYPT_PROV_DISPATCH = 0x0000_0001,
+  BCRYPT_ALG_HANDLE_HMAC_FLAG = 0x0000_0008,
+  BCRYPT_HASH_REUSABLE_FLAG = 0x0000_0020,
+}
+
+export enum BCryptPadFlags {
+  BCRYPT_PAD_NONE = 0x0000_0001,
+  BCRYPT_PAD_PKCS1 = 0x0000_0002,
+  BCRYPT_PAD_OAEP = 0x0000_0004,
+  BCRYPT_PAD_PSS = 0x0000_0008,
+  BCRYPT_PAD_PKCS1_OPTIONAL_HASH_OID = 0x0000_0010,
+}
+
+export enum CryptConfigFlags {
+  CRYPT_MIN_DEPENDENCIES = 0x0000_0001,
+  CRYPT_PROCESS_ISOLATE = 0x0001_0000,
+}
+
+export enum CryptConfigMode {
+  CRYPT_LOCAL = 0x0000_0001,
+  CRYPT_DOMAIN = 0x0000_0002,
+}
+
+export enum CryptContextConfigFlags {
+  CRYPT_EXCLUSIVE = 0x0000_0001,
+  CRYPT_OVERRIDE = 0x0001_0000,
+}
+
+export enum CryptProcessorMode {
+  CRYPT_UM = 0x0000_0001,
+  CRYPT_KM = 0x0000_0002,
+  CRYPT_MM = 0x0000_0003,
+  CRYPT_ANY = 0x0000_0004,
+}
+
+export enum CryptResolutionFlags {
+  CRYPT_ALL_FUNCTIONS = 0x0000_0001,
+  CRYPT_ALL_PROVIDERS = 0x0000_0002,
+}
+
+export enum CryptPriority {
+  CRYPT_PRIORITY_TOP = 0x0000_0000,
+  CRYPT_PRIORITY_BOTTOM = 0xffff_ffff,
+}
+
+export enum CryptWriteFlags {
+  CRYPT_OVERWRITE = 0x0000_0001,
+}
+
+export enum KDFBufferType {
+  KDF_HASH_ALGORITHM = 0x0,
+  KDF_SECRET_PREPEND = 0x1,
+  KDF_SECRET_APPEND = 0x2,
+  KDF_HMAC_KEY = 0x3,
+  KDF_TLS_PRF_LABEL = 0x4,
+  KDF_TLS_PRF_SEED = 0x5,
+  KDF_SECRET_HANDLE = 0x6,
+  KDF_TLS_PRF_PROTOCOL = 0x7,
+  KDF_ALGORITHMID = 0x8,
+  KDF_PARTYUINFO = 0x9,
+  KDF_PARTYVINFO = 0xa,
+  KDF_SUPPPUBINFO = 0xb,
+  KDF_SUPPPRIVINFO = 0xc,
+  KDF_LABEL = 0xd,
+  KDF_CONTEXT = 0xe,
+  KDF_SALT = 0xf,
+  KDF_ITERATION_COUNT = 0x10,
+  KDF_GENERIC_PARAMETER = 0x11,
+  KDF_KEYBITLENGTH = 0x12,
+  KDF_HKDF_SALT = 0x13,
+  KDF_HKDF_INFO = 0x14,
+}
+
+export enum KDFDeriveKeyFlags {
+  KDF_USE_SECRET_AS_HMAC_KEY_FLAG = 0x1,
+}
+
+// ── Pseudo algorithm handles ────────────────────────────────────────────────
+
+export const BCRYPT_3DES_112_CBC_ALG_HANDLE: BCRYPT_ALG_HANDLE = 0x0000_0171n;
+export const BCRYPT_3DES_112_CFB_ALG_HANDLE: BCRYPT_ALG_HANDLE = 0x0000_0191n;
+export const BCRYPT_3DES_112_ECB_ALG_HANDLE: BCRYPT_ALG_HANDLE = 0x0000_0181n;
+export const BCRYPT_3DES_CBC_ALG_HANDLE: BCRYPT_ALG_HANDLE = 0x0000_0141n;
+export const BCRYPT_3DES_CFB_ALG_HANDLE: BCRYPT_ALG_HANDLE = 0x0000_0161n;
+export const BCRYPT_3DES_ECB_ALG_HANDLE: BCRYPT_ALG_HANDLE = 0x0000_0151n;
+export const BCRYPT_AES_CBC_ALG_HANDLE: BCRYPT_ALG_HANDLE = 0x0000_01a1n;
+export const BCRYPT_AES_CCM_ALG_HANDLE: BCRYPT_ALG_HANDLE = 0x0000_01d1n;
+export const BCRYPT_AES_CFB_ALG_HANDLE: BCRYPT_ALG_HANDLE = 0x0000_01c1n;
+export const BCRYPT_AES_CMAC_ALG_HANDLE: BCRYPT_ALG_HANDLE = 0x0000_0101n;
+export const BCRYPT_AES_ECB_ALG_HANDLE: BCRYPT_ALG_HANDLE = 0x0000_01b1n;
+export const BCRYPT_AES_GCM_ALG_HANDLE: BCRYPT_ALG_HANDLE = 0x0000_01e1n;
+export const BCRYPT_AES_GMAC_ALG_HANDLE: BCRYPT_ALG_HANDLE = 0x0000_0111n;
+export const BCRYPT_CAPI_KDF_ALG_HANDLE: BCRYPT_ALG_HANDLE = 0x0000_0321n;
+export const BCRYPT_CHACHA20_POLY1305_ALG_HANDLE: BCRYPT_ALG_HANDLE = 0x0000_03a1n;
+export const BCRYPT_DES_CBC_ALG_HANDLE: BCRYPT_ALG_HANDLE = 0x0000_01f1n;
+export const BCRYPT_DES_CFB_ALG_HANDLE: BCRYPT_ALG_HANDLE = 0x0000_0211n;
+export const BCRYPT_DES_ECB_ALG_HANDLE: BCRYPT_ALG_HANDLE = 0x0000_0201n;
+export const BCRYPT_DESX_CBC_ALG_HANDLE: BCRYPT_ALG_HANDLE = 0x0000_0221n;
+export const BCRYPT_DESX_CFB_ALG_HANDLE: BCRYPT_ALG_HANDLE = 0x0000_0241n;
+export const BCRYPT_DESX_ECB_ALG_HANDLE: BCRYPT_ALG_HANDLE = 0x0000_0231n;
+export const BCRYPT_DH_ALG_HANDLE: BCRYPT_ALG_HANDLE = 0x0000_0281n;
+export const BCRYPT_DSA_ALG_HANDLE: BCRYPT_ALG_HANDLE = 0x0000_02d1n;
+export const BCRYPT_ECDH_ALG_HANDLE: BCRYPT_ALG_HANDLE = 0x0000_0291n;
+export const BCRYPT_ECDH_P256_ALG_HANDLE: BCRYPT_ALG_HANDLE = 0x0000_02a1n;
+export const BCRYPT_ECDH_P384_ALG_HANDLE: BCRYPT_ALG_HANDLE = 0x0000_02b1n;
+export const BCRYPT_ECDH_P521_ALG_HANDLE: BCRYPT_ALG_HANDLE = 0x0000_02c1n;
+export const BCRYPT_ECDSA_ALG_HANDLE: BCRYPT_ALG_HANDLE = 0x0000_00f1n;
+export const BCRYPT_ECDSA_P256_ALG_HANDLE: BCRYPT_ALG_HANDLE = 0x0000_02e1n;
+export const BCRYPT_ECDSA_P384_ALG_HANDLE: BCRYPT_ALG_HANDLE = 0x0000_02f1n;
+export const BCRYPT_ECDSA_P521_ALG_HANDLE: BCRYPT_ALG_HANDLE = 0x0000_0301n;
+export const BCRYPT_HKDF_ALG_HANDLE: BCRYPT_ALG_HANDLE = 0x0000_0391n;
+export const BCRYPT_HMAC_MD2_ALG_HANDLE: BCRYPT_ALG_HANDLE = 0x0000_0121n;
+export const BCRYPT_HMAC_MD4_ALG_HANDLE: BCRYPT_ALG_HANDLE = 0x0000_0131n;
+export const BCRYPT_HMAC_MD5_ALG_HANDLE: BCRYPT_ALG_HANDLE = 0x0000_0091n;
+export const BCRYPT_HMAC_SHA1_ALG_HANDLE: BCRYPT_ALG_HANDLE = 0x0000_00a1n;
+export const BCRYPT_HMAC_SHA256_ALG_HANDLE: BCRYPT_ALG_HANDLE = 0x0000_00b1n;
+export const BCRYPT_HMAC_SHA384_ALG_HANDLE: BCRYPT_ALG_HANDLE = 0x0000_00c1n;
+export const BCRYPT_HMAC_SHA512_ALG_HANDLE: BCRYPT_ALG_HANDLE = 0x0000_00d1n;
+export const BCRYPT_MD2_ALG_HANDLE: BCRYPT_ALG_HANDLE = 0x0000_0001n;
+export const BCRYPT_MD4_ALG_HANDLE: BCRYPT_ALG_HANDLE = 0x0000_0011n;
+export const BCRYPT_MD5_ALG_HANDLE: BCRYPT_ALG_HANDLE = 0x0000_0021n;
+export const BCRYPT_PBKDF2_ALG_HANDLE: BCRYPT_ALG_HANDLE = 0x0000_0331n;
+export const BCRYPT_RC2_CBC_ALG_HANDLE: BCRYPT_ALG_HANDLE = 0x0000_0251n;
+export const BCRYPT_RC2_CFB_ALG_HANDLE: BCRYPT_ALG_HANDLE = 0x0000_0271n;
+export const BCRYPT_RC2_ECB_ALG_HANDLE: BCRYPT_ALG_HANDLE = 0x0000_0261n;
+export const BCRYPT_RC4_ALG_HANDLE: BCRYPT_ALG_HANDLE = 0x0000_0071n;
+export const BCRYPT_RNG_ALG_HANDLE: BCRYPT_ALG_HANDLE = 0x0000_0081n;
+export const BCRYPT_RSA_ALG_HANDLE: BCRYPT_ALG_HANDLE = 0x0000_00e1n;
+export const BCRYPT_RSA_SIGN_ALG_HANDLE: BCRYPT_ALG_HANDLE = 0x0000_0311n;
+export const BCRYPT_SHA1_ALG_HANDLE: BCRYPT_ALG_HANDLE = 0x0000_0031n;
+export const BCRYPT_SHA256_ALG_HANDLE: BCRYPT_ALG_HANDLE = 0x0000_0041n;
+export const BCRYPT_SHA384_ALG_HANDLE: BCRYPT_ALG_HANDLE = 0x0000_0051n;
+export const BCRYPT_SHA512_ALG_HANDLE: BCRYPT_ALG_HANDLE = 0x0000_0061n;
+export const BCRYPT_SP800108_CTR_HMAC_ALG_HANDLE: BCRYPT_ALG_HANDLE = 0x0000_0341n;
+export const BCRYPT_SP80056A_CONCAT_ALG_HANDLE: BCRYPT_ALG_HANDLE = 0x0000_0351n;
+export const BCRYPT_TLS1_1_KDF_ALG_HANDLE: BCRYPT_ALG_HANDLE = 0x0000_0361n;
+export const BCRYPT_TLS1_2_KDF_ALG_HANDLE: BCRYPT_ALG_HANDLE = 0x0000_0371n;
+export const BCRYPT_XTS_AES_ALG_HANDLE: BCRYPT_ALG_HANDLE = 0x0000_0381n;
+
+// ── Struct versioning ───────────────────────────────────────────────────────
+
+export const BCRYPTBUFFER_VERSION = 0;
+
+// ── Algorithm identifiers (strings, pass as UTF-16LE NUL-terminated buffers) ─
+
+export const BCRYPT_3DES_112_ALGORITHM = '3DES_112';
+export const BCRYPT_3DES_ALGORITHM = '3DES';
+export const BCRYPT_AES_ALGORITHM = 'AES';
+export const BCRYPT_AES_CMAC_ALGORITHM = 'AES-CMAC';
+export const BCRYPT_AES_GMAC_ALGORITHM = 'AES-GMAC';
+export const BCRYPT_CAPI_KDF_ALGORITHM = 'CAPI_KDF';
+export const BCRYPT_CHACHA20_POLY1305_ALGORITHM = 'CHACHA20_POLY1305';
+export const BCRYPT_DES_ALGORITHM = 'DES';
+export const BCRYPT_DESX_ALGORITHM = 'DESX';
+export const BCRYPT_DH_ALGORITHM = 'DH';
+export const BCRYPT_DSA_ALGORITHM = 'DSA';
+export const BCRYPT_ECDH_ALGORITHM = 'ECDH';
+export const BCRYPT_ECDH_P256_ALGORITHM = 'ECDH_P256';
+export const BCRYPT_ECDH_P384_ALGORITHM = 'ECDH_P384';
+export const BCRYPT_ECDH_P521_ALGORITHM = 'ECDH_P521';
+export const BCRYPT_ECDSA_ALGORITHM = 'ECDSA';
+export const BCRYPT_ECDSA_P256_ALGORITHM = 'ECDSA_P256';
+export const BCRYPT_ECDSA_P384_ALGORITHM = 'ECDSA_P384';
+export const BCRYPT_ECDSA_P521_ALGORITHM = 'ECDSA_P521';
+export const BCRYPT_HKDF_ALGORITHM = 'HKDF';
+export const BCRYPT_MD2_ALGORITHM = 'MD2';
+export const BCRYPT_MD4_ALGORITHM = 'MD4';
+export const BCRYPT_MD5_ALGORITHM = 'MD5';
+export const BCRYPT_PBKDF2_ALGORITHM = 'PBKDF2';
+export const BCRYPT_RC2_ALGORITHM = 'RC2';
+export const BCRYPT_RC4_ALGORITHM = 'RC4';
+export const BCRYPT_RNG_ALGORITHM = 'RNG';
+export const BCRYPT_RNG_DUAL_EC_ALGORITHM = 'DUALECRNG';
+export const BCRYPT_RNG_FIPS186_DSA_ALGORITHM = 'FIPS186DSARNG';
+export const BCRYPT_RSA_ALGORITHM = 'RSA';
+export const BCRYPT_RSA_SIGN_ALGORITHM = 'RSA_SIGN';
+export const BCRYPT_SHA1_ALGORITHM = 'SHA1';
+export const BCRYPT_SHA256_ALGORITHM = 'SHA256';
+export const BCRYPT_SHA384_ALGORITHM = 'SHA384';
+export const BCRYPT_SHA512_ALGORITHM = 'SHA512';
+export const BCRYPT_SP800108_CTR_HMAC_ALGORITHM = 'SP800_108_CTR_HMAC';
+export const BCRYPT_SP80056A_CONCAT_ALGORITHM = 'SP800_56A_CONCAT';
+export const BCRYPT_TLS1_1_KDF_ALGORITHM = 'TLS1_1_KDF';
+export const BCRYPT_TLS1_2_KDF_ALGORITHM = 'TLS1_2_KDF';
+export const BCRYPT_XTS_AES_ALGORITHM = 'XTS-AES';
+
+// ── KDF type strings ────────────────────────────────────────────────────────
+
+export const BCRYPT_KDF_HASH = 'HASH';
+export const BCRYPT_KDF_HKDF = 'HKDF';
+export const BCRYPT_KDF_HMAC = 'HMAC';
+export const BCRYPT_KDF_RAW_SECRET = 'TRUNCATE';
+export const BCRYPT_KDF_SP80056A_CONCAT = 'SP800_56A_CONCAT';
+export const BCRYPT_KDF_TLS_PRF = 'TLS_PRF';
+
+// ── Chaining mode strings (for BCRYPT_CHAINING_MODE property) ───────────────
+
+export const BCRYPT_CHAIN_MODE_CBC = 'ChainingModeCBC';
+export const BCRYPT_CHAIN_MODE_CCM = 'ChainingModeCCM';
+export const BCRYPT_CHAIN_MODE_CFB = 'ChainingModeCFB';
+export const BCRYPT_CHAIN_MODE_ECB = 'ChainingModeECB';
+export const BCRYPT_CHAIN_MODE_GCM = 'ChainingModeGCM';
+export const BCRYPT_CHAIN_MODE_NA = 'ChainingModeN/A';
+
+// ── Property name strings ───────────────────────────────────────────────────
+
+export const BCRYPT_ALGORITHM_NAME = 'AlgorithmName';
+export const BCRYPT_AUTH_TAG_LENGTH = 'AuthTagLength';
+export const BCRYPT_BLOCK_LENGTH = 'BlockLength';
+export const BCRYPT_BLOCK_SIZE_LIST = 'BlockSizeList';
+export const BCRYPT_CHAINING_MODE = 'ChainingMode';
+export const BCRYPT_DH_PARAMETERS = 'DHParameters';
+export const BCRYPT_DSA_PARAMETERS = 'DSAParameters';
+export const BCRYPT_ECC_CURVE_NAME = 'ECCCurveName';
+export const BCRYPT_EFFECTIVE_KEY_LENGTH = 'EffectiveKeyLength';
+export const BCRYPT_HASH_BLOCK_LENGTH = 'HashBlockLength';
+export const BCRYPT_HASH_LENGTH = 'HashDigestLength';
+export const BCRYPT_HASH_OID_LIST = 'HashOIDList';
+export const BCRYPT_HKDF_HASH_ALGORITHM = 'HkdfHashAlgorithm';
+export const BCRYPT_INITIALIZATION_VECTOR = 'IV';
+export const BCRYPT_IS_KEYED_HASH = 'IsKeyedHash';
+export const BCRYPT_IS_REUSABLE_HASH = 'IsReusableHash';
+export const BCRYPT_KEY_LENGTH = 'KeyLength';
+export const BCRYPT_KEY_LENGTHS = 'KeyLengths';
+export const BCRYPT_KEY_OBJECT_LENGTH = 'KeyObjectLength';
+export const BCRYPT_KEY_STRENGTH = 'KeyStrength';
+export const BCRYPT_MESSAGE_BLOCK_LENGTH = 'MessageBlockLength';
+export const BCRYPT_MULTI_OBJECT_LENGTH = 'MultiObjectLength';
+export const BCRYPT_OBJECT_LENGTH = 'ObjectLength';
+export const BCRYPT_PADDING_SCHEMES = 'PaddingSchemes';
+export const BCRYPT_PRIMITIVE_TYPE = 'PrimitiveType';
+export const BCRYPT_PROVIDER_HANDLE = 'ProviderHandle';
+export const BCRYPT_PUBLIC_KEY_LENGTH = 'PublicKeyLength';
+export const BCRYPT_SIGNATURE_LENGTH = 'SignatureLength';
+
+// ── Blob type strings ───────────────────────────────────────────────────────
+
+export const BCRYPT_DH_PRIVATE_BLOB = 'DHPRIVATEBLOB';
+export const BCRYPT_DH_PUBLIC_BLOB = 'DHPUBLICBLOB';
+export const BCRYPT_DSA_PRIVATE_BLOB = 'DSAPRIVATEBLOB';
+export const BCRYPT_DSA_PUBLIC_BLOB = 'DSAPUBLICBLOB';
+export const BCRYPT_ECCFULLPRIVATE_BLOB = 'ECCFULLPRIVATEBLOB';
+export const BCRYPT_ECCFULLPUBLIC_BLOB = 'ECCFULLPUBLICBLOB';
+export const BCRYPT_ECCPRIVATE_BLOB = 'ECCPRIVATEBLOB';
+export const BCRYPT_ECCPUBLIC_BLOB = 'ECCPUBLICBLOB';
+export const BCRYPT_KEY_DATA_BLOB = 'KeyDataBlob';
+export const BCRYPT_OPAQUE_KEY_BLOB = 'OpaqueKeyBlob';
+export const BCRYPT_PRIVATE_KEY_BLOB = 'PRIVATEBLOB';
+export const BCRYPT_PUBLIC_KEY_BLOB = 'PUBLICBLOB';
+export const BCRYPT_RSAFULLPRIVATE_BLOB = 'RSAFULLPRIVATEBLOB';
+export const BCRYPT_RSAPRIVATE_BLOB = 'RSAPRIVATEBLOB';
+export const BCRYPT_RSAPUBLIC_BLOB = 'RSAPUBLICBLOB';
+
+// ── Provider names ──────────────────────────────────────────────────────────
+
+export const MS_PLATFORM_CRYPTO_PROVIDER = 'Microsoft Platform Crypto Provider';
+export const MS_PRIMITIVE_PROVIDER = 'Microsoft Primitive Provider';
+
+// ── Default context ─────────────────────────────────────────────────────────
+
+export const CRYPT_DEFAULT_CONTEXT = 'Default';

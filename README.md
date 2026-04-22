@@ -44,7 +44,10 @@ Published packages are AI-friendly. Alongside the `README.md`, each package incl
 
 #### Graphics & Windowing
 
+- [`comctl32`](./packages/comctl32) - common controls, image lists, property sheets, DPA/DSA dynamic arrays, flat scroll bars, window subclassing
+- [`d3d11`](./packages/d3d11) - Direct3D 11 device / swap-chain creation, D3D11-on-12 interop, WinRT `IDirect3DDevice` / `IDirect3DSurface` bridges
 - [`dwmapi`](./packages/dwmapi) - DWM composition, blur, thumbnails
+- [`dxgi`](./packages/dxgi) - DXGI adapter enumeration, factory creation, debug interface (`CreateDXGIFactory*`, `DXGIGetDebugInterface1`)
 - [`gdi32`](./packages/gdi32) - graphics device interface
 - [`glu32`](./packages/glu32) - OpenGL utility functions
 - [`opengl32`](./packages/opengl32) - OpenGL rendering context
@@ -53,6 +56,9 @@ Published packages are AI-friendly. Alongside the `README.md`, each package incl
 
 #### Multimedia
 
+- [`mfplat`](./packages/mfplat) - Media Foundation platform: lifecycle, work queues, MFT registry, media type / sample / byte stream factories (`MFStartup`, `MFTEnumEx`, `MFCreateAttributes`, `MFCreateSample`)
+- [`mfreadwrite`](./packages/mfreadwrite) - Media Foundation source reader / sink writer factories (`MFCreateSourceReader*`, `MFCreateSinkWriter*`)
+- [`mmdevapi`](./packages/mmdevapi) - MMDevice / Core Audio class factory, WASAPI async activation (`DllGetClassObject`, `ActivateAudioInterfaceAsync`)
 - [`winmm`](./packages/winmm) - multimedia audio, MIDI, mixers, timers, joysticks, MCI
 - [`xinput1_4`](./packages/xinput1_4) - XInput 1.4: Xbox controller state, vibration, battery, audio, keystroke
 - [`xinput9_1_0`](./packages/xinput9_1_0) - XInput 9.1.0: legacy Xbox controller state, vibration, DirectSound GUIDs
@@ -77,6 +83,7 @@ Published packages are AI-friendly. Alongside the `README.md`, each package incl
 #### Security & Crypto
 
 - [`advapi32`](./packages/advapi32) - registry, security descriptors, service control
+- [`bcrypt`](./packages/bcrypt) - Cryptography Next Gen (CNG): ciphers, hashes, HMAC, PBKDF2, signatures, random bytes, key agreement
 - [`credui`](./packages/credui) - credential prompts, username parsing, auth blobs, and SSPI prompt helpers
 - [`crypt32`](./packages/crypt32) - certificate stores, chains, encoding, DPAPI
 - [`secur32`](./packages/secur32) - SSPI authentication, credentials, LSA
@@ -99,6 +106,7 @@ Published packages are AI-friendly. Alongside the `README.md`, each package incl
 - [`psapi`](./packages/psapi) - process status and module enumeration
 - [`rstrtmgr`](./packages/rstrtmgr) - Restart Manager sessions, lock discovery, shutdown, and restart orchestration
 - [`setupapi`](./packages/setupapi) - device installation, INF parsing, class and interface enumeration
+- [`shcore`](./packages/shcore) - DPI awareness, scale factors, AppUserModelID, random access streams, registry helpers, isolated-container detection, threading refs
 - [`shell32`](./packages/shell32) - shell operations and file management
 - [`shlwapi`](./packages/shlwapi) - shell lightweight utility functions
 - [`taskschd`](./packages/taskschd) - Task Scheduler COM server entry points, class factory activation, task enumeration
