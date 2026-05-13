@@ -1,0 +1,131 @@
+import type { Pointer } from 'bun:ffi';
+
+export type { BOOL, BYTE, DWORD, HANDLE, HRESULT, LPDWORD, LPSTR, LPVOID, NULL, UINT, ULONG } from '@bun-win32/core';
+
+// ── DXVA2 / Monitor-specific scalar aliases ─────────────────────────────────
+
+export type HMONITOR = bigint;
+
+// ── Pointer aliases ─────────────────────────────────────────────────────────
+
+export type IDirect3DDevice9 = Pointer;
+export type IDirect3DDevice9Ex = Pointer;
+export type LPLUID = Pointer;
+export type LPMC_COLOR_TEMPERATURE = Pointer;
+export type LPMC_DISPLAY_TECHNOLOGY_TYPE = Pointer;
+export type LPMC_TIMING_REPORT = Pointer;
+export type LPMC_VCP_CODE_TYPE = Pointer;
+export type LPPHYSICAL_MONITOR = Pointer;
+export type LPUINT = Pointer;
+export type PDXVAHD_CONTENT_DESC = Pointer;
+export type PDXVAHDSW_Plugin = Pointer;
+export type PIDirect3DDeviceManager9 = Pointer;
+export type PIDXVAHD_Device = Pointer;
+export type PIOPMVideoOutput = Pointer;
+export type PIOPMVideoOutputArray = Pointer;
+export type PVOID_PTR = Pointer;
+export type REFIID = Pointer;
+
+// ── Enumerations ────────────────────────────────────────────────────────────
+
+export enum DXVAHD_DEVICE_USAGE {
+  DXVAHD_DEVICE_USAGE_OPTIMAL_QUALITY = 2,
+  DXVAHD_DEVICE_USAGE_OPTIMAL_SPEED = 1,
+  DXVAHD_DEVICE_USAGE_PLAYBACK_NORMAL = 0,
+}
+
+export enum MC_COLOR_TEMPERATURE {
+  MC_COLOR_TEMPERATURE_10000K = 7,
+  MC_COLOR_TEMPERATURE_11500K = 8,
+  MC_COLOR_TEMPERATURE_4000K = 1,
+  MC_COLOR_TEMPERATURE_5000K = 2,
+  MC_COLOR_TEMPERATURE_6500K = 3,
+  MC_COLOR_TEMPERATURE_7500K = 4,
+  MC_COLOR_TEMPERATURE_8200K = 5,
+  MC_COLOR_TEMPERATURE_9300K = 6,
+  MC_COLOR_TEMPERATURE_UNKNOWN = 0,
+}
+
+export enum MC_DISPLAY_TECHNOLOGY_TYPE {
+  MC_APERTURE_GRILL_CATHODE_RAY_TUBE = 1,
+  MC_ELECTROLUMINESCENT = 6,
+  MC_FIELD_EMISSION_DEVICE = 8,
+  MC_LIQUID_CRYSTAL_ON_SILICON = 3,
+  MC_MICROELECTROMECHANICAL = 7,
+  MC_ORGANIC_LIGHT_EMITTING_DIODE = 5,
+  MC_PLASMA = 4,
+  MC_SHADOW_MASK_CATHODE_RAY_TUBE = 0,
+  MC_THIN_FILM_TRANSISTOR = 2,
+}
+
+export enum MC_DRIVE_TYPE {
+  MC_BLUE_DRIVE = 2,
+  MC_GREEN_DRIVE = 1,
+  MC_RED_DRIVE = 0,
+}
+
+export enum MC_GAIN_TYPE {
+  MC_BLUE_GAIN = 2,
+  MC_GREEN_GAIN = 1,
+  MC_RED_GAIN = 0,
+}
+
+export enum MC_POSITION_TYPE {
+  MC_HORIZONTAL_POSITION = 0,
+  MC_VERTICAL_POSITION = 1,
+}
+
+export enum MC_SIZE_TYPE {
+  MC_HEIGHT = 1,
+  MC_WIDTH = 0,
+}
+
+export enum MC_VCP_CODE_TYPE {
+  MC_MOMENTARY = 0,
+  MC_SET_PARAMETER = 1,
+}
+
+export enum OPM_VIDEO_OUTPUT_SEMANTICS {
+  OPM_VOS_COPP_SEMANTICS = 0,
+  OPM_VOS_OPM_INDIRECT_DISPLAY = 2,
+  OPM_VOS_OPM_SEMANTICS = 1,
+}
+
+// ── Capability flags (from highlevelmonitorconfigurationapi.h) ──────────────
+
+export enum MC_CAPS {
+  MC_CAPS_BRIGHTNESS = 0x00000002,
+  MC_CAPS_COLOR_TEMPERATURE = 0x00000008,
+  MC_CAPS_CONTRAST = 0x00000004,
+  MC_CAPS_DEGAUSS = 0x00000040,
+  MC_CAPS_DISPLAY_AREA_POSITION = 0x00000080,
+  MC_CAPS_DISPLAY_AREA_SIZE = 0x00000100,
+  MC_CAPS_MONITOR_TECHNOLOGY_TYPE = 0x00000001,
+  MC_CAPS_NONE = 0x00000000,
+  MC_CAPS_RED_GREEN_BLUE_DRIVE = 0x00000020,
+  MC_CAPS_RED_GREEN_BLUE_GAIN = 0x00000010,
+  MC_CAPS_RESTORE_FACTORY_COLOR_DEFAULTS = 0x00000800,
+  MC_CAPS_RESTORE_FACTORY_DEFAULTS = 0x00000400,
+  MC_RESTORE_FACTORY_DEFAULTS_ENABLES_MONITOR_SETTINGS = 0x00001000,
+}
+
+export enum MC_SUPPORTED_COLOR_TEMPERATURE {
+  MC_SUPPORTED_COLOR_TEMPERATURE_10000K = 0x00000040,
+  MC_SUPPORTED_COLOR_TEMPERATURE_11500K = 0x00000080,
+  MC_SUPPORTED_COLOR_TEMPERATURE_4000K = 0x00000001,
+  MC_SUPPORTED_COLOR_TEMPERATURE_5000K = 0x00000002,
+  MC_SUPPORTED_COLOR_TEMPERATURE_6500K = 0x00000004,
+  MC_SUPPORTED_COLOR_TEMPERATURE_7500K = 0x00000008,
+  MC_SUPPORTED_COLOR_TEMPERATURE_8200K = 0x00000010,
+  MC_SUPPORTED_COLOR_TEMPERATURE_9300K = 0x00000020,
+  MC_SUPPORTED_COLOR_TEMPERATURE_NONE = 0x00000000,
+}
+
+// ── Constants ───────────────────────────────────────────────────────────────
+
+// A PHYSICAL_MONITOR description is exactly 128 WCHARs.
+export const PHYSICAL_MONITOR_DESCRIPTION_SIZE = 128;
+
+// sizeof(PHYSICAL_MONITOR) on Win64: HANDLE (8) + 128 * WCHAR (256) = 264 bytes.
+// Header uses `#pragma pack(1)` so the struct is packed with no trailing padding.
+export const PHYSICAL_MONITOR_SIZE = 8 + PHYSICAL_MONITOR_DESCRIPTION_SIZE * 2;

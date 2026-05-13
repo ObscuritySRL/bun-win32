@@ -45,10 +45,13 @@ Published packages are AI-friendly. Alongside the `README.md`, each package incl
 #### Graphics & Windowing
 
 - [`comctl32`](./packages/comctl32) - common controls, image lists, property sheets, DPA/DSA dynamic arrays, flat scroll bars, window subclassing
+- [`comdlg32`](./packages/comdlg32) - common dialogs: Open / Save File, Choose Color, Choose Font, Print, Page Setup, Find / Replace, and `CommDlgExtendedError`
 - [`d3d11`](./packages/d3d11) - Direct3D 11 device / swap-chain creation, D3D11-on-12 interop, WinRT `IDirect3DDevice` / `IDirect3DSurface` bridges
 - [`dwmapi`](./packages/dwmapi) - DWM composition, blur, thumbnails
 - [`dxgi`](./packages/dxgi) - DXGI adapter enumeration, factory creation, debug interface (`CreateDXGIFactory*`, `DXGIGetDebugInterface1`)
+- [`dxva2`](./packages/dxva2) - DDC/CI monitor configuration (brightness, contrast, RGB drive/gain, colour temperature, VCP), physical monitor enumeration, DXVA2 / DXVA-HD video acceleration, OPM video output
 - [`gdi32`](./packages/gdi32) - graphics device interface
+- [`gdiplus`](./packages/gdiplus) - GDI+ flat C API: image load/save (PNG, JPEG, BMP, GIF, TIFF, ICO), antialiased 2D drawing, paths, regions, gradients, brushes, fonts, color matrix effects, metafile recording
 - [`glu32`](./packages/glu32) - OpenGL utility functions
 - [`opengl32`](./packages/opengl32) - OpenGL rendering context
 - [`user32`](./packages/user32) - windows, messages, input, UI
@@ -69,6 +72,8 @@ Published packages are AI-friendly. Alongside the `README.md`, each package incl
 - [`iphlpapi`](./packages/iphlpapi) - network adapters, TCP/UDP tables, routing
 - [`mpr`](./packages/mpr) - network drive mapping, UNC connections, resource enumeration
 - [`netapi32`](./packages/netapi32) - users, groups, shares, domain joins
+- [`sensapi`](./packages/sensapi) - System Event Notification Service connectivity checks (`IsNetworkAlive`, `IsDestinationReachable`)
+- [`winhttp`](./packages/winhttp) - HTTP/HTTPS client, WebSockets, proxy auto-detect (WPAD/PAC), TLS configuration, request tracing
 - [`wlanapi`](./packages/wlanapi) - Native Wifi: interface enumeration, scans, profiles, Wi-Fi Direct
 - [`ws2_32`](./packages/ws2_32) - Winsock 2: BSD sockets, DNS, network I/O
 
@@ -132,7 +137,6 @@ bun-win32/
 |-- scripts/
 |-- AGENTS.md
 |-- PROMPT.md
-|-- PROMPT_NEW.md
 `-- README.md
 ```
 
@@ -145,10 +149,10 @@ All packages in this repo are AI-generated using Claude Code. To add bindings fo
 3. Send:
 
 ```
-Execute @PROMPT_NEW.md for `crypt32`.
+Execute @PROMPT.md for `crypt32`.
 ```
 
-Replace `crypt32` with whatever DLL you're targeting. `PROMPT_NEW.md` is the recommended package-generation prompt. It uses the scaffold, catalog, runtime-probe, and audit scripts to keep the work more mechanical, more resumable, and less error-prone.
+Replace `crypt32` with whatever DLL you're targeting. `PROMPT.md` uses the scaffold, catalog, runtime-probe, stub-scaffold, and audit scripts to keep the work mechanical, resumable, and less error-prone.
 
 ## License
 
