@@ -138,6 +138,12 @@ _Not captured yet._
 <!-- RUNTIME-PROBES:START -->
 _Not captured yet._
 <!-- RUNTIME-PROBES:END -->
+
+## Stub Scaffold
+
+<!-- STUB-SCAFFOLD:START -->
+_Not captured yet._
+<!-- STUB-SCAFFOLD:END -->
 `;
 
   writeFileSync(generationLogPath, generationLog);

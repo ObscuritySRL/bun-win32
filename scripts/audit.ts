@@ -15,11 +15,32 @@
 
 import { readFileSync, readdirSync, existsSync } from 'fs';
 import { join } from 'path';
-import { execSync } from 'child_process';
+import { execFileSync, execSync } from 'child_process';
 
 const ROOT = join(import.meta.dir, '..');
 const PACKAGES = join(ROOT, 'packages');
 const SDK_INCLUDE = resolveWindowsSdkIncludeDirectory();
+const RIPGREP_PATH = resolveRipgrepPath();
+
+function resolveRipgrepPath(): string {
+  const explicitArg = process.argv.find((argument) => argument.startsWith('--rg='));
+  if (explicitArg) return explicitArg.slice('--rg='.length);
+
+  const candidates = ['rg', join(process.env.LOCALAPPDATA ?? '', 'Microsoft', 'WinGet', 'Links', 'rg.exe'), join(process.env.ProgramData ?? '', 'chocolatey', 'bin', 'rg.exe'), join(process.env.USERPROFILE ?? '', 'scoop', 'shims', 'rg.exe'), 'C:\\Program Files\\Git\\usr\\bin\\rg.exe'];
+
+  for (const candidate of candidates) {
+    try {
+      execFileSync(candidate, ['--version'], { stdio: 'ignore', windowsHide: true });
+      return candidate;
+    } catch {
+      continue;
+    }
+  }
+
+  console.error('WARNING: ripgrep (rg) not found. SDK header cross-checks will be skipped.');
+  console.error('  Install: winget install BurntSushi.ripgrep.MSVC   or pass --rg=<path-to-rg.exe>');
+  return '';
+}
 
 function resolveWindowsSdkIncludeDirectory(): string {
   const sdkIncludeRoot = 'C:/Program Files (x86)/Windows Kits/10/Include';
@@ -70,6 +91,7 @@ const FFI_TO_JS: Record<string, string> = {
   'FFIType.u16': 'number',
   'FFIType.i16': 'number',
   'FFIType.u8': 'number',
+  'FFIType.i8': 'number',
   'FFIType.f32': 'number',
   'FFIType.f64': 'number',
   'FFIType.void': 'void',
@@ -220,6 +242,33 @@ const C_TYPE_TO_FFI: Record<string, string> = {
   PWINUSB_PIPE_INFORMATION_EX: 'FFIType.ptr',
   PUSBD_ISO_PACKET_DESCRIPTOR: 'FFIType.ptr',
   LPOVERLAPPED: 'FFIType.ptr',
+  // gdiplus opaque object pointers — treated as u64 handles by convention
+  'GpAdjustableArrowCap*': 'FFIType.u64',
+  'GpBitmap*': 'FFIType.u64',
+  'GpBrush*': 'FFIType.u64',
+  'GpCachedBitmap*': 'FFIType.u64',
+  'GpCustomLineCap*': 'FFIType.u64',
+  'GpEffect*': 'FFIType.u64',
+  'CGpEffect*': 'FFIType.u64',
+  'GpFont*': 'FFIType.u64',
+  'GpFontCollection*': 'FFIType.u64',
+  'GpFontFamily*': 'FFIType.u64',
+  'GpGraphics*': 'FFIType.u64',
+  'GpHatch*': 'FFIType.u64',
+  'GpImage*': 'FFIType.u64',
+  'GpImageAttributes*': 'FFIType.u64',
+  'GpLineGradient*': 'FFIType.u64',
+  'GpMatrix*': 'FFIType.u64',
+  'GpMetafile*': 'FFIType.u64',
+  'GpPath*': 'FFIType.u64',
+  'GpPathGradient*': 'FFIType.u64',
+  'GpPathIterator*': 'FFIType.u64',
+  'GpPen*': 'FFIType.u64',
+  'GpRegion*': 'FFIType.u64',
+  'GpSolidFill*': 'FFIType.u64',
+  'GpStringFormat*': 'FFIType.u64',
+  'GpTexture*': 'FFIType.u64',
+  'IStream*': 'FFIType.u64',
   // void
   VOID: 'FFIType.void',
   void: 'FFIType.void',
@@ -453,7 +502,7 @@ function buildSdkIndex(functionNames: string[]): Map<string, SdkProto> {
   if (sdkIndex) return sdkIndex;
   sdkIndex = new Map();
 
-  if (!existsSync(SDK_INCLUDE) || functionNames.length === 0) return sdkIndex;
+  if (!existsSync(SDK_INCLUDE) || functionNames.length === 0 || !RIPGREP_PATH) return sdkIndex;
 
   // Write function names as grep patterns: ^FunctionName(
   const patternFile = join(ROOT, '.sdk-audit-patterns.tmp');
@@ -466,7 +515,7 @@ function buildSdkIndex(functionNames: string[]): Map<string, SdkProto> {
 
   try {
     // Single grep across all headers with context
-    const grepResult = execSync(`rg -n -B 8 --no-heading -f "${patternFile}" ${searchDirs.map((d) => `"${d}"`).join(' ')} --glob "*.h"`, { encoding: 'utf-8', timeout: 60000, maxBuffer: 50 * 1024 * 1024 });
+    const grepResult = execSync(`"${RIPGREP_PATH}" -n -B 8 --no-heading -f "${patternFile}" ${searchDirs.map((d) => `"${d}"`).join(' ')} --glob "*.h"`, { encoding: 'utf-8', timeout: 60000, maxBuffer: 50 * 1024 * 1024 });
 
     for (const line of grepResult.split('\n')) {
       const normalizedLine = line.replace(/\r$/, '');
@@ -561,8 +610,10 @@ function buildSdkIndex(functionNames: string[]): Map<string, SdkProto> {
           if (paramContent) {
             const rawParams = paramContent[1]
               .replace(/_(?=[A-Za-z]*[a-z])[A-Za-z_]+(?:\([^)]*\))?\s*/g, '')
+              .replace(/\bGDIPCONST\b\s*/g, '')
               .replace(/CONST\s+/g, '')
-              .replace(/const\s+/g, '');
+              .replace(/const\s+/g, '')
+              .replace(/\b(?:IN|OUT|INOUT|OPTIONAL)\s+/g, '');
             const paramParts = rawParams
               .split(',')
               .map((p) => p.trim())
@@ -676,7 +727,7 @@ function auditPackage(pkgName: string, skipSdk: boolean = false): Mismatch[] {
 
     // ── Check return type even if JS types match — SDK might say it's wrong ──
     if (sdkProto?.returnType && expectedReturnJs === actualReturnJs) {
-      const expectedFfi = sdkProto.returnType.endsWith('*') ? 'FFIType.ptr' : C_TYPE_TO_FFI[sdkProto.returnType];
+      const expectedFfi = C_TYPE_TO_FFI[sdkProto.returnType] ?? (sdkProto.returnType.endsWith('*') ? 'FFIType.ptr' : C_TYPE_TO_FFI[sdkProto.returnType]);
       if (expectedFfi && expectedFfi !== symbol.returns) {
         mismatches.push({
           functionName: method.name,
@@ -721,10 +772,13 @@ function auditPackage(pkgName: string, skipSdk: boolean = false): Mismatch[] {
         mismatches.push(mismatch);
       }
 
-      // Also check: SDK says param type is X but FFI uses the wrong type
-      if (sdkProto?.params[pi] && expectedParamJs === actualParamJs) {
+      // Also check: SDK says param type is X but FFI uses the wrong type.
+      // Only do this when the SDK param count matches the method param count;
+      // otherwise positions are misaligned (audit's SDK parser skips unnamed params).
+      const sdkAligned = sdkProto && sdkProto.params.length === method.params.length;
+      if (sdkAligned && sdkProto?.params[pi] && expectedParamJs === actualParamJs) {
         const sdkParamType = sdkProto.params[pi].type;
-        const expectedFfi = sdkParamType.endsWith('*') ? 'FFIType.ptr' : C_TYPE_TO_FFI[sdkParamType];
+        const expectedFfi = C_TYPE_TO_FFI[sdkParamType] ?? (sdkParamType.endsWith('*') ? 'FFIType.ptr' : C_TYPE_TO_FFI[sdkParamType]);
         if (expectedFfi && expectedFfi !== ffiArg) {
           mismatches.push({
             functionName: method.name,

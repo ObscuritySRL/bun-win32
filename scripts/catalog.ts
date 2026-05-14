@@ -32,12 +32,14 @@ const packageDirectoryRoot = join(repositoryRoot, 'packages');
 const argumentList = process.argv.slice(2);
 const packageName = argumentList.find((argument) => !argument.startsWith('--'));
 const shouldWriteLog = argumentList.includes('--log');
+const shouldEmitJson = argumentList.includes('--json');
 
 if (!packageName) {
-  console.error('Usage: bun run scripts/catalog.ts <dll-name> [--log]');
+  console.error('Usage: bun run scripts/catalog.ts <dll-name> [--log] [--json] [--rg=<path>]');
   process.exit(1);
 }
 
+const ripgrepExecutablePath = resolveRipgrepExecutablePath();
 const dllPath = resolveDllPath(packageName);
 const sdkIncludeRootPath = resolveWindowsSdkIncludeRootPath();
 const headerSearchPaths = [join(sdkIncludeRootPath, 'shared'), join(sdkIncludeRootPath, 'um')].filter(existsSync);
@@ -49,24 +51,47 @@ for (const exportEntry of exportEntries) {
   prototypeEntriesByName.set(exportEntry.name, findPrototypeEntry(exportEntry.name, headerSearchPaths));
 }
 
-const reportText = createCatalogReport(packageName, dllPath, sdkIncludeRootPath, exportEntries, prototypeEntriesByName);
+if (shouldEmitJson) {
+  const jsonPayload = {
+    capturedAt: new Date().toISOString(),
+    dllPath,
+    exports: exportEntries.map((exportEntry) => {
+      const prototypeEntry = prototypeEntriesByName.get(exportEntry.name) ?? null;
+      return {
+        forwardedTo: exportEntry.forwardedTo,
+        headerName: prototypeEntry?.headerName ?? null,
+        name: exportEntry.name,
+        ordinal: exportEntry.ordinal,
+        parameters: prototypeEntry?.parameterEntries.map((parameterEntry) => ({ isNullable: parameterEntry.isNullable, name: parameterEntry.name, type: parameterEntry.type })) ?? [],
+        prototypeText: prototypeEntry?.prototypeText ?? null,
+        returnType: prototypeEntry?.returnType ?? null,
+      };
+    }),
+    packageName,
+    sdkIncludeRootPath,
+  };
 
-if (shouldWriteLog) {
-  const generationLogPath = join(packageDirectoryRoot, packageName, '.generation-log.md');
+  console.log(JSON.stringify(jsonPayload, null, 2));
+} else {
+  const reportText = createCatalogReport(packageName, dllPath, sdkIncludeRootPath, exportEntries, prototypeEntriesByName);
 
-  if (!existsSync(generationLogPath)) {
-    console.error(`Generation log not found: ${generationLogPath}`);
-    process.exit(1);
+  if (shouldWriteLog) {
+    const generationLogPath = join(packageDirectoryRoot, packageName, '.generation-log.md');
+
+    if (!existsSync(generationLogPath)) {
+      console.error(`Generation log not found: ${generationLogPath}`);
+      process.exit(1);
+    }
+
+    const existingGenerationLog = readFileSync(generationLogPath, 'utf8');
+    const updatedGenerationLog = replaceSection(existingGenerationLog, 'EXPORT-CATALOG', reportText.trim());
+    writeFileSync(generationLogPath, updatedGenerationLog);
+
+    console.log(`Wrote export catalog to ${generationLogPath}`);
   }
 
-  const existingGenerationLog = readFileSync(generationLogPath, 'utf8');
-  const updatedGenerationLog = replaceSection(existingGenerationLog, 'EXPORT-CATALOG', reportText.trim());
-  writeFileSync(generationLogPath, updatedGenerationLog);
-
-  console.log(`Wrote export catalog to ${generationLogPath}`);
+  console.log(reportText);
 }
-
-console.log(reportText);
 
 function resolveDllPath(packageName: string): string {
   const explicitPathArgument = argumentList.find((argument) => argument.startsWith('--dll='));
@@ -172,7 +197,7 @@ function findPrototypeEntry(functionName: string, headerSearchPaths: string[]): 
   let rgOutput = '';
 
   try {
-    rgOutput = execFileSync('rg', rgArguments, {
+    rgOutput = execFileSync(ripgrepExecutablePath, rgArguments, {
       encoding: 'utf8',
       windowsHide: true,
     });
@@ -194,6 +219,39 @@ function findPrototypeEntry(functionName: string, headerSearchPaths: string[]): 
   }
 
   return null;
+}
+
+function resolveRipgrepExecutablePath(): string {
+  const explicitPathArgument = argumentList.find((argument) => argument.startsWith('--rg='));
+
+  if (explicitPathArgument) {
+    return explicitPathArgument.slice('--rg='.length);
+  }
+
+  const candidatePaths = [
+    'rg',
+    join(process.env.LOCALAPPDATA ?? '', 'Microsoft', 'WinGet', 'Links', 'rg.exe'),
+    join(process.env.ProgramData ?? '', 'chocolatey', 'bin', 'rg.exe'),
+    join(process.env.USERPROFILE ?? '', 'scoop', 'shims', 'rg.exe'),
+    'C:\\Program Files\\Git\\usr\\bin\\rg.exe',
+  ];
+
+  for (const candidatePath of candidatePaths) {
+    try {
+      execFileSync(candidatePath, ['--version'], { stdio: 'ignore', windowsHide: true });
+      return candidatePath;
+    } catch {
+      continue;
+    }
+  }
+
+  throw new Error(
+    [
+      'ripgrep (rg) is required for SDK header lookup and was not found.',
+      'Install it (winget install BurntSushi.ripgrep.MSVC) or pass --rg=<path-to-rg.exe>.',
+      'Without rg, every prototype lookup silently returns null — do not proceed with a bind without it.',
+    ].join('\n'),
+  );
 }
 
 function extractPrototypeEntry(headerPath: string, functionName: string): PrototypeEntry | null {
@@ -219,10 +277,10 @@ function extractPrototypeEntry(headerPath: string, functionName: string): Protot
       }
     }
 
-    const provisionalReturnType = readReturnType(headerLines, lineIndex);
+    const provisionalReturnType = readReturnType(headerLines, lineIndex, functionName);
     const prototypePrefixLines = readPrototypePrefixLines(headerLines, lineIndex, provisionalReturnType);
     const prototypeText = [...prototypePrefixLines, ...parameterLines].join('\n').trim();
-    const returnType = deriveReturnTypeFromPrototypeText(prototypeText, functionName);
+    const returnType = deriveReturnTypeFromPrototypeText(prototypeText, functionName) || provisionalReturnType;
     const parameterEntries = parseParameterEntries(parameterLines.join('\n'));
 
     return {
@@ -236,11 +294,31 @@ function extractPrototypeEntry(headerPath: string, functionName: string): Protot
   return null;
 }
 
-function readReturnType(headerLines: string[], functionLineIndex: number): string {
+function readReturnType(headerLines: string[], functionLineIndex: number, functionName: string): string {
+  // Case 1: return type is on the same line as the function name.
+  const functionLine = headerLines[functionLineIndex];
+  const sameLinePattern = new RegExp(`^(.*?)\\b${functionName}\\s*\\(`);
+  const sameLineMatch = sameLinePattern.exec(functionLine);
+
+  if (sameLineMatch && sameLineMatch[1].trim()) {
+    const candidate = stripCallingConventionMacros(sameLineMatch[1].trim()).replace(/\s+/g, ' ').trim();
+
+    if (candidate) {
+      return candidate;
+    }
+  }
+
+  // Case 2: return type is on a prior line. Stop at a blank line — it separates
+  // this declaration from the previous one. Skip closing punctuation from the
+  // previous prototype but do not cross a blank gap.
   for (let lineIndex = functionLineIndex - 1; lineIndex >= Math.max(0, functionLineIndex - 12); lineIndex -= 1) {
     const trimmedLine = headerLines[lineIndex].trim();
 
     if (!trimmedLine) {
+      break;
+    }
+
+    if (trimmedLine === ');' || trimmedLine === ';' || trimmedLine === ')') {
       continue;
     }
 
@@ -252,7 +330,7 @@ function readReturnType(headerLines: string[], functionLineIndex: number): strin
       continue;
     }
 
-    return trimmedLine.replace(/\s+/g, ' ');
+    return stripCallingConventionMacros(trimmedLine).replace(/\s+/g, ' ');
   }
 
   return 'UNKNOWN';
@@ -265,15 +343,15 @@ function readPrototypePrefixLines(headerLines: string[], functionLineIndex: numb
     const trimmedLine = headerLines[lineIndex].trim();
 
     if (!trimmedLine) {
-      if (prototypePrefixLines.length > 0) {
-        break;
-      }
-
-      continue;
+      break;
     }
 
     if (trimmedLine.startsWith('//') || trimmedLine.startsWith('#')) {
       continue;
+    }
+
+    if (trimmedLine === ');' || trimmedLine === ';' || trimmedLine === ')') {
+      break;
     }
 
     prototypePrefixLines.unshift(headerLines[lineIndex]);
@@ -293,7 +371,7 @@ function parseParameterEntries(prototypeText: string): ParameterEntry[] {
     return [];
   }
 
-  const parameterText = parenthesizedMatch[1].trim();
+  const parameterText = stripEmbeddedComments(parenthesizedMatch[1]).trim();
 
   if (!parameterText || parameterText === 'void' || parameterText === 'VOID') {
     return [];
@@ -304,10 +382,11 @@ function parseParameterEntries(prototypeText: string): ParameterEntry[] {
 
   for (const rawParameterText of rawParameterEntries) {
     const normalizedParameterText = rawParameterText.trim().replace(/\s+/g, ' ');
-    const cleanedParameterText = normalizedParameterText
-      .replace(/_(?=[A-Za-z]*[a-z])[A-Za-z_]+(?:\([^)]*\))?\s*/g, '')
+    const cleanedParameterText = stripSalAnnotations(normalizedParameterText)
+      .replace(/\b(?:IN OUT|OUT IN|IN|OUT|OPTIONAL)\b\s*/g, '') // old-style directional markers
       .replace(/\bCONST\b\s+/g, '')
       .replace(/\bconst\b\s+/g, '')
+      .replace(/\s+/g, ' ')
       .trim();
 
     const parameterMatch = cleanedParameterText.match(/^(.*?)([A-Za-z_]\w*)$/);
@@ -323,6 +402,10 @@ function parseParameterEntries(prototypeText: string): ParameterEntry[] {
       continue;
     }
 
+    if (parameterType === '') {
+      continue;
+    }
+
     parameterEntries.push({
       isNullable: /_opt_|OPTIONAL|_Reserved_/i.test(normalizedParameterText),
       name: parameterName,
@@ -334,14 +417,111 @@ function parseParameterEntries(prototypeText: string): ParameterEntry[] {
   return parameterEntries;
 }
 
-function deriveReturnTypeFromPrototypeText(prototypeText: string, functionName: string): string {
-  const prototypeLines = prototypeText.split(/\r?\n/);
+function stripEmbeddedComments(parameterText: string): string {
+  return parameterText
+    .replace(/\/\*[\s\S]*?\*\//g, ' ') // /* ... */ block comments (possibly multi-line)
+    .replace(/\/\/[^\n]*/g, ' ') // // line comments
+    .replace(/\s+/g, ' ');
+}
 
-  for (let lineIndex = 0; lineIndex < prototypeLines.length; lineIndex += 1) {
-    if (!new RegExp(`\\b${functionName}\\s*\\(`).test(prototypeLines[lineIndex])) {
+// Strips SAL annotations (e.g. `_In_`, `_In_opt_`, `_Outptr_result_buffer_(_Inexpressible_("..."))`)
+// with support for balanced parens inside the annotation argument. The regex approach fails on
+// nested parens like `_Outptr_result_buffer_(_Inexpressible_(*puLen))`, which leaves a stray `)`
+// inside the parameter type. This walks the string and consumes argument parens by depth.
+function stripSalAnnotations(parameterText: string): string {
+  let result = '';
+  let index = 0;
+
+  while (index < parameterText.length) {
+    const character = parameterText[index];
+
+    if (character !== '_') {
+      result += character;
+      index += 1;
       continue;
     }
 
+    // Scan the identifier that begins with `_`.
+    let identifierEnd = index + 1;
+
+    while (identifierEnd < parameterText.length && /[A-Za-z0-9_]/.test(parameterText[identifierEnd]!)) {
+      identifierEnd += 1;
+    }
+
+    const identifierText = parameterText.slice(index, identifierEnd);
+
+    // SAL annotations contain at least one lowercase letter (e.g. `_In_`, `_Out_`). If there are
+    // no lowercase letters, this is probably a normal identifier that starts with `_` and should
+    // be kept verbatim.
+    if (!/[a-z]/.test(identifierText)) {
+      result += character;
+      index += 1;
+      continue;
+    }
+
+    // Skip optional whitespace between the identifier and a `(` argument list.
+    let argumentStart = identifierEnd;
+
+    while (argumentStart < parameterText.length && parameterText[argumentStart] === ' ') {
+      argumentStart += 1;
+    }
+
+    let consumedEnd = identifierEnd;
+
+    if (parameterText[argumentStart] === '(') {
+      // Walk balanced parentheses. Depth starts at 1 after the opening `(`.
+      let cursor = argumentStart + 1;
+      let depth = 1;
+
+      while (cursor < parameterText.length && depth > 0) {
+        const cursorCharacter = parameterText[cursor];
+
+        if (cursorCharacter === '(') {
+          depth += 1;
+        } else if (cursorCharacter === ')') {
+          depth -= 1;
+        }
+
+        cursor += 1;
+      }
+
+      consumedEnd = cursor;
+    }
+
+    // Swallow trailing whitespace so we collapse e.g. `_In_ LPCVOID` into `LPCVOID`.
+    while (consumedEnd < parameterText.length && parameterText[consumedEnd] === ' ') {
+      consumedEnd += 1;
+    }
+
+    index = consumedEnd;
+  }
+
+  return result;
+}
+
+function deriveReturnTypeFromPrototypeText(prototypeText: string, functionName: string): string {
+  const prototypeLines = prototypeText.split(/\r?\n/);
+  const functionNamePattern = new RegExp(`\\b${functionName}\\s*\\(`);
+
+  for (let lineIndex = 0; lineIndex < prototypeLines.length; lineIndex += 1) {
+    const functionLineMatch = functionNamePattern.exec(prototypeLines[lineIndex]);
+
+    if (!functionLineMatch) {
+      continue;
+    }
+
+    // Case 1: return type is on the same line as the function name.
+    const beforeFunctionNameOnSameLine = prototypeLines[lineIndex].slice(0, functionLineMatch.index).trim();
+
+    if (beforeFunctionNameOnSameLine) {
+      const candidate = stripCallingConventionMacros(beforeFunctionNameOnSameLine).replace(/\s+/g, ' ').trim();
+
+      if (candidate) {
+        return candidate;
+      }
+    }
+
+    // Case 2: walk backward, skipping macros and pure closing punctuation.
     for (let previousLineIndex = lineIndex - 1; previousLineIndex >= 0; previousLineIndex -= 1) {
       const trimmedLine = prototypeLines[previousLineIndex].trim();
 
@@ -349,15 +529,24 @@ function deriveReturnTypeFromPrototypeText(prototypeText: string, functionName: 
         continue;
       }
 
+      if (trimmedLine === ');' || trimmedLine === ';' || trimmedLine === ')') {
+        continue;
+      }
+
       if (isMacroLine(trimmedLine)) {
         continue;
       }
 
-      return trimmedLine.replace(/\s+/g, ' ');
+      return stripCallingConventionMacros(trimmedLine).replace(/\s+/g, ' ');
     }
   }
 
   return 'UNKNOWN';
+}
+
+function stripCallingConventionMacros(returnTypeText: string): string {
+  const callingConventionPattern = /\s+\b(?:WINAPI|APIENTRY|NTAPI|CALLBACK|WINAPIV|STDAPI|STDAPICALLTYPE|STDMETHODCALLTYPE|WINBASEAPI|WINUSERAPI|WINADVAPI|NTSYSAPI|WSAAPI|SOCKAPI|PASCAL)\b\s*/g;
+  return returnTypeText.replace(callingConventionPattern, ' ').trim();
 }
 
 function splitTopLevelCommaSeparatedText(text: string): string[] {
