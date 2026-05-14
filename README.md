@@ -47,12 +47,14 @@ Published packages are AI-friendly. Alongside the `README.md`, each package incl
 - [`comctl32`](./packages/comctl32) - common controls, image lists, property sheets, DPA/DSA dynamic arrays, flat scroll bars, window subclassing
 - [`comdlg32`](./packages/comdlg32) - common dialogs: Open / Save File, Choose Color, Choose Font, Print, Page Setup, Find / Replace, and `CommDlgExtendedError`
 - [`d3d11`](./packages/d3d11) - Direct3D 11 device / swap-chain creation, D3D11-on-12 interop, WinRT `IDirect3DDevice` / `IDirect3DSurface` bridges
+- [`d3dcompiler_47`](./packages/d3dcompiler_47) - HLSL → DXBC shader compilation, preprocessing, disassembly, reflection, blob part extraction, shader stripping, function linking graph
 - [`dwmapi`](./packages/dwmapi) - DWM composition, blur, thumbnails
 - [`dxgi`](./packages/dxgi) - DXGI adapter enumeration, factory creation, debug interface (`CreateDXGIFactory*`, `DXGIGetDebugInterface1`)
 - [`dxva2`](./packages/dxva2) - DDC/CI monitor configuration (brightness, contrast, RGB drive/gain, colour temperature, VCP), physical monitor enumeration, DXVA2 / DXVA-HD video acceleration, OPM video output
 - [`gdi32`](./packages/gdi32) - graphics device interface
 - [`gdiplus`](./packages/gdiplus) - GDI+ flat C API: image load/save (PNG, JPEG, BMP, GIF, TIFF, ICO), antialiased 2D drawing, paths, regions, gradients, brushes, fonts, color matrix effects, metafile recording
 - [`glu32`](./packages/glu32) - OpenGL utility functions
+- [`mscms`](./packages/mscms) - Image Color Management (ICM): ICC profiles, color transforms, sRGB / Adobe RGB / CMYK conversion via Win32 CMM, display calibration, and the Windows Color System (WCS) profile management API
 - [`opengl32`](./packages/opengl32) - OpenGL rendering context
 - [`user32`](./packages/user32) - windows, messages, input, UI
 - [`uxtheme`](./packages/uxtheme) - visual styles, themed controls, buffered painting
@@ -70,11 +72,13 @@ Published packages are AI-friendly. Alongside the `README.md`, each package incl
 
 - [`bluetoothapis`](./packages/bluetoothapis) - Bluetooth Classic radio/device discovery, BLE GATT, SDP, authentication
 - [`dnsapi`](./packages/dnsapi) - DNS resolution across every record type (A, AAAA, MX, NS, SOA, TXT, SRV, CAA, etc.), name validation, configured server discovery, DNS-SD, mDNS, async queries
+- [`httpapi`](./packages/httpapi) - HTTP Server API (HTTP.sys): kernel-mode listener powering IIS, request queues, URL groups, server sessions, SSL/TLS config, response caching, HTTP/2 push, request shaping
 - [`iphlpapi`](./packages/iphlpapi) - network adapters, TCP/UDP tables, routing
 - [`mpr`](./packages/mpr) - network drive mapping, UNC connections, resource enumeration
 - [`netapi32`](./packages/netapi32) - users, groups, shares, domain joins
 - [`sensapi`](./packages/sensapi) - System Event Notification Service connectivity checks (`IsNetworkAlive`, `IsDestinationReachable`)
 - [`winhttp`](./packages/winhttp) - HTTP/HTTPS client, WebSockets, proxy auto-detect (WPAD/PAC), TLS configuration, request tracing
+- [`wininet`](./packages/wininet) - WinINet/IE-legacy stack: HTTP/HTTPS, FTP, persistent URL cache, cookie jar (`InternetGetCookieEx2`, `InternetSetCookieEx2`), autodial, per-site cookie decisions
 - [`wlanapi`](./packages/wlanapi) - Native Wifi: interface enumeration, scans, profiles, Wi-Fi Direct
 - [`ws2_32`](./packages/ws2_32) - Winsock 2: BSD sockets, DNS, network I/O
 
@@ -92,9 +96,11 @@ Published packages are AI-friendly. Alongside the `README.md`, each package incl
 - [`bcrypt`](./packages/bcrypt) - Cryptography Next Gen (CNG): ciphers, hashes, HMAC, PBKDF2, signatures, random bytes, key agreement
 - [`credui`](./packages/credui) - credential prompts, username parsing, auth blobs, and SSPI prompt helpers
 - [`crypt32`](./packages/crypt32) - certificate stores, chains, encoding, DPAPI
+- [`ncrypt`](./packages/ncrypt) - CNG Key Storage: persisted keys, RSA/ECDSA/ECDH signing & key agreement, key attestation claims, DPAPI-NG protection descriptors and streaming
 - [`secur32`](./packages/secur32) - SSPI authentication, credentials, LSA
 - [`sspicli`](./packages/sspicli) - SSPI client-side auth and SASL
 - [`winscard`](./packages/winscard) - smart card resource manager, reader discovery, status changes, and APDU transport
+- [`wintrust`](./packages/wintrust) - Authenticode signature verification (WinVerifyTrust), catalog admin, SIP, and trust-provider helpers
 
 #### System
 
@@ -107,9 +113,11 @@ Published packages are AI-friendly. Alongside the `README.md`, each package incl
 - [`ntdll`](./packages/ntdll) - native NT API
 - [`normaliz`](./packages/normaliz) - internationalized domain names, Nameprep, and Unicode normalization
 - [`ole32`](./packages/ole32) - COM/OLE helpers, monikers, structured storage, clipboard, drag-drop
+- [`oleaut32`](./packages/oleaut32) - OLE Automation: BSTR, VARIANT, SAFEARRAY, DECIMAL, CURRENCY, type libraries, IDispatch helpers, OLE pictures, full Var\*From\* conversion family
 - [`pdh`](./packages/pdh) - performance counter queries, logs, and enumeration
 - [`powrprof`](./packages/powrprof) - power schemes, policies, sleep states, battery management
 - [`psapi`](./packages/psapi) - process status and module enumeration
+- [`rpcrt4`](./packages/rpcrt4) - RPC runtime: UUID generation (random + sequential), client/server bindings, endpoint mapper enumeration, authentication levels, extended error info, protocol sequences, MES pickling, string-binding compose/parse, `DceErrorInqText`
 - [`rstrtmgr`](./packages/rstrtmgr) - Restart Manager sessions, lock discovery, shutdown, and restart orchestration
 - [`setupapi`](./packages/setupapi) - device installation, INF parsing, class and interface enumeration
 - [`shcore`](./packages/shcore) - DPI awareness, scale factors, AppUserModelID, random access streams, registry helpers, isolated-container detection, threading refs

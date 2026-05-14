@@ -144,6 +144,19 @@
         "typescript": "^5",
       },
     },
+    "packages/d3dcompiler_47": {
+      "name": "@bun-win32/d3dcompiler_47",
+      "version": "1.0.0",
+      "dependencies": {
+        "@bun-win32/core": "workspace:*",
+      },
+      "devDependencies": {
+        "@types/bun": "latest",
+      },
+      "peerDependencies": {
+        "typescript": "^5",
+      },
+    },
     "packages/dbghelp": {
       "name": "@bun-win32/dbghelp",
       "version": "1.0.0",
@@ -272,6 +285,19 @@
         "typescript": "^5",
       },
     },
+    "packages/httpapi": {
+      "name": "@bun-win32/httpapi",
+      "version": "1.0.0",
+      "dependencies": {
+        "@bun-win32/core": "workspace:*",
+      },
+      "devDependencies": {
+        "@types/bun": "latest",
+      },
+      "peerDependencies": {
+        "typescript": "^5",
+      },
+    },
     "packages/iphlpapi": {
       "name": "@bun-win32/iphlpapi",
       "version": "1.0.4",
@@ -365,8 +391,34 @@
         "typescript": "^5",
       },
     },
+    "packages/mscms": {
+      "name": "@bun-win32/mscms",
+      "version": "1.0.0",
+      "dependencies": {
+        "@bun-win32/core": "workspace:*",
+      },
+      "devDependencies": {
+        "@types/bun": "latest",
+      },
+      "peerDependencies": {
+        "typescript": "^5",
+      },
+    },
     "packages/msi": {
       "name": "@bun-win32/msi",
+      "version": "1.0.0",
+      "dependencies": {
+        "@bun-win32/core": "workspace:*",
+      },
+      "devDependencies": {
+        "@types/bun": "latest",
+      },
+      "peerDependencies": {
+        "typescript": "^5",
+      },
+    },
+    "packages/ncrypt": {
+      "name": "@bun-win32/ncrypt",
       "version": "1.0.0",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
@@ -431,6 +483,20 @@
         "typescript": "^5",
       },
     },
+    "packages/oleaut32": {
+      "name": "@bun-win32/oleaut32",
+      "version": "1.0.0",
+      "dependencies": {
+        "@bun-win32/core": "workspace:*",
+      },
+      "devDependencies": {
+        "@bun-win32/kernel32": "workspace:*",
+        "@types/bun": "latest",
+      },
+      "peerDependencies": {
+        "typescript": "^5",
+      },
+    },
     "packages/opengl32": {
       "name": "@bun-win32/opengl32",
       "version": "1.4.10",
@@ -482,6 +548,19 @@
       },
       "devDependencies": {
         "@bun-win32/kernel32": "workspace:*",
+        "@types/bun": "latest",
+      },
+      "peerDependencies": {
+        "typescript": "^5",
+      },
+    },
+    "packages/rpcrt4": {
+      "name": "@bun-win32/rpcrt4",
+      "version": "1.0.0",
+      "dependencies": {
+        "@bun-win32/core": "workspace:*",
+      },
+      "devDependencies": {
         "@types/bun": "latest",
       },
       "peerDependencies": {
@@ -732,6 +811,19 @@
         "typescript": "^5",
       },
     },
+    "packages/wininet": {
+      "name": "@bun-win32/wininet",
+      "version": "1.0.0",
+      "dependencies": {
+        "@bun-win32/core": "workspace:*",
+      },
+      "devDependencies": {
+        "@types/bun": "latest",
+      },
+      "peerDependencies": {
+        "typescript": "^5",
+      },
+    },
     "packages/winmm": {
       "name": "@bun-win32/winmm",
       "version": "1.0.2",
@@ -765,6 +857,20 @@
         "@bun-win32/core": "workspace:*",
       },
       "devDependencies": {
+        "@types/bun": "latest",
+      },
+      "peerDependencies": {
+        "typescript": "^5",
+      },
+    },
+    "packages/wintrust": {
+      "name": "@bun-win32/wintrust",
+      "version": "1.0.0",
+      "dependencies": {
+        "@bun-win32/core": "workspace:*",
+      },
+      "devDependencies": {
+        "@bun-win32/kernel32": "workspace:*",
         "@types/bun": "latest",
       },
       "peerDependencies": {
@@ -872,6 +978,8 @@
 
     "@bun-win32/d3d11": ["@bun-win32/d3d11@workspace:packages/d3d11"],
 
+    "@bun-win32/d3dcompiler_47": ["@bun-win32/d3dcompiler_47@workspace:packages/d3dcompiler_47"],
+
     "@bun-win32/dbghelp": ["@bun-win32/dbghelp@workspace:packages/dbghelp"],
 
     "@bun-win32/dnsapi": ["@bun-win32/dnsapi@workspace:packages/dnsapi"],
@@ -890,6 +998,8 @@
 
     "@bun-win32/hid": ["@bun-win32/hid@workspace:packages/hid"],
 
+    "@bun-win32/httpapi": ["@bun-win32/httpapi@workspace:packages/httpapi"],
+
     "@bun-win32/iphlpapi": ["@bun-win32/iphlpapi@workspace:packages/iphlpapi"],
 
     "@bun-win32/kernel32": ["@bun-win32/kernel32@workspace:packages/kernel32"],
@@ -904,7 +1014,11 @@
 
     "@bun-win32/mpr": ["@bun-win32/mpr@workspace:packages/mpr"],
 
+    "@bun-win32/mscms": ["@bun-win32/mscms@workspace:packages/mscms"],
+
     "@bun-win32/msi": ["@bun-win32/msi@workspace:packages/msi"],
+
+    "@bun-win32/ncrypt": ["@bun-win32/ncrypt@workspace:packages/ncrypt"],
 
     "@bun-win32/netapi32": ["@bun-win32/netapi32@workspace:packages/netapi32"],
 
@@ -914,6 +1028,8 @@
 
     "@bun-win32/ole32": ["@bun-win32/ole32@workspace:packages/ole32"],
 
+    "@bun-win32/oleaut32": ["@bun-win32/oleaut32@workspace:packages/oleaut32"],
+
     "@bun-win32/opengl32": ["@bun-win32/opengl32@workspace:packages/opengl32"],
 
     "@bun-win32/pdh": ["@bun-win32/pdh@workspace:packages/pdh"],
@@ -921,6 +1037,8 @@
     "@bun-win32/powrprof": ["@bun-win32/powrprof@workspace:packages/powrprof"],
 
     "@bun-win32/psapi": ["@bun-win32/psapi@workspace:packages/psapi"],
+
+    "@bun-win32/rpcrt4": ["@bun-win32/rpcrt4@workspace:packages/rpcrt4"],
 
     "@bun-win32/rstrtmgr": ["@bun-win32/rstrtmgr@workspace:packages/rstrtmgr"],
 
@@ -956,11 +1074,15 @@
 
     "@bun-win32/winhttp": ["@bun-win32/winhttp@workspace:packages/winhttp"],
 
+    "@bun-win32/wininet": ["@bun-win32/wininet@workspace:packages/wininet"],
+
     "@bun-win32/winmm": ["@bun-win32/winmm@workspace:packages/winmm"],
 
     "@bun-win32/winscard": ["@bun-win32/winscard@workspace:packages/winscard"],
 
     "@bun-win32/winspool": ["@bun-win32/winspool@workspace:packages/winspool"],
+
+    "@bun-win32/wintrust": ["@bun-win32/wintrust@workspace:packages/wintrust"],
 
     "@bun-win32/winusb": ["@bun-win32/winusb@workspace:packages/winusb"],
 
@@ -990,21 +1112,39 @@
 
     "@bun-win32/core/@types/bun": ["@types/bun@1.3.14", "", { "dependencies": { "bun-types": "1.3.14" } }, "sha512-h1hFqFVcvAvD9j9K7ZW7vd82aSA+rTdznZa+5bwvCwqSB1jmmfLcbIWhOLx1/+boy/xmjgCs/OMUL8hRJSmnPw=="],
 
+    "@bun-win32/d3dcompiler_47/@types/bun": ["@types/bun@1.3.14", "", { "dependencies": { "bun-types": "1.3.14" } }, "sha512-h1hFqFVcvAvD9j9K7ZW7vd82aSA+rTdznZa+5bwvCwqSB1jmmfLcbIWhOLx1/+boy/xmjgCs/OMUL8hRJSmnPw=="],
+
     "@bun-win32/dnsapi/@types/bun": ["@types/bun@1.3.14", "", { "dependencies": { "bun-types": "1.3.14" } }, "sha512-h1hFqFVcvAvD9j9K7ZW7vd82aSA+rTdznZa+5bwvCwqSB1jmmfLcbIWhOLx1/+boy/xmjgCs/OMUL8hRJSmnPw=="],
 
     "@bun-win32/dxva2/@types/bun": ["@types/bun@1.3.14", "", { "dependencies": { "bun-types": "1.3.14" } }, "sha512-h1hFqFVcvAvD9j9K7ZW7vd82aSA+rTdznZa+5bwvCwqSB1jmmfLcbIWhOLx1/+boy/xmjgCs/OMUL8hRJSmnPw=="],
 
     "@bun-win32/gdiplus/@types/bun": ["@types/bun@1.3.14", "", { "dependencies": { "bun-types": "1.3.14" } }, "sha512-h1hFqFVcvAvD9j9K7ZW7vd82aSA+rTdznZa+5bwvCwqSB1jmmfLcbIWhOLx1/+boy/xmjgCs/OMUL8hRJSmnPw=="],
 
+    "@bun-win32/httpapi/@types/bun": ["@types/bun@1.3.14", "", { "dependencies": { "bun-types": "1.3.14" } }, "sha512-h1hFqFVcvAvD9j9K7ZW7vd82aSA+rTdznZa+5bwvCwqSB1jmmfLcbIWhOLx1/+boy/xmjgCs/OMUL8hRJSmnPw=="],
+
     "@bun-win32/kernel32/@types/bun": ["@types/bun@1.3.14", "", { "dependencies": { "bun-types": "1.3.14" } }, "sha512-h1hFqFVcvAvD9j9K7ZW7vd82aSA+rTdznZa+5bwvCwqSB1jmmfLcbIWhOLx1/+boy/xmjgCs/OMUL8hRJSmnPw=="],
+
+    "@bun-win32/mscms/@types/bun": ["@types/bun@1.3.14", "", { "dependencies": { "bun-types": "1.3.14" } }, "sha512-h1hFqFVcvAvD9j9K7ZW7vd82aSA+rTdznZa+5bwvCwqSB1jmmfLcbIWhOLx1/+boy/xmjgCs/OMUL8hRJSmnPw=="],
+
+    "@bun-win32/ncrypt/@types/bun": ["@types/bun@1.3.14", "", { "dependencies": { "bun-types": "1.3.14" } }, "sha512-h1hFqFVcvAvD9j9K7ZW7vd82aSA+rTdznZa+5bwvCwqSB1jmmfLcbIWhOLx1/+boy/xmjgCs/OMUL8hRJSmnPw=="],
+
+    "@bun-win32/oleaut32/@types/bun": ["@types/bun@1.3.14", "", { "dependencies": { "bun-types": "1.3.14" } }, "sha512-h1hFqFVcvAvD9j9K7ZW7vd82aSA+rTdznZa+5bwvCwqSB1jmmfLcbIWhOLx1/+boy/xmjgCs/OMUL8hRJSmnPw=="],
+
+    "@bun-win32/rpcrt4/@types/bun": ["@types/bun@1.3.14", "", { "dependencies": { "bun-types": "1.3.14" } }, "sha512-h1hFqFVcvAvD9j9K7ZW7vd82aSA+rTdznZa+5bwvCwqSB1jmmfLcbIWhOLx1/+boy/xmjgCs/OMUL8hRJSmnPw=="],
 
     "@bun-win32/user32/@types/bun": ["@types/bun@1.3.14", "", { "dependencies": { "bun-types": "1.3.14" } }, "sha512-h1hFqFVcvAvD9j9K7ZW7vd82aSA+rTdznZa+5bwvCwqSB1jmmfLcbIWhOLx1/+boy/xmjgCs/OMUL8hRJSmnPw=="],
 
     "@bun-win32/winhttp/@types/bun": ["@types/bun@1.3.14", "", { "dependencies": { "bun-types": "1.3.14" } }, "sha512-h1hFqFVcvAvD9j9K7ZW7vd82aSA+rTdznZa+5bwvCwqSB1jmmfLcbIWhOLx1/+boy/xmjgCs/OMUL8hRJSmnPw=="],
 
+    "@bun-win32/wininet/@types/bun": ["@types/bun@1.3.14", "", { "dependencies": { "bun-types": "1.3.14" } }, "sha512-h1hFqFVcvAvD9j9K7ZW7vd82aSA+rTdznZa+5bwvCwqSB1jmmfLcbIWhOLx1/+boy/xmjgCs/OMUL8hRJSmnPw=="],
+
+    "@bun-win32/wintrust/@types/bun": ["@types/bun@1.3.14", "", { "dependencies": { "bun-types": "1.3.14" } }, "sha512-h1hFqFVcvAvD9j9K7ZW7vd82aSA+rTdznZa+5bwvCwqSB1jmmfLcbIWhOLx1/+boy/xmjgCs/OMUL8hRJSmnPw=="],
+
     "@bun-win32/comdlg32/@types/bun/bun-types": ["bun-types@1.3.14", "", { "dependencies": { "@types/node": "*" } }, "sha512-4N0ig0fEomHt5R0KCFWjovxow98rIoRwKolrYdCcknNwMekCXRnWEUvgu5soYV8QXtVsrUD8B95MBOZGPvr6KQ=="],
 
     "@bun-win32/core/@types/bun/bun-types": ["bun-types@1.3.14", "", { "dependencies": { "@types/node": "*" } }, "sha512-4N0ig0fEomHt5R0KCFWjovxow98rIoRwKolrYdCcknNwMekCXRnWEUvgu5soYV8QXtVsrUD8B95MBOZGPvr6KQ=="],
+
+    "@bun-win32/d3dcompiler_47/@types/bun/bun-types": ["bun-types@1.3.14", "", { "dependencies": { "@types/node": "*" } }, "sha512-4N0ig0fEomHt5R0KCFWjovxow98rIoRwKolrYdCcknNwMekCXRnWEUvgu5soYV8QXtVsrUD8B95MBOZGPvr6KQ=="],
 
     "@bun-win32/dnsapi/@types/bun/bun-types": ["bun-types@1.3.14", "", { "dependencies": { "@types/node": "*" } }, "sha512-4N0ig0fEomHt5R0KCFWjovxow98rIoRwKolrYdCcknNwMekCXRnWEUvgu5soYV8QXtVsrUD8B95MBOZGPvr6KQ=="],
 
@@ -1012,10 +1152,24 @@
 
     "@bun-win32/gdiplus/@types/bun/bun-types": ["bun-types@1.3.14", "", { "dependencies": { "@types/node": "*" } }, "sha512-4N0ig0fEomHt5R0KCFWjovxow98rIoRwKolrYdCcknNwMekCXRnWEUvgu5soYV8QXtVsrUD8B95MBOZGPvr6KQ=="],
 
+    "@bun-win32/httpapi/@types/bun/bun-types": ["bun-types@1.3.14", "", { "dependencies": { "@types/node": "*" } }, "sha512-4N0ig0fEomHt5R0KCFWjovxow98rIoRwKolrYdCcknNwMekCXRnWEUvgu5soYV8QXtVsrUD8B95MBOZGPvr6KQ=="],
+
     "@bun-win32/kernel32/@types/bun/bun-types": ["bun-types@1.3.14", "", { "dependencies": { "@types/node": "*" } }, "sha512-4N0ig0fEomHt5R0KCFWjovxow98rIoRwKolrYdCcknNwMekCXRnWEUvgu5soYV8QXtVsrUD8B95MBOZGPvr6KQ=="],
+
+    "@bun-win32/mscms/@types/bun/bun-types": ["bun-types@1.3.14", "", { "dependencies": { "@types/node": "*" } }, "sha512-4N0ig0fEomHt5R0KCFWjovxow98rIoRwKolrYdCcknNwMekCXRnWEUvgu5soYV8QXtVsrUD8B95MBOZGPvr6KQ=="],
+
+    "@bun-win32/ncrypt/@types/bun/bun-types": ["bun-types@1.3.14", "", { "dependencies": { "@types/node": "*" } }, "sha512-4N0ig0fEomHt5R0KCFWjovxow98rIoRwKolrYdCcknNwMekCXRnWEUvgu5soYV8QXtVsrUD8B95MBOZGPvr6KQ=="],
+
+    "@bun-win32/oleaut32/@types/bun/bun-types": ["bun-types@1.3.14", "", { "dependencies": { "@types/node": "*" } }, "sha512-4N0ig0fEomHt5R0KCFWjovxow98rIoRwKolrYdCcknNwMekCXRnWEUvgu5soYV8QXtVsrUD8B95MBOZGPvr6KQ=="],
+
+    "@bun-win32/rpcrt4/@types/bun/bun-types": ["bun-types@1.3.14", "", { "dependencies": { "@types/node": "*" } }, "sha512-4N0ig0fEomHt5R0KCFWjovxow98rIoRwKolrYdCcknNwMekCXRnWEUvgu5soYV8QXtVsrUD8B95MBOZGPvr6KQ=="],
 
     "@bun-win32/user32/@types/bun/bun-types": ["bun-types@1.3.14", "", { "dependencies": { "@types/node": "*" } }, "sha512-4N0ig0fEomHt5R0KCFWjovxow98rIoRwKolrYdCcknNwMekCXRnWEUvgu5soYV8QXtVsrUD8B95MBOZGPvr6KQ=="],
 
     "@bun-win32/winhttp/@types/bun/bun-types": ["bun-types@1.3.14", "", { "dependencies": { "@types/node": "*" } }, "sha512-4N0ig0fEomHt5R0KCFWjovxow98rIoRwKolrYdCcknNwMekCXRnWEUvgu5soYV8QXtVsrUD8B95MBOZGPvr6KQ=="],
+
+    "@bun-win32/wininet/@types/bun/bun-types": ["bun-types@1.3.14", "", { "dependencies": { "@types/node": "*" } }, "sha512-4N0ig0fEomHt5R0KCFWjovxow98rIoRwKolrYdCcknNwMekCXRnWEUvgu5soYV8QXtVsrUD8B95MBOZGPvr6KQ=="],
+
+    "@bun-win32/wintrust/@types/bun/bun-types": ["bun-types@1.3.14", "", { "dependencies": { "@types/node": "*" } }, "sha512-4N0ig0fEomHt5R0KCFWjovxow98rIoRwKolrYdCcknNwMekCXRnWEUvgu5soYV8QXtVsrUD8B95MBOZGPvr6KQ=="],
   }
 }

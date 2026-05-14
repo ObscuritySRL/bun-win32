@@ -1,0 +1,221 @@
+import type { Pointer } from 'bun:ffi';
+
+export type { BOOL, BOOLEAN, DWORD, HANDLE, HWND, LPCVOID, LPCWSTR, LPVOID, LPWSTR, NULL, PBYTE, PDWORD, PHANDLE, PULONG, PVOID, SIZE_T, ULONG } from '@bun-win32/core';
+
+export type HCRYPTKEY = bigint;
+export type HCRYPTPROV = bigint;
+export type LPCBYTE = Pointer;
+export type LPCSTR = Pointer;
+export type LPNCryptBuffer = Pointer;
+export type LPNCryptBufferDesc = Pointer;
+export type LPSIZE_T = Pointer;
+export type NCRYPT_DESCRIPTOR_HANDLE = bigint;
+export type NCRYPT_HANDLE = bigint;
+export type NCRYPT_HASH_HANDLE = bigint;
+export type NCRYPT_KEY_HANDLE = bigint;
+export type NCRYPT_KEY_PROTECTOR_HANDLE = bigint;
+export type NCRYPT_PROV_HANDLE = bigint;
+export type NCRYPT_SECRET_HANDLE = bigint;
+export type NCRYPT_STREAM_HANDLE = bigint;
+export type PCERT_CONTEXT = Pointer;
+export type PNCRYPT_ALLOC_PARA = Pointer;
+export type PNCRYPT_DESCRIPTOR_HANDLE = Pointer;
+export type PNCRYPT_KEY_HANDLE = Pointer;
+export type PNCRYPT_KEY_PROTECTOR_HANDLE = Pointer;
+export type PNCRYPT_PROV_HANDLE = Pointer;
+export type PNCRYPT_SECRET_HANDLE = Pointer;
+export type PNCRYPT_STREAM_HANDLE = Pointer;
+export type PNCRYPT_SUPPORTED_LENGTHS = Pointer;
+export type PNCRYPT_UI_POLICY = Pointer;
+export type PNCryptAlgorithmName = Pointer;
+export type PNCryptKeyName = Pointer;
+export type PNCryptProviderName = Pointer;
+export type PPNCryptAlgorithmName = Pointer;
+export type PPNCryptKeyName = Pointer;
+export type PPNCryptProviderName = Pointer;
+export type SECURITY_STATUS = number;
+
+export enum NCryptAlgClass {
+  NCRYPT_ASYMMETRIC_ENCRYPTION_OPERATION = 0x0000_0004,
+  NCRYPT_CIPHER_OPERATION = 0x0000_0001,
+  NCRYPT_HASH_OPERATION = 0x0000_0002,
+  NCRYPT_KEY_DERIVATION_OPERATION = 0x0000_0040,
+  NCRYPT_RNG_OPERATION = 0x0000_0020,
+  NCRYPT_SECRET_AGREEMENT_OPERATION = 0x0000_0008,
+  NCRYPT_SIGNATURE_OPERATION = 0x0000_0010,
+}
+
+export enum NCryptClaimType {
+  NCRYPT_CLAIM_AUTHORITY_AND_SUBJECT = 0x0000_0103,
+  NCRYPT_CLAIM_AUTHORITY_ONLY = 0x0000_0101,
+  NCRYPT_CLAIM_NONE = 0x0000_0000,
+  NCRYPT_CLAIM_SUBJECT_ONLY = 0x0000_0102,
+  NCRYPT_CLAIM_UNKNOWN = 0x0000_1000,
+  NCRYPT_CLAIM_WEB_AUTH_SUBJECT_ONLY = 0x0000_0202,
+}
+
+export enum NCryptExportPolicy {
+  NCRYPT_ALLOW_ARCHIVING_FLAG = 0x0000_0004,
+  NCRYPT_ALLOW_EXPORT_FLAG = 0x0000_0001,
+  NCRYPT_ALLOW_PLAINTEXT_ARCHIVING_FLAG = 0x0000_0008,
+  NCRYPT_ALLOW_PLAINTEXT_EXPORT_FLAG = 0x0000_0002,
+}
+
+export enum NCryptFlags {
+  NCRYPT_DO_NOT_FINALIZE_FLAG = 0x0000_0400,
+  NCRYPT_IGNORE_DEVICE_STATE_FLAG = 0x0000_1000,
+  NCRYPT_MACHINE_KEY_FLAG = 0x0000_0020,
+  NCRYPT_NO_KEY_VALIDATION = 0x0000_0008,
+  NCRYPT_OVERWRITE_KEY_FLAG = 0x0000_0080,
+  NCRYPT_PERSIST_FLAG = 0x8000_0000,
+  NCRYPT_PERSIST_ONLY_FLAG = 0x4000_0000,
+  NCRYPT_PREFER_VIRTUAL_ISOLATION_FLAG = 0x0001_0000,
+  NCRYPT_REGISTER_NOTIFY_FLAG = 0x0000_0001,
+  NCRYPT_SILENT_FLAG = 0x0000_0040,
+  NCRYPT_UNREGISTER_NOTIFY_FLAG = 0x0000_0002,
+  NCRYPT_USE_PER_BOOT_KEY_FLAG = 0x0004_0000,
+  NCRYPT_USE_VIRTUAL_ISOLATION_FLAG = 0x0002_0000,
+  NCRYPT_WRITE_KEY_TO_LEGACY_STORE_FLAG = 0x0000_0200,
+}
+
+export enum NCryptImplType {
+  NCRYPT_IMPL_HARDWARE_FLAG = 0x0000_0001,
+  NCRYPT_IMPL_HARDWARE_RNG_FLAG = 0x0000_0010,
+  NCRYPT_IMPL_REMOVABLE_FLAG = 0x0000_0008,
+  NCRYPT_IMPL_SOFTWARE_FLAG = 0x0000_0002,
+}
+
+export enum NCryptKeySpec {
+  AT_KEYEXCHANGE = 0x0000_0001,
+  AT_SIGNATURE = 0x0000_0002,
+}
+
+export enum NCryptKeyUsage {
+  NCRYPT_ALLOW_ALL_USAGES = 0x00ff_ffff,
+  NCRYPT_ALLOW_DECRYPT_FLAG = 0x0000_0001,
+  NCRYPT_ALLOW_KEY_AGREEMENT_FLAG = 0x0000_0004,
+  NCRYPT_ALLOW_KEY_IMPORT_FLAG = 0x0000_0008,
+  NCRYPT_ALLOW_SIGNING_FLAG = 0x0000_0002,
+}
+
+export enum NCryptPaddingFlags {
+  NCRYPT_NO_PADDING_FLAG = 0x0000_0001,
+  NCRYPT_PAD_OAEP_FLAG = 0x0000_0004,
+  NCRYPT_PAD_PKCS1_FLAG = 0x0000_0002,
+  NCRYPT_PAD_PSS_FLAG = 0x0000_0008,
+}
+
+export enum NCryptProtectFlags {
+  NCRYPT_PROTECT_CRED_REGENERATE = 0x0000_0010,
+  NCRYPT_PROTECT_IGNORE_ID_FLAG = 0x0000_0020,
+  NCRYPT_PROTECT_NO_DECRYPT_FLAG = 0x0000_0004,
+  NCRYPT_PROTECT_TO_LOCAL_SYSTEM = 0x0000_0008,
+  NCRYPT_SILENT_FLAG = 0x0000_0040,
+  NCRYPT_UNPROTECT_NO_DECRYPT = 0x0000_0001,
+}
+
+export enum NCryptUIPolicyFlags {
+  NCRYPT_UI_FINGERPRINT_PROTECTION_FLAG = 0x0000_0004,
+  NCRYPT_UI_FORCE_HIGH_PROTECTION_FLAG = 0x0000_0002,
+  NCRYPT_UI_PROTECT_KEY_FLAG = 0x0000_0001,
+}
+
+export const AT_KEYEXCHANGE = 0x0000_0001;
+export const AT_SIGNATURE = 0x0000_0002;
+
+export const BCRYPT_DH_PRIVATE_BLOB = 'DHPRIVATEBLOB';
+export const BCRYPT_DH_PUBLIC_BLOB = 'DHPUBLICBLOB';
+export const BCRYPT_DSA_PRIVATE_BLOB = 'DSAPRIVATEBLOB';
+export const BCRYPT_DSA_PUBLIC_BLOB = 'DSAPUBLICBLOB';
+export const BCRYPT_ECCPRIVATE_BLOB = 'ECCPRIVATEBLOB';
+export const BCRYPT_ECCPUBLIC_BLOB = 'ECCPUBLICBLOB';
+export const BCRYPT_PRIVATE_KEY_BLOB = 'PRIVATEBLOB';
+export const BCRYPT_PUBLIC_KEY_BLOB = 'PUBLICBLOB';
+export const BCRYPT_RSAPRIVATE_BLOB = 'RSAPRIVATEBLOB';
+export const BCRYPT_RSAPUBLIC_BLOB = 'RSAPUBLICBLOB';
+
+export const LEGACY_RSAPRIVATE_BLOB = 'CAPIPRIVATEBLOB';
+export const LEGACY_RSAPUBLIC_BLOB = 'CAPIPUBLICBLOB';
+
+export const MS_KEY_PROTECTION_PROVIDER = 'Microsoft Key Protection Provider';
+export const MS_KEY_STORAGE_PROVIDER = 'Microsoft Software Key Storage Provider';
+export const MS_NGC_KEY_STORAGE_PROVIDER = 'Microsoft Passport Key Storage Provider';
+export const MS_PLATFORM_CRYPTO_PROVIDER = 'Microsoft Platform Crypto Provider';
+export const MS_SMART_CARD_KEY_STORAGE_PROVIDER = 'Microsoft Smart Card Key Storage Provider';
+
+export const NCRYPT_3DES_ALGORITHM = '3DES';
+export const NCRYPT_AES_ALGORITHM = 'AES';
+export const NCRYPT_DH_ALGORITHM = 'DH';
+export const NCRYPT_DSA_ALGORITHM = 'DSA';
+export const NCRYPT_ECDH_ALGORITHM = 'ECDH';
+export const NCRYPT_ECDH_P256_ALGORITHM = 'ECDH_P256';
+export const NCRYPT_ECDH_P384_ALGORITHM = 'ECDH_P384';
+export const NCRYPT_ECDH_P521_ALGORITHM = 'ECDH_P521';
+export const NCRYPT_ECDSA_ALGORITHM = 'ECDSA';
+export const NCRYPT_ECDSA_P256_ALGORITHM = 'ECDSA_P256';
+export const NCRYPT_ECDSA_P384_ALGORITHM = 'ECDSA_P384';
+export const NCRYPT_ECDSA_P521_ALGORITHM = 'ECDSA_P521';
+export const NCRYPT_MD2_ALGORITHM = 'MD2';
+export const NCRYPT_MD4_ALGORITHM = 'MD4';
+export const NCRYPT_MD5_ALGORITHM = 'MD5';
+export const NCRYPT_RC2_ALGORITHM = 'RC2';
+export const NCRYPT_RSA_ALGORITHM = 'RSA';
+export const NCRYPT_RSA_SIGN_ALGORITHM = 'RSA_SIGN';
+export const NCRYPT_SHA1_ALGORITHM = 'SHA1';
+export const NCRYPT_SHA256_ALGORITHM = 'SHA256';
+export const NCRYPT_SHA384_ALGORITHM = 'SHA384';
+export const NCRYPT_SHA512_ALGORITHM = 'SHA512';
+
+export const NCRYPT_ALGORITHM_GROUP_PROPERTY = 'Algorithm Group';
+export const NCRYPT_ALGORITHM_PROPERTY = 'Algorithm Name';
+export const NCRYPT_ASSOCIATED_ECDH_KEY = 'SmartCardAssociatedECDHKey';
+export const NCRYPT_AUTH_TAG_LENGTH = 'AuthTagLength';
+export const NCRYPT_BLOCK_LENGTH_PROPERTY = 'Block Length';
+export const NCRYPT_CERTIFICATE_PROPERTY = 'SmartCardKeyCertificate';
+export const NCRYPT_CHAINING_MODE_PROPERTY = 'Chaining Mode';
+export const NCRYPT_DH_PARAMETERS_PROPERTY = 'DHParameters';
+export const NCRYPT_DISMISS_UI_TIMEOUT_SEC_PROPERTY = 'SmartCardDismissUITimeoutSeconds';
+export const NCRYPT_ECC_CURVE_NAME_PROPERTY = 'ECCCurveName';
+export const NCRYPT_EXPORT_POLICY_PROPERTY = 'Export Policy';
+export const NCRYPT_IMPL_TYPE_PROPERTY = 'Impl Type';
+export const NCRYPT_INITIALIZATION_VECTOR = 'IV';
+export const NCRYPT_KEY_TYPE_PROPERTY = 'Key Type';
+export const NCRYPT_KEY_USAGE_PROPERTY = 'Key Usage';
+export const NCRYPT_LAST_MODIFIED_PROPERTY = 'Modified';
+export const NCRYPT_LENGTH_PROPERTY = 'Length';
+export const NCRYPT_LENGTHS_PROPERTY = 'Lengths';
+export const NCRYPT_MAX_NAME_LENGTH_PROPERTY = 'Max Name Length';
+export const NCRYPT_NAME_PROPERTY = 'Name';
+export const NCRYPT_PIN_PROMPT_PROPERTY = 'SmartCardPinPrompt';
+export const NCRYPT_PIN_PROPERTY = 'SmartCardPin';
+export const NCRYPT_PROVIDER_HANDLE_PROPERTY = 'Provider Handle';
+export const NCRYPT_PUBLIC_LENGTH_PROPERTY = 'PublicKeyLength';
+export const NCRYPT_READER_PROPERTY = 'SmartCardReader';
+export const NCRYPT_ROOT_CERTSTORE_PROPERTY = 'SmartcardRootCertStore';
+export const NCRYPT_SCARD_NGC_KEY_NAME = 'SmartCardNgcKeyName';
+export const NCRYPT_SCARD_PIN_ID = 'SmartCardPinId';
+export const NCRYPT_SCARD_PIN_INFO = 'SmartCardPinInfo';
+export const NCRYPT_SECURE_PIN_PROPERTY = 'SmartCardSecurePin';
+export const NCRYPT_SECURITY_DESCR_PROPERTY = 'Security Descr';
+export const NCRYPT_SECURITY_DESCR_SUPPORT_PROPERTY = 'Security Descr Support';
+export const NCRYPT_SIGNATURE_LENGTH_PROPERTY = 'SignatureLength';
+export const NCRYPT_SMARTCARD_GUID_PROPERTY = 'SmartCardGuid';
+export const NCRYPT_UI_POLICY_PROPERTY = 'UI Policy';
+export const NCRYPT_UNIQUE_NAME_PROPERTY = 'Unique Name';
+export const NCRYPT_USE_CONTEXT_PROPERTY = 'Use Context';
+export const NCRYPT_USE_COUNT_ENABLED_PROPERTY = 'Enabled Use Count';
+export const NCRYPT_USE_COUNT_PROPERTY = 'Use Count';
+export const NCRYPT_USER_CERTSTORE_PROPERTY = 'SmartCardUserCertStore';
+export const NCRYPT_VERSION_PROPERTY = 'Version';
+export const NCRYPT_WINDOW_HANDLE_PROPERTY = 'HWND Handle';
+
+export const NCRYPT_DH_ALGORITHM_GROUP = 'DH';
+export const NCRYPT_DSA_ALGORITHM_GROUP = 'DSA';
+export const NCRYPT_ECDH_ALGORITHM_GROUP = 'ECDH';
+export const NCRYPT_ECDSA_ALGORITHM_GROUP = 'ECDSA';
+export const NCRYPT_RSA_ALGORITHM_GROUP = 'RSA';
+
+export const NCRYPT_OPAQUETRANSPORT_BLOB = 'OpaqueTransport';
+export const NCRYPT_PKCS7_ENVELOPE_BLOB = 'PKCS7_ENVELOPE';
+export const NCRYPT_PKCS8_PRIVATE_KEY_BLOB = 'PKCS8_PRIVATEKEY';
+export const NCRYPT_PROTECTED_KEY_BLOB = 'ProtectedKey';
