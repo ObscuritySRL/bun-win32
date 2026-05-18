@@ -263,7 +263,7 @@ process.stdout.write('\x1b[?25l\x1b[2J');
 for (let frame = 0; frame < FRAMES; frame += 1) {
   dev.symbols.Poll(devAddress);
   const stHr = dev.symbols.GetDeviceState(devAddress, DIJOYSTATE_SIZE, state.ptr!);
-  if ((stHr >>> 0) === lostHr || stHr !== 0) dev.symbols.Acquire(devAddress);
+  if (stHr >>> 0 === lostHr || stHr !== 0) dev.symbols.Acquire(devAddress);
 
   const lines: string[] = [];
   lines.push(`${ANSI.bold}${ANSI.magenta}◼ Controller Scope${ANSI.reset}  ${ANSI.white}${(target.productName || target.instanceName).slice(0, 48)}${ANSI.reset}`);

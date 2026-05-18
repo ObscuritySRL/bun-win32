@@ -68,6 +68,7 @@ Published packages are AI-friendly. Alongside the `README.md`, each package incl
 #### Multimedia
 
 - [`avifil32`](./packages/avifil32) - Video for Windows AVIFile API: open/create `.avi` files, enumerate streams, read/write video, audio, MIDI, and text streams, decode frames to DIBs (`AVIStreamGetFrame`), mux files from streams, editable-stream cut/copy/paste
+- [`dinput8`](./packages/dinput8) - DirectInput 8: every non-Xbox controller — racing wheels, flight sticks / HOTAS, generic gamepads (`DirectInput8Create`, `GetdfDIJoystick`); device enumeration, capabilities, acquisition, and polling over the `IDirectInput8` COM vtable
 - [`mfplat`](./packages/mfplat) - Media Foundation platform: lifecycle, work queues, MFT registry, media type / sample / byte stream factories (`MFStartup`, `MFTEnumEx`, `MFCreateAttributes`, `MFCreateSample`)
 - [`mfreadwrite`](./packages/mfreadwrite) - Media Foundation source reader / sink writer factories (`MFCreateSourceReader*`, `MFCreateSinkWriter*`)
 - [`mmdevapi`](./packages/mmdevapi) - MMDevice / Core Audio class factory, WASAPI async activation (`DllGetClassObject`, `ActivateAudioInterfaceAsync`)
