@@ -52,6 +52,7 @@ Published packages are AI-friendly. Alongside the `README.md`, each package incl
 - [`d3dcompiler_47`](./packages/d3dcompiler_47) - HLSL → DXBC shader compilation, preprocessing, disassembly, reflection, blob part extraction, shader stripping, function linking graph
 - [`dwmapi`](./packages/dwmapi) - DWM composition, blur, thumbnails
 - [`dwrite`](./packages/dwrite) - DirectWrite factory entry point (`DWriteCreateFactory`): system font enumeration, text layout, glyph metrics, and pure-FFI ClearType/grayscale glyph rasterization over the `IDWriteFactory` COM vtable
+- [`dxcore`](./packages/dxcore) - DXCore adapter-factory entry point (`DXCoreCreateAdapterFactory`): DXGI-independent GPU & compute-only MCDM adapter enumeration, hardware IDs, memory pools, and capability/attribute queries over the `IDXCoreAdapterFactory`/`List`/`Adapter` COM vtable
 - [`dxgi`](./packages/dxgi) - DXGI adapter enumeration, factory creation, debug interface (`CreateDXGIFactory*`, `DXGIGetDebugInterface1`)
 - [`dxva2`](./packages/dxva2) - DDC/CI monitor configuration (brightness, contrast, RGB drive/gain, colour temperature, VCP), physical monitor enumeration, DXVA2 / DXVA-HD video acceleration, OPM video output
 - [`gdi32`](./packages/gdi32) - graphics device interface
