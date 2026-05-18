@@ -52,7 +52,7 @@
     "bun": ">=1.1.0"
   },
   "scripts": {
-    "example:tpm-attestation": "bun ./example/tpm-attestation.ts",
+    "example:tpm-entropy-fountain": "bun ./example/tpm-entropy-fountain.ts",
     "example:tpm-diagnostic": "bun ./example/tpm-diagnostic.ts"
   }
 }
