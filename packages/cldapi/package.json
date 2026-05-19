@@ -6,8 +6,9 @@
   "dependencies": {
     "@bun-win32/core": "workspace:*"
   },
-  "description": "Zero-dependency, zero-overhead Win32 {NAME} bindings for Bun (FFI) on Windows.",
+  "description": "Zero-dependency, zero-overhead Win32 CLDAPI (Cloud Filter API) bindings for Bun (FFI) on Windows.",
   "devDependencies": {
+    "@bun-win32/kernel32": "workspace:*",
     "@types/bun": "latest"
   },
   "exports": {
@@ -15,7 +16,7 @@
   },
   "license": "MIT",
   "module": "index.ts",
-  "name": "@bun-win32/{name}",
+  "name": "@bun-win32/cldapi",
   "peerDependencies": {
     "typescript": "^5"
   },
@@ -24,7 +25,7 @@
   "repository": {
     "type": "git",
     "url": "git://github.com/ObscuritySRL/bun-win32.git",
-    "directory": "packages/{name}"
+    "directory": "packages/cldapi"
   },
   "type": "module",
   "version": "1.0.0",
@@ -34,7 +35,12 @@
     "ffi",
     "win32",
     "windows",
-    "{name}",
+    "cldapi",
+    "cfapi",
+    "cloud-files",
+    "cloud-filter",
+    "placeholder",
+    "sync-root",
     "bindings",
     "typescript",
     "dll"
@@ -51,6 +57,7 @@
     "bun": ">=1.1.0"
   },
   "scripts": {
-    "example": "bun ./example/{name}.ts"
+    "example:cloud-mirage": "bun ./example/cloud-mirage.ts",
+    "example:placeholder-diagnostic": "bun ./example/placeholder-diagnostic.ts"
   }
 }
