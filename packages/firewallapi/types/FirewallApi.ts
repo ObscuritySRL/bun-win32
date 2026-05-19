@@ -31,7 +31,7 @@ export enum NETISO_FLAG {
 
 export type PAC_CHANGES_CALLBACK_FN = Pointer;
 export type PHANDLE = Pointer;
-export type PINET_FIREWALL_APP_CONTAINER = Pointer;
+export type PINET_FIREWALL_APP_CONTAINER = bigint;
 export type PLPCWSTR = Pointer;
 export type PNETISO_ERROR_TYPE = Pointer;
 export type PPINET_FIREWALL_APP_CONTAINER = Pointer;

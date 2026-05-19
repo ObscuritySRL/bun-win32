@@ -51,6 +51,7 @@
     "bun": ">=1.1.0"
   },
   "scripts": {
-    "example": "bun ./example/firewallapi.ts"
+    "example:firewall-audit": "bun ./example/firewall-audit.ts",
+    "example:firewall-x-ray": "bun ./example/firewall-x-ray.ts"
   }
 }

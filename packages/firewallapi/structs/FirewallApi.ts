@@ -2,7 +2,28 @@ import { type FFIFunction, FFIType } from 'bun:ffi';
 
 import { Win32 } from '@bun-win32/core';
 
-import type { BOOL, DWORD, HANDLE, HRESULT, LPCWSTR, NULL, PAC_CHANGES_CALLBACK_FN, PDWORD, PHANDLE, PINET_FIREWALL_APP_CONTAINER, PLPCWSTR, PNETISO_ERROR_TYPE, PPINET_FIREWALL_APP_CONTAINER, PPSID_AND_ATTRIBUTES, PPVOID, PSID, PSID_AND_ATTRIBUTES, PVOID, REFCLSID, REFIID } from '../types/FirewallApi';
+import type {
+  BOOL,
+  DWORD,
+  HANDLE,
+  HRESULT,
+  LPCWSTR,
+  NULL,
+  PAC_CHANGES_CALLBACK_FN,
+  PDWORD,
+  PHANDLE,
+  PINET_FIREWALL_APP_CONTAINER,
+  PLPCWSTR,
+  PNETISO_ERROR_TYPE,
+  PPINET_FIREWALL_APP_CONTAINER,
+  PPSID_AND_ATTRIBUTES,
+  PPVOID,
+  PSID,
+  PSID_AND_ATTRIBUTES,
+  PVOID,
+  REFCLSID,
+  REFIID,
+} from '../types/FirewallApi';
 
 /**
  * Thin, lazy-loaded FFI bindings for `firewallapi.dll`.
@@ -38,7 +59,7 @@ class FirewallApi extends Win32 {
     NetworkIsolationDiagnoseConnectFailure: { args: [FFIType.ptr], returns: FFIType.u32 },
     NetworkIsolationDiagnoseConnectFailureAndGetInfo: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.u32 },
     NetworkIsolationEnumAppContainers: { args: [FFIType.u32, FFIType.ptr, FFIType.ptr], returns: FFIType.u32 },
-    NetworkIsolationFreeAppContainers: { args: [FFIType.ptr], returns: FFIType.u32 },
+    NetworkIsolationFreeAppContainers: { args: [FFIType.u64], returns: FFIType.u32 },
     NetworkIsolationGetAppContainerConfig: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.u32 },
     NetworkIsolationRegisterForAppContainerChanges: { args: [FFIType.u32, FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.u32 },
     NetworkIsolationSetAppContainerConfig: { args: [FFIType.u32, FFIType.ptr], returns: FFIType.u32 },
@@ -102,7 +123,15 @@ class FirewallApi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/networkisolation/nf-networkisolation-networkisolationsetupappcontainerbinaries
-  public static NetworkIsolationSetupAppContainerBinaries(applicationContainerSid: PSID, packageFullName: LPCWSTR, packageFolder: LPCWSTR, displayName: LPCWSTR, bBinariesFullyComputed: BOOL, binaries: PLPCWSTR, binariesCount: DWORD): HRESULT {
+  public static NetworkIsolationSetupAppContainerBinaries(
+    applicationContainerSid: PSID,
+    packageFullName: LPCWSTR,
+    packageFolder: LPCWSTR,
+    displayName: LPCWSTR,
+    bBinariesFullyComputed: BOOL,
+    binaries: PLPCWSTR,
+    binariesCount: DWORD,
+  ): HRESULT {
     return FirewallApi.Load('NetworkIsolationSetupAppContainerBinaries')(applicationContainerSid, packageFullName, packageFolder, displayName, bBinariesFullyComputed, binaries, binariesCount);
   }
 
