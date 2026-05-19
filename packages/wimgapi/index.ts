@@ -1,4 +1,4 @@
-import WIN32_CLASS from './structs/WIN32_CLASS';
+import Wimgapi from './structs/Wimgapi';
 
-export * from './types/WIN32_CLASS';
-export default WIN32_CLASS;
+export * from './types/Wimgapi';
+export default Wimgapi;

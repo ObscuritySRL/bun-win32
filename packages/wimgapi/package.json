@@ -6,7 +6,7 @@
   "dependencies": {
     "@bun-win32/core": "workspace:*"
   },
-  "description": "Zero-dependency, zero-overhead Win32 {NAME} bindings for Bun (FFI) on Windows.",
+  "description": "Zero-dependency, zero-overhead Win32 WIMGAPI bindings for Bun (FFI) on Windows.",
   "devDependencies": {
     "@types/bun": "latest"
   },
@@ -15,7 +15,7 @@
   },
   "license": "MIT",
   "module": "index.ts",
-  "name": "@bun-win32/{name}",
+  "name": "@bun-win32/wimgapi",
   "peerDependencies": {
     "typescript": "^5"
   },
@@ -24,7 +24,7 @@
   "repository": {
     "type": "git",
     "url": "git://github.com/ObscuritySRL/bun-win32.git",
-    "directory": "packages/{name}"
+    "directory": "packages/wimgapi"
   },
   "type": "module",
   "version": "1.0.0",
@@ -34,7 +34,7 @@
     "ffi",
     "win32",
     "windows",
-    "{name}",
+    "wimgapi",
     "bindings",
     "typescript",
     "dll"
@@ -51,6 +51,6 @@
     "bun": ">=1.1.0"
   },
   "scripts": {
-    "example": "bun ./example/{name}.ts"
+    "example": "bun ./example/wimgapi.ts"
   }
 }
