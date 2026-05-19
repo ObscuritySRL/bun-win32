@@ -172,7 +172,16 @@ class Clfsw32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/clfsw32/nf-clfsw32-createlogmarshallingarea
-  public static CreateLogMarshallingArea(hLog: HANDLE, pfnAllocBuffer: CLFS_BLOCK_ALLOCATION | NULL, pfnFreeBuffer: CLFS_BLOCK_DEALLOCATION | NULL, pvBlockAllocContext: LPVOID | NULL, cbMarshallingBuffer: ULONG, cMaxWriteBuffers: ULONG, cMaxReadBuffers: ULONG, ppvMarshal: PVOID): BOOL {
+  public static CreateLogMarshallingArea(
+    hLog: HANDLE,
+    pfnAllocBuffer: CLFS_BLOCK_ALLOCATION | NULL,
+    pfnFreeBuffer: CLFS_BLOCK_DEALLOCATION | NULL,
+    pvBlockAllocContext: LPVOID | NULL,
+    cbMarshallingBuffer: ULONG,
+    cMaxWriteBuffers: ULONG,
+    cMaxReadBuffers: ULONG,
+    ppvMarshal: PVOID,
+  ): BOOL {
     return Clfsw32.Load('CreateLogMarshallingArea')(hLog, pfnAllocBuffer, pfnFreeBuffer, pvBlockAllocContext, cbMarshallingBuffer, cMaxWriteBuffers, cMaxReadBuffers, ppvMarshal);
   }
 
@@ -197,7 +206,19 @@ class Clfsw32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/clfsw32/nf-clfsw32-dumplogrecords
-  public static DumpLogRecords(pwszLogFileName: PWSTR, fRecordType: CLFS_RECORD_TYPE, plsnStart: PCLFS_LSN | NULL, plsnEnd: PCLFS_LSN | NULL, pstrmOut: PFILE | NULL, pfnPrintRecord: CLFS_PRINT_RECORD_ROUTINE | NULL, pfnAllocBlock: CLFS_BLOCK_ALLOCATION | NULL, pfnFreeBlock: CLFS_BLOCK_DEALLOCATION | NULL, pvBlockAllocContext: LPVOID | NULL, cbBlock: ULONG, cMaxBlocks: ULONG): BOOL {
+  public static DumpLogRecords(
+    pwszLogFileName: PWSTR,
+    fRecordType: CLFS_RECORD_TYPE,
+    plsnStart: PCLFS_LSN | NULL,
+    plsnEnd: PCLFS_LSN | NULL,
+    pstrmOut: PFILE | NULL,
+    pfnPrintRecord: CLFS_PRINT_RECORD_ROUTINE | NULL,
+    pfnAllocBlock: CLFS_BLOCK_ALLOCATION | NULL,
+    pfnFreeBlock: CLFS_BLOCK_DEALLOCATION | NULL,
+    pvBlockAllocContext: LPVOID | NULL,
+    cbBlock: ULONG,
+    cMaxBlocks: ULONG,
+  ): BOOL {
     return Clfsw32.Load('DumpLogRecords')(pwszLogFileName, fRecordType, plsnStart, plsnEnd, pstrmOut, pfnPrintRecord, pfnAllocBlock, pfnFreeBlock, pvBlockAllocContext, cbBlock, cMaxBlocks);
   }
 
@@ -272,7 +293,20 @@ class Clfsw32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/clfsw32/nf-clfsw32-preparelogarchive
-  public static PrepareLogArchive(hLog: HANDLE, pszBaseLogFileName: PWSTR, cLen: ULONG, plsnLow: PCLFS_LSN | NULL, plsnHigh: PCLFS_LSN | NULL, pcActualLength: PULONG | NULL, poffBaseLogFileData: PULONGLONG, pcbBaseLogFileLength: PULONGLONG, plsnBase: PCLFS_LSN, plsnLast: PCLFS_LSN, plsnCurrentArchiveTail: PCLFS_LSN, ppvArchiveContext: PCLFS_LOG_ARCHIVE_CONTEXT): BOOL {
+  public static PrepareLogArchive(
+    hLog: HANDLE,
+    pszBaseLogFileName: PWSTR,
+    cLen: ULONG,
+    plsnLow: PCLFS_LSN | NULL,
+    plsnHigh: PCLFS_LSN | NULL,
+    pcActualLength: PULONG | NULL,
+    poffBaseLogFileData: PULONGLONG,
+    pcbBaseLogFileLength: PULONGLONG,
+    plsnBase: PCLFS_LSN,
+    plsnLast: PCLFS_LSN,
+    plsnCurrentArchiveTail: PCLFS_LSN,
+    ppvArchiveContext: PCLFS_LOG_ARCHIVE_CONTEXT,
+  ): BOOL {
     return Clfsw32.Load('PrepareLogArchive')(hLog, pszBaseLogFileName, cLen, plsnLow, plsnHigh, pcActualLength, poffBaseLogFileData, pcbBaseLogFileLength, plsnBase, plsnLast, plsnCurrentArchiveTail, ppvArchiveContext);
   }
 
@@ -292,7 +326,18 @@ class Clfsw32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/clfsw32/nf-clfsw32-readlogrecord
-  public static ReadLogRecord(pvMarshal: CLFS_MARSHAL, plsnFirst: PCLFS_LSN, eContextMode: CLFS_CONTEXT_MODE, ppvReadBuffer: PVOID, pcbReadBuffer: PULONG, peRecordType: PCLFS_RECORD_TYPE, plsnUndoNext: PCLFS_LSN, plsnPrevious: PCLFS_LSN, ppvReadContext: PVOID, pOverlapped: LPOVERLAPPED | NULL): BOOL {
+  public static ReadLogRecord(
+    pvMarshal: CLFS_MARSHAL,
+    plsnFirst: PCLFS_LSN,
+    eContextMode: CLFS_CONTEXT_MODE,
+    ppvReadBuffer: PVOID,
+    pcbReadBuffer: PULONG,
+    peRecordType: PCLFS_RECORD_TYPE,
+    plsnUndoNext: PCLFS_LSN,
+    plsnPrevious: PCLFS_LSN,
+    ppvReadContext: PVOID,
+    pOverlapped: LPOVERLAPPED | NULL,
+  ): BOOL {
     return Clfsw32.Load('ReadLogRecord')(pvMarshal, plsnFirst, eContextMode, ppvReadBuffer, pcbReadBuffer, peRecordType, plsnUndoNext, plsnPrevious, ppvReadContext, pOverlapped);
   }
 
@@ -302,7 +347,17 @@ class Clfsw32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/clfsw32/nf-clfsw32-readnextlogrecord
-  public static ReadNextLogRecord(pvReadContext: CLFS_READ_CONTEXT, ppvBuffer: PVOID, pcbBuffer: PULONG, peRecordType: PCLFS_RECORD_TYPE, plsnUser: PCLFS_LSN | NULL, plsnUndoNext: PCLFS_LSN, plsnPrevious: PCLFS_LSN, plsnRecord: PCLFS_LSN, pOverlapped: LPOVERLAPPED | NULL): BOOL {
+  public static ReadNextLogRecord(
+    pvReadContext: CLFS_READ_CONTEXT,
+    ppvBuffer: PVOID,
+    pcbBuffer: PULONG,
+    peRecordType: PCLFS_RECORD_TYPE,
+    plsnUser: PCLFS_LSN | NULL,
+    plsnUndoNext: PCLFS_LSN,
+    plsnPrevious: PCLFS_LSN,
+    plsnRecord: PCLFS_LSN,
+    pOverlapped: LPOVERLAPPED | NULL,
+  ): BOOL {
     return Clfsw32.Load('ReadNextLogRecord')(pvReadContext, ppvBuffer, pcbBuffer, peRecordType, plsnUser, plsnUndoNext, plsnPrevious, plsnRecord, pOverlapped);
   }
 
@@ -337,12 +392,35 @@ class Clfsw32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/clfsw32/nf-clfsw32-reserveandappendlog
-  public static ReserveAndAppendLog(pvMarshal: CLFS_MARSHAL, rgWriteEntries: PCLFS_WRITE_ENTRY | NULL, cWriteEntries: ULONG, plsnUndoNext: PCLFS_LSN | NULL, plsnPrevious: PCLFS_LSN | NULL, cReserveRecords: ULONG, rgcbReservation: PLONGLONG | NULL, fFlags: ULONG, plsn: PCLFS_LSN | NULL, pOverlapped: LPOVERLAPPED | NULL): BOOL {
+  public static ReserveAndAppendLog(
+    pvMarshal: CLFS_MARSHAL,
+    rgWriteEntries: PCLFS_WRITE_ENTRY | NULL,
+    cWriteEntries: ULONG,
+    plsnUndoNext: PCLFS_LSN | NULL,
+    plsnPrevious: PCLFS_LSN | NULL,
+    cReserveRecords: ULONG,
+    rgcbReservation: PLONGLONG | NULL,
+    fFlags: ULONG,
+    plsn: PCLFS_LSN | NULL,
+    pOverlapped: LPOVERLAPPED | NULL,
+  ): BOOL {
     return Clfsw32.Load('ReserveAndAppendLog')(pvMarshal, rgWriteEntries, cWriteEntries, plsnUndoNext, plsnPrevious, cReserveRecords, rgcbReservation, fFlags, plsn, pOverlapped);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/clfsw32/nf-clfsw32-reserveandappendlogaligned
-  public static ReserveAndAppendLogAligned(pvMarshal: CLFS_MARSHAL, rgWriteEntries: PCLFS_WRITE_ENTRY | NULL, cWriteEntries: ULONG, cbEntryAlignment: ULONG, plsnUndoNext: PCLFS_LSN | NULL, plsnPrevious: PCLFS_LSN | NULL, cReserveRecords: ULONG, rgcbReservation: PLONGLONG | NULL, fFlags: ULONG, plsn: PCLFS_LSN | NULL, pOverlapped: LPOVERLAPPED | NULL): BOOL {
+  public static ReserveAndAppendLogAligned(
+    pvMarshal: CLFS_MARSHAL,
+    rgWriteEntries: PCLFS_WRITE_ENTRY | NULL,
+    cWriteEntries: ULONG,
+    cbEntryAlignment: ULONG,
+    plsnUndoNext: PCLFS_LSN | NULL,
+    plsnPrevious: PCLFS_LSN | NULL,
+    cReserveRecords: ULONG,
+    rgcbReservation: PLONGLONG | NULL,
+    fFlags: ULONG,
+    plsn: PCLFS_LSN | NULL,
+    pOverlapped: LPOVERLAPPED | NULL,
+  ): BOOL {
     return Clfsw32.Load('ReserveAndAppendLogAligned')(pvMarshal, rgWriteEntries, cWriteEntries, cbEntryAlignment, plsnUndoNext, plsnPrevious, cReserveRecords, rgcbReservation, fFlags, plsn, pOverlapped);
   }
 
@@ -392,7 +470,16 @@ class Clfsw32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/clfsw32/nf-clfsw32-writelogrestartarea
-  public static WriteLogRestartArea(pvMarshal: CLFS_MARSHAL, pvRestartBuffer: PVOID, cbRestartBuffer: ULONG, plsnBase: PCLFS_LSN | NULL, fFlags: ULONG, pcbWritten: PULONG | NULL, plsnNext: PCLFS_LSN | NULL, pOverlapped: LPOVERLAPPED | NULL): BOOL {
+  public static WriteLogRestartArea(
+    pvMarshal: CLFS_MARSHAL,
+    pvRestartBuffer: PVOID,
+    cbRestartBuffer: ULONG,
+    plsnBase: PCLFS_LSN | NULL,
+    fFlags: ULONG,
+    pcbWritten: PULONG | NULL,
+    plsnNext: PCLFS_LSN | NULL,
+    pOverlapped: LPOVERLAPPED | NULL,
+  ): BOOL {
     return Clfsw32.Load('WriteLogRestartArea')(pvMarshal, pvRestartBuffer, cbRestartBuffer, plsnBase, fFlags, pcbWritten, plsnNext, pOverlapped);
   }
 }

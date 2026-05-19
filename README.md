@@ -124,6 +124,7 @@ Published packages are AI-friendly. Alongside the `README.md`, each package incl
 
 - [`cabinet`](./packages/cabinet) - Compression API (MSZIP / XPRESS / XPRESS-Huffman / LZMS) plus Cabinet (.cab) archive creation and extraction via the FCI / FDI callback interfaces
 - [`cfgmgr32`](./packages/cfgmgr32) - device tree traversal, configuration management, device properties, interfaces, resources
+- [`clfsw32`](./packages/clfsw32) - Common Log File System: all 53 documented user-mode + management exports — dedicated/multiplexed log creation, containers, marshaling areas, durable record reserve/append, archival, the CLFS management policy surface, and the 8-byte by-value `CLFS_LSN` algebra (`LsnCreate`/`LsnContainer`/`LsnBlockOffset`/`LsnRecordSequence`) — the kernel write-ahead-log engine behind TxF/TxR, proven pure-FFI
 - [`combase`](./packages/combase) - Windows Runtime activation core: `RoInitialize`/`RoActivateInstance`/`RoGetActivationFactory`, the full `HSTRING` string API, fast-pass/preallocated buffers, and the WinRT error-info surface — the pure-FFI path to toast notifications and the rest of the WinRT projection
 - [`dbghelp`](./packages/dbghelp) - symbol engine, stack walking, minidumps, image helpers, source-level debugging
 - [`dismapi`](./packages/dismapi) - DISM image servicing: online/offline sessions, optional features, packages, drivers, capabilities, image health (`DismInitialize`, `DismOpenSession`, `DismGetFeatures`, `DismCheckImageHealth`) — the `DISM.exe` engine in-process, no spawn
