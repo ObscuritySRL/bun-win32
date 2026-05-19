@@ -1,3 +1,44 @@
 import type { Pointer } from 'bun:ffi';
 
-export type { DWORD, HRESULT, NULL } from '@bun-win32/core';
+export type { BOOL, DWORD, HANDLE, HRESULT, LPCWSTR, NULL, PDWORD } from '@bun-win32/core';
+
+export enum INET_FIREWALL_AC_CHANGE_TYPE {
+  INET_FIREWALL_AC_CHANGE_CREATE = 1,
+  INET_FIREWALL_AC_CHANGE_DELETE = 2,
+  INET_FIREWALL_AC_CHANGE_INVALID = 0,
+  INET_FIREWALL_AC_CHANGE_MAX = 3,
+}
+
+export enum INET_FIREWALL_AC_CREATION_TYPE {
+  INET_FIREWALL_AC_BINARY = 0x02,
+  INET_FIREWALL_AC_MAX = 0x04,
+  INET_FIREWALL_AC_NONE = 0x00,
+  INET_FIREWALL_AC_PACKAGE_ID_ONLY = 0x01,
+}
+
+export enum NETISO_ERROR_TYPE {
+  NETISO_ERROR_TYPE_INTERNET_CLIENT = 0x02,
+  NETISO_ERROR_TYPE_INTERNET_CLIENT_SERVER = 0x03,
+  NETISO_ERROR_TYPE_MAX = 0x04,
+  NETISO_ERROR_TYPE_NONE = 0x00,
+  NETISO_ERROR_TYPE_PRIVATE_NETWORK = 0x01,
+}
+
+export enum NETISO_FLAG {
+  NETISO_FLAG_FORCE_COMPUTE_BINARIES = 0x1,
+  NETISO_FLAG_MAX = 0x2,
+}
+
+export type PAC_CHANGES_CALLBACK_FN = Pointer;
+export type PHANDLE = Pointer;
+export type PINET_FIREWALL_APP_CONTAINER = Pointer;
+export type PLPCWSTR = Pointer;
+export type PNETISO_ERROR_TYPE = Pointer;
+export type PPINET_FIREWALL_APP_CONTAINER = Pointer;
+export type PPSID_AND_ATTRIBUTES = Pointer;
+export type PPVOID = Pointer;
+export type PSID = Pointer;
+export type PSID_AND_ATTRIBUTES = Pointer;
+export type PVOID = Pointer;
+export type REFCLSID = Pointer;
+export type REFIID = Pointer;
