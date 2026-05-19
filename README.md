@@ -73,10 +73,12 @@ Published packages are AI-friendly. Alongside the `README.md`, each package incl
 - [`dinput8`](./packages/dinput8) - DirectInput 8: every non-Xbox controller — racing wheels, flight sticks / HOTAS, generic gamepads (`DirectInput8Create`, `GetdfDIJoystick`); device enumeration, capabilities, acquisition, and polling over the `IDirectInput8` COM vtable
 - [`directml`](./packages/directml) - Vendor-neutral, Direct3D 12-backed machine-learning device creation (`DMLCreateDevice`, `DMLCreateDevice1`); creates a real `IDMLDevice` over an `ID3D12Device` and decodes its true max feature level over the `IDMLDevice` COM vtable — DirectML shipped, proven pure-FFI, audit 0 mismatches
 - [`dsound`](./packages/dsound) - DirectSound: playback / capture device creation & enumeration, full-duplex, and default-device GUID resolution (`DirectSoundCreate8`, `DirectSoundEnumerateW`, `GetDeviceID`, …) — synthesize and play PCM end-to-end over the `IDirectSound8` / `IDirectSoundBuffer` COM vtable
+- [`gameinput`](./packages/gameinput) - GameInput, the modern unified input model — `GameInputCreate` Nano-COM factory + `Dll*` COM-server entries; gamepad / keyboard / mouse / flight & arcade stick / racing wheel / sensor readings over the `IGameInput` COM vtable
 - [`mf`](./packages/mf) - Media Foundation pipeline: source resolver, ASF authoring graph (profile / multiplexer / indexer / splitter / stream selector), container media sinks (MP3 / AC-3 / ADTS / MPEG-4 / fragmented-MP4 / 3GP), streaming sinks, video renderer, network credential / proxy, and the protected-environment / signed-library surface (`MFCreateSourceResolver`, `MFCreateASFProfile`, `MFCreateMPEG4MediaSink`, `MFGetSupportedSchemes`, …)
 - [`mfplat`](./packages/mfplat) - Media Foundation platform: lifecycle, work queues, MFT registry, media type / sample / byte stream factories (`MFStartup`, `MFTEnumEx`, `MFCreateAttributes`, `MFCreateSample`)
 - [`mfreadwrite`](./packages/mfreadwrite) - Media Foundation source reader / sink writer factories (`MFCreateSourceReader*`, `MFCreateSinkWriter*`)
 - [`mmdevapi`](./packages/mmdevapi) - MMDevice / Core Audio class factory, WASAPI async activation (`DllGetClassObject`, `ActivateAudioInterfaceAsync`)
+- [`quartz`](./packages/quartz) - DirectShow runtime: HRESULT → text (`AMGetErrorTextA`/`W`) and the Filter Graph Manager `Dll*` COM server (`CLSID_FilterGraph` → `IGraphBuilder`); reaches legacy webcams / capture cards / codecs Media Foundation misses
 - [`winmm`](./packages/winmm) - multimedia audio, MIDI, mixers, timers, joysticks, MCI
 - [`xaudio2_9`](./packages/xaudio2_9) - XAudio2 2.9: low-latency audio engine + voice graph, X3DAudio positional math (matrix / Doppler / LPF solve), and every built-in XAPO — volume meter, reverb, FXEQ / FXMasteringLimiter / FXReverb / FXEcho (`XAudio2Create`, `X3DAudioInitialize`, `X3DAudioCalculate`, `CreateAudioVolumeMeter`, `CreateFX`); synthesize and play PCM end-to-end over the `IXAudio2` / `IXAudio2SourceVoice` COM vtable
 - [`xinput1_4`](./packages/xinput1_4) - XInput 1.4: Xbox controller state, vibration, battery, audio, keystroke
@@ -86,6 +88,7 @@ Published packages are AI-friendly. Alongside the `README.md`, each package incl
 
 - [`bluetoothapis`](./packages/bluetoothapis) - Bluetooth Classic radio/device discovery, BLE GATT, SDP, authentication
 - [`dnsapi`](./packages/dnsapi) - DNS resolution across every record type (A, AAAA, MX, NS, SOA, TXT, SRV, CAA, etc.), name validation, configured server discovery, DNS-SD, mDNS, async queries
+- [`firewallapi`](./packages/firewallapi) - Windows Firewall policy via the FirewallAPI.dll COM server (`INetFwPolicy2` profile state through `DllGetClassObject`) plus the 10 documented network-isolation / AppContainer functions (enumerate, free, config, change subscriptions, connect-failure diagnostics) — all 14 documented exports
 - [`fwpuclnt`](./packages/fwpuclnt) - Windows Filtering Platform: Base Filtering Engine sessions/transactions, provider/sub-layer/layer/callout/filter CRUD + enumeration + change subscriptions, IPsec SA/tunnel/key-manager, IKE/AuthIP SAs, net-event diagnostics, ALE endpoints, Winsock secure-socket extensions — all 199 documented exports
 - [`httpapi`](./packages/httpapi) - HTTP Server API (HTTP.sys): kernel-mode listener powering IIS, request queues, URL groups, server sessions, SSL/TLS config, response caching, HTTP/2 push, request shaping
 - [`iphlpapi`](./packages/iphlpapi) - network adapters, TCP/UDP tables, routing
@@ -115,6 +118,7 @@ Published packages are AI-friendly. Alongside the `README.md`, each package incl
 - [`bcrypt`](./packages/bcrypt) - Cryptography Next Gen (CNG): ciphers, hashes, HMAC, PBKDF2, signatures, random bytes, key agreement
 - [`credui`](./packages/credui) - credential prompts, username parsing, auth blobs, and SSPI prompt helpers
 - [`crypt32`](./packages/crypt32) - certificate stores, chains, encoding, DPAPI
+- [`fveapi`](./packages/fveapi) - BitLocker / Full Volume Encryption (`fveapi.dll`): all 162 exports — volume open / lock / unlock, protection & conversion status, key packages, recovery-password backup, device-encryption support, and the DMA / HSTI security checks
 - [`ncrypt`](./packages/ncrypt) - CNG Key Storage: persisted keys, RSA/ECDSA/ECDH signing & key agreement, key attestation claims, DPAPI-NG protection descriptors and streaming
 - [`secur32`](./packages/secur32) - SSPI authentication, credentials, LSA
 - [`sspicli`](./packages/sspicli) - SSPI client-side auth and SASL
@@ -126,10 +130,12 @@ Published packages are AI-friendly. Alongside the `README.md`, each package incl
 
 #### System
 
+- [`activeds`](./packages/activeds) - Active Directory Service Interfaces (ADSI): bind a directory object by ADsPath to `IADs` / `IADsContainer` (`ADsGetObject`, `ADsOpenObject`), enumerate container children, and round-trip binary security descriptors — WinNT / LDAP providers
 - [`cabinet`](./packages/cabinet) - Compression API (MSZIP / XPRESS / XPRESS-Huffman / LZMS) plus Cabinet (.cab) archive creation and extraction via the FCI / FDI callback interfaces
 - [`cfgmgr32`](./packages/cfgmgr32) - device tree traversal, configuration management, device properties, interfaces, resources
 - [`cldapi`](./packages/cldapi) - Cloud Files API (`cfapi.h`): all 35 documented exports — sync-root register/connect, placeholder create/convert/update/revert, hydrate/dehydrate, transfer keys, pin & in-sync state, placeholder/sync-root info, and platform version — the OneDrive Files On-Demand engine that projects zero-byte-on-disk placeholder files, proven pure-FFI
 - [`clfsw32`](./packages/clfsw32) - Common Log File System: all 53 documented user-mode + management exports — dedicated/multiplexed log creation, containers, marshaling areas, durable record reserve/append, archival, the CLFS management policy surface, and the 8-byte by-value `CLFS_LSN` algebra (`LsnCreate`/`LsnContainer`/`LsnBlockOffset`/`LsnRecordSequence`) — the kernel write-ahead-log engine behind TxF/TxR, proven pure-FFI
+- [`clusapi`](./packages/clusapi) - Failover Cluster API: cluster / node / group / resource / network / netinterface lifecycle, the full open / enum / control families, the cluster registry batch API, and notification ports — all 205 documented exports
 - [`combase`](./packages/combase) - Windows Runtime activation core: `RoInitialize`/`RoActivateInstance`/`RoGetActivationFactory`, the full `HSTRING` string API, fast-pass/preallocated buffers, and the WinRT error-info surface — the pure-FFI path to toast notifications and the rest of the WinRT projection
 - [`dbghelp`](./packages/dbghelp) - symbol engine, stack walking, minidumps, image helpers, source-level debugging
 - [`dismapi`](./packages/dismapi) - DISM image servicing: online/offline sessions, optional features, packages, drivers, capabilities, image health (`DismInitialize`, `DismOpenSession`, `DismGetFeatures`, `DismCheckImageHealth`) — the `DISM.exe` engine in-process, no spawn
@@ -155,16 +161,19 @@ Published packages are AI-friendly. Alongside the `README.md`, each package incl
 - [`shcore`](./packages/shcore) - DPI awareness, scale factors, AppUserModelID, random access streams, registry helpers, isolated-container detection, threading refs
 - [`shell32`](./packages/shell32) - shell operations and file management
 - [`shlwapi`](./packages/shlwapi) - shell lightweight utility functions
+- [`srclient`](./packages/srclient) - System Restore client: create / begin / end restore points (`SRSetRestorePointW`/`A`) and remove them (`SRRemoveRestorePoint`) — `RESTOREPOINTINFO` / `STATEMGRSTATUS` `pack(1)` structs
 - [`taskschd`](./packages/taskschd) - Task Scheduler COM server entry points, class factory activation, task enumeration
 - [`tdh`](./packages/tdh) - Trace Data Helper: ETW event decoding (`TdhGetEventInformation`, `TdhFormatProperty`), provider / field / event-schema enumeration, value & bitmap maps, manifest loading, and payload filters
 - [`uiautomationcore`](./packages/uiautomationcore) - UI Automation nodes, pattern objects, provider bridging, and event plumbing
 - [`userenv`](./packages/userenv) - user profiles, environment blocks, and Group Policy
 - [`version`](./packages/version) - file version resources, string tables, installer version helpers
 - [`virtdisk`](./packages/virtdisk) - VHD, VHDX, and ISO virtual disk creation, attachment, inspection, and management
+- [`vssapi`](./packages/vssapi) - Volume Shadow Copy Service: the `IVssBackupComponents` backup engine (`CreateVssBackupComponents`), writer-metadata examination, shadow-copy presence (`IsVolumeSnapshotted`), and revert-block policy — the documented `vsbackup.h` surface
 - [`wer`](./packages/wer) - Windows Error Reporting report authoring/stores (`WerReportCreate`, `WerReportSubmit`, `WerStoreOpen`, `WerStoreQueryReportMetadataV2`) plus the Wait Chain Traversal deadlock-detection API (`OpenThreadWaitChainSession`, `GetThreadWaitChain`) — live kernel thread-wait X-ray proven pure-FFI
 - [`wevtapi`](./packages/wevtapi) - Windows Event Log queries, rendering, subscriptions, channel configuration, publisher metadata
 - [`wimgapi`](./packages/wimgapi) - Windows Imaging (WIM): create/open `.wim` archives, capture/apply/enumerate images, mount/unmount/split/export, references, and live progress via a `WIMRegisterMessageCallback` JSCallback — the `DISM.exe`/`ImageX` engine in-process
 - [`winusb`](./packages/winusb) - WinUSB device I/O, descriptors, pipes, policies, and isochronous transfers
+- [`wuapi`](./packages/wuapi) - Windows Update Agent COM server (`Dll*` entries): the Windows Update object model — `IUpdateSession` / `IUpdateSearcher` / update-history enumeration and result decoding over the COM vtable
 
 ## Project Structure
 
