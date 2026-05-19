@@ -2,7 +2,8 @@ import { type FFIFunction, FFIType } from 'bun:ffi';
 
 import { Win32 } from '@bun-win32/core';
 
-import type { BOOL, DWORD, HANDLE, LPCWSTR, LPVOID, LPWSTR } from '../types/DirectML';
+import type { HRESULT, ID3D12Device, LPLPVOID, NULL, REFIID } from '../types/DirectML';
+import type { DML_CREATE_DEVICE_FLAGS, DML_FEATURE_LEVEL } from '../types/DirectML';
 
 /**
  * Thin, lazy-loaded FFI bindings for `DirectML.dll`.
@@ -17,20 +18,34 @@ import type { BOOL, DWORD, HANDLE, LPCWSTR, LPVOID, LPWSTR } from '../types/Dire
  *
  * @example
  * ```ts
- * import DirectML from './structs/DirectML';
+ * import DirectML, { DML_CREATE_DEVICE_FLAGS } from './structs/DirectML';
  *
  * // Lazy: bind on first call
- * const result = DirectML.SomeFunctionW(buffer.ptr);
+ * const ppv = Buffer.alloc(8);
+ * const hr = DirectML.DMLCreateDevice(d3d12Device, DML_CREATE_DEVICE_FLAGS.DML_CREATE_DEVICE_FLAG_NONE, riid.ptr, ppv.ptr);
  *
  * // Or preload a subset to avoid per-symbol lazy binding cost
- * DirectML.Preload(['SomeFunctionW', 'AnotherFunctionW']);
+ * DirectML.Preload(['DMLCreateDevice', 'DMLCreateDevice1']);
  * ```
  */
 class DirectML extends Win32 {
   protected static override name = 'DirectML.dll';
 
   /** @inheritdoc */
-  protected static override readonly Symbols = {} as const satisfies Record<string, FFIFunction>;
+  protected static override readonly Symbols = {
+    DMLCreateDevice: { args: [FFIType.u64, FFIType.u32, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
+    DMLCreateDevice1: { args: [FFIType.u64, FFIType.u32, FFIType.u32, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
+  } as const satisfies Record<string, FFIFunction>;
+
+  // https://learn.microsoft.com/en-us/windows/win32/api/directml/nf-directml-dmlcreatedevice
+  public static DMLCreateDevice(d3d12Device: ID3D12Device, flags: DML_CREATE_DEVICE_FLAGS, riid: REFIID, ppv: LPLPVOID | NULL): HRESULT {
+    return DirectML.Load('DMLCreateDevice')(d3d12Device, flags, riid, ppv);
+  }
+
+  // https://learn.microsoft.com/en-us/windows/win32/api/directml/nf-directml-dmlcreatedevice1
+  public static DMLCreateDevice1(d3d12Device: ID3D12Device, flags: DML_CREATE_DEVICE_FLAGS, minimumFeatureLevel: DML_FEATURE_LEVEL, riid: REFIID, ppv: LPLPVOID | NULL): HRESULT {
+    return DirectML.Load('DMLCreateDevice1')(d3d12Device, flags, minimumFeatureLevel, riid, ppv);
+  }
 }
 
 export default DirectML;
