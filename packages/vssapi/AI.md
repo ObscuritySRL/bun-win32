@@ -1,11 +1,11 @@
-# AI Guide for @bun-win32/Vssapi
+# AI Guide for @bun-win32/vssapi
 
 How to use this package, not what the Win32 API does.
 
 ## Usage
 
 ```ts
-import Vssapi, { SomeFlag } from '@bun-win32/Vssapi';
+import Vssapi, { SomeFlag } from '@bun-win32/vssapi';
 
 // Methods bind lazily on first call
 const result = Vssapi.SomeFunctionW(arg1, arg2);
@@ -24,11 +24,11 @@ Vssapi.Preload();
 | Find types, enums, constants      | `types/Vssapi.ts`   |
 | Quick examples                    | `README.md`          |
 
-`index.ts` re-exports the class and all types — import from `@bun-win32/Vssapi` directly.
+`index.ts` re-exports the class and all types — import from `@bun-win32/vssapi` directly.
 
 ## Calling Convention
 
-All documented `Vssapi.dll` exports are bound. Each method maps 1:1 to its DLL export. Names, parameter names, and order match Microsoft Docs.
+All documented `vssapi.dll` exports are bound. Each method maps 1:1 to its DLL export. Names, parameter names, and order match Microsoft Docs.
 
 ### Strings
 

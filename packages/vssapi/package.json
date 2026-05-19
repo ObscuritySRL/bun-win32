@@ -6,7 +6,7 @@
   "dependencies": {
     "@bun-win32/core": "workspace:*"
   },
-  "description": "Zero-dependency, zero-overhead Win32 VSSAPI bindings for Bun (FFI) on Windows.",
+  "description": "Zero-dependency, zero-overhead Win32 VSSAPI (Volume Shadow Copy Service) bindings for Bun (FFI) on Windows.",
   "devDependencies": {
     "@types/bun": "latest"
   },
@@ -51,6 +51,7 @@
     "bun": ">=1.1.0"
   },
   "scripts": {
-    "example": "bun ./example/vssapi.ts"
+    "example:shadow-copy-inspector": "bun ./example/shadow-copy-inspector.ts",
+    "example:vss-writer-xray": "bun ./example/vss-writer-xray.ts"
   }
 }

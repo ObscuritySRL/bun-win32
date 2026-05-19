@@ -1,11 +1,11 @@
-# AI Guide for @bun-win32/Activeds
+# AI Guide for @bun-win32/activeds
 
 How to use this package, not what the Win32 API does.
 
 ## Usage
 
 ```ts
-import Activeds, { SomeFlag } from '@bun-win32/Activeds';
+import Activeds, { SomeFlag } from '@bun-win32/activeds';
 
 // Methods bind lazily on first call
 const result = Activeds.SomeFunctionW(arg1, arg2);
@@ -24,7 +24,7 @@ Activeds.Preload();
 | Find types, enums, constants      | `types/Activeds.ts`   |
 | Quick examples                    | `README.md`          |
 
-`index.ts` re-exports the class and all types — import from `@bun-win32/Activeds` directly.
+`index.ts` re-exports the class and all types — import from `@bun-win32/activeds` directly.
 
 ## Calling Convention
 

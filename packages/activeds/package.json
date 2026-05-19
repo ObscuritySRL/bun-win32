@@ -51,6 +51,7 @@
     "bun": ">=1.1.0"
   },
   "scripts": {
-    "example": "bun ./example/activeds.ts"
+    "example:directory-constellation": "bun ./example/directory-constellation.ts",
+    "example:directory-explorer": "bun ./example/directory-explorer.ts"
   }
 }
