@@ -1,4 +1,4 @@
-import WIN32_CLASS from './structs/WIN32_CLASS';
+import Ktmw32 from './structs/Ktmw32';
 
-export * from './types/WIN32_CLASS';
-export default WIN32_CLASS;
+export * from './types/Ktmw32';
+export default Ktmw32;
