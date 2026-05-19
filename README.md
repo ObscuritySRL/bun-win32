@@ -89,6 +89,7 @@ Published packages are AI-friendly. Alongside the `README.md`, each package incl
 - [`iphlpapi`](./packages/iphlpapi) - network adapters, TCP/UDP tables, routing
 - [`mpr`](./packages/mpr) - network drive mapping, UNC connections, resource enumeration
 - [`netapi32`](./packages/netapi32) - users, groups, shares, domain joins
+- [`ntdsapi`](./packages/ntdsapi) - Active Directory client: directory bind (`DsBind*`), name-format translation (`DsCrackNames`), Kerberos SPN forge/register (`DsGetSpn`, `DsClientMakeSpnForTargetServer`, `DsWriteAccountSpn`), site/server/role/DC enumeration, replication control (`DsReplicaSync`/`Add`/`GetInfo`), SID-history migration — all 81 documented exports, SPN + syntactical name-cracking work with no domain
 - [`sensapi`](./packages/sensapi) - System Event Notification Service connectivity checks (`IsNetworkAlive`, `IsDestinationReachable`)
 - [`winhttp`](./packages/winhttp) - HTTP/HTTPS client, WebSockets, proxy auto-detect (WPAD/PAC), TLS configuration, request tracing
 - [`wininet`](./packages/wininet) - WinINet/IE-legacy stack: HTTP/HTTPS, FTP, persistent URL cache, cookie jar (`InternetGetCookieEx2`, `InternetSetCookieEx2`), autodial, per-site cookie decisions

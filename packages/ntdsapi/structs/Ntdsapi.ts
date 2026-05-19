@@ -164,12 +164,30 @@ class Ntdsapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntdsapi/nf-ntdsapi-dsbindbyinstancea
-  public static DsBindByInstanceA(ServerName: LPCSTR | NULL, Annotation: LPCSTR | NULL, InstanceGuid: LPGUID | NULL, DnsDomainName: LPCSTR | NULL, AuthIdentity: RPC_AUTH_IDENTITY_HANDLE | 0n, ServicePrincipalName: LPCSTR | NULL, BindFlags: DWORD, phDS: PHANDLE): DWORD {
+  public static DsBindByInstanceA(
+    ServerName: LPCSTR | NULL,
+    Annotation: LPCSTR | NULL,
+    InstanceGuid: LPGUID | NULL,
+    DnsDomainName: LPCSTR | NULL,
+    AuthIdentity: RPC_AUTH_IDENTITY_HANDLE | 0n,
+    ServicePrincipalName: LPCSTR | NULL,
+    BindFlags: DWORD,
+    phDS: PHANDLE,
+  ): DWORD {
     return Ntdsapi.Load('DsBindByInstanceA')(ServerName, Annotation, InstanceGuid, DnsDomainName, AuthIdentity, ServicePrincipalName, BindFlags, phDS);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntdsapi/nf-ntdsapi-dsbindbyinstancew
-  public static DsBindByInstanceW(ServerName: LPCWSTR | NULL, Annotation: LPCWSTR | NULL, InstanceGuid: LPGUID | NULL, DnsDomainName: LPCWSTR | NULL, AuthIdentity: RPC_AUTH_IDENTITY_HANDLE | 0n, ServicePrincipalName: LPCWSTR | NULL, BindFlags: DWORD, phDS: PHANDLE): DWORD {
+  public static DsBindByInstanceW(
+    ServerName: LPCWSTR | NULL,
+    Annotation: LPCWSTR | NULL,
+    InstanceGuid: LPGUID | NULL,
+    DnsDomainName: LPCWSTR | NULL,
+    AuthIdentity: RPC_AUTH_IDENTITY_HANDLE | 0n,
+    ServicePrincipalName: LPCWSTR | NULL,
+    BindFlags: DWORD,
+    phDS: PHANDLE,
+  ): DWORD {
     return Ntdsapi.Load('DsBindByInstanceW')(ServerName, Annotation, InstanceGuid, DnsDomainName, AuthIdentity, ServicePrincipalName, BindFlags, phDS);
   }
 
@@ -299,12 +317,32 @@ class Ntdsapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntdsapi/nf-ntdsapi-dsgetspna
-  public static DsGetSpnA(ServiceType: DS_SPN_NAME_TYPE, ServiceClass: LPCSTR, ServiceName: LPCSTR | NULL, InstancePort: USHORT, cInstanceNames: USHORT, pInstanceNames: LPVOID | NULL, pInstancePorts: LPVOID | NULL, pcSpn: PDWORD, prpszSpn: LPVOID): DWORD {
+  public static DsGetSpnA(
+    ServiceType: DS_SPN_NAME_TYPE,
+    ServiceClass: LPCSTR,
+    ServiceName: LPCSTR | NULL,
+    InstancePort: USHORT,
+    cInstanceNames: USHORT,
+    pInstanceNames: LPVOID | NULL,
+    pInstancePorts: LPVOID | NULL,
+    pcSpn: PDWORD,
+    prpszSpn: LPVOID,
+  ): DWORD {
     return Ntdsapi.Load('DsGetSpnA')(ServiceType, ServiceClass, ServiceName, InstancePort, cInstanceNames, pInstanceNames, pInstancePorts, pcSpn, prpszSpn);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntdsapi/nf-ntdsapi-dsgetspnw
-  public static DsGetSpnW(ServiceType: DS_SPN_NAME_TYPE, ServiceClass: LPCWSTR, ServiceName: LPCWSTR | NULL, InstancePort: USHORT, cInstanceNames: USHORT, pInstanceNames: LPVOID | NULL, pInstancePorts: LPVOID | NULL, pcSpn: PDWORD, prpszSpn: LPVOID): DWORD {
+  public static DsGetSpnW(
+    ServiceType: DS_SPN_NAME_TYPE,
+    ServiceClass: LPCWSTR,
+    ServiceName: LPCWSTR | NULL,
+    InstancePort: USHORT,
+    cInstanceNames: USHORT,
+    pInstanceNames: LPVOID | NULL,
+    pInstancePorts: LPVOID | NULL,
+    pcSpn: PDWORD,
+    prpszSpn: LPVOID,
+  ): DWORD {
     return Ntdsapi.Load('DsGetSpnW')(ServiceType, ServiceClass, ServiceName, InstancePort, cInstanceNames, pInstanceNames, pInstancePorts, pcSpn, prpszSpn);
   }
 
@@ -464,7 +502,17 @@ class Ntdsapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntdsapi/nf-ntdsapi-dsreplicagetinfo2w
-  public static DsReplicaGetInfo2W(hDS: HANDLE, InfoType: DS_REPL_INFO_TYPE, pszObject: LPCWSTR | NULL, puuidForSourceDsaObjGuid: LPGUID | NULL, pszAttributeName: LPCWSTR | NULL, pszValue: LPCWSTR | NULL, dwFlags: DWORD, dwEnumerationContext: DWORD, ppInfo: LPVOID): DWORD {
+  public static DsReplicaGetInfo2W(
+    hDS: HANDLE,
+    InfoType: DS_REPL_INFO_TYPE,
+    pszObject: LPCWSTR | NULL,
+    puuidForSourceDsaObjGuid: LPGUID | NULL,
+    pszAttributeName: LPCWSTR | NULL,
+    pszValue: LPCWSTR | NULL,
+    dwFlags: DWORD,
+    dwEnumerationContext: DWORD,
+    ppInfo: LPVOID,
+  ): DWORD {
     return Ntdsapi.Load('DsReplicaGetInfo2W')(hDS, InfoType, pszObject, puuidForSourceDsaObjGuid, pszAttributeName, pszValue, dwFlags, dwEnumerationContext, ppInfo);
   }
 
@@ -474,12 +522,32 @@ class Ntdsapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntdsapi/nf-ntdsapi-dsreplicamodifya
-  public static DsReplicaModifyA(hDS: HANDLE, NameContext: LPCSTR, pUuidSourceDsa: LPGUID | NULL, TransportDn: LPCSTR | NULL, SourceDsaAddress: LPCSTR, pSchedule: PSCHEDULE | NULL, ReplicaFlags: DWORD, ModifyFields: DWORD, Options: DWORD): DWORD {
+  public static DsReplicaModifyA(
+    hDS: HANDLE,
+    NameContext: LPCSTR,
+    pUuidSourceDsa: LPGUID | NULL,
+    TransportDn: LPCSTR | NULL,
+    SourceDsaAddress: LPCSTR,
+    pSchedule: PSCHEDULE | NULL,
+    ReplicaFlags: DWORD,
+    ModifyFields: DWORD,
+    Options: DWORD,
+  ): DWORD {
     return Ntdsapi.Load('DsReplicaModifyA')(hDS, NameContext, pUuidSourceDsa, TransportDn, SourceDsaAddress, pSchedule, ReplicaFlags, ModifyFields, Options);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntdsapi/nf-ntdsapi-dsreplicamodifyw
-  public static DsReplicaModifyW(hDS: HANDLE, NameContext: LPCWSTR, pUuidSourceDsa: LPGUID | NULL, TransportDn: LPCWSTR | NULL, SourceDsaAddress: LPCWSTR, pSchedule: PSCHEDULE | NULL, ReplicaFlags: DWORD, ModifyFields: DWORD, Options: DWORD): DWORD {
+  public static DsReplicaModifyW(
+    hDS: HANDLE,
+    NameContext: LPCWSTR,
+    pUuidSourceDsa: LPGUID | NULL,
+    TransportDn: LPCWSTR | NULL,
+    SourceDsaAddress: LPCWSTR,
+    pSchedule: PSCHEDULE | NULL,
+    ReplicaFlags: DWORD,
+    ModifyFields: DWORD,
+    Options: DWORD,
+  ): DWORD {
     return Ntdsapi.Load('DsReplicaModifyW')(hDS, NameContext, pUuidSourceDsa, TransportDn, SourceDsaAddress, pSchedule, ReplicaFlags, ModifyFields, Options);
   }
 
