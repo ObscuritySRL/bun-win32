@@ -272,6 +272,9 @@ const C_TYPE_TO_FFI: Record<string, string> = {
   'IStream*': 'FFIType.u64',
   // oleacc (MSAA) COM interface pointers — opaque tokens, treated as u64 handles by convention
   'IAccessible*': 'FFIType.u64',
+  // activeds (ADSI) COM interface pointers — opaque tokens, treated as u64 handles by convention
+  'IADsContainer*': 'FFIType.u64',
+  'IEnumVARIANT*': 'FFIType.u64',
   // wldap32 opaque handle pointers — treated as u64 handles by convention
   'LDAP*': 'FFIType.u64',
   'LDAPMessage*': 'FFIType.u64',
@@ -311,6 +314,10 @@ const C_TYPE_TO_FFI: Record<string, string> = {
   PWEBAUTHN_ASSERTION: 'FFIType.u64',
   PWEBAUTHN_CREDENTIAL_ATTESTATION: 'FFIType.u64',
   PWEBAUTHN_CREDENTIAL_DETAILS_LIST: 'FFIType.u64',
+  // firewallapi: NetworkIsolationEnumAppContainers allocates this array and
+  // NetworkIsolationFreeAppContainers frees it — the caller only round-trips
+  // the opaque token, treated as u64 by convention
+  PINET_FIREWALL_APP_CONTAINER: 'FFIType.u64',
   // combase WinRT opaque handle / cookie tokens — treated as u64 handles by convention
   HSTRING: 'FFIType.u64',
   HSTRING_BUFFER: 'FFIType.u64',
