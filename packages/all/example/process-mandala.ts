@@ -26,18 +26,12 @@
  *   Kernel32  CreateToolhelp32Snapshot / Process32FirstW / Process32NextW /
  *             OpenProcess (PROCESS_QUERY_LIMITED_INFORMATION) / CloseHandle
  *   Psapi     GetProcessMemoryInfo (PROCESS_MEMORY_COUNTERS, 72 B on x64)
- *   User32    RegisterClassExW / CreateWindowExW / DestroyWindow / SetTimer /
- *             KillTimer / DefWindowProcW / PostQuitMessage / GetMessageW /
- *             TranslateMessage / DispatchMessageW / InvalidateRect / GetDC /
- *             ReleaseDC / GetSystemMetrics / ShowWindow / UpdateWindow
- *   Dwmapi    DwmSetWindowAttribute (DWMWA_SYSTEMBACKDROP_TYPE, DARK_MODE)
- *   Gdiplus   GdiplusStartup / Shutdown / CreateBitmapFromScan0 /
- *             GetImageGraphicsContext / CreateFromHDC / SetSmoothingMode /
- *             SetTextRenderingHint / FillRectangle/I / FillEllipseI /
- *             DrawEllipseI / DrawLine / CreateSolidFill / CreatePen1 /
- *             CreateLineBrushFromRectWithAngle / DeleteBrush / DeletePen /
- *             CreateFontFamilyFromName / CreateFont / DrawString /
- *             CreateStringFormat / SetStringFormatAlign / DrawImageRectI
+ *   User32    RegisterClassExW / CreateWindowExW / SetTimer / GetMessageW /
+ *             InvalidateRect / GetDC / ReleaseDC / DefWindowProcW + lifecycle
+ *   Dwmapi    DwmSetWindowAttribute (DWMWA_SYSTEMBACKDROP_TYPE + DARK_MODE)
+ *   Gdiplus   Startup / CreateBitmapFromScan0 / CreateFromHDC / FillEllipseI /
+ *             DrawEllipseI / DrawLine / CreatePen1 / CreateSolidFill /
+ *             CreateLineBrushFromRectWithAngle / DrawString / DrawImageRectI
  *
  * PROCESSENTRY32W (x64, 568 B): dwSize@0x00, th32ProcessID@0x08,
  *   cntThreads@0x1C, th32ParentProcessID@0x20, szExeFile[260]@0x2C.
@@ -53,38 +47,25 @@ import { FontStyle, PixelFormat32bppARGB, SmoothingMode, Status, StringAlignment
 import { ProcessAccessRights } from '@bun-win32/kernel32';
 import { ExtendedWindowStyles, ShowWindowCommand, SystemMetric, VirtualKey, WindowStyles } from '@bun-win32/user32';
 
-// ── Geometry ──────────────────────────────────────────────────────────────────
+// ── Geometry + constants ──────────────────────────────────────────────────────
 
-const WINDOW_SIZE = 1100;
-const CENTER = WINDOW_SIZE / 2;
-const RING_SPACING = 80;
-const REFRESH_INTERVAL_MS = 500;
-const REENUMERATE_EVERY_MS = 2000;
-const TIMER_ID = 1n;
-
-// ── Win32 constants ───────────────────────────────────────────────────────────
-
-const WM_DESTROY = 0x0002;
-const WM_CLOSE = 0x0010;
-const WM_KEYDOWN = 0x0100;
-const WM_TIMER = 0x0113;
-const WM_MOUSEMOVE = 0x0200;
-const WM_PAINT = 0x000f;
+const WINDOW_SIZE = 1100, CENTER = WINDOW_SIZE / 2, RING_SPACING = 80;
+const REFRESH_INTERVAL_MS = 500, REENUMERATE_EVERY_MS = 2000, TIMER_ID = 1n;
 const MSG_SIZE_BYTES = 48;
+const WM_DESTROY = 0x0002, WM_CLOSE = 0x0010, WM_KEYDOWN = 0x0100;
+const WM_TIMER = 0x0113, WM_MOUSEMOVE = 0x0200, WM_PAINT = 0x000f;
 const TH32CS_SNAPPROCESS = 0x00000002;
 const INVALID_HANDLE_VALUE = 0xffffffffffffffffn;
-const PROCESSENTRY32W_SIZE = 568;
-const PROCESS_MEMORY_COUNTERS_SIZE = 72;
+const PROCESSENTRY32W_SIZE = 568, PROCESS_MEMORY_COUNTERS_SIZE = 72;
 
 // ── Utilities ─────────────────────────────────────────────────────────────────
 
 const encodeWide = (text: string): Buffer => Buffer.from(`${text}\0`, 'utf16le');
 const argb = (a: number, r: number, g: number, b: number): number =>
   (((a & 0xff) << 24) | ((r & 0xff) << 16) | ((g & 0xff) << 8) | (b & 0xff)) >>> 0;
-
-function check(status: number, where: string): void {
+const check = (status: number, where: string): void => {
   if (status !== Status.Ok) throw new Error(`${where} failed: ${Status[status]} (${status})`);
-}
+};
 
 function hsvToArgb(h: number, s: number, v: number, alpha = 0xff): number {
   const i = Math.floor(h * 6), f = h * 6 - i;
@@ -205,16 +186,13 @@ function buildMandala(): MandalaSnapshot {
 
   const layoutSubtree = (node: ProcessNode, depth: number, angularStart: number, angularSweep: number): void => {
     node.depth = depth;
-    if (depth === 0) {
-      node.x = CENTER;
-      node.y = CENTER;
-    } else {
-      const angle = angularStart + angularSweep / 2;
-      node.x = CENTER + Math.cos(angle) * (depth * RING_SPACING);
-      node.y = CENTER + Math.sin(angle) * (depth * RING_SPACING);
+    if (depth === 0) { node.x = CENTER; node.y = CENTER; }
+    else {
+      const angle = angularStart + angularSweep / 2, ringRadius = depth * RING_SPACING;
+      node.x = CENTER + Math.cos(angle) * ringRadius;
+      node.y = CENTER + Math.sin(angle) * ringRadius;
     }
-    // Petal radius from log10(working set); clamped so monster browsers don't
-    // eclipse their neighbors.
+    // Petal radius from log10(working set); clamped so heavy browsers don't eclipse neighbors.
     const logMem = node.workingSetBytes > 0 ? Math.log10(node.workingSetBytes + 1) : 0;
     node.radius = Math.max(4, Math.min(30, 2 + logMem * 2.5));
     if (node.children.length === 0) return;
@@ -250,10 +228,7 @@ const gdiplusToken = gdiplusTokenBuffer.readBigUInt64LE(0);
 
 // ── Window plumbing ───────────────────────────────────────────────────────────
 
-let shouldClose = false;
-let hoverX = -1;
-let hoverY = -1;
-let windowHandle = 0n;
+let shouldClose = false, hoverX = -1, hoverY = -1, windowHandle = 0n;
 
 const wndProcCallback = new JSCallback(
   (hWnd: bigint, msg: number, wParam: number | bigint, lParam: number | bigint): bigint => {
@@ -285,10 +260,7 @@ wndClassBuffer.writeUInt32LE(80, 0); // cbSize
 wndClassBuffer.writeBigUInt64LE(BigInt(wndProcCallback.ptr!), 8); // lpfnWndProc
 wndClassBuffer.writeBigUInt64LE(BigInt(className.ptr), 64); // lpszClassName
 
-if (!User32.RegisterClassExW(wndClassBuffer.ptr)) {
-  console.error('RegisterClassExW failed');
-  process.exit(1);
-}
+if (!User32.RegisterClassExW(wndClassBuffer.ptr)) { console.error('RegisterClassExW failed'); process.exit(1); }
 
 const screenWidth = User32.GetSystemMetrics(SystemMetric.SM_CXSCREEN);
 const screenHeight = User32.GetSystemMetrics(SystemMetric.SM_CYSCREEN);
@@ -303,13 +275,12 @@ windowHandle = User32.CreateWindowExW(
 );
 if (!windowHandle) { console.error('CreateWindowExW failed'); process.exit(1); }
 
-// Mica + dark-mode chrome for a window that has none.
-const backdropAttribute = Buffer.alloc(4);
-backdropAttribute.writeInt32LE(SystemBackdropType.DWMSBT_MAINWINDOW, 0);
-Dwmapi.DwmSetWindowAttribute(windowHandle, WindowAttribute.DWMWA_SYSTEMBACKDROP_TYPE, backdropAttribute.ptr, 4);
-const darkModeAttribute = Buffer.alloc(4);
-darkModeAttribute.writeInt32LE(1, 0);
-Dwmapi.DwmSetWindowAttribute(windowHandle, WindowAttribute.DWMWA_USE_IMMERSIVE_DARK_MODE, darkModeAttribute.ptr, 4);
+// Mica + dark-mode chrome for the borderless window.
+const dwmAttribute = Buffer.alloc(4);
+dwmAttribute.writeInt32LE(SystemBackdropType.DWMSBT_MAINWINDOW, 0);
+Dwmapi.DwmSetWindowAttribute(windowHandle, WindowAttribute.DWMWA_SYSTEMBACKDROP_TYPE, dwmAttribute.ptr, 4);
+dwmAttribute.writeInt32LE(1, 0);
+Dwmapi.DwmSetWindowAttribute(windowHandle, WindowAttribute.DWMWA_USE_IMMERSIVE_DARK_MODE, dwmAttribute.ptr, 4);
 
 User32.ShowWindow(windowHandle, ShowWindowCommand.SW_SHOW);
 User32.UpdateWindow(windowHandle);
@@ -318,10 +289,7 @@ User32.SetTimer(windowHandle, TIMER_ID, REFRESH_INTERVAL_MS, null);
 // ── Offscreen bitmap + Graphics ───────────────────────────────────────────────
 
 const bitmapHandleBuffer = Buffer.alloc(8);
-check(
-  Gdiplus.GdipCreateBitmapFromScan0(WINDOW_SIZE, WINDOW_SIZE, 0, PixelFormat32bppARGB, null, bitmapHandleBuffer.ptr),
-  'GdipCreateBitmapFromScan0',
-);
+check(Gdiplus.GdipCreateBitmapFromScan0(WINDOW_SIZE, WINDOW_SIZE, 0, PixelFormat32bppARGB, null, bitmapHandleBuffer.ptr), 'GdipCreateBitmapFromScan0');
 const offscreenBitmap = bitmapHandleBuffer.readBigUInt64LE(0);
 
 const offscreenGraphicsHandleBuffer = Buffer.alloc(8);
@@ -354,10 +322,8 @@ Gdiplus.GdipSetStringFormatAlign(leftStringFormat, StringAlignment.StringAlignme
 
 const reusableRect = Buffer.alloc(16);
 function writeRect(x: number, y: number, w: number, h: number): Pointer {
-  reusableRect.writeFloatLE(x, 0);
-  reusableRect.writeFloatLE(y, 4);
-  reusableRect.writeFloatLE(w, 8);
-  reusableRect.writeFloatLE(h, 12);
+  reusableRect.writeFloatLE(x, 0); reusableRect.writeFloatLE(y, 4);
+  reusableRect.writeFloatLE(w, 8); reusableRect.writeFloatLE(h, 12);
   return reusableRect.ptr;
 }
 
@@ -376,14 +342,9 @@ function findHoveredNode(x: number, y: number): ProcessNode | null {
   let best: ProcessNode | null = null;
   let bestDistSq = Infinity;
   for (const node of cachedSnapshot.nodes) {
-    const dx = node.x - x;
-    const dy = node.y - y;
-    const distSq = dx * dx + dy * dy;
+    const dx = node.x - x, dy = node.y - y, distSq = dx * dx + dy * dy;
     const hitR = node.radius + 2;
-    if (distSq <= hitR * hitR && distSq < bestDistSq) {
-      best = node;
-      bestDistSq = distSq;
-    }
+    if (distSq <= hitR * hitR && distSq < bestDistSq) { best = node; bestDistSq = distSq; }
   }
   return best;
 }
@@ -391,8 +352,7 @@ function findHoveredNode(x: number, y: number): ProcessNode | null {
 // ── Render ────────────────────────────────────────────────────────────────────
 
 // Brushes/pens are created per-call (one-shot) so we don't accumulate state.
-const brushOutBuffer = Buffer.alloc(8);
-const penOutBuffer = Buffer.alloc(8);
+const brushOutBuffer = Buffer.alloc(8), penOutBuffer = Buffer.alloc(8);
 function withBrush(color: number, body: (brush: bigint) => void): void {
   Gdiplus.GdipCreateSolidFill(color, brushOutBuffer.ptr);
   const brush = brushOutBuffer.readBigUInt64LE(0);
@@ -525,10 +485,7 @@ console.log('Cleaning up...');
 
 User32.KillTimer(windowHandle, TIMER_ID);
 Gdiplus.GdipDeleteStringFormat(leftStringFormat);
-Gdiplus.GdipDeleteFont(titleFont);
-Gdiplus.GdipDeleteFont(subtitleFont);
-Gdiplus.GdipDeleteFont(tooltipFont);
-Gdiplus.GdipDeleteFont(tooltipBoldFont);
+for (const font of [titleFont, subtitleFont, tooltipFont, tooltipBoldFont]) Gdiplus.GdipDeleteFont(font);
 Gdiplus.GdipDeleteFontFamily(fontFamily);
 Gdiplus.GdipDeleteGraphics(offscreenGraphics);
 Gdiplus.GdipDisposeImage(offscreenBitmap);
@@ -537,5 +494,4 @@ Gdiplus.GdiplusShutdown(gdiplusToken);
 if (windowHandle) User32.DestroyWindow(windowHandle);
 User32.UnregisterClassW(className.ptr, 0n);
 wndProcCallback.close();
-
 console.log('Done.');

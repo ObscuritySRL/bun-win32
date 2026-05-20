@@ -82,7 +82,7 @@
  * Run: bun run example/clipboard-museum.ts
  */
 
-import { JSCallback, type Pointer } from 'bun:ffi';
+import { JSCallback, toArrayBuffer, type Pointer } from 'bun:ffi';
 import { Dwmapi, GDI32, Gdiplus, Kernel32, User32 } from '../index';
 import { ExtendedWindowStyles, ShowWindowCommand, SystemMetric, VirtualKey, WindowStyles } from '@bun-win32/user32';
 import { SystemBackdropType, WindowAttribute, WindowCornerPreference } from '@bun-win32/dwmapi';
@@ -237,28 +237,12 @@ function ingestUnicodeText(advertisedFormats: readonly number[]): void {
   if (!ptr) return;
   try {
     const byteCount = Number(Kernel32.GlobalSize(handle));
-    // Wrap the locked block as a Buffer view so we can pull the wide string out
-    // without copying into JS until we have the boundary.
-    const view = new Uint8Array(new ArrayBuffer(byteCount));
-    // We cannot directly slice off Bun's Pointer; copy via read.u16 in a loop.
-    // For modest clipboard payloads this is fast enough; for large pastes we
-    // cap the scan at 64K wchars so we don't sit copying megabytes of HTML.
-    const charLimit = Math.min(byteCount / 2, 65_536);
-    const scratch = Buffer.alloc(charLimit * 2);
-    for (let i = 0; i < charLimit; i++) {
-      const codeUnit = readWcharAt(ptr, i);
-      if (codeUnit === 0) {
-        scratch.writeUInt16LE(0, i * 2);
-        // Truncate the buffer at the first NUL terminator.
-        const fullText = scratch.subarray(0, i * 2).toString('utf16le');
-        registerTextCard(fullText, advertisedFormats);
-        return;
-      }
-      scratch.writeUInt16LE(codeUnit, i * 2);
-    }
-    const fullText = scratch.toString('utf16le').replace(/\0.*$/, '');
+    // Cap the slurp at 128 KB of wide chars so a giant HTML paste does not
+    // blow the renderer; the preview is truncated to ~120 chars anyway.
+    const cap = Math.min(byteCount, 128 * 1024);
+    const snapshot = Buffer.from(toArrayBuffer(ptr, 0, cap));
+    const fullText = snapshot.toString('utf16le').replace(/\0.*$/, '');
     registerTextCard(fullText, advertisedFormats);
-    void view; // silence unused
   } finally {
     Kernel32.GlobalUnlock(handle);
   }
@@ -421,30 +405,22 @@ function pushCard(spec: Omit<ClipboardCard, 'identifier' | 'capturedAt' | 'slide
 }
 
 // ── Tiny FFI memory readers for clipboard payloads ───────────────────────────
-// Each one builds a Buffer.fromArrayBuffer view around the pointer so we don't
-// have to wire toArrayBuffer everywhere; the locked block is alive across the
-// short read window since GlobalUnlock is in the surrounding `finally`.
+// Each one builds a Buffer view around the pointer; the locked block is alive
+// across the short read window since GlobalUnlock is in the surrounding finally.
 function readWcharAt(pointer: Pointer, indexInWchars: number): number {
-  // toArrayBuffer with a 2-byte window is acceptable; we discard immediately.
-  // It is fine to call this in a tight loop for our ~64 KB cap.
-  const buf = Buffer.from(require('bun:ffi').toArrayBuffer(pointer, indexInWchars * 2, 2));
-  return buf.readUInt16LE(0);
+  return Buffer.from(toArrayBuffer(pointer, indexInWchars * 2, 2)).readUInt16LE(0);
 }
 function readU8At(pointer: Pointer, offset: number): number {
-  const buf = Buffer.from(require('bun:ffi').toArrayBuffer(pointer, offset, 1));
-  return buf.readUInt8(0);
+  return Buffer.from(toArrayBuffer(pointer, offset, 1)).readUInt8(0);
 }
 function readU16At(pointer: Pointer, offset: number): number {
-  const buf = Buffer.from(require('bun:ffi').toArrayBuffer(pointer, offset, 2));
-  return buf.readUInt16LE(0);
+  return Buffer.from(toArrayBuffer(pointer, offset, 2)).readUInt16LE(0);
 }
 function readU32At(pointer: Pointer, offset: number): number {
-  const buf = Buffer.from(require('bun:ffi').toArrayBuffer(pointer, offset, 4));
-  return buf.readUInt32LE(0);
+  return Buffer.from(toArrayBuffer(pointer, offset, 4)).readUInt32LE(0);
 }
 function readI32At(pointer: Pointer, offset: number): number {
-  const buf = Buffer.from(require('bun:ffi').toArrayBuffer(pointer, offset, 4));
-  return buf.readInt32LE(0);
+  return Buffer.from(toArrayBuffer(pointer, offset, 4)).readInt32LE(0);
 }
 
 // ── Build window class + window ──────────────────────────────────────────────

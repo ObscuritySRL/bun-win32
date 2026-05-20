@@ -356,9 +356,9 @@ console.log(`WH_KEYBOARD_LL hook installed (handle 0x${hookHandle.toString(16)})
 const cursorPointBuffer = new Int32Array(2);
 let shouldQuit = false;
 
+// TIMERPROC: VOID CALLBACK TimerProc(HWND, UINT, UINT_PTR, DWORD)
 const timerCallback = new JSCallback(
-  (_hWnd: bigint, _msg: number, _id: bigint, _time: number): bigint => {
-    // Drain pending keystrokes into particles.
+  (_hWnd: bigint, _msg: number, _id: bigint, _time: number): void => {
     while (pendingKeyEvents.length >= 3 && activeParticles.length < MAX_PARTICLES) {
       const vkCode = pendingKeyEvents.shift()!;
       const shiftHeld = pendingKeyEvents.shift()! !== 0;
@@ -376,7 +376,6 @@ const timerCallback = new JSCallback(
       });
     }
 
-    // Advance physics.
     for (let i = activeParticles.length - 1; i >= 0; i--) {
       const particle = activeParticles[i]!;
       particle.positionY += particle.velocityY;
@@ -385,18 +384,16 @@ const timerCallback = new JSCallback(
       if (particle.remainingLifeMs <= 0) activeParticles.splice(i, 1);
     }
 
-    // ESC poll - GetAsyncKeyState reads the high bit when the key is down.
     if ((User32.GetAsyncKeyState(VirtualKey.VK_ESCAPE) & 0x8000) !== 0) {
       shouldQuit = true;
       User32.PostQuitMessage(0);
-      return 0n;
+      return;
     }
 
     compositeFrame(screenPixels, screenWidth, screenHeight);
     User32.UpdateLayeredWindow(overlayHwnd, screenDeviceContext, destinationPoint.ptr, surfaceSize.ptr, memoryDeviceContext, sourcePoint.ptr, 0, blendFunction.ptr, ULW_ALPHA);
-    return 0n;
   },
-  { args: ['u64', 'u32', 'u64', 'u32'], returns: 'i64' },
+  { args: ['u64', 'u32', 'u64', 'u32'], returns: 'void' },
 );
 const renderTimerId = User32.SetTimer(overlayHwnd, 1n, FRAME_INTERVAL_MS, timerCallback.ptr);
 if (!renderTimerId) throw new Error('SetTimer failed');

@@ -48,7 +48,6 @@ import { ExtendedWindowStyles, ShowWindowCommand, SystemMetric, VirtualKey, Wind
 import { S_OK, XAUDIO2_USE_DEFAULT_PROCESSOR } from '@bun-win32/xaudio2_9';
 
 // ── Win32 + IXAudio2 constants ────────────────────────────────────────────────
-
 const WM_DESTROY = 0x0002;
 const WM_CLOSE = 0x0010;
 const TIMER_ID = 1n;
@@ -58,7 +57,6 @@ const AC_SRC_OVER = 0x00;
 const AC_SRC_ALPHA = 0x01;
 const BI_RGB = 0;
 const DIB_RGB_COLORS = 0;
-
 // IXAudio2 COM vtable slot order from xaudio2.h.
 const IUNKNOWN_RELEASE = 2;
 const IXAUDIO2_CREATESOURCEVOICE = 5;
@@ -69,13 +67,11 @@ const IXAUDIO2SOURCEVOICE_SUBMITSOURCEBUFFER = 21;
 const AudioCategory_GameEffects = 6;
 
 // ── Audio + particle tuning ───────────────────────────────────────────────────
-
 const SAMPLE_RATE = 44_100;
 const CHANNELS = 1;
 const BITS_PER_SAMPLE = 16;
 const BLOCK_ALIGN = (CHANNELS * BITS_PER_SAMPLE) / 8;
 const SPLAT_SAMPLES = Math.ceil(0.07 * SAMPLE_RATE);
-
 const MAX_PARTICLES = 2200;
 const SPAWN_PER_FRAME_MOVING = 6;
 const SPAWN_PER_FRAME_IDLE = 2;
@@ -156,23 +152,13 @@ wndClassBuffer.writeUInt32LE(80, 0); // cbSize
 wndClassBuffer.writeBigUInt64LE(BigInt(wndProc.ptr!), 8); // lpfnWndProc
 wndClassBuffer.writeBigUInt64LE(BigInt(className.ptr!), 64); // lpszClassName
 
-if (!User32.RegisterClassExW(wndClassBuffer.ptr!)) {
-  console.error('RegisterClassExW failed.');
-  process.exit(1);
-}
+if (!User32.RegisterClassExW(wndClassBuffer.ptr!)) { console.error('RegisterClassExW failed.'); process.exit(1); }
 
-const extendedStyle =
-  ExtendedWindowStyles.WS_EX_TOPMOST |
-  ExtendedWindowStyles.WS_EX_LAYERED |
-  ExtendedWindowStyles.WS_EX_TRANSPARENT |
-  ExtendedWindowStyles.WS_EX_TOOLWINDOW |
-  ExtendedWindowStyles.WS_EX_NOACTIVATE;
+const extendedStyle = ExtendedWindowStyles.WS_EX_TOPMOST | ExtendedWindowStyles.WS_EX_LAYERED |
+  ExtendedWindowStyles.WS_EX_TRANSPARENT | ExtendedWindowStyles.WS_EX_TOOLWINDOW | ExtendedWindowStyles.WS_EX_NOACTIVATE;
 const overlayHwnd = User32.CreateWindowExW(extendedStyle, className.ptr!, encodeWide('Cursor Rain').ptr!,
   WindowStyles.WS_POPUP | WindowStyles.WS_VISIBLE, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0n, 0n, 0n, null);
-if (!overlayHwnd) {
-  console.error('CreateWindowExW failed.');
-  process.exit(1);
-}
+if (!overlayHwnd) { console.error('CreateWindowExW failed.'); process.exit(1); }
 
 // ── Off-screen 32-bit BGRA DIB section (top-down so y=0 is the top row) ───────
 
@@ -414,10 +400,8 @@ function stepFrame(): void {
 
 const timerCallback = new JSCallback(() => stepFrame(), { args: ['u64', 'u32', 'u64', 'u32'], returns: 'void' });
 
-const timerId = User32.SetTimer(overlayHwnd, TIMER_ID, FRAME_INTERVAL_MS, timerCallback.ptr);
-if (!timerId) {
-  console.error('SetTimer failed.');
-  process.exit(1);
+if (!User32.SetTimer(overlayHwnd, TIMER_ID, FRAME_INTERVAL_MS, timerCallback.ptr)) {
+  console.error('SetTimer failed.'); process.exit(1);
 }
 
 User32.ShowWindow(overlayHwnd, ShowWindowCommand.SW_SHOWNOACTIVATE);
