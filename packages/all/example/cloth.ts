@@ -41,13 +41,30 @@ import { mkdirSync } from 'node:fs';
 import { resolve } from 'node:path';
 
 import { GDI32, User32 } from '../index';
+import { SystemMetric } from '@bun-win32/user32';
 import * as gpu from './_gpu';
+import * as hud from './_hud';
 import { captureBackBuffer, formatGrid } from './_snapshot';
 
 const encodeWide = (str: string): Buffer => Buffer.from(`${str}\0`, 'utf16le');
 
-const WIDTH = 1280;
-const HEIGHT = 720;
+// Fill the primary monitor (borderless). The HDR target + post both use clientW/clientH
+// so they follow whatever the window's real client size turns out to be.
+const WIDTH = User32.GetSystemMetrics(SystemMetric.SM_CXSCREEN) || 1280;
+const HEIGHT = User32.GetSystemMetrics(SystemMetric.SM_CYSCREEN) || 720;
+
+// Virtual-key codes for the interactive controls.
+const VK_LEFT = 0x25;
+const VK_UP = 0x26;
+const VK_RIGHT = 0x27;
+const VK_DOWN = 0x28;
+const VK_SPACE = 0x20;
+const VK_Q = 0x51;
+const VK_E = 0x45;
+const VK_Z = 0x5a;
+const VK_X = 0x58;
+const VK_P = 0x50;
+const VK_R = 0x52;
 
 // 256 × 256 = 65,536 cloth nodes. numthreads(256) → side groups for the 1D dispatch.
 const GRID_W = 256;
@@ -64,36 +81,37 @@ const SOLVE_ITERS = 16; // Jacobi constraint passes per frame
 const STRIDE = 16; // float4 per node (xyz + w pin flag)
 
 // ── Window + device ───────────────────────────────────────────────────────────
-const win = gpu.createWindow({ title: 'Cloth — 65,536-node GPU soft-body banner in pure TypeScript', width: WIDTH, height: HEIGHT, borderless: true });
+const win = gpu.createWindow({ title: 'Cloth — 65,536-node GPU soft-body, brushable in pure TypeScript', width: WIDTH, height: HEIGHT, borderless: true });
 const { w: clientW, h: clientH } = win.clientSize();
 const dev = gpu.createDevice(win.hwnd, { width: clientW, height: clientH });
 
-console.log('Cloth — a 65,536-node GPU soft-body banner, simulated & rendered in pure TypeScript.');
+console.log('Cloth — a 65,536-node GPU soft-body, simulated & rendered in pure TypeScript.');
 console.log(`  ${NODE_COUNT.toLocaleString()} nodes · ${SOLVE_ITERS} XPBD iters/frame · ${dev.driver} · ${dev.gpuName}`);
-console.log('  Auto-orbiting wind tunnel · ESC to exit.\n');
+console.log('  LMB drag: brush · arrows: orbit · Q/E: zoom · Z/X: wind · P: pin mode · Space: auto-orbit · R: reset · ESC.\n');
 
-// ── Seed the cloth: a flag plane in world space, LEFT edge pinned to a mast ──────
-// The flag hangs from a vertical mast on the left (gx == 0 pinned, w == 0) and streams
-// to the right in the wind — the iconic flapping-flag pose that reads unmistakably as
-// cloth. gx maps to world +x (along the flag, toward the free fly edge), gy maps to
-// world -y (top → bottom). A slight z waviness breaks the first-frame flatness.
+// ── Seed the cloth: a FLAT plane in world space, hanging from the top ────────────
+// The sheet is laid out as a flat lattice that hangs DOWN from the top: gx maps to
+// world +x (left → right across the cloth), gy maps to world -y (top row → bottom).
+// Which nodes are actually held is decided IN-SHADER from the grid coords (pinMode),
+// so this seed only establishes the rest/start geometry. The exact same formula
+// (x0, yTop, restPos) is mirrored in both compute shaders so a pinned node freezes at
+// precisely its lattice rest point regardless of the chosen pin mode. A whisper of z
+// waviness breaks the first-frame flatness so the lighting has something to catch.
 const posSeed = Buffer.alloc(NODE_COUNT * STRIDE);
 {
-  const x0 = -CLOTH_W * 0.5; // mast at the far left
-  const yTop = CLOTH_H * 0.5;
+  const x0 = -CLOTH_W * 0.5; // left edge
+  const yTop = CLOTH_H * 0.5; // top edge
   for (let gy = 0; gy < GRID_H; gy += 1) {
     for (let gx = 0; gx < GRID_W; gx += 1) {
       const i = gy * GRID_W + gx;
       const x = x0 + gx * REST;
       const y = yTop - gy * REST;
       const z = Math.sin(gx * 0.16) * 0.06 + Math.cos(gy * 0.11) * 0.04;
-      // Pin the entire LEFT column (the mast) hard: w == 0 pinned, w == 1 free.
-      const pinned = gx === 0 ? 0 : 1;
       const o = i * STRIDE;
       posSeed.writeFloatLE(x, o + 0);
       posSeed.writeFloatLE(y, o + 4);
       posSeed.writeFloatLE(z, o + 8);
-      posSeed.writeFloatLE(pinned, o + 12);
+      posSeed.writeFloatLE(1, o + 12); // P.w unused for pinning now (shader decides); keep 1
     }
   }
 }
@@ -101,7 +119,7 @@ const posSeed = Buffer.alloc(NODE_COUNT * STRIDE);
 // Three position buffers: pos (current), prev (Verlet history), plus a scratch buffer
 // for the Jacobi ping-pong solve. All are UAV+SRV structured float4 buffers.
 let posBuf = gpu.makeStructuredBuffer({ stride: STRIDE, count: NODE_COUNT, uav: true, srv: true, initialData: posSeed });
-const prevBuf = gpu.makeStructuredBuffer({ stride: STRIDE, count: NODE_COUNT, uav: true, srv: true, initialData: posSeed });
+let prevBuf = gpu.makeStructuredBuffer({ stride: STRIDE, count: NODE_COUNT, uav: true, srv: true, initialData: posSeed });
 let scratchBuf = gpu.makeStructuredBuffer({ stride: STRIDE, count: NODE_COUNT, uav: true, srv: true, initialData: posSeed });
 
 // ── HDR accumulation target + sampler + additive blend ──────────────────────────
@@ -137,9 +155,18 @@ const noCullState = (() => {
 //   float4 p1 (rest, gravity, damping, stiffness)
 //   float4 wind (wx, wy, wz, windStrength)
 //   float4 sphere (cx, cy, cz, radius)
-const SIM_CB_SIZE = 64;
+//   float4 p2 (pinMode, -, -, -)  — selects which lattice nodes are held in-shader
+const SIM_CB_SIZE = 80;
 const simCb = gpu.makeConstantBuffer(SIM_CB_SIZE);
 const simData = Buffer.alloc(SIM_CB_SIZE);
+
+// Brush CB (compute): the mouse-drag injector.
+//   float4x4 gVP (the SAME viewProj used to render, uploaded TRANSPOSED) @0
+//   float4 gMouse (ndcX, ndcY, active, radius) @64
+//   float4 gDrag  (dx, dy, dz, strength)       @80
+const BRUSH_CB_SIZE = 96;
+const brushCb = gpu.makeConstantBuffer(BRUSH_CB_SIZE);
+const brushData = Buffer.alloc(BRUSH_CB_SIZE);
 
 // Render CB (VS+PS): float4x4 viewProj (64) + float4 params (-, gridW, gridH, time)
 //   + float4 camPos(xyz) + float4 lightDir(xyz) = 64 + 16 + 16 + 16 = 112.
@@ -159,6 +186,7 @@ cbuffer Sim : register(b0) {
   float4 gP1;     // x=rest, y=gravity, z=damping, w=stiffness
   float4 gWind;   // xyz=wind dir, w=wind strength
   float4 gSphere; // xyz=center, w=radius
+  float4 gP2;     // x=pinMode (0=top corners, 1=top edge, 2=left edge)
 };
 RWStructuredBuffer<float4> Pos  : register(u0);
 RWStructuredBuffer<float4> Prev : register(u1);
@@ -169,46 +197,53 @@ void main(uint3 id : SV_DispatchThreadID) {
   uint count = (uint)(gP0.z * gP0.w);
   if (i >= count) return;
 
+  uint gw = (uint)gP0.z;
+  uint gh = (uint)gP0.w;
+  uint gx = i % gw;
+  uint gy = i / gw;
+  float rest = gP1.x;
+
+  // Deterministic pin geometry: the lattice's flat rest plane, hung from the top.
+  float x0   = -rest * (gP0.z - 1.0) * 0.5;
+  float yTop =  rest * (gP0.w - 1.0) * 0.5;
+  float3 restPos = float3(x0 + gx * rest, yTop - gy * rest, 0.0);
+  int mode = (int)gP2.x;
+  bool pinned = (mode == 0) ? (gy == 0 && (gx == 0 || gx == gw - 1))  // top corners
+              : (mode == 1) ? (gy == 0)                               // top edge
+              :               (gx == 0);                              // left edge
+
+  if (pinned) { Pos[i] = float4(restPos, 0); Prev[i] = float4(restPos, 0); return; }
+
   float4 P = Pos[i];
   float3 p = P.xyz;
-  float  pin = P.w;        // 0 = pinned, 1 = free
-
-  if (pin < 0.5) { Prev[i] = float4(p, pin); Pos[i] = float4(p, pin); return; }
+  float  pin = 1.0;        // free node
 
   float3 prev = Prev[i].xyz;
   float dt = gP0.x;
   float t  = gP0.y;
 
-  uint gw = (uint)gP0.z;
-  uint gx = i % gw;
-  uint gy = i / gw;
   float u = (float)gx / (gP0.z - 1.0);
   float vv = (float)gy / (gP0.w - 1.0);
 
-  // Gravity + wind. A flag reads best when the wind is dominated by an OUT-OF-PLANE
-  // (z) travelling wave: that produces the big S-shaped folds sweeping from mast to fly
-  // edge while the sheet stays broad and tall, rather than being dragged to a point. A
-  // gentle steady downwind push (+x) keeps it streaming; reach grows from mast→edge but
-  // never to zero in the middle, so the whole span flutters.
+  // Gravity dominates — the cloth hangs from its held edge and DRAPES. The wind is a
+  // gentle OUT-OF-PLANE (z) travelling flutter that ripples the sheet without dragging
+  // it sideways into a cinched column. Its amplitude grows with distance from the held
+  // top (vv): the held edge stays taut while the free lower body breathes and billows.
   float3 g = float3(0, gP1.y, 0);
-  // Reach grows from the mast then EASES back near the very fly edge so the free
-  // trailing column is not over-driven into folding over on itself (the knot).
-  float reach = 0.15 + 0.95 * u - 0.30 * u * u;      // mast 0.15 → peak ~0.95 → edge 0.80
-  // Steady downwind drift (mostly +x), modest.
-  float3 drift = normalize(gWind.xyz + 1e-5) * gWind.w * 0.45 * reach;
-  // Dominant out-of-plane travelling flutter — the visible ripple of a flag. The phase
-  // shears with HEIGHT (vv) so the top and bottom of any vertical slice swing on
-  // different beats: the trailing edge FANS into broad diagonal folds instead of all
-  // the free nodes lurching in z together and cinching into a knot.
-  float wave = sin(t * 5.2 - u * 9.0 + vv * 6.0)
-             + 0.6 * sin(t * 3.2 - u * 4.5 - vv * 9.0)
-             + 0.35 * sin(t * 7.5 - u * 14.0 + vv * 3.0);
-  float3 flutter = float3(0, 0, 1) * wave * gWind.w * reach * 0.92;
-  // Vertical undulation: folds tilt and the fly edge breathes open top-to-bottom.
-  flutter.y += sin(t * 4.5 - u * 7.0 + vv * 7.0) * gWind.w * reach * 0.30;
-  // Gentle outward "fan": push the free edge's top up and bottom down a touch so the
-  // trailing edge stays broad and tall rather than pinching toward the mid-line.
-  flutter.y += (vv - 0.5) * gWind.w * reach * reach * 0.55;
+  // Reach: ~0 at the held top, growing toward the free bottom so folds open downward.
+  float reach = 0.10 + 0.90 * vv;
+  // A faint lateral lean from the wind direction (mostly z), kept small so the drape
+  // stays broad and centred rather than streaming off to one side.
+  float3 drift = normalize(gWind.xyz + 1e-5) * gWind.w * 0.10 * reach;
+  // Dominant out-of-plane travelling wave — the visible ripple of cloth. The phase
+  // shears across BOTH axes so neighbouring columns swing on different beats and the
+  // sheet fans into broad diagonal folds instead of all lurching together.
+  float wave = sin(t * 3.4 + u * 7.0 - vv * 5.0)
+             + 0.6 * sin(t * 2.1 - u * 4.5 + vv * 8.0)
+             + 0.35 * sin(t * 5.2 + u * 11.0 + vv * 3.0);
+  float3 flutter = float3(0, 0, 1) * wave * gWind.w * reach * 0.55;
+  // A touch of vertical undulation so folds tilt and the lower hem breathes.
+  flutter.y += sin(t * 2.6 + u * 6.0 - vv * 6.0) * gWind.w * reach * 0.18;
   float3 a = g + drift + flutter;
 
   // Verlet integration with velocity damping.
@@ -216,8 +251,8 @@ void main(uint3 id : SV_DispatchThreadID) {
   float3 vel = (p - prev) * damp;
   float3 np = p + vel + a * dt * dt;
 
-  Prev[i] = float4(p, pin);
-  Pos[i]  = float4(np, pin);
+  Prev[i] = float4(p, 1.0);
+  Pos[i]  = float4(np, 1.0);
 }
 `;
 
@@ -232,6 +267,7 @@ cbuffer Sim : register(b0) {
   float4 gP1;     // x=rest, y=gravity, z=damping, w=stiffness
   float4 gWind;
   float4 gSphere; // xyz=center, w=radius
+  float4 gP2;     // x=pinMode (0=top corners, 1=top edge, 2=left edge)
 };
 StructuredBuffer<float4>   Src : register(t0);
 RWStructuredBuffer<float4> Dst : register(u0);
@@ -260,7 +296,6 @@ void main(uint3 id : SV_DispatchThreadID) {
 
   float4 P = Src[i];
   float3 p = P.xyz;
-  float  pin = P.w;
 
   uint gx = i % gw;
   uint gy = i / gw;
@@ -268,30 +303,80 @@ void main(uint3 id : SV_DispatchThreadID) {
   float diag = rest * SQRT2;
   float stiff = gP1.w;
 
-  if (pin > 0.5) {
-    float3 corr = 0.0.xxx;
-    float wsum = 0.0;
-    // Structural neighbours (±x, ±y).
-    if (gx > 0)      accumulate(corr, wsum, p, i - 1,  rest, stiff);
-    if (gx < gw - 1) accumulate(corr, wsum, p, i + 1,  rest, stiff);
-    if (gy > 0)      accumulate(corr, wsum, p, i - gw, rest, stiff);
-    if (gy < gh - 1) accumulate(corr, wsum, p, i + gw, rest, stiff);
-    // Shear neighbours (diagonals) — keep the weave from collapsing in shear.
-    if (gx > 0      && gy > 0)      accumulate(corr, wsum, p, i - gw - 1, diag, stiff);
-    if (gx < gw - 1 && gy > 0)      accumulate(corr, wsum, p, i - gw + 1, diag, stiff);
-    if (gx > 0      && gy < gh - 1) accumulate(corr, wsum, p, i + gw - 1, diag, stiff);
-    if (gx < gw - 1 && gy < gh - 1) accumulate(corr, wsum, p, i + gw + 1, diag, stiff);
+  // Same deterministic pin geometry + mode test as the integrate pass.
+  float x0   = -rest * (gP0.z - 1.0) * 0.5;
+  float yTop =  rest * (gP0.w - 1.0) * 0.5;
+  float3 restPos = float3(x0 + gx * rest, yTop - gy * rest, 0.0);
+  int mode = (int)gP2.x;
+  bool pinned = (mode == 0) ? (gy == 0 && (gx == 0 || gx == gw - 1))  // top corners
+              : (mode == 1) ? (gy == 0)                               // top edge
+              :               (gx == 0);                              // left edge
 
-    if (wsum > 0.0) p += corr / wsum;
+  if (pinned) { Dst[i] = float4(restPos, 0); return; }
 
-    // Collision sphere: push the node out to the surface if it penetrated.
-    float3 toC = p - gSphere.xyz;
-    float dC = length(toC);
-    float R = gSphere.w;
-    if (dC < R && dC > 1e-5) p = gSphere.xyz + toC * (R / dC);
+  float3 corr = 0.0.xxx;
+  float wsum = 0.0;
+  // Structural neighbours (±x, ±y).
+  if (gx > 0)      accumulate(corr, wsum, p, i - 1,  rest, stiff);
+  if (gx < gw - 1) accumulate(corr, wsum, p, i + 1,  rest, stiff);
+  if (gy > 0)      accumulate(corr, wsum, p, i - gw, rest, stiff);
+  if (gy < gh - 1) accumulate(corr, wsum, p, i + gw, rest, stiff);
+  // Shear neighbours (diagonals) — keep the weave from collapsing in shear.
+  if (gx > 0      && gy > 0)      accumulate(corr, wsum, p, i - gw - 1, diag, stiff);
+  if (gx < gw - 1 && gy > 0)      accumulate(corr, wsum, p, i - gw + 1, diag, stiff);
+  if (gx > 0      && gy < gh - 1) accumulate(corr, wsum, p, i + gw - 1, diag, stiff);
+  if (gx < gw - 1 && gy < gh - 1) accumulate(corr, wsum, p, i + gw + 1, diag, stiff);
+
+  if (wsum > 0.0) p += corr / wsum;
+
+  // Collision sphere: push the node out to the surface if it penetrated.
+  float3 toC = p - gSphere.xyz;
+  float dC = length(toC);
+  float R = gSphere.w;
+  if (dC < R && dC > 1e-5) p = gSphere.xyz + toC * (R / dC);
+
+  Dst[i] = float4(p, 1.0);
+}
+`;
+
+// ── HLSL: BRUSH (mouse-drag injector) ─────────────────────────────────────────────
+// Runs AFTER integrate, BEFORE the solve loop. Projects each node to clip space with
+// the SAME viewProj as the render pass, and if it falls under the mouse-brush disc in
+// NDC, ADDS the drag world-vector into Pos (not Prev) — in a Verlet sim adding to the
+// current position injects velocity, so dragging visibly grabs and swipes the fabric.
+// Pinned nodes (re-derived with the identical pinMode test) are skipped so the held
+// edge never tears loose. smoothstep falls off from the disc centre to its rim.
+const CS_BRUSH = `
+cbuffer Brush : register(b0) {
+  float4x4 gVP;     // same viewProj as render, uploaded TRANSPOSED
+  float4   gMouse;  // x=ndcX, y=ndcY, z=active, w=radius
+  float4   gDrag;   // xyz=world drag vector, w=strength
+};
+RWStructuredBuffer<float4> Pos : register(u0);
+
+static const uint GW = ${GRID_W};
+static const uint GH = ${GRID_H};
+
+[numthreads(${THREADS},1,1)]
+void main(uint3 id : SV_DispatchThreadID) {
+  uint i = id.x;
+  if (i >= GW * GH) return;
+  if (gMouse.z < 0.5) return;          // brush inactive (mouse up)
+
+  // Project the node with the SAME viewProj the cloth is rendered with, test the
+  // mouse-brush disc in NDC, and ADD the drag world-vector into Pos (not Prev) so the
+  // Verlet integrator reads it as injected velocity. Held nodes never need an explicit
+  // skip here: the very next solve pass re-pins them to their rest point each frame, so
+  // any transient brush nudge to the held edge is overwritten before it is ever drawn.
+  float4 clip = mul(gVP, float4(Pos[i].xyz, 1.0));
+  if (clip.w > 0.001) {
+    float2 ndc = clip.xy / clip.w;
+    float d = distance(ndc, gMouse.xy);
+    if (d < gMouse.w) {
+      float f = smoothstep(gMouse.w, 0.0, d) * gDrag.w;
+      Pos[i].xyz += gDrag.xyz * f;
+    }
   }
-
-  Dst[i] = float4(p, pin);
 }
 `;
 
@@ -507,6 +592,7 @@ VSOut main(uint vid : SV_VertexID) {
 // ── Compile + create shaders ──────────────────────────────────────────────────────
 const csIntegrateCode = gpu.compile(CS_INTEGRATE, 'main', 'cs_5_0');
 const csSolveCode = gpu.compile(CS_SOLVE, 'main', 'cs_5_0');
+const csBrushCode = gpu.compile(CS_BRUSH, 'main', 'cs_5_0');
 const vsCode = gpu.compile(VS_SRC, 'main', 'vs_5_0');
 const psSurfaceCode = gpu.compile(PS_SURFACE_SRC, 'main', 'ps_5_0');
 const vsFullscreenCode = gpu.compile(VS_FULLSCREEN_SRC, 'main', 'vs_5_0');
@@ -514,6 +600,7 @@ const psPostCode = gpu.compile(PS_POST_SRC, 'main', 'ps_5_0');
 
 const csIntegrate = gpu.makeComputeShader(csIntegrateCode);
 const csSolve = gpu.makeComputeShader(csSolveCode);
+const csBrush = gpu.makeComputeShader(csBrushCode);
 const vsSurface = gpu.makeVertexShader(vsCode);
 const psSurface = gpu.makePixelShader(psSurfaceCode);
 const vsFullscreen = gpu.makeVertexShader(vsFullscreenCode);
@@ -568,25 +655,42 @@ function mul4(a: number[], b: number[]): number[] {
   return r;
 }
 
+// ── Interactive state (mutated by the input handling each frame) ───────────────
+const PIN_MODE_LABELS = ['Top corners', 'Top edge', 'Left edge'] as const;
+let pinMode = 0; // 0 = top corners, 1 = top edge, 2 = left edge
+let windStrength = 5.6; // Z/X adjust; clamped [0, 12]
+let autoOrbit = true; // Space toggles the gentle idle orbit
+
 // ── GDI HUD font ──────────────────────────────────────────────────────────────
 const hudFont = GDI32.CreateFontW(-19, 0, 0, 0, 600, 0, 0, 0, 0, 0, 0, 4 /* ANTIALIASED_QUALITY */, 0, encodeWide('Consolas').ptr!);
+const hudFontSmall = GDI32.CreateFontW(-15, 0, 0, 0, 500, 0, 0, 0, 0, 0, 0, 4 /* ANTIALIASED_QUALITY */, 0, encodeWide('Consolas').ptr!);
 const TRANSPARENT_BK = 1;
 const nodeLabel = NODE_COUNT.toLocaleString();
 
 function drawHud(fps: number): void {
-  const dc = User32.GetDC(win.hwnd);
-  if (!dc) return;
-  const prevF = GDI32.SelectObject(dc, hudFont);
-  GDI32.SetBkMode(dc, TRANSPARENT_BK);
-  const line = `Cloth · ${nodeLabel} nodes · ${SOLVE_ITERS} XPBD iters · ${fps} fps · GPU: ${dev.gpuName}`;
-  const text = encodeWide(line);
-  const len = line.length;
-  GDI32.SetTextColor(dc, 0x00100804);
-  GDI32.TextOutW(dc, 19, 19, text.ptr!, len);
-  GDI32.SetTextColor(dc, 0x00f0d8b0);
-  GDI32.TextOutW(dc, 18, 18, text.ptr!, len);
-  GDI32.SelectObject(dc, prevF);
-  User32.ReleaseDC(win.hwnd, dc);
+  hud.draw(dev, clientW, clientH, (dc) => {
+    GDI32.SetBkMode(dc, TRANSPARENT_BK);
+
+    // Line 1 — live state (drawn with the bold font, drop-shadowed for legibility).
+    const prevBold = GDI32.SelectObject(dc, hudFont);
+    const line1 = `Cloth · ${nodeLabel} nodes · pin: ${PIN_MODE_LABELS[pinMode]} · wind ${windStrength.toFixed(1)} · ${fps} fps`;
+    const t1 = encodeWide(line1);
+    GDI32.SetTextColor(dc, 0x00100804);
+    GDI32.TextOutW(dc, 19, 19, t1.ptr!, line1.length);
+    GDI32.SetTextColor(dc, 0x00f0d8b0);
+    GDI32.TextOutW(dc, 18, 18, t1.ptr!, line1.length);
+
+    // Line 2 — the controls legend (lighter, smaller).
+    GDI32.SelectObject(dc, hudFontSmall);
+    const line2 = 'LMB drag: brush  ·  arrows: orbit  ·  Q/E: zoom  ·  Z/X: wind  ·  P: pin mode  ·  Space: auto-orbit  ·  R: reset  ·  ESC';
+    const t2 = encodeWide(line2);
+    GDI32.SetTextColor(dc, 0x00080604);
+    GDI32.TextOutW(dc, 19, 45, t2.ptr!, line2.length);
+    GDI32.SetTextColor(dc, 0x00c0b090);
+    GDI32.TextOutW(dc, 18, 44, t2.ptr!, line2.length);
+
+    GDI32.SelectObject(dc, prevBold);
+  });
 }
 
 // ── Teardown ──────────────────────────────────────────────────────────────────
@@ -596,6 +700,8 @@ function cleanup(code: number): never {
     cleanedUp = true;
     try {
       gpu.setBlendState(0n);
+      hud.release();
+      GDI32.DeleteObject(hudFontSmall);
       GDI32.DeleteObject(hudFont);
       gpu.comRelease(noCullState);
       gpu.comRelease(additiveBlend);
@@ -607,16 +713,19 @@ function cleanup(code: number): never {
       gpu.comRelease(vsFullscreen);
       gpu.comRelease(psSurface);
       gpu.comRelease(vsSurface);
+      gpu.comRelease(csBrush);
       gpu.comRelease(csSolve);
       gpu.comRelease(csIntegrate);
       gpu.blobRelease(psPostCode.blob);
       gpu.blobRelease(vsFullscreenCode.blob);
       gpu.blobRelease(psSurfaceCode.blob);
       gpu.blobRelease(vsCode.blob);
+      gpu.blobRelease(csBrushCode.blob);
       gpu.blobRelease(csSolveCode.blob);
       gpu.blobRelease(csIntegrateCode.blob);
       gpu.comRelease(postCb);
       gpu.comRelease(rendCb);
+      gpu.comRelease(brushCb);
       gpu.comRelease(simCb);
       for (const b of [posBuf, prevBuf, scratchBuf]) {
         gpu.comRelease(b.srv ?? 0n);
@@ -671,6 +780,30 @@ const rtvArrEmpty: readonly bigint[] = [];
 // The collision sphere sits behind the cloth so the wind drapes the banner over it.
 const SPHERE_R = CLOTH_W * 0.22;
 
+// ── Camera + interaction state (user-driven) ──────────────────────────────────
+let camYaw = -0.35;
+let camPitch = 0.18;
+let camDist = CLOTH_W * 1.15;
+// Previous mouse position in NDC, for computing the per-frame drag vector.
+let prevNdcX = 0;
+let prevNdcY = 0;
+// Edge-trigger latches: act once per key press, not once per frame held.
+let pLast = false;
+let spaceLast = false;
+let rLast = false;
+
+// Recreate the three position buffers from the flat seed (R = reset).
+function resetCloth(): void {
+  for (const b of [posBuf, prevBuf, scratchBuf]) {
+    gpu.comRelease(b.srv ?? 0n);
+    gpu.comRelease(b.uav ?? 0n);
+    gpu.comRelease(b.buffer);
+  }
+  posBuf = gpu.makeStructuredBuffer({ stride: STRIDE, count: NODE_COUNT, uav: true, srv: true, initialData: posSeed });
+  prevBuf = gpu.makeStructuredBuffer({ stride: STRIDE, count: NODE_COUNT, uav: true, srv: true, initialData: posSeed });
+  scratchBuf = gpu.makeStructuredBuffer({ stride: STRIDE, count: NODE_COUNT, uav: true, srv: true, initialData: posSeed });
+}
+
 while (!win.shouldClose()) {
   win.pump();
   if (win.shouldClose()) break;
@@ -679,13 +812,53 @@ while (!win.shouldClose()) {
   const dt = SIM_DT;
   const t = simTime;
 
-  // Wind drifts mainly along +x (downwind from the mast) with a slow z lean. The big
-  // visible ripple comes from the out-of-plane travelling wave in the shader.
+  // ── Input: camera (held), tweaks (held), and edge-triggered toggles ──
+  if (win.keyDown(VK_LEFT)) { camYaw -= 0.03; autoOrbit = false; }
+  if (win.keyDown(VK_RIGHT)) { camYaw += 0.03; autoOrbit = false; }
+  if (win.keyDown(VK_UP)) camPitch += 0.02;
+  if (win.keyDown(VK_DOWN)) camPitch -= 0.02;
+  camPitch = Math.max(-1.35, Math.min(1.35, camPitch));
+  if (win.keyDown(VK_Q)) camDist *= 0.98;
+  if (win.keyDown(VK_E)) camDist *= 1.02;
+  camDist = Math.max(CLOTH_W * 0.4, Math.min(CLOTH_W * 3.0, camDist));
+  if (win.keyDown(VK_Z)) windStrength = Math.max(0, windStrength - 0.2);
+  if (win.keyDown(VK_X)) windStrength = Math.min(12, windStrength + 0.2);
+
+  const pNow = win.keyDown(VK_P);
+  if (pNow && !pLast) pinMode = (pinMode + 1) % 3;
+  pLast = pNow;
+  const spaceNow = win.keyDown(VK_SPACE);
+  if (spaceNow && !spaceLast) autoOrbit = !autoOrbit;
+  spaceLast = spaceNow;
+  const rNow = win.keyDown(VK_R);
+  if (rNow && !rLast) resetCloth();
+  rLast = rNow;
+
+  if (autoOrbit) camYaw += 0.0035;
+
+  // In capture mode hold a fixed front-quarter framing so the gallery PNG always shows
+  // the broad draping face (the unbounded auto-orbit would otherwise rotate to an
+  // edge-on sliver by the chosen capture sim-time). Interactive runs are unaffected.
+  if (durationMs > 0) { camYaw = -0.42; camPitch = 0.20; camDist = CLOTH_W * 1.45; }
+
+  // Wind drifts mainly along +x with a slow z lean. The big visible ripple comes from
+  // the out-of-plane travelling wave in the shader; windStrength is user-tweakable.
   const windZ = Math.sin(t * 0.6) * 0.35;
   const windDir: V3 = [1.0, 0.0, windZ];
-  const windStrength = 5.6;
-  // Collision sphere parked behind the flag's mid-span so passing folds drape over it.
+  // Collision sphere parked behind the cloth's mid-span so passing folds drape over it.
   const sphereCenter: V3 = [CLOTH_W * 0.20, -CLOTH_H * 0.02 + Math.sin(t * 0.7) * 0.3, -SPHERE_R * 0.9 + Math.cos(t * 0.5) * 0.5];
+
+  // ── Camera basis (computed up front so the brush + render share one viewProj) ──
+  // The cloth hangs from the top in modes 0/1, so we frame it slightly low; in left-edge
+  // mode (2) it streams to the right like a flag, so the centre shifts downwind.
+  const center: V3 = pinMode < 2 ? [0, -CLOTH_H * 0.22, 0] : [CLOTH_W * 0.20, -CLOTH_H * 0.12, 0];
+  const eye: V3 = [
+    center[0] + Math.sin(camYaw) * Math.cos(camPitch) * camDist,
+    center[1] + Math.sin(camPitch) * camDist,
+    center[2] - Math.cos(camYaw) * Math.cos(camPitch) * camDist,
+  ];
+  const view = lookAt(eye, center, [0, 1, 0]);
+  const viewProj = mul4(proj, view);
 
   // ── Build the sim constant buffer (shared by integrate + solve) ──
   simData.writeFloatLE(dt, 0);
@@ -693,7 +866,7 @@ while (!win.shouldClose()) {
   simData.writeFloatLE(GRID_W, 8);
   simData.writeFloatLE(GRID_H, 12);
   simData.writeFloatLE(REST, 16);
-  simData.writeFloatLE(-4.2, 20); // gravity (y) — light, so the flag flies rather than droops
+  simData.writeFloatLE(-4.2, 20); // gravity (y) — light, so the cloth flies rather than droops
   simData.writeFloatLE(0.990, 24); // damping (a touch firmer so flaps settle, not ring)
   simData.writeFloatLE(1.0, 28); // stiffness
   simData.writeFloatLE(windDir[0], 32);
@@ -704,12 +877,63 @@ while (!win.shouldClose()) {
   simData.writeFloatLE(sphereCenter[1], 52);
   simData.writeFloatLE(sphereCenter[2], 56);
   simData.writeFloatLE(SPHERE_R, 60);
+  simData.writeFloatLE(pinMode, 64); // gP2.x — which lattice nodes are held, in-shader
   gpu.updateConstantBuffer(simCb, simData);
 
   // ── 1. Verlet integrate: pos & prev in place ──
   gpu.csSet(csIntegrate, { cb: [simCb], uav: [posBuf.uav!, prevBuf.uav!] });
   gpu.dispatch(GROUPS, 1, 1);
   unbindCsUav(2);
+
+  // ── 1b. Mouse brush: inject a drag impulse into Pos, AFTER integrate, BEFORE solve ──
+  const mouse = win.getMouse();
+  const ndcX = (mouse.x / clientW) * 2 - 1;
+  const ndcY = 1 - (mouse.y / clientH) * 2;
+  const dragNdcX = ndcX - prevNdcX;
+  const dragNdcY = ndcY - prevNdcY;
+  prevNdcX = ndcX;
+  prevNdcY = ndcY;
+  // Camera basis from eye→center, so a screen swipe maps to a world-space drag in the
+  // image plane: right = up × forward, up = forward × right.
+  let fwdX = center[0] - eye[0];
+  let fwdY = center[1] - eye[1];
+  let fwdZ = center[2] - eye[2];
+  const fwdL = Math.hypot(fwdX, fwdY, fwdZ) || 1;
+  fwdX /= fwdL; fwdY /= fwdL; fwdZ /= fwdL;
+  // right = normalize(cross([0,1,0], forward))
+  let rgtX = 1 * fwdZ - 0 * fwdY;
+  let rgtY = 0 * fwdX - 0 * fwdZ;
+  let rgtZ = 0 * fwdY - 1 * fwdX;
+  const rgtL = Math.hypot(rgtX, rgtY, rgtZ) || 1;
+  rgtX /= rgtL; rgtY /= rgtL; rgtZ /= rgtL;
+  // up = cross(forward, right)
+  const upX = fwdY * rgtZ - fwdZ * rgtY;
+  const upY = fwdZ * rgtX - fwdX * rgtZ;
+  const upZ = fwdX * rgtY - fwdY * rgtX;
+  const gain = camDist * 2; // a full-screen swipe meaningfully grabs the cloth
+  const dragWX = rgtX * dragNdcX * gain + upX * dragNdcY * gain;
+  const dragWY = rgtY * dragNdcX * gain + upY * dragNdcY * gain;
+  const dragWZ = rgtZ * dragNdcX * gain + upZ * dragNdcY * gain;
+
+  // Upload the brush CB: gVP TRANSPOSED (column-major HLSL read), gMouse, gDrag.
+  for (let row = 0; row < 4; row += 1) {
+    for (let col = 0; col < 4; col += 1) {
+      brushData.writeFloatLE(viewProj[col * 4 + row]!, (row * 4 + col) * 4);
+    }
+  }
+  brushData.writeFloatLE(ndcX, 64);
+  brushData.writeFloatLE(ndcY, 68);
+  brushData.writeFloatLE(mouse.down ? 1 : 0, 72);
+  brushData.writeFloatLE(0.13, 76); // brush radius (NDC)
+  brushData.writeFloatLE(dragWX, 80);
+  brushData.writeFloatLE(dragWY, 84);
+  brushData.writeFloatLE(dragWZ, 88);
+  brushData.writeFloatLE(1.0, 92); // strength
+  gpu.updateConstantBuffer(brushCb, brushData);
+
+  gpu.csSet(csBrush, { cb: [brushCb], uav: [posBuf.uav!] });
+  gpu.dispatch(GROUPS, 1, 1);
+  unbindCsUav(1);
 
   // ── 2. Jacobi constraint solve, ping-ponging posBuf <-> scratchBuf ──
   for (let iter = 0; iter < SOLVE_ITERS; iter += 1) {
@@ -723,19 +947,8 @@ while (!win.shouldClose()) {
     scratchBuf = tmp;
   }
 
-  // ── 3. Camera + render the cloth as a lit triangulated surface into the HDR target ──
-  // Frame the streaming flag's broad face from a slight front-quarter angle (so the
-  // travelling folds read in 3D) and orbit gently. The flag spans the mast at x≈-6.4
-  // out to a free edge billowing near x≈+5; centering near the mid-span keeps it framed.
-  const yaw = -0.30 + Math.sin(t * 0.22) * 0.20; // near-front, gentle orbit
-  const camDist = CLOTH_W * 1.10; // closer so the silk fills the wide frame
-  const camHeight = CLOTH_H * 0.02 + Math.sin(t * 0.2) * CLOTH_H * 0.03;
-  // Aim at the billowing visual centroid (downwind + a little low) so the fabric is
-  // centred and large in frame rather than hugging the left third.
-  const center: V3 = [CLOTH_W * 0.20, -CLOTH_H * 0.12, 0];
-  const eye: V3 = [center[0] + Math.sin(yaw) * camDist, camHeight, center[2] - Math.cos(yaw) * camDist];
-  const view = lookAt(eye, center, [0, 1, 0]);
-  const viewProj = mul4(proj, view);
+  // ── 3. Render the cloth as a lit triangulated surface into the HDR target ──
+  // The view/proj were already computed above (shared with the brush pass).
 
   // Key light: a warm sun from the upper-left-front, raking across the folds.
   let ldx = -0.45;
@@ -795,6 +1008,10 @@ while (!win.shouldClose()) {
   gpu.drawFullscreenTriangle();
   gpu.psSet(psPost, { srv: [0n] });
 
+  // Composite the GDI HUD INTO the back buffer (flicker-free) before present, so the
+  // text is part of the presented frame and shows up in the gallery capture below.
+  drawHud(fps);
+
   // ── Capture the gallery screenshot at a fixed SIM TIME (capture mode) ──
   // Trigger on the first frame whose sim time has passed the chosen well-developed
   // flapping pose; this is deterministic regardless of the (very high) frame rate.
@@ -811,7 +1028,6 @@ while (!win.shouldClose()) {
 
   dev.present(false);
   presented += 1;
-  drawHud(fps);
 
   frames += 1;
   if (wallNow - fpsWindowStart >= 500) {
