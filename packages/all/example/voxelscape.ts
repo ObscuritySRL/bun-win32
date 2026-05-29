@@ -295,7 +295,7 @@ bool traceVoxels(float3 ro, float3 rd, int maxSteps, bool skipWater,
   [loop]
   for (int i = 0; i < maxSteps; i++) {
     uint b = sampleVoxel(cell.x, cell.y, cell.z);
-    if (b != 0u && !(skipWater && b == 5u)) {
+    if (b != 0u && !(skipWater && b == ${B_WATER}u)) {
       outCell = cell; outNormal = normal; outBlock = b; outT = t;
       return true;
     }
@@ -314,42 +314,56 @@ bool traceVoxels(float3 ro, float3 rd, int maxSteps, bool skipWater,
   return false;
 }
 
-// Longer DDA shadow ray toward the sun for soft, far-reaching shadows. Returns
-// a visibility factor; distant occluders cast a slightly softer (lighter) shadow
-// so shadows feel penumbral rather than hard-edged.
-float shadowRay(float3 ro, float3 rd) {
-  int3 c; float3 n; uint b; float tt;
-  if (traceVoxels(ro, rd, 96, true, c, n, b, tt)) {
-    // Farther occluders -> softer shadow (cheap fake penumbra).
-    return lerp(0.12, 0.42, saturate(tt / 40.0));
+// Longer DDA shadow ray toward the sun. Averages two slightly jittered rays for a
+// soft-but-defined penumbra, and returns a low visibility in shadow (crisp contact
+// shadows rather than a washed half-tone). dither decorrelates the jitter per pixel.
+float shadowRay(float3 ro, float3 rd, float dither) {
+  float3 t1 = normalize(cross(rd, float3(0.0, 1.0, 0.0)) + float3(1e-3, 0.0, 0.0));
+  float3 t2 = cross(rd, t1);
+  float vis = 0.0;
+  [unroll] for (int s = 0; s < 2; s++) {
+    float a = (dither + float(s) * 0.5) * 6.2831853;
+    float2 off = float2(cos(a), sin(a)) * 0.013;
+    float3 jd = normalize(rd + t1 * off.x + t2 * off.y);
+    int3 c; float3 n; uint b; float tt;
+    // Nearer occluders cast a harder (darker) shadow; far ones soften slightly.
+    vis += traceVoxels(ro, jd, 80, true, c, n, b, tt) ? lerp(0.10, 0.32, saturate(tt / 28.0)) : 1.0;
   }
-  return 1.0;
+  return vis * 0.5;
 }
 
-// Cheap ambient occlusion: count solid neighbors around the hit cell along the
-// two tangent axes of the hit face (classic Minecraft-style corner darkening).
-float ambientOcc(int3 cell, float3 n, float3 hitPos) {
-  // Tangent basis on the face.
-  float3 up = abs(n.y) > 0.5 ? float3(1,0,0) : float3(0,1,0);
-  float3 t1 = normalize(cross(n, up));
-  float3 t2 = cross(n, t1);
-  // Position within the face (0..1) to bias toward edges/corners.
+// Does (x,y,z) occlude ambient light? (Air and water do not.)
+bool aoSolid(int x, int y, int z) {
+  uint b = sampleVoxel(x, y, z);
+  return b != 0u && b != ${B_WATER}u;
+}
+
+// Smooth (per-corner) ambient occlusion — classic Minecraft "smooth lighting".
+// Computes a vertex-AO brightness at each of the face's 4 corners from its 2 edge
+// neighbors + diagonal, then bilinearly interpolates across the face by the in-face
+// UV, giving a smooth crevice/edge gradient instead of a flat per-face value.
+float smoothAO(int3 cell, float3 n, float3 hitPos) {
+  float3 upv = abs(n.y) > 0.5 ? float3(0, 0, 1) : float3(0, 1, 0);
+  int3 t1 = int3(round(cross(n, upv)));
+  int3 t2 = int3(round(cross(n, float3(t1))));
+  int3 base = cell + int3(round(n));            // the air cell in front of the face
+  float corners[4];
+  int ci = 0;
+  [unroll] for (int j = -1; j <= 1; j += 2) {
+    [unroll] for (int i = -1; i <= 1; i += 2) {
+      bool s1 = aoSolid(base.x + i * t1.x, base.y + i * t1.y, base.z + i * t1.z);
+      bool s2 = aoSolid(base.x + j * t2.x, base.y + j * t2.y, base.z + j * t2.z);
+      bool cc = aoSolid(base.x + i * t1.x + j * t2.x, base.y + i * t1.y + j * t2.y, base.z + i * t1.z + j * t2.z);
+      float vert = (s1 && s2) ? 0.0 : (3.0 - (float(s1) + float(s2) + float(cc)));
+      corners[ci++] = lerp(0.38, 1.0, vert / 3.0); // fully-occluded corner = 0.38
+    }
+  }
   float3 fp = hitPos - (float3(cell) + 0.5);
-  float u = dot(fp, t1);
-  float v = dot(fp, t2);
-  int3 base = cell + int3(n);  // the air cell in front of the face
-  int3 du = int3(round(t1));
-  int3 dv = int3(round(t2));
-  float su = sign(u), sv = sign(v);
-  float side1 = sampleVoxel(base.x + int(su)*du.x, base.y + int(su)*du.y, base.z + int(su)*du.z) != 0u ? 1.0 : 0.0;
-  float side2 = sampleVoxel(base.x + int(sv)*dv.x, base.y + int(sv)*dv.y, base.z + int(sv)*dv.z) != 0u ? 1.0 : 0.0;
-  int3 cc = base + int3(int(su)*du.x + int(sv)*dv.x, int(su)*du.y + int(sv)*dv.y, int(su)*du.z + int(sv)*dv.z);
-  float corner = sampleVoxel(cc.x, cc.y, cc.z) != 0u ? 1.0 : 0.0;
-  float occ = (side1 + side2 + corner);
-  // Weight by how close we are to that corner.
-  float edge = saturate((abs(u) + abs(v)) * 1.5);
-  float ao = 1.0 - 0.55 * occ / 3.0 * edge;
-  return saturate(ao);
+  float u = saturate(dot(fp, float3(t1)) + 0.5);  // 0 at -t1 edge, 1 at +t1 edge
+  float v = saturate(dot(fp, float3(t2)) + 0.5);
+  float a = lerp(corners[0], corners[1], u);      // v = 0 edge (j = -1)
+  float b = lerp(corners[2], corners[3], u);      // v = 1 edge (j = +1)
+  return lerp(a, b, v);
 }
 
 float4 main(float4 fragPos : SV_Position, float2 uv : TEXCOORD0) : SV_Target {
@@ -377,46 +391,83 @@ float4 main(float4 fragPos : SV_Position, float2 uv : TEXCOORD0) : SV_Target {
     float vh = frac(sin(dot(float3(cell), float3(12.9898, 78.233, 37.719))) * 43758.5453);
     albedo *= 0.93 + 0.10 * vh;
 
-    // Lighting.
+    // Lighting. Per-face directional weighting (Minecraft-style) makes cubes read
+    // crisply even in flat light: bright tops, graded sides, dark undersides.
+    float face = (n.y > 0.5) ? 1.0
+               : (n.y < -0.5) ? 0.5
+               : (abs(n.x) > 0.5 ? (n.x > 0.0 ? 0.82 : 0.66)
+                                 : (n.z > 0.0 ? 0.76 : 0.70));
     float ndl = saturate(dot(n, sun));
-    float sh = (ndl > 0.0) ? shadowRay(hitPos + n * 0.002, sun) : 0.0;
-    float ao = ambientOcc(cell, n, hitPos);
+    float dither = hash21(fragPos.xy + iTime * 37.0);
+    float sh = (ndl > 0.0) ? shadowRay(hitPos + n * 0.03, sun, dither) : 0.0;
+    float ao = smoothAO(cell, n, hitPos);
 
-    // Hemispheric sky ambient (warm sky tint on up-faces, cool bounce on down).
-    float3 skyAmbCol = lerp(float3(0.16, 0.18, 0.24), float3(0.46, 0.54, 0.66), saturate(n.y * 0.5 + 0.5));
-    // Warm bounce/back-fill from the ground toward the sun on side faces.
-    float bounce = saturate(dot(n, normalize(float3(-sun.x, 0.15, -sun.z)))) * 0.18;
-    float3 lit = albedo * (skyAmbCol + sunCol * 1.7 * ndl * sh + bounce * float3(0.40, 0.34, 0.24)) * ao;
+    // Cooler, dimmer hemispheric sky ambient so the warm sun defines form (less wash).
+    float3 skyAmbCol = lerp(float3(0.09, 0.11, 0.16), float3(0.32, 0.39, 0.52), saturate(n.y * 0.5 + 0.5));
+    // Warm bounce/back-fill from the sunlit ground onto side faces.
+    float bounce = saturate(dot(n, normalize(float3(-sun.x, 0.12, -sun.z)))) * 0.14;
+    float3 lit = albedo * face * (skyAmbCol + sunCol * 2.05 * ndl * sh + bounce * float3(0.40, 0.34, 0.24)) * ao;
 
-    if (block == 5u) {
-      // ── Water surface: fresnel sky reflection + slight transparency + ripples.
-      // Animate a gentle normal perturbation from two crossed wave fields.
-      float2 wp = (hitPos.xz) * 0.7;
-      float wob = sin(wp.x * 1.3 + iTime * 1.6) * 0.5 + sin(wp.y * 1.7 - iTime * 1.2) * 0.5
-                + fbm2(wp * 0.5 + iTime * 0.05) * 0.6;
-      float3 wn = normalize(float3(cos(wp.x + iTime) * 0.12, 1.0, sin(wp.y - iTime * 0.8) * 0.12));
+    if (block == ${B_WATER}u) {
+      // ── Water surface: real raytraced reflection + depth-tinted refraction + foam.
+      // Crisp ripples: two directional waves + fbm chop, normal from the analytic gradient.
+      float2 wp = hitPos.xz;
+      float2 k1 = float2(0.90, 0.55); float A1 = 0.5;
+      float2 k2 = float2(-0.50, 1.00); float A2 = 0.4;
+      float ph1 = dot(wp, k1) + iTime * 1.7;
+      float ph2 = dot(wp, k2) - iTime * 1.3;
+      float2 dh = A1 * k1 * cos(ph1) + A2 * k2 * cos(ph2);
+      float2 wc = wp * 1.8 + iTime * 0.35;
+      dh += 0.6 * float2(fbm2(wc + float2(0.12, 0.0)) - fbm2(wc - float2(0.12, 0.0)),
+                         fbm2(wc + float2(0.0, 0.12)) - fbm2(wc - float2(0.0, 0.12)));
+      float3 wn = normalize(float3(-dh.x * 0.45, 1.0, -dh.y * 0.45));
+
+      // Reflection: trace the ACTUAL world along the reflected ray (hills, trees, sky).
       float3 refl = reflect(rd, wn);
-      float3 reflCol = skyColor(refl, sun);
-      float fres = pow(saturate(1.0 - dot(-rd, wn)), 5.0);
-      fres = lerp(0.04, 0.92, fres);
-      // Shallow refraction: peek at what is roughly under the water for depth color.
-      float3 deep = float3(0.03, 0.14, 0.26);
-      float3 shallow = float3(0.07, 0.40, 0.50);
-      float3 body = lerp(shallow, deep, saturate(t * 0.010));
-      body *= (0.55 + 0.55 * sh) * ao;
-      lit = lerp(body, reflCol, fres);
-      // Sharp sun glint riding the wobbled normal.
+      refl.y = max(refl.y, 0.015);
+      float3 reflCol;
+      {
+        int3 rc; float3 rn; uint rb; float rt;
+        if (traceVoxels(hitPos + wn * 0.06 + refl * 0.05, refl, 72, true, rc, rn, rb, rt)) {
+          float3 ra = blockColor(rb, float3(rc));
+          float rndl = saturate(dot(rn, sun));
+          reflCol = ra * (0.28 + 0.95 * rndl);          // cheap lit reflection of terrain
+        } else {
+          reflCol = skyColor(refl, sun);
+        }
+      }
+
+      // Depth: probe straight down to the floor for depth-based color + see-through bottom.
+      float3 bottomCol = float3(0.06, 0.20, 0.24);
+      int depth = 24;
+      [loop] for (int d = 0; d < 24; d++) {
+        uint bb = sampleVoxel(cell.x, cell.y - 1 - d, cell.z);
+        if (bb != 0u && bb != ${B_WATER}u) { bottomCol = blockColor(bb, float3(cell.x, cell.y - 1 - d, cell.z)); depth = d; break; }
+      }
+      float depthN = saturate(float(depth) / 6.0);
+      float3 shallowTint = float3(0.10, 0.42, 0.46);
+      float3 deepTint    = float3(0.02, 0.13, 0.19);
+      float3 waterTint = lerp(shallowTint, deepTint, depthN);
+      // See the sandy/stony bottom through shallow water; fade to water color with depth.
+      float3 refrCol = lerp(bottomCol * float3(0.55, 0.80, 0.92), waterTint, saturate(depthN * 1.5 + 0.18));
+      refrCol *= (0.5 + 0.5 * sh);
+
+      // Fresnel mix refraction (looking down) vs reflection (grazing).
+      float fres = lerp(0.03, 1.0, pow(saturate(1.0 - dot(-rd, wn)), 5.0));
+      lit = lerp(refrCol, reflCol, fres);
+
+      // Foam: white at the shoreline (shallow) and on the brightest ripple crests.
+      float crest = smoothstep(0.6, 1.0, (sin(ph1) * 0.5 + sin(ph2) * 0.5) * 0.5 + 0.5);
+      float shoreFoam = smoothstep(2.2, 0.0, float(depth));
+      lit = lerp(lit, float3(0.95, 0.97, 1.0), saturate(shoreFoam * 0.55 + crest * shoreFoam * 0.4 + crest * 0.06));
+
+      // Sharp sun glint + a shimmering reflection road toward the sun.
       float3 hh = normalize(sun - rd);
-      float spec = pow(saturate(dot(wn, hh)), 200.0);
-      lit += sunCol * spec * 1.8 * sh;
-      // Sun-streak: a long shimmering reflection road toward the sun.
-      float road = pow(saturate(dot(refl, sun)), 30.0);
-      lit += float3(1.0, 0.82, 0.55) * road * 0.7;
-      // Sparkle from the ripple field.
-      lit += float3(0.9, 0.95, 1.0) * smoothstep(0.82, 1.0, wob * 0.5 + 0.5) * 0.10;
+      lit += sunCol * pow(saturate(dot(wn, hh)), 220.0) * 2.4;
+      lit += float3(1.0, 0.82, 0.55) * pow(saturate(dot(refl, sun)), 28.0) * 0.5;
     } else {
       // Crisp specular highlight on snow only.
-      if (block == 8u) {
+      if (block == ${B_SNOW}u) {
         float3 h = normalize(sun - rd);
         float spec = pow(saturate(dot(n, h)), 28.0);
         lit += float3(1.0, 0.97, 0.88) * spec * 0.45 * sh;
@@ -428,7 +479,7 @@ float4 main(float4 fragPos : SV_Position, float2 uv : TEXCOORD0) : SV_Target {
     // ── Atmospheric aerial perspective: warm haze accumulates with distance and
     // brightens toward the sun (in-scattering), so far hills melt into golden air.
     // Kept gentle so foreground voxels stay crisp; only the deep distance softens.
-    float fog = 1.0 - exp(-max(0.0, t - 14.0) * 0.0085);
+    float fog = 1.0 - exp(-max(0.0, t - 22.0) * 0.0062);
     float sunAmt = saturate(dot(rd, sun));
     float3 hazeCol = lerp(sky, float3(1.0, 0.80, 0.55), pow(sunAmt, 4.0) * 0.35);
     col = lerp(col, hazeCol, saturate(fog));
