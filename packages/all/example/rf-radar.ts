@@ -275,13 +275,15 @@ function updateContact(id: string, label: string, kind: number, quality: number,
   }
 }
 
-// ── Window sized to the primary monitor (square radar centred) ──────────────────
+// ── A modest, near-square window (the radar disk fills it) — not the whole desktop ──
 const SM_CXSCREEN = 0;
 const SM_CYSCREEN = 1;
-const screenW = User32.GetSystemMetrics(SM_CXSCREEN) || 1280;
-const screenH = User32.GetSystemMetrics(SM_CYSCREEN) || 720;
+const screenW = User32.GetSystemMetrics(SM_CXSCREEN) || 1920;
+const screenH = User32.GetSystemMetrics(SM_CYSCREEN) || 1080;
+const HEIGHT = Math.min(1080, Math.floor(screenH * 0.8));
+const WIDTH = Math.min(Math.floor(screenW * 0.85), Math.round(HEIGHT * 1.2));
 
-const win = gpu.createWindow({ title: 'RF Radar', width: screenW, height: screenH, borderless: true });
+const win = gpu.createWindow({ title: 'RF Radar', width: WIDTH, height: HEIGHT, borderless: true });
 const { w: cw, h: ch } = win.clientSize();
 const g = gpu.createDevice(win.hwnd, { width: cw, height: ch });
 
