@@ -856,6 +856,10 @@ function main(): void {
 
   const durationMs = process.env.DEMO_DURATION_MS ? Number(process.env.DEMO_DURATION_MS) : 0;
   const interactive = durationMs === 0;
+  // Debug/verification static camera in capture mode: VOX_CAM="x,y,z,yaw,pitch".
+  const camOverride: number[] | null = process.env.VOX_CAM
+    ? process.env.VOX_CAM.split(',').map(Number)
+    : null;
 
   // Mouse-look recenter target (screen coords of the window center).
   const centerScr = { x: 0, y: 0 };
@@ -982,6 +986,13 @@ function main(): void {
       }
       prevLeft = leftDown;
       prevRight = rightDown;
+    } else if (camOverride) {
+      // ── Debug/verification static camera: VOX_CAM="x,y,z,yaw,pitch" ───────────
+      camX = camOverride[0]!;
+      camY = camOverride[1]!;
+      camZ = camOverride[2]!;
+      yaw = camOverride[3]!;
+      pitch = camOverride[4]!;
     } else {
       // ── Scripted cinematic fly-through (capture mode) ─────────────────────────
       // The shot is timed so the FINAL frame frames the low sun over the river: we
