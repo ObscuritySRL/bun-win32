@@ -523,7 +523,7 @@ export interface Entities {
   spawnDebris(x: number, y: number, z: number, vx: number, vy: number, vz: number, block: number): void;
   spawnCritter(x: number, y: number, z: number): Entity;
   spawnBomb(x: number, y: number, z: number, vx: number, vy: number, vz: number, fuse: number): void;
-  spawnMeteor(x: number, y: number, z: number, tx: number, tz: number): void;
+  spawnMeteor(x: number, y: number, z: number, tx: number, ty: number, tz: number): void;
   alarm(x: number, y: number, z: number, power: number): void;
   knockback(x: number, y: number, z: number, power: number): void;
 }
@@ -556,18 +556,20 @@ export function createEntities(sim: Sim): Entities {
       list.push({ kind: ENT_DEBRIS, pos: [x, y, z], vel: [vx, vy, vz], size: [0.3, 0.3, 0.3], ttl: 2.2 + Math.random() * 1.5, block, state: 0, timer: 0, hx: 0, hz: 0, ground: false });
     },
     spawnCritter(x, y, z) {
-      const e: Entity = { kind: ENT_CRITTER, pos: [x, y, z], vel: [0, 0, 0], size: [0.7, 1.6, 0.7], ttl: Infinity, block: B_WOOD, state: 0, timer: Math.random() * 2, hx: Math.random() * 2 - 1, hz: Math.random() * 2 - 1, ground: false };
+      const a0 = Math.random() * Math.PI * 2;
+      const e: Entity = { kind: ENT_CRITTER, pos: [x, y, z], vel: [0, 0, 0], size: [0.7, 1.6, 0.7], ttl: Infinity, block: B_WOOD, state: 0, timer: Math.random() * 2, hx: Math.cos(a0), hz: Math.sin(a0), ground: false };
       list.push(e);
       return e;
     },
     spawnBomb(x, y, z, vx, vy, vz, fuse) {
       list.push({ kind: ENT_BOMB, pos: [x, y, z], vel: [vx, vy, vz], size: [0.4, 0.4, 0.4], ttl: fuse, block: B_TNT, state: 0, timer: 0, hx: 0, hz: 0, ground: false });
     },
-    spawnMeteor(x, y, z, tx, tz) {
+    spawnMeteor(x, y, z, tx, ty, tz) {
       const dx = tx - x;
+      const dy = ty - y;
       const dz = tz - z;
       const t = 1.6;
-      list.push({ kind: ENT_METEOR, pos: [x, y, z], vel: [dx / t, -y / t, dz / t], size: [1.0, 1.0, 1.0], ttl: 6, block: B_LAVA, state: 0, timer: 0, hx: 0, hz: 0, ground: false });
+      list.push({ kind: ENT_METEOR, pos: [x, y, z], vel: [dx / t, dy / t, dz / t], size: [1.0, 1.0, 1.0], ttl: 6, block: B_LAVA, state: 0, timer: 0, hx: 0, hz: 0, ground: false });
     },
     alarm(x, y, z, power) {
       const r = 6 + power * 4;
@@ -870,7 +872,7 @@ float3 skyColor(float3 rd, float3 sun) {
   // ── Night sky: deep navy + stars + a soft moon opposite the sun ────────────
   float3 nightCol = lerp(float3(0.09, 0.10, 0.17), float3(0.012, 0.02, 0.055), pow(up, 1.1));
   nightCol += float3(1.0, 1.0, 0.96) * stars(rd) * (1.0 - day);
-  float3 moonDir = normalize(float3(-sun.x, 0.5, -sun.z));
+  float3 moonDir = normalize(float3(-sun.x, -sun.y, -sun.z));
   float md = saturate(dot(rd, moonDir));
   nightCol += float3(0.85, 0.88, 1.0) * pow(md, 900.0) * 3.0;  // moon disc
   nightCol += float3(0.40, 0.46, 0.62) * pow(md, 50.0) * 0.18; // moon halo
@@ -1621,6 +1623,7 @@ interface Audio {
 function makeAudio(): Audio {
   const SR = 44100;
   const BLOCK = 735; // ~16.7 ms
+  const audioBlock = new Int16Array(BLOCK); // reused synthesis scratch (pump copies it on submit)
   const pcm = createPcmOutput({ sampleRate: SR, channels: 1 });
   pcm.start();
   const voices: Voice[] = [];
@@ -1651,9 +1654,11 @@ function makeAudio(): Audio {
       fuseLvl += ((fuseActive ? 1 : 0) - fuseLvl) * 0.12;
       fireLvl += ((fireActive ? 1 : 0) - fireLvl) * 0.12;
       let guard = 0;
+      // Reused scratch block: every sample is overwritten each pass and pcm.submit()
+      // copies it into a long-lived ring slot, so a single buffer is safe to recycle.
+      const block = audioBlock;
       while (pcm.queued() < 3 && guard < 4) {
         guard += 1;
-        const block = new Int16Array(BLOCK);
         for (let i = 0; i < BLOCK; i += 1) {
           let s = 0;
           for (const v of voices) {
@@ -1884,6 +1889,10 @@ function main(): void {
   }
 
   const hudRect = Buffer.alloc(16);
+  // Reused per-call scratch for label text (avoids a Buffer.from() alloc per draw,
+  // ~10+ per HUD frame). 512 UTF-16 code units is ample for every HUD string.
+  const labelBuf = Buffer.alloc(1024);
+  const LABEL_MAX = 512;
   function drawHud(nowSec: number): void {
     hud.draw(g, cw, ch, (dc) => {
       GDI32.SetBkMode(dc, TRANSPARENT_BK);
@@ -1898,9 +1907,10 @@ function main(): void {
         GDI32.DeleteObject(br);
       };
       const label = (s: string, x: number, y: number, color: number): void => {
-        const buf = Buffer.from(`${s}\0`, 'utf16le');
+        const n = Math.min(s.length, LABEL_MAX);
+        const written = labelBuf.write(n < s.length ? s.slice(0, n) : s, 0, 'utf16le') / 2;
         GDI32.SetTextColor(dc, color);
-        GDI32.TextOutW(dc, x, y, buf.ptr!, s.length);
+        GDI32.TextOutW(dc, x, y, labelBuf.ptr!, written);
       };
       const swatch = (b: number): number => {
         switch (b) {
@@ -2495,7 +2505,7 @@ function main(): void {
       // M: meteor — a flaming projectile streaks down onto the aim point.
       const mDown = win.keyDown(VK_M);
       if (mDown && !prevM && pick.hit) {
-        entities.spawnMeteor(pick.cell[0] - 34, Math.min(H - 2, pick.cell[1] + 42), pick.cell[2] - 34, pick.cell[0], pick.cell[2]);
+        entities.spawnMeteor(pick.cell[0] - 34, Math.min(H - 2, pick.cell[1] + 42), pick.cell[2] - 34, pick.cell[0], pick.cell[1], pick.cell[2]);
         setToast('incoming meteor!', elapsed);
       }
       prevM = mDown;
