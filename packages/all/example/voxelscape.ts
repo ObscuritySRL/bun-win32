@@ -42,6 +42,7 @@ import { GDI32, User32 } from '../index';
 
 import * as gpu from './_gpu';
 import * as hud from './_hud';
+import { createPcmOutput } from './_audio';
 import { captureBackBuffer, formatGrid } from './_snapshot';
 
 const WIDTH = 1280;
@@ -1583,6 +1584,82 @@ export function sweptMove(
   return { x, y, z, vx, vy, vz, onGround, hitX, hitY, hitZ };
 }
 
+// ── Procedural audio (XAudio2 PCM out; silent-safe if no device) ───────────────
+interface Voice {
+  t: number;
+  dur: number;
+  gen: (t: number) => number;
+}
+interface Audio {
+  foot(): void;
+  jump(): void;
+  land(speed: number): void;
+  splash(): void;
+  breakBlock(): void;
+  place(): void;
+  boom(power: number): void;
+  squeak(): void;
+  pump(fuseActive: boolean, fireActive: boolean): void;
+  close(): void;
+}
+
+function makeAudio(): Audio {
+  const SR = 44100;
+  const BLOCK = 735; // ~16.7 ms
+  const pcm = createPcmOutput({ sampleRate: SR, channels: 1 });
+  pcm.start();
+  const voices: Voice[] = [];
+  let phase = 0;
+  let fuseLvl = 0;
+  let fireLvl = 0;
+  const noise = (): number => Math.random() * 2 - 1;
+  const add = (dur: number, gen: (t: number) => number): void => {
+    if (voices.length < 48) voices.push({ t: 0, dur, gen });
+  };
+  return {
+    foot: () => add(0.09, (t) => noise() * Math.exp(-t * 42) * 0.16),
+    jump: () => add(0.18, (t) => Math.sin(2 * Math.PI * (300 + 700 * t) * t) * Math.exp(-t * 9) * 0.18),
+    land: (v) => {
+      const a = Math.min(0.4, v * 0.018);
+      add(0.26, (t) => (Math.sin(2 * Math.PI * 68 * t) * 0.7 + noise() * 0.3) * Math.exp(-t * 13) * a);
+    },
+    splash: () => add(0.42, (t) => noise() * Math.exp(-t * 7) * 0.22 + Math.sin(2 * Math.PI * (640 - 430 * t) * t) * Math.exp(-t * 9) * 0.1),
+    breakBlock: () => add(0.12, (t) => (noise() * 0.6 + Math.sin(2 * Math.PI * 420 * t) * 0.4) * Math.exp(-t * 30) * 0.18),
+    place: () => add(0.08, (t) => Math.sin(2 * Math.PI * 220 * t) * Math.exp(-t * 42) * 0.14),
+    boom: (power) => {
+      const a = Math.min(0.95, 0.45 + power * 0.3);
+      add(1.15, (t) => (Math.sin(2 * Math.PI * (58 - 22 * t) * t) * 0.6 + noise() * Math.exp(-t * 6) * 0.5 + Math.sin(2 * Math.PI * 40 * t) * 0.3) * Math.exp(-t * 2.4) * a);
+    },
+    squeak: () => add(0.12, (t) => Math.sin(2 * Math.PI * (900 + 500 * Math.sin(t * 55)) * t) * Math.exp(-t * 16) * 0.1),
+    pump: (fuseActive, fireActive) => {
+      if (!pcm.available) return;
+      fuseLvl += ((fuseActive ? 1 : 0) - fuseLvl) * 0.12;
+      fireLvl += ((fireActive ? 1 : 0) - fireLvl) * 0.12;
+      let guard = 0;
+      while (pcm.queued() < 3 && guard < 4) {
+        guard += 1;
+        const block = new Int16Array(BLOCK);
+        for (let i = 0; i < BLOCK; i += 1) {
+          let s = 0;
+          for (const v of voices) {
+            s += v.gen(v.t);
+            v.t += 1 / SR;
+          }
+          s += noise() * 0.014 * fuseLvl; // fuse hiss
+          s += (noise() * 0.6 + Math.sin((2 * Math.PI * 190 * phase) / SR) * 0.4) * 0.02 * fireLvl; // fire crackle
+          s += noise() * 0.005; // faint ambient
+          phase += 1;
+          const c = s * 32000;
+          block[i] = c > 32000 ? 32000 : c < -32000 ? -32000 : c;
+        }
+        pcm.submit(block);
+        for (let k = voices.length - 1; k >= 0; k -= 1) if (voices[k]!.t >= voices[k]!.dur) voices.splice(k, 1);
+      }
+    },
+    close: () => pcm.close(),
+  };
+}
+
 function main(): void {
   const win = gpu.createWindow({ title: 'Voxelscape — raytraced voxel world', width: WIDTH, height: HEIGHT, borderless: true });
   const { w: cw, h: ch } = win.clientSize();
@@ -1712,6 +1789,11 @@ function main(): void {
   const camOverride: number[] | null = process.env.VOX_CAM
     ? process.env.VOX_CAM.split(',').map(Number)
     : null;
+  // Procedural audio only in interactive play (silent in capture).
+  const audio: Audio | null = interactive ? makeAudio() : null;
+  let footTimer = 0;
+  let prevOnGround = false;
+  let prevInWater = false;
 
   // Mouse-look recenter target (screen coords of the window center).
   const centerScr = { x: 0, y: 0 };
@@ -1909,6 +1991,7 @@ function main(): void {
     const atten = 1 / (1 + dist * 0.06);
     shake = Math.min(2.4, shake + power * 1.3 * atten);
     flash = Math.min(0.85, flash + power * 0.3 * atten);
+    audio?.boom(power * atten + 0.3);
   }
 
   function processSimEvents(ev: SimEvents): void {
@@ -2127,9 +2210,11 @@ function main(): void {
           if (win.keyDown(VK_SPACE)) pvel[1] = 4.2; // swim up
         } else if (onGround && win.keyDown(VK_SPACE)) {
           pvel[1] = JUMP_V; // jump (auto-repeats while held on ground)
+          audio?.jump();
         }
         if (inLava) pvel[1] = 9.0; // slapstick pop out of lava
         pvel[1] = Math.max(pvel[1], -55); // terminal velocity
+        const fallSpeed = -pvel[1];
         const res = sweptMove(player[0], player[1], player[2], pvel[0], pvel[1], pvel[2], PSX, PSY, PSZ, dt, solidAt, STEP_UP);
         player[0] = res.x;
         player[1] = res.y;
@@ -2138,6 +2223,19 @@ function main(): void {
         pvel[1] = res.vy;
         pvel[2] = res.vz;
         onGround = res.onGround;
+        // Footsteps, landing thud, and water splashes.
+        footTimer -= dt;
+        if (onGround && (mvF !== 0 || mvR !== 0) && footTimer <= 0) {
+          audio?.foot();
+          footTimer = win.keyDown(VK_SHIFT) ? 0.28 : 0.37;
+        }
+        if (onGround && !prevOnGround && fallSpeed > 6) audio?.land(fallSpeed);
+        if (inWater && !prevInWater) {
+          audio?.splash();
+          for (let s = 0; s < 8; s += 1) glowFx.push({ x: player[0] + (Math.random() - 0.5), y: player[1] + 1, z: player[2] + (Math.random() - 0.5), r0: 0.7, cr: 0.8, cg: 0.95, cb: 1.0, intensity: 0.9, life: 0.3, maxLife: 0.3 });
+        }
+        prevOnGround = onGround;
+        prevInWater = inWater;
       }
       // Eye follows the body.
       camX = player[0];
@@ -2163,6 +2261,7 @@ function main(): void {
         setBlock(pick.cell[0], pick.cell[1], pick.cell[2], B_AIR);
         editedThisFrame = true;
         actCooldown = 0.07;
+        audio?.breakBlock();
       }
 
       // RMB: place the selected material at the adjacent face (or light targeted TNT).
@@ -2174,6 +2273,7 @@ function main(): void {
         }
         editedThisFrame = true;
         actCooldown = 0.11;
+        audio?.place();
       }
       prevLeft = leftDown;
       prevRight = rightDown;
@@ -2210,7 +2310,10 @@ function main(): void {
 
       // C: spawn a critter; R: regenerate the world.
       const cDown = win.keyDown(VK_C);
-      if (cDown && !prevC && pick.hit) entities.spawnCritter(pick.cell[0] + 0.5, pick.cell[1] + 1.1, pick.cell[2] + 0.5);
+      if (cDown && !prevC && pick.hit) {
+        entities.spawnCritter(pick.cell[0] + 0.5, pick.cell[1] + 1.1, pick.cell[2] + 0.5);
+        audio?.squeak();
+      }
       prevC = cDown;
       const rDown = win.keyDown(VK_R);
       if (rDown && !prevR) {
@@ -2300,6 +2403,7 @@ function main(): void {
       ticksRun += 1;
     }
     entities.step(sdt);
+    audio?.pump(sim.fuses.size > 0, sim.burning.size > 0);
     // Re-upload the grid when the world changed, an edit happened, or entities exist.
     if (wasActive || editedThisFrame || entities.list.length > 0) reuploadField();
 
@@ -2383,6 +2487,7 @@ function main(): void {
   // ── Teardown ──────────────────────────────────────────────────────────────
   function teardown(code: number): void {
     if (interactive) User32.ShowCursor(1);
+    audio?.close();
     hud.release();
     GDI32.DeleteObject(hudFont);
     comReleaseSafe(samp);
