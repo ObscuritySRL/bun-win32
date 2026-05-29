@@ -40,6 +40,25 @@ The browser confined TypeScript to a `<canvas>` and `fetch`. `@bun-win32` hands 
 
 …plus **`shader-forge`** (compile HLSL at runtime and ray-march it on the GPU), **`mandelbrot`** (infinite df64 deep-zoom), **`boids`** (GPU murmuration), and **`desktop-shader`** (DXGI-duplicate your *live desktop* and run CRT / underwater / ASCII shaders on it).
 
+### The *"wait — that's TypeScript?!"* tier — a console, a brain, and a world
+
+Not effects on a triangle: an actual emulated game console, a neural network that learns in front of you, an explorable 3D world, a physics sim, your live network, and your live screen — each one `.ts` file on the same engine.
+
+<table>
+<tr>
+<td width="50%"><img src="https://raw.githubusercontent.com/ObscuritySRL/bun-win32/main/packages/all/screenshots/gameboy.png" alt="gameboy"><br><b>gameboy</b> — a complete <b>Game Boy (DMG)</b> emulated in pure TypeScript: full SM83 CPU + scanline PPU, GPU-rendered through D3D11, running the MIT <code>dmg-acid2</code> PPU acceptance test (the face renders correctly). Keyboard + XInput gamepad. <code>bun run gameboy</code></td>
+<td width="50%"><img src="https://raw.githubusercontent.com/ObscuritySRL/bun-win32/main/packages/all/screenshots/neural-descent.png" alt="neural-descent"><br><b>neural-descent</b> — a real <b>neural network that trains itself live on the GPU</b>: forward pass, backprop and an Adam optimizer all hand-written D3D11 compute shaders. Watch the <code>NEURAL NET</code> half snap into focus to match the <code>TARGET</code> as the loss falls. <code>bun run neural-descent</code></td>
+</tr>
+<tr>
+<td><img src="https://raw.githubusercontent.com/ObscuritySRL/bun-win32/main/packages/all/screenshots/voxelscape.png" alt="voxelscape"><br><b>voxelscape</b> — an explorable <b>raytraced voxel world</b>: procedural terrain, water, trees, sun, soft shadows, AO and fog, traced entirely by Amanatides–Woo DDA in one pixel shader. Fly with WASD + mouse, place/break blocks. <code>bun run voxelscape</code></td>
+<td><img src="https://raw.githubusercontent.com/ObscuritySRL/bun-win32/main/packages/all/screenshots/net-radar.png" alt="net-radar"><br><b>net-radar</b> — every <b>real TCP/UDP socket</b> on your machine (<code>iphlpapi</code>) as a glowing, state-colored blip on a rotating GPU radar sweep, remote IPs reverse-resolved to hostnames (<code>ws2_32</code>), new connections punching out pulse rings. <code>bun run net-radar</code></td>
+</tr>
+<tr>
+<td><img src="https://raw.githubusercontent.com/ObscuritySRL/bun-win32/main/packages/all/screenshots/cloth.png" alt="cloth"><br><b>cloth</b> — a <b>65,536-node soft-body flag</b> rippling in the wind: a Verlet + XPBD distance-constraint solver running as compute shaders, rendered as a glowing additive point cloud. <code>bun run cloth</code></td>
+<td><img src="https://raw.githubusercontent.com/ObscuritySRL/bun-win32/main/packages/all/screenshots/cam-filter.png" alt="cam-filter"><br><b>cam-filter</b> — your <b>live desktop</b> (DXGI Desktop Duplication) re-imagined in real time through cycling GPU pixel-shader effects: Predator thermal, Sobel edge/toon, ASCII mosaic, and a kaleidoscope. <code>bun run cam-filter</code></td>
+</tr>
+</table>
+
 ### Audio — sound you can see
 
 - **`sound-bloom`** — mic FFT painted as a click-through, full-desktop bloom overlay.

@@ -59,5 +59,11 @@ packages/all/screenshots/*
 !packages/all/screenshots/pathtracer.png
 !packages/all/screenshots/clouds.png
 !packages/all/screenshots/reaction-diffusion.png
+!packages/all/screenshots/gameboy.png
+!packages/all/screenshots/voxelscape.png
+!packages/all/screenshots/neural-descent.png
+!packages/all/screenshots/net-radar.png
+!packages/all/screenshots/cloth.png
+!packages/all/screenshots/cam-filter.png
 packages/all/replay-*.gif
 packages/all/bun-win32-wallpaper.png
