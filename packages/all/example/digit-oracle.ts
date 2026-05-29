@@ -316,7 +316,7 @@ function stampBrush(sx: number, sy: number): void {
   const gx = ((sx - canvasLeft) / canvasSize) * 28;
   const gy = ((sy - canvasTop) / canvasSize) * 28;
   if (gx < -2 || gy < -2 || gx > 30 || gy > 30) return;
-  const radius = 1.6; // cells
+  const radius = 1.0; // cells — ~2-cell stroke, MNIST-like (was 1.6 = too fat)
   const r2 = radius * radius;
   const lo = Math.max(0, Math.floor(gx - radius - 1));
   const hi = Math.min(27, Math.ceil(gx + radius + 1));
