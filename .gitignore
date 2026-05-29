@@ -45,7 +45,19 @@ DISCORD_POST.md
 DISCORD_POST2.md
 TODO.md
 
-# Showcase capture output (local-only)
-packages/all/screenshots/
+# Showcase capture output (local-only) — except the curated hero shots used in the README
+packages/all/screenshots/*
+!packages/all/screenshots/shader-forge.png
+!packages/all/screenshots/sound-bloom.png
+!packages/all/screenshots/event-horizon.png
+!packages/all/screenshots/oscilloscope-music.png
+!packages/all/screenshots/particle-galaxy.png
+!packages/all/screenshots/blackhole.png
+!packages/all/screenshots/fluid.png
+!packages/all/screenshots/slime.png
+!packages/all/screenshots/mandelbulb.png
+!packages/all/screenshots/pathtracer.png
+!packages/all/screenshots/clouds.png
+!packages/all/screenshots/reaction-diffusion.png
 packages/all/replay-*.gif
 packages/all/bun-win32-wallpaper.png
