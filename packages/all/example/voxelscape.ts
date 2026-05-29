@@ -1152,8 +1152,10 @@ float4 main(float4 fragPos : SV_Position, float2 uv : TEXCOORD0) : SV_Target {
     col = min(col, float3(60.0, 60.0, 60.0)); // keep 32 points from oversaturating
   }
 
-  // Explosion white flash (full-screen, pre-tonemap so it blooms through the filmic curve).
-  col += iFlash * float3(1.0, 0.92, 0.82) * 0.55;
+  // Explosion white flash (full-screen, pre-tonemap so it blooms through the filmic
+  // curve). Kept restrained + warm so the fireball reads as a colored ball rather
+  // than a flat white wash, especially when a close cinematic blast fills the frame.
+  col += iFlash * float3(1.0, 0.86, 0.66) * 0.40;
 
   // ── Filmic tonemap (ACES-ish) so highlights glow without hard clipping.
   float exposure = 0.95;
@@ -1982,8 +1984,9 @@ function main(): void {
   let slowmo = 0; // bullet-time: seconds of remaining slow motion
   let nextBoom = 0.4; // VOX_BOOM repeating-detonation timer (capture-mode verification)
   let cinematicBoomed = false; // one-shot finale detonation for the gallery shot
-  // Time of day (0..1). Capture mode pins it to a low golden-hour sun unless VOX_TOD is set.
-  let timeOfDay = process.env.VOX_TOD ? Number(process.env.VOX_TOD) : 0.28;
+  // Time of day (0..1). Capture mode pins it to a moody low-dusk sun (richer sky for
+  // contrast, so the finale fireball + glow POP instead of washing out) unless VOX_TOD is set.
+  let timeOfDay = process.env.VOX_TOD ? Number(process.env.VOX_TOD) : 0.225;
   interface GlowFx {
     x: number;
     y: number;
@@ -2527,30 +2530,34 @@ function main(): void {
       const ease = u * u * (3 - 2 * u);
       const cx = W * 0.5;
       const cz = D * 0.5;
-      // Sun azimuth: aim the hero frame down that bearing so the sun sits on the
-      // horizon over the water for the finale.
+      // Sun azimuth: aim the hero frame near that bearing so the low sun rakes the
+      // scene, but hold it OFF-center so its glare never merges with the fireball.
       const sunYaw = Math.atan2(sun[0], sun[2]);
-      // Position the camera up-sun of the river basin, looking back toward the sun
+      const heroYaw = sunYaw + 0.20; // sun rakes from just frame-right; fireball stays central
+      // Position the camera up-sun of the river basin, looking back toward the light
       // so the river leads the eye to the sun on the horizon. Keep it fairly close
       // and low so foreground blocks read crisply and the sky/sun fill the top.
-      const back = 36 - ease * 6;        // distance behind the basin, eases in a bit
+      const back = 34 - ease * 6;        // distance behind the basin, eases in a bit
       camX = cx - Math.sin(sunYaw) * back + Math.sin(tt * 0.22) * 3;
       camZ = cz - Math.cos(sunYaw) * back + Math.sin(tt * 0.16) * 3;
       // Glide down from a survey altitude to a relaxed elevated vista height.
-      camY = SEA_LEVEL + 18 - ease * 5 + Math.sin(tt * 0.55) * 0.8;
-      // Hold the heading on the sun, with a slow drift earlier to feel alive.
-      yaw = sunYaw + (1 - ease) * -0.28;
+      camY = SEA_LEVEL + 17 - ease * 5 + Math.sin(tt * 0.55) * 0.8;
+      // Settle the heading just off-sun, with a slow drift earlier to feel alive.
+      yaw = heroYaw + (1 - ease) * -0.30;
       // Tilt down to survey terrain, levelling toward the horizon so sky + sun show.
-      pitch = lerp01(-0.34, -0.11, ease) + Math.sin(tt * 0.5) * 0.012;
-      // Dip the gaze for the finale so the foreground detonation reads in-frame.
-      if (tt > total - 0.6) pitch -= (tt - (total - 0.6)) * 0.35;
+      pitch = lerp01(-0.34, -0.12, ease) + Math.sin(tt * 0.5) * 0.012;
+      // Gentle gaze dip into the finale so the fireball sits in the lower-center.
+      if (tt > total - 0.7) pitch -= (tt - (total - 0.7)) * 0.12;
 
-      // Finale: detonate a TNT cluster just ahead so the closing frame catches a
-      // bright fireball, flying debris, a chain reaction, and bullet-time.
-      if (!cinematicBoomed && !process.env.VOX_BOOM && tt > total - 0.16) {
+      // Finale: detonate a TNT cluster ahead so the closing frame catches a bright
+      // fireball, flying debris, a chain reaction, and bullet-time. Detonate a touch
+      // earlier so the fireball + smoke have a few frames to bloom and read as a
+      // defined orange ball (not a flat white flash); place it closer + higher so it
+      // fills the lower-center of frame, lifted off the sun-glare on the horizon.
+      if (!cinematicBoomed && !process.env.VOX_BOOM && tt > total - 0.20) {
         const f = basis().fwd;
-        const tx = Math.max(4, Math.min(W - 5, Math.floor(camX + f[0] * 15)));
-        const tz = Math.max(4, Math.min(D - 5, Math.floor(camZ + f[2] * 15)));
+        const tx = Math.max(4, Math.min(W - 5, Math.floor(camX + f[0] * 14)));
+        const tz = Math.max(4, Math.min(D - 5, Math.floor(camZ + f[2] * 14)));
         let ty = SEA_LEVEL + 1;
         for (let y = H - 1; y >= 1; y -= 1) {
           if (isSolid(voxelAt(tx, y, tz))) {
@@ -2558,8 +2565,29 @@ function main(): void {
             break;
           }
         }
-        for (let dx = -1; dx <= 1; dx += 1) for (let dz = -1; dz <= 1; dz += 1) setBlock(tx + dx, ty + 1, tz + dz, B_TNT);
-        detonate(tx, ty + 3, tz, 7, 2.4);
+        for (let dx = -1; dx <= 1; dx += 1) for (let dz = -1; dz <= 1; dz += 1) {
+          setBlock(tx + dx, ty + 1, tz + dz, B_TNT);
+          setBlock(tx + dx, ty + 2, tz + dz, B_TNT);
+        }
+        detonate(tx, ty + 3, tz, 7.5, 2.0);
+        // Stack a warm rising fireball column of glow points on top of the blast so the
+        // finale reads unmistakably as a fiery eruption (not just sun glare on water):
+        // a hot orange core fading up into amber smoke.
+        for (let k = 0; k < 5; k += 1) {
+          const f01 = k / 4;
+          glowFx.push({
+            x: tx + 0.5 + (Math.random() - 0.5) * 1.4,
+            y: ty + 3 + k * 1.7,
+            z: tz + 0.5 + (Math.random() - 0.5) * 1.4,
+            r0: 3.0 - f01 * 1.0,
+            cr: lerp01(2.2, 1.5, f01),
+            cg: lerp01(1.0, 0.62, f01),
+            cb: lerp01(0.32, 0.22, f01),
+            intensity: lerp01(2.8, 1.4, f01),
+            life: 0.6 - f01 * 0.15,
+            maxLife: 0.6,
+          });
+        }
         cinematicBoomed = true;
       }
     }
