@@ -46,9 +46,11 @@ const GRID = 28;
 const SELFCHECK = process.env.SELFCHECK === '1';
 
 // ── Window sized to fill the primary monitor (borderless) ─────────────────────
-const screenW = User32.GetSystemMetrics(SystemMetric.SM_CXSCREEN) || 1280;
-const screenH = User32.GetSystemMetrics(SystemMetric.SM_CYSCREEN) || 720;
-const win = gpu.createWindow({ title: 'Digit Oracle — a neural net on the GPU, in pure TypeScript', width: screenW, height: screenH, borderless: true });
+const screenW = User32.GetSystemMetrics(SystemMetric.SM_CXSCREEN) || 1920;
+const screenH = User32.GetSystemMetrics(SystemMetric.SM_CYSCREEN) || 1080;
+const WIN_H = Math.min(1000, Math.floor(screenH * 0.72));
+const WIN_W = Math.min(Math.floor(screenW * 0.9), Math.round(WIN_H * 16 / 9));
+const win = gpu.createWindow({ title: 'Digit Oracle — a neural net on the GPU, in pure TypeScript', width: WIN_W, height: WIN_H, borderless: true });
 const { w: clientW, h: clientH } = win.clientSize();
 const dev = gpu.createDevice(win.hwnd, { width: clientW, height: clientH });
 

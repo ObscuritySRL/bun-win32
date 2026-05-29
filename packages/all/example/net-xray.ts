@@ -326,9 +326,11 @@ function layoutStep(): void {
 
 // ── Window + device ─────────────────────────────────────────────────────────────
 // Fill the primary monitor (borderless) so the showcase capture is dominated by us.
-const scrW = User32.GetSystemMetrics(0) || WIDTH; // SM_CXSCREEN
-const scrH = User32.GetSystemMetrics(1) || HEIGHT; // SM_CYSCREEN
-const win = gpu.createWindow({ title: 'Net X-Ray — live socket constellation on the GPU', width: scrW, height: scrH, borderless: true });
+const scrW = User32.GetSystemMetrics(0) || 1920; // SM_CXSCREEN
+const scrH = User32.GetSystemMetrics(1) || 1080; // SM_CYSCREEN
+const WIN_H = Math.min(1000, Math.floor(scrH * 0.72));
+const WIN_W = Math.min(Math.floor(scrW * 0.9), Math.round(WIN_H * 16 / 9));
+const win = gpu.createWindow({ title: 'Net X-Ray — live socket constellation on the GPU', width: WIN_W, height: WIN_H, borderless: true });
 const { w: clientW, h: clientH } = win.clientSize();
 const dev = gpu.createDevice(win.hwnd, { width: clientW, height: clientH });
 const aspect = clientW / clientH;

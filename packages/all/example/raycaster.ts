@@ -334,12 +334,11 @@ function comReleaseSafe(ptr: bigint | undefined): void {
 
 function main(): void {
   // Fill the primary monitor (borderless) so the capture is dominated by the demo.
-  let screenW = User32.GetSystemMetrics(0); // SM_CXSCREEN
-  let screenH = User32.GetSystemMetrics(1); // SM_CYSCREEN
-  if (process.env.RAYCASTER_W) screenW = Number(process.env.RAYCASTER_W);
-  if (process.env.RAYCASTER_H) screenH = Number(process.env.RAYCASTER_H);
-  const winW = screenW > 0 ? screenW : 1280;
-  const winH = screenH > 0 ? screenH : 720;
+  const sW = User32.GetSystemMetrics(0) || 1920; // SM_CXSCREEN
+  const sH = User32.GetSystemMetrics(1) || 1080; // SM_CYSCREEN
+  // Modest 16:9 window by default; RAYCASTER_W/H override for an exact size.
+  const winH = process.env.RAYCASTER_H ? Number(process.env.RAYCASTER_H) : Math.min(1000, Math.floor(sH * 0.72));
+  const winW = process.env.RAYCASTER_W ? Number(process.env.RAYCASTER_W) : Math.min(Math.floor(sW * 0.9), Math.round(winH * 16 / 9));
 
   const win = gpu.createWindow({ title: 'Raycaster — Wolf3D-style maze in a pixel shader', width: winW, height: winH, borderless: true });
   const { w: cw, h: ch } = win.clientSize();

@@ -54,8 +54,10 @@ const SM_CXSCREEN = 0;
 const SM_CYSCREEN = 1;
 const screenW = User32.GetSystemMetrics(SM_CXSCREEN) || 1920;
 const screenH = User32.GetSystemMetrics(SM_CYSCREEN) || 1080;
+const WIN_H = Math.min(1000, Math.floor(screenH * 0.72));
+const WIN_W = Math.min(Math.floor(screenW * 0.9), Math.round(WIN_H * 16 / 9));
 
-const win = gpu.createWindow({ title: 'SPH 3D — 49,152-particle fluid in pure TypeScript', width: screenW, height: screenH, borderless: true });
+const win = gpu.createWindow({ title: 'SPH 3D — 49,152-particle fluid in pure TypeScript', width: WIN_W, height: WIN_H, borderless: true });
 const { w: clientW, h: clientH } = win.clientSize();
 const dev = gpu.createDevice(win.hwnd, { width: clientW, height: clientH });
 
