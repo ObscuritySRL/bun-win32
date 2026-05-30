@@ -857,7 +857,7 @@ cbuffer Frame : register(b0) {
   int3   iTargetCell;   // 96  (block under the crosshair)
   int    iTargetValid;  // 108
   uint   iGlowCount;    // 112
-  float  iPad5a;        // 116
+  float  iHurt;         // 116  (0..1 red damage vignette)
   float  iPad5b;        // 120
   float  iPad5c;        // 124
   float4 iGlow[${GLOW_MAX * 2}]; // 128: per point — [pos.xyz, radius], [color.rgb, intensity]
@@ -1331,6 +1331,12 @@ float4 main(float4 fragPos : SV_Position, float2 uv : TEXCOORD0) : SV_Target {
   col *= lerp(0.80, 1.05, vig);
   // Whisper of warm grade in the shadows.
   col = lerp(col, col * float3(1.04, 1.0, 0.94), 0.5);
+
+  // Damage vignette: the screen edges throb deep red the instant you take a hit.
+  if (iHurt > 0.001) {
+    float redge = pow(saturate(length(q - 0.5) * 1.7), 2.4);
+    col = lerp(col, float3(0.72, 0.02, 0.02), saturate(redge * iHurt));
+  }
 
   return float4(col, 1.0);
 }
@@ -1901,7 +1907,10 @@ function main(): void {
   const samp = gpu.makeSampler(); // unused by the PS but harmless; kept for parity
 
   // GDI HUD font.
-  const hudFont = GDI32.CreateFontW(-18, 0, 0, 0, 600, 0, 0, 0, 0, 0, 0, 4, 0, Buffer.from('Consolas\0', 'utf16le').ptr!);
+  const consolas = Buffer.from('Consolas\0', 'utf16le'); // kept alive; shared by all HUD fonts
+  const hudFont = GDI32.CreateFontW(-18, 0, 0, 0, 600, 0, 0, 0, 0, 0, 0, 4, 0, consolas.ptr!);
+  const hudFontSm = GDI32.CreateFontW(-13, 0, 0, 0, 600, 0, 0, 0, 0, 0, 0, 4, 0, consolas.ptr!); // status/labels
+  const hudFontBig = GDI32.CreateFontW(-30, 0, 0, 0, 800, 0, 0, 0, 0, 0, 0, 4, 0, consolas.ptr!); // banner/score/toast
 
   // ── Camera state ────────────────────────────────────────────────────────────
   let camX = W * 0.5;
@@ -1952,6 +1961,7 @@ function main(): void {
   let selectedSlot = 0;
   let actCooldown = 0; // throttles held break/place
   let meleeCd = 0; // throttles melee swats
+  let crosshairHot = false; // a hostile is within melee reach (crosshair reddens)
   let prevE = false;
   let prevB = false;
   let prevM = false;
@@ -2134,45 +2144,111 @@ function main(): void {
         }
       };
       const prevFont = GDI32.SelectObject(dc, hudFont);
-
-      // Crosshair (white cross over a dark backing for contrast).
+      const useFont = (f: bigint): void => void GDI32.SelectObject(dc, f);
       const cxp = Math.floor(cw / 2);
       const cyp = Math.floor(ch / 2);
+
+      // ── Top-left: compact status (clock lives in the day/night banner now) ──
+      useFont(hudFontSm);
+      const status = `${fps} fps · ${g.gpuName} · ents ${entities.list.length}`;
+      label(status, 17, 11, rgb(0, 0, 0));
+      label(status, 16, 10, rgb(205, 216, 234));
+
+      // ── Top-center: day / night + wave banner (big), with a sun/moon dot ──
+      useFont(hudFontBig);
+      let banner: string;
+      let bcol: number;
+      let dot: number;
+      if (waveActive) {
+        banner = `NIGHT ${wave}    ${entities.hostileCount()} ENEMIES`;
+        bcol = rgb(255, 150, 138);
+        dot = rgb(150, 172, 255);
+      } else if (wave > 0) {
+        banner = `DAY ${wave + 1}    prepare`;
+        bcol = rgb(255, 238, 188);
+        dot = rgb(255, 206, 64);
+      } else {
+        banner = 'DAY 1    build your defenses';
+        bcol = rgb(255, 238, 188);
+        dot = rgb(255, 206, 64);
+      }
+      const bx = Math.floor(cw / 2 - banner.length * 8);
+      fillRect(bx - 30, 12, 20, 20, rgb(0, 0, 0));
+      fillRect(bx - 29, 11, 20, 20, dot);
+      label(banner, bx + 1, 9, rgb(0, 0, 0));
+      label(banner, bx, 8, bcol);
+
+      // ── Top-right: score (big) ──
+      const sTxt = `SCORE ${score}`;
+      const sxr = cw - 24 - sTxt.length * 16;
+      label(sTxt, sxr + 1, 9, rgb(0, 0, 0));
+      label(sTxt, sxr, 8, rgb(255, 224, 120));
+
+      // ── Crosshair (reddens when a hostile is within reach) ──
+      const chCol = crosshairHot ? rgb(255, 76, 60) : rgb(255, 255, 255);
       fillRect(cxp - 1, cyp - 10, 3, 21, rgb(0, 0, 0));
       fillRect(cxp - 10, cyp - 1, 21, 3, rgb(0, 0, 0));
-      fillRect(cxp, cyp - 9, 1, 19, rgb(255, 255, 255));
-      fillRect(cxp - 9, cyp, 19, 1, rgb(255, 255, 255));
+      fillRect(cxp, cyp - 9, 1, 19, chCol);
+      fillRect(cxp - 9, cyp, 19, 1, chCol);
 
-      // Hotbar (10 colored slots, selected one highlighted).
+      // ── Health bar (bottom-left) ──
+      const hbW = 248;
+      const hbH = 20;
+      const hbx = 22;
+      const hby = ch - 104;
+      fillRect(hbx - 2, hby - 2, hbW + 4, hbH + 4, rgb(0, 0, 0));
+      fillRect(hbx, hby, hbW, hbH, rgb(34, 12, 12));
+      const hfrac = Math.max(0, Math.min(1, health / HEALTH_MAX));
+      const hcol = health > 55 ? rgb(74, 200, 86) : health > 28 ? rgb(236, 182, 44) : rgb(228, 52, 42);
+      fillRect(hbx, hby, Math.round(hbW * hfrac), hbH, hcol);
+      useFont(hudFontSm);
+      label(`HP ${Math.max(0, Math.ceil(health))}`, hbx + 7, hby + 2, rgb(255, 255, 255));
+
+      // ── Hotbar (bottom-center): swatch + number + name; the selected slot lifts ──
       const n = HOTBAR.length;
-      const sw = 50;
+      const sw = 48;
       const sgap = 6;
       const totalW = n * sw + (n - 1) * sgap;
       const x0 = Math.floor((cw - totalW) / 2);
-      const y0 = ch - sw - 18;
+      const y0 = ch - sw - 26;
       for (let i = 0; i < n; i += 1) {
-        const sx = x0 + i * (sw + sgap);
         const sel = i === selectedSlot;
-        fillRect(sx - 3, y0 - 3, sw + 6, sw + 6, sel ? rgb(255, 245, 180) : rgb(26, 26, 30));
-        fillRect(sx, y0, sw, sw, swatch(HOTBAR[i]!.block));
-        label(`${(i + 1) % 10}`, sx + 4, y0 + 2, rgb(255, 255, 255));
+        const sx = x0 + i * (sw + sgap);
+        const sy = sel ? y0 - 7 : y0;
+        fillRect(sx - 3, sy - 3, sw + 6, sw + 6, sel ? rgb(255, 238, 150) : rgb(18, 18, 24));
+        fillRect(sx, sy, sw, sw, swatch(HOTBAR[i]!.block));
+        useFont(hudFontSm);
+        label(`${(i + 1) % 10}`, sx + 3, sy + 1, rgb(255, 255, 255));
+        const nm = HOTBAR[i]!.name;
+        label(nm, sx + Math.max(0, Math.floor((sw - nm.length * 7) / 2)), sy + sw + 2, sel ? rgb(255, 240, 180) : rgb(176, 184, 200));
       }
-      const tn = HOTBAR[selectedSlot]!.name;
-      label(tn, Math.floor(cw / 2) - tn.length * 5, y0 - 26, rgb(255, 246, 205));
 
-      // Status (top-left) + controls strip (above the hotbar).
-      const tod = Math.floor(timeOfDay * 24) % 24;
-      const status = `Voxelscape · ${fps} fps · ${g.gpuName} · ${String(tod).padStart(2, '0')}:00 · ents ${entities.list.length} · awake ${sim.active.size}`;
-      label(status, 19, 19, rgb(0, 0, 0));
-      label(status, 18, 18, rgb(232, 240, 255));
-      const help = '1-0 tool · LMB dig · RMB place · E ignite · B carpet · M meteor · C critter · F fly · T time · R world';
-      label(help, 19, y0 - 49, rgb(0, 0, 0));
-      label(help, 18, y0 - 50, rgb(208, 218, 234));
+      // ── Controls hint, centered just above the hotbar (out of the banner's way) ──
+      const help = 'WASD move · Space jump · LMB attack/dig · RMB place · M meteor · B carpet · F fly · T scrub time · R new world';
+      const hx = Math.floor(cw / 2 - help.length * 3.5);
+      label(help, hx + 1, y0 - 25, rgb(0, 0, 0));
+      label(help, hx, y0 - 26, rgb(156, 164, 182));
 
-      // Transient event toast.
+      // ── Event toast (center, big) ──
       if (nowSec < toastUntil && toast) {
-        label(toast, Math.floor(cw / 2) - toast.length * 6, 70, rgb(255, 228, 130));
+        useFont(hudFontBig);
+        const tx = Math.floor(cw / 2 - toast.length * 8);
+        label(toast, tx + 1, 73, rgb(0, 0, 0));
+        label(toast, tx, 72, rgb(255, 228, 130));
       }
+
+      // ── Death overlay ──
+      if (dead) {
+        useFont(hudFontBig);
+        const dTxt = 'YOU DIED';
+        const dx = Math.floor(cw / 2 - dTxt.length * 8);
+        label(dTxt, dx + 2, cyp - 38, rgb(0, 0, 0));
+        label(dTxt, dx, cyp - 40, rgb(235, 60, 50));
+        useFont(hudFontSm);
+        const rTxt = 'respawning at dawn…';
+        label(rTxt, Math.floor(cw / 2 - rTxt.length * 4), cyp - 4, rgb(230, 200, 200));
+      }
+
       GDI32.SelectObject(dc, prevFont);
     });
   }
@@ -2904,6 +2980,7 @@ function main(): void {
           meleeTarget = e;
         }
       }
+      crosshairHot = meleeTarget !== null;
       meleeCd -= dt;
 
       // LMB: swat a mob → else lob a bomb (Bomb slot) → else dig (held, throttled).
@@ -3183,6 +3260,7 @@ function main(): void {
       cbData.writeInt32LE(0, 108);
     }
     cbData.writeUInt32LE(buildGlows(elapsed), 112);
+    cbData.writeFloatLE(Math.min(1, hurt), 116); // red damage vignette
     gpu.updateConstantBuffer(cb, cbData);
 
     gpu.setRenderTargets([g.backBufferRTV]);
@@ -3225,6 +3303,8 @@ function main(): void {
     audio?.close();
     hud.release();
     GDI32.DeleteObject(hudFont);
+    GDI32.DeleteObject(hudFontSm);
+    GDI32.DeleteObject(hudFontBig);
     comReleaseSafe(samp);
     comReleaseSafe(cb);
     comReleaseSafe(field.srv);
