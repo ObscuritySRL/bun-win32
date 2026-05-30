@@ -2611,6 +2611,9 @@ function main(): void {
     wave = 0;
     waveActive = false;
     prevNight = false;
+    dead = false;
+    deadTimer = 0;
+    hurt = 0;
     editedThisFrame = true;
   }
 
@@ -2622,6 +2625,21 @@ function main(): void {
     regenCd = 3.5;
     audio?.hurt();
     shake = Math.min(2.4, shake + 0.45);
+  }
+  /** Night ends (dawn OR death): spawned mobs retreat (despawn); feral wildlife revert. */
+  function retreatHostiles(): void {
+    for (let i = entities.list.length - 1; i >= 0; i -= 1) {
+      const e = entities.list[i]!;
+      if (e.kind !== ENT_CRITTER || !e.hostile) continue;
+      if (e.variant === 2) {
+        e.hostile = false;
+        e.block = B_CRITTER;
+        e.variant = 0;
+      } else {
+        glowFx.push({ x: e.pos[0], y: e.pos[1] + 0.6, z: e.pos[2], r0: 1.4, cr: 1.0, cg: 0.5, cb: 0.4, intensity: 1.0, life: 0.3, maxLife: 0.3 });
+        entities.list.splice(i, 1);
+      }
+    }
   }
   function onNightfall(now: number): void {
     wave += 1;
@@ -2652,19 +2670,7 @@ function main(): void {
       setToast(`Dawn — survived wave ${wave}!  +${bonus}`, now);
     }
     waveActive = false;
-    // First light: spawned mobs retreat (despawn); feral wildlife revert to grazing.
-    for (let i = entities.list.length - 1; i >= 0; i -= 1) {
-      const e = entities.list[i]!;
-      if (e.kind !== ENT_CRITTER || !e.hostile) continue;
-      if (e.variant === 2) {
-        e.hostile = false;
-        e.block = B_CRITTER;
-        e.variant = 0;
-      } else {
-        glowFx.push({ x: e.pos[0], y: e.pos[1] + 0.6, z: e.pos[2], r0: 1.4, cr: 1.0, cg: 0.5, cb: 0.4, intensity: 1.0, life: 0.3, maxLife: 0.3 });
-        entities.list.splice(i, 1);
-      }
-    }
+    retreatHostiles(); // spawned mobs retreat at first light; feral wildlife revert
   }
   function onDeath(now: number): void {
     dead = true;
@@ -2672,10 +2678,7 @@ function main(): void {
     waveActive = false;
     flash = Math.max(flash, 0.5);
     setToast('You fell — respawning at dawn…', now);
-    for (let i = entities.list.length - 1; i >= 0; i -= 1) {
-      const e = entities.list[i]!;
-      if (e.kind === ENT_CRITTER && e.hostile && e.variant !== 2) entities.list.splice(i, 1);
-    }
+    retreatHostiles(); // the assault breaks off (incl. reverting the feral wildlife)
     timeOfDay = 0.3; // skip to morning so the player gets a prep day
     computeSun(timeOfDay);
     prevNight = false;
