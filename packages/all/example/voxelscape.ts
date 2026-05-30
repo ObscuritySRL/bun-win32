@@ -1,10 +1,11 @@
 /**
- * Voxelscape — a fully playable RAYTRACED voxel PHYSICS SANDBOX, rendered entirely
- * by Amanatides-Woo DDA ray traversal in a single fullscreen pixel shader on your
- * real GPU, in pure TypeScript. No triangles, no depth buffer, no rasterized
- * geometry — every pixel marches a ray cell-by-cell through a 128x48x128 voxel grid
- * in a StructuredBuffer<uint>. Terrain, creatures, projectiles and flying debris are
- * ALL voxels in one grid, so everything shares the same lighting/shadows for free.
+ * Voxelscape — a RAYTRACED voxel SURVIVAL SANDBOX, rendered entirely by Amanatides-Woo
+ * DDA ray traversal in a single fullscreen pixel shader on your real GPU, in pure
+ * TypeScript. No triangles, no depth buffer, no rasterized geometry — every pixel
+ * marches a ray cell-by-cell through an enormous 384x64x384 voxel grid in a
+ * StructuredBuffer<uint>. Terrain, creatures, projectiles and flying debris are ALL
+ * voxels in one grid, so everything shares the same lighting/shadows for free. Build
+ * and explore by day; survive escalating night waves of mobs that hunt you down.
  *
  * ── Rendering ─────────────────────────────────────────────────────────────────
  * The pixel shader casts a primary DDA ray per pixel, derives the hit FACE NORMAL,
@@ -27,17 +28,27 @@
  * critters, and trigger bullet-time. A swept-AABB integrator (shared by the player and
  * all entities) gives gravity, jumping, 1-block step-up, swimming, and lava bounce.
  *
- * ── Play (interactive; no DEMO_DURATION_MS) ──────────────────────────────────
- * WASD move · mouse look · Space jump/swim · Shift sprint · F fly · 1-0 hotbar
- * (dig / stone / dirt / sand / gravel / water / lava / plank / TNT / bomb) · LMB dig ·
- * RMB place (or light a targeted TNT) · E ignite · B carpet-bomb · M meteor · C critter ·
- * T scrub time · R new world · ESC exit. A flicker-free GDI HUD (crosshair, colored
- * hotbar, status, toasts) composites into the frame; procedural XAudio2 SFX add footsteps,
- * splashes, break/place, and booms. Capture mode (DEMO_DURATION_MS>0) flies a golden-hour
- * cinematic that detonates a finale for the gallery PNG; the cursor is never touched.
+ * ── Survival ──────────────────────────────────────────────────────────────────
+ * Peaceful cream WILDLIFE graze + flee by day; at nightfall a WAVE of dark-red HOSTILE
+ * mobs (plus a few feral critters) hunts the player down (seek + hop AI, glowing eyes).
+ * Fight back with a melee swat, bombs, TNT traps, lava, and METEOR airstrikes — blasts,
+ * lava, and falls all gib them. Player HEALTH, a SCORE, and ever-bigger waves drive the
+ * loop; survive to dawn for a bonus, respawn forgivingly on death.
  *
- * Debug env: VOX_CAM="x,y,z,yaw,pitch" (static cam), VOX_TOD=0..1 (time), VOX_BOOM=1
- * (repeating detonations), VOX_HUD=1 (force HUD in capture).
+ * ── Play (interactive; no DEMO_DURATION_MS) ──────────────────────────────────
+ * DAY = build & prep, NIGHT = defend. WASD move · mouse look · Space jump/swim · Shift
+ * sprint · F fly · 1-0 hotbar (dig / stone / dirt / sand / gravel / water / lava / plank /
+ * TNT / bomb) · LMB swat a mob in reach, else dig · RMB place (or light a targeted TNT) ·
+ * E ignite · B carpet-bomb · M meteor airstrike · C critter · T scrub time · R brand-new
+ * RANDOM world · ESC exit. A flicker-free GDI HUD (crosshair, day/night + wave banner,
+ * health bar, score, colored hotbar, toasts) composites into the frame, with a red damage
+ * vignette; procedural XAudio2 SFX add footsteps, splashes, break/place, hurt, and booms.
+ * Capture mode (DEMO_DURATION_MS>0) flies a golden-hour cinematic — a meteor strike +
+ * distant eruption over the basin — for the gallery PNG; the cursor is never touched.
+ *
+ * Debug env: VOX_SEED=n (fixed world), VOX_CAM="x,y,z,yaw,pitch" (static cam), VOX_TOD=0..1
+ * (time), VOX_SURVIVAL=1 (run the wave loop in capture), VOX_MOBS=n (spawn a test wave),
+ * VOX_DIVE=1 (underwater cam), VOX_BOOM/VOX_METEOR=1 (repeating FX), VOX_HUD=1 (HUD in capture).
  *
  * @bun-win32 / engine APIs: createWindow, createDevice, compile, makeVertexShader/
  * makePixelShader, makeConstantBuffer/updateConstantBuffer, makeStructuredBuffer
@@ -2267,6 +2278,7 @@ function main(): void {
   let slowmo = 0; // bullet-time: seconds of remaining slow motion
   let nextBoom = 0.4; // VOX_BOOM repeating-detonation timer (capture-mode verification)
   let cinematicBoomed = false; // one-shot finale detonation for the gallery shot
+  let cinematicMeteor = false; // one-shot finale meteor streak for the gallery shot
 
   // ── Survival game state (day = build/prep · night = waves of hostile mobs) ─────
   const HEALTH_MAX = 100;
@@ -2284,7 +2296,7 @@ function main(): void {
   const aiTarget: [number, number, number] = [0, 0, 0]; // reused per-frame (no churn)
   // Time of day (0..1). Capture mode pins it to a moody low-dusk sun (richer sky for
   // contrast, so the finale fireball + glow POP instead of washing out) unless VOX_TOD is set.
-  let timeOfDay = process.env.VOX_TOD ? Number(process.env.VOX_TOD) : interactive ? 0.30 : 0.225;
+  let timeOfDay = process.env.VOX_TOD ? Number(process.env.VOX_TOD) : interactive ? 0.30 : 0.27;
   interface GlowFx {
     x: number;
     y: number;
@@ -3095,27 +3107,40 @@ function main(): void {
       // Position the camera up-sun of the river basin, looking back toward the light
       // so the river leads the eye to the sun on the horizon. Keep it fairly close
       // and low so foreground blocks read crisply and the sky/sun fill the top.
-      const back = 34 - ease * 6;        // distance behind the basin, eases in a bit
-      camX = cx - Math.sin(sunYaw) * back + Math.sin(tt * 0.22) * 3;
-      camZ = cz - Math.cos(sunYaw) * back + Math.sin(tt * 0.16) * 3;
-      // Glide down from a survey altitude to a relaxed elevated vista height.
-      camY = SEA_LEVEL + 17 - ease * 5 + Math.sin(tt * 0.55) * 0.8;
+      const back = 88 - ease * 16;       // pulled well back to survey the enormous basin
+      camX = cx - Math.sin(sunYaw) * back + Math.sin(tt * 0.18) * 4;
+      camZ = cz - Math.cos(sunYaw) * back + Math.sin(tt * 0.13) * 4;
+      // Soar high over the new (taller) terrain, descending to an elevated vista.
+      camY = SEA_LEVEL + 52 - ease * 9 + Math.sin(tt * 0.4) * 1.3;
       // Settle the heading just off-sun, with a slow drift earlier to feel alive.
-      yaw = heroYaw + (1 - ease) * -0.30;
+      yaw = heroYaw + (1 - ease) * -0.28;
       // Tilt down to survey terrain, levelling toward the horizon so sky + sun show.
-      pitch = lerp01(-0.34, -0.12, ease) + Math.sin(tt * 0.5) * 0.012;
+      pitch = lerp01(-0.42, -0.15, ease) + Math.sin(tt * 0.45) * 0.01;
       // Gentle gaze dip into the finale so the fireball sits in the lower-center.
-      if (tt > total - 0.7) pitch -= (tt - (total - 0.7)) * 0.12;
+      if (tt > total - 0.8) pitch -= (tt - (total - 0.8)) * 0.07;
 
-      // Finale: detonate a TNT cluster ahead so the closing frame catches a bright
-      // fireball, flying debris, a chain reaction, and bullet-time. Detonate a touch
-      // earlier so the fireball + smoke have a few frames to bloom and read as a
-      // defined orange ball (not a flat white flash); place it closer + higher so it
-      // fills the lower-center of frame, lifted off the sun-glare on the horizon.
-      if (!cinematicBoomed && !process.env.VOX_BOOM && tt > total - 0.20) {
-        const f = basis().fwd;
-        const tx = Math.max(4, Math.min(W - 5, Math.floor(camX + f[0] * 14)));
-        const tz = Math.max(4, Math.min(D - 5, Math.floor(camZ + f[2] * 14)));
+      // Finale: a flaming METEOR screams down and a distant TNT eruption blooms ~48
+      // blocks downrange, framed against the low sun — a fireball in the landscape, not
+      // smoke in the lens. Both sit in the lower-centre of the survey vista.
+      const f = basis().fwd;
+      const aheadX = Math.max(6, Math.min(W - 6, Math.floor(camX + f[0] * 48)));
+      const aheadZ = Math.max(6, Math.min(D - 6, Math.floor(camZ + f[2] * 48)));
+      let aheadY = SEA_LEVEL + 1;
+      for (let y = H - 1; y >= 1; y -= 1) {
+        if (isSolid(voxelAt(aheadX, y, aheadZ))) {
+          aheadY = y;
+          break;
+        }
+      }
+      if (!cinematicMeteor && tt > total - 1.7) {
+        const sx = Math.max(2, Math.min(W - 3, aheadX + 9));
+        const sz = Math.max(2, Math.min(D - 3, aheadZ + 9));
+        entities.spawnMeteor(sx, H - 2, sz, aheadX, aheadY, aheadZ); // streaks + impacts in-frame
+        cinematicMeteor = true;
+      }
+      if (!cinematicBoomed && !process.env.VOX_BOOM && tt > total - 0.42) {
+        const tx = Math.max(5, Math.min(W - 6, aheadX - 6));
+        const tz = aheadZ;
         let ty = SEA_LEVEL + 1;
         for (let y = H - 1; y >= 1; y -= 1) {
           if (isSolid(voxelAt(tx, y, tz))) {
@@ -3127,23 +3152,22 @@ function main(): void {
           setBlock(tx + dx, ty + 1, tz + dz, B_TNT);
           setBlock(tx + dx, ty + 2, tz + dz, B_TNT);
         }
-        detonate(tx, ty + 3, tz, 7.5, 2.0);
-        // Stack a warm rising fireball column of glow points on top of the blast so the
-        // finale reads unmistakably as a fiery eruption (not just sun glare on water):
-        // a hot orange core fading up into amber smoke.
-        for (let k = 0; k < 5; k += 1) {
-          const f01 = k / 4;
+        detonate(tx, ty + 3, tz, 8.0, 2.2);
+        // A warm rising fireball column of glow points so the finale reads as a fiery
+        // eruption (hot orange core fading up into amber smoke).
+        for (let k = 0; k < 6; k += 1) {
+          const f01 = k / 5;
           glowFx.push({
-            x: tx + 0.5 + (Math.random() - 0.5) * 1.4,
-            y: ty + 3 + k * 1.7,
-            z: tz + 0.5 + (Math.random() - 0.5) * 1.4,
-            r0: 3.0 - f01 * 1.0,
-            cr: lerp01(2.2, 1.5, f01),
-            cg: lerp01(1.0, 0.62, f01),
-            cb: lerp01(0.32, 0.22, f01),
-            intensity: lerp01(2.8, 1.4, f01),
-            life: 0.6 - f01 * 0.15,
-            maxLife: 0.6,
+            x: tx + 0.5 + (Math.random() - 0.5) * 1.6,
+            y: ty + 3 + k * 1.9,
+            z: tz + 0.5 + (Math.random() - 0.5) * 1.6,
+            r0: 3.2 - f01 * 1.0,
+            cr: lerp01(2.3, 1.5, f01),
+            cg: lerp01(1.02, 0.6, f01),
+            cb: lerp01(0.34, 0.22, f01),
+            intensity: lerp01(3.0, 1.4, f01),
+            life: 0.7 - f01 * 0.15,
+            maxLife: 0.7,
           });
         }
         cinematicBoomed = true;
@@ -3212,6 +3236,31 @@ function main(): void {
           const bx = rem - bz * W;
           spawnEmber(bx, by, bz);
         }
+      }
+    }
+    // Meteor ember trail: fiery sparks + smoke stream off each falling meteor so it
+    // reads as a blazing airstrike, not a lone voxel. Spawned in render time (dt).
+    for (const e of entities.list) {
+      if (e.kind !== ENT_METEOR || particles.length >= PARTICLE_CAP - 4) continue;
+      for (let k = 0; k < 3; k += 1) {
+        const ember = k < 2;
+        emitParticle({
+          x: e.pos[0] + (Math.random() - 0.5) * 0.8,
+          y: e.pos[1] + (Math.random() - 0.5) * 0.8,
+          z: e.pos[2] + (Math.random() - 0.5) * 0.8,
+          vx: -e.vel[0] * 0.12 + (Math.random() - 0.5) * 2.5,
+          vy: -e.vel[1] * 0.06 + (Math.random() - 0.5) * 2.5,
+          vz: -e.vel[2] * 0.12 + (Math.random() - 0.5) * 2.5,
+          cr: ember ? 2.6 : 0.5,
+          cg: ember ? 0.95 + Math.random() * 0.3 : 0.45,
+          cb: ember ? 0.2 : 0.5,
+          r0: ember ? 0.7 + Math.random() * 0.5 : 1.5,
+          inten: ember ? 1.8 : 0.6,
+          gravity: ember ? -2 : -4,
+          drag: 1.3,
+          life: 0.4 + Math.random() * 0.5,
+          maxLife: 0.9,
+        });
       }
     }
     audio?.pump(sim.fuses.size > 0, sim.burning.size > 0);
