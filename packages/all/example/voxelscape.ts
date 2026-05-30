@@ -566,6 +566,12 @@ const DEBRIS_CAP = 420;
 
 export function createEntities(sim: Sim): Entities {
   const list: Entity[] = [];
+  // Deferred side-effects: a detonating projectile's onExplode runs damage()/spawnDebris()
+  // which splice `list`, and a creature death runs onCritterDeath() which spawns debris — both
+  // mutate `list`. step() collects them here and fires them AFTER its loop so it never mutates
+  // the array it is iterating (which would drop the wrong entity / re-detonate a projectile).
+  const pendingBooms: { x: number; y: number; z: number; power: number }[] = [];
+  const pendingDeaths: { x: number; y: number; z: number; hostile: boolean }[] = [];
   const solid = (x: number, y: number, z: number): boolean => {
     if (x < 0 || z < 0 || x >= sim.W || z >= sim.D) return true;
     if (y < 0) return true;
@@ -690,6 +696,8 @@ export function createEntities(sim: Sim): Entities {
     },
     step(dt) {
       const g = 28;
+      pendingBooms.length = 0;
+      pendingDeaths.length = 0;
       for (let i = list.length - 1; i >= 0; i -= 1) {
         const e = list[i]!;
         if (e.kind === ENT_BOMB || e.kind === ENT_METEOR) {
@@ -700,13 +708,11 @@ export function createEntities(sim: Sim): Entities {
           e.ttl -= dt;
           const hitSolid = solid(nx, ny, nz);
           if (hitSolid || e.ttl <= 0 || ny < 0) {
-            if (ents.onExplode) {
-              const ex = Math.max(0, Math.min(sim.W - 1, Math.floor(e.pos[0])));
-              const ey = Math.max(0, Math.min(sim.H - 1, Math.floor(e.pos[1])));
-              const ez = Math.max(0, Math.min(sim.D - 1, Math.floor(e.pos[2])));
-              ents.onExplode(ex, ey, ez, e.kind === ENT_METEOR ? 2.0 : 1.0);
-            }
-            list.splice(i, 1);
+            const ex = Math.max(0, Math.min(sim.W - 1, Math.floor(e.pos[0])));
+            const ey = Math.max(0, Math.min(sim.H - 1, Math.floor(e.pos[1])));
+            const ez = Math.max(0, Math.min(sim.D - 1, Math.floor(e.pos[2])));
+            pendingBooms.push({ x: ex, y: ey, z: ez, power: e.kind === ENT_METEOR ? 2.0 : 1.0 });
+            list.splice(i, 1); // safe reverse-removal; onExplode fires after the loop
             continue;
           }
           e.pos[0] = nx;
@@ -811,10 +817,14 @@ export function createEntities(sim: Sim): Entities {
         e.vel[2] = r.vz;
         e.ground = r.onGround;
         if (e.hp <= 0) {
-          ents.onCritterDeath?.(e.pos[0], e.pos[1], e.pos[2], e.hostile);
-          list.splice(i, 1);
+          pendingDeaths.push({ x: e.pos[0], y: e.pos[1], z: e.pos[2], hostile: e.hostile });
+          list.splice(i, 1); // safe reverse-removal; onCritterDeath fires after the loop
         }
       }
+      // Drain deferred side-effects now that iteration is done — these mutate `list`
+      // (damage()/spawnDebris() splice + push), which is only safe outside the loop.
+      for (const d of pendingDeaths) ents.onCritterDeath?.(d.x, d.y, d.z, d.hostile);
+      for (const b of pendingBooms) ents.onExplode?.(b.x, b.y, b.z, b.power);
     },
   };
   return ents;
@@ -2101,6 +2111,17 @@ function main(): void {
     }
     gpu.updateDynamicBuffer(field.buffer, frameBuf);
   }
+  // Cheap signature of every entity's CELL (+ count). The render grid only changes when an
+  // entity crosses a cell boundary (or the world ticks/is edited), so this lets us skip the
+  // full 37.7 MB grid re-upload on the many frames where everything sits in the same cells.
+  let lastFieldSig = -1;
+  function entityCellSig(): number {
+    let s = (entities.list.length * 0x9e3779b1) | 0;
+    for (const e of entities.list) {
+      s = (Math.imul(s, 16777619) ^ (Math.floor(e.pos[0]) * 73856093 ^ Math.floor(e.pos[1]) * 19349663 ^ Math.floor(e.pos[2]) * 83492791)) | 0;
+    }
+    return s;
+  }
 
   function setBlock(x: number, y: number, z: number, t: number): void {
     sim.setBlock(x, y, z, t); // routes through the sim so edits wake the physics
@@ -2256,7 +2277,7 @@ function main(): void {
         label(dTxt, dx + 2, cyp - 38, rgb(0, 0, 0));
         label(dTxt, dx, cyp - 40, rgb(235, 60, 50));
         useFont(hudFontSm);
-        const rTxt = 'respawning at dawn…';
+        const rTxt = 'respawning…';
         label(rTxt, Math.floor(cw / 2 - rTxt.length * 4), cyp - 4, rgb(230, 200, 200));
       }
 
@@ -2614,6 +2635,11 @@ function main(): void {
     dead = false;
     deadTimer = 0;
     hurt = 0;
+    damageCd = 0;
+    regenCd = 0;
+    reinforceCd = 0;
+    timeOfDay = 0.3; // a fresh world always starts in the morning (a full prep day)
+    computeSun(timeOfDay);
     editedThisFrame = true;
   }
 
@@ -2677,13 +2703,15 @@ function main(): void {
     deadTimer = 2.4;
     waveActive = false;
     flash = Math.max(flash, 0.5);
-    setToast('You fell — respawning at dawn…', now);
+    setToast('You fell — respawning…', now);
     retreatHostiles(); // the assault breaks off (incl. reverting the feral wildlife)
     timeOfDay = 0.3; // skip to morning so the player gets a prep day
     computeSun(timeOfDay);
     prevNight = false;
   }
-  function updateSurvival(sdt2: number, now: number): void {
+  // `rdt` is REAL-time dt (not the bullet-time-scaled sdt): waves, health, i-frames and the
+  // hurt vignette tick in real time so a slow-mo explosion never warps the survival clock.
+  function updateSurvival(rdt: number, now: number): void {
     const night = sun[1] < -0.04;
     if (night && !prevNight && !dead) onNightfall(now);
     else if (!night && prevNight && !dead) onDawn(now);
@@ -2691,7 +2719,7 @@ function main(): void {
 
     // Reinforcements if the player clears a night early.
     if (waveActive && night && !dead) {
-      reinforceCd -= sdt2;
+      reinforceCd -= rdt;
       if (entities.hostileCount() === 0 && reinforceCd <= 0) {
         spawnMobWave(Math.min(14, 4 + wave));
         reinforceCd = 7;
@@ -2700,7 +2728,7 @@ function main(): void {
     }
 
     // Mob contact damage (i-framed so a swarm doesn't shred you instantly).
-    damageCd -= sdt2;
+    damageCd -= rdt;
     if (!dead && !flying && damageCd <= 0) {
       for (const e of entities.list) {
         if (e.kind !== ENT_CRITTER || !e.hostile) continue;
@@ -2720,19 +2748,19 @@ function main(): void {
 
     // Lava burns; fire too.
     if (!dead && !flying && voxelAt(Math.floor(player[0]), Math.floor(player[1] + 0.1), Math.floor(player[2])) === B_LAVA) {
-      hurtPlayer(26 * sdt2);
+      hurtPlayer(26 * rdt);
       regenCd = 2;
     }
 
     // Health regen after a lull; the hurt vignette decays.
-    regenCd -= sdt2;
-    if (!dead && regenCd <= 0 && health < HEALTH_MAX) health = Math.min(HEALTH_MAX, health + 7 * sdt2);
-    hurt = Math.max(0, hurt - sdt2 * 2.2);
+    regenCd -= rdt;
+    if (!dead && regenCd <= 0 && health < HEALTH_MAX) health = Math.min(HEALTH_MAX, health + 7 * rdt);
+    hurt = Math.max(0, hurt - rdt * 2.2);
 
     // Death + respawn.
     if (health <= 0 && !dead) onDeath(now);
     if (dead) {
-      deadTimer -= sdt2;
+      deadTimer -= rdt;
       if (deadTimer <= 0) {
         dead = false;
         respawnPlayer();
@@ -2885,10 +2913,13 @@ function main(): void {
       const { fwd, right } = basis();
       let mvF = 0;
       let mvR = 0;
-      if (win.keyDown(VK_W)) mvF += 1;
-      if (win.keyDown(VK_S)) mvF -= 1;
-      if (win.keyDown(VK_DK)) mvR += 1;
-      if (win.keyDown(VK_A)) mvR -= 1;
+      if (!dead) {
+        // Frozen during the death pause; mouse-look still works so you can watch the respawn.
+        if (win.keyDown(VK_W)) mvF += 1;
+        if (win.keyDown(VK_S)) mvF -= 1;
+        if (win.keyDown(VK_DK)) mvR += 1;
+        if (win.keyDown(VK_A)) mvR -= 1;
+      }
 
       if (flying) {
         // Free-fly: move the eye directly along the look basis (no gravity/collision).
@@ -2915,8 +2946,8 @@ function main(): void {
         if (inWater) {
           pvel[1] += GRAVITY * 0.2 * dt; // buoyancy
           pvel[1] = Math.max(pvel[1], -4.5); // slow sink
-          if (win.keyDown(VK_SPACE)) pvel[1] = 4.2; // swim up
-        } else if (onGround && win.keyDown(VK_SPACE)) {
+          if (!dead && win.keyDown(VK_SPACE)) pvel[1] = 4.2; // swim up
+        } else if (!dead && onGround && win.keyDown(VK_SPACE)) {
           pvel[1] = JUMP_V; // jump (auto-repeats while held on ground)
           audio?.jump();
         }
@@ -2950,7 +2981,8 @@ function main(): void {
       camY = player[1] + EYE_H;
       camZ = player[2];
 
-      // ── Tools: hotbar select + LMB dig / RMB place + set-pieces ────────────────
+      // ── Tools (frozen during the death pause): hotbar + LMB/RMB + set-pieces ───
+      if (!dead) {
       const { fwd: cf } = basis();
       for (let k = 0; k < 9; k += 1) if (win.keyDown(0x31 + k)) selectedSlot = k; // '1'..'9' → 0..8
       if (win.keyDown(0x30)) selectedSlot = 9; // '0' → bomb
@@ -3086,6 +3118,7 @@ function main(): void {
         setToast('new world', elapsed);
       }
       prevR = rDown;
+      } // end !dead tool actions
     } else if (camOverride) {
       // ── Debug/verification static camera: VOX_CAM="x,y,z,yaw,pitch" ───────────
       camX = camOverride[0]!;
@@ -3267,8 +3300,14 @@ function main(): void {
       }
     }
     audio?.pump(sim.fuses.size > 0, sim.burning.size > 0);
-    // Re-upload the grid when the world changed, an edit happened, or entities exist.
-    if (wasActive || editedThisFrame || entities.list.length > 0) reuploadField();
+    // Re-upload only when the render grid actually changed: the sim ticked or an edit
+    // happened (world cells), or an entity crossed into a new cell. Sub-cell drift leaves
+    // the per-cell grid identical, so most frames skip the full 37.7 MB upload entirely.
+    const fieldSig = entityCellSig();
+    if (wasActive || editedThisFrame || fieldSig !== lastFieldSig) {
+      reuploadField();
+      lastFieldSig = fieldSig;
+    }
 
     // ── Build the constant buffer immediately before the consuming call ─────────
     const { fwd, right, up } = basis();
