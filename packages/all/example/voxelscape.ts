@@ -708,9 +708,12 @@ export function createEntities(sim: Sim): Entities {
           e.ttl -= dt;
           const hitSolid = solid(nx, ny, nz);
           if (hitSolid || e.ttl <= 0 || ny < 0) {
-            const ex = Math.max(0, Math.min(sim.W - 1, Math.floor(e.pos[0])));
-            const ey = Math.max(0, Math.min(sim.H - 1, Math.floor(e.pos[1])));
-            const ez = Math.max(0, Math.min(sim.D - 1, Math.floor(e.pos[2])));
+            // Detonate at the actual collision endpoint (nx,ny,nz), not the previous
+            // frame's position — otherwise a fast meteor explodes a block or two above
+            // where it visibly strikes.
+            const ex = Math.max(0, Math.min(sim.W - 1, Math.floor(nx)));
+            const ey = Math.max(0, Math.min(sim.H - 1, Math.floor(ny)));
+            const ez = Math.max(0, Math.min(sim.D - 1, Math.floor(nz)));
             pendingBooms.push({ x: ex, y: ey, z: ez, power: e.kind === ENT_METEOR ? 2.0 : 1.0 });
             list.splice(i, 1); // safe reverse-removal; onExplode fires after the loop
             continue;
@@ -756,10 +759,14 @@ export function createEntities(sim: Sim): Entities {
           // Launched: tumble until grounded, then resume normal behaviour.
           if (e.ground && e.timer <= 0) e.state = 0;
         } else if (e.hostile) {
-          // Hunt: steer straight at the player; wander only if there's no target.
-          if (tdist > 0.01 && tdist < Infinity) {
-            e.hx = tdx / tdist;
-            e.hz = tdz / tdist;
+          // Hunt: steer straight at the player whenever a target exists (keeping the
+          // last heading at point-blank range so a mob hugging the player never reverts
+          // to wandering); only wander when there is genuinely no target.
+          if (tdist < Infinity) {
+            if (tdist > 0.01) {
+              e.hx = tdx / tdist;
+              e.hz = tdz / tdist;
+            }
           } else if (e.timer <= 0) {
             const a = Math.random() * Math.PI * 2;
             e.hx = Math.cos(a);
@@ -2182,7 +2189,8 @@ function main(): void {
 
       // ── Top-left: compact status (clock lives in the day/night banner now) ──
       useFont(hudFontSm);
-      const status = `${fps} fps · ${g.gpuName} · ents ${entities.list.length}`;
+      const gpuShort = g.gpuName.length > 40 ? `${g.gpuName.slice(0, 39)}…` : g.gpuName;
+      const status = `${fps} fps · ${gpuShort} · ents ${entities.list.length}`;
       label(status, 17, 11, rgb(0, 0, 0));
       label(status, 16, 10, rgb(205, 216, 234));
 
@@ -2614,6 +2622,14 @@ function main(): void {
     pvel[1] = 0;
     pvel[2] = 0;
     onGround = false;
+    // Fresh slate: face a known direction and clear per-player cooldowns so a respawn
+    // (or world regen, which calls this) never inherits a stale view angle or throttle.
+    yaw = 0.0;
+    pitch = -0.28;
+    damageCd = 0;
+    regenCd = 0;
+    actCooldown = 0;
+    meleeCd = 0;
   }
   /** R: brand-new RANDOM world — reset blocks, fluids, physics, entities; respawn the player. */
   function regenerate(): void {
@@ -2625,6 +2641,11 @@ function main(): void {
     sim.water.fill(0);
     for (let i = 0; i < sim.world.length; i += 1) if (sim.world[i] === B_WATER) sim.water[i] = WATER_MAX;
     entities.list.length = 0;
+    glowFx.length = 0; // drop the previous world's explosion / steam / death glows
+    particles.length = 0; // …and its break-flecks / sparks / embers
+    shake = 0; // no lingering screen-shake, white flash, or bullet-time
+    flash = 0;
+    slowmo = 0;
     spawnCritters(30);
     respawnPlayer();
     health = HEALTH_MAX;
@@ -2638,6 +2659,10 @@ function main(): void {
     damageCd = 0;
     regenCd = 0;
     reinforceCd = 0;
+    // Clear input edge-detection so holding a key across R doesn't swallow the next press.
+    prevF = prevE = prevB = prevM = prevC = prevR = false;
+    prevOnGround = prevInWater = prevLeft = prevRight = false;
+    footTimer = 0;
     timeOfDay = 0.3; // a fresh world always starts in the morning (a full prep day)
     computeSun(timeOfDay);
     editedThisFrame = true;
@@ -2994,7 +3019,9 @@ function main(): void {
       // Aim point for set-pieces (B/M): the targeted block, else a point ~24 blocks
       // ahead projected down to the terrain — so they work even aiming at sky/water.
       const aim = (): [number, number, number] => {
-        if (pick.hit) return [pick.cell[0], pick.cell[1], pick.cell[2]];
+        // Target the air cell just above the hit block (consistent with placement) so a
+        // near-vertical meteor arcs cleanly onto the surface rather than into it.
+        if (pick.hit) return [pick.cell[0], Math.min(H - 1, pick.cell[1] + 1), pick.cell[2]];
         let ax = Math.floor(camX + cf[0] * 24);
         const az = Math.floor(camZ + cf[2] * 24);
         ax = Math.max(1, Math.min(W - 2, ax));
@@ -3348,6 +3375,11 @@ function main(): void {
       cbData.writeInt32LE(tgt.cell[2], 104);
       cbData.writeInt32LE(1, 108);
     } else {
+      // Zero the whole target slot (not just the valid flag) so no stale cell coords
+      // linger in the persistent cbuffer Buffer between frames.
+      cbData.writeInt32LE(0, 96);
+      cbData.writeInt32LE(0, 100);
+      cbData.writeInt32LE(0, 104);
       cbData.writeInt32LE(0, 108);
     }
     cbData.writeUInt32LE(buildGlows(elapsed), 112);

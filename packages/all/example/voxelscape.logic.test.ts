@@ -184,6 +184,22 @@ check('air is not solid', isSolid(B_AIR) === false);
   const kills = ents.damage(5, 1.5, 5, 3, 10);
   check('damage gibs a mob and counts the kill', before === 1 && kills === 1 && ents.hostileCount() === 0);
 }
+{
+  // A meteor detonates at the cell it actually STRIKES, not its previous-frame
+  // position. (Regression: the explosion used to land a block or two above the visible
+  // impact because it floored the stale e.pos instead of the collision endpoint.)
+  const s = createSim(11, 48, 11);
+  for (let x = 0; x < 11; x += 1) for (let z = 0; z < 11; z += 1) s.setBlock(x, 0, z, B_STONE);
+  const ents = createEntities(s);
+  let boom: { x: number; y: number; z: number } | null = null;
+  ents.onExplode = (x, y, z): void => {
+    boom = { x, y, z };
+  };
+  ents.spawnMeteor(5, 40, 5, 5, 0, 5); // straight down onto the stone floor at y=0
+  for (let i = 0; i < 400 && !boom; i += 1) ents.step(1 / 30);
+  const b = boom as { x: number; y: number; z: number } | null;
+  check('meteor detonates at the impact cell, not above it', b !== null && b.y === 0 && b.x === 5 && b.z === 5);
+}
 
 console.log(failures === 0 ? '\nALL PASS' : `\n${failures} FAILURE(S)`);
 if (failures > 0) process.exit(1);
