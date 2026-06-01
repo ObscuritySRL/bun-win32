@@ -15,7 +15,34 @@ The browser confined TypeScript to a `<canvas>` and `fetch`. `@bun-win32` hands 
 
 > Clone and run any of them: `git clone https://github.com/ObscuritySRL/bun-win32 && cd bun-win32 && bun install && cd packages/all` then `bun run <demo>`.
 >
-> They're powered by [`example/_gpu.ts`](./example/_gpu.ts) — a ~pure-TypeScript **Direct3D 11 engine** (runtime HLSL compile, compute shaders, structured buffers/UAVs, textures, the whole COM vtable), [`example/_gpu3d.ts`](./example/_gpu3d.ts) (depth buffer + triangle-mesh drawing for the 3D demos), and [`example/_audio.ts`](./example/_audio.ts) (WinMM capture + FFT + XAudio2 streaming).
+> They're powered by [`example/_gpu.ts`](./example/_gpu.ts) — a ~pure-TypeScript **Direct3D 11 engine** (runtime HLSL compile, compute shaders, structured buffers/UAVs, textures, the whole COM vtable), [`example/_gpu3d.ts`](./example/_gpu3d.ts) (depth buffer + triangle-mesh drawing for the 3D demos), [`example/_audio.ts`](./example/_audio.ts) (WinMM capture + FFT + XAudio2 streaming), and [`example/_term.ts`](./example/_term.ts) — a **truecolor terminal framebuffer** that turns the console itself into a 24-bit RGB canvas.
+
+### Terminal — the whole console is a framebuffer, at 100s of fps
+
+> No window. No GPU. These render **inside your terminal** in 24-bit truecolor: every character cell is two stacked pixels (the `▀` upper-half-block trick), driven by [`example/_term.ts`](./example/_term.ts) — a hand-written **diffing renderer** that only repaints the cells that changed and only re-emits an escape when it must, streaming each frame in a single `write`. The result **scales to any terminal size** (resize the window and the picture reflows), carries a **live FPS counter**, and runs **far above 60fps** — the engine alone tops **2,000fps**, and every demo below benchmarks at the rate shown. Pure TypeScript over Win32 console FFI; `ESC`/`q` to quit, `SPACE` to pause.
+
+<table>
+<tr>
+<td width="50%"><img src="https://raw.githubusercontent.com/ObscuritySRL/bun-win32/main/packages/all/screenshots/clawd.png" alt="clawd"><br><b>clawd</b> — <b>Clawd, the Claude mascot</b>, alive in your terminal: an SDF clay-shaded character that breathes (eased squash &amp; stretch), blinks and waves, in front of the 12-spoke Claude <b>sunburst</b> with HDR bloom + ACES tonemapping. <b>≈580fps</b>. <code>bun run clawd</code></td>
+<td width="50%"><img src="https://raw.githubusercontent.com/ObscuritySRL/bun-win32/main/packages/all/screenshots/galaxy-tty.png" alt="galaxy-tty"><br><b>galaxy-tty</b> — a living <b>grand-design spiral galaxy</b>: 30k stars on differential-rotation orbits streaming through a rotating <b>log-spiral density wave</b>, with dust lanes, a legible golden nucleus, HDR additive bloom and an ACES filmic grade. <b>≈380fps</b>. <code>bun run galaxy-tty</code></td>
+</tr>
+<tr>
+<td><img src="https://raw.githubusercontent.com/ObscuritySRL/bun-win32/main/packages/all/screenshots/blackhole-tty.png" alt="blackhole-tty"><br><b>blackhole-tty</b> — a <b>gravitationally-lensed black hole</b>, the Interstellar look in text: a photon ring, a Doppler-beamed accretion disk whose far side arcs up <i>over</i> the shadow, and a starfield that warps around the silhouette. <b>≈140fps</b>. <code>bun run blackhole-tty</code></td>
+<td><img src="https://raw.githubusercontent.com/ObscuritySRL/bun-win32/main/packages/all/screenshots/torus-knot.png" alt="torus-knot"><br><b>torus-knot</b> — the spinning-donut demo, reborn: a glossy <b>chrome (2,3) torus knot ray-marched per pixel</b> against a hash-grid SDF, with soft shadows, ambient occlusion, fresnel and speculars that slide across the metal as it tumbles. <b>≈180fps</b>. <code>bun run torus-knot</code></td>
+</tr>
+<tr>
+<td><img src="https://raw.githubusercontent.com/ObscuritySRL/bun-win32/main/packages/all/screenshots/fluid-ink.png" alt="fluid-ink"><br><b>fluid-ink</b> — a real-time <b>Stam stable-fluids</b> solver (semi-Lagrangian advection + Jacobi pressure projection + vorticity confinement): luminous indigo–magenta–amber ink folds into vortices and filaments through clean dark water. <b>≈640fps</b>. <code>bun run fluid-ink</code></td>
+<td><img src="https://raw.githubusercontent.com/ObscuritySRL/bun-win32/main/packages/all/screenshots/flowfield.png" alt="flowfield"><br><b>flowfield</b> — thousands of particles riding a <b>divergence-free curl-noise current</b> into designed ribbons of light, with HDR trail bloom and a cohesive indigo-to-gold grade. Generative art, rendered as text. <b>≈770fps</b>. <code>bun run flowfield</code></td>
+</tr>
+<tr>
+<td><img src="https://raw.githubusercontent.com/ObscuritySRL/bun-win32/main/packages/all/screenshots/swarm3d.png" alt="swarm3d"><br><b>swarm3d</b> — a <b>3,600-starling 3D murmuration</b>: spatial-hash Reynolds boids sheared by curl-noise wind into morphing sheets and filaments, depth-graded over a dusk sky. It splits, swirls and reforms like the real thing. <b>≈265fps</b>. <code>bun run swarm3d</code></td>
+<td><img src="https://raw.githubusercontent.com/ObscuritySRL/bun-win32/main/packages/all/screenshots/reaction.png" alt="reaction"><br><b>reaction</b> — a <b>Gray-Scott reaction-diffusion</b> organism under glass: spots, worms and coral morph endlessly across a drifting feed/kill phase field, with wet-membrane shading and breathing voids. <b>≈270fps</b>. <code>bun run reaction</code></td>
+</tr>
+<tr>
+<td><img src="https://raw.githubusercontent.com/ObscuritySRL/bun-win32/main/packages/all/screenshots/mandel-dive.png" alt="mandel-dive"><br><b>mandel-dive</b> — an endless eased plunge into the <b>Mandelbrot</b> seahorse valley: smooth-iteration velvet interior, distance-estimate <b>gold filigree</b> on the boundary, ACES-graded, band-free, seamlessly looping. <b>≈145fps</b>. <code>bun run mandel-dive</code></td>
+<td><img src="https://raw.githubusercontent.com/ObscuritySRL/bun-win32/main/packages/all/screenshots/cinema.png" alt="cinema"><br><b>cinema</b> — <b>a self-playing film in your terminal</b>: a 2.39:1 letterboxed reel that dissolves through a nebula, a log-spiral galaxy, a Gerstner-wave <b>ocean sunrise</b> and an aurora — film grain, vignette and a warm/teal grade throughout. <b>≈1290fps</b>. <code>bun run cinema</code></td>
+</tr>
+</table>
 
 ### GPU — a million things at 60fps
 
@@ -42,7 +69,7 @@ The browser confined TypeScript to a `<canvas>` and `fetch`. `@bun-win32` hands 
 </tr>
 </table>
 
-…plus **`shader-forge`** (compile HLSL at runtime and ray-march it on the GPU), **`mandelbrot`** (infinite df64 deep-zoom), **`boids`** (GPU murmuration), and **`desktop-shader`** (DXGI-duplicate your *live desktop* and run CRT / underwater / ASCII shaders on it).
+…plus **`shader-forge`** (JIT-compile **ten** HLSL ray-marchers at runtime and fly a free camera through them with live cinematic post — glass dispersion, volumetric clouds, a compute reaction-diffusion creature, DOF/bloom, hot-recompiled on a keystroke), **`mandelbrot`** (infinite df64 deep-zoom), **`boids`** (GPU murmuration), and **`desktop-shader`** (DXGI-duplicate your *live desktop* and run CRT / underwater / ASCII shaders on it).
 
 ### The *"wait — that's TypeScript?!"* tier — a console, a brain, and a world
 
