@@ -23,7 +23,7 @@ The browser confined TypeScript to a `<canvas>` and `fetch`. `@bun-win32` hands 
 
 <table>
 <tr>
-<td width="50%"><img src="https://raw.githubusercontent.com/ObscuritySRL/bun-win32/main/packages/all/screenshots/clawd.png" alt="clawd"><br><b>clawd</b> — <b>Clawd, the Claude mascot</b>, alive in your terminal: an SDF clay-shaded character that breathes (eased squash &amp; stretch), blinks and waves, in front of the 12-spoke Claude <b>sunburst</b> with HDR bloom + ACES tonemapping. <b>≈580fps</b>. <code>bun run clawd</code></td>
+<td width="50%"><img src="https://raw.githubusercontent.com/ObscuritySRL/bun-win32/main/packages/all/screenshots/clawd.png" alt="clawd"><br><b>clawd</b> — Anthropic's pixel mascot <b>Claw'd</b> brought to life: the blocky terracotta critter from the <i>"Welcome, Claw'd"</i> card, hopping across the cream stage with springy squash-&amp;-stretch, legs that tuck mid-air, a bouncing drop-shadow and eased blinks. Faithful to the artwork. <b>≈9600fps</b>. <code>bun run clawd</code></td>
 <td width="50%"><img src="https://raw.githubusercontent.com/ObscuritySRL/bun-win32/main/packages/all/screenshots/galaxy-tty.png" alt="galaxy-tty"><br><b>galaxy-tty</b> — a living <b>grand-design spiral galaxy</b>: 30k stars on differential-rotation orbits streaming through a rotating <b>log-spiral density wave</b>, with dust lanes, a legible golden nucleus, HDR additive bloom and an ACES filmic grade. <b>≈380fps</b>. <code>bun run galaxy-tty</code></td>
 </tr>
 <tr>
