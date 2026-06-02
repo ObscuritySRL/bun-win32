@@ -28,6 +28,7 @@ import { STD_HANDLE } from '@bun-win32/kernel32';
 
 import * as audio from './_audio';
 import { Term, makeFrameWaiter, encodePNG } from './_term';
+import { loadCgbAcid2 } from './gameboy-cgb-rom';
 import { loadAcid2 } from './gameboy-rom';
 import { loadLibbet } from './gameboy-game-rom';
 
@@ -46,6 +47,28 @@ let activePalette = 0;
 export interface Buttons {
   right: boolean; left: boolean; up: boolean; down: boolean;
   a: boolean; bBtn: boolean; select: boolean; start: boolean;
+}
+
+/**
+ * Convert a 15-bit CGB color (BGR555) to a corrected 24-bit RGB triple. Raw CGB
+ * values are over-saturated for a modern display, so we apply the well-known
+ * (byuu/near) channel-mixing matrix that the LCD performs, then scale 0..960 to
+ * the full 0..255 range so the picture stays vivid on a bright terminal.
+ */
+export function cgbColor(rgb15: number): [number, number, number] {
+  const r = rgb15 & 31;
+  const g = (rgb15 >> 5) & 31;
+  const b = (rgb15 >> 10) & 31;
+  const R = Math.min(960, r * 26 + g * 4 + b * 2);
+  const G = Math.min(960, g * 24 + b * 8);
+  const B = Math.min(960, r * 6 + g * 4 + b * 22);
+  return [(R * 255 / 960) | 0, (G * 255 / 960) | 0, (B * 255 / 960) | 0];
+}
+
+/** As cgbColor, packed into a single 0xRRGGBB integer for the palette cache. */
+function cgbColorPacked(rgb15: number): number {
+  const [r, g, b] = cgbColor(rgb15);
+  return (r << 16) | (g << 8) | b;
 }
 
 // ════════════════════════════════════════════════════════════════════════════
@@ -577,6 +600,7 @@ export class Cartridge {
   readonly kind: number;
   readonly hasBattery: boolean;
   readonly hasRtc: boolean;
+  readonly cgb: boolean; // header 0x143 bit7 — Game Boy Color aware cartridge
   private readonly romBankMask: number;
   private readonly ramMask: number;
 
@@ -602,6 +626,7 @@ export class Cartridge {
     this.kind = t.kind;
     this.hasBattery = t.battery;
     this.hasRtc = t.rtc;
+    this.cgb = ((rom[0x143] ?? 0) & 0x80) !== 0;
     const banks = 2 << (rom[0x148] ?? 0); // header ROM-size byte
     this.romBankMask = Math.max(1, banks - 1);
     const ramBytes = this.kind === MBC2 ? 0x200 : (RAM_SIZE_BYTES[rom[0x149] ?? 0] ?? 0);
@@ -841,12 +866,34 @@ export class GameBoy {
 
   // ── Memory ─────────────────────────────────────────────────────────────────
   private readonly cart: Cartridge; // ROM + external RAM + memory-bank controller
-  private readonly vram = new Uint8Array(0x2000);
-  private readonly wram = new Uint8Array(0x2000);
+  private readonly vram = new Uint8Array(0x4000); // 2 banks (CGB); DMG uses bank 0
+  private readonly wram = new Uint8Array(0x8000); // 8 banks (CGB); DMG uses 0+1
   private readonly oam = new Uint8Array(0xa0);
   private readonly hram = new Uint8Array(0x7f);
   private readonly io = new Uint8Array(0x80);
   private ie = 0; // 0xFFFF interrupt-enable
+
+  // ── Game Boy Color state ────────────────────────────────────────────────────
+  readonly cgb: boolean; // running a CGB-aware cartridge in color mode
+  private vramBank = 0; // VBK (0xFF4F) — selects VRAM bank 0/1
+  private wramBank = 1; // SVBK (0xFF70) — WRAM bank at 0xD000 (1–7)
+  private doubleSpeed = false; // KEY1 current speed
+  private speedSwitchArmed = false; // KEY1 bit0 — STOP performs the switch
+  // CGB palette RAM: 8 palettes × 4 colors × 2 bytes (BGR555), + decoded caches.
+  private readonly bgPalRam = new Uint8Array(64);
+  private readonly objPalRam = new Uint8Array(64);
+  private readonly bgPalRgb = new Int32Array(32); // packed 0xRRGGBB per color slot
+  private readonly objPalRgb = new Int32Array(32);
+  private bgPalIndex = 0;
+  private bgPalAutoInc = false;
+  private objPalIndex = 0;
+  private objPalAutoInc = false;
+  // HDMA/GDMA (VRAM DMA).
+  private hdmaSrc = 0;
+  private hdmaDst = 0;
+  private hdmaRemaining = 0; // bytes still to transfer in an active H-blank DMA
+  private hdmaActive = false;
+  private readonly scanBgPriority = new Uint8Array(GB_W); // CGB BG-to-OAM priority bit
 
   // ── Timer state ──────────────────────────────────────────────────────────
   private divCounter = 0; // internal 16-bit counter; DIV is its high byte
@@ -888,6 +935,7 @@ export class GameBoy {
 
   constructor(rom: Uint8Array, apu: Apu | null = null) {
     this.cart = new Cartridge(rom);
+    this.cgb = this.cart.cgb && process.env.GB_MODE !== 'dmg';
     this.apu = apu;
     this.reset();
   }
@@ -909,7 +957,7 @@ export class GameBoy {
 
   /** Initialise post-boot state (skips the copyrighted Nintendo boot ROM). */
   private reset(): void {
-    this.a = 0x01;
+    this.a = this.cgb ? 0x11 : 0x01; // CGB BIOS leaves A=0x11 (games detect Color via this)
     this.f = 0xb0;
     this.b = 0x00;
     this.c = 0x13;
@@ -943,6 +991,25 @@ export class GameBoy {
     this.io[GameBoy.WX] = 0x00;
     this.divCounter = 0xabcc;
     this.ie = 0x00;
+
+    // CGB post-boot state. Palette RAM powers on as all-white so a game that
+    // reads before writing sees white rather than black.
+    this.vramBank = 0;
+    this.wramBank = 1;
+    this.doubleSpeed = false;
+    this.speedSwitchArmed = false;
+    this.hdmaActive = false;
+    this.hdmaRemaining = 0;
+    this.bgPalIndex = 0;
+    this.objPalIndex = 0;
+    this.bgPalAutoInc = false;
+    this.objPalAutoInc = false;
+    this.bgPalRam.fill(0xff);
+    this.objPalRam.fill(0xff);
+    for (let i = 0; i < 32; i += 1) {
+      this.bgPalRgb[i] = cgbColorPacked(0x7fff);
+      this.objPalRgb[i] = cgbColorPacked(0x7fff);
+    }
   }
 
   // ── Joypad input ─────────────────────────────────────────────────────────
@@ -981,20 +1048,38 @@ export class GameBoy {
   read8(addr: number): number {
     addr &= 0xffff;
     if (addr < 0x8000) return this.cart.readRom(addr);
-    if (addr < 0xa000) return this.vram[addr - 0x8000]!;
+    if (addr < 0xa000) return this.vram[this.vramBank * 0x2000 + (addr - 0x8000)]!;
     if (addr < 0xc000) return this.cart.readRam(addr);
-    if (addr < 0xe000) return this.wram[addr - 0xc000]!;
-    if (addr < 0xfe00) return this.wram[addr - 0xe000]!; // echo RAM
+    if (addr < 0xd000) return this.wram[addr - 0xc000]!; // bank 0
+    if (addr < 0xe000) return this.wram[this.wramBank * 0x1000 + (addr - 0xd000)]!;
+    if (addr < 0xfe00) return this.readEchoWram(addr - 0x2000); // echo RAM
     if (addr < 0xfea0) return this.oam[addr - 0xfe00]!;
     if (addr < 0xff00) return 0xff; // unusable
     if (addr < 0xff80) {
       const reg = addr - 0xff00;
       if (reg === GameBoy.P1) return this.readJoypad();
       if (reg === 0x26 && this.apu) return this.apu.readNr52(); // NR52 channel status
+      if (this.cgb) {
+        switch (reg) {
+          case 0x4d: return (this.doubleSpeed ? 0x80 : 0) | (this.speedSwitchArmed ? 0x01 : 0) | 0x7e; // KEY1
+          case 0x4f: return this.vramBank | 0xfe; // VBK
+          case 0x55: return this.hdmaActive ? (((this.hdmaRemaining >> 4) - 1) & 0x7f) : 0xff; // HDMA5
+          case 0x69: return this.bgPalRam[this.bgPalIndex]!; // BCPD
+          case 0x6b: return this.objPalRam[this.objPalIndex]!; // OCPD
+          case 0x70: return this.wramBank | 0xf8; // SVBK
+          default: break;
+        }
+      }
       return this.io[reg]!;
     }
     if (addr < 0xffff) return this.hram[addr - 0xff80]!;
     return this.ie;
+  }
+
+  /** Echo-RAM read at the already-de-mirrored address (0xC000–0xDDFF). */
+  private readEchoWram(a: number): number {
+    if (a < 0xd000) return this.wram[a - 0xc000]!;
+    return this.wram[this.wramBank * 0x1000 + (a - 0xd000)]!;
   }
 
   private read16(addr: number): number {
@@ -1009,19 +1094,26 @@ export class GameBoy {
       return;
     }
     if (addr < 0xa000) {
-      this.vram[addr - 0x8000] = value;
+      this.vram[this.vramBank * 0x2000 + (addr - 0x8000)] = value;
       return;
     }
     if (addr < 0xc000) {
       this.cart.writeRam(addr, value);
       return;
     }
+    if (addr < 0xd000) {
+      this.wram[addr - 0xc000] = value; // bank 0
+      return;
+    }
     if (addr < 0xe000) {
-      this.wram[addr - 0xc000] = value;
+      this.wram[this.wramBank * 0x1000 + (addr - 0xd000)] = value;
       return;
     }
     if (addr < 0xfe00) {
-      this.wram[addr - 0xe000] = value; // echo RAM
+      // Echo RAM mirrors 0xC000–0xDDFF.
+      const a = addr - 0x2000;
+      if (a < 0xd000) this.wram[a - 0xc000] = value;
+      else this.wram[this.wramBank * 0x1000 + (a - 0xd000)] = value;
       return;
     }
     if (addr < 0xfea0) {
@@ -1076,8 +1168,82 @@ export class GameBoy {
         this.io[reg] = (value & 0xf8) | (this.io[reg]! & 0x07);
         return;
       default:
+        if (this.cgb && this.cgbIoWrite(reg, value)) return;
         this.io[reg] = value;
     }
+  }
+
+  /** CGB-only IO registers. Returns true if the write was consumed. */
+  private cgbIoWrite(reg: number, value: number): boolean {
+    switch (reg) {
+      case 0x4d: // KEY1 — arm a speed switch (performed by the next STOP)
+        this.speedSwitchArmed = (value & 0x01) !== 0;
+        return true;
+      case 0x4f: // VBK — VRAM bank select
+        this.vramBank = value & 0x01;
+        this.io[reg] = value | 0xfe;
+        return true;
+      case 0x51: this.hdmaSrc = (this.hdmaSrc & 0x00ff) | (value << 8); return true; // HDMA1 src hi
+      case 0x52: this.hdmaSrc = (this.hdmaSrc & 0xff00) | (value & 0xf0); return true; // HDMA2 src lo
+      case 0x53: this.hdmaDst = (this.hdmaDst & 0x00ff) | ((value & 0x1f) << 8); return true; // HDMA3 dst hi
+      case 0x54: this.hdmaDst = (this.hdmaDst & 0xff00) | (value & 0xf0); return true; // HDMA4 dst lo
+      case 0x55: this.startHdma(value); return true; // HDMA5 — length/mode/start
+      case 0x68: this.bgPalIndex = value & 0x3f; this.bgPalAutoInc = (value & 0x80) !== 0; return true; // BCPS
+      case 0x69: this.writePalette(this.bgPalRam, this.bgPalRgb, 'bg', value); return true; // BCPD
+      case 0x6a: this.objPalIndex = value & 0x3f; this.objPalAutoInc = (value & 0x80) !== 0; return true; // OCPS
+      case 0x6b: this.writePalette(this.objPalRam, this.objPalRgb, 'obj', value); return true; // OCPD
+      case 0x70: // SVBK — WRAM bank select
+        this.wramBank = (value & 0x07) || 1;
+        this.io[reg] = value;
+        return true;
+      default:
+        return false;
+    }
+  }
+
+  /** Write a CGB palette byte, refresh the decoded color, and auto-increment. */
+  private writePalette(ram: Uint8Array, rgb: Int32Array, which: 'bg' | 'obj', value: number): void {
+    const idx = which === 'bg' ? this.bgPalIndex : this.objPalIndex;
+    ram[idx] = value;
+    const slot = idx >> 1;
+    rgb[slot] = cgbColorPacked(ram[slot * 2]! | (ram[slot * 2 + 1]! << 8));
+    if (which === 'bg') {
+      if (this.bgPalAutoInc) this.bgPalIndex = (idx + 1) & 0x3f;
+    } else if (this.objPalAutoInc) {
+      this.objPalIndex = (idx + 1) & 0x3f;
+    }
+  }
+
+  /** HDMA5 write: kick a general (immediate) or H-blank VRAM DMA. */
+  private startHdma(value: number): void {
+    const length = ((value & 0x7f) + 1) * 16;
+    if ((value & 0x80) === 0) {
+      // General-purpose DMA: transfer everything immediately.
+      if (this.hdmaActive) { this.hdmaActive = false; return; } // bit7=0 also cancels an active H-blank DMA
+      this.hdmaTransfer(length);
+    } else {
+      // H-blank DMA: 16 bytes per H-blank, starting now.
+      this.hdmaActive = true;
+      this.hdmaRemaining = length;
+    }
+  }
+
+  /** Copy `bytes` from the HDMA source into VRAM (current bank), advancing both. */
+  private hdmaTransfer(bytes: number): void {
+    const base = this.vramBank * 0x2000;
+    for (let i = 0; i < bytes; i += 1) {
+      this.vram[base + ((this.hdmaDst + i) & 0x1fff)] = this.read8((this.hdmaSrc + i) & 0xffff);
+    }
+    this.hdmaSrc = (this.hdmaSrc + bytes) & 0xffff;
+    this.hdmaDst = (this.hdmaDst + bytes) & 0x1fff;
+  }
+
+  /** One H-blank's worth of an active H-blank DMA (called from the PPU). */
+  private hdmaHblankStep(): void {
+    if (!this.hdmaActive) return;
+    this.hdmaTransfer(16);
+    this.hdmaRemaining -= 16;
+    if (this.hdmaRemaining <= 0) this.hdmaActive = false;
   }
 
   // ── Interrupts ───────────────────────────────────────────────────────────
@@ -1193,6 +1359,7 @@ export class GameBoy {
         if (mode !== 0) {
           this.setMode(0);
           this.renderScanline(ly); // render once when entering HBlank
+          this.hdmaHblankStep(); // CGB H-blank VRAM DMA advances here
         }
       }
     }
@@ -1204,6 +1371,13 @@ export class GameBoy {
     const rowBase = ly * GB_W;
     // Per-pixel BG color INDEX (0..3, pre-palette) for sprite priority decisions.
     const bgIndex = this.scanBgIndex;
+
+    if (this.cgb) {
+      // In CGB the BG is always drawn; LCDC bit0 instead controls master priority.
+      this.renderBgWindowCgb(ly, lcdc, bgIndex, this.scanBgPriority);
+      if (lcdc & 0x02) this.renderSpritesCgb(ly, lcdc, bgIndex, this.scanBgPriority);
+      return;
+    }
 
     if (lcdc & 0x01) {
       this.renderBgWindow(ly, lcdc, bgIndex);
@@ -1335,6 +1509,113 @@ export class GameBoy {
         this.frame[o] = r;
         this.frame[o + 1] = g;
         this.frame[o + 2] = b;
+        this.frame[o + 3] = 0xff;
+      }
+    }
+  }
+
+  // ── CGB rendering (color palettes + per-tile attributes + master priority) ──
+  private renderBgWindowCgb(ly: number, lcdc: number, bgIndex: Uint8Array, bgPrio: Uint8Array): void {
+    const scx = this.io[GameBoy.SCX]!;
+    const scy = this.io[GameBoy.SCY]!;
+    const wy = this.io[GameBoy.WY]!;
+    const wx = this.io[GameBoy.WX]!;
+    const windowEnabled = (lcdc & 0x20) !== 0 && ly >= wy;
+    const tileDataUnsigned = (lcdc & 0x10) !== 0;
+    const bgMapBase = (lcdc & 0x08) ? 0x1c00 : 0x1800;
+    const winMapBase = (lcdc & 0x40) ? 0x1c00 : 0x1800;
+    const rowBase = ly * GB_W;
+
+    for (let x = 0; x < GB_W; x += 1) {
+      let mapBase: number;
+      let px: number;
+      let py: number;
+      if (windowEnabled && x >= wx - 7) {
+        mapBase = winMapBase;
+        px = x - (wx - 7);
+        py = ly - wy;
+      } else {
+        mapBase = bgMapBase;
+        px = (x + scx) & 0xff;
+        py = (ly + scy) & 0xff;
+      }
+      const mapIdx = mapBase + (py >> 3) * 32 + (px >> 3);
+      const tileNum = this.vram[mapIdx]!; // map is always in bank 0
+      const attr = this.vram[0x2000 + mapIdx]!; // attributes live in bank 1
+      const palNum = attr & 0x07;
+      const tileBank = (attr & 0x08) ? 0x2000 : 0;
+      const xFlip = (attr & 0x20) !== 0;
+      const yFlip = (attr & 0x40) !== 0;
+      const priority = (attr & 0x80) !== 0;
+
+      let tileAddr: number;
+      if (tileDataUnsigned) tileAddr = tileNum * 16;
+      else tileAddr = 0x1000 + ((tileNum << 24) >> 24) * 16;
+      const fineY = yFlip ? 7 - (py & 0x07) : py & 0x07;
+      const lo = this.vram[tileBank + tileAddr + fineY * 2]!;
+      const hi = this.vram[tileBank + tileAddr + fineY * 2 + 1]!;
+      const bit = xFlip ? (px & 0x07) : 7 - (px & 0x07);
+      const colorIdx = ((lo >> bit) & 1) | (((hi >> bit) & 1) << 1);
+      bgIndex[x] = colorIdx;
+      bgPrio[x] = priority ? 1 : 0;
+      const packed = this.bgPalRgb[palNum * 4 + colorIdx]!;
+      const o = (rowBase + x) * 4;
+      this.frame[o] = (packed >> 16) & 0xff;
+      this.frame[o + 1] = (packed >> 8) & 0xff;
+      this.frame[o + 2] = packed & 0xff;
+      this.frame[o + 3] = 0xff;
+    }
+  }
+
+  private renderSpritesCgb(ly: number, lcdc: number, bgIndex: Uint8Array, bgPrio: Uint8Array): void {
+    const spriteHeight = (lcdc & 0x04) ? 16 : 8;
+    const rowBase = ly * GB_W;
+    const bgMaster = (lcdc & 0x01) !== 0; // CGB: BG can keep priority over OBJ
+
+    // Up to 10 sprites per line; CGB resolves ties by OAM index (lower = on top),
+    // so draw highest index first and let lower indices overwrite.
+    const visible: number[] = [];
+    for (let i = 0; i < 40 && visible.length < 10; i += 1) {
+      const oy = this.oam[i * 4]! - 16;
+      if (ly >= oy && ly < oy + spriteHeight) visible.push(i);
+    }
+    visible.sort((a, b) => b - a);
+
+    for (const i of visible) {
+      const oy = this.oam[i * 4]! - 16;
+      const ox = this.oam[i * 4 + 1]! - 8;
+      let tile = this.oam[i * 4 + 2]!;
+      const attr = this.oam[i * 4 + 3]!;
+      const flipX = (attr & 0x20) !== 0;
+      const flipY = (attr & 0x40) !== 0;
+      const behindBg = (attr & 0x80) !== 0;
+      const palNum = attr & 0x07;
+      const tileBank = (attr & 0x08) ? 0x2000 : 0;
+
+      let line = ly - oy;
+      if (flipY) line = spriteHeight - 1 - line;
+      if (spriteHeight === 16) {
+        tile &= 0xfe;
+        if (line >= 8) { tile += 1; line -= 8; }
+      }
+      const tileAddr = tileBank + tile * 16 + line * 2;
+      const lo = this.vram[tileAddr]!;
+      const hi = this.vram[tileAddr + 1]!;
+
+      for (let px = 0; px < 8; px += 1) {
+        const x = ox + px;
+        if (x < 0 || x >= GB_W) continue;
+        const bit = flipX ? px : 7 - px;
+        const colorIdx = ((lo >> bit) & 1) | (((hi >> bit) & 1) << 1);
+        if (colorIdx === 0) continue; // transparent
+        // Priority: with BG master on, a BG pixel wins when either the BG tile's
+        // priority bit or the sprite's behind-BG bit is set and BG color != 0.
+        if (bgMaster && (bgPrio[x]! === 1 || behindBg) && bgIndex[x]! !== 0) continue;
+        const packed = this.objPalRgb[palNum * 4 + colorIdx]!;
+        const o = (rowBase + x) * 4;
+        this.frame[o] = (packed >> 16) & 0xff;
+        this.frame[o + 1] = (packed >> 8) & 0xff;
+        this.frame[o + 2] = packed & 0xff;
         this.frame[o + 3] = 0xff;
       }
     }
@@ -1672,7 +1953,10 @@ export class GameBoy {
       }
 
       // ── 0x10-0x1F ──
-      case 0x10: this.fetch8(); return 4; // STOP (treat as 2-byte NOP)
+      case 0x10: // STOP — also performs a CGB speed switch when armed via KEY1
+        this.fetch8();
+        if (this.speedSwitchArmed) { this.doubleSpeed = !this.doubleSpeed; this.speedSwitchArmed = false; }
+        return 4;
       case 0x11: this.de = this.fetch16(); return 12;
       case 0x12: this.write8(this.de, this.a); return 8;
       case 0x13: this.de = (this.de + 1) & 0xffff; return 8;
@@ -1894,16 +2178,20 @@ export class GameBoy {
    */
   runFrame(): void {
     this.frameReady = false;
-    let budget = 70224;
-    let guard = 2_000_000; // safety bound against a runaway loop
+    // CGB double-speed runs the CPU/timers at 2× while the PPU dot clock and the
+    // APU stay at the base rate, so a frame is twice as many CPU cycles but the
+    // PPU/APU advance by half (cycles are always multiples of 4, so >>1 is exact).
+    const speedShift = this.doubleSpeed ? 1 : 0;
+    let budget = 70224 << speedShift;
+    let guard = 4_000_000; // safety bound against a runaway loop
     while (budget > 0 && guard-- > 0) {
       // EI enables interrupts AFTER the instruction following it.
       const enableImeAfter = this.imePending;
 
       const cycles = this.step();
       this.stepTimers(cycles);
-      this.stepPpu(cycles);
-      if (this.apu) this.apu.step(cycles);
+      this.stepPpu(cycles >> speedShift);
+      if (this.apu) this.apu.step(cycles >> speedShift);
       budget -= cycles;
 
       if (enableImeAfter) {
@@ -1914,8 +2202,8 @@ export class GameBoy {
       const intCycles = this.serviceInterrupts();
       if (intCycles > 0) {
         this.stepTimers(intCycles);
-        this.stepPpu(intCycles);
-        if (this.apu) this.apu.step(intCycles);
+        this.stepPpu(intCycles >> speedShift);
+        if (this.apu) this.apu.step(intCycles >> speedShift);
         budget -= intCycles;
       }
 
@@ -2186,6 +2474,7 @@ function resolveRom(): { rom: Uint8Array; title: string; path: string | null } {
   const sel = (process.argv[2] ?? process.env.GB_ROM ?? 'game').trim();
   if (sel === 'game' || sel === 'libbet') return { rom: loadLibbet(), title: 'Libbet and the Magic Floor', path: null };
   if (sel === 'acid2') return { rom: loadAcid2(), title: 'dmg-acid2', path: null };
+  if (sel === 'cgbacid2') return { rom: loadCgbAcid2(), title: 'cgb-acid2', path: null };
   const file = readFileSync(sel);
   const rom = new Uint8Array(file.buffer, file.byteOffset, file.byteLength);
   return { rom, title: romHeaderTitle(rom) || basename(sel), path: sel };

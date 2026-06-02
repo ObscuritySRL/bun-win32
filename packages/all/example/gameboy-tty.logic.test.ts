@@ -9,8 +9,9 @@
  * Run: bun run packages/all/example/gameboy-tty.logic.test.ts
  */
 import { Term } from './_term';
+import { loadCgbAcid2 } from './gameboy-cgb-rom';
 import { loadAcid2 } from './gameboy-rom';
-import { GameBoy, blitToTerm, __mapperForTest } from './gameboy-tty';
+import { GameBoy, blitToTerm, cgbColor, __mapperForTest } from './gameboy-tty';
 
 let failures = 0;
 function check(name: string, cond: boolean): void {
@@ -124,6 +125,33 @@ function makeFakeRom(type: number, romBanks: number, ramCode: number): Uint8Arra
   check('battery RAM round-trips through save/load', gb2.read8(0xa000) === 0x42 && gb2.read8(0xa123) === 0x99);
   const gb3 = new GameBoy(makeFakeRom(0x00, 2, 0)); // ROM-only: no battery
   check('ROM-only cart reports no save data', gb3.getSaveData() === null);
+}
+
+// ── Game Boy Color ─────────────────────────────────────────────────────────────
+{
+  const dmg = new GameBoy(loadAcid2());
+  check('DMG ROM stays in DMG mode (cgb=false)', dmg.cgb === false);
+  const cgb = new GameBoy(loadCgbAcid2());
+  check('CGB-only ROM enables color mode (cgb=true)', cgb.cgb === true);
+}
+{
+  const white = cgbColor(0x7fff); // r=g=b=31
+  const black = cgbColor(0x0000);
+  const red = cgbColor(0x001f); // r=31, g=b=0
+  check('cgb white maps near-white', white[0] > 230 && white[1] > 230 && white[2] > 230);
+  check('cgb black maps near-black', black[0] < 20 && black[1] < 20 && black[2] < 20);
+  check('cgb pure red is red-dominant', red[0] > red[1] && red[0] > red[2]);
+}
+{
+  // The CGB acid2 test renders a non-flat color image (exercises palettes/attrs).
+  const gb = new GameBoy(loadCgbAcid2());
+  for (let i = 0; i < 30; i += 1) gb.runFrame();
+  let colored = 0;
+  for (let i = 0; i < gb.frame.length; i += 4) {
+    const r = gb.frame[i]!, g = gb.frame[i + 1]!, b = gb.frame[i + 2]!;
+    if (Math.abs(r - g) > 24 || Math.abs(g - b) > 24 || Math.abs(r - b) > 24) colored += 1; // not greyscale
+  }
+  check('cgb-acid2 produces genuinely colored pixels', colored > 500);
 }
 
 console.log(failures === 0 ? '\nALL PASS' : `\n${failures} FAILURE(S)`);
