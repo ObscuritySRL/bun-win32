@@ -86,6 +86,7 @@ packages/all/screenshots/*
 !packages/all/screenshots/sph3d.png
 !packages/all/screenshots/webcam.png
 !packages/all/screenshots/clawd.png
+!packages/all/screenshots/claude-spark.png
 !packages/all/screenshots/galaxy-tty.png
 !packages/all/screenshots/torus-knot.png
 !packages/all/screenshots/blackhole-tty.png

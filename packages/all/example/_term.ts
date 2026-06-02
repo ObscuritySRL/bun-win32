@@ -45,6 +45,10 @@ const RESET = `${ESC}[0m`;
 const HIDE_CURSOR = `${ESC}[?25l`;
 const SHOW_CURSOR = `${ESC}[?25h`;
 const ALT_SCREEN_ON = `${ESC}[?1049h`;
+// xterm mouse: 1003 = report ALL motion (hover, no button needed), 1006 = SGR
+// extended coords (so columns/rows >223 work). Enabled only when a demo opts in.
+const MOUSE_ON = `${ESC}[?1003h${ESC}[?1006h`;
+const MOUSE_OFF = `${ESC}[?1003l${ESC}[?1006l`;
 const ALT_SCREEN_OFF = `${ESC}[?1049l`;
 const AUTOWRAP_OFF = `${ESC}[?7l`;
 const AUTOWRAP_ON = `${ESC}[?7h`;
@@ -275,6 +279,16 @@ export class Term {
   readonly aspect: number; // W / H
   readonly buf: Uint8Array; // RGB, length W*H*3
 
+  // Mouse state (only populated when the demo opts in via `mouse: true`; updated
+  // from xterm SGR mouse reports parsed off stdin). Coordinates are in PIXELS.
+  mouseX = -1;
+  mouseY = -1;
+  mouseDown = false; // left button held
+  mouseInside = false;
+  mouseActive = false; // has any mouse event been seen this Term
+  mouseSeq = 0; // increments on every mouse event (demos detect movement/idle via this)
+  wheel = 0; // accumulated wheel ticks (+up / −down); demo may read and reset
+
   private prevTop: Int32Array;
   private prevBot: Int32Array;
   private firstFrame = true;
@@ -498,10 +512,11 @@ interface ConsoleState {
   savedMode: number;
   savedCp: number;
   restored: boolean;
+  mouse: boolean;
 }
 let consoleState: ConsoleState | null = null;
 
-const setupConsole = (title?: string): void => {
+const setupConsole = (title?: string, mouse = false): void => {
   Kernel32.Preload(['GetStdHandle', 'GetConsoleMode', 'SetConsoleMode', 'GetConsoleOutputCP', 'SetConsoleOutputCP', 'SetConsoleTitleW', 'GetConsoleScreenBufferInfo']);
   const handle = Kernel32.GetStdHandle(STD_HANDLE.OUTPUT);
   const modeBuf = Buffer.alloc(4);
@@ -510,14 +525,14 @@ const setupConsole = (title?: string): void => {
   const savedCp = Kernel32.GetConsoleOutputCP();
   Kernel32.SetConsoleOutputCP(CP_UTF8);
   if (title) Kernel32.SetConsoleTitleW(Buffer.from(`${title}\0`, 'utf16le').ptr);
-  consoleState = { handle, savedMode: gotMode, savedCp, restored: false };
-  process.stdout.write(ALT_SCREEN_ON + HIDE_CURSOR + AUTOWRAP_OFF + CLEAR + HOME);
+  consoleState = { handle, savedMode: gotMode, savedCp, restored: false, mouse };
+  process.stdout.write(ALT_SCREEN_ON + HIDE_CURSOR + AUTOWRAP_OFF + (mouse ? MOUSE_ON : '') + CLEAR + HOME);
 };
 
 const restoreConsole = (): void => {
   if (!consoleState || consoleState.restored) return;
   consoleState.restored = true;
-  process.stdout.write(RESET + AUTOWRAP_ON + SHOW_CURSOR + ALT_SCREEN_OFF);
+  process.stdout.write((consoleState.mouse ? MOUSE_OFF : '') + RESET + AUTOWRAP_ON + SHOW_CURSOR + ALT_SCREEN_OFF);
   Kernel32.SetConsoleMode(consoleState.handle, consoleState.savedMode);
   Kernel32.SetConsoleOutputCP(consoleState.savedCp);
 };
@@ -565,6 +580,13 @@ export interface DemoSpec {
   drawHud?: boolean;
   /** Handle a key press in live mode (lowercased; 'esc','space','up'…). */
   onKey?: (key: string, t: Term) => void;
+  /**
+   * Enable xterm mouse reporting (hover + buttons + wheel). When true, the live
+   * loop populates t.mouseX/mouseY (pixels), t.mouseDown, t.mouseInside,
+   * t.mouseActive, t.mouseSeq and t.wheel. Off by default so other demos leave
+   * the terminal's normal mouse selection/scroll alone.
+   */
+  mouse?: boolean;
 }
 
 const drawHud = (t: Term, spec: DemoSpec, fps: number, ms: number, extra?: string): void => {
@@ -658,7 +680,7 @@ export async function runDemo(spec: DemoSpec): Promise<void> {
   }
 
   // ── Live ────────────────────────────────────────────────────────────────────
-  setupConsole(spec.title);
+  setupConsole(spec.title, spec.mouse === true);
   const { cols, rows } = detectSize();
   let t = new Term(cols, rows);
   await spec.init?.(t);
@@ -669,32 +691,61 @@ export async function runDemo(spec: DemoSpec): Promise<void> {
     running = false;
   };
 
-  // Raw-mode key handling when attached to a TTY.
+  const ARROWS: Record<string, string> = { A: 'up', B: 'down', C: 'right', D: 'left' };
+  // Apply one SGR mouse report `\x1b[<b;col;row(M|m)` to the current Term.
+  const applyMouse = (b: number, col: number, row: number, release: boolean): void => {
+    const motion = (b & 32) !== 0;
+    const wheel = (b & 64) !== 0;
+    const button = b & 3;
+    t.mouseX = Math.max(0, Math.min(t.W - 1, col - 1)); // 1 cell = 1 px wide
+    t.mouseY = Math.max(0, Math.min(t.H - 1, (row - 1) * 2)); // 1 cell = 2 px tall
+    t.mouseInside = true;
+    t.mouseActive = true;
+    t.mouseSeq++;
+    if (wheel) t.wheel += button === 0 ? 1 : -1;
+    else if (release) t.mouseDown = false;
+    else if (!motion) t.mouseDown = button === 0; // press
+  };
+
+  // Raw-mode key + mouse handling when attached to a TTY.
   const stdin = process.stdin;
   const onData = (data: Buffer): void => {
     const s = data.toString('latin1');
-    for (let i = 0; i < s.length; i++) {
+    let i = 0;
+    while (i < s.length) {
+      const ch = s[i];
       const code = s.charCodeAt(i);
-      if (code === 3 || s[i] === 'q' || s[i] === 'Q' || code === 27) {
-        // Ctrl-C / q / ESC (bare ESC; arrow keys send ESC[ … handled below)
-        if (code === 27 && s[i + 1] === '[') {
-          const k = s[i + 2];
-          const map: Record<string, string> = { A: 'up', B: 'down', C: 'right', D: 'left' };
-          if (map[k]) {
-            spec.onKey?.(map[k], t);
-            i += 2;
+      if (code === 27 && s[i + 1] === '[') {
+        // CSI: mouse (\x1b[<…M/m) or arrows (\x1b[A..D)
+        if (s[i + 2] === '<') {
+          const m = /^\x1b\[<(\d+);(\d+);(\d+)([Mm])/.exec(s.slice(i, i + 24));
+          if (m) {
+            applyMouse(+m[1], +m[2], +m[3], m[4] === 'm');
+            i += m[0].length;
             continue;
           }
         }
+        const arrow = ARROWS[s[i + 2]];
+        if (arrow) {
+          spec.onKey?.(arrow, t);
+          i += 3;
+          continue;
+        }
+        i += 2; // unknown CSI prefix — skip and keep parsing
+        continue;
+      }
+      if (code === 3 || ch === 'q' || ch === 'Q' || code === 27) {
         stop();
         return;
       }
-      if (s[i] === ' ') {
+      if (ch === ' ') {
         paused = !paused;
         spec.onKey?.('space', t);
+        i++;
         continue;
       }
-      spec.onKey?.(s[i].toLowerCase(), t);
+      spec.onKey?.(ch.toLowerCase(), t);
+      i++;
     }
   };
   let rawOn = false;

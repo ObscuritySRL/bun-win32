@@ -133,6 +133,7 @@
     "boids": "bun run example/boids.ts",
     "cam-filter": "bun run example/cam-filter.ts",
     "cinema": "bun run example/cinema.ts",
+    "claude-spark": "bun run example/claude-spark.ts",
     "clawd": "bun run example/clawd.ts",
     "cloth": "bun run example/cloth.ts",
     "clouds": "bun run example/clouds.ts",
