@@ -10,7 +10,7 @@
  */
 import { Term } from './_term';
 import { loadAcid2 } from './gameboy-rom';
-import { GameBoy, blitToTerm } from './gameboy-tty';
+import { GameBoy, blitToTerm, __mapperForTest } from './gameboy-tty';
 
 let failures = 0;
 function check(name: string, cond: boolean): void {
@@ -20,6 +20,16 @@ function check(name: string, cond: boolean): void {
     console.log(`FAIL  ${name}`);
     failures += 1;
   }
+}
+
+/** Build a minimal but valid cartridge header for direct read8/write8 tests. */
+function makeFakeRom(type: number, romBanks: number, ramCode: number): Uint8Array {
+  const rom = new Uint8Array(0x4000 * romBanks);
+  rom[0x147] = type;
+  rom[0x148] = Math.max(0, Math.ceil(Math.log2(romBanks / 2))); // banks = 2 << size
+  rom[0x149] = ramCode;
+  rom[0x100] = 0x00; // entry: NOP
+  return rom;
 }
 
 // ── Core boots a ROM and paints a non-blank framebuffer ────────────────────────
@@ -60,6 +70,60 @@ function check(name: string, cond: boolean): void {
   const isDown = buf.readInt32LE(4) !== 0;
   const vk = buf.readUInt16LE(10);
   check('INPUT_RECORD parses KEY_EVENT/down/VK_RIGHT at the right offsets', isKey && isDown && vk === 0x27);
+}
+
+// ── MBC bank math ──────────────────────────────────────────────────────────────
+{
+  const m = __mapperForTest(0x01, 31); // MBC1, 32 banks
+  m.write(0x2000, 0x00);
+  check('MBC1 bank 0 maps to 1', m.romBankFor(0x4000) === 1);
+}
+{
+  const m = __mapperForTest(0x01, 127); // MBC1, 128 banks
+  m.write(0x2000, 0x05);
+  m.write(0x4000, 0x02); // upper 2 bits = 0b10 → (2<<5)|5 = 0x45
+  check('MBC1 composes upper bank bits in mode 0', m.romBankFor(0x4000) === 0x45);
+}
+{
+  const m = __mapperForTest(0x1b, 511); // MBC5, 512 banks
+  m.write(0x2000, 0x00); // low byte
+  m.write(0x3000, 0x01); // bit 9 → bank 0x100
+  check('MBC5 builds a 9-bit ROM bank', m.romBankFor(0x4000) === 0x100);
+}
+{
+  const m = __mapperForTest(0x13, 127); // MBC3+RAM+BATTERY
+  const before = m.ramEnabled;
+  m.write(0x0000, 0x0a);
+  check('MBC3 RAM enable gates external RAM', !before && m.ramEnabled);
+}
+
+// ── MBC3 RTC ─────────────────────────────────────────────────────────────────
+{
+  const m = __mapperForTest(0x10, 127); // MBC3+TIMER+RAM+BATTERY
+  m.write(0x0000, 0x0a); // enable RAM/RTC
+  m.setRtcBaseSeconds(0);
+  m.write(0x4000, 0x08); // map RTC seconds register
+  m.advanceWallSeconds(65);
+  m.write(0x6000, 0x00);
+  m.write(0x6000, 0x01); // latch the live clock
+  check('MBC3 RTC latch freezes seconds (65 s → 5)', m.readRam(0xa000) === 5);
+}
+
+// ── Battery save round-trip ────────────────────────────────────────────────────
+{
+  const rom = makeFakeRom(0x03, 4, 3); // MBC1+RAM+BATTERY, 32 KiB RAM
+  const gb = new GameBoy(rom);
+  gb.write8(0x0000, 0x0a); // enable RAM
+  gb.write8(0xa000, 0x42);
+  gb.write8(0xa123, 0x99);
+  const save = gb.getSaveData();
+  check('battery cart yields save data', save !== null && save.length >= 0x8000);
+  const gb2 = new GameBoy(rom);
+  gb2.loadSaveData(save!);
+  gb2.write8(0x0000, 0x0a);
+  check('battery RAM round-trips through save/load', gb2.read8(0xa000) === 0x42 && gb2.read8(0xa123) === 0x99);
+  const gb3 = new GameBoy(makeFakeRom(0x00, 2, 0)); // ROM-only: no battery
+  check('ROM-only cart reports no save data', gb3.getSaveData() === null);
 }
 
 console.log(failures === 0 ? '\nALL PASS' : `\n${failures} FAILURE(S)`);

@@ -20,7 +20,7 @@
  */
 
 import { dlopen } from 'bun:ffi';
-import { readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { basename } from 'node:path';
 
 import { Kernel32, Xinput1_4 } from '../index';
@@ -523,6 +523,305 @@ export class Apu {
   }
 }
 
+// ════════════════════════════════════════════════════════════════════════════
+// Cartridge — the memory-bank controllers (MBC0/1/2/3/5), RTC, and battery RAM
+// ════════════════════════════════════════════════════════════════════════════
+//
+// Owns the ROM, external (cartridge) RAM, all bank registers, and — for MBC3+
+// TIMER carts — a host-wall-clock-backed real-time clock with the latch/halt/
+// day-carry semantics games like Pokémon Gold/Silver/Crystal depend on. The CPU
+// reaches it through readRom/readRam/writeRam/write; the front-end persists
+// getSaveData()/loadSaveData() to a .sav file for battery-backed carts.
+
+// MBC kinds.
+const MBC_NONE = 0;
+const MBC1 = 1;
+const MBC2 = 2;
+const MBC3 = 3;
+const MBC5 = 5;
+
+// External-RAM byte sizes by header code 0x149 (code 1 is unofficial 2 KiB).
+const RAM_SIZE_BYTES = [0, 0x800, 0x2000, 0x8000, 0x20000, 0x10000];
+
+interface CartType { kind: number; battery: boolean; rtc: boolean }
+
+/** Decode cartridge-type byte 0x147 → MBC kind + battery/RTC flags. */
+function decodeCartType(b: number): CartType {
+  switch (b) {
+    case 0x00: return { kind: MBC_NONE, battery: false, rtc: false };
+    case 0x01: return { kind: MBC1, battery: false, rtc: false };
+    case 0x02: return { kind: MBC1, battery: false, rtc: false };
+    case 0x03: return { kind: MBC1, battery: true, rtc: false };
+    case 0x05: return { kind: MBC2, battery: false, rtc: false };
+    case 0x06: return { kind: MBC2, battery: true, rtc: false };
+    case 0x08: return { kind: MBC_NONE, battery: false, rtc: false };
+    case 0x09: return { kind: MBC_NONE, battery: true, rtc: false };
+    case 0x0f: return { kind: MBC3, battery: true, rtc: true };
+    case 0x10: return { kind: MBC3, battery: true, rtc: true };
+    case 0x11: return { kind: MBC3, battery: false, rtc: false };
+    case 0x12: return { kind: MBC3, battery: false, rtc: false };
+    case 0x13: return { kind: MBC3, battery: true, rtc: false };
+    case 0x19: return { kind: MBC5, battery: false, rtc: false };
+    case 0x1a: return { kind: MBC5, battery: false, rtc: false };
+    case 0x1b: return { kind: MBC5, battery: true, rtc: false };
+    case 0x1c: return { kind: MBC5, battery: false, rtc: false };
+    case 0x1d: return { kind: MBC5, battery: false, rtc: false };
+    case 0x1e: return { kind: MBC5, battery: true, rtc: false };
+    default: return { kind: MBC1, battery: false, rtc: false }; // best-effort
+  }
+}
+
+export class Cartridge {
+  private readonly rom: Uint8Array;
+  private readonly eram: Uint8Array;
+  readonly kind: number;
+  readonly hasBattery: boolean;
+  readonly hasRtc: boolean;
+  private readonly romBankMask: number;
+  private readonly ramMask: number;
+
+  // Bank registers.
+  private romBank = 1; // current high-region (0x4000–0x7FFF) bank
+  private ramBank = 0; // current RAM bank, or RTC register index when ≥0x08 (MBC3)
+  private ramEnabled = false;
+  private mode = 0; // MBC1 banking mode: 0 = ROM, 1 = RAM/advanced
+
+  // RTC (MBC3+TIMER). The clock runs on injected wall seconds for testability.
+  private readonly nowSec: () => number;
+  private rtcBase = 0; // total RTC seconds represented at rtcAnchor
+  private rtcAnchor = 0; // nowSec() captured when rtcBase was set
+  private rtcHalt = false;
+  private rtcCarry = false;
+  private rtcLatched = { s: 0, m: 0, h: 0, d: 0, carry: false };
+  private rtcLatchArmed = false;
+
+  constructor(rom: Uint8Array, nowSec: () => number = () => Date.now() / 1000) {
+    this.rom = rom;
+    this.nowSec = nowSec;
+    const t = decodeCartType(rom[0x147] ?? 0);
+    this.kind = t.kind;
+    this.hasBattery = t.battery;
+    this.hasRtc = t.rtc;
+    const banks = 2 << (rom[0x148] ?? 0); // header ROM-size byte
+    this.romBankMask = Math.max(1, banks - 1);
+    const ramBytes = this.kind === MBC2 ? 0x200 : (RAM_SIZE_BYTES[rom[0x149] ?? 0] ?? 0);
+    this.eram = new Uint8Array(Math.max(ramBytes, this.kind === MBC2 ? 0x200 : 0));
+    this.ramMask = this.eram.length > 0 ? this.eram.length - 1 : 0;
+    this.rtcAnchor = this.nowSec();
+  }
+
+  // ── ROM reads ──────────────────────────────────────────────────────────────
+  readRom(addr: number): number {
+    if (addr < 0x4000) {
+      // Low region: usually bank 0, but MBC1 mode 1 banks it on ≥1 MiB carts.
+      let bank = 0;
+      if (this.kind === MBC1 && this.mode === 1) bank = (this.ramBank << 5) & this.romBankMask;
+      const off = bank * 0x4000 + addr;
+      return this.rom[off] ?? 0xff;
+    }
+    // High region 0x4000–0x7FFF.
+    let bank = this.romBank;
+    if (this.kind === MBC1) bank = ((this.ramBank << 5) | (this.romBank & 0x1f)) & this.romBankMask;
+    else bank &= this.romBankMask;
+    if (this.kind === MBC_NONE) bank = 1;
+    const off = bank * 0x4000 + (addr - 0x4000);
+    return this.rom[off] ?? 0xff;
+  }
+
+  /** The resolved ROM bank a CPU address currently reads from (test/debug aid). */
+  romBankFor(addr: number): number {
+    if (addr < 0x4000) {
+      if (this.kind === MBC1 && this.mode === 1) return (this.ramBank << 5) & this.romBankMask;
+      return 0;
+    }
+    if (this.kind === MBC_NONE) return 1;
+    if (this.kind === MBC1) return ((this.ramBank << 5) | (this.romBank & 0x1f)) & this.romBankMask;
+    return this.romBank & this.romBankMask;
+  }
+
+  get isRamEnabled(): boolean {
+    return this.ramEnabled;
+  }
+
+  // ── External RAM / RTC reads + writes ────────────────────────────────────────
+  readRam(addr: number): number {
+    if (!this.ramEnabled) return 0xff;
+    if (this.kind === MBC3 && this.ramBank >= 0x08 && this.ramBank <= 0x0c) return this.readRtc();
+    if (this.kind === MBC2) return (this.eram[(addr - 0xa000) & 0x1ff]! & 0x0f) | 0xf0;
+    if (this.eram.length === 0) return 0xff;
+    const bank = this.kind === MBC1 && this.mode === 0 ? 0 : this.ramBank;
+    return this.eram[(bank * 0x2000 + (addr - 0xa000)) & this.ramMask]!;
+  }
+
+  writeRam(addr: number, value: number): void {
+    if (!this.ramEnabled) return;
+    if (this.kind === MBC3 && this.ramBank >= 0x08 && this.ramBank <= 0x0c) { this.writeRtc(value); return; }
+    if (this.kind === MBC2) { this.eram[(addr - 0xa000) & 0x1ff] = value & 0x0f; return; }
+    if (this.eram.length === 0) return;
+    const bank = this.kind === MBC1 && this.mode === 0 ? 0 : this.ramBank;
+    this.eram[(bank * 0x2000 + (addr - 0xa000)) & this.ramMask] = value & 0xff;
+  }
+
+  // ── Bank-register writes (CPU writes to 0x0000–0x7FFF) ───────────────────────
+  write(addr: number, value: number): void {
+    value &= 0xff;
+    switch (this.kind) {
+      case MBC_NONE:
+        return;
+      case MBC1:
+        if (addr < 0x2000) this.ramEnabled = (value & 0x0f) === 0x0a;
+        else if (addr < 0x4000) { this.romBank = value & 0x1f; if (this.romBank === 0) this.romBank = 1; }
+        else if (addr < 0x6000) this.ramBank = value & 0x03;
+        else this.mode = value & 0x01;
+        return;
+      case MBC2:
+        // The address's bit 8 selects RAM-enable (clear) vs ROM-bank (set).
+        if (addr < 0x4000) {
+          if (addr & 0x0100) { this.romBank = (value & 0x0f) || 1; }
+          else this.ramEnabled = (value & 0x0f) === 0x0a;
+        }
+        return;
+      case MBC3:
+        if (addr < 0x2000) this.ramEnabled = (value & 0x0f) === 0x0a;
+        else if (addr < 0x4000) { this.romBank = value & 0x7f; if (this.romBank === 0) this.romBank = 1; }
+        else if (addr < 0x6000) this.ramBank = value & 0x0f; // 0–3 RAM, 0x08–0x0C RTC
+        else this.rtcLatch(value);
+        return;
+      case MBC5:
+        if (addr < 0x2000) this.ramEnabled = (value & 0x0f) === 0x0a;
+        else if (addr < 0x3000) this.romBank = (this.romBank & 0x100) | value; // low 8 bits
+        else if (addr < 0x4000) this.romBank = (this.romBank & 0xff) | ((value & 0x01) << 8); // bit 9
+        else if (addr < 0x6000) this.ramBank = value & 0x0f;
+        return;
+      default:
+        return;
+    }
+  }
+
+  // ── RTC internals ────────────────────────────────────────────────────────────
+  private liveSeconds(): number {
+    if (this.rtcHalt) return this.rtcBase;
+    return this.rtcBase + (this.nowSec() - this.rtcAnchor);
+  }
+
+  private rtcLatch(value: number): void {
+    // Writing 0 then 1 latches the live clock into the readable registers.
+    if (this.rtcLatchArmed && value === 1) {
+      let total = Math.floor(this.liveSeconds());
+      if (total < 0) total = 0;
+      const days = Math.floor(total / 86400);
+      this.rtcLatched = {
+        s: total % 60,
+        m: Math.floor(total / 60) % 60,
+        h: Math.floor(total / 3600) % 24,
+        d: days & 0x1ff,
+        carry: this.rtcCarry || days > 0x1ff,
+      };
+      if (days > 0x1ff) this.rtcCarry = true;
+    }
+    this.rtcLatchArmed = value === 0;
+  }
+
+  private readRtc(): number {
+    const r = this.rtcLatched;
+    switch (this.ramBank) {
+      case 0x08: return r.s;
+      case 0x09: return r.m;
+      case 0x0a: return r.h;
+      case 0x0b: return r.d & 0xff;
+      case 0x0c: return ((r.d >> 8) & 0x01) | (this.rtcHalt ? 0x40 : 0) | (r.carry ? 0x80 : 0);
+      default: return 0xff;
+    }
+  }
+
+  private writeRtc(value: number): void {
+    // Recompose total seconds from the (possibly just-written) component set.
+    const r = this.rtcLatched;
+    switch (this.ramBank) {
+      case 0x08: r.s = value % 60; break;
+      case 0x09: r.m = value % 60; break;
+      case 0x0a: r.h = value % 24; break;
+      case 0x0b: r.d = (r.d & 0x100) | (value & 0xff); break;
+      case 0x0c:
+        r.d = (r.d & 0xff) | ((value & 0x01) << 8);
+        this.rtcHalt = (value & 0x40) !== 0;
+        this.rtcCarry = (value & 0x80) !== 0;
+        r.carry = this.rtcCarry;
+        break;
+      default: return;
+    }
+    const total = r.s + r.m * 60 + r.h * 3600 + (r.d & 0x1ff) * 86400;
+    this.rtcBase = total;
+    this.rtcAnchor = this.nowSec();
+  }
+
+  // ── Battery persistence ──────────────────────────────────────────────────────
+  /** Serialize external RAM (+ RTC state for TIMER carts) for a .sav file. */
+  getSaveData(): Uint8Array | null {
+    if (!this.hasBattery) return null;
+    if (!this.hasRtc) return this.eram.slice();
+    const out = new Uint8Array(this.eram.length + 48);
+    out.set(this.eram, 0);
+    const dv = new DataView(out.buffer);
+    let o = this.eram.length;
+    // A compact RTC blob: base seconds, anchor wall seconds, halt, carry.
+    dv.setFloat64(o, this.rtcBase, true); o += 8;
+    dv.setFloat64(o, this.nowSec(), true); o += 8; // anchor = "now" at save time
+    dv.setUint8(o, this.rtcHalt ? 1 : 0); o += 1;
+    dv.setUint8(o, this.rtcCarry ? 1 : 0); o += 1;
+    return out;
+  }
+
+  /** Restore external RAM (+ RTC) from a previously-saved blob. */
+  loadSaveData(data: Uint8Array): void {
+    if (!this.hasBattery || data.length === 0) return;
+    const ramLen = Math.min(this.eram.length, this.hasRtc ? data.length - 18 : data.length);
+    this.eram.set(data.subarray(0, ramLen), 0);
+    if (this.hasRtc && data.length >= this.eram.length + 18) {
+      const dv = new DataView(data.buffer, data.byteOffset, data.byteLength);
+      let o = this.eram.length;
+      const savedBase = dv.getFloat64(o, true); o += 8;
+      const savedAnchor = dv.getFloat64(o, true); o += 8;
+      this.rtcHalt = dv.getUint8(o) !== 0; o += 1;
+      this.rtcCarry = dv.getUint8(o) !== 0; o += 1;
+      // Advance the clock by however long the game was off (unless halted).
+      const offline = this.rtcHalt ? 0 : Math.max(0, this.nowSec() - savedAnchor);
+      this.rtcBase = savedBase + offline;
+      this.rtcAnchor = this.nowSec();
+    }
+  }
+
+  // ── Test hooks ───────────────────────────────────────────────────────────────
+  setRtcBaseSeconds(s: number): void { this.rtcBase = s; this.rtcAnchor = this.nowSec(); this.rtcHalt = false; }
+}
+
+/** Test harness: a bare Cartridge over a synthetic ROM with an injectable clock. */
+export function __mapperForTest(typeByte: number, romBankMaskBanks: number, ramCode = 3): {
+  write(addr: number, value: number): void;
+  romBankFor(addr: number): number;
+  readRam(addr: number): number;
+  readonly ramEnabled: boolean;
+  setRtcBaseSeconds(s: number): void;
+  advanceWallSeconds(s: number): void;
+} {
+  // Build a minimal header so Cartridge sizes banks/RAM correctly.
+  const sizeCode = Math.max(0, Math.ceil(Math.log2((romBankMaskBanks + 1) / 2)));
+  const rom = new Uint8Array(0x4000 * (romBankMaskBanks + 1));
+  rom[0x147] = typeByte;
+  rom[0x148] = sizeCode;
+  rom[0x149] = ramCode;
+  let clock = 0;
+  const cart = new Cartridge(rom, () => clock);
+  return {
+    write: (addr, value) => cart.write(addr, value),
+    romBankFor: (addr) => cart.romBankFor(addr),
+    readRam: (addr) => cart.readRam(addr),
+    get ramEnabled() { return cart.isRamEnabled; },
+    setRtcBaseSeconds: (s) => cart.setRtcBaseSeconds(s),
+    advanceWallSeconds: (s) => { clock += s; },
+  };
+}
+
 export class GameBoy {
   // ── CPU registers ────────────────────────────────────────────────────────
   private a = 0;
@@ -541,23 +840,13 @@ export class GameBoy {
   private halted = false;
 
   // ── Memory ─────────────────────────────────────────────────────────────────
-  private readonly rom: Uint8Array; // full cartridge ROM
+  private readonly cart: Cartridge; // ROM + external RAM + memory-bank controller
   private readonly vram = new Uint8Array(0x2000);
   private readonly wram = new Uint8Array(0x2000);
   private readonly oam = new Uint8Array(0xa0);
   private readonly hram = new Uint8Array(0x7f);
   private readonly io = new Uint8Array(0x80);
   private ie = 0; // 0xFFFF interrupt-enable
-  // External cartridge RAM (MBC1) — 4 banks of 8 KiB is plenty for the showcase.
-  private readonly eram = new Uint8Array(0x8000);
-
-  // ── MBC state ────────────────────────────────────────────────────────────
-  private readonly mbcType: number;
-  private romBank = 1;
-  private ramBank = 0;
-  private ramEnabled = false;
-  private bankingMode = 0; // MBC1: 0 = ROM banking, 1 = RAM banking
-  private readonly romBankMask: number;
 
   // ── Timer state ──────────────────────────────────────────────────────────
   private divCounter = 0; // internal 16-bit counter; DIV is its high byte
@@ -598,14 +887,24 @@ export class GameBoy {
   private static readonly WX = 0x4b;
 
   constructor(rom: Uint8Array, apu: Apu | null = null) {
-    this.rom = rom;
+    this.cart = new Cartridge(rom);
     this.apu = apu;
-    this.mbcType = rom[0x147] ?? 0;
-    // ROM bank mask from the header ROM-size byte (0x148): banks = 2 << size.
-    const sizeCode = rom[0x148] ?? 0;
-    const banks = 2 << sizeCode;
-    this.romBankMask = Math.max(1, banks - 1);
     this.reset();
+  }
+
+  /** True for battery-backed carts (front-end persists a .sav for these). */
+  get hasBattery(): boolean {
+    return this.cart.hasBattery;
+  }
+
+  /** Serialize battery RAM (+RTC) for a .sav file, or null if no battery. */
+  getSaveData(): Uint8Array | null {
+    return this.cart.getSaveData();
+  }
+
+  /** Restore battery RAM (+RTC) from a .sav blob. */
+  loadSaveData(data: Uint8Array): void {
+    this.cart.loadSaveData(data);
   }
 
   /** Initialise post-boot state (skips the copyrighted Nintendo boot ROM). */
@@ -681,21 +980,9 @@ export class GameBoy {
   // ── Memory access ──────────────────────────────────────────────────────────
   read8(addr: number): number {
     addr &= 0xffff;
-    if (addr < 0x4000) {
-      // Bank 0 — fixed (MBC1 advanced banking ignored for this showcase).
-      return this.rom[addr] ?? 0xff;
-    }
-    if (addr < 0x8000) {
-      const bank = this.mbcType === 0 ? 1 : this.romBank;
-      const off = bank * 0x4000 + (addr - 0x4000);
-      return this.rom[off] ?? 0xff;
-    }
+    if (addr < 0x8000) return this.cart.readRom(addr);
     if (addr < 0xa000) return this.vram[addr - 0x8000]!;
-    if (addr < 0xc000) {
-      if (!this.ramEnabled) return 0xff;
-      const off = this.ramBank * 0x2000 + (addr - 0xa000);
-      return this.eram[off & (this.eram.length - 1)]!;
-    }
+    if (addr < 0xc000) return this.cart.readRam(addr);
     if (addr < 0xe000) return this.wram[addr - 0xc000]!;
     if (addr < 0xfe00) return this.wram[addr - 0xe000]!; // echo RAM
     if (addr < 0xfea0) return this.oam[addr - 0xfe00]!;
@@ -718,7 +1005,7 @@ export class GameBoy {
     addr &= 0xffff;
     value &= 0xff;
     if (addr < 0x8000) {
-      this.mbcWrite(addr, value);
+      this.cart.write(addr, value);
       return;
     }
     if (addr < 0xa000) {
@@ -726,10 +1013,7 @@ export class GameBoy {
       return;
     }
     if (addr < 0xc000) {
-      if (this.ramEnabled) {
-        const off = this.ramBank * 0x2000 + (addr - 0xa000);
-        this.eram[off & (this.eram.length - 1)] = value;
-      }
+      this.cart.writeRam(addr, value);
       return;
     }
     if (addr < 0xe000) {
@@ -759,29 +1043,6 @@ export class GameBoy {
   private write16(addr: number, value: number): void {
     this.write8(addr, value & 0xff);
     this.write8(addr + 1, (value >> 8) & 0xff);
-  }
-
-  private mbcWrite(addr: number, value: number): void {
-    if (this.mbcType === 0) return; // MBC0: ROM is read-only
-    // Thin MBC1 implementation (enough for the optional second ROM).
-    if (addr < 0x2000) {
-      this.ramEnabled = (value & 0x0f) === 0x0a;
-    } else if (addr < 0x4000) {
-      let bank = value & 0x1f;
-      if (bank === 0) bank = 1; // bank 0 maps to 1 in the low region
-      this.romBank = (this.romBank & 0x60) | bank;
-      this.romBank &= this.romBankMask;
-      if (this.romBank === 0) this.romBank = 1;
-    } else if (addr < 0x6000) {
-      if (this.bankingMode === 0) {
-        this.romBank = ((this.romBank & 0x1f) | ((value & 0x03) << 5)) & this.romBankMask;
-        if (this.romBank === 0) this.romBank = 1;
-      } else {
-        this.ramBank = value & 0x03;
-      }
-    } else {
-      this.bankingMode = value & 0x01;
-    }
   }
 
   private ioWrite(reg: number, value: number): void {
@@ -1983,7 +2244,7 @@ function runCapture(gb: GameBoy, title: string): void {
 // ════════════════════════════════════════════════════════════════════════════
 
 async function main(): Promise<void> {
-  const { rom, title } = resolveRom();
+  const { rom, title, path } = resolveRom();
 
   const AUDIO_RATE = 48000;
   const pcm = audio.createPcmOutput({ sampleRate: AUDIO_RATE, channels: 2 });
@@ -1995,6 +2256,22 @@ async function main(): Promise<void> {
     runCapture(gb, title);
     return;
   }
+
+  // Battery saves live next to the ROM as <rom>.sav.
+  const savePath = path && gb.hasBattery ? `${path}.sav` : null;
+  if (savePath && existsSync(savePath)) {
+    try {
+      const f = readFileSync(savePath);
+      gb.loadSaveData(new Uint8Array(f.buffer, f.byteOffset, f.byteLength));
+    } catch { /* corrupt/locked save — start fresh rather than crash */ }
+  }
+  const writeSave = (): void => {
+    if (!savePath) return;
+    const data = gb.getSaveData();
+    if (data) {
+      try { writeFileSync(savePath, data); } catch { /* ignore transient IO errors */ }
+    }
+  };
 
   if (pcm.available) {
     pcm.setVolume(0.6);
@@ -2022,6 +2299,7 @@ async function main(): Promise<void> {
   const cleanup = (): void => {
     if (restored) return;
     restored = true;
+    writeSave(); // flush battery RAM before tearing down
     input.restore();
     process.stdout.write('\x1b[0m\x1b[?7h\x1b[?25h\x1b[?1049l');
     Kernel32.SetConsoleMode(hOut, savedOut >>> 0);
@@ -2055,12 +2333,20 @@ async function main(): Promise<void> {
   const t0 = Bun.nanoseconds();
   let fpsEma = 60;
   let prevFrame = Bun.nanoseconds();
+  let lastSaveMs = 0;
 
   while (running) {
     const frameStart = Bun.nanoseconds();
     if (durationMs > 0 && (frameStart - t0) / 1e6 >= durationMs) break;
     const dtMs = (frameStart - prevFrame) / 1e6;
     prevFrame = frameStart;
+
+    // Autosave battery RAM every ~5 s so a hard kill loses at most that much.
+    const elapsedTotalMs = (frameStart - t0) / 1e6;
+    if (savePath && elapsedTotalMs - lastSaveMs >= 5000) {
+      lastSaveMs = elapsedTotalMs;
+      writeSave();
+    }
     if (dtMs > 0) fpsEma = fpsEma * 0.9 + Math.min(999, 1000 / dtMs) * 0.1;
 
     // Live resize.
@@ -2076,8 +2362,12 @@ async function main(): Promise<void> {
     for (const vk of input.pressed) {
       if (vk === VK.M) muted = !muted;
       else if (vk === VK.P) paused = !paused;
-      else if (vk === VK.R) gb = new GameBoy(rom, apu);
-      else if (vk === VK.LBRACK) activePalette = (activePalette + DMG_PALETTES.length - 1) % DMG_PALETTES.length;
+      else if (vk === VK.R) {
+        // Soft reset, preserving battery RAM (the physical cart keeps its save).
+        const carry = gb.getSaveData();
+        gb = new GameBoy(rom, apu);
+        if (carry) gb.loadSaveData(carry);
+      } else if (vk === VK.LBRACK) activePalette = (activePalette + DMG_PALETTES.length - 1) % DMG_PALETTES.length;
       else if (vk === VK.RBRACK) activePalette = (activePalette + 1) % DMG_PALETTES.length;
     }
     input.pressed.length = 0;
