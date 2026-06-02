@@ -2542,6 +2542,10 @@ async function main(): Promise<void> {
   const { rom, title, path } = resolveRom();
 
   const AUDIO_RATE = 48000;
+  // Keep ~this many ~16.75 ms buffers queued in XAudio2 so frame-time jitter (a
+  // slow terminal repaint, GC) never drains the queue to silence (an underrun =
+  // a click/thud). ~6 buffers ≈ 100 ms of cushion — survives a ~60 ms stall.
+  const AUDIO_TARGET = 6;
   const pcm = audio.createPcmOutput({ sampleRate: AUDIO_RATE, channels: 2 });
   const apu = new Apu(AUDIO_RATE);
   let gb = new GameBoy(rom, apu);
@@ -2580,6 +2584,13 @@ async function main(): Promise<void> {
 
   if (pcm.available) {
     pcm.setVolume(0.6);
+    // Prime a cushion of audio BEFORE playback starts so the stream never opens
+    // starved (the first few frames of a game are silent anyway).
+    for (let i = 0; i < AUDIO_TARGET && gb.apu; i += 1) {
+      gb.runFrame();
+      const b = gb.apu.drain(AUDIO_RATE);
+      if (b.length) pcm.submit(b);
+    }
     pcm.start();
   }
 
@@ -2636,16 +2647,29 @@ async function main(): Promise<void> {
   const GB_FRAME_MS = 1000 / 59.7;
   const durationMs = Number(process.env.DEMO_DURATION_MS ?? 0); // headless live-loop smoke
   const t0 = Bun.nanoseconds();
-  let fpsEma = 60;
-  let prevFrame = Bun.nanoseconds();
+  let fpsEma = 60; // engine frame-production rate (work only, excludes the 59.7 Hz wait)
   let lastSaveMs = 0;
+  let nextDue = Bun.nanoseconds() / 1e6; // wall-clock ms the next emulated frame is due
+
+  // Stream one emulated frame's audio: submit while XAudio2 has queue headroom,
+  // otherwise leave the samples in the APU ring (NO discard → no clicks). When
+  // muted / no endpoint we still drain so the APU ring can't overflow.
+  const feedAudio = (): void => {
+    if (!gb.apu) return;
+    if (pcm.available && !muted) {
+      if (pcm.queued() < AUDIO_TARGET) {
+        const blk = gb.apu.drain(AUDIO_RATE);
+        if (blk.length) pcm.submit(blk);
+      }
+    } else {
+      gb.apu.drain(AUDIO_RATE);
+    }
+  };
 
   try {
   while (running) {
     const frameStart = Bun.nanoseconds();
     if (durationMs > 0 && (frameStart - t0) / 1e6 >= durationMs) break;
-    const dtMs = (frameStart - prevFrame) / 1e6;
-    prevFrame = frameStart;
 
     // Autosave battery RAM every ~5 s (non-blocking) so a hard kill loses little.
     const elapsedTotalMs = (frameStart - t0) / 1e6;
@@ -2653,7 +2677,6 @@ async function main(): Promise<void> {
       lastSaveMs = elapsedTotalMs;
       autoSave();
     }
-    if (dtMs > 0) fpsEma = fpsEma * 0.9 + Math.min(999, 1000 / dtMs) * 0.1;
 
     // Live resize.
     sz = detectSize();
@@ -2679,20 +2702,27 @@ async function main(): Promise<void> {
     }
     input.pressed.length = 0;
 
-    if (!paused) {
+    const nowMs = frameStart / 1e6;
+    if (paused) {
+      nextDue = nowMs; // hold the schedule while paused (no debt builds up)
+    } else if (turbo) {
+      // Fast-forward: a fixed burst of frames, audio discarded to avoid garble.
       gb.setButtons(readButtons(input));
-      const steps = turbo ? 6 : 1;
-      for (let s = 0; s < steps; s += 1) {
+      for (let s = 0; s < 6; s += 1) { gb.runFrame(); gb.apu?.drain(AUDIO_RATE); }
+      nextDue = nowMs;
+    } else {
+      // Real time: run as many emulated frames as wall-clock owes us — so audio
+      // is always produced at 59.7 Hz even if a terminal repaint is slow (the
+      // picture just frame-skips). Capped so a long stall can't spiral.
+      gb.setButtons(readButtons(input));
+      let ran = 0;
+      while (nowMs >= nextDue && ran < 8) {
         gb.runFrame();
-        if (gb.apu) {
-          if (pcm.available && !muted && !turbo && pcm.queued() < 4) {
-            const blk = gb.apu.drain(AUDIO_RATE);
-            if (blk.length) pcm.submit(blk);
-          } else {
-            gb.apu.drain(AUDIO_RATE); // keep the ring from overflowing
-          }
-        }
+        feedAudio();
+        nextDue += GB_FRAME_MS;
+        ran += 1;
       }
+      if (ran >= 8) nextDue = nowMs; // fell far behind → resync and drop the debt
     }
 
     blitToTerm(t, gb.frame);
@@ -2701,12 +2731,23 @@ async function main(): Promise<void> {
     drawHud(t, title, status);
     t.present();
 
-    const elapsedMs = (Bun.nanoseconds() - frameStart) / 1e6;
-    if (!turbo) {
-      const left = GB_FRAME_MS - elapsedMs;
-      if (left > 0.2) {
-        if (wait) wait(left);
-        else await Bun.sleep(left);
+    // The real engine throughput: how long emulating + rendering + painting a
+    // frame actually took, excluding the pacing wait. (The game still runs at
+    // 59.7 Hz; this is the "could-render-this-fast" number, like the other demos.)
+    const workMs = (Bun.nanoseconds() - frameStart) / 1e6;
+    if (workMs > 0) fpsEma = fpsEma * 0.9 + Math.min(99999, 1000 / workMs) * 0.1;
+    // Pace to the next due frame (the accumulator already ran the emulation). While
+    // paused we still wait a frame so the loop doesn't busy-spin a core.
+    if (turbo) {
+      // run flat out — no wait
+    } else if (paused) {
+      if (wait) wait(GB_FRAME_MS);
+      else await Bun.sleep(GB_FRAME_MS);
+    } else {
+      const slack = Math.min(GB_FRAME_MS, nextDue - Bun.nanoseconds() / 1e6);
+      if (slack > 0.2) {
+        if (wait) wait(slack);
+        else await Bun.sleep(slack);
       }
     }
     await new Promise<void>((r) => setImmediate(r));
