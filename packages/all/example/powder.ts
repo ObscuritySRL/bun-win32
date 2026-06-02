@@ -526,8 +526,8 @@ const attract = (time: number): void => {
   // landing points roam and the pile grows as a heaped dune, shifting shape over the
   // loop. Kept apart in x so they merge into a wide bank rather than one tall pillar.
   if (lp >= 0 && lp < 11) {
-    pour(((0.34 * W) + wob(0.5, 0, W * 0.07)) | 0, 1, 3.3, SAND, 0.95);
-    pour(((0.55 * W) + wob(0.8, 2.3, W * 0.08)) | 0, 1, 3.0, SAND, 0.93);
+    pour(((0.33 * W) + wob(0.5, 0, W * 0.11)) | 0, 1, 3.0, SAND, 0.9);
+    pour(((0.56 * W) + wob(0.8, 2.3, W * 0.12)) | 0, 1, 2.7, SAND, 0.88);
   }
   // WATER fall — a tall central cascade onto the sand; pools, finds its level, runs
   // left toward the lava ledge (→ stone + a hiss of steam) and right into the oil.
@@ -593,17 +593,29 @@ const seedScene = (): void => {
   buildTerrain();
   const ledgeY = (GH * 0.42) | 0;
   const shelfY = (GH * 0.74) | 0;
+  // A thin SEDIMENT layer of settled sand drifted across the whole cellar floor, so the
+  // chamber reads as one continuous landscape grounded on a beach rather than a few
+  // isolated islands floating over black. It rises a touch under the central dune and
+  // dips into the water basin, with a gently uneven crest from a hashed wobble so the
+  // line never reads as a flat ruled edge.
+  for (let x = 1; x < W - 1; x++) {
+    const lump = (hash2(x * 5, 3) + hash2((x >> 2) * 11, 7)) * 0.5; // smooth-ish ripple 0..1
+    const base = 1 + (lump * 2.4 | 0);
+    for (let h = 0; h < base; h++) paint(x, floor - h, 0.7, SAND, 0.96);
+  }
   // A broad, heaped sand BANK across the centre, taller and wider than before so the
   // opening frame reads as a substantial body of material rather than a thin mound.
   for (let dx = -24; dx <= 24; dx++) {
     const hgt = Math.round(16 * Math.exp(-(dx * dx) / 185));
     for (let h = 0; h <= hgt; h++) paint(((0.45 * W) | 0) + dx, floor - h, 1, SAND, 0.97);
   }
-  // A real water POOL nestled in the dip to the right of the dune — a body with a
-  // surface, not a thin column, so it reads with depth and a glinting sheet.
-  for (let dx = -5; dx <= 6; dx++) {
-    const wh = 9 - Math.abs(dx);
-    for (let h = 0; h < wh; h++) paint(((0.60 * W) | 0) + dx, floor - h, 1, WATER, 0.92);
+  // A real water POOL nestled in the dip to the right of the dune — a broad body with
+  // a flat surface, not a thin column, so it reads with depth and a glinting sheet. A
+  // gently dished basin (deeper in the middle) gives the sheet a clear top line that the
+  // surface specular rides, so the launch frame already shows legible, lit water.
+  for (let dx = -9; dx <= 9; dx++) {
+    const wh = 8 - ((dx * dx) / 16 | 0);
+    for (let h = 0; h < wh; h++) paint(((0.62 * W) | 0) + dx, floor - h, 1, WATER, 0.94);
   }
   // A glowing lava pool already brimming in the dammed left ledge (a DEEP pool that
   // spills, not a stream), so the emissive bloom is rich on the opening frame. The pool
@@ -654,10 +666,10 @@ const seedScene = (): void => {
 type RGB = [number, number, number];
 
 // Base linear-ish colours (0..255-ish; emitters exceed for HDR before tonemap).
-const COL_SAND_A: RGB = [176, 128, 66]; // shadowed grain (warmer, deeper ochre)
-const COL_SAND_B: RGB = [248, 222, 158]; // sun-lit grain (brighter golden crest)
-const COL_WATER_SHAL: RGB = [70, 178, 236]; // bright turquoise near the surface
-const COL_WATER_DEEP: RGB = [14, 46, 120]; // dark blue in the depths
+const COL_SAND_A: RGB = [150, 110, 70]; // shadowed grain (cool-leaning ochre — sits in fill light)
+const COL_SAND_B: RGB = [238, 206, 142]; // sun-lit grain (warm golden crest, less acid-yellow)
+const COL_WATER_SHAL: RGB = [86, 196, 240]; // bright turquoise near the surface
+const COL_WATER_DEEP: RGB = [10, 40, 110]; // dark blue in the depths
 const COL_OIL_A: RGB = [40, 34, 30]; // base dark slick
 const COL_OIL_B: RGB = [78, 60, 44]; // lit film
 const COL_STONE_A: RGB = [62, 64, 76]; // shadowed basalt
@@ -668,8 +680,8 @@ const COL_PLANT_B: RGB = [128, 230, 116];
 // Atmospheric void: a cool indigo top fading to a faintly warm cellar floor, so the
 // scene sits in a graded chamber instead of dead black. The wide warm bloom pool
 // lifts this further wherever an emitter is near.
-const BG_TOP: RGB = [10, 12, 22];
-const BG_BOT: RGB = [24, 18, 26];
+const BG_TOP: RGB = [9, 11, 21];
+const BG_BOT: RGB = [27, 20, 27];
 
 // Smooth-ish 3-stop blackbody ramp for fire/lava heat (t 0..1, cool→white-hot).
 // Returns an unclamped HDR-ish RGB so the core can bloom past white.
@@ -747,8 +759,15 @@ const render = (t: Term, time: number): void => {
             const caus = 0.86 + 0.3 * hash2((x + tw) * 7, (y - (tw >> 1)) * 11);
             wr *= caus; wg *= caus; wb *= caus;
             if (surface) {
-              const glint = 0.35 + 0.65 * hash2(x * 13 + tw, 7);
-              wr += 70 * glint; wg += 96 * glint; wb += 120 * glint;
+              // The exposed top skin gets a crisp, sculpted specular: a smooth
+              // travelling sine highlight (the steady sheen of a settled sheet) plus a
+              // finer hashed sparkle. The exposed surface (open air above) gets the
+              // full glint; a submerged "surface" cell only a soft sub-surface sheen.
+              const exposed = y > 0 && cell[i - W] === EMPTY ? 1 : 0.32;
+              const wave = 0.5 + 0.5 * Math.sin((x + tw) * 0.55 + waterTop[x] * 0.3);
+              const spark = hash2(x * 13 + tw, 7);
+              const glint = (0.28 + 0.5 * wave + 0.34 * spark) * exposed;
+              wr += 78 * glint; wg += 104 * glint; wb += 130 * glint;
             }
             // Opaque enough at the surface that even a one-cell-thick sheet reads as
             // water; the body deepens toward translucent as it thins below.

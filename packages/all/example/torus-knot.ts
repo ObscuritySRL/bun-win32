@@ -28,7 +28,7 @@ import { runDemo, Term, hsv, clamp, clamp01, lerp, smoothstep, aces, mulberry32,
 // ── Knot geometry ──────────────────────────────────────────────────────────────
 const P = 2; // windings around the axis of symmetry
 const Q = 3; // windings around the torus tube
-const TUBE_R = 0.34; // glossy ribbon thickness (object space)
+const TUBE_R = 0.37; // glossy ribbon thickness (object space) — a touch fatter for sculptural body
 const SEG = 460; // centerline samples (the SDF tube is the union of these spheres-on-a-curve)
 
 // Centerline sample positions (object space), built once.
@@ -307,7 +307,11 @@ runDemo({
 
     // ── Camera + two-axis eased rotation ────────────────────────────────────────
     // Eased angular drift (smooth, never linear-jittery): blend of slow harmonics.
-    const ax = time * 0.45 + 0.25 * Math.sin(time * 0.21);
+    // A constant TILT on the x-axis keeps the knot from ever going dead edge-on
+    // (where the (2,3) silhouette flattens into an unreadable saucer): it always
+    // presents a sculptural 3/4 face, so the knot structure stays legible at every
+    // phase. The slow harmonics keep the spin organic rather than clockwork.
+    const ax = 0.5 + time * 0.43 + 0.22 * Math.sin(time * 0.21);
     const ay = time * 0.62 + 0.2 * Math.sin(time * 0.17 + 1.3);
     const sax = Math.sin(ax),
       cax = Math.cos(ax);
@@ -370,6 +374,19 @@ runDemo({
       out[1] = y2;
       out[2] = z2;
     };
+    // Object->camera (inverse of toObj): Rx(ax) then Ry(ay). We use it to bring the
+    // reflected ray back into CAMERA space so the chrome's environment reflection
+    // reads "sky overhead / ground below" no matter how the knot has rotated — the
+    // single biggest thing that makes the surface read as polished metal, not paint.
+    const toCam = (vx: number, vy: number, vz: number, out: Float32Array): void => {
+      const y1 = vy * cax - vz * sax;
+      const z1 = vy * sax + vz * cax;
+      const xc = vx * cay + z1 * say;
+      const zc = -vx * say + z1 * cay;
+      out[0] = xc;
+      out[1] = y1;
+      out[2] = zc;
+    };
     const oL = new Float32Array(3);
     toObj(Lx, Ly, Lz, oL);
     const oLx = oL[0],
@@ -403,6 +420,52 @@ runDemo({
     hfx /= hfl;
     hfy /= hfl;
     hfz /= hfl;
+
+    // ── Environment for the chrome reflection (camera space, designed palette) ──
+    // A vertical studio gradient: cool steel sky overhead, a luminous warm-teal
+    // horizon band, deep teal-indigo ground below — cohesive with the scene's own
+    // vignette but lighter so the metal reads bright and reflective. The horizon
+    // glow is biased toward the key light's azimuth so the brightest reflection
+    // band slides around the tube as the knot turns.
+    // Normalized horizontal key direction in camera space (x,z plane). We compare the
+    // reflected ray's azimuth to the key's via a plain dot product instead of atan2+cos
+    // in the hot per-pixel path — same glow, no trig.
+    const khLen = Math.hypot(klx, klz) || 1;
+    const keyHx = klx / khLen;
+    const keyHz = -klz / khLen;
+    const reflCam = new Float32Array(3);
+    const envOut = new Float32Array(3);
+    const sampleEnv = (rcx: number, rcy: number, rcz: number): void => {
+      // Vertical band: rcy in [-1,1].
+      const up = rcy * 0.5 + 0.5; // 0 ground .. 1 zenith
+      // Sky (up) and ground (down) palette, in linear-ish 0..1.
+      // Sky: bright cool steel-blue, lifting near-white toward the zenith so the
+      // chrome catches a clean specular sky. Ground: a deep teal-indigo with a
+      // faint warm bounce so the underside reads as polished metal, not a void.
+      const skyR = 0.46, skyG = 0.66, skyB = 0.98;
+      const grR = 0.05, grG = 0.07, grB = 0.13;
+      // Smooth vertical mix, with a zenith brightening for a crisp sky reflection.
+      const m = up * up * (3 - 2 * up);
+      const zen = up * up * up; // extra punch overhead
+      let er = grR + (skyR - grR) * m + zen * 0.16;
+      let eg = grG + (skyG - grG) * m + zen * 0.18;
+      let eb = grB + (skyB - grB) * m + zen * 0.2;
+      // Luminous horizon band (a soft bright ring where |rcy| is small), tinted warm
+      // teal-white and concentrated toward the key azimuth so it sweeps with the spin.
+      const horiz = 1 - Math.abs(rcy);
+      const h4 = horiz * horiz * horiz * horiz; // tight glowing band at the equator
+      // cos(azimuth - keyAzimuth) via the dot of the two unit horizontal directions.
+      const hlen = Math.sqrt(rcx * rcx + rcz * rcz) || 1;
+      const cosDa = (rcx * keyHx + -rcz * keyHz) / hlen;
+      const azGlow = 0.4 + 0.6 * cosDa; // 0..1, peak toward the key
+      const band = h4 * azGlow;
+      er += band * 1.05;
+      eg += band * 0.96;
+      eb += band * 0.74;
+      envOut[0] = er;
+      envOut[1] = eg;
+      envOut[2] = eb;
+    };
 
     // Camera origin in object space: at (0,0,CAM_Z) in camera space.
     const oO = new Float32Array(3);
@@ -558,14 +621,37 @@ runDemo({
       const fr = 1 - ndv;
       const fr2 = fr * fr;
       const fres = fr2 * fr2; // pow(1-ndv, 4)
-      // Crisper value separation: deeper ambient floor, punchier key, brighter spec.
+
+      // ── Environment reflection (what makes it read as CHROME, not paint) ───────
+      // Reflect the incident eye ray about the surface normal, carry it back to
+      // camera space, and sample the designed studio environment. Chrome is a near
+      // mirror: reflectivity is high even head-on and approaches 1 at grazing
+      // (Schlick), so the reflected world — not a diffuse albedo — owns the look.
+      const idn = -(oVx * nxo + oVy * nyo + oVz * nzo); // (I·N), I = -V
+      const orx = -oVx - 2 * idn * nxo;
+      const ory = -oVy - 2 * idn * nyo;
+      const orz = -oVz - 2 * idn * nzo;
+      toCam(orx, ory, orz, reflCam);
+      sampleEnv(reflCam[0], reflCam[1], reflCam[2]);
+      // Schlick reflectivity: base ~0.55 metal, rising to ~1 at the rim, modulated
+      // by ambient occlusion so deep crevices reflect a little less of the bright sky.
+      const refl = (0.55 + 0.45 * fres) * (0.6 + 0.4 * ao);
+      // The reflection carries a whisper of the teal albedo (chrome isn't perfectly
+      // neutral here) so the hue stays cohesive without ever becoming a rainbow.
+      const envR = envOut[0] * (0.78 + 0.22 * albR);
+      const envG = envOut[1] * (0.78 + 0.22 * albG);
+      const envB = envOut[2] * (0.78 + 0.22 * albB);
+
+      // Diffuse-ish body, much reduced (metal has little diffuse) — just enough to
+      // keep the shadow side from going dead black and to ground the form.
       const kd = ndl * shadow;
-      shadeOut[0] =
-        (0.055 + keyR * kd * 2.1 + fillR * ndf * 0.9) * albR * ao + specL * keyR * 3.6 + specFill * fillR * 2.0 + fres * 0.4;
-      shadeOut[1] =
-        (0.085 + keyG * kd * 2.1 + fillG * ndf * 0.9) * albG * ao + specL * keyG * 3.6 + specFill * fillG * 2.0 + fres * 0.58;
-      shadeOut[2] =
-        (0.15 + keyB * kd * 2.1 + fillB * ndf * 0.9) * albB * ao + specL * keyB * 3.6 + specFill * fillB * 2.0 + fres * 0.9;
+      const bodyR = (0.018 + keyR * kd * 0.85 + fillR * ndf * 0.4) * albR * ao;
+      const bodyG = (0.03 + keyG * kd * 0.85 + fillG * ndf * 0.4) * albG * ao;
+      const bodyB = (0.06 + keyB * kd * 0.85 + fillB * ndf * 0.4) * albB * ao;
+
+      shadeOut[0] = bodyR + envR * refl + specL * keyR * 4.0 + specFill * fillR * 1.8 + fres * 0.42;
+      shadeOut[1] = bodyG + envG * refl + specL * keyG * 4.0 + specFill * fillG * 1.8 + fres * 0.6;
+      shadeOut[2] = bodyB + envB * refl + specL * keyB * 4.0 + specFill * fillB * 1.8 + fres * 0.92;
       return specL;
     };
 

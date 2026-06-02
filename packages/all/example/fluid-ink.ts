@@ -40,14 +40,14 @@ const N = NX * NY;
 
 // ── Solver tuning ───────────────────────────────────────────────────────────────
 const PRESSURE_ITERS = 24; // red-black Gauss-Seidel sweeps → a smooth, divergence-free field
-const VORT_EPS = 2.0;      // vorticity confinement — restores the curl that keeps sheets folding
+const VORT_EPS = 2.2;      // vorticity confinement — restores the curl that keeps sheets folding (slightly raised → finer filaments)
 const BUOYANCY = 0.92;     // bright dye rises (negative-y = up)
 const AMBIENT_COOL = 0.22; // average density pulls down (so the tank circulates)
-const DYE_DECAY = 0.9962;  // ink slowly dissolves; water returns to dark
-const DYE_FLOOR = 0.0026;  // subtractive floor — crushes faint stray dye → clean dark water
-const VEL_DAMP = 0.9977;   // gentle velocity bleed so energy doesn't blow up
+const DYE_DECAY = 0.9968;  // ink slowly dissolves; water returns to dark (slightly slower → structure persists + fills the frame)
+const DYE_FLOOR = 0.0024;  // subtractive floor — crushes faint stray dye → clean dark water
+const VEL_DAMP = 0.9978;   // gentle velocity bleed so energy doesn't blow up
 const FLOW_SCALE = 0.85;   // global flow speed
-const DYE_DIFFUSE = 0.20;  // light diffusion — keeps filaments crisp, not blurred to cloud
+const DYE_DIFFUSE = 0.17;  // light diffusion — keeps filaments crisp, not blurred to cloud (lowered → finer threads)
 
 // ── Field storage ───────────────────────────────────────────────────────────────
 const u = new Float32Array(N);
@@ -295,25 +295,27 @@ let emitters: Emitter[] = [];
 const buildEmitters = (): void => {
   emitters = [];
   // Bias tints toward the indigo/magenta/amber anchors so the palette stays read-
-  // able rather than a continuous rainbow. Spread the path centres across the
-  // width so ink fills the whole frame; bias the centres low so plumes rise.
-  const anchors = [0.04, 0.5, 0.96, 0.27, 0.72];
-  const centresX = [0.20, 0.5, 0.80, 0.36, 0.66];
+  // able rather than a continuous rainbow. Spread the path centres EVENLY across
+  // the full width (edges included) so ink fills the whole frame — not a cluster
+  // floating in a void; bias the centres low so plumes rise. Six sources weave
+  // the three inks together for richer mixing without becoming a rainbow.
+  const anchors = [0.03, 0.5, 0.97, 0.24, 0.74, 0.46];
+  const centresX = [0.12, 0.30, 0.50, 0.70, 0.88, 0.42];
   for (let k = 0; k < anchors.length; k++) {
     emitters.push({
       tint: anchors[k],
-      tintDrift: (rng() - 0.5) * 0.04,
+      tintDrift: (rng() - 0.5) * 0.05,
       cx: centresX[k],
-      cy: 0.58 + rng() * 0.20,        // lower half — plumes rise through the frame
-      ax: 0.16 + rng() * 0.14,        // wider Lissajous reach → streams criss-cross
-      ay: 0.13 + rng() * 0.13,
+      cy: 0.60 + rng() * 0.22,        // lower band — plumes rise through the frame
+      ax: 0.17 + rng() * 0.16,        // wide Lissajous reach → streams criss-cross + cross hues
+      ay: 0.13 + rng() * 0.14,
       fx: 0.05 + rng() * 0.11,
       fy: 0.06 + rng() * 0.12,
       phx: rng() * TAU,
       phy: rng() * TAU,
-      speed: 0.9 + rng() * 0.5,
-      radius: 1.8 + rng() * 1.0,      // thinner nibs → fine streams that fold, not fat plumes
-      swirl: (rng() < 0.5 ? 1 : -1) * (0.6 + rng() * 0.7),
+      speed: 1.0 + rng() * 0.55,
+      radius: 1.7 + rng() * 1.0,      // thin nibs → fine streams that fold, not fat plumes
+      swirl: (rng() < 0.5 ? 1 : -1) * (0.7 + rng() * 0.8),
     });
   }
 };
@@ -362,7 +364,7 @@ const step = (time: number, dt: number): void => {
       vx * 0.05 - e.swirl * vy * 0.055,
       vy * 0.05 + e.swirl * vx * 0.055 - 0.95, // path drag + handed swirl + buoyant kick
       cr, cg, cb,
-      e.speed * pulse * 0.30 * fade,
+      e.speed * pulse * 0.34 * fade,
     );
   }
 
@@ -511,7 +513,7 @@ const render = (t: Term): void => {
       // so it sharpens colour separation without crushing the dark water. —
       if (dens > 1e-4) {
         const m = dens * (1 / 3);
-        const sat = dens < 1.2 ? dens * 0.30 : 0.36; // gentle, capped
+        const sat = dens < 1.15 ? dens * 0.36 : 0.41; // richer hue separation, still capped
         R += (R - m) * sat;
         G += (G - m) * sat;
         B += (B - m) * sat;
@@ -546,9 +548,12 @@ const render = (t: Term): void => {
       if (core > 0) {
         const glow = core * core * 0.34;
         const inv = dens > 1e-4 ? glow / dens : 0;
-        R += R * inv * 1.9 + glow * 0.035;
-        G += G * inv * 1.9 + glow * 0.030;
-        B += B * inv * 1.9 + glow * 0.045;
+        // Bloom mostly along the local hue; only a whisper of cool-white floor so a
+        // dense heart reads as a saturated luminous core (amber stays amber) rather
+        // than clipping to a featureless white puffball.
+        R += R * inv * 2.0 + glow * 0.018;
+        G += G * inv * 2.0 + glow * 0.016;
+        B += B * inv * 2.0 + glow * 0.030;
       }
 
       R = R * EXPOSURE + BASE_R;
@@ -597,13 +602,24 @@ const stroke = (
 };
 const seed = (): void => {
   u.fill(0); v.fill(0); dr.fill(0); dg.fill(0); db.fill(0);
-  const cx = GW * 0.5 + 1, cy = GH * 0.60 + 1;
-  stroke(cx - 34, cy + 8, 30, -10, 9, 3.0, 0.04, 0.32);   // indigo, low-left → up
-  stroke(cx - 6, cy + 12, 26, -22, -11, 2.8, 0.5, 0.32);  // magenta, sweeping up
-  stroke(cx + 8, cy - 2, 24, -6, 10, 2.6, 0.96, 0.30);    // amber, curling right
-  // counter-rotating vortices keep the ribbons shearing into sheets once sim runs
-  vortex(cx - 10, cy, 13, 0.95);
-  vortex(cx + 12, cy - 4, 12, -0.9);
+  const cy = GH * 0.58 + 1;
+  // A composed sweep that spans the FULL width so the opening frame is a balanced
+  // picture, not a cluster in a void: the palette reads left→right indigo → magenta
+  // → amber, three long thin ribbons that arc up and cross at centre (where the
+  // hues mix), bracketed by two short accent strokes near the edges. Finer nibs
+  // than before so frame 0 already shows threadwork, not fat plumes.
+  const left = GW * 0.16 + 1, mid = GW * 0.50 + 1, right = GW * 0.84 + 1;
+  stroke(left,        cy + 10, GW * 0.30, -16,  11, 2.2, 0.03, 0.30);  // indigo, low-left → up-right
+  stroke(mid - 10,    cy + 14, GW * 0.16, -26, -13, 2.0, 0.50, 0.32);  // magenta, sweeping up through centre
+  stroke(right,       cy + 8,  -GW * 0.30, -14, -11, 2.2, 0.96, 0.30); // amber, low-right → up-left (crosses the indigo)
+  stroke(left * 0.6,  cy - 6,  GW * 0.12, -8,    7, 1.7, 0.20, 0.24);  // indigo/violet edge accent
+  stroke(right + 14,  cy - 2,  -GW * 0.10, -9,  -7, 1.7, 0.78, 0.24);  // warm edge accent
+  // counter-rotating vortices distributed across the width keep the crossing
+  // ribbons shearing into sheets the instant the sim starts.
+  vortex(mid - 16, cy + 2, 12, 0.95);
+  vortex(mid + 16, cy - 4, 12, -0.95);
+  vortex(left + 6, cy - 2, 9, -0.8);
+  vortex(right - 6, cy + 2, 9, 0.8);
 };
 
 // ── Demo wiring ────────────────────────────────────────────────────────────────

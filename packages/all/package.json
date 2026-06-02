@@ -153,6 +153,7 @@
     "fluid-ink": "bun run example/fluid-ink.ts",
     "galaxy-tty": "bun run example/galaxy-tty.ts",
     "gameboy": "bun run example/gameboy.ts",
+    "gameboy-tty": "bun run example/gameboy-tty.ts",
     "glyphstorm": "bun run example/glyphstorm.ts",
     "http-server": "bun run example/http-server.ts",
     "inkwell": "bun run example/inkwell.ts",

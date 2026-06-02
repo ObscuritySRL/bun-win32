@@ -444,7 +444,9 @@ const shadePixel = (ix: number, iy: number, time: number): void => {
     const ringD = b - PHOTON_R;
     // A genuinely thin core (sharp Gaussian) plus a faint, tight outer thread — no
     // fat halo. The disk supplies the broad glow; the ring stays a defined line.
-    const ring = Math.exp(-ringD * ringD * 26.0) + 0.18 * Math.exp(-ringD * ringD * 5.0);
+    // The core is tightened (razor edge) and the outer thread pulled in so the ring
+    // reads as the crisp, perfectly circular signature of the shadow, not a soft glow.
+    const ring = Math.exp(-ringD * ringD * 34.0) + 0.13 * Math.exp(-ringD * ringD * 7.0);
     if (ring > 0.002) {
       // Project the ray's point of closest approach into the disk plane to find which
       // limb of the ring this pixel is on, then beam it like the disk's orbit.
@@ -460,7 +462,10 @@ const shadePixel = (ix: number, iy: number, time: number): void => {
         const ty = -sphi * day + cphi * dby;
         const tz = -sphi * daz + cphi * dbz;
         const dop = clamp01(0.5 + 0.5 * (tx * fwdX + ty * fwdY + tz * fwdZ) * 1.6);
-        beam = 0.22 + 2.6 * dop * dop;                 // dim receding thread → blazing limb
+        // Relativistic beaming on the ring's limbs, sharpened to dop^3 so the
+        // approaching limb truly blazes while the receding side sinks to a faint
+        // thread — the same signature asymmetry the disk carries.
+        beam = 0.18 + 3.1 * dop * dop * dop;           // dim receding thread → blazing limb
       }
       // colour shifts cooler/bluer on the bright (approaching) limb
       const warm = clamp01(2.0 - beam);

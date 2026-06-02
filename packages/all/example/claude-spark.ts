@@ -30,9 +30,11 @@ const SPIKES = [
 ];
 const N = SPIKES.length;
 
-const CLAY: [number, number, number] = [217, 119, 87];
+const CLAY: [number, number, number] = [217, 119, 87]; // body clay at the tips
+const CLAY_HOT: [number, number, number] = [240, 158, 110]; // brighter clay nearer the core (light from within)
 const CLAY_GLOW: [number, number, number] = [150, 70, 44]; // dim additive halo (stays clay in overlaps)
-const CORE: [number, number, number] = [255, 198, 150]; // hot centre highlight
+const CLAY_RIM: [number, number, number] = [255, 196, 150]; // warm rim/sheen highlight
+const CORE: [number, number, number] = [255, 210, 162]; // hot centre highlight
 const BG: [number, number, number] = [16, 13, 12];
 
 // Per-tentacle springy tip state (allocated to size in init).
@@ -40,6 +42,27 @@ let tipX = new Float64Array(N);
 let tipY = new Float64Array(N);
 const phase = new Float64Array(N);
 let inited = false;
+
+// Background radial profile LUT (the stage is rotationally symmetric about the
+// centre, so vignette + warm glow depend only on distance). Rebuilt on resize.
+let bgLut: Float64Array | null = null; // [r0,g0,b0, r1,g1,b1, …] by integer distance
+let bgLutR = 0; // L_/maxDist scale baked into the table
+const buildBgLut = (R: number, maxR: number): void => {
+  const n = (Math.ceil(maxR) + 2) | 0;
+  const lut = new Float64Array(n * 3);
+  const invR2 = 1 / (R * R * 1.3);
+  const invMaxR = 1 / maxR;
+  for (let d = 0; d < n; d++) {
+    const vig = 1 - 0.5 * (d * invMaxR);
+    const glow = Math.exp(-(d * d) * invR2); // tight warm pool behind the spark
+    const halo = Math.exp(-(d * d) * invR2 * 0.22) * 0.5; // broad soft bloom
+    lut[d * 3] = clamp(BG[0] * vig + glow * 78 + halo * 34, 0, 255);
+    lut[d * 3 + 1] = clamp(BG[1] * vig + glow * 40 + halo * 16, 0, 255);
+    lut[d * 3 + 2] = clamp(BG[2] * vig + glow * 27 + halo * 11, 0, 255);
+  }
+  bgLut = lut;
+  bgLutR = n;
+};
 
 // Control state. spin/reachScale persist across resizes; kb target re-seeds on init.
 // Initial values may be set from the env (SPARK_SPIN radians, SPARK_REACH 0.2..2).
@@ -78,6 +101,7 @@ runDemo({
   },
   init: (t) => {
     const cx = t.W / 2, cy = t.H / 2, R = Math.min(t.W, t.H) * 0.42;
+    buildBgLut(R, Math.hypot(t.W, t.H) * 0.5);
     const rng = mulberry32(0x5afe);
     for (let i = 0; i < N; i++) {
       const [rx, ry] = restPos(i, cx, cy, R);
@@ -97,17 +121,23 @@ runDemo({
     if (!inited) return;
 
     // ── Background: deep warm stage + a soft central glow + vignette ──────────
+    // Rotationally symmetric → read a precomputed radial profile by distance
+    // (no per-pixel sqrt/exp). LUT is rebuilt in init/resize for the current R.
     const maxR = Math.hypot(W, H) * 0.5;
+    if (!bgLut) buildBgLut(R, maxR);
+    const lut = bgLut!, lutMax = bgLutR - 1, buf = t.buf;
     for (let y = 0; y < H; y++) {
+      const dy = y - cy, dy2 = dy * dy;
+      let i = y * W * 3;
       for (let x = 0; x < W; x++) {
-        const dx = (x - cx), dy = (y - cy);
-        const d = Math.sqrt(dx * dx + dy * dy);
-        const vig = 1 - 0.55 * (d / maxR);
-        const glow = Math.exp(-(d * d) / (R * R * 1.3)) * 0.5; // warm pool behind the spark
-        const i = (y * W + x) * 3;
-        t.buf[i] = clamp(BG[0] * vig + glow * 60, 0, 255);
-        t.buf[i + 1] = clamp(BG[1] * vig + glow * 32, 0, 255);
-        t.buf[i + 2] = clamp(BG[2] * vig + glow * 22, 0, 255);
+        const dx = x - cx;
+        let d = Math.sqrt(dx * dx + dy2) | 0;
+        if (d > lutMax) d = lutMax;
+        const li = d * 3;
+        buf[i] = lut[li];
+        buf[i + 1] = lut[li + 1];
+        buf[i + 2] = lut[li + 2];
+        i += 3;
       }
     }
 
@@ -128,28 +158,57 @@ runDemo({
     const mnx = tdx / md, mny = tdy / md;
     const springK = 1 - Math.exp(-dt * (9 + 6 * surge)); // follow rate (snappier on click)
 
-    // helper: tapered clay disc (glow pass additive, body pass solid)
-    const disc = (x: number, y: number, r: number, c: [number, number, number], add: boolean, k = 1): void => {
+    // helper: additive radial-falloff disc (soft glow / bloom).
+    const glowDisc = (x: number, y: number, r: number, c: [number, number, number], k = 1): void => {
+      const r2 = r * r, invR2 = 1 / r2;
+      const x0 = Math.max(0, Math.floor(x - r)), x1 = Math.min(W - 1, Math.ceil(x + r));
+      const y0 = Math.max(0, Math.floor(y - r)), y1 = Math.min(H - 1, Math.ceil(y + r));
+      const cr = c[0] * k, cg = c[1] * k, cb = c[2] * k;
+      for (let py = y0; py <= y1; py++) {
+        const dy = py - y, dy2 = dy * dy;
+        for (let px = x0; px <= x1; px++) {
+          const dx = px - x;
+          const d2 = dx * dx + dy2;
+          if (d2 > r2) continue;
+          const f = 1 - d2 * invR2;
+          t.addPixel(px, py, cr * f, cg * f, cb * f);
+        }
+      }
+    };
+
+    // helper: anti-aliased SOLID disc — opaque core, ~1px feathered rim. Optional
+    // [rim,g,b] sheen blended on the outer shell to give the clay a lit edge.
+    const bodyDisc = (x: number, y: number, r: number, cr: number, cg: number, cb: number, rim?: [number, number, number]): void => {
       const r2 = r * r;
+      const inner = Math.max(0, r - 1), inner2 = inner * inner;
       const x0 = Math.max(0, Math.floor(x - r)), x1 = Math.min(W - 1, Math.ceil(x + r));
       const y0 = Math.max(0, Math.floor(y - r)), y1 = Math.min(H - 1, Math.ceil(y + r));
       for (let py = y0; py <= y1; py++) {
+        const dy = py - y, dy2 = dy * dy;
         for (let px = x0; px <= x1; px++) {
-          const dx = px - x, dy = py - y;
-          const d2 = dx * dx + dy * dy;
+          const dx = px - x;
+          const d2 = dx * dx + dy2;
           if (d2 > r2) continue;
-          if (add) {
-            const f = (1 - d2 / r2) * k;
-            t.addPixel(px, py, c[0] * f, c[1] * f, c[2] * f);
+          if (d2 <= inner2) {
+            t.setPixel(px, py, cr, cg, cb);
           } else {
-            t.setPixel(px, py, c[0], c[1], c[2]);
+            // feathered shell: coverage by distance from the true edge, and a
+            // touch of warm rim sheen right at the silhouette.
+            const d = Math.sqrt(d2);
+            const cov = clamp01(r - d);
+            if (rim) {
+              const s = (d - inner); // 0 at inner shell → 1 at edge
+              t.blendPixel(px, py, lerp(cr, rim[0], s * 0.6), lerp(cg, rim[1], s * 0.6), lerp(cb, rim[2], s * 0.6), cov);
+            } else {
+              t.blendPixel(px, py, cr, cg, cb, cov);
+            }
           }
         }
       }
     };
 
-    const baseW = Math.max(1.6, R * 0.05);
-    const tipW = Math.max(0.5, R * 0.012);
+    const baseW = Math.max(1.8, R * 0.058); // wedge base → reads as the Claude burst, not a thin star
+    const tipW = Math.max(0.4, R * 0.008);
 
     // ── Each tentacle: spring its tip toward (rest blended with reach) ────────
     for (let i = 0; i < N; i++) {
@@ -189,22 +248,32 @@ runDemo({
       const ctrlX = cx + vx * 0.5 + perpx * sway;
       const ctrlY = cy + vy * 0.5 + perpy * sway;
 
-      const steps = Math.max(8, Math.ceil(vlen / 1.4));
+      const steps = Math.max(10, Math.ceil(vlen / 1.1));
+      const invSteps = 1 / steps;
       for (let s = 0; s <= steps; s++) {
-        const u = s / steps, m = 1 - u;
+        const u = s * invSteps, m = 1 - u;
         const bx = m * m * cx + 2 * m * u * ctrlX + u * u * tx;
         const by = m * m * cy + 2 * m * u * ctrlY + u * u * ty;
-        const wid = baseW * Math.pow(m, 0.6) + tipW; // thick base → pointed tip
-        disc(bx, by, wid * 2.0, CLAY_GLOW, true, 0.5); // glow halo
-        disc(bx, by, wid, CLAY, false); // solid clay body
+        // Wedge profile: a confident tapered spike (full near the hub, steadily
+        // converging to a real point) — the Claude mark, not a thin needle or a paddle.
+        const taper = m * (0.55 + 0.45 * m); // ≈ quadratic ease to a sharp tip
+        const wid = baseW * taper + tipW;
+        // Light from within: hotter clay near the hub, settling to body clay at the tip.
+        const heat = 1 - smoothstep(0.0, 0.55, u);
+        const cr = lerp(CLAY[0], CLAY_HOT[0], heat);
+        const cg = lerp(CLAY[1], CLAY_HOT[1], heat);
+        const cb = lerp(CLAY[2], CLAY_HOT[2], heat);
+        glowDisc(bx, by, wid * 1.7 + 1, CLAY_GLOW, 0.16); // faint clay bloom behind the body
+        bodyDisc(bx, by, wid, cr, cg, cb, CLAY_RIM); // shaded solid clay with a lit rim
       }
     }
 
-    // ── Centre hub where the tentacles fuse + a hot core ──────────────────────
-    disc(cx, cy, R * 0.2, CLAY_GLOW, true, 0.7);
-    disc(cx, cy, R * 0.135, CLAY, false);
-    disc(cx, cy, R * 0.06, CORE, false);
-    disc(cx, cy, R * 0.13, CORE, true, 0.35);
+    // ── Centre hub where the tentacles fuse + a hot, clean core ───────────────
+    glowDisc(cx, cy, R * 0.3, CLAY_GLOW, 0.4); // warm seat under the hub
+    bodyDisc(cx, cy, R * 0.15, CLAY_HOT[0], CLAY_HOT[1], CLAY_HOT[2], CLAY_RIM);
+    bodyDisc(cx, cy, R * 0.075, CORE[0], CORE[1], CORE[2]); // hot inner disc
+    glowDisc(cx, cy, R * 0.05, [255, 240, 218], 0.7); // crisp bright pip
+    glowDisc(cx, cy, R * 0.2, CORE, 0.16); // gentle radiant halo off the core
 
     // ── Pointer reticle so you can see what it's reaching for ─────────────────
     {
@@ -215,9 +284,7 @@ runDemo({
         const ang = (k / 48) * TAU;
         t.blendPixel(Math.round(mx + Math.cos(ang) * rr), Math.round(my + Math.sin(ang) * rr), col[0], col[1], col[2], ringA);
       }
-      if (mode === 1 && surge) disc(mx, my, rr * 0.6, CORE, true, 0.5);
+      if (mode === 1 && surge) glowDisc(mx, my, rr * 0.6, CORE, 0.5);
     }
-
-    void clamp01;
   },
 });

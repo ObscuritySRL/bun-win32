@@ -70,14 +70,20 @@ const ITER_PER_EFOLD = 22; // extra iterations per natural-log of zoom
 const ITER_CAP = 460;
 
 // ── Palette (Inigo-Quilez cosine gradient: a + b*cos(2pi*(c*t + d))) ───────────
-// A cohesive deep-twilight ramp: indigo/violet shadow → teal → warm amber → rose
-// highlight. The channel phase offsets (d) are spread so colour SEPARATES instead of
-// going grey, and the base (a) is kept low so the far field stays rich and dark and
-// only the boundary lights up. Tasteful and restrained; hue slowly drifts over time.
-const PAL_A0 = 0.34, PAL_A1 = 0.28, PAL_A2 = 0.40;
-const PAL_B0 = 0.40, PAL_B1 = 0.36, PAL_B2 = 0.44;
-const PAL_C0 = 1.0, PAL_C1 = 1.0, PAL_C2 = 1.0;
-const PAL_D0 = 0.50, PAL_D1 = 0.62, PAL_D2 = 0.82;
+// A cohesive deep-twilight ramp that travels a SHORT, designed arc instead of
+// cycling through every hue: indigo/violet shadow → muted teal → warm amber-gold
+// highlight. The channel phases (d) are pulled CLOSE together (R leads, G trails,
+// B lags) so the three cosines move almost in lockstep — the colour reads as one
+// continuous gold-on-twilight ramp rather than separating into rainbow stripes.
+// The base (a) sits low (esp. blue) so the far field stays a rich dark velvet and
+// only the boundary lights warm. Tasteful and restrained; hue drifts slowly.
+const PAL_A0 = 0.38, PAL_A1 = 0.26, PAL_A2 = 0.28;
+const PAL_B0 = 0.44, PAL_B1 = 0.32, PAL_B2 = 0.30;
+// Lower channel frequencies (<1) so one mu-decade spans well under a full hue
+// cycle — the gradient stratifies into a FEW broad bands, not a dense rainbow.
+const PAL_C0 = 0.62, PAL_C1 = 0.62, PAL_C2 = 0.62;
+// Tight, ordered phase fan → warm-leaning, cohesive ramp (no grey, no spectrum).
+const PAL_D0 = 0.10, PAL_D1 = 0.22, PAL_D2 = 0.40;
 
 // ── Anti-aliasing sample offsets (rotated triad, in pixel units, centred on 0). ─
 // A pixel that the cheap centre-probe flags as on the boundary shell is re-shaded
@@ -152,7 +158,7 @@ runDemo({
 
     // Deep field base (velvet) we blend the open exterior toward, so the far field
     // stays cohesive and calm and colour concentrates near the luminous boundary.
-    const FIELD_R = 0.018, FIELD_G = 0.012, FIELD_B = 0.045;
+    const FIELD_R = 0.014, FIELD_G = 0.010, FIELD_B = 0.042;
 
     // Distance-estimate rim width, in units of a pixel. The glow occupies a SOFT,
     // wide band hugging the boundary; widening it (vs a 1-pixel thread) is what
@@ -201,12 +207,15 @@ runDemo({
       }
 
       if (n >= maxIter) {
-        // ── Interior: deep velvet, faintly lit by how close the orbit came to 0.
+        // ── Interior: deep indigo velvet, faintly lit by how close the orbit came
+        // to 0. The faint lift is kept COOL (blue-leaning, low red) so the solid
+        // interior reads as calm velvet shadow, never a warm/red speckled blob —
+        // the warmth in this picture belongs to the boundary filigree alone.
         const tr = clamp01(Math.sqrt(trap) * 0.95);
         const tr2 = tr * tr;
-        sr = (7 + tr2 * 30) / 255;
-        sg = (5 + tr2 * 12) / 255;
-        sb = (16 + tr2 * 40) / 255;
+        sr = (5 + tr2 * 16) / 255;
+        sg = (4 + tr2 * 14) / 255;
+        sb = (14 + tr2 * 40) / 255;
         // Interior is a smooth velvet wash — no speckle. We trigger AA only a hair
         // (the inner boundary is already caught by adjacent exterior pixels whose
         // `edge` is high), so the solid interior stays 1× cheap.
@@ -219,10 +228,11 @@ runDemo({
       const nu = Math.log(logZn * invLog2) * invLog2; // log2(log2|z|)
       const mu = n + 1 - nu;
 
-      // Map mu through the cycling cosine palette. A gentle log compresses the
-      // fast-growing mu so colour bands stay even at every depth and the field
-      // cycles through the whole ramp, giving layered, stratified depth.
-      const ts = Math.log(mu + 1) * 0.62 + palShift;
+      // Map mu through the cosine palette. A gentle log compresses the
+      // fast-growing mu so colour bands stay even at every depth; the slower
+      // multiplier (with the reduced PAL_C above) spreads the ramp across a few
+      // BROAD strata — layered depth without a busy rainbow of thin bands.
+      const ts = Math.log(mu + 1) * 0.42 + palShift;
       const ph0 = TAU * (PAL_C0 * ts + PAL_D0);
       const ph1 = TAU * (PAL_C1 * ts + PAL_D1);
       const ph2 = TAU * (PAL_C2 * ts + PAL_D2);
@@ -249,7 +259,7 @@ runDemo({
         // lower clamp is dead, but we keep clamp01's exact form for identical bits.
         let tr = d / 2.2; tr = tr < 0 ? 0 : tr > 1 ? 1 : tr;
         rim = 1 - tr * tr * (3 - 2 * tr);
-        let tn = d / 6.5; tn = tn < 0 ? 0 : tn > 1 ? 1 : tn;
+        let tn = d / 5.0; tn = tn < 0 ? 0 : tn > 1 ? 1 : tn;
         near = 1 - tn * tn * (3 - 2 * tn);
         let te = d / 4.0; te = te < 0 ? 0 : te > 1 ? 1 : te;
         edge = 1 - te * te * (3 - 2 * te);
@@ -257,10 +267,12 @@ runDemo({
 
       // Concentrate chroma near structure: open field dissolves into velvet.
       // lerp(a,b,t) inlined as a+(b-a)*t (bit-for-bit identical to the engine).
-      // near^3 makes the gate STEEP — at deep zoom the whole frame is "near"
-      // structure, so a soft gate left the exterior a milky wash; cubing it
-      // keeps the velvet field dark and reserves chroma for the true boundary.
-      const chroma = near * near * near;
+      // A STEEP near^4 gate — at deep zoom the whole frame is "near" structure,
+      // so any softer gate floods the exterior into a milky tan wash; the 4th
+      // power keeps the velvet field deep and dark and reserves chroma for the
+      // genuine boundary, so even thousand-mini-brot frames stay legible.
+      const near2 = near * near;
+      const chroma = near2 * near2;
       pr = FIELD_R + (pr - FIELD_R) * chroma;
       pg = FIELD_G + (pg - FIELD_G) * chroma;
       pb = FIELD_B + (pb - FIELD_B) * chroma;
@@ -279,10 +291,12 @@ runDemo({
       // necklace of sub-pixel dots with dark gaps; this dim glow fills the gaps so
       // the spiral reads as a CONTINUOUS thread of lace rather than scattered
       // sparkle. It is very low amplitude — it lifts the floor, never the peaks.
-      const bloom = near * near * near * 0.10;
+      // Gated on near^4 (the steep `chroma`) so at deep zoom, where the whole
+      // frame is technically "near", it doesn't accumulate into a tan haze.
+      const bloom = chroma * 0.085;
       pr += bloom * 1.0;
-      pg += bloom * 0.78;
-      pb += bloom * 0.5;
+      pg += bloom * 0.74;
+      pb += bloom * 0.42;
 
       // Warm gold sheen confined to the edge. The drive is rim^2 (smoother onset
       // than a cubic, so the band has body) and the magnitude is SOFT-CLAMPED
@@ -304,15 +318,18 @@ runDemo({
       // blend reaches the cap entirely, so the brightest filigree is a controlled,
       // cohesive gold rather than noise. Deep field (low lum) is untouched.
       const lmax = pr > pg ? (pr > pb ? pr : pb) : (pg > pb ? pg : pb);
-      if (lmax > 0.5) {
-        // warm = smoothstep(0.5,1,lmax), inlined bit-for-bit (t=clamp01((lmax-0.5)/0.5)).
-        let tw = (lmax - 0.5) / 0.5; tw = tw < 0 ? 0 : tw > 1 ? 1 : tw;
+      if (lmax > 0.42) {
+        // warm = smoothstep(0.42,1,lmax), inlined bit-for-bit (t=clamp01((lmax-0.42)/0.58)).
+        // A lower onset catches MORE of the bright filigree so the lit boundary
+        // leans cohesively toward spun gold instead of letting the palette's cool
+        // (blue/cyan) component dominate the brightest sub-pixel rim dots.
+        let tw = (lmax - 0.42) / 0.58; tw = tw < 0 ? 0 : tw > 1 ? 1 : tw;
         const warm = tw * tw * (3 - 2 * tw); // 0..1 blend weight
         const cap = lmax / (1 + 0.35 * lmax);    // soft ceiling (~0.9 as lmax→∞)
         // Target a SATURATED amber, not a pale cream: a low green/blue ratio keeps
         // the dense deep-zoom filigree reading as rich spun gold rather than a
         // milky tan wash when thousands of sub-pixel rim hits crowd one region.
-        const gr = cap, gg = cap * 0.70, gb = cap * 0.34;
+        const gr = cap, gg = cap * 0.68, gb = cap * 0.30;
         pr = pr + (gr - pr) * warm;
         pg = pg + (gg - pg) * warm;
         pb = pb + (gb - pb) * warm;
@@ -373,9 +390,9 @@ runDemo({
         // ── Loop seam cross-fade: dissolve toward velvet so the wrap is invisible.
         if (seamFade > 0) {
           const k = seamFade;
-          r = r * (1 - k) + 7 * k;
-          g = g * (1 - k) + 5 * k;
-          b = b * (1 - k) + 16 * k;
+          r = r * (1 - k) + 5 * k;
+          g = g * (1 - k) + 4 * k;
+          b = b * (1 - k) + 14 * k;
         }
 
         // Manual clamp — we bypass setPixel for speed, and v/seam/aces can leave

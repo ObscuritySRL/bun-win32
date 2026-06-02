@@ -9,32 +9,38 @@
  * the flow exactly divergence-free, so particles neither pile up nor thin out — they
  * glide along smooth, incompressible streamlines that reorganize as ψ evolves.
  *
- * COMPOSITION over noise. ψ is built as a HIERARCHY of octaves: one big, slow gesture
- * that sets a few large sweeping bands, then a medium octave and a whisper of fine
- * filigree layered INSIDE the bands. A separate low-frequency COMPOSITION field carves
- * the frame into a handful of luminous RIBBON CORRIDORS and wide NEGATIVE SPACE: the
- * field morphs slowly so corridors breathe and migrate but never dissolve into uniform
- * busy-ness. Particles in the void deposit almost nothing and are pulled back toward a
- * corridor when they respawn, so light concentrates into intentional ribbons while the
- * surround stays a deep near-black — the piece reads as designed flow, not turbulence.
+ * A FOCAL FLOW, not turbulence. ψ is DOMINATED by a smooth diagonal ramp — the
+ * streamfunction of a uniform wind — so its curl is one clear sweeping current the eye
+ * can follow. Noise octaves (a big gesture, a medium shape, a whisper of filigree) are
+ * layered ON TOP to bend that wind into a few large, legible streamlines with finer
+ * detail braided inside. A separate low-frequency COMPOSITION field lays a SMALL number
+ * of broad RIBBONS by phasing one warped coordinate that runs across the flow, then a
+ * slow envelope swells some stretches into a bright focal gesture while others recede —
+ * so the frame reads as designed bands with wide NEGATIVE SPACE, never a busy barcode
+ * or uniform knot. Particles in the void deposit almost nothing and respawn biased back
+ * into a ribbon, so light concentrates into the bands and the surround stays near-black.
  *
  * Each particle deposits a thin ADDITIVE smear into a floating-point HDR accumulation
  * buffer; the whole buffer is MULTIPLIED DOWN a hair every frame, so trails persist as
- * silky ribbons that BLOOM where corridors converge and fade where they thin. Color is
- * sampled from a hand-tuned cohesive gradient (deep indigo → violet → magenta → warm
- * gold) indexed by where the particle sits ACROSS its corridor (cool edges, warm spine)
- * and by speed, with a slow global drift — never garish. A separable blur lifts a soft
- * BLOOM off the brightest confluences, an ACES filmic tonemap grades the HDR to 8-bit,
- * and a faint cold vignette keeps the void premium and the eye on the light.
+ * silky ribbons that BLOOM where bands converge and fade where they thin. Color is
+ * sampled from a hand-tuned cohesive gradient (deep indigo → teal-blue → violet →
+ * magenta → warm coral → gold) indexed by where the particle sits ACROSS its ribbon —
+ * a wide cool teal-blue BODY warming only at the bright SPINE — plus speed and a slow
+ * drift, never garish. A COLORED separable bloom (each channel blurred) lets the warm
+ * gold confluences glow warm and the cool bodies glow cool, an ACES filmic tonemap
+ * grades the HDR to 8-bit, and a faint cold vignette keeps the void premium.
  *
  * Everything is in normalized/world space sampled analytically, so the whole field
- * reflows seamlessly on resize at any aspect ratio. All randomness is mulberry32-seeded
- * → captures are deterministic; motion is purely a function of time.
+ * reflows seamlessly on resize at any aspect ratio; the advected particle COUNT scales
+ * with the pixel area so per-pixel glow (and cost) stays constant at any grid size — no
+ * small-window blowout. All randomness is mulberry32-seeded → captures are
+ * deterministic; motion is purely a function of time.
  *
- * Technique: hierarchical curl-noise streamfunction (large gesture + fine detail,
- * divergence-free advection) · designed composition field for negative space + focal
- * corridors · cross-corridor color ramp · HDR additive trail accumulation with decay ·
- * separable bloom · ACES tonemap · normalized-space particles for seamless resize.
+ * Technique: directional-wind + noise streamfunction (one focal sweep, fine detail,
+ * divergence-free advection) · phased-band composition field for negative space + a
+ * focal swell envelope · across-ribbon cool→warm color ramp · HDR additive trail
+ * accumulation with decay · COLORED separable bloom · ACES tonemap · resolution-scaled
+ * particle subset for constant density + seamless resize.
  *
  * Run: bun run packages/all/example/flowfield.ts
  */
@@ -108,49 +114,84 @@ const vnoise = (x: number, y: number, w: number): number => {
 // filigree threaded inside. Weighting the big octave heavily is what turns the flow
 // from uniform turbulence into a few legible ribbons with finer detail layered in.
 // We finite-difference ψ for the curl, so keeping it smooth keeps the velocity smooth.
+//
+// Crucially, ψ is dominated by a SMOOTH DIAGONAL RAMP (a linear streamfunction whose
+// curl is a constant sweeping wind). Layering noise on top bends that wind into a few
+// large, legible streamlines instead of a directionless turbulent knot — so the eye
+// gets one clear focal flow with finer detail braided inside it.
+const FLOW_DIRX = 0.92, FLOW_DIRY = -0.40; // the dominant sweep direction (normalized-ish)
 const psi = (x: number, y: number, w: number): number => {
-  let f = 0;
-  f += vnoise(x, y, w) * 1.00;                                          // large gesture
-  f += vnoise(x * 2.15 + 11.7, y * 2.15 - 4.1, w * 1.7 + 3.0) * 0.34;   // medium shape
-  f += vnoise(x * 4.30 - 7.9, y * 4.30 + 2.6, w * 2.6 - 5.0) * 0.11;    // fine filigree
+  // ψ of a uniform wind is the perpendicular linear ramp; curl(ψ)=constant wind.
+  let f = (x * FLOW_DIRY - y * FLOW_DIRX) * 3.6;                        // dominant sweep
+  f += vnoise(x, y, w) * 2.05;                                          // large gesture
+  f += vnoise(x * 2.15 + 11.7, y * 2.15 - 4.1, w * 1.7 + 3.0) * 0.40;   // medium shape
+  f += vnoise(x * 4.30 - 7.9, y * 4.30 + 2.6, w * 2.6 - 5.0) * 0.10;    // fine filigree
   return f;
 };
 
 // ── Composition field ───────────────────────────────────────────────────────────
-// A slow, very-low-frequency scalar that defines WHERE the light lives. We fold a
-// smooth noise into a few ridged "corridors": values near 1 are the luminous spines
-// of ribbons, values near 0 are negative space. The field morphs gently so corridors
-// breathe and drift without ever flattening into uniform busy-ness. Returns [0,1].
-const COMP_SCALE = 1.7;  // few cells across the frame → big, calm regions
-// rotate the composition domain ~22° so corridors sweep DIAGONALLY across the frame
-// instead of stacking into flat horizontal bands — more dynamic, more designed.
-const COMP_COS = Math.cos(0.38), COMP_SIN = Math.sin(0.38);
+// A slow, very-low-frequency scalar that defines WHERE the light lives, returning
+// [0,1]: ~1 along the luminous SPINE of a ribbon, 0 in negative space.
+//
+// Instead of a high-frequency ridge (which fragments into many thin scattered strands
+// and reads as busy turbulence), we lay down a SMALL number of broad bands by phasing
+// a single low-frequency coordinate that runs ACROSS the focal flow. A gentle warp
+// bends those bands into organic sweeping ribbons that fill the whole frame, and a
+// soft profile keeps each ribbon WIDE with generous dark gaps between — designed
+// negative space, not noise. The field drifts slowly so ribbons breathe and migrate.
+const COMP_BANDS = 2.05; // ~2 ribbons across the frame → big, legible, balanced
+// the banding coordinate runs PERPENDICULAR to the focal sweep so ribbons align with
+// (and braid through) the dominant flow rather than cutting against it.
+const BAND_NX = 0.40, BAND_NY = 0.92; // ⟂ to (FLOW_DIRX,FLOW_DIRY)
+// Scratch outputs published by comp() so the deposit can colour ACROSS the ribbon
+// independently of how bright the focal envelope makes that stretch. compBand is the
+// raw across-ribbon position (0 at the edge/gap, 1 on the spine) — that's what should
+// drive the cool-edge→warm-spine colour ramp, NOT the gated brightness.
+let compBand = 0; // last comp() across-ribbon profile [0,1]
 const comp = (x: number, y: number, w: number): number => {
-  const rx = x * COMP_COS - y * COMP_SIN;
-  const ry = x * COMP_SIN + y * COMP_COS;
-  // low-freq base in [-1,1]; a second softer slice adds organic asymmetry
-  const n =
-    vnoise(rx * COMP_SCALE + 30.0, ry * COMP_SCALE - 17.0, w * 0.6 + 50.0) * 0.80 +
-    vnoise(rx * COMP_SCALE * 2.1 - 5.0, ry * COMP_SCALE * 2.1 + 9.0, w * 0.9 + 80.0) * 0.20;
-  // ridge: |n| flipped so the zero-crossings (smooth corridors) become bright spines.
-  const ridge = 1 - Math.abs(n);
-  // shape the ridge into THIN corridors with wide dark gaps between (negative space).
-  // A high knee keeps only the narrow spine of each ribbon, so the frame breathes.
-  return smoothstep(0.62, 0.99, ridge);
+  // coordinate across the ribbons, in [0,1]-ish; centered so warp is symmetric
+  const across = x * BAND_NX + y * BAND_NY;
+  const along = x * FLOW_DIRX + y * FLOW_DIRY;
+  // organic warp: bend the bands with a slow low-freq noise that varies ALONG the
+  // flow, so straight bands become sweeping, curving ribbons (not a barcode). A
+  // second finer warp adds life without breaking the few-large-shapes read.
+  const warp =
+    vnoise(along * 1.05 + 8.0, across * 0.7 - 3.0, w * 0.5 + 50.0) * 0.52 +
+    vnoise(along * 2.4 - 4.0, across * 1.5 + 9.0, w * 0.8 + 80.0) * 0.16;
+  // phase the bands: a cosine of the warped across-coordinate gives smooth periodic
+  // ribbons. (-cos+1)/2 in [0,1], peak=1 on the spine.
+  const phase = (across + warp) * COMP_BANDS * TAU;
+  const band = 0.5 - 0.5 * Math.cos(phase); // 1 at spine, 0 in the gap
+  const profile = smoothstep(0.18, 0.92, band); // broad ribbon body, soft edges, dark gaps
+  compBand = profile; // publish across-ribbon position for the colour ramp
+  // BREAK the regular striping: a slow large-scale envelope makes some stretches of
+  // ribbon swell into a bright FOCAL flow while others thin toward dark — so it reads
+  // as a few designed gestures with negative space, not evenly-spaced parallel lines.
+  const env =
+    vnoise(along * 0.85 - 12.0, across * 0.95 + 4.0, w * 0.4 + 120.0) * 0.5 + 0.5; // [0,1]
+  const focal = 0.55 + 0.45 * smoothstep(0.28, 0.82, env); // dim ribbons recede, focal ones bloom
+  // brightness gate = ribbon profile × focal envelope: generous negative space, broad
+  // smooth ribbon cores, a few intentional bands swelling into focal gestures.
+  return profile * focal;
 };
 
 // ── Palette ────────────────────────────────────────────────────────────────────
-// A cohesive designed gradient sampled by a normalized key in [0,1]: deep indigo →
-// royal violet → magenta → warm gold. Values are HDR-ish (allowed > 1) so the
-// brightest stops bloom through the ACES tonemap. Stops are linear RGB.
+// A cohesive designed gradient sampled by a normalized key in [0,1], reading from the
+// cool EDGES of a ribbon to its luminous warm SPINE: deep indigo void → teal-touched
+// blue → royal violet → soft magenta → warm amber → gold. The cool teal/blue range
+// is wide (it carries most of the frame, keeping the piece restrained and premium),
+// magenta is brief, and gold is RESERVED for the brightest confluence spines so it
+// stays earned, not garish. Values are HDR-ish (>1 at the top) so the brightest stops
+// bloom through the ACES tonemap. Stops are linear RGB.
 type RGB = [number, number, number];
 const STOPS: { t: number; c: RGB }[] = [
-  { t: 0.00, c: [0.04, 0.05, 0.16] }, // near-black indigo
-  { t: 0.22, c: [0.10, 0.10, 0.42] }, // deep blue
-  { t: 0.44, c: [0.34, 0.13, 0.62] }, // royal violet
-  { t: 0.64, c: [0.85, 0.20, 0.66] }, // magenta
-  { t: 0.82, c: [1.05, 0.45, 0.42] }, // warm coral
-  { t: 1.00, c: [1.15, 0.92, 0.50] }, // gold
+  { t: 0.00, c: [0.03, 0.05, 0.13] }, // near-black indigo void
+  { t: 0.18, c: [0.04, 0.14, 0.36] }, // deep ocean blue
+  { t: 0.38, c: [0.07, 0.30, 0.56] }, // luminous teal-blue (cool ribbon body)
+  { t: 0.54, c: [0.24, 0.22, 0.62] }, // indigo-violet
+  { t: 0.70, c: [0.62, 0.22, 0.64] }, // soft magenta
+  { t: 0.85, c: [1.05, 0.45, 0.40] }, // warm coral
+  { t: 1.00, c: [1.35, 0.92, 0.42] }, // gold spine (warm, low green/blue so it stays gold lit)
 ];
 const paletteR = new Float32Array(256);
 const paletteG = new Float32Array(256);
@@ -215,7 +256,12 @@ const seedAll = (): void => {
 let accR = new Float32Array(0);
 let accG = new Float32Array(0);
 let accB = new Float32Array(0);
-let bloom = new Float32Array(0); // scratch luminance for the separable bloom
+// COLORED bloom: blur each channel's bright excess so warm gold spines bloom warm and
+// the cool ribbon bodies bloom cool — the glow reinforces the palette instead of
+// washing confluences toward a flat white/blue. Three channels + one scratch row buffer.
+let bloomR = new Float32Array(0);
+let bloomG = new Float32Array(0);
+let bloomB = new Float32Array(0);
 let bloomTmp = new Float32Array(0);
 let vigLUT = new Float32Array(0); // per-pixel vignette multiplier (position-only → cache)
 let accW = 0, accH = 0;
@@ -225,7 +271,9 @@ const allocAccum = (W: number, H: number): void => {
   accR = new Float32Array(W * H);
   accG = new Float32Array(W * H);
   accB = new Float32Array(W * H);
-  bloom = new Float32Array(W * H);
+  bloomR = new Float32Array(W * H);
+  bloomG = new Float32Array(W * H);
+  bloomB = new Float32Array(W * H);
   bloomTmp = new Float32Array(W * H);
   // Precompute the cold vignette: it depends only on pixel position, so bake it once
   // per size instead of recomputing hypot+smoothstep for every pixel every frame.
@@ -250,8 +298,8 @@ const allocAccum = (W: number, H: number): void => {
 const FIELD_SCALE = 2.3; // how many lattice cells span [0,1] → broad sweeping bands
 const EPS = 0.0016; // finite-difference step (world units)
 const FLOW_SPEED = 0.082; // base advection speed (normalized units/sec)
-const SPEED_REF = 1.5; // reference curl-speed (≈ field mean) used to normalize color
-const EXPOSURE = 4.4; // HDR exposure before the ACES tonemap
+const SPEED_REF = 1.9; // reference curl-speed (≈ field mean) used to normalize color
+const EXPOSURE = 3.3; // HDR exposure before the ACES tonemap (tuned so ribbons keep colour, not blow to white)
 
 // ── Per-frame ───────────────────────────────────────────────────────────────────
 const decayPow = (base: number, dt: number): number => Math.pow(base, dt * 60);
@@ -276,6 +324,20 @@ const frame = (t: Term, time: number, dt: number): void => {
   // Stabilize the advection step (don't let a long frame fling particles).
   const sdt = Math.min(dt, 1 / 30);
 
+  // RESOLUTION-NORMALIZED deposit: brightness must not depend on grid size. A fixed
+  // particle count splatting into a SMALL grid packs many particles per pixel (→ white
+  // blowout); into a LARGE grid, few per pixel (→ faint). Scale each deposit by
+  // pixels-per-particle relative to a reference so the integrated glow is the same at
+  // 110×68 and 300×180. Clamped so extreme sizes stay tasteful.
+  // Keep particles-per-pixel roughly CONSTANT across grid sizes by advecting only an
+  // active SUBSET scaled to the pixel count (the rest stay dormant). This is what kills
+  // the small-window white blowout at its source — a 110×68 grid runs far fewer
+  // particles than a 300×180 one — and it also saves work on small terminals.
+  const REF_PPP = 0.075; // target particles per pixel
+  let activeCount = Math.round(W * H * REF_PPP);
+  if (activeCount < 700) activeCount = 700;        // floor: keep the field alive when tiny
+  if (activeCount > PARTICLES) activeCount = PARTICLES;
+
   // — Decay the accumulation buffer (silky trail persistence) —
   const fadeMul = decayPow(0.915, dt);
   for (let i = 0; i < accR.length; i++) { accR[i] *= fadeMul; accG[i] *= fadeMul; accB[i] *= fadeMul; }
@@ -285,7 +347,7 @@ const frame = (t: Term, time: number, dt: number): void => {
   // positions in pure normalized [0,1] space so wrapping/respawn is trivial.
   const fs = FIELD_SCALE;
   const invEps2 = 1 / (2 * EPS);
-  for (let i = 0; i < PARTICLES; i++) {
+  for (let i = 0; i < activeCount; i++) {
     let x = px[i], y = py[i];
 
     // world sample coords (aspect-corrected so the field isn't stretched)
@@ -295,21 +357,21 @@ const frame = (t: Term, time: number, dt: number): void => {
     // curl of ψ:  v = ( ∂ψ/∂y , −∂ψ/∂x )
     const dpx = (psi(sx + EPS, sy, wSlice) - psi(sx - EPS, sy, wSlice)) * invEps2;
     const dpy = (psi(sx, sy + EPS, wSlice) - psi(sx, sy - EPS, wSlice)) * invEps2;
-    let vx = dpy;
-    let vy = -dpx;
-
-    // a faint large-scale rotational bias gives the whole piece a slow global swirl
-    const cx = x - 0.5, cy = y - 0.5;
-    vx += -cy * 0.10;
-    vy += cx * 0.10;
+    const vx = dpy;
+    const vy = -dpx;
+    // No global rotational bias: the dominant directional wind baked into ψ already
+    // gives one clear focal sweep, and a swirl on top of it just pools particles into
+    // a corner (lopsided frame). Letting the wind carry them keeps the frame balanced.
 
     const sp = Math.sqrt(vx * vx + vy * vy) + 1e-6;
     // smoothed speed for stable coloring
     pspd[i] = pspd[i] * 0.86 + sp * 0.14;
 
     // membership in a luminous corridor (1) vs negative space (0). This gates how
-    // much light the particle lays down and where it sits in the palette ramp.
+    // much light the particle lays down. comp() also publishes compBand = the raw
+    // across-ribbon position, which we read right after for the colour ramp.
     const cm = comp(x, y * aspect, compW);
+    const bandPos = compBand; // 0 at ribbon edge, 1 on the spine
 
     // advance along the streamline. We move at a roughly constant arc-length speed
     // (normalize then scale) so ribbons stay evenly drawn, but let local speed still
@@ -339,24 +401,30 @@ const frame = (t: Term, time: number, dt: number): void => {
 
     // normalized speed (≈0..1 for the bulk of the field; SPEED_REF ≈ field mean)
     const ns = pspd[i] / SPEED_REF;
-    // palette key drives COLOR ACROSS the corridor: the cool indigo/violet base sits
-    // at corridor EDGES (low cm), warming through magenta toward a gold SPINE (high
-    // cm) where the light concentrates. Speed nudges it warmer at confluences and a
-    // slow global drift + tiny per-particle jitter keep it alive — gold stays earned.
-    const key = clamp01(0.12 + cm * 0.44 + ns * 0.20 + pseed[i] + hueDrift * 0.08);
+    // Colour ACROSS the ribbon, driven by bandPos (edge→spine), NOT by brightness —
+    // so a dim ribbon and the focal one share the same cohesive cool-edge→warm-spine
+    // gradient. The cool teal-blue body owns the broad mid-ribbon; only the very spine
+    // (bandPos→1, helped by speed) tips into magenta→gold. bandPos^1.8 keeps the warm
+    // end RESERVED, and the 0.28 base anchors the body in luminous teal-blue.
+    const bWarm = bandPos * bandPos * bandPos * (1.3 - 0.3 * bandPos); // ≈ bandPos^2.6, warm reserved
+    const key = clamp01(0.26 + bWarm * 0.56 + ns * 0.10 + pseed[i] + hueDrift * 0.05);
     const pi = (key * 255) | 0;
     let cr = paletteR[pi], cg = paletteG[pi], cb = paletteB[pi];
 
     // fade-in newly respawned particles so they don't pop, and fade them back OUT
     // as they age so no single ribbon ever accumulates to a solid white smear.
     const birth = smoothstep(0, 0.6, plife[i]) * (1 - smoothstep(6, 11, plife[i]));
-    // corridor gate: deposit scales with membership SQUARED so the negative space
-    // goes truly dark (premium void) while ribbon spines carry the energy. This is
-    // what turns a uniform busy field into a few intentional ribbons of light.
-    const corridor = cm * cm;
-    // a touch brighter where flow is fast → energy reads as light, but kept low so
-    // the HDR buffer settles well below white and the palette stays visible.
-    const intensity = (0.013 + ns * 0.030) * birth * (0.03 + 0.97 * corridor);
+    // corridor gate: deposit scales with membership so the negative space goes truly
+    // dark (premium void) while ribbon bodies carry the energy. A gentle ~1.6 power
+    // (cheap polynomial, no sqrt) keeps the void clean yet lets the cool teal ribbon
+    // BODY (mid cm) read as light, not just the hot spine — so the cohesive cool→warm
+    // gradient is actually visible across each ribbon.
+    const corridor = cm * (1.3 - 0.3 * cm); // ≈ cm^1.2 — broad body reads, void stays clean
+    // a touch brighter where flow is fast → energy reads as light, but kept low so the
+    // HDR buffer settles well below white and the palette stays visible. (Per-pixel
+    // density is held constant across grid sizes by the active-subset count above, so
+    // no size-dependent blowout — this stays a fixed deposit weight.)
+    const intensity = (0.013 + ns * 0.024) * birth * (0.02 + 0.98 * corridor);
     cr *= intensity; cg *= intensity; cb *= intensity;
 
     // bilinear splat for sub-pixel-smooth ribbons
@@ -382,10 +450,11 @@ const frame = (t: Term, time: number, dt: number): void => {
   let o = 0;
   for (let idx = 0; idx < N; idx++) {
     const vig = vigLUT[idx];
-    const bl = bloom[idx];
-    let R = (accR[idx] * EXPOSURE + bl * 0.70) * vig + 0.006;
-    let G = (accG[idx] * EXPOSURE + bl * 0.62) * vig + 0.009;
-    let B = (accB[idx] * EXPOSURE + bl * 0.95) * vig + 0.020;
+    // colored bloom (warm where the gold spines confluence, cool along the bodies),
+    // plus a faint cold ambient floor that keeps the void premium and slightly blue.
+    let R = (accR[idx] * EXPOSURE + bloomR[idx] * 0.55) * vig + 0.006;
+    let G = (accG[idx] * EXPOSURE + bloomG[idx] * 0.55) * vig + 0.010;
+    let B = (accB[idx] * EXPOSURE + bloomB[idx] * 0.60) * vig + 0.024;
 
     // ACES filmic, inlined (a=2.51 b=0.03 c=2.43 d=0.59 e=0.14), clamped to 0..1
     R = (R * (2.51 * R + 0.03)) / (R * (2.43 * R + 0.59) + 0.14);
@@ -402,15 +471,9 @@ const frame = (t: Term, time: number, dt: number): void => {
   }
 };
 
-// Separable bloom: threshold the accumulation luminance, blur it, store in `bloom`.
-const buildBloom = (W: number, H: number): void => {
-  // extract bright confluences into bloomTmp
-  for (let i = 0; i < accR.length; i++) {
-    const l = (accR[i] * 0.6 + accG[i] * 0.4 + accB[i] * 0.7) * EXPOSURE;
-    const e = l - 0.85; // knee: only the brightest confluences bloom
-    bloomTmp[i] = e > 0 ? e : 0;
-  }
-  // horizontal blur (5-tap) → bloom
+// Separable 5-tap blur of `dst` in place, via the shared `bloomTmp` scratch.
+const blurChannel = (dst: Float32Array, W: number, H: number): void => {
+  // horizontal: dst → bloomTmp
   for (let y = 0; y < H; y++) {
     const row = y * W;
     for (let x = 0; x < W; x++) {
@@ -418,12 +481,12 @@ const buildBloom = (W: number, H: number): void => {
       const x1 = x > 0 ? x - 1 : 0;
       const x3 = x < W - 1 ? x + 1 : W - 1;
       const x4 = x < W - 2 ? x + 2 : W - 1;
-      bloom[row + x] =
-        bloomTmp[row + x0] * 0.12 + bloomTmp[row + x1] * 0.24 +
-        bloomTmp[row + x] * 0.28 + bloomTmp[row + x3] * 0.24 + bloomTmp[row + x4] * 0.12;
+      bloomTmp[row + x] =
+        dst[row + x0] * 0.12 + dst[row + x1] * 0.24 +
+        dst[row + x] * 0.28 + dst[row + x3] * 0.24 + dst[row + x4] * 0.12;
     }
   }
-  // vertical blur (5-tap) → bloomTmp → copy back to bloom
+  // vertical: bloomTmp → dst
   for (let y = 0; y < H; y++) {
     const y0 = y > 1 ? y - 2 : 0;
     const y1 = y > 0 ? y - 1 : 0;
@@ -431,17 +494,42 @@ const buildBloom = (W: number, H: number): void => {
     const y4 = y < H - 2 ? y + 2 : H - 1;
     const r0 = y0 * W, r1 = y1 * W, r = y * W, r3 = y3 * W, r4 = y4 * W;
     for (let x = 0; x < W; x++) {
-      bloomTmp[r + x] =
-        bloom[r0 + x] * 0.12 + bloom[r1 + x] * 0.24 +
-        bloom[r + x] * 0.28 + bloom[r3 + x] * 0.24 + bloom[r4 + x] * 0.12;
+      dst[r + x] =
+        bloomTmp[r0 + x] * 0.12 + bloomTmp[r1 + x] * 0.24 +
+        bloomTmp[r + x] * 0.28 + bloomTmp[r3 + x] * 0.24 + bloomTmp[r4 + x] * 0.12;
     }
   }
-  bloom.set(bloomTmp);
+};
+
+// COLORED separable bloom: extract each channel's bright excess above a luminance
+// knee, then blur the three channels. Because the bloom carries the local hue, warm
+// gold spines bloom WARM and cool ribbon bodies bloom cool — the glow reinforces the
+// palette at confluences instead of flattening them toward white. Cheap enough (we
+// have huge perf headroom) and a real lift in how the light reads.
+const buildBloom = (W: number, H: number): void => {
+  const n = accR.length;
+  for (let i = 0; i < n; i++) {
+    const r = accR[i] * EXPOSURE, g = accG[i] * EXPOSURE, b = accB[i] * EXPOSURE;
+    const l = r * 0.6 + g * 0.4 + b * 0.7;
+    const e = l - 0.92; // high knee: only the brightest gold confluences bloom (keep it earned)
+    if (e > 0) {
+      // weight each channel by its share of the luminance so the bloom keeps the hue
+      const inv = e / (l + 1e-5);
+      bloomR[i] = r * inv;
+      bloomG[i] = g * inv;
+      bloomB[i] = b * inv;
+    } else {
+      bloomR[i] = 0; bloomG[i] = 0; bloomB[i] = 0;
+    }
+  }
+  blurChannel(bloomR, W, H);
+  blurChannel(bloomG, W, H);
+  blurChannel(bloomB, W, H);
 };
 
 runDemo({
   title: 'Flow Field',
-  hud: 'HIERARCHICAL CURL-NOISE - DESIGNED CORRIDORS + NEGATIVE SPACE - HDR TRAIL BLOOM',
+  hud: 'CURL-NOISE FOCAL FLOW - DESIGNED RIBBONS + NEGATIVE SPACE - HDR COLORED BLOOM',
   captureT: 7,
   init: (t) => {
     allocAccum(t.W, t.H);

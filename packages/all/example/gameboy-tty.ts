@@ -19,7 +19,17 @@
  *   (no arg boots the bundled homebrew; GB_ROM=acid2 / GB_ROM=cgbacid2 = tests)
  */
 
-import { Term } from './_term';
+import { dlopen } from 'bun:ffi';
+import { readFileSync, writeFileSync } from 'node:fs';
+import { basename } from 'node:path';
+
+import { Kernel32, Xinput1_4 } from '../index';
+import { STD_HANDLE } from '@bun-win32/kernel32';
+
+import * as audio from './_audio';
+import { Term, makeFrameWaiter, encodePNG } from './_term';
+import { loadAcid2 } from './gameboy-rom';
+import { loadLibbet } from './gameboy-game-rom';
 
 const GB_W = 160;
 const GB_H = 144;
@@ -1690,4 +1700,433 @@ export function blitToTerm(t: Term, frame: Uint8Array): void {
       t.setPixel(ox + x, rowT, frame[o]!, frame[o + 1]!, frame[o + 2]!);
     }
   }
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// Input — true held buttons via the Win32 console API (ANSI autorepeat fallback)
+// ════════════════════════════════════════════════════════════════════════════
+
+// Virtual-key codes.
+const VK = {
+  LEFT: 0x25, UP: 0x26, RIGHT: 0x27, DOWN: 0x28,
+  Z: 0x5a, X: 0x58, RETURN: 0x0d, RSHIFT: 0xa1,
+  CONTROL: 0x11, ESC: 0x1b, M: 0x4d, R: 0x52, P: 0x50,
+  TAB: 0x09, LBRACK: 0xdb, RBRACK: 0xdd, C: 0x43,
+} as const;
+
+// Console input mode flags.
+const ENABLE_PROCESSED_INPUT = 0x0001;
+const ENABLE_LINE_INPUT = 0x0002;
+const ENABLE_ECHO_INPUT = 0x0004;
+const ENABLE_WINDOW_INPUT = 0x0008;
+const ENABLE_MOUSE_INPUT = 0x0010;
+const ENABLE_VIRTUAL_TERMINAL_INPUT = 0x0200;
+
+/**
+ * A live input source. `held` is the set of currently-down virtual-key codes
+ * (the joypad state); `pressed` accumulates edge presses (for toggle hotkeys) —
+ * the caller drains and clears it each frame. `poll()` refreshes both.
+ */
+interface InputSource {
+  ok: boolean;
+  held: Set<number>;
+  pressed: number[];
+  poll(): void;
+  restore(): void;
+}
+
+/**
+ * The authentic path: put the console input handle in raw mode (no line/echo/
+ * VT-input) and read real KEY_DOWN/KEY_UP `INPUT_RECORD`s via ReadConsoleInputW
+ * — so a held D-pad is genuinely held until release, exactly like a gamepad.
+ * Returns null when stdin is not a real console (piped/redirected).
+ */
+function setupWin32Input(): InputSource | null {
+  try {
+    const k = dlopen('kernel32.dll', {
+      GetStdHandle: { args: ['u32'], returns: 'ptr' },
+      GetConsoleMode: { args: ['ptr', 'ptr'], returns: 'i32' },
+      SetConsoleMode: { args: ['ptr', 'u32'], returns: 'i32' },
+      GetNumberOfConsoleInputEvents: { args: ['ptr', 'ptr'], returns: 'i32' },
+      ReadConsoleInputW: { args: ['ptr', 'ptr', 'u32', 'ptr'], returns: 'i32' },
+      FlushConsoleInputBuffer: { args: ['ptr'], returns: 'i32' },
+    });
+    const hIn = k.symbols.GetStdHandle(0xfffffff6); // STD_INPUT_HANDLE = (DWORD)-10
+    const saved = Buffer.alloc(4);
+    if (!k.symbols.GetConsoleMode(hIn, saved.ptr!)) return null; // not a real console
+    const savedMode = saved.readUInt32LE(0);
+    const raw = savedMode & ~(ENABLE_LINE_INPUT | ENABLE_ECHO_INPUT | ENABLE_PROCESSED_INPUT |
+      ENABLE_VIRTUAL_TERMINAL_INPUT | ENABLE_MOUSE_INPUT | ENABLE_WINDOW_INPUT);
+    k.symbols.SetConsoleMode(hIn, raw >>> 0);
+    k.symbols.FlushConsoleInputBuffer(hIn);
+
+    const REC = 20; // sizeof(INPUT_RECORD) on x64
+    const N = 64;
+    const buf = Buffer.alloc(REC * N);
+    const countBuf = Buffer.alloc(4);
+    const readBuf = Buffer.alloc(4);
+    const held = new Set<number>();
+    const pressed: number[] = [];
+    return {
+      ok: true,
+      held,
+      pressed,
+      poll(): void {
+        for (;;) {
+          if (!k.symbols.GetNumberOfConsoleInputEvents(hIn, countBuf.ptr!)) break;
+          const avail = countBuf.readUInt32LE(0);
+          if (avail === 0) break;
+          const want = Math.min(N, avail);
+          if (!k.symbols.ReadConsoleInputW(hIn, buf.ptr!, want, readBuf.ptr!)) break;
+          const got = readBuf.readUInt32LE(0);
+          for (let i = 0; i < got; i += 1) {
+            const o = i * REC;
+            if (buf.readUInt16LE(o) !== 1) continue; // KEY_EVENT == 1
+            const down = buf.readInt32LE(o + 4) !== 0;
+            const vk = buf.readUInt16LE(o + 10);
+            if (down) {
+              if (!held.has(vk)) pressed.push(vk);
+              held.add(vk);
+            } else {
+              held.delete(vk);
+            }
+          }
+          if (got < want) break;
+        }
+      },
+      restore(): void {
+        k.symbols.SetConsoleMode(hIn, savedMode >>> 0);
+      },
+    };
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Fallback for piped/SSH/non-conhost stdin: terminals send key REPEATS, not
+ * releases, so we latch each key and expire it shortly after its last repeat
+ * (matching the house pattern in voxel-flight.ts). Degraded feel, but playable
+ * anywhere. Select maps to Backspace here (RShift is not distinguishable).
+ */
+function setupAnsiInput(): InputSource {
+  const held = new Set<number>();
+  const pressed: number[] = [];
+  const expiry = new Map<number, number>();
+  const DECAY_MS = 150;
+  const stdin = process.stdin;
+  let rawOn = false;
+  const now = (): number => Bun.nanoseconds() / 1e6;
+  const press = (vk: number): void => {
+    if (!held.has(vk)) pressed.push(vk);
+    held.add(vk);
+    expiry.set(vk, now() + DECAY_MS);
+  };
+  const onData = (data: Buffer): void => {
+    const s = data.toString('latin1');
+    for (let i = 0; i < s.length; i += 1) {
+      const ch = s[i]!;
+      const code = s.charCodeAt(i);
+      if (code === 27 && s[i + 1] === '[') {
+        const a = s[i + 2];
+        if (a === 'A') press(VK.UP);
+        else if (a === 'B') press(VK.DOWN);
+        else if (a === 'C') press(VK.RIGHT);
+        else if (a === 'D') press(VK.LEFT);
+        i += 2;
+        continue;
+      }
+      if (code === 27) { press(VK.ESC); continue; }
+      if (code === 3) { press(VK.CONTROL); press(VK.C); continue; } // Ctrl-C
+      if (code === 13) { press(VK.RETURN); continue; }
+      if (code === 127 || code === 8) { press(VK.RSHIFT); continue; } // Backspace → Select
+      if (code === 9) { press(VK.TAB); continue; }
+      const up = ch.toUpperCase();
+      if (up === 'Z') press(VK.Z);
+      else if (up === 'X') press(VK.X);
+      else if (up === 'M') press(VK.M);
+      else if (up === 'R') press(VK.R);
+      else if (up === 'P') press(VK.P);
+      else if (ch === '[') press(VK.LBRACK);
+      else if (ch === ']') press(VK.RBRACK);
+    }
+  };
+  try {
+    if (stdin.isTTY) { stdin.setRawMode(true); rawOn = true; }
+    stdin.resume();
+    stdin.on('data', onData);
+  } catch {
+    /* not interactive — held stays empty */
+  }
+  return {
+    ok: false,
+    held,
+    pressed,
+    poll(): void {
+      const t = now();
+      for (const [vk, when] of expiry) {
+        if (t >= when) { held.delete(vk); expiry.delete(vk); }
+      }
+    },
+    restore(): void {
+      try {
+        stdin.removeListener('data', onData);
+        if (rawOn) stdin.setRawMode(false);
+        stdin.pause();
+      } catch {
+        /* ignore */
+      }
+    },
+  };
+}
+
+// XInput state buffer (16 bytes) reused each frame.
+const xinputBuf = Buffer.alloc(16);
+
+/** Fold the held-key set plus an XInput pad (controller 0) into Buttons. */
+function readButtons(src: InputSource): Buttons {
+  const h = src.held;
+  let right = h.has(VK.RIGHT), left = h.has(VK.LEFT), up = h.has(VK.UP), down = h.has(VK.DOWN);
+  let a = h.has(VK.Z), bBtn = h.has(VK.X), start = h.has(VK.RETURN), select = h.has(VK.RSHIFT);
+  if (Xinput1_4.XInputGetState(0, xinputBuf.ptr!) === 0) {
+    const btn = xinputBuf.readUInt16LE(4);
+    const lx = xinputBuf.readInt16LE(8);
+    const ly = xinputBuf.readInt16LE(10);
+    const DZ = 7849;
+    if (btn & 0x1000) a = true;
+    if (btn & 0x2000) bBtn = true;
+    if (btn & 0x0010) start = true;
+    if (btn & 0x0020) select = true;
+    if ((btn & 0x0001) || ly > DZ) up = true;
+    if ((btn & 0x0002) || ly < -DZ) down = true;
+    if ((btn & 0x0004) || lx < -DZ) left = true;
+    if ((btn & 0x0008) || lx > DZ) right = true;
+  }
+  return { right, left, up, down, a, bBtn, select, start };
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// ROM loading + HUD + headless capture
+// ════════════════════════════════════════════════════════════════════════════
+
+/** The 16-char cartridge title from the header (0x134–0x143). */
+function romHeaderTitle(rom: Uint8Array): string {
+  let s = '';
+  for (let addr = 0x134; addr <= 0x143; addr += 1) {
+    const c = rom[addr] ?? 0;
+    if (c === 0) break;
+    if (c >= 32 && c < 127) s += String.fromCharCode(c);
+  }
+  return s.trim();
+}
+
+/** Resolve which ROM to boot: CLI arg / GB_ROM, else the bundled homebrew. */
+function resolveRom(): { rom: Uint8Array; title: string; path: string | null } {
+  const sel = (process.argv[2] ?? process.env.GB_ROM ?? 'game').trim();
+  if (sel === 'game' || sel === 'libbet') return { rom: loadLibbet(), title: 'Libbet and the Magic Floor', path: null };
+  if (sel === 'acid2') return { rom: loadAcid2(), title: 'dmg-acid2', path: null };
+  const file = readFileSync(sel);
+  const rom = new Uint8Array(file.buffer, file.byteOffset, file.byteLength);
+  return { rom, title: romHeaderTitle(rom) || basename(sel), path: sel };
+}
+
+/** A small translucent status line in the top-left bezel/corner. */
+function drawHud(t: Term, title: string, info: string): void {
+  const line = `GB · ${title}`;
+  const w = Math.min(t.W - 4, Math.max(Term.textWidth(line), Term.textWidth(info)) + 6);
+  t.plate(2, 2, w, 20, 0.42);
+  t.text(5, 4, line, 150, 220, 170, 1);
+  t.text(5, 12, info, 150, 150, 165, 1);
+}
+
+/** A scripted joypad timeline for deterministic capture (clear title → wander). */
+function scriptedButtons(frame: number): Buttons {
+  const none: Buttons = { right: false, left: false, up: false, down: false, a: false, bBtn: false, select: false, start: false };
+  const pulse = (lo: number, hi: number): boolean => frame >= lo && frame < hi;
+  if (pulse(30, 40) || pulse(70, 80) || pulse(110, 120) || pulse(150, 160) || pulse(190, 200) || pulse(230, 240)) {
+    return { ...none, start: true };
+  }
+  if (pulse(255, 268)) return { ...none, right: true };
+  if (pulse(275, 288)) return { ...none, down: true };
+  if (pulse(295, 308)) return { ...none, right: true };
+  if (pulse(315, 328)) return { ...none, down: true };
+  return none;
+}
+
+/** Headless: run N frames with the scripted timeline, write a PNG, print stats. */
+function runCapture(gb: GameBoy, title: string): void {
+  const cols = Math.max(20, Number(process.env.TERM_COLS ?? 160) | 0);
+  const rows = Math.max(8, Number(process.env.TERM_ROWS ?? 72) | 0);
+  const frames = Math.max(1, Number(process.env.CAPTURE_FRAMES_RUN ?? 340) | 0);
+  const t = new Term(cols, rows);
+  for (let i = 0; i < frames; i += 1) {
+    gb.setButtons(scriptedButtons(i));
+    gb.runFrame();
+  }
+  blitToTerm(t, gb.frame);
+  drawHud(t, title, 'pure-TS GB/CGB · terminal');
+  const out = process.env.CAPTURE_PNG!;
+  writeFileSync(out, encodePNG(t.buf, t.W, t.H));
+  let nonBlack = 0;
+  let lumaSum = 0;
+  const n = t.buf.length / 3;
+  for (let i = 0; i < t.buf.length; i += 3) {
+    const L = t.buf[i]! * 0.299 + t.buf[i + 1]! * 0.587 + t.buf[i + 2]! * 0.114;
+    lumaSum += L;
+    if (L > 8) nonBlack += 1;
+  }
+  console.log(`[shot] ok=true nonBlack=${(nonBlack / n).toFixed(3)} meanLuma=${(lumaSum / n / 255).toFixed(3)} -> ${out}`);
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// Live loop
+// ════════════════════════════════════════════════════════════════════════════
+
+async function main(): Promise<void> {
+  const { rom, title } = resolveRom();
+
+  const AUDIO_RATE = 48000;
+  const pcm = audio.createPcmOutput({ sampleRate: AUDIO_RATE, channels: 2 });
+  const apu = new Apu(AUDIO_RATE);
+  let gb = new GameBoy(rom, apu);
+
+  // Headless capture short-circuits the console/audio setup entirely.
+  if (process.env.CAPTURE_PNG) {
+    runCapture(gb, title);
+    return;
+  }
+
+  if (pcm.available) {
+    pcm.setVolume(0.6);
+    pcm.start();
+  }
+
+  // Console OUTPUT → VT truecolor + UTF-8 + alt screen + hidden cursor.
+  Kernel32.Preload(['GetStdHandle', 'GetConsoleMode', 'SetConsoleMode', 'GetConsoleOutputCP', 'SetConsoleOutputCP', 'GetConsoleScreenBufferInfo']);
+  const hOut = Kernel32.GetStdHandle(STD_HANDLE.OUTPUT);
+  const omBuf = Buffer.alloc(4);
+  Kernel32.GetConsoleMode(hOut, omBuf.ptr);
+  const savedOut = omBuf.readUInt32LE(0);
+  Kernel32.SetConsoleMode(hOut, (savedOut | 0x0001 | 0x0004) >>> 0); // PROCESSED_OUTPUT | VT_PROCESSING
+  const savedCp = Kernel32.GetConsoleOutputCP();
+  Kernel32.SetConsoleOutputCP(65001);
+  process.stdout.write('\x1b[?1049h\x1b[?25l\x1b[?7l\x1b[2J\x1b[H');
+
+  const input = setupWin32Input() ?? setupAnsiInput();
+
+  let muted = false;
+  let paused = false;
+  let running = true;
+
+  let restored = false;
+  const cleanup = (): void => {
+    if (restored) return;
+    restored = true;
+    input.restore();
+    process.stdout.write('\x1b[0m\x1b[?7h\x1b[?25h\x1b[?1049l');
+    Kernel32.SetConsoleMode(hOut, savedOut >>> 0);
+    Kernel32.SetConsoleOutputCP(savedCp);
+    pcm.close();
+  };
+  process.on('exit', cleanup);
+  process.on('SIGINT', () => { running = false; });
+
+  const detectSize = (): { cols: number; rows: number } => {
+    const csbi = Buffer.alloc(22);
+    let cols = 0;
+    let rows = 0;
+    if (Kernel32.GetConsoleScreenBufferInfo(hOut, csbi.ptr)) {
+      const v = new DataView(csbi.buffer);
+      cols = v.getInt16(14, true) - v.getInt16(10, true) + 1;
+      rows = v.getInt16(16, true) - v.getInt16(12, true) + 1;
+    }
+    if (!cols) cols = process.stdout.columns || 120;
+    if (!rows) rows = process.stdout.rows || 40;
+    cols = Math.max(20, Math.min(cols | 0, 400));
+    rows = Math.max(8, Math.min((rows | 0) - 1, 200));
+    return { cols, rows };
+  };
+
+  let sz = detectSize();
+  let t = new Term(sz.cols, sz.rows);
+  const wait = makeFrameWaiter();
+  const GB_FRAME_MS = 1000 / 59.7;
+  const durationMs = Number(process.env.DEMO_DURATION_MS ?? 0); // headless live-loop smoke
+  const t0 = Bun.nanoseconds();
+  let fpsEma = 60;
+  let prevFrame = Bun.nanoseconds();
+
+  while (running) {
+    const frameStart = Bun.nanoseconds();
+    if (durationMs > 0 && (frameStart - t0) / 1e6 >= durationMs) break;
+    const dtMs = (frameStart - prevFrame) / 1e6;
+    prevFrame = frameStart;
+    if (dtMs > 0) fpsEma = fpsEma * 0.9 + Math.min(999, 1000 / dtMs) * 0.1;
+
+    // Live resize.
+    sz = detectSize();
+    if (sz.cols !== t.cols || sz.rows !== t.rows) {
+      t = new Term(sz.cols, sz.rows);
+      process.stdout.write('\x1b[2J\x1b[H');
+    }
+
+    input.poll();
+    if (input.held.has(VK.ESC) || (input.held.has(VK.CONTROL) && input.held.has(VK.C))) break;
+    const turbo = input.held.has(VK.TAB);
+    for (const vk of input.pressed) {
+      if (vk === VK.M) muted = !muted;
+      else if (vk === VK.P) paused = !paused;
+      else if (vk === VK.R) gb = new GameBoy(rom, apu);
+      else if (vk === VK.LBRACK) activePalette = (activePalette + DMG_PALETTES.length - 1) % DMG_PALETTES.length;
+      else if (vk === VK.RBRACK) activePalette = (activePalette + 1) % DMG_PALETTES.length;
+    }
+    input.pressed.length = 0;
+
+    if (!paused) {
+      gb.setButtons(readButtons(input));
+      const steps = turbo ? 6 : 1;
+      for (let s = 0; s < steps; s += 1) {
+        gb.runFrame();
+        if (gb.apu) {
+          if (pcm.available && !muted && !turbo && pcm.queued() < 4) {
+            const blk = gb.apu.drain(AUDIO_RATE);
+            if (blk.length) pcm.submit(blk);
+          } else {
+            gb.apu.drain(AUDIO_RATE); // keep the ring from overflowing
+          }
+        }
+      }
+    }
+
+    blitToTerm(t, gb.frame);
+    const status = `${Math.round(fpsEma)} FPS  ${muted ? 'MUTE' : '♪'}` +
+      `${paused ? '  PAUSE' : ''}${turbo ? '  TURBO' : ''}  Z=A X=B ENT=START RSH=SEL  ESC quit`;
+    drawHud(t, title, status);
+    t.present();
+
+    const elapsedMs = (Bun.nanoseconds() - frameStart) / 1e6;
+    if (!turbo) {
+      const left = GB_FRAME_MS - elapsedMs;
+      if (left > 0.2) {
+        if (wait) wait(left);
+        else await Bun.sleep(left);
+      }
+    }
+    await new Promise<void>((r) => setImmediate(r));
+  }
+
+  cleanup();
+  process.exit(0);
+}
+
+process.on('uncaughtException', (e) => {
+  console.error(e);
+  process.exit(1);
+});
+
+if (import.meta.main) {
+  main().catch((e) => {
+    console.error(e);
+    process.exit(1);
+  });
 }

@@ -51,6 +51,7 @@ const METER_TRACK: RGB = [48, 46, 58];
 // A block renders into a span of transcript rows. `reveal` (0..1) is animated by
 // the director so streaming / fills / panels grow in over time.
 type Block =
+  | { kind: 'welcome' }
   | { kind: 'user'; text: string }
   | { kind: 'assistant'; text: string; reveal: number }
   | { kind: 'tool'; head: string; status: 'run' | 'done'; lines: ToolLine[]; reveal: number }
@@ -499,6 +500,8 @@ function initState(t: CharTerm): void {
 // Measure the number of transcript rows a block occupies at width w.
 function blockHeight(b: Block, w: number, caches: WrapCache): number {
   switch (b.kind) {
+    case 'welcome':
+      return 5; // 3-row boxed splash + tip line + spacer
     case 'user':
       return wrapCached(caches, 'u', b.text, w - 2).length + 1;
     case 'assistant': {
@@ -549,6 +552,26 @@ function drawBlock(
 ): void {
   const inner = w - 2;
   switch (b.kind) {
+    case 'welcome': {
+      // Session-start splash — the real Claude Code welcome card. A rounded, clay-
+      // edged box with the sparkle mark, anchored at the top of every session so
+      // the transcript never opens onto a black void. Width-capped so it reads as a
+      // card, not a banner, on wide terminals.
+      const bw = Math.min(w, 52);
+      t.fillRect(x, y, bw, 3, PANEL_BG);
+      // Faint clay drop-shadow for a touch of depth.
+      t.shadeRect(x + 1, y + 3, bw, 1, 0, 0, 0, 0.45);
+      t.box(x, y, bw, 3, 'rounded', CLAY_DIM, PANEL_BG);
+      t.put(x + 2, y + 1, '✻', CLAY, PANEL_BG, true);
+      t.text(x + 4, y + 1, 'Welcome to', INK, PANEL_BG, false);
+      t.text(x + 15, y + 1, 'Claude Code', CLAY, PANEL_BG, true);
+      const research = ' research preview ';
+      // Tag only when there's clear room past the title (narrow cards drop it).
+      if (bw >= 48) t.text(x + bw - research.length - 2, y + 1, research, FAINT, PANEL_BG);
+      // Subtle one-line tip under the card.
+      t.text(x + 2, y + 3, '/help for commands · cwd: ~/projects/api', FAINT);
+      return;
+    }
     case 'user': {
       const lines = wrapCached(caches, 'u', b.text, inner);
       for (let i = 0; i < lines.length; i++) {
@@ -765,7 +788,9 @@ function frame(t: CharTerm, time: number, _dt: number, _frameNo: number): void {
   const transRows = Math.max(1, transBottom - transTop);
 
   // ── Build transcript blocks for this frame ──
-  const blocks: Block[] = [];
+  // Every session opens with the welcome splash, so the transcript top is always
+  // anchored by a designed card rather than a void.
+  const blocks: Block[] = [{ kind: 'welcome' }];
   let inputText = S.inputBuf;
   let caretInInput = true;
 
@@ -815,15 +840,18 @@ function frame(t: CharTerm, time: number, _dt: number, _frameNo: number): void {
     totalH += h + 1;
   }
 
-  // Anchor: while the transcript is shorter than the viewport, grow DOWNWARD from
-  // the top (just under the chrome) like the real TUI — no floating top void. Once
-  // it overflows, it bottom-pins so the freshest content always hugs the prompt.
-  const maxScroll = Math.max(0, totalH - transRows);
+  // Anchor (faithful to the real TUI): the welcome card pins to the TOP under the
+  // chrome and content flows downward; once the stack overflows the viewport it
+  // bottom-pins so the freshest block always hugs the input box and older content
+  // scrolls up off the top. The trailing inter-block spacer of the last block is
+  // dropped so a full transcript ends one clean line above the prompt.
+  const stackH = totalH - 1;
+  const maxScroll = Math.max(0, stackH - transRows);
   S.scroll = Math.max(0, Math.min(S.scroll, maxScroll));
-  // y of the first block's first row (can be negative → clipped by puts).
-  let y = totalH <= transRows
-    ? transTop
-    : transTop + (transRows - totalH) + S.scroll;
+  // y of the first block's first row (negative → clipped by puts).
+  let y = stackH <= transRows
+    ? transTop // fits: welcome card hugs the chrome, content flows down
+    : transBottom - stackH + S.scroll; // overflows: bottom-pin, scroll lifts older in
 
   const hoverRow = (!attract && t.mouseInside && t.mouseY >= transTop && t.mouseY < transBottom)
     ? t.mouseY

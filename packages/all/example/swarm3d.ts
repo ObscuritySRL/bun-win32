@@ -66,6 +66,7 @@ let cellCursor!: Int32Array;   // scratch write-cursor for the counting sort
 let sx!: Float32Array, sy!: Float32Array, sDepth!: Float32Array;
 let sDirX!: Float32Array, sDirY!: Float32Array; // projected heading (for the streak)
 let sLen!: Float32Array, sBright!: Float32Array, sWarm!: Float32Array, sSize!: Float32Array;
+let sHaze!: Float32Array;       // aerial-perspective blend toward the sky tone (far→1)
 let zOrder!: Int32Array;
 
 // Starfield (deterministic, screen-fraction space → placed per W/H each frame).
@@ -82,7 +83,7 @@ function init(t: Term): void {
   sx = new Float32Array(N); sy = new Float32Array(N); sDepth = new Float32Array(N);
   sDirX = new Float32Array(N); sDirY = new Float32Array(N);
   sLen = new Float32Array(N); sBright = new Float32Array(N); sWarm = new Float32Array(N);
-  sSize = new Float32Array(N);
+  sSize = new Float32Array(N); sHaze = new Float32Array(N);
   zOrder = new Int32Array(N);
   bucketCount = new Int32Array(DEPTH_BUCKETS + 1);
   bucketKey = new Int32Array(N);
@@ -359,6 +360,44 @@ function birdColor(warm: number, out: Float32Array): void {
 }
 const colScratch = new Float32Array(3);
 
+// ── Cinematic dusk-sky gradient (cached per-height row LUT) ─────────────────────
+// Four hand-picked stops sampled top→bottom give a cohesive dusk: a deep indigo
+// zenith, a muted blue-violet upper sky, a soft rose-amber afterglow band lifting
+// off the horizon, and a slightly cooler, denser haze hugging the very bottom.
+// Storing the per-row RGB once (rebuilt only when H changes) lets the sky fill be
+// a flat copy AND lets far birds sample the exact sky tone behind them for true
+// aerial-perspective haze — the cheap trick that sells real atmospheric depth.
+let skyRGB!: Float32Array; // 3 floats per row, length H*3
+let skyH = -1;
+// Stops as {y, r,g,b}. y∈[0,1] top→bottom.
+const SKY_STOPS = [
+  [0.00, 4, 6, 20],     // deep indigo zenith
+  [0.46, 11, 13, 38],   // muted blue-violet upper sky
+  [0.72, 33, 23, 52],   // dusty mauve where the afterglow begins
+  [0.88, 96, 54, 66],   // warm rose afterglow lifting off the horizon
+  [0.96, 150, 88, 62],  // brightest amber ember just above the horizon line
+  [1.00, 46, 28, 42],   // cooler dense haze settling at the very base
+] as const;
+function buildSky(H: number): void {
+  if (skyH === H && skyRGB) return;
+  skyH = H;
+  skyRGB = new Float32Array(H * 3);
+  for (let y = 0; y < H; y++) {
+    const fy = y / (H - 1 || 1);
+    // find bracketing stops
+    let s = 0;
+    while (s < SKY_STOPS.length - 2 && fy > SKY_STOPS[s + 1][0]) s++;
+    const a = SKY_STOPS[s], b = SKY_STOPS[s + 1];
+    const span = b[0] - a[0] || 1e-6;
+    const tRaw = clamp01((fy - a[0]) / span);
+    const tt = tRaw * tRaw * (3 - 2 * tRaw); // smoothstep each segment for a soft blend
+    const o = y * 3;
+    skyRGB[o] = lerp(a[1], b[1], tt);
+    skyRGB[o + 1] = lerp(a[2], b[2], tt);
+    skyRGB[o + 2] = lerp(a[3], b[3], tt);
+  }
+}
+
 // ── Render ─────────────────────────────────────────────────────────────────────
 function frame(t: Term, time: number, dt: number): void {
   simulate(time, dt);
@@ -366,15 +405,14 @@ function frame(t: Term, time: number, dt: number): void {
   const W = t.W, H = t.H, buf = t.buf;
   const aspect = t.aspect;
 
-  // — Dusk sky: deep indigo above, a warm ember band at the horizon. Painted
-  //   directly into buf (replaces, not adds) so the night stays clean. —
+  // — Cinematic dusk sky: a designed multi-stop vertical gradient (deep indigo
+  //   zenith → mauve → rose-amber afterglow → cool base haze). Painted directly
+  //   into buf (replaces, not adds) so the night stays clean. The per-row colour
+  //   is precomputed in a height-keyed LUT, so this is a flat copy per row. —
+  buildSky(H);
   for (let y = 0; y < H; y++) {
-    const fy = y / (H - 1 || 1);
-    const horizon = smoothstep(0.50, 0.99, fy);   // 0 high sky → 1 horizon
-    const glow = smoothstep(0.72, 0.965, fy) * (1 - smoothstep(0.965, 1.0, fy) * 0.5);
-    const r = lerp(5, 36, horizon) + 34 * glow;
-    const g = lerp(8, 21, horizon) + 17 * glow;
-    const b = lerp(24, 30, horizon) + 6 * glow;
+    const so = y * 3;
+    const r = skyRGB[so], g = skyRGB[so + 1], b = skyRGB[so + 2];
     let o = y * W * 3;
     for (let x = 0; x < W; x++) { buf[o] = r; buf[o + 1] = g; buf[o + 2] = b; o += 3; }
   }
@@ -446,6 +484,10 @@ function frame(t: Term, time: number, dt: number): void {
     // Warmth follows depth (near cores ember, far mist slate) plus a gentle
     // golden-hour cast for birds lower in frame, nearer the horizon glow.
     sWarm[i] = clamp01(d2 + 0.26 * smoothstep(0.3, 1.0, scrY / H));
+    // Aerial perspective: the farthest birds dissolve INTO the sky tone behind
+    // them, so the cloud reads as receding through real atmosphere instead of a
+    // flat curtain of dim dots. Near birds (d2→1) keep their own colour entirely.
+    sHaze[i] = (1 - d2) * (1 - d2) * 0.7;
 
     zOrder[visible++] = i;
   }
@@ -466,7 +508,18 @@ function frame(t: Term, time: number, dt: number): void {
     const bright = sBright[i];
     const size = sSize[i];
     birdColor(sWarm[i], colScratch);
-    const cr = colScratch[0], cg = colScratch[1], cb = colScratch[2];
+    let cr = colScratch[0], cg = colScratch[1], cb = colScratch[2];
+    // Aerial perspective: pull far birds toward the sky tone directly behind them
+    // (sampled from the cached gradient at their screen row), so they recede into
+    // atmosphere rather than reading as flat dim dots on a curtain.
+    const hz = sHaze[i];
+    if (hz > 0.001) {
+      let syRow = cyy | 0; if (syRow < 0) syRow = 0; else if (syRow >= H) syRow = H - 1;
+      const so = syRow * 3;
+      cr += (skyRGB[so] - cr) * hz;
+      cg += (skyRGB[so + 1] - cg) * hz;
+      cb += (skyRGB[so + 2] - cb) * hz;
+    }
 
     // Base per-bird energy — low, so a knot accumulates instead of clipping.
     const peak = 72 * bright;

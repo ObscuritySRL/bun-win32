@@ -481,6 +481,9 @@ const decayPow = (base: number, dt: number): number => Math.pow(base, dt * 60);
 // Drawn at a given footprint radius `fr` (px). The squared-exp falloff `inv` is
 // passed in so streak segments share one precompute. Bright crisp core; the trail
 // length comes from the persistent buffer + the streak interpolation below.
+// HDR accumulation ceiling (per channel). Tuned so the dense core saturates to a
+// hot blue-white that still tonemaps with visible structure rather than a flat clip.
+const ACC_MAX = 1.9;
 const splatDot = (W: number, H: number, sxp: number, syp: number, fr: number, inv: number,
                   cr: number, cg: number, cb: number, peak: number): void => {
   const fr2 = fr * fr;
@@ -495,7 +498,14 @@ const splatDot = (W: number, H: number, sxp: number, syp: number, fr: number, in
       if (d2 > fr2) continue;
       const g = Math.exp(-d2 * inv) * peak;
       const o = row + xx;
-      accR[o] += cr * g; accG[o] += cg * g; accB[o] += cb * g;
+      // Per-channel HDR ceiling: the dense core piles many bright trails into a few
+      // pixels — without a cap they run away to flat 255 white. Clamping each channel
+      // to ACC_MAX lets the nucleus stay LUMINOUS but keep its hot blue-white TINT
+      // (b ≥ g ≥ r in the core colour), so it reads as a real central body, not a
+      // featureless white disc. The arms sit far below the cap, untouched.
+      let nr = accR[o] + cr * g; accR[o] = nr > ACC_MAX ? ACC_MAX : nr;
+      let ng = accG[o] + cg * g; accG[o] = ng > ACC_MAX ? ACC_MAX : ng;
+      let nb = accB[o] + cb * g; accB[o] = nb > ACC_MAX ? ACC_MAX : nb;
     }
   }
 };
@@ -505,11 +515,13 @@ const splatDot = (W: number, H: number, sxp: number, syp: number, fr: number, in
 // frames turns the per-frame fade into legible CURVED trails (the marquee look)
 // instead of disconnected blobs when a body crosses several pixels per frame. ────
 const splatBodyTrail = (W: number, H: number, px: number, py: number, sxp: number, syp: number,
-                        rad: number, cr: number, cg: number, cb: number): void => {
+                        rad: number, cr: number, cg: number, cb: number, corona: number): void => {
   // head footprint (clamped so a giant sun doesn't paint the whole frame).
   // Tight Gaussian (low variance) → a crisp bright point with a hard-ish edge so
-  // even a slow planet reads as a star, not a soft fat blob.
-  const headFr = clamp(rad * projSx * 1.05, 1.0, 7.5);
+  // even a slow planet reads as a star, not a soft fat blob. Capped tighter than
+  // before so the primary stays a COMPACT hot disc — its glow comes from the
+  // separate corona + bloom below, not from one fat blown-out Gaussian.
+  const headFr = clamp(rad * projSx * 1.05, 1.0, 5.2);
   const headInv = 1 / (headFr * headFr * 0.16);
   // thinner core for the connecting streak so paths read as crisp filaments
   const tailFr = clamp(headFr * 0.52, 0.8, 4.0);
@@ -531,8 +543,21 @@ const splatBodyTrail = (W: number, H: number, px: number, py: number, sxp: numbe
       }
     }
   }
-  // bright crisp head
-  splatDot(W, H, sxp, syp, headFr, headInv, cr, cg, cb, 1.18);
+  // CORONA: massive bodies get a soft wide halo ring laid UNDER the crisp head so
+  // the nucleus reads as a luminous BODY with a glowing atmosphere — a legible
+  // central sun — instead of a flat white clip. Low peak + wide soft Gaussian, so
+  // it never blows out; it just bathes the surrounding space in cohesive light.
+  if (corona > 0) {
+    const coFr = headFr * (1.7 + 1.1 * corona);
+    const coInv = 1 / (coFr * coFr * 0.5);
+    // Cool, faint atmosphere: mostly BLUE so it tints the surround instead of adding
+    // to the white core fill — the hot head stays the bright disc, the corona is just
+    // a breath of cyan light around it.
+    splatDot(W, H, sxp, syp, coFr, coInv, cr * 0.10, cg * 0.16, cb * 0.30, 0.20 * corona);
+  }
+  // bright crisp head (a touch lower peak than before so the hot core keeps a
+  // little tonal structure under the bloom rather than slamming to flat white)
+  splatDot(W, H, sxp, syp, headFr, headInv, cr, cg, cb, 1.1);
 };
 
 // ── Frame ─────────────────────────────────────────────────────────────────────
@@ -651,10 +676,18 @@ const frame = (t: Term, time: number, dt: number, _frameNo: number): void => {
     const li = (tk * 255) | 0;
     const cr = TEMP_R[li], cg = TEMP_G[li], cb = TEMP_B[li];
     // brightness grows with mass (more luminous suns) but is kept HDR-modest so the
-    // ACES grade keeps a legible coloured core rather than a clipped white blob.
+    // ACES grade keeps a legible coloured core rather than a clipped white blob. A
+    // SOFT KNEE compresses the very heaviest suns (cbrt(m) past ~0.8) so the primary
+    // no longer races off into a flat white disc as it accretes — it stays a legible
+    // hot body whose luminosity reads through the corona + bloom, not raw clip.
     const birth = smoothstep(0, 0.35, bage[i]);
-    const bright = (0.55 + 1.9 * Math.cbrt(m)) * birth * (bpinned[i] ? 1.15 : 1);
-    splatBodyTrail(W, H, bpx[i], bpy[i], sxp, syp, rad, cr * bright, cg * bright, cb * bright);
+    let lum = Math.cbrt(m);
+    if (lum > 0.8) lum = 0.8 + (lum - 0.8) * 0.45; // knee on the brightest suns
+    const bright = (0.55 + 1.75 * lum) * birth * (bpinned[i] ? 1.15 : 1);
+    // Heavy bodies earn a soft corona (a glowing atmosphere); disk motes get none so
+    // the arms stay crisp filaments. Ramps in only for genuine suns (m ≳ 0.1).
+    const corona = smoothstep(0.10, 0.9, m);
+    splatBodyTrail(W, H, bpx[i], bpy[i], sxp, syp, rad, cr * bright, cg * bright, cb * bright, corona);
     bpx[i] = sxp; bpy[i] = syp;
   }
 
@@ -672,10 +705,11 @@ const frame = (t: Term, time: number, dt: number, _frameNo: number): void => {
 
   // ── COMPOSITE: trails + starfield + bloom + vignette + ACES → t.buf ──
   const out = t.buf;
-  const EXPOSURE = 1.18;
+  const EXPOSURE = 1.10;
   // Bloom carries a gentle COOL diffraction skew (less red, more blue) so bright suns
   // radiate an astronomical halo instead of an amber fireball — the cores read as stars.
-  const BLOOM_R = 0.33, BLOOM_G = 0.38, BLOOM_B = 0.48;
+  // R/G trimmed a touch so the halo stays cool and never washes the disc warm-white.
+  const BLOOM_R = 0.26, BLOOM_G = 0.31, BLOOM_B = 0.46;
   const Aa = 2.51, Ab = 0.03, Ac = 2.43, Ad = 0.59, Ae = 0.14;
   for (let yy = 0; yy < H; yy++) {
     const rowB = yy * W;
@@ -778,7 +812,11 @@ const drawCursorRing = (t: Term): void => {
 
 // Separable bloom: threshold the trail buffer at half-res, blur it, leave in bloomA.
 const buildBloom = (W: number, H: number): void => {
-  const thr = 0.70;
+  // Higher threshold than before: only genuine HIGHLIGHTS (the bright trail spines
+  // and hot cores) bloom, so the broad mid-bright wash around the nucleus no longer
+  // floods a fat white halo over the disc. The arms' crisp spines still clear it, so
+  // they keep their silky glow while the central body reads as a defined sun.
+  const thr = 0.95;
   for (let y = 0; y < bh; y++) {
     const sy0 = y * 2;
     for (let x = 0; x < bw; x++) {

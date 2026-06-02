@@ -206,7 +206,7 @@ function sceneNebula(t: Term, local: number, reveal: number, time: number): void
       n += (top + (bot - top) * ty2) * 0.12;
       // shape into wispy clouds; raise to power so dark voids dominate
       const cloud = clamp01((n - 0.40) / 0.60);
-      const dens = cloud * cloud;
+      const dens = cloud * cloud * (0.7 + 0.3 * cloud); // soft cube → crisper voids
       // Distance to the hero core drives an emission glow that lights the gas.
       const dxh = (nx - heroU) * asp;
       const glow = EXP(-(dxh * dxh + dvh2) * 5.5);
@@ -214,14 +214,19 @@ function sceneNebula(t: Term, local: number, reveal: number, time: number): void
       // Emission palette: warm magenta-rose lit core, teal-blue shadowed gas.
       // Mix between a cool nebula tint and a hot emission tint by glow + density.
       const heat = clamp01(glow * 1.6 + dens * 0.35);
-      const r = c * (24 + 60 * n) + c * heat * (130 + 90 * glow);
-      const g = c * (16 + 32 * n) + c * heat * (44 + 60 * glow);
-      const b = c * (52 + 96 * n) + c * heat * (70 + 30 * glow);
+      // Self-shadow: denser gas turned toward the core lights warmer; the noise
+      // value `n` proxies facing, giving the clouds dimensional shading.
+      const lit = heat * (0.6 + 0.4 * n);
+      // A hot ionized cyan-white seam where the brightest emission meets dense gas.
+      const ion = glow * glow * dens * 70;
+      const r = c * (22 + 58 * n) + c * lit * (138 + 96 * glow) + ion * 0.85;
+      const g = c * (14 + 30 * n) + c * lit * (46 + 64 * glow) + ion;
+      const b = c * (54 + 100 * n) + c * lit * (74 + 34 * glow) + ion * 1.05;
       // Faint ambient core bloom even where the gas is thin.
       const halo = glow * glow * haloScale;
       const rr = (r + halo) * reveal;
       const gg = (g + halo * 0.55) * reveal;
-      const bb = (b + halo * 0.8) * reveal;
+      const bb = (b + halo * 0.82) * reveal;
       const i = rowBase + x * 3;
       t.buf[i] = rr > 255 ? 255 : rr | 0;
       t.buf[i + 1] = gg > 255 ? 255 : gg | 0;
@@ -424,9 +429,12 @@ function sceneOcean(t: Term, local: number, reveal: number, time: number): void 
     const wz = 1.6 / (depth + 0.02);
     const persp = 1 / (wz * 0.18 + 1);
     const dpt = smoothstep(0, 1, sy);
-    const baseR = lerp(7, 26, dpt);
-    const baseG = lerp(32, 66, dpt);
-    const baseB = lerp(56, 92, dpt);
+    const baseR = lerp(7, 22, dpt);
+    const baseG = lerp(32, 60, dpt);
+    const baseB = lerp(56, 96, dpt);
+    // Fresnel: grazing far water mirrors the warm dawn sky; near water (steep
+    // view) reveals its own cool teal body. Drives a sky-reflection tint.
+    const fres = 1 - sy * 0.85;
     const roadW = 6 + sy * 30;
     const invRoadW = 1 / roadW;
     const roadEnv = smoothstep(0.02, 0.42, sy);
@@ -464,6 +472,13 @@ function sceneOcean(t: Term, local: number, reveal: number, time: number): void 
       let r = baseR + ndl * 32 + h * 12;
       let g = baseG + ndl * 42 + h * 14;
       let b = baseB + ndl * 38 + h * 10;
+      // Fresnel sky reflection: down-slope facets (nz<0) catch the warm sky on
+      // the far water, lifting the sea with the same dawn band as the horizon so
+      // sky and sea read as one atmosphere; near water keeps its cool body.
+      const sky = fres * (0.5 + 0.5 * nl);
+      r += sky * 70;
+      g += sky * 42;
+      b += sky * 30;
       // melt the far rows into the warm horizon haze
       r = lerp(hazeR, r, haze);
       g = lerp(hazeG, g, haze);
@@ -475,13 +490,13 @@ function sceneOcean(t: Term, local: number, reveal: number, time: number): void 
       g += 132 * road;
       b += 72 * road;
       // Stochastic specular glitter on up-facing crests within the road.
-      if (road > 0.05 && h > 0.24) {
+      if (road > 0.04 && h > 0.18) {
         const spark = hash2((x * 1.7 + sparkGp) | 0, yh13);
-        if (spark > 0.82) {
-          const s = (spark - 0.82) * 5.5 * road;
+        if (spark > 0.80) {
+          const s = (spark - 0.80) * 5.2 * road;
           r += 255 * s;
-          g += 220 * s;
-          b += 150 * s;
+          g += 222 * s;
+          b += 152 * s;
         }
       }
       r *= reveal;

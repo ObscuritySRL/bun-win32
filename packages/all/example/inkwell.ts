@@ -1,29 +1,38 @@
 /**
- * Inkwell — stir a real fluid with your cursor.
+ * Inkwell — elegant ink blooms folding in clean, lit water.
  *
  * A live 2D STABLE-FLUIDS solver (Jos Stam, SIGGRAPH 1999) on a FIXED interior
  * grid, decoupled from the terminal: velocity is advected SEMI-LAGRANGIANLY
  * (trace each cell backward along the flow, bilinearly sample — unconditionally
  * stable), made incompressible by red-black GAUSS-SEIDEL pressure projection
  * (∇·u → solve ∇²p = ∇·u → u −= ∇p), and re-curled by VORTICITY CONFINEMENT so
- * the ink keeps rolling into vortices instead of dissolving. Three luminous DYE
- * channels ride that flow. The grid is BILINEARLY upsampled to the pixel buffer
- * and mapped density→HDR colour with an additive glow core and an ACES grade —
- * luminous ink in a black void.
+ * the ink keeps rolling into filaments and vortices instead of dissolving. Three
+ * dye channels ride that flow, advected with BFECC so thin ribbons stay crisp.
+ *
+ * Unlike its sibling fluid-ink (rising smoke in a black void), inkwell is a tank
+ * of CLEAN, ILLUMINATED WATER: the empty background is a soft cool gradient lit
+ * from above with a gentle caustic shimmer and vignette, so a still tank already
+ * reads as water. Ink is composited OVER that water — translucent where thin,
+ * saturated where dense — on a tightly CURATED, cohesive palette (deep sapphire,
+ * teal-cyan, soft violet, one restrained warm rose accent). The render keeps
+ * dense overlaps chromatic (deepening toward the ink's own colour, never washing
+ * to grey/white), with hue-preserving bloom, a directional sheen, and an ACES
+ * grade — so it shows filaments + vortices + colour mixing and never collapses
+ * into one muddy mass.
  *
  * INTERACTION (live): moving the cursor injects velocity along the drag vector
- * (you stir the water); holding the button injects luminous dye at the cursor;
- * the wheel shifts the dye hue. With no input — or after a few idle seconds — a
- * deterministic, time-driven invisible cursor traces flowing Lissajous curves,
- * dropping dye and dragging the fluid so the piece is alive instantly and every
- * CAPTURE_PNG is a rich, swirling frame. Hand-off is immediate on interaction.
+ * (you stir the water); holding the button drops luminous ink at the cursor; the
+ * wheel shifts the ink hue. With no input — or after a few idle seconds — two
+ * deterministic, counter-phased invisible cursors trace flowing curves across the
+ * whole tank, dropping curated inks and dragging the fluid in opposite senses so
+ * the ribbons shear and fold into vortices between them. Hand-off is immediate.
  *
  * The attract path is a closed-form function of `time` (no RNG, no wall clock),
  * so captures and benches are bit-for-bit reproducible.
  *
  * Run: bun run packages/all/example/inkwell.ts
  */
-import { runDemo, Term, clamp, smoothstep, hsv } from './_term';
+import { runDemo, Term, clamp, smoothstep, aces } from './_term';
 
 // ── Fixed interior simulation grid (+1-cell border). Tuned for ≥90 bench fps. ───
 const GW = 128;
@@ -34,7 +43,7 @@ const N = NX * NY;
 
 // ── Solver tuning ───────────────────────────────────────────────────────────────
 const PRESSURE_ITERS = 26; // red-black Gauss-Seidel sweeps → smooth, divergence-free
-const VORT_EPS = 1.85;     // vorticity confinement — keeps the swirl alive without shredding dye into speckle
+const VORT_EPS = 2.05;     // vorticity confinement — keeps the swirl alive (folds ribbons into vortices) without shredding dye into speckle
 const VEL_DAMP = 0.9978;   // gentle velocity bleed so energy doesn't blow up
 const DYE_DECAY = 0.9992;  // ink dissolves slowly → strokes layer into a rich, persistent field
 const DYE_FLOOR = 0.0013;  // subtractive floor — crushes faint stray dye → clean dark
@@ -312,16 +321,48 @@ const stir = (cx: number, cy: number, radius: number, fx: number, fy: number): v
   }
 };
 
-// ── Dye colour from a hue (turns). Saturated, HDR — luminous ink, not pastel. ───
+// ── Curated ink palette ──────────────────────────────────────────────────────────
+// A cohesive, gallery-grade set of inks rather than raw HSV (which gives garish
+// primaries). The wheel/attract "hue" 0..1 indexes a designed ramp dominated by
+// cool jewel tones — deep sapphire → ultramarine → teal-cyan → soft violet — with
+// a single restrained warm ROSE accent so a frame reads as cohesive ink in water,
+// never rainbow-vomit. Values are linear-ish HDR (lifted so dense ink blooms in
+// its own colour). The ramp wraps (last anchor ≈ first) so the wheel is seamless.
 type RGB = [number, number, number];
+const HDR = 1.36;
+const INK_ANCHORS: RGB[] = [
+  [0.05, 0.22, 0.92],  // 0.00 deep sapphire
+  [0.07, 0.42, 1.05],  // 0.17 ultramarine
+  [0.09, 0.74, 0.95],  // 0.33 teal-cyan
+  [0.16, 0.92, 0.78],  // 0.50 aqua-mint (cool highlight ink)
+  [0.40, 0.40, 1.05],  // 0.67 periwinkle-violet
+  [0.66, 0.20, 0.92],  // 0.83 amethyst
+  [1.05, 0.22, 0.52],  // 1.00 restrained warm rose (wraps toward sapphire)
+];
+// Precomputed 256-entry LUT (R,G,B interleaved) so inkColor() is a table lookup,
+// not a branch + lerp, in the hot attract/cursor paths.
+const INK_LUT = new Float32Array(256 * 3);
+(() => {
+  const segs = INK_ANCHORS.length - 1;
+  for (let i = 0; i < 256; i++) {
+    const f = (i / 255) * segs;
+    let s = f | 0; if (s >= segs) s = segs - 1;
+    const k = f - s;
+    const a = INK_ANCHORS[s], b = INK_ANCHORS[s + 1];
+    INK_LUT[i * 3] = (a[0] + (b[0] - a[0]) * k) * HDR;
+    INK_LUT[i * 3 + 1] = (a[1] + (b[1] - a[1]) * k) * HDR;
+    INK_LUT[i * 3 + 2] = (a[2] + (b[2] - a[2]) * k) * HDR;
+  }
+})();
 const inkColor = (hue: number): RGB => {
-  const [r, g, b] = hsv(hue, 0.9, 1);
-  // Lift to HDR (≈1.42×) so dense ink blooms in its own colour.
-  return [(r / 255) * 1.42, (g / 255) * 1.42, (b / 255) * 1.42];
+  let h = hue - Math.floor(hue);
+  const idx = (h * 255) | 0;
+  const o = idx * 3;
+  return [INK_LUT[o], INK_LUT[o + 1], INK_LUT[o + 2]];
 };
 
 // ── Input / hue / cursor state ───────────────────────────────────────────────────
-let hue = 0.58;            // current dye hue (turns); wheel shifts it
+let hue = 0.30;            // current ink hue (ramp index 0..1); wheel shifts it — teal-cyan
 let lastMX = -1, lastMY = -1; // previous cursor grid position (for the drag vector)
 let lastSeq = -1;          // last mouse event sequence seen
 let idleTime = 0;          // seconds since last interaction
@@ -375,21 +416,23 @@ const attract = (time: number, sdt: number): void => {
   // four capture phases instead of one band staying light. A slow precession term
   // rotates the whole figure so successive laps don't retrace the same arc.
   const ang0 = t * 1.12 + 0.22 * Math.sin(t * 0.19) + 0.4;
-  const rad0 = 0.225 + 0.035 * Math.sin(t * 0.13 + 0.7);
+  const rad0 = 0.27 + 0.05 * Math.sin(t * 0.13 + 0.7);
   const cx0 = 0.5 + rad0 * Math.cos(ang0);
-  // The vertical orbit is squashed (×0.66) and the epicycle's Y is too: a tank
-  // wider than it is tall has free-slip top/bottom walls, and dye carried into a
-  // wall has no vertical escape and pancakes into a flat slab. Keeping the brushes
-  // vertically central (and the X sweep wide) fills the frame without slabbing.
-  const cy0 = 0.5 + rad0 * 0.66 * Math.sin(ang0);
+  // The vertical orbit is squashed (×0.82) so a tank wider than it is tall doesn't
+  // pin dye into the free-slip top/bottom walls (where it has no vertical escape and
+  // pancakes into a flat slab) — but it reaches farther up and down than before, plus
+  // a slow vertical drift, so the blooms sweep the whole height of the frame instead
+  // of pooling in one central band.
+  const cy0 = 0.5 + rad0 * 0.82 * Math.sin(ang0) + 0.06 * Math.sin(t * 0.37 + 1.1);
   const fx0 = cx0 + 0.1 * Math.cos(-t * 1.43 + 1.7);
   const fy0 = cy0 + 0.072 * Math.sin(-t * 1.43 + 1.7);
-  // Wide horizontal reach, vertically held well off both walls in [0.2,0.8] so the
+  // Wide horizontal reach, vertically held off both walls in [0.16,0.84] so the
   // ribbons stay airborne and keep curling instead of pinning into a slab.
   const gx0 = clamp(fx0, 0.06, 0.94) * GW + 1;
-  const gy0 = clamp(fy0, 0.2, 0.8) * GH + 1;
-  // Cool half of the wheel (cyan→violet), drifting slowly so a frame holds a family.
-  const h0 = 0.56 + 0.13 * Math.sin(t * 0.23) + 0.05 * Math.sin(t * 0.09 + 1.3);
+  const gy0 = clamp(fy0, 0.16, 0.84) * GH + 1;
+  // Brush A roams the COOL jewel band of the ramp (sapphire → teal-cyan → aqua),
+  // drifting slowly so a frame holds a tight family rather than a smear of hues.
+  const h0 = 0.18 + 0.16 * (0.5 + 0.5 * Math.sin(t * 0.21)) + 0.03 * Math.sin(t * 0.09 + 1.3);
   const [cr0, cg0, cb0] = inkColor(h0);
 
   // ── Brush B: the POINT-REFLECTION of brush A's centre through the tank centre,
@@ -401,11 +444,12 @@ const attract = (time: number, sdt: number): void => {
   const fx1 = cx1 + 0.1 * Math.cos(t * 1.31 + 0.6);
   const fy1 = cy1 + 0.072 * Math.sin(t * 1.31 + 0.6);
   const gx1 = clamp(fx1, 0.06, 0.94) * GW + 1;
-  const gy1 = clamp(fy1, 0.2, 0.8) * GH + 1;
-  // Warm half (crimson→rose→magenta), held in [0.88,0.97] so it never crosses into
-  // the red→yellow arc (which reads garish), offset ~half the wheel from A → strong
-  // complementary contrast against the cyan/violet brush.
-  const h1 = 0.925 + 0.045 * Math.sin(t * 0.19 + 2.2) + 0.02 * Math.cos(t * 0.11);
+  const gy1 = clamp(fy1, 0.16, 0.84) * GH + 1;
+  // Brush B roams the VIOLET→ROSE band (periwinkle → amethyst → restrained rose):
+  // a designed analogous-plus-accent contrast against A's cool jewels, so the two
+  // inks read as a cohesive duet — cool teal shearing into warm violet — not a
+  // garish complementary clash. Held below the pure-red arc so it never reads hot.
+  const h1 = 0.66 + 0.16 * (0.5 + 0.5 * Math.sin(t * 0.17 + 2.2)) + 0.02 * Math.cos(t * 0.11);
   const [cr1, cg1, cb1] = inkColor(h1);
 
   if (prevAX0 < 0) { prevAX0 = gx0; prevAY0 = gy0; prevAX1 = gx1; prevAY1 = gy1; }
@@ -483,7 +527,7 @@ const step = (time: number, dt: number, t: Term, useAttract: boolean): void => {
   advectBFECC(dr, s0, sdt);
   advectBFECC(dg, s1, sdt);
   advectBFECC(db, s2, sdt);
-  despeckle(dr, 0.5); despeckle(dg, 0.5); despeckle(db, 0.5);
+  despeckle(dr, 0.42); despeckle(dg, 0.42); despeckle(db, 0.42);
   // Decay toward dark water with a subtractive floor, and SOFT-CAP each channel:
   // once dye stacks above ~1.35 it compresses HARD, so dense cores stay in the
   // bloom-in-colour regime instead of piling into a clipped white puffball.
@@ -496,9 +540,8 @@ const step = (time: number, dt: number, t: Term, useAttract: boolean): void => {
   setScalarBounds(dr); setScalarBounds(dg); setScalarBounds(db);
 };
 
-// ── Render: bilinear-upsample dye → pixels, HDR glow + edge-light + ACES. ───────
-const BASE_R = 0.004, BASE_G = 0.009, BASE_B = 0.024; // deep-water base tint (linear HDR)
-const EXPOSURE = 1.55;
+// ── Render: composite luminous ink OVER lit, clean water. ───────────────────────
+const EXPOSURE = 1.5;
 const ACES_A = 2.51, ACES_B = 0.03, ACES_C = 2.43, ACES_D = 0.59, ACES_E = 0.14;
 
 const buildMag = (): void => {
@@ -512,7 +555,19 @@ let xi = new Int32Array(0);
 let xf = new Float32Array(0);
 let yi = new Int32Array(0);
 let yf = new Float32Array(0);
-const buildBilinearLUT = (W: number, H: number): void => {
+
+// ── Clean-water background (linear HDR), baked per-pixel on resize. ─────────────
+// A still tank must already read as WATER, not a black void: a cool depth gradient
+// (lit shallow water near the top where light enters, darker indigo toward the
+// bottom), a soft overhead light pool, a gentle dappled caustic shimmer, and a
+// vignette that frames the centred composition. Static + deterministic; the ink
+// motion carries the life. Ink composites OVER this so thin wisps read as
+// translucent dye suspended in lit water — that's the depth a void can't give.
+let waterR = new Float32Array(0);
+let waterG = new Float32Array(0);
+let waterB = new Float32Array(0);
+
+const buildLUTs = (W: number, H: number): void => {
   if (W === lutW && H === lutH) return;
   lutW = W; lutH = H;
   xi = new Int32Array(W); xf = new Float32Array(W);
@@ -530,19 +585,54 @@ const buildBilinearLUT = (W: number, H: number): void => {
     if (y0 < 1) y0 = 1; else if (y0 > NY - 3) y0 = NY - 3;
     yi[y] = y0; yf[y] = gy - y0;
   }
+
+  waterR = new Float32Array(W * H);
+  waterG = new Float32Array(W * H);
+  waterB = new Float32Array(W * H);
+  const TOPR = 0.016, TOPG = 0.056, TOPB = 0.112;   // lit shallow water (cool teal-blue)
+  const BOTR = 0.004, BOTG = 0.013, BOTB = 0.044;   // deep indigo
+  const cx = (W - 1) * 0.5;
+  const invW = 1 / Math.max(1, W - 1), invH = 1 / Math.max(1, H - 1);
+  for (let y = 0; y < H; y++) {
+    const vY = y * invH;                            // 0 top → 1 bottom
+    const dEase = vY * vY * (3 - 2 * vY);           // eased depth ramp
+    const bR = TOPR + (BOTR - TOPR) * dEase;
+    const bG = TOPG + (BOTG - TOPG) * dEase;
+    const bB = TOPB + (BOTB - TOPB) * dEase;
+    const pool = (1 - vY) * (1 - vY);               // overhead light fades with depth
+    for (let x = 0; x < W; x++) {
+      const hx = (x - cx) * invW * 2;               // -1..1 across width
+      // Gentle dappled caustic — only modulates WHERE light already is (scaled by
+      // `band`), so deep dark water stays smooth instead of showing a texture grid.
+      const caustic =
+        0.5 + 0.5 * Math.sin(x * 0.09 + y * 0.06) * Math.sin(x * 0.045 - y * 0.11 + 1.7);
+      const band = pool * (0.6 + 0.4 * Math.exp(-hx * hx * 1.6)); // centred light pool
+      const light = band * (0.78 + 0.22 * caustic);
+      let vig = 1 - 0.5 * (hx * hx * 0.7 + (vY - 0.42) * (vY - 0.42) * 1.3);
+      if (vig < 0) vig = 0;
+      const i = y * W + x;
+      waterR[i] = (bR + light * 0.020) * vig;       // light lifts cool channels most
+      waterG[i] = (bG + light * 0.052) * vig;
+      waterB[i] = (bB + light * 0.086) * vig;
+    }
+  }
 };
 
-const render = (t: Term): void => {
+const render = (t: Term, time: number): void => {
   buildMag();
   const buf = t.buf;
   const W = t.W, H = t.H;
-  buildBilinearLUT(W, H);
+  buildLUTs(W, H);
+  // Subtle global breathing of the tank light so the empty water still feels alive
+  // between blooms (deterministic — a pure function of sim time).
+  const expo = EXPOSURE * (0.96 + 0.04 * Math.sin(time * 0.5));
   for (let y = 0; y < H; y++) {
     const y0 = yi[y];
     const fy = yf[y];
     const fy1 = 1 - fy;
     const r0 = y0 * NX;
     const r1 = r0 + NX;
+    const wRow = y * W;
     let o = y * W * 3;
     for (let x = 0; x < W; x++) {
       const x0 = xi[x];
@@ -551,70 +641,80 @@ const render = (t: Term): void => {
       const i00 = r0 + x0, i10 = i00 + 1, i01 = r1 + x0, i11 = i01 + 1;
       const w00 = fx1 * fy1, w10 = fx * fy1, w01 = fx1 * fy, w11 = fx * fy;
 
+      const wi = wRow + x;
+      const wR = waterR[wi], wG = waterG[wi], wB = waterB[wi];
+
       let R = dr[i00] * w00 + dr[i10] * w10 + dr[i01] * w01 + dr[i11] * w11;
       let G = dg[i00] * w00 + dg[i10] * w10 + dg[i01] * w01 + dg[i11] * w11;
       let B = db[i00] * w00 + db[i10] * w10 + db[i01] * w01 + db[i11] * w11;
 
       let dens = R + G + B;
 
-      // Clean-water rolloff: faint smeared dye fades to black; real ink stays lit.
-      if (dens < 0.16) {
-        const tg = dens * 6.25;
+      // Clean-water gate: faint smeared dye dissolves invisibly into the water.
+      if (dens < 0.14) {
+        const tg = dens * 7.142857;
         const gate = tg * tg * (3 - 2 * tg);
         R *= gate; G *= gate; B *= gate;
         dens *= gate;
       }
 
-      // Chroma lift: keep mixed regions saturated instead of greying to white.
-      // The amount is FADED IN over [0.12,0.45] density (smoothstep) so the very
-      // thinnest low-density edges get NO push and keep their literal interpolated
-      // hue — pushing channels apart there is what manufactured the faint green
-      // fringe on thinning cyan against the cold blue base. Past the fade it climbs
-      // to a strong plateau so dense complementary overlaps stay vivid, never grey.
-      if (dens > 0.12) {
-        const m = dens * (1 / 3);
-        let lo = (dens - 0.12) * (1 / 0.33);
-        if (lo > 1) lo = 1;
-        const ramp = lo * lo * (3 - 2 * lo);        // 0 at thin edge → 1 by 0.45
-        const sat = (dens < 1 ? 0.16 + dens * 0.44 : 0.6) * ramp;
-        R += (R - m) * sat;
-        G += (G - m) * sat;
-        B += (B - m) * sat;
-        if (R < 0) R = 0; if (G < 0) G = 0; if (B < 0) B = 0;
+      if (dens > 1e-4) {
+        // Chroma lift: push channels apart so mixed regions stay saturated and dense
+        // overlaps deepen toward their OWN colour instead of greying to white. Faded
+        // in over [0.12,0.45] density so the thinnest edges keep their literal hue.
+        if (dens > 0.12) {
+          const m = dens * (1 / 3);
+          let lo = (dens - 0.12) * (1 / 0.33);
+          if (lo > 1) lo = 1;
+          const ramp = lo * lo * (3 - 2 * lo);
+          const sat = (dens < 1 ? 0.18 + dens * 0.46 : 0.64) * ramp;
+          R += (R - m) * sat;
+          G += (G - m) * sat;
+          B += (B - m) * sat;
+          if (R < 0) R = 0; if (G < 0) G = 0; if (B < 0) B = 0;
+        }
+
+        // Filament edge-light + a soft directional sheen (light from upper-left) so
+        // rims facing the light read brighter — gives blooms volume, not flat outline.
+        const cgx = mag[i10] - mag[i00] + mag[i11] - mag[i01];
+        const cgy = mag[i01] - mag[i00] + mag[i11] - mag[i10];
+        let grad = cgx < 0 ? -cgx : cgx;
+        const agy = cgy < 0 ? -cgy : cgy;
+        grad += agy;
+        let dir = 1 + 0.35 * (-cgx - cgy);
+        if (dir < 0.45) dir = 0.45; else if (dir > 1.55) dir = 1.55;
+        const rim = grad * (dens < 1 ? dens : 1) * 1.55 * dir;
+        if (rim > 0) {
+          const inv = rim / dens;
+          R += R * inv; G += G * inv; B += B * inv;
+        }
+
+        // Glow core: dense ink blooms above a knee, tinted by its OWN hue (term
+        // scales by the channel), so a sapphire heart blooms brighter sapphire and a
+        // rose heart brighter rose — luminous, never drifting toward white.
+        const core = dens - 1.0;
+        if (core > 0) {
+          const glow = core * core * 0.5;
+          const inv = glow / dens;
+          R += R * inv * 2.4 + glow * 0.006;
+          G += G * inv * 2.4 + glow * 0.006;
+          B += B * inv * 2.4 + glow * 0.010;
+        }
       }
 
-      // Filament edge-light: gradient of the density field carves luminous rims.
-      const cgx = mag[i10] - mag[i00] + mag[i11] - mag[i01];
-      const cgy = mag[i01] - mag[i00] + mag[i11] - mag[i10];
-      let grad = cgx < 0 ? -cgx : cgx;
-      const agy = cgy < 0 ? -cgy : cgy;
-      grad += agy;
-      const rim = grad * (dens < 1 ? dens : 1) * 1.55;
-      if (dens > 1e-4 && rim > 0) {
-        const inv = rim / dens;
-        R += R * inv;
-        G += G * inv;
-        B += B * inv;
-      }
-
-      // Glow core: dense ink blooms above a knee, tinted by its own hue. Almost
-      // no white is added (the tiny constant term only lifts the very brightest
-      // hearts) so an amber heart stays amber and a magenta heart stays magenta.
-      const core = dens - 1.0;
-      if (core > 0) {
-        const glow = core * core * 0.5;
-        const inv = dens > 1e-4 ? glow / dens : 0;
-        // In-hue multiplier nudged up (the term scaled by the channel itself, so a
-        // magenta heart blooms brighter MAGENTA); the tiny near-white constants are
-        // held flat so dense cores gain luminance without drifting toward white.
-        R += R * inv * 2.3 + glow * 0.008;
-        G += G * inv * 2.3 + glow * 0.006;
-        B += B * inv * 2.3 + glow * 0.011;
-      }
-
-      R = R * EXPOSURE + BASE_R;
-      G = G * EXPOSURE + BASE_G;
-      B = B * EXPOSURE + BASE_B;
+      // Composite ink OVER water with a density-driven opacity: thin ink is sheer
+      // (lit water shows through → submerged depth), dense ink is near-opaque and
+      // adds its own luminous glow on top. The small additive term that gives ink
+      // its luminous lift TAPERS with opacity (×ia) so dense cores don't blow toward
+      // white — only the sheer, translucent ink picks up the extra glow.
+      let op = dens * 1.7;
+      if (op > 1) op = 1;
+      op = op * op * (3 - 2 * op);
+      const ia = 1 - op;
+      const add = expo * (0.30 + 0.30 * ia);
+      R = wR * ia + R * (expo * op + add);
+      G = wG * ia + G * (expo * op + add);
+      B = wB * ia + B * (expo * op + add);
 
       let tR = (R * (ACES_A * R + ACES_B)) / (R * (ACES_C * R + ACES_D) + ACES_E);
       let tG = (G * (ACES_A * G + ACES_B)) / (G * (ACES_C * G + ACES_D) + ACES_E);
@@ -636,7 +736,10 @@ const drawCursor = (t: Term): void => {
   if (cx < 0 || cy < 0) return;
   const ring = t.mouseDown ? 3.2 : 2.4;
   const r2 = (ring + 1.5) * (ring + 1.5);
-  const [hr, hg, hb] = hsv(hue, 0.7, 1);
+  // Halo colour from the SAME curated palette as the ink it drops, so the cursor
+  // reads as a luminous nib of the current ink (ACES-graded to display range).
+  const [ir, ig, ib] = inkColor(hue);
+  const hr = aces(ir * 1.3) * 255, hg = aces(ig * 1.3) * 255, hb = aces(ib * 1.3) * 255;
   for (let dy = -4; dy <= 4; dy++) {
     for (let dx = -4; dx <= 4; dx++) {
       const d = Math.sqrt(dx * dx + dy * dy);
@@ -673,10 +776,13 @@ const seed = (): void => {
   const cx = GW * 0.5 + 1, cy = GH * 0.5 + 1;
   // Big crossing strokes spanning the tank so the opening second is already a
   // rich, folding bouquet of ink — not a few dots that decay before attract ramps.
-  stroke(cx - 46, cy + 14, 52, -22, 14, 4.2, 0.56, 0.62);  // teal, low-left → up-right
-  stroke(cx + 40, cy + 12, -50, -20, -13, 4.0, 0.80, 0.62); // violet, low-right → up-left
-  stroke(cx - 8, cy + 24, 16, -46, 18, 3.6, 0.04, 0.56);    // amber, vertical plume
-  stroke(cx - 28, cy - 16, 44, 6, -12, 3.4, 0.66, 0.52);    // cyan, upper sweep
+  // Hues picked off the curated ramp for a cohesive cool-dominant composition with
+  // one restrained warm accent: teal-cyan, aqua, periwinkle, sapphire, rose.
+  stroke(cx - 46, cy + 14, 52, -22, 14, 4.2, 0.30, 0.62);  // teal-cyan, low-left → up-right
+  stroke(cx + 40, cy + 12, -50, -20, -13, 4.0, 0.66, 0.60); // periwinkle-violet, low-right → up-left
+  stroke(cx - 6, cy + 24, 14, -46, 18, 3.4, 0.96, 0.42);    // rose accent, vertical plume (restrained)
+  stroke(cx - 28, cy - 16, 44, 6, -12, 3.4, 0.46, 0.52);    // aqua, upper sweep
+  stroke(cx + 8, cy - 22, -38, 12, 11, 3.2, 0.10, 0.46);    // sapphire, upper counter-sweep
   // very gentle counter-rotating swirl so the strokes slowly shear into sheets
   // (a hard stir advects the dye off-screen before it can fold — keep it tiny;
   // vorticity confinement and the attract brush provide the ongoing motion)
@@ -730,7 +836,7 @@ runDemo({
     const sdt = dt / sub;
     for (let s = 0; s < sub; s++) step(time + s * sdt, sdt > 0 ? sdt : 1 / 60, t, useAttract);
 
-    render(t);
+    render(t, time);
     if (!useAttract) drawCursor(t);
   },
 });

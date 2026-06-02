@@ -128,27 +128,29 @@ const albedo = [0, 0, 0];
 const sampleAlbedo = (h: number, jitter: number): void => {
   let r: number, g: number, b: number;
   if (h < 0.30) {
-    // deep water → shallow turquoise → wet sand
+    // deep teal → shallow turquoise → wet sand. A deeper, more saturated open-water
+    // teal reads unmistakably as WATER in the valleys (not just dark ground), brightening
+    // through a tropical turquoise on the shallows before the warm beach lip.
     const k = h / 0.30;
-    r = lerp(0.03, 0.62, smoothstep(0.6, 1.0, k));
-    g = lerp(0.11, 0.60, smoothstep(0.40, 1.0, k));
-    b = lerp(0.26, 0.50, k);
+    r = lerp(0.020, 0.58, smoothstep(0.6, 1.0, k));
+    g = lerp(0.135, 0.66, smoothstep(0.36, 1.0, k));
+    b = lerp(0.34, 0.56, k);
     if (k > 0.86) { // bright beach lip
       const s = smoothstep(0.86, 1.0, k);
-      r = lerp(r, 0.84, s); g = lerp(g, 0.74, s); b = lerp(b, 0.50, s);
+      r = lerp(r, 0.85, s); g = lerp(g, 0.74, s); b = lerp(b, 0.49, s);
     }
   } else if (h < 0.52) {
-    const k = (h - 0.30) / 0.22; // golden sand → lush saturated grass
-    r = lerp(0.86, 0.18, k); g = lerp(0.74, 0.58, k); b = lerp(0.48, 0.12, k);
+    const k = (h - 0.30) / 0.22; // golden sand → lush saturated grass (a touch deeper)
+    r = lerp(0.87, 0.15, k); g = lerp(0.74, 0.55, k); b = lerp(0.47, 0.11, k);
   } else if (h < 0.72) {
     const k = (h - 0.52) / 0.20; // grass → warm rock (deeper green dips to ochre rock)
-    r = lerp(0.18, 0.52, k); g = lerp(0.58, 0.43, k); b = lerp(0.12, 0.32, k);
+    r = lerp(0.15, 0.53, k); g = lerp(0.55, 0.43, k); b = lerp(0.11, 0.31, k);
   } else if (h < 0.86) {
     const k = (h - 0.72) / 0.14; // rock → snowline (cool grey lift)
-    r = lerp(0.50, 0.66, k); g = lerp(0.44, 0.66, k); b = lerp(0.34, 0.70, k);
+    r = lerp(0.51, 0.68, k); g = lerp(0.45, 0.68, k); b = lerp(0.35, 0.74, k);
   } else {
-    const k = (h - 0.86) / 0.14; // snow
-    r = lerp(0.74, 0.99, k); g = lerp(0.76, 1.0, k); b = lerp(0.82, 1.0, k);
+    const k = (h - 0.86) / 0.14; // snow — brilliant, faintly cool caps that crown the peaks
+    r = lerp(0.78, 1.0, k); g = lerp(0.80, 1.0, k); b = lerp(0.88, 1.0, k);
   }
   // Per-cell texture jitter (deterministic) so flats aren't dead-uniform. Kept LOW
   // amplitude: heavy per-cell jitter is what dithers the flats into speckle that the
@@ -266,7 +268,10 @@ const buildMap = (): void => {
       // Lighting: a punchy warm golden-hour key over a cool sky ambient + a faint warm
       // bounce on lit ground. Low ambient keeps colour saturated; AO models the relief.
       const sunWarmR = 1.94, sunWarmG = 1.22, sunWarmB = 0.56;
-      const ambR = 0.16, ambG = 0.22, ambB = 0.38; // cool sky fill in shadow
+      // Cool dusk-sky fill in shadow: a touch more blue lift so shaded slopes read as
+      // cool-shadowed relief (sky-lit) rather than crushing to dead black on backlit
+      // faces — adds depth without bleaching the saturated sunlit midtones.
+      const ambR = 0.155, ambG = 0.225, ambB = 0.44;
       const lit = ndl * cloudShadow;
       let r = albedo[0] * (ambR * ao + sunWarmR * lit);
       let g = albedo[1] * (ambG * ao + sunWarmG * lit);
@@ -392,7 +397,7 @@ let rowSrcW = 0;
 let SKY_R!: Float32Array, SKY_G!: Float32Array, SKY_B!: Float32Array;
 // Fog target = a soft hazy blue-grey (linear). Distance melts terrain into THIS,
 // then the same colour feeds the lowest sky band so ground and sky meet seamlessly.
-const FOG_LR = 0.46, FOG_LG = 0.50, FOG_LB = 0.60;
+const FOG_LR = 0.43, FOG_LG = 0.49, FOG_LB = 0.62;
 let skyH = 0;
 const buildSky = (H: number): void => {
   if (skyH === H && SKY_R) return;
@@ -401,13 +406,21 @@ const buildSky = (H: number): void => {
   for (let y = 0; y < H; y++) {
     const t = y / (H - 1); // 0 top (zenith), 1 bottom (below horizon)
     const ts = smoothstep(0.0, 1.0, t);
-    // Deep dusk indigo zenith → a soft violet shoulder → desaturated steel blue.
-    // The violet mid-band gives the dusk sky depth instead of a flat blue ramp.
-    let r = lerp(0.05, 0.30, ts);
-    let g = lerp(0.09, 0.37, ts);
-    let b = lerp(0.28, 0.50, ts);
-    const violet = Math.exp(-((t - 0.40) * (t - 0.40)) * 28); // rosy band mid-sky
-    r += violet * 0.10; g += violet * 0.03; b += violet * 0.07;
+    // Deep dusk indigo zenith → a soft violet shoulder → desaturated steel blue. A
+    // gentle gamma on the climb keeps the upper third a rich, saturated indigo (the
+    // dome reads as real high atmosphere) before it opens out toward the hazy horizon.
+    const tg = Math.pow(ts, 0.82);
+    let r = lerp(0.035, 0.30, tg);
+    let g = lerp(0.065, 0.37, tg);
+    let b = lerp(0.27, 0.50, tg);
+    // A faint cool zenith lift — the last light of the sky dome, just off the deepest
+    // indigo — gives the top band dimension instead of a dead flat cap.
+    const zenith = Math.exp(-(t * t) * 7.5);
+    r += zenith * 0.018; g += zenith * 0.030; b += zenith * 0.060;
+    // Rosy violet shoulder mid-sky: warm anti-solar scatter that gives the dusk its
+    // depth. Slightly wider + warmer than before so the band reads as a real glow.
+    const violet = Math.exp(-((t - 0.40) * (t - 0.40)) * 24);
+    r += violet * 0.115; g += violet * 0.030; b += violet * 0.075;
     // Blend the lower sky toward the hazy fog colour + a warm horizon lift, so the sky
     // meets the foggy distance in the same hue (no hard seam, no blowout). A stronger,
     // warmer band just above the horizon reads as scattered golden-hour light.
@@ -416,9 +429,9 @@ const buildSky = (H: number): void => {
     g = lerp(g, FOG_LG + 0.09, low);
     b = lerp(b, FOG_LB - 0.05, low);
     const warmBand = smoothstep(0.78, 1.0, t); // hot peach right at the horizon
-    r = lerp(r, 0.92, warmBand * 0.45);
-    g = lerp(g, 0.58, warmBand * 0.45);
-    b = lerp(b, 0.40, warmBand * 0.45);
+    r = lerp(r, 0.94, warmBand * 0.47);
+    g = lerp(g, 0.58, warmBand * 0.47);
+    b = lerp(b, 0.39, warmBand * 0.47);
     SKY_R[y] = r; SKY_G[y] = g; SKY_B[y] = b;
   }
 };

@@ -498,12 +498,13 @@ const drawNotepad = (t: CharTerm, wn: Win, focused: boolean, time: number): void
   t.text(wn.x + 2, stY, status.length > wn.w - 4 ? status.slice(0, wn.w - 4) : status, DIM, [16, 17, 24]);
 };
 
-// ── App: Video player (a real "clip" — synthwave sunset over a rippling sea) ───────
-// Instead of uniform plasma noise, the screen plays a legible SCENE: a banded sky, a
-// horizon, a travelling sun that arcs across and sets, its reflection rippling on the
-// water below. Dark sky/water cells stay near-empty so the bright subject + flowing
-// bands read as MOTION, not static. Luminance → glyph ramp; warm sun, cool sea.
-const RAMP = ' .:-=+*#%@';
+// ── App: Video player (a real "clip" — a sun setting over a rippling sea) ──────────
+// The screen plays a legible SCENE rather than plasma noise: a graded twilight sky,
+// a CLEAR round sun with a contained bloom, a crisp horizon line, and a single bright
+// reflection column shimmering on near-black water. The glyph chosen per cell is
+// driven by the FINAL shaded value, so dark cells stay genuinely empty and the bright
+// sun + glittering reflection read as the subject. Warm gold sun, cool indigo sky/sea.
+const RAMP = ' .·:-=+*#%@';
 let videoTime = 0; // elapsed seconds in the clip
 let videoPlaying = true;
 const VIDEO_TOTAL = 24; // total clip length (s)
@@ -514,72 +515,113 @@ const drawVideo = (t: CharTerm, wn: Win, focused: boolean, time: number): void =
   const innerW = wn.w - 2;
   const innerH = wn.h - 5; // leave 2 rows for transport
   // Letterboxed black screen.
-  t.fillRect(innerX, innerY, innerW, innerH, [6, 6, 10]);
+  t.fillRect(innerX, innerY, innerW, innerH, [5, 5, 10]);
 
   const ph = videoTime;
-  // Horizon sits a little below centre; sky above, sea below.
-  const horizon = innerH * 0.46;
-  // The sun travels in a slow arc and dips toward the horizon over the loop.
+  // The sun sweeps left→right and SETS into the sea over the loop, so the horizon
+  // line stays put while the sun dips through it — a real, readable sunset.
+  const horizon = Math.round(innerH * 0.50); // integer row → a crisp seam
   const arc = fract(ph / VIDEO_TOTAL); // 0..1 across the clip
-  const sunX = innerW * (0.16 + 0.68 * arc); // sweeps left→right
-  // Rises then sets — a gentle parabola peaking mid-clip, settling onto the horizon.
-  const sunY = horizon - (innerH * 0.30) * Math.sin(arc * Math.PI) * 0.85 + innerH * 0.04;
-  const sunR = innerW * 0.16; // sun radius (in screen-x cells)
+  const sunX = innerW * (0.18 + 0.64 * arc); // glides across
+  // Rises a touch then settles onto/just below the horizon by clip end.
+  const sunY = horizon - innerH * (0.26 * Math.sin(arc * Math.PI) - 0.02);
+  const sunR = Math.max(2.4, innerW * 0.10); // sun radius in screen-x cells
+  const aspY = 1.6; // cells are ~1.6:1 tall → stretch dy so the disc reads round
   const invW = 1 / Math.max(1, innerW);
+  const RN = RAMP.length - 1;
+  // Palette anchors blended in RGB so the sky never crosses the green/cyan zone
+  // that a raw HSV hue-lerp would pass through. warm 0→1 = cool indigo → hot gold.
+  // [deep indigo] → [violet dusk] → [amber] → [white-gold sun core]
+  const SKY_DARK = [10, 14, 40]; // upper sky / away from sun
+  const SKY_DUSK = [60, 34, 78]; // mid violet
+  const SKY_WARM = [235, 138, 56]; // amber near horizon/sun
+  const SUN_CORE = [255, 234, 168]; // hot white-gold disc
+  const skyCol = (warm: number, out: number[]): void => {
+    // Two-segment RGB ramp: dark→dusk for the cool half, dusk→warm→core for the hot.
+    if (warm < 0.5) {
+      const k = warm * 2;
+      out[0] = SKY_DARK[0] + (SKY_DUSK[0] - SKY_DARK[0]) * k;
+      out[1] = SKY_DARK[1] + (SKY_DUSK[1] - SKY_DARK[1]) * k;
+      out[2] = SKY_DARK[2] + (SKY_DUSK[2] - SKY_DARK[2]) * k;
+    } else {
+      const k = (warm - 0.5) * 2;
+      const a = k < 0.6 ? SKY_DUSK : SKY_WARM;
+      const b = k < 0.6 ? SKY_WARM : SUN_CORE;
+      const kk = k < 0.6 ? k / 0.6 : (k - 0.6) / 0.4;
+      out[0] = a[0] + (b[0] - a[0]) * kk;
+      out[1] = a[1] + (b[1] - a[1]) * kk;
+      out[2] = a[2] + (b[2] - a[2]) * kk;
+    }
+  };
+  const SEA_DARK = [8, 12, 34]; // near-black indigo water
+  const SEA_GLINT = [255, 196, 96]; // warm gold glitter
+  const col: number[] = [0, 0, 0];
 
   for (let y = 0; y < innerH; y++) {
     const sky = y < horizon;
     // Faint scanline darkening on alternate rows → reads as a real display.
-    const scan = (y & 1) ? 0.9 : 1.0;
+    const scan = (y & 1) ? 0.92 : 1.0;
     // Vertical position normalised within sky / sea band.
     const vSky = horizon > 0 ? y / horizon : 0; // 0 top → 1 horizon
-    const vSea = innerH > horizon ? (y - horizon) / (innerH - horizon) : 0; // 0..1 down
+    const seaH = Math.max(1, innerH - horizon);
+    const vSea = (y - horizon) / seaH; // 0 at horizon → 1 bottom
+    // Distance of this whole row from the sun centre (vertical part, squashed).
+    const dyS = (y - sunY) * aspY;
     for (let x = 0; x < innerW; x++) {
       let lum: number;
-      let hue: number;
-      let sat: number;
+      let warm: number;
       if (sky) {
-        // Banded sky: stacked horizontal sine bands that scroll slowly upward, with
-        // a warm glow pooling toward the horizon and around the sun.
-        const band = 0.5 + 0.5 * sinT(y * 0.9 - ph * 1.1 + x * 0.05);
-        const grad = vSky * vSky; // brighter toward the horizon
-        // Sun bloom (elliptical, sun is wider than tall in cell space).
+        // Graded twilight that warms toward the horizon.
+        const grad = vSky * vSky; // glow pools toward the horizon
+        // Tight round sun + a CONTAINED bloom (falls to ~0 within a few radii).
         const dxs = (x - sunX) / sunR;
-        const dys = (y - sunY) / (sunR * 0.62);
-        const dd = dxs * dxs + dys * dys;
-        const disc = dd < 1 ? 1 : 0; // hard-ish sun disc
-        const halo = Math.exp(-dd * 0.6); // soft halo falloff
-        lum = clamp01(0.10 + 0.34 * grad + 0.18 * band * grad + 0.95 * disc + 0.7 * halo);
-        // Sun = warm gold/orange; sky away from sun cools to magenta/indigo.
-        hue = fract(0.04 + 0.10 * (1 - halo) + 0.03 * sinT(x * 0.18 + ph * 0.3));
-        sat = 0.72 + 0.22 * halo;
+        const dd = dxs * dxs + (dyS / sunR) * (dyS / sunR);
+        const disc = dd < 1.0 ? smoothstep(1.0, 0.55, dd) : 0; // round soft-edged disc
+        const halo = Math.exp(-dd * 1.1); // bloom contained to a few radii
+        // Slow horizontal cloud band streaks near the sun (subtracts light → silhouette).
+        const cloud = smoothstep(0.6, 0.95, 0.5 + 0.5 * sinT(y * 1.5 - ph * 0.5)) * 0.4 * halo;
+        lum = clamp01(0.04 + 0.16 * grad + 1.0 * disc + 0.55 * halo - cloud);
+        warm = clamp01(disc + halo * 0.85 + grad * 0.45);
+        skyCol(warm, col);
       } else {
-        // Sea: dark water with a bright sun-reflection column that ripples, plus a
-        // few travelling crests. Most of the water stays dark so the glint pops.
+        // Sea: near-black water with ONE bright reflection column under the sun that
+        // shimmers in horizontal dashes, plus a faint distant swell.
         const reflectX = Math.abs(x - sunX);
-        const colWidth = sunR * (0.7 + 1.1 * vSea); // reflection widens downwards
-        const inCol = reflectX < colWidth ? 1 - reflectX / colWidth : 0;
-        // Ripple breaks the reflection into horizontal dashes that scroll toward us.
-        const ripple = 0.5 + 0.5 * sinT(y * 1.7 - ph * 2.6 + sinT(x * 0.4) * 1.5);
-        const glint = inCol * ripple * ripple * (1 - vSea * 0.35);
-        // Sparse far swell on the open water.
-        const swell = 0.5 + 0.5 * sinT(x * 0.5 + y * 0.8 - ph * 1.6);
-        const water = 0.05 * swell * (1 - vSea * 0.5);
-        lum = clamp01(water + 0.92 * glint);
-        // Warm gold glint over a cool teal sea.
-        hue = glint > 0.12 ? fract(0.07 + 0.05 * (1 - inCol)) : fract(0.5 + 0.04 * swell);
-        sat = glint > 0.12 ? 0.85 : 0.6;
+        const colW = sunR * (0.5 + 0.85 * vSea);
+        const inCol = reflectX < colW ? 1 - reflectX / colW : 0;
+        // Ripple chops the column into traveling dashes scrolling toward the viewer.
+        const ripple = 0.5 + 0.5 * sinT(y * 2.0 - ph * 3.0 + sinT(x * 0.5) * 1.6);
+        const glint = inCol * inCol * (0.3 + 0.7 * ripple) * (1 - vSea * 0.3);
+        // Sparse far swell — keeps open water alive without lighting it up.
+        const swell = 0.5 + 0.5 * sinT(x * 0.45 + y * 0.9 - ph * 1.8);
+        const water = 0.035 * swell * (1 - vSea * 0.6);
+        lum = clamp01(water + 0.95 * glint);
+        warm = clamp01(glint * 2);
+        col[0] = SEA_DARK[0] + (SEA_GLINT[0] - SEA_DARK[0]) * warm;
+        col[1] = SEA_DARK[1] + (SEA_GLINT[1] - SEA_DARK[1]) * warm;
+        col[2] = SEA_DARK[2] + (SEA_GLINT[2] - SEA_DARK[2]) * warm;
       }
       // Edge vignette so the panel has depth.
       const u = (x - innerW * 0.5) * invW;
-      const vig = 1 - 0.5 * (u * u * 2.2 + (sky ? 0 : 0.15));
-      const val = clamp01(lum) * vig * scan;
-      const ri = Math.min(RAMP.length - 1, Math.max(0, (lum * (RAMP.length - 1)) | 0));
-      const ch = RAMP[ri];
-      const [cr, cg, cb] = hsv(hue, sat * (0.7 + 0.3 * lum), 0.12 + 0.88 * val);
-      // Hue-matched dim backing so even near-empty cells carry the scene's colour.
-      const [br, bg, bb] = hsv(hue, sat * 0.7, 0.05 + 0.05 * val);
-      t.put(innerX + x, innerY + y, ch, [cr, cg, cb], [br + 3, bg + 3, bb + 6]);
+      const vig = 1 - 0.42 * (u * u * 2.0 + (sky ? 0 : 0.10));
+      const val = clamp01(lum * vig) * scan;
+      const ri = (val * RN + 0.5) | 0;
+      const ch = RAMP[ri > RN ? RN : ri];
+      // Glyph carries the lit colour; a much dimmer hue-matched backing fills the cell.
+      const fgv = 0.45 + 0.55 * val;
+      t.put(
+        innerX + x, innerY + y, ch,
+        [col[0] * fgv, col[1] * fgv, col[2] * fgv],
+        [col[0] * 0.16 + 3, col[1] * 0.16 + 3, col[2] * 0.16 + 6],
+      );
+    }
+  }
+  // A crisp glowing horizon seam where sky meets sea — brightest under the sun.
+  if (horizon > 0 && horizon < innerH) {
+    for (let x = 0; x < innerW; x++) {
+      const near = clamp01(1 - Math.abs(x - sunX) / (sunR * 2.4));
+      const r = lerp(40, 255, near), g = lerp(46, 188, near), b = lerp(86, 110, near);
+      t.put(innerX + x, innerY + horizon, near > 0.35 ? '━' : '─', [r, g, b], undefined, near > 0.5);
     }
   }
 
@@ -671,16 +713,19 @@ const drawClock = (t: CharTerm, wn: Win, focused: boolean, time: number): void =
       t.put(tx, ty, '·', focused ? [62, 78, 110] : [46, 54, 74], undefined);
     }
   }
-  // Hands: aspect-correct lines whose glyph follows the on-SCREEN slope so a
+  // Hands: aspect-correct strokes whose glyph follows the on-SCREEN slope so a
   // near-horizontal hand draws '─' and a near-vertical one '│' — no smear. Each
   // hand has a distinct WEIGHT so they can never be confused:
-  //   • hour   — SHORT + THICK: a solid bar, doubled perpendicular, bright + bold.
+  //   • hour   — SHORT + HEAVY: a bright bold stroke, fattened one cell on each side
+  //              over its inner length so it reads as a tapered wedge (not a block).
   //   • minute — LONG + THIN: a single fine stroke.
   //   • second — LONGEST + finest: a dim tapering red sweep.
-  const slopeGlyph = (dx: number, dy: number): string => {
+  // Heavy glyphs trace the slope too, so the wedge stays a clean diagonal — never a
+  // blocky 'T'. Box-drawing heavies: ━ │ (vertical stays single-weight, still bold).
+  const slopeGlyph = (dx: number, dy: number, heavy: boolean): string => {
     const ax = Math.abs(dx);
     const ay = Math.abs(dy) * 2; // un-squash to screen space for slope test
-    if (ax > ay * 2.2) return '─';
+    if (ax > ay * 2.2) return heavy ? '━' : '─';
     if (ay > ax * 2.2) return '│';
     return dx * dy < 0 ? '/' : '\\';
   };
@@ -694,8 +739,9 @@ const drawClock = (t: CharTerm, wn: Win, focused: boolean, time: number): void =
     const a = frac * TAU - TAU / 4;
     const ex = Math.cos(a);
     const ey = Math.sin(a);
-    const g = slopeGlyph(ex, ey);
-    // Perpendicular (screen-space) unit, used to fatten a thick hand by one cell.
+    const g = slopeGlyph(ex, ey, thick);
+    // Perpendicular (screen-space) unit, used to fatten the heavy hour hand by one
+    // cell on EACH side over its inner length so it reads as a solid tapered wedge.
     const plen = Math.hypot(ex, ey * asp) || 1;
     const pxn = (-ey * asp) / plen;
     const pyn = ex / plen;
@@ -710,18 +756,18 @@ const drawClock = (t: CharTerm, wn: Win, focused: boolean, time: number): void =
       lpx = hx;
       lpy = hy;
       const k = taper ? 0.62 + 0.38 * (1 - s / steps) : 1;
-      // Thick hand uses solid blocks so the stub reads as a chunky wedge; thin hands
-      // use the slope glyph for a fine stroke.
-      const glyph = thick ? '█' : g;
-      t.put(hx, hy, glyph, [col[0] * k, col[1] * k, col[2] * k], undefined, bold);
-      if (thick) {
-        // Fatten on BOTH sides over the inner portion → a solid short wedge; the tip
-        // stays single-cell so the hour hand is unmistakably a SHORT FAT stub.
-        if (s < steps * 0.75) {
-          const ox = Math.round(cxp + ex * rr + pxn);
-          const oy = Math.round(cyp + ey * rr * asp + pyn * asp);
-          t.put(ox, oy, '█', [col[0] * 0.85, col[1] * 0.85, col[2] * 0.85], undefined, bold);
-        }
+      t.put(hx, hy, g, [col[0] * k, col[1] * k, col[2] * k], undefined, bold);
+      if (thick && s < steps * 0.7) {
+        // Fatten symmetrically over the inner portion → a solid wedge that narrows to
+        // a single-cell tip. Both flanks use the SAME slope glyph so the heavy hour
+        // hand stays a clean diagonal bar, never a blocky T.
+        const ox1 = Math.round(cxp + ex * rr + pxn);
+        const oy1 = Math.round(cyp + ey * rr * asp + pyn * asp);
+        const ox2 = Math.round(cxp + ex * rr - pxn);
+        const oy2 = Math.round(cyp + ey * rr * asp - pyn * asp);
+        const fc: RGB = [col[0] * 0.82, col[1] * 0.82, col[2] * 0.82];
+        if (ox1 !== hx || oy1 !== hy) t.put(ox1, oy1, g, fc, undefined, bold);
+        if (ox2 !== hx || oy2 !== hy) t.put(ox2, oy2, g, fc, undefined, bold);
       }
     }
   };
@@ -775,13 +821,15 @@ const drawWallpaper = (t: CharTerm, time: number): void => {
       const aur = clamp01(band * 0.5 + 0.5);
       // Sharpen the ridges into filaments, then hue-shift teal→violet for depth.
       // Pool the curtain toward the lower-middle (where open desktop shows it off).
-      const ridge = aur * aur;
-      const horizon = smoothstep(0.0, 0.45, v) * smoothstep(1.05, 0.5, v);
-      const amp = ridge * (0.45 + 0.55 * horizon);
+      // A faint vertical striation breaks the sheet into hanging curtains of light.
+      const ridge = aur * aur * (0.65 + 0.35 * aur);
+      const curtain = 0.7 + 0.3 * (0.5 + 0.5 * sinT(u * 9.0 + b2 * 1.4 + time * 0.05));
+      const horizon = smoothstep(0.0, 0.45, v) * smoothstep(1.1, 0.5, v);
+      const amp = ridge * curtain * (0.5 + 0.6 * horizon);
       const vio = smoothstep(0.2, 0.9, v); // top→violet, bottom→teal
-      r += amp * (14 + 30 * vio);
-      g += amp * (54 - 18 * vio);
-      b += amp * (40 + 26 * vio);
+      r += amp * (22 + 40 * vio);
+      g += amp * (74 - 22 * vio);
+      b += amp * (58 + 34 * vio);
       // Soft top-left light bloom (radial falloff, no hard edge).
       const dx = x - lx;
       const d2 = dx * dx + dy * dy;

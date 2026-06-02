@@ -224,7 +224,9 @@ const buildFK = (time: number): void => {
       dn = dn * 0.74 + sampleLat(latB, drx * (fd * 2.1) - doy + 7.0, dry * (fd * 2.1) + dox + 3.0) * 0.26;
       // Below DEAD_HI the cell starts dying; below DEAD_LO it's fully dead. This
       // makes void cores decisively dark while keeping a soft membrane shoreline.
-      const DEAD_HI = 0.56, DEAD_LO = 0.33;
+      // Raised slightly so negative space stays confident as the field matures
+      // (otherwise the organism densifies into uniform wallpaper over time).
+      const DEAD_HI = 0.60, DEAD_LO = 0.34;
       const dm = clamp01((DEAD_HI - dn) / (DEAD_HI - DEAD_LO)); // 0 at HI → 1 at/below LO
       const dead = dm * dm * (3 - 2 * dm);
       Fv = Fv + (DEAD_F - Fv) * dead;
@@ -321,14 +323,14 @@ const step = (): void => {
 // and bone only for ridge crests — keeps the field inky and the structure luminous
 // rather than a flat sheet of teal. Values are LINEAR; tonemapped at the end.
 const RAMP: [number, number, number][] = [
-  [0.006, 0.008, 0.022], // abyss (dead field / negative space)
-  [0.014, 0.024, 0.070], // deep indigo
-  [0.028, 0.080, 0.170], // indigo-teal
-  [0.040, 0.230, 0.320], // ocean teal
-  [0.110, 0.470, 0.470], // bright teal
-  [0.420, 0.700, 0.580], // jade
-  [0.840, 0.880, 0.740], // warm bone
-  [1.000, 0.975, 0.890], // hot bone-white
+  [0.004, 0.006, 0.018], // abyss (dead field / negative space) — deeper for contrast
+  [0.012, 0.022, 0.066], // deep indigo
+  [0.026, 0.078, 0.168], // indigo-teal
+  [0.044, 0.236, 0.326], // ocean teal
+  [0.130, 0.490, 0.476], // bright teal
+  [0.470, 0.720, 0.560], // jade, warmer
+  [0.910, 0.870, 0.660], // warm bone — amber-biased crest
+  [1.000, 0.965, 0.840], // hot bone-white, warm
 ];
 const rampCol = (t: number, out: [number, number, number]): void => {
   t = clamp01(t) * (RAMP.length - 1);
@@ -468,6 +470,10 @@ const render = (t: Term, time: number): void => {
       const rz = 2 * diff * nz - Lz;
       const spec = rz > 0 ? rz * rz * rz * rz : 0; // pow ~16 via squaring chain below
       const spec2 = spec * spec;                   // ~pow 8 of rz; tightens highlight
+      // Fresnel rim: grazing-angle facets (steep membrane walls, where nz is small)
+      // catch a cool sheen — the signature "wet, under glass" look. (1 - nz)^3.
+      const fres1 = 1 - nz;
+      const fresnel = fres1 * fres1 * fres1;
 
       // Cavity occlusion: troughs (where the local field is below the body) read
       // darker, giving the organism real depth in its folds. Cheap: compare the
@@ -490,14 +496,22 @@ const render = (t: Term, time: number): void => {
       // dead field stays inky. Tinted faintly cyan. (smoothstep(0.10,0.30,val) inlined)
       let sw = (val - 0.10) * 5; // 1/(0.30-0.10) = 5
       sw = sw < 0 ? 0 : sw > 1 ? 1 : sw;
-      const sh = spec2 * (sw * sw * (3 - 2 * sw));
-      r += sh * 0.50; g += sh * 0.74; bl += sh * 0.92;
+      const swS = sw * sw * (3 - 2 * sw);
+      const sh = spec2 * swS;
+      r += sh * 0.54; g += sh * 0.78; bl += sh * 0.96;
+      // Fresnel rim light: a faint cool wet-glass sheen on the membrane shoulders,
+      // gated to live catalyst and modulated by the lamp so it reads as reflection,
+      // not a flat outline. This is what sells the "wet membrane under glass".
+      const rim = fresnel * swS * (0.32 + 0.68 * lam);
+      r += rim * 0.10; g += rim * 0.20; bl += rim * 0.30;
 
       // Self-emissive crest glow — the densest catalyst lights up warm bone-white.
+      // A warm-biased emissive so ridge crests clearly read as the "hot" regime,
+      // giving the long-term morph a legible bright-to-dark signature.
       const core = val - 0.40;
       if (core > 0) {
-        const e = core * core * 6.0;
-        r += e * 1.00; g += e * 0.93; bl += e * 0.72;
+        const e = core * core * 6.4;
+        r += e * 1.06; g += e * 0.92; bl += e * 0.66;
       }
 
       buf[o] = acesByte(r);
@@ -616,6 +630,19 @@ const bloomVignette = (t: Term, time: number): void => {
 let seeded = false;
 let fkTimer = 1e9; // force a rebuild on the first frame
 
+// Deterministic prewarm: run the solver forward a fixed amount with the t=0 field
+// so the very first DISPLAYED frame is already a living membrane, not bare seed
+// dots. This is the attract/screenshot state — it must be gorgeous on its own.
+// Purely seed-derived (buildFK(0) + fixed step count), so capture stays exact.
+let prewarmed = false;
+const PREWARM_STEPS = 46 * SUBSTEPS; // ~46 displayed frames of evolution
+const prewarm = (): void => {
+  if (prewarmed) return;
+  buildFK(0);
+  for (let i = 0; i < PREWARM_STEPS; i++) step();
+  prewarmed = true;
+};
+
 runDemo({
   title: 'Reaction',
   hud: 'GRAY-SCOTT REACTION-DIFFUSION - SPATIAL PHASE FIELD - LIVING TURING ORGANISM',
@@ -623,11 +650,13 @@ runDemo({
   init: () => {
     if (latA.length === 0) initNoise();
     if (!seeded) { seed(); seeded = true; }
+    prewarm();
     fkTimer = 1e9;
   },
   frame: (t, time, dt) => {
     if (latA.length === 0) initNoise();
     if (!seeded) { seed(); seeded = true; }
+    if (!prewarmed) prewarm();
     // Rebuild the spatial (F,K) field a few times per second — it drifts slowly,
     // so this is plenty smooth and keeps the per-substep loop lean.
     fkTimer += dt;

@@ -411,13 +411,15 @@ const frame = (t: Term, time: number, _dt: number, _frameNo: number): void => {
     if (ix < 1 || iy < 1 || ix >= W - 1 || iy >= H - 1) continue;
 
     // colour: base temp pushed hot-blue inside the arm (young stars in compressed gas)
-    let tc = baseTemp[i] + 0.62 * (arm * arm); // arm² → only the crest goes truly blue
+    let tc = baseTemp[i] + 0.66 * (arm * arm); // arm² → only the crest goes truly blue
     if (tc > 1) tc = 1;
     const li = (tc * 255) | 0;
     const cr = TEMP_LUT_R[li], cg = TEMP_LUT_G[li], cb = TEMP_LUT_B[li];
 
     // brightness: low ambient disk floor + a STRONG arm term (so arms read clearly),
     // gentle mass weighting + a subtle depth shade (near edge slightly brighter).
+    // The inter-arm floor is held LOW and the arm gain is strong so the grand-design
+    // crests stand cleanly proud of the smooth disk (more contrast, no milky inter-arm wash).
     let sh = (depth + GALAXY_R) * INV_2GR; sh = sh < 0 ? 0 : sh > 1 ? 1 : sh;
     const shade = 0.80 + 0.20 * sh;
     // Central density compensation: the projected bulge packs hundreds of stars into a
@@ -426,7 +428,7 @@ const frame = (t: Term, time: number, _dt: number, _frameNo: number): void => {
     // gold core injection below) so the centre stays a legible GOLDEN nucleus, never clipped.
     let cTap = densNorm;
     if (rn < CORE_TAPER_R) { const u = rn * INV_CORE_TAPER_R; cTap *= CORE_TAPER_MIN + (1 - CORE_TAPER_MIN) * (u * u * (3 - 2 * u)); }
-    const bright = (0.028 + 0.160 * arm) * massW[i] * shade * cTap;
+    const bright = (0.0235 + 0.178 * arm) * massW[i] * shade * cTap;
 
     const br = cr * bright, bg = cg * bright, bb = cb * bright;
 
@@ -529,7 +531,7 @@ const frame = (t: Term, time: number, _dt: number, _frameNo: number): void => {
   const BLOOM_GAIN = 0.40;
   // hoisted dust + tonemap invariants
   const INV_COSI = 1 / (cosI + 1e-6);
-  const laneW = ARM_WIDTH * 0.42;
+  const laneW = ARM_WIDTH * 0.40;
   const INV_2LANEW2 = 1 / (2 * laneW * laneW);
   const RR_LO = ARM_R0 * 1.2, RR_HI = GALAXY_R * 1.3;
   // fade = smoothstep(0.14,0.34,rn)*smoothstep(1.30,1.0,rn); rn = rr/GALAXY_R
@@ -567,9 +569,9 @@ const frame = (t: Term, time: number, _dt: number, _frameNo: number): void => {
           const rn = rr * INV_GR;
           let fa = (rn - fE0) * fInvA; fa = fa < 0 ? 0 : fa > 1 ? 1 : fa; fa = fa * fa * (3 - 2 * fa);
           let fb = (rn - fE0b) * fInvB; fb = fb < 0 ? 0 : fb > 1 ? 1 : fb; fb = fb * fb * (3 - 2 * fb);
-          const tau = lane * fa * fb * 0.66;
+          const tau = lane * fa * fb * 0.74;
           // chromatic extinction: dust scatters blue away → lanes darken cool-first, redden
-          rl *= 1 - tau * 0.86; gl *= 1 - tau * 0.96; bl *= 1 - tau;
+          rl *= 1 - tau * 0.84; gl *= 1 - tau * 0.95; bl *= 1 - tau;
         }
       }
 

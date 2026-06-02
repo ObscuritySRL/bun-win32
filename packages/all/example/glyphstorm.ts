@@ -13,8 +13,12 @@
  * is multiplied down a hair each frame, so motion leaves silky trails; a separable
  * bloom lifts a glow off the dense letterform spines and an ACES filmic tonemap grades
  * the HDR to 8-bit — the text reads as luminous neon constellations on a deep void,
- * brightest exactly where the swarm has coalesced. Colour is a per-word hue ramp that
- * sweeps across the line, with a faint global drift; never garish.
+ * brightest exactly where the swarm has coalesced. The void itself is a precomputed
+ * NEBULA stage (a deep blue-violet vignette with faint cool clouds, brightest behind the
+ * word band), so the storm always sits on a premium backdrop instead of flat black.
+ * Colour is a CURATED cool-neon palette: each word draws a base hue from a tight band
+ * arcing electric-cyan -> azure -> indigo -> violet -> magenta with a gentle intra-word
+ * ramp, so the storm never wanders into garish green/yellow.
  *
  * INTERACTION (live): printable keys append a glyph (its swarm flies in); BACKSPACE
  * dissolves the last glyph back into outward sparks; ENTER bursts the whole line and
@@ -188,8 +192,45 @@ let accG = new Float32Array(0);
 let accB = new Float32Array(0);
 let bloom = new Float32Array(0);
 let bloomTmp = new Float32Array(0);
+// Precomputed per-pixel nebula base (R,G,B interleaved). A static deep-space glow that
+// lifts the void off pure black with real depth: a soft blue-violet vignette brightest
+// behind the word band, with a couple of faint cool nebula clouds. Computed once per
+// resize (loop-invariant), so it costs nothing per frame and the storm always sits on a
+// premium stage instead of flat black — gorgeous even when no letters are assembled.
+let nebula = new Float32Array(0);
 let accW = 0;
 let accH = 0;
+const buildNebula = (W: number, H: number): void => {
+  nebula = new Float32Array(W * H * 3);
+  const cx = W * 0.5;
+  const cy = H * 0.5;
+  const invW = 1 / W;
+  const invH = 1 / H;
+  // two faint off-center nebula clouds for organic asymmetry (deterministic)
+  const b1x = W * 0.30, b1y = H * 0.34, b2x = W * 0.74, b2y = H * 0.66;
+  for (let y = 0; y < H; y++) {
+    const ny = (y - cy) * invH * 2; // -1..1
+    const yr = y * W;
+    for (let x = 0; x < W; x++) {
+      const nx = (x - cx) * invW * 2; // -1..1
+      // central glow: brightest behind the word band, falling off to the corners.
+      const r2 = nx * nx * 0.7 + ny * ny * 1.35;
+      const glow = Math.exp(-r2 * 1.9);
+      // faint nebula clouds
+      const d1x = (x - b1x) * invW, d1y = (y - b1y) * invH;
+      const d2x = (x - b2x) * invW, d2y = (y - b2y) * invH;
+      const c1 = Math.exp(-(d1x * d1x + d1y * d1y) * 9) * 0.5;
+      const c2 = Math.exp(-(d2x * d2x + d2y * d2y) * 11) * 0.4;
+      const cloud = c1 + c2;
+      // deep indigo base + blue-violet central lift; B leads, then G, faint R — cohesive
+      // with the cyan→magenta word band and never muddy.
+      const o = (yr + x) * 3;
+      nebula[o] = 0.006 + glow * 0.022 + cloud * 0.016;       // R
+      nebula[o + 1] = 0.010 + glow * 0.030 + cloud * 0.018;   // G
+      nebula[o + 2] = 0.022 + glow * 0.060 + cloud * 0.040;   // B
+    }
+  }
+};
 const allocAccum = (W: number, H: number): void => {
   accW = W;
   accH = H;
@@ -198,6 +239,7 @@ const allocAccum = (W: number, H: number): void => {
   accB = new Float32Array(W * H);
   bloom = new Float32Array(W * H);
   bloomTmp = new Float32Array(W * H);
+  buildNebula(W, H);
 };
 
 // ── Curl-noise drift field (cheap, smooth, deterministic) ────────────────────────
@@ -234,10 +276,15 @@ const sampleN = (x: number, y: number): number => {
 let curCol = 0;
 let curRow = 0;
 let lineCount = 1;
-// Per-word hue start. Seeded in the cool neon band (cyan ≈ 0.50) so the very first
-// word reads as electric-cyan and the ramp sweeps it toward violet/magenta.
-const HUE_START = 0.5;
-let hueBase = HUE_START; // drifts each word/line for variety
+// Curated cool-neon palette: every word's base hue is drawn from a tight band that
+// arcs electric-cyan → azure → indigo → violet → magenta. Words rotate through these
+// anchors instead of letting the hue free-drift, so the storm NEVER wanders into the
+// green/yellow zone — the whole piece stays a cohesive, premium cyan-to-magenta gamut.
+const WORD_HUES = [0.515, 0.60, 0.70, 0.80, 0.555, 0.755];
+let wordIndex = 0; // advances each word/line; selects the base hue anchor
+const baseHueFor = (idx: number): number => WORD_HUES[((idx % WORD_HUES.length) + WORD_HUES.length) % WORD_HUES.length];
+const HUE_START = WORD_HUES[0];
+let hueBase = HUE_START; // current word's base hue (from the palette)
 
 const recenterAll = (): void => {
   // Recompute every bound glyph's target points for the current lineCount, so
@@ -290,9 +337,10 @@ const addGlyph = (ch: string): void => {
     ch: isSpace ? ' ' : up,
     col: curCol,
     row: curRow,
-    // Per-word hue RAMP: sweep boldly across the line so the word reads as a
-    // gradient (cyan → violet → magenta) instead of one flat colour.
-    hue: hueBase + curCol * 0.058 + curRow * 0.06,
+    // Per-word hue RAMP: a gentle sweep across the line so the word reads as a soft
+    // gradient WITHIN the curated band (the base hue ± a few percent) instead of a
+    // flat fill — tight enough that even a 10-letter word never drifts out of palette.
+    hue: hueBase + curCol * 0.020 + curRow * 0.035,
     born: nowTime,
     parts: [],
   };
@@ -376,7 +424,8 @@ const burstLine = (): void => {
   curCol = 0;
   curRow = 0;
   lineCount = 1;
-  hueBase += 0.17; // shift the palette for the next word
+  wordIndex++; // advance to the next curated palette anchor for the next word
+  hueBase = baseHueFor(wordIndex);
 };
 
 const avg = (idx: number[], arr: Float32Array): number => {
@@ -392,7 +441,9 @@ let userActive = false; // a real key/mouse interaction has occurred
 const IDLE_RESUME = 3.0; // seconds idle before attract resumes
 
 // Attract performance: a deterministic script of words to type out, hold, dissolve.
-const ATTRACT_WORDS = ['GLYPHSTORM', 'TERMINAL', '60 FPS', 'CLAUDE CODE', 'TYPE ME'];
+// Curated so the loop reads as a tight little phrase about what this is — and so the
+// deterministic capture frames land on a fully-assembled, on-brand word.
+const ATTRACT_WORDS = ['GLYPHSTORM', 'CLAUDE', 'PURE TYPESCRIPT', 'TERMINAL', 'BUN', 'TYPE ME'];
 let attractInited = false;
 let attractWordIdx = 0;
 let attractTypedCount = 0; // glyphs of the current word already typed
@@ -415,7 +466,8 @@ const resetAttract = (): void => {
   curCol = 0;
   curRow = 0;
   lineCount = 1;
-  hueBase = HUE_START;
+  wordIndex = 0;
+  hueBase = baseHueFor(0);
   for (let i = 0; i < N; i++) {
     STATE[i] = 0;
     GLYPHID[i] = -1;
@@ -437,7 +489,9 @@ const stepAttract = (time: number): void => {
   }
   const word = ATTRACT_WORDS[attractWordIdx % ATTRACT_WORDS.length];
   if (attractPhase === 0) {
-    // typing the word, one glyph per interval
+    // typing the word, one glyph per interval. Pin the palette anchor to this word so
+    // every attract word lands on a deliberate hue from the curated band.
+    if (attractTypedCount === 0) hueBase = baseHueFor(attractWordIdx);
     if (attractTypedCount < word.length && time - attractLastTypeT >= ATTRACT_TYPE_INTERVAL) {
       const ch = word[attractTypedCount];
       addGlyph(ch);
@@ -474,7 +528,8 @@ const onKey = (key: string, t: Term): void => {
     curCol = 0;
     curRow = 0;
     lineCount = 1;
-    hueBase = HUE_START + 0.1;
+    wordIndex = 0;
+    hueBase = baseHueFor(0);
     for (let i = 0; i < N; i++) {
       STATE[i] = 0;
       GLYPHID[i] = -1;
@@ -677,13 +732,14 @@ const frame = (t: Term, time: number, dt: number): void => {
       hue = lerp(0.56, HUE[i], hot) + gHue;
       sat = 0.95;
     } else {
-      // Constellation dust — a cool deep-blue/cyan band (decoupled from the per-word
-      // hue) so the void reads as a premium starfield. A per-star twinkle pulses a
-      // few of them bright so the background sparkles instead of sitting as flat haze.
+      // Constellation dust — a cool azure→indigo band (decoupled from the per-word hue)
+      // that bridges the nebula's blue base toward the words' violet, so the whole void
+      // reads as one cohesive premium starfield. A per-star twinkle pulses a few of them
+      // bright so the storm sparkles with life instead of sitting as flat haze.
       const tw = 0.5 + 0.5 * Math.sin(noiseT * 3.3 + SEED[i]);
-      intensity = (0.012 + 0.030 * tw * tw * tw) * JIT[i];
-      hue = 0.55 + (SEED[i] % 1) * 0.10 + gHue * 0.5;
-      sat = 0.9;
+      intensity = (0.016 + 0.044 * tw * tw * tw) * JIT[i];
+      hue = 0.56 + (SEED[i] % 1) * 0.13 + gHue * 0.5;
+      sat = 0.88;
     }
 
     // Neon palette: saturated hue carried into the HDR buffer. Value=1 keeps the
@@ -719,15 +775,18 @@ const frame = (t: Term, time: number, dt: number): void => {
   // toward white only in proportion to how hot the cell is — so letterform spines get
   // a white-hot core wrapped in a saturated coloured glow rather than a flat blob.
   const buf = t.buf;
+  const neb = nebula;
   const total = W * H;
   let o = 0;
   for (let idx = 0; idx < total; idx++) {
     const bl = bloom[idx];
-    // Bloom is tinted slightly cool (more blue) for a clean electric halo. A faint
-    // cold base lifts the void off pure black so the starfield never crushes flat.
-    const R = accR[idx] * EXPOSURE + bl * 0.80 + 0.004;
-    const G = accG[idx] * EXPOSURE + bl * 0.82 + 0.007;
-    const B = accB[idx] * EXPOSURE + bl * 1.14 + 0.016;
+    const no = idx * 3;
+    // Bloom is tinted slightly cool (more blue) for a clean electric halo. The static
+    // nebula base (deep blue-violet vignette + faint clouds) lifts the void off pure
+    // black with real depth so the starfield always sits on a premium stage.
+    const R = accR[idx] * EXPOSURE + bl * 0.80 + neb[no];
+    const G = accG[idx] * EXPOSURE + bl * 0.82 + neb[no + 1];
+    const B = accB[idx] * EXPOSURE + bl * 1.14 + neb[no + 2];
     const lum = R * 0.2126 + G * 0.7152 + B * 0.0722 + 1e-6;
     // ACES on the scalar luminance.
     const Lt = (lum * (2.51 * lum + 0.03)) / (lum * (2.43 * lum + 0.59) + 0.14);
@@ -808,8 +867,11 @@ runDemo({
     // Pre-warm the attract script so the first displayed/captured frame is already a
     // living, partially-assembled word rather than a sparse scatter. Run real frames
     // at negative time ending exactly at t=0 to keep the timeline deterministic.
+    // ~2.25s of prewarm: the first word finishes typing well before t=0 and has time
+    // to SETTLE, so the very first displayed/captured frame is a fully-assembled, glowing
+    // word on the nebula stage — gorgeous and self-explanatory, not a mid-flight scatter.
     const warmDt = 1 / 60;
-    for (let k = 90; k >= 1; k--) frame(t, -k * warmDt, warmDt);
+    for (let k = 135; k >= 1; k--) frame(t, -k * warmDt, warmDt);
   },
   frame,
   onKey,
