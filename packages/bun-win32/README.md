@@ -17,7 +17,7 @@ Kernel32.GetCurrentProcessId();
 User32.GetForegroundWindow();
 ```
 
-This package re-exports `@bun-win32/all` verbatim — every default class from every `@bun-win32/*` package, plus the shared `Win32` namespace from `@bun-win32/core`. See [`@bun-win32/all`](../all/README.md) for the full surface and the showcase examples.
+This package re-exports `@bun-win32/all` verbatim — every default class from every `@bun-win32/*` package, plus the shared `Win32` namespace from `@bun-win32/core`. See [`@bun-win32/all`](../all/README.md) for the full surface.
 
 For types, enums, and packed-struct helpers, import from the specific package — those are not re-exported here because the namespace would collide:
 

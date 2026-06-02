@@ -69,6 +69,7 @@ const encodeWide = (str: string): Buffer => Buffer.from(`${str}\0`, 'utf16le');
 
 const WIDTH = 1280;
 const HEIGHT = 720;
+// const AGENT_COUNT = (1 << 20) * 5; // 1,048,576 agents
 const AGENT_COUNT = 1 << 20; // 1,048,576 agents
 const AGENT_GROUP = 256;
 const DIFFUSE_GROUP = 16;

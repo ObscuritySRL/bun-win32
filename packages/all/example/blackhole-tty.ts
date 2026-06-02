@@ -27,13 +27,24 @@
  * a fixed-area internal HDR buffer (adaptive sample budget for ≥120 bench fps) and
  * bilinearly resampled to fill any window size, so it reflows on live resize.
  *
+ * INTERACTIVE: click-drag to orbit the camera (drag horizontally to swing the
+ * azimuth, vertically to tilt the inclination — the point you grab follows the
+ * cursor); the scroll wheel (or +/−) dollies in and out; the arrow keys nudge; and
+ * 'r' eases the view back to the default framing. A flick of the drag throws the
+ * orbit into an eased spin, and once you let go it HOLDS your angle with only a
+ * gentle drift so the scene stays alive. Before you ever touch it — and in any
+ * headless capture — it runs the original cinematic auto-orbit, so the screenshot
+ * is unchanged. Mouse tracking is real xterm SGR reporting parsed off stdin by the
+ * ./_term engine (terminal mouse, in pure TypeScript).
+ *
  * Technique: closed-form gravitational lensing · dual-ray disk lensing (near/halo)
  *   · analytic photon ring · Doppler-beamed temperature disk · fbm turbulence ·
- *   separable bloom · ACES tonemap · decoupled internal buffer + bilinear upsample.
+ *   separable bloom · ACES tonemap · decoupled internal buffer + bilinear upsample
+ *   · drag-to-orbit camera with flick momentum + idle drift.
  *
- * Run: bun run packages/all/example/blackhole-tty.ts
+ * Run: bun run packages/all/example/blackhole-tty.ts   (drag orbit · wheel zoom · R reset · ESC/q quit)
  */
-import { runDemo, Term, clamp, clamp01, lerp, smoothstep, aces } from './_term';
+import { runDemo, Term, clamp, clamp01, lerp, smoothstep, aces, TAU } from './_term';
 
 // ── Internal render scale ───────────────────────────────────────────────────────
 // The lensing march is the cost driver, so it runs at a fixed PIXEL BUDGET and is
@@ -270,6 +281,42 @@ let dbx = 0, dby = 0, dbz = 0;              // in-plane axis B
 // camera → hole vector (= -camRo), constant per frame, hoisted out of shadePixel
 let chx = 0, chy = 0, chz = 0;
 
+// ── Interactive orbit camera ────────────────────────────────────────────────────
+// Drag orbits (azim/elev), wheel or +/− dollies (dist), a flick imparts momentum,
+// idle adds a gentle drift, and 'r' eases back to the default framing. Until the
+// FIRST interaction (and in any headless capture, which has no mouse/keys) the
+// camera runs the original cinematic auto-orbit verbatim, so the screenshot is
+// byte-for-byte unchanged. Pixel deltas hit the angles DIRECTLY so dragging stays
+// responsive even when the sim is paused (dt = 0); momentum/drift/zoom use dt.
+const AZIM0 = 0;                          // default azimuth seed
+const ELEV0 = 0.135;                      // default inclination (~7.7°, near-edge-on)
+const DIST0 = 18.0;                       // default dolly distance
+const ELEV_LIMIT = 1.45;                  // clamp |elev| to ~83°; near ±90° the basis gimbal-locks (roll/flip)
+const DIST_MIN = 13.0, DIST_MAX = 45.0;   // keep the camera outside the disk, never uselessly far
+const DRAG_AZIM = 0.006;                  // radians of orbit per horizontal pixel dragged
+const DRAG_ELEV = 0.006;                  // radians of tilt per vertical pixel dragged
+const MOMENTUM_DECAY = 2.2;               // e-folding rate (1/s) of the post-flick spin
+const MOMENTUM_MAX = 4.0;                 // cap the flung angular velocity (rad/s)
+const IDLE_DRIFT_DELAY = 2.5;             // seconds of stillness before the gentle drift resumes
+const IDLE_DRIFT_RATE = 0.05;            // radians/s of idle azimuthal drift
+const KEY_AZIM_STEP = 0.08;               // arrow-key azimuth nudge (radians)
+const KEY_ELEV_STEP = 0.05;               // arrow-key inclination nudge (radians)
+const ZOOM_WHEEL = 0.86;                  // dist *= this per wheel tick toward the viewer (zoom in)
+const ZOOM_KEY = 0.90;                    // dist *= this per +/− key (zoom in)
+
+let camAzim = AZIM0, camElev = ELEV0;     // live camera angles (manual mode)
+let camDist = DIST0, tgtDist = DIST0;     // live distance eased toward the zoom target
+let velAzim = 0;                          // post-flick angular momentum (rad/s)
+let everInteracted = false;               // has the user touched it yet?
+let lastInteractT = 0;                    // sim-time of the last interaction
+let dragging = false;                     // left button was held last frame
+let prevMX = 0, prevMY = 0;               // previous mouse pixel pos (for the drag delta)
+let resetting = false;                    // easing back toward the default framing
+// onKey → frame hand-off accumulators (written between frames, consumed once per frame)
+let kbAzim = 0, kbElev = 0;               // pending arrow-key nudges
+let kbZoom = 0;                           // pending +/− zoom steps (net; + = in)
+let pendingReset = false;                 // 'r' pressed
+
 // Intersect a (origin+dir·s) ray with the disk plane (through origin, normal nrm),
 // writing the emissive disk colour into acc3 and the hit distance into hitT.
 const acc3 = [0, 0, 0];
@@ -489,20 +536,98 @@ const doBloom = (): void => {
 };
 
 // ── Per-frame ──────────────────────────────────────────────────────────────────
-const frame = (t: Term, time: number, _dt: number, _frameNo: number): void => {
+const frame = (t: Term, time: number, dt: number, _frameNo: number): void => {
   const W = t.W, H = t.H;
   if (RW === 0) initBuffers(t);
 
-  // ── camera: slow azimuthal orbit at a LOW elevation so we view the equatorial
-  //    disk nearly edge-on — that near-grazing angle is exactly what makes the
-  //    far side of the disk lens up and over the top of the shadow (the halo).
-  //    A gentle eased bob lets the inclination breathe between ~7° and ~17°. ──
-  const orbit = time * 0.075;
-  const elev = 0.135 + 0.055 * Math.sin(time * 0.19);   // radians above the disk plane (~5°–11°)
-  const dist = 18.0 + 1.4 * Math.sin(time * 0.12);
+  // ── camera: an interactive orbit camera. The DEFAULT (untouched) pose is the
+  //    original slow azimuthal orbit at a LOW elevation so we view the equatorial
+  //    disk nearly edge-on — that near-grazing angle is what makes the far side of
+  //    the disk lens up and over the top of the shadow (the halo). Drag/scroll/keys
+  //    take that pose over; until then (and in any headless capture) it auto-orbits
+  //    exactly as before, so the screenshot is unchanged. ──
+  const autoAzim = time * 0.075;
+  const autoElev = 0.135 + 0.055 * Math.sin(time * 0.19);   // ~5°–11° eased inclination bob
+  const autoDist = 18.0 + 1.4 * Math.sin(time * 0.12);
+
+  // Drain the keyboard accumulators (written by onKey between frames) and the wheel.
+  const keyAzim = kbAzim, keyElev = kbElev, keyZoom = kbZoom, doReset = pendingReset;
+  kbAzim = 0; kbElev = 0; kbZoom = 0; pendingReset = false;
+  const wheel = t.wheel; t.wheel = 0;
+
+  // Drag deltas from the (opted-in) mouse: anchor on press, accumulate while held.
+  const down = t.mouseDown && t.mouseInside;
+  let dragAzim = 0, dragElev = 0;
+  if (down && !dragging) { prevMX = t.mouseX; prevMY = t.mouseY; velAzim = 0; }   // press: anchor, no jump, fresh flick
+  else if (down && dragging) {
+    dragAzim = (t.mouseX - prevMX) * DRAG_AZIM;
+    dragElev = (t.mouseY - prevMY) * DRAG_ELEV;
+    prevMX = t.mouseX; prevMY = t.mouseY;
+  }
+  dragging = down;
+
+  const anyInput = down || wheel !== 0 || keyAzim !== 0 || keyElev !== 0 || keyZoom !== 0 || doReset;
+
+  if (anyInput && !everInteracted) {
+    // First touch: seed the manual state from the live auto pose so nothing jumps.
+    camAzim = autoAzim; camElev = autoElev; camDist = autoDist; tgtDist = autoDist;
+    everInteracted = true;
+  }
+
+  if (!everInteracted) {
+    // Untouched / headless: original cinematic auto-orbit, verbatim.
+    camAzim = autoAzim; camElev = autoElev; camDist = autoDist; tgtDist = autoDist;
+  } else {
+    if (anyInput) lastInteractT = time;
+
+    // Orbit by drag — applied DIRECTLY (responsive even when paused, dt = 0). Grab
+    // feel: the point you hold trails the cursor (drag right → the scene swings right).
+    if (dragAzim !== 0 || dragElev !== 0) {
+      camAzim += dragAzim;
+      camElev += dragElev;
+      if (dt > 1e-4) velAzim = clamp(dragAzim / dt, -MOMENTUM_MAX, MOMENTUM_MAX); // carry the flick
+    }
+    // Arrow-key fine nudges.
+    camAzim += keyAzim;
+    camElev += keyElev;
+
+    // Reset request: ease back toward the default framing.
+    if (doReset) { resetting = true; velAzim = 0; }
+
+    // Zoom: wheel + keys fold into the eased target distance (+tick = toward viewer).
+    if (wheel !== 0) tgtDist *= Math.pow(ZOOM_WHEEL, wheel);
+    if (keyZoom !== 0) tgtDist *= Math.pow(ZOOM_KEY, keyZoom);
+    tgtDist = clamp(tgtDist, DIST_MIN, DIST_MAX);
+
+    if (resetting) {
+      // Ease azimuth (shortest angular path), inclination, and distance to default.
+      const dA = ((AZIM0 - camAzim + Math.PI) % TAU + TAU) % TAU - Math.PI;
+      const k = 1 - Math.exp(-dt * 3.0);
+      camAzim += dA * k;
+      camElev += (ELEV0 - camElev) * k;
+      tgtDist = DIST0;
+      if (Math.abs(dA) < 0.01 && Math.abs(ELEV0 - camElev) < 0.01) resetting = false;
+      if (down || keyAzim !== 0 || keyElev !== 0) resetting = false;  // user grabbed back
+    } else if (!down) {
+      // Post-flick momentum, then a gentle idle drift once it has settled.
+      camAzim += velAzim * dt;
+      velAzim *= Math.exp(-dt * MOMENTUM_DECAY);
+      if (Math.abs(velAzim) < 1e-3) velAzim = 0;
+      if (velAzim === 0 && time - lastInteractT > IDLE_DRIFT_DELAY) camAzim += IDLE_DRIFT_RATE * dt;
+    }
+
+    // Smooth dolly toward the zoom target.
+    camDist += (tgtDist - camDist) * (1 - Math.exp(-dt * 6.0));
+
+    // Clamps: stay clear of the ±90° gimbal-lock pole and outside the disk volume.
+    camElev = clamp(camElev, -ELEV_LIMIT, ELEV_LIMIT);
+    camDist = clamp(camDist, DIST_MIN, DIST_MAX);
+  }
+
+  const azim = camAzim, elev = camElev, dist = camDist;
   const cp = Math.cos(elev), sp = Math.sin(elev);
-  camRoX = Math.cos(orbit) * dist * cp;
-  camRoZ = Math.sin(orbit) * dist * cp;
+  camRoX = Math.cos(azim) * dist * cp;
+  camRoZ = Math.sin(azim) * dist * cp;
   camRoY = sp * dist;
   chx = -camRoX; chy = -camRoY; chz = -camRoZ;          // camera → hole, hoisted for shadePixel
 
@@ -615,9 +740,21 @@ const frame = (t: Term, time: number, _dt: number, _frameNo: number): void => {
 
 runDemo({
   title: 'Black Hole TTY',
-  hud: 'CLOSED-FORM GRAVITATIONAL LENSING - DOPPLER DISK - PHOTON RING - HDR BLOOM',
+  hud: 'DRAG ORBIT - WHEEL/+- ZOOM - ARROWS NUDGE - R RESET',
   captureT: 7,
+  mouse: true,
   init: (t) => { RW = 0; initBuffers(t); },
   resize: (t) => { RW = 0; initBuffers(t); },
+  // Camera control: arrows nudge the orbit, +/− dolly, 'r' resets. The wheel and
+  // drag are read straight off the Term each frame; these accumulate between frames.
+  onKey: (k) => {
+    if (k === 'left') kbAzim -= KEY_AZIM_STEP;
+    else if (k === 'right') kbAzim += KEY_AZIM_STEP;
+    else if (k === 'up') kbElev += KEY_ELEV_STEP;
+    else if (k === 'down') kbElev -= KEY_ELEV_STEP;
+    else if (k === 'r') pendingReset = true;
+    else if (k === '+' || k === '=') kbZoom += 1;   // zoom in
+    else if (k === '-' || k === '_') kbZoom -= 1;   // zoom out
+  },
   frame,
 });

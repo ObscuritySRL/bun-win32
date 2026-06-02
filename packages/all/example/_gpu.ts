@@ -83,6 +83,9 @@ const WM_KEYUP = 0x0101;
 const WM_MOUSEMOVE = 0x0200;
 const WM_LBUTTONDOWN = 0x0201;
 const WM_LBUTTONUP = 0x0202;
+const WM_RBUTTONDOWN = 0x0204;
+const WM_RBUTTONUP = 0x0205;
+const WM_MOUSEWHEEL = 0x020a;
 const CS_HREDRAW = 0x0002;
 const CS_VREDRAW = 0x0001;
 const PM_REMOVE = 0x0001;
@@ -269,7 +272,9 @@ function blobAsString(blob: bigint): string {
 export interface Win {
   hwnd: bigint;
   wndProc: JSCallback;
-  getMouse(): { x: number; y: number; down: boolean };
+  getMouse(): { x: number; y: number; down: boolean; rightDown: boolean };
+  /** Accumulated mouse-wheel delta since the last call (positive = forward); reset on read. */
+  getWheel(): number;
   keyDown(vk: number): boolean;
   pump(): void;
   shouldClose(): boolean;
@@ -298,6 +303,8 @@ export function createWindow(options: CreateWindowOptions): Win {
   let mouseX = width / 2;
   let mouseY = height / 2;
   let mouseDown = false;
+  let mouseRightDown = false;
+  let wheelAccum = 0;
   let closing = false;
   const keys = new Set<number>();
   let hwnd = 0n;
@@ -317,6 +324,19 @@ export function createWindow(options: CreateWindowOptions): Win {
         case WM_LBUTTONUP:
           mouseDown = false;
           return 0n;
+        case WM_RBUTTONDOWN:
+          mouseRightDown = true;
+          return 0n;
+        case WM_RBUTTONUP:
+          mouseRightDown = false;
+          return 0n;
+        case WM_MOUSEWHEEL: {
+          // HIWORD(wParam) is a signed short wheel delta in multiples of 120.
+          let delta = Number((wParam >> 16n) & 0xffffn);
+          if (delta >= 0x8000) delta -= 0x10000;
+          wheelAccum += delta / 120;
+          return 0n;
+        }
         case WM_KEYDOWN:
           keys.add(Number(wParam));
           if (Number(wParam) === VK_ESCAPE) {
@@ -398,7 +418,12 @@ export function createWindow(options: CreateWindowOptions): Win {
   return {
     hwnd,
     wndProc,
-    getMouse: () => ({ x: mouseX, y: mouseY, down: mouseDown }),
+    getMouse: () => ({ x: mouseX, y: mouseY, down: mouseDown, rightDown: mouseRightDown }),
+    getWheel: () => {
+      const d = wheelAccum;
+      wheelAccum = 0;
+      return d;
+    },
     keyDown: (vk: number) => keys.has(vk),
     pump: () => {
       while (User32.PeekMessageW(msgBuffer.ptr!, 0n, 0, 0, PM_REMOVE) !== 0) {

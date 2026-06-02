@@ -98,3 +98,11 @@ packages/all/screenshots/*
 !packages/all/screenshots/cinema.png
 packages/all/replay-*.gif
 packages/all/bun-win32-wallpaper.png
+
+# Local verification captures + process scratch from the interactive terminal demos
+packages/all/.shots/
+*.stackdump
+packages/all/example/nul
+packages/all/example/.train.*
+packages/all/replay-2026-*/
+packages/all/.triage-logs/

@@ -41,25 +41,6 @@ SetWindowPos(hWnd, 0n, x, y, width, height, flags);
 > [!IMPORTANT]
 > If you destructure before binding, you capture the lazy wrapper instead of the native function.
 
-## Showcase
-
-[`@bun-win32/all`](./packages/all) ships a gallery of cross-package examples that compose many DLLs into a single experience — real Win32 windows with DWM acrylic, FFI-driven audio synthesis, 60 fps GDI+ rendering, real Windows Hello passkey ceremonies, live wait-chain X-rays, hardware-RNG visualizations, full playable games, even a complete CHIP-8 emulator. They're the proof of what pure Bun FFI can do on Windows:
-
-```sh
-bun --filter @bun-win32/all run example:demoscene       # 75s music-synced multi-scene demoscene production
-bun --filter @bun-win32/all run example:bun-os          # mini desktop with task monitor + music player + clock
-bun --filter @bun-win32/all run example:window-xray     # glass HUD pinned to the cursor; reveals every pixel
-bun --filter @bun-win32/all run example:synth-studio    # 8-voice polyphonic FM synth + scope + FFT
-bun --filter @bun-win32/all run example:asteroids       # full playable arcade game with controller + audio
-bun --filter @bun-win32/all run example:chip8-bun       # complete CHIP-8 emulator in a Win32 window
-bun --filter @bun-win32/all run example:matrix-desktop  # The Matrix digital rain, click-through, over your desktop
-bun --filter @bun-win32/all run example:live-piano      # hum into mic → FFT pitch detect → piano plays back
-bun --filter @bun-win32/all run example:tpm-lavalamp    # real TPM 2.0 hardware-RNG-driven metaball lavalamp
-# ... and many more — see packages/all/example/
-```
-
-Each example is a single self-contained TypeScript file. No native build step, no Electron, no addon. Every byte goes through `bun:ffi`.
-
 ## Packages
 
 All type definitions are provided by [`@bun-win32/core`](./packages/core).
