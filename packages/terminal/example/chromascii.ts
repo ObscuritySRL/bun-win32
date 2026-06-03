@@ -22,7 +22,10 @@
  * ATTRACT: a slow turntable that auto-cycles the gallery, so a capture always
  * lands on a fully shaded, contoured, multicoloured, RECOGNISABLE solid.
  */
-import { runTextDemo, CharTerm, clamp01, smoothstep, aces, hsv, type RGB } from './_textterm';
+import { CharTerm, runText } from '@bun-win32/terminal';
+import type { RGB } from '@bun-win32/terminal';
+
+import { aces, clamp01, hsv, smoothstep } from './_kit';
 
 // ── Glyph density ramps (dark → bright). Cycled with [ ]. ────────────────────────
 const RAMPS: string[] = [
@@ -146,7 +149,7 @@ let shapeOverride = -1;
 let shapeChangeT = -1e9;
 
 const buildScene = (t: CharTerm): Scene => {
-  const cols = t.cols;
+  const cols = t.columns;
   const rows = t.rows;
   const ssx = cols * SS;
   const ssy = rows * SS;
@@ -378,7 +381,7 @@ const L0x = 0.58, L0y = 0.66, L0z = 0.48; // key (warm)
 const L1x = -0.82, L1y = 0.18, L1z = 0.54; // fill (cool)
 const L2x = 0.66, L2y = -0.44, L2z = -0.32; // rim (magenta)
 
-runTextDemo({
+runText({
   title: 'chromascii — colour ASCII 3D renderer',
   hud: 'DRAG ORBIT · WHEEL ZOOM · n SHAPE · [ ] RAMP · p PALETTE · e INK',
   captureT: 5,
@@ -416,7 +419,7 @@ runTextDemo({
     keyTouched = true;
   },
   frame: (t: CharTerm, time: number) => {
-    const sc = scene && scene.cols === t.cols && scene.rows === t.rows ? scene : (scene = buildScene(t));
+    const sc = scene && scene.cols === t.columns && scene.rows === t.rows ? scene : (scene = buildScene(t));
     renderFrame(t, sc, time);
   },
 });
@@ -437,21 +440,21 @@ const SHAPE_PERIOD = SHAPE_HOLD + SHAPE_FADE;
 
 const renderFrame = (t: CharTerm, sc: Scene, time: number): void => {
   // ── Interaction: mouse drag orbit + wheel zoom (LIVE only) ────────────────────
-  if (t.wheel !== 0) {
-    zoom = Math.max(0.55, Math.min(2.4, zoom * Math.pow(1.12, t.wheel)));
-    t.wheel = 0;
+  if (t.mouse.wheel !== 0) {
+    zoom = Math.max(0.55, Math.min(2.4, zoom * Math.pow(1.12, t.mouse.wheel)));
+    t.mouse.wheel = 0;
     interactT = time;
   }
-  if (t.mouseDown && t.mouseInside) {
+  if (t.mouse.down && t.mouse.inside) {
     if (!dragging) {
       dragging = true;
-      dragPrevX = t.mouseX;
-      dragPrevY = t.mouseY;
+      dragPrevX = t.mouse.x;
+      dragPrevY = t.mouse.y;
     } else {
-      const dx = t.mouseX - dragPrevX;
-      const dy = t.mouseY - dragPrevY;
-      dragPrevX = t.mouseX;
-      dragPrevY = t.mouseY;
+      const dx = t.mouse.x - dragPrevX;
+      const dy = t.mouse.y - dragPrevY;
+      dragPrevX = t.mouse.x;
+      dragPrevY = t.mouse.y;
       yaw += dx * 0.045;
       pitch += dy * 0.05;
       pitch = Math.max(-1.35, Math.min(1.35, pitch));
@@ -897,7 +900,7 @@ const BIG_FONT: Record<string, string[]> = {
 
 const drawTitle = (t: CharTerm, name: string, pal: Palette): void => {
   // Skip the giant label on tiny grids — fall back to a single bright line.
-  const fitsBig = t.cols >= 60 && t.rows >= 18;
+  const fitsBig = t.columns >= 60 && t.rows >= 18;
   // Title colour: a warm-cream lifted from the palette key for cohesion.
   const tc: RGB = [
     Math.min(255, (180 + pal.warm[0] * 60) | 0),
@@ -919,7 +922,7 @@ const drawTitle = (t: CharTerm, name: string, pal: Palette): void => {
   // the top. A 1-cell drop shadow gives it weight over the busy raymarched field.
   const glyphAdv = BIG_W + 1;
   const labelW = name.length * glyphAdv - 1;
-  const x0 = Math.max(1, ((t.cols - labelW) / 2) | 0);
+  const x0 = Math.max(1, ((t.columns - labelW) / 2) | 0);
   const y0 = 1;
 
   // Soft top vignette so the title + subtitle always read cleanly even when the
@@ -928,7 +931,7 @@ const drawTitle = (t: CharTerm, name: string, pal: Palette): void => {
   const bannerH = y0 + BIG_H + 2;
   for (let by = 0; by < bannerH && by < t.rows; by++) {
     const a = 0.62 * (1 - by / bannerH);
-    if (a > 0.02) t.shadeRect(0, by, t.cols, 1, 3, 4, 9, a);
+    if (a > 0.02) t.shadeRect(0, by, t.columns, 1, 3, 4, 9, a);
   }
   for (let li = 0; li < name.length; li++) {
     const rows = BIG_FONT[name[li]] ?? BIG_FONT[' '];
@@ -954,7 +957,7 @@ const drawTitle = (t: CharTerm, name: string, pal: Palette): void => {
     }
   }
   // Subtitle, centred under the label.
-  const subX = Math.max(1, ((t.cols - SUBTITLE.length) / 2) | 0);
+  const subX = Math.max(1, ((t.columns - SUBTITLE.length) / 2) | 0);
   const subY = y0 + BIG_H + 1;
   if (subY < t.rows - 1) t.text(subX, subY, SUBTITLE, subColor, undefined, false);
 };
