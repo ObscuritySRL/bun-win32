@@ -565,6 +565,14 @@ export class Gba {
     return this.ppu.frame;
   }
 
+  /** The 128 KiB Flash save image, for persisting to a .sav file. */
+  getSaveData(): Uint8Array {
+    return this.sram.slice();
+  }
+  loadSaveData(data: Uint8Array): void {
+    this.sram.set(data.subarray(0, this.sram.length));
+  }
+
   setButtons(b: GbaButtons): void {
     let k = 0x3ff;
     if (b.a) k &= ~0x001;
