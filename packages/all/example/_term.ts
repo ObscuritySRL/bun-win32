@@ -297,7 +297,8 @@ export const encodePNG = (rgb: Uint8Array, w: number, h: number): Uint8Array => 
 //   quad    2×2  quadrant blocks  ▘▝▖▗▌▐▀▄▚▞…   — 2× horizontal detail
 //   sextant 2×3  legacy sextants  (U+1FB00)    — 2×3 detail (Unicode 13)
 //   braille 2×4  braille dots     (U+2800)     — 2×4 detail, fine etched look
-export type TermMode = 'half' | 'quad' | 'sextant' | 'braille';
+//   ascii   1×2  luminance-ramp glyph, tinted  — classic colour-ASCII (1 char/cell)
+export type TermMode = 'half' | 'quad' | 'sextant' | 'braille' | 'ascii';
 // Diff strategy: exact = repaint changed cells; threshold = also skip cells whose
 // colour drifted by ≤ `threshold` per channel (huge win on video/photographic
 // content); none = repaint every cell every frame (robust on flaky terminals).
@@ -317,7 +318,13 @@ const MODE_DIMS: Record<TermMode, readonly [number, number]> = {
   quad: [2, 2],
   sextant: [2, 3],
   braille: [2, 4],
+  ascii: [1, 2],
 };
+
+// ASCII luminance ramp (dark→bright); each cell becomes one tinted ramp glyph.
+const RAMP = ' .:-=+*#%@';
+const RAMP_BYTES = Array.from(RAMP, (c) => Uint8Array.of(c.charCodeAt(0)));
+const RAMP_LAST = RAMP.length - 1;
 
 const bytesOf = (s: string): Uint8Array => {
   const b = new Uint8Array(s.length);
@@ -484,16 +491,18 @@ const SUBL = new Int32Array(8);
 export class Term {
   readonly cols: number;
   readonly rows: number;
-  readonly W: number; // pixel grid width  = cols * pxW
-  readonly H: number; // pixel grid height = rows * pxH
-  readonly aspect: number; // W / H
-  readonly buf: Uint8Array; // RGB, length W*H*3
+  // W/H/aspect/buf track the active mode and are re-derived by reconfigure(); the
+  // CHARACTER-cell count (cols×rows) never changes, so the terminal layout is stable.
+  W: number; // pixel grid width  = cols * pxW
+  H: number; // pixel grid height = rows * pxH
+  aspect: number; // W / H
+  buf: Uint8Array; // RGB, length W*H*3
 
-  // Encoder configuration (read by the HUD; immutable for a Term's lifetime).
-  readonly mode: TermMode;
-  readonly diff: TermDiff;
-  readonly depth: TermDepth;
-  readonly threshold: number;
+  // Encoder configuration (read by the HUD; switch at runtime via reconfigure()).
+  mode: TermMode;
+  diff: TermDiff;
+  depth: TermDepth;
+  threshold: number;
 
   // Mouse state (only populated when the demo opts in via `mouse: true`; updated
   // from xterm SGR mouse reports parsed off stdin). Coordinates are in PIXELS.
@@ -506,11 +515,11 @@ export class Term {
   wheel = 0; // accumulated wheel ticks (+up / −down); demo may read and reset
 
   // Sub-cell packing for the active mode.
-  private readonly pxW: number;
-  private readonly pxH: number;
-  private readonly subN: number;
-  private readonly bitLayout: ReadonlyArray<number> | null; // null = half (constant glyph)
-  private readonly glyphTable: Uint8Array[] | null; // null = half
+  private pxW: number;
+  private pxH: number;
+  private subN: number;
+  private bitLayout: ReadonlyArray<number> | null; // null = half/ascii (no glyph table)
+  private glyphTable: Uint8Array[] | null; // null = half/ascii
 
   // Per-cell diff cache. For diff='exact'/'none' these hold the last EMITTED key
   // (packed RGB for truecolour, palette index otherwise); for diff='threshold'
@@ -563,6 +572,50 @@ export class Term {
         this.bitLayout = null;
         this.glyphTable = null;
     }
+  }
+
+  /**
+   * Switch mode / diff / depth / threshold on a LIVE Term. Re-derives the pixel grid
+   * (reallocating buf only when W or H changes — i.e. when the mode changes its
+   * sub-cell packing) and forces a full repaint. The character-cell count (cols×rows)
+   * is invariant, so the terminal layout never shifts. After a mode change the caller
+   * must redraw / re-feed buf at the new t.W×t.H resolution.
+   */
+  reconfigure(opts: TermOptions): void {
+    if (opts.mode !== undefined) this.mode = opts.mode;
+    if (opts.diff !== undefined) this.diff = opts.diff;
+    if (opts.depth !== undefined) this.depth = opts.depth;
+    if (opts.threshold !== undefined) this.threshold = opts.threshold;
+    const [pw, ph] = MODE_DIMS[this.mode];
+    this.pxW = pw;
+    this.pxH = ph;
+    this.subN = pw * ph;
+    const W = this.cols * pw;
+    const H = this.rows * ph;
+    if (W !== this.W || H !== this.H) {
+      this.W = W;
+      this.H = H;
+      this.aspect = W / H;
+      this.buf = new Uint8Array(W * H * 3);
+    }
+    switch (this.mode) {
+      case 'quad':
+        this.bitLayout = QUAD_BIT;
+        this.glyphTable = QUAD_BYTES;
+        break;
+      case 'sextant':
+        this.bitLayout = SEXT_BIT;
+        this.glyphTable = SEXT_BYTES;
+        break;
+      case 'braille':
+        this.bitLayout = BRAILLE_BIT;
+        this.glyphTable = BRAILLE_BYTES;
+        break;
+      default:
+        this.bitLayout = null;
+        this.glyphTable = null;
+    }
+    this.invalidate();
   }
 
   // — pixel ops (bounds-checked; hot enough to inline-ish) —
@@ -760,9 +813,70 @@ export class Term {
     this.outPos = 0;
     this.putBytes(HOME_BYTES);
     if (this.mode === 'half') this.emitHalf();
+    else if (this.mode === 'ascii') this.emitAscii();
     else this.emitMulti();
     this.firstFrame = false;
     return this.outPos;
+  }
+
+  /**
+   * Colour-ASCII path: each cell averages its 1×2 sub-pixels, picks a glyph from a
+   * dark→bright luminance ramp, and tints it with the average colour over a black
+   * background — the classic ASCII-video look, but in truecolor.
+   */
+  private emitAscii(): void {
+    const { cols, rows, W, buf, prevFg, prevGlyph } = this;
+    const first = this.firstFrame;
+    const truecolor = this.depth === 'truecolor';
+    const d256 = this.depth === '256';
+    const thr = this.diff === 'threshold' ? this.threshold : -1;
+    const none = this.diff === 'none';
+    const emitBg = truecolor ? 0 : d256 ? quant256(0, 0, 0) : quant16(0, 0, 0); // black
+    let curRow = 0;
+    let curCol = 0;
+    for (let r = 0; r < rows; r++) {
+      const topBase = r * 2 * W * 3;
+      const botBase = (r * 2 + 1) * W * 3;
+      const cellBase = r * cols;
+      for (let c = 0; c < cols; c++) {
+        const ti = topBase + c * 3;
+        const bi = botBase + c * 3;
+        const rr = (buf[ti] + buf[bi]) >> 1;
+        const gg = (buf[ti + 1] + buf[bi + 1]) >> 1;
+        const bb = (buf[ti + 2] + buf[bi + 2]) >> 1;
+        const lum = (rr * 299 + gg * 587 + bb * 114) / 1000; // 0..255
+        let gi = ((lum * RAMP_LAST) / 255 + 0.5) | 0;
+        if (gi < 0) gi = 0;
+        else if (gi > RAMP_LAST) gi = RAMP_LAST;
+        const fgRgb = (rr << 16) | (gg << 8) | bb;
+        const emitFg = truecolor ? fgRgb : d256 ? quant256(rr, gg, bb) : quant16(rr, gg, bb);
+        const idx = cellBase + c;
+        if (!first && !none) {
+          if (thr < 0) {
+            if (prevGlyph[idx] === gi && prevFg[idx] === emitFg) continue;
+            prevFg[idx] = emitFg;
+          } else {
+            const pf = prevFg[idx];
+            if (prevGlyph[idx] === gi && pf >= 0 && chDelta(pf, rr, gg, bb) <= thr) continue;
+            prevFg[idx] = fgRgb;
+          }
+        } else if (thr < 0) {
+          prevFg[idx] = emitFg;
+        } else {
+          prevFg[idx] = fgRgb;
+        }
+        prevGlyph[idx] = gi;
+        if (curRow !== r || curCol !== c) {
+          this.emitCursor(r + 1, c + 1);
+          curRow = r;
+          curCol = c;
+        }
+        this.putColor(emitFg, emitBg);
+        this.putBytes(RAMP_BYTES[gi]);
+        curCol++;
+        if (curCol >= cols) curRow = -1;
+      }
+    }
   }
 
   /**

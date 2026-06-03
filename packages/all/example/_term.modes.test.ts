@@ -190,5 +190,32 @@ brailleTest((t) => t.setPixel(0, 3, 255, 255, 255), 0x2840, 'dot7 (0,3)');
   check('16 emits 38;5;', Buffer.from(t.frameBytes()).toString('latin1').includes('38;5;'));
 }
 
+// ── ascii: luminance ramp ' .:-=+*#%@', tinted with the cell's average colour ──
+{
+  const t = new Term(3, 1, { mode: 'ascii' }); // W=3, H=2
+  t.setPixel(0, 0, 255, 255, 255); t.setPixel(0, 1, 255, 255, 255); // bright → '@'
+  // cell1 left black (0) → ' '
+  t.setPixel(2, 0, 128, 128, 128); t.setPixel(2, 1, 128, 128, 128); // mid → '+'
+  t.buildFrame();
+  const g = decode(t.frameBytes(), 3, 1);
+  check('ascii bright → @', g[0].cp === 0x40, hex(g[0].cp));
+  check('ascii dark → space', g[1].cp === 0x20, hex(g[1].cp));
+  check('ascii mid → +', g[2].cp === 0x2b, hex(g[2].cp));
+  check('ascii tint fg=white', g[0].fg === 0xffffff, g[0].fg.toString(16));
+}
+
+// ── reconfigure: switch mode/diff/depth on a live Term ──
+{
+  const t = new Term(10, 4); // half → W=10, H=8
+  t.reconfigure({ mode: 'sextant' });
+  check('reconfigure W = cols*2', t.W === 20, `${t.W}`);
+  check('reconfigure H = rows*3', t.H === 12, `${t.H}`);
+  check('reconfigure buf resized', t.buf.length === 20 * 12 * 3, `${t.buf.length}`);
+  check('reconfigure mode set', t.mode === 'sextant');
+  t.reconfigure({ mode: 'half', depth: '16' });
+  check('reconfigure back to half W/H', t.W === 10 && t.H === 8, `${t.W}x${t.H}`);
+  check('reconfigure depth set', t.depth === '16');
+}
+
 process.stdout.write(`\n_term.modes.test: ${pass} pass, ${fail} fail\n`);
 if (fail > 0) process.exit(1);

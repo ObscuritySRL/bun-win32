@@ -16,6 +16,9 @@
  *              QUEUE; the render loop drains it on a SIM-TIME clock for smooth,
  *              correctly-paced playback. SPACE freezes sim time → a true pause (the
  *              full queue backpressures ffmpeg, so it blocks rather than buffering).
+ *              Live keys cycle the render options without restarting the process:
+ *              M = sub-cell mode (half→quad→sextant→braille→ascii), D = diff
+ *              strategy, C = colour depth — via Term.reconfigure().
  *   • BENCH / CAPTURE_PNG — pre-decode N distinct frames to memory, then cycle them
  *              so BENCH measures the engine's true ceiling on REAL video and a
  *              CAPTURE writes a real frame to PNG for headless inspection.
@@ -25,7 +28,7 @@
  *   TERM_MODE=sextant TERM_DIFF=threshold TERM_THRESHOLD=18 bun run example/video-term.ts
  *   TERM_DEPTH=16 BENCH=1 bun run example/video-term.ts        (the big fps number)
  */
-import { runDemo, type Term } from './_term';
+import { runDemo, type Term, type TermMode, type TermDiff, type TermDepth } from './_term';
 
 const DEFAULT_VIDEO = 'C:\\Users\\stevp\\Videos\\Captures\\Counter-Strike 2 2025-11-16 19-40-24.mp4';
 const videoPath = process.argv[2] ?? process.env.VIDEO ?? DEFAULT_VIDEO;
@@ -47,6 +50,16 @@ const killFfmpeg = (): void => {
 };
 process.on('exit', killFfmpeg);
 let stopped = false; // set when the demo loop ends → unblocks/abandons the reader
+let gen = 0; // bumped on each startLive so a stale reader (after a switch) self-exits
+
+// Live render options, synced to the Term in init() and cycled by the M/D/C keys.
+const MODES: TermMode[] = ['half', 'quad', 'sextant', 'braille', 'ascii'];
+const DIFFS: TermDiff[] = ['exact', 'threshold', 'none'];
+const DEPTHS: TermDepth[] = ['truecolor', '256', '16'];
+let curMode: TermMode = 'half';
+let curDiff: TermDiff = 'exact';
+let curDepth: TermDepth = 'truecolor';
+let curThr = 8;
 
 // ── LIVE: a reader fills a bounded frame QUEUE; the render loop drains it on a
 // sim-time clock. Decode runs ~10× realtime, so the queue stays full; when it
@@ -69,13 +82,16 @@ let curFrame: Uint8Array | null = null;
 let shownIdx = -1; // last index copied into t.buf (skips redundant memcpy on spin iterations)
 
 const startLive = (W: number, H: number): void => {
-  frameSize = W * H * 3;
+  const fs = W * H * 3; // captured locally so a stale reader never uses a changed size
+  frameSize = fs;
   queue.length = 0;
-  pool.length = 0;
+  pool.length = 0; // old-size pooled buffers are wrong after a mode switch → drop them
   nextIdx = 0;
   originSet = false;
   curFrame = null;
   shownIdx = -1;
+  gen++;
+  const myGen = gen;
   proc = Bun.spawn({
     cmd: [
       'ffmpeg', '-hide_banner', '-loglevel', 'error',
@@ -88,25 +104,26 @@ const startLive = (W: number, H: number): void => {
     stderr: 'inherit',
   });
   // Assemble complete frames into the queue, applying backpressure when it's full.
+  // A newer startLive (mode/size switch, or exit) bumps `gen` → this reader returns
+  // without ever pushing a wrong-sized frame into the freshly-reset queue.
   (async () => {
-    let frame = pool.pop() ?? new Uint8Array(frameSize);
+    let frame = pool.pop() ?? new Uint8Array(fs);
     let have = 0;
     try {
       for await (const chunk of proc!.stdout as ReadableStream<Uint8Array>) {
-        if (stopped) break;
+        if (stopped || myGen !== gen) return;
         let off = 0;
         while (off < chunk.length) {
-          const take = Math.min(frameSize - have, chunk.length - off);
+          const take = Math.min(fs - have, chunk.length - off);
           frame.set(chunk.subarray(off, off + take), have);
           have += take;
           off += take;
-          if (have === frameSize) {
+          if (have === fs) {
+            if (stopped || myGen !== gen) return;
             queue.push(frame);
             have = 0;
-            frame = pool.pop() ?? new Uint8Array(frameSize);
-            // Backpressure: when the buffer is full (paused / display behind) stop
-            // draining so the pipe fills and ffmpeg blocks rather than hoarding RAM.
-            while (!stopped && queue.length >= QUEUE_MAX) await Bun.sleep(8);
+            frame = pool.pop() ?? new Uint8Array(fs);
+            while (!stopped && myGen === gen && queue.length >= QUEUE_MAX) await Bun.sleep(8);
           }
         }
       }
@@ -151,11 +168,16 @@ const decodeFrames = async (W: number, H: number, n: number): Promise<void> => {
 
 await runDemo({
   title: `VIDEO ${fileName}`,
-  hud: 'real video on _term · SPACE pause · TERM_MODE/DIFF/DEPTH to taste · ESC quit',
+  hud: 'M mode · D diff · C depth · SPACE pause · ESC quit',
   captureT: 2,
-  targetFps: 0, // uncapped: let the HUD show the engine's true render ceiling
+  targetFps: 0, // uncapped (see the LIVE note above for why the loop is not capped)
   drawHud: true,
   init: async (t: Term) => {
+    // Sync the live-option state to however the Term was configured (env / defaults).
+    curMode = t.mode;
+    curDiff = t.diff;
+    curDepth = t.depth;
+    curThr = t.threshold;
     if (headless) {
       const n = Math.max(30, Math.min(180, Number(process.env.BENCH_FRAMES ?? 120) | 0));
       await decodeFrames(t.W, t.H, n);
@@ -167,8 +189,26 @@ await runDemo({
     }
   },
   resize: (t: Term) => {
-    // Terminal changed size → restart ffmpeg at the new grid resolution.
+    // Terminal changed size → re-apply the live options (runDemo rebuilt the Term
+    // from the original env opts) and restart ffmpeg at the new grid resolution.
     if (!headless) {
+      t.reconfigure({ mode: curMode, diff: curDiff, depth: curDepth, threshold: curThr });
+      killFfmpeg();
+      startLive(t.W, t.H);
+    }
+  },
+  onKey: (key: string, t: Term) => {
+    if (headless) return;
+    let changed = false;
+    if (key === 'm') { curMode = MODES[(MODES.indexOf(curMode) + 1) % MODES.length]; changed = true; }
+    else if (key === 'd') { curDiff = DIFFS[(DIFFS.indexOf(curDiff) + 1) % DIFFS.length]; changed = true; }
+    else if (key === 'c') { curDepth = DEPTHS[(DEPTHS.indexOf(curDepth) + 1) % DEPTHS.length]; changed = true; }
+    if (!changed) return;
+    const ow = t.W, oh = t.H;
+    t.reconfigure({ mode: curMode, diff: curDiff, depth: curDepth, threshold: curThr });
+    // A mode change alters the pixel resolution → re-decode at the new size. A
+    // diff/depth change keeps the same frames, so the next repaint just adopts it.
+    if (t.W !== ow || t.H !== oh) {
       killFfmpeg();
       startLive(t.W, t.H);
     }
