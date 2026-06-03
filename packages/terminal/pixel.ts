@@ -16,6 +16,7 @@ import { encodePNG } from './png';
 import { standardOutput } from './stdout';
 import type { MouseState, TermDepth, TermDiff, TermMode, TermOptions } from './types';
 
+const { abs, max, min } = Math;
 const ASCII_RAMP_LAST = asciiRampBytes.length - 1;
 const SOLID_LUMA_SPAN = 6 * 1000; // luma span below which a multi-mode cell is treated as solid
 const SUBPIXEL_CAPACITY = 8; // braille's 2×4 is the largest cell
@@ -66,6 +67,11 @@ export class Term {
   #pixelWidth = 1;
   #subpixelCount = 2;
 
+  #clipBottom = 0;
+  #clipLeft = 0;
+  #clipRight = 0;
+  #clipTop = 0;
+
   #firstFrame = true;
   #output = new OutputBuffer();
 
@@ -88,6 +94,7 @@ export class Term {
     this.width = columns * this.#pixelWidth;
     this.aspect = this.width / this.height;
     this.pixels = new Uint8Array(this.width * this.height * 3);
+    this.noClip();
     const cellCount = columns * rows;
     this.#previousBackground = new Int32Array(cellCount).fill(-1);
     this.#previousForeground = new Int32Array(cellCount).fill(-1);
@@ -138,6 +145,7 @@ export class Term {
       this.aspect = width / height;
       this.pixels = new Uint8Array(width * height * 3);
     }
+    this.noClip();
     this.invalidate();
   }
 
@@ -199,6 +207,127 @@ export class Term {
   plate(x: number, y: number, width: number, height: number, alpha = 0.55): void {
     for (let row = 0; row < height; row++) {
       for (let column = 0; column < width; column++) this.blendPixel(x + column, y + row, 0, 0, 0, alpha);
+    }
+  }
+
+  /** Restrict `line`/`rect`/`fillRect`/`circle`/`fillCircle`/`blit` to a sub-rectangle (clamped to the framebuffer). */
+  clip(x: number, y: number, width: number, height: number): void {
+    this.#clipBottom = min(this.height, (y | 0) + (height | 0));
+    this.#clipLeft = max(0, x | 0);
+    this.#clipRight = min(this.width, (x | 0) + (width | 0));
+    this.#clipTop = max(0, y | 0);
+  }
+
+  /** Remove the clip rectangle (draw to the whole framebuffer). */
+  noClip(): void {
+    this.#clipBottom = this.height;
+    this.#clipLeft = 0;
+    this.#clipRight = this.width;
+    this.#clipTop = 0;
+  }
+
+  #plot(x: number, y: number, red: number, green: number, blue: number): void {
+    if (x < this.#clipLeft || y < this.#clipTop || x >= this.#clipRight || y >= this.#clipBottom) return;
+    const index = (y * this.width + x) * 3;
+    this.pixels[index] = red < 0 ? 0 : red > 255 ? 255 : red;
+    this.pixels[index + 1] = green < 0 ? 0 : green > 255 ? 255 : green;
+    this.pixels[index + 2] = blue < 0 ? 0 : blue > 255 ? 255 : blue;
+  }
+
+  /** Draw a 1px line with a Bresenham trace (respects the clip rectangle). */
+  line(startX: number, startY: number, endX: number, endY: number, red: number, green: number, blue: number): void {
+    let x = startX | 0;
+    let y = startY | 0;
+    const targetX = endX | 0;
+    const targetY = endY | 0;
+    const deltaX = abs(targetX - x);
+    const deltaY = -abs(targetY - y);
+    const stepX = x < targetX ? 1 : -1;
+    const stepY = y < targetY ? 1 : -1;
+    let error = deltaX + deltaY;
+    for (;;) {
+      this.#plot(x, y, red, green, blue);
+      if (x === targetX && y === targetY) break;
+      const doubleError = error * 2;
+      if (doubleError >= deltaY) {
+        error += deltaY;
+        x += stepX;
+      }
+      if (doubleError <= deltaX) {
+        error += deltaX;
+        y += stepY;
+      }
+    }
+  }
+
+  /** Draw a rectangle outline (respects the clip rectangle). */
+  rect(x: number, y: number, width: number, height: number, red: number, green: number, blue: number): void {
+    const right = (x | 0) + (width | 0) - 1;
+    const bottom = (y | 0) + (height | 0) - 1;
+    this.line(x, y, right, y, red, green, blue);
+    this.line(x, bottom, right, bottom, red, green, blue);
+    this.line(x, y, x, bottom, red, green, blue);
+    this.line(right, y, right, bottom, red, green, blue);
+  }
+
+  /** Fill a rectangle (respects the clip rectangle). */
+  fillRect(x: number, y: number, width: number, height: number, red: number, green: number, blue: number): void {
+    const startX = x | 0;
+    const startY = y | 0;
+    const endX = startX + (width | 0);
+    const endY = startY + (height | 0);
+    for (let row = startY; row < endY; row++) for (let column = startX; column < endX; column++) this.#plot(column, row, red, green, blue);
+  }
+
+  /** Draw a circle outline with the midpoint algorithm (respects the clip rectangle). */
+  circle(centerX: number, centerY: number, radius: number, red: number, green: number, blue: number): void {
+    const cx = centerX | 0;
+    const cy = centerY | 0;
+    let offsetX = radius | 0;
+    let offsetY = 0;
+    let error = 1 - offsetX;
+    while (offsetX >= offsetY) {
+      this.#plot(cx + offsetX, cy + offsetY, red, green, blue);
+      this.#plot(cx + offsetY, cy + offsetX, red, green, blue);
+      this.#plot(cx - offsetY, cy + offsetX, red, green, blue);
+      this.#plot(cx - offsetX, cy + offsetY, red, green, blue);
+      this.#plot(cx - offsetX, cy - offsetY, red, green, blue);
+      this.#plot(cx - offsetY, cy - offsetX, red, green, blue);
+      this.#plot(cx + offsetY, cy - offsetX, red, green, blue);
+      this.#plot(cx + offsetX, cy - offsetY, red, green, blue);
+      offsetY++;
+      if (error < 0) {
+        error += 2 * offsetY + 1;
+      } else {
+        offsetX--;
+        error += 2 * (offsetY - offsetX) + 1;
+      }
+    }
+  }
+
+  /** Fill a circle (respects the clip rectangle). */
+  fillCircle(centerX: number, centerY: number, radius: number, red: number, green: number, blue: number): void {
+    const cx = centerX | 0;
+    const cy = centerY | 0;
+    const radiusSquared = radius * radius;
+    const extent = radius | 0;
+    for (let offsetY = -extent; offsetY <= extent; offsetY++) {
+      for (let offsetX = -extent; offsetX <= extent; offsetX++) {
+        if (offsetX * offsetX + offsetY * offsetY <= radiusSquared) this.#plot(cx + offsetX, cy + offsetY, red, green, blue);
+      }
+    }
+  }
+
+  /** Copy a tightly packed source RGB image into the framebuffer at (destinationX, destinationY), respecting the clip rectangle. */
+  blit(sourcePixels: Uint8Array, sourceWidth: number, sourceHeight: number, destinationX: number, destinationY: number): void {
+    const baseX = destinationX | 0;
+    const baseY = destinationY | 0;
+    for (let row = 0; row < sourceHeight; row++) {
+      const sourceRowBase = row * sourceWidth * 3;
+      for (let column = 0; column < sourceWidth; column++) {
+        const sourceIndex = sourceRowBase + column * 3;
+        this.#plot(baseX + column, baseY + row, sourcePixels[sourceIndex], sourcePixels[sourceIndex + 1], sourcePixels[sourceIndex + 2]);
+      }
     }
   }
 
