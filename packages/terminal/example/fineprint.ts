@@ -45,7 +45,8 @@
  * Try:      TERM_MODE=braille bun run packages/all/example/fineprint.ts
  */
 
-import { runDemo, Term, clamp01, fract, TAU, hsv } from './_term';
+import { Term, run } from '@bun-win32/terminal';
+import { TAU, clamp01, fract, hsv } from './_kit';
 
 // ── Julia constant orbit. c = R·e^{iθ}; R sits just inside the boundary of the
 // connected locus so the set is a dense filigree (the most detail-rich regime).
@@ -57,14 +58,14 @@ const JULIA_ITER = 96; // escape-time budget — high enough for thread-thin ten
 const STAR_POINTS = 11; // odd → connecting every 4th makes a continuous star
 const STAR_STEP = 4;
 
-runDemo({
+run({
   title: 'Fineprint',
   hud: 'RESOLUTION TEST-CARD - RUN WITH TERM_MODE=half|quad|sextant|braille TO SEE IT SHARPEN',
   captureT: 2,
   frame: (t: Term, time: number) => {
-    const W = t.W;
-    const H = t.H;
-    const buf = t.buf;
+    const W = t.width;
+    const H = t.height;
+    const buf = t.pixels;
 
     // ── DDA line into setPixel — the 1px-thin primitive the whole demo leans on. ─
     const line = (x0: number, y0: number, x1: number, y1: number, r: number, g: number, b: number): void => {

@@ -127,6 +127,7 @@
         "@bun-win32/taskschd": "workspace:*",
         "@bun-win32/tbs": "workspace:*",
         "@bun-win32/tdh": "workspace:*",
+        "@bun-win32/terminal": "workspace:*",
         "@bun-win32/uiautomationcore": "workspace:*",
         "@bun-win32/user32": "workspace:*",
         "@bun-win32/userenv": "workspace:*",
@@ -762,7 +763,7 @@
     },
     "packages/kernel32": {
       "name": "@bun-win32/kernel32",
-      "version": "1.0.22",
+      "version": "1.0.23",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
