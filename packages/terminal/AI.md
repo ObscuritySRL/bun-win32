@@ -23,8 +23,9 @@ Drive a surface yourself, or hand a spec to **`run`** / **`runText`** for a mana
 | Fewer bytes/frame | `depth`: `truecolor` (default) `256` `16`; `diff`: `exact` (default) `threshold` `none` |
 | Run an app | `run(spec)` (pixel) / `runText(spec)` (char) — live loop + `CAPTURE_PNG`/`BENCH` |
 | Present a frame yourself | `surface.present({ sync?, sink? })` — `sync` = tear-free (DEC 2026), `sink` = redirect bytes |
-| Input (live loop) | `spec.onKey(key, surface)` (real key up/down via FFI `ReadConsoleInputW`); `spec.mouse: true` → `surface.mouse.{x,y,down,wheel,…}` |
-| Raw console session | `new ConsoleSession({ mouse?, title? })` + `new ConsoleInput(handlers)` (`poll()` per frame) + `createFrameWaiter()` |
+| Input (live loop) | `spec.onKey(key, surface)` (real key up/down via FFI `ReadConsoleInputW`); `spec.mouse: true` → `surface.mouse.{x,y,down,wheel,…}`; `spec.onFocus(focused, surface)`, `spec.onPaste(text, surface)` |
+| Partial redraw | `surface.markDamage(x, y, w, h)` before `present()` — the next frame scans only that rectangle (caller contract: the rest is unchanged); `surface.clearDamage()` to cancel |
+| Raw console session | `new ConsoleSession({ mouse?, title? })` + `new ConsoleInput({ focus?, key?, paste?, pointer?, resize? })` (`poll()` per frame) + `createFrameWaiter()` |
 | Headless image | `surface.toPNG()` → PNG bytes; `encodePNG(rgb, w, h)` |
 | Enumerate features | `CAPABILITIES` (modes/diffs/depths/inputBackends/features/options); `detectCapabilities()` |
 

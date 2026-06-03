@@ -12,9 +12,12 @@ export const CAPABILITIES = {
   features: {
     blit: true,
     clipRect: true,
+    damageRegion: true,
     drawPrimitives: true,
+    focusEvents: true,
     keyUpDown: true,
     mouse: true,
+    pasteEvents: true,
     pipeSink: true,
     pngExport: true,
     resizeEvents: true,

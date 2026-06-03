@@ -15,7 +15,8 @@ Input arrives through `ReadConsoleInputW` (real key **up/down** + repeat + modif
 
 - Sub-cell modes (`half`/`quad`/`sextant`/`braille`/`ascii`), diff strategies (`exact`/`threshold`/`none`), colour depths (`truecolor`/`256`/`16`).
 - Drawing: `setPixel`/`add`/`blend`/`plate`/`text` plus `line`/`rect`/`circle`/`blit` and a clip rectangle.
-- FFI keyboard (key up/down) + mouse + window-resize events; high-resolution frame pacing.
+- FFI keyboard (key up/down) + mouse + window-resize + focus + paste events; high-resolution frame pacing.
+- Damage regions (`markDamage`) for partial redraws on mostly-static surfaces.
 - DEC synchronized output (tear-free), a pluggable frame sink (record / pipe), and PNG export.
 - A machine-readable `CAPABILITIES` manifest for runtime feature discovery.
 

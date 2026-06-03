@@ -45,6 +45,13 @@ export class CharTerm {
   /** Pointer state, updated by the app loop when mouse reporting is enabled. Coordinates are cells. */
   readonly mouse: MouseState = { active: false, down: false, inside: false, sequence: 0, wheel: 0, x: -1, y: -1 };
 
+  // Per-frame damage window in CELLS (valid when active); see Term.markDamage.
+  #damageActive = false;
+  #damageBottom = 0;
+  #damageLeft = 0;
+  #damageRight = 0;
+  #damageTop = 0;
+
   #firstFrame = true;
   #output = new OutputBuffer();
 
@@ -186,6 +193,36 @@ export class CharTerm {
     }
   }
 
+  /**
+   * Restrict the next `buildFrame()` to the cells overlapping this CELL rectangle —
+   * a caller contract that the rest of the grid is unchanged. Multiple calls union.
+   * Consumed by one `buildFrame()`; a full repaint (first frame / `invalidate`) ignores it.
+   */
+  markDamage(x: number, y: number, width: number, height: number): void {
+    const left = Math.max(0, x | 0);
+    const top = Math.max(0, y | 0);
+    const right = Math.min(this.columns, (x | 0) + (width | 0));
+    const bottom = Math.min(this.rows, (y | 0) + (height | 0));
+    if (right <= left || bottom <= top) return;
+    if (this.#damageActive) {
+      if (left < this.#damageLeft) this.#damageLeft = left;
+      if (top < this.#damageTop) this.#damageTop = top;
+      if (right > this.#damageRight) this.#damageRight = right;
+      if (bottom > this.#damageBottom) this.#damageBottom = bottom;
+    } else {
+      this.#damageActive = true;
+      this.#damageBottom = bottom;
+      this.#damageLeft = left;
+      this.#damageRight = right;
+      this.#damageTop = top;
+    }
+  }
+
+  /** Cancel a pending damage region so the next `buildFrame()` scans the whole grid. */
+  clearDamage(): void {
+    this.#damageActive = false;
+  }
+
   /** Build the diffed frame into the output buffer (no I/O). Returns the byte length. */
   buildFrame(): number {
     const { columns, rows } = this;
@@ -201,11 +238,16 @@ export class CharTerm {
     output.reset();
     output.home();
     const isFirstFrame = this.#firstFrame;
+    const useDamage = this.#damageActive && !isFirstFrame;
+    const columnStart = useDamage ? this.#damageLeft : 0;
+    const columnEnd = useDamage ? this.#damageRight : columns;
+    const rowStart = useDamage ? this.#damageTop : 0;
+    const rowEnd = useDamage ? this.#damageBottom : rows;
     let currentRow = -1;
     let currentColumn = -1;
-    for (let row = 0; row < rows; row++) {
+    for (let row = rowStart; row < rowEnd; row++) {
       const rowBase = row * columns;
-      for (let column = 0; column < columns; column++) {
+      for (let column = columnStart; column < columnEnd; column++) {
         const cellIndex = rowBase + column;
         const cellCharacter = characters[cellIndex];
         const cellForeground = foreground[cellIndex];
@@ -237,6 +279,7 @@ export class CharTerm {
       }
     }
     this.#firstFrame = false;
+    this.#damageActive = false;
     return output.length;
   }
 

@@ -16,7 +16,7 @@ import { encodePNG } from './png';
 import { SYNCHRONIZED_OUTPUT_BEGIN, SYNCHRONIZED_OUTPUT_END, standardOutput } from './stdout';
 import type { MouseState, PresentOptions, TermDepth, TermDiff, TermMode, TermOptions } from './types';
 
-const { abs, max, min } = Math;
+const { abs, ceil, max, min } = Math;
 const ASCII_RAMP_LAST = asciiRampBytes.length - 1;
 const SOLID_LUMA_SPAN = 6 * 1000; // luma span below which a multi-mode cell is treated as solid
 const SUBPIXEL_CAPACITY = 8; // braille's 2×4 is the largest cell
@@ -71,6 +71,14 @@ export class Term {
   #clipLeft = 0;
   #clipRight = 0;
   #clipTop = 0;
+
+  // Per-frame damage window in CELLS (valid when active). When set, buildFrame scans
+  // only this sub-grid — a caller contract: pixels changed outside it are not re-sent.
+  #damageActive = false;
+  #damageBottom = 0;
+  #damageLeft = 0;
+  #damageRight = 0;
+  #damageTop = 0;
 
   #firstFrame = true;
   #output = new OutputBuffer();
@@ -360,14 +368,50 @@ export class Term {
     return text.length * (PIXEL_FONT_WIDTH + 1) * scale;
   }
 
+  /**
+   * Restrict the next `buildFrame()` to the cells overlapping this pixel rectangle —
+   * a caller contract that the rest of the surface is unchanged. Multiple calls union.
+   * Consumed by one `buildFrame()`; a full repaint (first frame / `invalidate`) ignores it.
+   */
+  markDamage(x: number, y: number, width: number, height: number): void {
+    const left = max(0, (x / this.#pixelWidth) | 0);
+    const top = max(0, (y / this.#pixelHeight) | 0);
+    const right = min(this.columns, ceil((x + width) / this.#pixelWidth));
+    const bottom = min(this.rows, ceil((y + height) / this.#pixelHeight));
+    if (right <= left || bottom <= top) return;
+    if (this.#damageActive) {
+      if (left < this.#damageLeft) this.#damageLeft = left;
+      if (top < this.#damageTop) this.#damageTop = top;
+      if (right > this.#damageRight) this.#damageRight = right;
+      if (bottom > this.#damageBottom) this.#damageBottom = bottom;
+    } else {
+      this.#damageActive = true;
+      this.#damageBottom = bottom;
+      this.#damageLeft = left;
+      this.#damageRight = right;
+      this.#damageTop = top;
+    }
+  }
+
+  /** Cancel a pending damage region so the next `buildFrame()` scans the whole surface. */
+  clearDamage(): void {
+    this.#damageActive = false;
+  }
+
   /** Build the diffed frame into the output buffer (no I/O). Returns the byte length. */
   buildFrame(): number {
     this.#output.reset();
     this.#output.home();
-    if (this.mode === 'half') this.#emitHalf();
-    else if (this.mode === 'ascii') this.#emitAscii();
-    else this.#emitMulti();
+    const useDamage = this.#damageActive && !this.#firstFrame;
+    const columnStart = useDamage ? this.#damageLeft : 0;
+    const columnEnd = useDamage ? this.#damageRight : this.columns;
+    const rowStart = useDamage ? this.#damageTop : 0;
+    const rowEnd = useDamage ? this.#damageBottom : this.rows;
+    if (this.mode === 'half') this.#emitHalf(columnStart, columnEnd, rowStart, rowEnd);
+    else if (this.mode === 'ascii') this.#emitAscii(columnStart, columnEnd, rowStart, rowEnd);
+    else this.#emitMulti(columnStart, columnEnd, rowStart, rowEnd);
     this.#firstFrame = false;
+    this.#damageActive = false;
     return this.#output.length;
   }
 
@@ -410,8 +454,8 @@ export class Term {
 
   // Colour-ASCII: average each cell's 1×2 sub-pixels, pick a glyph from the
   // luminance ramp, and tint it with the average colour over a black background.
-  #emitAscii(): void {
-    const { columns, rows, width } = this;
+  #emitAscii(columnStart: number, columnEnd: number, rowStart: number, rowEnd: number): void {
+    const { columns, width } = this;
     const pixels = this.pixels;
     const previousForeground = this.#previousForeground;
     const previousGlyph = this.#previousGlyph;
@@ -424,11 +468,11 @@ export class Term {
     const blackBackground = isTruecolor ? 0 : is256 ? quantizeTo256(0, 0, 0) : quantizeTo16(0, 0, 0);
     let currentRow = 0;
     let currentColumn = 0;
-    for (let row = 0; row < rows; row++) {
+    for (let row = rowStart; row < rowEnd; row++) {
       const topRowBase = row * 2 * width * 3;
       const bottomRowBase = (row * 2 + 1) * width * 3;
       const cellRowBase = row * columns;
-      for (let column = 0; column < columns; column++) {
+      for (let column = columnStart; column < columnEnd; column++) {
         const topIndex = topRowBase + column * 3;
         const bottomIndex = bottomRowBase + column * 3;
         const red = (pixels[topIndex] + pixels[bottomIndex]) >> 1;
@@ -469,14 +513,14 @@ export class Term {
     }
   }
 
-  #emitHalf(): void {
-    if (this.depth === 'truecolor' && this.diff !== 'threshold') this.#emitHalfFast();
-    else this.#emitHalfGeneral();
+  #emitHalf(columnStart: number, columnEnd: number, rowStart: number, rowEnd: number): void {
+    if (this.depth === 'truecolor' && this.diff !== 'threshold') this.#emitHalfFast(columnStart, columnEnd, rowStart, rowEnd);
+    else this.#emitHalfGeneral(columnStart, columnEnd, rowStart, rowEnd);
   }
 
   // Hottest path: half-block, truecolour, exact (or none) diff.
-  #emitHalfFast(): void {
-    const { columns, rows, width } = this;
+  #emitHalfFast(columnStart: number, columnEnd: number, rowStart: number, rowEnd: number): void {
+    const { columns, width } = this;
     const pixels = this.pixels;
     const previousForeground = this.#previousForeground;
     const previousBackground = this.#previousBackground;
@@ -484,11 +528,11 @@ export class Term {
     const skipUnchanged = !this.#firstFrame && this.diff !== 'none';
     let currentRow = 0;
     let currentColumn = 0;
-    for (let row = 0; row < rows; row++) {
+    for (let row = rowStart; row < rowEnd; row++) {
       const topRowBase = row * 2 * width * 3;
       const bottomRowBase = (row * 2 + 1) * width * 3;
       const cellRowBase = row * columns;
-      for (let column = 0; column < columns; column++) {
+      for (let column = columnStart; column < columnEnd; column++) {
         const topIndex = topRowBase + column * 3;
         const bottomIndex = bottomRowBase + column * 3;
         const foregroundKey = (pixels[topIndex] << 16) | (pixels[topIndex + 1] << 8) | pixels[topIndex + 2];
@@ -510,8 +554,8 @@ export class Term {
   }
 
   // General half-block path: palette depths and/or threshold diffing.
-  #emitHalfGeneral(): void {
-    const { columns, rows, width } = this;
+  #emitHalfGeneral(columnStart: number, columnEnd: number, rowStart: number, rowEnd: number): void {
+    const { columns, width } = this;
     const pixels = this.pixels;
     const previousForeground = this.#previousForeground;
     const previousBackground = this.#previousBackground;
@@ -523,11 +567,11 @@ export class Term {
     const repaintAll = this.diff === 'none';
     let currentRow = 0;
     let currentColumn = 0;
-    for (let row = 0; row < rows; row++) {
+    for (let row = rowStart; row < rowEnd; row++) {
       const topRowBase = row * 2 * width * 3;
       const bottomRowBase = (row * 2 + 1) * width * 3;
       const cellRowBase = row * columns;
-      for (let column = 0; column < columns; column++) {
+      for (let column = columnStart; column < columnEnd; column++) {
         const topIndex = topRowBase + column * 3;
         const bottomIndex = bottomRowBase + column * 3;
         const topRed = pixels[topIndex];
@@ -583,8 +627,8 @@ export class Term {
   // quad/sextant/braille: gather the cell's sub-pixels, split them into a bright
   // (foreground) and dark (background) group at the mid-luma, average each group,
   // and pick the glyph whose lit sub-cells match the bright group.
-  #emitMulti(): void {
-    const { columns, rows, width } = this;
+  #emitMulti(columnStart: number, columnEnd: number, rowStart: number, rowEnd: number): void {
+    const { columns, width } = this;
     const pixels = this.pixels;
     const pixelWidth = this.#pixelWidth;
     const pixelHeight = this.#pixelHeight;
@@ -602,10 +646,10 @@ export class Term {
     const repaintAll = this.diff === 'none';
     let currentRow = 0;
     let currentColumn = 0;
-    for (let row = 0; row < rows; row++) {
+    for (let row = rowStart; row < rowEnd; row++) {
       const cellRowBase = row * columns;
       const pixelRowBase = row * pixelHeight;
-      for (let column = 0; column < columns; column++) {
+      for (let column = columnStart; column < columnEnd; column++) {
         const pixelColumnBase = column * pixelWidth;
         let minimumLuma = 0x7fffffff;
         let maximumLuma = -1;
