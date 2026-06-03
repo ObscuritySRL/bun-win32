@@ -21,6 +21,9 @@
     "typescript": "^5"
   },
   "private": false,
+  "publishConfig": {
+    "access": "public"
+  },
   "homepage": "https://github.com/ObscuritySRL/bun-win32#readme",
   "repository": {
     "type": "git",

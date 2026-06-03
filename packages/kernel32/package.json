@@ -20,6 +20,9 @@
     "typescript": "^5"
   },
   "private": false,
+  "publishConfig": {
+    "access": "public"
+  },
   "homepage": "https://github.com/ObscuritySRL/bun-win32#readme",
   "repository": {
     "type": "git",
@@ -27,7 +30,7 @@
     "directory": "packages/kernel32"
   },
   "type": "module",
-  "version": "1.0.23",
+  "version": "1.0.24",
   "main": "./index.ts",
   "keywords": [
     "bun",
