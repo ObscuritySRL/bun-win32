@@ -1,0 +1,1 @@
+desktop|DETERMINISTIC|29788|both runs byte-identical at 160x50 t=4

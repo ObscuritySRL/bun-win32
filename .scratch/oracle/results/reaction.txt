@@ -1,0 +1,1 @@
+reaction|DETERMINISTIC|22886|cols=160 rows=50 t=4

@@ -1,0 +1,1 @@
+raycaster-term|DETERMINISTIC|31172|cols=160 rows=50 t=4
