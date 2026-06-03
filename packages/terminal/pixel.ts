@@ -536,10 +536,11 @@ export class Term {
         const bottomRed = pixels[bottomIndex];
         const bottomGreen = pixels[bottomIndex + 1];
         const bottomBlue = pixels[bottomIndex + 2];
-        const foregroundRgb = (topRed << 16) | (topGreen << 8) | topBlue;
-        const backgroundRgb = (bottomRed << 16) | (bottomGreen << 8) | bottomBlue;
-        const emittedForeground = isTruecolor ? foregroundRgb : is256 ? quantizeTo256(topRed, topGreen, topBlue) : quantizeTo16(topRed, topGreen, topBlue);
-        const emittedBackground = isTruecolor ? backgroundRgb : is256 ? quantizeTo256(bottomRed, bottomGreen, bottomBlue) : quantizeTo16(bottomRed, bottomGreen, bottomBlue);
+        // The packed source RGB is only the stored key for truecolour (where it IS
+        // the emitted value) and for threshold diffing. Palette + exact/none never
+        // touches it, so don't pack it there.
+        const emittedForeground = isTruecolor ? (topRed << 16) | (topGreen << 8) | topBlue : is256 ? quantizeTo256(topRed, topGreen, topBlue) : quantizeTo16(topRed, topGreen, topBlue);
+        const emittedBackground = isTruecolor ? (bottomRed << 16) | (bottomGreen << 8) | bottomBlue : is256 ? quantizeTo256(bottomRed, bottomGreen, bottomBlue) : quantizeTo16(bottomRed, bottomGreen, bottomBlue);
         const cellIndex = cellRowBase + column;
         if (!isFirstFrame && !repaintAll) {
           if (thresholdLimit < 0) {
@@ -556,15 +557,15 @@ export class Term {
               channelDelta(previousBackgroundRgb, bottomRed, bottomGreen, bottomBlue) <= thresholdLimit
             )
               continue;
-            previousForeground[cellIndex] = foregroundRgb;
-            previousBackground[cellIndex] = backgroundRgb;
+            previousForeground[cellIndex] = isTruecolor ? emittedForeground : (topRed << 16) | (topGreen << 8) | topBlue;
+            previousBackground[cellIndex] = isTruecolor ? emittedBackground : (bottomRed << 16) | (bottomGreen << 8) | bottomBlue;
           }
         } else if (thresholdLimit < 0) {
           previousForeground[cellIndex] = emittedForeground;
           previousBackground[cellIndex] = emittedBackground;
         } else {
-          previousForeground[cellIndex] = foregroundRgb;
-          previousBackground[cellIndex] = backgroundRgb;
+          previousForeground[cellIndex] = isTruecolor ? emittedForeground : (topRed << 16) | (topGreen << 8) | topBlue;
+          previousBackground[cellIndex] = isTruecolor ? emittedBackground : (bottomRed << 16) | (bottomGreen << 8) | bottomBlue;
         }
         if (currentRow !== row || currentColumn !== column) {
           output.moveCursor(row + 1, column + 1);
@@ -682,10 +683,10 @@ export class Term {
           backgroundGreen = ((totalGreen - brightGreen) / darkCount) | 0;
           backgroundBlue = ((totalBlue - brightBlue) / darkCount) | 0;
         }
-        const foregroundRgb = (foregroundRed << 16) | (foregroundGreen << 8) | foregroundBlue;
-        const backgroundRgb = (backgroundRed << 16) | (backgroundGreen << 8) | backgroundBlue;
-        const emittedForeground = isTruecolor ? foregroundRgb : is256 ? quantizeTo256(foregroundRed, foregroundGreen, foregroundBlue) : quantizeTo16(foregroundRed, foregroundGreen, foregroundBlue);
-        const emittedBackground = isTruecolor ? backgroundRgb : is256 ? quantizeTo256(backgroundRed, backgroundGreen, backgroundBlue) : quantizeTo16(backgroundRed, backgroundGreen, backgroundBlue);
+        // As in #emitHalfGeneral: the packed averaged RGB is the stored key only for
+        // truecolour and threshold; palette + exact/none never reads it.
+        const emittedForeground = isTruecolor ? (foregroundRed << 16) | (foregroundGreen << 8) | foregroundBlue : is256 ? quantizeTo256(foregroundRed, foregroundGreen, foregroundBlue) : quantizeTo16(foregroundRed, foregroundGreen, foregroundBlue);
+        const emittedBackground = isTruecolor ? (backgroundRed << 16) | (backgroundGreen << 8) | backgroundBlue : is256 ? quantizeTo256(backgroundRed, backgroundGreen, backgroundBlue) : quantizeTo16(backgroundRed, backgroundGreen, backgroundBlue);
         const cellIndex = cellRowBase + column;
         if (!isFirstFrame && !repaintAll) {
           if (thresholdLimit < 0) {
@@ -703,15 +704,15 @@ export class Term {
               channelDelta(previousBackgroundRgb, backgroundRed, backgroundGreen, backgroundBlue) <= thresholdLimit
             )
               continue;
-            previousForeground[cellIndex] = foregroundRgb;
-            previousBackground[cellIndex] = backgroundRgb;
+            previousForeground[cellIndex] = isTruecolor ? emittedForeground : (foregroundRed << 16) | (foregroundGreen << 8) | foregroundBlue;
+            previousBackground[cellIndex] = isTruecolor ? emittedBackground : (backgroundRed << 16) | (backgroundGreen << 8) | backgroundBlue;
           }
         } else if (thresholdLimit < 0) {
           previousForeground[cellIndex] = emittedForeground;
           previousBackground[cellIndex] = emittedBackground;
         } else {
-          previousForeground[cellIndex] = foregroundRgb;
-          previousBackground[cellIndex] = backgroundRgb;
+          previousForeground[cellIndex] = isTruecolor ? emittedForeground : (foregroundRed << 16) | (foregroundGreen << 8) | foregroundBlue;
+          previousBackground[cellIndex] = isTruecolor ? emittedBackground : (backgroundRed << 16) | (backgroundGreen << 8) | backgroundBlue;
         }
         previousGlyph[cellIndex] = glyphMask;
         if (currentRow !== row || currentColumn !== column) {

@@ -191,4 +191,54 @@ layout tables were boxed `number[]`. A `Uint8Array` is a faster, unboxed read.
 
 **Result.** sextant/16 ~+2-3%, others within noise. Golden + modes-decode green.
 
+## Round 10 — drop dead RGB packing on the palette paths · KEEP
+
+**Hypothesis.** `#emitHalfGeneral` and `#emitMulti` always packed `foregroundRgb` /
+`backgroundRgb`, but for **palette + exact/none** that packed value is never read —
+the emitted value and the diff key are the quantised index. It's the stored key only
+for truecolour (where it *is* the emitted value) and for threshold diffing.
+
+**Change.** `pixel.ts` — fold the pack into the truecolour arm of `emittedForeground`
+/`emittedBackground`, and compute the source pack lazily inside the threshold stores
+only. Palette + exact now packs nothing. State-identical → byte-identical.
+
+**Result.**
+
+| scenario | before | after | Δ |
+| --- | ---: | ---: | ---: |
+| half / 16 / exact — VIDEO | 15542 | 16676 | **+7%** |
+| sextant / 16 / exact — VIDEO | 3234 | 3284 | +2% |
+
+Truecolour paths flat (the pack is still the emitted value there). Golden green.
+
 ---
+
+## Summary — baseline → optimised
+
+Best-of-7, 200×60, frame-production fps. Ten rounds: eight kept (four substantial),
+one neutral simplification, one reverted regression.
+
+| scenario | baseline | optimised | Δ |
+| --- | ---: | ---: | ---: |
+| half / truecolor / exact — VIDEO | 1975 | 2658 | **+35%** |
+| half / truecolor / exact — STATIC | 40250 | 40741 | +1% |
+| half / 16 / exact — VIDEO | 14890 | 16676 | **+12%** |
+| half / truecolor / threshold — VIDEO | 4965 | 5650 | **+14%** |
+| sextant / truecolor / exact — VIDEO | 1185 | 1585 | **+34%** |
+| sextant / 16 / exact — VIDEO | 2685 | 3284 | **+22%** |
+| quad / truecolor / exact — VIDEO | 1394 | 1889 | **+36%** |
+| char / bold — VIDEO (CharTerm) | 1649 | 2520 | **+53%** |
+
+The throughput win concentrates where it matters: full-frame churn (video / heavy
+animation). The skip-bound path was already near its memory-bandwidth floor and was
+left there (Round 6 proved that pushing on it backfires). Every number above was
+produced by an engine that is byte-for-byte identical to the pre-optimisation engine
+— `frame.golden.test.ts` (`4a6e2109` / `6406c50a`) gated every round.
+
+### What didn't work, and why it's recorded
+
+Round 2 and Round 8 were kept despite being speed-neutral — both are byte-identical
+simplifications that remove real work the profiler simply couldn't separate from
+noise. Round 6 was a *measured regression* (strength-reduction serialised a scan
+loop) and was reverted. Recording the misses is the point: the next person sees that
+the index arithmetic and the dark-group accumulation were already tried.
