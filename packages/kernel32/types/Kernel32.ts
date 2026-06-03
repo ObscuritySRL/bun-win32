@@ -511,6 +511,11 @@ export enum MouseEventFlags {
   MOUSE_WHEELED = 0x0000_0004,
 }
 
+/** Decoded `FOCUS_EVENT_RECORD`; `setFocus` is true when the window gained focus. */
+export interface FocusEventRecord {
+  setFocus: boolean;
+}
+
 /** Decoded `KEY_EVENT_RECORD`; `character` is the UTF-16 code unit (0 for non-character keys). */
 export interface KeyEventRecord {
   character: number;
@@ -539,6 +544,7 @@ export interface WindowBufferSizeRecord {
 /** Decoded `INPUT_RECORD`; the populated member matches `eventType`. */
 export interface InputRecord {
   eventType: EventType;
+  focusEvent?: FocusEventRecord;
   keyEvent?: KeyEventRecord;
   mouseEvent?: MouseEventRecord;
   windowBufferSizeEvent?: WindowBufferSizeRecord;
@@ -600,6 +606,8 @@ export function decodeInputRecord(buffer: Buffer, byteOffset = 0): InputRecord {
         eventType,
         windowBufferSizeEvent: { columns: buffer.readInt16LE(byteOffset + 0x04), rows: buffer.readInt16LE(byteOffset + 0x06) },
       };
+    case EventType.FOCUS_EVENT:
+      return { eventType, focusEvent: { setFocus: buffer.readInt32LE(byteOffset + 0x04) !== 0 } };
     default:
       return { eventType };
   }
