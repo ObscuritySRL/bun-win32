@@ -46,17 +46,33 @@
   "files": [
     "AI.md",
     "README.md",
+    "boxdrawing.ts",
+    "capabilities.ts",
+    "char.ts",
+    "color.ts",
+    "console.ts",
+    "env.ts",
+    "font5x7.ts",
+    "font6x10.ts",
+    "glyphs.ts",
     "index.ts",
-    "src/**/*.ts"
+    "input.ts",
+    "loop.ts",
+    "output.ts",
+    "pacing.ts",
+    "pixel.ts",
+    "png.ts",
+    "stdout.ts",
+    "types.ts"
   ],
   "sideEffects": false,
   "engines": {
     "bun": ">=1.1.0"
   },
   "scripts": {
-    "example:game": "bun ./example/game.ts",
-    "example:tui": "bun ./example/tui.ts",
-    "example:video": "bun ./example/video.ts",
-    "example:plugin": "bun ./example/plugin.ts"
+    "example:dashboard": "bun ./example/term-dashboard.ts",
+    "example:fineprint": "bun ./example/fineprint.ts",
+    "example:raycaster": "bun ./example/raycaster-term.ts",
+    "example:video": "bun ./example/video-term.ts"
   }
 }
