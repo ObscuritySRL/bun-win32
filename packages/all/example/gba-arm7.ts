@@ -72,6 +72,9 @@ export class Arm7 {
   private shifterCarry = 0; // carry-out of the barrel shifter (for logical ops)
   cycles = 0; // approximate; refined when the bus models wait-states
   halted = false; // CPU halted (BIOS Halt / IntrWait) until an IRQ
+  // BIOS high-level emulation: if set, SWI is handled here (r0-r3 in/out) and
+  // execution falls through to the next instruction instead of vectoring to BIOS.
+  onSwi: ((comment: number) => void) | null = null;
 
   constructor(bus: Bus) {
     this.bus = bus;
@@ -251,7 +254,7 @@ export class Arm7 {
       if (top === 0b011 && (op & 0x10) !== 0) return; // undefined
       return this.armSingleTransfer(op);
     }
-    if (top === 0b111) { if ((op & (1 << 24)) !== 0) this.armSwi(); return; }
+    if (top === 0b111) { if ((op & (1 << 24)) !== 0) this.armSwi((op >>> 16) & 0xff); return; }
     if (top === 0b110) return; // coprocessor transfer — unused on GBA
     // top is 000 or 001 — data processing + the 000 extension space.
     if (top === 0b000) {
@@ -543,7 +546,8 @@ export class Arm7 {
     this.r[i] = v | 0;
   }
 
-  private armSwi(): void {
+  private armSwi(comment: number): void {
+    if (this.onSwi) { this.onSwi(comment); return; } // HLE: fall through to next instruction
     const ret = (this.r[15] + 4) | 0;
     const saved = this.cpsr;
     this.switchMode(MODE_SVC);
@@ -615,7 +619,7 @@ export class Arm7 {
       }
       case 0b110: {
         if ((op & 0x1000) === 0) return this.thumbBlockTransfer(op); // format 15 (1100)
-        if ((op & 0x0f00) === 0x0f00) { this.thumbSwi(); return; } // format 17 (11011111)
+        if ((op & 0x0f00) === 0x0f00) { this.thumbSwi(op & 0xff); return; } // format 17 (11011111)
         return this.thumbCondBranch(op); // format 16 (1101)
       }
       default: { // 0b111
@@ -832,7 +836,8 @@ export class Arm7 {
     this.write(15, (this.read(15) + offset * 2) | 0);
   }
 
-  private thumbSwi(): void {
+  private thumbSwi(comment: number): void {
+    if (this.onSwi) { this.onSwi(comment); return; } // HLE: fall through to next instruction
     const ret = (this.r[15] + 2) | 0;
     const saved = this.cpsr;
     this.switchMode(MODE_SVC);
