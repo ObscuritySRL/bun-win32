@@ -23,15 +23,17 @@
  *              so BENCH measures the engine's true ceiling on REAL video and a
  *              CAPTURE writes a real frame to PNG for headless inspection.
  *
- * Pick the file with $VIDEO or argv[2]; otherwise a default capture is used.
- * Try it loud:
- *   TERM_MODE=sextant TERM_DIFF=threshold TERM_THRESHOLD=18 bun run example/video-term.ts
- *   TERM_DEPTH=16 BENCH=1 bun run example/video-term.ts        (the big fps number)
+ * The video file is REQUIRED — pass it as argv[2] or via $VIDEO. Try it loud:
+ *   TERM_MODE=sextant TERM_DIFF=threshold TERM_THRESHOLD=18 bun run example/video-term.ts clip.mp4
+ *   TERM_DEPTH=16 BENCH=1 bun run example/video-term.ts clip.mp4        (the big fps number)
  */
 import { run, type Term, type TermMode, type TermDiff, type TermDepth } from '@bun-win32/terminal';
 
-const DEFAULT_VIDEO = 'C:\\Users\\stevp\\Videos\\Captures\\Counter-Strike 2 2025-11-16 19-40-24.mp4';
-const videoPath = process.argv[2] ?? process.env.VIDEO ?? DEFAULT_VIDEO;
+const videoPath = process.argv[2] ?? process.env.VIDEO;
+if (videoPath === undefined) {
+  process.stdout.write('usage: bun run example/video-term.ts <path-to-video.mp4|mkv|avi|mov|…>   (or set $VIDEO)\n');
+  process.exit(1);
+}
 const fileName = videoPath.replace(/^.*[\\/]/, '');
 const headless = (process.env.CAPTURE_PNG ?? '') !== '' || process.env.BENCH === '1';
 const startSec = Number(process.env.VIDEO_SS ?? 30) || 0; // seek past the intro into action
