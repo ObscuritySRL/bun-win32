@@ -25,7 +25,7 @@ const VIRTUAL_KEY_NAMES: Record<number, string> = {
   0x08: 'backspace',
   0x09: 'tab',
   0x0d: 'enter',
-  0x1b: 'escape',
+  0x1b: 'esc',
   0x20: 'space',
   0x21: 'pageup',
   0x22: 'pagedown',
