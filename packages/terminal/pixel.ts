@@ -77,20 +77,20 @@ export class Term {
   #previousGlyph: Int32Array;
 
   constructor(columns: number, rows: number, options?: TermOptions) {
-    this.mode = options?.mode ?? 'half';
-    this.diff = options?.diff ?? 'exact';
-    this.depth = options?.depth ?? 'truecolor';
-    this.threshold = options?.threshold ?? 8;
     this.columns = columns;
     this.rows = rows;
+    this.depth = options?.depth ?? 'truecolor';
+    this.diff = options?.diff ?? 'exact';
+    this.mode = options?.mode ?? 'half';
+    this.threshold = options?.threshold ?? 8;
     this.#selectMode();
-    this.width = columns * this.#pixelWidth;
     this.height = rows * this.#pixelHeight;
+    this.width = columns * this.#pixelWidth;
     this.aspect = this.width / this.height;
     this.pixels = new Uint8Array(this.width * this.height * 3);
     const cellCount = columns * rows;
-    this.#previousForeground = new Int32Array(cellCount).fill(-1);
     this.#previousBackground = new Int32Array(cellCount).fill(-1);
+    this.#previousForeground = new Int32Array(cellCount).fill(-1);
     this.#previousGlyph = new Int32Array(cellCount).fill(-1);
   }
 

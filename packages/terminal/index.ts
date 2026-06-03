@@ -1,2 +1,13 @@
-// @bun-win32/terminal — public surface (engine under construction).
-export {};
+export { BLOCK, BOX } from './boxdrawing';
+export type { BoxStyle } from './boxdrawing';
+export { CharTerm } from './char';
+export { ConsoleSession, detectConsoleSize } from './console';
+export type { ConsoleSessionOptions } from './console';
+export { ConsoleInput } from './input';
+export type { KeyEvent, PointerEvent } from './input';
+export { run } from './loop';
+export type { AppSpec } from './loop';
+export { createFrameWaiter } from './pacing';
+export { Term } from './pixel';
+export { encodePNG } from './png';
+export type { MouseState, RGB, TermDepth, TermDiff, TermMode, TermOptions } from './types';

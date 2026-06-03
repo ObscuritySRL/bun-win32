@@ -58,14 +58,14 @@ export class CharTerm {
     this.rows = rows;
     this.aspect = columns / rows;
     const cellCount = columns * rows;
-    this.characters = new Int32Array(cellCount).fill(SPACE_CODE_POINT);
-    this.foreground = new Int32Array(cellCount).fill(DEFAULT_FOREGROUND);
     this.background = new Int32Array(cellCount);
     this.bold = new Uint8Array(cellCount);
-    this.#previousCharacters = new Int32Array(cellCount).fill(-1);
-    this.#previousForeground = new Int32Array(cellCount).fill(-1);
+    this.characters = new Int32Array(cellCount).fill(SPACE_CODE_POINT);
+    this.foreground = new Int32Array(cellCount).fill(DEFAULT_FOREGROUND);
     this.#previousBackground = new Int32Array(cellCount).fill(-1);
     this.#previousBold = new Uint8Array(cellCount).fill(255);
+    this.#previousCharacters = new Int32Array(cellCount).fill(-1);
+    this.#previousForeground = new Int32Array(cellCount).fill(-1);
   }
 
   #inBounds(x: number, y: number): boolean {
