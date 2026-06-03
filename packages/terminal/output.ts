@@ -25,6 +25,10 @@ const TRUECOLOR_JOIN = stringToBytes(';48;2;');
 const FOREGROUND_PALETTE_PREFIX = stringToBytes('\x1b[38;5;');
 const BACKGROUND_PALETTE_PREFIX = stringToBytes('\x1b[48;5;');
 const PALETTE_JOIN = stringToBytes(';48;5;');
+const FOREGROUND_TRUECOLOR_PARAMS = stringToBytes('38;2;'); // no CSI prefix — combined with bold
+const BACKGROUND_TRUECOLOR_PARAMS = stringToBytes('48;2;');
+const BOLD_ON = stringToBytes('1');
+const BOLD_OFF = stringToBytes('22');
 
 const SEMICOLON = 0x3b; // ;
 const LETTER_H = 0x48; // H
@@ -35,6 +39,7 @@ export class OutputBuffer {
   #position = 0;
   #penForeground = -1;
   #penBackground = -1;
+  #penBold = 0;
   #digits = new Uint8Array(12);
 
   /** Number of bytes written since the last `reset()`. */
@@ -56,6 +61,7 @@ export class OutputBuffer {
   resetPen(): void {
     this.#penForeground = -1;
     this.#penBackground = -1;
+    this.#penBold = 0;
   }
 
   #ensureCapacity(extra: number): void {
@@ -173,5 +179,71 @@ export class OutputBuffer {
     }
     this.#penForeground = foreground;
     this.#penBackground = background;
+  }
+
+  /** Append a single Unicode code point as UTF-8 (1..4 bytes). */
+  putCodePoint(codePoint: number): void {
+    if (codePoint < 0x80) {
+      this.putByte(codePoint);
+      return;
+    }
+    if (codePoint < 0x800) {
+      this.#ensureCapacity(2);
+      this.#bytes[this.#position++] = 0xc0 | (codePoint >> 6);
+      this.#bytes[this.#position++] = 0x80 | (codePoint & 0x3f);
+      return;
+    }
+    if (codePoint < 0x10000) {
+      this.#ensureCapacity(3);
+      this.#bytes[this.#position++] = 0xe0 | (codePoint >> 12);
+      this.#bytes[this.#position++] = 0x80 | ((codePoint >> 6) & 0x3f);
+      this.#bytes[this.#position++] = 0x80 | (codePoint & 0x3f);
+      return;
+    }
+    this.#ensureCapacity(4);
+    this.#bytes[this.#position++] = 0xf0 | (codePoint >> 18);
+    this.#bytes[this.#position++] = 0x80 | ((codePoint >> 12) & 0x3f);
+    this.#bytes[this.#position++] = 0x80 | ((codePoint >> 6) & 0x3f);
+    this.#bytes[this.#position++] = 0x80 | (codePoint & 0x3f);
+  }
+
+  /**
+   * Set the truecolour pen with a bold flag, emitting one combined SGR escape
+   * containing only the bold / foreground / background parameters that changed.
+   */
+  setBoldTruecolor(foreground: number, background: number, bold: number): void {
+    const needBold = bold !== this.#penBold;
+    const needForeground = foreground !== this.#penForeground;
+    const needBackground = background !== this.#penBackground;
+    if (!needBold && !needForeground && !needBackground) return;
+    this.putBytes(CONTROL_SEQUENCE_INTRODUCER);
+    let first = true;
+    if (needBold) {
+      this.putBytes(bold ? BOLD_ON : BOLD_OFF);
+      this.#penBold = bold;
+      first = false;
+    }
+    if (needForeground) {
+      if (!first) this.putByte(SEMICOLON);
+      this.putBytes(FOREGROUND_TRUECOLOR_PARAMS);
+      this.putDecimal((foreground >> 16) & 0xff);
+      this.putByte(SEMICOLON);
+      this.putDecimal((foreground >> 8) & 0xff);
+      this.putByte(SEMICOLON);
+      this.putDecimal(foreground & 0xff);
+      this.#penForeground = foreground;
+      first = false;
+    }
+    if (needBackground) {
+      if (!first) this.putByte(SEMICOLON);
+      this.putBytes(BACKGROUND_TRUECOLOR_PARAMS);
+      this.putDecimal((background >> 16) & 0xff);
+      this.putByte(SEMICOLON);
+      this.putDecimal((background >> 8) & 0xff);
+      this.putByte(SEMICOLON);
+      this.putDecimal(background & 0xff);
+      this.#penBackground = background;
+    }
+    this.putByte(LETTER_M);
   }
 }
