@@ -20,8 +20,10 @@ import { basename } from 'node:path';
 import { Kernel32, Xinput1_4 } from '../index';
 import { STD_HANDLE } from '@bun-win32/kernel32';
 
+import * as audio from './_audio';
 import { Term, makeFrameWaiter, encodePNG } from './_term';
 import { Gba, type GbaButtons } from './gba-bus';
+import { GbaApu } from './gba-apu';
 import { GBA_W, GBA_H } from './gba-ppu';
 
 const BEZEL: readonly [number, number, number] = [10, 12, 18];
@@ -32,7 +34,7 @@ const SYNC_END = '\x1b[?2026l';
 const VK = {
   LEFT: 0x25, UP: 0x26, RIGHT: 0x27, DOWN: 0x28,
   Z: 0x5a, X: 0x58, A: 0x41, S: 0x53, RETURN: 0x0d, RSHIFT: 0xa1,
-  CONTROL: 0x11, ESC: 0x1b, P: 0x50, TAB: 0x09, C: 0x43,
+  CONTROL: 0x11, ESC: 0x1b, P: 0x50, M: 0x4d, TAB: 0x09, C: 0x43,
 } as const;
 
 const ENABLE_PROCESSED_INPUT = 0x0001, ENABLE_LINE_INPUT = 0x0002, ENABLE_ECHO_INPUT = 0x0004,
@@ -208,9 +210,26 @@ function runCapture(gba: Gba, title: string): void {
 async function main(): Promise<void> {
   const { rom, title, path } = resolveRom();
   const gba = new Gba();
+  const AUDIO_RATE = 48000;
+  const AUDIO_TARGET = 6; // ~100 ms XAudio2 cushion so jitter never starves the stream
+  gba.apu = new GbaApu(AUDIO_RATE);
   gba.loadRom(rom);
 
   if (process.env.CAPTURE_PNG) { runCapture(gba, title); return; }
+
+  const pcm = audio.createPcmOutput({ sampleRate: AUDIO_RATE, channels: 2 });
+  let muted = false;
+  const feedAudio = (): void => {
+    if (!gba.apu) return;
+    if (pcm.available && !muted) {
+      if (pcm.queued() < AUDIO_TARGET) { const b = gba.apu.drain(AUDIO_RATE); if (b.length) pcm.submit(b); }
+    } else { gba.apu.drain(AUDIO_RATE); }
+  };
+  if (pcm.available) {
+    pcm.setVolume(0.6);
+    for (let i = 0; i < AUDIO_TARGET; i += 1) { gba.runFrame(); const b = gba.apu.drain(AUDIO_RATE); if (b.length) pcm.submit(b); }
+    pcm.start();
+  }
 
   const savePath = `${path}.sav`;
   if (existsSync(savePath)) {
@@ -239,6 +258,7 @@ async function main(): Promise<void> {
     input.restore();
     process.stdout.write(`${SYNC_END}\x1b[0m\x1b[?7h\x1b[?25h\x1b[?1049l`);
     Kernel32.SetConsoleMode(hOut, savedOut >>> 0); Kernel32.SetConsoleOutputCP(savedCp);
+    pcm.close();
   };
   process.on('exit', cleanup);
   process.on('SIGINT', () => { running = false; });
@@ -276,7 +296,7 @@ async function main(): Promise<void> {
       input.poll();
       if (input.held.has(VK.ESC) || (input.held.has(VK.CONTROL) && input.held.has(VK.C))) break;
       const turbo = input.held.has(VK.TAB);
-      for (const vk of input.pressed) if (vk === VK.P) paused = !paused;
+      for (const vk of input.pressed) { if (vk === VK.P) paused = !paused; else if (vk === VK.M) muted = !muted; }
       input.pressed.length = 0;
 
       const nowMs = frameStart / 1e6;
@@ -284,17 +304,17 @@ async function main(): Promise<void> {
         nextDue = nowMs;
       } else if (turbo) {
         gba.setButtons(readButtons(input));
-        for (let s = 0; s < 4; s += 1) gba.runFrame();
+        for (let s = 0; s < 4; s += 1) { gba.runFrame(); gba.apu?.drain(AUDIO_RATE); }
         nextDue = nowMs;
       } else {
         gba.setButtons(readButtons(input));
         let ran = 0;
-        while (nowMs >= nextDue && ran < 4) { gba.runFrame(); nextDue += FRAME_MS; ran += 1; }
+        while (nowMs >= nextDue && ran < 4) { gba.runFrame(); feedAudio(); nextDue += FRAME_MS; ran += 1; }
         if (ran >= 4) nextDue = nowMs;
       }
 
       blitToTerm(t, gba.frame);
-      drawHud(t, title, `${Math.round(fpsEma)} FPS${paused ? '  PAUSE' : ''}${turbo ? '  TURBO' : ''}  Z=A X=B ENT=ST  ESC quit`);
+      drawHud(t, title, `${Math.round(fpsEma)} FPS  ${muted ? 'MUTE' : '♪'}${paused ? '  PAUSE' : ''}${turbo ? '  TURBO' : ''}  Z=A X=B ENT=ST  ESC quit`);
       process.stdout.write(SYNC_BEGIN);
       t.present();
       process.stdout.write(SYNC_END);

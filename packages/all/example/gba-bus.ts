@@ -10,6 +10,7 @@
  */
 import { Arm7 } from './gba-arm7';
 import { GbaPpu } from './gba-ppu';
+import { GbaApu } from './gba-apu';
 
 /** GBA joypad state (true = pressed). */
 export interface GbaButtons {
@@ -70,6 +71,7 @@ export class Gba {
   private readonly tmFrac = new Int32Array(4); // prescaler accumulator
 
   readonly ppu: GbaPpu;
+  apu: GbaApu | null = null;
 
   constructor() {
     this.cpu = new Arm7(this);
@@ -252,6 +254,13 @@ export class Gba {
       this.io[0x202] = next & 0xff; this.io[0x203] = next >> 8;
       return;
     }
+    // DirectSound FIFO writes (0xA0-0xA3 = FIFO A, 0xA4-0xA7 = FIFO B) — write-only.
+    if (this.apu) {
+      if (off === 0xa0 || off === 0xa2) { this.apu.pushFifoA(value & 0xff); this.apu.pushFifoA((value >> 8) & 0xff); return; }
+      if (off === 0xa4 || off === 0xa6) { this.apu.pushFifoB(value & 0xff); this.apu.pushFifoB((value >> 8) & 0xff); return; }
+      if (off === 0x82) this.apu.writeControlH(value); // SOUNDCNT_H
+      if (off === 0x84) this.apu.writeControlX(value); // SOUNDCNT_X
+    }
     this.io[off] = value & 0xff;
     this.io[off + 1] = value >> 8;
     // Timer reload-low writes (0x100/4/8/C) set the reload latch, not the counter.
@@ -379,10 +388,22 @@ export class Gba {
     if (v > 0xffff) {
       v = this.tmReload[ch]!;
       if (this.tmCtrl[ch]! & 0x40) this.raiseIrq(IRQ_TIMER0 + ch); // overflow IRQ
+      if (this.apu && ch < 2) this.apu.onTimerOverflow(ch); // clock the DirectSound FIFOs
       // Cascade: if the next timer is in count-up mode + enabled, tick it.
       if (ch < 3 && (this.tmCtrl[ch + 1]! & 0x84) === 0x84) this.timerIncrement(ch + 1);
     }
     this.tmCounter[ch] = v;
+  }
+
+  /** Refill a DirectSound FIFO via its DMA (always 4 words, dest fixed). */
+  private runSoundDma(ch: number): void {
+    const ctrl = this.dmaCtrl[ch]!;
+    if ((ctrl & 0x8000) === 0 || ((ctrl >> 12) & 3) !== 3) return; // not an active special-timing DMA
+    let src = this.dmaSrcLatch[ch]! >>> 0;
+    const dst = this.dmaDstLatch[ch]! >>> 0; // FIFO address (fixed)
+    for (let i = 0; i < 4; i += 1) { this.write32(dst, this.read32(src)); src = (src + 4) >>> 0; }
+    this.dmaSrcLatch[ch] = src;
+    if (ctrl & 0x4000) this.raiseIrq(IRQ_DMA0 + ch);
   }
 
   // ════════════════════════════════════════════════════════════════════════════
@@ -519,15 +540,23 @@ export class Gba {
     this.io[0x04] = ds & 0xff; this.io[0x05] = (ds >> 8) & 0xff;
   }
 
-  /** Run the CPU for ~`target` cycles, stepping timers and honouring HALT. */
+  /** Run the CPU for ~`target` cycles, stepping timers/APU and honouring HALT. */
   private runCycles(target: number): void {
     let done = 0;
     while (done < target) {
-      if (this.cpu.halted) { this.stepTimers(target - done); return; }
+      if (this.cpu.halted) { this.stepTimers(target - done); if (this.apu) { this.apu.step(target - done); this.serviceSoundDma(); } return; }
       const c = this.cpu.step();
       this.stepTimers(c);
+      if (this.apu) { this.apu.step(c); this.serviceSoundDma(); }
       done += c;
     }
+  }
+
+  /** Refill the DirectSound FIFOs whenever a timer overflow drained them. */
+  private serviceSoundDma(): void {
+    if (!this.apu) return;
+    if (this.apu.dmaReqA) { this.apu.dmaReqA = false; this.runSoundDma(1); }
+    if (this.apu.dmaReqB) { this.apu.dmaReqB = false; this.runSoundDma(2); }
   }
 
   /** Emulate exactly one video frame, producing ppu.frame. */
