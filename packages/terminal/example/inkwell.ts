@@ -804,7 +804,7 @@ run({
   title: 'Inkwell',
   hud: 'DRAG TO STIR  -  HOLD TO INK  -  WHEEL SHIFTS HUE',
   captureT: 5,
-  targetFps: 60,
+  targetFps: 0, // uncapped
   mouse: true,
   init: () => { inited = false; ensure(); idleTime = 0; everInteracted = false; lastSeq = -1; lastMX = -1; lastMY = -1; prevAX0 = -1; prevAY0 = -1; prevAX1 = -1; prevAY1 = -1; },
   resize: () => { /* sim is fixed-resolution; LUT rebuilds itself in render */ },

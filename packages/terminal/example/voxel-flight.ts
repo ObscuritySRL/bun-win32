@@ -950,7 +950,7 @@ run({
   hud: 'WASD/ARROWS FLY - MOUSE LOOK - WHEEL ALTITUDE - SHIFT BOOST',
   captureT: 6,
   mouse: true,
-  targetFps: 60,
+  targetFps: 0, // uncapped
   init: () => { buildMap(); resetCam(); userControlled = false; lastInputT = -1e9; lastMouseSeq = -1; lastMouseX = -1; lastMouseY = -1; },
   frame,
 });

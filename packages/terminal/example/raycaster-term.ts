@@ -524,7 +524,7 @@ run({
   diff: 'threshold',
   threshold: 6,
   captureT: 3,
-  targetFps: 120,
+  targetFps: 0, // uncapped
   init: () => { buildMaze(); resetPlayer(); everPressed = false; lastInputT = -1e9; },
   frame,
   onKey,

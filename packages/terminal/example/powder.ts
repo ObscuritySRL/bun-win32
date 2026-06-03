@@ -1056,7 +1056,7 @@ run({
   hud: '1-8 MATERIAL  -  DRAG TO PAINT  -  WHEEL BRUSH  -  C CLEAR',
   captureT: 5,
   mouse: true,
-  targetFps: 60,
+  targetFps: 0, // uncapped
   init: (t) => {
     allocate(t.width, t.height);
     seedScene();

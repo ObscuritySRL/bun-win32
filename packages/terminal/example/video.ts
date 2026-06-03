@@ -1003,7 +1003,7 @@ function onKey(key: string): void {
 await runText({
   title: `${fileName}`,
   hud: '',
-  targetFps: 60,
+  targetFps: 0, // uncapped
   drawFps: false, // we draw our own FPS in the overlay so it shows/hides with the controls
   mouse: true, // report mouse motion so we can reveal the overlay on move
   frame: (t, time, dt) => {
