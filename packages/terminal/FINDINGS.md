@@ -168,4 +168,27 @@ golden `6406c50a`, captured from the pre-round engine and still green after).
 
 Term paths untouched. Golden green (both hashes); full suite green.
 
+## Round 8 — derive the dark group from the running totals · KEEP (neutral, simpler)
+
+**Hypothesis.** `#emitMulti`'s split loop accumulates both the bright and dark
+groups. Since Round 5 keeps `total*`, the dark group is just `total − bright`, so
+only the bright group need be accumulated.
+
+**Change.** `pixel.ts` — split loop accumulates bright only; `dark* = total* −
+bright*`, `darkCount = subpixelCount − brightCount`. The solid-span guard proves
+both counts are ≥ 1, so neither divisor is zero.
+
+**Result.** Flat (within noise) — the dark adds weren't the bottleneck. Kept anyway:
+byte-identical, four fewer locals, one branch arm gone. No speed win claimed.
+
+## Round 9 — typed bit-layout tables · KEEP (small)
+
+**Hypothesis.** `#emitMulti` indexes `bitLayout[subIndex]` per lit sub-pixel, but the
+layout tables were boxed `number[]`. A `Uint8Array` is a faster, unboxed read.
+
+**Change.** `glyphs.ts` — `quadrant/sextant/brailleBitLayout` become `Uint8Array`;
+`pixel.ts` `#bitLayout` typed to match.
+
+**Result.** sextant/16 ~+2-3%, others within noise. Golden + modes-decode green.
+
 ---

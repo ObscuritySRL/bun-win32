@@ -61,7 +61,7 @@ export class Term {
   /** Pointer state, updated by the app loop when mouse reporting is enabled. Coordinates are pixels. */
   readonly mouse: MouseState = { active: false, down: false, inside: false, sequence: 0, wheel: 0, x: -1, y: -1 };
 
-  #bitLayout: readonly number[] | null = null;
+  #bitLayout: Uint8Array | null = null;
   #glyphTable: Uint8Array[] | null = null;
   #pixelHeight = 2;
   #pixelWidth = 1;
@@ -661,11 +661,10 @@ export class Term {
           let brightGreen = 0;
           let brightBlue = 0;
           let brightCount = 0;
-          let darkRed = 0;
-          let darkGreen = 0;
-          let darkBlue = 0;
-          let darkCount = 0;
           glyphMask = 0;
+          // Accumulate only the bright group; the dark group is the remainder of
+          // the running totals (total − bright). The solid-span guard guarantees
+          // both groups are non-empty, so neither divisor is zero.
           for (let subIndex = 0; subIndex < subpixelCount; subIndex++) {
             if (subpixelLuma[subIndex] >= midLuma) {
               brightRed += subpixelRed[subIndex];
@@ -673,19 +672,15 @@ export class Term {
               brightBlue += subpixelBlue[subIndex];
               brightCount++;
               glyphMask |= 1 << bitLayout[subIndex];
-            } else {
-              darkRed += subpixelRed[subIndex];
-              darkGreen += subpixelGreen[subIndex];
-              darkBlue += subpixelBlue[subIndex];
-              darkCount++;
             }
           }
+          const darkCount = subpixelCount - brightCount;
           foregroundRed = (brightRed / brightCount) | 0;
           foregroundGreen = (brightGreen / brightCount) | 0;
           foregroundBlue = (brightBlue / brightCount) | 0;
-          backgroundRed = (darkRed / darkCount) | 0;
-          backgroundGreen = (darkGreen / darkCount) | 0;
-          backgroundBlue = (darkBlue / darkCount) | 0;
+          backgroundRed = ((totalRed - brightRed) / darkCount) | 0;
+          backgroundGreen = ((totalGreen - brightGreen) / darkCount) | 0;
+          backgroundBlue = ((totalBlue - brightBlue) / darkCount) | 0;
         }
         const foregroundRgb = (foregroundRed << 16) | (foregroundGreen << 8) | foregroundBlue;
         const backgroundRgb = (backgroundRed << 16) | (backgroundGreen << 8) | backgroundBlue;

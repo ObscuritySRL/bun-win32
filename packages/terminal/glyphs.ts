@@ -57,6 +57,6 @@ export const brailleGlyphs = (() => {
 
 // Sub-cell index (subRow * pixelWidth + subColumn) → glyph bit position, per mode.
 // Only braille's dot numbering is non-row-major (dots 1,4,2,5,3,6,7,8).
-export const quadrantBitLayout = [0, 1, 2, 3];
-export const sextantBitLayout = [0, 1, 2, 3, 4, 5];
-export const brailleBitLayout = [0, 3, 1, 4, 2, 5, 6, 7];
+export const quadrantBitLayout = new Uint8Array([0, 1, 2, 3]);
+export const sextantBitLayout = new Uint8Array([0, 1, 2, 3, 4, 5]);
+export const brailleBitLayout = new Uint8Array([0, 3, 1, 4, 2, 5, 6, 7]);
