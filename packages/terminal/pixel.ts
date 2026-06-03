@@ -14,7 +14,7 @@ import {
 import { OutputBuffer } from './output';
 import { encodePNG } from './png';
 import { standardOutput } from './stdout';
-import type { TermDepth, TermDiff, TermMode, TermOptions } from './types';
+import type { MouseState, TermDepth, TermDiff, TermMode, TermOptions } from './types';
 
 const ASCII_RAMP_LAST = asciiRampBytes.length - 1;
 const SOLID_LUMA_SPAN = 6 * 1000; // luma span below which a multi-mode cell is treated as solid
@@ -40,36 +40,41 @@ const subpixelRed = new Uint8Array(SUBPIXEL_CAPACITY);
  * surface.present();
  */
 export class Term {
-  readonly columns: number;
-  readonly rows: number;
-  /** Pixel grid width = columns × mode pixel width. Re-derived by `reconfigure()`. */
-  width: number;
-  /** Pixel grid height = rows × mode pixel height. Re-derived by `reconfigure()`. */
-  height: number;
   /** `width / height`. */
   aspect: number;
+  /** Pixel grid height = rows × mode pixel height. Re-derived by `reconfigure()`. */
+  height: number;
   /** Row-major RGB framebuffer, length `width × height × 3`. Written directly by callers. */
   pixels: Uint8Array;
+  /** Pixel grid width = columns × mode pixel width. Re-derived by `reconfigure()`. */
+  width: number;
 
-  mode: TermMode;
-  diff: TermDiff;
+  readonly columns: number;
+  readonly rows: number;
+
   depth: TermDepth;
+  diff: TermDiff;
+  mode: TermMode;
   threshold: number;
 
-  #pixelWidth = 1;
-  #pixelHeight = 2;
-  #subpixelCount = 2;
+  /** Pointer state, updated by the app loop when mouse reporting is enabled. Coordinates are pixels. */
+  readonly mouse: MouseState = { active: false, down: false, inside: false, sequence: 0, wheel: 0, x: -1, y: -1 };
+
   #bitLayout: readonly number[] | null = null;
   #glyphTable: Uint8Array[] | null = null;
+  #pixelHeight = 2;
+  #pixelWidth = 1;
+  #subpixelCount = 2;
+
+  #firstFrame = true;
+  #output = new OutputBuffer();
 
   // Per-cell diff cache. For exact/none these hold the last EMITTED key (packed RGB
   // for truecolour, palette index otherwise); for threshold they hold the last-SENT
   // source RGB so accumulated drift stays bounded by `threshold`.
-  #previousForeground: Int32Array;
   #previousBackground: Int32Array;
+  #previousForeground: Int32Array;
   #previousGlyph: Int32Array;
-  #firstFrame = true;
-  #output = new OutputBuffer();
 
   constructor(columns: number, rows: number, options?: TermOptions) {
     this.mode = options?.mode ?? 'half';

@@ -4,7 +4,7 @@ import { CHAR_FONT_HEIGHT, CHAR_FONT_WIDTH, charFont } from './font6x10';
 import { OutputBuffer } from './output';
 import { encodePNG } from './png';
 import { standardOutput } from './stdout';
-import type { RGB } from './types';
+import type { MouseState, RGB } from './types';
 
 const SPACE_CODE_POINT = 0x20;
 const DEFAULT_FOREGROUND = 0xc8c8d0;
@@ -28,26 +28,30 @@ const packRgb = (red: number, green: number, blue: number): number =>
  * surface.present();
  */
 export class CharTerm {
-  readonly columns: number;
-  readonly rows: number;
   /** `columns / rows` (a grid ratio; cell aspect is not applied). */
   readonly aspect: number;
+  readonly columns: number;
+  readonly rows: number;
 
-  /** Per-cell code point. Written directly by callers that bypass the draw primitives. */
-  readonly characters: Int32Array;
-  /** Per-cell packed-RGB foreground. */
-  readonly foreground: Int32Array;
   /** Per-cell packed-RGB background. */
   readonly background: Int32Array;
   /** Per-cell bold flag (0 or 1). */
   readonly bold: Uint8Array;
+  /** Per-cell code point. Written directly by callers that bypass the draw primitives. */
+  readonly characters: Int32Array;
+  /** Per-cell packed-RGB foreground. */
+  readonly foreground: Int32Array;
 
-  #previousCharacters: Int32Array;
-  #previousForeground: Int32Array;
-  #previousBackground: Int32Array;
-  #previousBold: Uint8Array;
+  /** Pointer state, updated by the app loop when mouse reporting is enabled. Coordinates are cells. */
+  readonly mouse: MouseState = { active: false, down: false, inside: false, sequence: 0, wheel: 0, x: -1, y: -1 };
+
   #firstFrame = true;
   #output = new OutputBuffer();
+
+  #previousBackground: Int32Array;
+  #previousBold: Uint8Array;
+  #previousCharacters: Int32Array;
+  #previousForeground: Int32Array;
 
   constructor(columns: number, rows: number) {
     this.columns = columns;

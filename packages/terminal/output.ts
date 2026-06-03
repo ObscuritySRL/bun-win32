@@ -36,10 +36,12 @@ const TRUECOLOR_JOIN = stringToBytes(';48;2;');
 export class OutputBuffer {
   #bytes = new Uint8Array(1 << 18);
   #position = 0;
-  #penForeground = -1;
+
+  #digits = new Uint8Array(12);
+
   #penBackground = -1;
   #penBold = 0;
-  #digits = new Uint8Array(12);
+  #penForeground = -1;
 
   /** Number of bytes written since the last `reset()`. */
   get length(): number {

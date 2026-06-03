@@ -41,10 +41,10 @@ export interface ConsoleSessionOptions {
  */
 export class ConsoleSession {
   #handle: bigint;
-  #savedMode: number;
-  #savedCodePage: number;
   #mouse: boolean;
   #restored = false;
+  #savedCodePage: number;
+  #savedMode: number;
 
   constructor(options?: ConsoleSessionOptions) {
     this.#handle = GetStdHandle(STD_HANDLE.OUTPUT);
