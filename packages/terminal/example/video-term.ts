@@ -5,12 +5,12 @@
  * animated content (the hardest possible input for a diffing renderer).
  *
  * Decode: ffmpeg streams raw rgb24 frames, scaled + letterboxed to the terminal's
- * exact pixel grid (cols·pxW × rows·pxH for the active mode), straight into t.buf.
+ * exact pixel grid (cols·pxW × rows·pxH for the active mode), straight into t.pixels.
  * No per-pixel work in TypeScript on the decode side — ffmpeg does the scaling,
  * the engine does the diffing. (video.ts is the sibling pure-Media-Foundation +
  * audio player for the _textterm char engine; this one targets _term.)
  *
- * Two paths, both via runDemo so console setup / pacing / HUD / resize / the whole
+ * Two paths, both via run so console setup / pacing / HUD / resize / the whole
  * TERM_MODE·TERM_DIFF·TERM_DEPTH option matrix come for free:
  *   • LIVE   — ffmpeg decodes (looping via -stream_loop -1) into a bounded frame
  *              QUEUE; the render loop drains it on a SIM-TIME clock for smooth,
@@ -28,7 +28,7 @@
  *   TERM_MODE=sextant TERM_DIFF=threshold TERM_THRESHOLD=18 bun run example/video-term.ts
  *   TERM_DEPTH=16 BENCH=1 bun run example/video-term.ts        (the big fps number)
  */
-import { runDemo, type Term, type TermMode, type TermDiff, type TermDepth } from './_term';
+import { run, type Term, type TermMode, type TermDiff, type TermDepth } from '@bun-win32/terminal';
 
 const DEFAULT_VIDEO = 'C:\\Users\\stevp\\Videos\\Captures\\Counter-Strike 2 2025-11-16 19-40-24.mp4';
 const videoPath = process.argv[2] ?? process.env.VIDEO ?? DEFAULT_VIDEO;
@@ -79,7 +79,7 @@ let nextIdx = 0; // absolute index of the frame at queue[0]
 let originSet = false;
 let origin = 0; // sim time at which frame 0 is shown
 let curFrame: Uint8Array | null = null;
-let shownIdx = -1; // last index copied into t.buf (skips redundant memcpy on spin iterations)
+let shownIdx = -1; // last index copied into t.pixels (skips redundant memcpy on spin iterations)
 
 const startLive = (W: number, H: number): void => {
   const fs = W * H * 3; // captured locally so a stale reader never uses a changed size
@@ -166,7 +166,7 @@ const decodeFrames = async (W: number, H: number, n: number): Promise<void> => {
   await p.exited;
 };
 
-await runDemo({
+await run({
   title: `VIDEO ${fileName}`,
   hud: 'M mode · D diff · C depth · SPACE pause · ESC quit',
   captureT: 2,
@@ -180,21 +180,21 @@ await runDemo({
     curThr = t.threshold;
     if (headless) {
       const n = Math.max(30, Math.min(180, Number(process.env.BENCH_FRAMES ?? 120) | 0));
-      await decodeFrames(t.W, t.H, n);
+      await decodeFrames(t.width, t.height, n);
       if (preFrames.length === 0) {
         process.stderr.write(`video-term: no frames decoded from "${videoPath}". Is ffmpeg installed and the path valid?\n`);
       }
     } else {
-      startLive(t.W, t.H);
+      startLive(t.width, t.height);
     }
   },
   resize: (t: Term) => {
-    // Terminal changed size → re-apply the live options (runDemo rebuilt the Term
+    // Terminal changed size → re-apply the live options (run rebuilt the Term
     // from the original env opts) and restart ffmpeg at the new grid resolution.
     if (!headless) {
       t.reconfigure({ mode: curMode, diff: curDiff, depth: curDepth, threshold: curThr });
       killFfmpeg();
-      startLive(t.W, t.H);
+      startLive(t.width, t.height);
     }
   },
   onKey: (key: string, t: Term) => {
@@ -204,21 +204,21 @@ await runDemo({
     else if (key === 'd') { curDiff = DIFFS[(DIFFS.indexOf(curDiff) + 1) % DIFFS.length]; changed = true; }
     else if (key === 'c') { curDepth = DEPTHS[(DEPTHS.indexOf(curDepth) + 1) % DEPTHS.length]; changed = true; }
     if (!changed) return;
-    const ow = t.W, oh = t.H;
+    const ow = t.width, oh = t.height;
     t.reconfigure({ mode: curMode, diff: curDiff, depth: curDepth, threshold: curThr });
     // A mode change alters the pixel resolution → re-decode at the new size. A
     // diff/depth change keeps the same frames, so the next repaint just adopts it.
-    if (t.W !== ow || t.H !== oh) {
+    if (t.width !== ow || t.height !== oh) {
       killFfmpeg();
-      startLive(t.W, t.H);
+      startLive(t.width, t.height);
     }
   },
   frame: (t: Term, time, _dt, frameNo) => {
     if (headless) {
-      if (preFrames.length > 0) t.buf.set(preFrames[frameNo % preFrames.length]);
+      if (preFrames.length > 0) t.pixels.set(preFrames[frameNo % preFrames.length]);
       return;
     }
-    // LIVE: drain the queue on the sim-time clock. `time` (runDemo's simTime) stops
+    // LIVE: drain the queue on the sim-time clock. `time` (run's simTime) stops
     // advancing while paused, so the playhead — and the picture — freeze on SPACE.
     if (!originSet) {
       if (queue.length === 0) return; // nothing decoded yet → hold the (black) frame
@@ -233,7 +233,7 @@ await runDemo({
     }
     curFrame = queue[0] ?? curFrame;
     if (curFrame && nextIdx !== shownIdx) {
-      t.buf.set(curFrame);
+      t.pixels.set(curFrame);
       shownIdx = nextIdx;
     }
   },

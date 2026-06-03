@@ -23,14 +23,14 @@ import { dlopen } from 'bun:ffi';
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { basename } from 'node:path';
 
-import { Kernel32, Xinput1_4 } from '../index';
-import { STD_HANDLE } from '@bun-win32/kernel32';
+import Kernel32, { STD_HANDLE } from '@bun-win32/kernel32';
+import Xinput1_4 from '@bun-win32/xinput1_4';
 
-import * as audio from './_audio';
-import { Term, makeFrameWaiter, encodePNG } from './_term';
-import { loadCgbAcid2 } from './gameboy-cgb-rom';
-import { loadAcid2 } from './gameboy-rom';
-import { loadLibbet } from './gameboy-game-rom';
+import { Term, createFrameWaiter, encodePNG } from '@bun-win32/terminal';
+import * as audio from '../../all/example/_audio';
+import { loadCgbAcid2 } from '../../all/example/gameboy-cgb-rom';
+import { loadAcid2 } from '../../all/example/gameboy-rom';
+import { loadLibbet } from '../../all/example/gameboy-game-rom';
 
 const GB_W = 160;
 const GB_H = 144;
@@ -2231,8 +2231,8 @@ const SYNC_END = '\x1b[?2026l';
  * outside the picture is painted with the bezel colour.
  */
 export function blitToTerm(t: Term, frame: Uint8Array): void {
-  const W = t.W;
-  const H = t.H;
+  const W = t.width;
+  const H = t.height;
   let scale = Math.min(W / GB_W, H / GB_H);
   if (scale >= 1) scale = Math.floor(scale); // crisp integer scaling when it fits
   if (scale <= 0) scale = Math.min(W / GB_W, H / GB_H); // tiny terminal: best effort
@@ -2490,7 +2490,7 @@ function drawHud(t: Term, title: string, info: string): void {
   // A single thin status line in the top-left, kept short so it barely covers
   // the picture. Drawn over a translucent plate for legibility on any scene.
   const line = `GB ${title}  ${info}`;
-  const w = Math.min(t.W - 2, Term.textWidth(line) + 5);
+  const w = Math.min(t.width - 2, Term.textWidth(line) + 5);
   t.plate(1, 1, w, 11, 0.4);
   t.text(3, 3, line, 150, 220, 170, 1);
 }
@@ -2527,12 +2527,12 @@ function runCapture(gb: GameBoy, title: string): void {
   blitToTerm(t, gb.frame);
   drawHud(t, title, 'pure-TS GB/CGB · terminal');
   const out = process.env.CAPTURE_PNG!;
-  writeFileSync(out, encodePNG(t.buf, t.W, t.H));
+  writeFileSync(out, encodePNG(t.pixels, t.width, t.height));
   let nonBlack = 0;
   let lumaSum = 0;
-  const n = t.buf.length / 3;
-  for (let i = 0; i < t.buf.length; i += 3) {
-    const L = t.buf[i]! * 0.299 + t.buf[i + 1]! * 0.587 + t.buf[i + 2]! * 0.114;
+  const n = t.pixels.length / 3;
+  for (let i = 0; i < t.pixels.length; i += 3) {
+    const L = t.pixels[i]! * 0.299 + t.pixels[i + 1]! * 0.587 + t.pixels[i + 2]! * 0.114;
     lumaSum += L;
     if (L > 8) nonBlack += 1;
   }
@@ -2648,7 +2648,7 @@ async function main(): Promise<void> {
 
   let sz = detectSize();
   let t = new Term(sz.cols, sz.rows);
-  const wait = makeFrameWaiter();
+  const wait = createFrameWaiter();
   const GB_FRAME_MS = 1000 / 59.7;
   const durationMs = Number(process.env.DEMO_DURATION_MS ?? 0); // headless live-loop smoke
   const t0 = Bun.nanoseconds();
@@ -2685,7 +2685,7 @@ async function main(): Promise<void> {
 
     // Live resize.
     sz = detectSize();
-    if (sz.cols !== t.cols || sz.rows !== t.rows) {
+    if (sz.cols !== t.columns || sz.rows !== t.rows) {
       t = new Term(sz.cols, sz.rows);
       process.stdout.write('\x1b[2J\x1b[H');
     }

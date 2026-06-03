@@ -1,9 +1,9 @@
 /**
  * gba-tty — a from-scratch Game Boy Advance emulator that plays in the terminal.
  * The 240×160 display is drawn with half-block truecolor "pixels" via the shared
- * _term renderer; the ARM7TDMI CPU + memory bus + PPU live in gba-arm7.ts /
- * gba-bus.ts / gba-ppu.ts. Real key down/up comes from the Win32 console input
- * API for an authentic held D-pad; Flash saves persist to <rom>.sav.
+ * @bun-win32/terminal renderer; the ARM7TDMI CPU + memory bus + PPU live in
+ * gba-arm7.ts / gba-bus.ts / gba-ppu.ts. Real key down/up comes from the Win32
+ * console input API for an authentic held D-pad; Flash saves persist to <rom>.sav.
  *
  * No copyrighted BIOS is used — the handful of BIOS SWIs games rely on are
  * high-level-emulated. Bring your own legally-dumped .gba ROM.
@@ -11,20 +11,21 @@
  * Controls: arrows = D-pad · Z = A · X = B · Enter = Start · RShift = Select ·
  * A = L · S = R · Tab = turbo · P = pause · Esc = quit. XInput pad works too.
  *
- * Run: bun run packages/all/example/gba-tty.ts <path-to-rom.gba>
+ * Run: bun run packages/terminal/example/gba-tty.ts <path-to-rom.gba>
  */
 import { dlopen } from 'bun:ffi';
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { basename } from 'node:path';
 
-import { Kernel32, Xinput1_4 } from '../index';
+import Kernel32 from '@bun-win32/kernel32';
+import Xinput1_4 from '@bun-win32/xinput1_4';
 import { STD_HANDLE } from '@bun-win32/kernel32';
 
-import * as audio from './_audio';
-import { Term, makeFrameWaiter, encodePNG } from './_term';
-import { Gba, type GbaButtons } from './gba-bus';
-import { GbaApu } from './gba-apu';
-import { GBA_W, GBA_H } from './gba-ppu';
+import { Term, createFrameWaiter, encodePNG } from '@bun-win32/terminal';
+import * as audio from '../../all/example/_audio';
+import { Gba, type GbaButtons } from '../../all/example/gba-bus';
+import { GbaApu } from '../../all/example/gba-apu';
+import { GBA_W, GBA_H } from '../../all/example/gba-ppu';
 
 const BEZEL: readonly [number, number, number] = [10, 12, 18];
 const SYNC_BEGIN = '\x1b[?2026h';
@@ -148,7 +149,7 @@ function readButtons(src: InputSource): GbaButtons {
 
 /** Nearest-neighbour scale-to-fit + center the 240×160 RGBA frame into Term. */
 function blitToTerm(t: Term, frame: Uint8Array): void {
-  const W = t.W, H = t.H;
+  const W = t.width, H = t.height;
   let scale = Math.min(W / GBA_W, H / GBA_H);
   if (scale >= 1) scale = Math.floor(scale);
   if (scale <= 0) scale = Math.min(W / GBA_W, H / GBA_H);
@@ -186,7 +187,7 @@ function resolveRom(): { rom: Uint8Array; title: string; path: string } {
 
 function drawHud(t: Term, title: string, info: string): void {
   const line = `GBA ${title}  ${info}`;
-  const w = Math.min(t.W - 2, Term.textWidth(line) + 5);
+  const w = Math.min(t.width - 2, Term.textWidth(line) + 5);
   t.plate(1, 1, w, 11, 0.4);
   t.text(3, 3, line, 150, 200, 235, 1);
 }
@@ -200,10 +201,10 @@ function runCapture(gba: Gba, title: string): void {
   blitToTerm(t, gba.frame);
   drawHud(t, title, 'pure-TS GBA · terminal');
   const out = process.env.CAPTURE_PNG!;
-  writeFileSync(out, encodePNG(t.buf, t.W, t.H));
+  writeFileSync(out, encodePNG(t.pixels, t.width, t.height));
   let nonBlack = 0, lumaSum = 0;
-  const n = t.buf.length / 3;
-  for (let i = 0; i < t.buf.length; i += 3) { const L = t.buf[i]! * 0.299 + t.buf[i + 1]! * 0.587 + t.buf[i + 2]! * 0.114; lumaSum += L; if (L > 8) nonBlack += 1; }
+  const n = t.pixels.length / 3;
+  for (let i = 0; i < t.pixels.length; i += 3) { const L = t.pixels[i]! * 0.299 + t.pixels[i + 1]! * 0.587 + t.pixels[i + 2]! * 0.114; lumaSum += L; if (L > 8) nonBlack += 1; }
   console.log(`[shot] ok=true nonBlack=${(nonBlack / n).toFixed(3)} meanLuma=${(lumaSum / n / 255).toFixed(3)} -> ${out}`);
 }
 
@@ -277,7 +278,7 @@ async function main(): Promise<void> {
 
   let sz = detectSize();
   let t = new Term(sz.cols, sz.rows);
-  const wait = makeFrameWaiter();
+  const wait = createFrameWaiter();
   const FRAME_MS = 1000 / 59.73;
   const durationMs = Number(process.env.DEMO_DURATION_MS ?? 0);
   const t0 = Bun.nanoseconds();
@@ -291,7 +292,7 @@ async function main(): Promise<void> {
       if (elapsedTotal - lastSaveMs >= 5000) { lastSaveMs = elapsedTotal; autoSave(); }
 
       sz = detectSize();
-      if (sz.cols !== t.cols || sz.rows !== t.rows) { t = new Term(sz.cols, sz.rows); process.stdout.write('\x1b[2J\x1b[H'); }
+      if (sz.cols !== t.columns || sz.rows !== t.rows) { t = new Term(sz.cols, sz.rows); process.stdout.write('\x1b[2J\x1b[H'); }
 
       input.poll();
       if (input.held.has(VK.ESC) || (input.held.has(VK.CONTROL) && input.held.has(VK.C))) break;
