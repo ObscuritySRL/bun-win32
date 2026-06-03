@@ -1,0 +1,62 @@
+{
+  "author": "Stev Peifer <stev@bell.net>",
+  "bugs": {
+    "url": "https://github.com/ObscuritySRL/bun-win32/issues"
+  },
+  "dependencies": {
+    "@bun-win32/core": "workspace:*",
+    "@bun-win32/kernel32": "workspace:*"
+  },
+  "description": "High-performance terminal rendering engine — pixel framebuffer, TUI, FFI input, plugins — for Bun on Windows.",
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "exports": {
+    ".": "./index.ts"
+  },
+  "license": "MIT",
+  "module": "index.ts",
+  "name": "@bun-win32/terminal",
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "private": false,
+  "homepage": "https://github.com/ObscuritySRL/bun-win32#readme",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/ObscuritySRL/bun-win32.git",
+    "directory": "packages/terminal"
+  },
+  "type": "module",
+  "version": "1.0.0",
+  "main": "./index.ts",
+  "keywords": [
+    "bun",
+    "ffi",
+    "win32",
+    "windows",
+    "terminal",
+    "tui",
+    "ansi",
+    "vt",
+    "renderer",
+    "game",
+    "typescript"
+  ],
+  "files": [
+    "AI.md",
+    "README.md",
+    "index.ts",
+    "src/**/*.ts"
+  ],
+  "sideEffects": false,
+  "engines": {
+    "bun": ">=1.1.0"
+  },
+  "scripts": {
+    "example:game": "bun ./example/game.ts",
+    "example:tui": "bun ./example/tui.ts",
+    "example:video": "bun ./example/video.ts",
+    "example:plugin": "bun ./example/plugin.ts"
+  }
+}
