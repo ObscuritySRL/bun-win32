@@ -44,6 +44,7 @@ const killFfmpeg = (): void => {
   }
 };
 process.on('exit', killFfmpeg);
+let stopped = false; // set when the demo loop ends → unblocks/abandons the reader
 
 // ── LIVE: background reader keeps the most-recent decoded frame ────────────────
 let latest: Uint8Array | null = null;
@@ -69,6 +70,7 @@ const startLive = (W: number, H: number): void => {
     let have = 0;
     try {
       for await (const chunk of proc!.stdout as ReadableStream<Uint8Array>) {
+        if (stopped) break;
         let off = 0;
         while (off < chunk.length) {
           const need = frameSize - have;
@@ -121,7 +123,7 @@ const decodeFrames = async (W: number, H: number, n: number): Promise<void> => {
   await p.exited;
 };
 
-runDemo({
+await runDemo({
   title: `VIDEO ${fileName}`,
   hud: 'real video on _term · SPACE pause · TERM_MODE/DIFF/DEPTH to taste · ESC quit',
   captureT: 2,
@@ -153,3 +155,9 @@ runDemo({
     }
   },
 });
+
+// The demo loop has ended (ESC / q / DEMO_DURATION_MS): stop the reader and the
+// ffmpeg child so the pending stream read can't keep the process alive forever.
+stopped = true;
+killFfmpeg();
+process.exit(0);
