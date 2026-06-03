@@ -70,9 +70,31 @@
     "bun": ">=1.1.0"
   },
   "scripts": {
-    "example:dashboard": "bun ./example/term-dashboard.ts",
+    "example:blackhole-tty": "bun ./example/blackhole-tty.ts",
+    "example:chromascii": "bun ./example/chromascii.ts",
+    "example:cinema": "bun ./example/cinema.ts",
+    "example:claude-spark": "bun ./example/claude-spark.ts",
+    "example:claude-tui": "bun ./example/claude-tui.ts",
+    "example:clawd": "bun ./example/clawd.ts",
+    "example:desktop": "bun ./example/desktop.ts",
     "example:fineprint": "bun ./example/fineprint.ts",
-    "example:raycaster": "bun ./example/raycaster-term.ts",
-    "example:video": "bun ./example/video-term.ts"
+    "example:flowfield": "bun ./example/flowfield.ts",
+    "example:fluid-ink": "bun ./example/fluid-ink.ts",
+    "example:galaxy-tty": "bun ./example/galaxy-tty.ts",
+    "example:gameboy-tty": "bun ./example/gameboy-tty.ts",
+    "example:gba-tty": "bun ./example/gba-tty.ts",
+    "example:glyphstorm": "bun ./example/glyphstorm.ts",
+    "example:inkwell": "bun ./example/inkwell.ts",
+    "example:mandel-dive": "bun ./example/mandel-dive.ts",
+    "example:orbits": "bun ./example/orbits.ts",
+    "example:powder": "bun ./example/powder.ts",
+    "example:raycaster-term": "bun ./example/raycaster-term.ts",
+    "example:reaction": "bun ./example/reaction.ts",
+    "example:swarm3d": "bun ./example/swarm3d.ts",
+    "example:term-dashboard": "bun ./example/term-dashboard.ts",
+    "example:torus-knot": "bun ./example/torus-knot.ts",
+    "example:video": "bun ./example/video.ts",
+    "example:video-term": "bun ./example/video-term.ts",
+    "example:voxel-flight": "bun ./example/voxel-flight.ts"
   }
 }
