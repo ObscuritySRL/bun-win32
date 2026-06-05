@@ -23,12 +23,7 @@
  * Run: bun run example/registry-explorer.ts
  */
 
-import Advapi32, {
-  HKEY_LOCAL_MACHINE,
-  HKEY_CURRENT_USER,
-  RegKeyAccessRights,
-  RegType,
-} from '../index';
+import Advapi32, { HKEY_LOCAL_MACHINE, HKEY_CURRENT_USER, RegKeyAccessRights, RegType } from '../index';
 
 const encode = (str: string) => Buffer.from(`${str}\0`, 'utf16le');
 
@@ -64,13 +59,7 @@ function regTypeName(type: number): string {
 // Open a registry key, returning the handle or null on failure
 function openKey(rootKey: bigint, subKeyPath: string): bigint | null {
   const hKeyBuf = Buffer.alloc(8);
-  const result = Advapi32.RegOpenKeyExW(
-    rootKey,
-    encode(subKeyPath).ptr,
-    0,
-    RegKeyAccessRights.KEY_READ,
-    hKeyBuf.ptr,
-  );
+  const result = Advapi32.RegOpenKeyExW(rootKey, encode(subKeyPath).ptr, 0, RegKeyAccessRights.KEY_READ, hKeyBuf.ptr);
   if (result !== 0) return null;
   return hKeyBuf.readBigUInt64LE(0);
 }
@@ -82,14 +71,7 @@ function readStringValue(hKey: bigint, valueName: string): string | null {
   const sizeBuf = Buffer.alloc(4);
   sizeBuf.writeUInt32LE(2048, 0);
 
-  const result = Advapi32.RegQueryValueExW(
-    hKey,
-    encode(valueName).ptr,
-    null,
-    typeBuf.ptr,
-    dataBuf.ptr,
-    sizeBuf.ptr,
-  );
+  const result = Advapi32.RegQueryValueExW(hKey, encode(valueName).ptr, null, typeBuf.ptr, dataBuf.ptr, sizeBuf.ptr);
   if (result !== 0) return null;
 
   const type = typeBuf.readUInt32LE(0);
@@ -108,14 +90,7 @@ function readDwordValue(hKey: bigint, valueName: string): number | null {
   const sizeBuf = Buffer.alloc(4);
   sizeBuf.writeUInt32LE(4, 0);
 
-  const result = Advapi32.RegQueryValueExW(
-    hKey,
-    encode(valueName).ptr,
-    null,
-    typeBuf.ptr,
-    dataBuf.ptr,
-    sizeBuf.ptr,
-  );
+  const result = Advapi32.RegQueryValueExW(hKey, encode(valueName).ptr, null, typeBuf.ptr, dataBuf.ptr, sizeBuf.ptr);
   if (result !== 0) return null;
   if (typeBuf.readUInt32LE(0) !== RegType.REG_DWORD) return null;
   return dataBuf.readUInt32LE(0);
@@ -128,14 +103,7 @@ function readAnyValue(hKey: bigint, valueName: string): { type: number; display:
   const sizeBuf = Buffer.alloc(4);
   sizeBuf.writeUInt32LE(4096, 0);
 
-  const result = Advapi32.RegQueryValueExW(
-    hKey,
-    encode(valueName).ptr,
-    null,
-    typeBuf.ptr,
-    dataBuf.ptr,
-    sizeBuf.ptr,
-  );
+  const result = Advapi32.RegQueryValueExW(hKey, encode(valueName).ptr, null, typeBuf.ptr, dataBuf.ptr, sizeBuf.ptr);
   if (result !== 0) return null;
 
   const type = typeBuf.readUInt32LE(0);
@@ -156,13 +124,18 @@ function readAnyValue(hKey: bigint, valueName: string): { type: number; display:
       break;
     case RegType.REG_BINARY: {
       const bytes = dataBuf.subarray(0, Math.min(dataSize, 32));
-      display = Array.from(bytes).map((b) => b.toString(16).padStart(2, '0')).join(' ');
+      display = Array.from(bytes)
+        .map((b) => b.toString(16).padStart(2, '0'))
+        .join(' ');
       if (dataSize > 32) display += ` ... (${dataSize} bytes total)`;
       break;
     }
     case RegType.REG_MULTI_SZ: {
       const raw = dataBuf.subarray(0, dataSize).toString('utf16le');
-      display = raw.split('\0').filter((s) => s.length > 0).join('; ');
+      display = raw
+        .split('\0')
+        .filter((s) => s.length > 0)
+        .join('; ');
       break;
     }
     default:
@@ -228,13 +201,18 @@ function enumValues(hKey: bigint, maxValues: number = 100): Array<{ name: string
         break;
       case RegType.REG_BINARY: {
         const bytes = dataBuf.subarray(0, Math.min(dataSize, 16));
-        display = Array.from(bytes).map((b) => b.toString(16).padStart(2, '0')).join(' ');
+        display = Array.from(bytes)
+          .map((b) => b.toString(16).padStart(2, '0'))
+          .join(' ');
         if (dataSize > 16) display += ` ... (${dataSize} bytes)`;
         break;
       }
       case RegType.REG_MULTI_SZ: {
         const raw = dataBuf.subarray(0, dataSize).toString('utf16le');
-        display = raw.split('\0').filter((s) => s.length > 0).join('; ');
+        display = raw
+          .split('\0')
+          .filter((s) => s.length > 0)
+          .join('; ');
         break;
       }
       default:

@@ -196,7 +196,7 @@ function probeActivate(activateAddress: bigint): MftInfo {
 
 const coInitHr = ole32.symbols.CoInitializeEx(null, COINIT_APARTMENTTHREADED);
 const shouldUninitialize = coInitHr >= 0;
-if (coInitHr < 0 && (coInitHr >>> 0) !== RPC_E_CHANGED_MODE) {
+if (coInitHr < 0 && coInitHr >>> 0 !== RPC_E_CHANGED_MODE) {
   console.error(`${ANSI.red}CoInitializeEx failed: ${formatHResult(coInitHr)}${ANSI.reset}`);
   process.exit(1);
 }

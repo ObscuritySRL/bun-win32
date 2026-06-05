@@ -226,12 +226,17 @@ function batteryLine(status: number): string {
   const color = percent >= 50 ? ANSI.green : percent >= 20 ? ANSI.yellow : ANSI.red;
   const bar = `${color}${'#'.repeat(filled)}${ANSI.reset}${ANSI.dim}${'.'.repeat(width - filled)}${ANSI.reset}`;
   const state =
-    charge === 0x0 ? `${ANSI.dim}discharging${ANSI.reset}` :
-    charge === 0x1 ? `${ANSI.yellow}charging${ANSI.reset}` :
-    charge === 0x2 ? `${ANSI.green}full${ANSI.reset}` :
-    charge === 0xa || charge === 0xb ? `${ANSI.red}temp error${ANSI.reset}` :
-    charge === 0xf ? `${ANSI.red}charge error${ANSI.reset}` :
-    `${ANSI.dim}0x${charge.toString(16)}${ANSI.reset}`;
+    charge === 0x0
+      ? `${ANSI.dim}discharging${ANSI.reset}`
+      : charge === 0x1
+        ? `${ANSI.yellow}charging${ANSI.reset}`
+        : charge === 0x2
+          ? `${ANSI.green}full${ANSI.reset}`
+          : charge === 0xa || charge === 0xb
+            ? `${ANSI.red}temp error${ANSI.reset}`
+            : charge === 0xf
+              ? `${ANSI.red}charge error${ANSI.reset}`
+              : `${ANSI.dim}0x${charge.toString(16)}${ANSI.reset}`;
   return `Battery [${bar}] ${percent.toString().padStart(3)}%  ${state}`;
 }
 

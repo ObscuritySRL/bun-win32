@@ -297,10 +297,18 @@ export function createMicAnalyser(options: MicAnalyserOptions = {}): MicAnalyser
       poll: () => undefined,
       magnitudes,
       waveform,
-      get level() { return 0; },
-      get bass() { return 0; },
-      get mid() { return 0; },
-      get treble() { return 0; },
+      get level() {
+        return 0;
+      },
+      get bass() {
+        return 0;
+      },
+      get mid() {
+        return 0;
+      },
+      get treble() {
+        return 0;
+      },
       available: false,
       close: () => undefined,
     };
@@ -423,10 +431,18 @@ export function createMicAnalyser(options: MicAnalyserOptions = {}): MicAnalyser
     poll,
     magnitudes,
     waveform,
-    get level() { return level; },
-    get bass() { return bass; },
-    get mid() { return mid; },
-    get treble() { return treble; },
+    get level() {
+      return level;
+    },
+    get bass() {
+      return bass;
+    },
+    get mid() {
+      return mid;
+    },
+    get treble() {
+      return treble;
+    },
     available: started,
     close,
   };
@@ -504,12 +520,7 @@ export function createPcmOutput(options: PcmOutputOptions = {}): PcmOutput {
   const engine = ppEngine.readBigUInt64LE(0);
 
   const ppMaster = Buffer.alloc(8);
-  const masterHr = vcall(
-    engine,
-    IXAUDIO2_CREATEMASTERINGVOICE,
-    [FFIType.ptr, FFIType.u32, FFIType.u32, FFIType.u32, FFIType.ptr, FFIType.ptr, FFIType.i32],
-    [ppMaster.ptr!, 0, 0, 0, null, null, AUDIO_CATEGORY_GAME_EFFECTS],
-  );
+  const masterHr = vcall(engine, IXAUDIO2_CREATEMASTERINGVOICE, [FFIType.ptr, FFIType.u32, FFIType.u32, FFIType.u32, FFIType.ptr, FFIType.ptr, FFIType.i32], [ppMaster.ptr!, 0, 0, 0, null, null, AUDIO_CATEGORY_GAME_EFFECTS]);
   if (masterHr !== S_OK) {
     // No endpoint — release the engine and degrade silently.
     vcall(engine, IUNKNOWN_RELEASE, [], [], FFIType.u32);
@@ -528,12 +539,7 @@ export function createPcmOutput(options: PcmOutputOptions = {}): PcmOutput {
   wfx.writeUInt16LE(0, 16);
 
   const ppSource = Buffer.alloc(8);
-  const srcHr = vcall(
-    engine,
-    IXAUDIO2_CREATESOURCEVOICE,
-    [FFIType.ptr, FFIType.ptr, FFIType.u32, FFIType.f32, FFIType.ptr, FFIType.ptr, FFIType.ptr],
-    [ppSource.ptr!, wfx.ptr!, 0, XAUDIO2_DEFAULT_FREQ_RATIO, null, null, null],
-  );
+  const srcHr = vcall(engine, IXAUDIO2_CREATESOURCEVOICE, [FFIType.ptr, FFIType.ptr, FFIType.u32, FFIType.f32, FFIType.ptr, FFIType.ptr, FFIType.ptr], [ppSource.ptr!, wfx.ptr!, 0, XAUDIO2_DEFAULT_FREQ_RATIO, null, null, null]);
   if (srcHr !== S_OK) {
     vcall(master, IXAUDIO2VOICE_DESTROYVOICE, [], [], FFIType.void);
     vcall(engine, IUNKNOWN_RELEASE, [], [], FFIType.u32);
@@ -637,11 +643,8 @@ async function selfTest(): Promise<void> {
   let micPrints = 0;
   while (performance.now() - micStart < 1_500) {
     mic.poll();
-    if (micPrints < 6 && (performance.now() - micStart) > micPrints * 250) {
-      console.log(
-        `[mic] t=${((performance.now() - micStart) / 1000).toFixed(2)}s  ` +
-        `level=${mic.level.toFixed(5)}  bass=${mic.bass.toFixed(5)}  mid=${mic.mid.toFixed(5)}  treble=${mic.treble.toFixed(5)}`,
-      );
+    if (micPrints < 6 && performance.now() - micStart > micPrints * 250) {
+      console.log(`[mic] t=${((performance.now() - micStart) / 1000).toFixed(2)}s  ` + `level=${mic.level.toFixed(5)}  bass=${mic.bass.toFixed(5)}  mid=${mic.mid.toFixed(5)}  treble=${mic.treble.toFixed(5)}`);
       micPrints += 1;
     }
     await sleep(40);

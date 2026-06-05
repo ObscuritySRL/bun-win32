@@ -37,16 +37,37 @@ const GB_H = 144;
 
 // DMG shade palettes — classic Game Boy green plus alternates (cycle with [ ]).
 const DMG_PALETTES: ReadonlyArray<ReadonlyArray<readonly [number, number, number]>> = [
-  [[0xe0, 0xf8, 0xd0], [0x88, 0xc0, 0x70], [0x34, 0x68, 0x56], [0x08, 0x18, 0x20]], // classic green
-  [[0xff, 0xff, 0xff], [0xa9, 0xa9, 0xa9], [0x54, 0x54, 0x54], [0x00, 0x00, 0x00]], // grayscale
-  [[0xe6, 0xd6, 0x9c], [0xb4, 0xa0, 0x68], [0x7c, 0x6c, 0x40], [0x3c, 0x34, 0x20]], // pocket sepia
+  [
+    [0xe0, 0xf8, 0xd0],
+    [0x88, 0xc0, 0x70],
+    [0x34, 0x68, 0x56],
+    [0x08, 0x18, 0x20],
+  ], // classic green
+  [
+    [0xff, 0xff, 0xff],
+    [0xa9, 0xa9, 0xa9],
+    [0x54, 0x54, 0x54],
+    [0x00, 0x00, 0x00],
+  ], // grayscale
+  [
+    [0xe6, 0xd6, 0x9c],
+    [0xb4, 0xa0, 0x68],
+    [0x7c, 0x6c, 0x40],
+    [0x3c, 0x34, 0x20],
+  ], // pocket sepia
 ];
 let activePalette = 0;
 
 /** Live joypad state (true = pressed). */
 export interface Buttons {
-  right: boolean; left: boolean; up: boolean; down: boolean;
-  a: boolean; bBtn: boolean; select: boolean; start: boolean;
+  right: boolean;
+  left: boolean;
+  up: boolean;
+  down: boolean;
+  a: boolean;
+  bBtn: boolean;
+  select: boolean;
+  start: boolean;
 }
 
 /**
@@ -62,7 +83,7 @@ export function cgbColor(rgb15: number): [number, number, number] {
   const R = Math.min(960, r * 26 + g * 4 + b * 2);
   const G = Math.min(960, g * 24 + b * 8);
   const B = Math.min(960, r * 6 + g * 4 + b * 22);
-  return [(R * 255 / 960) | 0, (G * 255 / 960) | 0, (B * 255 / 960) | 0];
+  return [((R * 255) / 960) | 0, ((G * 255) / 960) | 0, ((B * 255) / 960) | 0];
 }
 
 /** As cgbColor, packed into a single 0xRRGGBB integer for the palette cache. */
@@ -279,7 +300,8 @@ export class Apu {
       case 0x25: // NR51 panning
         this.nr51 = value;
         break;
-      case 0x26: { // NR52 power
+      case 0x26: {
+        // NR52 power
         const on = (value & 0x80) !== 0;
         if (!on && this.enabled) {
           // Power-off clears every channel register/state.
@@ -408,12 +430,25 @@ export class Apu {
   private frameSeqTick(): void {
     // 8-step sequence: length on 0/2/4/6, sweep on 2/6, envelope on 7.
     switch (this.frameSeqStep) {
-      case 0: this.stepLength(); break;
-      case 2: this.stepLength(); this.stepSweep(); break;
-      case 4: this.stepLength(); break;
-      case 6: this.stepLength(); this.stepSweep(); break;
-      case 7: this.stepEnvelope(); break;
-      default: break;
+      case 0:
+        this.stepLength();
+        break;
+      case 2:
+        this.stepLength();
+        this.stepSweep();
+        break;
+      case 4:
+        this.stepLength();
+        break;
+      case 6:
+        this.stepLength();
+        this.stepSweep();
+        break;
+      case 7:
+        this.stepEnvelope();
+        break;
+      default:
+        break;
     }
     this.frameSeqStep = (this.frameSeqStep + 1) & 0x07;
   }
@@ -438,7 +473,7 @@ export class Apu {
       this.c3FreqTimer += (2048 - this.c3Freq) * 2 || 2;
       this.c3Pos = (this.c3Pos + 1) & 0x1f;
       const byte = this.waveRam[this.c3Pos >> 1]!;
-      this.c3Sample = (this.c3Pos & 1) ? (byte & 0x0f) : (byte >> 4);
+      this.c3Sample = this.c3Pos & 1 ? byte & 0x0f : byte >> 4;
     }
     // Noise
     this.c4FreqTimer -= cycles;
@@ -519,8 +554,10 @@ export class Apu {
     const scale = 22000 / 480;
     let l = Math.round(left * scale);
     let r = Math.round(right * scale);
-    if (l > 32767) l = 32767; else if (l < -32768) l = -32768;
-    if (r > 32767) r = 32767; else if (r < -32768) r = -32768;
+    if (l > 32767) l = 32767;
+    else if (l < -32768) l = -32768;
+    if (r > 32767) r = 32767;
+    else if (r < -32768) r = -32768;
     const w = this.outWrite;
     this.out[w] = l;
     this.out[w + 1] = r;
@@ -566,31 +603,55 @@ const MBC5 = 5;
 // External-RAM byte sizes by header code 0x149 (code 1 is unofficial 2 KiB).
 const RAM_SIZE_BYTES = [0, 0x800, 0x2000, 0x8000, 0x20000, 0x10000];
 
-interface CartType { kind: number; battery: boolean; rtc: boolean }
+interface CartType {
+  kind: number;
+  battery: boolean;
+  rtc: boolean;
+}
 
 /** Decode cartridge-type byte 0x147 → MBC kind + battery/RTC flags. */
 function decodeCartType(b: number): CartType {
   switch (b) {
-    case 0x00: return { kind: MBC_NONE, battery: false, rtc: false };
-    case 0x01: return { kind: MBC1, battery: false, rtc: false };
-    case 0x02: return { kind: MBC1, battery: false, rtc: false };
-    case 0x03: return { kind: MBC1, battery: true, rtc: false };
-    case 0x05: return { kind: MBC2, battery: false, rtc: false };
-    case 0x06: return { kind: MBC2, battery: true, rtc: false };
-    case 0x08: return { kind: MBC_NONE, battery: false, rtc: false };
-    case 0x09: return { kind: MBC_NONE, battery: true, rtc: false };
-    case 0x0f: return { kind: MBC3, battery: true, rtc: true };
-    case 0x10: return { kind: MBC3, battery: true, rtc: true };
-    case 0x11: return { kind: MBC3, battery: false, rtc: false };
-    case 0x12: return { kind: MBC3, battery: false, rtc: false };
-    case 0x13: return { kind: MBC3, battery: true, rtc: false };
-    case 0x19: return { kind: MBC5, battery: false, rtc: false };
-    case 0x1a: return { kind: MBC5, battery: false, rtc: false };
-    case 0x1b: return { kind: MBC5, battery: true, rtc: false };
-    case 0x1c: return { kind: MBC5, battery: false, rtc: false };
-    case 0x1d: return { kind: MBC5, battery: false, rtc: false };
-    case 0x1e: return { kind: MBC5, battery: true, rtc: false };
-    default: return { kind: MBC1, battery: false, rtc: false }; // best-effort
+    case 0x00:
+      return { kind: MBC_NONE, battery: false, rtc: false };
+    case 0x01:
+      return { kind: MBC1, battery: false, rtc: false };
+    case 0x02:
+      return { kind: MBC1, battery: false, rtc: false };
+    case 0x03:
+      return { kind: MBC1, battery: true, rtc: false };
+    case 0x05:
+      return { kind: MBC2, battery: false, rtc: false };
+    case 0x06:
+      return { kind: MBC2, battery: true, rtc: false };
+    case 0x08:
+      return { kind: MBC_NONE, battery: false, rtc: false };
+    case 0x09:
+      return { kind: MBC_NONE, battery: true, rtc: false };
+    case 0x0f:
+      return { kind: MBC3, battery: true, rtc: true };
+    case 0x10:
+      return { kind: MBC3, battery: true, rtc: true };
+    case 0x11:
+      return { kind: MBC3, battery: false, rtc: false };
+    case 0x12:
+      return { kind: MBC3, battery: false, rtc: false };
+    case 0x13:
+      return { kind: MBC3, battery: true, rtc: false };
+    case 0x19:
+      return { kind: MBC5, battery: false, rtc: false };
+    case 0x1a:
+      return { kind: MBC5, battery: false, rtc: false };
+    case 0x1b:
+      return { kind: MBC5, battery: true, rtc: false };
+    case 0x1c:
+      return { kind: MBC5, battery: false, rtc: false };
+    case 0x1d:
+      return { kind: MBC5, battery: false, rtc: false };
+    case 0x1e:
+      return { kind: MBC5, battery: true, rtc: false };
+    default:
+      return { kind: MBC1, battery: false, rtc: false }; // best-effort
   }
 }
 
@@ -680,8 +741,14 @@ export class Cartridge {
 
   writeRam(addr: number, value: number): void {
     if (!this.ramEnabled) return;
-    if (this.kind === MBC3 && this.ramBank >= 0x08 && this.ramBank <= 0x0c) { this.writeRtc(value); return; }
-    if (this.kind === MBC2) { this.eram[(addr - 0xa000) & 0x1ff] = value & 0x0f; return; }
+    if (this.kind === MBC3 && this.ramBank >= 0x08 && this.ramBank <= 0x0c) {
+      this.writeRtc(value);
+      return;
+    }
+    if (this.kind === MBC2) {
+      this.eram[(addr - 0xa000) & 0x1ff] = value & 0x0f;
+      return;
+    }
     if (this.eram.length === 0) return;
     const bank = this.kind === MBC1 && this.mode === 0 ? 0 : this.ramBank;
     this.eram[(bank * 0x2000 + (addr - 0xa000)) & this.ramMask] = value & 0xff;
@@ -695,27 +762,35 @@ export class Cartridge {
         return;
       case MBC1:
         if (addr < 0x2000) this.ramEnabled = (value & 0x0f) === 0x0a;
-        else if (addr < 0x4000) { this.romBank = value & 0x1f; if (this.romBank === 0) this.romBank = 1; }
-        else if (addr < 0x6000) this.ramBank = value & 0x03;
+        else if (addr < 0x4000) {
+          this.romBank = value & 0x1f;
+          if (this.romBank === 0) this.romBank = 1;
+        } else if (addr < 0x6000) this.ramBank = value & 0x03;
         else this.mode = value & 0x01;
         return;
       case MBC2:
         // The address's bit 8 selects RAM-enable (clear) vs ROM-bank (set).
         if (addr < 0x4000) {
-          if (addr & 0x0100) { this.romBank = (value & 0x0f) || 1; }
-          else this.ramEnabled = (value & 0x0f) === 0x0a;
+          if (addr & 0x0100) {
+            this.romBank = value & 0x0f || 1;
+          } else this.ramEnabled = (value & 0x0f) === 0x0a;
         }
         return;
       case MBC3:
         if (addr < 0x2000) this.ramEnabled = (value & 0x0f) === 0x0a;
-        else if (addr < 0x4000) { this.romBank = value & 0x7f; if (this.romBank === 0) this.romBank = 1; }
-        else if (addr < 0x6000) this.ramBank = value & 0x0f; // 0–3 RAM, 0x08–0x0C RTC
+        else if (addr < 0x4000) {
+          this.romBank = value & 0x7f;
+          if (this.romBank === 0) this.romBank = 1;
+        } else if (addr < 0x6000)
+          this.ramBank = value & 0x0f; // 0–3 RAM, 0x08–0x0C RTC
         else this.rtcLatch(value);
         return;
       case MBC5:
         if (addr < 0x2000) this.ramEnabled = (value & 0x0f) === 0x0a;
-        else if (addr < 0x3000) this.romBank = (this.romBank & 0x100) | value; // low 8 bits
-        else if (addr < 0x4000) this.romBank = (this.romBank & 0xff) | ((value & 0x01) << 8); // bit 9
+        else if (addr < 0x3000)
+          this.romBank = (this.romBank & 0x100) | value; // low 8 bits
+        else if (addr < 0x4000)
+          this.romBank = (this.romBank & 0xff) | ((value & 0x01) << 8); // bit 9
         else if (addr < 0x6000) this.ramBank = value & 0x0f;
         return;
       default:
@@ -750,12 +825,18 @@ export class Cartridge {
   private readRtc(): number {
     const r = this.rtcLatched;
     switch (this.ramBank) {
-      case 0x08: return r.s;
-      case 0x09: return r.m;
-      case 0x0a: return r.h;
-      case 0x0b: return r.d & 0xff;
-      case 0x0c: return ((r.d >> 8) & 0x01) | (this.rtcHalt ? 0x40 : 0) | (r.carry ? 0x80 : 0);
-      default: return 0xff;
+      case 0x08:
+        return r.s;
+      case 0x09:
+        return r.m;
+      case 0x0a:
+        return r.h;
+      case 0x0b:
+        return r.d & 0xff;
+      case 0x0c:
+        return ((r.d >> 8) & 0x01) | (this.rtcHalt ? 0x40 : 0) | (r.carry ? 0x80 : 0);
+      default:
+        return 0xff;
     }
   }
 
@@ -763,17 +844,26 @@ export class Cartridge {
     // Recompose total seconds from the (possibly just-written) component set.
     const r = this.rtcLatched;
     switch (this.ramBank) {
-      case 0x08: r.s = value % 60; break;
-      case 0x09: r.m = value % 60; break;
-      case 0x0a: r.h = value % 24; break;
-      case 0x0b: r.d = (r.d & 0x100) | (value & 0xff); break;
+      case 0x08:
+        r.s = value % 60;
+        break;
+      case 0x09:
+        r.m = value % 60;
+        break;
+      case 0x0a:
+        r.h = value % 24;
+        break;
+      case 0x0b:
+        r.d = (r.d & 0x100) | (value & 0xff);
+        break;
       case 0x0c:
         r.d = (r.d & 0xff) | ((value & 0x01) << 8);
         this.rtcHalt = (value & 0x40) !== 0;
         this.rtcCarry = (value & 0x80) !== 0;
         r.carry = this.rtcCarry;
         break;
-      default: return;
+      default:
+        return;
     }
     const days = (r.d & 0x1ff) + (this.rtcCarry ? 512 : 0); // carry bit extends the day count
     this.rtcBase = r.s + r.m * 60 + r.h * 3600 + days * 86400;
@@ -790,10 +880,14 @@ export class Cartridge {
     const dv = new DataView(out.buffer);
     let o = this.eram.length;
     // A compact RTC blob: base seconds, anchor wall seconds, halt, carry.
-    dv.setFloat64(o, this.rtcBase, true); o += 8;
-    dv.setFloat64(o, this.nowSec(), true); o += 8; // anchor = "now" at save time
-    dv.setUint8(o, this.rtcHalt ? 1 : 0); o += 1;
-    dv.setUint8(o, this.rtcCarry ? 1 : 0); o += 1;
+    dv.setFloat64(o, this.rtcBase, true);
+    o += 8;
+    dv.setFloat64(o, this.nowSec(), true);
+    o += 8; // anchor = "now" at save time
+    dv.setUint8(o, this.rtcHalt ? 1 : 0);
+    o += 1;
+    dv.setUint8(o, this.rtcCarry ? 1 : 0);
+    o += 1;
     return out;
   }
 
@@ -805,10 +899,14 @@ export class Cartridge {
     if (this.hasRtc && data.length >= this.eram.length + 18) {
       const dv = new DataView(data.buffer, data.byteOffset, data.byteLength);
       let o = this.eram.length;
-      const savedBase = dv.getFloat64(o, true); o += 8;
-      const savedAnchor = dv.getFloat64(o, true); o += 8;
-      this.rtcHalt = dv.getUint8(o) !== 0; o += 1;
-      this.rtcCarry = dv.getUint8(o) !== 0; o += 1;
+      const savedBase = dv.getFloat64(o, true);
+      o += 8;
+      const savedAnchor = dv.getFloat64(o, true);
+      o += 8;
+      this.rtcHalt = dv.getUint8(o) !== 0;
+      o += 1;
+      this.rtcCarry = dv.getUint8(o) !== 0;
+      o += 1;
       // Advance the clock by however long the game was off (unless halted).
       const offline = this.rtcHalt ? 0 : Math.max(0, this.nowSec() - savedAnchor);
       this.rtcBase = savedBase + offline;
@@ -817,11 +915,19 @@ export class Cartridge {
   }
 
   // ── Test hooks ───────────────────────────────────────────────────────────────
-  setRtcBaseSeconds(s: number): void { this.rtcBase = s; this.rtcAnchor = this.nowSec(); this.rtcHalt = false; }
+  setRtcBaseSeconds(s: number): void {
+    this.rtcBase = s;
+    this.rtcAnchor = this.nowSec();
+    this.rtcHalt = false;
+  }
 }
 
 /** Test harness: a bare Cartridge over a synthetic ROM with an injectable clock. */
-export function __mapperForTest(typeByte: number, romBankMaskBanks: number, ramCode = 3): {
+export function __mapperForTest(
+  typeByte: number,
+  romBankMaskBanks: number,
+  ramCode = 3,
+): {
   write(addr: number, value: number): void;
   romBankFor(addr: number): number;
   readRam(addr: number): number;
@@ -841,9 +947,13 @@ export function __mapperForTest(typeByte: number, romBankMaskBanks: number, ramC
     write: (addr, value) => cart.write(addr, value),
     romBankFor: (addr) => cart.romBankFor(addr),
     readRam: (addr) => cart.readRam(addr),
-    get ramEnabled() { return cart.isRamEnabled; },
+    get ramEnabled() {
+      return cart.isRamEnabled;
+    },
     setRtcBaseSeconds: (s) => cart.setRtcBaseSeconds(s),
-    advanceWallSeconds: (s) => { clock += s; },
+    advanceWallSeconds: (s) => {
+      clock += s;
+    },
   };
 }
 
@@ -1017,10 +1127,7 @@ export class GameBoy {
    * Set the live joypad state from booleans. Active-low is handled internally:
    * a pressed button drives its bit to 0.
    */
-  setButtons(b: {
-    right: boolean; left: boolean; up: boolean; down: boolean;
-    a: boolean; bBtn: boolean; select: boolean; start: boolean;
-  }): void {
+  setButtons(b: { right: boolean; left: boolean; up: boolean; down: boolean; a: boolean; bBtn: boolean; select: boolean; start: boolean }): void {
     let dir = 0x0f;
     if (b.right) dir &= ~0x01;
     if (b.left) dir &= ~0x02;
@@ -1061,13 +1168,20 @@ export class GameBoy {
       if (reg === 0x26 && this.apu) return this.apu.readNr52(); // NR52 channel status
       if (this.cgb) {
         switch (reg) {
-          case 0x4d: return (this.doubleSpeed ? 0x80 : 0) | (this.speedSwitchArmed ? 0x01 : 0) | 0x7e; // KEY1
-          case 0x4f: return this.vramBank | 0xfe; // VBK
-          case 0x55: return this.hdmaActive ? (((this.hdmaRemaining >> 4) - 1) & 0x7f) : 0xff; // HDMA5
-          case 0x69: return this.bgPalRam[this.bgPalIndex]!; // BCPD
-          case 0x6b: return this.objPalRam[this.objPalIndex]!; // OCPD
-          case 0x70: return this.wramBank | 0xf8; // SVBK
-          default: break;
+          case 0x4d:
+            return (this.doubleSpeed ? 0x80 : 0) | (this.speedSwitchArmed ? 0x01 : 0) | 0x7e; // KEY1
+          case 0x4f:
+            return this.vramBank | 0xfe; // VBK
+          case 0x55:
+            return this.hdmaActive ? ((this.hdmaRemaining >> 4) - 1) & 0x7f : 0xff; // HDMA5
+          case 0x69:
+            return this.bgPalRam[this.bgPalIndex]!; // BCPD
+          case 0x6b:
+            return this.objPalRam[this.objPalIndex]!; // OCPD
+          case 0x70:
+            return this.wramBank | 0xf8; // SVBK
+          default:
+            break;
         }
       }
       return this.io[reg]!;
@@ -1183,17 +1297,37 @@ export class GameBoy {
         this.vramBank = value & 0x01;
         this.io[reg] = value | 0xfe;
         return true;
-      case 0x51: this.hdmaSrc = (this.hdmaSrc & 0x00ff) | (value << 8); return true; // HDMA1 src hi
-      case 0x52: this.hdmaSrc = (this.hdmaSrc & 0xff00) | (value & 0xf0); return true; // HDMA2 src lo
-      case 0x53: this.hdmaDst = (this.hdmaDst & 0x00ff) | ((value & 0x1f) << 8); return true; // HDMA3 dst hi
-      case 0x54: this.hdmaDst = (this.hdmaDst & 0xff00) | (value & 0xf0); return true; // HDMA4 dst lo
-      case 0x55: this.startHdma(value); return true; // HDMA5 — length/mode/start
-      case 0x68: this.bgPalIndex = value & 0x3f; this.bgPalAutoInc = (value & 0x80) !== 0; return true; // BCPS
-      case 0x69: this.writePalette(this.bgPalRam, this.bgPalRgb, 'bg', value); return true; // BCPD
-      case 0x6a: this.objPalIndex = value & 0x3f; this.objPalAutoInc = (value & 0x80) !== 0; return true; // OCPS
-      case 0x6b: this.writePalette(this.objPalRam, this.objPalRgb, 'obj', value); return true; // OCPD
+      case 0x51:
+        this.hdmaSrc = (this.hdmaSrc & 0x00ff) | (value << 8);
+        return true; // HDMA1 src hi
+      case 0x52:
+        this.hdmaSrc = (this.hdmaSrc & 0xff00) | (value & 0xf0);
+        return true; // HDMA2 src lo
+      case 0x53:
+        this.hdmaDst = (this.hdmaDst & 0x00ff) | ((value & 0x1f) << 8);
+        return true; // HDMA3 dst hi
+      case 0x54:
+        this.hdmaDst = (this.hdmaDst & 0xff00) | (value & 0xf0);
+        return true; // HDMA4 dst lo
+      case 0x55:
+        this.startHdma(value);
+        return true; // HDMA5 — length/mode/start
+      case 0x68:
+        this.bgPalIndex = value & 0x3f;
+        this.bgPalAutoInc = (value & 0x80) !== 0;
+        return true; // BCPS
+      case 0x69:
+        this.writePalette(this.bgPalRam, this.bgPalRgb, 'bg', value);
+        return true; // BCPD
+      case 0x6a:
+        this.objPalIndex = value & 0x3f;
+        this.objPalAutoInc = (value & 0x80) !== 0;
+        return true; // OCPS
+      case 0x6b:
+        this.writePalette(this.objPalRam, this.objPalRgb, 'obj', value);
+        return true; // OCPD
       case 0x70: // SVBK — WRAM bank select
-        this.wramBank = (value & 0x07) || 1;
+        this.wramBank = value & 0x07 || 1;
         this.io[reg] = value;
         return true;
       default:
@@ -1219,7 +1353,10 @@ export class GameBoy {
     const length = ((value & 0x7f) + 1) * 16;
     if ((value & 0x80) === 0) {
       // General-purpose DMA: transfer everything immediately.
-      if (this.hdmaActive) { this.hdmaActive = false; return; } // bit7=0 also cancels an active H-blank DMA
+      if (this.hdmaActive) {
+        this.hdmaActive = false;
+        return;
+      } // bit7=0 also cancels an active H-blank DMA
       this.hdmaTransfer(length);
     } else {
       // H-blank DMA: 16 bytes per H-blank, starting now.
@@ -1263,7 +1400,7 @@ export class GameBoy {
       const mask = 1 << bit;
       if (pending & mask) {
         this.ime = false;
-        this.io[GameBoy.IF] = (this.io[GameBoy.IF]! & ~mask) & 0x1f;
+        this.io[GameBoy.IF] = this.io[GameBoy.IF]! & ~mask & 0x1f;
         this.sp = (this.sp - 2) & 0xffff;
         this.write16(this.sp, this.pc);
         this.pc = 0x40 + bit * 8;
@@ -1408,8 +1545,8 @@ export class GameBoy {
     const windowEnabled = (lcdc & 0x20) !== 0 && ly >= wy;
     // Tile data area: bit4 selects 0x8000 unsigned vs 0x8800 signed.
     const tileDataUnsigned = (lcdc & 0x10) !== 0;
-    const bgMapBase = (lcdc & 0x08) ? 0x1c00 : 0x1800;
-    const winMapBase = (lcdc & 0x40) ? 0x1c00 : 0x1800;
+    const bgMapBase = lcdc & 0x08 ? 0x1c00 : 0x1800;
+    const winMapBase = lcdc & 0x40 ? 0x1c00 : 0x1800;
     const rowBase = ly * GB_W;
 
     for (let x = 0; x < GB_W; x += 1) {
@@ -1452,7 +1589,7 @@ export class GameBoy {
   }
 
   private renderSprites(ly: number, lcdc: number, bgIndex: Uint8Array): void {
-    const spriteHeight = (lcdc & 0x04) ? 16 : 8;
+    const spriteHeight = lcdc & 0x04 ? 16 : 8;
     const rowBase = ly * GB_W;
 
     // Collect up to 10 sprites on this line (OAM scan order).
@@ -1479,7 +1616,7 @@ export class GameBoy {
       const flipX = (attr & 0x20) !== 0;
       const flipY = (attr & 0x40) !== 0;
       const behindBg = (attr & 0x80) !== 0;
-      const palette = (attr & 0x10) ? this.io[GameBoy.OBP1]! : this.io[GameBoy.OBP0]!;
+      const palette = attr & 0x10 ? this.io[GameBoy.OBP1]! : this.io[GameBoy.OBP0]!;
 
       let line = ly - oy;
       if (flipY) line = spriteHeight - 1 - line;
@@ -1522,8 +1659,8 @@ export class GameBoy {
     const wx = this.io[GameBoy.WX]!;
     const windowEnabled = (lcdc & 0x20) !== 0 && ly >= wy;
     const tileDataUnsigned = (lcdc & 0x10) !== 0;
-    const bgMapBase = (lcdc & 0x08) ? 0x1c00 : 0x1800;
-    const winMapBase = (lcdc & 0x40) ? 0x1c00 : 0x1800;
+    const bgMapBase = lcdc & 0x08 ? 0x1c00 : 0x1800;
+    const winMapBase = lcdc & 0x40 ? 0x1c00 : 0x1800;
     const rowBase = ly * GB_W;
 
     for (let x = 0; x < GB_W; x += 1) {
@@ -1543,7 +1680,7 @@ export class GameBoy {
       const tileNum = this.vram[mapIdx]!; // map is always in bank 0
       const attr = this.vram[0x2000 + mapIdx]!; // attributes live in bank 1
       const palNum = attr & 0x07;
-      const tileBank = (attr & 0x08) ? 0x2000 : 0;
+      const tileBank = attr & 0x08 ? 0x2000 : 0;
       const xFlip = (attr & 0x20) !== 0;
       const yFlip = (attr & 0x40) !== 0;
       const priority = (attr & 0x80) !== 0;
@@ -1554,7 +1691,7 @@ export class GameBoy {
       const fineY = yFlip ? 7 - (py & 0x07) : py & 0x07;
       const lo = this.vram[tileBank + tileAddr + fineY * 2]!;
       const hi = this.vram[tileBank + tileAddr + fineY * 2 + 1]!;
-      const bit = xFlip ? (px & 0x07) : 7 - (px & 0x07);
+      const bit = xFlip ? px & 0x07 : 7 - (px & 0x07);
       const colorIdx = ((lo >> bit) & 1) | (((hi >> bit) & 1) << 1);
       bgIndex[x] = colorIdx;
       bgPrio[x] = priority ? 1 : 0;
@@ -1568,7 +1705,7 @@ export class GameBoy {
   }
 
   private renderSpritesCgb(ly: number, lcdc: number, bgIndex: Uint8Array, bgPrio: Uint8Array): void {
-    const spriteHeight = (lcdc & 0x04) ? 16 : 8;
+    const spriteHeight = lcdc & 0x04 ? 16 : 8;
     const rowBase = ly * GB_W;
     const bgMaster = (lcdc & 0x01) !== 0; // CGB: BG can keep priority over OBJ
 
@@ -1590,13 +1727,16 @@ export class GameBoy {
       const flipY = (attr & 0x40) !== 0;
       const behindBg = (attr & 0x80) !== 0;
       const palNum = attr & 0x07;
-      const tileBank = (attr & 0x08) ? 0x2000 : 0;
+      const tileBank = attr & 0x08 ? 0x2000 : 0;
 
       let line = ly - oy;
       if (flipY) line = spriteHeight - 1 - line;
       if (spriteHeight === 16) {
         tile &= 0xfe;
-        if (line >= 8) { tile += 1; line -= 8; }
+        if (line >= 8) {
+          tile += 1;
+          line -= 8;
+        }
       }
       const tileAddr = tileBank + tile * 16 + line * 2;
       const lo = this.vram[tileAddr]!;
@@ -1684,14 +1824,14 @@ export class GameBoy {
   private add8(value: number): void {
     const a = this.a;
     const r = a + value;
-    this.setFlags((r & 0xff) === 0, false, ((a & 0xf) + (value & 0xf)) > 0xf, r > 0xff);
+    this.setFlags((r & 0xff) === 0, false, (a & 0xf) + (value & 0xf) > 0xf, r > 0xff);
     this.a = r & 0xff;
   }
   private adc8(value: number): void {
     const a = this.a;
     const carry = this.cf ? 1 : 0;
     const r = a + value + carry;
-    this.setFlags((r & 0xff) === 0, false, ((a & 0xf) + (value & 0xf) + carry) > 0xf, r > 0xff);
+    this.setFlags((r & 0xff) === 0, false, (a & 0xf) + (value & 0xf) + carry > 0xf, r > 0xff);
     this.a = r & 0xff;
   }
   private sub8(value: number): void {
@@ -1737,7 +1877,7 @@ export class GameBoy {
   private addHL(value: number): void {
     const hl = this.hl;
     const r = hl + value;
-    this.setFlags(this.zf, false, ((hl & 0xfff) + (value & 0xfff)) > 0xfff, r > 0xffff);
+    this.setFlags(this.zf, false, (hl & 0xfff) + (value & 0xfff) > 0xfff, r > 0xffff);
     this.hl = r & 0xffff;
   }
   /** ADD SP,e8 / LD HL,SP+e8 share these flags (computed on the low byte). */
@@ -1745,7 +1885,7 @@ export class GameBoy {
     const e = (this.fetch8() << 24) >> 24; // signed
     const sp = this.sp;
     const r = (sp + e) & 0xffff;
-    this.setFlags(false, false, ((sp & 0xf) + (e & 0xf)) > 0xf, ((sp & 0xff) + (e & 0xff)) > 0xff);
+    this.setFlags(false, false, (sp & 0xf) + (e & 0xf) > 0xf, (sp & 0xff) + (e & 0xff) > 0xff);
     return r;
   }
 
@@ -1803,27 +1943,50 @@ export class GameBoy {
   // ── 8-bit register get/set by index (B,C,D,E,H,L,(HL),A) ───────────────────
   private getReg(idx: number): number {
     switch (idx) {
-      case 0: return this.b;
-      case 1: return this.c;
-      case 2: return this.d;
-      case 3: return this.e;
-      case 4: return this.h;
-      case 5: return this.l;
-      case 6: return this.read8(this.hl);
-      default: return this.a;
+      case 0:
+        return this.b;
+      case 1:
+        return this.c;
+      case 2:
+        return this.d;
+      case 3:
+        return this.e;
+      case 4:
+        return this.h;
+      case 5:
+        return this.l;
+      case 6:
+        return this.read8(this.hl);
+      default:
+        return this.a;
     }
   }
   private setReg(idx: number, value: number): void {
     value &= 0xff;
     switch (idx) {
-      case 0: this.b = value; return;
-      case 1: this.c = value; return;
-      case 2: this.d = value; return;
-      case 3: this.e = value; return;
-      case 4: this.h = value; return;
-      case 5: this.l = value; return;
-      case 6: this.write8(this.hl, value); return;
-      default: this.a = value;
+      case 0:
+        this.b = value;
+        return;
+      case 1:
+        this.c = value;
+        return;
+      case 2:
+        this.d = value;
+        return;
+      case 3:
+        this.e = value;
+        return;
+      case 4:
+        this.h = value;
+        return;
+      case 5:
+        this.l = value;
+        return;
+      case 6:
+        this.write8(this.hl, value);
+        return;
+      default:
+        this.a = value;
     }
   }
 
@@ -1851,14 +2014,30 @@ export class GameBoy {
       const sub = (op >> 3) & 0x07;
       let r: number;
       switch (sub) {
-        case 0: r = this.rlc(value); break;
-        case 1: r = this.rrc(value); break;
-        case 2: r = this.rl(value); break;
-        case 3: r = this.rr(value); break;
-        case 4: r = this.sla(value); break;
-        case 5: r = this.sra(value); break;
-        case 6: r = this.swap(value); break;
-        default: r = this.srl(value); break;
+        case 0:
+          r = this.rlc(value);
+          break;
+        case 1:
+          r = this.rrc(value);
+          break;
+        case 2:
+          r = this.rl(value);
+          break;
+        case 3:
+          r = this.rr(value);
+          break;
+        case 4:
+          r = this.sla(value);
+          break;
+        case 5:
+          r = this.sra(value);
+          break;
+        case 6:
+          r = this.swap(value);
+          break;
+        default:
+          r = this.srl(value);
+          break;
       }
       this.setReg(reg, r);
       return isMem ? 16 : 8;
@@ -1904,10 +2083,14 @@ export class GameBoy {
   // ── Conditional helpers for JR/JP/CALL/RET cc ──────────────────────────────
   private cond(idx: number): boolean {
     switch (idx) {
-      case 0: return !this.zf; // NZ
-      case 1: return this.zf; // Z
-      case 2: return !this.cf; // NC
-      default: return this.cf; // C
+      case 0:
+        return !this.zf; // NZ
+      case 1:
+        return this.zf; // Z
+      case 2:
+        return !this.cf; // NC
+      default:
+        return this.cf; // C
     }
   }
 
@@ -1921,31 +2104,59 @@ export class GameBoy {
     const op = this.fetch8();
     switch (op) {
       // ── 0x00-0x0F ──
-      case 0x00: return 4; // NOP
-      case 0x01: this.bc = this.fetch16(); return 12; // LD BC,d16
-      case 0x02: this.write8(this.bc, this.a); return 8; // LD (BC),A
-      case 0x03: this.bc = (this.bc + 1) & 0xffff; return 8; // INC BC
-      case 0x04: this.b = this.inc8(this.b); return 4;
-      case 0x05: this.b = this.dec8(this.b); return 4;
-      case 0x06: this.b = this.fetch8(); return 8;
-      case 0x07: { // RLCA
+      case 0x00:
+        return 4; // NOP
+      case 0x01:
+        this.bc = this.fetch16();
+        return 12; // LD BC,d16
+      case 0x02:
+        this.write8(this.bc, this.a);
+        return 8; // LD (BC),A
+      case 0x03:
+        this.bc = (this.bc + 1) & 0xffff;
+        return 8; // INC BC
+      case 0x04:
+        this.b = this.inc8(this.b);
+        return 4;
+      case 0x05:
+        this.b = this.dec8(this.b);
+        return 4;
+      case 0x06:
+        this.b = this.fetch8();
+        return 8;
+      case 0x07: {
+        // RLCA
         const c = (this.a >> 7) & 1;
         this.a = ((this.a << 1) | c) & 0xff;
         this.setFlags(false, false, false, c === 1);
         return 4;
       }
-      case 0x08: { // LD (a16),SP
+      case 0x08: {
+        // LD (a16),SP
         const addr = this.fetch16();
         this.write16(addr, this.sp);
         return 20;
       }
-      case 0x09: this.addHL(this.bc); return 8;
-      case 0x0a: this.a = this.read8(this.bc); return 8;
-      case 0x0b: this.bc = (this.bc - 1) & 0xffff; return 8;
-      case 0x0c: this.c = this.inc8(this.c); return 4;
-      case 0x0d: this.c = this.dec8(this.c); return 4;
-      case 0x0e: this.c = this.fetch8(); return 8;
-      case 0x0f: { // RRCA
+      case 0x09:
+        this.addHL(this.bc);
+        return 8;
+      case 0x0a:
+        this.a = this.read8(this.bc);
+        return 8;
+      case 0x0b:
+        this.bc = (this.bc - 1) & 0xffff;
+        return 8;
+      case 0x0c:
+        this.c = this.inc8(this.c);
+        return 4;
+      case 0x0d:
+        this.c = this.dec8(this.c);
+        return 4;
+      case 0x0e:
+        this.c = this.fetch8();
+        return 8;
+      case 0x0f: {
+        // RRCA
         const c = this.a & 1;
         this.a = ((this.a >> 1) | (c << 7)) & 0xff;
         this.setFlags(false, false, false, c === 1);
@@ -1955,33 +2166,63 @@ export class GameBoy {
       // ── 0x10-0x1F ──
       case 0x10: // STOP — also performs a CGB speed switch when armed via KEY1
         this.fetch8();
-        if (this.speedSwitchArmed) { this.doubleSpeed = !this.doubleSpeed; this.speedSwitchArmed = false; }
+        if (this.speedSwitchArmed) {
+          this.doubleSpeed = !this.doubleSpeed;
+          this.speedSwitchArmed = false;
+        }
         return 4;
-      case 0x11: this.de = this.fetch16(); return 12;
-      case 0x12: this.write8(this.de, this.a); return 8;
-      case 0x13: this.de = (this.de + 1) & 0xffff; return 8;
-      case 0x14: this.d = this.inc8(this.d); return 4;
-      case 0x15: this.d = this.dec8(this.d); return 4;
-      case 0x16: this.d = this.fetch8(); return 8;
-      case 0x17: { // RLA
+      case 0x11:
+        this.de = this.fetch16();
+        return 12;
+      case 0x12:
+        this.write8(this.de, this.a);
+        return 8;
+      case 0x13:
+        this.de = (this.de + 1) & 0xffff;
+        return 8;
+      case 0x14:
+        this.d = this.inc8(this.d);
+        return 4;
+      case 0x15:
+        this.d = this.dec8(this.d);
+        return 4;
+      case 0x16:
+        this.d = this.fetch8();
+        return 8;
+      case 0x17: {
+        // RLA
         const c = this.cf ? 1 : 0;
         const newC = (this.a >> 7) & 1;
         this.a = ((this.a << 1) | c) & 0xff;
         this.setFlags(false, false, false, newC === 1);
         return 4;
       }
-      case 0x18: { // JR r8
+      case 0x18: {
+        // JR r8
         const e = (this.fetch8() << 24) >> 24;
         this.pc = (this.pc + e) & 0xffff;
         return 12;
       }
-      case 0x19: this.addHL(this.de); return 8;
-      case 0x1a: this.a = this.read8(this.de); return 8;
-      case 0x1b: this.de = (this.de - 1) & 0xffff; return 8;
-      case 0x1c: this.e = this.inc8(this.e); return 4;
-      case 0x1d: this.e = this.dec8(this.e); return 4;
-      case 0x1e: this.e = this.fetch8(); return 8;
-      case 0x1f: { // RRA
+      case 0x19:
+        this.addHL(this.de);
+        return 8;
+      case 0x1a:
+        this.a = this.read8(this.de);
+        return 8;
+      case 0x1b:
+        this.de = (this.de - 1) & 0xffff;
+        return 8;
+      case 0x1c:
+        this.e = this.inc8(this.e);
+        return 4;
+      case 0x1d:
+        this.e = this.dec8(this.e);
+        return 4;
+      case 0x1e:
+        this.e = this.fetch8();
+        return 8;
+      case 0x1f: {
+        // RRA
         const c = this.cf ? 1 : 0;
         const newC = this.a & 1;
         this.a = ((this.a >> 1) | (c << 7)) & 0xff;
@@ -1990,7 +2231,8 @@ export class GameBoy {
       }
 
       // ── 0x20-0x2F ──
-      case 0x20: { // JR NZ,r8
+      case 0x20: {
+        // JR NZ,r8
         const e = (this.fetch8() << 24) >> 24;
         if (!this.zf) {
           this.pc = (this.pc + e) & 0xffff;
@@ -1998,14 +2240,30 @@ export class GameBoy {
         }
         return 8;
       }
-      case 0x21: this.hl = this.fetch16(); return 12;
-      case 0x22: this.write8(this.hl, this.a); this.hl = (this.hl + 1) & 0xffff; return 8; // LD (HL+),A
-      case 0x23: this.hl = (this.hl + 1) & 0xffff; return 8;
-      case 0x24: this.h = this.inc8(this.h); return 4;
-      case 0x25: this.h = this.dec8(this.h); return 4;
-      case 0x26: this.h = this.fetch8(); return 8;
-      case 0x27: this.daa(); return 4;
-      case 0x28: { // JR Z,r8
+      case 0x21:
+        this.hl = this.fetch16();
+        return 12;
+      case 0x22:
+        this.write8(this.hl, this.a);
+        this.hl = (this.hl + 1) & 0xffff;
+        return 8; // LD (HL+),A
+      case 0x23:
+        this.hl = (this.hl + 1) & 0xffff;
+        return 8;
+      case 0x24:
+        this.h = this.inc8(this.h);
+        return 4;
+      case 0x25:
+        this.h = this.dec8(this.h);
+        return 4;
+      case 0x26:
+        this.h = this.fetch8();
+        return 8;
+      case 0x27:
+        this.daa();
+        return 4;
+      case 0x28: {
+        // JR Z,r8
         const e = (this.fetch8() << 24) >> 24;
         if (this.zf) {
           this.pc = (this.pc + e) & 0xffff;
@@ -2013,19 +2271,33 @@ export class GameBoy {
         }
         return 8;
       }
-      case 0x29: this.addHL(this.hl); return 8;
-      case 0x2a: this.a = this.read8(this.hl); this.hl = (this.hl + 1) & 0xffff; return 8; // LD A,(HL+)
-      case 0x2b: this.hl = (this.hl - 1) & 0xffff; return 8;
-      case 0x2c: this.l = this.inc8(this.l); return 4;
-      case 0x2d: this.l = this.dec8(this.l); return 4;
-      case 0x2e: this.l = this.fetch8(); return 8;
+      case 0x29:
+        this.addHL(this.hl);
+        return 8;
+      case 0x2a:
+        this.a = this.read8(this.hl);
+        this.hl = (this.hl + 1) & 0xffff;
+        return 8; // LD A,(HL+)
+      case 0x2b:
+        this.hl = (this.hl - 1) & 0xffff;
+        return 8;
+      case 0x2c:
+        this.l = this.inc8(this.l);
+        return 4;
+      case 0x2d:
+        this.l = this.dec8(this.l);
+        return 4;
+      case 0x2e:
+        this.l = this.fetch8();
+        return 8;
       case 0x2f: // CPL
-        this.a = (~this.a) & 0xff;
+        this.a = ~this.a & 0xff;
         this.f = (this.zf ? 0x80 : 0) | 0x40 | 0x20 | (this.cf ? 0x10 : 0);
         return 4;
 
       // ── 0x30-0x3F ──
-      case 0x30: { // JR NC,r8
+      case 0x30: {
+        // JR NC,r8
         const e = (this.fetch8() << 24) >> 24;
         if (!this.cf) {
           this.pc = (this.pc + e) & 0xffff;
@@ -2033,16 +2305,30 @@ export class GameBoy {
         }
         return 8;
       }
-      case 0x31: this.sp = this.fetch16(); return 12;
-      case 0x32: this.write8(this.hl, this.a); this.hl = (this.hl - 1) & 0xffff; return 8; // LD (HL-),A
-      case 0x33: this.sp = (this.sp + 1) & 0xffff; return 8;
-      case 0x34: this.write8(this.hl, this.inc8(this.read8(this.hl))); return 12; // INC (HL)
-      case 0x35: this.write8(this.hl, this.dec8(this.read8(this.hl))); return 12; // DEC (HL)
-      case 0x36: this.write8(this.hl, this.fetch8()); return 12; // LD (HL),d8
+      case 0x31:
+        this.sp = this.fetch16();
+        return 12;
+      case 0x32:
+        this.write8(this.hl, this.a);
+        this.hl = (this.hl - 1) & 0xffff;
+        return 8; // LD (HL-),A
+      case 0x33:
+        this.sp = (this.sp + 1) & 0xffff;
+        return 8;
+      case 0x34:
+        this.write8(this.hl, this.inc8(this.read8(this.hl)));
+        return 12; // INC (HL)
+      case 0x35:
+        this.write8(this.hl, this.dec8(this.read8(this.hl)));
+        return 12; // DEC (HL)
+      case 0x36:
+        this.write8(this.hl, this.fetch8());
+        return 12; // LD (HL),d8
       case 0x37: // SCF
         this.f = (this.zf ? 0x80 : 0) | 0x10;
         return 4;
-      case 0x38: { // JR C,r8
+      case 0x38: {
+        // JR C,r8
         const e = (this.fetch8() << 24) >> 24;
         if (this.cf) {
           this.pc = (this.pc + e) & 0xffff;
@@ -2050,12 +2336,25 @@ export class GameBoy {
         }
         return 8;
       }
-      case 0x39: this.addHL(this.sp); return 8;
-      case 0x3a: this.a = this.read8(this.hl); this.hl = (this.hl - 1) & 0xffff; return 8; // LD A,(HL-)
-      case 0x3b: this.sp = (this.sp - 1) & 0xffff; return 8;
-      case 0x3c: this.a = this.inc8(this.a); return 4;
-      case 0x3d: this.a = this.dec8(this.a); return 4;
-      case 0x3e: this.a = this.fetch8(); return 8;
+      case 0x39:
+        this.addHL(this.sp);
+        return 8;
+      case 0x3a:
+        this.a = this.read8(this.hl);
+        this.hl = (this.hl - 1) & 0xffff;
+        return 8; // LD A,(HL-)
+      case 0x3b:
+        this.sp = (this.sp - 1) & 0xffff;
+        return 8;
+      case 0x3c:
+        this.a = this.inc8(this.a);
+        return 4;
+      case 0x3d:
+        this.a = this.dec8(this.a);
+        return 4;
+      case 0x3e:
+        this.a = this.fetch8();
+        return 8;
       case 0x3f: // CCF
         this.f = (this.zf ? 0x80 : 0) | (this.cf ? 0 : 0x10);
         return 4;
@@ -2075,7 +2374,7 @@ export class GameBoy {
       const src = op & 0x07;
       const value = this.getReg(src);
       this.setReg(dst, value);
-      return (dst === 6 || src === 6) ? 8 : 4;
+      return dst === 6 || src === 6 ? 8 : 4;
     }
 
     // ALU A,r block (0x80-0xBF).
@@ -2084,86 +2383,275 @@ export class GameBoy {
       const value = this.getReg(src);
       const aluOp = (op >> 3) & 0x07;
       switch (aluOp) {
-        case 0: this.add8(value); break;
-        case 1: this.adc8(value); break;
-        case 2: this.sub8(value); break;
-        case 3: this.sbc8(value); break;
-        case 4: this.and8(value); break;
-        case 5: this.xor8(value); break;
-        case 6: this.or8(value); break;
-        default: this.cp8(value); break;
+        case 0:
+          this.add8(value);
+          break;
+        case 1:
+          this.adc8(value);
+          break;
+        case 2:
+          this.sub8(value);
+          break;
+        case 3:
+          this.sbc8(value);
+          break;
+        case 4:
+          this.and8(value);
+          break;
+        case 5:
+          this.xor8(value);
+          break;
+        case 6:
+          this.or8(value);
+          break;
+        default:
+          this.cp8(value);
+          break;
       }
       return src === 6 ? 8 : 4;
     }
 
     // ── 0xC0-0xFF: control flow, stack, immediates, IO ──
     switch (op) {
-      case 0xc0: if (!this.zf) { this.pc = this.pop16(); return 20; } return 8; // RET NZ
-      case 0xc1: this.bc = this.pop16(); return 12;
-      case 0xc2: { const a = this.fetch16(); if (!this.zf) { this.pc = a; return 16; } return 12; } // JP NZ
-      case 0xc3: this.pc = this.fetch16(); return 16; // JP a16
-      case 0xc4: { const a = this.fetch16(); if (!this.zf) { this.push16(this.pc); this.pc = a; return 24; } return 12; } // CALL NZ
-      case 0xc5: this.push16(this.bc); return 16;
-      case 0xc6: this.add8(this.fetch8()); return 8;
-      case 0xc7: this.push16(this.pc); this.pc = 0x00; return 16; // RST 00
-      case 0xc8: if (this.zf) { this.pc = this.pop16(); return 20; } return 8; // RET Z
-      case 0xc9: this.pc = this.pop16(); return 16; // RET
-      case 0xca: { const a = this.fetch16(); if (this.zf) { this.pc = a; return 16; } return 12; } // JP Z
-      case 0xcb: return this.execCB();
-      case 0xcc: { const a = this.fetch16(); if (this.zf) { this.push16(this.pc); this.pc = a; return 24; } return 12; } // CALL Z
-      case 0xcd: { const a = this.fetch16(); this.push16(this.pc); this.pc = a; return 24; } // CALL a16
-      case 0xce: this.adc8(this.fetch8()); return 8;
-      case 0xcf: this.push16(this.pc); this.pc = 0x08; return 16; // RST 08
+      case 0xc0:
+        if (!this.zf) {
+          this.pc = this.pop16();
+          return 20;
+        }
+        return 8; // RET NZ
+      case 0xc1:
+        this.bc = this.pop16();
+        return 12;
+      case 0xc2: {
+        const a = this.fetch16();
+        if (!this.zf) {
+          this.pc = a;
+          return 16;
+        }
+        return 12;
+      } // JP NZ
+      case 0xc3:
+        this.pc = this.fetch16();
+        return 16; // JP a16
+      case 0xc4: {
+        const a = this.fetch16();
+        if (!this.zf) {
+          this.push16(this.pc);
+          this.pc = a;
+          return 24;
+        }
+        return 12;
+      } // CALL NZ
+      case 0xc5:
+        this.push16(this.bc);
+        return 16;
+      case 0xc6:
+        this.add8(this.fetch8());
+        return 8;
+      case 0xc7:
+        this.push16(this.pc);
+        this.pc = 0x00;
+        return 16; // RST 00
+      case 0xc8:
+        if (this.zf) {
+          this.pc = this.pop16();
+          return 20;
+        }
+        return 8; // RET Z
+      case 0xc9:
+        this.pc = this.pop16();
+        return 16; // RET
+      case 0xca: {
+        const a = this.fetch16();
+        if (this.zf) {
+          this.pc = a;
+          return 16;
+        }
+        return 12;
+      } // JP Z
+      case 0xcb:
+        return this.execCB();
+      case 0xcc: {
+        const a = this.fetch16();
+        if (this.zf) {
+          this.push16(this.pc);
+          this.pc = a;
+          return 24;
+        }
+        return 12;
+      } // CALL Z
+      case 0xcd: {
+        const a = this.fetch16();
+        this.push16(this.pc);
+        this.pc = a;
+        return 24;
+      } // CALL a16
+      case 0xce:
+        this.adc8(this.fetch8());
+        return 8;
+      case 0xcf:
+        this.push16(this.pc);
+        this.pc = 0x08;
+        return 16; // RST 08
 
-      case 0xd0: if (!this.cf) { this.pc = this.pop16(); return 20; } return 8; // RET NC
-      case 0xd1: this.de = this.pop16(); return 12;
-      case 0xd2: { const a = this.fetch16(); if (!this.cf) { this.pc = a; return 16; } return 12; } // JP NC
+      case 0xd0:
+        if (!this.cf) {
+          this.pc = this.pop16();
+          return 20;
+        }
+        return 8; // RET NC
+      case 0xd1:
+        this.de = this.pop16();
+        return 12;
+      case 0xd2: {
+        const a = this.fetch16();
+        if (!this.cf) {
+          this.pc = a;
+          return 16;
+        }
+        return 12;
+      } // JP NC
       // 0xd3 — illegal
-      case 0xd4: { const a = this.fetch16(); if (!this.cf) { this.push16(this.pc); this.pc = a; return 24; } return 12; } // CALL NC
-      case 0xd5: this.push16(this.de); return 16;
-      case 0xd6: this.sub8(this.fetch8()); return 8;
-      case 0xd7: this.push16(this.pc); this.pc = 0x10; return 16; // RST 10
-      case 0xd8: if (this.cf) { this.pc = this.pop16(); return 20; } return 8; // RET C
-      case 0xd9: this.pc = this.pop16(); this.ime = true; return 16; // RETI
-      case 0xda: { const a = this.fetch16(); if (this.cf) { this.pc = a; return 16; } return 12; } // JP C
+      case 0xd4: {
+        const a = this.fetch16();
+        if (!this.cf) {
+          this.push16(this.pc);
+          this.pc = a;
+          return 24;
+        }
+        return 12;
+      } // CALL NC
+      case 0xd5:
+        this.push16(this.de);
+        return 16;
+      case 0xd6:
+        this.sub8(this.fetch8());
+        return 8;
+      case 0xd7:
+        this.push16(this.pc);
+        this.pc = 0x10;
+        return 16; // RST 10
+      case 0xd8:
+        if (this.cf) {
+          this.pc = this.pop16();
+          return 20;
+        }
+        return 8; // RET C
+      case 0xd9:
+        this.pc = this.pop16();
+        this.ime = true;
+        return 16; // RETI
+      case 0xda: {
+        const a = this.fetch16();
+        if (this.cf) {
+          this.pc = a;
+          return 16;
+        }
+        return 12;
+      } // JP C
       // 0xdb — illegal
-      case 0xdc: { const a = this.fetch16(); if (this.cf) { this.push16(this.pc); this.pc = a; return 24; } return 12; } // CALL C
+      case 0xdc: {
+        const a = this.fetch16();
+        if (this.cf) {
+          this.push16(this.pc);
+          this.pc = a;
+          return 24;
+        }
+        return 12;
+      } // CALL C
       // 0xdd — illegal
-      case 0xde: this.sbc8(this.fetch8()); return 8;
-      case 0xdf: this.push16(this.pc); this.pc = 0x18; return 16; // RST 18
+      case 0xde:
+        this.sbc8(this.fetch8());
+        return 8;
+      case 0xdf:
+        this.push16(this.pc);
+        this.pc = 0x18;
+        return 16; // RST 18
 
-      case 0xe0: this.write8(0xff00 + this.fetch8(), this.a); return 12; // LDH (a8),A
-      case 0xe1: this.hl = this.pop16(); return 12;
-      case 0xe2: this.write8(0xff00 + this.c, this.a); return 8; // LD (C),A
+      case 0xe0:
+        this.write8(0xff00 + this.fetch8(), this.a);
+        return 12; // LDH (a8),A
+      case 0xe1:
+        this.hl = this.pop16();
+        return 12;
+      case 0xe2:
+        this.write8(0xff00 + this.c, this.a);
+        return 8; // LD (C),A
       // 0xe3, 0xe4 — illegal
-      case 0xe5: this.push16(this.hl); return 16;
-      case 0xe6: this.and8(this.fetch8()); return 8;
-      case 0xe7: this.push16(this.pc); this.pc = 0x20; return 16; // RST 20
-      case 0xe8: this.sp = this.addSpE8(); return 16; // ADD SP,r8
-      case 0xe9: this.pc = this.hl; return 4; // JP (HL)
-      case 0xea: this.write8(this.fetch16(), this.a); return 16; // LD (a16),A
+      case 0xe5:
+        this.push16(this.hl);
+        return 16;
+      case 0xe6:
+        this.and8(this.fetch8());
+        return 8;
+      case 0xe7:
+        this.push16(this.pc);
+        this.pc = 0x20;
+        return 16; // RST 20
+      case 0xe8:
+        this.sp = this.addSpE8();
+        return 16; // ADD SP,r8
+      case 0xe9:
+        this.pc = this.hl;
+        return 4; // JP (HL)
+      case 0xea:
+        this.write8(this.fetch16(), this.a);
+        return 16; // LD (a16),A
       // 0xeb, 0xec, 0xed — illegal
-      case 0xee: this.xor8(this.fetch8()); return 8;
-      case 0xef: this.push16(this.pc); this.pc = 0x28; return 16; // RST 28
+      case 0xee:
+        this.xor8(this.fetch8());
+        return 8;
+      case 0xef:
+        this.push16(this.pc);
+        this.pc = 0x28;
+        return 16; // RST 28
 
-      case 0xf0: this.a = this.read8(0xff00 + this.fetch8()); return 12; // LDH A,(a8)
-      case 0xf1: this.af = this.pop16(); return 12;
-      case 0xf2: this.a = this.read8(0xff00 + this.c); return 8; // LD A,(C)
-      case 0xf3: this.ime = false; this.imePending = false; return 4; // DI
+      case 0xf0:
+        this.a = this.read8(0xff00 + this.fetch8());
+        return 12; // LDH A,(a8)
+      case 0xf1:
+        this.af = this.pop16();
+        return 12;
+      case 0xf2:
+        this.a = this.read8(0xff00 + this.c);
+        return 8; // LD A,(C)
+      case 0xf3:
+        this.ime = false;
+        this.imePending = false;
+        return 4; // DI
       // 0xf4 — illegal
-      case 0xf5: this.push16(this.af); return 16;
-      case 0xf6: this.or8(this.fetch8()); return 8;
-      case 0xf7: this.push16(this.pc); this.pc = 0x30; return 16; // RST 30
-      case 0xf8: { // LD HL,SP+r8
+      case 0xf5:
+        this.push16(this.af);
+        return 16;
+      case 0xf6:
+        this.or8(this.fetch8());
+        return 8;
+      case 0xf7:
+        this.push16(this.pc);
+        this.pc = 0x30;
+        return 16; // RST 30
+      case 0xf8: {
+        // LD HL,SP+r8
         this.hl = this.addSpE8();
         return 12;
       }
-      case 0xf9: this.sp = this.hl; return 8; // LD SP,HL
-      case 0xfa: this.a = this.read8(this.fetch16()); return 16; // LD A,(a16)
-      case 0xfb: this.imePending = true; return 4; // EI (delayed one instruction)
+      case 0xf9:
+        this.sp = this.hl;
+        return 8; // LD SP,HL
+      case 0xfa:
+        this.a = this.read8(this.fetch16());
+        return 16; // LD A,(a16)
+      case 0xfb:
+        this.imePending = true;
+        return 4; // EI (delayed one instruction)
       // 0xfc, 0xfd — illegal
-      case 0xfe: this.cp8(this.fetch8()); return 8; // CP d8
-      case 0xff: this.push16(this.pc); this.pc = 0x38; return 16; // RST 38
+      case 0xfe:
+        this.cp8(this.fetch8());
+        return 8; // CP d8
+      case 0xff:
+        this.push16(this.pc);
+        this.pc = 0x38;
+        return 16; // RST 38
 
       default:
         // Illegal/undefined opcode — behave as a NOP so the test ROM survives.
@@ -2262,10 +2750,23 @@ export function blitToTerm(t: Term, frame: Uint8Array): void {
 
 // Virtual-key codes.
 const VK = {
-  LEFT: 0x25, UP: 0x26, RIGHT: 0x27, DOWN: 0x28,
-  Z: 0x5a, X: 0x58, RETURN: 0x0d, RSHIFT: 0xa1,
-  CONTROL: 0x11, ESC: 0x1b, M: 0x4d, R: 0x52, P: 0x50,
-  TAB: 0x09, LBRACK: 0xdb, RBRACK: 0xdd, C: 0x43,
+  LEFT: 0x25,
+  UP: 0x26,
+  RIGHT: 0x27,
+  DOWN: 0x28,
+  Z: 0x5a,
+  X: 0x58,
+  RETURN: 0x0d,
+  RSHIFT: 0xa1,
+  CONTROL: 0x11,
+  ESC: 0x1b,
+  M: 0x4d,
+  R: 0x52,
+  P: 0x50,
+  TAB: 0x09,
+  LBRACK: 0xdb,
+  RBRACK: 0xdd,
+  C: 0x43,
 } as const;
 
 // Console input mode flags.
@@ -2309,8 +2810,7 @@ function setupWin32Input(): InputSource | null {
     const saved = Buffer.alloc(4);
     if (!k.symbols.GetConsoleMode(hIn, saved.ptr!)) return null; // not a real console
     const savedMode = saved.readUInt32LE(0);
-    const raw = savedMode & ~(ENABLE_LINE_INPUT | ENABLE_ECHO_INPUT | ENABLE_PROCESSED_INPUT |
-      ENABLE_VIRTUAL_TERMINAL_INPUT | ENABLE_MOUSE_INPUT | ENABLE_WINDOW_INPUT);
+    const raw = savedMode & ~(ENABLE_LINE_INPUT | ENABLE_ECHO_INPUT | ENABLE_PROCESSED_INPUT | ENABLE_VIRTUAL_TERMINAL_INPUT | ENABLE_MOUSE_INPUT | ENABLE_WINDOW_INPUT);
     k.symbols.SetConsoleMode(hIn, raw >>> 0);
     k.symbols.FlushConsoleInputBuffer(hIn);
 
@@ -2390,11 +2890,27 @@ function setupAnsiInput(): InputSource {
         i += 2;
         continue;
       }
-      if (code === 27) { press(VK.ESC); continue; }
-      if (code === 3) { press(VK.CONTROL); press(VK.C); continue; } // Ctrl-C
-      if (code === 13) { press(VK.RETURN); continue; }
-      if (code === 127 || code === 8) { press(VK.RSHIFT); continue; } // Backspace → Select
-      if (code === 9) { press(VK.TAB); continue; }
+      if (code === 27) {
+        press(VK.ESC);
+        continue;
+      }
+      if (code === 3) {
+        press(VK.CONTROL);
+        press(VK.C);
+        continue;
+      } // Ctrl-C
+      if (code === 13) {
+        press(VK.RETURN);
+        continue;
+      }
+      if (code === 127 || code === 8) {
+        press(VK.RSHIFT);
+        continue;
+      } // Backspace → Select
+      if (code === 9) {
+        press(VK.TAB);
+        continue;
+      }
       const up = ch.toUpperCase();
       if (up === 'Z') press(VK.Z);
       else if (up === 'X') press(VK.X);
@@ -2406,7 +2922,10 @@ function setupAnsiInput(): InputSource {
     }
   };
   try {
-    if (stdin.isTTY) { stdin.setRawMode(true); rawOn = true; }
+    if (stdin.isTTY) {
+      stdin.setRawMode(true);
+      rawOn = true;
+    }
     stdin.resume();
     stdin.on('data', onData);
   } catch {
@@ -2419,7 +2938,10 @@ function setupAnsiInput(): InputSource {
     poll(): void {
       const t = now();
       for (const [vk, when] of expiry) {
-        if (t >= when) { held.delete(vk); expiry.delete(vk); }
+        if (t >= when) {
+          held.delete(vk);
+          expiry.delete(vk);
+        }
       }
     },
     restore(): void {
@@ -2440,8 +2962,14 @@ const xinputBuf = Buffer.alloc(16);
 /** Fold the held-key set plus an XInput pad (controller 0) into Buttons. */
 function readButtons(src: InputSource): Buttons {
   const h = src.held;
-  let right = h.has(VK.RIGHT), left = h.has(VK.LEFT), up = h.has(VK.UP), down = h.has(VK.DOWN);
-  let a = h.has(VK.Z), bBtn = h.has(VK.X), start = h.has(VK.RETURN), select = h.has(VK.RSHIFT);
+  let right = h.has(VK.RIGHT),
+    left = h.has(VK.LEFT),
+    up = h.has(VK.UP),
+    down = h.has(VK.DOWN);
+  let a = h.has(VK.Z),
+    bBtn = h.has(VK.X),
+    start = h.has(VK.RETURN),
+    select = h.has(VK.RSHIFT);
   if (Xinput1_4.XInputGetState(0, xinputBuf.ptr!) === 0) {
     const btn = xinputBuf.readUInt16LE(4);
     const lx = xinputBuf.readInt16LE(8);
@@ -2451,10 +2979,10 @@ function readButtons(src: InputSource): Buttons {
     if (btn & 0x2000) bBtn = true;
     if (btn & 0x0010) start = true;
     if (btn & 0x0020) select = true;
-    if ((btn & 0x0001) || ly > DZ) up = true;
-    if ((btn & 0x0002) || ly < -DZ) down = true;
-    if ((btn & 0x0004) || lx < -DZ) left = true;
-    if ((btn & 0x0008) || lx > DZ) right = true;
+    if (btn & 0x0001 || ly > DZ) up = true;
+    if (btn & 0x0002 || ly < -DZ) down = true;
+    if (btn & 0x0004 || lx < -DZ) left = true;
+    if (btn & 0x0008 || lx > DZ) right = true;
   }
   return { right, left, up, down, a, bBtn, select, start };
 }
@@ -2567,14 +3095,20 @@ async function main(): Promise<void> {
     try {
       const f = readFileSync(savePath);
       gb.loadSaveData(new Uint8Array(f.buffer, f.byteOffset, f.byteLength));
-    } catch { /* corrupt/locked save — start fresh rather than crash */ }
+    } catch {
+      /* corrupt/locked save — start fresh rather than crash */
+    }
   }
   // Synchronous save — used on teardown so the file is fully flushed before exit.
   const writeSave = (): void => {
     if (!savePath) return;
     const data = gb.getSaveData();
     if (data) {
-      try { writeFileSync(savePath, data); } catch { /* ignore transient IO errors */ }
+      try {
+        writeFileSync(savePath, data);
+      } catch {
+        /* ignore transient IO errors */
+      }
     }
   };
   // Non-blocking autosave — fire-and-forget so a slow disk never stalls a frame.
@@ -2584,7 +3118,13 @@ async function main(): Promise<void> {
     const data = gb.getSaveData();
     if (!data) return;
     autosaving = true;
-    Bun.write(savePath, data).catch(() => { /* ignore */ }).finally(() => { autosaving = false; });
+    Bun.write(savePath, data)
+      .catch(() => {
+        /* ignore */
+      })
+      .finally(() => {
+        autosaving = false;
+      });
   };
 
   if (pcm.available) {
@@ -2628,7 +3168,9 @@ async function main(): Promise<void> {
     pcm.close();
   };
   process.on('exit', cleanup);
-  process.on('SIGINT', () => { running = false; });
+  process.on('SIGINT', () => {
+    running = false;
+  });
 
   const detectSize = (): { cols: number; rows: number } => {
     const csbi = Buffer.alloc(22);
@@ -2672,98 +3214,100 @@ async function main(): Promise<void> {
   };
 
   try {
-  while (running) {
-    const frameStart = Bun.nanoseconds();
-    if (durationMs > 0 && (frameStart - t0) / 1e6 >= durationMs) break;
+    while (running) {
+      const frameStart = Bun.nanoseconds();
+      if (durationMs > 0 && (frameStart - t0) / 1e6 >= durationMs) break;
 
-    // Autosave battery RAM every ~5 s (non-blocking) so a hard kill loses little.
-    const elapsedTotalMs = (frameStart - t0) / 1e6;
-    if (savePath && elapsedTotalMs - lastSaveMs >= 5000) {
-      lastSaveMs = elapsedTotalMs;
-      autoSave();
-    }
-
-    // Live resize.
-    sz = detectSize();
-    if (sz.cols !== t.columns || sz.rows !== t.rows) {
-      t = new Term(sz.cols, sz.rows);
-      process.stdout.write('\x1b[2J\x1b[H');
-    }
-
-    input.poll();
-    if (input.held.has(VK.ESC) || (input.held.has(VK.CONTROL) && input.held.has(VK.C))) break;
-    const turbo = input.held.has(VK.TAB);
-    for (const vk of input.pressed) {
-      if (vk === VK.M) muted = !muted;
-      else if (vk === VK.P) paused = !paused;
-      else if (vk === VK.R) {
-        // Soft reset, preserving battery RAM (the physical cart keeps its save).
-        // A fresh APU avoids carrying stale channel/sequencer state into the reset.
-        const carry = gb.getSaveData();
-        gb = new GameBoy(rom, new Apu(AUDIO_RATE));
-        if (carry) gb.loadSaveData(carry);
-      } else if (vk === VK.LBRACK) activePalette = (activePalette + DMG_PALETTES.length - 1) % DMG_PALETTES.length;
-      else if (vk === VK.RBRACK) activePalette = (activePalette + 1) % DMG_PALETTES.length;
-    }
-    input.pressed.length = 0;
-
-    const nowMs = frameStart / 1e6;
-    if (paused) {
-      nextDue = nowMs; // hold the schedule while paused (no debt builds up)
-    } else if (turbo) {
-      // Fast-forward: a fixed burst of frames, audio discarded to avoid garble.
-      gb.setButtons(readButtons(input));
-      for (let s = 0; s < 6; s += 1) { gb.runFrame(); gb.apu?.drain(AUDIO_RATE); }
-      nextDue = nowMs;
-    } else {
-      // Real time: run as many emulated frames as wall-clock owes us — so audio
-      // is always produced at 59.7 Hz even if a terminal repaint is slow (the
-      // picture just frame-skips). Capped so a long stall can't spiral.
-      gb.setButtons(readButtons(input));
-      let ran = 0;
-      while (nowMs >= nextDue && ran < 8) {
-        gb.runFrame();
-        feedAudio();
-        nextDue += GB_FRAME_MS;
-        ran += 1;
+      // Autosave battery RAM every ~5 s (non-blocking) so a hard kill loses little.
+      const elapsedTotalMs = (frameStart - t0) / 1e6;
+      if (savePath && elapsedTotalMs - lastSaveMs >= 5000) {
+        lastSaveMs = elapsedTotalMs;
+        autoSave();
       }
-      if (ran >= 8) nextDue = nowMs; // fell far behind → resync and drop the debt
-    }
 
-    blitToTerm(t, gb.frame);
-    const status = `${Math.round(fpsEma)} FPS  ${muted ? 'MUTE' : '♪'}` +
-      `${paused ? '  PAUSE' : ''}${turbo ? '  TURBO' : ''}  Z=A X=B ENT=START RSH=SEL  ESC quit`;
-    drawHud(t, title, status);
-    // Synchronized Output (DEC private mode 2026) — the terminal's "VSync":
-    // bracket the frame so a supporting terminal (Windows Terminal) buffers the
-    // whole update and flips it atomically instead of revealing it mid-scanout
-    // (which is the tearing you see while the BG scrolls). Unsupported terminals
-    // ignore the escapes harmlessly.
-    process.stdout.write(SYNC_BEGIN);
-    t.present();
-    process.stdout.write(SYNC_END);
-
-    // The real engine throughput: how long emulating + rendering + painting a
-    // frame actually took, excluding the pacing wait. (The game still runs at
-    // 59.7 Hz; this is the "could-render-this-fast" number, like the other demos.)
-    const workMs = (Bun.nanoseconds() - frameStart) / 1e6;
-    if (workMs > 0) fpsEma = fpsEma * 0.9 + Math.min(99999, 1000 / workMs) * 0.1;
-    // Pace to the next due frame (the accumulator already ran the emulation). While
-    // paused we still wait a frame so the loop doesn't busy-spin a core.
-    if (turbo) {
-      // run flat out — no wait
-    } else if (paused) {
-      if (wait) wait(GB_FRAME_MS);
-      else await Bun.sleep(GB_FRAME_MS);
-    } else {
-      const slack = Math.min(GB_FRAME_MS, nextDue - Bun.nanoseconds() / 1e6);
-      if (slack > 0.2) {
-        if (wait) wait(slack);
-        else await Bun.sleep(slack);
+      // Live resize.
+      sz = detectSize();
+      if (sz.cols !== t.columns || sz.rows !== t.rows) {
+        t = new Term(sz.cols, sz.rows);
+        process.stdout.write('\x1b[2J\x1b[H');
       }
+
+      input.poll();
+      if (input.held.has(VK.ESC) || (input.held.has(VK.CONTROL) && input.held.has(VK.C))) break;
+      const turbo = input.held.has(VK.TAB);
+      for (const vk of input.pressed) {
+        if (vk === VK.M) muted = !muted;
+        else if (vk === VK.P) paused = !paused;
+        else if (vk === VK.R) {
+          // Soft reset, preserving battery RAM (the physical cart keeps its save).
+          // A fresh APU avoids carrying stale channel/sequencer state into the reset.
+          const carry = gb.getSaveData();
+          gb = new GameBoy(rom, new Apu(AUDIO_RATE));
+          if (carry) gb.loadSaveData(carry);
+        } else if (vk === VK.LBRACK) activePalette = (activePalette + DMG_PALETTES.length - 1) % DMG_PALETTES.length;
+        else if (vk === VK.RBRACK) activePalette = (activePalette + 1) % DMG_PALETTES.length;
+      }
+      input.pressed.length = 0;
+
+      const nowMs = frameStart / 1e6;
+      if (paused) {
+        nextDue = nowMs; // hold the schedule while paused (no debt builds up)
+      } else if (turbo) {
+        // Fast-forward: a fixed burst of frames, audio discarded to avoid garble.
+        gb.setButtons(readButtons(input));
+        for (let s = 0; s < 6; s += 1) {
+          gb.runFrame();
+          gb.apu?.drain(AUDIO_RATE);
+        }
+        nextDue = nowMs;
+      } else {
+        // Real time: run as many emulated frames as wall-clock owes us — so audio
+        // is always produced at 59.7 Hz even if a terminal repaint is slow (the
+        // picture just frame-skips). Capped so a long stall can't spiral.
+        gb.setButtons(readButtons(input));
+        let ran = 0;
+        while (nowMs >= nextDue && ran < 8) {
+          gb.runFrame();
+          feedAudio();
+          nextDue += GB_FRAME_MS;
+          ran += 1;
+        }
+        if (ran >= 8) nextDue = nowMs; // fell far behind → resync and drop the debt
+      }
+
+      blitToTerm(t, gb.frame);
+      const status = `${Math.round(fpsEma)} FPS  ${muted ? 'MUTE' : '♪'}` + `${paused ? '  PAUSE' : ''}${turbo ? '  TURBO' : ''}  Z=A X=B ENT=START RSH=SEL  ESC quit`;
+      drawHud(t, title, status);
+      // Synchronized Output (DEC private mode 2026) — the terminal's "VSync":
+      // bracket the frame so a supporting terminal (Windows Terminal) buffers the
+      // whole update and flips it atomically instead of revealing it mid-scanout
+      // (which is the tearing you see while the BG scrolls). Unsupported terminals
+      // ignore the escapes harmlessly.
+      process.stdout.write(SYNC_BEGIN);
+      t.present();
+      process.stdout.write(SYNC_END);
+
+      // The real engine throughput: how long emulating + rendering + painting a
+      // frame actually took, excluding the pacing wait. (The game still runs at
+      // 59.7 Hz; this is the "could-render-this-fast" number, like the other demos.)
+      const workMs = (Bun.nanoseconds() - frameStart) / 1e6;
+      if (workMs > 0) fpsEma = fpsEma * 0.9 + Math.min(99999, 1000 / workMs) * 0.1;
+      // Pace to the next due frame (the accumulator already ran the emulation). While
+      // paused we still wait a frame so the loop doesn't busy-spin a core.
+      if (turbo) {
+        // run flat out — no wait
+      } else if (paused) {
+        if (wait) wait(GB_FRAME_MS);
+        else await Bun.sleep(GB_FRAME_MS);
+      } else {
+        const slack = Math.min(GB_FRAME_MS, nextDue - Bun.nanoseconds() / 1e6);
+        if (slack > 0.2) {
+          if (wait) wait(slack);
+          else await Bun.sleep(slack);
+        }
+      }
+      await new Promise<void>((r) => setImmediate(r));
     }
-    await new Promise<void>((r) => setImmediate(r));
-  }
   } finally {
     cleanup(); // always restore the console + flush the save, even on a thrown error
   }

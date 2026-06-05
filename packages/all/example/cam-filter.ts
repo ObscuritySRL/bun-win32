@@ -124,7 +124,7 @@ const adapter = ppAdapter.readBigUInt64LE(0);
 
 const ppOutput = Buffer.alloc(8);
 const enumHr = gpu.vcall(adapter, DXGIADAPTER_ENUM_OUTPUTS, [FFIType.u32, FFIType.ptr], [0, ppOutput.ptr!]);
-if ((enumHr >>> 0) === DXGI_ERROR_NOT_FOUND) fatal('No connected output on the adapter (EnumOutputs → NOT_FOUND).');
+if (enumHr >>> 0 === DXGI_ERROR_NOT_FOUND) fatal('No connected output on the adapter (EnumOutputs → NOT_FOUND).');
 if (enumHr !== S_OK) fatal(`IDXGIAdapter::EnumOutputs failed ${hex(enumHr)}.`);
 const output = ppOutput.readBigUInt64LE(0);
 
@@ -136,7 +136,7 @@ const output1 = ppOutput1.readBigUInt64LE(0);
 
 const ppDupl = Buffer.alloc(8);
 const dupHr = gpu.vcall(output1, DXGIOUTPUT1_DUPLICATE_OUTPUT, [FFIType.u64, FFIType.ptr], [g.device, ppDupl.ptr!]);
-if ((dupHr >>> 0) === E_ACCESSDENIED) {
+if (dupHr >>> 0 === E_ACCESSDENIED) {
   fatal('DuplicateOutput → E_ACCESSDENIED: another Desktop Duplication is already active (close screen-capture/recording tools and retry).');
 }
 if (dupHr !== S_OK) fatal(`IDXGIOutput1::DuplicateOutput failed ${hex(dupHr)}.`);
@@ -425,8 +425,8 @@ function ensureSrcTex(w: number, h: number): void {
 function grabDesktopFrame(): boolean {
   ppResource.writeBigUInt64LE(0n, 0);
   const hr = gpu.vcall(dupl, DUPL_ACQUIRE_NEXT_FRAME, [FFIType.u32, FFIType.ptr, FFIType.ptr], [60, frameInfo.ptr!, ppResource.ptr!]);
-  if ((hr >>> 0) === DXGI_ERROR_WAIT_TIMEOUT) return false; // no new desktop frame this tick
-  if ((hr >>> 0) === DXGI_ERROR_ACCESS_LOST) {
+  if (hr >>> 0 === DXGI_ERROR_WAIT_TIMEOUT) return false; // no new desktop frame this tick
+  if (hr >>> 0 === DXGI_ERROR_ACCESS_LOST) {
     // The duplication became invalid (mode change / secure desktop). Re-acquire.
     gpu.comRelease(dupl);
     const pp = Buffer.alloc(8);

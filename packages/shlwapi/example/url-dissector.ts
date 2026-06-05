@@ -112,14 +112,14 @@ const byteSizes: bigint[] = [
   1536n,
   10240n,
   102400n,
-  1048576n,           // 1 MB
-  10485760n,          // 10 MB
-  104857600n,         // 100 MB
-  1073741824n,        // 1 GB
-  5368709120n,        // 5 GB
-  10737418240n,       // 10 GB
-  1099511627776n,     // 1 TB
-  1125899906842624n,  // 1 PB
+  1048576n, // 1 MB
+  10485760n, // 10 MB
+  104857600n, // 100 MB
+  1073741824n, // 1 GB
+  5368709120n, // 5 GB
+  10737418240n, // 10 GB
+  1099511627776n, // 1 TB
+  1125899906842624n, // 1 PB
 ];
 
 for (const size of byteSizes) {
@@ -165,10 +165,7 @@ console.log('');
 
 // Now sort a list naturally
 console.log('  Natural sort demonstration:');
-const unsorted = [
-  'file1.txt', 'file10.txt', 'file2.txt', 'file20.txt', 'file3.txt',
-  'file100.txt', 'file11.txt', 'file9.txt', 'file21.txt', 'file0.txt',
-];
+const unsorted = ['file1.txt', 'file10.txt', 'file2.txt', 'file20.txt', 'file3.txt', 'file100.txt', 'file11.txt', 'file9.txt', 'file21.txt', 'file0.txt'];
 
 // lexicographic sort for comparison
 const lexSorted = [...unsorted].sort();

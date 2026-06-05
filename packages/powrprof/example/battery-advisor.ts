@@ -23,14 +23,7 @@ import { type Pointer, toArrayBuffer } from 'bun:ffi';
 import PowrProf, { POWER_INFORMATION_LEVEL, POWER_PLATFORM_ROLE } from '../index';
 import Kernel32 from '@bun-win32/kernel32';
 
-PowrProf.Preload([
-  'CallNtPowerInformation',
-  'PowerGetActiveScheme',
-  'PowerReadFriendlyName',
-  'PowerDeterminePlatformRole',
-  'IsPwrHibernateAllowed',
-  'IsPwrSuspendAllowed',
-]);
+PowrProf.Preload(['CallNtPowerInformation', 'PowerGetActiveScheme', 'PowerReadFriendlyName', 'PowerDeterminePlatformRole', 'IsPwrHibernateAllowed', 'IsPwrSuspendAllowed']);
 Kernel32.Preload(['GetSystemPowerStatus']);
 
 // 1. GetSystemPowerStatus (SYSTEM_POWER_STATUS = 12 bytes)
@@ -61,11 +54,7 @@ if (spsOk) {
 
 // 2. CallNtPowerInformation - SystemBatteryState
 const batteryStateBuf = Buffer.alloc(64);
-const batteryNtStatus = PowrProf.CallNtPowerInformation(
-  POWER_INFORMATION_LEVEL.SystemBatteryState,
-  null, 0,
-  batteryStateBuf.ptr, batteryStateBuf.byteLength,
-);
+const batteryNtStatus = PowrProf.CallNtPowerInformation(POWER_INFORMATION_LEVEL.SystemBatteryState, null, 0, batteryStateBuf.ptr, batteryStateBuf.byteLength);
 
 let ntBatteryInfo = {
   acOnline: false,
@@ -118,13 +107,7 @@ if (schemeResult === 0) {
   const guidBytes = new Uint8Array(toArrayBuffer(guidAddr, 0, 16));
 
   const h = [...guidBytes].map((b) => b.toString(16).padStart(2, '0'));
-  powerPlanGuid = [
-    h.slice(0, 4).reverse().join(''),
-    h.slice(4, 6).reverse().join(''),
-    h.slice(6, 8).reverse().join(''),
-    h.slice(8, 10).join(''),
-    h.slice(10, 16).join(''),
-  ].join('-');
+  powerPlanGuid = [h.slice(0, 4).reverse().join(''), h.slice(4, 6).reverse().join(''), h.slice(6, 8).reverse().join(''), h.slice(8, 10).join(''), h.slice(10, 16).join('')].join('-');
 
   // Get friendly name
   const sizeBuf = Buffer.alloc(4);
@@ -162,35 +145,19 @@ function formatTime(seconds: number): string {
 
 function getAdvice(percent: number, onAc: boolean, hasBattery: boolean): string[] {
   if (!hasBattery) {
-    return [
-      'No battery detected. You are running on pure wall power.',
-      'Tip: Your PC is an immovable fortress. Enjoy unlimited power!',
-      'Consider getting a UPS for those surprise power outages.',
-    ];
+    return ['No battery detected. You are running on pure wall power.', 'Tip: Your PC is an immovable fortress. Enjoy unlimited power!', 'Consider getting a UPS for those surprise power outages.'];
   }
 
   if (onAc) {
-    return [
-      'Plugged in and charging. Living the good life!',
-      `Current charge: ${percent}%. ${percent === 100 ? 'Fully charged - you are invincible.' : 'Topping up...'}`,
-      'Pro tip: unplug occasionally to keep that battery healthy.',
-    ];
+    return ['Plugged in and charging. Living the good life!', `Current charge: ${percent}%. ${percent === 100 ? 'Fully charged - you are invincible.' : 'Topping up...'}`, 'Pro tip: unplug occasionally to keep that battery healthy.'];
   }
 
   // On battery
   if (percent > 80) {
-    return [
-      `Battery at ${percent}%. You are golden!`,
-      'Plenty of juice. Go ahead, open another browser tab.',
-      'At this rate, you could probably outlast a Marvel movie.',
-    ];
+    return [`Battery at ${percent}%. You are golden!`, 'Plenty of juice. Go ahead, open another browser tab.', 'At this rate, you could probably outlast a Marvel movie.'];
   }
   if (percent > 50) {
-    return [
-      `Battery at ${percent}%. Still comfortable, but keep an eye on it.`,
-      'Maybe close some of those 47 Chrome tabs?',
-      'If you see a power outlet, give it a friendly nod.',
-    ];
+    return [`Battery at ${percent}%. Still comfortable, but keep an eye on it.`, 'Maybe close some of those 47 Chrome tabs?', 'If you see a power outlet, give it a friendly nod.'];
   }
   if (percent > 20) {
     return [

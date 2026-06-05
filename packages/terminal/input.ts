@@ -1,11 +1,4 @@
-import Kernel32, {
-  ControlKeyState,
-  EventType,
-  INPUT_RECORD_SIZE,
-  MouseButtonState,
-  MouseEventFlags,
-  decodeInputRecord,
-} from '@bun-win32/kernel32';
+import Kernel32, { ControlKeyState, EventType, INPUT_RECORD_SIZE, MouseButtonState, MouseEventFlags, decodeInputRecord } from '@bun-win32/kernel32';
 
 import { closeConsoleHandle, openConsoleInputHandle } from './console';
 
@@ -159,8 +152,10 @@ export class ConsoleInput {
       const named = VIRTUAL_KEY_NAMES[event.virtualKeyCode];
       let key: string;
       if (named !== undefined) key = named;
-      else if (event.character === 0) return; // a lone modifier or unmapped key
-      else if (ctrl && event.character < 0x20) key = String.fromCharCode(event.character + 0x60); // ctrl+letter → the letter
+      else if (event.character === 0)
+        return; // a lone modifier or unmapped key
+      else if (ctrl && event.character < 0x20)
+        key = String.fromCharCode(event.character + 0x60); // ctrl+letter → the letter
       else key = String.fromCharCode(event.character);
       this.#handlers.key?.({
         alt,

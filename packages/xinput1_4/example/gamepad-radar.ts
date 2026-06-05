@@ -15,15 +15,7 @@
  * Run: bun run example/gamepad-radar.ts
  */
 
-import Xinput1_4, {
-  BatteryDevType,
-  BatteryLevel,
-  BatteryType,
-  XUSER_MAX_COUNT,
-  XInputDevSubType,
-  XInputGamepadButtons,
-  XInputGetCapabilitiesFlags,
-} from '../index';
+import Xinput1_4, { BatteryDevType, BatteryLevel, BatteryType, XUSER_MAX_COUNT, XInputDevSubType, XInputGamepadButtons, XInputGetCapabilitiesFlags } from '../index';
 
 Xinput1_4.Preload(['XInputGetState', 'XInputGetBatteryInformation', 'XInputGetCapabilities']);
 

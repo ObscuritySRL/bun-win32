@@ -39,8 +39,7 @@ const headless = (process.env.CAPTURE_PNG ?? '') !== '' || process.env.BENCH ===
 const startSec = Number(process.env.VIDEO_SS ?? 30) || 0; // seek past the intro into action
 
 // ffmpeg's video filter: scale into the grid preserving aspect, pad the rest black.
-const vfChain = (W: number, H: number): string =>
-  `scale=${W}:${H}:force_original_aspect_ratio=decrease,pad=${W}:${H}:(ow-iw)/2:(oh-ih)/2:black`;
+const vfChain = (W: number, H: number): string => `scale=${W}:${H}:force_original_aspect_ratio=decrease,pad=${W}:${H}:(ow-iw)/2:(oh-ih)/2:black`;
 
 let proc: ReturnType<typeof Bun.spawn> | null = null;
 const killFfmpeg = (): void => {
@@ -95,13 +94,7 @@ const startLive = (W: number, H: number): void => {
   gen++;
   const myGen = gen;
   proc = Bun.spawn({
-    cmd: [
-      'ffmpeg', '-hide_banner', '-loglevel', 'error',
-      '-stream_loop', '-1', '-ss', String(startSec),
-      '-i', videoPath,
-      '-vf', vfChain(W, H), '-r', String(FPS),
-      '-f', 'rawvideo', '-pix_fmt', 'rgb24', '-',
-    ],
+    cmd: ['ffmpeg', '-hide_banner', '-loglevel', 'error', '-stream_loop', '-1', '-ss', String(startSec), '-i', videoPath, '-vf', vfChain(W, H), '-r', String(FPS), '-f', 'rawvideo', '-pix_fmt', 'rgb24', '-'],
     stdout: 'pipe',
     stderr: 'inherit',
   });
@@ -140,12 +133,7 @@ const preFrames: Uint8Array[] = [];
 const decodeFrames = async (W: number, H: number, n: number): Promise<void> => {
   frameSize = W * H * 3;
   const p = Bun.spawn({
-    cmd: [
-      'ffmpeg', '-hide_banner', '-loglevel', 'error',
-      '-ss', String(startSec), '-i', videoPath,
-      '-vf', vfChain(W, H), '-r', '30', '-frames:v', String(n),
-      '-f', 'rawvideo', '-pix_fmt', 'rgb24', '-',
-    ],
+    cmd: ['ffmpeg', '-hide_banner', '-loglevel', 'error', '-ss', String(startSec), '-i', videoPath, '-vf', vfChain(W, H), '-r', '30', '-frames:v', String(n), '-f', 'rawvideo', '-pix_fmt', 'rgb24', '-'],
     stdout: 'pipe',
     stderr: 'inherit',
   });
@@ -202,11 +190,19 @@ await run({
   onKey: (key: string, t: Term) => {
     if (headless) return;
     let changed = false;
-    if (key === 'm') { curMode = MODES[(MODES.indexOf(curMode) + 1) % MODES.length]; changed = true; }
-    else if (key === 'd') { curDiff = DIFFS[(DIFFS.indexOf(curDiff) + 1) % DIFFS.length]; changed = true; }
-    else if (key === 'c') { curDepth = DEPTHS[(DEPTHS.indexOf(curDepth) + 1) % DEPTHS.length]; changed = true; }
+    if (key === 'm') {
+      curMode = MODES[(MODES.indexOf(curMode) + 1) % MODES.length];
+      changed = true;
+    } else if (key === 'd') {
+      curDiff = DIFFS[(DIFFS.indexOf(curDiff) + 1) % DIFFS.length];
+      changed = true;
+    } else if (key === 'c') {
+      curDepth = DEPTHS[(DEPTHS.indexOf(curDepth) + 1) % DEPTHS.length];
+      changed = true;
+    }
     if (!changed) return;
-    const ow = t.width, oh = t.height;
+    const ow = t.width,
+      oh = t.height;
     t.reconfigure({ mode: curMode, diff: curDiff, depth: curDepth, threshold: curThr });
     // A mode change alters the pixel resolution → re-decode at the new size. A
     // diff/depth change keeps the same frames, so the next repaint just adopts it.

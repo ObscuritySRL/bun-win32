@@ -1166,7 +1166,8 @@ class User32 extends Win32 {
     hWndParent: HWND | 0n,
     hMenu: HMENU | 0n,
     hInstance: HINSTANCE | 0n,
-    lpParam: LPVOID | NULL): HWND {
+    lpParam: LPVOID | NULL,
+  ): HWND {
     return User32.Load('CreateWindowExW')(dwExStyle, lpClassName, lpWindowName, dwStyle, X, Y, nWidth, nHeight, hWndParent, hMenu, hInstance, lpParam);
   }
 

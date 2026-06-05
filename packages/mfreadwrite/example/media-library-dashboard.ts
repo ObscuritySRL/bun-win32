@@ -160,7 +160,7 @@ function probeFile(fullPath: string): MediaEntry {
 
 const coInitHr = ole32.symbols.CoInitializeEx(null, COINIT_APARTMENTTHREADED);
 const shouldUninitialize = coInitHr >= 0;
-if (coInitHr < 0 && (coInitHr >>> 0) !== RPC_E_CHANGED_MODE) {
+if (coInitHr < 0 && coInitHr >>> 0 !== RPC_E_CHANGED_MODE) {
   console.error(`${ANSI.red}CoInitializeEx failed: ${formatHResult(coInitHr)}${ANSI.reset}`);
   process.exit(1);
 }
@@ -220,7 +220,9 @@ for (const entry of failed) {
 }
 
 console.log();
-console.log(`  ${ANSI.bold}${entries.length}${ANSI.reset} files  ${ANSI.dim}•${ANSI.reset}  total ${ANSI.bold}${formatDuration(totalSeconds)}${ANSI.reset}  ${ANSI.dim}•${ANSI.reset}  ${formatBytes(totalBytes)}  ${ANSI.dim}•${ANSI.reset}  ${ANSI.green}${successful.length} decoded${ANSI.reset}${failed.length > 0 ? `, ${ANSI.red}${failed.length} failed${ANSI.reset}` : ''}`);
+console.log(
+  `  ${ANSI.bold}${entries.length}${ANSI.reset} files  ${ANSI.dim}•${ANSI.reset}  total ${ANSI.bold}${formatDuration(totalSeconds)}${ANSI.reset}  ${ANSI.dim}•${ANSI.reset}  ${formatBytes(totalBytes)}  ${ANSI.dim}•${ANSI.reset}  ${ANSI.green}${successful.length} decoded${ANSI.reset}${failed.length > 0 ? `, ${ANSI.red}${failed.length} failed${ANSI.reset}` : ''}`,
+);
 if (longest !== undefined) console.log(`  ${ANSI.dim}longest  ${ANSI.reset}${ANSI.yellow}${longest.fileName}${ANSI.reset}  ${ANSI.magenta}${formatDuration(longest.durationSeconds)}${ANSI.reset}`);
 if (shortest !== undefined) console.log(`  ${ANSI.dim}shortest ${ANSI.reset}${ANSI.yellow}${shortest.fileName}${ANSI.reset}  ${ANSI.magenta}${formatDuration(shortest.durationSeconds)}${ANSI.reset}`);
 console.log();

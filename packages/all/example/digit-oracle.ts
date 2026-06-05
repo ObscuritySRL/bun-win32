@@ -43,10 +43,7 @@ import { SystemMetric } from '@bun-win32/user32';
 import * as gpu from './_gpu';
 import * as hud from './_hud';
 import { captureBackBuffer } from './_snapshot';
-import {
-  C1, C2, K, PAD, FC_IN, N_OUT, GRID, MNIST_TEST_ACC,
-  WEIGHTS_B64, REF3_B64, REF7_B64, REF5_B64, REF8_B64,
-} from './digit-oracle.weights';
+import { C1, C2, K, PAD, FC_IN, N_OUT, GRID, MNIST_TEST_ACC, WEIGHTS_B64, REF3_B64, REF7_B64, REF5_B64, REF8_B64 } from './digit-oracle.weights';
 
 const encodeWide = (str: string): Buffer => Buffer.from(`${str}\0`, 'utf16le');
 const SELFSHOT = process.env.SELFSHOT === '1';
@@ -546,7 +543,7 @@ const workBot = Math.round(clientH * 0.93);
 const workH = workBot - workTop;
 
 // Column 1 — draw canvas (square), vertically centered.
-const canvasSize = Math.min(Math.round(workH * 0.74), Math.round(clientW * 0.30));
+const canvasSize = Math.min(Math.round(workH * 0.74), Math.round(clientW * 0.3));
 const canvasLeft = margin;
 const canvasTop = workTop + Math.round((workH - canvasSize) / 2);
 
@@ -564,8 +561,8 @@ const col3Left = featLeft + Math.round(featGridW) + Math.round(clientW * 0.05);
 const col3Right = clientW - margin;
 const col3W = col3Right - col3Left;
 const verdictTop = workTop + Math.round(workH * 0.02);
-const verdictH = Math.round(workH * 0.40);
-const barTop = verdictTop + verdictH + Math.round(workH * 0.10);
+const verdictH = Math.round(workH * 0.4);
+const barTop = verdictTop + verdictH + Math.round(workH * 0.1);
 const barHeight = workBot - barTop;
 const barLabelW = Math.round(col3W * 0.07);
 const barPctW = Math.round(col3W * 0.16);
@@ -575,7 +572,7 @@ const barWidth = col3W - barLabelW - barPctW;
 // The huge winner digit lives INSIDE the verdict card (top of column 3), sized to fit
 // the card height with margin (leaving room for the confidence readout below) so it
 // never overflows the client area.
-const bigFontPx = Math.round(verdictH * 0.80);
+const bigFontPx = Math.round(verdictH * 0.8);
 // Center + radius of the neon halo the pixel shader paints behind that digit.
 const verdictCx = col3Left + Math.round(col3W / 2);
 const verdictCy = verdictTop + Math.round(bigFontPx * 0.46);
@@ -774,7 +771,7 @@ stampRef(3); // default for an unattended screenshot
 // ── GDI HUD ─────────────────────────────────────────────────────────────────────
 const titleFont = GDI32.CreateFontW(-Math.round(clientH * 0.026), 0, 0, 0, 600, 0, 0, 0, 0, 0, 0, 4, 0, encodeWide('Segoe UI').ptr!);
 const bigFont = GDI32.CreateFontW(-bigFontPx, 0, 0, 0, 800, 0, 0, 0, 0, 0, 0, 4, 0, encodeWide('Segoe UI Semibold').ptr!);
-const labelFont = GDI32.CreateFontW(-Math.round(Math.min(clientH * 0.040, 36)), 0, 0, 0, 700, 0, 0, 0, 0, 0, 0, 4, 0, encodeWide('Consolas').ptr!);
+const labelFont = GDI32.CreateFontW(-Math.round(Math.min(clientH * 0.04, 36)), 0, 0, 0, 700, 0, 0, 0, 0, 0, 0, 4, 0, encodeWide('Consolas').ptr!);
 const smallFont = GDI32.CreateFontW(-Math.round(clientH * 0.022), 0, 0, 0, 600, 0, 0, 0, 0, 0, 0, 4, 0, encodeWide('Consolas').ptr!);
 const TRANSPARENT_BK = 1;
 
@@ -794,35 +791,27 @@ function drawHud(fps: number, argmax: number, conf: number, hasInk: boolean): vo
 
     // Title bar.
     GDI32.SelectObject(dc, titleFont);
-    text(dc, Math.round(margin), Math.round(clientH * 0.045),
-      'DIGIT ORACLE', 0x00f0e0c0);
+    text(dc, Math.round(margin), Math.round(clientH * 0.045), 'DIGIT ORACLE', 0x00f0e0c0);
     GDI32.SelectObject(dc, smallFont);
-    text(dc, Math.round(margin), Math.round(clientH * 0.090),
-      `convolutional neural net · GPU compute · pure TypeScript · ${MNIST_TEST_ACC}% MNIST`, 0x00b0c8d8);
+    text(dc, Math.round(margin), Math.round(clientH * 0.09), `convolutional neural net · GPU compute · pure TypeScript · ${MNIST_TEST_ACC}% MNIST`, 0x00b0c8d8);
     // fps + gpu, right aligned-ish.
-    text(dc, Math.round(clientW - clientW * 0.32), Math.round(clientH * 0.045),
-      `${fps} fps`, 0x0090ffd0);
-    text(dc, Math.round(clientW - clientW * 0.32), Math.round(clientH * 0.078),
-      `${dev.gpuName}`, 0x008090a0);
+    text(dc, Math.round(clientW - clientW * 0.32), Math.round(clientH * 0.045), `${fps} fps`, 0x0090ffd0);
+    text(dc, Math.round(clientW - clientW * 0.32), Math.round(clientH * 0.078), `${dev.gpuName}`, 0x008090a0);
 
     // Canvas caption.
     GDI32.SelectObject(dc, smallFont);
-    text(dc, Math.round(canvasLeft), Math.round(canvasTop - clientH * 0.038),
-      hasInk ? 'INPUT  28x28' : 'DRAW A DIGIT (hold LMB)', hasInk ? 0x0070b0e0 : 0x0060a0ff);
-    text(dc, Math.round(canvasLeft), Math.round(canvasTop + canvasSize + clientH * 0.012),
-      'SPACE clears · 1-4 samples · ESC', 0x00708090);
+    text(dc, Math.round(canvasLeft), Math.round(canvasTop - clientH * 0.038), hasInk ? 'INPUT  28x28' : 'DRAW A DIGIT (hold LMB)', hasInk ? 0x0070b0e0 : 0x0060a0ff);
+    text(dc, Math.round(canvasLeft), Math.round(canvasTop + canvasSize + clientH * 0.012), 'SPACE clears · 1-4 samples · ESC', 0x00708090);
 
     // Feature-map caption.
-    text(dc, Math.round(featLeft), Math.round(featTop - clientH * 0.038),
-      'CONV-2 FEATURE MAPS  16ch', 0x0080d0e0);
+    text(dc, Math.round(featLeft), Math.round(featTop - clientH * 0.038), 'CONV-2 FEATURE MAPS  16ch', 0x0080d0e0);
 
     // Confidence caption + labels.
-    text(dc, Math.round(barLeft), Math.round(barTop - clientH * 0.038),
-      'CLASS CONFIDENCE', 0x0090c0d0);
+    text(dc, Math.round(barLeft), Math.round(barTop - clientH * 0.038), 'CLASS CONFIDENCE', 0x0090c0d0);
     GDI32.SelectObject(dc, labelFont);
     const rowH = barHeight / 10;
     for (let d = 0; d < 10; d += 1) {
-      const ly = Math.round(barTop + d * rowH + rowH * 0.10);
+      const ly = Math.round(barTop + d * rowH + rowH * 0.1);
       const isWin = hasInk && d === argmax;
       text(dc, Math.round(barLeft - clientW * 0.022), ly, String(d), isWin ? 0x0080ffd0 : 0x00a0b0c0);
       const pstr = `${(Math.min(1, probsOut[d]!) * 100).toFixed(0)}%`;
@@ -830,8 +819,7 @@ function drawHud(fps: number, argmax: number, conf: number, hasInk: boolean): vo
     }
 
     // Verdict caption above the card.
-    text(dc, Math.round(col3Left), Math.round(verdictTop - clientH * 0.038),
-      'VERDICT', 0x0090c0d0);
+    text(dc, Math.round(col3Left), Math.round(verdictTop - clientH * 0.038), 'VERDICT', 0x0090c0d0);
 
     // Big prediction digit — centered INSIDE the verdict card (top of column 3) so it
     // always fits within the client area.
@@ -844,7 +832,7 @@ function drawHud(fps: number, argmax: number, conf: number, hasInk: boolean): vo
       const predX = col3Left + Math.round((col3W - glyphW) / 2);
       // Seat the digit toward the top of the card, leaving a clear band below for the
       // confidence readout (GDI font cells carry internal leading, so nudge up a touch).
-      const predY = verdictTop - Math.round(bigFontPx * 0.10);
+      const predY = verdictTop - Math.round(bigFontPx * 0.1);
       GDI32.SetTextColor(dc, 0x00103020);
       GDI32.TextOutW(dc, predX + 5, predY + 5, dt.ptr!, ds.length);
       GDI32.SetTextColor(dc, 0x0070ffd0);
@@ -853,7 +841,7 @@ function drawHud(fps: number, argmax: number, conf: number, hasInk: boolean): vo
       GDI32.SelectObject(dc, titleFont);
       const cstr = `${(conf * 100).toFixed(1)}% sure`;
       const cx = col3Left + Math.round((col3W - cstr.length * clientH * 0.013) / 2);
-      text(dc, cx, verdictTop + verdictH - Math.round(clientH * 0.020), cstr, 0x00d0f0e0);
+      text(dc, cx, verdictTop + verdictH - Math.round(clientH * 0.02), cstr, 0x00d0f0e0);
     }
   });
 }
@@ -903,8 +891,7 @@ process.on('uncaughtException', (err) => {
 // of real test images and reports accuracy. ~98-99% means model + preprocessing are
 // sound; far lower means the live inference path is broken.
 if (SELFCHECK) {
-  const be32 = (b: Uint8Array, off: number): number =>
-    ((b[off]! << 24) | (b[off + 1]! << 16) | (b[off + 2]! << 8) | b[off + 3]!) >>> 0;
+  const be32 = (b: Uint8Array, off: number): number => ((b[off]! << 24) | (b[off + 1]! << 16) | (b[off + 2]! << 8) | b[off + 3]!) >>> 0;
 
   // (a) Reference-glyph sanity: each baked REF must classify to its label.
   let refOk = 0;

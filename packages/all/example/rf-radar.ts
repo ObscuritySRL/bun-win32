@@ -233,7 +233,10 @@ function refreshBluetooth(): number {
     const hDevFind = BluetoothApis.BluetoothFindFirstDevice(searchParams.ptr, devInfo.ptr);
     if (hDevFind === 0n) continue;
     do {
-      const addr = Array.from(devInfo.subarray(8, 14)).reverse().map((b) => b.toString(16).padStart(2, '0')).join(':');
+      const addr = Array.from(devInfo.subarray(8, 14))
+        .reverse()
+        .map((b) => b.toString(16).padStart(2, '0'))
+        .join(':');
       const classOfDevice = devInfo.readUInt32LE(16);
       const connected = devInfo.readInt32LE(20) !== 0;
       const name = readWide(devInfo, 64, 248) || '(unnamed)';
@@ -597,7 +600,8 @@ function drawLabels(): void {
       GDI32.TextOutW(dc, lx + 2, ly + 2, buf.ptr!, len);
       let col = 0x0080ffb0; // default bright green (BGR)
       if (c.isBT) col = 0x00ffb060;
-      else if (c.kind === 2) col = 0x0050c0ff; // enterprise amber
+      else if (c.kind === 2)
+        col = 0x0050c0ff; // enterprise amber
       else if (c.kind === 3) col = 0x0060e0ff; // WPA3 gold
       GDI32.SetTextColor(dc, col);
       GDI32.TextOutW(dc, lx, ly, buf.ptr!, len);
@@ -606,10 +610,8 @@ function drawLabels(): void {
     GDI32.SelectObject(dc, hudFont);
     let wifiN = 0;
     let btN = 0;
-    for (const c of contacts.values()) (c.isBT ? (btN += 1) : (wifiN += 1));
-    const hudLine = wlanOk
-      ? `RF RADAR · ${wifiN} WiFi AP · ${btN} BT · ${fps} fps · ${g.gpuName}`
-      : `RF RADAR · NO WLAN ADAPTER · ${btN} BT · ${fps} fps`;
+    for (const c of contacts.values()) c.isBT ? (btN += 1) : (wifiN += 1);
+    const hudLine = wlanOk ? `RF RADAR · ${wifiN} WiFi AP · ${btN} BT · ${fps} fps · ${g.gpuName}` : `RF RADAR · NO WLAN ADAPTER · ${btN} BT · ${fps} fps`;
     const hbuf = Buffer.from(`${hudLine}\0`, 'utf16le');
     GDI32.SetTextColor(dc, 0x00000000);
     GDI32.TextOutW(dc, 25, 25, hbuf.ptr!, hudLine.length);

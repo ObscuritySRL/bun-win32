@@ -20,15 +20,7 @@ import { join } from 'node:path';
 
 import Kernel32 from '@bun-win32/kernel32';
 
-import Virtdisk, {
-  CREATE_VIRTUAL_DISK_FLAG,
-  CREATE_VIRTUAL_DISK_VERSION,
-  GET_VIRTUAL_DISK_INFO_VERSION,
-  OPEN_VIRTUAL_DISK_FLAG,
-  OPEN_VIRTUAL_DISK_VERSION,
-  VIRTUAL_DISK_ACCESS_MASK,
-  VIRTUAL_STORAGE_TYPE_DEVICE_VHDX,
-} from '../index';
+import Virtdisk, { CREATE_VIRTUAL_DISK_FLAG, CREATE_VIRTUAL_DISK_VERSION, GET_VIRTUAL_DISK_INFO_VERSION, OPEN_VIRTUAL_DISK_FLAG, OPEN_VIRTUAL_DISK_VERSION, VIRTUAL_DISK_ACCESS_MASK, VIRTUAL_STORAGE_TYPE_DEVICE_VHDX } from '../index';
 
 const ERROR_SUCCESS = 0;
 const RESET = '\x1b[0m';
@@ -50,8 +42,14 @@ function formatBytes(bytes: bigint): string {
 
 function formatGuid(buf: Buffer, offset: number): string {
   const d1 = buf.readUInt32LE(offset).toString(16).padStart(8, '0');
-  const d2 = buf.readUInt16LE(offset + 4).toString(16).padStart(4, '0');
-  const d3 = buf.readUInt16LE(offset + 6).toString(16).padStart(4, '0');
+  const d2 = buf
+    .readUInt16LE(offset + 4)
+    .toString(16)
+    .padStart(4, '0');
+  const d3 = buf
+    .readUInt16LE(offset + 6)
+    .toString(16)
+    .padStart(4, '0');
   const d4hi = buf.subarray(offset + 8, offset + 10).toString('hex');
   const d4lo = buf.subarray(offset + 10, offset + 16).toString('hex');
   return `{${d1}-${d2}-${d3}-${d4hi}-${d4lo}}`.toUpperCase();
@@ -59,12 +57,18 @@ function formatGuid(buf: Buffer, offset: number): string {
 
 function deviceName(id: number): string {
   switch (id) {
-    case 0: return 'Unknown';
-    case 1: return 'ISO';
-    case 2: return 'VHD';
-    case 3: return 'VHDX';
-    case 4: return 'VHD Set';
-    default: return `Device(${id})`;
+    case 0:
+      return 'Unknown';
+    case 1:
+      return 'ISO';
+    case 2:
+      return 'VHD';
+    case 3:
+      return 'VHDX';
+    case 4:
+      return 'VHD Set';
+    default:
+      return `Device(${id})`;
   }
 }
 
@@ -101,17 +105,7 @@ createParams.writeBigUInt64LE(128n * 1024n * 1024n, 24); // 128 MB
 
 const createHandle = Buffer.alloc(8);
 
-let status = Virtdisk.CreateVirtualDisk(
-  storageType.ptr!,
-  pathBuf.ptr!,
-  VIRTUAL_DISK_ACCESS_MASK.VIRTUAL_DISK_ACCESS_CREATE,
-  null,
-  CREATE_VIRTUAL_DISK_FLAG.CREATE_VIRTUAL_DISK_FLAG_NONE,
-  0,
-  createParams.ptr!,
-  null,
-  createHandle.ptr!,
-);
+let status = Virtdisk.CreateVirtualDisk(storageType.ptr!, pathBuf.ptr!, VIRTUAL_DISK_ACCESS_MASK.VIRTUAL_DISK_ACCESS_CREATE, null, CREATE_VIRTUAL_DISK_FLAG.CREATE_VIRTUAL_DISK_FLAG_NONE, 0, createParams.ptr!, null, createHandle.ptr!);
 
 if (status !== ERROR_SUCCESS) {
   console.error(`CreateVirtualDisk failed: error ${status}`);
@@ -132,20 +126,13 @@ Kernel32.CloseHandle(createHandle.readBigUInt64LE(0));
  */
 const openParams = Buffer.alloc(28);
 openParams.writeUInt32LE(OPEN_VIRTUAL_DISK_VERSION.OPEN_VIRTUAL_DISK_VERSION_2, 0);
-openParams.writeInt32LE(1, 4);  // GetInfoOnly = TRUE
-openParams.writeInt32LE(1, 8);  // ReadOnly = TRUE
+openParams.writeInt32LE(1, 4); // GetInfoOnly = TRUE
+openParams.writeInt32LE(1, 8); // ReadOnly = TRUE
 
 const openHandle = Buffer.alloc(8);
 const openPath = Buffer.from(`${vhdxPath}\0`, 'utf16le');
 
-status = Virtdisk.OpenVirtualDisk(
-  storageType.ptr!,
-  openPath.ptr!,
-  VIRTUAL_DISK_ACCESS_MASK.VIRTUAL_DISK_ACCESS_NONE,
-  OPEN_VIRTUAL_DISK_FLAG.OPEN_VIRTUAL_DISK_FLAG_NONE,
-  openParams.ptr!,
-  openHandle.ptr!,
-);
+status = Virtdisk.OpenVirtualDisk(storageType.ptr!, openPath.ptr!, VIRTUAL_DISK_ACCESS_MASK.VIRTUAL_DISK_ACCESS_NONE, OPEN_VIRTUAL_DISK_FLAG.OPEN_VIRTUAL_DISK_FLAG_NONE, openParams.ptr!, openHandle.ptr!);
 
 if (status !== ERROR_SUCCESS) {
   console.error(`OpenVirtualDisk failed: error ${status}`);

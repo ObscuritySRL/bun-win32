@@ -2,7 +2,65 @@ import { type FFIFunction, FFIType } from 'bun:ffi';
 
 import { Win32 } from '@bun-win32/core';
 
-import type { BOOL, COLORREF, DWORD, DWORD_PTR, HANDLE, HBITMAP, HDC, HDPA, HDSA, HICON, HIMAGELIST, HINSTANCE, HMENU, HPROPSHEETPAGE, HRESULT, HWND, INT, INT_PTR, LANGID, LONG, LPARAM, LPCOLORMAP, LPCPROPSHEETHEADERA, LPCPROPSHEETHEADERW, LPCPROPSHEETPAGEA, LPCPROPSHEETPAGEW, LPCRECT, LPCSTR, LPCTBBUTTON, LPCVOID, LPCWSTR, LPDLLVERSIONINFO, LPIMAGEINFO, LPIMAGELISTDRAWPARAMS, LPINITCOMMONCONTROLSEX, LPINT, LPPOINT, LPRECT, LPSCROLLINFO, LPTRACKMOUSEEVENT, LPVOID, LPWSTR, LRESULT, NULL, PACKED_POINT, PFNDACOMPARE, PFNDAENUMCALLBACK, PFNDPAMERGE, PFNDPASTREAM, PINT_PTR, PLPWSTR, PSTREAM, SUBCLASSPROC, UINT, UINT_PTR, VOID, WPARAM } from '../types/Comctl32';
+import type {
+  BOOL,
+  COLORREF,
+  DWORD,
+  DWORD_PTR,
+  HANDLE,
+  HBITMAP,
+  HDC,
+  HDPA,
+  HDSA,
+  HICON,
+  HIMAGELIST,
+  HINSTANCE,
+  HMENU,
+  HPROPSHEETPAGE,
+  HRESULT,
+  HWND,
+  INT,
+  INT_PTR,
+  LANGID,
+  LONG,
+  LPARAM,
+  LPCOLORMAP,
+  LPCPROPSHEETHEADERA,
+  LPCPROPSHEETHEADERW,
+  LPCPROPSHEETPAGEA,
+  LPCPROPSHEETPAGEW,
+  LPCRECT,
+  LPCSTR,
+  LPCTBBUTTON,
+  LPCVOID,
+  LPCWSTR,
+  LPDLLVERSIONINFO,
+  LPIMAGEINFO,
+  LPIMAGELISTDRAWPARAMS,
+  LPINITCOMMONCONTROLSEX,
+  LPINT,
+  LPPOINT,
+  LPRECT,
+  LPSCROLLINFO,
+  LPTRACKMOUSEEVENT,
+  LPVOID,
+  LPWSTR,
+  LRESULT,
+  NULL,
+  PACKED_POINT,
+  PFNDACOMPARE,
+  PFNDAENUMCALLBACK,
+  PFNDPAMERGE,
+  PFNDPASTREAM,
+  PINT_PTR,
+  PLPWSTR,
+  PSTREAM,
+  SUBCLASSPROC,
+  UINT,
+  UINT_PTR,
+  VOID,
+  WPARAM,
+} from '../types/Comctl32';
 
 /**
  * Thin, lazy-loaded FFI bindings for `comctl32.dll`.
@@ -178,7 +236,21 @@ class Comctl32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-createtoolbarex
-  public static CreateToolbarEx(hwnd: HWND, ws: DWORD, wID: UINT, nBitmaps: INT, hBMInst: HINSTANCE, wBMID: UINT_PTR, lpButtons: LPCTBBUTTON, iNumButtons: INT, dxButton: INT, dyButton: INT, dxBitmap: INT, dyBitmap: INT, uStructSize: UINT): HWND {
+  public static CreateToolbarEx(
+    hwnd: HWND,
+    ws: DWORD,
+    wID: UINT,
+    nBitmaps: INT,
+    hBMInst: HINSTANCE,
+    wBMID: UINT_PTR,
+    lpButtons: LPCTBBUTTON,
+    iNumButtons: INT,
+    dxButton: INT,
+    dyButton: INT,
+    dxBitmap: INT,
+    dyBitmap: INT,
+    uStructSize: UINT,
+  ): HWND {
     return Comctl32.Load('CreateToolbarEx')(hwnd, ws, wID, nBitmaps, hBMInst, wBMID, lpButtons, iNumButtons, dxButton, dyButton, dxBitmap, dyBitmap, uStructSize);
   }
 

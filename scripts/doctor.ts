@@ -72,9 +72,7 @@ function checkBunVersion(): void {
   checkResults.push({
     label: 'Bun version',
     status: meetsMinimum ? 'pass' : 'fail',
-    detail: meetsMinimum
-      ? `${bunVersionString} (>= ${minimumBunMajor}.${minimumBunMinor}.0 required)`
-      : `${bunVersionString} — upgrade to >= ${minimumBunMajor}.${minimumBunMinor}.0`,
+    detail: meetsMinimum ? `${bunVersionString} (>= ${minimumBunMajor}.${minimumBunMinor}.0 required)` : `${bunVersionString} — upgrade to >= ${minimumBunMajor}.${minimumBunMinor}.0`,
   });
 }
 
@@ -92,9 +90,7 @@ function checkRipgrep(): void {
     checkResults.push({
       label: 'ripgrep (rg)',
       status: 'fail',
-      detail: explicitRipgrepPath
-        ? `cannot execute ${explicitRipgrepPath}`
-        : 'not on PATH — install ripgrep or pass --rg=<path> to catalog.ts / stub.ts',
+      detail: explicitRipgrepPath ? `cannot execute ${explicitRipgrepPath}` : 'not on PATH — install ripgrep or pass --rg=<path> to catalog.ts / stub.ts',
     });
   }
 }

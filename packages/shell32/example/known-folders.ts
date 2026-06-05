@@ -130,12 +130,7 @@ for (const category of categories) {
 
   console.log(`${category.toUpperCase()} FOLDERS (${catResolved.length}/${catResults.length} resolved)`);
   console.log(divider);
-  console.log(
-    '  ' +
-      'CSIDL Name'.padEnd(36) +
-      'Value'.padEnd(10) +
-      'Path',
-  );
+  console.log('  ' + 'CSIDL Name'.padEnd(36) + 'Value'.padEnd(10) + 'Path');
   console.log(divider);
 
   for (const r of catResults) {

@@ -12,8 +12,7 @@ const DEFAULT_FOREGROUND = 0xc8c8d0;
 const clampChannel = (value: number): number => (value < 0 ? 0 : value > 255 ? 255 : value) | 0;
 
 /** Pack three 0..255 channels into a single 24-bit key (also the per-cell diff key). */
-const packRgb = (red: number, green: number, blue: number): number =>
-  (clampChannel(red) << 16) | (clampChannel(green) << 8) | clampChannel(blue);
+const packRgb = (red: number, green: number, blue: number): number => (clampChannel(red) << 16) | (clampChannel(green) << 8) | clampChannel(blue);
 
 /**
  * A character-cell grid for terminal user interfaces. Each cell carries a code
@@ -93,7 +92,7 @@ export class CharTerm {
     y |= 0;
     if (!this.#inBounds(x, y)) return;
     const cellIndex = y * this.columns + x;
-    this.characters[cellIndex] = typeof glyph === 'number' ? glyph : glyph.codePointAt(0) ?? SPACE_CODE_POINT;
+    this.characters[cellIndex] = typeof glyph === 'number' ? glyph : (glyph.codePointAt(0) ?? SPACE_CODE_POINT);
     this.foreground[cellIndex] = packRgb(foreground[0], foreground[1], foreground[2]);
     if (background) this.background[cellIndex] = packRgb(background[0], background[1], background[2]);
     this.bold[cellIndex] = bold ? 1 : 0;
@@ -253,14 +252,7 @@ export class CharTerm {
         const cellForeground = foreground[cellIndex];
         const cellBackground = background[cellIndex];
         const cellBold = bold[cellIndex];
-        if (
-          !isFirstFrame &&
-          previousCharacters[cellIndex] === cellCharacter &&
-          previousForeground[cellIndex] === cellForeground &&
-          previousBackground[cellIndex] === cellBackground &&
-          previousBold[cellIndex] === cellBold
-        )
-          continue;
+        if (!isFirstFrame && previousCharacters[cellIndex] === cellCharacter && previousForeground[cellIndex] === cellForeground && previousBackground[cellIndex] === cellBackground && previousBold[cellIndex] === cellBold) continue;
         previousCharacters[cellIndex] = cellCharacter;
         previousForeground[cellIndex] = cellForeground;
         previousBackground[cellIndex] = cellBackground;
@@ -354,18 +346,7 @@ export class CharTerm {
 
   // Rasterise one glyph into the image. Block / shade / box-drawing glyphs are drawn
   // procedurally by code point; ASCII / Latin come from the bitmap font.
-  #rasterGlyph(
-    pixels: Uint8Array,
-    imageWidth: number,
-    cellPixelX: number,
-    cellPixelY: number,
-    cellWidth: number,
-    cellHeight: number,
-    codePoint: number,
-    foregroundRed: number,
-    foregroundGreen: number,
-    foregroundBlue: number,
-  ): void {
+  #rasterGlyph(pixels: Uint8Array, imageWidth: number, cellPixelX: number, cellPixelY: number, cellWidth: number, cellHeight: number, codePoint: number, foregroundRed: number, foregroundGreen: number, foregroundBlue: number): void {
     const setAlpha = (x: number, y: number, alpha: number): void => {
       if (alpha <= 0 || x < 0 || y < 0 || x >= imageWidth) return;
       const offset = (y * imageWidth + x) * 3;

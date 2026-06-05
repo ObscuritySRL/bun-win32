@@ -22,20 +22,9 @@
 
 import { read, type Pointer } from 'bun:ffi';
 
-import Bcrypt, {
-  BCRYPT_HASH_BLOCK_LENGTH,
-  BCRYPT_HASH_LENGTH,
-  BCryptAlgOperationFlags,
-  type BCRYPT_ALG_HANDLE,
-} from '../index';
+import Bcrypt, { BCRYPT_HASH_BLOCK_LENGTH, BCRYPT_HASH_LENGTH, BCryptAlgOperationFlags, type BCRYPT_ALG_HANDLE } from '../index';
 
-Bcrypt.Preload([
-  'BCryptCloseAlgorithmProvider',
-  'BCryptEnumAlgorithms',
-  'BCryptFreeBuffer',
-  'BCryptGetProperty',
-  'BCryptOpenAlgorithmProvider',
-]);
+Bcrypt.Preload(['BCryptCloseAlgorithmProvider', 'BCryptEnumAlgorithms', 'BCryptFreeBuffer', 'BCryptGetProperty', 'BCryptOpenAlgorithmProvider']);
 
 const ANSI = {
   bold: '\x1b[1m',
@@ -121,9 +110,7 @@ function describeHash(name: string): string {
     const hashLength = getUint32Property(handle, BCRYPT_HASH_LENGTH);
     const blockLength = getUint32Either(handle, BCRYPT_HASH_BLOCK_LENGTH);
     const digestBits = hashLength * 8;
-    return blockLength > 0
-      ? `${ANSI.dim}digest ${digestBits}b · block ${blockLength}B${ANSI.reset}`
-      : `${ANSI.dim}digest ${digestBits}b${ANSI.reset}`;
+    return blockLength > 0 ? `${ANSI.dim}digest ${digestBits}b · block ${blockLength}B${ANSI.reset}` : `${ANSI.dim}digest ${digestBits}b${ANSI.reset}`;
   } finally {
     Bcrypt.BCryptCloseAlgorithmProvider(handle, 0);
   }

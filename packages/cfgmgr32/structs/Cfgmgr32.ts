@@ -921,7 +921,15 @@ class Cfgmgr32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_get_device_interface_property_exw
-  public static CM_Get_Device_Interface_Property_ExW(pszDeviceInterface: LPCWSTR, PropertyKey: PDEVPROPKEY, PropertyType: PDEVPROPTYPE, PropertyBuffer: PBYTE | NULL, PropertyBufferSize: PULONG, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
+  public static CM_Get_Device_Interface_Property_ExW(
+    pszDeviceInterface: LPCWSTR,
+    PropertyKey: PDEVPROPKEY,
+    PropertyType: PDEVPROPTYPE,
+    PropertyBuffer: PBYTE | NULL,
+    PropertyBufferSize: PULONG,
+    ulFlags: ULONG,
+    hMachine: HMACHINE | 0n,
+  ): CONFIGRET {
     return Cfgmgr32.Load('CM_Get_Device_Interface_Property_ExW')(pszDeviceInterface, PropertyKey, PropertyType, PropertyBuffer, PropertyBufferSize, ulFlags, hMachine);
   }
 
@@ -1461,7 +1469,15 @@ class Cfgmgr32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_set_device_interface_property_exw
-  public static CM_Set_Device_Interface_Property_ExW(pszDeviceInterface: LPCWSTR, PropertyKey: PDEVPROPKEY, PropertyType: DEVPROPTYPE, PropertyBuffer: PBYTE | NULL, PropertyBufferSize: ULONG, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
+  public static CM_Set_Device_Interface_Property_ExW(
+    pszDeviceInterface: LPCWSTR,
+    PropertyKey: PDEVPROPKEY,
+    PropertyType: DEVPROPTYPE,
+    PropertyBuffer: PBYTE | NULL,
+    PropertyBufferSize: ULONG,
+    ulFlags: ULONG,
+    hMachine: HMACHINE | 0n,
+  ): CONFIGRET {
     return Cfgmgr32.Load('CM_Set_Device_Interface_Property_ExW')(pszDeviceInterface, PropertyKey, PropertyType, PropertyBuffer, PropertyBufferSize, ulFlags, hMachine);
   }
 
@@ -1556,33 +1572,129 @@ class Cfgmgr32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/devquery/nf-devquery-devcreateobjectquery
-  public static DevCreateObjectQuery(ObjectType: ULONG, QueryFlags: ULONG, cRequestedProperties: ULONG, pRequestedProperties: PVOID | NULL, cFilterExpressionCount: ULONG, pFilter: PVOID | NULL, pCallback: PVOID, pContext: PVOID | NULL, phDevQuery: PHDEVQUERY): HRESULT {
+  public static DevCreateObjectQuery(
+    ObjectType: ULONG,
+    QueryFlags: ULONG,
+    cRequestedProperties: ULONG,
+    pRequestedProperties: PVOID | NULL,
+    cFilterExpressionCount: ULONG,
+    pFilter: PVOID | NULL,
+    pCallback: PVOID,
+    pContext: PVOID | NULL,
+    phDevQuery: PHDEVQUERY,
+  ): HRESULT {
     return Cfgmgr32.Load('DevCreateObjectQuery')(ObjectType, QueryFlags, cRequestedProperties, pRequestedProperties, cFilterExpressionCount, pFilter, pCallback, pContext, phDevQuery);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/devquery/nf-devquery-devcreateobjectqueryex
-  public static DevCreateObjectQueryEx(ObjectType: ULONG, QueryFlags: ULONG, cRequestedProperties: ULONG, pRequestedProperties: PVOID | NULL, cFilterExpressionCount: ULONG, pFilter: PVOID | NULL, cExtendedParameterCount: ULONG, pExtendedParameters: PVOID | NULL, pCallback: PVOID, pContext: PVOID | NULL, phDevQuery: PHDEVQUERY): HRESULT {
+  public static DevCreateObjectQueryEx(
+    ObjectType: ULONG,
+    QueryFlags: ULONG,
+    cRequestedProperties: ULONG,
+    pRequestedProperties: PVOID | NULL,
+    cFilterExpressionCount: ULONG,
+    pFilter: PVOID | NULL,
+    cExtendedParameterCount: ULONG,
+    pExtendedParameters: PVOID | NULL,
+    pCallback: PVOID,
+    pContext: PVOID | NULL,
+    phDevQuery: PHDEVQUERY,
+  ): HRESULT {
     return Cfgmgr32.Load('DevCreateObjectQueryEx')(ObjectType, QueryFlags, cRequestedProperties, pRequestedProperties, cFilterExpressionCount, pFilter, cExtendedParameterCount, pExtendedParameters, pCallback, pContext, phDevQuery);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/devquery/nf-devquery-devcreateobjectqueryfromid
-  public static DevCreateObjectQueryFromId(ObjectType: ULONG, pszObjectId: PCWSTR, QueryFlags: ULONG, cRequestedProperties: ULONG, pRequestedProperties: PVOID | NULL, cFilterExpressionCount: ULONG, pFilter: PVOID | NULL, pCallback: PVOID, pContext: PVOID | NULL, phDevQuery: PHDEVQUERY): HRESULT {
+  public static DevCreateObjectQueryFromId(
+    ObjectType: ULONG,
+    pszObjectId: PCWSTR,
+    QueryFlags: ULONG,
+    cRequestedProperties: ULONG,
+    pRequestedProperties: PVOID | NULL,
+    cFilterExpressionCount: ULONG,
+    pFilter: PVOID | NULL,
+    pCallback: PVOID,
+    pContext: PVOID | NULL,
+    phDevQuery: PHDEVQUERY,
+  ): HRESULT {
     return Cfgmgr32.Load('DevCreateObjectQueryFromId')(ObjectType, pszObjectId, QueryFlags, cRequestedProperties, pRequestedProperties, cFilterExpressionCount, pFilter, pCallback, pContext, phDevQuery);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/devquery/nf-devquery-devcreateobjectqueryfromidex
-  public static DevCreateObjectQueryFromIdEx(ObjectType: ULONG, pszObjectId: PCWSTR, QueryFlags: ULONG, cRequestedProperties: ULONG, pRequestedProperties: PVOID | NULL, cFilterExpressionCount: ULONG, pFilter: PVOID | NULL, cExtendedParameterCount: ULONG, pExtendedParameters: PVOID | NULL, pCallback: PVOID, pContext: PVOID | NULL, phDevQuery: PHDEVQUERY): HRESULT {
-    return Cfgmgr32.Load('DevCreateObjectQueryFromIdEx')(ObjectType, pszObjectId, QueryFlags, cRequestedProperties, pRequestedProperties, cFilterExpressionCount, pFilter, cExtendedParameterCount, pExtendedParameters, pCallback, pContext, phDevQuery);
+  public static DevCreateObjectQueryFromIdEx(
+    ObjectType: ULONG,
+    pszObjectId: PCWSTR,
+    QueryFlags: ULONG,
+    cRequestedProperties: ULONG,
+    pRequestedProperties: PVOID | NULL,
+    cFilterExpressionCount: ULONG,
+    pFilter: PVOID | NULL,
+    cExtendedParameterCount: ULONG,
+    pExtendedParameters: PVOID | NULL,
+    pCallback: PVOID,
+    pContext: PVOID | NULL,
+    phDevQuery: PHDEVQUERY,
+  ): HRESULT {
+    return Cfgmgr32.Load('DevCreateObjectQueryFromIdEx')(
+      ObjectType,
+      pszObjectId,
+      QueryFlags,
+      cRequestedProperties,
+      pRequestedProperties,
+      cFilterExpressionCount,
+      pFilter,
+      cExtendedParameterCount,
+      pExtendedParameters,
+      pCallback,
+      pContext,
+      phDevQuery,
+    );
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/devquery/nf-devquery-devcreateobjectqueryfromids
-  public static DevCreateObjectQueryFromIds(ObjectType: ULONG, pszzObjectIds: PCZZWSTR, QueryFlags: ULONG, cRequestedProperties: ULONG, pRequestedProperties: PVOID | NULL, cFilterExpressionCount: ULONG, pFilter: PVOID | NULL, pCallback: PVOID, pContext: PVOID | NULL, phDevQuery: PHDEVQUERY): HRESULT {
+  public static DevCreateObjectQueryFromIds(
+    ObjectType: ULONG,
+    pszzObjectIds: PCZZWSTR,
+    QueryFlags: ULONG,
+    cRequestedProperties: ULONG,
+    pRequestedProperties: PVOID | NULL,
+    cFilterExpressionCount: ULONG,
+    pFilter: PVOID | NULL,
+    pCallback: PVOID,
+    pContext: PVOID | NULL,
+    phDevQuery: PHDEVQUERY,
+  ): HRESULT {
     return Cfgmgr32.Load('DevCreateObjectQueryFromIds')(ObjectType, pszzObjectIds, QueryFlags, cRequestedProperties, pRequestedProperties, cFilterExpressionCount, pFilter, pCallback, pContext, phDevQuery);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/devquery/nf-devquery-devcreateobjectqueryfromidsex
-  public static DevCreateObjectQueryFromIdsEx(ObjectType: ULONG, pszzObjectIds: PCZZWSTR, QueryFlags: ULONG, cRequestedProperties: ULONG, pRequestedProperties: PVOID | NULL, cFilterExpressionCount: ULONG, pFilter: PVOID | NULL, cExtendedParameterCount: ULONG, pExtendedParameters: PVOID | NULL, pCallback: PVOID, pContext: PVOID | NULL, phDevQuery: PHDEVQUERY): HRESULT {
-    return Cfgmgr32.Load('DevCreateObjectQueryFromIdsEx')(ObjectType, pszzObjectIds, QueryFlags, cRequestedProperties, pRequestedProperties, cFilterExpressionCount, pFilter, cExtendedParameterCount, pExtendedParameters, pCallback, pContext, phDevQuery);
+  public static DevCreateObjectQueryFromIdsEx(
+    ObjectType: ULONG,
+    pszzObjectIds: PCZZWSTR,
+    QueryFlags: ULONG,
+    cRequestedProperties: ULONG,
+    pRequestedProperties: PVOID | NULL,
+    cFilterExpressionCount: ULONG,
+    pFilter: PVOID | NULL,
+    cExtendedParameterCount: ULONG,
+    pExtendedParameters: PVOID | NULL,
+    pCallback: PVOID,
+    pContext: PVOID | NULL,
+    phDevQuery: PHDEVQUERY,
+  ): HRESULT {
+    return Cfgmgr32.Load('DevCreateObjectQueryFromIdsEx')(
+      ObjectType,
+      pszzObjectIds,
+      QueryFlags,
+      cRequestedProperties,
+      pRequestedProperties,
+      cFilterExpressionCount,
+      pFilter,
+      cExtendedParameterCount,
+      pExtendedParameters,
+      pCallback,
+      pContext,
+      phDevQuery,
+    );
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/devquery/nf-devquery-devfindproperty
@@ -1606,7 +1718,17 @@ class Cfgmgr32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/devquery/nf-devquery-devgetobjectpropertiesex
-  public static DevGetObjectPropertiesEx(ObjectType: ULONG, pszObjectId: PCWSTR, QueryFlags: ULONG, cRequestedProperties: ULONG, pRequestedProperties: PVOID, cExtendedParameterCount: ULONG, pExtendedParameters: PVOID | NULL, pcPropertyCount: PULONG, ppProperties: PVOID): HRESULT {
+  public static DevGetObjectPropertiesEx(
+    ObjectType: ULONG,
+    pszObjectId: PCWSTR,
+    QueryFlags: ULONG,
+    cRequestedProperties: ULONG,
+    pRequestedProperties: PVOID,
+    cExtendedParameterCount: ULONG,
+    pExtendedParameters: PVOID | NULL,
+    pcPropertyCount: PULONG,
+    ppProperties: PVOID,
+  ): HRESULT {
     return Cfgmgr32.Load('DevGetObjectPropertiesEx')(ObjectType, pszObjectId, QueryFlags, cRequestedProperties, pRequestedProperties, cExtendedParameterCount, pExtendedParameters, pcPropertyCount, ppProperties);
   }
 
@@ -1616,7 +1738,18 @@ class Cfgmgr32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/devquery/nf-devquery-devgetobjectsex
-  public static DevGetObjectsEx(ObjectType: ULONG, QueryFlags: ULONG, cRequestedProperties: ULONG, pRequestedProperties: PVOID | NULL, cFilterExpressionCount: ULONG, pFilter: PVOID | NULL, cExtendedParameterCount: ULONG, pExtendedParameters: PVOID | NULL, pcObjectCount: PULONG, ppObjects: PVOID): HRESULT {
+  public static DevGetObjectsEx(
+    ObjectType: ULONG,
+    QueryFlags: ULONG,
+    cRequestedProperties: ULONG,
+    pRequestedProperties: PVOID | NULL,
+    cFilterExpressionCount: ULONG,
+    pFilter: PVOID | NULL,
+    cExtendedParameterCount: ULONG,
+    pExtendedParameters: PVOID | NULL,
+    pcObjectCount: PULONG,
+    ppObjects: PVOID,
+  ): HRESULT {
     return Cfgmgr32.Load('DevGetObjectsEx')(ObjectType, QueryFlags, cRequestedProperties, pRequestedProperties, cFilterExpressionCount, pFilter, cExtendedParameterCount, pExtendedParameters, pcObjectCount, ppObjects);
   }
 

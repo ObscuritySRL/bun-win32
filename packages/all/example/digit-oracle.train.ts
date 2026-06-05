@@ -450,9 +450,7 @@ function backward(img: Float32Array, label: number): void {
   }
 }
 
-function sgdStep(
-  w: Float32Array, g: Float32Array, v: Float32Array, lr: number, scale: number, decay: boolean,
-): void {
+function sgdStep(w: Float32Array, g: Float32Array, v: Float32Array, lr: number, scale: number, decay: boolean): void {
   for (let i = 0; i < w.length; i += 1) {
     let grad = g[i]! * scale;
     if (decay) grad += WEIGHT_DECAY * w[i]!;
@@ -521,12 +519,18 @@ async function bakeWeights(fullAcc: number): Promise<void> {
   // Layout (matches the GPU demo's reader): w1, b1, w2, b2, wf, bf.
   const flat = new Float32Array(w1.length + b1.length + w2.length + b2.length + wf.length + bf.length);
   let off = 0;
-  flat.set(w1, off); off += w1.length;
-  flat.set(b1, off); off += b1.length;
-  flat.set(w2, off); off += w2.length;
-  flat.set(b2, off); off += b2.length;
-  flat.set(wf, off); off += wf.length;
-  flat.set(bf, off); off += bf.length;
+  flat.set(w1, off);
+  off += w1.length;
+  flat.set(b1, off);
+  off += b1.length;
+  flat.set(w2, off);
+  off += w2.length;
+  flat.set(b2, off);
+  off += b2.length;
+  flat.set(wf, off);
+  off += wf.length;
+  flat.set(bf, off);
+  off += bf.length;
   const b64 = Buffer.from(flat.buffer).toString('base64');
   const ref3 = refB64(3);
   const ref7 = refB64(7);

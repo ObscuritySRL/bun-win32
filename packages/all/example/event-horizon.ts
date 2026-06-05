@@ -653,7 +653,7 @@ function renderHero(): void {
   }
 
   // Disk plane geometry, shared by the back/front passes and the lensed top arc.
-  const tilt = 0.30; // y-foreshortening of the tilted disk plane
+  const tilt = 0.3; // y-foreshortening of the tilted disk plane
   const innerR = shadowR * 1.04;
   const outerR = shadowR * 3.0;
 
@@ -825,7 +825,7 @@ function applyRedshift(strength: number): void {
   colorFloats[18] = 1; // A←A
   colorFloats[24] = 1; // homogeneous
   colorFloats[5] = lerp(0, 0.45, k); // R gets some of input G (warm smear)
-  colorFloats[10] = lerp(0, 0.30, k); // R gets some of input B
+  colorFloats[10] = lerp(0, 0.3, k); // R gets some of input B
   // Brightness crush: negative translation on RGB pulls everything toward black.
   const crush = lerp(0, -0.45, k * k);
   colorFloats[20] = crush; // T→R

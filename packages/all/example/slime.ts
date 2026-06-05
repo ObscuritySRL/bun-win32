@@ -473,5 +473,5 @@ while (!win.shouldClose()) {
   if (durationMs > 0 && now - start >= durationMs) break;
 }
 
-console.log(`  ran ${frame} frames over ${((performance.now() - start) / 1000).toFixed(2)}s (${fps} fps, ${(AGENT_COUNT * frame / 1e6).toFixed(0)}M agent-steps).`);
+console.log(`  ran ${frame} frames over ${((performance.now() - start) / 1000).toFixed(2)}s (${fps} fps, ${((AGENT_COUNT * frame) / 1e6).toFixed(0)}M agent-steps).`);
 cleanup(0);

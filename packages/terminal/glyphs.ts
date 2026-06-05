@@ -64,10 +64,32 @@ export const brailleGlyphs = (() => {
 // order exactly, so the bit layout is the identity. Mapping verified against the
 // Unicode 16 NamesList and the wezterm/kitty implementations.
 const octantReusedCodePoint: Record<number, number> = {
-  0: 0x0020, 1: 0x1cea8, 2: 0x1ceab, 3: 0x1fb82, 5: 0x2598, 10: 0x259d, 15: 0x2580, 20: 0x1fbe6,
-  40: 0x1fbe7, 63: 0x1fb85, 64: 0x1cea3, 80: 0x2596, 85: 0x258c, 90: 0x259e, 95: 0x259b, 128: 0x1cea0,
-  160: 0x2597, 165: 0x259a, 170: 0x2590, 175: 0x259c, 192: 0x2582, 240: 0x2584, 245: 0x2599, 250: 0x259f,
-  252: 0x2586, 255: 0x2588,
+  0: 0x0020,
+  1: 0x1cea8,
+  2: 0x1ceab,
+  3: 0x1fb82,
+  5: 0x2598,
+  10: 0x259d,
+  15: 0x2580,
+  20: 0x1fbe6,
+  40: 0x1fbe7,
+  63: 0x1fb85,
+  64: 0x1cea3,
+  80: 0x2596,
+  85: 0x258c,
+  90: 0x259e,
+  95: 0x259b,
+  128: 0x1cea0,
+  160: 0x2597,
+  165: 0x259a,
+  170: 0x2590,
+  175: 0x259c,
+  192: 0x2582,
+  240: 0x2584,
+  245: 0x2599,
+  250: 0x259f,
+  252: 0x2586,
+  255: 0x2588,
 };
 export const octantGlyphs = (() => {
   const glyphs: Uint8Array[] = new Array(256);

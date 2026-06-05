@@ -105,10 +105,7 @@ if (enumStatus === 0) {
   const foundPackages: string[] = [];
 
   for (let i = 0; i < packageCount; i++) {
-    const namePtr = Number(
-      Buffer.from(toArrayBuffer((Number(arrayBasePtr) + i * 32 + 16) as unknown as Pointer, 0, 8))
-        .readBigUInt64LE(0)
-    );
+    const namePtr = Number(Buffer.from(toArrayBuffer((Number(arrayBasePtr) + i * 32 + 16) as unknown as Pointer, 0, 8)).readBigUInt64LE(0));
     if (namePtr) {
       const name = Buffer.from(toArrayBuffer(namePtr as unknown as Pointer, 0, 256))
         .toString('utf16le')
@@ -118,13 +115,11 @@ if (enumStatus === 0) {
   }
 
   for (const critical of criticalPackages) {
-    const found = foundPackages.some(p => p.toLowerCase() === critical.toLowerCase());
+    const found = foundPackages.some((p) => p.toLowerCase() === critical.toLowerCase());
     console.log(`  ${found ? PASS : FAIL} ${critical}`);
   }
 
-  const otherPackages = foundPackages.filter(
-    p => !criticalPackages.some(c => c.toLowerCase() === p.toLowerCase())
-  );
+  const otherPackages = foundPackages.filter((p) => !criticalPackages.some((c) => c.toLowerCase() === p.toLowerCase()));
   if (otherPackages.length > 0) {
     console.log(`\n  ${INFO} ${otherPackages.length} additional package(s): ${otherPackages.join(', ')}`);
   }

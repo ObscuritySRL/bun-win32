@@ -229,7 +229,7 @@ lines.push(boxRow('In Use:', formatBytes(usedPhysMem)));
 lines.push(boxRow('Memory Load:', progressBar(memoryLoad)));
 lines.push(boxRow('Page File Total:', formatBytes(totalPageFile)));
 lines.push(boxRow('Page File Free:', formatBytes(availPageFile)));
-const pageFileUsedPct = totalPageFile > 0n ? Number((totalPageFile - availPageFile) * 100n / totalPageFile) : 0;
+const pageFileUsedPct = totalPageFile > 0n ? Number(((totalPageFile - availPageFile) * 100n) / totalPageFile) : 0;
 lines.push(boxRow('Page File Usage:', progressBar(pageFileUsedPct)));
 lines.push(boxRow('Virtual Total:', formatBytes(totalVirtual)));
 lines.push(boxRow('Virtual Available:', formatBytes(availVirtual)));
@@ -242,7 +242,7 @@ for (const d of driveInfos) {
     continue;
   }
   const usedBytes = d.totalBytes - d.freeBytes;
-  const usedPct = Number(usedBytes * 100n / d.totalBytes);
+  const usedPct = Number((usedBytes * 100n) / d.totalBytes);
   lines.push(boxRow(`Drive ${d.letter}: Total`, formatBytes(d.totalBytes)));
   lines.push(boxRow(`         Free`, formatBytes(d.freeBytes)));
   lines.push(boxRow(`         Used`, `${formatBytes(usedBytes)} ${progressBar(usedPct, 20)}`));

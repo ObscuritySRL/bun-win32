@@ -57,18 +57,7 @@ interface ResolvedSymbol {
   size: number;
 }
 
-Dbghelp.Preload([
-  'SymCleanup',
-  'SymFromName',
-  'SymGetModuleInfo64',
-  'SymGetOptions',
-  'SymGetSearchPath',
-  'SymInitialize',
-  'SymLoadModuleEx',
-  'SymSetOptions',
-  'SymUnloadModule64',
-  'UnDecorateSymbolName',
-]);
+Dbghelp.Preload(['SymCleanup', 'SymFromName', 'SymGetModuleInfo64', 'SymGetOptions', 'SymGetSearchPath', 'SymInitialize', 'SymLoadModuleEx', 'SymSetOptions', 'SymUnloadModule64', 'UnDecorateSymbolName']);
 
 function readAsciiString(buffer: Buffer, offset: number, maxLength: number): string {
   let end = offset;
@@ -95,16 +84,26 @@ function formatFlags(flags: number): string {
 
 function symTypeName(symType: number): string {
   switch (symType) {
-    case SYM_TYPE.SymNone: return 'None';
-    case SYM_TYPE.SymCoff: return 'COFF';
-    case SYM_TYPE.SymCv: return 'CodeView';
-    case SYM_TYPE.SymPdb: return 'PDB';
-    case SYM_TYPE.SymExport: return 'Export';
-    case SYM_TYPE.SymDeferred: return 'Deferred';
-    case SYM_TYPE.SymSym: return 'SYM';
-    case SYM_TYPE.SymDia: return 'DIA';
-    case SYM_TYPE.SymVirtual: return 'Virtual';
-    default: return 'Unknown';
+    case SYM_TYPE.SymNone:
+      return 'None';
+    case SYM_TYPE.SymCoff:
+      return 'COFF';
+    case SYM_TYPE.SymCv:
+      return 'CodeView';
+    case SYM_TYPE.SymPdb:
+      return 'PDB';
+    case SYM_TYPE.SymExport:
+      return 'Export';
+    case SYM_TYPE.SymDeferred:
+      return 'Deferred';
+    case SYM_TYPE.SymSym:
+      return 'SYM';
+    case SYM_TYPE.SymDia:
+      return 'DIA';
+    case SYM_TYPE.SymVirtual:
+      return 'Virtual';
+    default:
+      return 'Unknown';
   }
 }
 
@@ -197,18 +196,7 @@ try {
 
   console.log('');
 
-  const targetSymbols = [
-    'NtCreateFile',
-    'NtClose',
-    'NtReadVirtualMemory',
-    'NtWriteFile',
-    'NtQueryInformationProcess',
-    'RtlInitUnicodeString',
-    'RtlGetVersion',
-    'LdrLoadDll',
-    'RtlAllocateHeap',
-    'NtDeviceIoControlFile',
-  ];
+  const targetSymbols = ['NtCreateFile', 'NtClose', 'NtReadVirtualMemory', 'NtWriteFile', 'NtQueryInformationProcess', 'RtlInitUnicodeString', 'RtlGetVersion', 'LdrLoadDll', 'RtlAllocateHeap', 'NtDeviceIoControlFile'];
 
   console.log(`${CYAN}Resolved Symbols${RESET}`);
   console.log(`${DIM}${''.padEnd(2)}${'Name'.padEnd(34)}${'Address'.padEnd(20)}${'Size'.padEnd(8)}Flags${RESET}`);
@@ -219,12 +207,7 @@ try {
     const sym = resolveSymbol(hProcess, symbolName);
     if (sym) {
       resolvedCount++;
-      console.log(
-        `  ${GREEN}${sym.name.padEnd(32)}${RESET}` +
-        `  ${YELLOW}${formatAddress(sym.address)}${RESET}` +
-        `  ${String(sym.size).padEnd(6)}` +
-        `  ${MAGENTA}${formatFlags(sym.flags)}${RESET}`,
-      );
+      console.log(`  ${GREEN}${sym.name.padEnd(32)}${RESET}` + `  ${YELLOW}${formatAddress(sym.address)}${RESET}` + `  ${String(sym.size).padEnd(6)}` + `  ${MAGENTA}${formatFlags(sym.flags)}${RESET}`);
     } else {
       console.log(`  ${RED}${symbolName.padEnd(32)}${RESET}  (not found)`);
     }
@@ -234,11 +217,7 @@ try {
   console.log(`  ${resolvedCount}/${targetSymbols.length} symbols resolved`);
   console.log('');
 
-  const mangledNames = [
-    '?what@exception@std@@UEBAPEBDXZ',
-    '??0runtime_error@std@@QEAA@AEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@1@@Z',
-    '??1exception@std@@UEAA@XZ',
-  ];
+  const mangledNames = ['?what@exception@std@@UEBAPEBDXZ', '??0runtime_error@std@@QEAA@AEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@1@@Z', '??1exception@std@@UEAA@XZ'];
 
   console.log(`${CYAN}Name Demangling${RESET}`);
   console.log(separator);

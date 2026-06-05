@@ -26,7 +26,13 @@ function resolveRipgrepPath(): string {
   const explicitArg = process.argv.find((argument) => argument.startsWith('--rg='));
   if (explicitArg) return explicitArg.slice('--rg='.length);
 
-  const candidates = ['rg', join(process.env.LOCALAPPDATA ?? '', 'Microsoft', 'WinGet', 'Links', 'rg.exe'), join(process.env.ProgramData ?? '', 'chocolatey', 'bin', 'rg.exe'), join(process.env.USERPROFILE ?? '', 'scoop', 'shims', 'rg.exe'), 'C:\\Program Files\\Git\\usr\\bin\\rg.exe'];
+  const candidates = [
+    'rg',
+    join(process.env.LOCALAPPDATA ?? '', 'Microsoft', 'WinGet', 'Links', 'rg.exe'),
+    join(process.env.ProgramData ?? '', 'chocolatey', 'bin', 'rg.exe'),
+    join(process.env.USERPROFILE ?? '', 'scoop', 'shims', 'rg.exe'),
+    'C:\\Program Files\\Git\\usr\\bin\\rg.exe',
+  ];
 
   for (const candidate of candidates) {
     try {
@@ -634,7 +640,10 @@ function buildSdkIndex(functionNames: string[]): Map<string, SdkProto> {
             const sameLineMatch = hLines[i].match(new RegExp(`^(.*?)\\b${funcName}\\s*\\(`));
             if (sameLineMatch && sameLineMatch[1].trim()) {
               const sameLineReturnType = sameLineMatch[1]
-                .replace(/\b(?:WINBERAPI|WINLDAPAPI|WINBASEAPI|WINUSERAPI|WINNORMALIZEAPI|WINADVAPI|NTSYSAPI|WINSOCK_API_LINKAGE|NET_API_FUNCTION|WSPAPI|IMAGEAPI|INTERNETAPI|BOOLAPI|DECLSPEC_IMPORT|WINAPI|LDAPAPI|BERAPI|APIENTRY|NTAPI|CALLBACK|STDAPI|STDAPICALLTYPE|extern|"C")\b/g, '')
+                .replace(
+                  /\b(?:WINBERAPI|WINLDAPAPI|WINBASEAPI|WINUSERAPI|WINNORMALIZEAPI|WINADVAPI|NTSYSAPI|WINSOCK_API_LINKAGE|NET_API_FUNCTION|WSPAPI|IMAGEAPI|INTERNETAPI|BOOLAPI|DECLSPEC_IMPORT|WINAPI|LDAPAPI|BERAPI|APIENTRY|NTAPI|CALLBACK|STDAPI|STDAPICALLTYPE|extern|"C")\b/g,
+                  '',
+                )
                 .replace(/\s+/g, ' ')
                 .replace(/\s*\*/g, '*')
                 .trim();

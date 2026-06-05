@@ -117,28 +117,33 @@ export const B_MOB = 17; //     hostile mob body — dark menacing red
 // ── Per-block property tables (indexed by block id, length B_COUNT) ────────────
 /** Collides with a physical body. Air, water, and lava are non-solid (pass through). */
 export const SOLID: boolean[] = [
-  /* 0 air      */ false, /* 1 grass  */ true, /* 2 dirt   */ true, /* 3 stone */ true,
-  /* 4 sand     */ true, /* 5 water  */ false, /* 6 wood    */ true, /* 7 leaf  */ true,
-  /* 8 snow     */ true, /* 9 gravel */ true, /* 10 tnt    */ true, /* 11 lava */ false,
-  /* 12 glowstn */ true, /* 13 plank */ true, /* 14 brick  */ true, /* 15 obsid */ true,
+  /* 0 air      */ false,
+  /* 1 grass  */ true,
+  /* 2 dirt   */ true,
+  /* 3 stone */ true,
+  /* 4 sand     */ true,
+  /* 5 water  */ false,
+  /* 6 wood    */ true,
+  /* 7 leaf  */ true,
+  /* 8 snow     */ true,
+  /* 9 gravel */ true,
+  /* 10 tnt    */ true,
+  /* 11 lava */ false,
+  /* 12 glowstn */ true,
+  /* 13 plank */ true,
+  /* 14 brick  */ true,
+  /* 15 obsid */ true,
 ];
 /** Settles under gravity like sand (falls + topples). */
-export const FALLS: boolean[] = [
-  false, false, false, false, true, false, false, false, false, true,
-  false, false, false, false, false, false,
-];
+export const FALLS: boolean[] = [false, false, false, false, true, false, false, false, false, true, false, false, false, false, false, false];
 /** Fluid kind: 0 none, 1 water, 2 lava. */
 export const FLUID: number[] = [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0];
 /** Ignite/spread weight: 0 inert; higher catches + spreads faster (leaf fastest). */
-export const FLAMMABLE: number[] = [
-  0, 0, 0, 0, 0, 0, 0.7, 1.0, 0, 0, 0, 0, 0, 0.6, 0, 0,
-];
+export const FLAMMABLE: number[] = [0, 0, 0, 0, 0, 0, 0.7, 1.0, 0, 0, 0, 0, 0, 0.6, 0, 0];
 /** Self-emission 0..1 (lit at night; feeds the glow layer). */
 export const EMISSIVE: number[] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1.0, 0.8, 0, 0, 0];
 /** Blast resistance 0 (shatters) .. 1 (immune). */
-export const BLAST_RESIST: number[] = [
-  0, 0.05, 0.1, 0.35, 0.05, 0, 0.12, 0.04, 0.05, 0.1, 0.1, 0, 0.4, 0.12, 0.7, 1.0,
-];
+export const BLAST_RESIST: number[] = [0, 0.05, 0.1, 0.35, 0.05, 0, 0.12, 0.04, 0.05, 0.1, 0.1, 0, 0.4, 0.12, 0.7, 1.0];
 
 /** Does block `b` collide with a physical body? (air/water/lava pass through.) */
 export function isSolid(b: number): boolean {
@@ -599,7 +604,22 @@ export function createEntities(sim: Sim): Entities {
     },
     spawnCritter(x, y, z) {
       const a0 = Math.random() * Math.PI * 2;
-      const e: Entity = { kind: ENT_CRITTER, pos: [x, y, z], vel: [0, 0, 0], size: [0.7, 1.6, 0.7], ttl: Infinity, block: B_CRITTER, state: 0, timer: Math.random() * 2, hx: Math.cos(a0), hz: Math.sin(a0), ground: false, hostile: false, variant: 0, hp: 3 };
+      const e: Entity = {
+        kind: ENT_CRITTER,
+        pos: [x, y, z],
+        vel: [0, 0, 0],
+        size: [0.7, 1.6, 0.7],
+        ttl: Infinity,
+        block: B_CRITTER,
+        state: 0,
+        timer: Math.random() * 2,
+        hx: Math.cos(a0),
+        hz: Math.sin(a0),
+        ground: false,
+        hostile: false,
+        variant: 0,
+        hp: 3,
+      };
       list.push(e);
       return e;
     },
@@ -1451,7 +1471,7 @@ function generateWorld(seed = 1337): Uint32Array {
       const riverDist = Math.abs(z - riverCenter);
       const riverWidth = 8 + nWarp(x / 18, 13) * 6;
       if (riverDist < riverWidth) {
-        const carve = (1 - riverDist / riverWidth); // 0..1, deepest at center
+        const carve = 1 - riverDist / riverWidth; // 0..1, deepest at center
         const bed = SEA_LEVEL - 3 - Math.floor(carve * 4);
         if (h > bed) h = bed;
         h = Math.max(2, h);
@@ -1463,7 +1483,8 @@ function generateWorld(seed = 1337): Uint32Array {
         let block: number;
         if (y === h) {
           if (h >= H - 16) block = B_SNOW;
-          else if (h <= SEA_LEVEL + 1) block = B_SAND;            // beaches/banks
+          else if (h <= SEA_LEVEL + 1)
+            block = B_SAND; // beaches/banks
           else block = B_GRASS;
         } else if (y >= h - 3) {
           block = h <= SEA_LEVEL + 2 ? B_SAND : B_DIRT;
@@ -1481,7 +1502,7 @@ function generateWorld(seed = 1337): Uint32Array {
   }
 
   // Scatter trees on grass above the shoreline, with varied canopy shapes/sizes.
-  let treeSeed = ((24680 ^ (s * 40503)) & 0x7fffffff) || 1;
+  let treeSeed = (24680 ^ (s * 40503)) & 0x7fffffff || 1;
   const rng = (): number => {
     treeSeed = (treeSeed * 1103515245 + 12345) & 0x7fffffff;
     return treeSeed / 0x7fffffff;
@@ -1613,12 +1634,7 @@ function generateWorld(seed = 1337): Uint32Array {
 }
 
 /** CPU mirror of the shader DDA — picks the targeted/adjacent cell from screen center. */
-function pickVoxel(
-  voxels: Uint32Array,
-  ro: [number, number, number],
-  rd: [number, number, number],
-  maxSteps: number,
-): { hit: boolean; cell: [number, number, number]; prev: [number, number, number] } {
+function pickVoxel(voxels: Uint32Array, ro: [number, number, number], rd: [number, number, number], maxSteps: number): { hit: boolean; cell: [number, number, number]; prev: [number, number, number] } {
   let cx = Math.floor(ro[0]);
   let cy = Math.floor(ro[1]);
   let cz = Math.floor(ro[2]);
@@ -1677,15 +1693,7 @@ export interface MoveResult {
  * Does the body AABB — centered on (x,z) with width sx,sz, feet at y, height sy —
  * overlap any solid voxel? `sampleSolid` decides per cell (incl. out-of-bounds).
  */
-function bodyHitsSolid(
-  x: number,
-  y: number,
-  z: number,
-  sx: number,
-  sy: number,
-  sz: number,
-  sampleSolid: (x: number, y: number, z: number) => boolean,
-): boolean {
+function bodyHitsSolid(x: number, y: number, z: number, sx: number, sy: number, sz: number, sampleSolid: (x: number, y: number, z: number) => boolean): boolean {
   const x0 = Math.floor(x - sx / 2);
   const x1 = Math.floor(x + sx / 2 - 1e-6);
   const z0 = Math.floor(z - sz / 2);
@@ -1722,20 +1730,7 @@ function sweepAxis(blocked: (p: number) => boolean, from: number, to: number): {
  * (so walking up voxel terrain is smooth); sets `onGround` when downward motion is
  * stopped. Pure: `sampleSolid` is the only world access. Gravity/jump are the caller's.
  */
-export function sweptMove(
-  px: number,
-  py: number,
-  pz: number,
-  vx: number,
-  vy: number,
-  vz: number,
-  sx: number,
-  sy: number,
-  sz: number,
-  dt: number,
-  sampleSolid: (x: number, y: number, z: number) => boolean,
-  stepUp: number,
-): MoveResult {
+export function sweptMove(px: number, py: number, pz: number, vx: number, vy: number, vz: number, sx: number, sy: number, sz: number, dt: number, sampleSolid: (x: number, y: number, z: number) => boolean, stepUp: number): MoveResult {
   const maxMove = Math.max(Math.abs(vx), Math.abs(vy), Math.abs(vz)) * dt;
   const steps = Math.min(16, Math.max(1, Math.ceil(maxMove / 0.4)));
   const h = dt / steps;
@@ -1752,11 +1747,7 @@ export function sweptMove(
       const nx = x + vx * h;
       const r = sweepAxis((p) => bodyHitsSolid(p, y, z, sx, sy, sz, sampleSolid), x, nx);
       if (r.hit) {
-        if (
-          stepUp > 0 &&
-          !bodyHitsSolid(x, y + stepUp, z, sx, sy, sz, sampleSolid) &&
-          !bodyHitsSolid(nx, y + stepUp, z, sx, sy, sz, sampleSolid)
-        ) {
+        if (stepUp > 0 && !bodyHitsSolid(x, y + stepUp, z, sx, sy, sz, sampleSolid) && !bodyHitsSolid(nx, y + stepUp, z, sx, sy, sz, sampleSolid)) {
           x = nx;
           y += stepUp;
         } else {
@@ -1772,11 +1763,7 @@ export function sweptMove(
       const nz = z + vz * h;
       const r = sweepAxis((p) => bodyHitsSolid(x, y, p, sx, sy, sz, sampleSolid), z, nz);
       if (r.hit) {
-        if (
-          stepUp > 0 &&
-          !bodyHitsSolid(x, y + stepUp, z, sx, sy, sz, sampleSolid) &&
-          !bodyHitsSolid(x, y + stepUp, nz, sx, sy, sz, sampleSolid)
-        ) {
+        if (stepUp > 0 && !bodyHitsSolid(x, y + stepUp, z, sx, sy, sz, sampleSolid) && !bodyHitsSolid(x, y + stepUp, nz, sx, sy, sz, sampleSolid)) {
           z = nz;
           y += stepUp;
         } else {
@@ -1907,8 +1894,7 @@ function main(): void {
   const field = gpu.makeStructuredBuffer({ stride: 4, count: W * H * D, srv: true, cpuWritable: true, initialData: voxelBytes });
 
   /** Block id at (x,y,z), or air outside the world. */
-  const voxelAt = (x: number, y: number, z: number): number =>
-    x < 0 || y < 0 || z < 0 || x >= W || y >= H || z >= D ? B_AIR : voxels[idx(x, y, z)]!;
+  const voxelAt = (x: number, y: number, z: number): number => (x < 0 || y < 0 || z < 0 || x >= W || y >= H || z >= D ? B_AIR : voxels[idx(x, y, z)]!);
 
   // Compile shaders.
   let vs: bigint;
@@ -2022,9 +2008,7 @@ function main(): void {
   }
 
   // Debug/verification static camera in capture mode: VOX_CAM="x,y,z,yaw,pitch".
-  let camOverride: number[] | null = process.env.VOX_CAM
-    ? process.env.VOX_CAM.split(',').map(Number)
-    : null;
+  let camOverride: number[] | null = process.env.VOX_CAM ? process.env.VOX_CAM.split(',').map(Number) : null;
   // VOX_SURVIVAL: run the night-wave loop in capture mode (verification), camera pinned at
   // the player's eye so the converging mobs swarm into view. VOX_CAM still overrides.
   if (process.env.VOX_SURVIVAL && !camOverride) {
@@ -2086,11 +2070,7 @@ function main(): void {
     const rl = Math.hypot(rx, rz) || 1;
     const right: [number, number, number] = [rx / rl, 0, rz / rl];
     // up = cross(fwd, right)
-    const up: [number, number, number] = [
-      fwd[1] * right[2] - fwd[2] * right[1],
-      fwd[2] * right[0] - fwd[0] * right[2],
-      fwd[0] * right[1] - fwd[1] * right[0],
-    ];
+    const up: [number, number, number] = [fwd[1] * right[2] - fwd[2] * right[1], fwd[2] * right[0] - fwd[0] * right[2], fwd[0] * right[1] - fwd[1] * right[0]];
     return { fwd, right, up };
   }
 
@@ -2125,7 +2105,7 @@ function main(): void {
   function entityCellSig(): number {
     let s = (entities.list.length * 0x9e3779b1) | 0;
     for (const e of entities.list) {
-      s = (Math.imul(s, 16777619) ^ (Math.floor(e.pos[0]) * 73856093 ^ Math.floor(e.pos[1]) * 19349663 ^ Math.floor(e.pos[2]) * 83492791)) | 0;
+      s = (Math.imul(s, 16777619) ^ ((Math.floor(e.pos[0]) * 73856093) ^ (Math.floor(e.pos[1]) * 19349663) ^ (Math.floor(e.pos[2]) * 83492791))) | 0;
     }
     return s;
   }
@@ -2325,7 +2305,7 @@ function main(): void {
   const aiTarget: [number, number, number] = [0, 0, 0]; // reused per-frame (no churn)
   // Time of day (0..1). Capture mode pins it to a moody low-dusk sun (richer sky for
   // contrast, so the finale fireball + glow POP instead of washing out) unless VOX_TOD is set.
-  let timeOfDay = process.env.VOX_TOD ? Number(process.env.VOX_TOD) : interactive ? 0.30 : 0.27;
+  let timeOfDay = process.env.VOX_TOD ? Number(process.env.VOX_TOD) : interactive ? 0.3 : 0.27;
   interface GlowFx {
     x: number;
     y: number;
@@ -3008,143 +2988,143 @@ function main(): void {
 
       // ── Tools (frozen during the death pause): hotbar + LMB/RMB + set-pieces ───
       if (!dead) {
-      const { fwd: cf } = basis();
-      for (let k = 0; k < 9; k += 1) if (win.keyDown(0x31 + k)) selectedSlot = k; // '1'..'9' → 0..8
-      if (win.keyDown(0x30)) selectedSlot = 9; // '0' → bomb
-      const slot = HOTBAR[selectedSlot]!;
-      const leftDown = (User32.GetAsyncKeyState(VK_LBUTTON) & 0x8000) !== 0;
-      const rightDown = (User32.GetAsyncKeyState(VK_RBUTTON) & 0x8000) !== 0;
-      const pick = pickVoxel(voxels, [camX, camY, camZ], cf, 90);
-      actCooldown -= dt;
-      // Aim point for set-pieces (B/M): the targeted block, else a point ~24 blocks
-      // ahead projected down to the terrain — so they work even aiming at sky/water.
-      const aim = (): [number, number, number] => {
-        // Target the air cell just above the hit block (consistent with placement) so a
-        // near-vertical meteor arcs cleanly onto the surface rather than into it.
-        if (pick.hit) return [pick.cell[0], Math.min(H - 1, pick.cell[1] + 1), pick.cell[2]];
-        let ax = Math.floor(camX + cf[0] * 24);
-        const az = Math.floor(camZ + cf[2] * 24);
-        ax = Math.max(1, Math.min(W - 2, ax));
-        const cz = Math.max(1, Math.min(D - 2, az));
-        let ay = Math.min(H - 2, Math.floor(camY + cf[1] * 24));
-        for (let y = H - 1; y >= 1; y -= 1) {
-          if (isSolid(voxelAt(ax, y, cz))) {
-            ay = y;
-            break;
+        const { fwd: cf } = basis();
+        for (let k = 0; k < 9; k += 1) if (win.keyDown(0x31 + k)) selectedSlot = k; // '1'..'9' → 0..8
+        if (win.keyDown(0x30)) selectedSlot = 9; // '0' → bomb
+        const slot = HOTBAR[selectedSlot]!;
+        const leftDown = (User32.GetAsyncKeyState(VK_LBUTTON) & 0x8000) !== 0;
+        const rightDown = (User32.GetAsyncKeyState(VK_RBUTTON) & 0x8000) !== 0;
+        const pick = pickVoxel(voxels, [camX, camY, camZ], cf, 90);
+        actCooldown -= dt;
+        // Aim point for set-pieces (B/M): the targeted block, else a point ~24 blocks
+        // ahead projected down to the terrain — so they work even aiming at sky/water.
+        const aim = (): [number, number, number] => {
+          // Target the air cell just above the hit block (consistent with placement) so a
+          // near-vertical meteor arcs cleanly onto the surface rather than into it.
+          if (pick.hit) return [pick.cell[0], Math.min(H - 1, pick.cell[1] + 1), pick.cell[2]];
+          let ax = Math.floor(camX + cf[0] * 24);
+          const az = Math.floor(camZ + cf[2] * 24);
+          ax = Math.max(1, Math.min(W - 2, ax));
+          const cz = Math.max(1, Math.min(D - 2, az));
+          let ay = Math.min(H - 2, Math.floor(camY + cf[1] * 24));
+          for (let y = H - 1; y >= 1; y -= 1) {
+            if (isSolid(voxelAt(ax, y, cz))) {
+              ay = y;
+              break;
+            }
+          }
+          return [ax, ay, cz];
+        };
+
+        // Melee: a hostile in front + within reach → LMB swats it (so you're never
+        // defenseless), taking priority over digging/lobbing so close combat always works.
+        let meleeTarget: Entity | null = null;
+        {
+          let best = 3.0 * 3.0;
+          for (const e of entities.list) {
+            if (e.kind !== ENT_CRITTER || !e.hostile) continue;
+            const dx = e.pos[0] - camX;
+            const dy = e.pos[1] + 0.8 - camY;
+            const dz = e.pos[2] - camZ;
+            const d2 = dx * dx + dy * dy + dz * dz;
+            if (d2 > best) continue;
+            const d = Math.sqrt(d2) || 1;
+            if ((dx * cf[0] + dy * cf[1] + dz * cf[2]) / d < 0.5) continue; // must be roughly ahead
+            best = d2;
+            meleeTarget = e;
           }
         }
-        return [ax, ay, cz];
-      };
+        crosshairHot = meleeTarget !== null;
+        meleeCd -= dt;
 
-      // Melee: a hostile in front + within reach → LMB swats it (so you're never
-      // defenseless), taking priority over digging/lobbing so close combat always works.
-      let meleeTarget: Entity | null = null;
-      {
-        let best = 3.0 * 3.0;
-        for (const e of entities.list) {
-          if (e.kind !== ENT_CRITTER || !e.hostile) continue;
-          const dx = e.pos[0] - camX;
-          const dy = e.pos[1] + 0.8 - camY;
-          const dz = e.pos[2] - camZ;
-          const d2 = dx * dx + dy * dy + dz * dz;
-          if (d2 > best) continue;
-          const d = Math.sqrt(d2) || 1;
-          if ((dx * cf[0] + dy * cf[1] + dz * cf[2]) / d < 0.5) continue; // must be roughly ahead
-          best = d2;
-          meleeTarget = e;
-        }
-      }
-      crosshairHot = meleeTarget !== null;
-      meleeCd -= dt;
-
-      // LMB: swat a mob → else lob a bomb (Bomb slot) → else dig (held, throttled).
-      if (leftDown && meleeTarget && meleeCd <= 0) {
-        entities.damage(meleeTarget.pos[0], meleeTarget.pos[1], meleeTarget.pos[2], 1.3, 3.4);
-        entities.knockback(meleeTarget.pos[0], meleeTarget.pos[1], meleeTarget.pos[2], 0.5);
-        meleeCd = 0.32;
-        audio?.breakBlock();
-      } else if (slot.block === -2) {
-        if (leftDown && !prevLeft) {
-          entities.spawnBomb(camX + cf[0] * 1.2, camY + cf[1] * 1.2, camZ + cf[2] * 1.2, cf[0] * 24, cf[1] * 24 + 4, cf[2] * 24, 2.6);
-        }
-      } else if (leftDown && actCooldown <= 0 && pick.hit) {
-        const broken = voxelAt(pick.cell[0], pick.cell[1], pick.cell[2]);
-        setBlock(pick.cell[0], pick.cell[1], pick.cell[2], B_AIR);
-        spawnBreakFlecks(pick.cell[0], pick.cell[1], pick.cell[2], broken);
-        editedThisFrame = true;
-        actCooldown = 0.07;
-        audio?.breakBlock();
-      }
-
-      // RMB: place the selected material at the adjacent face (or light targeted TNT).
-      if (rightDown && actCooldown <= 0 && pick.hit && slot.block >= 0) {
-        if (slot.block === B_TNT && voxelAt(pick.cell[0], pick.cell[1], pick.cell[2]) === B_TNT) {
-          sim.light(pick.cell[0], pick.cell[1], pick.cell[2]);
-        } else {
-          setBlock(pick.prev[0], pick.prev[1], pick.prev[2], slot.block);
-        }
-        editedThisFrame = true;
-        actCooldown = 0.11;
-        audio?.place();
-      }
-      prevLeft = leftDown;
-      prevRight = rightDown;
-
-      // E: ignite — light a targeted TNT, or set a flammable block alight.
-      const eDown = win.keyDown(VK_E);
-      if (eDown && !prevE && pick.hit) {
-        const tb = voxelAt(pick.cell[0], pick.cell[1], pick.cell[2]);
-        if (tb === B_TNT) sim.light(pick.cell[0], pick.cell[1], pick.cell[2]);
-        else sim.ignite(pick.cell[0], pick.cell[1], pick.cell[2]);
-        editedThisFrame = true;
-      }
-      prevE = eDown;
-
-      // B: carpet bomb — rain TNT bombs over the aim point.
-      const bDown = win.keyDown(VK_B);
-      if (bDown && !prevB) {
-        const [ax, ay, az] = aim();
-        for (let dx = -2; dx <= 2; dx += 1) {
-          for (let dz = -2; dz <= 2; dz += 1) {
-            entities.spawnBomb(
-              Math.max(1, Math.min(W - 2, ax + dx * 2)) + 0.5,
-              Math.min(H - 1, ay + 24),
-              Math.max(1, Math.min(D - 2, az + dz * 2)) + 0.5,
-              (Math.random() - 0.5) * 2,
-              0,
-              (Math.random() - 0.5) * 2,
-              0.9 + Math.random() * 0.6,
-            );
+        // LMB: swat a mob → else lob a bomb (Bomb slot) → else dig (held, throttled).
+        if (leftDown && meleeTarget && meleeCd <= 0) {
+          entities.damage(meleeTarget.pos[0], meleeTarget.pos[1], meleeTarget.pos[2], 1.3, 3.4);
+          entities.knockback(meleeTarget.pos[0], meleeTarget.pos[1], meleeTarget.pos[2], 0.5);
+          meleeCd = 0.32;
+          audio?.breakBlock();
+        } else if (slot.block === -2) {
+          if (leftDown && !prevLeft) {
+            entities.spawnBomb(camX + cf[0] * 1.2, camY + cf[1] * 1.2, camZ + cf[2] * 1.2, cf[0] * 24, cf[1] * 24 + 4, cf[2] * 24, 2.6);
           }
+        } else if (leftDown && actCooldown <= 0 && pick.hit) {
+          const broken = voxelAt(pick.cell[0], pick.cell[1], pick.cell[2]);
+          setBlock(pick.cell[0], pick.cell[1], pick.cell[2], B_AIR);
+          spawnBreakFlecks(pick.cell[0], pick.cell[1], pick.cell[2], broken);
+          editedThisFrame = true;
+          actCooldown = 0.07;
+          audio?.breakBlock();
         }
-        setToast('carpet bomb away!', elapsed);
-      }
-      prevB = bDown;
 
-      // M: meteor — a flaming projectile streaks down from high overhead onto the aim.
-      const mDown = win.keyDown(VK_M);
-      if (mDown && !prevM) {
-        const [ax, ay, az] = aim();
-        const sx = Math.max(1, Math.min(W - 2, ax + 6));
-        const sz = Math.max(1, Math.min(D - 2, az + 6));
-        entities.spawnMeteor(sx, H - 2, sz, ax, ay, az);
-        setToast('incoming meteor!', elapsed);
-      }
-      prevM = mDown;
+        // RMB: place the selected material at the adjacent face (or light targeted TNT).
+        if (rightDown && actCooldown <= 0 && pick.hit && slot.block >= 0) {
+          if (slot.block === B_TNT && voxelAt(pick.cell[0], pick.cell[1], pick.cell[2]) === B_TNT) {
+            sim.light(pick.cell[0], pick.cell[1], pick.cell[2]);
+          } else {
+            setBlock(pick.prev[0], pick.prev[1], pick.prev[2], slot.block);
+          }
+          editedThisFrame = true;
+          actCooldown = 0.11;
+          audio?.place();
+        }
+        prevLeft = leftDown;
+        prevRight = rightDown;
 
-      // C: spawn a critter; R: regenerate the world.
-      const cDown = win.keyDown(VK_C);
-      if (cDown && !prevC && pick.hit) {
-        entities.spawnCritter(pick.cell[0] + 0.5, pick.cell[1] + 1.1, pick.cell[2] + 0.5);
-        audio?.squeak();
-      }
-      prevC = cDown;
-      const rDown = win.keyDown(VK_R);
-      if (rDown && !prevR) {
-        regenerate();
-        setToast('new world', elapsed);
-      }
-      prevR = rDown;
+        // E: ignite — light a targeted TNT, or set a flammable block alight.
+        const eDown = win.keyDown(VK_E);
+        if (eDown && !prevE && pick.hit) {
+          const tb = voxelAt(pick.cell[0], pick.cell[1], pick.cell[2]);
+          if (tb === B_TNT) sim.light(pick.cell[0], pick.cell[1], pick.cell[2]);
+          else sim.ignite(pick.cell[0], pick.cell[1], pick.cell[2]);
+          editedThisFrame = true;
+        }
+        prevE = eDown;
+
+        // B: carpet bomb — rain TNT bombs over the aim point.
+        const bDown = win.keyDown(VK_B);
+        if (bDown && !prevB) {
+          const [ax, ay, az] = aim();
+          for (let dx = -2; dx <= 2; dx += 1) {
+            for (let dz = -2; dz <= 2; dz += 1) {
+              entities.spawnBomb(
+                Math.max(1, Math.min(W - 2, ax + dx * 2)) + 0.5,
+                Math.min(H - 1, ay + 24),
+                Math.max(1, Math.min(D - 2, az + dz * 2)) + 0.5,
+                (Math.random() - 0.5) * 2,
+                0,
+                (Math.random() - 0.5) * 2,
+                0.9 + Math.random() * 0.6,
+              );
+            }
+          }
+          setToast('carpet bomb away!', elapsed);
+        }
+        prevB = bDown;
+
+        // M: meteor — a flaming projectile streaks down from high overhead onto the aim.
+        const mDown = win.keyDown(VK_M);
+        if (mDown && !prevM) {
+          const [ax, ay, az] = aim();
+          const sx = Math.max(1, Math.min(W - 2, ax + 6));
+          const sz = Math.max(1, Math.min(D - 2, az + 6));
+          entities.spawnMeteor(sx, H - 2, sz, ax, ay, az);
+          setToast('incoming meteor!', elapsed);
+        }
+        prevM = mDown;
+
+        // C: spawn a critter; R: regenerate the world.
+        const cDown = win.keyDown(VK_C);
+        if (cDown && !prevC && pick.hit) {
+          entities.spawnCritter(pick.cell[0] + 0.5, pick.cell[1] + 1.1, pick.cell[2] + 0.5);
+          audio?.squeak();
+        }
+        prevC = cDown;
+        const rDown = win.keyDown(VK_R);
+        if (rDown && !prevR) {
+          regenerate();
+          setToast('new world', elapsed);
+        }
+        prevR = rDown;
       } // end !dead tool actions
     } else if (camOverride) {
       // ── Debug/verification static camera: VOX_CAM="x,y,z,yaw,pitch" ───────────
@@ -3166,11 +3146,11 @@ function main(): void {
       // Sun azimuth: aim the hero frame near that bearing so the low sun rakes the
       // scene, but hold it OFF-center so its glare never merges with the fireball.
       const sunYaw = Math.atan2(sun[0], sun[2]);
-      const heroYaw = sunYaw + 0.20; // sun rakes from just frame-right; fireball stays central
+      const heroYaw = sunYaw + 0.2; // sun rakes from just frame-right; fireball stays central
       // Position the camera up-sun of the river basin, looking back toward the light
       // so the river leads the eye to the sun on the horizon. Keep it fairly close
       // and low so foreground blocks read crisply and the sky/sun fill the top.
-      const back = 88 - ease * 16;       // pulled well back to survey the enormous basin
+      const back = 88 - ease * 16; // pulled well back to survey the enormous basin
       camX = cx - Math.sin(sunYaw) * back + Math.sin(tt * 0.18) * 4;
       camZ = cz - Math.cos(sunYaw) * back + Math.sin(tt * 0.13) * 4;
       // Soar high over the new (taller) terrain, descending to an elevated vista.
@@ -3211,10 +3191,11 @@ function main(): void {
             break;
           }
         }
-        for (let dx = -1; dx <= 1; dx += 1) for (let dz = -1; dz <= 1; dz += 1) {
-          setBlock(tx + dx, ty + 1, tz + dz, B_TNT);
-          setBlock(tx + dx, ty + 2, tz + dz, B_TNT);
-        }
+        for (let dx = -1; dx <= 1; dx += 1)
+          for (let dz = -1; dz <= 1; dz += 1) {
+            setBlock(tx + dx, ty + 1, tz + dz, B_TNT);
+            setBlock(tx + dx, ty + 2, tz + dz, B_TNT);
+          }
         detonate(tx, ty + 3, tz, 8.0, 2.2);
         // A warm rising fireball column of glow points so the finale reads as a fiery
         // eruption (hot orange core fading up into amber smoke).

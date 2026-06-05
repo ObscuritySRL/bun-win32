@@ -98,7 +98,7 @@ console.log('');
 
 // Show key folder paths as "excavation site coordinates"
 console.log('  EXCAVATION SITE COORDINATES');
-console.log('  (Key locations on this system\'s filesystem)');
+console.log("  (Key locations on this system's filesystem)");
 console.log('');
 
 const sites: Array<{ name: string; csidl: number; description: string }> = [
@@ -106,7 +106,7 @@ const sites: Array<{ name: string; csidl: number; description: string }> = [
   { name: 'Documents', csidl: CSIDL.CSIDL_PERSONAL, description: 'The primary document repository' },
   { name: 'AppData', csidl: CSIDL.CSIDL_APPDATA, description: 'The hidden catacombs of application state' },
   { name: 'Local AppData', csidl: CSIDL.CSIDL_LOCAL_APPDATA, description: 'Deeper catacombs, machine-specific relics' },
-  { name: 'Profile', csidl: CSIDL.CSIDL_PROFILE, description: 'The user\'s home base camp' },
+  { name: 'Profile', csidl: CSIDL.CSIDL_PROFILE, description: "The user's home base camp" },
   { name: 'Windows', csidl: CSIDL.CSIDL_WINDOWS, description: 'The ancient operating system ruins' },
 ];
 

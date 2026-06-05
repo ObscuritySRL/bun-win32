@@ -72,7 +72,10 @@ run({
       const dx = x1 - x0;
       const dy = y1 - y0;
       const steps = Math.max(Math.abs(dx), Math.abs(dy)) | 0;
-      if (steps === 0) { t.setPixel(x0, y0, r, g, b); return; }
+      if (steps === 0) {
+        t.setPixel(x0, y0, r, g, b);
+        return;
+      }
       const sx = dx / steps;
       const sy = dy / steps;
       let x = x0;
@@ -138,7 +141,9 @@ run({
         let R: number, G: number, B: number;
         if (n >= JULIA_ITER) {
           // Interior — deep cold near-black so vector overlay + text pop.
-          R = 4; G = 5; B = 10;
+          R = 4;
+          G = 5;
+          B = 10;
         } else {
           // smooth iteration, then HARD-quantise into contour bands.
           const m2 = zr2 + zi2;
@@ -150,8 +155,10 @@ run({
           // base band colour: a cool→warm twilight ramp, alternating value per band
           // so adjacent contour bands contrast — the stepped look that exposes edges.
           const hue = 0.58 + band * 0.018 + time * 0.01;
-          const [hr, hg, hb] = hsv(fract(hue), 0.55, 0.40 + 0.14 * (band & 1));
-          R = hr; G = hg; B = hb;
+          const [hr, hg, hb] = hsv(fract(hue), 0.55, 0.4 + 0.14 * (band & 1));
+          R = hr;
+          G = hg;
+          B = hb;
           // a thin bright GOLD thread right at each band boundary (inBand≈0 or ≈1).
           // The falloff is STEEP (×14) so the thread is a genuine 1px hairline — the
           // most mode-sensitive feature possible: a stack of crisp contour lines that
@@ -224,8 +231,8 @@ run({
       const x1 = cx + Math.cos(a) * overlayR;
       const y1 = cy + Math.sin(a) * overlayR;
       // alternate brightness so adjacent spokes contrast hard
-      const c = (s & 1) ? 90 : 200;
-      line(cx, cy, x1, y1, c, c, (s & 1) ? 200 : 90);
+      const c = s & 1 ? 90 : 200;
+      line(cx, cy, x1, y1, c, c, s & 1 ? 200 : 90);
     }
 
     // rotating stellated polygon (compass rose) — bright 1px chords
@@ -253,11 +260,7 @@ run({
     const capLine1 = `MODE ${modeName}  ${W}x${H} PX`;
     const capLine2 = 'FINE DETAIL - 1PX STROKES - JULIA CONTOURS - 5X7 TEXT';
     const capLine3 = 'half 1x2  quad 2x2  sextant 2x3  braille 2x4';
-    const capW = Math.max(
-      Term.textWidth(capLine1),
-      Term.textWidth(capLine2),
-      Term.textWidth(capLine3),
-    ) + 6;
+    const capW = Math.max(Term.textWidth(capLine1), Term.textWidth(capLine2), Term.textWidth(capLine3)) + 6;
     const capX = ((W - capW) / 2) | 0;
     const capY = (H - 30) | 0;
     t.plate(capX - 2, capY - 2, capW, 28, 0.6);
@@ -273,7 +276,7 @@ run({
     // a ruler of single-pixel tick marks along the top edge — 1px features at a
     // known pitch make the resolution ladder measurable at a glance.
     for (let x = 0; x < W; x += 4) {
-      const tall = (x % 20) === 0;
+      const tall = x % 20 === 0;
       const h = tall ? 5 : 2;
       for (let y = 0; y < h; y++) t.setPixel(x, 11 + y, 255, 255, 255);
     }

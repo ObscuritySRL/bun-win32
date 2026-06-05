@@ -158,11 +158,11 @@ const iidClassFactory = guidBytes(IID_I_CLASS_FACTORY);
 
 const coInitHr = ole32.symbols.CoInitializeEx(null, COINIT_APARTMENTTHREADED);
 const shouldUninitialize = coInitHr >= 0;
-if (coInitHr < 0 && (coInitHr >>> 0) !== RPC_E_CHANGED_MODE) {
+if (coInitHr < 0 && coInitHr >>> 0 !== RPC_E_CHANGED_MODE) {
   console.error(`${ANSI.red}CoInitializeEx failed: ${formatHResult(coInitHr)}${ANSI.reset}`);
   process.exit(1);
 }
-recordCheck('CoInitializeEx', coInitHr >= 0 || (coInitHr >>> 0) === RPC_E_CHANGED_MODE ? 'ok' : 'fail', coInitHr, `apartment = STA`);
+recordCheck('CoInitializeEx', coInitHr >= 0 || coInitHr >>> 0 === RPC_E_CHANGED_MODE ? 'ok' : 'fail', coInitHr, `apartment = STA`);
 
 const mfStartHr = mfplat.symbols.MFStartup(MF_VERSION, MFSTARTUP_LITE);
 recordCheck('MFStartup', mfStartHr >= 0 ? 'ok' : 'fail', mfStartHr, `MF_VERSION = ${formatHResult(MF_VERSION)}, MFSTARTUP_LITE`);
@@ -173,12 +173,11 @@ recordCheck('DllCanUnloadNow (baseline)', unloadBaseline === S_FALSE || unloadBa
 const sourceFactoryOut = Buffer.alloc(POINTER_SIZE);
 const sourceFactoryHr = Mfreadwrite.DllGetClassObject(clsidSourceReader.ptr, iidClassFactory.ptr, sourceFactoryOut.ptr);
 const sourceFactoryAddress = sourceFactoryHr === 0 ? sourceFactoryOut.readBigUInt64LE(0) : 0n;
-const sourceFactoryStatus: CheckStatus =
-  sourceFactoryHr === 0 && sourceFactoryAddress !== 0n ? 'ok' : (sourceFactoryHr >>> 0) === CLASS_E_CLASSNOTAVAILABLE ? 'info' : 'fail';
+const sourceFactoryStatus: CheckStatus = sourceFactoryHr === 0 && sourceFactoryAddress !== 0n ? 'ok' : sourceFactoryHr >>> 0 === CLASS_E_CLASSNOTAVAILABLE ? 'info' : 'fail';
 const sourceFactoryDetail =
   sourceFactoryHr === 0 && sourceFactoryAddress !== 0n
     ? `IClassFactory @ ${formatAddress(sourceFactoryAddress)}`
-    : (sourceFactoryHr >>> 0) === CLASS_E_CLASSNOTAVAILABLE
+    : sourceFactoryHr >>> 0 === CLASS_E_CLASSNOTAVAILABLE
       ? 'CLSID not exposed as class factory — use MFCreateSourceReaderFromURL instead'
       : 'no class factory';
 recordCheck('DllGetClassObject · CLSID_MFSourceReader', sourceFactoryStatus, sourceFactoryHr, sourceFactoryDetail);
@@ -186,12 +185,11 @@ recordCheck('DllGetClassObject · CLSID_MFSourceReader', sourceFactoryStatus, so
 const sinkFactoryOut = Buffer.alloc(POINTER_SIZE);
 const sinkFactoryHr = Mfreadwrite.DllGetClassObject(clsidSinkWriter.ptr, iidClassFactory.ptr, sinkFactoryOut.ptr);
 const sinkFactoryAddress = sinkFactoryHr === 0 ? sinkFactoryOut.readBigUInt64LE(0) : 0n;
-const sinkFactoryStatus: CheckStatus =
-  sinkFactoryHr === 0 && sinkFactoryAddress !== 0n ? 'ok' : (sinkFactoryHr >>> 0) === CLASS_E_CLASSNOTAVAILABLE ? 'info' : 'fail';
+const sinkFactoryStatus: CheckStatus = sinkFactoryHr === 0 && sinkFactoryAddress !== 0n ? 'ok' : sinkFactoryHr >>> 0 === CLASS_E_CLASSNOTAVAILABLE ? 'info' : 'fail';
 const sinkFactoryDetail =
   sinkFactoryHr === 0 && sinkFactoryAddress !== 0n
     ? `IClassFactory @ ${formatAddress(sinkFactoryAddress)}`
-    : (sinkFactoryHr >>> 0) === CLASS_E_CLASSNOTAVAILABLE
+    : sinkFactoryHr >>> 0 === CLASS_E_CLASSNOTAVAILABLE
       ? 'CLSID not exposed as class factory — use MFCreateSinkWriterFromURL instead'
       : 'no class factory';
 recordCheck('DllGetClassObject · CLSID_MFSinkWriter', sinkFactoryStatus, sinkFactoryHr, sinkFactoryDetail);
@@ -232,12 +230,7 @@ const sinkUrl = toWideBuffer(SINK_TARGET_PATH);
 const sinkOut = Buffer.alloc(POINTER_SIZE);
 const sinkHr = Mfreadwrite.MFCreateSinkWriterFromURL(sinkUrl.ptr, null, null, sinkOut.ptr);
 const sinkAddress = sinkHr === 0 ? sinkOut.readBigUInt64LE(0) : 0n;
-recordCheck(
-  'MFCreateSinkWriterFromURL',
-  sinkHr === 0 && sinkAddress !== 0n ? 'ok' : 'fail',
-  sinkHr,
-  sinkAddress === 0n ? SINK_TARGET_PATH : `IMFSinkWriter @ ${formatAddress(sinkAddress)}  →  ${SINK_TARGET_PATH}`,
-);
+recordCheck('MFCreateSinkWriterFromURL', sinkHr === 0 && sinkAddress !== 0n ? 'ok' : 'fail', sinkHr, sinkAddress === 0n ? SINK_TARGET_PATH : `IMFSinkWriter @ ${formatAddress(sinkAddress)}  →  ${SINK_TARGET_PATH}`);
 
 recordCheck('MFCreateSourceReaderFromMediaSource', 'skip', null, 'needs an IMFMediaSource (IMFSourceResolver bindings not in this package)');
 recordCheck('MFCreateSinkWriterFromMediaSink', 'skip', null, 'needs an IMFMediaSink (IMFMediaSink factory bindings not in this package)');
@@ -314,7 +307,9 @@ const infoCount = checks.filter((c) => c.status === 'info').length;
 const skipCount = checks.filter((c) => c.status === 'skip').length;
 
 console.log();
-console.log(`  ${ANSI.bold}${okCount}${ANSI.reset} ${ANSI.green}ok${ANSI.reset}  ${ANSI.dim}•${ANSI.reset}  ${ANSI.bold}${failCount}${ANSI.reset} ${ANSI.red}fail${ANSI.reset}  ${ANSI.dim}•${ANSI.reset}  ${ANSI.bold}${infoCount}${ANSI.reset} ${ANSI.cyan}info${ANSI.reset}  ${ANSI.dim}•${ANSI.reset}  ${ANSI.bold}${skipCount}${ANSI.reset} ${ANSI.dim}skip${ANSI.reset}`);
+console.log(
+  `  ${ANSI.bold}${okCount}${ANSI.reset} ${ANSI.green}ok${ANSI.reset}  ${ANSI.dim}•${ANSI.reset}  ${ANSI.bold}${failCount}${ANSI.reset} ${ANSI.red}fail${ANSI.reset}  ${ANSI.dim}•${ANSI.reset}  ${ANSI.bold}${infoCount}${ANSI.reset} ${ANSI.cyan}info${ANSI.reset}  ${ANSI.dim}•${ANSI.reset}  ${ANSI.bold}${skipCount}${ANSI.reset} ${ANSI.dim}skip${ANSI.reset}`,
+);
 console.log();
 
 process.exit(failCount > 0 ? 1 : 0);

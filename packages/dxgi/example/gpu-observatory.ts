@@ -172,7 +172,7 @@ const adapters: Adapter[] = [];
 for (let i = 0; i < 16; i += 1) {
   const adapterOut = Buffer.alloc(POINTER_SIZE);
   const enumHr = factoryCalls.symbols.EnumAdapters1(factoryAddress, i, adapterOut.ptr);
-  if ((enumHr >>> 0) === DXGI_ERROR_NOT_FOUND) break;
+  if (enumHr >>> 0 === DXGI_ERROR_NOT_FOUND) break;
   if (enumHr !== 0) {
     console.error(`${ANSI.red}EnumAdapters1(${i}) → 0x${(enumHr >>> 0).toString(16).padStart(8, '0')}${ANSI.reset}`);
     break;
@@ -215,7 +215,7 @@ for (let i = 0; i < 16; i += 1) {
   const outputOut = Buffer.alloc(POINTER_SIZE);
   for (let j = 0; j < 16; j += 1) {
     const outHr = adapterCalls.symbols.EnumOutputs(adapterAddress, j, outputOut.ptr);
-    if ((outHr >>> 0) === DXGI_ERROR_NOT_FOUND || outHr !== 0) break;
+    if (outHr >>> 0 === DXGI_ERROR_NOT_FOUND || outHr !== 0) break;
     outputs += 1;
     const outputAddress = outputOut.readBigUInt64LE(0);
     if (outputAddress !== 0n) {
@@ -293,10 +293,7 @@ for (let index = 0; index < adapters.length; index += 1) {
 }
 
 console.log(`${ANSI.dim}  ─ totals ─${ANSI.reset}`);
-console.log(
-  `  ${ANSI.dim}dedicated VRAM${ANSI.reset} ${ANSI.yellow}${formatBytes(totalDedicated)}${ANSI.reset}` +
-    `  ${ANSI.dim}shared pool${ANSI.reset} ${ANSI.yellow}${formatBytes(totalShared)}${ANSI.reset}`,
-);
+console.log(`  ${ANSI.dim}dedicated VRAM${ANSI.reset} ${ANSI.yellow}${formatBytes(totalDedicated)}${ANSI.reset}` + `  ${ANSI.dim}shared pool${ANSI.reset} ${ANSI.yellow}${formatBytes(totalShared)}${ANSI.reset}`);
 console.log();
 
 process.exit(adapters.length === 0 ? 1 : 0);

@@ -141,13 +141,7 @@ export function draw(g: gpu.Gpu, w: number, h: number, drawFn: (dc: bigint, w: n
   s.view.fill(0); // transparent black
   drawFn(s.memDC, s.w, s.h);
   GDI32.GdiFlush(); // flush GDI batch so the DIB bits are final before upload
-  gpu.vcall(
-    s.g.context,
-    gpu.CTX_UPDATE_SUBRESOURCE,
-    [FFIType.u64, FFIType.u32, FFIType.ptr, FFIType.ptr, FFIType.u32, FFIType.u32],
-    [s.tex.tex, 0, null, s.view.ptr!, s.w * 4, 0],
-    FFIType.void,
-  );
+  gpu.vcall(s.g.context, gpu.CTX_UPDATE_SUBRESOURCE, [FFIType.u64, FFIType.u32, FFIType.ptr, FFIType.ptr, FFIType.u32, FFIType.u32], [s.tex.tex, 0, null, s.view.ptr!, s.w * 4, 0], FFIType.void);
   gpu.setRenderTargets([s.g.backBufferRTV]);
   gpu.setViewport(s.w, s.h);
   gpu.setBlendState(s.blend);

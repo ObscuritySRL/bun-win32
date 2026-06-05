@@ -3,23 +3,78 @@ import { type FFIFunction, FFIType } from 'bun:ffi';
 import { Win32 } from '@bun-win32/core';
 
 import type {
-  BOOL, BOOLEAN, DWORD, DWORD64, HANDLE, HMODULE, HWND,
-  IMAGEHLP_EXTENDED_OPTIONS, IMAGEHLP_SYMBOL_TYPE_INFO, LPCSTR, LPCWSTR, LPDWORD, LPSTR, LPVOID, LPWSTR,
-  LPAPI_VERSION, LPSTACKFRAME64, LPSTACKFRAME_EX, MINIDUMP_TYPE, NULL,
-  PDWORD, PDWORD64, PENUMDIRTREE_CALLBACK, PENUMDIRTREE_CALLBACKW, PENUMLOADED_MODULES_CALLBACK64,
-  PENUMLOADED_MODULES_CALLBACKW64, PENUMSOURCEFILETOKENSCALLBACK, PFIND_DEBUG_FILE_CALLBACK,
-  PFIND_DEBUG_FILE_CALLBACKW, PFIND_EXE_FILE_CALLBACK, PFIND_EXE_FILE_CALLBACKW, PFINDFILEINPATHCALLBACK,
-  PFINDFILEINPATHCALLBACKW, PFUNCTION_TABLE_ACCESS_ROUTINE64, PGET_MODULE_BASE_ROUTINE64,
-  PIMAGE_NT_HEADERS, PIMAGE_SECTION_HEADER, PIMAGEHLP_CONTEXT, PIMAGEHLP_GET_TYPE_INFO_PARAMS,
-  PIMAGEHLP_LINE64, PIMAGEHLP_LINEW64, PIMAGEHLP_MODULE64, PIMAGEHLP_MODULEW64,
-  PIMAGEHLP_STACK_FRAME, PIMAGEHLP_SYMBOL64, PLONG,
-  PMINIDUMP_CALLBACK_INFORMATION, PMINIDUMP_DIRECTORY, PMINIDUMP_EXCEPTION_INFORMATION,
-  PMINIDUMP_USER_STREAM_INFORMATION, PMODLOAD_DATA, POMAP, PREAD_PROCESS_MEMORY_ROUTINE64,
-  PSYM_ENUMLINES_CALLBACK, PSYM_ENUMLINES_CALLBACKW, PSYM_ENUMERATESYMBOLS_CALLBACK,
-  PSYM_ENUMERATESYMBOLS_CALLBACKW, PSYM_ENUMSOURCEFILES_CALLBACK, PSYM_ENUMSOURCEFILES_CALLBACKW,
-  PSYMBOL_FUNCENTRY_CALLBACK64, PSYMBOL_INFO, PSYMBOL_INFOW,
-  PSYMBOL_REGISTERED_CALLBACK64, PSYMSRV_INDEX_INFO, PSYMSRV_INDEX_INFOW,
-  PTRANSLATE_ADDRESS_ROUTINE64, PULONG, PVOID, SIZE_T, ULONG, ULONG64, USHORT,
+  BOOL,
+  BOOLEAN,
+  DWORD,
+  DWORD64,
+  HANDLE,
+  HMODULE,
+  HWND,
+  IMAGEHLP_EXTENDED_OPTIONS,
+  IMAGEHLP_SYMBOL_TYPE_INFO,
+  LPCSTR,
+  LPCWSTR,
+  LPDWORD,
+  LPSTR,
+  LPVOID,
+  LPWSTR,
+  LPAPI_VERSION,
+  LPSTACKFRAME64,
+  LPSTACKFRAME_EX,
+  MINIDUMP_TYPE,
+  NULL,
+  PDWORD,
+  PDWORD64,
+  PENUMDIRTREE_CALLBACK,
+  PENUMDIRTREE_CALLBACKW,
+  PENUMLOADED_MODULES_CALLBACK64,
+  PENUMLOADED_MODULES_CALLBACKW64,
+  PENUMSOURCEFILETOKENSCALLBACK,
+  PFIND_DEBUG_FILE_CALLBACK,
+  PFIND_DEBUG_FILE_CALLBACKW,
+  PFIND_EXE_FILE_CALLBACK,
+  PFIND_EXE_FILE_CALLBACKW,
+  PFINDFILEINPATHCALLBACK,
+  PFINDFILEINPATHCALLBACKW,
+  PFUNCTION_TABLE_ACCESS_ROUTINE64,
+  PGET_MODULE_BASE_ROUTINE64,
+  PIMAGE_NT_HEADERS,
+  PIMAGE_SECTION_HEADER,
+  PIMAGEHLP_CONTEXT,
+  PIMAGEHLP_GET_TYPE_INFO_PARAMS,
+  PIMAGEHLP_LINE64,
+  PIMAGEHLP_LINEW64,
+  PIMAGEHLP_MODULE64,
+  PIMAGEHLP_MODULEW64,
+  PIMAGEHLP_STACK_FRAME,
+  PIMAGEHLP_SYMBOL64,
+  PLONG,
+  PMINIDUMP_CALLBACK_INFORMATION,
+  PMINIDUMP_DIRECTORY,
+  PMINIDUMP_EXCEPTION_INFORMATION,
+  PMINIDUMP_USER_STREAM_INFORMATION,
+  PMODLOAD_DATA,
+  POMAP,
+  PREAD_PROCESS_MEMORY_ROUTINE64,
+  PSYM_ENUMLINES_CALLBACK,
+  PSYM_ENUMLINES_CALLBACKW,
+  PSYM_ENUMERATESYMBOLS_CALLBACK,
+  PSYM_ENUMERATESYMBOLS_CALLBACKW,
+  PSYM_ENUMSOURCEFILES_CALLBACK,
+  PSYM_ENUMSOURCEFILES_CALLBACKW,
+  PSYMBOL_FUNCENTRY_CALLBACK64,
+  PSYMBOL_INFO,
+  PSYMBOL_INFOW,
+  PSYMBOL_REGISTERED_CALLBACK64,
+  PSYMSRV_INDEX_INFO,
+  PSYMSRV_INDEX_INFOW,
+  PTRANSLATE_ADDRESS_ROUTINE64,
+  PULONG,
+  PVOID,
+  SIZE_T,
+  ULONG,
+  ULONG64,
+  USHORT,
 } from '../types/Dbghelp';
 
 /**
@@ -324,7 +379,15 @@ class Dbghelp extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/minidumpapiset/nf-minidumpapiset-minidumpwritedump
-  public static MiniDumpWriteDump(hProcess: HANDLE, ProcessId: DWORD, hFile: HANDLE, DumpType: MINIDUMP_TYPE, ExceptionParam: PMINIDUMP_EXCEPTION_INFORMATION | NULL, UserStreamParam: PMINIDUMP_USER_STREAM_INFORMATION | NULL, CallbackParam: PMINIDUMP_CALLBACK_INFORMATION | NULL): BOOL {
+  public static MiniDumpWriteDump(
+    hProcess: HANDLE,
+    ProcessId: DWORD,
+    hFile: HANDLE,
+    DumpType: MINIDUMP_TYPE,
+    ExceptionParam: PMINIDUMP_EXCEPTION_INFORMATION | NULL,
+    UserStreamParam: PMINIDUMP_USER_STREAM_INFORMATION | NULL,
+    CallbackParam: PMINIDUMP_CALLBACK_INFORMATION | NULL,
+  ): BOOL {
     return Dbghelp.Load('MiniDumpWriteDump')(hProcess, ProcessId, hFile, DumpType, ExceptionParam, UserStreamParam, CallbackParam);
   }
 
@@ -339,12 +402,33 @@ class Dbghelp extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dbghelp/nf-dbghelp-stackwalk64
-  public static StackWalk64(MachineType: DWORD, hProcess: HANDLE, hThread: HANDLE, StackFrame: LPSTACKFRAME64, ContextRecord: PVOID, ReadMemoryRoutine: PREAD_PROCESS_MEMORY_ROUTINE64 | NULL, FunctionTableAccessRoutine: PFUNCTION_TABLE_ACCESS_ROUTINE64 | NULL, GetModuleBaseRoutine: PGET_MODULE_BASE_ROUTINE64 | NULL, TranslateAddress: PTRANSLATE_ADDRESS_ROUTINE64 | NULL): BOOL {
+  public static StackWalk64(
+    MachineType: DWORD,
+    hProcess: HANDLE,
+    hThread: HANDLE,
+    StackFrame: LPSTACKFRAME64,
+    ContextRecord: PVOID,
+    ReadMemoryRoutine: PREAD_PROCESS_MEMORY_ROUTINE64 | NULL,
+    FunctionTableAccessRoutine: PFUNCTION_TABLE_ACCESS_ROUTINE64 | NULL,
+    GetModuleBaseRoutine: PGET_MODULE_BASE_ROUTINE64 | NULL,
+    TranslateAddress: PTRANSLATE_ADDRESS_ROUTINE64 | NULL,
+  ): BOOL {
     return Dbghelp.Load('StackWalk64')(MachineType, hProcess, hThread, StackFrame, ContextRecord, ReadMemoryRoutine, FunctionTableAccessRoutine, GetModuleBaseRoutine, TranslateAddress);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dbghelp/nf-dbghelp-stackwalkex
-  public static StackWalkEx(MachineType: DWORD, hProcess: HANDLE, hThread: HANDLE, StackFrame: LPSTACKFRAME_EX, ContextRecord: PVOID, ReadMemoryRoutine: PREAD_PROCESS_MEMORY_ROUTINE64 | NULL, FunctionTableAccessRoutine: PFUNCTION_TABLE_ACCESS_ROUTINE64 | NULL, GetModuleBaseRoutine: PGET_MODULE_BASE_ROUTINE64 | NULL, TranslateAddress: PTRANSLATE_ADDRESS_ROUTINE64 | NULL, Flags: DWORD): BOOL {
+  public static StackWalkEx(
+    MachineType: DWORD,
+    hProcess: HANDLE,
+    hThread: HANDLE,
+    StackFrame: LPSTACKFRAME_EX,
+    ContextRecord: PVOID,
+    ReadMemoryRoutine: PREAD_PROCESS_MEMORY_ROUTINE64 | NULL,
+    FunctionTableAccessRoutine: PFUNCTION_TABLE_ACCESS_ROUTINE64 | NULL,
+    GetModuleBaseRoutine: PGET_MODULE_BASE_ROUTINE64 | NULL,
+    TranslateAddress: PTRANSLATE_ADDRESS_ROUTINE64 | NULL,
+    Flags: DWORD,
+  ): BOOL {
     return Dbghelp.Load('StackWalkEx')(MachineType, hProcess, hThread, StackFrame, ContextRecord, ReadMemoryRoutine, FunctionTableAccessRoutine, GetModuleBaseRoutine, TranslateAddress, Flags);
   }
 
@@ -479,12 +563,34 @@ class Dbghelp extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dbghelp/nf-dbghelp-symfindfileinpath
-  public static SymFindFileInPath(hprocess: HANDLE, SearchPath: LPCSTR | NULL, FileName: LPCSTR, id: PVOID | NULL, two: DWORD, three: DWORD, flags: DWORD, FoundFile: LPSTR, callback: PFINDFILEINPATHCALLBACK | NULL, context: PVOID | NULL): BOOL {
+  public static SymFindFileInPath(
+    hprocess: HANDLE,
+    SearchPath: LPCSTR | NULL,
+    FileName: LPCSTR,
+    id: PVOID | NULL,
+    two: DWORD,
+    three: DWORD,
+    flags: DWORD,
+    FoundFile: LPSTR,
+    callback: PFINDFILEINPATHCALLBACK | NULL,
+    context: PVOID | NULL,
+  ): BOOL {
     return Dbghelp.Load('SymFindFileInPath')(hprocess, SearchPath, FileName, id, two, three, flags, FoundFile, callback, context);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dbghelp/nf-dbghelp-symfindfileinpathw
-  public static SymFindFileInPathW(hprocess: HANDLE, SearchPath: LPCWSTR | NULL, FileName: LPCWSTR, id: PVOID | NULL, two: DWORD, three: DWORD, flags: DWORD, FoundFile: LPWSTR, callback: PFINDFILEINPATHCALLBACKW | NULL, context: PVOID | NULL): BOOL {
+  public static SymFindFileInPathW(
+    hprocess: HANDLE,
+    SearchPath: LPCWSTR | NULL,
+    FileName: LPCWSTR,
+    id: PVOID | NULL,
+    two: DWORD,
+    three: DWORD,
+    flags: DWORD,
+    FoundFile: LPWSTR,
+    callback: PFINDFILEINPATHCALLBACKW | NULL,
+    context: PVOID | NULL,
+  ): BOOL {
     return Dbghelp.Load('SymFindFileInPathW')(hprocess, SearchPath, FileName, id, two, three, flags, FoundFile, callback, context);
   }
 
@@ -834,7 +940,17 @@ class Dbghelp extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dbghelp/nf-dbghelp-symsearchw
-  public static SymSearchW(hProcess: HANDLE, BaseOfDll: ULONG64, Index: DWORD, SymTag: DWORD, Mask: LPCWSTR | NULL, Address: DWORD64 | 0n, EnumSymbolsCallback: PSYM_ENUMERATESYMBOLS_CALLBACKW, UserContext: PVOID | NULL, Options: DWORD): BOOL {
+  public static SymSearchW(
+    hProcess: HANDLE,
+    BaseOfDll: ULONG64,
+    Index: DWORD,
+    SymTag: DWORD,
+    Mask: LPCWSTR | NULL,
+    Address: DWORD64 | 0n,
+    EnumSymbolsCallback: PSYM_ENUMERATESYMBOLS_CALLBACKW,
+    UserContext: PVOID | NULL,
+    Options: DWORD,
+  ): BOOL {
     return Dbghelp.Load('SymSearchW')(hProcess, BaseOfDll, Index, SymTag, Mask, Address, EnumSymbolsCallback, UserContext, Options);
   }
 

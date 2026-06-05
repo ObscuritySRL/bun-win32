@@ -53,30 +53,14 @@ const SELFSHOT = process.env.SELFSHOT === '1';
 // Designed so the start pose looks straight down a long textured corridor.
 const MAP_DIM = 24;
 const MAP: number[] = [
-  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 4, 4, 4, 4, 4, 4, 1, 1, 1, 1, 1, 1, 1, 1,
-  1, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 1,
-  1, 0, 2, 2, 2, 0, 1, 1, 2, 0, 1, 1, 1, 1, 0, 4, 0, 3, 3, 3, 3, 3, 0, 1,
-  1, 0, 2, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 4, 0, 3, 0, 0, 0, 3, 0, 1,
-  1, 0, 2, 0, 1, 1, 1, 1, 1, 0, 1, 0, 0, 1, 0, 0, 0, 3, 0, 4, 0, 0, 0, 1,
-  1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 4, 4, 3, 0, 4, 4, 4, 0, 1,
-  1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 1, 1, 0, 1, 1, 4, 0, 0, 0, 0, 0, 4, 0, 1,
-  1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 2, 2, 2, 0, 4, 0, 1,
-  1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 2, 0, 2, 0, 0, 0, 1,
-  1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 2, 0, 0, 0, 1, 0, 1,
-  1, 0, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1,
-  1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1,
-  1, 0, 1, 0, 1, 0, 1, 1, 2, 2, 2, 2, 2, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1,
-  1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 2, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1,
-  1, 0, 1, 1, 1, 0, 1, 0, 2, 0, 0, 0, 2, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1,
-  1, 0, 0, 0, 1, 0, 0, 0, 2, 0, 3, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1,
-  1, 1, 1, 0, 1, 1, 1, 0, 2, 2, 0, 2, 2, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1,
-  1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-  1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1,
-  1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1,
-  1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1,
-  1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1,
-  1, 0, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1,
-  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 4, 4, 4, 4, 4, 4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 2, 2, 2, 0, 1, 1, 2, 0, 1, 1, 1, 1, 0, 4, 0, 3, 3, 3, 3, 3, 0, 1, 1, 0, 2, 0, 0, 0, 0,
+  0, 0, 0, 1, 0, 0, 1, 0, 4, 0, 3, 0, 0, 0, 3, 0, 1, 1, 0, 2, 0, 1, 1, 1, 1, 1, 0, 1, 0, 0, 1, 0, 0, 0, 3, 0, 4, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 4, 4, 3, 0, 4, 4, 4, 0, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 1, 1, 0, 1,
+  1, 4, 0, 0, 0, 0, 0, 4, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 2, 2, 2, 0, 4, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 2, 0, 2, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 2, 0, 0, 0,
+  1, 0, 1, 1, 0, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 0, 1, 0, 1, 1, 2, 2, 2, 2, 2, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 0, 1, 0,
+  0, 0, 1, 0, 0, 0, 0, 0, 2, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 1, 0, 1, 1, 1, 0, 1, 0, 2, 0, 0, 0, 2, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 2, 0, 3, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 0, 2, 2, 0,
+  2, 2, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0,
+  0, 0, 0, 1, 0, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1,
+  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
 ];
 
 // A few procedural "lamp" sprites placed in open cells (x,y world coords at cell centers).
@@ -338,7 +322,7 @@ function main(): void {
   const sH = User32.GetSystemMetrics(1) || 1080; // SM_CYSCREEN
   // Modest 16:9 window by default; RAYCASTER_W/H override for an exact size.
   const winH = process.env.RAYCASTER_H ? Number(process.env.RAYCASTER_H) : Math.min(1000, Math.floor(sH * 0.72));
-  const winW = process.env.RAYCASTER_W ? Number(process.env.RAYCASTER_W) : Math.min(Math.floor(sW * 0.9), Math.round(winH * 16 / 9));
+  const winW = process.env.RAYCASTER_W ? Number(process.env.RAYCASTER_W) : Math.min(Math.floor(sW * 0.9), Math.round((winH * 16) / 9));
 
   const win = gpu.createWindow({ title: 'Raycaster — Wolf3D-style maze in a pixel shader', width: winW, height: winH, borderless: true });
   const { w: cw, h: ch } = win.clientSize();
@@ -481,11 +465,14 @@ function main(): void {
       // frames a textured 3D hallway with receding walls + the lamps ahead.
       py = 11.5;
       px = 5.5 + Math.min(3.0, elapsed * 1.2);
-      angle = 0.10 * Math.sin(elapsed * 0.8); // small sway, mostly facing +x (east)
+      angle = 0.1 * Math.sin(elapsed * 0.8); // small sway, mostly facing +x (east)
     } else {
       const m = win.getMouse();
       if (m.down) {
-        if (!dragging) { dragging = true; lastMx = m.x; }
+        if (!dragging) {
+          dragging = true;
+          lastMx = m.x;
+        }
         angle += (m.x - lastMx) * 0.005;
         lastMx = m.x;
       } else dragging = false;
@@ -497,10 +484,22 @@ function main(): void {
       const dirY = Math.sin(angle);
       let mvX = 0;
       let mvY = 0;
-      if (win.keyDown(VK_W) || win.keyDown(VK_UP)) { mvX += dirX; mvY += dirY; }
-      if (win.keyDown(VK_S) || win.keyDown(VK_DOWN)) { mvX -= dirX; mvY -= dirY; }
-      if (win.keyDown(VK_A)) { mvX += dirY; mvY -= dirX; } // strafe left
-      if (win.keyDown(VK_D)) { mvX -= dirY; mvY += dirX; } // strafe right
+      if (win.keyDown(VK_W) || win.keyDown(VK_UP)) {
+        mvX += dirX;
+        mvY += dirY;
+      }
+      if (win.keyDown(VK_S) || win.keyDown(VK_DOWN)) {
+        mvX -= dirX;
+        mvY -= dirY;
+      }
+      if (win.keyDown(VK_A)) {
+        mvX += dirY;
+        mvY -= dirX;
+      } // strafe left
+      if (win.keyDown(VK_D)) {
+        mvX -= dirY;
+        mvY += dirX;
+      } // strafe right
       const len = Math.hypot(mvX, mvY);
       if (len > 1e-4) {
         const nx = px + (mvX / len) * moveSpeed;

@@ -630,31 +630,25 @@ function lookAt(eye: V3, center: V3, up: V3): number[] {
   let zy = center[1] - eye[1];
   let zz = center[2] - eye[2];
   const zl = Math.hypot(zx, zy, zz) || 1;
-  zx /= zl; zy /= zl; zz /= zl;
+  zx /= zl;
+  zy /= zl;
+  zz /= zl;
   let xx = up[1] * zz - up[2] * zy;
   let xy = up[2] * zx - up[0] * zz;
   let xz = up[0] * zy - up[1] * zx;
   const xl = Math.hypot(xx, xy, xz) || 1;
-  xx /= xl; xy /= xl; xz /= xl;
+  xx /= xl;
+  xy /= xl;
+  xz /= xl;
   const yx = zy * xz - zz * xy;
   const yy = zz * xx - zx * xz;
   const yz = zx * xy - zy * xx;
-  return [
-    xx, xy, xz, -(xx * eye[0] + xy * eye[1] + xz * eye[2]),
-    yx, yy, yz, -(yx * eye[0] + yy * eye[1] + yz * eye[2]),
-    zx, zy, zz, -(zx * eye[0] + zy * eye[1] + zz * eye[2]),
-    0, 0, 0, 1,
-  ];
+  return [xx, xy, xz, -(xx * eye[0] + xy * eye[1] + xz * eye[2]), yx, yy, yz, -(yx * eye[0] + yy * eye[1] + yz * eye[2]), zx, zy, zz, -(zx * eye[0] + zy * eye[1] + zz * eye[2]), 0, 0, 0, 1];
 }
 function perspective(fovY: number, aspect: number, near: number, far: number): number[] {
   const ff = 1 / Math.tan(fovY / 2);
   const range = far / (far - near);
-  return [
-    ff / aspect, 0, 0, 0,
-    0, ff, 0, 0,
-    0, 0, range, -near * range,
-    0, 0, 1, 0,
-  ];
+  return [ff / aspect, 0, 0, 0, 0, ff, 0, 0, 0, 0, range, -near * range, 0, 0, 1, 0];
 }
 function mul4(a: number[], b: number[]): number[] {
   const r = new Array<number>(16).fill(0);
@@ -768,7 +762,10 @@ function cleanup(code: number): never {
   process.exit(code);
 }
 process.on('SIGINT', () => cleanup(0));
-process.on('uncaughtException', (e) => { console.error(e); cleanup(1); });
+process.on('uncaughtException', (e) => {
+  console.error(e);
+  cleanup(1);
+});
 
 const NULLP = null as unknown as Pointer;
 
@@ -816,7 +813,14 @@ let lastFrameWall = startTime; // wall clock of the previous frame, for time-bas
 let prevNdcX = 0;
 let prevNdcY = 0;
 // Edge-trigger latches: act once per key press, not once per frame held.
-let pLast = false, spaceLast = false, rLast = false, fLast = false, cLast = false, zeroLast = false, k1Last = false, k2Last = false;
+let pLast = false,
+  spaceLast = false,
+  rLast = false,
+  fLast = false,
+  cLast = false,
+  zeroLast = false,
+  k1Last = false,
+  k2Last = false;
 
 // Recreate the three position buffers from the flat seed (R = reset).
 function resetCloth(): void {
@@ -845,9 +849,22 @@ while (!win.shouldClose()) {
   const t = simTime;
 
   // ── Input: camera + tweaks are HELD (time-based, units/sec × rdt); toggles edge-fire ──
-  const ORBIT = 1.4, PITCHR = 1.0, ZOOM = 0.9, AUTO = 0.2, WINDR = 3.0, GRAVR = 6.0, STIFFR = 0.5, BRUSHR = 0.4;
-  if (win.keyDown(VK_LEFT)) { camYaw -= ORBIT * rdt; autoOrbit = false; }
-  if (win.keyDown(VK_RIGHT)) { camYaw += ORBIT * rdt; autoOrbit = false; }
+  const ORBIT = 1.4,
+    PITCHR = 1.0,
+    ZOOM = 0.9,
+    AUTO = 0.2,
+    WINDR = 3.0,
+    GRAVR = 6.0,
+    STIFFR = 0.5,
+    BRUSHR = 0.4;
+  if (win.keyDown(VK_LEFT)) {
+    camYaw -= ORBIT * rdt;
+    autoOrbit = false;
+  }
+  if (win.keyDown(VK_RIGHT)) {
+    camYaw += ORBIT * rdt;
+    autoOrbit = false;
+  }
   if (win.keyDown(VK_UP)) camPitch += PITCHR * rdt;
   if (win.keyDown(VK_DOWN)) camPitch -= PITCHR * rdt;
   camPitch = Math.max(-1.35, Math.min(1.35, camPitch));
@@ -864,38 +881,59 @@ while (!win.shouldClose()) {
   if (win.keyDown(VK_N)) brushGain = Math.min(1.0, brushGain + BRUSHR * rdt);
 
   // Edge-triggered toggles (one action per press, not once per frame held).
-  const pNow = win.keyDown(VK_P); if (pNow && !pLast) pinMode = (pinMode + 1) % 3; pLast = pNow;
-  const spNow = win.keyDown(VK_SPACE); if (spNow && !spaceLast) autoOrbit = !autoOrbit; spaceLast = spNow;
-  const rNow = win.keyDown(VK_R); if (rNow && !rLast) resetCloth(); rLast = rNow;
-  const fNow = win.keyDown(VK_F); if (fNow && !fLast) windOn = !windOn; fLast = fNow;
-  const cNow = win.keyDown(VK_C); if (cNow && !cLast) collideOn = !collideOn; cLast = cNow;
-  const k1Now = win.keyDown(VK_1); if (k1Now && !k1Last) solveIters = Math.max(2, solveIters - 1); k1Last = k1Now;
-  const k2Now = win.keyDown(VK_2); if (k2Now && !k2Last) solveIters = Math.min(40, solveIters + 1); k2Last = k2Now;
-  const zNow = win.keyDown(VK_0); if (zNow && !zeroLast) { camYaw = CAM_YAW0; camPitch = CAM_PITCH0; camDist = CAM_DIST0; autoOrbit = true; } zeroLast = zNow;
+  const pNow = win.keyDown(VK_P);
+  if (pNow && !pLast) pinMode = (pinMode + 1) % 3;
+  pLast = pNow;
+  const spNow = win.keyDown(VK_SPACE);
+  if (spNow && !spaceLast) autoOrbit = !autoOrbit;
+  spaceLast = spNow;
+  const rNow = win.keyDown(VK_R);
+  if (rNow && !rLast) resetCloth();
+  rLast = rNow;
+  const fNow = win.keyDown(VK_F);
+  if (fNow && !fLast) windOn = !windOn;
+  fLast = fNow;
+  const cNow = win.keyDown(VK_C);
+  if (cNow && !cLast) collideOn = !collideOn;
+  cLast = cNow;
+  const k1Now = win.keyDown(VK_1);
+  if (k1Now && !k1Last) solveIters = Math.max(2, solveIters - 1);
+  k1Last = k1Now;
+  const k2Now = win.keyDown(VK_2);
+  if (k2Now && !k2Last) solveIters = Math.min(40, solveIters + 1);
+  k2Last = k2Now;
+  const zNow = win.keyDown(VK_0);
+  if (zNow && !zeroLast) {
+    camYaw = CAM_YAW0;
+    camPitch = CAM_PITCH0;
+    camDist = CAM_DIST0;
+    autoOrbit = true;
+  }
+  zeroLast = zNow;
 
   if (autoOrbit) camYaw += AUTO * rdt;
 
   // In capture mode hold a fixed front-quarter framing so the gallery PNG always shows
   // the broad draping face (the unbounded auto-orbit would otherwise rotate to an
   // edge-on sliver by the chosen capture sim-time). Interactive runs are unaffected.
-  if (durationMs > 0) { camYaw = -0.42; camPitch = 0.20; camDist = CLOTH_W * 1.45; }
+  if (durationMs > 0) {
+    camYaw = -0.42;
+    camPitch = 0.2;
+    camDist = CLOTH_W * 1.45;
+  }
 
   // Wind drifts mainly along +x with a slow z lean. The big visible ripple comes from
   // the out-of-plane travelling wave in the shader; windStrength is user-tweakable.
   const windZ = Math.sin(t * 0.6) * 0.35;
   const windDir: V3 = [1.0, 0.0, windZ];
   // Collision sphere parked behind the cloth's mid-span so passing folds drape over it.
-  const sphereCenter: V3 = [CLOTH_W * 0.20, -CLOTH_H * 0.02 + Math.sin(t * 0.7) * 0.3, -SPHERE_R * 0.9 + Math.cos(t * 0.5) * 0.5];
+  const sphereCenter: V3 = [CLOTH_W * 0.2, -CLOTH_H * 0.02 + Math.sin(t * 0.7) * 0.3, -SPHERE_R * 0.9 + Math.cos(t * 0.5) * 0.5];
 
   // ── Camera basis (computed up front so the brush + render share one viewProj) ──
   // The cloth hangs from the top in modes 0/1, so we frame it slightly low; in left-edge
   // mode (2) it streams to the right like a flag, so the centre shifts downwind.
-  const center: V3 = pinMode < 2 ? [0, -CLOTH_H * 0.22, 0] : [CLOTH_W * 0.20, -CLOTH_H * 0.12, 0];
-  const eye: V3 = [
-    center[0] + Math.sin(camYaw) * Math.cos(camPitch) * camDist,
-    center[1] + Math.sin(camPitch) * camDist,
-    center[2] - Math.cos(camYaw) * Math.cos(camPitch) * camDist,
-  ];
+  const center: V3 = pinMode < 2 ? [0, -CLOTH_H * 0.22, 0] : [CLOTH_W * 0.2, -CLOTH_H * 0.12, 0];
+  const eye: V3 = [center[0] + Math.sin(camYaw) * Math.cos(camPitch) * camDist, center[1] + Math.sin(camPitch) * camDist, center[2] - Math.cos(camYaw) * Math.cos(camPitch) * camDist];
   const view = lookAt(eye, center, [0, 1, 0]);
   const viewProj = mul4(proj, view);
 
@@ -906,7 +944,7 @@ while (!win.shouldClose()) {
   simData.writeFloatLE(GRID_H, 12);
   simData.writeFloatLE(REST, 16);
   simData.writeFloatLE(gravity, 20); // gravity (y) — G/H tweakable
-  simData.writeFloatLE(0.990, 24); // damping (a touch firmer so flaps settle, not ring)
+  simData.writeFloatLE(0.99, 24); // damping (a touch firmer so flaps settle, not ring)
   simData.writeFloatLE(stiffness, 28); // J/K tweakable
   simData.writeFloatLE(windDir[0], 32);
   simData.writeFloatLE(windDir[1], 36);
@@ -938,13 +976,17 @@ while (!win.shouldClose()) {
   let fwdY = center[1] - eye[1];
   let fwdZ = center[2] - eye[2];
   const fwdL = Math.hypot(fwdX, fwdY, fwdZ) || 1;
-  fwdX /= fwdL; fwdY /= fwdL; fwdZ /= fwdL;
+  fwdX /= fwdL;
+  fwdY /= fwdL;
+  fwdZ /= fwdL;
   // right = normalize(cross([0,1,0], forward))
   let rgtX = 1 * fwdZ - 0 * fwdY;
   let rgtY = 0 * fwdX - 0 * fwdZ;
   let rgtZ = 0 * fwdY - 1 * fwdX;
   const rgtL = Math.hypot(rgtX, rgtY, rgtZ) || 1;
-  rgtX /= rgtL; rgtY /= rgtL; rgtZ /= rgtL;
+  rgtX /= rgtL;
+  rgtY /= rgtL;
+  rgtZ /= rgtL;
   // up = cross(forward, right)
   const upX = fwdY * rgtZ - fwdZ * rgtY;
   const upY = fwdZ * rgtX - fwdX * rgtZ;
@@ -992,9 +1034,11 @@ while (!win.shouldClose()) {
   // Key light: a warm sun from the upper-left-front, raking across the folds.
   let ldx = -0.45;
   let ldy = -0.55;
-  let ldz = 0.70;
+  let ldz = 0.7;
   const ll = Math.hypot(ldx, ldy, ldz);
-  ldx /= ll; ldy /= ll; ldz /= ll;
+  ldx /= ll;
+  ldy /= ll;
+  ldz /= ll;
 
   // Upload viewProj TRANSPOSED (column-major HLSL read recovers the row-major matrix).
   for (let row = 0; row < 4; row += 1) {

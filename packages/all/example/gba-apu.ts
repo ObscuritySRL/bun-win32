@@ -20,14 +20,24 @@ export class GbaApu {
   // DirectSound channel A/B FIFOs (signed 8-bit), 32 bytes each.
   private readonly fifoA = new Int8Array(32);
   private readonly fifoB = new Int8Array(32);
-  private aHead = 0; private aTail = 0; private aCount = 0;
-  private bHead = 0; private bTail = 0; private bCount = 0;
-  private curA = 0; private curB = 0; // last sample popped (held until next overflow)
+  private aHead = 0;
+  private aTail = 0;
+  private aCount = 0;
+  private bHead = 0;
+  private bTail = 0;
+  private bCount = 0;
+  private curA = 0;
+  private curB = 0; // last sample popped (held until next overflow)
 
   // SOUNDCNT_H config.
-  private aVolHalf = false; private bVolHalf = false;
-  private aRight = false; private aLeft = false; private aTimer = 0;
-  private bRight = false; private bLeft = false; private bTimer = 0;
+  private aVolHalf = false;
+  private bVolHalf = false;
+  private aRight = false;
+  private aLeft = false;
+  private aTimer = 0;
+  private bRight = false;
+  private bLeft = false;
+  private bTimer = 0;
   private masterOn = false;
 
   // DMA refill requests (read + cleared by the system after stepping timers).
@@ -51,12 +61,16 @@ export class GbaApu {
     this.bVolHalf = (value & 0x0008) === 0;
     this.aRight = (value & 0x0100) !== 0;
     this.aLeft = (value & 0x0200) !== 0;
-    this.aTimer = (value & 0x0400) ? 1 : 0;
-    if (value & 0x0800) { this.aHead = this.aTail = this.aCount = 0; } // FIFO A reset
+    this.aTimer = value & 0x0400 ? 1 : 0;
+    if (value & 0x0800) {
+      this.aHead = this.aTail = this.aCount = 0;
+    } // FIFO A reset
     this.bRight = (value & 0x1000) !== 0;
     this.bLeft = (value & 0x2000) !== 0;
-    this.bTimer = (value & 0x4000) ? 1 : 0;
-    if (value & 0x8000) { this.bHead = this.bTail = this.bCount = 0; } // FIFO B reset
+    this.bTimer = value & 0x4000 ? 1 : 0;
+    if (value & 0x8000) {
+      this.bHead = this.bTail = this.bCount = 0;
+    } // FIFO B reset
   }
 
   /** SOUNDCNT_X (0x04000084) write — master sound enable (bit7). */
@@ -80,11 +94,19 @@ export class GbaApu {
   /** Timer 0/1 overflowed: pop the next sample for any DMA channel using it. */
   onTimerOverflow(timerIndex: number): void {
     if (this.aTimer === timerIndex) {
-      if (this.aCount > 0) { this.curA = this.fifoA[this.aHead]!; this.aHead = (this.aHead + 1) & 31; this.aCount -= 1; }
+      if (this.aCount > 0) {
+        this.curA = this.fifoA[this.aHead]!;
+        this.aHead = (this.aHead + 1) & 31;
+        this.aCount -= 1;
+      }
       if (this.aCount <= 16) this.dmaReqA = true;
     }
     if (this.bTimer === timerIndex) {
-      if (this.bCount > 0) { this.curB = this.fifoB[this.bHead]!; this.bHead = (this.bHead + 1) & 31; this.bCount -= 1; }
+      if (this.bCount > 0) {
+        this.curB = this.fifoB[this.bHead]!;
+        this.bHead = (this.bHead + 1) & 31;
+        this.bCount -= 1;
+      }
       if (this.bCount <= 16) this.dmaReqB = true;
     }
   }
@@ -100,20 +122,27 @@ export class GbaApu {
 
   private emit(): void {
     if (this.outCount + 2 > this.out.length) return;
-    let left = 0, right = 0;
+    let left = 0,
+      right = 0;
     if (this.masterOn) {
       // DMA A/B are signed 8-bit; full volume maps roughly to ±127 → scale up.
       const a = this.curA * (this.aVolHalf ? 1 : 2);
       const b = this.curB * (this.bVolHalf ? 1 : 2);
-      if (this.aLeft) left += a; if (this.aRight) right += a;
-      if (this.bLeft) left += b; if (this.bRight) right += b;
+      if (this.aLeft) left += a;
+      if (this.aRight) right += a;
+      if (this.bLeft) left += b;
+      if (this.bRight) right += b;
     }
     // ±255 per side max → scale to ~0.7 of int16.
-    let l = (left * 90) | 0, r = (right * 90) | 0;
-    if (l > 32767) l = 32767; else if (l < -32768) l = -32768;
-    if (r > 32767) r = 32767; else if (r < -32768) r = -32768;
+    let l = (left * 90) | 0,
+      r = (right * 90) | 0;
+    if (l > 32767) l = 32767;
+    else if (l < -32768) l = -32768;
+    if (r > 32767) r = 32767;
+    else if (r < -32768) r = -32768;
     const w = this.outWrite;
-    this.out[w] = l; this.out[w + 1] = r;
+    this.out[w] = l;
+    this.out[w + 1] = r;
     this.outWrite = (w + 2) % this.out.length;
     this.outCount += 2;
   }
@@ -123,7 +152,10 @@ export class GbaApu {
     const want = Math.min(maxFrames * 2, this.outCount);
     const block = new Int16Array(want);
     let read = (this.outWrite - this.outCount + this.out.length * 2) % this.out.length;
-    for (let i = 0; i < want; i += 1) { block[i] = this.out[read]!; read = (read + 1) % this.out.length; }
+    for (let i = 0; i < want; i += 1) {
+      block[i] = this.out[read]!;
+      read = (read + 1) % this.out.length;
+    }
     this.outCount -= want;
     return block;
   }

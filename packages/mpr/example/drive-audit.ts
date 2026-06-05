@@ -14,11 +14,7 @@
  * Run: bun run example:drive-audit
  */
 
-import Mpr, {
-  WN_EXTENDED_ERROR,
-  WN_MORE_DATA,
-  WN_NO_ERROR,
-} from '../index';
+import Mpr, { WN_EXTENDED_ERROR, WN_MORE_DATA, WN_NO_ERROR } from '../index';
 
 Mpr.Preload(['WNetGetConnectionW', 'WNetGetLastErrorW', 'WNetGetUserW']);
 
@@ -74,11 +70,7 @@ function getUser(driveName: string | null): string {
   const sizeBuf = Buffer.alloc(4);
   sizeBuf.writeUInt32LE(256, 0);
 
-  const result = Mpr.WNetGetUserW(
-    nameBuf !== null ? nameBuf.ptr : null,
-    userBuf.ptr,
-    sizeBuf.ptr,
-  );
+  const result = Mpr.WNetGetUserW(nameBuf !== null ? nameBuf.ptr : null, userBuf.ptr, sizeBuf.ptr);
 
   if (result !== WN_NO_ERROR) return '(unavailable)';
   return readWide(userBuf);
@@ -129,9 +121,7 @@ if (drives.length === 0) {
   const pathWidth = 40;
   const userWidth = 30;
 
-  console.log(
-    `  ${ANSI.bold}${ANSI.white}${'Drive'.padEnd(letterWidth)}${'Remote Path'.padEnd(pathWidth)}${'User'.padEnd(userWidth)}${ANSI.reset}`,
-  );
+  console.log(`  ${ANSI.bold}${ANSI.white}${'Drive'.padEnd(letterWidth)}${'Remote Path'.padEnd(pathWidth)}${'User'.padEnd(userWidth)}${ANSI.reset}`);
   console.log(`  ${ANSI.dim}${'\u2500'.repeat(letterWidth + pathWidth + userWidth)}${ANSI.reset}`);
 
   for (const d of drives) {

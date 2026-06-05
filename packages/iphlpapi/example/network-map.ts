@@ -39,9 +39,9 @@ const adapterTypeNames = new Map<number, string>([
 ]);
 
 const adapterTypeIcons = new Map<number, string>([
-  [6, '\uD83D\uDDA5\uFE0F'],   // desktop computer
-  [71, '\uD83D\uDCF6'],         // antenna bars
-  [24, '\uD83D\uDD04'],         // counterclockwise arrows
+  [6, '\uD83D\uDDA5\uFE0F'], // desktop computer
+  [71, '\uD83D\uDCF6'], // antenna bars
+  [24, '\uD83D\uDD04'], // counterclockwise arrows
   [131, '\uD83D\uDD73\uFE0F'], // hole
 ]);
 

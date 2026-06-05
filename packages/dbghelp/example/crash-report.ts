@@ -20,13 +20,7 @@
  *
  * Run: bun run example/crash-report.ts
  */
-import Dbghelp, {
-  MAX_SYM_NAME,
-  SYMOPT_DEFERRED_LOADS,
-  SYMOPT_UNDNAME,
-  SYM_TYPE,
-  UNDNAME_NAME_ONLY,
-} from '../index';
+import Dbghelp, { MAX_SYM_NAME, SYMOPT_DEFERRED_LOADS, SYMOPT_UNDNAME, SYM_TYPE, UNDNAME_NAME_ONLY } from '../index';
 
 const RESET = '\x1b[0m';
 const BOLD = '\x1b[1m';
@@ -53,17 +47,7 @@ interface ModuleSnapshot {
   timestamp: number;
 }
 
-Dbghelp.Preload([
-  'SymCleanup',
-  'SymFromAddr',
-  'SymFromName',
-  'SymGetModuleInfo64',
-  'SymInitialize',
-  'SymLoadModuleEx',
-  'SymSetOptions',
-  'SymUnloadModule64',
-  'UnDecorateSymbolName',
-]);
+Dbghelp.Preload(['SymCleanup', 'SymFromAddr', 'SymFromName', 'SymGetModuleInfo64', 'SymInitialize', 'SymLoadModuleEx', 'SymSetOptions', 'SymUnloadModule64', 'UnDecorateSymbolName']);
 
 function readAsciiString(buffer: Buffer, offset: number, maxLength: number): string {
   let end = offset;
@@ -77,24 +61,37 @@ function formatHex(value: bigint, width = 16): string {
 
 function symTypeName(symType: number): string {
   switch (symType) {
-    case SYM_TYPE.SymNone: return 'None';
-    case SYM_TYPE.SymCoff: return 'COFF';
-    case SYM_TYPE.SymCv: return 'CodeView';
-    case SYM_TYPE.SymPdb: return 'PDB';
-    case SYM_TYPE.SymExport: return 'Export';
-    case SYM_TYPE.SymDeferred: return 'Deferred';
-    case SYM_TYPE.SymDia: return 'DIA';
-    case SYM_TYPE.SymVirtual: return 'Virtual';
-    default: return `Unknown(${symType})`;
+    case SYM_TYPE.SymNone:
+      return 'None';
+    case SYM_TYPE.SymCoff:
+      return 'COFF';
+    case SYM_TYPE.SymCv:
+      return 'CodeView';
+    case SYM_TYPE.SymPdb:
+      return 'PDB';
+    case SYM_TYPE.SymExport:
+      return 'Export';
+    case SYM_TYPE.SymDeferred:
+      return 'Deferred';
+    case SYM_TYPE.SymDia:
+      return 'DIA';
+    case SYM_TYPE.SymVirtual:
+      return 'Virtual';
+    default:
+      return `Unknown(${symType})`;
   }
 }
 
 function machineTypeName(machine: number): string {
   switch (machine) {
-    case 0x8664: return 'AMD64';
-    case 0x014c: return 'i386';
-    case 0xaa64: return 'ARM64';
-    default: return `0x${machine.toString(16)}`;
+    case 0x8664:
+      return 'AMD64';
+    case 0x014c:
+      return 'i386';
+    case 0xaa64:
+      return 'ARM64';
+    default:
+      return `0x${machine.toString(16)}`;
   }
 }
 
@@ -203,12 +200,12 @@ try {
     if (info) {
       console.log(
         `  ${GREEN}${info.moduleName.padEnd(12)}${RESET}` +
-        `  ${formatHex(info.base)}` +
-        `  ${String(info.imageSize.toLocaleString()).padEnd(12)}` +
-        `  ${String(info.numSyms).padEnd(8)}` +
-        `  ${symTypeName(info.symType).padEnd(8)}` +
-        `  ${machineTypeName(info.machineType).padEnd(8)}` +
-        `  ${info.imageName}`,
+          `  ${formatHex(info.base)}` +
+          `  ${String(info.imageSize.toLocaleString()).padEnd(12)}` +
+          `  ${String(info.numSyms).padEnd(8)}` +
+          `  ${symTypeName(info.symType).padEnd(8)}` +
+          `  ${machineTypeName(info.machineType).padEnd(8)}` +
+          `  ${info.imageName}`,
       );
     }
   }
@@ -241,10 +238,10 @@ try {
 
       console.log(
         `  ${DIM}${moduleName.padEnd(12)}${RESET}` +
-        `${YELLOW}${fwd.resolvedName.padEnd(36)}${RESET}` +
-        `${formatHex(fwd.address)}` +
-        `  ${String(fwd.size).padEnd(6)}` +
-        `  ${reverseOk ? `${GREEN}verified${RESET}` : `${RED}mismatch (${rev?.name ?? 'null'})${RESET}`}`,
+          `${YELLOW}${fwd.resolvedName.padEnd(36)}${RESET}` +
+          `${formatHex(fwd.address)}` +
+          `  ${String(fwd.size).padEnd(6)}` +
+          `  ${reverseOk ? `${GREEN}verified${RESET}` : `${RED}mismatch (${rev?.name ?? 'null'})${RESET}`}`,
       );
     }
   }
@@ -256,11 +253,7 @@ try {
   console.log(`${BOLD}C++ Name Demangling${RESET}`);
   console.log(separator);
 
-  const samples = [
-    '?what@exception@std@@UEBAPEBDXZ',
-    '??1exception@std@@UEAA@XZ',
-    '??0runtime_error@std@@QEAA@AEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@1@@Z',
-  ];
+  const samples = ['?what@exception@std@@UEBAPEBDXZ', '??1exception@std@@UEAA@XZ', '??0runtime_error@std@@QEAA@AEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@1@@Z'];
 
   for (const mangled of samples) {
     const inBuf = Buffer.from(`${mangled}\0`);

@@ -129,12 +129,12 @@ const GALAXY_RADIUS = 9.0;
 // smooth GLOBAL field is carried analytically by the central black hole + halo (below), so the
 // grid only has to supply LOCAL structure and the disk cannot ring up into axisymmetric shells
 // (the failure mode of a naive PM disk with no stabilising backbone).
-const GRID_N = envNum('GRID_N', 640);        // field resolution (GRID_N² cells); multiple of 16
-const FIELD_HALF = GALAXY_RADIUS * 2.25;     // self-gravity field half-extent (covers the disk + margin); a star past it keeps orbiting on the analytic BH+halo, where self-gravity is negligible anyway
-const CELL = (2 * FIELD_HALF) / GRID_N;      // world width of one cell
-const MASS_FIXED_SCALE = 1.0e7;              // float mass → uint fixed-point for InterlockedAdd
+const GRID_N = envNum('GRID_N', 640); // field resolution (GRID_N² cells); multiple of 16
+const FIELD_HALF = GALAXY_RADIUS * 2.25; // self-gravity field half-extent (covers the disk + margin); a star past it keeps orbiting on the analytic BH+halo, where self-gravity is negligible anyway
+const CELL = (2 * FIELD_HALF) / GRID_N; // world width of one cell
+const MASS_FIXED_SCALE = 1.0e7; // float mass → uint fixed-point for InterlockedAdd
 const JACOBI_ITERS = envNum('JACOBI_ITERS', 32); // warm-started relaxation passes per sub-step
-const GRID_GROUPS = Math.ceil(GRID_N / 16);  // numthreads(16,16); ceil so a non-mult-of-16 GRID_N still covers (shaders bound-check id<GRID_N)
+const GRID_GROUPS = Math.ceil(GRID_N / 16); // numthreads(16,16); ceil so a non-mult-of-16 GRID_N still covers (shaders bound-check id<GRID_N)
 
 // ── Physics constants (shared with the integrate shader as cbuffer values) ────
 // STABILITY MODEL: a heavy SOFTENED central BLACK HOLE sets the inner Keplerian spin (the
@@ -145,13 +145,13 @@ const GRID_GROUPS = Math.ceil(GRID_N / 16);  // numthreads(16,16); ceil so a non
 // warmed by a small velocity dispersion (Toomre Q>1) so it neither collapses nor flies apart.
 // The BH+halo backbone keeps Toomre Q high enough that the live self-gravity only sculpts
 // LOCAL structure (arms, clumps, spurs) rather than globally fragmenting the disk.
-const G_CONST = 1.0;                     // gravitational constant (folds into the mass scale)
-const M_BH = envNum('M_BH', 18.0);       // central BLACK HOLE mass (softened point mass, invisible)
-const SOFT_BH = envNum('SOFT_BH', 0.30); // BH softening: peak accel M_BH/soft² stays < MAX_ACC (seed ≡ runtime force) and keeps inner Ω·dt < 1
-const M_HALO = envNum('M_HALO', 30.0);   // extended halo mass within R_HALO → a flat-ish v_c(r) curve. Lowered from 60 so the disk's own gravity carries much of the support (self-gravitating, Toomre Q≈1.3 — spiral-forming) yet stays warm enough that it sculpts open arms rather than shattering into axisymmetric rings (equilibrium-preserving: the measured seed v_c uses the same M_HALO)
-const SOFTEN = envNum('SOFTEN', 1.10);   // halo / general softening
-const STAR_MASS = envNum('STARMASS', 0.0000160); // MEAN per-star mass → total disk mass N·mean. Heavier than the old 1.1e-5 → more disk self-gravity (lower Toomre Q) → BOLDER emergent arms (equilibrium-preserving: scales seed & live force together)
-const DT_FIXED = envNum('DT', 0.007);    // physics timestep (s); smaller ⇒ less leapfrog heating of the stiff nucleus
+const G_CONST = 1.0; // gravitational constant (folds into the mass scale)
+const M_BH = envNum('M_BH', 18.0); // central BLACK HOLE mass (softened point mass, invisible)
+const SOFT_BH = envNum('SOFT_BH', 0.3); // BH softening: peak accel M_BH/soft² stays < MAX_ACC (seed ≡ runtime force) and keeps inner Ω·dt < 1
+const M_HALO = envNum('M_HALO', 30.0); // extended halo mass within R_HALO → a flat-ish v_c(r) curve. Lowered from 60 so the disk's own gravity carries much of the support (self-gravitating, Toomre Q≈1.3 — spiral-forming) yet stays warm enough that it sculpts open arms rather than shattering into axisymmetric rings (equilibrium-preserving: the measured seed v_c uses the same M_HALO)
+const SOFTEN = envNum('SOFTEN', 1.1); // halo / general softening
+const STAR_MASS = envNum('STARMASS', 0.000016); // MEAN per-star mass → total disk mass N·mean. Heavier than the old 1.1e-5 → more disk self-gravity (lower Toomre Q) → BOLDER emergent arms (equilibrium-preserving: scales seed & live force together)
+const DT_FIXED = envNum('DT', 0.007); // physics timestep (s); smaller ⇒ less leapfrog heating of the stiff nucleus
 // SELF_G_GAIN ↔ DISK_SEED_W are a MATCHED, VERIFIED-STABLE pair: DISK_SEED_W is how much of the
 // disk's own gravity the SEED v_c assumes; SELF_G_GAIN is the live weight that REPRODUCES that
 // support so the disk starts in equilibrium. DO NOT change this pair to crank self-gravity — its
@@ -162,17 +162,17 @@ const DT_FIXED = envNum('DT', 0.007);    // physics timestep (s); smaller ⇒ le
 // the radial balance.
 const SELF_G_GAIN = envNum('SELF_G_GAIN', 26.0); // weight on the 2-D self-gravity (-∇φ) [verified-stable]
 const DISK_SEED_W = envNum('DISK_SEED_W', 0.65); // disk self-gravity weight to balance the SEED v_c
-const VEL_DISP = envNum('VEL_DISP', 0.045);      // velocity dispersion as a fraction of v_c (Toomre Q≈1.3): warm enough to SUPPRESS axisymmetric ring modes, cool enough that self-gravity keeps sculpting open spiral arms / spurs / feathering from the seed
+const VEL_DISP = envNum('VEL_DISP', 0.045); // velocity dispersion as a fraction of v_c (Toomre Q≈1.3): warm enough to SUPPRESS axisymmetric ring modes, cool enough that self-gravity keeps sculpting open spiral arms / spurs / feathering from the seed
 // CONSERVATIVE BY DEFAULT — no drag, no clamps. Once the particle-mesh force was made
 // momentum-conserving (CIC deposit ↔ grid finite-difference force ↔ CIC interpolation) and the
 // timestep halved, the thermostat became UNNECESSARY: the ENERGY_PROBE shows total E only drifting
 // ~0.1%/s (decelerating, bound, no escape runaway) instead of the blow-up the old unmatched force
 // produced when unclamped. Each knob is still env-overridable for an extra margin on weak hardware
 // (e.g. GAL_VEL_DAMP=0.003 GAL_MAX_ACC=260 GAL_MAX_SPEED=34), or set them up to reproduce the study.
-const VEL_DAMP = envNum('VEL_DAMP', 0.0);        // velocity damping; 0 = fully conservative (no drag)
-const MAX_ACC = envNum('MAX_ACC', 0.0);          // accel clamp; 0 = off (softening + conservative force bound accel)
-const MAX_SPEED = envNum('MAX_SPEED', 0.0);      // speed clamp; 0 = off (a star keeps exactly what gravity/clicks give it)
-const R_MIN = 0.045;                     // respawn core-plungers (keeps the innermost orbit's Ω·dt below the leapfrog limit)
+const VEL_DAMP = envNum('VEL_DAMP', 0.0); // velocity damping; 0 = fully conservative (no drag)
+const MAX_ACC = envNum('MAX_ACC', 0.0); // accel clamp; 0 = off (softening + conservative force bound accel)
+const MAX_SPEED = envNum('MAX_SPEED', 0.0); // speed clamp; 0 = off (a star keeps exactly what gravity/clicks give it)
+const R_MIN = 0.045; // respawn core-plungers (keeps the innermost orbit's Ω·dt below the leapfrog limit)
 const R_MAX = GALAXY_RADIUS * envNum('R_MAX_MUL', 20.0); // far escape net (≈off → unbound stars leave for good); only a NaN-safe backstop
 
 // ── Stellar Initial Mass Function (Salpeter ξ(m) ∝ m^-2.35 on [M_LO, M_HI]) ────
@@ -180,9 +180,9 @@ const R_MAX = GALAXY_RADIUS * envNum('R_MAX_MUL', 20.0); // far escape net (≈o
 // giants that render bigger/brighter AND pull harder (deposit more mass), so giants become
 // local anchors that gather neighbours. Masses are normalised so the BATCH MEAN equals
 // STAR_MASS (rotation-curve magnitude preserved). Pos.w stores the per-star sim mass.
-const IMF_M_LO = 0.1;            // lightest star (solar units, pre-normalisation)
-const IMF_M_HI = 30.0;           // heaviest star (solar units, pre-normalisation)
-const IMF_SLOPE = 2.35;          // Salpeter exponent
+const IMF_M_LO = 0.1; // lightest star (solar units, pre-normalisation)
+const IMF_M_HI = 30.0; // heaviest star (solar units, pre-normalisation)
+const IMF_SLOPE = 2.35; // Salpeter exponent
 
 const SELFSHOT = process.env.SELFSHOT === '1';
 const SELFSHOT_T = process.env.SELFSHOT_T ? Number(process.env.SELFSHOT_T) : 6.0;
@@ -217,7 +217,7 @@ console.log('  Space = pause · [ ] = slow/fast · . = step · H = help · R = r
 const posSeed = Buffer.alloc(PARTICLE_COUNT * 16);
 const velSeed = Buffer.alloc(PARTICLE_COUNT * 16);
 
-const DISK_SCALE = GALAXY_RADIUS * 0.40; // exponential disk scale length h
+const DISK_SCALE = GALAXY_RADIUS * 0.4; // exponential disk scale length h
 const DISK_MASS_TOTAL = PARTICLE_COUNT * STAR_MASS;
 const R_HALO = GALAXY_RADIUS * envNum('R_HALO_MUL', 1.0); // halo mass grows out to here (flat v_c)
 const BULGE_R = GALAXY_RADIUS * 0.16; // central bulge radius (spheroidal nucleus)
@@ -257,11 +257,11 @@ function circularSpeed(r: number): number {
 // rotation. PERT_AMP=0 → a pure smooth/Poisson-noise seed (arms still grow, more flocculent);
 // raise it for a grander-design head-start. This is what makes the galaxy read as REAL physics
 // rather than a rotating painted pattern: structure is grown, winds, shears and regenerates.
-const PERT_AMP = envNum('PERT_AMP', 0.45);   // seed overdensity amplitude (0 = pure smooth disk). A clearly-visible but irregular m=2 log-spiral head-start that the live self-gravity then sculpts — winds, feathers, grows spurs and asymmetry — so the arms read as open and ALIVE, not painted
-const ARM_R0 = GALAXY_RADIUS * 0.20;         // inside this radius the perturbation fades into the bulge
+const PERT_AMP = envNum('PERT_AMP', 0.45); // seed overdensity amplitude (0 = pure smooth disk). A clearly-visible but irregular m=2 log-spiral head-start that the live self-gravity then sculpts — winds, feathers, grows spurs and asymmetry — so the arms read as open and ALIVE, not painted
+const ARM_R0 = GALAXY_RADIUS * 0.2; // inside this radius the perturbation fades into the bulge
 
 // Salpeter IMF inverse-CDF: u∈[0,1) → a stellar mass on [M_LO, M_HI] with ξ(m)∝m^-slope.
-const IMF_A = 1 - IMF_SLOPE;                 // -1.35
+const IMF_A = 1 - IMF_SLOPE; // -1.35
 const IMF_LO_A = Math.pow(IMF_M_LO, IMF_A);
 const IMF_HI_A = Math.pow(IMF_M_HI, IMF_A);
 function imfSampleRaw(u: number): number {
@@ -270,8 +270,8 @@ function imfSampleRaw(u: number): number {
 // Analytic mean of that distribution, so per-star masses normalise to a batch mean of
 // STAR_MASS without a second pass: mean = ∫m·m^-α / ∫m^-α over [lo,hi].
 const IMF_MEAN_RAW = (() => {
-  const p = 1 - IMF_SLOPE;                   // -1.35
-  const q = 2 - IMF_SLOPE;                   // -0.35
+  const p = 1 - IMF_SLOPE; // -1.35
+  const q = 2 - IMF_SLOPE; // -0.35
   const numer = (Math.pow(IMF_M_HI, q) - Math.pow(IMF_M_LO, q)) / q;
   const denom = (Math.pow(IMF_M_HI, p) - Math.pow(IMF_M_LO, p)) / p;
   return numer / denom;
@@ -287,8 +287,10 @@ const IMF_MEAN_RAW = (() => {
   // Faint multi-arm seed perturbation (random phases, drawn once). A star is accepted onto azimuth
   // φ with probability ∝ (1 + PERT_AMP·Σ wₘ cos(mφ+φ0ₘ)) — a few-percent coherent overdensity that
   // gives swing amplification a grand-design head-start WITHOUT pinning stars to painted ridges.
-  const ph2 = rand() * Math.PI * 2, ph3 = rand() * Math.PI * 2;
-  const pertW2 = 1.0, pertW3 = 0.30; // m=2 grand-design dominant + a touch of m=3 for irregularity
+  const ph2 = rand() * Math.PI * 2,
+    ph3 = rand() * Math.PI * 2;
+  const pertW2 = 1.0,
+    pertW3 = 0.3; // m=2 grand-design dominant + a touch of m=3 for irregularity
   const pertMax = 1 + PERT_AMP * (pertW2 + pertW3);
   // LOG-SPIRAL seed: the perturbation peaks along a TRAILING two-arm logarithmic spiral (OPEN arms),
   // not a radial m=2 oval (which would wind straight into concentric rings). armAngle winds with
@@ -316,9 +318,7 @@ const IMF_MEAN_RAW = (() => {
     const rNorm = r / GALAXY_RADIUS;
 
     // Thickness: a thin disk that flares slightly outward; the bulge is a puffy spheroid.
-    const thick = isBulge
-      ? BULGE_R * 0.55 * Math.pow(1 - Math.min(1, r / BULGE_R), 0.5)
-      : 0.045 * GALAXY_RADIUS * (0.5 + 0.6 * Math.min(1, rNorm));
+    const thick = isBulge ? BULGE_R * 0.55 * Math.pow(1 - Math.min(1, r / BULGE_R), 0.5) : 0.045 * GALAXY_RADIUS * (0.5 + 0.6 * Math.min(1, rNorm));
     const yy = gauss() * thick;
 
     // Azimuth: SMOOTH (uniform), then nudged by the faint multi-mode perturbation via rejection
@@ -341,11 +341,11 @@ const IMF_MEAN_RAW = (() => {
     // colour structure follows the GROWN arms instead of being baked into the seed.
     let temp: number;
     if (isBulge) {
-      temp = 0.42 + gauss() * 0.07;                     // warm-gold bulge
+      temp = 0.42 + gauss() * 0.07; // warm-gold bulge
     } else {
-      temp = 0.52 - 0.30 * rNorm + gauss() * 0.12;      // bluer mid-disk → red outskirts, with scatter
+      temp = 0.52 - 0.3 * rNorm + gauss() * 0.12; // bluer mid-disk → red outskirts, with scatter
     }
-    if (!isBulge && rand() < 0.10) temp = 0.40 + rand() * 0.12; // warm-gold intermediates
+    if (!isBulge && rand() < 0.1) temp = 0.4 + rand() * 0.12; // warm-gold intermediates
     temp = Math.min(1, Math.max(0, temp));
 
     // Initial velocity: tangential circular speed + small dispersion. Tangential direction
@@ -400,7 +400,12 @@ const forceBuf = gpu.makeStructuredBuffer({ stride: 8, count: GRID_CELLS, uav: t
 const HDR_FMT = gpu.DXGI_FORMAT_R16G16B16A16_FLOAT;
 const hdr = gpu.makeTexture({ w: clientW, h: clientH, format: HDR_FMT, rtv: true, srv: true });
 const BLOOM_LEVELS = 3;
-interface BloomMip { w: number; h: number; a: gpu.TextureResult; b: gpu.TextureResult }
+interface BloomMip {
+  w: number;
+  h: number;
+  a: gpu.TextureResult;
+  b: gpu.TextureResult;
+}
 const bloom: BloomMip[] = [];
 {
   let bw = clientW;
@@ -449,12 +454,12 @@ const postData = Buffer.alloc(POST_CB_SIZE);
 //    dust-column proxy and reddens + darkens the HDR scene BEFORE bloom, so dense arm dust both
 //    dims the light through it AND stops blooming → it reads as dark dust LANES threading the arms. ──
 const DUST_ON = envNum('DUST', 1) > 0.5;
-const DUST_STRENGTH = envNum('DUST_STRENGTH', 2.3);   // peak optical depth scale — bold lanes that carve the bright arm ridges into segments
-const DUST_FLOOR = envNum('DUST_FLOOR', 0.05);        // overdensity threshold (below = clear)
-const DUST_GAMMA = envNum('DUST_GAMMA', 0.52);        // column→tau shaping (lower = crisper lanes)
-const DUST_REDDEN = envNum('DUST_REDDEN', 1.0);       // 0 grey dimming … 1 full blue-biased reddening
-const DUST_OFFSET = envNum('DUST_OFFSET', 0.55);      // inward silhouette offset (cells)
-const DUST_TINT = envNum('DUST_TINT', 0.5);           // faint warm-brown re-emission in deep lanes
+const DUST_STRENGTH = envNum('DUST_STRENGTH', 2.3); // peak optical depth scale — bold lanes that carve the bright arm ridges into segments
+const DUST_FLOOR = envNum('DUST_FLOOR', 0.05); // overdensity threshold (below = clear)
+const DUST_GAMMA = envNum('DUST_GAMMA', 0.52); // column→tau shaping (lower = crisper lanes)
+const DUST_REDDEN = envNum('DUST_REDDEN', 1.0); // 0 grey dimming … 1 full blue-biased reddening
+const DUST_OFFSET = envNum('DUST_OFFSET', 0.55); // inward silhouette offset (cells)
+const DUST_TINT = envNum('DUST_TINT', 0.5); // faint warm-brown re-emission in deep lanes
 const DUST_CB_SIZE = 96;
 const dustCb = gpu.makeConstantBuffer(DUST_CB_SIZE);
 const dustData = Buffer.alloc(DUST_CB_SIZE);
@@ -463,19 +468,19 @@ const hdr2 = gpu.makeTexture({ w: clientW, h: clientH, format: HDR_FMT, rtv: tru
 
 // ── NUCLEUS + LENSING + HII pass knobs + CB (7 float4 = 112 bytes) ──
 const HII_ON = envNum('HII', 1) > 0.5;
-const HII_STRENGTH = envNum('HII_STRENGTH', 0.42);   // peak nebula emission — subtle (the pink should accent the arms, not coat them)
-const HII_FLOOR = envNum('HII_FLOOR', 0.5);          // overdensity threshold (below = no nebula) — only the densest knots glow
-const HII_GAMMA = envNum('HII_GAMMA', 0.85);         // overdensity→emission shaping
+const HII_STRENGTH = envNum('HII_STRENGTH', 0.42); // peak nebula emission — subtle (the pink should accent the arms, not coat them)
+const HII_FLOOR = envNum('HII_FLOOR', 0.5); // overdensity threshold (below = no nebula) — only the densest knots glow
+const HII_GAMMA = envNum('HII_GAMMA', 0.85); // overdensity→emission shaping
 const CORE_INTENSITY = envNum('CORE_INTENSITY', 3.4); // brilliance of the accretion glow (HDR, blooms)
-const CORE_SPAN = envNum('CORE_SPAN', 0.017);        // core glow radius (fraction of screen height) — compact
+const CORE_SPAN = envNum('CORE_SPAN', 0.017); // core glow radius (fraction of screen height) — compact
 const LENS_STRENGTH = envNum('LENS_STRENGTH', 0.016); // gravitational-lensing deflection scale (0 = off)
-const LENS_RADIUS = envNum('LENS_RADIUS', 0.045);    // lensing influence radius (UV)
+const LENS_RADIUS = envNum('LENS_RADIUS', 0.045); // lensing influence radius (UV)
 const FX_CB_SIZE = 144;
 const fxCb = gpu.makeConstantBuffer(FX_CB_SIZE);
 const fxData = Buffer.alloc(FX_CB_SIZE);
-const SN_ON = envNum('SN', 0) > 0.5;                  // rare supernova flashes — OFF by default (opt in with GAL_SN=1); the random flashes/shock-rings read as distracting pulses
-const SN_PEAK = envNum('SN_PEAK', 5.0);              // flash brilliance (HDR, blooms hard)
-const SN_INTERVAL = envNum('SN_INTERVAL', 4.5);     // mean sim-seconds between supernovae
+const SN_ON = envNum('SN', 0) > 0.5; // rare supernova flashes — OFF by default (opt in with GAL_SN=1); the random flashes/shock-rings read as distracting pulses
+const SN_PEAK = envNum('SN_PEAK', 5.0); // flash brilliance (HDR, blooms hard)
+const SN_INTERVAL = envNum('SN_INTERVAL', 4.5); // mean sim-seconds between supernovae
 // HII radial baseline (mass-per-cell at r=0) — same exponential-disk model as the arm lighting.
 const HII_BASE0 = (DISK_MASS_TOTAL / (2 * Math.PI * DISK_SCALE * DISK_SCALE)) * CELL * CELL;
 
@@ -791,9 +796,9 @@ void main(uint3 id : SV_DispatchThreadID) {
 // PM density exceeds the smooth radial baseline at its radius is "in an arm" → it renders as a
 // young hot-blue luminous star. So colour/brightness FOLLOW the emergent grown structure.
 const ARM_BASE0 = (DISK_MASS_TOTAL / (2 * Math.PI * DISK_SCALE * DISK_SCALE)) * CELL * CELL;
-const ARM_GAIN = envNum('ARM_GAIN', 1.6);   // how sharply overdensity → blue arm tint
-const ARM_BLUE = envNum('ARM_BLUE', 0.42);  // arm young-population blue shift
-const ARM_GLOW = envNum('ARM_GLOW', 0.16);  // extra arm brightness — lets the emergent arms compete with the bright nucleus
+const ARM_GAIN = envNum('ARM_GAIN', 1.6); // how sharply overdensity → blue arm tint
+const ARM_BLUE = envNum('ARM_BLUE', 0.42); // arm young-population blue shift
+const ARM_GLOW = envNum('ARM_GLOW', 0.16); // extra arm brightness — lets the emergent arms compete with the bright nucleus
 
 // ── VERTEX: expand each star into a soft additive quad (6 verts/star) ─────────
 // Colour is driven by REAL dynamics AND the live emergent structure: stars in dense GROWN arms
@@ -1353,31 +1358,26 @@ function mul4(a: number[], b: number[]): number[] {
 
 // Left-handed look-at (D3D). Returns ROW-MAJOR (transposed on upload) plus the camera
 // right/up/forward/eye so the VS can billboard and so the cursor ray can be unprojected.
-function lookAt(
-  eye: [number, number, number],
-  center: [number, number, number],
-  up: [number, number, number],
-): { m: number[]; right: [number, number, number]; up: [number, number, number]; forward: [number, number, number] } {
+function lookAt(eye: [number, number, number], center: [number, number, number], up: [number, number, number]): { m: number[]; right: [number, number, number]; up: [number, number, number]; forward: [number, number, number] } {
   let zx = center[0] - eye[0];
   let zy = center[1] - eye[1];
   let zz = center[2] - eye[2];
   const zl = Math.hypot(zx, zy, zz);
-  zx /= zl; zy /= zl; zz /= zl;
+  zx /= zl;
+  zy /= zl;
+  zz /= zl;
   let xx = up[1] * zz - up[2] * zy;
   let xy = up[2] * zx - up[0] * zz;
   let xz = up[0] * zy - up[1] * zx;
   const xl = Math.hypot(xx, xy, xz);
-  xx /= xl; xy /= xl; xz /= xl;
+  xx /= xl;
+  xy /= xl;
+  xz /= xl;
   const yx = zy * xz - zz * xy;
   const yy = zz * xx - zx * xz;
   const yz = zx * xy - zy * xx;
   return {
-    m: [
-      xx, xy, xz, -(xx * eye[0] + xy * eye[1] + xz * eye[2]),
-      yx, yy, yz, -(yx * eye[0] + yy * eye[1] + yz * eye[2]),
-      zx, zy, zz, -(zx * eye[0] + zy * eye[1] + zz * eye[2]),
-      0, 0, 0, 1,
-    ],
+    m: [xx, xy, xz, -(xx * eye[0] + xy * eye[1] + xz * eye[2]), yx, yy, yz, -(yx * eye[0] + yy * eye[1] + yz * eye[2]), zx, zy, zz, -(zx * eye[0] + zy * eye[1] + zz * eye[2]), 0, 0, 0, 1],
     right: [xx, xy, xz],
     up: [yx, yy, yz],
     forward: [zx, zy, zz],
@@ -1387,12 +1387,7 @@ function lookAt(
 function perspective(fovY: number, aspect: number, near: number, far: number): number[] {
   const ff = 1 / Math.tan(fovY / 2);
   const range = far / (far - near);
-  return [
-    ff / aspect, 0, 0, 0,
-    0, ff, 0, 0,
-    0, 0, range, -near * range,
-    0, 0, 1, 0,
-  ];
+  return [ff / aspect, 0, 0, 0, 0, ff, 0, 0, 0, 0, range, -near * range, 0, 0, 1, 0];
 }
 
 // ── GDI HUD ───────────────────────────────────────────────────────────────────
@@ -1416,7 +1411,9 @@ function drawHud(fps: number, timeScale: number, isPaused: boolean, helpOpen: bo
 
     // Help overlay panel (toggled with H / ?): a dark scrim + a column of every control.
     if (helpOpen) {
-      const x0 = 18, y0 = 56, lineH = 26;
+      const x0 = 18,
+        y0 = 56,
+        lineH = 26;
       const rc = Buffer.alloc(16);
       rc.writeInt32LE(x0 - 8, 0);
       rc.writeInt32LE(y0 - 8, 4);
@@ -1455,13 +1452,13 @@ let shotTaken = false;
 let simTime = 0;
 // Substep count is derived from a target sim-time per frame, so halving DT keeps the on-screen
 // evolution rate (and capture speed) the same — it just integrates more accurately.
-const SUBSTEPS = Math.max(1, Math.round(((SELFSHOT || ENERGY_PROBE) ? 0.084 : 0.013) / DT_FIXED));
+const SUBSTEPS = Math.max(1, Math.round((SELFSHOT || ENERGY_PROBE ? 0.084 : 0.013) / DT_FIXED));
 
 // ── Energy diagnostic (ENERGY_PROBE) ──────────────────────────────────────────
 // Closed-form softened-BH potential Φ_BH(r) (its gradient is exactly the BH force used in the
 // shader: -G·Mbh·r̂/(r²+soft²)), and a numerically-integrated halo potential Φ_halo(r) = -∫_r^∞ g.
 function phiBH(r: number): number {
-  return (G_CONST * M_BH / SOFT_BH) * (Math.atan(r / SOFT_BH) - Math.PI / 2);
+  return ((G_CONST * M_BH) / SOFT_BH) * (Math.atan(r / SOFT_BH) - Math.PI / 2);
 }
 const PHI_TBL_DR = 0.05;
 const PHI_TBL_RMAX = 400;
@@ -1483,11 +1480,19 @@ let nextProbeT = 2.0;
 function energyProbe(): void {
   const pos = new Float32Array(gpu.readbackBuffer(posBuf.buffer, PARTICLE_COUNT * 16));
   const vel = new Float32Array(gpu.readbackBuffer(velBuf.buffer, PARTICLE_COUNT * 16));
-  let KE = 0, PE_BH = 0, PE_halo = 0, escaped = 0;
+  let KE = 0,
+    PE_BH = 0,
+    PE_halo = 0,
+    escaped = 0;
   for (let i = 0; i < PARTICLE_COUNT; i += 1) {
     const o = i * 4;
-    const px = pos[o]!, py = pos[o + 1]!, pz = pos[o + 2]!, mm = pos[o + 3]!;
-    const vx = vel[o]!, vy = vel[o + 1]!, vz = vel[o + 2]!;
+    const px = pos[o]!,
+      py = pos[o + 1]!,
+      pz = pos[o + 2]!,
+      mm = pos[o + 3]!;
+    const vx = vel[o]!,
+      vy = vel[o + 1]!,
+      vz = vel[o + 2]!;
     const r3 = Math.hypot(px, py, pz);
     KE += 0.5 * mm * (vx * vx + vy * vy + vz * vz);
     PE_BH += mm * phiBH(r3);
@@ -1502,7 +1507,7 @@ function energyProbe(): void {
   const PE_self = 0.5 * SELF_G_GAIN * sp;
   const E = KE + PE_BH + PE_halo + PE_self;
   console.log(
-    `ENERGY t=${simTime.toFixed(1)}s  KE=${KE.toFixed(1)}  PE_BH=${PE_BH.toFixed(1)}  PE_halo=${PE_halo.toFixed(1)}  PE_self=${PE_self.toFixed(1)}  E=${E.toFixed(2)}  2KE/|PE|=${(2 * KE / Math.abs(PE_BH + PE_halo + PE_self)).toFixed(3)}  escaped=${(100 * escaped / PARTICLE_COUNT).toFixed(2)}%`,
+    `ENERGY t=${simTime.toFixed(1)}s  KE=${KE.toFixed(1)}  PE_BH=${PE_BH.toFixed(1)}  PE_halo=${PE_halo.toFixed(1)}  PE_self=${PE_self.toFixed(1)}  E=${E.toFixed(2)}  2KE/|PE|=${((2 * KE) / Math.abs(PE_BH + PE_halo + PE_self)).toFixed(3)}  escaped=${((100 * escaped) / PARTICLE_COUNT).toFixed(2)}%`,
   );
 }
 
@@ -1525,8 +1530,12 @@ function cleanup(code: number): never {
       gpu.comRelease(additiveBlend);
       gpu.comRelease(sampler);
       for (const m of bloom) {
-        gpu.comRelease(m.a.srv ?? 0n); gpu.comRelease(m.a.rtv ?? 0n); gpu.comRelease(m.a.tex);
-        gpu.comRelease(m.b.srv ?? 0n); gpu.comRelease(m.b.rtv ?? 0n); gpu.comRelease(m.b.tex);
+        gpu.comRelease(m.a.srv ?? 0n);
+        gpu.comRelease(m.a.rtv ?? 0n);
+        gpu.comRelease(m.a.tex);
+        gpu.comRelease(m.b.srv ?? 0n);
+        gpu.comRelease(m.b.rtv ?? 0n);
+        gpu.comRelease(m.b.tex);
       }
       gpu.comRelease(hdr.srv ?? 0n);
       gpu.comRelease(hdr.rtv ?? 0n);
@@ -1647,36 +1656,50 @@ let prevR = false;
 
 // ── Interactive cinematic camera: left-drag orbits, wheel/keys dolly, inertial glide, and a
 //    slow auto-orbit fades back in after a few idle seconds so an untouched demo stays alive. ──
-const CAM_ORBIT_RATE = envNum('CAM_ORBIT_RATE', 0.085);  // idle auto-orbit yaw rate (rad/s)
-const CAM_DRAG_SENS = envNum('CAM_DRAG_SENS', 0.0046);   // rad of orbit per pixel dragged
-const CAM_ZOOM_SENS = envNum('CAM_ZOOM_SENS', 0.14);     // log-dist per wheel notch / key tick
-const CAM_INERTIA = envNum('CAM_INERTIA', 6.0);          // orbit velocity damping (1/s)
+const CAM_ORBIT_RATE = envNum('CAM_ORBIT_RATE', 0.085); // idle auto-orbit yaw rate (rad/s)
+const CAM_DRAG_SENS = envNum('CAM_DRAG_SENS', 0.0046); // rad of orbit per pixel dragged
+const CAM_ZOOM_SENS = envNum('CAM_ZOOM_SENS', 0.14); // log-dist per wheel notch / key tick
+const CAM_INERTIA = envNum('CAM_INERTIA', 6.0); // orbit velocity damping (1/s)
 const CAM_ZOOM_INERTIA = envNum('CAM_ZOOM_INERTIA', 9.0); // dolly velocity damping (1/s)
-const CAM_IDLE = envNum('CAM_IDLE', 3.5);                // idle seconds before auto-orbit fades in
-const CAM_AUTO_FADE = envNum('CAM_AUTO_FADE', 1.5);      // seconds to ease auto-orbit 0→1
-const CAM_ELEV_MIN = 0.18;                               // ~10° above the disk (keep eye above y=0)
-const CAM_ELEV_MAX = 1.45;                               // ~83° (short of the look-down gimbal)
+const CAM_IDLE = envNum('CAM_IDLE', 3.5); // idle seconds before auto-orbit fades in
+const CAM_AUTO_FADE = envNum('CAM_AUTO_FADE', 1.5); // seconds to ease auto-orbit 0→1
+const CAM_ELEV_MIN = 0.18; // ~10° above the disk (keep eye above y=0)
+const CAM_ELEV_MAX = 1.45; // ~83° (short of the look-down gimbal)
 const CAM_DIST_MIN = envNum('CAM_DIST_MIN', 6.0);
 const CAM_DIST_MAX = envNum('CAM_DIST_MAX', 60.0);
 const CAM_DEFAULT_DIST = envNum('CAM_DIST', 17.0);
-const CAM_DEFAULT_ELEV = Math.min(CAM_ELEV_MAX, Math.max(CAM_ELEV_MIN, envNum('CAM_ELEV', 1.10)));
+const CAM_DEFAULT_ELEV = Math.min(CAM_ELEV_MAX, Math.max(CAM_ELEV_MIN, envNum('CAM_ELEV', 1.1)));
 interface CamState {
-  yaw: number; elev: number; dist: number;
-  yawVel: number; elevVel: number; logDistVel: number;
-  autoMix: number; idle: number; resetEase: number;
+  yaw: number;
+  elev: number;
+  dist: number;
+  yawVel: number;
+  elevVel: number;
+  logDistVel: number;
+  autoMix: number;
+  idle: number;
+  resetEase: number;
 }
 const cam0: CamState = {
-  yaw: 0, elev: CAM_DEFAULT_ELEV, dist: CAM_DEFAULT_DIST,
-  yawVel: 0, elevVel: 0, logDistVel: 0, autoMix: 1, idle: CAM_IDLE, resetEase: 0,
+  yaw: 0,
+  elev: CAM_DEFAULT_ELEV,
+  dist: CAM_DEFAULT_DIST,
+  yawVel: 0,
+  elevVel: 0,
+  logDistVel: 0,
+  autoMix: 1,
+  idle: CAM_IDLE,
+  resetEase: 0,
 };
-const CAM_CLICK_PX = 5;          // left-press travel below which it's a BANG click, not an orbit drag
+const CAM_CLICK_PX = 5; // left-press travel below which it's a BANG click, not an orbit drag
 let dragActive = false;
 let dragMoved = 0;
 let dragPrevX = 0;
 let dragPrevY = 0;
 let camPrevLeft = false;
 let camPrevWall = performance.now();
-const VK_ADD = 0x6b, VK_SUBTRACT = 0x6d; // numpad +/- = zoom (arrows also zoom)
+const VK_ADD = 0x6b,
+  VK_SUBTRACT = 0x6d; // numpad +/- = zoom (arrows also zoom)
 const keyDownVK = (vk: number): boolean => (User32.GetAsyncKeyState(vk) & 0x8000) !== 0;
 
 // ── Time controls + HUD state. timeScale multiplies the per-frame SUB-STEP COUNT (never DT, which
@@ -1687,8 +1710,13 @@ const TIME_SCALE_DEFAULT_IX = 3;
 const HUD_STATS = process.env.GAL_HUD_STATS === '1'; // live virial readout costs a buffer readback → opt-in
 const STAT_INTERVAL_MS = envNum('STAT_MS', 1200);
 const STAT_STRIDE = Math.max(1, Math.round(envNum('STAT_STRIDE', 64)));
-const VK_H = 0x48, VK_OEM_4 = 0xdb, VK_OEM_6 = 0xdd, VK_OEM_MINUS = 0xbd, VK_OEM_PLUS = 0xbb;
-const VK_OEM_PERIOD = 0xbe, VK_OEM_2 = 0xbf;
+const VK_H = 0x48,
+  VK_OEM_4 = 0xdb,
+  VK_OEM_6 = 0xdd,
+  VK_OEM_MINUS = 0xbd,
+  VK_OEM_PLUS = 0xbb;
+const VK_OEM_PERIOD = 0xbe,
+  VK_OEM_2 = 0xbf;
 let timeScaleIx = TIME_SCALE_DEFAULT_IX;
 let paused = false;
 let showHelp = false;
@@ -1708,11 +1736,19 @@ let statWallT = -1e9;
 function sampleStats(): void {
   const pos = new Float32Array(gpu.readbackBuffer(posBuf.buffer, PARTICLE_COUNT * 16));
   const vel = new Float32Array(gpu.readbackBuffer(velBuf.buffer, PARTICLE_COUNT * 16));
-  let KE = 0, PE = 0, vsum = 0, n = 0;
+  let KE = 0,
+    PE = 0,
+    vsum = 0,
+    n = 0;
   for (let i = 0; i < PARTICLE_COUNT; i += STAT_STRIDE) {
     const o = i * 4;
-    const px = pos[o]!, py = pos[o + 1]!, pz = pos[o + 2]!, mm = pos[o + 3]!;
-    const vx = vel[o]!, vy = vel[o + 1]!, vz = vel[o + 2]!;
+    const px = pos[o]!,
+      py = pos[o + 1]!,
+      pz = pos[o + 2]!,
+      mm = pos[o + 3]!;
+    const vx = vel[o]!,
+      vy = vel[o + 1]!,
+      vz = vel[o + 2]!;
     const r3 = Math.hypot(px, py, pz);
     const sp2 = vx * vx + vy * vy + vz * vz;
     KE += 0.5 * mm * sp2;
@@ -1742,9 +1778,9 @@ const helpLines: string[] = [
 // ── Galaxy COLLISION: press C to launch a heavy INTRUDER black hole on a grazing flyby that
 //    shears the disk into real tidal TAILS and a BRIDGE. It's an extra softened well in the
 //    integrate shader (gBH2); m=0 ⇒ no force ⇒ single-galaxy physics is byte-identical. ──
-const COLL_MASS = envNum('COLL_MASS', M_BH * 1.1);           // intruder BH mass (≳ the host's own BH → strong tidal tails)
-const COLL_SPEED = envNum('COLL_SPEED', 4.2);                // launch speed
-const COLL_R0 = envNum('COLL_R0', GALAXY_RADIUS * 2.0);      // launch distance from centre (closer → arrives sooner)
+const COLL_MASS = envNum('COLL_MASS', M_BH * 1.1); // intruder BH mass (≳ the host's own BH → strong tidal tails)
+const COLL_SPEED = envNum('COLL_SPEED', 4.2); // launch speed
+const COLL_R0 = envNum('COLL_R0', GALAXY_RADIUS * 2.0); // launch distance from centre (closer → arrives sooner)
 const COLL_IMPACT = envNum('COLL_IMPACT', GALAXY_RADIUS * 0.45); // impact parameter (closer grazing pass → bigger tidal bridge/tails)
 const COLL_HEIGHT = envNum('COLL_HEIGHT', GALAXY_RADIUS * 0.35); // launch height above the disk plane
 const VK_C = 0x43;
@@ -1754,14 +1790,19 @@ let prevC = false;
 let collisionActive = false;
 let collPullSmooth = 0; // eased camera pull-back during a collision (no hard jolt on launch)
 // Supernova flashes: a rare bright transient at a random disk site, blooming then fading.
-let snAge = 1e9, snNext = SN_INTERVAL, snIdx = 0;
+let snAge = 1e9,
+  snNext = SN_INTERVAL,
+  snIdx = 0;
 const snPos: [number, number, number] = [0, 0, 0];
-const snHash = (k: number): number => { const s = Math.sin(k) * 43758.5453; return s - Math.floor(s); };
+const snHash = (k: number): number => {
+  const s = Math.sin(k) * 43758.5453;
+  return s - Math.floor(s);
+};
 const bh2 = { p: [0, 0, 0] as [number, number, number], v: [0, 0, 0] as [number, number, number], m: 0 };
 function launchIntruder(): void {
   collisionActive = true;
-  bh2.p = [-COLL_R0, COLL_HEIGHT, COLL_IMPACT];          // off to the side and above the plane
-  const dir = [1.0, -0.16, -0.30];                       // aimed across the centre for a grazing pass
+  bh2.p = [-COLL_R0, COLL_HEIGHT, COLL_IMPACT]; // off to the side and above the plane
+  const dir = [1.0, -0.16, -0.3]; // aimed across the centre for a grazing pass
   const dl = Math.hypot(dir[0]!, dir[1]!, dir[2]!);
   bh2.v = [(dir[0]! / dl) * COLL_SPEED, (dir[1]! / dl) * COLL_SPEED, (dir[2]! / dl) * COLL_SPEED];
   bh2.m = COLL_MASS;
@@ -1796,27 +1837,37 @@ function advanceIntruder(dt: number): void {
 const MEASURE_EQ = envNum('MEASURE_EQ', 1) > 0.5;
 function solveFieldOnce(coldIters: number): void {
   simData.fill(0);
-  simData.writeFloatLE(DT_FIXED, 0);   // gParams.x dt
-  simData.writeFloatLE(0, 4);          // gParams.y time
-  simData.writeFloatLE(1, 8);          // gParams.z spread (render only)
-  simData.writeFloatLE(M_HALO, 12);    // gParams.w halo mass
-  simData.writeFloatLE(G_CONST, 16);   // gGrav.x G
-  simData.writeFloatLE(M_BH, 20);      // gGrav.y BH mass
-  simData.writeFloatLE(SOFTEN, 24);    // gGrav.z soft
+  simData.writeFloatLE(DT_FIXED, 0); // gParams.x dt
+  simData.writeFloatLE(0, 4); // gParams.y time
+  simData.writeFloatLE(1, 8); // gParams.z spread (render only)
+  simData.writeFloatLE(M_HALO, 12); // gParams.w halo mass
+  simData.writeFloatLE(G_CONST, 16); // gGrav.x G
+  simData.writeFloatLE(M_BH, 20); // gGrav.y BH mass
+  simData.writeFloatLE(SOFTEN, 24); // gGrav.z soft
   simData.writeFloatLE(SELF_G_GAIN, 28); // gGrav.w selfGain
-  simData.writeFloatLE(R_HALO, 44);    // gPhys.w halo radius
-  simData.writeFloatLE(SOFT_BH, 48);   // gBH.x BH softening
+  simData.writeFloatLE(R_HALO, 44); // gPhys.w halo radius
+  simData.writeFloatLE(SOFT_BH, 48); // gBH.x BH softening
   gpu.updateConstantBuffer(simCb, simData);
-  gpu.csSet(csClearGrid, { cb: [simCb], uav: [densBuf.uav!] }); gpu.dispatch(GRID_GROUPS, GRID_GROUPS, 1); gpu.csSet(0n, { uav: [0n] });
-  gpu.csSet(csDeposit, { cb: [simCb], srv: [posBuf.srv!], uav: [densBuf.uav!] }); gpu.dispatch(GROUPS, 1, 1); gpu.csSet(0n, { srv: [0n], uav: [0n] });
-  gpu.csSet(csSource, { cb: [simCb], uav: [densBuf.uav!, srcBuf.uav!] }); gpu.dispatch(GRID_GROUPS, GRID_GROUPS, 1); gpu.csSet(0n, { uav: [0n, 0n] });
+  gpu.csSet(csClearGrid, { cb: [simCb], uav: [densBuf.uav!] });
+  gpu.dispatch(GRID_GROUPS, GRID_GROUPS, 1);
+  gpu.csSet(0n, { uav: [0n] });
+  gpu.csSet(csDeposit, { cb: [simCb], srv: [posBuf.srv!], uav: [densBuf.uav!] });
+  gpu.dispatch(GROUPS, 1, 1);
+  gpu.csSet(0n, { srv: [0n], uav: [0n] });
+  gpu.csSet(csSource, { cb: [simCb], uav: [densBuf.uav!, srcBuf.uav!] });
+  gpu.dispatch(GRID_GROUPS, GRID_GROUPS, 1);
+  gpu.csSet(0n, { uav: [0n, 0n] });
   for (let k = 0; k < coldIters; k += 1) {
     gpu.csSet(csJacobi, { cb: [simCb], srv: [srcBuf.srv!, phiRead.srv!], uav: [phiWrite.uav!] });
     gpu.dispatch(GRID_GROUPS, GRID_GROUPS, 1);
     gpu.csSet(0n, { srv: [0n, 0n], uav: [0n] });
-    const tmp = phiRead; phiRead = phiWrite; phiWrite = tmp;
+    const tmp = phiRead;
+    phiRead = phiWrite;
+    phiWrite = tmp;
   }
-  gpu.csSet(csForce, { cb: [simCb], srv: [phiRead.srv!], uav: [forceBuf.uav!] }); gpu.dispatch(GRID_GROUPS, GRID_GROUPS, 1); gpu.csSet(0n, { srv: [0n], uav: [0n] });
+  gpu.csSet(csForce, { cb: [simCb], srv: [phiRead.srv!], uav: [forceBuf.uav!] });
+  gpu.dispatch(GRID_GROUPS, GRID_GROUPS, 1);
+  gpu.csSet(0n, { srv: [0n], uav: [0n] });
 }
 if (MEASURE_EQ) {
   solveFieldOnce(500); // cold start → many passes for a converged t=0 field (also warm-starts the loop)
@@ -1834,17 +1885,33 @@ if (MEASURE_EQ) {
       const c = (gy * GRID_N + gx) * 2;
       const inward = -((force[c]! * wx + force[c + 1]! * wz) / r); // inward radial part of -∇φ (>0 attracting)
       const bin = Math.min(NR - 1, ((r / RMAXP) * NR) | 0);
-      accSum[bin] += inward; accCnt[bin] += 1;
+      accSum[bin] += inward;
+      accCnt[bin] += 1;
     }
   }
   const aSelf = new Float64Array(NR);
   let last = 0;
-  for (let b = 0; b < NR; b += 1) { aSelf[b] = accCnt[b]! > 0 ? accSum[b]! / accCnt[b]! : last; last = aSelf[b]!; }
+  for (let b = 0; b < NR; b += 1) {
+    aSelf[b] = accCnt[b]! > 0 ? accSum[b]! / accCnt[b]! : last;
+    last = aSelf[b]!;
+  }
   const aS = new Float64Array(NR); // light radial smoothing of the measured profile
-  for (let b = 0; b < NR; b += 1) { let s = 0, n = 0; for (let d = -3; d <= 3; d += 1) { const j = b + d; if (j >= 0 && j < NR) { s += aSelf[j]!; n += 1; } } aS[b] = s / n; }
+  for (let b = 0; b < NR; b += 1) {
+    let s = 0,
+      n = 0;
+    for (let d = -3; d <= 3; d += 1) {
+      const j = b + d;
+      if (j >= 0 && j < NR) {
+        s += aSelf[j]!;
+        n += 1;
+      }
+    }
+    aS[b] = s / n;
+  }
   const measuredSelfAt = (r: number): number => {
     const f = Math.min(NR - 1.001, Math.max(0, (r / RMAXP) * NR));
-    const i = f | 0; const t = f - i;
+    const i = f | 0;
+    const t = f - i;
     return Math.max(0, aS[i]! * (1 - t) + aS[Math.min(NR - 1, i + 1)]! * t);
   };
   // Measured circular speed: v² = r·(a_BH + a_halo + selfGain·a_self_measured). a_self is the live
@@ -1855,7 +1922,10 @@ if (MEASURE_EQ) {
     return Math.sqrt(Math.max(0, r * (aBH + aHalo + SELF_G_GAIN * measuredSelfAt(r))));
   };
   let es = 0x51ed270b >>> 0;
-  const erand = (): number => { es = (Math.imul(es, 1664525) + 1013904223) >>> 0; return es / 0x1_0000_0000; };
+  const erand = (): number => {
+    es = (Math.imul(es, 1664525) + 1013904223) >>> 0;
+    return es / 0x1_0000_0000;
+  };
   const egauss = (): number => erand() + erand() + erand() + erand() - 2.0;
   for (let i = 0; i < PARTICLE_COUNT; i += 1) {
     const o = i * 16;
@@ -1865,7 +1935,8 @@ if (MEASURE_EQ) {
     if (r < 1e-4) continue;
     const vc = vcMeasured(r);
     const disp = vc * VEL_DISP;
-    const tx = -pz / r, tz = px / r; // CCW tangential unit vector
+    const tx = -pz / r,
+      tz = px / r; // CCW tangential unit vector
     velSeed.writeFloatLE(tx * vc + egauss() * disp, o);
     velSeed.writeFloatLE(egauss() * disp * 0.5, o + 4);
     velSeed.writeFloatLE(tz * vc + egauss() * disp, o + 8);
@@ -1894,10 +1965,20 @@ while (!win.shouldClose()) {
     simTime = 0;
     bangFlash = 0;
     prevLeft = false;
-    cam0.resetEase = 1; cam0.yaw = 0; cam0.idle = 0; cam0.autoMix = 0; // re-frame the camera too
-    timeScaleIx = TIME_SCALE_DEFAULT_IX; paused = false; substepAccum = 0; stepOnce = false;
-    collisionActive = false; bh2.m = 0; collPullSmooth = 0; // exit collision mode, drop the camera pull-back
-    snAge = 1e9; snNext = SN_INTERVAL; snIdx = 0; // reset the supernova scheduler (else it stalls / loses SELFSHOT determinism post-reset)
+    cam0.resetEase = 1;
+    cam0.yaw = 0;
+    cam0.idle = 0;
+    cam0.autoMix = 0; // re-frame the camera too
+    timeScaleIx = TIME_SCALE_DEFAULT_IX;
+    paused = false;
+    substepAccum = 0;
+    stepOnce = false;
+    collisionActive = false;
+    bh2.m = 0;
+    collPullSmooth = 0; // exit collision mode, drop the camera pull-back
+    snAge = 1e9;
+    snNext = SN_INTERVAL;
+    snIdx = 0; // reset the supernova scheduler (else it stalls / loses SELFSHOT determinism post-reset)
   }
   prevR = rDown;
 
@@ -1905,17 +1986,20 @@ while (!win.shouldClose()) {
   const cDown = (User32.GetAsyncKeyState(VK_C) & 0x8000) !== 0;
   if (cDown && !prevC) launchIntruder();
   prevC = cDown;
-  if (COLLIDE_AUTO && !autoCollided && simTime >= 1.0) { launchIntruder(); autoCollided = true; }
+  if (COLLIDE_AUTO && !autoCollided && simTime >= 1.0) {
+    launchIntruder();
+    autoCollided = true;
+  }
 
   const now = performance.now();
   const t = simTime; // SIM time governs the look/physics; render uses it too
 
   // ── Time / view control keys ──
-  if (edge(VK_H) || edge(VK_OEM_2)) showHelp = !showHelp;                 // H / ? toggle help overlay
-  if (edge(VirtualKey.VK_SPACE)) paused = !paused;                        // Space pause / resume
-  if (edge(VK_OEM_4) || edge(VK_OEM_MINUS)) timeScaleIx = Math.max(0, timeScaleIx - 1);                 // [ / -  slower
+  if (edge(VK_H) || edge(VK_OEM_2)) showHelp = !showHelp; // H / ? toggle help overlay
+  if (edge(VirtualKey.VK_SPACE)) paused = !paused; // Space pause / resume
+  if (edge(VK_OEM_4) || edge(VK_OEM_MINUS)) timeScaleIx = Math.max(0, timeScaleIx - 1); // [ / -  slower
   if (edge(VK_OEM_6) || edge(VK_OEM_PLUS)) timeScaleIx = Math.min(TIME_SCALES.length - 1, timeScaleIx + 1); // ] / =  faster
-  if (edge(VK_OEM_PERIOD)) stepOnce = true;                              // .  single-step while paused
+  if (edge(VK_OEM_PERIOD)) stepOnce = true; // .  single-step while paused
   const timeScale = TIME_SCALES[timeScaleIx]!;
 
   // ── Interactive camera: left-drag orbits, wheel/keys dolly, inertial glide, idle auto-orbit.
@@ -1934,16 +2018,23 @@ while (!win.shouldClose()) {
 
   let userInput = false;
   let bangSuppressed = false;
-  if (leftDown && !camPrevLeft) { dragActive = true; dragMoved = 0; dragPrevX = m.x; dragPrevY = m.y; }
+  if (leftDown && !camPrevLeft) {
+    dragActive = true;
+    dragMoved = 0;
+    dragPrevX = m.x;
+    dragPrevY = m.y;
+  }
   if (dragActive && leftDown) {
     const dx = m.x - dragPrevX;
     const dy = m.y - dragPrevY;
-    dragPrevX = m.x; dragPrevY = m.y;
+    dragPrevX = m.x;
+    dragPrevY = m.y;
     dragMoved += Math.abs(dx) + Math.abs(dy);
-    if (dragMoved > CAM_CLICK_PX) {              // past the click threshold → orbit (not a BANG)
+    if (dragMoved > CAM_CLICK_PX) {
+      // past the click threshold → orbit (not a BANG)
       cam0.yaw -= dx * CAM_DRAG_SENS;
       cam0.elev += dy * CAM_DRAG_SENS;
-      cam0.yawVel = (-dx * CAM_DRAG_SENS) / camDt;  // leave inertia so release glides on
+      cam0.yawVel = (-dx * CAM_DRAG_SENS) / camDt; // leave inertia so release glides on
       cam0.elevVel = (dy * CAM_DRAG_SENS) / camDt;
       userInput = true;
     }
@@ -1953,29 +2044,39 @@ while (!win.shouldClose()) {
   camPrevLeft = leftDown;
 
   const wheel = win.getWheel(); // +forward = zoom in; resets on read
-  if (wheel !== 0) { cam0.logDistVel -= (wheel * CAM_ZOOM_SENS) / camDt; userInput = true; }
+  if (wheel !== 0) {
+    cam0.logDistVel -= (wheel * CAM_ZOOM_SENS) / camDt;
+    userInput = true;
+  }
   let keyZoom = 0;
   if (keyDownVK(VK_ADD) || keyDownVK(VirtualKey.VK_UP)) keyZoom -= 1;
   if (keyDownVK(VK_SUBTRACT) || keyDownVK(VirtualKey.VK_DOWN)) keyZoom += 1;
-  if (keyZoom !== 0) { cam0.logDistVel += keyZoom * CAM_ZOOM_SENS * 8.0; userInput = true; }
+  if (keyZoom !== 0) {
+    cam0.logDistVel += keyZoom * CAM_ZOOM_SENS * 8.0;
+    userInput = true;
+  }
 
   cam0.yaw += cam0.yawVel * camDt;
   cam0.elev += cam0.elevVel * camDt;
-  cam0.dist *= Math.exp(cam0.logDistVel * camDt);          // log-space dolly → always positive
+  cam0.dist *= Math.exp(cam0.logDistVel * camDt); // log-space dolly → always positive
   cam0.yawVel *= Math.exp(-CAM_INERTIA * camDt);
   cam0.elevVel *= Math.exp(-CAM_INERTIA * camDt);
   cam0.logDistVel *= Math.exp(-CAM_ZOOM_INERTIA * camDt);
-  if (cam0.resetEase > 0) {                                // R eases the camera back to default
+  if (cam0.resetEase > 0) {
+    // R eases the camera back to default
     const k = Math.min(1, camDt * 6.0);
     cam0.elev += (CAM_DEFAULT_ELEV - cam0.elev) * k;
     cam0.dist += (CAM_DEFAULT_DIST - cam0.dist) * k;
     cam0.yawVel = cam0.elevVel = cam0.logDistVel = 0;
     cam0.resetEase = Math.max(0, cam0.resetEase - camDt / 0.6);
   }
-  if (userInput) { cam0.idle = 0; cam0.autoMix = 0; } else cam0.idle += camDt;
+  if (userInput) {
+    cam0.idle = 0;
+    cam0.autoMix = 0;
+  } else cam0.idle += camDt;
   const wantAuto = cam0.idle > CAM_IDLE ? 1 : 0;
   cam0.autoMix += (wantAuto - cam0.autoMix) * Math.min(1, camDt / CAM_AUTO_FADE);
-  cam0.yaw += CAM_ORBIT_RATE * cam0.autoMix * camDt;       // slow auto-orbit when idle
+  cam0.yaw += CAM_ORBIT_RATE * cam0.autoMix * camDt; // slow auto-orbit when idle
   cam0.elev += (CAM_DEFAULT_ELEV + 0.05 * Math.sin(t * 0.05) - cam0.elev) * (cam0.autoMix * Math.min(1, camDt * 0.6));
   cam0.elev = Math.min(CAM_ELEV_MAX, Math.max(CAM_ELEV_MIN, cam0.elev));
   cam0.dist = Math.min(CAM_DIST_MAX, Math.max(CAM_DIST_MIN, cam0.dist));
@@ -1985,7 +2086,7 @@ while (!win.shouldClose()) {
 
   // Keep the encounter framed, but EASE the pull-back so launching a collision never snaps the camera
   // (the old code added the full pull in a single frame → a hard jolt). Smoothly track the target.
-  const collPullTarget = collisionActive ? Math.min(11, 0.30 * Math.hypot(bh2.p[0], bh2.p[1], bh2.p[2])) : 0;
+  const collPullTarget = collisionActive ? Math.min(11, 0.3 * Math.hypot(bh2.p[0], bh2.p[1], bh2.p[2])) : 0;
   collPullSmooth += (collPullTarget - collPullSmooth) * Math.min(1, camDt * 1.6); // ~0.6s ease
   const renderDist = cam0.dist + 3.0 * (1 - spread) + collPullSmooth; // reveal/collision fold into render dist only
   const eyeY = renderDist * Math.sin(cam0.elev);
@@ -2005,7 +2106,9 @@ while (!win.shouldClose()) {
   let rdy = cam.forward[1] + cam.right[1] * (ndcX * aspect * tanH) + cam.up[1] * (ndcY * tanH);
   let rdz = cam.forward[2] + cam.right[2] * (ndcX * aspect * tanH) + cam.up[2] * (ndcY * tanH);
   const rl = Math.hypot(rdx, rdy, rdz) || 1;
-  rdx /= rl; rdy /= rl; rdz /= rl;
+  rdx /= rl;
+  rdy /= rl;
+  rdz /= rl;
   // The camera sits ABOVE the disk (eye.y > 0) looking down, so only a DOWNWARD ray (rdy < 0)
   // meets the y=0 plane in front of it. The well lands at the TRUE point under the cursor — we do
   // NOT clamp it to a circle. (The old radius clamp pinned the well to the r=1.7·R circle, which
@@ -2039,18 +2142,28 @@ while (!win.shouldClose()) {
   }
 
   // ── Interaction mode + edge-triggered BANG (a dragged left press orbits instead, via bangSuppressed) ──
-  let mode = 0;     // 0 none, 1 bang, 2 implode, 3 vortex
+  let mode = 0; // 0 none, 1 bang, 2 implode, 3 vortex
   let strength = 0;
   let radius = 1.6;
   let cursorActive = 0;
   const bangThisFrame = leftDown && !prevLeft && !bangSuppressed; // clean press only → one-shot impulse
   if (stepsThisFrame > 0) prevLeft = leftDown; // don't consume the press on a frozen frame → fires on resume
   if (bangThisFrame && hitValid) {
-    mode = 1; strength = 16.0; radius = 1.8; cursorActive = 1; bangFlash = 1.0;
+    mode = 1;
+    strength = 16.0;
+    radius = 1.8;
+    cursorActive = 1;
+    bangFlash = 1.0;
   } else if (rightDown && hitValid) {
-    mode = 2; strength = 90.0; radius = 2.2; cursorActive = 1;
+    mode = 2;
+    strength = 90.0;
+    radius = 2.2;
+    cursorActive = 1;
   } else if (middleDown && hitValid) {
-    mode = 3; strength = 22.0; radius = 2.6; cursorActive = 1;
+    mode = 3;
+    strength = 22.0;
+    radius = 2.6;
+    cursorActive = 1;
   }
 
   // Advance the intruder black hole once this frame by the sim-time about to elapse (0 when paused).
@@ -2059,37 +2172,37 @@ while (!win.shouldClose()) {
   // ── Advance the physics by stepsThisFrame fixed leapfrog steps (0 when paused) ──
   for (let step = 0; step < stepsThisFrame; step += 1) {
     // The interaction (especially the one-shot BANG) must apply on exactly one sub-step.
-    const stepMode = step === 0 ? mode : (mode === 1 ? 0 : mode);
-    const stepActive = step === 0 ? cursorActive : (mode === 1 ? 0 : cursorActive);
+    const stepMode = step === 0 ? mode : mode === 1 ? 0 : mode;
+    const stepActive = step === 0 ? cursorActive : mode === 1 ? 0 : cursorActive;
 
-    simData.writeFloatLE(DT_FIXED, 0);      // gParams.x dt
-    simData.writeFloatLE(simTime, 4);       // gParams.y time
-    simData.writeFloatLE(spread, 8);        // gParams.z spread (render-only)
-    simData.writeFloatLE(M_HALO, 12);       // gParams.w halo mass
-    simData.writeFloatLE(G_CONST, 16);      // gGrav.x G
-    simData.writeFloatLE(M_BH, 20);         // gGrav.y black-hole mass
-    simData.writeFloatLE(SOFTEN, 24);       // gGrav.z soft
-    simData.writeFloatLE(SELF_G_GAIN, 28);  // gGrav.w selfGain
-    simData.writeFloatLE(VEL_DAMP, 32);     // gPhys.x velDamp
-    simData.writeFloatLE(MAX_ACC, 36);      // gPhys.y maxAcc
-    simData.writeFloatLE(MAX_SPEED, 40);    // gPhys.z maxSpeed
-    simData.writeFloatLE(R_HALO, 44);       // gPhys.w halo radius
-    simData.writeFloatLE(SOFT_BH, 48);      // gBH.x black-hole softening
+    simData.writeFloatLE(DT_FIXED, 0); // gParams.x dt
+    simData.writeFloatLE(simTime, 4); // gParams.y time
+    simData.writeFloatLE(spread, 8); // gParams.z spread (render-only)
+    simData.writeFloatLE(M_HALO, 12); // gParams.w halo mass
+    simData.writeFloatLE(G_CONST, 16); // gGrav.x G
+    simData.writeFloatLE(M_BH, 20); // gGrav.y black-hole mass
+    simData.writeFloatLE(SOFTEN, 24); // gGrav.z soft
+    simData.writeFloatLE(SELF_G_GAIN, 28); // gGrav.w selfGain
+    simData.writeFloatLE(VEL_DAMP, 32); // gPhys.x velDamp
+    simData.writeFloatLE(MAX_ACC, 36); // gPhys.y maxAcc
+    simData.writeFloatLE(MAX_SPEED, 40); // gPhys.z maxSpeed
+    simData.writeFloatLE(R_HALO, 44); // gPhys.w halo radius
+    simData.writeFloatLE(SOFT_BH, 48); // gBH.x black-hole softening
     simData.writeFloatLE(0, 52);
     simData.writeFloatLE(0, 56);
     simData.writeFloatLE(0, 60);
-    simData.writeFloatLE(stepMode, 64);     // gAct.x mode
-    simData.writeFloatLE(strength, 68);     // gAct.y strength
-    simData.writeFloatLE(radius, 72);       // gAct.z radius
+    simData.writeFloatLE(stepMode, 64); // gAct.x mode
+    simData.writeFloatLE(strength, 68); // gAct.y strength
+    simData.writeFloatLE(radius, 72); // gAct.z radius
     simData.writeFloatLE(0, 76);
-    simData.writeFloatLE(hitX, 80);         // gCursor.x
-    simData.writeFloatLE(0, 84);            // gCursor.y (disk plane)
-    simData.writeFloatLE(hitZ, 88);         // gCursor.z
-    simData.writeFloatLE(stepActive, 92);   // gCursor.w active
-    simData.writeFloatLE(collisionActive ? bh2.p[0] : 0, 96);  // gBH2.x intruder pos
+    simData.writeFloatLE(hitX, 80); // gCursor.x
+    simData.writeFloatLE(0, 84); // gCursor.y (disk plane)
+    simData.writeFloatLE(hitZ, 88); // gCursor.z
+    simData.writeFloatLE(stepActive, 92); // gCursor.w active
+    simData.writeFloatLE(collisionActive ? bh2.p[0] : 0, 96); // gBH2.x intruder pos
     simData.writeFloatLE(collisionActive ? bh2.p[1] : 0, 100); // gBH2.y
     simData.writeFloatLE(collisionActive ? bh2.p[2] : 0, 104); // gBH2.z
-    simData.writeFloatLE(collisionActive ? bh2.m : 0, 108);    // gBH2.w intruder mass (0 ⇒ no force)
+    simData.writeFloatLE(collisionActive ? bh2.m : 0, 108); // gBH2.w intruder mass (0 ⇒ no force)
     gpu.updateConstantBuffer(simCb, simData);
 
     // 1. clear the GRID_N² density cells
@@ -2109,7 +2222,9 @@ while (!win.shouldClose()) {
       gpu.csSet(csJacobi, { cb: [simCb], srv: [srcBuf.srv!, phiRead.srv!], uav: [phiWrite.uav!] });
       gpu.dispatch(GRID_GROUPS, GRID_GROUPS, 1);
       gpu.csSet(0n, { srv: [0n, 0n], uav: [0n] });
-      const tmp = phiRead; phiRead = phiWrite; phiWrite = tmp; // latest solution now in phiRead
+      const tmp = phiRead;
+      phiRead = phiWrite;
+      phiWrite = tmp; // latest solution now in phiRead
     }
     // 5. grid force field g = -∇φ (central difference), so the integrate pass can CIC-interpolate it
     gpu.csSet(csForce, { cb: [simCb], srv: [phiRead.srv!], uav: [forceBuf.uav!] });
@@ -2123,7 +2238,7 @@ while (!win.shouldClose()) {
     simTime += DT_FIXED;
   }
   dispatched = true;
-  if (bangFlash > 0) bangFlash = Math.max(0, bangFlash - DT_FIXED * stepsThisFrame / 0.5);
+  if (bangFlash > 0) bangFlash = Math.max(0, bangFlash - (DT_FIXED * stepsThisFrame) / 0.5);
 
   // ── Supernova scheduler: ignite a rare flash at a deterministic random disk site, then age it
   //    (the FX pass blooms + fades it). Deterministic in snIdx so SELFSHOT captures are reproducible. ──
@@ -2131,12 +2246,14 @@ while (!win.shouldClose()) {
     snAge += DT_FIXED * stepsThisFrame;
     if (simTime >= snNext) {
       snIdx += 1;
-      const h1 = snHash(snIdx * 12.9898), h2 = snHash(snIdx * 78.233 + 1.7);
-      const h3 = snHash(snIdx * 37.71 + 4.1), h4 = snHash(snIdx * 5.31 + 9.2);
+      const h1 = snHash(snIdx * 12.9898),
+        h2 = snHash(snIdx * 78.233 + 1.7);
+      const h3 = snHash(snIdx * 37.71 + 4.1),
+        h4 = snHash(snIdx * 5.31 + 9.2);
       const rr = GALAXY_RADIUS * (0.22 + 0.82 * h1);
       const ang = h2 * Math.PI * 2;
       snPos[0] = rr * Math.cos(ang);
-      snPos[1] = (h3 - 0.5) * 0.10 * GALAXY_RADIUS;
+      snPos[1] = (h3 - 0.5) * 0.1 * GALAXY_RADIUS;
       snPos[2] = rr * Math.sin(ang);
       snAge = 0;
       snNext = simTime + SN_INTERVAL * (0.5 + 1.0 * h4);
@@ -2169,15 +2286,15 @@ while (!win.shouldClose()) {
   rendData.writeFloatLE(cam.right[0], 80);
   rendData.writeFloatLE(cam.right[1], 84);
   rendData.writeFloatLE(cam.right[2], 88);
-  rendData.writeFloatLE(eye[0], 92);   // eyeX (Doppler)
+  rendData.writeFloatLE(eye[0], 92); // eyeX (Doppler)
   rendData.writeFloatLE(cam.up[0], 96);
   rendData.writeFloatLE(cam.up[1], 100);
   rendData.writeFloatLE(cam.up[2], 104);
-  rendData.writeFloatLE(eye[1], 108);  // eyeY (Doppler)
+  rendData.writeFloatLE(eye[1], 108); // eyeY (Doppler)
   rendData.writeFloatLE(cam.forward[0], 112);
   rendData.writeFloatLE(cam.forward[1], 116);
   rendData.writeFloatLE(cam.forward[2], 120);
-  rendData.writeFloatLE(eye[2], 124);  // eyeZ (Doppler)
+  rendData.writeFloatLE(eye[2], 124); // eyeZ (Doppler)
   gpu.updateConstantBuffer(rendCb, rendData);
 
   gpu.setRenderTargets([hdr.rtv!]);
@@ -2198,13 +2315,31 @@ while (!win.shouldClose()) {
   //    then read dustSrc, so dark lanes don't bloom (true silhouettes). ──
   let dustSrc = hdr;
   if (DUST_ON) {
-    const tanHalf = Math.tan((52 * Math.PI / 180) / 2);
-    dustData.writeFloatLE(eye[0], 0); dustData.writeFloatLE(eye[1], 4); dustData.writeFloatLE(eye[2], 8); dustData.writeFloatLE(0, 12);
-    dustData.writeFloatLE(cam.forward[0], 16); dustData.writeFloatLE(cam.forward[1], 20); dustData.writeFloatLE(cam.forward[2], 24); dustData.writeFloatLE(tanHalf, 28);
-    dustData.writeFloatLE(cam.right[0], 32); dustData.writeFloatLE(cam.right[1], 36); dustData.writeFloatLE(cam.right[2], 40); dustData.writeFloatLE(aspect, 44);
-    dustData.writeFloatLE(cam.up[0], 48); dustData.writeFloatLE(cam.up[1], 52); dustData.writeFloatLE(cam.up[2], 56); dustData.writeFloatLE(0, 60);
-    dustData.writeFloatLE(DUST_STRENGTH, 64); dustData.writeFloatLE(DUST_FLOOR, 68); dustData.writeFloatLE(DUST_GAMMA, 72); dustData.writeFloatLE(DUST_REDDEN, 76);
-    dustData.writeFloatLE(DUST_OFFSET, 80); dustData.writeFloatLE(DUST_TINT, 84); dustData.writeFloatLE(FIELD_HALF, 88); dustData.writeFloatLE(1.0, 92);
+    const tanHalf = Math.tan((52 * Math.PI) / 180 / 2);
+    dustData.writeFloatLE(eye[0], 0);
+    dustData.writeFloatLE(eye[1], 4);
+    dustData.writeFloatLE(eye[2], 8);
+    dustData.writeFloatLE(0, 12);
+    dustData.writeFloatLE(cam.forward[0], 16);
+    dustData.writeFloatLE(cam.forward[1], 20);
+    dustData.writeFloatLE(cam.forward[2], 24);
+    dustData.writeFloatLE(tanHalf, 28);
+    dustData.writeFloatLE(cam.right[0], 32);
+    dustData.writeFloatLE(cam.right[1], 36);
+    dustData.writeFloatLE(cam.right[2], 40);
+    dustData.writeFloatLE(aspect, 44);
+    dustData.writeFloatLE(cam.up[0], 48);
+    dustData.writeFloatLE(cam.up[1], 52);
+    dustData.writeFloatLE(cam.up[2], 56);
+    dustData.writeFloatLE(0, 60);
+    dustData.writeFloatLE(DUST_STRENGTH, 64);
+    dustData.writeFloatLE(DUST_FLOOR, 68);
+    dustData.writeFloatLE(DUST_GAMMA, 72);
+    dustData.writeFloatLE(DUST_REDDEN, 76);
+    dustData.writeFloatLE(DUST_OFFSET, 80);
+    dustData.writeFloatLE(DUST_TINT, 84);
+    dustData.writeFloatLE(FIELD_HALF, 88);
+    dustData.writeFloatLE(1.0, 92);
     gpu.updateConstantBuffer(dustCb, dustData);
     gpu.setRenderTargets([hdr2.rtv!]);
     gpu.setViewport(clientW, clientH);
@@ -2222,8 +2357,8 @@ while (!win.shouldClose()) {
   //    (gravitational lensing + a faint Einstein ring), and lights the dense arm ridges with H-alpha
   //    pink + OIII cyan star-forming nebulae read from the live density field. In HDR → it blooms. ──
   if (HII_ON || CORE_INTENSITY > 0 || LENS_STRENGTH > 0) {
-    const fxDst = (dustSrc === hdr) ? hdr2 : hdr;
-    const tanHalf = Math.tan((52 * Math.PI / 180) / 2);
+    const fxDst = dustSrc === hdr ? hdr2 : hdr;
+    const tanHalf = Math.tan((52 * Math.PI) / 180 / 2);
     // Project the black hole (world origin) to screen UV using the SAME viewProj the scene renders
     // with. clip = viewProj·(0,0,0,1) = the matrix's 4th column (row-major store → indices 3,7,11,15).
     const cw = viewProj[15]!;
@@ -2235,9 +2370,13 @@ while (!win.shouldClose()) {
     const coreInt = coreInFront ? CORE_INTENSITY * (0.22 + 0.78 * spread) + bangFlash * 1.5 : 0;
     // Project the COLLISION companion (intruder black hole) to screen so the FX pass can draw its
     // visible bright nucleus. Same row-major viewProj·(p,1) projection as the core above.
-    let compU = 0, compV = 0, compInt = 0;
+    let compU = 0,
+      compV = 0,
+      compInt = 0;
     if (collisionActive && bh2.m > 0) {
-      const px = bh2.p[0], py = bh2.p[1], pz = bh2.p[2];
+      const px = bh2.p[0],
+        py = bh2.p[1],
+        pz = bh2.p[2];
       const ccw = viewProj[12]! * px + viewProj[13]! * py + viewProj[14]! * pz + viewProj[15]!;
       if (ccw > 1e-4) {
         const nx = (viewProj[0]! * px + viewProj[1]! * py + viewProj[2]! * pz + viewProj[3]!) / ccw;
@@ -2247,18 +2386,47 @@ while (!win.shouldClose()) {
         compInt = CORE_INTENSITY * 0.7; // a bit dimmer than the host nucleus
       }
     }
-    fxData.writeFloatLE(eye[0], 0); fxData.writeFloatLE(eye[1], 4); fxData.writeFloatLE(eye[2], 8); fxData.writeFloatLE(t, 12);
-    fxData.writeFloatLE(cam.forward[0], 16); fxData.writeFloatLE(cam.forward[1], 20); fxData.writeFloatLE(cam.forward[2], 24); fxData.writeFloatLE(tanHalf, 28);
-    fxData.writeFloatLE(cam.right[0], 32); fxData.writeFloatLE(cam.right[1], 36); fxData.writeFloatLE(cam.right[2], 40); fxData.writeFloatLE(aspect, 44);
-    fxData.writeFloatLE(cam.up[0], 48); fxData.writeFloatLE(cam.up[1], 52); fxData.writeFloatLE(cam.up[2], 56); fxData.writeFloatLE(FIELD_HALF, 60);
-    fxData.writeFloatLE(coreU, 64); fxData.writeFloatLE(coreV, 68); fxData.writeFloatLE(CORE_SPAN, 72); fxData.writeFloatLE(coreInt, 76);
-    fxData.writeFloatLE(LENS_STRENGTH, 80); fxData.writeFloatLE(LENS_RADIUS, 84); fxData.writeFloatLE(HII_ON ? HII_STRENGTH : 0, 88); fxData.writeFloatLE(HII_FLOOR, 92);
-    fxData.writeFloatLE(HII_GAMMA, 96); fxData.writeFloatLE(HII_BASE0, 100); fxData.writeFloatLE(1 / DISK_SCALE, 104); fxData.writeFloatLE(0, 108);
-    fxData.writeFloatLE(compU, 112); fxData.writeFloatLE(compV, 116); fxData.writeFloatLE(CORE_SPAN * 0.7, 120); fxData.writeFloatLE(compInt, 124);
+    fxData.writeFloatLE(eye[0], 0);
+    fxData.writeFloatLE(eye[1], 4);
+    fxData.writeFloatLE(eye[2], 8);
+    fxData.writeFloatLE(t, 12);
+    fxData.writeFloatLE(cam.forward[0], 16);
+    fxData.writeFloatLE(cam.forward[1], 20);
+    fxData.writeFloatLE(cam.forward[2], 24);
+    fxData.writeFloatLE(tanHalf, 28);
+    fxData.writeFloatLE(cam.right[0], 32);
+    fxData.writeFloatLE(cam.right[1], 36);
+    fxData.writeFloatLE(cam.right[2], 40);
+    fxData.writeFloatLE(aspect, 44);
+    fxData.writeFloatLE(cam.up[0], 48);
+    fxData.writeFloatLE(cam.up[1], 52);
+    fxData.writeFloatLE(cam.up[2], 56);
+    fxData.writeFloatLE(FIELD_HALF, 60);
+    fxData.writeFloatLE(coreU, 64);
+    fxData.writeFloatLE(coreV, 68);
+    fxData.writeFloatLE(CORE_SPAN, 72);
+    fxData.writeFloatLE(coreInt, 76);
+    fxData.writeFloatLE(LENS_STRENGTH, 80);
+    fxData.writeFloatLE(LENS_RADIUS, 84);
+    fxData.writeFloatLE(HII_ON ? HII_STRENGTH : 0, 88);
+    fxData.writeFloatLE(HII_FLOOR, 92);
+    fxData.writeFloatLE(HII_GAMMA, 96);
+    fxData.writeFloatLE(HII_BASE0, 100);
+    fxData.writeFloatLE(1 / DISK_SCALE, 104);
+    fxData.writeFloatLE(0, 108);
+    fxData.writeFloatLE(compU, 112);
+    fxData.writeFloatLE(compV, 116);
+    fxData.writeFloatLE(CORE_SPAN * 0.7, 120);
+    fxData.writeFloatLE(compInt, 124);
     // Project the active supernova to screen and fade it over ~1s (fills the FX flash slot).
-    let snU = 0, snV = 0, snSpan = 0, snInt = 0;
+    let snU = 0,
+      snV = 0,
+      snSpan = 0,
+      snInt = 0;
     if (SN_ON && snAge < 1.8) {
-      const px = snPos[0], py = snPos[1], pz = snPos[2];
+      const px = snPos[0],
+        py = snPos[1],
+        pz = snPos[2];
       const sw = viewProj[12]! * px + viewProj[13]! * py + viewProj[14]! * pz + viewProj[15]!;
       if (sw > 1e-4) {
         snU = ((viewProj[0]! * px + viewProj[1]! * py + viewProj[2]! * pz + viewProj[3]!) / sw + 1) * 0.5;
@@ -2267,7 +2435,10 @@ while (!win.shouldClose()) {
         snSpan = 0.009 * (1 + snAge * 3.5); // expanding shock shell
       }
     }
-    fxData.writeFloatLE(snU, 128); fxData.writeFloatLE(snV, 132); fxData.writeFloatLE(snSpan, 136); fxData.writeFloatLE(snInt, 140);
+    fxData.writeFloatLE(snU, 128);
+    fxData.writeFloatLE(snV, 132);
+    fxData.writeFloatLE(snSpan, 136);
+    fxData.writeFloatLE(snInt, 140);
     gpu.updateConstantBuffer(fxCb, fxData);
     gpu.setRenderTargets([fxDst.rtv!]);
     gpu.setViewport(clientW, clientH);
@@ -2302,7 +2473,11 @@ while (!win.shouldClose()) {
     dev.present(false);
     presented += 1;
     frames += 1;
-    if (now - fpsWindowStart >= 500) { fps = Math.round((frames * 1000) / (now - fpsWindowStart)); frames = 0; fpsWindowStart = now; }
+    if (now - fpsWindowStart >= 500) {
+      fps = Math.round((frames * 1000) / (now - fpsWindowStart));
+      frames = 0;
+      fpsWindowStart = now;
+    }
     if (durationMs > 0 && now - startTime >= durationMs) break;
     if (SELFSHOT && shotTaken) break;
     continue;
@@ -2312,7 +2487,7 @@ while (!win.shouldClose()) {
   //    seed never blooms to white; a LEFT-click BANG briefly lifts exposure + bloom. ──
   const postRamp = spread;
   const flash = bangFlash;
-  const exposure = 0.30 + 0.58 * postRamp + 0.35 * flash;
+  const exposure = 0.3 + 0.58 * postRamp + 0.35 * flash;
   const bloomStrength = 0.05 + 0.42 * postRamp + 0.5 * flash;
   const bloomThreshold = 3.9 - 1.1 * postRamp - 0.9 * flash; // higher knee → only true highlights bloom (tames the white-core halo)
 

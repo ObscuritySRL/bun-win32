@@ -88,15 +88,11 @@ function isNormalized(text: string): boolean {
 }
 
 function normalizeText(text: string): TransformResult {
-  return convertWithSizingCall(text, (sourceBuffer, outputBuffer, outputLength) =>
-    Normaliz.NormalizeString(NormalizationForm.NormalizationC, sourceBuffer, -1, outputBuffer, outputLength),
-  );
+  return convertWithSizingCall(text, (sourceBuffer, outputBuffer, outputLength) => Normaliz.NormalizeString(NormalizationForm.NormalizationC, sourceBuffer, -1, outputBuffer, outputLength));
 }
 
 function nameprepText(text: string): TransformResult {
-  return convertWithSizingCall(text, (sourceBuffer, outputBuffer, outputLength) =>
-    Normaliz.IdnToNameprepUnicode(0, sourceBuffer, -1, outputBuffer, outputLength),
-  );
+  return convertWithSizingCall(text, (sourceBuffer, outputBuffer, outputLength) => Normaliz.IdnToNameprepUnicode(0, sourceBuffer, -1, outputBuffer, outputLength));
 }
 
 function convertIdnToAscii(text: string): TransformResult {
@@ -107,10 +103,7 @@ function convertIdnToUnicode(text: string): TransformResult {
   return convertWithSizingCall(text, (sourceBuffer, outputBuffer, outputLength) => Normaliz.IdnToUnicode(0, sourceBuffer, -1, outputBuffer, outputLength));
 }
 
-function convertWithSizingCall(
-  text: string,
-  invoke: (sourceBuffer: NonNullable<Buffer['ptr']>, outputBuffer: NonNullable<Buffer['ptr']> | null, outputLength: number) => number,
-): TransformResult {
+function convertWithSizingCall(text: string, invoke: (sourceBuffer: NonNullable<Buffer['ptr']>, outputBuffer: NonNullable<Buffer['ptr']> | null, outputLength: number) => number): TransformResult {
   const sourceBuffer = createWideBuffer(text);
   const requiredLength = invoke(sourceBuffer.ptr!, null, 0);
 
@@ -242,20 +235,8 @@ function printTransition(apiName: string): void {
   console.log(`  ${TERMINAL.dim}  │ ${apiName}${TERMINAL.reset}`);
 }
 
-function printLengths(
-  sourceText: string,
-  normalizedResult: TransformResult,
-  nameprepResult: TransformResult,
-  asciiResult: TransformResult,
-  unicodeResult: TransformResult,
-): void {
-  const stages = [
-    `raw=${sourceText.length}`,
-    `normalized=${getLengthLabel(normalizedResult)}`,
-    `nameprep=${getLengthLabel(nameprepResult)}`,
-    `ascii=${getLengthLabel(asciiResult)}`,
-    `unicode=${getLengthLabel(unicodeResult)}`,
-  ];
+function printLengths(sourceText: string, normalizedResult: TransformResult, nameprepResult: TransformResult, asciiResult: TransformResult, unicodeResult: TransformResult): void {
+  const stages = [`raw=${sourceText.length}`, `normalized=${getLengthLabel(normalizedResult)}`, `nameprep=${getLengthLabel(nameprepResult)}`, `ascii=${getLengthLabel(asciiResult)}`, `unicode=${getLengthLabel(unicodeResult)}`];
 
   console.log(`  ${TERMINAL.dim}lengths   ${stages.join(' -> ')}${TERMINAL.reset}`);
 }

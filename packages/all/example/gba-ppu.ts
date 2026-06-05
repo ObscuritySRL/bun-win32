@@ -17,7 +17,9 @@ export const GBA_H = 160;
 
 /** Expand a 15-bit BGR555 color to 24-bit RGB (low bits replicated). */
 function rgb15(c: number): number {
-  const r = c & 0x1f, g = (c >> 5) & 0x1f, b = (c >> 10) & 0x1f;
+  const r = c & 0x1f,
+    g = (c >> 5) & 0x1f,
+    b = (c >> 10) & 0x1f;
   return (((r << 3) | (r >> 2)) << 16) | (((g << 3) | (g >> 2)) << 8) | ((b << 3) | (b >> 2));
 }
 
@@ -58,8 +60,8 @@ export class GbaPpu {
   frameStart(): void {
     for (let bg = 2; bg <= 3; bg += 1) {
       const base = bg === 2 ? 0x28 : 0x38;
-      this.bgRefX[bg] = (this.signed28(this.io16(base) | (this.io16(base + 2) << 16)));
-      this.bgRefY[bg] = (this.signed28(this.io16(base + 4) | (this.io16(base + 6) << 16)));
+      this.bgRefX[bg] = this.signed28(this.io16(base) | (this.io16(base + 2) << 16));
+      this.bgRefY[bg] = this.signed28(this.io16(base + 4) | (this.io16(base + 6) << 16));
     }
   }
   private signed28(v: number): number {
@@ -73,7 +75,11 @@ export class GbaPpu {
     const row = line * GBA_W * 4;
 
     if (forcedBlank) {
-      for (let x = 0; x < GBA_W; x += 1) { const o = row + x * 4; this.frame[o] = this.frame[o + 1] = this.frame[o + 2] = 0xff; this.frame[o + 3] = 0xff; }
+      for (let x = 0; x < GBA_W; x += 1) {
+        const o = row + x * 4;
+        this.frame[o] = this.frame[o + 1] = this.frame[o + 2] = 0xff;
+        this.frame[o + 3] = 0xff;
+      }
       this.advanceAffine();
       return;
     }
@@ -128,15 +134,19 @@ export class GbaPpu {
     const color256 = (cnt & 0x80) !== 0;
     const screenBase = ((cnt >> 8) & 0x1f) * 0x800;
     const size = (cnt >> 14) & 0x3;
-    const widthTiles = (size & 1) ? 64 : 32;
-    const heightTiles = (size & 2) ? 64 : 32;
+    const widthTiles = size & 1 ? 64 : 32;
+    const heightTiles = size & 2 ? 64 : 32;
     const hofs = this.io16(0x10 + bg * 4) & 0x1ff;
     const vofs = this.io16(0x12 + bg * 4) & 0x1ff;
     const out = this.bgColor[bg]!;
     const prioShift = priority << 29; // pack priority into bits 29-30 of the stored value
 
     let yy = (line + vofs) & (heightTiles * 8 - 1);
-    if (mosaic) { const my = (this.io16(0x4c) >> 4) & 0xf; if (my) yy = line - (line % (my + 1)) + vofs; yy &= heightTiles * 8 - 1; }
+    if (mosaic) {
+      const my = (this.io16(0x4c) >> 4) & 0xf;
+      if (my) yy = line - (line % (my + 1)) + vofs;
+      yy &= heightTiles * 8 - 1;
+    }
     const tileRow = (yy >> 3) & (heightTiles - 1);
     const fineY = yy & 7;
 
@@ -145,7 +155,8 @@ export class GbaPpu {
       const tileCol = (xx >> 3) & (widthTiles - 1);
       // Pick the right 32×32 screenblock for sizes >256.
       let sb = screenBase;
-      const blockCol = tileCol >> 5, blockRow = tileRow >> 5;
+      const blockCol = tileCol >> 5,
+        blockRow = tileRow >> 5;
       if (widthTiles === 64 && blockCol) sb += 0x800;
       if (heightTiles === 64 && blockRow) sb += widthTiles === 64 ? 0x1000 : 0x800;
       const entry = this.vram16(sb + ((tileRow & 31) * 32 + (tileCol & 31)) * 2);
@@ -154,7 +165,7 @@ export class GbaPpu {
       const vflip = (entry & 0x800) !== 0;
       const pal = (entry >> 12) & 0xf;
       const fy = vflip ? 7 - fineY : fineY;
-      const fx = hflip ? 7 - (xx & 7) : (xx & 7);
+      const fx = hflip ? 7 - (xx & 7) : xx & 7;
       let colorIdx: number;
       if (color256) {
         colorIdx = this.vram8(charBase + tileNum * 64 + fy * 8 + fx);
@@ -162,7 +173,7 @@ export class GbaPpu {
         out[x] = prioShift | this.pal16(colorIdx * 2);
       } else {
         const byte = this.vram8(charBase + tileNum * 32 + fy * 4 + (fx >> 1));
-        colorIdx = (fx & 1) ? (byte >> 4) : (byte & 0xf);
+        colorIdx = fx & 1 ? byte >> 4 : byte & 0xf;
         if (colorIdx === 0) continue;
         out[x] = prioShift | this.pal16((pal * 16 + colorIdx) * 2);
       }
@@ -192,8 +203,10 @@ export class GbaPpu {
       let py = refY >> 8;
       refX = (refX + pa) | 0;
       refY = (refY + pc) | 0;
-      if (wrap) { px &= pixels - 1; py &= pixels - 1; }
-      else if (px < 0 || py < 0 || px >= pixels || py >= pixels) continue;
+      if (wrap) {
+        px &= pixels - 1;
+        py &= pixels - 1;
+      } else if (px < 0 || py < 0 || px >= pixels || py >= pixels) continue;
       const tileNum = this.vram8(screenBase + (py >> 3) * mapSize + (px >> 3));
       const colorIdx = this.vram8(charBase + tileNum * 64 + (py & 7) * 8 + (px & 7));
       if (colorIdx === 0) continue;
@@ -209,7 +222,7 @@ export class GbaPpu {
   }
   private renderBitmapMode4(line: number, dispcnt: number): void {
     const out = this.bgColor[2]!;
-    const page = (dispcnt & 0x10) ? 0xa000 : 0;
+    const page = dispcnt & 0x10 ? 0xa000 : 0;
     const base = page + line * GBA_W;
     for (let x = 0; x < GBA_W; x += 1) {
       const idx = this.vram8(base + x);
@@ -219,22 +232,38 @@ export class GbaPpu {
   private renderBitmapMode5(line: number, dispcnt: number): void {
     const out = this.bgColor[2]!;
     if (line >= 128) return; // mode 5 is 160×128
-    const page = (dispcnt & 0x10) ? 0xa000 : 0;
+    const page = dispcnt & 0x10 ? 0xa000 : 0;
     const base = page + line * 160 * 2;
     for (let x = 0; x < 160; x += 1) out[x] = this.vram16(base + x * 2);
   }
 
   // ── Sprites (OBJ) ───────────────────────────────────────────────────────────
   private static readonly OBJ_SIZE: ReadonlyArray<ReadonlyArray<readonly [number, number]>> = [
-    [[8, 8], [16, 16], [32, 32], [64, 64]], // square
-    [[16, 8], [32, 8], [32, 16], [64, 32]], // horizontal
-    [[8, 16], [8, 32], [16, 32], [32, 64]], // vertical
+    [
+      [8, 8],
+      [16, 16],
+      [32, 32],
+      [64, 64],
+    ], // square
+    [
+      [16, 8],
+      [32, 8],
+      [32, 16],
+      [64, 32],
+    ], // horizontal
+    [
+      [8, 16],
+      [8, 32],
+      [16, 32],
+      [32, 64],
+    ], // vertical
   ];
 
   private renderSprites(line: number, dispcnt: number): void {
     const oneDim = (dispcnt & 0x40) !== 0;
     const oam = this.sys.oam;
-    for (let i = 127; i >= 0; i -= 1) { // lower index = higher priority → draw high index first
+    for (let i = 127; i >= 0; i -= 1) {
+      // lower index = higher priority → draw high index first
       const a0 = oam[i * 8]! | (oam[i * 8 + 1]! << 8);
       const a1 = oam[i * 8 + 2]! | (oam[i * 8 + 3]! << 8);
       const a2 = oam[i * 8 + 4]! | (oam[i * 8 + 5]! << 8);
@@ -244,7 +273,8 @@ export class GbaPpu {
       const shape = (a0 >> 14) & 0x3;
       const sizeIdx = (a1 >> 14) & 0x3;
       const dims = GbaPpu.OBJ_SIZE[shape === 3 ? 0 : shape]![sizeIdx]!;
-      const w = dims[0], h = dims[1];
+      const w = dims[0],
+        h = dims[1];
       const affine = objMode === 1 || objMode === 3;
       const doubleSize = objMode === 3;
       const boxW = doubleSize ? w * 2 : w;
@@ -260,20 +290,31 @@ export class GbaPpu {
       const palBank = (a2 >> 12) & 0xf;
 
       // Affine parameters (or identity for regular sprites with flips).
-      let pa = 0x100, pb = 0, pc = 0, pd = 0x100;
-      let hflip = false, vflip = false;
+      let pa = 0x100,
+        pb = 0,
+        pc = 0,
+        pd = 0x100;
+      let hflip = false,
+        vflip = false;
       if (affine) {
         const grp = (a1 >> 9) & 0x1f;
-        pa = (this.io16Oam(grp, 3)) | 0; pb = this.io16Oam(grp, 7); pc = this.io16Oam(grp, 11); pd = this.io16Oam(grp, 15);
-        pa = (pa << 16) >> 16; pb = (pb << 16) >> 16; pc = (pc << 16) >> 16; pd = (pd << 16) >> 16;
+        pa = this.io16Oam(grp, 3) | 0;
+        pb = this.io16Oam(grp, 7);
+        pc = this.io16Oam(grp, 11);
+        pd = this.io16Oam(grp, 15);
+        pa = (pa << 16) >> 16;
+        pb = (pb << 16) >> 16;
+        pc = (pc << 16) >> 16;
+        pd = (pd << 16) >> 16;
       } else {
         hflip = (a1 & 0x1000) !== 0;
         vflip = (a1 & 0x2000) !== 0;
       }
 
-      const halfW = boxW >> 1, halfH = boxH >> 1;
+      const halfW = boxW >> 1,
+        halfH = boxH >> 1;
       const localY = line - y - halfH;
-      const tilesPerRow = oneDim ? (w >> 3) : (color256 ? 16 : 32);
+      const tilesPerRow = oneDim ? w >> 3 : color256 ? 16 : 32;
       const charStep = color256 ? 64 : 32;
 
       for (let px = 0; px < boxW; px += 1) {
@@ -285,25 +326,41 @@ export class GbaPpu {
           texX = ((pa * localX + pb * localY) >> 8) + (w >> 1);
           texY = ((pc * localX + pd * localY) >> 8) + (h >> 1);
         } else {
-          texX = localX + halfW; texY = localY + halfH;
+          texX = localX + halfW;
+          texY = localY + halfH;
           if (hflip) texX = w - 1 - texX;
           if (vflip) texY = h - 1 - texY;
         }
         if (texX < 0 || texY < 0 || texX >= w || texY >= h) continue;
         const tile = tileNum + (texY >> 3) * tilesPerRow + (texX >> 3) * (color256 ? 2 : 1);
-        const fx = texX & 7, fy = texY & 7;
+        const fx = texX & 7,
+          fy = texY & 7;
         let colorIdx: number;
         if (color256) {
           colorIdx = this.vram8(0x10000 + tile * 32 + fy * 8 + fx);
           if (colorIdx === 0) continue;
-          if (gfxMode === 2) { this.objWindow[sx] = 1; continue; }
-          if (priority < this.objPriority[sx]!) { this.objColor[sx] = 0x100 /*OBJ palette flag*/ + colorIdx; this.objPriority[sx] = priority; this.objSemi[sx] = gfxMode === 1 ? 1 : 0; }
+          if (gfxMode === 2) {
+            this.objWindow[sx] = 1;
+            continue;
+          }
+          if (priority < this.objPriority[sx]!) {
+            this.objColor[sx] = 0x100 /*OBJ palette flag*/ + colorIdx;
+            this.objPriority[sx] = priority;
+            this.objSemi[sx] = gfxMode === 1 ? 1 : 0;
+          }
         } else {
           const byte = this.vram8(0x10000 + tile * 32 + fy * 4 + (fx >> 1));
-          colorIdx = (fx & 1) ? (byte >> 4) : (byte & 0xf);
+          colorIdx = fx & 1 ? byte >> 4 : byte & 0xf;
           if (colorIdx === 0) continue;
-          if (gfxMode === 2) { this.objWindow[sx] = 1; continue; }
-          if (priority < this.objPriority[sx]!) { this.objColor[sx] = 0x100 + palBank * 16 + colorIdx; this.objPriority[sx] = priority; this.objSemi[sx] = gfxMode === 1 ? 1 : 0; }
+          if (gfxMode === 2) {
+            this.objWindow[sx] = 1;
+            continue;
+          }
+          if (priority < this.objPriority[sx]!) {
+            this.objColor[sx] = 0x100 + palBank * 16 + colorIdx;
+            this.objPriority[sx] = priority;
+            this.objSemi[sx] = gfxMode === 1 ? 1 : 0;
+          }
         }
       }
     }
@@ -341,11 +398,17 @@ export class GbaPpu {
       if (windowsOn) enable = this.winMask[x]!;
 
       // Find the top two opaque layers (for blending) by priority.
-      let topColor = backdrop, topLayer = 5, topPrio = 5;
-      let secondColor = backdrop, secondLayer = 5, secondPrio = 5;
+      let topColor = backdrop,
+        topLayer = 5,
+        topPrio = 5;
+      let secondColor = backdrop,
+        secondLayer = 5,
+        secondPrio = 5;
       const objV = this.objColor[x]!;
-      if (objV >= 0 && (enable & 0x10)) {
-        topColor = objV; topLayer = 4; topPrio = this.objPriority[x]!;
+      if (objV >= 0 && enable & 0x10) {
+        topColor = objV;
+        topLayer = 4;
+        topPrio = this.objPriority[x]!;
       }
       for (let bg = 0; bg < 4; bg += 1) {
         if (!(dispcnt & (1 << (8 + bg)))) continue;
@@ -356,26 +419,33 @@ export class GbaPpu {
         const color = v & 0x7fff;
         const cmp = bg; // lower bg = higher among same priority
         if (prio < topPrio || (prio === topPrio && topLayer !== 4 && cmp < topLayer)) {
-          secondColor = topColor; secondLayer = topLayer; secondPrio = topPrio;
-          topColor = color; topLayer = bg; topPrio = prio;
+          secondColor = topColor;
+          secondLayer = topLayer;
+          secondPrio = topPrio;
+          topColor = color;
+          topLayer = bg;
+          topPrio = prio;
         } else if (prio < secondPrio || (prio === secondPrio && cmp < secondLayer)) {
-          secondColor = color; secondLayer = bg; secondPrio = prio;
+          secondColor = color;
+          secondLayer = bg;
+          secondPrio = prio;
         }
       }
-      void bgPrio; void secondPrio;
+      void bgPrio;
+      void secondPrio;
 
       // Blending.
       let finalColor = topColor;
-      const topBit = topLayer === 4 ? 0x10 : (1 << topLayer);
-      const bottomBit = secondLayer === 4 ? 0x10 : secondLayer === 5 ? 0x20 : (1 << secondLayer);
+      const topBit = topLayer === 4 ? 0x10 : 1 << topLayer;
+      const bottomBit = secondLayer === 4 ? 0x10 : secondLayer === 5 ? 0x20 : 1 << secondLayer;
       const semiObj = topLayer === 4 && this.objSemi[x] === 1;
-      if (semiObj && (bldcnt & (bottomBit << 8))) {
+      if (semiObj && bldcnt & (bottomBit << 8)) {
         finalColor = this.blendAlpha(topColor, secondColor, eva, evb);
-      } else if (blendMode === 1 && (bldcnt & topBit) && (bldcnt & (bottomBit << 8))) {
+      } else if (blendMode === 1 && bldcnt & topBit && bldcnt & (bottomBit << 8)) {
         finalColor = this.blendAlpha(topColor, secondColor, eva, evb);
-      } else if (blendMode === 2 && (bldcnt & topBit)) {
+      } else if (blendMode === 2 && bldcnt & topBit) {
         finalColor = this.blendBrightness(topColor, evy, true);
-      } else if (blendMode === 3 && (bldcnt & topBit)) {
+      } else if (blendMode === 3 && bldcnt & topBit) {
         finalColor = this.blendBrightness(topColor, evy, false);
       }
 
@@ -389,14 +459,20 @@ export class GbaPpu {
   }
 
   private blendAlpha(top: number, bottom: number, eva: number, evb: number): number {
-    const mix = (a: number, b: number): number => Math.min(31, ((a * eva + b * evb) >> 4));
-    const tr = top & 31, tg = (top >> 5) & 31, tb = (top >> 10) & 31;
-    const br = bottom & 31, bg = (bottom >> 5) & 31, bb = (bottom >> 10) & 31;
+    const mix = (a: number, b: number): number => Math.min(31, (a * eva + b * evb) >> 4);
+    const tr = top & 31,
+      tg = (top >> 5) & 31,
+      tb = (top >> 10) & 31;
+    const br = bottom & 31,
+      bg = (bottom >> 5) & 31,
+      bb = (bottom >> 10) & 31;
     return mix(tr, br) | (mix(tg, bg) << 5) | (mix(tb, bb) << 10);
   }
   private blendBrightness(color: number, evy: number, up: boolean): number {
-    const ch = (c: number): number => up ? c + (((31 - c) * evy) >> 4) : c - ((c * evy) >> 4);
-    const r = ch(color & 31), g = ch((color >> 5) & 31), b = ch((color >> 10) & 31);
+    const ch = (c: number): number => (up ? c + (((31 - c) * evy) >> 4) : c - ((c * evy) >> 4));
+    const r = ch(color & 31),
+      g = ch((color >> 5) & 31),
+      b = ch((color >> 10) & 31);
     return (r & 31) | ((g & 31) << 5) | ((b & 31) << 10);
   }
 
@@ -415,7 +491,7 @@ export class GbaPpu {
       const top = (this.io16(0x44 + n * 2) >> 8) & 0xff;
       const bottom = this.io16(0x44 + n * 2) & 0xff;
       void y1;
-      return bottom >= top ? (line >= top && line < bottom) : (line >= top || line < bottom);
+      return bottom >= top ? line >= top && line < bottom : line >= top || line < bottom;
     };
     const win0V = win0on && inWinV(0);
     const win1V = win1on && inWinV(1);

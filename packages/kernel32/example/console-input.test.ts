@@ -2,15 +2,7 @@
 // layouts. Run: `bun run packages/kernel32/example/console-input.test.ts`.
 // Exits non-zero on any failure.
 
-import {
-  ControlKeyState,
-  decodeConsoleScreenBufferInfo,
-  decodeInputRecord,
-  EventType,
-  INPUT_RECORD_SIZE,
-  MouseEventFlags,
-  packCOORD,
-} from '../index';
+import { ControlKeyState, decodeConsoleScreenBufferInfo, decodeInputRecord, EventType, INPUT_RECORD_SIZE, MouseEventFlags, packCOORD } from '../index';
 
 let passCount = 0;
 let failCount = 0;

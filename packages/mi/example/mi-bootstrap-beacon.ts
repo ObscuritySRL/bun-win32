@@ -79,29 +79,14 @@ interface ApplicationCloseLibrary {
 interface ApplicationNewSessionLibrary {
   close(): void;
   symbols: {
-    NewSession(
-      application: PointerArgument,
-      protocol: PointerArgument,
-      destination: PointerArgument,
-      options: PointerArgument,
-      callbacks: PointerArgument,
-      extendedError: PointerArgument,
-      session: PointerArgument,
-    ): number;
+    NewSession(application: PointerArgument, protocol: PointerArgument, destination: PointerArgument, options: PointerArgument, callbacks: PointerArgument, extendedError: PointerArgument, session: PointerArgument): number;
   };
 }
 
 interface InstanceGetElementLibrary {
   close(): void;
   symbols: {
-    GetElement(
-      self: bigint,
-      name: PointerArgument,
-      value: PointerArgument,
-      type: PointerArgument,
-      flags: PointerArgument,
-      index: PointerArgument,
-    ): number;
+    GetElement(self: bigint, name: PointerArgument, value: PointerArgument, type: PointerArgument, flags: PointerArgument, index: PointerArgument): number;
   };
 }
 
@@ -115,14 +100,7 @@ interface OperationCloseLibrary {
 interface OperationGetInstanceLibrary {
   close(): void;
   symbols: {
-    GetInstance(
-      operation: PointerArgument,
-      instance: PointerArgument,
-      moreResults: PointerArgument,
-      result: PointerArgument,
-      errorMessage: PointerArgument,
-      completionDetails: PointerArgument,
-    ): number;
+    GetInstance(operation: PointerArgument, instance: PointerArgument, moreResults: PointerArgument, result: PointerArgument, errorMessage: PointerArgument, completionDetails: PointerArgument): number;
   };
 }
 
@@ -281,7 +259,7 @@ function getPressureColor(ratio: number): string {
     return ANSI.red;
   }
 
-  if (ratio >= 0.70) {
+  if (ratio >= 0.7) {
     return ANSI.yellow;
   }
 
@@ -381,14 +359,7 @@ function readInstanceProperty(instanceAddress: bigint, propertyName: string): In
   const flagsBuffer = Buffer.alloc(4);
   const indexBuffer = Buffer.alloc(4);
   const getElementLibrary = ensureInstanceGetElementLibrary(instanceAddress);
-  const propertyStatus = getElementLibrary.symbols.GetElement(
-    instanceAddress,
-    propertyNameBuffer.ptr,
-    valueBuffer.ptr,
-    typeBuffer.ptr,
-    flagsBuffer.ptr,
-    indexBuffer.ptr,
-  );
+  const propertyStatus = getElementLibrary.symbols.GetElement(instanceAddress, propertyNameBuffer.ptr, valueBuffer.ptr, typeBuffer.ptr, flagsBuffer.ptr, indexBuffer.ptr);
 
   if (propertyStatus !== MI_Result.MI_RESULT_OK) {
     throw new Error(`MI_Instance_GetElement(${propertyName}) failed with ${formatMiResult(propertyStatus)}`);
@@ -463,12 +434,7 @@ function decodeProcessSnapshot(instanceAddress: bigint): ProcessSnapshot {
   };
 }
 
-function executeSynchronousQuery<T>(
-  sessionBuffer: Buffer,
-  queryInstancesLibrary: SessionQueryInstancesLibrary,
-  queryExpression: string,
-  decodeInstance: (instanceAddress: bigint) => T,
-): { closeStatus: MI_Result; rows: T[] } {
+function executeSynchronousQuery<T>(sessionBuffer: Buffer, queryInstancesLibrary: SessionQueryInstancesLibrary, queryExpression: string, decodeInstance: (instanceAddress: bigint) => T): { closeStatus: MI_Result; rows: T[] } {
   const namespaceBuffer = createWideStringBuffer(SYSTEM_NAMESPACE);
   const queryDialectBuffer = createWideStringBuffer(QUERY_DIALECT);
   const queryExpressionBuffer = createWideStringBuffer(queryExpression);
@@ -477,16 +443,7 @@ function executeSynchronousQuery<T>(
   let closeStatus = MI_Result.MI_RESULT_FAILED;
   let failure: Error | null = null;
 
-  queryInstancesLibrary.symbols.QueryInstances(
-    sessionBuffer.ptr,
-    0,
-    null,
-    namespaceBuffer.ptr,
-    queryDialectBuffer.ptr,
-    queryExpressionBuffer.ptr,
-    null,
-    operationBuffer.ptr,
-  );
+  queryInstancesLibrary.symbols.QueryInstances(sessionBuffer.ptr, 0, null, namespaceBuffer.ptr, queryDialectBuffer.ptr, queryExpressionBuffer.ptr, null, operationBuffer.ptr);
 
   const operationFunctionTableAddress = operationBuffer.readBigUInt64LE(MI_FUNCTION_TABLE_OFFSET);
 
@@ -504,14 +461,7 @@ function executeSynchronousQuery<T>(
       const resultBuffer = Buffer.alloc(4);
       const errorMessageBuffer = Buffer.alloc(POINTER_SIZE);
       const completionDetailsBuffer = Buffer.alloc(POINTER_SIZE);
-      const getInstanceStatus = getInstanceLibrary.symbols.GetInstance(
-        operationBuffer.ptr,
-        instanceBuffer.ptr,
-        moreResultsBuffer.ptr,
-        resultBuffer.ptr,
-        errorMessageBuffer.ptr,
-        completionDetailsBuffer.ptr,
-      );
+      const getInstanceStatus = getInstanceLibrary.symbols.GetInstance(operationBuffer.ptr, instanceBuffer.ptr, moreResultsBuffer.ptr, resultBuffer.ptr, errorMessageBuffer.ptr, completionDetailsBuffer.ptr);
 
       if (getInstanceStatus !== MI_Result.MI_RESULT_OK) {
         throw new Error(`MI_Operation_GetInstance failed with ${formatMiResult(getInstanceStatus)} for query: ${queryExpression}`);
@@ -589,15 +539,7 @@ try {
   sessionBuffer = Buffer.alloc(MI_OBJECT_SIZE);
 
   const newSessionExtendedErrorBuffer = Buffer.alloc(POINTER_SIZE);
-  const newSessionStatus = newSessionLibrary.symbols.NewSession(
-    applicationBuffer.ptr,
-    null,
-    null,
-    null,
-    null,
-    newSessionExtendedErrorBuffer.ptr,
-    sessionBuffer.ptr,
-  );
+  const newSessionStatus = newSessionLibrary.symbols.NewSession(applicationBuffer.ptr, null, null, null, null, newSessionExtendedErrorBuffer.ptr, sessionBuffer.ptr);
 
   if (newSessionStatus !== MI_Result.MI_RESULT_OK) {
     throw new Error(`MI_Application_NewSession failed with ${formatMiResult(newSessionStatus)}`);
@@ -612,12 +554,7 @@ try {
   sessionCloseLibrary = createSessionCloseLibrary(readPointerValue(sessionFunctionTableAddress + BigInt(MI_SESSION_CLOSE_OFFSET)));
   queryInstancesLibrary = createSessionQueryInstancesLibrary(readPointerValue(sessionFunctionTableAddress + BigInt(MI_SESSION_QUERY_INSTANCES_OFFSET)));
 
-  const operatingSystemQuery = executeSynchronousQuery(
-    sessionBuffer,
-    queryInstancesLibrary,
-    'SELECT CSName,Caption,Version,FreePhysicalMemory,TotalVisibleMemorySize FROM Win32_OperatingSystem',
-    decodeOperatingSystemSnapshot,
-  );
+  const operatingSystemQuery = executeSynchronousQuery(sessionBuffer, queryInstancesLibrary, 'SELECT CSName,Caption,Version,FreePhysicalMemory,TotalVisibleMemorySize FROM Win32_OperatingSystem', decodeOperatingSystemSnapshot);
 
   operatingSystemQueryCloseStatus = operatingSystemQuery.closeStatus;
   operatingSystemSnapshot = operatingSystemQuery.rows[0] ?? null;
@@ -626,12 +563,7 @@ try {
     throw new Error('Win32_OperatingSystem query returned no rows');
   }
 
-  const processQuery = executeSynchronousQuery(
-    sessionBuffer,
-    queryInstancesLibrary,
-    'SELECT Name,ProcessId,ThreadCount,WorkingSetSize FROM Win32_Process',
-    decodeProcessSnapshot,
-  );
+  const processQuery = executeSynchronousQuery(sessionBuffer, queryInstancesLibrary, 'SELECT Name,ProcessId,ThreadCount,WorkingSetSize FROM Win32_Process', decodeProcessSnapshot);
 
   processQueryCloseStatus = processQuery.closeStatus;
   processSnapshots = processQuery.rows;
@@ -728,7 +660,7 @@ if (failure !== null) {
 
   for (const processSnapshot of topProcessSnapshots) {
     const barRatio = highestWorkingSetSize === 0n ? 0 : Number(processSnapshot.workingSetSize) / Number(highestWorkingSetSize);
-    const barColor = barRatio >= 0.80 ? ANSI.red : barRatio >= 0.50 ? ANSI.yellow : ANSI.cyan;
+    const barColor = barRatio >= 0.8 ? ANSI.red : barRatio >= 0.5 ? ANSI.yellow : ANSI.cyan;
     console.log(
       `  ${truncate(processSnapshot.name, 28)} ${String(processSnapshot.processId).padStart(6, ' ')} ${String(processSnapshot.threadCount).padStart(7, ' ')} ${formatBytes(processSnapshot.workingSetSize).padStart(12, ' ')}  ${barColor}${renderMeter(barRatio, PROCESS_BAR_WIDTH)}${ANSI.reset}`,
     );

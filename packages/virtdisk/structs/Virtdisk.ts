@@ -110,7 +110,14 @@ class Virtdisk extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/virtdisk/nf-virtdisk-attachvirtualdisk
-  public static AttachVirtualDisk(VirtualDiskHandle: HANDLE, SecurityDescriptor: PSECURITY_DESCRIPTOR | NULL, Flags: DWORD, ProviderSpecificFlags: ULONG, Parameters: PATTACH_VIRTUAL_DISK_PARAMETERS | NULL, Overlapped: LPOVERLAPPED | NULL): DWORD {
+  public static AttachVirtualDisk(
+    VirtualDiskHandle: HANDLE,
+    SecurityDescriptor: PSECURITY_DESCRIPTOR | NULL,
+    Flags: DWORD,
+    ProviderSpecificFlags: ULONG,
+    Parameters: PATTACH_VIRTUAL_DISK_PARAMETERS | NULL,
+    Overlapped: LPOVERLAPPED | NULL,
+  ): DWORD {
     return Virtdisk.Load('AttachVirtualDisk')(VirtualDiskHandle, SecurityDescriptor, Flags, ProviderSpecificFlags, Parameters, Overlapped);
   }
 
@@ -130,7 +137,17 @@ class Virtdisk extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/virtdisk/nf-virtdisk-createvirtualdisk
-  public static CreateVirtualDisk(VirtualStorageType: PVIRTUAL_STORAGE_TYPE, Path: LPCWSTR, VirtualDiskAccessMask: DWORD, SecurityDescriptor: PSECURITY_DESCRIPTOR | NULL, Flags: DWORD, ProviderSpecificFlags: ULONG, Parameters: PCREATE_VIRTUAL_DISK_PARAMETERS, Overlapped: LPOVERLAPPED | NULL, Handle: PHANDLE): DWORD {
+  public static CreateVirtualDisk(
+    VirtualStorageType: PVIRTUAL_STORAGE_TYPE,
+    Path: LPCWSTR,
+    VirtualDiskAccessMask: DWORD,
+    SecurityDescriptor: PSECURITY_DESCRIPTOR | NULL,
+    Flags: DWORD,
+    ProviderSpecificFlags: ULONG,
+    Parameters: PCREATE_VIRTUAL_DISK_PARAMETERS,
+    Overlapped: LPOVERLAPPED | NULL,
+    Handle: PHANDLE,
+  ): DWORD {
     return Virtdisk.Load('CreateVirtualDisk')(VirtualStorageType, Path, VirtualDiskAccessMask, SecurityDescriptor, Flags, ProviderSpecificFlags, Parameters, Overlapped, Handle);
   }
 
@@ -215,7 +232,16 @@ class Virtdisk extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/virtdisk/nf-virtdisk-querychangesvirtualdisk
-  public static QueryChangesVirtualDisk(VirtualDiskHandle: HANDLE, ChangeTrackingId: LPCWSTR, ByteOffset: ULONG64, ByteLength: ULONG64, Flags: DWORD, Ranges: PQUERY_CHANGES_VIRTUAL_DISK_RANGE, RangeCount: PULONG, ProcessedLength: PULONG64): DWORD {
+  public static QueryChangesVirtualDisk(
+    VirtualDiskHandle: HANDLE,
+    ChangeTrackingId: LPCWSTR,
+    ByteOffset: ULONG64,
+    ByteLength: ULONG64,
+    Flags: DWORD,
+    Ranges: PQUERY_CHANGES_VIRTUAL_DISK_RANGE,
+    RangeCount: PULONG,
+    ProcessedLength: PULONG64,
+  ): DWORD {
     return Virtdisk.Load('QueryChangesVirtualDisk')(VirtualDiskHandle, ChangeTrackingId, ByteOffset, ByteLength, Flags, Ranges, RangeCount, ProcessedLength);
   }
 

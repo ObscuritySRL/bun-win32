@@ -41,7 +41,8 @@ const SHADOW: [number, number, number] = [191, 186, 173]; // a touch deeper than
 const UNITS_W = 18;
 const UNITS_H = 16;
 const BODY_BOTTOM = 13; // legs hang below this
-const HEAD_L = 3, HEAD_R = 15; // narrow head/torso span (cols 3..15 → width 12)
+const HEAD_L = 3,
+  HEAD_R = 15; // narrow head/torso span (cols 3..15 → width 12)
 
 run({
   title: "CLAW'D",
@@ -74,8 +75,7 @@ run({
     const ground = Math.pow(1 - arc, 3); // ≈1 near the ground, 0 mid-air
     // Anticipation: a brief extra crouch just before the launch (start of cycle)
     // and a quick over-settle right after landing (end of cycle), both eased.
-    const anticip = Math.max(smoothstep(0.0, 0.10, hp) * (1 - smoothstep(0.10, 0.20, hp)),
-                             smoothstep(0.80, 0.92, hp) * (1 - smoothstep(0.92, 1.0, hp)));
+    const anticip = Math.max(smoothstep(0.0, 0.1, hp) * (1 - smoothstep(0.1, 0.2, hp)), smoothstep(0.8, 0.92, hp) * (1 - smoothstep(0.92, 1.0, hp)));
     const squashY = 1 - (0.13 * ground + 0.05 * anticip) + 0.06 * arc; // <1 grounded, >1 airborne
     const squashX = 1 + (0.15 * ground + 0.05 * anticip) - 0.05 * arc;
 
@@ -87,8 +87,7 @@ run({
 
     // ── Blink: quick eased close roughly every 3.3s (occasional double) ───────
     const bt = time % 3.3;
-    const blink =
-      bt < 0.16 ? 1 - Math.abs(bt - 0.08) / 0.08 : bt > 0.3 && bt < 0.42 ? 1 - Math.abs(bt - 0.36) / 0.06 : 0;
+    const blink = bt < 0.16 ? 1 - Math.abs(bt - 0.08) / 0.08 : bt > 0.3 && bt < 0.42 ? 1 - Math.abs(bt - 0.36) / 0.06 : 0;
     const eyeOpen = 1 - clamp01(blink); // 1 open, 0 shut
 
     // Sprite→pixel transform. Feet anchored at groundY (squash pivots on the feet);
@@ -97,9 +96,13 @@ run({
     const py = (v: number): number => groundY - lift - (UNITS_H - v) * S * squashY;
 
     const fillRect = (x0: number, y0: number, x1: number, y1: number, c: [number, number, number]): void => {
-      const ax = Math.round(Math.min(x0, x1)), bx = Math.round(Math.max(x0, x1));
-      const ay = Math.round(Math.min(y0, y1)), by = Math.round(Math.max(y0, y1));
-      const cr = c[0], cg = c[1], cb = c[2];
+      const ax = Math.round(Math.min(x0, x1)),
+        bx = Math.round(Math.max(x0, x1));
+      const ay = Math.round(Math.min(y0, y1)),
+        by = Math.round(Math.max(y0, y1));
+      const cr = c[0],
+        cg = c[1],
+        cb = c[2];
       for (let y = ay; y < by; y++) for (let x = ax; x < bx; x++) t.setPixel(x, y, cr, cg, cb);
     };
 
@@ -107,13 +110,15 @@ run({
     // A clean soft ellipse with a slightly raised falloff so it actually reads as
     // ground contact (not a faint smudge). Manual clamp on the buffer write.
     {
-      const rx = (HEAD_R - HEAD_L + 5) * S * (0.48 + 0.40 * ground); // wider when grounded
+      const rx = (HEAD_R - HEAD_L + 5) * S * (0.48 + 0.4 * ground); // wider when grounded
       const ry = Math.max(1.6, S * (0.62 + 0.45 * ground));
       const scy = groundY + S * 0.62;
-      const a = 0.46 * (0.40 + 0.60 * ground); // softer (smaller + fainter) in the air
+      const a = 0.46 * (0.4 + 0.6 * ground); // softer (smaller + fainter) in the air
       const cxr = Math.round(cx);
-      const irx = Math.ceil(rx), iry = Math.ceil(ry);
-      const invrx2 = 1 / (rx * rx), invry2 = 1 / (ry * ry);
+      const irx = Math.ceil(rx),
+        iry = Math.ceil(ry);
+      const invrx2 = 1 / (rx * rx),
+        invry2 = 1 / (ry * ry);
       for (let y = -iry; y <= iry; y++) {
         const yy = y * y * invry2;
         for (let x = -irx; x <= irx; x++) {
@@ -136,9 +141,10 @@ run({
 
     // Carve the four extreme corners back to cream (top of head + tips of shoulders).
     const carveCorner = (cornerX: number, cornerY: number, sx: number, sy: number): void => {
-      for (let j = 0; j < corner; j++) for (let k = 0; k < corner - j; k++) {
-        t.setPixel(Math.round(cornerX) + sx * k, Math.round(cornerY) + sy * j, CREAM[0], CREAM[1], CREAM[2]);
-      }
+      for (let j = 0; j < corner; j++)
+        for (let k = 0; k < corner - j; k++) {
+          t.setPixel(Math.round(cornerX) + sx * k, Math.round(cornerY) + sy * j, CREAM[0], CREAM[1], CREAM[2]);
+        }
     };
     carveCorner(px(HEAD_L), py(0), 1, 1); // head top-left
     carveCorner(px(HEAD_R) - 1, py(0), -1, 1); // head top-right
@@ -167,22 +173,25 @@ run({
     // ── Eyes: two ink squares high on the head; blink shrinks them to a line ──
     // A single dim catch-light pixel in each eye reads as "alive" without breaking
     // the flat look (it vanishes when the eye blinks shut).
-    const eyeW = 2.6, eyeFull = 2.4;
+    const eyeW = 2.6,
+      eyeFull = 2.4;
     const eh = Math.max(0.5, eyeFull * eyeOpen);
     const eyeMidV = 2.6; // vertical centre on the head
     const eyeGx = gaze / S; // shift in units toward travel
     const catchN = Math.max(1, Math.round(S * 0.34));
     for (const ev of [HEAD_L + 2.2, HEAD_R - 2.2]) {
       const ecx = ev + eyeGx;
-      const ex0 = px(ecx - eyeW / 2), ey0 = py(eyeMidV - eh / 2);
+      const ex0 = px(ecx - eyeW / 2),
+        ey0 = py(eyeMidV - eh / 2);
       fillRect(ex0, ey0, px(ecx + eyeW / 2), py(eyeMidV + eh / 2), INK);
       if (eyeOpen > 0.55) {
         // upper-left catch-light, gaze offsets it slightly toward travel
         const cxp = Math.round(ex0 + (gaze >= 0 ? S * 0.55 : S * 0.95));
         const cyp = Math.round(ey0 + S * 0.45);
-        for (let j = 0; j < catchN; j++) for (let k = 0; k < catchN; k++) {
-          t.setPixel(cxp + k, cyp + j, CATCH[0], CATCH[1], CATCH[2]);
-        }
+        for (let j = 0; j < catchN; j++)
+          for (let k = 0; k < catchN; k++) {
+            t.setPixel(cxp + k, cyp + j, CATCH[0], CATCH[1], CATCH[2]);
+          }
       }
     }
 

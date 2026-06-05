@@ -64,7 +64,9 @@ const GVAL = new Float32Array(256);
   for (let i = 0; i < 256; i++) p[i] = i;
   for (let i = 255; i > 0; i--) {
     const j = (rng() * (i + 1)) | 0;
-    const tmp = p[i]; p[i] = p[j]; p[j] = tmp;
+    const tmp = p[i];
+    p[i] = p[j];
+    p[j] = tmp;
   }
   for (let i = 0; i < 512; i++) PERM[i] = p[i & 255];
   for (let i = 0; i < 256; i++) GVAL[i] = rng() * 2 - 1; // lattice values in [-1,1]
@@ -79,34 +81,42 @@ const GVAL = new Float32Array(256);
 // the PERM[(Y+wb)] hash for each w-slice is hoisted out of the x-branches so the four
 // corner lookups share work. Identical math to the original, just hand-fused.
 const vnoise = (x: number, y: number, w: number): number => {
-  const xi = Math.floor(x), yi = Math.floor(y), wi = Math.floor(w);
-  const xf = x - xi, yf = y - yi, wf = w - wi;
+  const xi = Math.floor(x),
+    yi = Math.floor(y),
+    wi = Math.floor(w);
+  const xf = x - xi,
+    yf = y - yi,
+    wf = w - wi;
   // inline quintic fade(t) = t*t*t*(t*(t*6-15)+10)
   const u = xf * xf * xf * (xf * (xf * 6 - 15) + 10);
   const v = yf * yf * yf * (yf * (yf * 6 - 15) + 10);
   const s = wf * wf * wf * (wf * (wf * 6 - 15) + 10);
-  const X = xi & 255, Y = yi & 255;
-  const X1 = (xi + 1) & 255, Y1 = (yi + 1) & 255;
+  const X = xi & 255,
+    Y = yi & 255;
+  const X1 = (xi + 1) & 255,
+    Y1 = (yi + 1) & 255;
 
   // slice 0
   const wb0 = wi & 255;
-  const pY0 = PERM[(Y + wb0) & 255], pY10 = PERM[(Y1 + wb0) & 255];
+  const pY0 = PERM[(Y + wb0) & 255],
+    pY10 = PERM[(Y1 + wb0) & 255];
   const aa0 = GVAL[PERM[(X + pY0) & 255]];
   const ba0 = GVAL[PERM[(X1 + pY0) & 255]];
   const ab0 = GVAL[PERM[(X + pY10) & 255]];
   const bb0 = GVAL[PERM[(X1 + pY10) & 255]];
   const top0 = aa0 + (ba0 - aa0) * u;
-  const s0 = top0 + ((ab0 + (bb0 - ab0) * u) - top0) * v;
+  const s0 = top0 + (ab0 + (bb0 - ab0) * u - top0) * v;
 
   // slice 1
   const wb1 = (wi + 1) & 255;
-  const pY1 = PERM[(Y + wb1) & 255], pY11 = PERM[(Y1 + wb1) & 255];
+  const pY1 = PERM[(Y + wb1) & 255],
+    pY11 = PERM[(Y1 + wb1) & 255];
   const aa1 = GVAL[PERM[(X + pY1) & 255]];
   const ba1 = GVAL[PERM[(X1 + pY1) & 255]];
   const ab1 = GVAL[PERM[(X + pY11) & 255]];
   const bb1 = GVAL[PERM[(X1 + pY11) & 255]];
   const top1 = aa1 + (ba1 - aa1) * u;
-  const s1 = top1 + ((ab1 + (bb1 - ab1) * u) - top1) * v;
+  const s1 = top1 + (ab1 + (bb1 - ab1) * u - top1) * v;
 
   return s0 + (s1 - s0) * s;
 };
@@ -121,13 +131,14 @@ const vnoise = (x: number, y: number, w: number): number => {
 // curl is a constant sweeping wind). Layering noise on top bends that wind into a few
 // large, legible streamlines instead of a directionless turbulent knot — so the eye
 // gets one clear focal flow with finer detail braided inside it.
-const FLOW_DIRX = 0.92, FLOW_DIRY = -0.40; // the dominant sweep direction (normalized-ish)
+const FLOW_DIRX = 0.92,
+  FLOW_DIRY = -0.4; // the dominant sweep direction (normalized-ish)
 const psi = (x: number, y: number, w: number): number => {
   // ψ of a uniform wind is the perpendicular linear ramp; curl(ψ)=constant wind.
-  let f = (x * FLOW_DIRY - y * FLOW_DIRX) * 3.6;                        // dominant sweep
-  f += vnoise(x, y, w) * 2.05;                                          // large gesture
-  f += vnoise(x * 2.15 + 11.7, y * 2.15 - 4.1, w * 1.7 + 3.0) * 0.40;   // medium shape
-  f += vnoise(x * 4.30 - 7.9, y * 4.30 + 2.6, w * 2.6 - 5.0) * 0.10;    // fine filigree
+  let f = (x * FLOW_DIRY - y * FLOW_DIRX) * 3.6; // dominant sweep
+  f += vnoise(x, y, w) * 2.05; // large gesture
+  f += vnoise(x * 2.15 + 11.7, y * 2.15 - 4.1, w * 1.7 + 3.0) * 0.4; // medium shape
+  f += vnoise(x * 4.3 - 7.9, y * 4.3 + 2.6, w * 2.6 - 5.0) * 0.1; // fine filigree
   return f;
 };
 
@@ -144,7 +155,8 @@ const psi = (x: number, y: number, w: number): number => {
 const COMP_BANDS = 2.05; // ~2 ribbons across the frame → big, legible, balanced
 // the banding coordinate runs PERPENDICULAR to the focal sweep so ribbons align with
 // (and braid through) the dominant flow rather than cutting against it.
-const BAND_NX = 0.40, BAND_NY = 0.92; // ⟂ to (FLOW_DIRX,FLOW_DIRY)
+const BAND_NX = 0.4,
+  BAND_NY = 0.92; // ⟂ to (FLOW_DIRX,FLOW_DIRY)
 // Scratch outputs published by comp() so the deposit can colour ACROSS the ribbon
 // independently of how bright the focal envelope makes that stretch. compBand is the
 // raw across-ribbon position (0 at the edge/gap, 1 on the spine) — that's what should
@@ -157,9 +169,7 @@ const comp = (x: number, y: number, w: number): number => {
   // organic warp: bend the bands with a slow low-freq noise that varies ALONG the
   // flow, so straight bands become sweeping, curving ribbons (not a barcode). A
   // second finer warp adds life without breaking the few-large-shapes read.
-  const warp =
-    vnoise(along * 1.05 + 8.0, across * 0.7 - 3.0, w * 0.5 + 50.0) * 0.52 +
-    vnoise(along * 2.4 - 4.0, across * 1.5 + 9.0, w * 0.8 + 80.0) * 0.16;
+  const warp = vnoise(along * 1.05 + 8.0, across * 0.7 - 3.0, w * 0.5 + 50.0) * 0.52 + vnoise(along * 2.4 - 4.0, across * 1.5 + 9.0, w * 0.8 + 80.0) * 0.16;
   // phase the bands: a cosine of the warped across-coordinate gives smooth periodic
   // ribbons. (-cos+1)/2 in [0,1], peak=1 on the spine.
   const phase = (across + warp) * COMP_BANDS * TAU;
@@ -169,8 +179,7 @@ const comp = (x: number, y: number, w: number): number => {
   // BREAK the regular striping: a slow large-scale envelope makes some stretches of
   // ribbon swell into a bright FOCAL flow while others thin toward dark — so it reads
   // as a few designed gestures with negative space, not evenly-spaced parallel lines.
-  const env =
-    vnoise(along * 0.85 - 12.0, across * 0.95 + 4.0, w * 0.4 + 120.0) * 0.5 + 0.5; // [0,1]
+  const env = vnoise(along * 0.85 - 12.0, across * 0.95 + 4.0, w * 0.4 + 120.0) * 0.5 + 0.5; // [0,1]
   const focal = 0.55 + 0.45 * smoothstep(0.28, 0.82, env); // dim ribbons recede, focal ones bloom
   // brightness gate = ribbon profile × focal envelope: generous negative space, broad
   // smooth ribbon cores, a few intentional bands swelling into focal gestures.
@@ -187,13 +196,13 @@ const comp = (x: number, y: number, w: number): number => {
 // bloom through the ACES tonemap. Stops are linear RGB.
 type RGB = [number, number, number];
 const STOPS: { t: number; c: RGB }[] = [
-  { t: 0.00, c: [0.03, 0.05, 0.13] }, // near-black indigo void
+  { t: 0.0, c: [0.03, 0.05, 0.13] }, // near-black indigo void
   { t: 0.18, c: [0.04, 0.14, 0.36] }, // deep ocean blue
-  { t: 0.38, c: [0.07, 0.30, 0.56] }, // luminous teal-blue (cool ribbon body)
+  { t: 0.38, c: [0.07, 0.3, 0.56] }, // luminous teal-blue (cool ribbon body)
   { t: 0.54, c: [0.24, 0.22, 0.62] }, // indigo-violet
-  { t: 0.70, c: [0.62, 0.22, 0.64] }, // soft magenta
-  { t: 0.85, c: [1.05, 0.45, 0.40] }, // warm coral
-  { t: 1.00, c: [1.35, 0.92, 0.42] }, // gold spine (warm, low green/blue so it stays gold lit)
+  { t: 0.7, c: [0.62, 0.22, 0.64] }, // soft magenta
+  { t: 0.85, c: [1.05, 0.45, 0.4] }, // warm coral
+  { t: 1.0, c: [1.35, 0.92, 0.42] }, // gold spine (warm, low green/blue so it stays gold lit)
 ];
 const paletteR = new Float32Array(256);
 const paletteG = new Float32Array(256);
@@ -201,9 +210,14 @@ const paletteB = new Float32Array(256);
 {
   for (let i = 0; i < 256; i++) {
     const t = i / 255;
-    let a = STOPS[0], b = STOPS[STOPS.length - 1];
+    let a = STOPS[0],
+      b = STOPS[STOPS.length - 1];
     for (let k = 0; k < STOPS.length - 1; k++) {
-      if (t >= STOPS[k].t && t <= STOPS[k + 1].t) { a = STOPS[k]; b = STOPS[k + 1]; break; }
+      if (t >= STOPS[k].t && t <= STOPS[k + 1].t) {
+        a = STOPS[k];
+        b = STOPS[k + 1];
+        break;
+      }
     }
     const f = smoothstep(a.t, b.t, t);
     paletteR[i] = lerp(a.c[0], b.c[0], f);
@@ -232,13 +246,19 @@ const prng = mulberry32(0xc0ffee01);
 let compW = 0;
 let compAspect = 1;
 const seedParticle = (i: number): void => {
-  let bx = prng(), by = prng();
+  let bx = prng(),
+    by = prng();
   let best = comp(bx, by * compAspect, compW);
   for (let k = 0; k < 7; k++) {
-    const cx = prng(), cy = prng();
+    const cx = prng(),
+      cy = prng();
     const c = comp(cx, cy * compAspect, compW);
     // accept stronger corridor membership; keeps a little spread so edges read soft
-    if (c > best) { best = c; bx = cx; by = cy; }
+    if (c > best) {
+      best = c;
+      bx = cx;
+      by = cy;
+    }
   }
   px[i] = bx;
   py[i] = by;
@@ -266,10 +286,12 @@ let bloomG = new Float32Array(0);
 let bloomB = new Float32Array(0);
 let bloomTmp = new Float32Array(0);
 let vigLUT = new Float32Array(0); // per-pixel vignette multiplier (position-only → cache)
-let accW = 0, accH = 0;
+let accW = 0,
+  accH = 0;
 
 const allocAccum = (W: number, H: number): void => {
-  accW = W; accH = H;
+  accW = W;
+  accH = H;
   accR = new Float32Array(W * H);
   accG = new Float32Array(W * H);
   accB = new Float32Array(W * H);
@@ -280,11 +302,13 @@ const allocAccum = (W: number, H: number): void => {
   // Precompute the cold vignette: it depends only on pixel position, so bake it once
   // per size instead of recomputing hypot+smoothstep for every pixel every frame.
   vigLUT = new Float32Array(W * H);
-  const halfW = (W - 1) * 0.5, halfH = (H - 1) * 0.5;
+  const halfW = (W - 1) * 0.5,
+    halfH = (H - 1) * 0.5;
   const invDiag = 1 / Math.hypot(halfW, halfH);
   let p = 0;
   for (let yy = 0; yy < H; yy++) {
-    const dy = yy - halfH, dy2 = dy * dy;
+    const dy = yy - halfH,
+      dy2 = dy * dy;
     for (let xx = 0; xx < W; xx++) {
       const dx = xx - halfW;
       const vr = Math.sqrt(dx * dx + dy2) * invDiag;
@@ -307,14 +331,15 @@ const EXPOSURE = 3.3; // HDR exposure before the ACES tonemap (tuned so ribbons 
 const decayPow = (base: number, dt: number): number => Math.pow(base, dt * 60);
 
 const frame = (t: Term, time: number, dt: number): void => {
-  const W = t.width, H = t.height;
+  const W = t.width,
+    H = t.height;
   if (accW !== W || accH !== H) allocAccum(W, H);
   if (!seeded) seedAll();
 
   const aspect = t.aspect; // W/H ; used to keep the flow isotropic on screen
 
   // The streamfunction's slow morph: a third-dimension drift makes ψ evolve.
-  const wSlice = time * 0.10;
+  const wSlice = time * 0.1;
   // The composition (corridor) field drifts even slower so the negative space and
   // focal ribbons are stable enough to read as design, not flicker. Publish the
   // current slice/aspect so respawns this frame seed into the live corridors.
@@ -337,12 +362,16 @@ const frame = (t: Term, time: number, dt: number): void => {
   // particles than a 300×180 one — and it also saves work on small terminals.
   const REF_PPP = 0.075; // target particles per pixel
   let activeCount = Math.round(W * H * REF_PPP);
-  if (activeCount < 700) activeCount = 700;        // floor: keep the field alive when tiny
+  if (activeCount < 700) activeCount = 700; // floor: keep the field alive when tiny
   if (activeCount > PARTICLES) activeCount = PARTICLES;
 
   // — Decay the accumulation buffer (silky trail persistence) —
   const fadeMul = decayPow(0.915, dt);
-  for (let i = 0; i < accR.length; i++) { accR[i] *= fadeMul; accG[i] *= fadeMul; accB[i] *= fadeMul; }
+  for (let i = 0; i < accR.length; i++) {
+    accR[i] *= fadeMul;
+    accG[i] *= fadeMul;
+    accB[i] *= fadeMul;
+  }
 
   // — Advect + deposit every particle —
   // We sample ψ in an aspect-corrected space so streamlines look round, but advance
@@ -350,11 +379,12 @@ const frame = (t: Term, time: number, dt: number): void => {
   const fs = FIELD_SCALE;
   const invEps2 = 1 / (2 * EPS);
   for (let i = 0; i < activeCount; i++) {
-    let x = px[i], y = py[i];
+    let x = px[i],
+      y = py[i];
 
     // world sample coords (aspect-corrected so the field isn't stretched)
     const sx = x * fs;
-    const sy = y * fs / aspect;
+    const sy = (y * fs) / aspect;
 
     // curl of ψ:  v = ( ∂ψ/∂y , −∂ψ/∂x )
     const dpx = (psi(sx + EPS, sy, wSlice) - psi(sx - EPS, sy, wSlice)) * invEps2;
@@ -387,18 +417,20 @@ const frame = (t: Term, time: number, dt: number): void => {
     // respawn if it left the domain, stalled in a dead zone, drifted deep into the
     // negative space, or aged out — so particles never linger over-painting one spot
     // OR fogging up the void. Respawn (corridor-biased) keeps the ribbons fed.
-    if (x < -0.02 || x > 1.02 || y < -0.02 || y > 1.02 || sp < 0.012 ||
-        plife[i] > 12 || (cm < 0.04 && plife[i] > 1.2)) {
+    if (x < -0.02 || x > 1.02 || y < -0.02 || y > 1.02 || sp < 0.012 || plife[i] > 12 || (cm < 0.04 && plife[i] > 1.2)) {
       seedParticle(i);
-      x = px[i]; y = py[i];
+      x = px[i];
+      y = py[i];
     }
 
-    px[i] = x; py[i] = y;
+    px[i] = x;
+    py[i] = y;
 
     // — deposit into the HDR buffer —
     const fx = x * (W - 1);
     const fy = y * (H - 1);
-    const ix = fx | 0, iy = fy | 0;
+    const ix = fx | 0,
+      iy = fy | 0;
     if (ix < 0 || iy < 0 || ix >= W - 1 || iy >= H - 1) continue;
 
     // normalized speed (≈0..1 for the bulk of the field; SPEED_REF ≈ field mean)
@@ -409,9 +441,11 @@ const frame = (t: Term, time: number, dt: number): void => {
     // (bandPos→1, helped by speed) tips into magenta→gold. bandPos^1.8 keeps the warm
     // end RESERVED, and the 0.28 base anchors the body in luminous teal-blue.
     const bWarm = bandPos * bandPos * bandPos * (1.3 - 0.3 * bandPos); // ≈ bandPos^2.6, warm reserved
-    const key = clamp01(0.26 + bWarm * 0.56 + ns * 0.10 + pseed[i] + hueDrift * 0.05);
+    const key = clamp01(0.26 + bWarm * 0.56 + ns * 0.1 + pseed[i] + hueDrift * 0.05);
     const pi = (key * 255) | 0;
-    let cr = paletteR[pi], cg = paletteG[pi], cb = paletteB[pi];
+    let cr = paletteR[pi],
+      cg = paletteG[pi],
+      cb = paletteB[pi];
 
     // fade-in newly respawned particles so they don't pop, and fade them back OUT
     // as they age so no single ribbon ever accumulates to a solid white smear.
@@ -427,17 +461,33 @@ const frame = (t: Term, time: number, dt: number): void => {
     // density is held constant across grid sizes by the active-subset count above, so
     // no size-dependent blowout — this stays a fixed deposit weight.)
     const intensity = (0.013 + ns * 0.024) * birth * (0.02 + 0.98 * corridor);
-    cr *= intensity; cg *= intensity; cb *= intensity;
+    cr *= intensity;
+    cg *= intensity;
+    cb *= intensity;
 
     // bilinear splat for sub-pixel-smooth ribbons
-    const tx = fx - ix, ty = fy - iy;
-    const w00 = (1 - tx) * (1 - ty), w10 = tx * (1 - ty);
-    const w01 = (1 - tx) * ty, w11 = tx * ty;
-    const o00 = iy * W + ix, o10 = o00 + 1, o01 = o00 + W, o11 = o01 + 1;
-    accR[o00] += cr * w00; accG[o00] += cg * w00; accB[o00] += cb * w00;
-    accR[o10] += cr * w10; accG[o10] += cg * w10; accB[o10] += cb * w10;
-    accR[o01] += cr * w01; accG[o01] += cg * w01; accB[o01] += cb * w01;
-    accR[o11] += cr * w11; accG[o11] += cg * w11; accB[o11] += cb * w11;
+    const tx = fx - ix,
+      ty = fy - iy;
+    const w00 = (1 - tx) * (1 - ty),
+      w10 = tx * (1 - ty);
+    const w01 = (1 - tx) * ty,
+      w11 = tx * ty;
+    const o00 = iy * W + ix,
+      o10 = o00 + 1,
+      o01 = o00 + W,
+      o11 = o01 + 1;
+    accR[o00] += cr * w00;
+    accG[o00] += cg * w00;
+    accB[o00] += cb * w00;
+    accR[o10] += cr * w10;
+    accG[o10] += cg * w10;
+    accB[o10] += cb * w10;
+    accR[o01] += cr * w01;
+    accG[o01] += cg * w01;
+    accB[o01] += cb * w01;
+    accR[o11] += cr * w11;
+    accG[o11] += cg * w11;
+    accB[o11] += cb * w11;
   }
 
   // — Bloom: build a luminance map of the bright confluences, blur it separably,
@@ -455,8 +505,8 @@ const frame = (t: Term, time: number, dt: number): void => {
     // colored bloom (warm where the gold spines confluence, cool along the bodies),
     // plus a faint cold ambient floor that keeps the void premium and slightly blue.
     let R = (accR[idx] * EXPOSURE + bloomR[idx] * 0.55) * vig + 0.006;
-    let G = (accG[idx] * EXPOSURE + bloomG[idx] * 0.55) * vig + 0.010;
-    let B = (accB[idx] * EXPOSURE + bloomB[idx] * 0.60) * vig + 0.024;
+    let G = (accG[idx] * EXPOSURE + bloomG[idx] * 0.55) * vig + 0.01;
+    let B = (accB[idx] * EXPOSURE + bloomB[idx] * 0.6) * vig + 0.024;
 
     // ACES filmic, inlined (a=2.51 b=0.03 c=2.43 d=0.59 e=0.14), clamped to 0..1
     R = (R * (2.51 * R + 0.03)) / (R * (2.43 * R + 0.59) + 0.14);
@@ -483,9 +533,7 @@ const blurChannel = (dst: Float32Array, W: number, H: number): void => {
       const x1 = x > 0 ? x - 1 : 0;
       const x3 = x < W - 1 ? x + 1 : W - 1;
       const x4 = x < W - 2 ? x + 2 : W - 1;
-      bloomTmp[row + x] =
-        dst[row + x0] * 0.12 + dst[row + x1] * 0.24 +
-        dst[row + x] * 0.28 + dst[row + x3] * 0.24 + dst[row + x4] * 0.12;
+      bloomTmp[row + x] = dst[row + x0] * 0.12 + dst[row + x1] * 0.24 + dst[row + x] * 0.28 + dst[row + x3] * 0.24 + dst[row + x4] * 0.12;
     }
   }
   // vertical: bloomTmp → dst
@@ -494,11 +542,13 @@ const blurChannel = (dst: Float32Array, W: number, H: number): void => {
     const y1 = y > 0 ? y - 1 : 0;
     const y3 = y < H - 1 ? y + 1 : H - 1;
     const y4 = y < H - 2 ? y + 2 : H - 1;
-    const r0 = y0 * W, r1 = y1 * W, r = y * W, r3 = y3 * W, r4 = y4 * W;
+    const r0 = y0 * W,
+      r1 = y1 * W,
+      r = y * W,
+      r3 = y3 * W,
+      r4 = y4 * W;
     for (let x = 0; x < W; x++) {
-      dst[r + x] =
-        bloomTmp[r0 + x] * 0.12 + bloomTmp[r1 + x] * 0.24 +
-        bloomTmp[r + x] * 0.28 + bloomTmp[r3 + x] * 0.24 + bloomTmp[r4 + x] * 0.12;
+      dst[r + x] = bloomTmp[r0 + x] * 0.12 + bloomTmp[r1 + x] * 0.24 + bloomTmp[r + x] * 0.28 + bloomTmp[r3 + x] * 0.24 + bloomTmp[r4 + x] * 0.12;
     }
   }
 };
@@ -511,7 +561,9 @@ const blurChannel = (dst: Float32Array, W: number, H: number): void => {
 const buildBloom = (W: number, H: number): void => {
   const n = accR.length;
   for (let i = 0; i < n; i++) {
-    const r = accR[i] * EXPOSURE, g = accG[i] * EXPOSURE, b = accB[i] * EXPOSURE;
+    const r = accR[i] * EXPOSURE,
+      g = accG[i] * EXPOSURE,
+      b = accB[i] * EXPOSURE;
     const l = r * 0.6 + g * 0.4 + b * 0.7;
     const e = l - 0.92; // high knee: only the brightest gold confluences bloom (keep it earned)
     if (e > 0) {
@@ -521,7 +573,9 @@ const buildBloom = (W: number, H: number): void => {
       bloomG[i] = g * inv;
       bloomB[i] = b * inv;
     } else {
-      bloomR[i] = 0; bloomG[i] = 0; bloomB[i] = 0;
+      bloomR[i] = 0;
+      bloomG[i] = 0;
+      bloomB[i] = 0;
     }
   }
   blurChannel(bloomR, W, H);

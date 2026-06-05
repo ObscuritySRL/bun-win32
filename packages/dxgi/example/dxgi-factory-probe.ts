@@ -137,7 +137,7 @@ for (const entry of FACTORY_IIDS) {
   if (hr === 0 && address !== 0n) {
     recordCheck(`CreateDXGIFactory  · ${entry.name}`, 'ok', hr, formatAddress(address));
     releaseComObject(address);
-  } else if ((hr >>> 0) === E_NOINTERFACE) {
+  } else if (hr >>> 0 === E_NOINTERFACE) {
     recordCheck(`CreateDXGIFactory  · ${entry.name}`, 'info', hr, 'E_NOINTERFACE (interface unsupported on this Windows build)');
   } else {
     recordCheck(`CreateDXGIFactory  · ${entry.name}`, 'fail', hr, formatHResult(hr));
@@ -152,7 +152,7 @@ for (const entry of FACTORY_IIDS) {
   if (hr === 0 && address !== 0n) {
     recordCheck(`CreateDXGIFactory1 · ${entry.name}`, 'ok', hr, formatAddress(address));
     releaseComObject(address);
-  } else if ((hr >>> 0) === E_NOINTERFACE) {
+  } else if (hr >>> 0 === E_NOINTERFACE) {
     recordCheck(`CreateDXGIFactory1 · ${entry.name}`, 'info', hr, 'E_NOINTERFACE (interface unsupported on this Windows build)');
   } else {
     recordCheck(`CreateDXGIFactory1 · ${entry.name}`, 'fail', hr, formatHResult(hr));
@@ -168,7 +168,7 @@ for (const flags of [0, DXGI_CREATE_FACTORY_DEBUG]) {
   if (hr === 0 && address !== 0n) {
     recordCheck(`CreateDXGIFactory2 · ${label}`, 'ok', hr, `IDXGIFactory2 @ ${formatAddress(address)}`);
     releaseComObject(address);
-  } else if ((hr >>> 0) === DXGI_ERROR_SDK_COMPONENT_MISSING) {
+  } else if (hr >>> 0 === DXGI_ERROR_SDK_COMPONENT_MISSING) {
     recordCheck(`CreateDXGIFactory2 · ${label}`, 'info', hr, 'Graphics Tools feature not installed — enable it via Settings → Apps → Optional Features');
   } else {
     recordCheck(`CreateDXGIFactory2 · ${label}`, 'fail', hr, formatHResult(hr));
@@ -187,9 +187,9 @@ for (const entry of [
   if (hr === 0 && address !== 0n) {
     recordCheck(`DXGIGetDebugInterface1 · ${entry.name}`, 'ok', hr, formatAddress(address));
     releaseComObject(address);
-  } else if ((hr >>> 0) === DXGI_ERROR_SDK_COMPONENT_MISSING) {
+  } else if (hr >>> 0 === DXGI_ERROR_SDK_COMPONENT_MISSING) {
     recordCheck(`DXGIGetDebugInterface1 · ${entry.name}`, 'info', hr, 'Graphics Tools / debug layer not installed');
-  } else if ((hr >>> 0) === E_NOINTERFACE) {
+  } else if (hr >>> 0 === E_NOINTERFACE) {
     recordCheck(`DXGIGetDebugInterface1 · ${entry.name}`, 'info', hr, 'interface not exposed by this dxgi.dll build');
   } else {
     recordCheck(`DXGIGetDebugInterface1 · ${entry.name}`, 'fail', hr, formatHResult(hr));
@@ -199,18 +199,18 @@ for (const entry of [
 const removalFirst = Dxgi.DXGIDeclareAdapterRemovalSupport();
 if (removalFirst === 0) {
   recordCheck('DXGIDeclareAdapterRemovalSupport · first', 'ok', removalFirst, 'process opted in for adapter-removal notifications');
-} else if ((removalFirst >>> 0) === DXGI_ERROR_UNSUPPORTED) {
+} else if (removalFirst >>> 0 === DXGI_ERROR_UNSUPPORTED) {
   recordCheck('DXGIDeclareAdapterRemovalSupport · first', 'info', removalFirst, 'DXGI_ERROR_UNSUPPORTED (Windows 10 1803+ required)');
 } else {
   recordCheck('DXGIDeclareAdapterRemovalSupport · first', 'fail', removalFirst, formatHResult(removalFirst));
 }
 
 const removalSecond = Dxgi.DXGIDeclareAdapterRemovalSupport();
-if ((removalSecond >>> 0) === DXGI_ERROR_ALREADY_EXISTS) {
+if (removalSecond >>> 0 === DXGI_ERROR_ALREADY_EXISTS) {
   recordCheck('DXGIDeclareAdapterRemovalSupport · repeat', 'ok', removalSecond, 'returned DXGI_ERROR_ALREADY_EXISTS as documented on second call');
 } else if (removalSecond === 0) {
   recordCheck('DXGIDeclareAdapterRemovalSupport · repeat', 'info', removalSecond, 'returned S_OK again (this OS does not guard repeat calls)');
-} else if ((removalSecond >>> 0) === DXGI_ERROR_UNSUPPORTED) {
+} else if (removalSecond >>> 0 === DXGI_ERROR_UNSUPPORTED) {
   recordCheck('DXGIDeclareAdapterRemovalSupport · repeat', 'info', removalSecond, 'DXGI_ERROR_UNSUPPORTED');
 } else {
   recordCheck('DXGIDeclareAdapterRemovalSupport · repeat', 'fail', removalSecond, formatHResult(removalSecond));

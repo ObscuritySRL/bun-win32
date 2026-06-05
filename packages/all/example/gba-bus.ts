@@ -14,8 +14,16 @@ import { GbaApu } from './gba-apu';
 
 /** GBA joypad state (true = pressed). */
 export interface GbaButtons {
-  a: boolean; b: boolean; select: boolean; start: boolean;
-  right: boolean; left: boolean; up: boolean; down: boolean; r: boolean; l: boolean;
+  a: boolean;
+  b: boolean;
+  select: boolean;
+  start: boolean;
+  right: boolean;
+  left: boolean;
+  up: boolean;
+  down: boolean;
+  r: boolean;
+  l: boolean;
 }
 
 // IRQ bit positions (IE/IF).
@@ -132,26 +140,69 @@ export class Gba {
   }
   private flashWrite8(addr: number, value: number): void {
     const a = addr & 0xffff;
-    if (this.flashWriteArm) { this.sram[this.flashBank * 0x10000 + a] = value; this.flashWriteArm = false; this.flashSeq = 0; return; }
-    if (this.flashBankArm) { this.flashBank = value & 1; this.flashBankArm = false; this.flashSeq = 0; return; }
-    if (this.flashSeq === 0 && a === 0x5555 && value === 0xaa) { this.flashSeq = 1; return; }
-    if (this.flashSeq === 1 && a === 0x2aaa && value === 0x55) { this.flashSeq = 2; return; }
+    if (this.flashWriteArm) {
+      this.sram[this.flashBank * 0x10000 + a] = value;
+      this.flashWriteArm = false;
+      this.flashSeq = 0;
+      return;
+    }
+    if (this.flashBankArm) {
+      this.flashBank = value & 1;
+      this.flashBankArm = false;
+      this.flashSeq = 0;
+      return;
+    }
+    if (this.flashSeq === 0 && a === 0x5555 && value === 0xaa) {
+      this.flashSeq = 1;
+      return;
+    }
+    if (this.flashSeq === 1 && a === 0x2aaa && value === 0x55) {
+      this.flashSeq = 2;
+      return;
+    }
     if (this.flashSeq === 2 && a === 0x5555) {
       switch (value) {
-        case 0x90: this.flashId = true; this.flashSeq = 0; return; // enter ID mode
-        case 0xf0: this.flashId = false; this.flashSeq = 0; return; // exit ID mode
-        case 0xa0: this.flashWriteArm = true; this.flashSeq = 0; return; // program a byte
-        case 0xb0: this.flashBankArm = true; this.flashSeq = 0; return; // bank switch
-        case 0x80: this.flashSeq = 3; return; // erase setup
-        default: this.flashSeq = 0; return;
+        case 0x90:
+          this.flashId = true;
+          this.flashSeq = 0;
+          return; // enter ID mode
+        case 0xf0:
+          this.flashId = false;
+          this.flashSeq = 0;
+          return; // exit ID mode
+        case 0xa0:
+          this.flashWriteArm = true;
+          this.flashSeq = 0;
+          return; // program a byte
+        case 0xb0:
+          this.flashBankArm = true;
+          this.flashSeq = 0;
+          return; // bank switch
+        case 0x80:
+          this.flashSeq = 3;
+          return; // erase setup
+        default:
+          this.flashSeq = 0;
+          return;
       }
     }
-    if (this.flashSeq === 3 && a === 0x5555 && value === 0xaa) { this.flashSeq = 4; return; }
-    if (this.flashSeq === 4 && a === 0x2aaa && value === 0x55) { this.flashSeq = 5; return; }
+    if (this.flashSeq === 3 && a === 0x5555 && value === 0xaa) {
+      this.flashSeq = 4;
+      return;
+    }
+    if (this.flashSeq === 4 && a === 0x2aaa && value === 0x55) {
+      this.flashSeq = 5;
+      return;
+    }
     if (this.flashSeq === 5) {
-      if (a === 0x5555 && value === 0x10) this.sram.fill(0xff); // chip erase
-      else if (value === 0x30) { const s = this.flashBank * 0x10000 + (a & 0xf000); for (let i = 0; i < 0x1000; i += 1) this.sram[s + i] = 0xff; } // sector erase
-      this.flashSeq = 0; return;
+      if (a === 0x5555 && value === 0x10)
+        this.sram.fill(0xff); // chip erase
+      else if (value === 0x30) {
+        const s = this.flashBank * 0x10000 + (a & 0xf000);
+        for (let i = 0; i < 0x1000; i += 1) this.sram[s + i] = 0xff;
+      } // sector erase
+      this.flashSeq = 0;
+      return;
     }
     this.flashSeq = 0;
   }
@@ -159,40 +210,83 @@ export class Gba {
   read8(addr: number): number {
     addr >>>= 0;
     switch ((addr >>> 24) & 0xf) {
-      case 0x0: case 0x1: return this.bios[addr & 0x3fff]!;
-      case 0x2: return this.ewram[addr & 0x3ffff]!;
-      case 0x3: return this.iwram[addr & 0x7fff]!;
-      case 0x4: return this.readIO8(addr & 0x3ff);
-      case 0x5: return this.palette[addr & 0x3ff]!;
-      case 0x6: return this.vram[this.vramOffset(addr)]!;
-      case 0x7: return this.oam[addr & 0x3ff]!;
-      case 0x8: case 0x9: case 0xa: case 0xb: case 0xc: case 0xd:
+      case 0x0:
+      case 0x1:
+        return this.bios[addr & 0x3fff]!;
+      case 0x2:
+        return this.ewram[addr & 0x3ffff]!;
+      case 0x3:
+        return this.iwram[addr & 0x7fff]!;
+      case 0x4:
+        return this.readIO8(addr & 0x3ff);
+      case 0x5:
+        return this.palette[addr & 0x3ff]!;
+      case 0x6:
+        return this.vram[this.vramOffset(addr)]!;
+      case 0x7:
+        return this.oam[addr & 0x3ff]!;
+      case 0x8:
+      case 0x9:
+      case 0xa:
+      case 0xb:
+      case 0xc:
+      case 0xd:
         return this.rom[addr & 0x1ffffff] ?? 0;
-      case 0xe: case 0xf: return this.flashRead8(addr);
-      default: return 0;
+      case 0xe:
+      case 0xf:
+        return this.flashRead8(addr);
+      default:
+        return 0;
     }
   }
   read16(addr: number): number {
     addr >>>= 0;
     const a = addr & ~1;
     switch ((a >>> 24) & 0xf) {
-      case 0x0: case 0x1: return this.bios[a & 0x3fff]! | (this.bios[(a & 0x3fff) + 1]! << 8);
-      case 0x2: { const o = a & 0x3ffff; return this.ewram[o]! | (this.ewram[o + 1]! << 8); }
-      case 0x3: { const o = a & 0x7fff; return this.iwram[o]! | (this.iwram[o + 1]! << 8); }
-      case 0x4: return this.readIO16(a & 0x3ff);
-      case 0x5: { const o = a & 0x3ff; return this.palette[o]! | (this.palette[o + 1]! << 8); }
-      case 0x6: { const o = this.vramOffset(a); return this.vram[o]! | (this.vram[o + 1]! << 8); }
-      case 0x7: { const o = a & 0x3ff; return this.oam[o]! | (this.oam[o + 1]! << 8); }
-      case 0x8: case 0x9: case 0xa: case 0xb: case 0xc: case 0xd: {
-        const o = a & 0x1ffffff; return (this.rom[o] ?? 0) | ((this.rom[o + 1] ?? 0) << 8);
+      case 0x0:
+      case 0x1:
+        return this.bios[a & 0x3fff]! | (this.bios[(a & 0x3fff) + 1]! << 8);
+      case 0x2: {
+        const o = a & 0x3ffff;
+        return this.ewram[o]! | (this.ewram[o + 1]! << 8);
       }
-      case 0xe: case 0xf: return this.flashRead8(a) | (this.flashRead8(a + 1) << 8);
-      default: return 0;
+      case 0x3: {
+        const o = a & 0x7fff;
+        return this.iwram[o]! | (this.iwram[o + 1]! << 8);
+      }
+      case 0x4:
+        return this.readIO16(a & 0x3ff);
+      case 0x5: {
+        const o = a & 0x3ff;
+        return this.palette[o]! | (this.palette[o + 1]! << 8);
+      }
+      case 0x6: {
+        const o = this.vramOffset(a);
+        return this.vram[o]! | (this.vram[o + 1]! << 8);
+      }
+      case 0x7: {
+        const o = a & 0x3ff;
+        return this.oam[o]! | (this.oam[o + 1]! << 8);
+      }
+      case 0x8:
+      case 0x9:
+      case 0xa:
+      case 0xb:
+      case 0xc:
+      case 0xd: {
+        const o = a & 0x1ffffff;
+        return (this.rom[o] ?? 0) | ((this.rom[o + 1] ?? 0) << 8);
+      }
+      case 0xe:
+      case 0xf:
+        return this.flashRead8(a) | (this.flashRead8(a + 1) << 8);
+      default:
+        return 0;
     }
   }
   read32(addr: number): number {
     const a = addr & ~3;
-    return ((this.read16(a) | (this.read16(a + 2) << 16))) >>> 0;
+    return (this.read16(a) | (this.read16(a + 2) << 16)) >>> 0;
   }
 
   write8(addr: number, value: number): void {
@@ -200,15 +294,35 @@ export class Gba {
     value &= 0xff;
     if (this.onWrite) this.onWrite(addr, value, 1);
     switch ((addr >>> 24) & 0xf) {
-      case 0x2: this.ewram[addr & 0x3ffff] = value; return;
-      case 0x3: this.iwram[addr & 0x7fff] = value; return;
-      case 0x4: this.writeIO8(addr & 0x3ff, value); return;
+      case 0x2:
+        this.ewram[addr & 0x3ffff] = value;
+        return;
+      case 0x3:
+        this.iwram[addr & 0x7fff] = value;
+        return;
+      case 0x4:
+        this.writeIO8(addr & 0x3ff, value);
+        return;
       // Palette/VRAM/OAM ignore 8-bit writes on real hardware (or mirror to 16-bit);
       // games don't rely on byte writes here for OAM. Palette/VRAM byte write = halfword.
-      case 0x5: { const o = (addr & 0x3ff) & ~1; this.palette[o] = value; this.palette[o + 1] = value; return; }
-      case 0x6: { const o = this.vramOffset(addr) & ~1; this.vram[o] = value; this.vram[o + 1] = value; return; }
-      case 0xe: case 0xf: this.flashWrite8(addr, value); return;
-      default: return;
+      case 0x5: {
+        const o = addr & 0x3ff & ~1;
+        this.palette[o] = value;
+        this.palette[o + 1] = value;
+        return;
+      }
+      case 0x6: {
+        const o = this.vramOffset(addr) & ~1;
+        this.vram[o] = value;
+        this.vram[o + 1] = value;
+        return;
+      }
+      case 0xe:
+      case 0xf:
+        this.flashWrite8(addr, value);
+        return;
+      default:
+        return;
     }
   }
   write16(addr: number, value: number): void {
@@ -217,14 +331,45 @@ export class Gba {
     if (this.onWrite) this.onWrite(addr, value, 2);
     const a = addr & ~1;
     switch ((a >>> 24) & 0xf) {
-      case 0x2: { const o = a & 0x3ffff; this.ewram[o] = value & 0xff; this.ewram[o + 1] = value >> 8; return; }
-      case 0x3: { const o = a & 0x7fff; this.iwram[o] = value & 0xff; this.iwram[o + 1] = value >> 8; return; }
-      case 0x4: this.writeIO16(a & 0x3ff, value); return;
-      case 0x5: { const o = a & 0x3ff; this.palette[o] = value & 0xff; this.palette[o + 1] = value >> 8; return; }
-      case 0x6: { const o = this.vramOffset(a); this.vram[o] = value & 0xff; this.vram[o + 1] = value >> 8; return; }
-      case 0x7: { const o = a & 0x3ff; this.oam[o] = value & 0xff; this.oam[o + 1] = value >> 8; return; }
-      case 0xe: case 0xf: this.flashWrite8(a, value & 0xff); return;
-      default: return;
+      case 0x2: {
+        const o = a & 0x3ffff;
+        this.ewram[o] = value & 0xff;
+        this.ewram[o + 1] = value >> 8;
+        return;
+      }
+      case 0x3: {
+        const o = a & 0x7fff;
+        this.iwram[o] = value & 0xff;
+        this.iwram[o + 1] = value >> 8;
+        return;
+      }
+      case 0x4:
+        this.writeIO16(a & 0x3ff, value);
+        return;
+      case 0x5: {
+        const o = a & 0x3ff;
+        this.palette[o] = value & 0xff;
+        this.palette[o + 1] = value >> 8;
+        return;
+      }
+      case 0x6: {
+        const o = this.vramOffset(a);
+        this.vram[o] = value & 0xff;
+        this.vram[o + 1] = value >> 8;
+        return;
+      }
+      case 0x7: {
+        const o = a & 0x3ff;
+        this.oam[o] = value & 0xff;
+        this.oam[o + 1] = value >> 8;
+        return;
+      }
+      case 0xe:
+      case 0xf:
+        this.flashWrite8(a, value & 0xff);
+        return;
+      default:
+        return;
     }
   }
   write32(addr: number, value: number): void {
@@ -251,13 +396,22 @@ export class Gba {
     if (off === 0x202) {
       const cur = this.io[0x202]! | (this.io[0x203]! << 8);
       const next = cur & ~value;
-      this.io[0x202] = next & 0xff; this.io[0x203] = next >> 8;
+      this.io[0x202] = next & 0xff;
+      this.io[0x203] = next >> 8;
       return;
     }
     // DirectSound FIFO writes (0xA0-0xA3 = FIFO A, 0xA4-0xA7 = FIFO B) — write-only.
     if (this.apu) {
-      if (off === 0xa0 || off === 0xa2) { this.apu.pushFifoA(value & 0xff); this.apu.pushFifoA((value >> 8) & 0xff); return; }
-      if (off === 0xa4 || off === 0xa6) { this.apu.pushFifoB(value & 0xff); this.apu.pushFifoB((value >> 8) & 0xff); return; }
+      if (off === 0xa0 || off === 0xa2) {
+        this.apu.pushFifoA(value & 0xff);
+        this.apu.pushFifoA((value >> 8) & 0xff);
+        return;
+      }
+      if (off === 0xa4 || off === 0xa6) {
+        this.apu.pushFifoB(value & 0xff);
+        this.apu.pushFifoB((value >> 8) & 0xff);
+        return;
+      }
       if (off === 0x82) this.apu.writeControlH(value); // SOUNDCNT_H
       if (off === 0x84) this.apu.writeControlX(value); // SOUNDCNT_X
     }
@@ -279,7 +433,7 @@ export class Gba {
   }
   private writeIO8(off: number, value: number): void {
     const cur = this.readIO16(off & ~1);
-    const next = (off & 1) ? (cur & 0x00ff) | (value << 8) : (cur & 0xff00) | value;
+    const next = off & 1 ? (cur & 0x00ff) | (value << 8) : (cur & 0xff00) | value;
     this.writeIO16(off & ~1, next);
   }
 
@@ -289,7 +443,8 @@ export class Gba {
   raiseIrq(bit: number): void {
     const flag = this.io[0x202]! | (this.io[0x203]! << 8);
     const next = flag | (1 << bit);
-    this.io[0x202] = next & 0xff; this.io[0x203] = next >> 8;
+    this.io[0x202] = next & 0xff;
+    this.io[0x203] = next >> 8;
     this.checkIrq();
   }
   checkIrq(): void {
@@ -401,7 +556,10 @@ export class Gba {
     if ((ctrl & 0x8000) === 0 || ((ctrl >> 12) & 3) !== 3) return; // not an active special-timing DMA
     let src = this.dmaSrcLatch[ch]! >>> 0;
     const dst = this.dmaDstLatch[ch]! >>> 0; // FIFO address (fixed)
-    for (let i = 0; i < 4; i += 1) { this.write32(dst, this.read32(src)); src = (src + 4) >>> 0; }
+    for (let i = 0; i < 4; i += 1) {
+      this.write32(dst, this.read32(src));
+      src = (src + 4) >>> 0;
+    }
     this.dmaSrcLatch[ch] = src;
     if (ctrl & 0x4000) this.raiseIrq(IRQ_DMA0 + ch);
   }
@@ -413,7 +571,8 @@ export class Gba {
   swi(comment: number): void {
     const r = this.cpu.r;
     switch (comment) {
-      case 0x00: { // SoftReset — re-enter the cart (or EWRAM) with fresh stacks.
+      case 0x00: {
+        // SoftReset — re-enter the cart (or EWRAM) with fresh stacks.
         const flag = this.read8(0x03007ffa);
         for (let a = 0x7e00; a < 0x8000; a += 1) this.iwram[a] = 0; // clear top 0x200 of IWRAM
         const entry = flag === 0 ? 0x08000000 : 0x02000000;
@@ -426,7 +585,8 @@ export class Gba {
         this.cpu.forceBranch(entry);
         return;
       }
-      case 0x01: { // RegisterRamReset — clear the selected RAM/IO regions.
+      case 0x01: {
+        // RegisterRamReset — clear the selected RAM/IO regions.
         const f = r[0]! & 0xff;
         if (f & 0x01) this.ewram.fill(0);
         if (f & 0x02) for (let a = 0; a < 0x7e00; a += 1) this.iwram[a] = 0; // keep top 0x200
@@ -436,32 +596,70 @@ export class Gba {
         this.writeIO16(0x00, 0x0080); // DISPCNT → forced blank (post-reset state)
         return;
       }
-      case 0x02: this.cpu.halted = true; return; // Halt
-      case 0x04: case 0x05: this.cpu.halted = true; return; // IntrWait / VBlankIntrWait
-      case 0x06: { // Div: r0/r1 → r0=quot, r1=rem, r3=abs(quot)
-        const n = r[0]! | 0, d = r[1]! | 0;
-        if (d !== 0) { const q = (n / d) | 0; r[0] = q; r[1] = (n % d) | 0; r[3] = Math.abs(q) | 0; }
+      case 0x02:
+        this.cpu.halted = true;
+        return; // Halt
+      case 0x04:
+      case 0x05:
+        this.cpu.halted = true;
+        return; // IntrWait / VBlankIntrWait
+      case 0x06: {
+        // Div: r0/r1 → r0=quot, r1=rem, r3=abs(quot)
+        const n = r[0]! | 0,
+          d = r[1]! | 0;
+        if (d !== 0) {
+          const q = (n / d) | 0;
+          r[0] = q;
+          r[1] = (n % d) | 0;
+          r[3] = Math.abs(q) | 0;
+        }
         return;
       }
-      case 0x07: { // DivArm: r1/r0
-        const n = r[1]! | 0, d = r[0]! | 0;
-        if (d !== 0) { const q = (n / d) | 0; r[0] = q; r[1] = (n % d) | 0; r[3] = Math.abs(q) | 0; }
+      case 0x07: {
+        // DivArm: r1/r0
+        const n = r[1]! | 0,
+          d = r[0]! | 0;
+        if (d !== 0) {
+          const q = (n / d) | 0;
+          r[0] = q;
+          r[1] = (n % d) | 0;
+          r[3] = Math.abs(q) | 0;
+        }
         return;
       }
-      case 0x08: r[0] = Math.floor(Math.sqrt(r[0]! >>> 0)) | 0; return; // Sqrt
-      case 0x09: { // ArcTan
-        const x = (r[0]! << 16) >> 16; r[0] = Math.round(Math.atan(x / 16384) * 0x4000 / (Math.PI / 2)) & 0xffff; return;
+      case 0x08:
+        r[0] = Math.floor(Math.sqrt(r[0]! >>> 0)) | 0;
+        return; // Sqrt
+      case 0x09: {
+        // ArcTan
+        const x = (r[0]! << 16) >> 16;
+        r[0] = Math.round((Math.atan(x / 16384) * 0x4000) / (Math.PI / 2)) & 0xffff;
+        return;
       }
-      case 0x0a: { // ArcTan2
-        const x = (r[0]! << 16) >> 16, y = (r[1]! << 16) >> 16;
-        let t = Math.atan2(y, x) / (2 * Math.PI); if (t < 0) t += 1; r[0] = Math.round(t * 0x10000) & 0xffff; return;
+      case 0x0a: {
+        // ArcTan2
+        const x = (r[0]! << 16) >> 16,
+          y = (r[1]! << 16) >> 16;
+        let t = Math.atan2(y, x) / (2 * Math.PI);
+        if (t < 0) t += 1;
+        r[0] = Math.round(t * 0x10000) & 0xffff;
+        return;
       }
-      case 0x0b: return this.cpuSet(r[0]! >>> 0, r[1]! >>> 0, r[2]! >>> 0, false);
-      case 0x0c: return this.cpuSet(r[0]! >>> 0, r[1]! >>> 0, r[2]! >>> 0, true);
-      case 0x0d: r[0] = 0xbaae187f; return; // GetBiosChecksum (GBA value)
-      case 0x11: case 0x12: return this.lz77(r[0]! >>> 0, r[1]! >>> 0); // LZ77UnComp Wram/Vram
-      case 0x14: case 0x15: return this.rlUnComp(r[0]! >>> 0, r[1]! >>> 0); // RLUnComp Wram/Vram
-      default: return; // unimplemented SWIs are no-ops (best-effort HLE)
+      case 0x0b:
+        return this.cpuSet(r[0]! >>> 0, r[1]! >>> 0, r[2]! >>> 0, false);
+      case 0x0c:
+        return this.cpuSet(r[0]! >>> 0, r[1]! >>> 0, r[2]! >>> 0, true);
+      case 0x0d:
+        r[0] = 0xbaae187f;
+        return; // GetBiosChecksum (GBA value)
+      case 0x11:
+      case 0x12:
+        return this.lz77(r[0]! >>> 0, r[1]! >>> 0); // LZ77UnComp Wram/Vram
+      case 0x14:
+      case 0x15:
+        return this.rlUnComp(r[0]! >>> 0, r[1]! >>> 0); // RLUnComp Wram/Vram
+      default:
+        return; // unimplemented SWIs are no-ops (best-effort HLE)
     }
   }
 
@@ -471,7 +669,8 @@ export class Gba {
     const word = fast || (ctrl & (1 << 26)) !== 0;
     if (word) {
       const n = fast ? count & ~7 : count; // CpuFastSet works in 8-word blocks
-      let s = src & ~3, d = dst & ~3;
+      let s = src & ~3,
+        d = dst & ~3;
       const fillVal = this.read32(s);
       for (let i = 0; i < n; i += 1) {
         this.write32(d, fill ? fillVal : this.read32(s));
@@ -479,7 +678,8 @@ export class Gba {
         d = (d + 4) >>> 0;
       }
     } else {
-      let s = src & ~1, d = dst & ~1;
+      let s = src & ~1,
+        d = dst & ~1;
       const fillVal = this.read16(s);
       for (let i = 0; i < count; i += 1) {
         this.write16(d, fill ? fillVal : this.read16(s));
@@ -496,18 +696,25 @@ export class Gba {
     let s = (src + 4) >>> 0;
     let d = dst >>> 0;
     while (size > 0) {
-      const flags = this.read8(s); s = (s + 1) >>> 0;
+      const flags = this.read8(s);
+      s = (s + 1) >>> 0;
       for (let bit = 7; bit >= 0 && size > 0; bit -= 1) {
         if (flags & (1 << bit)) {
-          const b1 = this.read8(s); const b2 = this.read8((s + 1) >>> 0); s = (s + 2) >>> 0;
+          const b1 = this.read8(s);
+          const b2 = this.read8((s + 1) >>> 0);
+          s = (s + 2) >>> 0;
           const len = (b1 >> 4) + 3;
           const disp = (((b1 & 0xf) << 8) | b2) + 1;
           for (let i = 0; i < len && size > 0; i += 1) {
             this.write8(d, this.read8((d - disp) >>> 0));
-            d = (d + 1) >>> 0; size -= 1;
+            d = (d + 1) >>> 0;
+            size -= 1;
           }
         } else {
-          this.write8(d, this.read8(s)); s = (s + 1) >>> 0; d = (d + 1) >>> 0; size -= 1;
+          this.write8(d, this.read8(s));
+          s = (s + 1) >>> 0;
+          d = (d + 1) >>> 0;
+          size -= 1;
         }
       }
     }
@@ -519,14 +726,25 @@ export class Gba {
     let s = (src + 4) >>> 0;
     let d = dst >>> 0;
     while (size > 0) {
-      const flag = this.read8(s); s = (s + 1) >>> 0;
+      const flag = this.read8(s);
+      s = (s + 1) >>> 0;
       if (flag & 0x80) {
         const len = (flag & 0x7f) + 3;
-        const v = this.read8(s); s = (s + 1) >>> 0;
-        for (let i = 0; i < len && size > 0; i += 1) { this.write8(d, v); d = (d + 1) >>> 0; size -= 1; }
+        const v = this.read8(s);
+        s = (s + 1) >>> 0;
+        for (let i = 0; i < len && size > 0; i += 1) {
+          this.write8(d, v);
+          d = (d + 1) >>> 0;
+          size -= 1;
+        }
       } else {
         const len = (flag & 0x7f) + 1;
-        for (let i = 0; i < len && size > 0; i += 1) { this.write8(d, this.read8(s)); s = (s + 1) >>> 0; d = (d + 1) >>> 0; size -= 1; }
+        for (let i = 0; i < len && size > 0; i += 1) {
+          this.write8(d, this.read8(s));
+          s = (s + 1) >>> 0;
+          d = (d + 1) >>> 0;
+          size -= 1;
+        }
       }
     }
   }
@@ -536,18 +754,30 @@ export class Gba {
   // ════════════════════════════════════════════════════════════════════════════
   private setDispstatBit(bit: number, on: boolean): void {
     let ds = this.io[0x04]! | (this.io[0x05]! << 8);
-    if (on) ds |= bit; else ds &= ~bit;
-    this.io[0x04] = ds & 0xff; this.io[0x05] = (ds >> 8) & 0xff;
+    if (on) ds |= bit;
+    else ds &= ~bit;
+    this.io[0x04] = ds & 0xff;
+    this.io[0x05] = (ds >> 8) & 0xff;
   }
 
   /** Run the CPU for ~`target` cycles, stepping timers/APU and honouring HALT. */
   private runCycles(target: number): void {
     let done = 0;
     while (done < target) {
-      if (this.cpu.halted) { this.stepTimers(target - done); if (this.apu) { this.apu.step(target - done); this.serviceSoundDma(); } return; }
+      if (this.cpu.halted) {
+        this.stepTimers(target - done);
+        if (this.apu) {
+          this.apu.step(target - done);
+          this.serviceSoundDma();
+        }
+        return;
+      }
       const c = this.cpu.step();
       this.stepTimers(c);
-      if (this.apu) { this.apu.step(c); this.serviceSoundDma(); }
+      if (this.apu) {
+        this.apu.step(c);
+        this.serviceSoundDma();
+      }
       done += c;
     }
   }
@@ -555,20 +785,28 @@ export class Gba {
   /** Refill the DirectSound FIFOs whenever a timer overflow drained them. */
   private serviceSoundDma(): void {
     if (!this.apu) return;
-    if (this.apu.dmaReqA) { this.apu.dmaReqA = false; this.runSoundDma(1); }
-    if (this.apu.dmaReqB) { this.apu.dmaReqB = false; this.runSoundDma(2); }
+    if (this.apu.dmaReqA) {
+      this.apu.dmaReqA = false;
+      this.runSoundDma(1);
+    }
+    if (this.apu.dmaReqB) {
+      this.apu.dmaReqB = false;
+      this.runSoundDma(2);
+    }
   }
 
   /** Emulate exactly one video frame, producing ppu.frame. */
   runFrame(): void {
-    const VISIBLE = 960, HBLANK = 272; // approximate cycles (1 instr ≈ 1 unit for now)
+    const VISIBLE = 960,
+      HBLANK = 272; // approximate cycles (1 instr ≈ 1 unit for now)
     for (let line = 0; line < 228; line += 1) {
-      this.io[0x06] = line & 0xff; this.io[0x07] = (line >> 8) & 0xff; // VCOUNT
+      this.io[0x06] = line & 0xff;
+      this.io[0x07] = (line >> 8) & 0xff; // VCOUNT
       const dispstat = this.io[0x04]! | (this.io[0x05]! << 8);
       // VCount match.
       const vcMatch = ((dispstat >> 8) & 0xff) === line;
       this.setDispstatBit(0x04, vcMatch);
-      if (vcMatch && (dispstat & 0x20)) this.raiseIrq(IRQ_VCOUNT);
+      if (vcMatch && dispstat & 0x20) this.raiseIrq(IRQ_VCOUNT);
 
       if (line === 0) this.ppu.frameStart();
       if (line === 160) {
@@ -582,7 +820,10 @@ export class Gba {
 
       // HBlank.
       this.setDispstatBit(0x02, true);
-      if (line < 160) { this.ppu.renderScanline(line); this.triggerDma(2); }
+      if (line < 160) {
+        this.ppu.renderScanline(line);
+        this.triggerDma(2);
+      }
       if (dispstat & 0x10) this.raiseIrq(IRQ_HBLANK);
       this.runCycles(HBLANK);
       this.setDispstatBit(0x02, false);

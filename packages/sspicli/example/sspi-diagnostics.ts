@@ -92,16 +92,7 @@ console.log('\n2. TARGET HOST NAME RESOLUTION\n');
 const machineName = process.env.COMPUTERNAME || 'UNKNOWN';
 const domainName = process.env.USERDNSDOMAIN || null;
 
-const targetNames = [
-  'localhost',
-  machineName,
-  '127.0.0.1',
-  '::1',
-  `\\\\${machineName}`,
-  `${machineName}.local`,
-  'example.com',
-  'dc.contoso.com',
-];
+const targetNames = ['localhost', machineName, '127.0.0.1', '::1', `\\\\${machineName}`, `${machineName}.local`, 'example.com', 'dc.contoso.com'];
 
 if (domainName) {
   targetNames.push(`${machineName}.${domainName}`);
@@ -157,9 +148,7 @@ if (enumStatus === 0) {
   console.log(`   Total registered packages: ${packageCount}\n`);
 
   for (let i = 0; i < packageCount; i++) {
-    const entryBuf = Buffer.from(
-      toArrayBuffer((Number(arrayBasePtr) + i * SEC_PKG_INFO_SIZE) as unknown as Pointer, 0, SEC_PKG_INFO_SIZE)
-    );
+    const entryBuf = Buffer.from(toArrayBuffer((Number(arrayBasePtr) + i * SEC_PKG_INFO_SIZE) as unknown as Pointer, 0, SEC_PKG_INFO_SIZE));
 
     const fCapabilities = entryBuf.readUInt32LE(0);
     const wVersion = entryBuf.readUInt16LE(4);
@@ -186,7 +175,7 @@ if (enumStatus === 0) {
     console.log(`   Package ${(i + 1).toString().padStart(2)}: ${name}`);
     console.log(`      Comment:      ${comment || '(none)'}`);
     console.log(`      Version:      ${wVersion}`);
-    console.log(`      RPC ID:       ${wRPCID === 0xFFFF ? '(none)' : wRPCID.toString()}`);
+    console.log(`      RPC ID:       ${wRPCID === 0xffff ? '(none)' : wRPCID.toString()}`);
     console.log(`      Max Token:    ${cbMaxToken.toLocaleString()} bytes`);
     console.log(`      Capabilities: ${statusHex(fCapabilities)} [${caps.join(', ') || 'none'}]`);
     console.log('');
@@ -207,19 +196,7 @@ if (lsaStatus === 0) {
   const lsaHandle = hLsaBuf.readBigUInt64LE(0);
   console.log(`   LSA handle: 0x${lsaHandle.toString(16)}\n`);
 
-  const authPackages = [
-    'MICROSOFT_AUTHENTICATION_PACKAGE_V1_0',
-    'Kerberos',
-    'Negotiate',
-    'WDigest',
-    'Schannel',
-    'Microsoft Unified Security Protocol Provider',
-    'Default TLS SSP',
-    'CREDSSP',
-    'TSSSP',
-    'pku2u',
-    'CloudAP',
-  ];
+  const authPackages = ['MICROSOFT_AUTHENTICATION_PACKAGE_V1_0', 'Kerberos', 'Negotiate', 'WDigest', 'Schannel', 'Microsoft Unified Security Protocol Provider', 'Default TLS SSP', 'CREDSSP', 'TSSSP', 'pku2u', 'CloudAP'];
 
   for (const pkgName of authPackages) {
     // Build LSA_STRING: Length(u16) + MaxLen(u16) + pad(4) + Buffer(ptr) = 16 bytes

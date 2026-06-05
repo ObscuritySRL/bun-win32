@@ -90,8 +90,7 @@ DENSITY[STEAM] = -2;
 const isLiquid = (m: number): boolean => m === WATER || m === OIL || m === LAVA;
 const isFlammable = (m: number): boolean => m === OIL || m === PLANT;
 // May a falling/flowing grain swap into a cell currently holding `there`?
-const canSinkInto = (mover: number, there: number): boolean =>
-  there === EMPTY || (DENSITY[there] >= 0 && isLiquid(there) && DENSITY[mover] > DENSITY[there]);
+const canSinkInto = (mover: number, there: number): boolean => there === EMPTY || (DENSITY[there] >= 0 && isLiquid(there) && DENSITY[mover] > DENSITY[there]);
 
 // ── Grids (allocated for the live pixel resolution in init/resize) ─────────────
 let GW = 0;
@@ -133,7 +132,8 @@ const setCell = (x: number, y: number, m: number, spawnX: number, spawnY: number
   if (m === FIRE) life[i] = 40 + ((rng() * 28) | 0);
   else if (m === SMOKE) life[i] = 54 + ((rng() * 44) | 0);
   else if (m === STEAM) life[i] = 30 + ((rng() * 24) | 0);
-  else if (m === LAVA) life[i] = 0; // lava life unused; kept 0
+  else if (m === LAVA)
+    life[i] = 0; // lava life unused; kept 0
   else life[i] = 0;
 };
 
@@ -148,9 +148,18 @@ const moveCell = (from: number, to: number): void => {
 };
 
 const swapCell = (a: number, b: number): void => {
-  const cm = cell[a]; const cl = life[a]; const cx = sx[a]; const cy = sy[a];
-  cell[a] = cell[b]; life[a] = life[b]; sx[a] = sx[b]; sy[a] = sy[b];
-  cell[b] = cm; life[b] = cl; sx[b] = cx; sy[b] = cy;
+  const cm = cell[a];
+  const cl = life[a];
+  const cx = sx[a];
+  const cy = sy[a];
+  cell[a] = cell[b];
+  life[a] = life[b];
+  sx[a] = sx[b];
+  sy[a] = sy[b];
+  cell[b] = cm;
+  life[b] = cl;
+  sx[b] = cx;
+  sy[b] = cy;
   moved[a] = stamp;
   moved[b] = stamp;
 };
@@ -212,14 +221,30 @@ const update = (): void => {
       if (moved[i] === stamp) continue;
 
       switch (m) {
-        case SAND: stepSand(x, y, i); break;
-        case WATER: stepLiquid(x, y, i, WATER, 5); break;
-        case OIL: stepLiquid(x, y, i, OIL, 6); break;
-        case LAVA: stepLava(x, y, i); break;
-        case FIRE: stepFire(x, y, i); break;
-        case SMOKE: stepGas(x, y, i, SMOKE); break;
-        case STEAM: stepGas(x, y, i, STEAM); break;
-        case PLANT: stepPlant(x, y, i); break;
+        case SAND:
+          stepSand(x, y, i);
+          break;
+        case WATER:
+          stepLiquid(x, y, i, WATER, 5);
+          break;
+        case OIL:
+          stepLiquid(x, y, i, OIL, 6);
+          break;
+        case LAVA:
+          stepLava(x, y, i);
+          break;
+        case FIRE:
+          stepFire(x, y, i);
+          break;
+        case SMOKE:
+          stepGas(x, y, i, SMOKE);
+          break;
+        case STEAM:
+          stepGas(x, y, i, STEAM);
+          break;
+        case PLANT:
+          stepPlant(x, y, i);
+          break;
       }
     }
   }
@@ -242,11 +267,14 @@ const stepSand = (x: number, y: number, i: number): void => {
   const dr = right && canSinkInto(SAND, cell[below + 1]) && canSinkInto(SAND, cell[i + 1]);
   if (dl && dr) {
     const to = rng() < 0.5 ? below - 1 : below + 1;
-    if (cell[to] === EMPTY) moveCell(i, to); else swapCell(i, to);
+    if (cell[to] === EMPTY) moveCell(i, to);
+    else swapCell(i, to);
   } else if (dl) {
-    if (cell[below - 1] === EMPTY) moveCell(i, below - 1); else swapCell(i, below - 1);
+    if (cell[below - 1] === EMPTY) moveCell(i, below - 1);
+    else swapCell(i, below - 1);
   } else if (dr) {
-    if (cell[below + 1] === EMPTY) moveCell(i, below + 1); else swapCell(i, below + 1);
+    if (cell[below + 1] === EMPTY) moveCell(i, below + 1);
+    else swapCell(i, below + 1);
   }
 };
 
@@ -258,16 +286,31 @@ const stepLiquid = (x: number, y: number, i: number, mat: number, spread: number
   if (y < GH - 1) {
     const below = i + GW;
     const cb = cell[below];
-    if (cb === EMPTY) { moveCell(i, below); return; }
-    if (isLiquid(cb) && DENSITY[mat] > DENSITY[cb]) { swapCell(i, below); return; }
+    if (cb === EMPTY) {
+      moveCell(i, below);
+      return;
+    }
+    if (isLiquid(cb) && DENSITY[mat] > DENSITY[cb]) {
+      swapCell(i, below);
+      return;
+    }
     // Diagonal trickle into an open lower cell (keeps liquids from stacking columns).
     const left = x > 0;
     const right = x < GW - 1;
     const odl = left && cell[below - 1] === EMPTY;
     const odr = right && cell[below + 1] === EMPTY;
-    if (odl && odr) { moveCell(i, rng() < 0.5 ? below - 1 : below + 1); return; }
-    if (odl) { moveCell(i, below - 1); return; }
-    if (odr) { moveCell(i, below + 1); return; }
+    if (odl && odr) {
+      moveCell(i, rng() < 0.5 ? below - 1 : below + 1);
+      return;
+    }
+    if (odl) {
+      moveCell(i, below - 1);
+      return;
+    }
+    if (odr) {
+      moveCell(i, below + 1);
+      return;
+    }
   }
   // Horizontal flow to find level. Choose a direction, persist it via life bias.
   let dir = life[i] === 1 ? 1 : life[i] === 0 ? -1 : 0;
@@ -310,15 +353,30 @@ const stepLava = (x: number, y: number, i: number): void => {
   if (y < GH - 1) {
     const below = i + GW;
     const cb = cell[below];
-    if (cb === EMPTY) { moveCell(i, below); return; }
-    if ((cb === WATER || cb === OIL)) { swapCell(i, below); return; }
+    if (cb === EMPTY) {
+      moveCell(i, below);
+      return;
+    }
+    if (cb === WATER || cb === OIL) {
+      swapCell(i, below);
+      return;
+    }
     const left = x > 0;
     const right = x < GW - 1;
     const odl = left && cell[below - 1] === EMPTY;
     const odr = right && cell[below + 1] === EMPTY;
-    if (odl && odr) { moveCell(i, rng() < 0.5 ? below - 1 : below + 1); return; }
-    if (odl) { moveCell(i, below - 1); return; }
-    if (odr) { moveCell(i, below + 1); return; }
+    if (odl && odr) {
+      moveCell(i, rng() < 0.5 ? below - 1 : below + 1);
+      return;
+    }
+    if (odl) {
+      moveCell(i, below - 1);
+      return;
+    }
+    if (odr) {
+      moveCell(i, below + 1);
+      return;
+    }
   }
   // Short, slow horizontal creep.
   const dir = rng() < 0.5 ? -1 : 1;
@@ -327,7 +385,10 @@ const stepLava = (x: number, y: number, i: number): void => {
     const tx = x + dd;
     if (tx < 0 || tx >= GW) continue;
     const t = idx(tx, y);
-    if (cell[t] === EMPTY) { moveCell(i, t); return; }
+    if (cell[t] === EMPTY) {
+      moveCell(i, t);
+      return;
+    }
   }
 };
 
@@ -389,8 +450,14 @@ const stepFire = (x: number, y: number, i: number): void => {
   // Age; on death leave a rising wisp of smoke (kept short-lived so the plume lifts
   // out cleanly instead of building a muddy floor haze).
   if (life[i] <= 1) {
-    if (rng() < 0.42) { cell[i] = SMOKE; life[i] = 42 + ((rng() * 30) | 0); moved[i] = stamp; }
-    else { cell[i] = EMPTY; life[i] = 0; }
+    if (rng() < 0.42) {
+      cell[i] = SMOKE;
+      life[i] = 42 + ((rng() * 30) | 0);
+      moved[i] = stamp;
+    } else {
+      cell[i] = EMPTY;
+      life[i] = 0;
+    }
     return;
   }
   life[i]--;
@@ -399,10 +466,16 @@ const stepFire = (x: number, y: number, i: number): void => {
     const up = i - GW;
     if (cell[up] === EMPTY) {
       const drift = rng();
-      if (drift < 0.6) { moveCell(i, up); return; }
+      if (drift < 0.6) {
+        moveCell(i, up);
+        return;
+      }
       const dd = drift < 0.8 ? -1 : 1;
       const nx = x + dd;
-      if (nx >= 0 && nx < GW && cell[idx(nx, y - 1)] === EMPTY) { moveCell(i, idx(nx, y - 1)); return; }
+      if (nx >= 0 && nx < GW && cell[idx(nx, y - 1)] === EMPTY) {
+        moveCell(i, idx(nx, y - 1));
+        return;
+      }
       moveCell(i, up);
       return;
     }
@@ -410,7 +483,9 @@ const stepFire = (x: number, y: number, i: number): void => {
     if (rng() < 0.4) {
       const dd = rng() < 0.5 ? -1 : 1;
       const nx = x + dd;
-      if (nx >= 0 && nx < GW && cell[idx(nx, y)] === EMPTY) { moveCell(i, idx(nx, y)); }
+      if (nx >= 0 && nx < GW && cell[idx(nx, y)] === EMPTY) {
+        moveCell(i, idx(nx, y));
+      }
     }
   }
 };
@@ -421,15 +496,25 @@ const stepFire = (x: number, y: number, i: number): void => {
 // so a slow / old wisp drifts sideways far less than a fresh, hot one (keeping the
 // plume a tidy column and the floor clean). Steam rises faster and dies sooner.
 const stepGas = (x: number, y: number, i: number, mat: number): void => {
-  if (life[i] <= 1) { cell[i] = EMPTY; life[i] = 0; return; }
+  if (life[i] <= 1) {
+    cell[i] = EMPTY;
+    life[i] = 0;
+    return;
+  }
   life[i]--;
   const buoyant = mat === STEAM ? 0.9 : 0.82;
   if (y > 0 && rng() < buoyant) {
     const up = i - GW;
-    if (cell[up] === EMPTY) { moveCell(i, up); return; }
+    if (cell[up] === EMPTY) {
+      moveCell(i, up);
+      return;
+    }
     const dd = rng() < 0.5 ? -1 : 1;
     const nx = x + dd;
-    if (nx >= 0 && nx < GW && cell[idx(nx, y - 1)] === EMPTY) { moveCell(i, idx(nx, y - 1)); return; }
+    if (nx >= 0 && nx < GW && cell[idx(nx, y - 1)] === EMPTY) {
+      moveCell(i, idx(nx, y - 1));
+      return;
+    }
   }
   // Lateral diffusion — only while the wisp is still young/energetic, so a fading
   // plume narrows and clears instead of smearing along the floor.
@@ -449,7 +534,10 @@ const stepPlant = (x: number, y: number, i: number): void => {
   const dir = (rng() * 4) | 0;
   let nx = x;
   let ny = y;
-  if (dir === 0) ny = y - 1; else if (dir === 1) ny = y + 1; else if (dir === 2) nx = x - 1; else nx = x + 1;
+  if (dir === 0) ny = y - 1;
+  else if (dir === 1) ny = y + 1;
+  else if (dir === 2) nx = x - 1;
+  else nx = x + 1;
   if (nx < 0 || nx >= GW || ny < 0 || ny >= GH) return;
   const j = idx(nx, ny);
   if (cell[j] === WATER) {
@@ -521,33 +609,33 @@ const attract = (time: number): void => {
   // LAVA vent — pours onto a mid-height stone LEDGE on the left so it pools and then
   // SPILLS off the lip as a glowing cascade (a molten body, not a thin free-fall).
   if (lp >= 0.2 && lp < 13) {
-    pour(((0.12 * W) + wob(0.7, 0, W * 0.025)) | 0, (GH * 0.30) | 0, 2.7, LAVA, 0.92);
+    pour((0.12 * W + wob(0.7, 0, W * 0.025)) | 0, (GH * 0.3) | 0, 2.7, LAVA, 0.92);
   }
   // SAND — two WELL-SEPARATED fat streams that build a broad, layered BANK across
   // the lower-centre (not a single thin spire). Each sweeps on its own phase so the
   // landing points roam and the pile grows as a heaped dune, shifting shape over the
   // loop. Kept apart in x so they merge into a wide bank rather than one tall pillar.
   if (lp >= 0 && lp < 11) {
-    pour(((0.33 * W) + wob(0.5, 0, W * 0.11)) | 0, 1, 3.0, SAND, 0.9);
-    pour(((0.56 * W) + wob(0.8, 2.3, W * 0.12)) | 0, 1, 2.7, SAND, 0.88);
+    pour((0.33 * W + wob(0.5, 0, W * 0.11)) | 0, 1, 3.0, SAND, 0.9);
+    pour((0.56 * W + wob(0.8, 2.3, W * 0.12)) | 0, 1, 2.7, SAND, 0.88);
   }
   // WATER fall — a tall central cascade onto the sand; pools, finds its level, runs
   // left toward the lava ledge (→ stone + a hiss of steam) and right into the oil.
   // Wider so it forms a readable pool with a real surface, not a thin trickle.
   if (lp >= 0.8 && lp < 12) {
-    pour(((0.50 * W) + wob(0.85, 1.0, W * 0.11)) | 0, 1, 3.0, WATER, 0.9);
+    pour((0.5 * W + wob(0.85, 1.0, W * 0.11)) | 0, 1, 3.0, WATER, 0.9);
   }
   // OIL slick — right third, on a low stone shelf so it spreads into a thin film.
   if (lp >= 1.2 && lp < 12) {
-    pour(((0.80 * W) + wob(0.6, 0.4, W * 0.05)) | 0, (GH * 0.60) | 0, 3.0, OIL, 0.82);
+    pour((0.8 * W + wob(0.6, 0.4, W * 0.05)) | 0, (GH * 0.6) | 0, 3.0, OIL, 0.82);
   }
   // FIRE — dripped onto the oil from ~2.0s, pulsed so tongues climb and smoke rises.
   if (lp >= 2.0 && lp < 13 && Math.sin(time * 7) > 0) {
-    pour(((0.80 * W) + wob(0.9, 0, W * 0.10)) | 0, (GH * 0.5) | 0, 2.1, FIRE, 1.0);
+    pour((0.8 * W + wob(0.9, 0, W * 0.1)) | 0, (GH * 0.5) | 0, 2.1, FIRE, 1.0);
   }
   // PLANT — seeds at the waterline so vines creep through the pool over the loop.
   if (lp >= 2.6 && lp < 2.8) {
-    paint(((0.62 * W)) | 0, (GH * 0.78) | 0, 1.6, PLANT, 1.0);
+    paint((0.62 * W) | 0, (GH * 0.78) | 0, 1.6, PLANT, 1.0);
   }
 };
 
@@ -602,7 +690,7 @@ const seedScene = (): void => {
   // line never reads as a flat ruled edge.
   for (let x = 1; x < W - 1; x++) {
     const lump = (hash2(x * 5, 3) + hash2((x >> 2) * 11, 7)) * 0.5; // smooth-ish ripple 0..1
-    const base = 1 + (lump * 2.4 | 0);
+    const base = 1 + ((lump * 2.4) | 0);
     for (let h = 0; h < base; h++) paint(x, floor - h, 0.7, SAND, 0.96);
   }
   // A broad, heaped sand BANK across the centre, taller and wider than before so the
@@ -616,7 +704,7 @@ const seedScene = (): void => {
   // gently dished basin (deeper in the middle) gives the sheet a clear top line that the
   // surface specular rides, so the launch frame already shows legible, lit water.
   for (let dx = -9; dx <= 9; dx++) {
-    const wh = 8 - ((dx * dx) / 16 | 0);
+    const wh = 8 - (((dx * dx) / 16) | 0);
     for (let h = 0; h < wh; h++) paint(((0.62 * W) | 0) + dx, floor - h, 1, WATER, 0.94);
   }
   // A glowing lava pool already brimming in the dammed left ledge (a DEEP pool that
@@ -628,15 +716,15 @@ const seedScene = (): void => {
     for (let h = 0; h < 10 - (Math.abs(dx) >> 1); h++) paint(((0.13 * W) | 0) + dx, ledgeY - 1 - h, 1, LAVA, 0.98);
   }
   // An established cascade already running the full cliff face into a pool at the base.
-  for (let h = 0; h < 9; h++) paint(((0.18 * W) | 0), ledgeY + 2 + h, 1, LAVA, 0.96);
+  for (let h = 0; h < 9; h++) paint((0.18 * W) | 0, ledgeY + 2 + h, 1, LAVA, 0.96);
   for (let dx = -2; dx <= 2; dx++) {
     for (let h = 0; h < 4 + (2 - Math.abs(dx)); h++) paint(((0.17 * W) | 0) + dx, floor - h, 1, LAVA, 0.95);
   }
   // Oil slick on the right shelf, broad and already alight (emissive flames + smoke
   // at t=0) so the right third is a living fire, not a few stray embers.
-  for (let dx = -6; dx <= 6; dx++) paint(((0.80 * W) | 0) + dx, shelfY - 1, 1, OIL, 0.9);
-  paint((0.80 * W) | 0, shelfY - 4, 4, FIRE, 1.0);
-  paint(((0.74 * W) | 0), shelfY - 3, 2, FIRE, 1.0);
+  for (let dx = -6; dx <= 6; dx++) paint(((0.8 * W) | 0) + dx, shelfY - 1, 1, OIL, 0.9);
+  paint((0.8 * W) | 0, shelfY - 4, 4, FIRE, 1.0);
+  paint((0.74 * W) | 0, shelfY - 3, 2, FIRE, 1.0);
   // Plant sprigs by the water.
   paint((0.64 * W) | 0, floor - 1, 1, PLANT, 1.0);
   paint((0.66 * W) | 0, floor - 2, 1, PLANT, 1.0);
@@ -648,17 +736,17 @@ const seedScene = (): void => {
     // Keep the oil fire fed throughout the settle so a continuous plume rises (rather
     // than a single puff that has already cleared by the time we capture t=0).
     if (k >= 20 && (k & 3) === 0) {
-      paint((0.80 * W) | 0, shelfY - 4, 3, FIRE, 1.0);
-      paint(((0.74 * W) | 0), shelfY - 3, 2, FIRE, 1.0);
+      paint((0.8 * W) | 0, shelfY - 4, 3, FIRE, 1.0);
+      paint((0.74 * W) | 0, shelfY - 3, 2, FIRE, 1.0);
     }
   }
   // Re-light the oil after settling so flames are active on the opening frame, then
   // step a few more frames so the tongues actually CLIMB and the smoke plume is already
   // mid-rise — the right third reads as a living fire, not a fresh ignition.
-  paint((0.80 * W) | 0, shelfY - 4, 4, FIRE, 1.0);
-  paint(((0.74 * W) | 0), shelfY - 3, 2, FIRE, 1.0);
+  paint((0.8 * W) | 0, shelfY - 4, 4, FIRE, 1.0);
+  paint((0.74 * W) | 0, shelfY - 3, 2, FIRE, 1.0);
   for (let k = 0; k < 7; k++) update();
-  paint((0.80 * W) | 0, shelfY - 4, 3, FIRE, 1.0); // top up so flames stay alive at t=0
+  paint((0.8 * W) | 0, shelfY - 4, 3, FIRE, 1.0); // top up so flames stay alive at t=0
 };
 
 // ── Render ─────────────────────────────────────────────────────────────────────
@@ -714,7 +802,10 @@ const render = (t: Term, time: number): void => {
   for (let x = 0; x < W; x++) {
     let top = GH; // sentinel = no water in this column
     for (let y = 0; y < H; y++) {
-      if (cell[y * W + x] === WATER) { top = y; break; }
+      if (cell[y * W + x] === WATER) {
+        top = y;
+        break;
+      }
     }
     waterTop[x] = top;
   }
@@ -759,7 +850,9 @@ const render = (t: Term, time: number): void => {
             let wb = COL_WATER_SHAL[2] + (COL_WATER_DEEP[2] - COL_WATER_SHAL[2]) * depth;
             // Caustic shimmer — a slow travelling bright/dark band through the body.
             const caus = 0.86 + 0.3 * hash2((x + tw) * 7, (y - (tw >> 1)) * 11);
-            wr *= caus; wg *= caus; wb *= caus;
+            wr *= caus;
+            wg *= caus;
+            wb *= caus;
             if (surface) {
               // The exposed top skin gets a crisp, sculpted specular: a smooth
               // travelling sine highlight (the steady sheen of a settled sheet) plus a
@@ -769,7 +862,9 @@ const render = (t: Term, time: number): void => {
               const wave = 0.5 + 0.5 * Math.sin((x + tw) * 0.55 + waterTop[x] * 0.3);
               const spark = hash2(x * 13 + tw, 7);
               const glint = (0.28 + 0.5 * wave + 0.34 * spark) * exposed;
-              wr += 78 * glint; wg += 104 * glint; wb += 130 * glint;
+              wr += 78 * glint;
+              wg += 104 * glint;
+              wb += 130 * glint;
             }
             // Opaque enough at the surface that even a one-cell-thick sheet reads as
             // water; the body deepens toward translucent as it thins below.
@@ -789,7 +884,11 @@ const render = (t: Term, time: number): void => {
             let or0 = COL_OIL_A[0] + (COL_OIL_B[0] - COL_OIL_A[0]) * sheen + sheen * 22;
             let og0 = COL_OIL_A[1] + (COL_OIL_B[1] - COL_OIL_A[1]) * sheen + sheen * sheen * 26;
             let ob0 = COL_OIL_A[2] + (COL_OIL_B[2] - COL_OIL_A[2]) * sheen + sheen * 70;
-            if (skin) { or0 += 18; og0 += 22; ob0 += 46; } // rainbow film on the skin
+            if (skin) {
+              or0 += 18;
+              og0 += 22;
+              ob0 += 46;
+            } // rainbow film on the skin
             r = bgR * (1 - a) + or0 * a;
             g = bgG * (1 - a) + og0 * a;
             b = bgB * (1 - a) + ob0 * a;
@@ -815,7 +914,7 @@ const render = (t: Term, time: number): void => {
             // Blackbody flame: hot blue-white at the base of a tongue, cooling to a
             // smoky orange-red tip as life runs down + with a per-cell flicker.
             const lf = clamp01(life[i] / 60);
-            const fl = 0.5 + 0.5 * hash2(x * 3 + (flick | 0), y * 5 + (flick * 0.5 | 0));
+            const fl = 0.5 + 0.5 * hash2(x * 3 + (flick | 0), y * 5 + ((flick * 0.5) | 0));
             const heat = clamp01(0.42 + 0.6 * lf) * (0.7 + 0.4 * fl);
             blackbody(heat, bbTmp);
             const e = 1.3 + 1.3 * heat;
@@ -969,8 +1068,7 @@ const bloomAndComposite = (t: Term, N: number): void => {
     const dn2 = (y < H - 2 ? y + 2 : H - 1) * W;
     for (let x = 0; x < W; x++) {
       const c = bloomA[row + x];
-      bloomB[row + x] =
-        c * 0.34 + (bloomA[up1 + x] + bloomA[dn1 + x]) * 0.22 + (bloomA[up2 + x] + bloomA[dn2 + x]) * 0.11;
+      bloomB[row + x] = c * 0.34 + (bloomA[up1 + x] + bloomA[dn1 + x]) * 0.22 + (bloomA[up2 + x] + bloomA[dn2 + x]) * 0.11;
     }
   }
   // — WIDE bloom: downsample light → wideA (2×2 average) —
@@ -1024,7 +1122,9 @@ const bloomAndComposite = (t: Term, N: number): void => {
       const gl = bloomB[i] + light[i] * 0.5 + wide * 1.15;
       const o = i * 3;
       if (gl <= 0.0015) {
-        const r = buf[o]; const g = buf[o + 1]; const b = buf[o + 2];
+        const r = buf[o];
+        const g = buf[o + 1];
+        const b = buf[o + 2];
         buf[o] = r > 255 ? 255 : r;
         buf[o + 1] = g > 255 ? 255 : g;
         buf[o + 2] = b > 255 ? 255 : b;
@@ -1075,7 +1175,10 @@ run({
   },
   onKey: (key, _t) => {
     sawKey = true; // refresh the idle clock in `frame` (onKey has no sim clock)
-    if (key === 'c') { clearWorld(); return; }
+    if (key === 'c') {
+      clearWorld();
+      return;
+    }
     const n = parseInt(key, 10);
     if (Number.isFinite(n) && n >= 1 && n <= PALETTE.length) curMat = PALETTE[n - 1].id;
   },
@@ -1090,12 +1193,15 @@ run({
     }
     // Track interaction. onKey can't see `time`, so any mouse activity or a pending
     // key flag refreshes the idle clock here.
-    if (t.mouse.active && (t.mouse.sequence !== 0)) {
+    if (t.mouse.active && t.mouse.sequence !== 0) {
       if (t.mouse.x !== prevMouseX || t.mouse.y !== prevMouseY || t.mouse.down) lastInputTime = time;
       prevMouseX = t.mouse.x;
       prevMouseY = t.mouse.y;
     }
-    if (sawKey) { lastInputTime = time; sawKey = false; }
+    if (sawKey) {
+      lastInputTime = time;
+      sawKey = false;
+    }
 
     const userActive = time - lastInputTime < IDLE_BEFORE_ATTRACT;
 
@@ -1189,14 +1295,23 @@ const drawSelector = (t: Term, userActive: boolean): void => {
 // Representative swatch colour for the selector (mid-tone of each material).
 const swatchColor = (m: number): RGB => {
   switch (m) {
-    case SAND: return [214, 183, 118];
-    case WATER: return [50, 120, 220];
-    case OIL: return [70, 58, 50];
-    case FIRE: return [255, 150, 40];
-    case LAVA: return [255, 110, 24];
-    case STONE: return [104, 106, 116];
-    case WALL: return [60, 62, 72];
-    case PLANT: return [70, 180, 72];
-    default: return [40, 40, 50];
+    case SAND:
+      return [214, 183, 118];
+    case WATER:
+      return [50, 120, 220];
+    case OIL:
+      return [70, 58, 50];
+    case FIRE:
+      return [255, 150, 40];
+    case LAVA:
+      return [255, 110, 24];
+    case STONE:
+      return [104, 106, 116];
+    case WALL:
+      return [60, 62, 72];
+    case PLANT:
+      return [70, 180, 72];
+    default:
+      return [40, 40, 50];
   }
 };

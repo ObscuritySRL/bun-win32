@@ -26,8 +26,8 @@ const assert = (label: string, condition: boolean, detail = ''): void => {
   for (let index = 0; index < 8; index++) if (png[index] !== signature[index]) signatureMatches = false;
   assert('PNG signature', signatureMatches);
   assert('IHDR chunk type', png[12] === 0x49 && png[13] === 0x48 && png[14] === 0x44 && png[15] === 0x52);
-  assert('PNG width', (((png[16] << 24) | (png[17] << 16) | (png[18] << 8) | png[19]) >>> 0) === width);
-  assert('PNG height', (((png[20] << 24) | (png[21] << 16) | (png[22] << 8) | png[23]) >>> 0) === height);
+  assert('PNG width', ((png[16] << 24) | (png[17] << 16) | (png[18] << 8) | png[19]) >>> 0 === width);
+  assert('PNG height', ((png[20] << 24) | (png[21] << 16) | (png[22] << 8) | png[23]) >>> 0 === height);
   assert('PNG bit depth 8', png[24] === 8);
   assert('PNG colour type 2', png[25] === 2);
   let idatStart = -1;

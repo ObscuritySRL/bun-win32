@@ -149,7 +149,9 @@ function makeFakeRom(type: number, romBanks: number, ramCode: number): Uint8Arra
   for (let i = 0; i < 30; i += 1) gb.runFrame();
   let colored = 0;
   for (let i = 0; i < gb.frame.length; i += 4) {
-    const r = gb.frame[i]!, g = gb.frame[i + 1]!, b = gb.frame[i + 2]!;
+    const r = gb.frame[i]!,
+      g = gb.frame[i + 1]!,
+      b = gb.frame[i + 2]!;
     if (Math.abs(r - g) > 24 || Math.abs(g - b) > 24 || Math.abs(r - b) > 24) colored += 1; // not greyscale
   }
   check('cgb-acid2 produces genuinely colored pixels', colored > 500);

@@ -113,10 +113,7 @@ function readSystemTime(buf: Buffer, offset: number): string {
 
   if (year === 0 && month === 0 && day === 0) return '(never)';
 
-  return (
-    `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')} ` +
-    `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}:${String(second).padStart(2, '0')}`
-  );
+  return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')} ` + `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}:${String(second).padStart(2, '0')}`;
 }
 
 console.log();
@@ -189,13 +186,13 @@ for (let ri = 0; ri < radios.length; ri++) {
 
   // Enumerate devices for this radio
   const searchParams = Buffer.alloc(40);
-  searchParams.writeUInt32LE(40, 0);        // dwSize
-  searchParams.writeInt32LE(1, 8);           // fReturnAuthenticated
-  searchParams.writeInt32LE(1, 12);          // fReturnRemembered
-  searchParams.writeInt32LE(1, 16);          // fReturnUnknown
-  searchParams.writeInt32LE(1, 20);          // fReturnConnected
-  searchParams.writeInt32LE(0, 24);          // fIssueInquiry (skip live scan)
-  searchParams.writeUInt8(0, 28);            // cTimeoutMultiplier
+  searchParams.writeUInt32LE(40, 0); // dwSize
+  searchParams.writeInt32LE(1, 8); // fReturnAuthenticated
+  searchParams.writeInt32LE(1, 12); // fReturnRemembered
+  searchParams.writeInt32LE(1, 16); // fReturnUnknown
+  searchParams.writeInt32LE(1, 20); // fReturnConnected
+  searchParams.writeInt32LE(0, 24); // fIssueInquiry (skip live scan)
+  searchParams.writeUInt8(0, 28); // cTimeoutMultiplier
   searchParams.writeBigUInt64LE(hRadio, 32); // hRadio
 
   const deviceInfo = Buffer.alloc(560);

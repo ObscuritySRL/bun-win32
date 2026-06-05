@@ -324,7 +324,7 @@ function setupDuplication(device: bigint): bigint | { error: 'denied' | string }
 
   const ppOutput = Buffer.alloc(8);
   const enumHr = gpu.vcall(adapter, DXGIADAPTER_ENUM_OUTPUTS, [FFIType.u32, FFIType.ptr], [0, ppOutput.ptr!]);
-  if ((enumHr >>> 0) === DXGI_ERROR_NOT_FOUND) {
+  if (enumHr >>> 0 === DXGI_ERROR_NOT_FOUND) {
     gpu.comRelease(adapter);
     gpu.comRelease(dxgiDevice);
     return { error: 'No connected output (EnumOutputs → NOT_FOUND).' };
@@ -352,7 +352,7 @@ function setupDuplication(device: bigint): bigint | { error: 'denied' | string }
   gpu.comRelease(output);
   gpu.comRelease(adapter);
   gpu.comRelease(dxgiDevice);
-  if ((dupHr >>> 0) === E_ACCESSDENIED) return { error: 'denied' };
+  if (dupHr >>> 0 === E_ACCESSDENIED) return { error: 'denied' };
   if (dupHr !== S_OK) return { error: `IDXGIOutput1::DuplicateOutput failed ${hex(dupHr)}.` };
   return ppDupl.readBigUInt64LE(0);
 }
@@ -420,8 +420,8 @@ const tex2dIid = guidBytes(IID_ID3D11TEXTURE2D);
 function captureFrame(): 'ok' | 'reuse' | 'lost' {
   ppResource.writeBigUInt64LE(0n, 0);
   const hr = gpu.vcall(duplication, DUPL_ACQUIRE_NEXT_FRAME, [FFIType.u32, FFIType.ptr, FFIType.ptr], [12, frameInfo.ptr!, ppResource.ptr!]);
-  if ((hr >>> 0) === DXGI_ERROR_WAIT_TIMEOUT) return 'reuse';
-  if ((hr >>> 0) === DXGI_ERROR_ACCESS_LOST) return 'lost';
+  if (hr >>> 0 === DXGI_ERROR_WAIT_TIMEOUT) return 'reuse';
+  if (hr >>> 0 === DXGI_ERROR_ACCESS_LOST) return 'lost';
   if (hr !== S_OK) return 'reuse';
 
   const resource = ppResource.readBigUInt64LE(0);

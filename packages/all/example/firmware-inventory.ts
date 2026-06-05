@@ -223,8 +223,7 @@ function decodeUuid(s: SmbiosStructure): string {
   const allSame = (v: number): boolean => b.every((x) => x === v);
   if (allSame(0x00) || allSame(0xff)) return 'Not present';
   const hex = (n: number): string => n.toString(16).padStart(2, '0');
-  const le = (i0: number, i1: number, i2: number, i3: number): string =>
-    hex(b[i3]!) + hex(b[i2]!) + hex(b[i1]!) + hex(b[i0]!);
+  const le = (i0: number, i1: number, i2: number, i3: number): string => hex(b[i3]!) + hex(b[i2]!) + hex(b[i1]!) + hex(b[i0]!);
   const f1 = le(0, 1, 2, 3);
   const f2 = hex(b[5]!) + hex(b[4]!);
   const f3 = hex(b[7]!) + hex(b[6]!);
@@ -369,22 +368,13 @@ function main(): void {
     const populated = modules.filter((m) => m.sizeMB > 0);
     const totalMB = populated.reduce((acc, m) => acc + m.sizeMB, 0);
     lines.push(boxSep());
-    lines.push(
-      boxTitle(
-        `MEMORY  (Type 17) — ${populated.length}/${modules.length} slots populated, ${formatMemSize(totalMB)} total`,
-      ),
-    );
+    lines.push(boxTitle(`MEMORY  (Type 17) — ${populated.length}/${modules.length} slots populated, ${formatMemSize(totalMB)} total`));
     for (const m of modules) {
       if (m.sizeMB === 0) {
         lines.push(boxRow(m.locator, `${DIM}(empty)${RESET}`));
       } else {
         const speed = m.speed > 0 ? `${m.speed} MT/s` : 'speed unknown';
-        lines.push(
-          boxRow(
-            m.locator,
-            `${C_GOOD}${formatMemSize(m.sizeMB)}${RESET}${C_VALUE} @ ${speed}  ${DIM}(${m.manufacturer})${RESET}`,
-          ),
-        );
+        lines.push(boxRow(m.locator, `${C_GOOD}${formatMemSize(m.sizeMB)}${RESET}${C_VALUE} @ ${speed}  ${DIM}(${m.manufacturer})${RESET}`));
       }
     }
   }

@@ -7,21 +7,7 @@
  *
  * Run: bun run packages/all/example/voxelscape.logic.test.ts
  */
-import {
-  B_AIR,
-  B_GRAVEL,
-  B_LAVA,
-  B_OBSIDIAN,
-  B_SAND,
-  B_STONE,
-  B_TNT,
-  B_WATER,
-  B_WOOD,
-  createEntities,
-  createSim,
-  isSolid,
-  sweptMove,
-} from './voxelscape';
+import { B_AIR, B_GRAVEL, B_LAVA, B_OBSIDIAN, B_SAND, B_STONE, B_TNT, B_WATER, B_WOOD, createEntities, createSim, isSolid, sweptMove } from './voxelscape';
 
 let failures = 0;
 function check(name: string, cond: boolean): void {

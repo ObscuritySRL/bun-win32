@@ -104,8 +104,8 @@ try {
     // Bind to 127.0.0.1:0 to get an ephemeral port
     const sockaddrBuf = Buffer.alloc(16);
     sockaddrBuf.writeUInt16LE(AF_INET, 0); // sin_family
-    sockaddrBuf.writeUInt16BE(0, 2);       // sin_port = 0 (ephemeral)
-    sockaddrBuf[4] = 127;                  // 127.0.0.1
+    sockaddrBuf.writeUInt16BE(0, 2); // sin_port = 0 (ephemeral)
+    sockaddrBuf[4] = 127; // 127.0.0.1
     sockaddrBuf[5] = 0;
     sockaddrBuf[6] = 0;
     sockaddrBuf[7] = 1;

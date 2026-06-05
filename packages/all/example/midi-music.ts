@@ -305,8 +305,8 @@ function main(): void {
   // Assign GM instruments per channel (ProgramChange 0xCn).
   // Pad: Warm Pad(89). Arp: Music Box(10). Lead: Square Lead(80→use 81 Saw? pick 81). Bass: Fingered Bass(33).
   const PROGRAMS: Record<number, number> = {
-    [CH_PAD]: 89,  // Pad 2 (warm)
-    [CH_ARP]: 9,   // Glockenspiel — bright sparkle
+    [CH_PAD]: 89, // Pad 2 (warm)
+    [CH_ARP]: 9, // Glockenspiel — bright sparkle
     [CH_LEAD]: 81, // Lead 2 (sawtooth) — singing
     [CH_BASS]: 33, // Electric Bass (finger)
   };
@@ -327,7 +327,10 @@ function main(): void {
   } catch (err) {
     console.error(String((err as Error).message));
     silenceAll();
-    if (midiOk) { Winmm.midiOutReset(hmo); Winmm.midiOutClose(hmo); }
+    if (midiOk) {
+      Winmm.midiOutReset(hmo);
+      Winmm.midiOutClose(hmo);
+    }
     win.destroy();
     process.exit(1);
     return;

@@ -23,24 +23,10 @@
  * Run: bun run example/power-audit.ts
  */
 import { type Pointer, toArrayBuffer } from 'bun:ffi';
-import PowrProf, {
-  POWER_INFORMATION_LEVEL,
-  POWER_DATA_ACCESSOR,
-  POWER_PLATFORM_ROLE,
-} from '../index';
+import PowrProf, { POWER_INFORMATION_LEVEL, POWER_DATA_ACCESSOR, POWER_PLATFORM_ROLE } from '../index';
 import Kernel32 from '@bun-win32/kernel32';
 
-PowrProf.Preload([
-  'PowerGetActiveScheme',
-  'PowerReadFriendlyName',
-  'PowerEnumerate',
-  'CallNtPowerInformation',
-  'GetPwrCapabilities',
-  'PowerDeterminePlatformRoleEx',
-  'IsPwrHibernateAllowed',
-  'IsPwrSuspendAllowed',
-  'IsPwrShutdownAllowed',
-]);
+PowrProf.Preload(['PowerGetActiveScheme', 'PowerReadFriendlyName', 'PowerEnumerate', 'CallNtPowerInformation', 'GetPwrCapabilities', 'PowerDeterminePlatformRoleEx', 'IsPwrHibernateAllowed', 'IsPwrSuspendAllowed', 'IsPwrShutdownAllowed']);
 Kernel32.Preload(['GetSystemPowerStatus']);
 
 const W = 76;
@@ -61,13 +47,7 @@ function yesNo(val: number | boolean): string {
 
 function formatGuid(guidBytes: Uint8Array): string {
   const h = [...guidBytes].map((b) => b.toString(16).padStart(2, '0'));
-  return [
-    h.slice(0, 4).reverse().join(''),
-    h.slice(4, 6).reverse().join(''),
-    h.slice(6, 8).reverse().join(''),
-    h.slice(8, 10).join(''),
-    h.slice(10, 16).join(''),
-  ].join('-');
+  return [h.slice(0, 4).reverse().join(''), h.slice(4, 6).reverse().join(''), h.slice(6, 8).reverse().join(''), h.slice(8, 10).join(''), h.slice(10, 16).join('')].join('-');
 }
 
 function readFriendlyName(guidBuf: Buffer): string {
@@ -127,12 +107,7 @@ let schemeIndex = 0;
 
 while (true) {
   sizeBuf.writeUInt32LE(16, 0);
-  const enumResult = PowrProf.PowerEnumerate(
-    0n, null, null,
-    POWER_DATA_ACCESSOR.ACCESS_SCHEME,
-    schemeIndex,
-    guidBuf.ptr, sizeBuf.ptr,
-  );
+  const enumResult = PowrProf.PowerEnumerate(0n, null, null, POWER_DATA_ACCESSOR.ACCESS_SCHEME, schemeIndex, guidBuf.ptr, sizeBuf.ptr);
 
   // ERROR_NO_MORE_ITEMS = 259
   if (enumResult === 259 || enumResult !== 0) break;
@@ -141,9 +116,7 @@ while (true) {
   const guidStr = formatGuid(schemeGuidBytes);
   const name = readFriendlyName(Buffer.from(schemeGuidBytes));
 
-  const isActive = activeGuidBytes
-    ? schemeGuidBytes.every((b, i) => b === activeGuidBytes![i])
-    : false;
+  const isActive = activeGuidBytes ? schemeGuidBytes.every((b, i) => b === activeGuidBytes![i]) : false;
   const marker = isActive ? ' << ACTIVE' : '';
 
   row(`[${schemeIndex}] ${name}`, `{${guidStr}}${marker}`);
@@ -158,11 +131,7 @@ if (schemeIndex === 0) {
 heading('BATTERY STATE (CallNtPowerInformation)');
 
 const battBuf = Buffer.alloc(64);
-const battStatus = PowrProf.CallNtPowerInformation(
-  POWER_INFORMATION_LEVEL.SystemBatteryState,
-  null, 0,
-  battBuf.ptr, battBuf.byteLength,
-);
+const battStatus = PowrProf.CallNtPowerInformation(POWER_INFORMATION_LEVEL.SystemBatteryState, null, 0, battBuf.ptr, battBuf.byteLength);
 
 if (battStatus === 0) {
   const bv = new DataView(battBuf.buffer);
@@ -199,11 +168,7 @@ if (battStatus === 0) {
 heading('SYSTEM POWER CAPABILITIES (CallNtPowerInformation)');
 
 const capBuf = Buffer.alloc(128);
-const capStatus = PowrProf.CallNtPowerInformation(
-  POWER_INFORMATION_LEVEL.SystemPowerCapabilities,
-  null, 0,
-  capBuf.ptr, capBuf.byteLength,
-);
+const capStatus = PowrProf.CallNtPowerInformation(POWER_INFORMATION_LEVEL.SystemPowerCapabilities, null, 0, capBuf.ptr, capBuf.byteLength);
 
 if (capStatus === 0) {
   const cv = new DataView(capBuf.buffer);
@@ -330,11 +295,7 @@ heading('SYSTEM POWER INFORMATION (CallNtPowerInformation)');
 
 const spiSize = 32;
 const spiBuf = Buffer.alloc(spiSize);
-const spiStatus = PowrProf.CallNtPowerInformation(
-  POWER_INFORMATION_LEVEL.SystemPowerInformation,
-  null, 0,
-  spiBuf.ptr, spiBuf.byteLength,
-);
+const spiStatus = PowrProf.CallNtPowerInformation(POWER_INFORMATION_LEVEL.SystemPowerInformation, null, 0, spiBuf.ptr, spiBuf.byteLength);
 
 if (spiStatus === 0) {
   const sv = new DataView(spiBuf.buffer);

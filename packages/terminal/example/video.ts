@@ -458,8 +458,16 @@ interface AudioSource {
 // file or unsupported codec — the caller then keeps the original wall-clock pacing.
 function openAudio(path: string): AudioSource {
   const disabled: AudioSource = {
-    ok: false, rate: 0, channels: 0, bits: 0, underruns: 0,
-    feed: () => {}, masterSec: () => 0, pause: () => {}, resume: () => {}, shutdown: () => {},
+    ok: false,
+    rate: 0,
+    channels: 0,
+    bits: 0,
+    underruns: 0,
+    feed: () => {},
+    masterSec: () => 0,
+    pause: () => {},
+    resume: () => {},
+    shutdown: () => {},
   };
 
   const wpath = wide(path);
@@ -488,8 +496,7 @@ function openAudio(path: string): AudioSource {
   let bits = 16;
   if (vcall(reader, READER_GET_CURRENT_MEDIA_TYPE, [FFIType.u32, FFIType.ptr], [MF_SOURCE_READER_FIRST_AUDIO_STREAM, aPpCurType.ptr!]) === S_OK) {
     const cur = aPpCurType.readBigUInt64LE(0);
-    const getU32 = (guid: string, def: number): number =>
-      vcall(cur, ATTR_GET_UINT32, [FFIType.ptr, FFIType.ptr], [guidBytes(guid).ptr!, aU32Out.ptr!]) === S_OK ? aU32Out.readUInt32LE(0) : def;
+    const getU32 = (guid: string, def: number): number => (vcall(cur, ATTR_GET_UINT32, [FFIType.ptr, FFIType.ptr], [guidBytes(guid).ptr!, aU32Out.ptr!]) === S_OK ? aU32Out.readUInt32LE(0) : def);
     rate = getU32(MF_MT_AUDIO_SAMPLES_PER_SECOND, 48000);
     channels = getU32(MF_MT_AUDIO_NUM_CHANNELS, 2);
     bits = getU32(MF_MT_AUDIO_BITS_PER_SAMPLE, 16);
@@ -545,7 +552,8 @@ function openAudio(path: string): AudioSource {
     // ReadSample can return a warm-up null; try a few times to land real bytes.
     for (let tries = 0; tries < 8 && written === 0; tries++) {
       const hr = vcall(
-        reader, READER_READ_SAMPLE,
+        reader,
+        READER_READ_SAMPLE,
         [FFIType.u32, FFIType.u32, FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.ptr],
         [MF_SOURCE_READER_FIRST_AUDIO_STREAM, 0, aActualIndex.ptr!, aStreamFlags.ptr!, aTimestamp.ptr!, aPpSample.ptr!],
       );
@@ -608,7 +616,11 @@ function openAudio(path: string): AudioSource {
       // (zeroes the byte clock), free all slots, and let the next feed() re-prime from 0.
       if (atEof) {
         let allDone = true;
-        for (let i = 0; i < AUDIO_RING; i++) if ((audioHdr[i]!.readUInt32LE(24) & WHDR_DONE) === 0) { allDone = false; break; }
+        for (let i = 0; i < AUDIO_RING; i++)
+          if ((audioHdr[i]!.readUInt32LE(24) & WHDR_DONE) === 0) {
+            allDone = false;
+            break;
+          }
         if (allDone) {
           winmm.symbols.waveOutReset(hwo); // zeroes the device byte counter (epoch restart)
           for (let i = 0; i < AUDIO_RING; i++) audioHdr[i]!.writeUInt32LE(WHDR_DONE | WHDR_PREPARED, 24); // free all slots (keep PREPARED)
@@ -653,7 +665,7 @@ if (path === undefined || path === '') {
 
 const coHr = ole32.symbols.CoInitializeEx(null, COINIT_APARTMENTTHREADED);
 const coOwned = coHr >= 0;
-if (coHr < 0 && (coHr >>> 0) !== RPC_E_CHANGED_MODE) process.stderr.write(`video: CoInitializeEx ${hex(coHr)} (continuing)\n`);
+if (coHr < 0 && coHr >>> 0 !== RPC_E_CHANGED_MODE) process.stderr.write(`video: CoInitializeEx ${hex(coHr)} (continuing)\n`);
 const mfStartHr = Mfplat.MFStartup(MF_VERSION, MFSTARTUP_LITE);
 if (mfStartHr !== S_OK) {
   process.stdout.write(`video: MFStartup ${hex(mfStartHr)} — Media Foundation unavailable.\n`);
@@ -766,13 +778,7 @@ function buildLut(cols: number, rows: number, stride: number, flip: boolean): Do
 }
 
 function ensureLut(cols: number, rows: number, stride: number, flip: boolean): DownscaleLut {
-  if (
-    lut === null ||
-    lut.cols !== cols ||
-    lut.rows !== rows ||
-    lut.stride !== stride ||
-    lut.flip !== flip
-  ) {
+  if (lut === null || lut.cols !== cols || lut.rows !== rows || lut.stride !== stride || lut.flip !== flip) {
     lut = buildLut(cols, rows, stride, flip);
   }
   return lut;
@@ -1040,8 +1046,6 @@ winmm.close();
 
 if (process.env.FPS_REPORT === '1') {
   const sync = syncSamples.map((s) => `${s.master.toFixed(2)}:${s.disp.toFixed(2)}`).join(' ');
-  process.stderr.write(
-    `video_stats decoded=${framesDecoded} dropped=${framesDropped} audio=${audioActive ? `${audio.rate}/${audio.channels}/${audio.bits}` : 'off'} underruns=${audio.underruns} sync[master:disp]=${sync}\n`,
-  );
+  process.stderr.write(`video_stats decoded=${framesDecoded} dropped=${framesDropped} audio=${audioActive ? `${audio.rate}/${audio.channels}/${audio.bits}` : 'off'} underruns=${audio.underruns} sync[master:disp]=${sync}\n`);
 }
 process.exit(0);

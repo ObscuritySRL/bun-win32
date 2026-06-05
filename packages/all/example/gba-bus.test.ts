@@ -10,7 +10,10 @@ import { Gba } from './gba-bus';
 let failures = 0;
 function check(name: string, cond: boolean, got?: unknown, want?: unknown): void {
   if (cond) console.log(`PASS  ${name}`);
-  else { console.log(`FAIL  ${name}${got !== undefined ? `  got=${fmt(got)} want=${fmt(want)}` : ''}`); failures += 1; }
+  else {
+    console.log(`FAIL  ${name}${got !== undefined ? `  got=${fmt(got)} want=${fmt(want)}` : ''}`);
+    failures += 1;
+  }
 }
 const fmt = (v: unknown): string => (typeof v === 'number' ? `0x${(v >>> 0).toString(16)}` : String(v));
 
@@ -24,7 +27,7 @@ function freshGba(): Gba {
 {
   const g = freshGba();
   g.write32(0x02000000, 0xdeadbeef);
-  check('EWRAM 32-bit round-trip', (g.read32(0x02000000) >>> 0) === 0xdeadbeef, g.read32(0x02000000), 0xdeadbeef);
+  check('EWRAM 32-bit round-trip', g.read32(0x02000000) >>> 0 === 0xdeadbeef, g.read32(0x02000000), 0xdeadbeef);
   g.write16(0x03000010, 0x1234);
   check('IWRAM 16-bit round-trip', g.read16(0x03000010) === 0x1234, g.read16(0x03000010), 0x1234);
   g.write16(0x06000000, 0xabcd);
@@ -40,7 +43,7 @@ function freshGba(): Gba {
   g.write16(0x040000b8, 4); // count = 4 units
   g.write16(0x040000ba, 0x8400); // enable + 32-bit + immediate
   let ok = true;
-  for (let i = 0; i < 4; i += 1) if ((g.read32(0x03000100 + i * 4) >>> 0) !== (0x1000 + i)) ok = false;
+  for (let i = 0; i < 4; i += 1) if (g.read32(0x03000100 + i * 4) >>> 0 !== 0x1000 + i) ok = false;
   check('DMA0 immediate copied 4 words', ok, g.read32(0x03000100), 0x1000);
   check('DMA0 enable bit cleared after non-repeat', (g.read16(0x040000ba) & 0x8000) === 0);
 }
@@ -80,7 +83,7 @@ function freshGba(): Gba {
   g.write16(0x04000208, 1); // IME
   g.raiseIrq(0); // VBlank
   check('IRQ entered IRQ mode', (g.cpu.cpsr & 0x1f) === 0x12);
-  check('IRQ vector PC = 0x18', (g.cpu.r[15] >>> 0) === 0x18, g.cpu.r[15], 0x18);
+  check('IRQ vector PC = 0x18', g.cpu.r[15] >>> 0 === 0x18, g.cpu.r[15], 0x18);
 }
 {
   const g = freshGba();
@@ -94,7 +97,8 @@ function freshGba(): Gba {
 // ── BIOS HLE SWIs ────────────────────────────────────────────────────────────
 {
   const g = freshGba();
-  g.cpu.r[0] = 100; g.cpu.r[1] = 7;
+  g.cpu.r[0] = 100;
+  g.cpu.r[1] = 7;
   g.swi(0x06); // Div
   check('SWI Div quotient', g.cpu.r[0] === 14, g.cpu.r[0], 14);
   check('SWI Div remainder', g.cpu.r[1] === 2, g.cpu.r[1], 2);
@@ -102,7 +106,8 @@ function freshGba(): Gba {
 }
 {
   const g = freshGba();
-  g.cpu.r[0] = -20; g.cpu.r[1] = 6;
+  g.cpu.r[0] = -20;
+  g.cpu.r[1] = 6;
   g.swi(0x06);
   check('SWI Div signed quotient', g.cpu.r[0] === -3, g.cpu.r[0], -3);
 }
@@ -116,7 +121,8 @@ function freshGba(): Gba {
   // CpuSet fill: fill 8 halfwords at 0x03000200 with the value at 0x03000000.
   const g = freshGba();
   g.write16(0x03000000, 0x5a5a);
-  g.cpu.r[0] = 0x03000000; g.cpu.r[1] = 0x03000200;
+  g.cpu.r[0] = 0x03000000;
+  g.cpu.r[1] = 0x03000200;
   g.cpu.r[2] = 8 | (1 << 24); // count 8, fill, halfword
   g.swi(0x0b);
   check('SWI CpuSet fill', g.read16(0x03000200) === 0x5a5a && g.read16(0x0300020e) === 0x5a5a);
@@ -125,7 +131,8 @@ function freshGba(): Gba {
   // LZ77: decompress "AAAA" — header (size=4, type=1) + one flag block.
   // Encode: literal 'A', then back-reference len=3 disp=1 (repeat previous byte).
   const g = freshGba();
-  const src = 0x02000000, dst = 0x03000400;
+  const src = 0x02000000,
+    dst = 0x03000400;
   g.write32(src, (4 << 8) | (1 << 4)); // decompressed size 4, type 1
   // flag byte: bit7=0 (literal), bit6=1 (compressed) → 0b01000000 = 0x40
   g.write8(src + 4, 0x40);
@@ -133,7 +140,8 @@ function freshGba(): Gba {
   // compressed token: len=3 → (3-3)=0 in high nibble; disp=1 → (disp-1)=0
   g.write8(src + 6, 0x00);
   g.write8(src + 7, 0x00);
-  g.cpu.r[0] = src; g.cpu.r[1] = dst;
+  g.cpu.r[0] = src;
+  g.cpu.r[1] = dst;
   g.swi(0x11);
   let aaaa = true;
   for (let i = 0; i < 4; i += 1) if (g.read8(dst + i) !== 0x41) aaaa = false;
@@ -145,7 +153,8 @@ function freshGba(): Gba {
   g.cpu.reset();
   g.cpu.cpsr = 0x1f | 0x20; // THUMB
   g.cpu.r[15] = 0x03000000;
-  g.cpu.r[0] = 50; g.cpu.r[1] = 5;
+  g.cpu.r[0] = 50;
+  g.cpu.r[1] = 5;
   g.write16(0x03000000, 0xdf06); // THUMB SWI #6 (Div)
   g.cpu.step();
   check('executed THUMB SWI ran HLE Div', g.cpu.r[0] === 10, g.cpu.r[0], 10);

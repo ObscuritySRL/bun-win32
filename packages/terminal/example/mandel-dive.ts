@@ -54,7 +54,7 @@ import { clamp01, smoothstep, TAU } from './_kit';
 // ── Dive target: a self-similar point on the rim of the seahorse valley. ───────
 // Zooming toward it reveals an endless cascade of mini-brots and spirals.
 const TARGET_X = -0.743643887037151;
-const TARGET_Y = 0.131825904205330;
+const TARGET_Y = 0.13182590420533;
 
 // ── Zoom schedule ──────────────────────────────────────────────────────────────
 // The view half-width shrinks exponentially toward the target. We run it on a
@@ -79,13 +79,21 @@ const ITER_CAP = 460;
 // continuous gold-on-twilight ramp rather than separating into rainbow stripes.
 // The base (a) sits low (esp. blue) so the far field stays a rich dark velvet and
 // only the boundary lights warm. Tasteful and restrained; hue drifts slowly.
-const PAL_A0 = 0.38, PAL_A1 = 0.26, PAL_A2 = 0.28;
-const PAL_B0 = 0.44, PAL_B1 = 0.32, PAL_B2 = 0.30;
+const PAL_A0 = 0.38,
+  PAL_A1 = 0.26,
+  PAL_A2 = 0.28;
+const PAL_B0 = 0.44,
+  PAL_B1 = 0.32,
+  PAL_B2 = 0.3;
 // Lower channel frequencies (<1) so one mu-decade spans well under a full hue
 // cycle — the gradient stratifies into a FEW broad bands, not a dense rainbow.
-const PAL_C0 = 0.62, PAL_C1 = 0.62, PAL_C2 = 0.62;
+const PAL_C0 = 0.62,
+  PAL_C1 = 0.62,
+  PAL_C2 = 0.62;
 // Tight, ordered phase fan → warm-leaning, cohesive ramp (no grey, no spectrum).
-const PAL_D0 = 0.10, PAL_D1 = 0.22, PAL_D2 = 0.40;
+const PAL_D0 = 0.1,
+  PAL_D1 = 0.22,
+  PAL_D2 = 0.4;
 
 // ── Anti-aliasing sample offsets (rotated triad, in pixel units, centred on 0). ─
 // A pixel that the cheap centre-probe flags as on the boundary shell is re-shaded
@@ -100,14 +108,18 @@ const PAL_D0 = 0.10, PAL_D1 = 0.22, PAL_D2 = 0.40;
 // fractal's own near-horizontal/vertical filaments, which is exactly where
 // single-sample speckle is worst. Stored as flat scalars (not a tuple array) so
 // the supersample loop avoids per-tap indexing + destructuring.
-const AA_OX0 = 0.00, AA_OY0 = -0.33;
-const AA_OX1 = 0.30, AA_OY1 = 0.20;
-const AA_OX2 = -0.30, AA_OY2 = 0.20;
+const AA_OX0 = 0.0,
+  AA_OY0 = -0.33;
+const AA_OX1 = 0.3,
+  AA_OY1 = 0.2;
+const AA_OX2 = -0.3,
+  AA_OY2 = 0.2;
 
 // Shading scratch — the shader writes its linear-light RGB result here to avoid
 // allocating a tuple per sample (this loop runs W·H·(1..5) times a frame).
-let sr = 0, sg = 0, sb = 0;
-
+let sr = 0,
+  sg = 0,
+  sb = 0;
 
 run({
   title: 'Mandel-Dive',
@@ -155,22 +167,26 @@ run({
 
     // Vignette: a soft radial darkening toward the corners so the dive reads as a
     // tunnel of light — depth cue. Precompute the centre + inv-radius once.
-    const vcx = (W - 1) * 0.5, vcy = (H - 1) * 0.5;
+    const vcx = (W - 1) * 0.5,
+      vcy = (H - 1) * 0.5;
     const vInv = 1 / (vcx * vcx + vcy * vcy);
 
     // Deep field base (velvet) we blend the open exterior toward, so the far field
     // stays cohesive and calm and colour concentrates near the luminous boundary.
-    const FIELD_R = 0.014, FIELD_G = 0.010, FIELD_B = 0.042;
+    const FIELD_R = 0.014,
+      FIELD_G = 0.01,
+      FIELD_B = 0.042;
 
     // Distance-estimate rim width, in units of a pixel. The glow occupies a SOFT,
     // wide band hugging the boundary; widening it (vs a 1-pixel thread) is what
     // turns the harsh sparkle into a continuous luminous filigree — the bright
     // core is spread across a few pixels so single-sample aliasing can't spike it.
-    const pxStep = (2 * halfX) * invW; // complex-plane size of one pixel column
+    const pxStep = 2 * halfX * invW; // complex-plane size of one pixel column
     const RIM_PX = 3.4; // rim band half-width in pixels (was a hard 1.6px thread)
     const rimScale = 1 / (pxStep * RIM_PX);
     // Sub-pixel sample steps for the AA grid (centre-relative), in complex units.
-    const sxStep = pxStep, syStep = (2 * halfY) * invH;
+    const sxStep = pxStep,
+      syStep = 2 * halfY * invH;
 
     // Per-sample shader. Evaluates the escape-time orbit + derivative at one point
     // in the complex plane and writes its LINEAR-light colour into sr/sg/sb. Kept
@@ -182,9 +198,12 @@ run({
       // ── Escape-time iteration z = z^2 + c, carrying the derivative z'. ───────
       // dz_{k+1} = 2·z_k·dz_k + 1  (seeded dz0 = 0). Tracking it lets us compute
       // the exterior distance estimate without finite differences.
-      let zr = 0.0, zi = 0.0;
-      let zr2 = 0.0, zi2 = 0.0;
-      let dr = 0.0, di = 0.0; // derivative z'
+      let zr = 0.0,
+        zi = 0.0;
+      let zr2 = 0.0,
+        zi2 = 0.0;
+      let dr = 0.0,
+        di = 0.0; // derivative z'
       let n = 0;
       let trap = 1e9; // orbit trap (min |z|^2) → interior tint
       let m2 = 0.0;
@@ -196,7 +215,8 @@ run({
         // z' = 2·z·z' + 1   (do this with the OLD z, before updating z)
         const ndr = zr2x * dr - zi2x * di + 1;
         const ndi = zr2x * di + zi2x * dr;
-        dr = ndr; di = ndi;
+        dr = ndr;
+        di = ndi;
         // z = z^2 + c
         zi = zr2x * zi + ci;
         zr = zr2 - zi2 + cr;
@@ -248,7 +268,9 @@ run({
       // rolled so it has no hard inner/outer edge) and a WIDE halo (`near`, how
       // close to structure we are) that both gates chroma and triggers AA.
       const dz2 = dr * dr + di * di;
-      let rim = 0, near = 0, edge = 0;
+      let rim = 0,
+        near = 0,
+        edge = 0;
       if (dz2 > 1e-300) {
         const mz = Math.sqrt(m2);
         // |z|·log|z| where log|z| == logZn (already computed = 0.5·log m2).
@@ -259,11 +281,14 @@ run({
         // bit: t=clamp01(d/e1); t·t·(3-2t)) to drop three function calls and the
         // `|| 1e-9` guard from the hottest per-exterior-pixel path. `d>=0`, so the
         // lower clamp is dead, but we keep clamp01's exact form for identical bits.
-        let tr = d / 2.2; tr = tr < 0 ? 0 : tr > 1 ? 1 : tr;
+        let tr = d / 2.2;
+        tr = tr < 0 ? 0 : tr > 1 ? 1 : tr;
         rim = 1 - tr * tr * (3 - 2 * tr);
-        let tn = d / 5.0; tn = tn < 0 ? 0 : tn > 1 ? 1 : tn;
+        let tn = d / 5.0;
+        tn = tn < 0 ? 0 : tn > 1 ? 1 : tn;
         near = 1 - tn * tn * (3 - 2 * tn);
-        let te = d / 4.0; te = te < 0 ? 0 : te > 1 ? 1 : te;
+        let te = d / 4.0;
+        te = te < 0 ? 0 : te > 1 ? 1 : te;
         edge = 1 - te * te * (3 - 2 * te);
       }
 
@@ -285,7 +310,9 @@ run({
       // never washes the whole field to a milky midtone. The *sheen* below carries
       // the actual glint, so this stays gentle.
       const lum = 0.52 + (1.04 - 0.52) * rim;
-      pr *= lum; pg *= lum; pb *= lum;
+      pr *= lum;
+      pg *= lum;
+      pb *= lum;
 
       // ── Soft proximity bloom. ──────────────────────────────────────────────
       // The broad `near` halo adds a faint, warm ambient wash to the whole shell
@@ -319,25 +346,30 @@ run({
       // sub-pixel rim hit can't spike to a blown white speck. At full strength the
       // blend reaches the cap entirely, so the brightest filigree is a controlled,
       // cohesive gold rather than noise. Deep field (low lum) is untouched.
-      const lmax = pr > pg ? (pr > pb ? pr : pb) : (pg > pb ? pg : pb);
+      const lmax = pr > pg ? (pr > pb ? pr : pb) : pg > pb ? pg : pb;
       if (lmax > 0.42) {
         // warm = smoothstep(0.42,1,lmax), inlined bit-for-bit (t=clamp01((lmax-0.42)/0.58)).
         // A lower onset catches MORE of the bright filigree so the lit boundary
         // leans cohesively toward spun gold instead of letting the palette's cool
         // (blue/cyan) component dominate the brightest sub-pixel rim dots.
-        let tw = (lmax - 0.42) / 0.58; tw = tw < 0 ? 0 : tw > 1 ? 1 : tw;
+        let tw = (lmax - 0.42) / 0.58;
+        tw = tw < 0 ? 0 : tw > 1 ? 1 : tw;
         const warm = tw * tw * (3 - 2 * tw); // 0..1 blend weight
-        const cap = lmax / (1 + 0.35 * lmax);    // soft ceiling (~0.9 as lmax→∞)
+        const cap = lmax / (1 + 0.35 * lmax); // soft ceiling (~0.9 as lmax→∞)
         // Target a SATURATED amber, not a pale cream: a low green/blue ratio keeps
         // the dense deep-zoom filigree reading as rich spun gold rather than a
         // milky tan wash when thousands of sub-pixel rim hits crowd one region.
-        const gr = cap, gg = cap * 0.68, gb = cap * 0.30;
+        const gr = cap,
+          gg = cap * 0.68,
+          gb = cap * 0.3;
         pr = pr + (gr - pr) * warm;
         pg = pg + (gg - pg) * warm;
         pb = pb + (gb - pb) * warm;
       }
 
-      sr = pr; sg = pg; sb = pb;
+      sr = pr;
+      sg = pg;
+      sb = pb;
       return edge;
     };
 
@@ -351,7 +383,9 @@ run({
         // Cheap centre probe. Most of the frame is calm open field or solid
         // interior, where one sample is exact — those pixels cost nothing extra.
         const edge = shade(cr, ci);
-        let lr = sr, lg = sg, lb = sb;
+        let lr = sr,
+          lg = sg,
+          lb = sb;
 
         // ── Adaptive boundary AA. ───────────────────────────────────────────
         // Only where the probe lands on the narrow boundary shell (where the
@@ -361,12 +395,20 @@ run({
         // instead of a blown speck. Calm field never enters this branch.
         if (edge > 0.03) {
           shade(cr + AA_OX0 * sxStep, ci + AA_OY0 * syStep);
-          lr += sr; lg += sg; lb += sb;
+          lr += sr;
+          lg += sg;
+          lb += sb;
           shade(cr + AA_OX1 * sxStep, ci + AA_OY1 * syStep);
-          lr += sr; lg += sg; lb += sb;
+          lr += sr;
+          lg += sg;
+          lb += sb;
           shade(cr + AA_OX2 * sxStep, ci + AA_OY2 * syStep);
-          lr += sr; lg += sg; lb += sb;
-          lr *= 0.25; lg *= 0.25; lb *= 0.25; // /4 (centre + 3)
+          lr += sr;
+          lg += sg;
+          lb += sb;
+          lr *= 0.25;
+          lg *= 0.25;
+          lb *= 0.25; // /4 (centre + 3)
         }
 
         // ── Tone-map ONCE on the resolved linear colour. ────────────────────
@@ -387,7 +429,9 @@ run({
         // ── Soft vignette: darken toward the corners for tunnel-of-light depth. ─
         const vdx = px - vcx;
         const v = 1 - 0.34 * (vdx * vdx + vdy * vdy) * vInv; // 1 centre → 0.66 corner
-        r *= v; g *= v; b *= v;
+        r *= v;
+        g *= v;
+        b *= v;
 
         // ── Loop seam cross-fade: dissolve toward velvet so the wrap is invisible.
         if (seamFade > 0) {

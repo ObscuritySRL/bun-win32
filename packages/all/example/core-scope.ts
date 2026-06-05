@@ -79,10 +79,7 @@ function detectCoreCount(): number {
   const basic = Buffer.alloc(64);
   const retLen = Buffer.alloc(4);
   let n = 0;
-  if (
-    Ntdll.NtQuerySystemInformation(SystemInformationClass.SystemBasicInformation, basic.ptr, basic.byteLength, retLen.ptr) ===
-    STATUS_SUCCESS
-  ) {
+  if (Ntdll.NtQuerySystemInformation(SystemInformationClass.SystemBasicInformation, basic.ptr, basic.byteLength, retLen.ptr) === STATUS_SUCCESS) {
     n = basic.readUInt8(0x34); // CCHAR NumberOfProcessors @ 0x34
   }
   // ALL_PROCESSOR_GROUPS = 0xFFFF; on a single-group box equals the per-core array length.
@@ -108,12 +105,7 @@ interface Sample {
 function readPerf(out: Sample[]): boolean {
   // Assemble + call immediately (no await between): the kernel writes one
   // SYSTEM_PROCESSOR_PERFORMANCE_INFORMATION per logical core.
-  const st = Ntdll.NtQuerySystemInformation(
-    SystemInformationClass.SystemProcessorPerformanceInformation,
-    perfBuf.ptr,
-    cores * PERF_STRIDE,
-    perfRet.ptr,
-  );
+  const st = Ntdll.NtQuerySystemInformation(SystemInformationClass.SystemProcessorPerformanceInformation, perfBuf.ptr, cores * PERF_STRIDE, perfRet.ptr);
   if (st !== STATUS_SUCCESS) return false;
   for (let i = 0; i < cores; i += 1) {
     const o = i * PERF_STRIDE;
@@ -226,7 +218,7 @@ function sampleProcesses(): void {
 const screenW = User32.GetSystemMetrics(SystemMetric.SM_CXSCREEN) || 1920;
 const screenH = User32.GetSystemMetrics(SystemMetric.SM_CYSCREEN) || 1080;
 const WIN_H = Math.min(1000, Math.floor(screenH * 0.72));
-const WIN_W = Math.min(Math.floor(screenW * 0.9), Math.round(WIN_H * 16 / 9));
+const WIN_W = Math.min(Math.floor(screenW * 0.9), Math.round((WIN_H * 16) / 9));
 const win = gpu.createWindow({ title: 'core-scope · live per-core scheduler X-ray', width: WIN_W, height: WIN_H, borderless: true });
 const { w: BBW, h: BBH } = win.clientSize();
 const g = gpu.createDevice(win.hwnd, { width: BBW, height: BBH });
@@ -249,9 +241,9 @@ function heat(b: number, u: number, dst: Buffer, px: number): void {
   // Gamma-lift the busy value so small loads register, but keep idle dark.
   const t = Math.pow(Math.min(1, b), 0.55);
   // Dark deep-navy idle floor; warms quickly as load rises.
-  let r = 0.02 + t * t * (0.6 + 0.9 * u);     // reds bloom in the upper range
-  let gr = 0.03 + t * (0.35 + 0.85 * u);       // greens carry the mid-band
-  let bl = 0.14 + (1 - t) * 0.22 - t * 0.1;    // navy at idle, recedes when hot
+  let r = 0.02 + t * t * (0.6 + 0.9 * u); // reds bloom in the upper range
+  let gr = 0.03 + t * (0.35 + 0.85 * u); // greens carry the mid-band
+  let bl = 0.14 + (1 - t) * 0.22 - t * 0.1; // navy at idle, recedes when hot
   // Kernel/interrupt time tints magenta (classic Task-Manager "kernel" overlay).
   r += kernelFrac * 0.85;
   bl += kernelFrac * 0.65;
@@ -271,13 +263,7 @@ function primeWaterfall(): void {
     full[p * 4 + 2] = 18;
     full[p * 4 + 3] = 255;
   }
-  gpu.vcall(
-    g.context,
-    gpu.CTX_UPDATE_SUBRESOURCE,
-    [FFIType.u64, FFIType.u32, FFIType.ptr, FFIType.ptr, FFIType.u32, FFIType.u32],
-    [waterfall.tex, 0, null, full.ptr!, cores * 4, 0],
-    FFIType.void,
-  );
+  gpu.vcall(g.context, gpu.CTX_UPDATE_SUBRESOURCE, [FFIType.u64, FFIType.u32, FFIType.ptr, FFIType.ptr, FFIType.u32, FFIType.u32], [waterfall.tex, 0, null, full.ptr!, cores * 4, 0], FFIType.void);
 }
 
 // Busy-spin for a short, real interval so successive perf deltas cover genuine
@@ -315,13 +301,7 @@ function pushRow(): void {
   box.writeUInt32LE(cores, 12); // right
   box.writeUInt32LE(ringY + 1, 16); // bottom
   box.writeUInt32LE(1, 20); // back
-  gpu.vcall(
-    g.context,
-    gpu.CTX_UPDATE_SUBRESOURCE,
-    [FFIType.u64, FFIType.u32, FFIType.ptr, FFIType.ptr, FFIType.u32, FFIType.u32],
-    [waterfall.tex, 0, box.ptr!, rowPixels.ptr!, cores * 4, 0],
-    FFIType.void,
-  );
+  gpu.vcall(g.context, gpu.CTX_UPDATE_SUBRESOURCE, [FFIType.u64, FFIType.u32, FFIType.ptr, FFIType.ptr, FFIType.u32, FFIType.u32], [waterfall.tex, 0, box.ptr!, rowPixels.ptr!, cores * 4, 0], FFIType.void);
   ringY = (ringY + 1) % HISTORY;
 }
 
@@ -483,18 +463,12 @@ function drawHud(fps: number): void {
     const prevFont = GDI32.SelectObject(dc, titleFont);
     out(dc, 22, 8, 'core-scope', 0x00ffffff);
     GDI32.SelectObject(dc, hudFont);
-    out(
-      dc,
-      190,
-      14,
-      `live per-core scheduler X-ray · ${cores} logical cores · avg ${(avgBusy() * 100).toFixed(0)}% · ${fps} fps · ${g.gpuName} · NtQuerySystemInformation · ESC`,
-      0x00bfe0ff,
-    );
+    out(dc, 190, 14, `live per-core scheduler X-ray · ${cores} logical cores · avg ${(avgBusy() * 100).toFixed(0)}% · ${fps} fps · ${g.gpuName} · NtQuerySystemInformation · ESC`, 0x00bfe0ff);
 
     // ── Top-process panel (large labeled blocks) ─────────────────────────────────
     const panelW = 420;
     const px = BBW - panelW - 24;
-    let py = Math.floor(BBH * 0.10);
+    let py = Math.floor(BBH * 0.1);
     out(dc, px, py, 'TOP CPU CONSUMERS  (Δ user+kernel)', 0x0080ffff);
     py += 30;
     const rowH = 40;
@@ -534,9 +508,7 @@ const IID_ID3D11TEXTURE2D = '6f15aaf2-d208-4e89-9ab4-489535d34f9c';
 function selfVerify(): void {
   const ppBack = Buffer.alloc(8);
   const iid = guidBytes(IID_ID3D11TEXTURE2D);
-  if (
-    gpu.vcall(g.swapChain, gpu.SWAP_GET_BUFFER, [FFIType.u32, FFIType.ptr, FFIType.ptr], [0, iid.ptr!, ppBack.ptr!]) !== 0
-  ) {
+  if (gpu.vcall(g.swapChain, gpu.SWAP_GET_BUFFER, [FFIType.u32, FFIType.ptr, FFIType.ptr], [0, iid.ptr!, ppBack.ptr!]) !== 0) {
     console.log('SELFCHECK_STATS ' + JSON.stringify({ error: 'GetBuffer failed' }));
     return;
   }
@@ -545,12 +517,7 @@ function selfVerify(): void {
   gpu.copyResource(staging.tex, backTex);
 
   const mapped = Buffer.alloc(16);
-  const hr = gpu.vcall(
-    g.context,
-    gpu.CTX_MAP,
-    [FFIType.u64, FFIType.u32, FFIType.u32, FFIType.u32, FFIType.ptr],
-    [staging.tex, 0, 1 /* D3D11_MAP_READ */, 0, mapped.ptr!],
-  );
+  const hr = gpu.vcall(g.context, gpu.CTX_MAP, [FFIType.u64, FFIType.u32, FFIType.u32, FFIType.u32, FFIType.ptr], [staging.tex, 0, 1 /* D3D11_MAP_READ */, 0, mapped.ptr!]);
   if (hr !== 0) {
     gpu.comRelease(staging.tex);
     gpu.comRelease(backTex);
@@ -668,8 +635,8 @@ function selfVerify(): void {
 if (!readPerf(prev)) {
   for (let i = 0; i < cores; i += 1) prev[i] = { idle: 0n, kernel: 0n, user: 0n };
 }
-primeWaterfall();      // idle-floor fallback under the backfill
-backfillWaterfall();   // FILL all HISTORY rows with real samples → full-frame on frame 1
+primeWaterfall(); // idle-floor fallback under the backfill
+backfillWaterfall(); // FILL all HISTORY rows with real samples → full-frame on frame 1
 // After backfill the ring is full; treat every row as live history.
 
 // ── Main loop ────────────────────────────────────────────────────────────────────

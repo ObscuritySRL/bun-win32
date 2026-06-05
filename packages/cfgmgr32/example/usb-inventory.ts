@@ -18,13 +18,7 @@
 
 import Cfgmgr32, { CR, CM_LOCATE_DEVNODE, CM_GETIDLIST_FILTER, CM_REGISTRY, DN } from '../index';
 
-Cfgmgr32.Preload([
-  'CM_Get_DevNode_Registry_PropertyW',
-  'CM_Get_DevNode_Status',
-  'CM_Get_Device_ID_ListW',
-  'CM_Get_Device_ID_List_SizeW',
-  'CM_Locate_DevNodeW',
-]);
+Cfgmgr32.Preload(['CM_Get_DevNode_Registry_PropertyW', 'CM_Get_DevNode_Status', 'CM_Get_Device_ID_ListW', 'CM_Get_Device_ID_List_SizeW', 'CM_Locate_DevNodeW']);
 
 const ANSI = {
   bold: '\x1b[1m',

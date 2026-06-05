@@ -315,10 +315,10 @@ function main(): void {
   const hudFont = GDI32.CreateFontW(-18, 0, 0, 0, 600, 0, 0, 0, 0, 0, 0, 4 /* ANTIALIASED_QUALITY */, 0, Buffer.from('Consolas\0', 'utf16le').ptr!);
 
   // ── Orbit-camera state ────────────────────────────────────────────────────
-  let yaw = 0.6;          // azimuth (radians)
-  let pitch = 0.25;       // elevation (radians)
-  let zoom = 0.35;        // 0 = wide, 1 = close (drives fov)
-  let camDist = 2.6;      // world-space camera distance
+  let yaw = 0.6; // azimuth (radians)
+  let pitch = 0.25; // elevation (radians)
+  let zoom = 0.35; // 0 = wide, 1 = close (drives fov)
+  let camDist = 2.6; // world-space camera distance
   let dragging = false;
   let lastMx = 0;
   let lastMy = 0;

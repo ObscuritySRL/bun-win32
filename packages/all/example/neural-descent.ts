@@ -145,9 +145,11 @@ gpu.recreateRTV();
 let seed = 0x9e3779b9 >>> 0;
 function rand(): number {
   // xorshift32 in [0,1)
-  seed ^= seed << 13; seed >>>= 0;
+  seed ^= seed << 13;
+  seed >>>= 0;
   seed ^= seed >> 17;
-  seed ^= seed << 5; seed >>>= 0;
+  seed ^= seed << 5;
+  seed >>>= 0;
   return seed / 0x1_0000_0000;
 }
 // SIREN init: first layer U(-1/fanIn, 1/fanIn); hidden U(-sqrt(6/fanIn)/omega, +...).
@@ -983,7 +985,12 @@ const bloomB = makeTexture({ w: bloomW, h: bloomH, format: DXGI_FORMAT_R16G16B16
 const linSampler = makeSampler({ filter: D3D11_FILTER_MIN_MAG_MIP_LINEAR, address: D3D11_TEXTURE_ADDRESS_CLAMP });
 
 // ── Per-parameter Adam dispatch descriptors ─────────────────────────────────────
-interface AdamGroup { uav: Buffer; srv: Buffer; count: number; groups: number; }
+interface AdamGroup {
+  uav: Buffer;
+  srv: Buffer;
+  count: number;
+  groups: number;
+}
 function adamGroup(p: { uav?: bigint }, m: { uav?: bigint }, s: { uav?: bigint }, g: { srv?: bigint }, count: number): AdamGroup {
   const uav = Buffer.alloc(8 * 3);
   uav.writeBigUInt64LE(p.uav!, 0);
@@ -1041,12 +1048,7 @@ function cleanup(code: number): never {
     cleaned = true;
     hud.release();
     GDI32.DeleteObject(hudFont);
-    for (const sb of [
-      w1, b1, w2, b2, w3, b3, w4, b4,
-      gw1, gb1, gw2, gb2, gw3, gb3, gw4, gb4,
-      mw1, mb1, mw2, mb2, mw3, mb3, mw4, mb4,
-      sw1, sb1, sw2, sb2, sw3, sb3, sw4, sb4, lossPlot,
-    ]) {
+    for (const sb of [w1, b1, w2, b2, w3, b3, w4, b4, gw1, gb1, gw2, gb2, gw3, gb3, gw4, gb4, mw1, mb1, mw2, mb2, mw3, mb3, mw4, mb4, sw1, sb1, sw2, sb2, sw3, sb3, sw4, sb4, lossPlot]) {
       comRelease(sb.srv ?? 0n);
       comRelease(sb.uav ?? 0n);
       comRelease(sb.buffer);
@@ -1210,7 +1212,7 @@ while (!win.shouldClose()) {
   // seconds (rather than snapping across the instant the loss drops). It eases in, crosses
   // the sun near the middle of the run, and is told to fully clear the right edge by the end.
   const tPace = Math.max(0, Math.min(1, (time - 0.6) / WIPE_SECS));
-  const paced = tPace * tPace * (3 - 2 * tPace);                 // smoothstep ease
+  const paced = tPace * tPace * (3 - 2 * tPace); // smoothstep ease
   const wRaw = Math.min(paced, convCap);
   // hold fully-open once both pacing and convergence have crossed the finish line
   const wipe = wRaw >= 0.985 ? 1.0 : wRaw;
@@ -1266,14 +1268,14 @@ while (!win.shouldClose()) {
   cbData.writeFloatLE(0, 68);
   cbData.writeFloatLE(OMEGA0, 72);
   cbData.writeFloatLE(0, 76);
-  cbData.writeFloatLE(plotCount, 80);   // uPlotCount
-  cbData.writeFloatLE(psnr, 84);        // uPsnr
-  cbData.writeFloatLE(scanY, 88);       // uScanY
-  cbData.writeFloatLE(curMse, 92);      // uMse
-  cbData.writeFloatLE(totalSteps, 96);  // uEpoch
-  cbData.writeFloatLE(lrNowR, 100);     // uLrNow
-  cbData.writeFloatLE(0, 104);          // uBlurDir (set per blur pass)
-  cbData.writeFloatLE(bloomStr, 108);   // uBloomStr
+  cbData.writeFloatLE(plotCount, 80); // uPlotCount
+  cbData.writeFloatLE(psnr, 84); // uPsnr
+  cbData.writeFloatLE(scanY, 88); // uScanY
+  cbData.writeFloatLE(curMse, 92); // uMse
+  cbData.writeFloatLE(totalSteps, 96); // uEpoch
+  cbData.writeFloatLE(lrNowR, 100); // uLrNow
+  cbData.writeFloatLE(0, 104); // uBlurDir (set per blur pass)
+  cbData.writeFloatLE(bloomStr, 108); // uBloomStr
   updateConstantBuffer(cb, cbData);
 
   setViewport(clientW, clientH);
@@ -1327,9 +1329,7 @@ while (!win.shouldClose()) {
   drawHud(totalSteps, curMse, psnr, fps);
 
   if (willBreak) {
-    const outPath = selfshot && selfshotPath
-      ? selfshotPath
-      : resolve(import.meta.dir, '..', 'screenshots', 'neural-descent.png');
+    const outPath = selfshot && selfshotPath ? selfshotPath : resolve(import.meta.dir, '..', 'screenshots', 'neural-descent.png');
     mkdirSync(resolve(outPath, '..'), { recursive: true });
     const stats = captureBackBuffer(gpu, outPath, { gridW: 48, gridH: 22 });
     console.log(formatGrid(stats));

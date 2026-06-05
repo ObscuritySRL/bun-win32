@@ -63,9 +63,18 @@ type Block =
   | { kind: 'spinner'; verb: string; t0: number }
   | { kind: 'note'; text: string };
 
-interface ToolLine { text: string; tone: 'out' | 'ok' | 'err'; }
-interface DiffRow { sign: ' ' | '+' | '-'; text: string; }
-interface TodoItem { text: string; state: 0 | 1 | 2; } // 0 pending, 1 active, 2 done
+interface ToolLine {
+  text: string;
+  tone: 'out' | 'ok' | 'err';
+}
+interface DiffRow {
+  sign: ' ' | '+' | '-';
+  text: string;
+}
+interface TodoItem {
+  text: string;
+  state: 0 | 1 | 2;
+} // 0 pending, 1 active, 2 done
 
 // Braille spinner frames (render fine in the live TTY; PNG shows a dot, still alive).
 const SPIN = '⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏';
@@ -76,8 +85,7 @@ const SPIN = '⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏';
 // always lands on a solid caret, keeping the streaming cursor visible in the PNG.
 const BLINK_HZ = 1.7;
 const BLINK_DUTY = 0.62;
-const caretLit = (time: number, phase = 0): boolean =>
-  (((time * BLINK_HZ + phase) % 1) + 1) % 1 < BLINK_DUTY;
+const caretLit = (time: number, phase = 0): boolean => (((time * BLINK_HZ + phase) % 1) + 1) % 1 < BLINK_DUTY;
 
 // ── Scripted sessions (deterministic content for the attract director) ───────────
 interface Session {
@@ -94,10 +102,7 @@ const SESSIONS: Session[] = [
   {
     prompt: 'refactor the auth module to use async tokens',
     verb: 'Thinking',
-    reply:
-      "I'll refactor the auth flow to issue and verify tokens asynchronously. " +
-      "I'll read the current module, swap the sync verify for a promise-based one, " +
-      'and update the call sites and tests.',
+    reply: "I'll refactor the auth flow to issue and verify tokens asynchronously. " + "I'll read the current module, swap the sync verify for a promise-based one, " + 'and update the call sites and tests.',
     tool: {
       head: '● Read(src/auth.ts)',
       lines: [
@@ -138,9 +143,7 @@ const SESSIONS: Session[] = [
   {
     prompt: 'add a retry wrapper around the fetch client',
     verb: 'Working',
-    reply:
-      "Good idea. I'll wrap fetchJSON with exponential backoff, jittered delays " +
-      'and a max-attempt cap, then verify the suite still passes.',
+    reply: "Good idea. I'll wrap fetchJSON with exponential backoff, jittered delays " + 'and a max-attempt cap, then verify the suite still passes.',
     tool: {
       head: '● Bash(bun test net/)',
       lines: [
@@ -181,10 +184,7 @@ const SESSIONS: Session[] = [
   {
     prompt: 'fix the memory leak in the LRU cache',
     verb: 'Reasoning',
-    reply:
-      "Found it — entries are evicted from the map but their timers are never " +
-      "cleared, so they pin the values. I'll clear the timer on eviction and cap " +
-      'the map, then prove it holds steady under load.',
+    reply: 'Found it — entries are evicted from the map but their timers are never ' + "cleared, so they pin the values. I'll clear the timer on eviction and cap " + 'the map, then prove it holds steady under load.',
     tool: {
       head: '● Grep(setTimeout in cache.ts)',
       lines: [
@@ -259,12 +259,7 @@ function loopLength(s: Session): number {
   const promptT = s.prompt.length / T.promptCps;
   const replyT = s.reply.length / T.replyCps;
   const todoT = s.todos.length * T.todoStep + 0.6;
-  return (
-    T.promptStart + promptT + T.thinkLead + T.thinkHold + replyT + 0.4 +
-    T.toolGrow + T.toolHold + T.diffGrow + T.diffHold +
-    T.verifyGrow + T.verifyHold + todoT +
-    T.finalHold + T.reset
-  );
+  return T.promptStart + promptT + T.thinkLead + T.thinkHold + replyT + 0.4 + T.toolGrow + T.toolHold + T.diffGrow + T.diffHold + T.verifyGrow + T.verifyHold + todoT + T.finalHold + T.reset;
 }
 
 // Build the transcript state for a session at local time `lt` (0..loopLen).
@@ -394,14 +389,35 @@ function wrap(str: string, w: number): string[] {
 // fallback ink (diff add/del lines pass their add/del tint so unhighlighted text
 // still reads as added/removed). `dimFactor` softens code inside removed lines.
 const KEYWORDS = new Set([
-  'export', 'function', 'async', 'await', 'return', 'const', 'let', 'import',
-  'from', 'Promise', 'boolean', 'string', 'number', 'true', 'false', 'new', 'void',
-  'if', 'else', 'then', 'class', 'interface', 'type', 'of', 'in',
+  'export',
+  'function',
+  'async',
+  'await',
+  'return',
+  'const',
+  'let',
+  'import',
+  'from',
+  'Promise',
+  'boolean',
+  'string',
+  'number',
+  'true',
+  'false',
+  'new',
+  'void',
+  'if',
+  'else',
+  'then',
+  'class',
+  'interface',
+  'type',
+  'of',
+  'in',
 ]);
 
-const isWord = (c: number): boolean =>
-  (c >= 65 && c <= 90) || (c >= 97 && c <= 122) || (c >= 48 && c <= 57) || c === 95 || c === 36;
-const isDigit = (c: number): boolean => (c >= 48 && c <= 57);
+const isWord = (c: number): boolean => (c >= 65 && c <= 90) || (c >= 97 && c <= 122) || (c >= 48 && c <= 57) || c === 95 || c === 36;
+const isDigit = (c: number): boolean => c >= 48 && c <= 57;
 
 // Blend an RGB toward black by `k` (0 = unchanged, 1 = black) — used to dim the
 // syntax colours on removed (-) diff lines so the green/clay reads as "old code".
@@ -413,10 +429,7 @@ function dim(c: RGB, k: number): RGB {
 // Paint a line of source at (x,y), tinting tokens. Stops at maxW chars. `bg` is the
 // cell background (diff line tint or panel bg). `mute` (0..1) darkens all token
 // colours for removed lines. Returns nothing; clips on the right.
-function drawCode(
-  t: CharTerm, x: number, y: number, s: string, maxW: number,
-  base: RGB, bg: RGB | undefined, mute: number,
-): void {
+function drawCode(t: CharTerm, x: number, y: number, s: string, maxW: number, base: RGB, bg: RGB | undefined, mute: number): void {
   const n = Math.min(s.length, maxW);
   let i = 0;
   while (i < s.length && i < maxW) {
@@ -549,10 +562,7 @@ function wrapCached(c: WrapCache, tag: string, text: string, w: number): string[
 
 // Draw a block at absolute transcript y. Rows outside [top,bottom) are clipped by
 // the caller passing only on-screen blocks; we still guard each put via the term.
-function drawBlock(
-  t: CharTerm, b: Block, x: number, y: number, w: number, caches: WrapCache,
-  time: number, hoverRow: number,
-): void {
+function drawBlock(t: CharTerm, b: Block, x: number, y: number, w: number, caches: WrapCache, time: number, hoverRow: number): void {
   const inner = w - 2;
   switch (b.kind) {
     case 'welcome': {
@@ -647,7 +657,8 @@ function drawBlock(
       // File header line.
       t.text(x, y, '⎿ ', FAINT);
       t.text(x + 2, y, b.file, CODE_FN, undefined, true);
-      let adds = 0, dels = 0;
+      let adds = 0,
+        dels = 0;
       for (let i = 0; i < shown; i++) {
         if (b.rows[i].sign === '+') adds++;
         else if (b.rows[i].sign === '-') dels++;
@@ -662,8 +673,13 @@ function drawBlock(
         const row = b.rows[i];
         let lineBg: RGB | undefined;
         let signFg: RGB = FAINT;
-        if (row.sign === '+') { lineBg = ADD_BG; signFg = ADD_FG; }
-        else if (row.sign === '-') { lineBg = DEL_BG; signFg = DEL_FG; }
+        if (row.sign === '+') {
+          lineBg = ADD_BG;
+          signFg = ADD_FG;
+        } else if (row.sign === '-') {
+          lineBg = DEL_BG;
+          signFg = DEL_FG;
+        }
         if (lineBg) t.fillRect(x, yy, w, 1, lineBg);
         const ln = String(i + 1).padStart(2);
         t.text(x, yy, ln, FAINT, lineBg);
@@ -754,11 +770,7 @@ function frame(t: CharTerm, time: number, _dt: number, _frameNo: number): void {
   t.fillRect(0, topY, t.columns, 1, BAR_BG);
   // Slowly pulsing sparkle mark (deterministic from time).
   const pulse = 0.62 + 0.38 * (0.5 + 0.5 * Math.sin(time * 2.2));
-  const spark: RGB = [
-    Math.round(CLAY[0] * pulse + 28),
-    Math.round(CLAY[1] * pulse),
-    Math.round(CLAY[2] * pulse),
-  ];
+  const spark: RGB = [Math.round(CLAY[0] * pulse + 28), Math.round(CLAY[1] * pulse), Math.round(CLAY[2] * pulse)];
   t.put(1, topY, '✻', spark, BAR_BG, true);
   t.text(3, topY, 'Claude Code', INK, BAR_BG, true);
   t.text(15, topY, 'opus-4.8', CLAY_DIM, BAR_BG, true);
@@ -767,7 +779,7 @@ function frame(t: CharTerm, time: number, _dt: number, _frameNo: number): void {
   t.text(42, topY, 'main', GREEN, BAR_BG);
   // Context-window meter — a small clay/green bar that breathes with the session
   // so the chrome feels live. Kept well clear of the engine FPS readout (far right).
-  const ctx = 0.34 + 0.30 * (0.5 + 0.5 * Math.sin(time * 0.5 + 1.1));
+  const ctx = 0.34 + 0.3 * (0.5 + 0.5 * Math.sin(time * 0.5 + 1.1));
   const meterX = 52;
   const meterW = 14;
   t.text(meterX, topY, 'context', FAINT, BAR_BG);
@@ -852,13 +864,12 @@ function frame(t: CharTerm, time: number, _dt: number, _frameNo: number): void {
   const maxScroll = Math.max(0, stackH - transRows);
   S.scroll = Math.max(0, Math.min(S.scroll, maxScroll));
   // y of the first block's first row (negative → clipped by puts).
-  let y = stackH <= transRows
-    ? transTop // fits: welcome card hugs the chrome, content flows down
-    : transBottom - stackH + S.scroll; // overflows: bottom-pin, scroll lifts older in
+  let y =
+    stackH <= transRows
+      ? transTop // fits: welcome card hugs the chrome, content flows down
+      : transBottom - stackH + S.scroll; // overflows: bottom-pin, scroll lifts older in
 
-  const hoverRow = (!attract && t.mouse.inside && t.mouse.y >= transTop && t.mouse.y < transBottom)
-    ? t.mouse.y
-    : -1;
+  const hoverRow = !attract && t.mouse.inside && t.mouse.y >= transTop && t.mouse.y < transBottom ? t.mouse.y : -1;
 
   for (let i = 0; i < blocks.length; i++) {
     const h = heights[i];
@@ -890,9 +901,7 @@ function frame(t: CharTerm, time: number, _dt: number, _frameNo: number): void {
   // ── Bottom hint line ──
   const hy = t.rows - 1;
   const mode = attract ? 'attract' : 'you';
-  t.text(transX, hy, attract
-    ? 'auto-demo · type to take over · ↑↓/wheel scroll'
-    : '↵ send · ⌫ delete · ↑↓ scroll · esc interrupt', FAINT);
+  t.text(transX, hy, attract ? 'auto-demo · type to take over · ↑↓/wheel scroll' : '↵ send · ⌫ delete · ↑↓ scroll · esc interrupt', FAINT);
   t.text(t.columns - 12, hy, `[${mode}]`, attract ? CLAY_DIM : GREEN);
 }
 
@@ -903,10 +912,7 @@ function frame(t: CharTerm, time: number, _dt: number, _frameNo: number): void {
 // drawn outside the band on the SAME frame order. Transcript is drawn before the
 // input box and after the top bar, but a tall block could spill over the top bar
 // (row 0/1) or under the input. To prevent that we clip here.
-function drawBlockClipped(
-  t: CharTerm, b: Block, x: number, y: number, w: number,
-  top: number, bottom: number, time: number, hoverRow: number,
-): void {
+function drawBlockClipped(t: CharTerm, b: Block, x: number, y: number, w: number, top: number, bottom: number, time: number, hoverRow: number): void {
   // Fast path: fully inside.
   const h = blockHeight(b, w, wrapCache);
   if (y >= top && y + h <= bottom) {
@@ -931,11 +937,26 @@ function onKey(key: string, t: CharTerm): void {
   S.lastInputTime = now;
   S.hasInteracted = true;
 
-  if (key === 'up') { S.scroll += 1; return; }
-  if (key === 'down') { S.scroll = Math.max(0, S.scroll - 1); return; }
-  if (key === 'pageup') { S.scroll += 8; return; }
-  if (key === 'pagedown') { S.scroll = Math.max(0, S.scroll - 8); return; }
-  if (key === 'esc') { S.liveReply = null; return; }
+  if (key === 'up') {
+    S.scroll += 1;
+    return;
+  }
+  if (key === 'down') {
+    S.scroll = Math.max(0, S.scroll - 1);
+    return;
+  }
+  if (key === 'pageup') {
+    S.scroll += 8;
+    return;
+  }
+  if (key === 'pagedown') {
+    S.scroll = Math.max(0, S.scroll - 8);
+    return;
+  }
+  if (key === 'esc') {
+    S.liveReply = null;
+    return;
+  }
 
   if (key === 'backspace') {
     S.inputBuf = S.inputBuf.slice(0, -1);
@@ -967,7 +988,9 @@ function onKey(key: string, t: CharTerm): void {
 // We need a sim clock for key events; the engine doesn't pass time to onKey, so we
 // track the latest frame time in a module variable updated each frame.
 let simNow = 0;
-function nowSim(): number { return simNow; }
+function nowSim(): number {
+  return simNow;
+}
 
 runText({
   title: 'Claude Code',

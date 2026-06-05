@@ -168,13 +168,7 @@ export function setRenderTargetsWithDepth(rtvs: readonly bigint[], dsv: bigint):
 export function clearDepth(dsv: bigint, depth = 1.0): void {
   const { context } = require3d();
   // ClearDepthStencilView(pDSV, ClearFlags u32, Depth f32, Stencil u8).
-  gpu.vcall(
-    context,
-    CTX_CLEAR_DEPTH_STENCIL_VIEW,
-    [FFIType.u64, FFIType.u32, FFIType.f32, FFIType.u8],
-    [dsv, D3D11_CLEAR_DEPTH, depth, 0],
-    FFIType.void,
-  );
+  gpu.vcall(context, CTX_CLEAR_DEPTH_STENCIL_VIEW, [FFIType.u64, FFIType.u32, FFIType.f32, FFIType.u8], [dsv, D3D11_CLEAR_DEPTH, depth, 0], FFIType.void);
 }
 
 // ── Depth-stencil state (created + cached per enable/write combination) ────────
@@ -358,12 +352,7 @@ function selfTest(): void {
 
   const D3D11_MAP_READ = 1;
   const mapped = Buffer.alloc(16); // pData@0, RowPitch u32@8, DepthPitch u32@12
-  const hr = gpu.vcall(
-    g.context,
-    gpu.CTX_MAP,
-    [FFIType.u64, FFIType.u32, FFIType.u32, FFIType.u32, FFIType.ptr],
-    [staging.tex, 0, D3D11_MAP_READ, 0, mapped.ptr!],
-  );
+  const hr = gpu.vcall(g.context, gpu.CTX_MAP, [FFIType.u64, FFIType.u32, FFIType.u32, FFIType.u32, FFIType.ptr], [staging.tex, 0, D3D11_MAP_READ, 0, mapped.ptr!]);
   if (hr !== 0) {
     console.log(`FAIL — Map(staging) failed 0x${(hr >>> 0).toString(16)}`);
     process.exit(1);
@@ -381,7 +370,7 @@ function selfTest(): void {
   //  - GREEN-only band (right edge): only the green near quad covers it → GREEN.
   const cx = Math.floor(W * 0.5);
   const cy = Math.floor(H * 0.5);
-  const leftX = Math.floor(W * 0.10); // inside red quad (x from -1.2..0.6), outside green (x>=-0.6 → NDC -0.6 ≈ px 51)
+  const leftX = Math.floor(W * 0.1); // inside red quad (x from -1.2..0.6), outside green (x>=-0.6 → NDC -0.6 ≈ px 51)
   const rightX = Math.floor(W * 0.92); // inside green quad (x up to 1.2), outside red (x<=0.6 → px 204)
 
   const overlap = readPixel(cx, cy);

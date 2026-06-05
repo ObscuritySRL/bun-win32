@@ -152,7 +152,10 @@ const JOY_CAP_FLAGS: [number, string][] = [
 
 /** Read a null-terminated UTF-16LE string from a buffer region. */
 function readWideString(buffer: Buffer, offset: number, maxBytes: number): string {
-  return buffer.subarray(offset, offset + maxBytes).toString('utf16le').replace(/\0.*$/, '');
+  return buffer
+    .subarray(offset, offset + maxBytes)
+    .toString('utf16le')
+    .replace(/\0.*$/, '');
 }
 
 /** Decode a wave format bitmask into an array of human-readable format strings. */

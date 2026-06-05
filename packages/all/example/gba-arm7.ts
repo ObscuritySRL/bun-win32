@@ -44,12 +44,18 @@ const F_T = 0x00000020; // THUMB state
 /** Map a processor mode to a 0..5 bank index (USR and SYS share bank 0). */
 function bankIndex(mode: number): number {
   switch (mode) {
-    case MODE_FIQ: return 1;
-    case MODE_IRQ: return 2;
-    case MODE_SVC: return 3;
-    case MODE_ABT: return 4;
-    case MODE_UND: return 5;
-    default: return 0; // USR / SYS
+    case MODE_FIQ:
+      return 1;
+    case MODE_IRQ:
+      return 2;
+    case MODE_SVC:
+      return 3;
+    case MODE_ABT:
+      return 4;
+    case MODE_UND:
+      return 5;
+    default:
+      return 0; // USR / SYS
   }
 }
 
@@ -131,9 +137,15 @@ export class Arm7 {
     this.bankR13[oi] = this.r[13]!;
     this.bankR14[oi] = this.r[14]!;
     if (newMode === MODE_FIQ && old !== MODE_FIQ) {
-      for (let i = 0; i < 5; i += 1) { this.usrR[i] = this.r[8 + i]!; this.r[8 + i] = this.fiqR[i]!; }
+      for (let i = 0; i < 5; i += 1) {
+        this.usrR[i] = this.r[8 + i]!;
+        this.r[8 + i] = this.fiqR[i]!;
+      }
     } else if (old === MODE_FIQ && newMode !== MODE_FIQ) {
-      for (let i = 0; i < 5; i += 1) { this.fiqR[i] = this.r[8 + i]!; this.r[8 + i] = this.usrR[i]!; }
+      for (let i = 0; i < 5; i += 1) {
+        this.fiqR[i] = this.r[8 + i]!;
+        this.r[8 + i] = this.usrR[i]!;
+      }
     }
     this.r[13] = this.bankR13[ni]!;
     this.r[14] = this.bankR14[ni]!;
@@ -164,7 +176,8 @@ export class Arm7 {
     this.cpsr = (this.cpsr & ~(F_N | F_Z)) | (result & F_N) | ((result | 0) === 0 ? F_Z : 0);
   }
   private setFlag(flag: number, on: boolean): void {
-    if (on) this.cpsr |= flag; else this.cpsr &= ~flag;
+    if (on) this.cpsr |= flag;
+    else this.cpsr &= ~flag;
   }
   private get cFlag(): number {
     return (this.cpsr & F_C) !== 0 ? 1 : 0;
@@ -173,16 +186,41 @@ export class Arm7 {
   /** Evaluate a 4-bit ARM condition code against the current flags. */
   private cond(c: number): boolean {
     const p = this.cpsr;
-    const N = (p & F_N) !== 0, Z = (p & F_Z) !== 0, C = (p & F_C) !== 0, V = (p & F_V) !== 0;
+    const N = (p & F_N) !== 0,
+      Z = (p & F_Z) !== 0,
+      C = (p & F_C) !== 0,
+      V = (p & F_V) !== 0;
     switch (c) {
-      case 0x0: return Z; case 0x1: return !Z;
-      case 0x2: return C; case 0x3: return !C;
-      case 0x4: return N; case 0x5: return !N;
-      case 0x6: return V; case 0x7: return !V;
-      case 0x8: return C && !Z; case 0x9: return !C || Z;
-      case 0xa: return N === V; case 0xb: return N !== V;
-      case 0xc: return !Z && N === V; case 0xd: return Z || N !== V;
-      default: return true; // 0xE always, 0xF reserved (treat as always)
+      case 0x0:
+        return Z;
+      case 0x1:
+        return !Z;
+      case 0x2:
+        return C;
+      case 0x3:
+        return !C;
+      case 0x4:
+        return N;
+      case 0x5:
+        return !N;
+      case 0x6:
+        return V;
+      case 0x7:
+        return !V;
+      case 0x8:
+        return C && !Z;
+      case 0x9:
+        return !C || Z;
+      case 0xa:
+        return N === V;
+      case 0xb:
+        return N !== V;
+      case 0xc:
+        return !Z && N === V;
+      case 0xd:
+        return Z || N !== V;
+      default:
+        return true; // 0xE always, 0xF reserved (treat as always)
     }
   }
 
@@ -196,27 +234,53 @@ export class Arm7 {
     }
     switch (type) {
       case 0: // LSL
-        if (amount === 0) { this.shifterCarry = this.cFlag; return value; }
-        if (amount < 32) { this.shifterCarry = (value >>> (32 - amount)) & 1; return value << amount; }
-        if (amount === 32) { this.shifterCarry = value & 1; return 0; }
-        this.shifterCarry = 0; return 0;
+        if (amount === 0) {
+          this.shifterCarry = this.cFlag;
+          return value;
+        }
+        if (amount < 32) {
+          this.shifterCarry = (value >>> (32 - amount)) & 1;
+          return value << amount;
+        }
+        if (amount === 32) {
+          this.shifterCarry = value & 1;
+          return 0;
+        }
+        this.shifterCarry = 0;
+        return 0;
       case 1: // LSR
-        if (amount === 0 || amount === 32) { this.shifterCarry = (value >>> 31) & 1; return 0; }
-        if (amount < 32) { this.shifterCarry = (value >>> (amount - 1)) & 1; return value >>> amount; }
-        this.shifterCarry = 0; return 0;
+        if (amount === 0 || amount === 32) {
+          this.shifterCarry = (value >>> 31) & 1;
+          return 0;
+        }
+        if (amount < 32) {
+          this.shifterCarry = (value >>> (amount - 1)) & 1;
+          return value >>> amount;
+        }
+        this.shifterCarry = 0;
+        return 0;
       case 2: // ASR
-        if (amount === 0 || amount >= 32) { this.shifterCarry = (value >>> 31) & 1; return value >> 31; }
-        this.shifterCarry = (value >>> (amount - 1)) & 1; return value >> amount;
-      default: { // ROR
-        if (amount === 0) { // RRX (rotate right through carry)
+        if (amount === 0 || amount >= 32) {
+          this.shifterCarry = (value >>> 31) & 1;
+          return value >> 31;
+        }
+        this.shifterCarry = (value >>> (amount - 1)) & 1;
+        return value >> amount;
+      default: {
+        // ROR
+        if (amount === 0) {
+          // RRX (rotate right through carry)
           const carryIn = this.cFlag;
           this.shifterCarry = value & 1;
-          return ((value >>> 1) | (carryIn << 31)) | 0;
+          return (value >>> 1) | (carryIn << 31) | 0;
         }
         const a = amount & 31;
-        if (a === 0) { this.shifterCarry = (value >>> 31) & 1; return value; }
+        if (a === 0) {
+          this.shifterCarry = (value >>> 31) & 1;
+          return value;
+        }
         this.shifterCarry = (value >>> (a - 1)) & 1;
-        return ((value >>> a) | (value << (32 - a))) | 0;
+        return (value >>> a) | (value << (32 - a)) | 0;
       }
     }
   }
@@ -268,7 +332,10 @@ export class Arm7 {
       if (top === 0b011 && (op & 0x10) !== 0) return; // undefined
       return this.armSingleTransfer(op);
     }
-    if (top === 0b111) { if ((op & (1 << 24)) !== 0) this.armSwi((op >>> 16) & 0xff); return; }
+    if (top === 0b111) {
+      if ((op & (1 << 24)) !== 0) this.armSwi((op >>> 16) & 0xff);
+      return;
+    }
     if (top === 0b110) return; // coprocessor transfer — unused on GBA
     // top is 000 or 001 — data processing + the 000 extension space.
     if (top === 0b000) {
@@ -290,7 +357,8 @@ export class Arm7 {
 
   private armBx(op: number): void {
     const rn = this.read(op & 0xf);
-    if (rn & 1) this.cpsr |= F_T; else this.cpsr &= ~F_T;
+    if (rn & 1) this.cpsr |= F_T;
+    else this.cpsr &= ~F_T;
     this.write(15, rn & ~1);
   }
 
@@ -333,7 +401,7 @@ export class Arm7 {
     if (immediate) {
       const imm = op & 0xff;
       const rot = ((op >>> 8) & 0xf) * 2;
-      operand2 = rot === 0 ? imm : ((imm >>> rot) | (imm << (32 - rot))) | 0;
+      operand2 = rot === 0 ? imm : (imm >>> rot) | (imm << (32 - rot)) | 0;
       this.shifterCarry = rot === 0 ? this.cFlag : (operand2 >>> 31) & 1;
     } else {
       const rm = op & 0xf;
@@ -352,22 +420,64 @@ export class Arm7 {
     let logical = false;
     let write = true;
     switch (opcode) {
-      case 0x0: result = a & operand2; logical = true; break; // AND
-      case 0x1: result = a ^ operand2; logical = true; break; // EOR
-      case 0x2: result = this.sbcOp(a, operand2, 1, setFlags); break; // SUB
-      case 0x3: result = this.sbcOp(operand2, a, 1, setFlags); break; // RSB
-      case 0x4: result = this.adcOp(a, operand2, 0, setFlags); break; // ADD
-      case 0x5: result = this.adcOp(a, operand2, carry, setFlags); break; // ADC
-      case 0x6: result = this.sbcOp(a, operand2, carry, setFlags); break; // SBC
-      case 0x7: result = this.sbcOp(operand2, a, carry, setFlags); break; // RSC
-      case 0x8: result = a & operand2; logical = true; write = false; break; // TST
-      case 0x9: result = a ^ operand2; logical = true; write = false; break; // TEQ
-      case 0xa: this.sbcOp(a, operand2, 1, true); return; // CMP
-      case 0xb: this.adcOp(a, operand2, 0, true); return; // CMN
-      case 0xc: result = a | operand2; logical = true; break; // ORR
-      case 0xd: result = operand2; logical = true; break; // MOV
-      case 0xe: result = a & ~operand2; logical = true; break; // BIC
-      default: result = ~operand2; logical = true; break; // MVN (0xf)
+      case 0x0:
+        result = a & operand2;
+        logical = true;
+        break; // AND
+      case 0x1:
+        result = a ^ operand2;
+        logical = true;
+        break; // EOR
+      case 0x2:
+        result = this.sbcOp(a, operand2, 1, setFlags);
+        break; // SUB
+      case 0x3:
+        result = this.sbcOp(operand2, a, 1, setFlags);
+        break; // RSB
+      case 0x4:
+        result = this.adcOp(a, operand2, 0, setFlags);
+        break; // ADD
+      case 0x5:
+        result = this.adcOp(a, operand2, carry, setFlags);
+        break; // ADC
+      case 0x6:
+        result = this.sbcOp(a, operand2, carry, setFlags);
+        break; // SBC
+      case 0x7:
+        result = this.sbcOp(operand2, a, carry, setFlags);
+        break; // RSC
+      case 0x8:
+        result = a & operand2;
+        logical = true;
+        write = false;
+        break; // TST
+      case 0x9:
+        result = a ^ operand2;
+        logical = true;
+        write = false;
+        break; // TEQ
+      case 0xa:
+        this.sbcOp(a, operand2, 1, true);
+        return; // CMP
+      case 0xb:
+        this.adcOp(a, operand2, 0, true);
+        return; // CMN
+      case 0xc:
+        result = a | operand2;
+        logical = true;
+        break; // ORR
+      case 0xd:
+        result = operand2;
+        logical = true;
+        break; // MOV
+      case 0xe:
+        result = a & ~operand2;
+        logical = true;
+        break; // BIC
+      default:
+        result = ~operand2;
+        logical = true;
+        break; // MVN (0xf)
     }
     if (logical && setFlags) {
       this.setNZ(result);
@@ -392,7 +502,9 @@ export class Arm7 {
     let result = Math.imul(this.r[rm]!, this.r[rs]!);
     if (accumulate) result = (result + this.r[rn]!) | 0;
     this.r[rd] = result | 0;
-    if (op & (1 << 20)) { this.setNZ(result); }
+    if (op & (1 << 20)) {
+      this.setNZ(result);
+    }
   }
 
   private armMulLong(op: number): void {
@@ -424,7 +536,8 @@ export class Arm7 {
     const rd = (op >>> 12) & 0xf;
     const rm = op & 0xf;
     const addr = this.r[rn]! >>> 0;
-    if (op & (1 << 22)) { // SWPB
+    if (op & (1 << 22)) {
+      // SWPB
       const tmp = this.bus.read8(addr);
       this.bus.write8(addr, this.r[rm]! & 0xff);
       this.r[rd] = tmp;
@@ -440,7 +553,7 @@ export class Arm7 {
     const aligned = addr & ~3;
     const value = this.bus.read32(aligned) >>> 0;
     const rot = (addr & 3) * 8;
-    return rot === 0 ? value : ((value >>> rot) | (value << (32 - rot))) | 0;
+    return rot === 0 ? value : (value >>> rot) | (value << (32 - rot)) | 0;
   }
 
   private armSingleTransfer(op: number): void {
@@ -473,7 +586,8 @@ export class Arm7 {
       this.write(rd, value);
     } else {
       const value = rd === 15 ? (this.r[15] + 12) | 0 : this.r[rd]!;
-      if (byte) this.bus.write8(addr, value & 0xff); else this.bus.write32(addr & ~3, value);
+      if (byte) this.bus.write8(addr, value & 0xff);
+      else this.bus.write32(addr & ~3, value);
       if (!preIndex || writeBack) this.write(rn, offsetAddr);
     }
   }
@@ -495,8 +609,10 @@ export class Arm7 {
 
     if (load) {
       let value: number;
-      if (sh === 1) value = this.bus.read16(addr & ~1) & 0xffff; // LDRH
-      else if (sh === 2) value = (this.bus.read8(addr) << 24) >> 24; // LDRSB
+      if (sh === 1)
+        value = this.bus.read16(addr & ~1) & 0xffff; // LDRH
+      else if (sh === 2)
+        value = (this.bus.read8(addr) << 24) >> 24; // LDRSB
       else value = (this.bus.read16(addr & ~1) << 16) >> 16; // LDRSH
       if (!preIndex || writeBack) this.write(rn, offsetAddr);
       this.write(rd, value);
@@ -521,10 +637,10 @@ export class Arm7 {
     let addr = up ? base : (base - count * 4) >>> 0;
     const finalBase = up ? (base + count * 4) >>> 0 : (base - count * 4) >>> 0;
     // For decreasing, addresses run low→high but the base ends lower.
-    const startAddr = up ? (preIndex ? addr + 4 : addr) : (preIndex ? addr : addr + 4);
+    const startAddr = up ? (preIndex ? addr + 4 : addr) : preIndex ? addr : addr + 4;
     addr = startAddr >>> 0;
 
-    const userBank = psr && !(load && (list & 0x8000)); // S with no R15 → user-mode registers
+    const userBank = psr && !(load && list & 0x8000); // S with no R15 → user-mode registers
     let wroteBase = false;
     for (let i = 0; i < 16; i += 1) {
       if ((list & (1 << i)) === 0) continue;
@@ -533,15 +649,14 @@ export class Arm7 {
         if (userBank && i >= 8 && i <= 14) this.writeUserReg(i, value);
         else this.write(i, value);
       } else {
-        const value = userBank && i >= 8 && i <= 14 ? this.readUserReg(i)
-          : i === 15 ? (this.r[15] + 12) | 0 : (i === rn && wroteBase ? finalBase : this.r[i]!);
+        const value = userBank && i >= 8 && i <= 14 ? this.readUserReg(i) : i === 15 ? (this.r[15] + 12) | 0 : i === rn && wroteBase ? finalBase : this.r[i]!;
         this.bus.write32(addr & ~3, value);
       }
       if (i === rn) wroteBase = true;
       addr = (addr + 4) >>> 0;
     }
-    if (writeBack && !(load && (list & (1 << rn)))) this.r[rn] = finalBase | 0;
-    if (load && psr && (list & 0x8000)) this.setCpsr(this.spsr); // LDM with R15 + S → restore CPSR
+    if (writeBack && !(load && list & (1 << rn))) this.r[rn] = finalBase | 0;
+    if (load && psr && list & 0x8000) this.setCpsr(this.spsr); // LDM with R15 + S → restore CPSR
   }
 
   // User-bank access for LDM/STM with the ^ (S) flag and no R15.
@@ -553,15 +668,30 @@ export class Arm7 {
     return this.r[i]!;
   }
   private writeUserReg(i: number, v: number): void {
-    if (this.mode === MODE_USR || this.mode === MODE_SYS) { this.r[i] = v | 0; return; }
-    if (this.mode === MODE_FIQ && i >= 8 && i <= 12) { this.usrR[i - 8] = v | 0; return; }
-    if (i === 13) { this.bankR13[0] = v | 0; return; }
-    if (i === 14) { this.bankR14[0] = v | 0; return; }
+    if (this.mode === MODE_USR || this.mode === MODE_SYS) {
+      this.r[i] = v | 0;
+      return;
+    }
+    if (this.mode === MODE_FIQ && i >= 8 && i <= 12) {
+      this.usrR[i - 8] = v | 0;
+      return;
+    }
+    if (i === 13) {
+      this.bankR13[0] = v | 0;
+      return;
+    }
+    if (i === 14) {
+      this.bankR14[0] = v | 0;
+      return;
+    }
     this.r[i] = v | 0;
   }
 
   private armSwi(comment: number): void {
-    if (this.onSwi) { this.onSwi(comment); return; } // HLE: fall through to next instruction
+    if (this.onSwi) {
+      this.onSwi(comment);
+      return;
+    } // HLE: fall through to next instruction
     const ret = (this.r[15] + 4) | 0;
     const saved = this.cpsr;
     this.switchMode(MODE_SVC);
@@ -585,7 +715,7 @@ export class Arm7 {
       if (op & (1 << 25)) {
         const imm = op & 0xff;
         const rot = ((op >>> 8) & 0xf) * 2;
-        value = rot === 0 ? imm : ((imm >>> rot) | (imm << (32 - rot))) | 0;
+        value = rot === 0 ? imm : (imm >>> rot) | (imm << (32 - rot)) | 0;
       } else {
         value = this.r[op & 0xf]!;
       }
@@ -614,14 +744,16 @@ export class Arm7 {
         if ((op & 0x1800) === 0x1800) return this.thumbAddSub(op); // format 2
         return this.thumbMoveShifted(op); // format 1
       }
-      case 0b001: return this.thumbImm(op); // format 3
+      case 0b001:
+        return this.thumbImm(op); // format 3
       case 0b010: {
         if (op & 0x1000) return this.thumbRegOffset(op); // formats 7/8 (0101): bit12 set
         if (op & 0x0800) return this.thumbPcLoad(op); // format 6 (01001): bit11 set
         if (op & 0x0400) return this.thumbHiReg(op); // format 5 (010001): bit10 set
         return this.thumbAlu(op); // format 4 (010000)
       }
-      case 0b011: return this.thumbImmOffset(op); // format 9
+      case 0b011:
+        return this.thumbImmOffset(op); // format 9
       case 0b100: {
         if ((op & 0x1000) === 0) return this.thumbHalf(op); // format 10 (1000)
         return this.thumbSpRel(op); // format 11 (1001)
@@ -633,17 +765,22 @@ export class Arm7 {
       }
       case 0b110: {
         if ((op & 0x1000) === 0) return this.thumbBlockTransfer(op); // format 15 (1100)
-        if ((op & 0x0f00) === 0x0f00) { this.thumbSwi(op & 0xff); return; } // format 17 (11011111)
+        if ((op & 0x0f00) === 0x0f00) {
+          this.thumbSwi(op & 0xff);
+          return;
+        } // format 17 (11011111)
         return this.thumbCondBranch(op); // format 16 (1101)
       }
-      default: { // 0b111
+      default: {
+        // 0b111
         if ((op & 0x1800) === 0x0000) return this.thumbBranch(op); // format 18 (11100)
         return this.thumbLongBranch(op); // format 19 (1111x)
       }
     }
   }
 
-  private thumbMoveShifted(op: number): void { // format 1: LSL/LSR/ASR Rd, Rs, #imm5
+  private thumbMoveShifted(op: number): void {
+    // format 1: LSL/LSR/ASR Rd, Rs, #imm5
     const type = (op >>> 11) & 0x3;
     const offset = (op >>> 6) & 0x1f;
     const rs = (op >>> 3) & 0x7;
@@ -654,7 +791,8 @@ export class Arm7 {
     this.setFlag(F_C, this.shifterCarry !== 0);
   }
 
-  private thumbAddSub(op: number): void { // format 2
+  private thumbAddSub(op: number): void {
+    // format 2
     const immediate = (op & (1 << 10)) !== 0;
     const sub = (op & (1 << 9)) !== 0;
     const rnOff = (op >>> 6) & 0x7;
@@ -664,19 +802,30 @@ export class Arm7 {
     this.r[rd] = sub ? this.sbcOp(this.r[rs]!, b, 1, true) : this.adcOp(this.r[rs]!, b, 0, true);
   }
 
-  private thumbImm(op: number): void { // format 3: MOV/CMP/ADD/SUB Rd, #imm8
+  private thumbImm(op: number): void {
+    // format 3: MOV/CMP/ADD/SUB Rd, #imm8
     const opcode = (op >>> 11) & 0x3;
     const rd = (op >>> 8) & 0x7;
     const imm = op & 0xff;
     switch (opcode) {
-      case 0: this.r[rd] = imm; this.setNZ(imm); break; // MOV
-      case 1: this.sbcOp(this.r[rd]!, imm, 1, true); break; // CMP
-      case 2: this.r[rd] = this.adcOp(this.r[rd]!, imm, 0, true); break; // ADD
-      default: this.r[rd] = this.sbcOp(this.r[rd]!, imm, 1, true); break; // SUB
+      case 0:
+        this.r[rd] = imm;
+        this.setNZ(imm);
+        break; // MOV
+      case 1:
+        this.sbcOp(this.r[rd]!, imm, 1, true);
+        break; // CMP
+      case 2:
+        this.r[rd] = this.adcOp(this.r[rd]!, imm, 0, true);
+        break; // ADD
+      default:
+        this.r[rd] = this.sbcOp(this.r[rd]!, imm, 1, true);
+        break; // SUB
     }
   }
 
-  private thumbAlu(op: number): void { // format 4
+  private thumbAlu(op: number): void {
+    // format 4
     const opcode = (op >>> 6) & 0xf;
     const rs = (op >>> 3) & 0x7;
     const rd = op & 0x7;
@@ -685,22 +834,57 @@ export class Arm7 {
     let result = a;
     let logical = true;
     switch (opcode) {
-      case 0x0: result = a & b; break; // AND
-      case 0x1: result = a ^ b; break; // EOR
-      case 0x2: result = this.barrel(0, a, b & 0xff, false); break; // LSL
-      case 0x3: result = this.barrel(1, a, b & 0xff, false); break; // LSR
-      case 0x4: result = this.barrel(2, a, b & 0xff, false); break; // ASR
-      case 0x5: this.r[rd] = this.adcOp(a, b, this.cFlag, true); return; // ADC
-      case 0x6: this.r[rd] = this.sbcOp(a, b, this.cFlag, true); return; // SBC
-      case 0x7: result = this.barrel(3, a, b & 0xff, false); break; // ROR
-      case 0x8: this.setNZ(a & b); return; // TST
-      case 0x9: this.r[rd] = this.sbcOp(0, b, 1, true); return; // NEG
-      case 0xa: this.sbcOp(a, b, 1, true); return; // CMP
-      case 0xb: this.adcOp(a, b, 0, true); return; // CMN
-      case 0xc: result = a | b; break; // ORR
-      case 0xd: result = Math.imul(a, b); logical = false; this.r[rd] = result | 0; this.setNZ(result); return; // MUL
-      case 0xe: result = a & ~b; break; // BIC
-      default: result = ~b; break; // MVN
+      case 0x0:
+        result = a & b;
+        break; // AND
+      case 0x1:
+        result = a ^ b;
+        break; // EOR
+      case 0x2:
+        result = this.barrel(0, a, b & 0xff, false);
+        break; // LSL
+      case 0x3:
+        result = this.barrel(1, a, b & 0xff, false);
+        break; // LSR
+      case 0x4:
+        result = this.barrel(2, a, b & 0xff, false);
+        break; // ASR
+      case 0x5:
+        this.r[rd] = this.adcOp(a, b, this.cFlag, true);
+        return; // ADC
+      case 0x6:
+        this.r[rd] = this.sbcOp(a, b, this.cFlag, true);
+        return; // SBC
+      case 0x7:
+        result = this.barrel(3, a, b & 0xff, false);
+        break; // ROR
+      case 0x8:
+        this.setNZ(a & b);
+        return; // TST
+      case 0x9:
+        this.r[rd] = this.sbcOp(0, b, 1, true);
+        return; // NEG
+      case 0xa:
+        this.sbcOp(a, b, 1, true);
+        return; // CMP
+      case 0xb:
+        this.adcOp(a, b, 0, true);
+        return; // CMN
+      case 0xc:
+        result = a | b;
+        break; // ORR
+      case 0xd:
+        result = Math.imul(a, b);
+        logical = false;
+        this.r[rd] = result | 0;
+        this.setNZ(result);
+        return; // MUL
+      case 0xe:
+        result = a & ~b;
+        break; // BIC
+      default:
+        result = ~b;
+        break; // MVN
     }
     this.r[rd] = result | 0;
     this.setNZ(result);
@@ -709,55 +893,76 @@ export class Arm7 {
     }
   }
 
-  private thumbHiReg(op: number): void { // format 5: hi-reg ops + BX
+  private thumbHiReg(op: number): void {
+    // format 5: hi-reg ops + BX
     const opcode = (op >>> 8) & 0x3;
-    const rsFull = ((op >>> 3) & 0x7) + ((op & (1 << 6)) ? 8 : 0);
-    const rdFull = (op & 0x7) + ((op & (1 << 7)) ? 8 : 0);
+    const rsFull = ((op >>> 3) & 0x7) + (op & (1 << 6) ? 8 : 0);
+    const rdFull = (op & 0x7) + (op & (1 << 7) ? 8 : 0);
     const sv = rsFull === 15 ? (this.r[15] + 4) | 0 : this.r[rsFull]!;
     switch (opcode) {
-      case 0: { // ADD (no flags)
+      case 0: {
+        // ADD (no flags)
         const v = ((rdFull === 15 ? (this.r[15] + 4) | 0 : this.r[rdFull]!) + sv) | 0;
         this.write(rdFull, v);
         break;
       }
-      case 1: this.sbcOp(rdFull === 15 ? (this.r[15] + 4) | 0 : this.r[rdFull]!, sv, 1, true); break; // CMP
-      case 2: this.write(rdFull, sv); break; // MOV
-      default: { // BX
-        if (sv & 1) this.cpsr |= F_T; else this.cpsr &= ~F_T;
+      case 1:
+        this.sbcOp(rdFull === 15 ? (this.r[15] + 4) | 0 : this.r[rdFull]!, sv, 1, true);
+        break; // CMP
+      case 2:
+        this.write(rdFull, sv);
+        break; // MOV
+      default: {
+        // BX
+        if (sv & 1) this.cpsr |= F_T;
+        else this.cpsr &= ~F_T;
         this.write(15, sv & ~1);
         break;
       }
     }
   }
 
-  private thumbPcLoad(op: number): void { // format 6: LDR Rd, [PC, #imm8*4]
+  private thumbPcLoad(op: number): void {
+    // format 6: LDR Rd, [PC, #imm8*4]
     const rd = (op >>> 8) & 0x7;
     const addr = (((this.r[15] + 4) & ~3) + (op & 0xff) * 4) >>> 0;
     this.r[rd] = this.bus.read32(addr) | 0;
   }
 
-  private thumbRegOffset(op: number): void { // formats 7 & 8
+  private thumbRegOffset(op: number): void {
+    // formats 7 & 8
     const ro = (op >>> 6) & 0x7;
     const rb = (op >>> 3) & 0x7;
     const rd = op & 0x7;
     const addr = (this.r[rb]! + this.r[ro]!) >>> 0;
-    if ((op & (1 << 9)) === 0) { // format 7: load/store with register offset
+    if ((op & (1 << 9)) === 0) {
+      // format 7: load/store with register offset
       const load = (op & (1 << 11)) !== 0;
       const byte = (op & (1 << 10)) !== 0;
       if (load) this.r[rd] = byte ? this.bus.read8(addr) : this.ldrWord(addr);
       else if (byte) this.bus.write8(addr, this.r[rd]! & 0xff);
       else this.bus.write32(addr & ~3, this.r[rd]!);
-    } else { // format 8: sign-extended byte/halfword
+    } else {
+      // format 8: sign-extended byte/halfword
       switch ((op >>> 10) & 0x3) {
-        case 0: this.bus.write16(addr & ~1, this.r[rd]! & 0xffff); break; // STRH
-        case 1: this.r[rd] = (this.bus.read8(addr) << 24) >> 24; break; // LDSB
-        case 2: this.r[rd] = this.bus.read16(addr & ~1) & 0xffff; break; // LDRH
-        default: this.r[rd] = (this.bus.read16(addr & ~1) << 16) >> 16; break; // LDSH
+        case 0:
+          this.bus.write16(addr & ~1, this.r[rd]! & 0xffff);
+          break; // STRH
+        case 1:
+          this.r[rd] = (this.bus.read8(addr) << 24) >> 24;
+          break; // LDSB
+        case 2:
+          this.r[rd] = this.bus.read16(addr & ~1) & 0xffff;
+          break; // LDRH
+        default:
+          this.r[rd] = (this.bus.read16(addr & ~1) << 16) >> 16;
+          break; // LDSH
       }
     }
   }
 
-  private thumbImmOffset(op: number): void { // format 9
+  private thumbImmOffset(op: number): void {
+    // format 9
     const byte = (op & (1 << 12)) !== 0;
     const load = (op & (1 << 11)) !== 0;
     const offset = (op >>> 6) & 0x1f;
@@ -769,7 +974,8 @@ export class Arm7 {
     else this.bus.write32(addr & ~3, this.r[rd]!);
   }
 
-  private thumbHalf(op: number): void { // format 10: LDRH/STRH Rd, [Rb, #imm5*2]
+  private thumbHalf(op: number): void {
+    // format 10: LDRH/STRH Rd, [Rb, #imm5*2]
     const load = (op & (1 << 11)) !== 0;
     const offset = ((op >>> 6) & 0x1f) * 2;
     const rb = (op >>> 3) & 0x7;
@@ -779,7 +985,8 @@ export class Arm7 {
     else this.bus.write16(addr & ~1, this.r[rd]! & 0xffff);
   }
 
-  private thumbSpRel(op: number): void { // format 11: LDR/STR Rd, [SP, #imm8*4]
+  private thumbSpRel(op: number): void {
+    // format 11: LDR/STR Rd, [SP, #imm8*4]
     const load = (op & (1 << 11)) !== 0;
     const rd = (op >>> 8) & 0x7;
     const addr = (this.r[13]! + (op & 0xff) * 4) >>> 0;
@@ -787,48 +994,64 @@ export class Arm7 {
     else this.bus.write32(addr & ~3, this.r[rd]!);
   }
 
-  private thumbLoadAddr(op: number): void { // format 12: ADD Rd, PC/SP, #imm8*4
+  private thumbLoadAddr(op: number): void {
+    // format 12: ADD Rd, PC/SP, #imm8*4
     const useSp = (op & (1 << 11)) !== 0;
     const rd = (op >>> 8) & 0x7;
     const base = useSp ? this.r[13]! >>> 0 : ((this.r[15] + 4) & ~3) >>> 0;
     this.r[rd] = (base + (op & 0xff) * 4) | 0;
   }
 
-  private thumbAddSp(op: number): void { // format 13: ADD SP, #±imm7*4
+  private thumbAddSp(op: number): void {
+    // format 13: ADD SP, #±imm7*4
     const offset = (op & 0x7f) * 4;
-    this.r[13] = (this.r[13]! + ((op & (1 << 7)) ? -offset : offset)) | 0;
+    this.r[13] = (this.r[13]! + (op & (1 << 7) ? -offset : offset)) | 0;
   }
 
-  private thumbPushPop(op: number): void { // format 14
+  private thumbPushPop(op: number): void {
+    // format 14
     const load = (op & (1 << 11)) !== 0;
     const pcLr = (op & (1 << 8)) !== 0;
     const list = op & 0xff;
     let sp = this.r[13]! >>> 0;
-    if (load) { // POP
+    if (load) {
+      // POP
       for (let i = 0; i < 8; i += 1) {
-        if (list & (1 << i)) { this.r[i] = this.bus.read32(sp & ~3) | 0; sp = (sp + 4) >>> 0; }
+        if (list & (1 << i)) {
+          this.r[i] = this.bus.read32(sp & ~3) | 0;
+          sp = (sp + 4) >>> 0;
+        }
       }
-      if (pcLr) { this.write(15, this.bus.read32(sp & ~3) & ~1); sp = (sp + 4) >>> 0; }
+      if (pcLr) {
+        this.write(15, this.bus.read32(sp & ~3) & ~1);
+        sp = (sp + 4) >>> 0;
+      }
       this.r[13] = sp | 0;
-    } else { // PUSH
+    } else {
+      // PUSH
       let count = pcLr ? 1 : 0;
       for (let i = 0; i < 8; i += 1) if (list & (1 << i)) count += 1;
       sp = (sp - count * 4) >>> 0;
       let addr = sp;
       for (let i = 0; i < 8; i += 1) {
-        if (list & (1 << i)) { this.bus.write32(addr & ~3, this.r[i]!); addr = (addr + 4) >>> 0; }
+        if (list & (1 << i)) {
+          this.bus.write32(addr & ~3, this.r[i]!);
+          addr = (addr + 4) >>> 0;
+        }
       }
       if (pcLr) this.bus.write32(addr & ~3, this.r[14]!);
       this.r[13] = sp | 0;
     }
   }
 
-  private thumbBlockTransfer(op: number): void { // format 15: LDMIA/STMIA Rb!, {rlist}
+  private thumbBlockTransfer(op: number): void {
+    // format 15: LDMIA/STMIA Rb!, {rlist}
     const load = (op & (1 << 11)) !== 0;
     const rb = (op >>> 8) & 0x7;
     const list = op & 0xff;
     let addr = this.r[rb]! >>> 0;
-    if (list === 0) { // empty list: transfers PC, Rb += 0x40 (edge case)
+    if (list === 0) {
+      // empty list: transfers PC, Rb += 0x40 (edge case)
       if (load) this.write(15, this.bus.read32(addr & ~3));
       else this.bus.write32(addr & ~3, (this.r[15] + 4) | 0);
       this.r[rb] = (addr + 0x40) | 0;
@@ -840,10 +1063,11 @@ export class Arm7 {
       else this.bus.write32(addr & ~3, this.r[i]!);
       addr = (addr + 4) >>> 0;
     }
-    if (!(load && (list & (1 << rb)))) this.r[rb] = addr | 0; // writeback unless Rb was loaded
+    if (!(load && list & (1 << rb))) this.r[rb] = addr | 0; // writeback unless Rb was loaded
   }
 
-  private thumbCondBranch(op: number): void { // format 16
+  private thumbCondBranch(op: number): void {
+    // format 16
     const cond = (op >>> 8) & 0xf;
     if (!this.cond(cond)) return;
     const offset = ((op & 0xff) << 24) >> 24; // sign-extend 8-bit
@@ -851,7 +1075,10 @@ export class Arm7 {
   }
 
   private thumbSwi(comment: number): void {
-    if (this.onSwi) { this.onSwi(comment); return; } // HLE: fall through to next instruction
+    if (this.onSwi) {
+      this.onSwi(comment);
+      return;
+    } // HLE: fall through to next instruction
     const ret = (this.r[15] + 2) | 0;
     const saved = this.cpsr;
     this.switchMode(MODE_SVC);
@@ -862,12 +1089,14 @@ export class Arm7 {
     this.branched = true;
   }
 
-  private thumbBranch(op: number): void { // format 18: unconditional
+  private thumbBranch(op: number): void {
+    // format 18: unconditional
     const offset = ((op & 0x7ff) << 21) >> 21; // sign-extend 11-bit
     this.write(15, (this.read(15) + offset * 2) | 0);
   }
 
-  private thumbLongBranch(op: number): void { // format 19: BL (two halves)
+  private thumbLongBranch(op: number): void {
+    // format 19: BL (two halves)
     if ((op & (1 << 11)) === 0) {
       // High part: LR = PC + (signext offset11 << 12)
       const offset = ((op & 0x7ff) << 21) >> 21;

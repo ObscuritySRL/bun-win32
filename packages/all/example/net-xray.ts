@@ -67,9 +67,18 @@ const MAX_EDGES = 768;
 const MAX_EDGE_POINTS = MAX_EDGES * SAMPLES_PER_EDGE;
 
 const tcpStateNames = new Map<number, string>([
-  [1, 'CLOSED'], [2, 'LISTEN'], [3, 'SYN_SENT'], [4, 'SYN_RCVD'],
-  [5, 'ESTABLISHED'], [6, 'FIN_WAIT1'], [7, 'FIN_WAIT2'], [8, 'CLOSE_WAIT'],
-  [9, 'CLOSING'], [10, 'LAST_ACK'], [11, 'TIME_WAIT'], [12, 'DELETE_TCB'],
+  [1, 'CLOSED'],
+  [2, 'LISTEN'],
+  [3, 'SYN_SENT'],
+  [4, 'SYN_RCVD'],
+  [5, 'ESTABLISHED'],
+  [6, 'FIN_WAIT1'],
+  [7, 'FIN_WAIT2'],
+  [8, 'CLOSE_WAIT'],
+  [9, 'CLOSING'],
+  [10, 'LAST_ACK'],
+  [11, 'TIME_WAIT'],
+  [12, 'DELETE_TCB'],
 ]);
 
 function ipFromU32(val: number): string {
@@ -105,7 +114,10 @@ function pidName(pid: number): string {
         // QueryFullProcessImageNameW(h, 0, buf, &size): size is chars in/out.
         if (Kernel32.QueryFullProcessImageNameW(h, 0, buf.ptr!, sizeBuf.ptr!)) {
           const chars = sizeBuf.readUInt32LE(0);
-          const path = buf.subarray(0, chars * 2).toString('utf16le').replace(/\0.*$/, '');
+          const path = buf
+            .subarray(0, chars * 2)
+            .toString('utf16le')
+            .replace(/\0.*$/, '');
           const base = path.split('\\').pop() ?? path;
           if (base.length > 0) name = base;
         }
@@ -124,8 +136,10 @@ interface Node {
   id: string;
   kind: number; // 0 hub, 1 remote
   label: string;
-  x: number; y: number; // current (lerped) position
-  tx: number; ty: number; // force-layout target
+  x: number;
+  y: number; // current (lerped) position
+  tx: number;
+  ty: number; // force-layout target
   degree: number; // connection count → glow size
   bornAt: number;
   seen: boolean; // touched this poll
@@ -158,12 +172,18 @@ function ensureNode(id: string, kind: number, label: string, now: number): Node 
     // then the force layout pulls it into place (hubs near center, remotes outer).
     const h = hashStr(id);
     const ang = (h / 0x1_0000_0000) * Math.PI * 2;
-    const rad = kind === 0 ? 0.12 + ((h >>> 8) & 0xff) / 255 * 0.18 : 0.45 + ((h >>> 16) & 0xff) / 255 * 0.4;
+    const rad = kind === 0 ? 0.12 + (((h >>> 8) & 0xff) / 255) * 0.18 : 0.45 + (((h >>> 16) & 0xff) / 255) * 0.4;
     n = {
-      id, kind, label,
-      x: Math.cos(ang) * rad, y: Math.sin(ang) * rad,
-      tx: Math.cos(ang) * rad, ty: Math.sin(ang) * rad,
-      degree: 0, bornAt: now, seen: true,
+      id,
+      kind,
+      label,
+      x: Math.cos(ang) * rad,
+      y: Math.sin(ang) * rad,
+      tx: Math.cos(ang) * rad,
+      ty: Math.sin(ang) * rad,
+      degree: 0,
+      bornAt: now,
+      seen: true,
     };
     nodes.set(id, n);
   } else {
@@ -207,7 +227,10 @@ function poll(now: number): void {
           if (state === 5) est += 1;
           if (state === 2) continue; // LISTEN — no remote endpoint, skip as edge
           if (!isRealRemote(remoteAddr)) continue;
-          if (remoteAddr !== 0) { lastRemoteSample = remoteAddr; lastRemotePortSample = remotePort; }
+          if (remoteAddr !== 0) {
+            lastRemoteSample = remoteAddr;
+            lastRemotePortSample = remotePort;
+          }
 
           const hubId = `p${pid}`;
           const remId = `r${remoteAddr}`;
@@ -262,7 +285,10 @@ function poll(now: number): void {
   }
   // A node lives while any edge references it OR it was seen this poll (or briefly after).
   const referenced = new Set<string>();
-  for (const e of edges.values()) { referenced.add(e.from); referenced.add(e.to); }
+  for (const e of edges.values()) {
+    referenced.add(e.from);
+    referenced.add(e.to);
+  }
   for (const n of nodes.values()) {
     if (!n.seen && !referenced.has(n.id) && now - n.bornAt > 1500) nodes.delete(n.id);
   }
@@ -288,7 +314,11 @@ function layoutStep(): void {
       let dx = a.tx - b.tx;
       let dy = a.ty - b.ty;
       let d2 = dx * dx + dy * dy;
-      if (d2 < 1e-5) { dx = (hashStr(a.id + b.id) / 0x1_0000_0000 - 0.5) * 0.01; dy = (hashStr(b.id + a.id) / 0x1_0000_0000 - 0.5) * 0.01; d2 = dx * dx + dy * dy + 1e-5; }
+      if (d2 < 1e-5) {
+        dx = (hashStr(a.id + b.id) / 0x1_0000_0000 - 0.5) * 0.01;
+        dy = (hashStr(b.id + a.id) / 0x1_0000_0000 - 0.5) * 0.01;
+        d2 = dx * dx + dy * dy + 1e-5;
+      }
       const inv = REP / d2;
       fx += dx * inv;
       fy += dy * inv;
@@ -320,7 +350,10 @@ function layoutStep(): void {
   // Clamp to the visible disk.
   for (const a of arr) {
     const r = Math.hypot(a.tx, a.ty);
-    if (r > 0.95) { a.tx = (a.tx / r) * 0.95; a.ty = (a.ty / r) * 0.95; }
+    if (r > 0.95) {
+      a.tx = (a.tx / r) * 0.95;
+      a.ty = (a.ty / r) * 0.95;
+    }
   }
 }
 
@@ -329,7 +362,7 @@ function layoutStep(): void {
 const scrW = User32.GetSystemMetrics(0) || 1920; // SM_CXSCREEN
 const scrH = User32.GetSystemMetrics(1) || 1080; // SM_CYSCREEN
 const WIN_H = Math.min(1000, Math.floor(scrH * 0.72));
-const WIN_W = Math.min(Math.floor(scrW * 0.9), Math.round(WIN_H * 16 / 9));
+const WIN_W = Math.min(Math.floor(scrW * 0.9), Math.round((WIN_H * 16) / 9));
 const win = gpu.createWindow({ title: 'Net X-Ray — live socket constellation on the GPU', width: WIN_W, height: WIN_H, borderless: true });
 const { w: clientW, h: clientH } = win.clientSize();
 const dev = gpu.createDevice(win.hwnd, { width: clientW, height: clientH });
@@ -523,7 +556,10 @@ function drawHud(fps: number): void {
 
     // Top talkers: hubs by degree.
     GDI32.SelectObject(dc, smallFont);
-    const hubs = [...nodes.values()].filter((n) => n.kind === 0).sort((a, b) => b.degree - a.degree).slice(0, 10);
+    const hubs = [...nodes.values()]
+      .filter((n) => n.kind === 0)
+      .sort((a, b) => b.degree - a.degree)
+      .slice(0, 10);
     let y = 56;
     GDI32.SetTextColor(dc, 0x00aad8ff);
     const head = 'TOP TALKERS  (process · connections)';
@@ -547,16 +583,20 @@ function drawHud(fps: number): void {
 }
 
 // ── Optional: a few harmless outbound connects so the constellation has live edges ──
-const seedHosts = [
-  'https://one.one.one.one/', 'https://dns.google/', 'https://www.cloudflare.com/',
-  'https://example.com/', 'https://www.microsoft.com/', 'https://github.com/',
-  'https://www.wikipedia.org/', 'https://www.bing.com/',
-];
+const seedHosts = ['https://one.one.one.one/', 'https://dns.google/', 'https://www.cloudflare.com/', 'https://example.com/', 'https://www.microsoft.com/', 'https://github.com/', 'https://www.wikipedia.org/', 'https://www.bing.com/'];
 function seedConnections(): void {
   for (const url of seedHosts) {
     fetch(url, { method: 'GET' })
-      .then(async (r) => { try { await r.arrayBuffer(); } catch { /* ignore */ } })
-      .catch(() => { /* offline hosts simply won't appear */ });
+      .then(async (r) => {
+        try {
+          await r.arrayBuffer();
+        } catch {
+          /* ignore */
+        }
+      })
+      .catch(() => {
+        /* offline hosts simply won't appear */
+      });
   }
 }
 
@@ -593,13 +633,18 @@ function cleanup(code: number): never {
       gpu.comRelease(dev.swapChain);
       gpu.comRelease(dev.context);
       gpu.comRelease(dev.device);
-    } catch { /* best-effort */ }
+    } catch {
+      /* best-effort */
+    }
     win.destroy();
   }
   process.exit(code);
 }
 process.on('SIGINT', () => cleanup(0));
-process.on('uncaughtException', (err) => { console.error(err); cleanup(1); });
+process.on('uncaughtException', (err) => {
+  console.error(err);
+  cleanup(1);
+});
 
 // ── Self-check: back-buffer readback → 2D pixel stats ───────────────────────────
 const SELFCHECK = process.env.SELFCHECK === '1';
@@ -763,12 +808,12 @@ while (!win.shouldClose()) {
       inten *= Math.max(0, 1 - dage / 0.6); // fade to 0
     }
     // Slight live shimmer so filaments read as alive.
-    const flick = 0.85 + 0.15 * Math.sin(time * 6 + hashStr(e.key) % 100);
+    const flick = 0.85 + 0.15 * Math.sin(time * 6 + (hashStr(e.key) % 100));
     inten *= flick;
     for (let s = 0; s < SAMPLES_PER_EDGE; s += 1) {
       const t = s / (SAMPLES_PER_EDGE - 1);
       // Gentle arc bow so parallel edges separate visually.
-      const bow = Math.sin(t * Math.PI) * 0.04 * (((hashStr(e.key) & 1) === 0) ? 1 : -1);
+      const bow = Math.sin(t * Math.PI) * 0.04 * ((hashStr(e.key) & 1) === 0 ? 1 : -1);
       const nx = -(B.y - A.y);
       const ny = B.x - A.x;
       const nl = Math.hypot(nx, ny) || 1;
@@ -806,7 +851,7 @@ while (!win.shouldClose()) {
   // ── Render points additively into the HDR target ──
   gpu.setRenderTargets([hdr.rtv!]);
   gpu.setViewport(clientW, clientH);
-  gpu.clear(hdr.rtv!, [0.010, 0.014, 0.026, 1]); // deep navy void
+  gpu.clear(hdr.rtv!, [0.01, 0.014, 0.026, 1]); // deep navy void
   gpu.setBlendState(additiveBlend);
 
   // Edges first (so node cores sit on top of the filaments).

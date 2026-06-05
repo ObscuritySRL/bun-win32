@@ -68,17 +68,52 @@ class D3d11 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/d3d11/nf-d3d11-d3d11createdevice
-  public static D3D11CreateDevice(pAdapter: IDXGIAdapter | NULL, DriverType: D3D_DRIVER_TYPE, Software: HMODULE | 0n, Flags: UINT, pFeatureLevels: PD3D_FEATURE_LEVEL | NULL, FeatureLevels: UINT, SDKVersion: UINT, ppDevice: PID3D11Device | NULL, pFeatureLevel: PD3D_FEATURE_LEVEL | NULL, ppImmediateContext: PID3D11DeviceContext | NULL): HRESULT {
+  public static D3D11CreateDevice(
+    pAdapter: IDXGIAdapter | NULL,
+    DriverType: D3D_DRIVER_TYPE,
+    Software: HMODULE | 0n,
+    Flags: UINT,
+    pFeatureLevels: PD3D_FEATURE_LEVEL | NULL,
+    FeatureLevels: UINT,
+    SDKVersion: UINT,
+    ppDevice: PID3D11Device | NULL,
+    pFeatureLevel: PD3D_FEATURE_LEVEL | NULL,
+    ppImmediateContext: PID3D11DeviceContext | NULL,
+  ): HRESULT {
     return D3d11.Load('D3D11CreateDevice')(pAdapter, DriverType, Software, Flags, pFeatureLevels, FeatureLevels, SDKVersion, ppDevice, pFeatureLevel, ppImmediateContext);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/d3d11/nf-d3d11-d3d11createdeviceandswapchain
-  public static D3D11CreateDeviceAndSwapChain(pAdapter: IDXGIAdapter | NULL, DriverType: D3D_DRIVER_TYPE, Software: HMODULE | 0n, Flags: UINT, pFeatureLevels: PD3D_FEATURE_LEVEL | NULL, FeatureLevels: UINT, SDKVersion: UINT, pSwapChainDesc: PDXGI_SWAP_CHAIN_DESC | NULL, ppSwapChain: PIDXGISwapChain | NULL, ppDevice: PID3D11Device | NULL, pFeatureLevel: PD3D_FEATURE_LEVEL | NULL, ppImmediateContext: PID3D11DeviceContext | NULL): HRESULT {
+  public static D3D11CreateDeviceAndSwapChain(
+    pAdapter: IDXGIAdapter | NULL,
+    DriverType: D3D_DRIVER_TYPE,
+    Software: HMODULE | 0n,
+    Flags: UINT,
+    pFeatureLevels: PD3D_FEATURE_LEVEL | NULL,
+    FeatureLevels: UINT,
+    SDKVersion: UINT,
+    pSwapChainDesc: PDXGI_SWAP_CHAIN_DESC | NULL,
+    ppSwapChain: PIDXGISwapChain | NULL,
+    ppDevice: PID3D11Device | NULL,
+    pFeatureLevel: PD3D_FEATURE_LEVEL | NULL,
+    ppImmediateContext: PID3D11DeviceContext | NULL,
+  ): HRESULT {
     return D3d11.Load('D3D11CreateDeviceAndSwapChain')(pAdapter, DriverType, Software, Flags, pFeatureLevels, FeatureLevels, SDKVersion, pSwapChainDesc, ppSwapChain, ppDevice, pFeatureLevel, ppImmediateContext);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/d3d11on12/nf-d3d11on12-d3d11on12createdevice
-  public static D3D11On12CreateDevice(pDevice: IUnknown, Flags: UINT, pFeatureLevels: PD3D_FEATURE_LEVEL | NULL, FeatureLevels: UINT, ppCommandQueues: PIUnknown | NULL, NumQueues: UINT, NodeMask: UINT, ppDevice: PID3D11Device | NULL, ppImmediateContext: PID3D11DeviceContext | NULL, pChosenFeatureLevel: PD3D_FEATURE_LEVEL | NULL): HRESULT {
+  public static D3D11On12CreateDevice(
+    pDevice: IUnknown,
+    Flags: UINT,
+    pFeatureLevels: PD3D_FEATURE_LEVEL | NULL,
+    FeatureLevels: UINT,
+    ppCommandQueues: PIUnknown | NULL,
+    NumQueues: UINT,
+    NodeMask: UINT,
+    ppDevice: PID3D11Device | NULL,
+    ppImmediateContext: PID3D11DeviceContext | NULL,
+    pChosenFeatureLevel: PD3D_FEATURE_LEVEL | NULL,
+  ): HRESULT {
     return D3d11.Load('D3D11On12CreateDevice')(pDevice, Flags, pFeatureLevels, FeatureLevels, ppCommandQueues, NumQueues, NodeMask, ppDevice, ppImmediateContext, pChosenFeatureLevel);
   }
 }

@@ -63,9 +63,9 @@ gpu3d.bindGpu3d(g);
 // ── Mesh: a GRID of cells. Each cell = 2 triangles = 6 vertices, fetched from the
 // grid SRV by SV_VertexID. The SRV stores per-grid-vertex world-space XZ base coords;
 // the index buffer is implicit (six SV_VertexIDs per cell map to four corners). ──
-const GRID = 320;                       // cells per side
+const GRID = 320; // cells per side
 const VERTS_X = GRID + 1;
-const TILE = 320.0;                     // world extent of the patch (metres)
+const TILE = 320.0; // world extent of the patch (metres)
 const HALF = TILE * 0.5;
 const NUM_WAVES = 6;
 
@@ -86,7 +86,14 @@ const depth = gpu3d.makeDepthBuffer(clientW, clientH);
 // ── Gerstner wave table (CPU side → uploaded once). Each wave: dir(x,z), amplitude,
 // wavelength, speed, steepness(Q). Mixed directions/scales so the sea reads as a real
 // wind-driven swell with smaller chop riding the dominant long waves. ─────────────
-interface Wave { dx: number; dz: number; amp: number; wlen: number; speed: number; steep: number }
+interface Wave {
+  dx: number;
+  dz: number;
+  amp: number;
+  wlen: number;
+  speed: number;
+  steep: number;
+}
 const WIND = 0.5; // dominant wind heading (radians)
 const waves: Wave[] = [];
 {
@@ -97,22 +104,22 @@ const waves: Wave[] = [];
   };
   // Longest, dominant swell first; each successive wave is shorter, steeper chop.
   const specs = [
-    { wlen: 90, amp: 2.6, spread: 0.20 },
+    { wlen: 90, amp: 2.6, spread: 0.2 },
     { wlen: 54, amp: 1.5, spread: 0.55 },
     { wlen: 31, amp: 0.85, spread: 0.95 },
-    { wlen: 19, amp: 0.48, spread: 1.30 },
-    { wlen: 11, amp: 0.26, spread: 1.70 },
-    { wlen: 6.5, amp: 0.14, spread: 2.20 },
+    { wlen: 19, amp: 0.48, spread: 1.3 },
+    { wlen: 11, amp: 0.26, spread: 1.7 },
+    { wlen: 6.5, amp: 0.14, spread: 2.2 },
   ];
   for (const sp of specs) {
     const ang = WIND + (rand() - 0.5) * 2 * sp.spread;
-    const k = (2 * Math.PI) / sp.wlen;     // wavenumber
-    const c = Math.sqrt(9.81 / k);          // deep-water phase speed = sqrt(g/k)
+    const k = (2 * Math.PI) / sp.wlen; // wavenumber
+    const c = Math.sqrt(9.81 / k); // deep-water phase speed = sqrt(g/k)
     waves.push({ dx: Math.cos(ang), dz: Math.sin(ang), amp: sp.amp, wlen: sp.wlen, speed: c, steep: 0.0 });
   }
   // Steepness Q per wave, normalised so the sum can't pinch past a cusp (Q*k*A <= 1
   // overall). Bias the longer waves to carry most of the steepness.
-  const totalKA = waves.reduce((acc, w) => acc + (2 * Math.PI) / w.wlen * w.amp, 0);
+  const totalKA = waves.reduce((acc, w) => acc + ((2 * Math.PI) / w.wlen) * w.amp, 0);
   for (const w of waves) {
     const ka = ((2 * Math.PI) / w.wlen) * w.amp;
     w.steep = (0.82 / Math.max(1e-3, totalKA)) * (ka / Math.max(1e-3, ka)) * 1.0;
@@ -413,38 +420,36 @@ function mul4(a: number[], b: number[]): number[] {
   }
   return r;
 }
-interface Basis { fwd: [number, number, number]; right: [number, number, number]; up: [number, number, number] }
+interface Basis {
+  fwd: [number, number, number];
+  right: [number, number, number];
+  up: [number, number, number];
+}
 function lookAtBasis(eye: [number, number, number], center: [number, number, number], up: [number, number, number]): { m: number[]; basis: Basis } {
   let zx = center[0] - eye[0];
   let zy = center[1] - eye[1];
   let zz = center[2] - eye[2];
   const zl = Math.hypot(zx, zy, zz) || 1;
-  zx /= zl; zy /= zl; zz /= zl;
+  zx /= zl;
+  zy /= zl;
+  zz /= zl;
   let xx = up[1] * zz - up[2] * zy;
   let xy = up[2] * zx - up[0] * zz;
   let xz = up[0] * zy - up[1] * zx;
   const xl = Math.hypot(xx, xy, xz) || 1;
-  xx /= xl; xy /= xl; xz /= xl;
+  xx /= xl;
+  xy /= xl;
+  xz /= xl;
   const yx = zy * xz - zz * xy;
   const yy = zz * xx - zx * xz;
   const yz = zx * xy - zy * xx;
-  const m = [
-    xx, xy, xz, -(xx * eye[0] + xy * eye[1] + xz * eye[2]),
-    yx, yy, yz, -(yx * eye[0] + yy * eye[1] + yz * eye[2]),
-    zx, zy, zz, -(zx * eye[0] + zy * eye[1] + zz * eye[2]),
-    0, 0, 0, 1,
-  ];
+  const m = [xx, xy, xz, -(xx * eye[0] + xy * eye[1] + xz * eye[2]), yx, yy, yz, -(yx * eye[0] + yy * eye[1] + yz * eye[2]), zx, zy, zz, -(zx * eye[0] + zy * eye[1] + zz * eye[2]), 0, 0, 0, 1];
   return { m, basis: { fwd: [zx, zy, zz], right: [xx, xy, xz], up: [yx, yy, yz] } };
 }
 function perspective(fovY: number, aspect: number, near: number, far: number): number[] {
   const ff = 1 / Math.tan(fovY / 2);
   const range = far / (far - near);
-  return [
-    ff / aspect, 0, 0, 0,
-    0, ff, 0, 0,
-    0, 0, range, -near * range,
-    0, 0, 1, 0,
-  ];
+  return [ff / aspect, 0, 0, 0, 0, ff, 0, 0, 0, 0, range, -near * range, 0, 0, 1, 0];
 }
 
 const FOV_Y = (52 * Math.PI) / 180;
@@ -453,8 +458,8 @@ const TAN_HALF = Math.tan(FOV_Y / 2);
 const proj = perspective(FOV_Y, aspect, 0.1, 1200);
 
 // Low golden sun just above the horizon so its glitter road runs to the camera.
-const sunElev = 0.12;   // radians above horizon (low, dramatic)
-const sunAzim = WIND;   // aim the sun down-wind so the swell rolls toward the light
+const sunElev = 0.12; // radians above horizon (low, dramatic)
+const sunAzim = WIND; // aim the sun down-wind so the swell rolls toward the light
 const sun: [number, number, number] = [Math.cos(sunElev) * Math.cos(sunAzim), Math.sin(sunElev), Math.cos(sunElev) * Math.sin(sunAzim)];
 
 // ── GDI HUD font ──────────────────────────────────────────────────────────────
@@ -533,17 +538,13 @@ while (!win.shouldClose()) {
   // ── Slowly orbiting camera skimming low over the surface, looking toward the sun.
   const orbit = t * 0.06;
   const camR = 26.0;
-  const camY = 4.2 + Math.sin(t * 0.4) * 0.6;        // skim low, gently bobbing
+  const camY = 4.2 + Math.sin(t * 0.4) * 0.6; // skim low, gently bobbing
   const camX = Math.sin(orbit) * camR;
   const camZ = Math.cos(orbit) * camR - 4.0;
   // Look toward a point out near the horizon in the sun's bearing so the glitter road
   // and the sun sit in frame; aim slightly down to keep plenty of sea in the lower half.
   const lookAhead = 80.0;
-  const tgt: [number, number, number] = [
-    camX + sun[0] * lookAhead,
-    1.0,
-    camZ + sun[2] * lookAhead,
-  ];
+  const tgt: [number, number, number] = [camX + sun[0] * lookAhead, 1.0, camZ + sun[2] * lookAhead];
   const eye: [number, number, number] = [camX, camY, camZ];
   const { m: view, basis } = lookAtBasis(eye, tgt, [0, 1, 0]);
   const viewProj = mul4(proj, view);
@@ -553,18 +554,36 @@ while (!win.shouldClose()) {
   for (let row = 0; row < 4; row += 1) {
     for (let col = 0; col < 4; col += 1) skyData.writeFloatLE(viewProj[col * 4 + row]!, (row * 4 + col) * 4);
   }
-  skyData.writeFloatLE(eye[0], 64); skyData.writeFloatLE(eye[1], 68); skyData.writeFloatLE(eye[2], 72); skyData.writeFloatLE(t, 76);
-  skyData.writeFloatLE(sun[0], 80); skyData.writeFloatLE(sun[1], 84); skyData.writeFloatLE(sun[2], 88); skyData.writeFloatLE(0, 92);
-  skyData.writeFloatLE(1 / clientW, 96); skyData.writeFloatLE(1 / clientH, 100); skyData.writeFloatLE(TAN_HALF, 104); skyData.writeFloatLE(aspect, 108);
-  skyData.writeFloatLE(basis.right[0], 112); skyData.writeFloatLE(basis.right[1], 116); skyData.writeFloatLE(basis.right[2], 120); skyData.writeFloatLE(0, 124);
-  skyData.writeFloatLE(basis.up[0], 128); skyData.writeFloatLE(basis.up[1], 132); skyData.writeFloatLE(basis.up[2], 136); skyData.writeFloatLE(0, 140);
-  skyData.writeFloatLE(basis.fwd[0], 144); skyData.writeFloatLE(basis.fwd[1], 148); skyData.writeFloatLE(basis.fwd[2], 152); skyData.writeFloatLE(0, 156);
+  skyData.writeFloatLE(eye[0], 64);
+  skyData.writeFloatLE(eye[1], 68);
+  skyData.writeFloatLE(eye[2], 72);
+  skyData.writeFloatLE(t, 76);
+  skyData.writeFloatLE(sun[0], 80);
+  skyData.writeFloatLE(sun[1], 84);
+  skyData.writeFloatLE(sun[2], 88);
+  skyData.writeFloatLE(0, 92);
+  skyData.writeFloatLE(1 / clientW, 96);
+  skyData.writeFloatLE(1 / clientH, 100);
+  skyData.writeFloatLE(TAN_HALF, 104);
+  skyData.writeFloatLE(aspect, 108);
+  skyData.writeFloatLE(basis.right[0], 112);
+  skyData.writeFloatLE(basis.right[1], 116);
+  skyData.writeFloatLE(basis.right[2], 120);
+  skyData.writeFloatLE(0, 124);
+  skyData.writeFloatLE(basis.up[0], 128);
+  skyData.writeFloatLE(basis.up[1], 132);
+  skyData.writeFloatLE(basis.up[2], 136);
+  skyData.writeFloatLE(0, 140);
+  skyData.writeFloatLE(basis.fwd[0], 144);
+  skyData.writeFloatLE(basis.fwd[1], 148);
+  skyData.writeFloatLE(basis.fwd[2], 152);
+  skyData.writeFloatLE(0, 156);
   gpu.updateConstantBuffer(skyCb, skyData);
 
   gpu3d.setRenderTargetsWithDepth([g.backBufferRTV], depth.dsv);
   gpu.setViewport(clientW, clientH);
   gpu3d.clearDepth(depth.dsv, 1.0);
-  gpu3d.setDepthState(false, false);   // sky doesn't write/test depth
+  gpu3d.setDepthState(false, false); // sky doesn't write/test depth
   gpu3d.setCull('none');
   gpu.vsSet(skyVs, [skyCb]);
   gpu.psSet(skyPs, { cb: [skyCb] });
@@ -577,19 +596,31 @@ while (!win.shouldClose()) {
     for (let col = 0; col < 4; col += 1) cbData.writeFloatLE(viewProj[col * 4 + row]!, (row * 4 + col) * 4);
   }
   o = 64;
-  cbData.writeFloatLE(eye[0], o); cbData.writeFloatLE(eye[1], o + 4); cbData.writeFloatLE(eye[2], o + 8); cbData.writeFloatLE(t, o + 12);
+  cbData.writeFloatLE(eye[0], o);
+  cbData.writeFloatLE(eye[1], o + 4);
+  cbData.writeFloatLE(eye[2], o + 8);
+  cbData.writeFloatLE(t, o + 12);
   o = 80;
-  cbData.writeFloatLE(sun[0], o); cbData.writeFloatLE(sun[1], o + 4); cbData.writeFloatLE(sun[2], o + 8); cbData.writeFloatLE(0, o + 12);
+  cbData.writeFloatLE(sun[0], o);
+  cbData.writeFloatLE(sun[1], o + 4);
+  cbData.writeFloatLE(sun[2], o + 8);
+  cbData.writeFloatLE(0, o + 12);
   o = 96; // gWaveDir[]
   for (let i = 0; i < NUM_WAVES; i += 1) {
     const w = waves[i]!;
     const k = (2 * Math.PI) / w.wlen;
-    cbData.writeFloatLE(w.dx, o); cbData.writeFloatLE(w.dz, o + 4); cbData.writeFloatLE(w.amp, o + 8); cbData.writeFloatLE(k, o + 12);
+    cbData.writeFloatLE(w.dx, o);
+    cbData.writeFloatLE(w.dz, o + 4);
+    cbData.writeFloatLE(w.amp, o + 8);
+    cbData.writeFloatLE(k, o + 12);
     o += 16;
   }
   for (let i = 0; i < NUM_WAVES; i += 1) {
     const w = waves[i]!;
-    cbData.writeFloatLE(w.speed, o); cbData.writeFloatLE(w.steep, o + 4); cbData.writeFloatLE(0, o + 8); cbData.writeFloatLE(0, o + 12);
+    cbData.writeFloatLE(w.speed, o);
+    cbData.writeFloatLE(w.steep, o + 4);
+    cbData.writeFloatLE(0, o + 8);
+    cbData.writeFloatLE(0, o + 12);
     o += 16;
   }
   gpu.updateConstantBuffer(cb, cbData);

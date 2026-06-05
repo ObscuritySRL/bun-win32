@@ -43,23 +43,7 @@
  */
 
 import { GDI32, User32 } from '../index';
-import {
-  clear,
-  comRelease,
-  compile,
-  createDevice,
-  createWindow,
-  drawFullscreenTriangle,
-  makeConstantBuffer,
-  makePixelShader,
-  makeVertexShader,
-  psSet,
-  setRenderTargets,
-  setViewport,
-  updateConstantBuffer,
-  vsSet,
-  blobRelease,
-} from './_gpu';
+import { clear, comRelease, compile, createDevice, createWindow, drawFullscreenTriangle, makeConstantBuffer, makePixelShader, makeVertexShader, psSet, setRenderTargets, setViewport, updateConstantBuffer, vsSet, blobRelease } from './_gpu';
 
 // ── Virtual-key codes (the engine's Win.keyDown takes raw VKs) ────────────────
 const VK_LEFT = 0x25;
@@ -257,7 +241,7 @@ const cbData = Buffer.alloc(CB_SIZE);
 //  left/right & top/bottom luminance balance ≈ 0.97, mean luminance ≈ 0.60.
 const OPEN_CENTER_X = -0.235;
 const OPEN_CENTER_Y = 0.827;
-const OPEN_SCALE = 0.30; // half-height in world units → zoom ≈ BASE_SCALE/scale ≈ 4.7×
+const OPEN_SCALE = 0.3; // half-height in world units → zoom ≈ BASE_SCALE/scale ≈ 4.7×
 let centerX = OPEN_CENTER_X;
 let centerY = OPEN_CENTER_Y;
 let scale = OPEN_SCALE; // half-height of the view in world units (≈ zoom = 1.4/scale)
@@ -317,11 +301,7 @@ function reset(): void {
 }
 
 // ── HUD (GDI on the window DC) ────────────────────────────────────────────────
-const hudFont = GDI32.CreateFontW(
-  -18, 0, 0, 0, FW_SEMIBOLD, 0, 0, 0,
-  DEFAULT_CHARSET, 0, 0, CLEARTYPE_QUALITY, VARIABLE_PITCH,
-  Buffer.from('Segoe UI\0', 'utf16le').ptr!,
-);
+const hudFont = GDI32.CreateFontW(-18, 0, 0, 0, FW_SEMIBOLD, 0, 0, 0, DEFAULT_CHARSET, 0, 0, CLEARTYPE_QUALITY, VARIABLE_PITCH, Buffer.from('Segoe UI\0', 'utf16le').ptr!);
 
 function drawHud(text: string): void {
   const dc = User32.GetWindowDC(win.hwnd);
@@ -399,7 +379,7 @@ try {
     const zoomInHeld = win.keyDown(VK_OEM_PLUS) || win.keyDown(VK_ADD) || win.keyDown(VK_Z);
     const zoomOutHeld = win.keyDown(VK_OEM_MINUS) || win.keyDown(VK_SUBTRACT) || win.keyDown(VK_X);
     if (zoomInHeld) {
-      zoomToward(mx, my, Math.pow(0.30, dt));
+      zoomToward(mx, my, Math.pow(0.3, dt));
       autoZoom = false;
     }
     if (zoomOutHeld) {
@@ -409,10 +389,22 @@ try {
 
     // Arrow-key pan (in addition to drag).
     const panSpeed = scale * 1.4 * dt;
-    if (win.keyDown(VK_LEFT)) { centerX -= panSpeed * aspect; autoZoom = false; }
-    if (win.keyDown(VK_RIGHT)) { centerX += panSpeed * aspect; autoZoom = false; }
-    if (win.keyDown(VK_UP)) { centerY += panSpeed; autoZoom = false; }
-    if (win.keyDown(VK_DOWN)) { centerY -= panSpeed; autoZoom = false; }
+    if (win.keyDown(VK_LEFT)) {
+      centerX -= panSpeed * aspect;
+      autoZoom = false;
+    }
+    if (win.keyDown(VK_RIGHT)) {
+      centerX += panSpeed * aspect;
+      autoZoom = false;
+    }
+    if (win.keyDown(VK_UP)) {
+      centerY += panSpeed;
+      autoZoom = false;
+    }
+    if (win.keyDown(VK_DOWN)) {
+      centerY -= panSpeed;
+      autoZoom = false;
+    }
 
     // J toggles Mandelbrot ↔ Julia (edge-triggered).
     if (win.keyDown(VK_J)) {
@@ -426,7 +418,10 @@ try {
     }
     if (win.keyDown(VK_R)) reset();
     if (win.keyDown(VK_SPACE)) {
-      if (!spaceLatch) { spaceLatch = true; autoZoom = !autoZoom; }
+      if (!spaceLatch) {
+        spaceLatch = true;
+        autoZoom = !autoZoom;
+      }
     } else {
       spaceLatch = false;
     }

@@ -30,13 +30,7 @@
 
 import { FFIType, dlopen, linkSymbols } from 'bun:ffi';
 
-import Mmdevapi, {
-  CLSID_MMDeviceEnumerator,
-  DEVICE_STATE,
-  EDataFlow,
-  ERole,
-  IID_IMMDeviceEnumerator,
-} from '..';
+import Mmdevapi, { CLSID_MMDeviceEnumerator, DEVICE_STATE, EDataFlow, ERole, IID_IMMDeviceEnumerator } from '..';
 
 const ANSI = {
   bold: '\x1b[1m',
@@ -169,7 +163,7 @@ const PKEY_DEVICEINTERFACE_FRIENDLY_NAME = buildPropertyKey('026e516e-b814-414b-
 
 const coInitHr = ole32.symbols.CoInitializeEx(null, COINIT_APARTMENTTHREADED);
 const shouldUninitialize = coInitHr >= 0;
-if (coInitHr < 0 && (coInitHr >>> 0) !== RPC_E_CHANGED_MODE) {
+if (coInitHr < 0 && coInitHr >>> 0 !== RPC_E_CHANGED_MODE) {
   console.error(`${ANSI.red}CoInitializeEx failed: ${formatHResult(coInitHr)}${ANSI.reset}`);
   process.exit(1);
 }
@@ -412,9 +406,7 @@ console.log(`${ANSI.bold}${ANSI.cyan}mmdevapi.dll${ANSI.reset}  ${ANSI.dim}audio
 console.log(`${ANSI.dim}enumerator  ${ANSI.reset}IMMDeviceEnumerator @ 0x${enumeratorAddress.toString(16).padStart(16, '0')}`);
 console.log(`${ANSI.dim}scope       ${ANSI.reset}eRender + eCapture, DEVICE_STATEMASK_ALL`);
 console.log();
-console.log(
-  `  ${ANSI.dim}${'Flow'.padEnd(7)}  ${'State'.padEnd(12)}  ${'Friendly name'.padEnd(NAME_WIDTH)}  ${'Controller'.padEnd(INTERFACE_WIDTH)}  Default roles${ANSI.reset}`,
-);
+console.log(`  ${ANSI.dim}${'Flow'.padEnd(7)}  ${'State'.padEnd(12)}  ${'Friendly name'.padEnd(NAME_WIDTH)}  ${'Controller'.padEnd(INTERFACE_WIDTH)}  Default roles${ANSI.reset}`);
 console.log(`  ${ANSI.dim}${'─'.repeat(7 + 2 + 12 + 2 + NAME_WIDTH + 2 + INTERFACE_WIDTH + 2 + 40)}${ANSI.reset}`);
 
 for (const record of records) {
@@ -424,8 +416,7 @@ for (const record of records) {
   const stateTag = `${state.color}${state.label.padEnd(12)}${ANSI.reset}`;
   const nameTag = `${ANSI.yellow}${truncate(record.friendlyName, NAME_WIDTH).padEnd(NAME_WIDTH)}${ANSI.reset}`;
   const interfaceTag = `${ANSI.dim}${truncate(record.interfaceName, INTERFACE_WIDTH).padEnd(INTERFACE_WIDTH)}${ANSI.reset}`;
-  const defaultTag =
-    record.defaults.length > 0 ? `${ANSI.bold}${ANSI.green}${record.defaults.join(' • ')}${ANSI.reset}` : `${ANSI.dim}·${ANSI.reset}`;
+  const defaultTag = record.defaults.length > 0 ? `${ANSI.bold}${ANSI.green}${record.defaults.join(' • ')}${ANSI.reset}` : `${ANSI.dim}·${ANSI.reset}`;
   console.log(`  ${flowTag}  ${stateTag}  ${nameTag}  ${interfaceTag}  ${defaultTag}`);
 }
 
@@ -437,9 +428,7 @@ const disabledCount = records.filter((r) => (r.state & DEVICE_STATE.DEVICE_STATE
 const notPresentCount = records.filter((r) => (r.state & DEVICE_STATE.DEVICE_STATE_NOTPRESENT) !== 0).length;
 
 console.log();
-console.log(
-  `  ${ANSI.bold}${records.length}${ANSI.reset} endpoints  ${ANSI.dim}•${ANSI.reset}  ${ANSI.cyan}${renderCount} render${ANSI.reset}  ${ANSI.dim}•${ANSI.reset}  ${ANSI.magenta}${captureCount} capture${ANSI.reset}`,
-);
+console.log(`  ${ANSI.bold}${records.length}${ANSI.reset} endpoints  ${ANSI.dim}•${ANSI.reset}  ${ANSI.cyan}${renderCount} render${ANSI.reset}  ${ANSI.dim}•${ANSI.reset}  ${ANSI.magenta}${captureCount} capture${ANSI.reset}`);
 console.log(
   `  ${ANSI.green}${activeCount} active${ANSI.reset}  ${ANSI.dim}•${ANSI.reset}  ${ANSI.yellow}${disabledCount} disabled${ANSI.reset}  ${ANSI.dim}•${ANSI.reset}  ${ANSI.magenta}${unpluggedCount} unplugged${ANSI.reset}  ${ANSI.dim}•${ANSI.reset}  ${ANSI.dim}${notPresentCount} not-present${ANSI.reset}`,
 );

@@ -21,9 +21,11 @@
 function buildCorpus(): string {
   let s = 0x9e3779b9 >>> 0;
   const rnd = (): number => {
-    s ^= s << 13; s >>>= 0;
+    s ^= s << 13;
+    s >>>= 0;
     s ^= s >> 17;
-    s ^= s << 5; s >>>= 0;
+    s ^= s << 5;
+    s >>>= 0;
     return s / 0x1_0000_0000;
   };
   const pick = <T>(a: T[]): T => a[Math.floor(rnd() * a.length)]!;
@@ -92,7 +94,12 @@ const gauss = (sd: number): number => {
   return Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2) * sd;
 };
 
-interface Param { v: Float32Array; m: Float32Array; vv: Float32Array; name: string }
+interface Param {
+  v: Float32Array;
+  m: Float32Array;
+  vv: Float32Array;
+  name: string;
+}
 const params: Param[] = [];
 function P(name: string, n: number, init: (i: number) => number): Float32Array {
   const v = new Float32Array(n);
@@ -105,25 +112,43 @@ const wte = P('wte', V * D, () => gauss(0.02)); // [V][D]
 const wpe = P('wpe', T * D, () => gauss(0.02)); // [T][D]
 
 interface Layer {
-  ln1g: Float32Array; ln1b: Float32Array;
-  wq: Float32Array; wk: Float32Array; wv: Float32Array; // [D][D] each
-  bq: Float32Array; bk: Float32Array; bv: Float32Array; // [D]
-  wo: Float32Array; bo: Float32Array; // [D][D], [D]
-  ln2g: Float32Array; ln2b: Float32Array;
-  w1: Float32Array; b1: Float32Array; // [D][DFF], [DFF]
-  w2: Float32Array; b2: Float32Array; // [DFF][D], [D]
+  ln1g: Float32Array;
+  ln1b: Float32Array;
+  wq: Float32Array;
+  wk: Float32Array;
+  wv: Float32Array; // [D][D] each
+  bq: Float32Array;
+  bk: Float32Array;
+  bv: Float32Array; // [D]
+  wo: Float32Array;
+  bo: Float32Array; // [D][D], [D]
+  ln2g: Float32Array;
+  ln2b: Float32Array;
+  w1: Float32Array;
+  b1: Float32Array; // [D][DFF], [DFF]
+  w2: Float32Array;
+  b2: Float32Array; // [DFF][D], [D]
 }
 const layers: Layer[] = [];
 for (let l = 0; l < NL; l += 1) {
   const sc = 0.02;
   layers.push({
-    ln1g: P(`l${l}.ln1g`, D, () => 1), ln1b: P(`l${l}.ln1b`, D, () => 0),
-    wq: P(`l${l}.wq`, D * D, () => gauss(sc)), wk: P(`l${l}.wk`, D * D, () => gauss(sc)), wv: P(`l${l}.wv`, D * D, () => gauss(sc)),
-    bq: P(`l${l}.bq`, D, () => 0), bk: P(`l${l}.bk`, D, () => 0), bv: P(`l${l}.bv`, D, () => 0),
-    wo: P(`l${l}.wo`, D * D, () => gauss(sc)), bo: P(`l${l}.bo`, D, () => 0),
-    ln2g: P(`l${l}.ln2g`, D, () => 1), ln2b: P(`l${l}.ln2b`, D, () => 0),
-    w1: P(`l${l}.w1`, D * DFF, () => gauss(sc)), b1: P(`l${l}.b1`, DFF, () => 0),
-    w2: P(`l${l}.w2`, DFF * D, () => gauss(sc)), b2: P(`l${l}.b2`, D, () => 0),
+    ln1g: P(`l${l}.ln1g`, D, () => 1),
+    ln1b: P(`l${l}.ln1b`, D, () => 0),
+    wq: P(`l${l}.wq`, D * D, () => gauss(sc)),
+    wk: P(`l${l}.wk`, D * D, () => gauss(sc)),
+    wv: P(`l${l}.wv`, D * D, () => gauss(sc)),
+    bq: P(`l${l}.bq`, D, () => 0),
+    bk: P(`l${l}.bk`, D, () => 0),
+    bv: P(`l${l}.bv`, D, () => 0),
+    wo: P(`l${l}.wo`, D * D, () => gauss(sc)),
+    bo: P(`l${l}.bo`, D, () => 0),
+    ln2g: P(`l${l}.ln2g`, D, () => 1),
+    ln2b: P(`l${l}.ln2b`, D, () => 0),
+    w1: P(`l${l}.w1`, D * DFF, () => gauss(sc)),
+    b1: P(`l${l}.b1`, DFF, () => 0),
+    w2: P(`l${l}.w2`, DFF * D, () => gauss(sc)),
+    b2: P(`l${l}.b2`, D, () => 0),
   });
 }
 const lnfg = P('lnfg', D, () => 1);
@@ -133,7 +158,7 @@ const bout = P('bout', V, () => 0);
 
 let totalParams = 0;
 for (const p of params) totalParams += p.v.length;
-console.log(`Model: V=${V} T=${T} D=${D} NH=${NH} NL=${NL} DFF=${DFF} -> ${totalParams} params (${(totalParams * 4 / 1024).toFixed(0)} KB f32).`);
+console.log(`Model: V=${V} T=${T} D=${D} NH=${NH} NL=${NL} DFF=${DFF} -> ${totalParams} params (${((totalParams * 4) / 1024).toFixed(0)} KB f32).`);
 
 // ── Forward (with cached activations for backprop), batch=1, seq length S<=T ──────
 const GELU = (x: number): number => 0.5 * x * (1 + Math.tanh(0.7978845608 * (x + 0.044715 * x * x * x)));
@@ -141,21 +166,28 @@ const GELU = (x: number): number => 0.5 * x * (1 + Math.tanh(0.7978845608 * (x +
 interface Cache {
   S: number;
   ids: Int32Array;
-  x0: Float32Array;           // [S][D] embeddings
-  ln1n: Float32Array[];       // per-layer normalized [S][D]
-  ln1mean: Float32Array[]; ln1rstd: Float32Array[]; // [S]
-  q: Float32Array[]; k: Float32Array[]; vv2: Float32Array[]; // [S][D]
-  att: Float32Array[];        // [NH][S][S] softmax weights, flattened [h*S*S + i*S + j]
-  ao: Float32Array[];         // attention output before proj [S][D]
-  attproj: Float32Array[];    // [S][D]
-  res1: Float32Array[];       // x + attproj  [S][D]
-  ln2n: Float32Array[]; ln2mean: Float32Array[]; ln2rstd: Float32Array[];
-  hpre: Float32Array[];       // [S][DFF] pre-gelu
-  hact: Float32Array[];       // [S][DFF] post-gelu
-  mlpout: Float32Array[];     // [S][D]
-  res2: Float32Array[];       // res1 + mlpout [S][D] (= input to next layer)
-  lnfn: Float32Array; lnfmean: Float32Array; lnfrstd: Float32Array;
-  logits: Float32Array;       // [S][V]
+  x0: Float32Array; // [S][D] embeddings
+  ln1n: Float32Array[]; // per-layer normalized [S][D]
+  ln1mean: Float32Array[];
+  ln1rstd: Float32Array[]; // [S]
+  q: Float32Array[];
+  k: Float32Array[];
+  vv2: Float32Array[]; // [S][D]
+  att: Float32Array[]; // [NH][S][S] softmax weights, flattened [h*S*S + i*S + j]
+  ao: Float32Array[]; // attention output before proj [S][D]
+  attproj: Float32Array[]; // [S][D]
+  res1: Float32Array[]; // x + attproj  [S][D]
+  ln2n: Float32Array[];
+  ln2mean: Float32Array[];
+  ln2rstd: Float32Array[];
+  hpre: Float32Array[]; // [S][DFF] pre-gelu
+  hact: Float32Array[]; // [S][DFF] post-gelu
+  mlpout: Float32Array[]; // [S][D]
+  res2: Float32Array[]; // res1 + mlpout [S][D] (= input to next layer)
+  lnfn: Float32Array;
+  lnfmean: Float32Array;
+  lnfrstd: Float32Array;
+  logits: Float32Array; // [S][V]
 }
 
 function layerNorm(x: Float32Array, S: number, g: Float32Array, b: Float32Array): { n: Float32Array; mean: Float32Array; rstd: Float32Array } {
@@ -167,10 +199,14 @@ function layerNorm(x: Float32Array, S: number, g: Float32Array, b: Float32Array)
     for (let d = 0; d < D; d += 1) m += x[i * D + d]!;
     m /= D;
     let varc = 0;
-    for (let d = 0; d < D; d += 1) { const z = x[i * D + d]! - m; varc += z * z; }
+    for (let d = 0; d < D; d += 1) {
+      const z = x[i * D + d]! - m;
+      varc += z * z;
+    }
     varc /= D;
     const rs = 1 / Math.sqrt(varc + 1e-5);
-    mean[i] = m; rstd[i] = rs;
+    mean[i] = m;
+    rstd[i] = rs;
     for (let d = 0; d < D; d += 1) n[i * D + d] = (x[i * D + d]! - m) * rs * g[d]! + b[d]!;
   }
   return { n, mean, rstd };
@@ -191,10 +227,25 @@ function matmul(x: Float32Array, S: number, w: Float32Array, b: Float32Array | n
 
 function forward(ids: Int32Array, S: number): Cache {
   const c = {} as Cache;
-  c.S = S; c.ids = ids;
-  c.ln1n = []; c.ln1mean = []; c.ln1rstd = [];
-  c.q = []; c.k = []; c.vv2 = []; c.att = []; c.ao = []; c.attproj = []; c.res1 = [];
-  c.ln2n = []; c.ln2mean = []; c.ln2rstd = []; c.hpre = []; c.hact = []; c.mlpout = []; c.res2 = [];
+  c.S = S;
+  c.ids = ids;
+  c.ln1n = [];
+  c.ln1mean = [];
+  c.ln1rstd = [];
+  c.q = [];
+  c.k = [];
+  c.vv2 = [];
+  c.att = [];
+  c.ao = [];
+  c.attproj = [];
+  c.res1 = [];
+  c.ln2n = [];
+  c.ln2mean = [];
+  c.ln2rstd = [];
+  c.hpre = [];
+  c.hact = [];
+  c.mlpout = [];
+  c.res2 = [];
 
   const x0 = new Float32Array(S * D);
   for (let i = 0; i < S; i += 1) {
@@ -207,12 +258,16 @@ function forward(ids: Int32Array, S: number): Cache {
   for (let l = 0; l < NL; l += 1) {
     const L = layers[l]!;
     const { n: ln1n, mean: ln1mean, rstd: ln1rstd } = layerNorm(x, S, L.ln1g, L.ln1b);
-    c.ln1n[l] = ln1n; c.ln1mean[l] = ln1mean; c.ln1rstd[l] = ln1rstd;
+    c.ln1n[l] = ln1n;
+    c.ln1mean[l] = ln1mean;
+    c.ln1rstd[l] = ln1rstd;
 
     const q = matmul(ln1n, S, L.wq, L.bq, D, D);
     const k = matmul(ln1n, S, L.wk, L.bk, D, D);
     const v = matmul(ln1n, S, L.wv, L.bv, D, D);
-    c.q[l] = q; c.k[l] = k; c.vv2[l] = v;
+    c.q[l] = q;
+    c.k[l] = k;
+    c.vv2[l] = v;
 
     const att = new Float32Array(NH * S * S);
     const ao = new Float32Array(S * D);
@@ -231,7 +286,11 @@ function forward(ids: Int32Array, S: number): Cache {
           if (dot > mx) mx = dot;
         }
         let sum = 0;
-        for (let j = 0; j <= i; j += 1) { const e = Math.exp(scores[j]! - mx); scores[j] = e; sum += e; }
+        for (let j = 0; j <= i; j += 1) {
+          const e = Math.exp(scores[j]! - mx);
+          scores[j] = e;
+          sum += e;
+        }
         for (let j = 0; j <= i; j += 1) {
           const w = scores[j]! / sum;
           att[h * S * S + i * S + j] = w;
@@ -239,7 +298,8 @@ function forward(ids: Int32Array, S: number): Cache {
         }
       }
     }
-    c.att[l] = att; c.ao[l] = ao;
+    c.att[l] = att;
+    c.ao[l] = ao;
 
     const attproj = matmul(ao, S, L.wo, L.bo, D, D);
     c.attproj[l] = attproj;
@@ -248,12 +308,15 @@ function forward(ids: Int32Array, S: number): Cache {
     c.res1[l] = res1;
 
     const { n: ln2n, mean: ln2mean, rstd: ln2rstd } = layerNorm(res1, S, L.ln2g, L.ln2b);
-    c.ln2n[l] = ln2n; c.ln2mean[l] = ln2mean; c.ln2rstd[l] = ln2rstd;
+    c.ln2n[l] = ln2n;
+    c.ln2mean[l] = ln2mean;
+    c.ln2rstd[l] = ln2rstd;
 
     const hpre = matmul(ln2n, S, L.w1, L.b1, D, DFF);
     const hact = new Float32Array(S * DFF);
     for (let i = 0; i < S * DFF; i += 1) hact[i] = GELU(hpre[i]!);
-    c.hpre[l] = hpre; c.hact[l] = hact;
+    c.hpre[l] = hpre;
+    c.hact[l] = hact;
 
     const mlpout = matmul(hact, S, L.w2, L.b2, DFF, D);
     c.mlpout[l] = mlpout;
@@ -264,7 +327,9 @@ function forward(ids: Int32Array, S: number): Cache {
   }
 
   const { n: lnfn, mean: lnfmean, rstd: lnfrstd } = layerNorm(x, S, lnfg, lnfb);
-  c.lnfn = lnfn; c.lnfmean = lnfmean; c.lnfrstd = lnfrstd;
+  c.lnfn = lnfn;
+  c.lnfmean = lnfmean;
+  c.lnfrstd = lnfrstd;
   c.logits = matmul(lnfn, S, wout, bout, D, V);
   return c;
 }
@@ -273,15 +338,19 @@ function forward(ids: Int32Array, S: number): Cache {
 // Grad buffers keyed identically to params (parallel arrays).
 const grad = new Map<Float32Array, Float32Array>();
 for (const p of params) grad.set(p.v, new Float32Array(p.v.length));
-function zeroGrads(): void { for (const g of grad.values()) g.fill(0); }
+function zeroGrads(): void {
+  for (const g of grad.values()) g.fill(0);
+}
 const g = (t: Float32Array): Float32Array => grad.get(t)!;
 
 function lnBackward(dout: Float32Array, S: number, xin: Float32Array, n: Float32Array, mean: Float32Array, rstd: Float32Array, gParam: Float32Array, bParam: Float32Array): Float32Array {
   // returns dx; accumulates dgamma,dbeta. n is the *output* (post affine); recompute normed = (x-mean)*rstd.
   const dx = new Float32Array(S * D);
-  const dg = g(gParam); const db = g(bParam);
+  const dg = g(gParam);
+  const db = g(bParam);
   for (let i = 0; i < S; i += 1) {
-    const rs = rstd[i]!; const mu = mean[i]!;
+    const rs = rstd[i]!;
+    const mu = mean[i]!;
     // normalized (pre-affine)
     let dnormDot = 0; // sum(dnorm * normed)
     let dnormSum = 0; // sum(dnorm)
@@ -291,13 +360,15 @@ function lnBackward(dout: Float32Array, S: number, xin: Float32Array, n: Float32
       const nm = (xin[i * D + d]! - mu) * rs;
       normed[d] = nm;
       const dy = dout[i * D + d]!;
-      dg[d]! += dy * nm; db[d]! += dy;
+      dg[d]! += dy * nm;
+      db[d]! += dy;
       const dn = dy * gParam[d]!;
       dnorm[d] = dn;
-      dnormSum += dn; dnormDot += dn * nm;
+      dnormSum += dn;
+      dnormDot += dn * nm;
     }
     for (let d = 0; d < D; d += 1) {
-      dx[i * D + d] = rs * (dnorm[d]! - dnormSum / D - normed[d]! * dnormDot / D);
+      dx[i * D + d] = rs * (dnorm[d]! - dnormSum / D - (normed[d]! * dnormDot) / D);
     }
   }
   return dx;
@@ -339,7 +410,11 @@ function backward(c: Cache, targets: Int32Array): number {
     for (let vv = 0; vv < V; vv += 1) if (c.logits[i * V + vv]! > mx) mx = c.logits[i * V + vv]!;
     let sum = 0;
     const p = new Float32Array(V);
-    for (let vv = 0; vv < V; vv += 1) { const e = Math.exp(c.logits[i * V + vv]! - mx); p[vv] = e; sum += e; }
+    for (let vv = 0; vv < V; vv += 1) {
+      const e = Math.exp(c.logits[i * V + vv]! - mx);
+      p[vv] = e;
+      sum += e;
+    }
     const tgt = targets[i]!;
     for (let vv = 0; vv < V; vv += 1) {
       const pr = p[vv]! / sum;
@@ -382,7 +457,10 @@ function backward(c: Cache, targets: Int32Array): number {
     const dk = new Float32Array(S * D);
     const dv = new Float32Array(S * D);
     const scale = 1 / Math.sqrt(HD);
-    const att = c.att[l]!; const q = c.q[l]!; const k = c.k[l]!; const v = c.vv2[l]!;
+    const att = c.att[l]!;
+    const q = c.q[l]!;
+    const k = c.k[l]!;
+    const v = c.vv2[l]!;
     for (let h = 0; h < NH; h += 1) {
       const ho = h * HD;
       for (let i = 0; i < S; i += 1) {
@@ -430,7 +508,8 @@ function backward(c: Cache, targets: Int32Array): number {
   }
 
   // Embedding backward: x0[i] = wte[ids[i]] + wpe[i]; dx is gradient wrt x0.
-  const dwte = g(wte); const dwpe = g(wpe);
+  const dwte = g(wte);
+  const dwpe = g(wpe);
   for (let i = 0; i < S; i += 1) {
     const tok = c.ids[i]!;
     for (let d = 0; d < D; d += 1) {
@@ -446,19 +525,26 @@ function backward(c: Cache, targets: Int32Array): number {
 let step = 0;
 function adamStep(lr: number): void {
   step += 1;
-  const b1 = 0.9; const b2 = 0.999; const eps = 1e-8; const wd = 0.01;
+  const b1 = 0.9;
+  const b2 = 0.999;
+  const eps = 1e-8;
+  const wd = 0.01;
   const bc1 = 1 - Math.pow(b1, step);
   const bc2 = 1 - Math.pow(b2, step);
   for (const p of params) {
     const gp = grad.get(p.v)!;
-    const isWeight = p.name.startsWith('l') && (p.name.endsWith('.wq') || p.name.endsWith('.wk') || p.name.endsWith('.wv') || p.name.endsWith('.wo') || p.name.endsWith('.w1') || p.name.endsWith('.w2')) || p.name === 'wte' || p.name === 'wpe' || p.name === 'wout';
+    const isWeight =
+      (p.name.startsWith('l') && (p.name.endsWith('.wq') || p.name.endsWith('.wk') || p.name.endsWith('.wv') || p.name.endsWith('.wo') || p.name.endsWith('.w1') || p.name.endsWith('.w2'))) ||
+      p.name === 'wte' ||
+      p.name === 'wpe' ||
+      p.name === 'wout';
     for (let i = 0; i < p.v.length; i += 1) {
       const gi = gp[i]!;
       p.m[i] = b1 * p.m[i]! + (1 - b1) * gi;
       p.vv[i] = b2 * p.vv[i]! + (1 - b2) * gi * gi;
       const mh = p.m[i]! / bc1;
       const vh = p.vv[i]! / bc2;
-      let upd = lr * mh / (Math.sqrt(vh) + eps);
+      let upd = (lr * mh) / (Math.sqrt(vh) + eps);
       if (isWeight) p.v[i]! -= lr * wd * p.v[i]!;
       p.v[i]! -= upd;
     }
@@ -507,10 +593,20 @@ function sample(prompt: string, n: number, temp: number): string {
     for (let vv = 0; vv < V; vv += 1) if (logits[vv]! > mx) mx = logits[vv]!;
     let sum = 0;
     const p = new Float32Array(V);
-    for (let vv = 0; vv < V; vv += 1) { const e = Math.exp(logits[vv]! - mx); p[vv] = e; sum += e; }
+    for (let vv = 0; vv < V; vv += 1) {
+      const e = Math.exp(logits[vv]! - mx);
+      p[vv] = e;
+      sum += e;
+    }
     let r = rnd() * sum;
     let chosen = 0;
-    for (let vv = 0; vv < V; vv += 1) { r -= p[vv]!; if (r <= 0) { chosen = vv; break; } }
+    for (let vv = 0; vv < V; vv += 1) {
+      r -= p[vv]!;
+      if (r <= 0) {
+        chosen = vv;
+        break;
+      }
+    }
     ids.push(chosen);
     out += chars[chosen]!;
   }
@@ -534,7 +630,10 @@ let total = 0;
 for (const t of ordered) total += t.length;
 const flat = new Float32Array(total);
 let off = 0;
-for (const t of ordered) { flat.set(t, off); off += t.length; }
+for (const t of ordered) {
+  flat.set(t, off);
+  off += t.length;
+}
 const b64 = Buffer.from(flat.buffer).toString('base64');
 
 const fileContents = `/**
@@ -558,5 +657,5 @@ export const TOTAL_PARAMS = ${total};
 export const WEIGHTS_B64 = '${b64}';
 `;
 await Bun.write(`${import.meta.dir}/nano-gpt.weights.ts`, fileContents);
-console.log(`\nWrote nano-gpt.weights.ts (${(fileContents.length / 1024).toFixed(0)} KB text, ${total} floats, ${(total * 4 / 1024).toFixed(0)} KB f32).`);
+console.log(`\nWrote nano-gpt.weights.ts (${(fileContents.length / 1024).toFixed(0)} KB text, ${total} floats, ${((total * 4) / 1024).toFixed(0)} KB f32).`);
 console.log('Done.');

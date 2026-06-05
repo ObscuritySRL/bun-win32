@@ -280,7 +280,8 @@ class Apu {
       case 0x25: // NR51 panning
         this.nr51 = value;
         break;
-      case 0x26: { // NR52 power
+      case 0x26: {
+        // NR52 power
         const on = (value & 0x80) !== 0;
         if (!on && this.enabled) {
           // Power-off clears every channel register/state.
@@ -409,12 +410,25 @@ class Apu {
   private frameSeqTick(): void {
     // 8-step sequence: length on 0/2/4/6, sweep on 2/6, envelope on 7.
     switch (this.frameSeqStep) {
-      case 0: this.stepLength(); break;
-      case 2: this.stepLength(); this.stepSweep(); break;
-      case 4: this.stepLength(); break;
-      case 6: this.stepLength(); this.stepSweep(); break;
-      case 7: this.stepEnvelope(); break;
-      default: break;
+      case 0:
+        this.stepLength();
+        break;
+      case 2:
+        this.stepLength();
+        this.stepSweep();
+        break;
+      case 4:
+        this.stepLength();
+        break;
+      case 6:
+        this.stepLength();
+        this.stepSweep();
+        break;
+      case 7:
+        this.stepEnvelope();
+        break;
+      default:
+        break;
     }
     this.frameSeqStep = (this.frameSeqStep + 1) & 0x07;
   }
@@ -439,7 +453,7 @@ class Apu {
       this.c3FreqTimer += (2048 - this.c3Freq) * 2 || 2;
       this.c3Pos = (this.c3Pos + 1) & 0x1f;
       const byte = this.waveRam[this.c3Pos >> 1]!;
-      this.c3Sample = (this.c3Pos & 1) ? (byte & 0x0f) : (byte >> 4);
+      this.c3Sample = this.c3Pos & 1 ? byte & 0x0f : byte >> 4;
     }
     // Noise
     this.c4FreqTimer -= cycles;
@@ -520,8 +534,10 @@ class Apu {
     const scale = 22000 / 480;
     let l = Math.round(left * scale);
     let r = Math.round(right * scale);
-    if (l > 32767) l = 32767; else if (l < -32768) l = -32768;
-    if (r > 32767) r = 32767; else if (r < -32768) r = -32768;
+    if (l > 32767) l = 32767;
+    else if (l < -32768) l = -32768;
+    if (r > 32767) r = 32767;
+    else if (r < -32768) r = -32768;
     const w = this.outWrite;
     this.out[w] = l;
     this.out[w + 1] = r;
@@ -675,10 +691,7 @@ class GameBoy {
    * Set the live joypad state from booleans. Active-low is handled internally:
    * a pressed button drives its bit to 0.
    */
-  setButtons(b: {
-    right: boolean; left: boolean; up: boolean; down: boolean;
-    a: boolean; bBtn: boolean; select: boolean; start: boolean;
-  }): void {
+  setButtons(b: { right: boolean; left: boolean; up: boolean; down: boolean; a: boolean; bBtn: boolean; select: boolean; start: boolean }): void {
     let dir = 0x0f;
     if (b.right) dir &= ~0x01;
     if (b.left) dir &= ~0x02;
@@ -860,7 +873,7 @@ class GameBoy {
       const mask = 1 << bit;
       if (pending & mask) {
         this.ime = false;
-        this.io[GameBoy.IF] = (this.io[GameBoy.IF]! & ~mask) & 0x1f;
+        this.io[GameBoy.IF] = this.io[GameBoy.IF]! & ~mask & 0x1f;
         this.sp = (this.sp - 2) & 0xffff;
         this.write16(this.sp, this.pc);
         this.pc = 0x40 + bit * 8;
@@ -997,8 +1010,8 @@ class GameBoy {
     const windowEnabled = (lcdc & 0x20) !== 0 && ly >= wy;
     // Tile data area: bit4 selects 0x8000 unsigned vs 0x8800 signed.
     const tileDataUnsigned = (lcdc & 0x10) !== 0;
-    const bgMapBase = (lcdc & 0x08) ? 0x1c00 : 0x1800;
-    const winMapBase = (lcdc & 0x40) ? 0x1c00 : 0x1800;
+    const bgMapBase = lcdc & 0x08 ? 0x1c00 : 0x1800;
+    const winMapBase = lcdc & 0x40 ? 0x1c00 : 0x1800;
     const rowBase = ly * GB_W;
 
     for (let x = 0; x < GB_W; x += 1) {
@@ -1041,7 +1054,7 @@ class GameBoy {
   }
 
   private renderSprites(ly: number, lcdc: number, bgIndex: Uint8Array): void {
-    const spriteHeight = (lcdc & 0x04) ? 16 : 8;
+    const spriteHeight = lcdc & 0x04 ? 16 : 8;
     const rowBase = ly * GB_W;
 
     // Collect up to 10 sprites on this line (OAM scan order).
@@ -1068,7 +1081,7 @@ class GameBoy {
       const flipX = (attr & 0x20) !== 0;
       const flipY = (attr & 0x40) !== 0;
       const behindBg = (attr & 0x80) !== 0;
-      const palette = (attr & 0x10) ? this.io[GameBoy.OBP1]! : this.io[GameBoy.OBP0]!;
+      const palette = attr & 0x10 ? this.io[GameBoy.OBP1]! : this.io[GameBoy.OBP0]!;
 
       let line = ly - oy;
       if (flipY) line = spriteHeight - 1 - line;
@@ -1166,14 +1179,14 @@ class GameBoy {
   private add8(value: number): void {
     const a = this.a;
     const r = a + value;
-    this.setFlags((r & 0xff) === 0, false, ((a & 0xf) + (value & 0xf)) > 0xf, r > 0xff);
+    this.setFlags((r & 0xff) === 0, false, (a & 0xf) + (value & 0xf) > 0xf, r > 0xff);
     this.a = r & 0xff;
   }
   private adc8(value: number): void {
     const a = this.a;
     const carry = this.cf ? 1 : 0;
     const r = a + value + carry;
-    this.setFlags((r & 0xff) === 0, false, ((a & 0xf) + (value & 0xf) + carry) > 0xf, r > 0xff);
+    this.setFlags((r & 0xff) === 0, false, (a & 0xf) + (value & 0xf) + carry > 0xf, r > 0xff);
     this.a = r & 0xff;
   }
   private sub8(value: number): void {
@@ -1219,7 +1232,7 @@ class GameBoy {
   private addHL(value: number): void {
     const hl = this.hl;
     const r = hl + value;
-    this.setFlags(this.zf, false, ((hl & 0xfff) + (value & 0xfff)) > 0xfff, r > 0xffff);
+    this.setFlags(this.zf, false, (hl & 0xfff) + (value & 0xfff) > 0xfff, r > 0xffff);
     this.hl = r & 0xffff;
   }
   /** ADD SP,e8 / LD HL,SP+e8 share these flags (computed on the low byte). */
@@ -1227,7 +1240,7 @@ class GameBoy {
     const e = (this.fetch8() << 24) >> 24; // signed
     const sp = this.sp;
     const r = (sp + e) & 0xffff;
-    this.setFlags(false, false, ((sp & 0xf) + (e & 0xf)) > 0xf, ((sp & 0xff) + (e & 0xff)) > 0xff);
+    this.setFlags(false, false, (sp & 0xf) + (e & 0xf) > 0xf, (sp & 0xff) + (e & 0xff) > 0xff);
     return r;
   }
 
@@ -1285,27 +1298,50 @@ class GameBoy {
   // ── 8-bit register get/set by index (B,C,D,E,H,L,(HL),A) ───────────────────
   private getReg(idx: number): number {
     switch (idx) {
-      case 0: return this.b;
-      case 1: return this.c;
-      case 2: return this.d;
-      case 3: return this.e;
-      case 4: return this.h;
-      case 5: return this.l;
-      case 6: return this.read8(this.hl);
-      default: return this.a;
+      case 0:
+        return this.b;
+      case 1:
+        return this.c;
+      case 2:
+        return this.d;
+      case 3:
+        return this.e;
+      case 4:
+        return this.h;
+      case 5:
+        return this.l;
+      case 6:
+        return this.read8(this.hl);
+      default:
+        return this.a;
     }
   }
   private setReg(idx: number, value: number): void {
     value &= 0xff;
     switch (idx) {
-      case 0: this.b = value; return;
-      case 1: this.c = value; return;
-      case 2: this.d = value; return;
-      case 3: this.e = value; return;
-      case 4: this.h = value; return;
-      case 5: this.l = value; return;
-      case 6: this.write8(this.hl, value); return;
-      default: this.a = value;
+      case 0:
+        this.b = value;
+        return;
+      case 1:
+        this.c = value;
+        return;
+      case 2:
+        this.d = value;
+        return;
+      case 3:
+        this.e = value;
+        return;
+      case 4:
+        this.h = value;
+        return;
+      case 5:
+        this.l = value;
+        return;
+      case 6:
+        this.write8(this.hl, value);
+        return;
+      default:
+        this.a = value;
     }
   }
 
@@ -1333,14 +1369,30 @@ class GameBoy {
       const sub = (op >> 3) & 0x07;
       let r: number;
       switch (sub) {
-        case 0: r = this.rlc(value); break;
-        case 1: r = this.rrc(value); break;
-        case 2: r = this.rl(value); break;
-        case 3: r = this.rr(value); break;
-        case 4: r = this.sla(value); break;
-        case 5: r = this.sra(value); break;
-        case 6: r = this.swap(value); break;
-        default: r = this.srl(value); break;
+        case 0:
+          r = this.rlc(value);
+          break;
+        case 1:
+          r = this.rrc(value);
+          break;
+        case 2:
+          r = this.rl(value);
+          break;
+        case 3:
+          r = this.rr(value);
+          break;
+        case 4:
+          r = this.sla(value);
+          break;
+        case 5:
+          r = this.sra(value);
+          break;
+        case 6:
+          r = this.swap(value);
+          break;
+        default:
+          r = this.srl(value);
+          break;
       }
       this.setReg(reg, r);
       return isMem ? 16 : 8;
@@ -1386,10 +1438,14 @@ class GameBoy {
   // ── Conditional helpers for JR/JP/CALL/RET cc ──────────────────────────────
   private cond(idx: number): boolean {
     switch (idx) {
-      case 0: return !this.zf; // NZ
-      case 1: return this.zf; // Z
-      case 2: return !this.cf; // NC
-      default: return this.cf; // C
+      case 0:
+        return !this.zf; // NZ
+      case 1:
+        return this.zf; // Z
+      case 2:
+        return !this.cf; // NC
+      default:
+        return this.cf; // C
     }
   }
 
@@ -1403,31 +1459,59 @@ class GameBoy {
     const op = this.fetch8();
     switch (op) {
       // ── 0x00-0x0F ──
-      case 0x00: return 4; // NOP
-      case 0x01: this.bc = this.fetch16(); return 12; // LD BC,d16
-      case 0x02: this.write8(this.bc, this.a); return 8; // LD (BC),A
-      case 0x03: this.bc = (this.bc + 1) & 0xffff; return 8; // INC BC
-      case 0x04: this.b = this.inc8(this.b); return 4;
-      case 0x05: this.b = this.dec8(this.b); return 4;
-      case 0x06: this.b = this.fetch8(); return 8;
-      case 0x07: { // RLCA
+      case 0x00:
+        return 4; // NOP
+      case 0x01:
+        this.bc = this.fetch16();
+        return 12; // LD BC,d16
+      case 0x02:
+        this.write8(this.bc, this.a);
+        return 8; // LD (BC),A
+      case 0x03:
+        this.bc = (this.bc + 1) & 0xffff;
+        return 8; // INC BC
+      case 0x04:
+        this.b = this.inc8(this.b);
+        return 4;
+      case 0x05:
+        this.b = this.dec8(this.b);
+        return 4;
+      case 0x06:
+        this.b = this.fetch8();
+        return 8;
+      case 0x07: {
+        // RLCA
         const c = (this.a >> 7) & 1;
         this.a = ((this.a << 1) | c) & 0xff;
         this.setFlags(false, false, false, c === 1);
         return 4;
       }
-      case 0x08: { // LD (a16),SP
+      case 0x08: {
+        // LD (a16),SP
         const addr = this.fetch16();
         this.write16(addr, this.sp);
         return 20;
       }
-      case 0x09: this.addHL(this.bc); return 8;
-      case 0x0a: this.a = this.read8(this.bc); return 8;
-      case 0x0b: this.bc = (this.bc - 1) & 0xffff; return 8;
-      case 0x0c: this.c = this.inc8(this.c); return 4;
-      case 0x0d: this.c = this.dec8(this.c); return 4;
-      case 0x0e: this.c = this.fetch8(); return 8;
-      case 0x0f: { // RRCA
+      case 0x09:
+        this.addHL(this.bc);
+        return 8;
+      case 0x0a:
+        this.a = this.read8(this.bc);
+        return 8;
+      case 0x0b:
+        this.bc = (this.bc - 1) & 0xffff;
+        return 8;
+      case 0x0c:
+        this.c = this.inc8(this.c);
+        return 4;
+      case 0x0d:
+        this.c = this.dec8(this.c);
+        return 4;
+      case 0x0e:
+        this.c = this.fetch8();
+        return 8;
+      case 0x0f: {
+        // RRCA
         const c = this.a & 1;
         this.a = ((this.a >> 1) | (c << 7)) & 0xff;
         this.setFlags(false, false, false, c === 1);
@@ -1435,32 +1519,61 @@ class GameBoy {
       }
 
       // ── 0x10-0x1F ──
-      case 0x10: this.fetch8(); return 4; // STOP (treat as 2-byte NOP)
-      case 0x11: this.de = this.fetch16(); return 12;
-      case 0x12: this.write8(this.de, this.a); return 8;
-      case 0x13: this.de = (this.de + 1) & 0xffff; return 8;
-      case 0x14: this.d = this.inc8(this.d); return 4;
-      case 0x15: this.d = this.dec8(this.d); return 4;
-      case 0x16: this.d = this.fetch8(); return 8;
-      case 0x17: { // RLA
+      case 0x10:
+        this.fetch8();
+        return 4; // STOP (treat as 2-byte NOP)
+      case 0x11:
+        this.de = this.fetch16();
+        return 12;
+      case 0x12:
+        this.write8(this.de, this.a);
+        return 8;
+      case 0x13:
+        this.de = (this.de + 1) & 0xffff;
+        return 8;
+      case 0x14:
+        this.d = this.inc8(this.d);
+        return 4;
+      case 0x15:
+        this.d = this.dec8(this.d);
+        return 4;
+      case 0x16:
+        this.d = this.fetch8();
+        return 8;
+      case 0x17: {
+        // RLA
         const c = this.cf ? 1 : 0;
         const newC = (this.a >> 7) & 1;
         this.a = ((this.a << 1) | c) & 0xff;
         this.setFlags(false, false, false, newC === 1);
         return 4;
       }
-      case 0x18: { // JR r8
+      case 0x18: {
+        // JR r8
         const e = (this.fetch8() << 24) >> 24;
         this.pc = (this.pc + e) & 0xffff;
         return 12;
       }
-      case 0x19: this.addHL(this.de); return 8;
-      case 0x1a: this.a = this.read8(this.de); return 8;
-      case 0x1b: this.de = (this.de - 1) & 0xffff; return 8;
-      case 0x1c: this.e = this.inc8(this.e); return 4;
-      case 0x1d: this.e = this.dec8(this.e); return 4;
-      case 0x1e: this.e = this.fetch8(); return 8;
-      case 0x1f: { // RRA
+      case 0x19:
+        this.addHL(this.de);
+        return 8;
+      case 0x1a:
+        this.a = this.read8(this.de);
+        return 8;
+      case 0x1b:
+        this.de = (this.de - 1) & 0xffff;
+        return 8;
+      case 0x1c:
+        this.e = this.inc8(this.e);
+        return 4;
+      case 0x1d:
+        this.e = this.dec8(this.e);
+        return 4;
+      case 0x1e:
+        this.e = this.fetch8();
+        return 8;
+      case 0x1f: {
+        // RRA
         const c = this.cf ? 1 : 0;
         const newC = this.a & 1;
         this.a = ((this.a >> 1) | (c << 7)) & 0xff;
@@ -1469,7 +1582,8 @@ class GameBoy {
       }
 
       // ── 0x20-0x2F ──
-      case 0x20: { // JR NZ,r8
+      case 0x20: {
+        // JR NZ,r8
         const e = (this.fetch8() << 24) >> 24;
         if (!this.zf) {
           this.pc = (this.pc + e) & 0xffff;
@@ -1477,14 +1591,30 @@ class GameBoy {
         }
         return 8;
       }
-      case 0x21: this.hl = this.fetch16(); return 12;
-      case 0x22: this.write8(this.hl, this.a); this.hl = (this.hl + 1) & 0xffff; return 8; // LD (HL+),A
-      case 0x23: this.hl = (this.hl + 1) & 0xffff; return 8;
-      case 0x24: this.h = this.inc8(this.h); return 4;
-      case 0x25: this.h = this.dec8(this.h); return 4;
-      case 0x26: this.h = this.fetch8(); return 8;
-      case 0x27: this.daa(); return 4;
-      case 0x28: { // JR Z,r8
+      case 0x21:
+        this.hl = this.fetch16();
+        return 12;
+      case 0x22:
+        this.write8(this.hl, this.a);
+        this.hl = (this.hl + 1) & 0xffff;
+        return 8; // LD (HL+),A
+      case 0x23:
+        this.hl = (this.hl + 1) & 0xffff;
+        return 8;
+      case 0x24:
+        this.h = this.inc8(this.h);
+        return 4;
+      case 0x25:
+        this.h = this.dec8(this.h);
+        return 4;
+      case 0x26:
+        this.h = this.fetch8();
+        return 8;
+      case 0x27:
+        this.daa();
+        return 4;
+      case 0x28: {
+        // JR Z,r8
         const e = (this.fetch8() << 24) >> 24;
         if (this.zf) {
           this.pc = (this.pc + e) & 0xffff;
@@ -1492,19 +1622,33 @@ class GameBoy {
         }
         return 8;
       }
-      case 0x29: this.addHL(this.hl); return 8;
-      case 0x2a: this.a = this.read8(this.hl); this.hl = (this.hl + 1) & 0xffff; return 8; // LD A,(HL+)
-      case 0x2b: this.hl = (this.hl - 1) & 0xffff; return 8;
-      case 0x2c: this.l = this.inc8(this.l); return 4;
-      case 0x2d: this.l = this.dec8(this.l); return 4;
-      case 0x2e: this.l = this.fetch8(); return 8;
+      case 0x29:
+        this.addHL(this.hl);
+        return 8;
+      case 0x2a:
+        this.a = this.read8(this.hl);
+        this.hl = (this.hl + 1) & 0xffff;
+        return 8; // LD A,(HL+)
+      case 0x2b:
+        this.hl = (this.hl - 1) & 0xffff;
+        return 8;
+      case 0x2c:
+        this.l = this.inc8(this.l);
+        return 4;
+      case 0x2d:
+        this.l = this.dec8(this.l);
+        return 4;
+      case 0x2e:
+        this.l = this.fetch8();
+        return 8;
       case 0x2f: // CPL
-        this.a = (~this.a) & 0xff;
+        this.a = ~this.a & 0xff;
         this.f = (this.zf ? 0x80 : 0) | 0x40 | 0x20 | (this.cf ? 0x10 : 0);
         return 4;
 
       // ── 0x30-0x3F ──
-      case 0x30: { // JR NC,r8
+      case 0x30: {
+        // JR NC,r8
         const e = (this.fetch8() << 24) >> 24;
         if (!this.cf) {
           this.pc = (this.pc + e) & 0xffff;
@@ -1512,16 +1656,30 @@ class GameBoy {
         }
         return 8;
       }
-      case 0x31: this.sp = this.fetch16(); return 12;
-      case 0x32: this.write8(this.hl, this.a); this.hl = (this.hl - 1) & 0xffff; return 8; // LD (HL-),A
-      case 0x33: this.sp = (this.sp + 1) & 0xffff; return 8;
-      case 0x34: this.write8(this.hl, this.inc8(this.read8(this.hl))); return 12; // INC (HL)
-      case 0x35: this.write8(this.hl, this.dec8(this.read8(this.hl))); return 12; // DEC (HL)
-      case 0x36: this.write8(this.hl, this.fetch8()); return 12; // LD (HL),d8
+      case 0x31:
+        this.sp = this.fetch16();
+        return 12;
+      case 0x32:
+        this.write8(this.hl, this.a);
+        this.hl = (this.hl - 1) & 0xffff;
+        return 8; // LD (HL-),A
+      case 0x33:
+        this.sp = (this.sp + 1) & 0xffff;
+        return 8;
+      case 0x34:
+        this.write8(this.hl, this.inc8(this.read8(this.hl)));
+        return 12; // INC (HL)
+      case 0x35:
+        this.write8(this.hl, this.dec8(this.read8(this.hl)));
+        return 12; // DEC (HL)
+      case 0x36:
+        this.write8(this.hl, this.fetch8());
+        return 12; // LD (HL),d8
       case 0x37: // SCF
         this.f = (this.zf ? 0x80 : 0) | 0x10;
         return 4;
-      case 0x38: { // JR C,r8
+      case 0x38: {
+        // JR C,r8
         const e = (this.fetch8() << 24) >> 24;
         if (this.cf) {
           this.pc = (this.pc + e) & 0xffff;
@@ -1529,12 +1687,25 @@ class GameBoy {
         }
         return 8;
       }
-      case 0x39: this.addHL(this.sp); return 8;
-      case 0x3a: this.a = this.read8(this.hl); this.hl = (this.hl - 1) & 0xffff; return 8; // LD A,(HL-)
-      case 0x3b: this.sp = (this.sp - 1) & 0xffff; return 8;
-      case 0x3c: this.a = this.inc8(this.a); return 4;
-      case 0x3d: this.a = this.dec8(this.a); return 4;
-      case 0x3e: this.a = this.fetch8(); return 8;
+      case 0x39:
+        this.addHL(this.sp);
+        return 8;
+      case 0x3a:
+        this.a = this.read8(this.hl);
+        this.hl = (this.hl - 1) & 0xffff;
+        return 8; // LD A,(HL-)
+      case 0x3b:
+        this.sp = (this.sp - 1) & 0xffff;
+        return 8;
+      case 0x3c:
+        this.a = this.inc8(this.a);
+        return 4;
+      case 0x3d:
+        this.a = this.dec8(this.a);
+        return 4;
+      case 0x3e:
+        this.a = this.fetch8();
+        return 8;
       case 0x3f: // CCF
         this.f = (this.zf ? 0x80 : 0) | (this.cf ? 0 : 0x10);
         return 4;
@@ -1554,7 +1725,7 @@ class GameBoy {
       const src = op & 0x07;
       const value = this.getReg(src);
       this.setReg(dst, value);
-      return (dst === 6 || src === 6) ? 8 : 4;
+      return dst === 6 || src === 6 ? 8 : 4;
     }
 
     // ALU A,r block (0x80-0xBF).
@@ -1563,86 +1734,275 @@ class GameBoy {
       const value = this.getReg(src);
       const aluOp = (op >> 3) & 0x07;
       switch (aluOp) {
-        case 0: this.add8(value); break;
-        case 1: this.adc8(value); break;
-        case 2: this.sub8(value); break;
-        case 3: this.sbc8(value); break;
-        case 4: this.and8(value); break;
-        case 5: this.xor8(value); break;
-        case 6: this.or8(value); break;
-        default: this.cp8(value); break;
+        case 0:
+          this.add8(value);
+          break;
+        case 1:
+          this.adc8(value);
+          break;
+        case 2:
+          this.sub8(value);
+          break;
+        case 3:
+          this.sbc8(value);
+          break;
+        case 4:
+          this.and8(value);
+          break;
+        case 5:
+          this.xor8(value);
+          break;
+        case 6:
+          this.or8(value);
+          break;
+        default:
+          this.cp8(value);
+          break;
       }
       return src === 6 ? 8 : 4;
     }
 
     // ── 0xC0-0xFF: control flow, stack, immediates, IO ──
     switch (op) {
-      case 0xc0: if (!this.zf) { this.pc = this.pop16(); return 20; } return 8; // RET NZ
-      case 0xc1: this.bc = this.pop16(); return 12;
-      case 0xc2: { const a = this.fetch16(); if (!this.zf) { this.pc = a; return 16; } return 12; } // JP NZ
-      case 0xc3: this.pc = this.fetch16(); return 16; // JP a16
-      case 0xc4: { const a = this.fetch16(); if (!this.zf) { this.push16(this.pc); this.pc = a; return 24; } return 12; } // CALL NZ
-      case 0xc5: this.push16(this.bc); return 16;
-      case 0xc6: this.add8(this.fetch8()); return 8;
-      case 0xc7: this.push16(this.pc); this.pc = 0x00; return 16; // RST 00
-      case 0xc8: if (this.zf) { this.pc = this.pop16(); return 20; } return 8; // RET Z
-      case 0xc9: this.pc = this.pop16(); return 16; // RET
-      case 0xca: { const a = this.fetch16(); if (this.zf) { this.pc = a; return 16; } return 12; } // JP Z
-      case 0xcb: return this.execCB();
-      case 0xcc: { const a = this.fetch16(); if (this.zf) { this.push16(this.pc); this.pc = a; return 24; } return 12; } // CALL Z
-      case 0xcd: { const a = this.fetch16(); this.push16(this.pc); this.pc = a; return 24; } // CALL a16
-      case 0xce: this.adc8(this.fetch8()); return 8;
-      case 0xcf: this.push16(this.pc); this.pc = 0x08; return 16; // RST 08
+      case 0xc0:
+        if (!this.zf) {
+          this.pc = this.pop16();
+          return 20;
+        }
+        return 8; // RET NZ
+      case 0xc1:
+        this.bc = this.pop16();
+        return 12;
+      case 0xc2: {
+        const a = this.fetch16();
+        if (!this.zf) {
+          this.pc = a;
+          return 16;
+        }
+        return 12;
+      } // JP NZ
+      case 0xc3:
+        this.pc = this.fetch16();
+        return 16; // JP a16
+      case 0xc4: {
+        const a = this.fetch16();
+        if (!this.zf) {
+          this.push16(this.pc);
+          this.pc = a;
+          return 24;
+        }
+        return 12;
+      } // CALL NZ
+      case 0xc5:
+        this.push16(this.bc);
+        return 16;
+      case 0xc6:
+        this.add8(this.fetch8());
+        return 8;
+      case 0xc7:
+        this.push16(this.pc);
+        this.pc = 0x00;
+        return 16; // RST 00
+      case 0xc8:
+        if (this.zf) {
+          this.pc = this.pop16();
+          return 20;
+        }
+        return 8; // RET Z
+      case 0xc9:
+        this.pc = this.pop16();
+        return 16; // RET
+      case 0xca: {
+        const a = this.fetch16();
+        if (this.zf) {
+          this.pc = a;
+          return 16;
+        }
+        return 12;
+      } // JP Z
+      case 0xcb:
+        return this.execCB();
+      case 0xcc: {
+        const a = this.fetch16();
+        if (this.zf) {
+          this.push16(this.pc);
+          this.pc = a;
+          return 24;
+        }
+        return 12;
+      } // CALL Z
+      case 0xcd: {
+        const a = this.fetch16();
+        this.push16(this.pc);
+        this.pc = a;
+        return 24;
+      } // CALL a16
+      case 0xce:
+        this.adc8(this.fetch8());
+        return 8;
+      case 0xcf:
+        this.push16(this.pc);
+        this.pc = 0x08;
+        return 16; // RST 08
 
-      case 0xd0: if (!this.cf) { this.pc = this.pop16(); return 20; } return 8; // RET NC
-      case 0xd1: this.de = this.pop16(); return 12;
-      case 0xd2: { const a = this.fetch16(); if (!this.cf) { this.pc = a; return 16; } return 12; } // JP NC
+      case 0xd0:
+        if (!this.cf) {
+          this.pc = this.pop16();
+          return 20;
+        }
+        return 8; // RET NC
+      case 0xd1:
+        this.de = this.pop16();
+        return 12;
+      case 0xd2: {
+        const a = this.fetch16();
+        if (!this.cf) {
+          this.pc = a;
+          return 16;
+        }
+        return 12;
+      } // JP NC
       // 0xd3 — illegal
-      case 0xd4: { const a = this.fetch16(); if (!this.cf) { this.push16(this.pc); this.pc = a; return 24; } return 12; } // CALL NC
-      case 0xd5: this.push16(this.de); return 16;
-      case 0xd6: this.sub8(this.fetch8()); return 8;
-      case 0xd7: this.push16(this.pc); this.pc = 0x10; return 16; // RST 10
-      case 0xd8: if (this.cf) { this.pc = this.pop16(); return 20; } return 8; // RET C
-      case 0xd9: this.pc = this.pop16(); this.ime = true; return 16; // RETI
-      case 0xda: { const a = this.fetch16(); if (this.cf) { this.pc = a; return 16; } return 12; } // JP C
+      case 0xd4: {
+        const a = this.fetch16();
+        if (!this.cf) {
+          this.push16(this.pc);
+          this.pc = a;
+          return 24;
+        }
+        return 12;
+      } // CALL NC
+      case 0xd5:
+        this.push16(this.de);
+        return 16;
+      case 0xd6:
+        this.sub8(this.fetch8());
+        return 8;
+      case 0xd7:
+        this.push16(this.pc);
+        this.pc = 0x10;
+        return 16; // RST 10
+      case 0xd8:
+        if (this.cf) {
+          this.pc = this.pop16();
+          return 20;
+        }
+        return 8; // RET C
+      case 0xd9:
+        this.pc = this.pop16();
+        this.ime = true;
+        return 16; // RETI
+      case 0xda: {
+        const a = this.fetch16();
+        if (this.cf) {
+          this.pc = a;
+          return 16;
+        }
+        return 12;
+      } // JP C
       // 0xdb — illegal
-      case 0xdc: { const a = this.fetch16(); if (this.cf) { this.push16(this.pc); this.pc = a; return 24; } return 12; } // CALL C
+      case 0xdc: {
+        const a = this.fetch16();
+        if (this.cf) {
+          this.push16(this.pc);
+          this.pc = a;
+          return 24;
+        }
+        return 12;
+      } // CALL C
       // 0xdd — illegal
-      case 0xde: this.sbc8(this.fetch8()); return 8;
-      case 0xdf: this.push16(this.pc); this.pc = 0x18; return 16; // RST 18
+      case 0xde:
+        this.sbc8(this.fetch8());
+        return 8;
+      case 0xdf:
+        this.push16(this.pc);
+        this.pc = 0x18;
+        return 16; // RST 18
 
-      case 0xe0: this.write8(0xff00 + this.fetch8(), this.a); return 12; // LDH (a8),A
-      case 0xe1: this.hl = this.pop16(); return 12;
-      case 0xe2: this.write8(0xff00 + this.c, this.a); return 8; // LD (C),A
+      case 0xe0:
+        this.write8(0xff00 + this.fetch8(), this.a);
+        return 12; // LDH (a8),A
+      case 0xe1:
+        this.hl = this.pop16();
+        return 12;
+      case 0xe2:
+        this.write8(0xff00 + this.c, this.a);
+        return 8; // LD (C),A
       // 0xe3, 0xe4 — illegal
-      case 0xe5: this.push16(this.hl); return 16;
-      case 0xe6: this.and8(this.fetch8()); return 8;
-      case 0xe7: this.push16(this.pc); this.pc = 0x20; return 16; // RST 20
-      case 0xe8: this.sp = this.addSpE8(); return 16; // ADD SP,r8
-      case 0xe9: this.pc = this.hl; return 4; // JP (HL)
-      case 0xea: this.write8(this.fetch16(), this.a); return 16; // LD (a16),A
+      case 0xe5:
+        this.push16(this.hl);
+        return 16;
+      case 0xe6:
+        this.and8(this.fetch8());
+        return 8;
+      case 0xe7:
+        this.push16(this.pc);
+        this.pc = 0x20;
+        return 16; // RST 20
+      case 0xe8:
+        this.sp = this.addSpE8();
+        return 16; // ADD SP,r8
+      case 0xe9:
+        this.pc = this.hl;
+        return 4; // JP (HL)
+      case 0xea:
+        this.write8(this.fetch16(), this.a);
+        return 16; // LD (a16),A
       // 0xeb, 0xec, 0xed — illegal
-      case 0xee: this.xor8(this.fetch8()); return 8;
-      case 0xef: this.push16(this.pc); this.pc = 0x28; return 16; // RST 28
+      case 0xee:
+        this.xor8(this.fetch8());
+        return 8;
+      case 0xef:
+        this.push16(this.pc);
+        this.pc = 0x28;
+        return 16; // RST 28
 
-      case 0xf0: this.a = this.read8(0xff00 + this.fetch8()); return 12; // LDH A,(a8)
-      case 0xf1: this.af = this.pop16(); return 12;
-      case 0xf2: this.a = this.read8(0xff00 + this.c); return 8; // LD A,(C)
-      case 0xf3: this.ime = false; this.imePending = false; return 4; // DI
+      case 0xf0:
+        this.a = this.read8(0xff00 + this.fetch8());
+        return 12; // LDH A,(a8)
+      case 0xf1:
+        this.af = this.pop16();
+        return 12;
+      case 0xf2:
+        this.a = this.read8(0xff00 + this.c);
+        return 8; // LD A,(C)
+      case 0xf3:
+        this.ime = false;
+        this.imePending = false;
+        return 4; // DI
       // 0xf4 — illegal
-      case 0xf5: this.push16(this.af); return 16;
-      case 0xf6: this.or8(this.fetch8()); return 8;
-      case 0xf7: this.push16(this.pc); this.pc = 0x30; return 16; // RST 30
-      case 0xf8: { // LD HL,SP+r8
+      case 0xf5:
+        this.push16(this.af);
+        return 16;
+      case 0xf6:
+        this.or8(this.fetch8());
+        return 8;
+      case 0xf7:
+        this.push16(this.pc);
+        this.pc = 0x30;
+        return 16; // RST 30
+      case 0xf8: {
+        // LD HL,SP+r8
         this.hl = this.addSpE8();
         return 12;
       }
-      case 0xf9: this.sp = this.hl; return 8; // LD SP,HL
-      case 0xfa: this.a = this.read8(this.fetch16()); return 16; // LD A,(a16)
-      case 0xfb: this.imePending = true; return 4; // EI (delayed one instruction)
+      case 0xf9:
+        this.sp = this.hl;
+        return 8; // LD SP,HL
+      case 0xfa:
+        this.a = this.read8(this.fetch16());
+        return 16; // LD A,(a16)
+      case 0xfb:
+        this.imePending = true;
+        return 4; // EI (delayed one instruction)
       // 0xfc, 0xfd — illegal
-      case 0xfe: this.cp8(this.fetch8()); return 8; // CP d8
-      case 0xff: this.push16(this.pc); this.pc = 0x38; return 16; // RST 38
+      case 0xfe:
+        this.cp8(this.fetch8());
+        return 8; // CP d8
+      case 0xff:
+        this.push16(this.pc);
+        this.pc = 0x38;
+        return 16; // RST 38
 
       default:
         // Illegal/undefined opcode — behave as a NOP so the test ROM survives.
@@ -1857,9 +2217,7 @@ function main(): void {
     // quickly, then play the floor. Tap Start across the first ~2.4 s (each pulse
     // is an edge the menu/story screens consume) to reach a live floor.
     const pulse = (lo: number, hi: number) => ms >= lo && ms < hi;
-    if (pulse(200, 320) || pulse(520, 640) || pulse(840, 960) ||
-        pulse(1160, 1280) || pulse(1480, 1600) || pulse(1800, 1920) ||
-        pulse(2120, 2240) || pulse(2440, 2560)) {
+    if (pulse(200, 320) || pulse(520, 640) || pulse(840, 960) || pulse(1160, 1280) || pulse(1480, 1600) || pulse(1800, 1920) || pulse(2120, 2240) || pulse(2440, 2560)) {
       return { ...NONE, start: true };
     }
     // Then roll a tour of the magic floor — each move leaves a track and bumps
@@ -1919,13 +2277,7 @@ function main(): void {
     // Copy the emulator framebuffer into the persistent upload buffer, then push
     // it to the GPU texture via UpdateSubresource (raw COM vtable invoke).
     uploadBuf.set(gb.frame);
-    gpu.vcall(
-      g.context,
-      gpu.CTX_UPDATE_SUBRESOURCE,
-      [FFIType.u64, FFIType.u32, FFIType.ptr, FFIType.ptr, FFIType.u32, FFIType.u32],
-      [screen.tex, 0, null, uploadBuf.ptr!, GB_W * 4, 0],
-      FFIType.void,
-    );
+    gpu.vcall(g.context, gpu.CTX_UPDATE_SUBRESOURCE, [FFIType.u64, FFIType.u32, FFIType.ptr, FFIType.ptr, FFIType.u32, FFIType.u32], [screen.tex, 0, null, uploadBuf.ptr!, GB_W * 4, 0], FFIType.void);
   }
 
   function drawHud(): void {
@@ -2001,7 +2353,10 @@ function main(): void {
           audioBlocks += 1;
           if (process.env.GB_AUDIO_DEBUG) {
             let peak = 0;
-            for (let i = 0; i < block.length; i += 1) { const v = Math.abs(block[i]!); if (v > peak) peak = v; }
+            for (let i = 0; i < block.length; i += 1) {
+              const v = Math.abs(block[i]!);
+              if (v > peak) peak = v;
+            }
             if (peak > audioPeak) audioPeak = peak;
           }
         }

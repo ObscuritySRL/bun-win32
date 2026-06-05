@@ -20,13 +20,7 @@ import { read } from 'bun:ffi';
 
 import Kernel32 from '@bun-win32/kernel32';
 
-import Mpr, {
-  ResourceDisplayType,
-  ResourceScope,
-  ResourceType,
-  WN_NO_ERROR,
-  WN_NO_MORE_ENTRIES,
-} from '../index';
+import Mpr, { ResourceDisplayType, ResourceScope, ResourceType, WN_NO_ERROR, WN_NO_MORE_ENTRIES } from '../index';
 
 Mpr.Preload(['WNetCloseEnum', 'WNetEnumResourceW', 'WNetGetUserW', 'WNetOpenEnumW']);
 Kernel32.Preload(['GetCurrentProcess', 'ReadProcessMemory']);
@@ -80,24 +74,37 @@ function readWideStringAt(addr: number, maxChars = 260): string {
 
 function getTypeName(t: number): string {
   switch (t) {
-    case ResourceType.RESOURCETYPE_DISK: return 'Disk';
-    case ResourceType.RESOURCETYPE_PRINT: return 'Print';
-    case ResourceType.RESOURCETYPE_ANY: return 'Any';
-    default: return 'Unknown';
+    case ResourceType.RESOURCETYPE_DISK:
+      return 'Disk';
+    case ResourceType.RESOURCETYPE_PRINT:
+      return 'Print';
+    case ResourceType.RESOURCETYPE_ANY:
+      return 'Any';
+    default:
+      return 'Unknown';
   }
 }
 
 function getDisplayTypeName(dt: number): string {
   switch (dt) {
-    case ResourceDisplayType.RESOURCEDISPLAYTYPE_DOMAIN: return 'Domain';
-    case ResourceDisplayType.RESOURCEDISPLAYTYPE_SERVER: return 'Server';
-    case ResourceDisplayType.RESOURCEDISPLAYTYPE_SHARE: return 'Share';
-    case ResourceDisplayType.RESOURCEDISPLAYTYPE_FILE: return 'File';
-    case ResourceDisplayType.RESOURCEDISPLAYTYPE_GROUP: return 'Group';
-    case ResourceDisplayType.RESOURCEDISPLAYTYPE_NETWORK: return 'Network';
-    case ResourceDisplayType.RESOURCEDISPLAYTYPE_ROOT: return 'Root';
-    case ResourceDisplayType.RESOURCEDISPLAYTYPE_DIRECTORY: return 'Directory';
-    default: return 'Generic';
+    case ResourceDisplayType.RESOURCEDISPLAYTYPE_DOMAIN:
+      return 'Domain';
+    case ResourceDisplayType.RESOURCEDISPLAYTYPE_SERVER:
+      return 'Server';
+    case ResourceDisplayType.RESOURCEDISPLAYTYPE_SHARE:
+      return 'Share';
+    case ResourceDisplayType.RESOURCEDISPLAYTYPE_FILE:
+      return 'File';
+    case ResourceDisplayType.RESOURCEDISPLAYTYPE_GROUP:
+      return 'Group';
+    case ResourceDisplayType.RESOURCEDISPLAYTYPE_NETWORK:
+      return 'Network';
+    case ResourceDisplayType.RESOURCEDISPLAYTYPE_ROOT:
+      return 'Root';
+    case ResourceDisplayType.RESOURCEDISPLAYTYPE_DIRECTORY:
+      return 'Directory';
+    default:
+      return 'Generic';
   }
 }
 

@@ -368,18 +368,14 @@ function analyze(time: number): void {
     const swell = 0.35 + 0.25 * Math.sin(time * 0.7);
     for (let b = 0; b < BANDS; b += 1) {
       const f = b / BANDS;
-      const tone =
-        0.5 * Math.sin(time * (1.2 + f * 5) + f * 18) +
-        0.5 * Math.sin(time * (0.6 + f * 3) - f * 9);
+      const tone = 0.5 * Math.sin(time * (1.2 + f * 5) + f * 18) + 0.5 * Math.sin(time * (0.6 + f * 3) - f * 9);
       const lowBoost = Math.exp(-f * 4) * kick; // bass-weighted kick
       bands[b] = Math.max(0, (0.18 + 0.18 * tone) * swell + lowBoost) * (1 - f * 0.4);
       bands[b] = Math.min(1, bands[b]!);
     }
     for (let i = 0; i < WAVE_TAPS; i += 1) {
       const t = i / WAVE_TAPS;
-      waveTaps[i] =
-        0.6 * Math.sin(t * 12 + time * 3) * (0.5 + 0.5 * kick) +
-        0.3 * Math.sin(t * 31 - time * 5);
+      waveTaps[i] = 0.6 * Math.sin(t * 12 + time * 3) * (0.5 + 0.5 * kick) + 0.3 * Math.sin(t * 31 - time * 5);
     }
     bassSmooth = bassSmooth * 0.6 + (0.25 + 0.6 * kick) * 0.4;
     midSmooth = midSmooth * 0.7 + (0.3 + 0.2 * Math.sin(time * 1.3)) * 0.3;
@@ -390,7 +386,7 @@ function analyze(time: number): void {
   // Beat detection: rising bass edge fires the shockwave envelope.
   const rise = bassSmooth - prevBass;
   if (rise > 0.06) beatEnv = Math.min(1, beatEnv + rise * 4);
-  beatEnv *= 0.90;
+  beatEnv *= 0.9;
   prevBass = bassSmooth;
 
   // Evolving palette: hue drifts with time and jumps on strong beats.
@@ -410,7 +406,11 @@ let cleanedUp = false;
 function cleanup(code: number): never {
   if (!cleanedUp) {
     cleanedUp = true;
-    try { mic.close(); } catch { /* ignore */ }
+    try {
+      mic.close();
+    } catch {
+      /* ignore */
+    }
     hud.release();
     GDI32.DeleteObject(hudFont);
     GDI32.DeleteObject(barFont);
@@ -419,8 +419,12 @@ function cleanup(code: number): never {
     comRelease(cbParams);
     comRelease(cbSpec);
     comRelease(cbWave);
-    comRelease(texA.srv!); comRelease(texA.rtv!); comRelease(texA.tex);
-    comRelease(texB.srv!); comRelease(texB.rtv!); comRelease(texB.tex);
+    comRelease(texA.srv!);
+    comRelease(texA.rtv!);
+    comRelease(texA.tex);
+    comRelease(texB.srv!);
+    comRelease(texB.rtv!);
+    comRelease(texB.tex);
     comRelease(psBloom);
     comRelease(psFeedback);
     comRelease(vs);
@@ -457,8 +461,8 @@ function drawHud(): void {
       return '#'.repeat(n) + '.'.repeat(20 - n);
     };
     const lines: [string, number][] = [
-      [`bass   [${blocks(bassSmooth)}]`, 0x004060ff],   // BGR: orange-red
-      [`mid    [${blocks(midSmooth)}]`, 0x0040ff60],    // green
+      [`bass   [${blocks(bassSmooth)}]`, 0x004060ff], // BGR: orange-red
+      [`mid    [${blocks(midSmooth)}]`, 0x0040ff60], // green
       [`treble [${blocks(trebleSmooth)}]`, 0x00ffd040], // cyan-blue
     ];
     for (let i = 0; i < lines.length; i += 1) {
@@ -499,9 +503,9 @@ while (!win.shouldClose()) {
   paramsBuf.writeFloatLE(trebleSmooth, 24);
   paramsBuf.writeFloatLE(levelSmooth, 28);
   paramsBuf.writeFloatLE(beatEnv, 32);
-  paramsBuf.writeFloatLE(0.4 + bassSmooth, 36);              // warp
-  paramsBuf.writeFloatLE(hue, 40);                           // palette hue
-  paramsBuf.writeFloatLE((time * 0.37) % 1.0, 44);          // jitter seed
+  paramsBuf.writeFloatLE(0.4 + bassSmooth, 36); // warp
+  paramsBuf.writeFloatLE(hue, 40); // palette hue
+  paramsBuf.writeFloatLE((time * 0.37) % 1.0, 44); // jitter seed
   for (let b = 0; b < BANDS; b += 1) specBuf.writeFloatLE(bands[b]!, b * 4);
   for (let i = 0; i < WAVE_TAPS; i += 1) waveBuf.writeFloatLE(waveTaps[i]!, i * 4);
 

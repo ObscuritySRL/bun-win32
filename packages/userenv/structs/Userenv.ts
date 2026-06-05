@@ -300,8 +300,32 @@ class Userenv extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/userenv/nf-userenv-rsopaccesscheckbytype
-  public static RsopAccessCheckByType(pSecurityDescriptor: PSECURITY_DESCRIPTOR, pPrincipalSelfSid: PSID | NULL, pRsopToken: PRSOPTOKEN, dwDesiredAccessMask: DWORD, pObjectTypeList: POBJECT_TYPE_LIST | NULL, ObjectTypeListLength: DWORD, pGenericMapping: PGENERIC_MAPPING, pPrivilegeSet: PPRIVILEGE_SET | NULL, pdwPrivilegeSetLength: LPDWORD | NULL, pdwGrantedAccessMask: LPDWORD, pbAccessStatus: LPBOOL): HRESULT {
-    return Userenv.Load('RsopAccessCheckByType')(pSecurityDescriptor, pPrincipalSelfSid, pRsopToken, dwDesiredAccessMask, pObjectTypeList, ObjectTypeListLength, pGenericMapping, pPrivilegeSet, pdwPrivilegeSetLength, pdwGrantedAccessMask, pbAccessStatus);
+  public static RsopAccessCheckByType(
+    pSecurityDescriptor: PSECURITY_DESCRIPTOR,
+    pPrincipalSelfSid: PSID | NULL,
+    pRsopToken: PRSOPTOKEN,
+    dwDesiredAccessMask: DWORD,
+    pObjectTypeList: POBJECT_TYPE_LIST | NULL,
+    ObjectTypeListLength: DWORD,
+    pGenericMapping: PGENERIC_MAPPING,
+    pPrivilegeSet: PPRIVILEGE_SET | NULL,
+    pdwPrivilegeSetLength: LPDWORD | NULL,
+    pdwGrantedAccessMask: LPDWORD,
+    pbAccessStatus: LPBOOL,
+  ): HRESULT {
+    return Userenv.Load('RsopAccessCheckByType')(
+      pSecurityDescriptor,
+      pPrincipalSelfSid,
+      pRsopToken,
+      dwDesiredAccessMask,
+      pObjectTypeList,
+      ObjectTypeListLength,
+      pGenericMapping,
+      pPrivilegeSet,
+      pdwPrivilegeSetLength,
+      pdwGrantedAccessMask,
+      pbAccessStatus,
+    );
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/userenv/nf-userenv-rsopfileaccesscheck

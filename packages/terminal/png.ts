@@ -28,8 +28,7 @@ const adler32 = (bytes: Uint8Array): number => {
   return ((high << 16) | low) >>> 0;
 };
 
-const uint32BigEndian = (value: number): Uint8Array =>
-  Uint8Array.of((value >>> 24) & 0xff, (value >>> 16) & 0xff, (value >>> 8) & 0xff, value & 0xff);
+const uint32BigEndian = (value: number): Uint8Array => Uint8Array.of((value >>> 24) & 0xff, (value >>> 16) & 0xff, (value >>> 8) & 0xff, value & 0xff);
 
 const pngChunk = (type: string, data: Uint8Array): Uint8Array => {
   const typeBytes = Uint8Array.from(type, (character) => character.charCodeAt(0));

@@ -52,7 +52,10 @@ function formatIpv6(buf: Buffer, offset: number): string {
   }
   // Simple compression: replace longest run of :0: with ::
   const full = groups.join(':');
-  return full.replace(/\b(0:)+0\b/, '::').replace(/^0::/, '::').replace(/::0$/, '::');
+  return full
+    .replace(/\b(0:)+0\b/, '::')
+    .replace(/^0::/, '::')
+    .replace(/::0$/, '::');
 }
 
 // Initialize Winsock

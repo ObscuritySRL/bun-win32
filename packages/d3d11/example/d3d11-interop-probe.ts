@@ -138,37 +138,16 @@ const ppContext = Buffer.alloc(POINTER_SIZE);
 const featureLevels = Buffer.alloc(4);
 featureLevels.writeUInt32LE(D3D_FEATURE_LEVEL.D3D_FEATURE_LEVEL_11_0, 0);
 
-const hrDevice = D3d11.D3D11CreateDevice(
-  null,
-  D3D_DRIVER_TYPE.D3D_DRIVER_TYPE_HARDWARE,
-  0n,
-  0,
-  featureLevels.ptr,
-  1,
-  D3D11_SDK_VERSION,
-  ppDevice.ptr,
-  pFeatureLevel.ptr,
-  ppContext.ptr,
-);
+const hrDevice = D3d11.D3D11CreateDevice(null, D3D_DRIVER_TYPE.D3D_DRIVER_TYPE_HARDWARE, 0n, 0, featureLevels.ptr, 1, D3D11_SDK_VERSION, ppDevice.ptr, pFeatureLevel.ptr, ppContext.ptr);
 
-record(
-  'D3D11CreateDevice',
-  hrDevice === 0 ? 'ok' : 'fail',
-  hrDevice,
-  hrDevice === 0 ? 'hardware · FL 11_0' : formatHResult(hrDevice),
-);
+record('D3D11CreateDevice', hrDevice === 0 ? 'ok' : 'fail', hrDevice, hrDevice === 0 ? 'hardware · FL 11_0' : formatHResult(hrDevice));
 
 const deviceAddr = hrDevice === 0 ? ppDevice.readBigUInt64LE(0) : 0n;
 const contextAddr = hrDevice === 0 ? ppContext.readBigUInt64LE(0) : 0n;
 
 const dxgi = deviceAddr !== 0n ? comQueryInterface(deviceAddr, IID_IDXGIDEVICE) : { addr: 0n, hr: -1, ptr: null };
 if (deviceAddr !== 0n) {
-  record(
-    'ID3D11Device → IDXGIDevice',
-    dxgi.hr === 0 ? 'ok' : 'fail',
-    dxgi.hr,
-    dxgi.hr === 0 ? `@ ${formatAddress(dxgi.addr)}` : formatHResult(dxgi.hr),
-  );
+  record('ID3D11Device → IDXGIDevice', dxgi.hr === 0 ? 'ok' : 'fail', dxgi.hr, dxgi.hr === 0 ? `@ ${formatAddress(dxgi.addr)}` : formatHResult(dxgi.hr));
 }
 
 if (dxgi.ptr !== null) {

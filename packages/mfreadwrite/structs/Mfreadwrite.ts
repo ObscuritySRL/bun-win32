@@ -2,20 +2,7 @@ import { type FFIFunction, FFIType } from 'bun:ffi';
 
 import { Win32 } from '@bun-win32/core';
 
-import type {
-  HRESULT,
-  IMFAttributes,
-  IMFByteStream,
-  IMFMediaSink,
-  IMFMediaSource,
-  LPCWSTR,
-  LPLPVOID,
-  NULL,
-  PIMFSinkWriter,
-  PIMFSourceReader,
-  REFCLSID,
-  REFIID,
-} from '../types/Mfreadwrite';
+import type { HRESULT, IMFAttributes, IMFByteStream, IMFMediaSink, IMFMediaSource, LPCWSTR, LPLPVOID, NULL, PIMFSinkWriter, PIMFSourceReader, REFCLSID, REFIID } from '../types/Mfreadwrite';
 
 /**
  * Thin, lazy-loaded FFI bindings for `mfreadwrite.dll`.

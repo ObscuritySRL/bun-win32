@@ -272,10 +272,7 @@ function openCamera(context: bigint): Camera {
   // For RGB32 we upload BGRA directly; for NV12 we upload the planar bytes into a
   // single-channel-wide R8 texture and unpack Y/UV in the shader. We size the texture
   // for the byte layout: RGB32 = w*h*4, NV12 = w*(h*3/2) bytes packed as R8 of width w.
-  const tex =
-    format === 'RGB32'
-      ? gpu.makeTexture({ w, h, format: gpu.DXGI_FORMAT_B8G8R8A8_UNORM, srv: true })
-      : gpu.makeTexture({ w, h: Math.floor((h * 3) / 2), format: gpu.DXGI_FORMAT_R8G8B8A8_UNORM, srv: true });
+  const tex = format === 'RGB32' ? gpu.makeTexture({ w, h, format: gpu.DXGI_FORMAT_B8G8R8A8_UNORM, srv: true }) : gpu.makeTexture({ w, h: Math.floor((h * 3) / 2), format: gpu.DXGI_FORMAT_R8G8B8A8_UNORM, srv: true });
 
   console.log(`webcam: ${name} · ${w}x${h} · ${format} · video processor enabled.`);
 
@@ -308,13 +305,7 @@ function openCamera(context: bigint): Camera {
           const curLen = pCurLen.readUInt32LE(0);
           if (dataPtr !== 0n && curLen > 0) {
             const rowPitch = format === 'RGB32' ? w * 4 : w; // NV12 planes packed at width w
-            gpu.vcall(
-              context,
-              gpu.CTX_UPDATE_SUBRESOURCE,
-              [FFIType.u64, FFIType.u32, FFIType.ptr, FFIType.u64, FFIType.u32, FFIType.u32],
-              [tex.tex, 0, null, dataPtr, rowPitch, 0],
-              FFIType.void,
-            );
+            gpu.vcall(context, gpu.CTX_UPDATE_SUBRESOURCE, [FFIType.u64, FFIType.u32, FFIType.ptr, FFIType.u64, FFIType.u32, FFIType.u32], [tex.tex, 0, null, dataPtr, rowPitch, 0], FFIType.void);
             uploaded = true;
           }
           gpu.vcall(buffer, BUFFER_UNLOCK, [], [], FFIType.i32);
@@ -510,7 +501,7 @@ const selfShot = process.env.SELFSHOT === '1';
 const screenW = User32.GetSystemMetrics(SystemMetric.SM_CXSCREEN) || 1920;
 const screenH = User32.GetSystemMetrics(SystemMetric.SM_CYSCREEN) || 1080;
 const WIN_H = Math.min(1000, Math.floor(screenH * 0.72));
-const WIN_W = Math.min(Math.floor(screenW * 0.9), Math.round(WIN_H * 16 / 9));
+const WIN_W = Math.min(Math.floor(screenW * 0.9), Math.round((WIN_H * 16) / 9));
 const win = gpu.createWindow({ title: 'webcam · live MF capture → GPU shaders', width: WIN_W, height: WIN_H, borderless: true });
 const { w: BBW, h: BBH } = win.clientSize();
 const g = gpu.createDevice(win.hwnd, { width: BBW, height: BBH });
@@ -518,7 +509,7 @@ const g = gpu.createDevice(win.hwnd, { width: BBW, height: BBH });
 // ── Initialize Media Foundation (COM-backed; must come before any MF call) ───────
 const coHr = ole32.symbols.CoInitializeEx(null, COINIT_APARTMENTTHREADED);
 const coOwned = coHr >= 0;
-if (coHr < 0 && (coHr >>> 0) !== RPC_E_CHANGED_MODE) console.log(`webcam: CoInitializeEx ${hex(coHr)} (continuing)`);
+if (coHr < 0 && coHr >>> 0 !== RPC_E_CHANGED_MODE) console.log(`webcam: CoInitializeEx ${hex(coHr)} (continuing)`);
 const mfStartHr = Mfplat.MFStartup(MF_VERSION, MFSTARTUP_LITE);
 if (mfStartHr !== S_OK) console.log(`webcam: MFStartup ${hex(mfStartHr)} (continuing — fallback only)`);
 
@@ -573,9 +564,7 @@ function drawHud(effect: number, fps: number): void {
     const prevFont = GDI32.SelectObject(dc, hudFont);
     drawTextShadow(dc, 24, 22, line1, cam.available ? 0x0040ddff : 0x00ffd060);
     // Sub-line: format / fps / GPU / quit.
-    const line2 = cam.available
-      ? `${cam.format} · ${fps} fps · ${g.gpuName} · SPACE cycle · ESC quit`
-      : `procedural fallback · run Camera Hub / plug a camera · ${fps} fps · ${g.gpuName} · ESC quit`;
+    const line2 = cam.available ? `${cam.format} · ${fps} fps · ${g.gpuName} · SPACE cycle · ESC quit` : `procedural fallback · run Camera Hub / plug a camera · ${fps} fps · ${g.gpuName} · ESC quit`;
     GDI32.SelectObject(dc, hudFontSmall);
     drawTextShadow(dc, 24, 56, line2, 0x00c0c0c0);
     GDI32.SelectObject(dc, prevFont);

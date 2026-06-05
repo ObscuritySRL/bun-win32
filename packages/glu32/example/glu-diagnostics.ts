@@ -41,10 +41,8 @@ const DIM = '\x1b[2m';
 const RESET = '\x1b[0m';
 
 const PIXEL_FORMAT_DESCRIPTOR = Buffer.from([
-  0x28, 0x00, 0x01, 0x00, 0x25, 0x00, 0x00, 0x00, 0x00, 0x20, 0x00, 0x00,
-  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x18,
-  0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-  0x00, 0x00, 0x00, 0x00,
+  0x28, 0x00, 0x01, 0x00, 0x25, 0x00, 0x00, 0x00, 0x00, 0x20, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x18, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+  0x00,
 ]);
 
 function readCString(pointer: any): string {
@@ -59,20 +57,7 @@ function readCString(pointer: any): string {
 function createHiddenWindowAndContext(): { hwnd: bigint; hdc: bigint; hglrc: bigint } {
   const hInstance = Kernel32.GetModuleHandleW(0 as unknown as Pointer);
 
-  const hwnd = User32.CreateWindowExW(
-    0,
-    Buffer.from('STATIC\0', 'utf16le').ptr,
-    Buffer.from('GLU Diagnostics\0', 'utf16le').ptr,
-    0x00000000,
-    0,
-    0,
-    1,
-    1,
-    0n,
-    0n,
-    hInstance,
-    null,
-  );
+  const hwnd = User32.CreateWindowExW(0, Buffer.from('STATIC\0', 'utf16le').ptr, Buffer.from('GLU Diagnostics\0', 'utf16le').ptr, 0x00000000, 0, 0, 1, 1, 0n, 0n, hInstance, null);
   if (!hwnd) throw new Error(`CreateWindowExW failed: ${Kernel32.GetLastError()}`);
 
   const hdc = User32.GetDC(hwnd);
@@ -218,11 +203,7 @@ function main(): void {
   const winZ = new Float64Array(1);
 
   for (const point of testPoints) {
-    const result = GLU32.gluProject(
-      point.x, point.y, point.z,
-      ptr(modelMatrix), ptr(projMatrix), ptr(viewport),
-      ptr(winX), ptr(winY), ptr(winZ),
-    );
+    const result = GLU32.gluProject(point.x, point.y, point.z, ptr(modelMatrix), ptr(projMatrix), ptr(viewport), ptr(winX), ptr(winY), ptr(winZ));
     if (result) {
       console.log(`  (${point.x}, ${point.y}, ${point.z}) [${point.label}]`);
       console.log(`    => screen (${winX[0]!.toFixed(2)}, ${winY[0]!.toFixed(2)}, depth=${winZ[0]!.toFixed(6)})`);
@@ -235,11 +216,7 @@ function main(): void {
   console.log(`\n${YELLOW}[6] gluUnProject Round Trip (2D back to 3D)${RESET}`);
 
   // First project the origin to get screen coordinates
-  GLU32.gluProject(
-    0.0, 0.0, 0.0,
-    ptr(modelMatrix), ptr(projMatrix), ptr(viewport),
-    ptr(winX), ptr(winY), ptr(winZ),
-  );
+  GLU32.gluProject(0.0, 0.0, 0.0, ptr(modelMatrix), ptr(projMatrix), ptr(viewport), ptr(winX), ptr(winY), ptr(winZ));
 
   const screenX = winX[0]!;
   const screenY = winY[0]!;
@@ -252,11 +229,7 @@ function main(): void {
   const objY = new Float64Array(1);
   const objZ = new Float64Array(1);
 
-  const unresult = GLU32.gluUnProject(
-    screenX, screenY, screenZ,
-    ptr(modelMatrix), ptr(projMatrix), ptr(viewport),
-    ptr(objX), ptr(objY), ptr(objZ),
-  );
+  const unresult = GLU32.gluUnProject(screenX, screenY, screenZ, ptr(modelMatrix), ptr(projMatrix), ptr(viewport), ptr(objX), ptr(objY), ptr(objZ));
 
   if (unresult) {
     console.log(`  Unprojected back to 3D:     (${objX[0]!.toFixed(6)}, ${objY[0]!.toFixed(6)}, ${objZ[0]!.toFixed(6)})`);
@@ -272,18 +245,10 @@ function main(): void {
 
   // Test a second round trip with an off-center point
   console.log(`\n  Testing off-center point (2.0, 1.5, -3.0):`);
-  GLU32.gluProject(
-    2.0, 1.5, -3.0,
-    ptr(modelMatrix), ptr(projMatrix), ptr(viewport),
-    ptr(winX), ptr(winY), ptr(winZ),
-  );
+  GLU32.gluProject(2.0, 1.5, -3.0, ptr(modelMatrix), ptr(projMatrix), ptr(viewport), ptr(winX), ptr(winY), ptr(winZ));
   console.log(`    Projected:    screen (${winX[0]!.toFixed(2)}, ${winY[0]!.toFixed(2)}, ${winZ[0]!.toFixed(6)})`);
 
-  const unresult2 = GLU32.gluUnProject(
-    winX[0]!, winY[0]!, winZ[0]!,
-    ptr(modelMatrix), ptr(projMatrix), ptr(viewport),
-    ptr(objX), ptr(objY), ptr(objZ),
-  );
+  const unresult2 = GLU32.gluUnProject(winX[0]!, winY[0]!, winZ[0]!, ptr(modelMatrix), ptr(projMatrix), ptr(viewport), ptr(objX), ptr(objY), ptr(objZ));
   if (unresult2) {
     console.log(`    Unprojected:  (${objX[0]!.toFixed(6)}, ${objY[0]!.toFixed(6)}, ${objZ[0]!.toFixed(6)})`);
     const maxErr = Math.max(Math.abs(objX[0]! - 2.0), Math.abs(objY[0]! - 1.5), Math.abs(objZ[0]! + 3.0));

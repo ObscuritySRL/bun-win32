@@ -2,26 +2,7 @@ import { type FFIFunction, FFIType } from 'bun:ffi';
 
 import { Win32 } from '@bun-win32/core';
 
-import type {
-  BOOL,
-  DWORD,
-  HANDLE,
-  HWND,
-  LPCONNECTDLGSTRUCTW,
-  LPCWSTR,
-  LPDISCDLGSTRUCTW,
-  LPDWORD,
-  LPHANDLE,
-  LPLPWSTR,
-  LPNETCONNECTINFOSTRUCT,
-  LPNETINFOSTRUCT,
-  LPNETRESOURCEW,
-  LPVOID,
-  LPWSTR,
-  NULL,
-  PBYTE,
-  PVOID,
-} from '../types/Mpr';
+import type { BOOL, DWORD, HANDLE, HWND, LPCONNECTDLGSTRUCTW, LPCWSTR, LPDISCDLGSTRUCTW, LPDWORD, LPHANDLE, LPLPWSTR, LPNETCONNECTINFOSTRUCT, LPNETINFOSTRUCT, LPNETRESOURCEW, LPVOID, LPWSTR, NULL, PBYTE, PVOID } from '../types/Mpr';
 
 class Mpr extends Win32 {
   protected static override name = 'mpr.dll';
@@ -171,12 +152,32 @@ class Mpr extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winnetwk/nf-winnetwk-wnetuseconnection4w
-  public static WNetUseConnection4W(hwndOwner: HWND | 0n, lpNetResource: LPNETRESOURCEW, pAuthBuffer: PVOID | NULL, cbAuthBuffer: DWORD, dwFlags: DWORD, lpUseOptions: PBYTE | NULL, cbUseOptions: DWORD, lpAccessName: LPWSTR | NULL, lpBufferSize: LPDWORD | NULL, lpResult: LPDWORD | NULL): DWORD {
+  public static WNetUseConnection4W(
+    hwndOwner: HWND | 0n,
+    lpNetResource: LPNETRESOURCEW,
+    pAuthBuffer: PVOID | NULL,
+    cbAuthBuffer: DWORD,
+    dwFlags: DWORD,
+    lpUseOptions: PBYTE | NULL,
+    cbUseOptions: DWORD,
+    lpAccessName: LPWSTR | NULL,
+    lpBufferSize: LPDWORD | NULL,
+    lpResult: LPDWORD | NULL,
+  ): DWORD {
     return Mpr.Load('WNetUseConnection4W')(hwndOwner, lpNetResource, pAuthBuffer, cbAuthBuffer, dwFlags, lpUseOptions, cbUseOptions, lpAccessName, lpBufferSize, lpResult);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winnetwk/nf-winnetwk-wnetuseconnectionw
-  public static WNetUseConnectionW(hwndOwner: HWND | 0n, lpNetResource: LPNETRESOURCEW, lpPassword: LPCWSTR | NULL, lpUserId: LPCWSTR | NULL, dwFlags: DWORD, lpAccessName: LPWSTR | NULL, lpBufferSize: LPDWORD | NULL, lpResult: LPDWORD | NULL): DWORD {
+  public static WNetUseConnectionW(
+    hwndOwner: HWND | 0n,
+    lpNetResource: LPNETRESOURCEW,
+    lpPassword: LPCWSTR | NULL,
+    lpUserId: LPCWSTR | NULL,
+    dwFlags: DWORD,
+    lpAccessName: LPWSTR | NULL,
+    lpBufferSize: LPDWORD | NULL,
+    lpResult: LPDWORD | NULL,
+  ): DWORD {
     return Mpr.Load('WNetUseConnectionW')(hwndOwner, lpNetResource, lpPassword, lpUserId, dwFlags, lpAccessName, lpBufferSize, lpResult);
   }
 }

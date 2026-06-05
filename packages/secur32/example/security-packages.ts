@@ -141,9 +141,9 @@ console.log(`LSA handle acquired: 0x${lsaHandle.toString(16)}\n`);
 function makeLsaString(text: string): Buffer {
   const textBuf = Buffer.from(text, 'ascii');
   const lsaString = Buffer.alloc(16);
-  lsaString.writeUInt16LE(textBuf.byteLength, 0);       // Length (excluding null)
-  lsaString.writeUInt16LE(textBuf.byteLength, 2);       // MaximumLength
-  lsaString.writeBigUInt64LE(BigInt(textBuf.ptr), 8);    // Buffer pointer at offset 8
+  lsaString.writeUInt16LE(textBuf.byteLength, 0); // Length (excluding null)
+  lsaString.writeUInt16LE(textBuf.byteLength, 2); // MaximumLength
+  lsaString.writeBigUInt64LE(BigInt(textBuf.ptr), 8); // Buffer pointer at offset 8
   return lsaString;
 }
 

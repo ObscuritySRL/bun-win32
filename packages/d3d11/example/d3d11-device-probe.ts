@@ -149,31 +149,14 @@ function buildSwapChainDesc(hwnd: bigint): Buffer {
   return buffer;
 }
 
-function recordDeviceResult(
-  lane: string,
-  config: string,
-  driverType: D3D_DRIVER_TYPE,
-  flags: number,
-  levels: number[] | null,
-): void {
+function recordDeviceResult(lane: string, config: string, driverType: D3D_DRIVER_TYPE, flags: number, levels: number[] | null): void {
   const ppDevice = Buffer.alloc(POINTER_SIZE);
   const pFeatureLevel = Buffer.alloc(4);
   const ppImmediateContext = Buffer.alloc(POINTER_SIZE);
   const levelsBuf = levels === null ? null : levelsBuffer(levels);
   const levelsCount = levels === null ? 0 : levels.length;
 
-  const hr = D3d11.D3D11CreateDevice(
-    null,
-    driverType,
-    0n,
-    flags,
-    levelsBuf === null ? null : levelsBuf.ptr,
-    levelsCount,
-    D3D11_SDK_VERSION,
-    ppDevice.ptr,
-    pFeatureLevel.ptr,
-    ppImmediateContext.ptr,
-  );
+  const hr = D3d11.D3D11CreateDevice(null, driverType, 0n, flags, levelsBuf === null ? null : levelsBuf.ptr, levelsCount, D3D11_SDK_VERSION, ppDevice.ptr, pFeatureLevel.ptr, ppImmediateContext.ptr);
 
   const levelLabel = hr === 0 ? labelForLevel(pFeatureLevel.readUInt32LE(0)) : '—';
 
@@ -189,13 +172,7 @@ function recordDeviceResult(
   const hrU = hr >>> 0;
   if (hrU === DXGI_ERROR_UNSUPPORTED || hrU === DXGI_ERROR_SDK_COMPONENT_MISSING || hrU === E_NOTIMPL || hrU === E_INVALIDARG) {
     const reason =
-      hrU === DXGI_ERROR_UNSUPPORTED
-        ? 'DXGI_ERROR_UNSUPPORTED'
-        : hrU === DXGI_ERROR_SDK_COMPONENT_MISSING
-        ? 'Graphics Tools / debug layer not installed'
-        : hrU === E_NOTIMPL
-        ? 'E_NOTIMPL (reference driver not installed)'
-        : 'E_INVALIDARG';
+      hrU === DXGI_ERROR_UNSUPPORTED ? 'DXGI_ERROR_UNSUPPORTED' : hrU === DXGI_ERROR_SDK_COMPONENT_MISSING ? 'Graphics Tools / debug layer not installed' : hrU === E_NOTIMPL ? 'E_NOTIMPL (reference driver not installed)' : 'E_INVALIDARG';
     results.push({ config, detail: reason, hr, lane, level: '—', status: 'info' });
     return;
   }
@@ -203,14 +180,7 @@ function recordDeviceResult(
   results.push({ config, detail: formatHResult(hr), hr, lane, level: '—', status: 'fail' });
 }
 
-function recordSwapChainResult(
-  lane: string,
-  config: string,
-  driverType: D3D_DRIVER_TYPE,
-  flags: number,
-  levels: number[] | null,
-  hwnd: bigint,
-): void {
+function recordSwapChainResult(lane: string, config: string, driverType: D3D_DRIVER_TYPE, flags: number, levels: number[] | null, hwnd: bigint): void {
   const desc = buildSwapChainDesc(hwnd);
   const ppSwapChain = Buffer.alloc(POINTER_SIZE);
   const ppDevice = Buffer.alloc(POINTER_SIZE);
@@ -219,20 +189,7 @@ function recordSwapChainResult(
   const levelsBuf = levels === null ? null : levelsBuffer(levels);
   const levelsCount = levels === null ? 0 : levels.length;
 
-  const hr = D3d11.D3D11CreateDeviceAndSwapChain(
-    null,
-    driverType,
-    0n,
-    flags,
-    levelsBuf === null ? null : levelsBuf.ptr,
-    levelsCount,
-    D3D11_SDK_VERSION,
-    desc.ptr,
-    ppSwapChain.ptr,
-    ppDevice.ptr,
-    pFeatureLevel.ptr,
-    ppImmediateContext.ptr,
-  );
+  const hr = D3d11.D3D11CreateDeviceAndSwapChain(null, driverType, 0n, flags, levelsBuf === null ? null : levelsBuf.ptr, levelsCount, D3D11_SDK_VERSION, desc.ptr, ppSwapChain.ptr, ppDevice.ptr, pFeatureLevel.ptr, ppImmediateContext.ptr);
 
   const levelLabel = hr === 0 ? labelForLevel(pFeatureLevel.readUInt32LE(0)) : '—';
 
@@ -249,14 +206,7 @@ function recordSwapChainResult(
 
   const hrU = hr >>> 0;
   if (hrU === DXGI_ERROR_UNSUPPORTED || hrU === DXGI_ERROR_SDK_COMPONENT_MISSING || hrU === E_NOTIMPL || hrU === E_INVALIDARG) {
-    const reason =
-      hrU === DXGI_ERROR_UNSUPPORTED
-        ? 'DXGI_ERROR_UNSUPPORTED'
-        : hrU === DXGI_ERROR_SDK_COMPONENT_MISSING
-        ? 'Graphics Tools not installed'
-        : hrU === E_NOTIMPL
-        ? 'E_NOTIMPL'
-        : 'E_INVALIDARG';
+    const reason = hrU === DXGI_ERROR_UNSUPPORTED ? 'DXGI_ERROR_UNSUPPORTED' : hrU === DXGI_ERROR_SDK_COMPONENT_MISSING ? 'Graphics Tools not installed' : hrU === E_NOTIMPL ? 'E_NOTIMPL' : 'E_INVALIDARG';
     results.push({ config, detail: reason, hr, lane, level: '—', status: 'info' });
     return;
   }

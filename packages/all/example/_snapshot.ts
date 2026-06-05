@@ -34,17 +34,7 @@ import { FFIType, read, toArrayBuffer, type Pointer } from 'bun:ffi';
 
 import { Gdiplus } from '../index';
 import { Status } from '@bun-win32/gdiplus';
-import {
-  CTX_COPY_RESOURCE,
-  CTX_MAP,
-  CTX_UNMAP,
-  DEV_CREATE_TEXTURE_2D,
-  DXGI_FORMAT_B8G8R8A8_UNORM,
-  SWAP_GET_BUFFER,
-  comRelease,
-  vcall,
-  type Gpu,
-} from './_gpu';
+import { CTX_COPY_RESOURCE, CTX_MAP, CTX_UNMAP, DEV_CREATE_TEXTURE_2D, DXGI_FORMAT_B8G8R8A8_UNORM, SWAP_GET_BUFFER, comRelease, vcall, type Gpu } from './_gpu';
 
 const IID_ID3D11TEXTURE2D = '6f15aaf2-d208-4e89-9ab4-489535d34f9c';
 const D3D11_USAGE_STAGING = 3;
@@ -102,7 +92,16 @@ export function captureBackBuffer(gpu: Gpu, outPath: string, opts: CaptureOption
   const gridW = Math.max(1, opts.gridW ?? 32);
   const gridH = Math.max(1, opts.gridH ?? 18);
   const fail = (note: string, w = 0, h = 0): SnapshotStats => ({
-    ok: false, width: w, height: h, nonBlackFrac: 0, meanLuma: 0, grid: [], gridW, gridH, path: outPath, note,
+    ok: false,
+    width: w,
+    height: h,
+    nonBlackFrac: 0,
+    meanLuma: 0,
+    grid: [],
+    gridW,
+    gridH,
+    path: outPath,
+    note,
   });
 
   if (gpu.swapChain === 0n) return fail('no swap chain (compute-only device)');
@@ -272,19 +271,25 @@ if (import.meta.main) {
   const { w: cw, h: ch } = win.clientSize();
   const dev = gpu.createDevice(win.hwnd, { width: cw, height: ch });
 
-  const vs = gpu.makeVertexShader(gpu.compile(
-    `struct VSOut { float4 pos : SV_Position; float2 uv : TEXCOORD0; };
+  const vs = gpu.makeVertexShader(
+    gpu.compile(
+      `struct VSOut { float4 pos : SV_Position; float2 uv : TEXCOORD0; };
      VSOut main(uint vid : SV_VertexID) {
        VSOut o; float2 p = float2((vid << 1) & 2, vid & 2);
        o.uv = p; o.pos = float4(p * float2(2,-2) + float2(-1,1), 0, 1); return o; }`,
-    'main', 'vs_5_0',
-  ));
-  const ps = gpu.makePixelShader(gpu.compile(
-    `float4 main(float4 fp : SV_Position, float2 uv : TEXCOORD0) : SV_Target {
+      'main',
+      'vs_5_0',
+    ),
+  );
+  const ps = gpu.makePixelShader(
+    gpu.compile(
+      `float4 main(float4 fp : SV_Position, float2 uv : TEXCOORD0) : SV_Target {
        float3 c = float3(uv.x, uv.y, 0.5 + 0.5 * sin(uv.x * 18.0));
        return float4(c, 1); }`,
-    'main', 'ps_5_0',
-  ));
+      'main',
+      'ps_5_0',
+    ),
+  );
 
   win.pump();
   gpu.setRenderTargets([dev.backBufferRTV]);

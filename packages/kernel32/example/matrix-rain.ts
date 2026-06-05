@@ -22,14 +22,7 @@
 
 import Kernel32, { STD_HANDLE } from '../index';
 
-Kernel32.Preload([
-  'GetStdHandle',
-  'GetConsoleMode',
-  'SetConsoleMode',
-  'GetConsoleScreenBufferInfo',
-  'SetConsoleCursorInfo',
-  'SetConsoleTitleW',
-]);
+Kernel32.Preload(['GetStdHandle', 'GetConsoleMode', 'SetConsoleMode', 'GetConsoleScreenBufferInfo', 'SetConsoleCursorInfo', 'SetConsoleTitleW']);
 
 const ENABLE_VIRTUAL_TERMINAL_PROCESSING = 0x0004;
 
@@ -76,8 +69,8 @@ if (consoleHeight < 5) consoleHeight = 24;
 //   +0x04: bVisible (BOOL)
 const cursorInfoBuf = Buffer.alloc(8);
 const cursorInfoView = new DataView(cursorInfoBuf.buffer);
-cursorInfoView.setUint32(0, 1, true);   // dwSize = 1 (thinnest)
-cursorInfoView.setUint32(4, 0, true);   // bVisible = FALSE
+cursorInfoView.setUint32(0, 1, true); // dwSize = 1 (thinnest)
+cursorInfoView.setUint32(4, 0, true); // bVisible = FALSE
 Kernel32.SetConsoleCursorInfo(hStdout, cursorInfoBuf.ptr);
 
 // Set the console window title
@@ -104,11 +97,11 @@ function randomChar(): string {
 
 // Each column tracks where its leading "head" character is and how fast it falls
 interface RainColumn {
-  y: number;        // current head position (can be negative = pre-delay)
-  speed: number;    // cells to advance per frame (1 or 2)
-  length: number;   // total trail length behind the head
-  active: boolean;  // whether this column is currently raining
-  delay: number;    // frames to wait before reactivating
+  y: number; // current head position (can be negative = pre-delay)
+  speed: number; // cells to advance per frame (1 or 2)
+  length: number; // total trail length behind the head
+  active: boolean; // whether this column is currently raining
+  delay: number; // frames to wait before reactivating
 }
 
 const columns: RainColumn[] = [];
@@ -194,8 +187,8 @@ while (Date.now() - startTime < DURATION_MS) {
 }
 
 // Restore cursor visibility
-cursorInfoView.setUint32(0, 25, true);  // dwSize = 25 (default)
-cursorInfoView.setUint32(4, 1, true);   // bVisible = TRUE
+cursorInfoView.setUint32(0, 25, true); // dwSize = 25 (default)
+cursorInfoView.setUint32(4, 1, true); // bVisible = TRUE
 Kernel32.SetConsoleCursorInfo(hStdout, cursorInfoBuf.ptr);
 
 // Restore original console mode

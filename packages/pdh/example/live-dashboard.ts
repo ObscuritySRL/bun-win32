@@ -17,14 +17,7 @@
  */
 import Pdh, { PdhCounterFormat } from '../index';
 
-Pdh.Preload([
-  'PdhOpenQueryW',
-  'PdhAddEnglishCounterW',
-  'PdhCollectQueryData',
-  'PdhGetFormattedCounterValue',
-  'PdhRemoveCounter',
-  'PdhCloseQuery',
-]);
+Pdh.Preload(['PdhOpenQueryW', 'PdhAddEnglishCounterW', 'PdhCollectQueryData', 'PdhGetFormattedCounterValue', 'PdhRemoveCounter', 'PdhCloseQuery']);
 
 // Open a real-time query
 const hQueryBuf = Buffer.alloc(8);
@@ -101,12 +94,7 @@ await Bun.sleep(1000);
 function readCounterDouble(hCounter: bigint): number | null {
   if (hCounter === 0n) return null;
   const valueBuf = Buffer.alloc(24); // PDH_FMT_COUNTERVALUE: 4 bytes status + 4 pad + 8/16 bytes value
-  const status = Pdh.PdhGetFormattedCounterValue(
-    hCounter,
-    PdhCounterFormat.PDH_FMT_DOUBLE,
-    null,
-    valueBuf.ptr,
-  );
+  const status = Pdh.PdhGetFormattedCounterValue(hCounter, PdhCounterFormat.PDH_FMT_DOUBLE, null, valueBuf.ptr);
   if (status !== 0) return null;
   return valueBuf.readDoubleLE(8);
 }

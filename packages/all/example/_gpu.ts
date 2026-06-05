@@ -200,13 +200,7 @@ D3dcompiler_47.Preload(['D3DCompile']);
 const invokers = new Map<string, ReturnType<typeof CFunction>>();
 
 /** Invoke COM method `slot` on `thisPtr`; argTypes/args exclude the implicit `this`. */
-export function vcall(
-  thisPtr: bigint,
-  slot: number,
-  argTypes: readonly FFIType[],
-  args: readonly unknown[],
-  returns: FFIType = FFIType.i32,
-): number {
+export function vcall(thisPtr: bigint, slot: number, argTypes: readonly FFIType[], args: readonly unknown[], returns: FFIType = FFIType.i32): number {
   const vtable = read.u64(Number(thisPtr) as Pointer, 0);
   const method = read.u64(Number(vtable) as Pointer, slot * 8);
   const key = `${method}|${returns}|${argTypes.join(',')}`;
@@ -380,24 +374,9 @@ export function createWindow(options: CreateWindowOptions): Win {
   const screenH = User32.GetSystemMetrics(SystemMetric.SM_CYSCREEN);
   const startX = Math.max(0, Math.floor((screenW - width) / 2));
   const startY = Math.max(0, Math.floor((screenH - height) / 2));
-  const style = borderless
-    ? WindowStyles.WS_POPUP | WindowStyles.WS_VISIBLE
-    : WindowStyles.WS_OVERLAPPEDWINDOW | WindowStyles.WS_VISIBLE;
+  const style = borderless ? WindowStyles.WS_POPUP | WindowStyles.WS_VISIBLE : WindowStyles.WS_OVERLAPPEDWINDOW | WindowStyles.WS_VISIBLE;
 
-  hwnd = User32.CreateWindowExW(
-    0,
-    className.ptr!,
-    encodeWide(title).ptr!,
-    style,
-    startX,
-    startY,
-    width,
-    height,
-    0n,
-    0n,
-    0n,
-    null as unknown as Pointer,
-  );
+  hwnd = User32.CreateWindowExW(0, className.ptr!, encodeWide(title).ptr!, style, startX, startY, width, height, 0n, 0n, 0n, null as unknown as Pointer);
   if (!hwnd) {
     User32.UnregisterClassW(className.ptr!, 0n);
     wndProc.close();
@@ -484,12 +463,7 @@ function buildSwapChainDesc(window: bigint, w: number, h: number): Buffer {
   return b;
 }
 
-function tryCreateDeviceAndSwapChain(
-  hwnd: bigint,
-  w: number,
-  h: number,
-  driverType: D3D_DRIVER_TYPE,
-): { swap: bigint; device: bigint; context: bigint } | null {
+function tryCreateDeviceAndSwapChain(hwnd: bigint, w: number, h: number, driverType: D3D_DRIVER_TYPE): { swap: bigint; device: bigint; context: bigint } | null {
   const desc = buildSwapChainDesc(hwnd, w, h);
   const featureLevels = Buffer.alloc(4);
   featureLevels.writeUInt32LE(D3D_FEATURE_LEVEL_11_0, 0);
@@ -497,20 +471,7 @@ function tryCreateDeviceAndSwapChain(
   const ppDevice = Buffer.alloc(8);
   const pFeatureLevel = Buffer.alloc(4);
   const ppContext = Buffer.alloc(8);
-  const hr = D3d11.D3D11CreateDeviceAndSwapChain(
-    null,
-    driverType,
-    0n,
-    D3D11_CREATE_DEVICE_BGRA_SUPPORT,
-    featureLevels.ptr!,
-    1,
-    D3D11_SDK_VERSION,
-    desc.ptr!,
-    ppSwap.ptr!,
-    ppDevice.ptr!,
-    pFeatureLevel.ptr!,
-    ppContext.ptr!,
-  );
+  const hr = D3d11.D3D11CreateDeviceAndSwapChain(null, driverType, 0n, D3D11_CREATE_DEVICE_BGRA_SUPPORT, featureLevels.ptr!, 1, D3D11_SDK_VERSION, desc.ptr!, ppSwap.ptr!, ppDevice.ptr!, pFeatureLevel.ptr!, ppContext.ptr!);
   if (hr !== 0) return null;
   return { swap: ppSwap.readBigUInt64LE(0), device: ppDevice.readBigUInt64LE(0), context: ppContext.readBigUInt64LE(0) };
 }
@@ -581,18 +542,7 @@ export function createComputeDevice(): Gpu {
     const ppDevice = Buffer.alloc(8);
     const pFeatureLevel = Buffer.alloc(4);
     const ppContext = Buffer.alloc(8);
-    const hr = D3d11.D3D11CreateDevice(
-      null,
-      driverType,
-      0n,
-      D3D11_CREATE_DEVICE_BGRA_SUPPORT,
-      featureLevels.ptr!,
-      1,
-      D3D11_SDK_VERSION,
-      ppDevice.ptr!,
-      pFeatureLevel.ptr!,
-      ppContext.ptr!,
-    );
+    const hr = D3d11.D3D11CreateDevice(null, driverType, 0n, D3D11_CREATE_DEVICE_BGRA_SUPPORT, featureLevels.ptr!, 1, D3D11_SDK_VERSION, ppDevice.ptr!, pFeatureLevel.ptr!, ppContext.ptr!);
     if (hr !== 0) return null;
     return { device: ppDevice.readBigUInt64LE(0), context: ppContext.readBigUInt64LE(0) };
   }
@@ -674,19 +624,7 @@ export function compile(source: string, entry: string, target: string): Compiled
   const targetBuf = encodeAscii(target);
   const ppCode = Buffer.alloc(8);
   const ppErr = Buffer.alloc(8);
-  const hr = D3dcompiler_47.D3DCompile(
-    src.ptr!,
-    BigInt(src.byteLength - 1),
-    null,
-    null,
-    null,
-    entryBuf.ptr!,
-    targetBuf.ptr!,
-    D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_OPTIMIZATION_LEVEL3,
-    0,
-    ppCode.ptr!,
-    ppErr.ptr!,
-  );
+  const hr = D3dcompiler_47.D3DCompile(src.ptr!, BigInt(src.byteLength - 1), null, null, null, entryBuf.ptr!, targetBuf.ptr!, D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_OPTIMIZATION_LEVEL3, 0, ppCode.ptr!, ppErr.ptr!);
   if (hr !== 0) {
     const errPtr = ppErr.readBigUInt64LE(0);
     const msg = errPtr !== 0n ? blobAsString(errPtr) : '(no error blob)';
@@ -749,13 +687,7 @@ export function makeConstantBuffer(byteSize: number): bigint {
 /** Upload `data` into a DEFAULT-usage constant buffer via UpdateSubresource. */
 export function updateConstantBuffer(buffer: bigint, data: Buffer): void {
   const { context } = requireGpu();
-  vcall(
-    context,
-    CTX_UPDATE_SUBRESOURCE,
-    [FFIType.u64, FFIType.u32, FFIType.ptr, FFIType.ptr, FFIType.u32, FFIType.u32],
-    [buffer, 0, null, data.ptr!, 0, 0],
-    FFIType.void,
-  );
+  vcall(context, CTX_UPDATE_SUBRESOURCE, [FFIType.u64, FFIType.u32, FFIType.ptr, FFIType.ptr, FFIType.u32, FFIType.u32], [buffer, 0, null, data.ptr!, 0, 0], FFIType.void);
 }
 
 /** Result of {@link makeStructuredBuffer}: the buffer plus optional UAV/SRV views. */
@@ -1127,13 +1059,7 @@ export function csSet(shader: bigint, bindings: CsBindings = {}): void {
     const arr = Buffer.alloc(8 * bindings.uav.length);
     bindings.uav.forEach((u, i) => arr.writeBigUInt64LE(u, i * 8));
     // CSSetUnorderedAccessViews: StartSlot, NumUAVs, ppUAVs, pUAVInitialCounts.
-    vcall(
-      context,
-      CTX_CS_SET_UNORDERED_ACCESS_VIEWS,
-      [FFIType.u32, FFIType.u32, FFIType.ptr, FFIType.ptr],
-      [0, bindings.uav.length, arr.ptr!, null],
-      FFIType.void,
-    );
+    vcall(context, CTX_CS_SET_UNORDERED_ACCESS_VIEWS, [FFIType.u32, FFIType.u32, FFIType.ptr, FFIType.ptr], [0, bindings.uav.length, arr.ptr!, null], FFIType.void);
   }
   if (bindings.srv && bindings.srv.length > 0) {
     const arr = Buffer.alloc(8 * bindings.srv.length);

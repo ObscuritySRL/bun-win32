@@ -166,24 +166,14 @@ function writePointerAt(destAddress: bigint, value: bigint): void {
 
 const coInitHr = ole32.symbols.CoInitializeEx(null, COINIT_MULTITHREADED);
 const shouldUninitialize = coInitHr >= 0;
-if (coInitHr < 0 && (coInitHr >>> 0) !== RPC_E_CHANGED_MODE) {
+if (coInitHr < 0 && coInitHr >>> 0 !== RPC_E_CHANGED_MODE) {
   console.error(`${ANSI.red}CoInitializeEx failed: ${formatHResult(coInitHr)}${ANSI.reset}`);
   process.exit(1);
 }
-recordCheck(
-  'CoInitializeEx',
-  coInitHr >= 0 || (coInitHr >>> 0) === RPC_E_CHANGED_MODE ? 'ok' : 'fail',
-  coInitHr,
-  (coInitHr >>> 0) === RPC_E_CHANGED_MODE ? 'apartment = MTA (already STA on this thread)' : 'apartment = MTA',
-);
+recordCheck('CoInitializeEx', coInitHr >= 0 || coInitHr >>> 0 === RPC_E_CHANGED_MODE ? 'ok' : 'fail', coInitHr, coInitHr >>> 0 === RPC_E_CHANGED_MODE ? 'apartment = MTA (already STA on this thread)' : 'apartment = MTA');
 
 const unloadBaseline = Mmdevapi.DllCanUnloadNow();
-recordCheck(
-  'DllCanUnloadNow (baseline)',
-  unloadBaseline === 0 || unloadBaseline === S_FALSE ? 'ok' : 'fail',
-  unloadBaseline,
-  unloadBaseline === S_FALSE ? 'server holds live refs' : 'server reports unloadable',
-);
+recordCheck('DllCanUnloadNow (baseline)', unloadBaseline === 0 || unloadBaseline === S_FALSE ? 'ok' : 'fail', unloadBaseline, unloadBaseline === S_FALSE ? 'server holds live refs' : 'server reports unloadable');
 
 const clsidEnumerator = guidBytes(CLSID_MMDeviceEnumerator);
 const iidEnumerator = guidBytes(IID_IMMDeviceEnumerator);
@@ -258,12 +248,7 @@ if (factoryAddress !== 0n) {
         }
       }
     }
-    recordCheck(
-      'IMMDeviceEnumerator::GetDefaultAudioEndpoint · eRender/eMultimedia',
-      defHr === 0 && renderEndpointId !== '' ? 'ok' : 'fail',
-      defHr,
-      renderEndpointId === '' ? 'no default render endpoint' : renderEndpointId,
-    );
+    recordCheck('IMMDeviceEnumerator::GetDefaultAudioEndpoint · eRender/eMultimedia', defHr === 0 && renderEndpointId !== '' ? 'ok' : 'fail', defHr, renderEndpointId === '' ? 'no default render endpoint' : renderEndpointId);
 
     enumeratorVtable.symbols.Release(enumeratorAddress);
     enumeratorVtable.close();
@@ -283,10 +268,7 @@ if (renderEndpointId !== '') {
       queryHitCount += 1;
       const iidBuf = Buffer.alloc(16);
       kernel32.symbols.ReadProcessMemory(currentProcess, riidPtr, iidBuf.ptr, 16n, null);
-      const matches =
-        guidBytesEqual(iidBuf, iidUnknown) ||
-        guidBytesEqual(iidBuf, iidCompletionHandler) ||
-        guidBytesEqual(iidBuf, iidAgileObject);
+      const matches = guidBytesEqual(iidBuf, iidUnknown) || guidBytesEqual(iidBuf, iidCompletionHandler) || guidBytesEqual(iidBuf, iidAgileObject);
       if (matches) {
         writePointerAt(ppvObject, thisPtr);
         queryMatchCount += 1;
@@ -319,13 +301,7 @@ if (renderEndpointId !== '') {
   const interfacePathStr = `\\\\?\\SWD#MMDEVAPI#${renderEndpointId}#${KSCATEGORY_RENDER}`;
   const deviceInterfacePath = Buffer.from(`${interfacePathStr}\0`, 'utf16le');
   const operationOut = Buffer.alloc(POINTER_SIZE);
-  const activateHr = Mmdevapi.ActivateAudioInterfaceAsync(
-    deviceInterfacePath.ptr,
-    iidAudioClient.ptr,
-    null,
-    ptr(handlerObject),
-    operationOut.ptr,
-  );
+  const activateHr = Mmdevapi.ActivateAudioInterfaceAsync(deviceInterfacePath.ptr, iidAudioClient.ptr, null, ptr(handlerObject), operationOut.ptr);
 
   let activateResultHr: number | null = null;
   let activatedInterfaceAddress = 0n;

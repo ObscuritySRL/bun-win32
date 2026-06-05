@@ -126,7 +126,7 @@ packages/{name}/
     `-- {Class}.ts
 ```
 
-No other files or directories. `.gitignore` and `.prettierrc.json` live at the repo root.
+No other files or directories. `.gitignore` and `biome.json` live at the repo root.
 
 ---
 
@@ -602,7 +602,7 @@ Follow this order. **Test at every step.**
 
 8. **README, AI.md, examples.** Fill in the README template. Fill in AI.md, but keep it generic (change only class/DLL/package names and path references). Write examples per Section 10 (minimum 2: one creative, one professional, each with JSDoc header and ANSI output). Add `example:*` scripts to `package.json`. Update the **root README.md** (Packages table and Project Structure tree).
 
-9. **Final verification.** Run `bun run index.ts`. Run `bunx prettier --write "packages/{name}/**/*.ts"`. Run `bunx tsc --noEmit`. Run a real integration test.
+9. **Final verification.** Run `bun run index.ts`. Run `bunx biome format --write packages/{name}`. Run `bunx tsc --noEmit`. Run a real integration test.
 
 ---
 
@@ -619,7 +619,7 @@ Follow this order. **Test at every step.**
 - [ ] `bun run scripts/audit.ts {name}` reports zero mismatches
 - [ ] No `as unknown as T` or `as any` casts
 - [ ] Hex literals use numeric separators (`0x0000_0001`)
-- [ ] Prettier formatted, tsc passes with no errors
+- [ ] Biome formatted, tsc passes with no errors
 - [ ] At least two examples: one creative (WOW), one professional (thorough diagnostic)
 - [ ] Every example has JSDoc header (title, description, APIs, run command)
 - [ ] Examples use ANSI escape codes for color, not `WriteConsoleW`
@@ -649,7 +649,7 @@ cd packages/{name} && bun run index.ts
 cd packages/{name} && bunx tsc --noEmit
 
 # Format
-cd packages/{name} && bunx prettier --write "**/*.ts"
+cd packages/{name} && bunx biome format --write .
 
 # Type consistency audit (must report 0 mismatches)
 bun run scripts/audit.ts {name}

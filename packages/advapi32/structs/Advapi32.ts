@@ -2060,7 +2060,14 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/securitybaseapi/nf-securitybaseapi-createprivateobjectsecurity
-  public static CreatePrivateObjectSecurity(ParentDescriptor: PSECURITY_DESCRIPTOR | NULL, CreatorDescriptor: PSECURITY_DESCRIPTOR | NULL, NewDescriptor: PVOID, IsDirectoryObject: BOOL, Token: HANDLE | 0n, GenericMapping: PGENERIC_MAPPING): BOOL {
+  public static CreatePrivateObjectSecurity(
+    ParentDescriptor: PSECURITY_DESCRIPTOR | NULL,
+    CreatorDescriptor: PSECURITY_DESCRIPTOR | NULL,
+    NewDescriptor: PVOID,
+    IsDirectoryObject: BOOL,
+    Token: HANDLE | 0n,
+    GenericMapping: PGENERIC_MAPPING,
+  ): BOOL {
     return Advapi32.Load('CreatePrivateObjectSecurity')(ParentDescriptor, CreatorDescriptor, NewDescriptor, IsDirectoryObject, Token, GenericMapping);
   }
 
@@ -2751,7 +2758,17 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/evntrace/nf-evntrace-enabletraceex
-  public static EnableTraceEx(ProviderId: PVOID, SourceId: PVOID | NULL, TraceHandle: TRACEHANDLE, IsEnabled: ULONG, Level: BYTE, MatchAnyKeyword: ULONG_PTR, MatchAllKeyword: ULONG_PTR, EnableProperty: ULONG, EnableFilterDesc: PVOID | NULL): ULONG {
+  public static EnableTraceEx(
+    ProviderId: PVOID,
+    SourceId: PVOID | NULL,
+    TraceHandle: TRACEHANDLE,
+    IsEnabled: ULONG,
+    Level: BYTE,
+    MatchAnyKeyword: ULONG_PTR,
+    MatchAllKeyword: ULONG_PTR,
+    EnableProperty: ULONG,
+    EnableFilterDesc: PVOID | NULL,
+  ): ULONG {
     return Advapi32.Load('EnableTraceEx')(ProviderId, SourceId, TraceHandle, IsEnabled, Level, MatchAnyKeyword, MatchAllKeyword, EnableProperty, EnableFilterDesc);
   }
 
@@ -2811,7 +2828,16 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsvc/nf-winsvc-enumservicesstatusa
-  public static EnumServicesStatusA(hSCManager: SC_HANDLE, dwServiceType: DWORD, dwServiceState: DWORD, lpServices: LPBYTE | NULL, cbBufSize: DWORD, pcbBytesNeeded: LPDWORD, lpServicesReturned: LPDWORD, lpResumeHandle: LPDWORD | NULL): BOOL {
+  public static EnumServicesStatusA(
+    hSCManager: SC_HANDLE,
+    dwServiceType: DWORD,
+    dwServiceState: DWORD,
+    lpServices: LPBYTE | NULL,
+    cbBufSize: DWORD,
+    pcbBytesNeeded: LPDWORD,
+    lpServicesReturned: LPDWORD,
+    lpResumeHandle: LPDWORD | NULL,
+  ): BOOL {
     return Advapi32.Load('EnumServicesStatusA')(hSCManager, dwServiceType, dwServiceState, lpServices, cbBufSize, pcbBytesNeeded, lpServicesReturned, lpResumeHandle);
   }
 
@@ -2848,7 +2874,16 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsvc/nf-winsvc-enumservicesstatusw
-  public static EnumServicesStatusW(hSCManager: SC_HANDLE, dwServiceType: DWORD, dwServiceState: DWORD, lpServices: LPBYTE | NULL, cbBufSize: DWORD, pcbBytesNeeded: LPDWORD, lpServicesReturned: LPDWORD, lpResumeHandle: LPDWORD | NULL): BOOL {
+  public static EnumServicesStatusW(
+    hSCManager: SC_HANDLE,
+    dwServiceType: DWORD,
+    dwServiceState: DWORD,
+    lpServices: LPBYTE | NULL,
+    cbBufSize: DWORD,
+    pcbBytesNeeded: LPDWORD,
+    lpServicesReturned: LPDWORD,
+    lpResumeHandle: LPDWORD | NULL,
+  ): BOOL {
     return Advapi32.Load('EnumServicesStatusW')(hSCManager, dwServiceType, dwServiceState, lpServices, cbBufSize, pcbBytesNeeded, lpServicesReturned, lpResumeHandle);
   }
 
@@ -3145,7 +3180,16 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/aclapi/nf-aclapi-getnamedsecurityinfoa
-  public static GetNamedSecurityInfoA(pObjectName: LPCSTR, ObjectType: DWORD, SecurityInfo: SECURITY_INFORMATION, ppsidOwner: PVOID | NULL, ppsidGroup: PVOID | NULL, ppDacl: PVOID | NULL, ppSacl: PVOID | NULL, ppSecurityDescriptor: PVOID): DWORD {
+  public static GetNamedSecurityInfoA(
+    pObjectName: LPCSTR,
+    ObjectType: DWORD,
+    SecurityInfo: SECURITY_INFORMATION,
+    ppsidOwner: PVOID | NULL,
+    ppsidGroup: PVOID | NULL,
+    ppDacl: PVOID | NULL,
+    ppSacl: PVOID | NULL,
+    ppSecurityDescriptor: PVOID,
+  ): DWORD {
     return Advapi32.Load('GetNamedSecurityInfoA')(pObjectName, ObjectType, SecurityInfo, ppsidOwner, ppsidGroup, ppDacl, ppSacl, ppSecurityDescriptor);
   }
 
@@ -3160,7 +3204,16 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/aclapi/nf-aclapi-getnamedsecurityinfow
-  public static GetNamedSecurityInfoW(pObjectName: LPCWSTR, ObjectType: DWORD, SecurityInfo: SECURITY_INFORMATION, ppsidOwner: PVOID | NULL, ppsidGroup: PVOID | NULL, ppDacl: PVOID | NULL, ppSacl: PVOID | NULL, ppSecurityDescriptor: PVOID): DWORD {
+  public static GetNamedSecurityInfoW(
+    pObjectName: LPCWSTR,
+    ObjectType: DWORD,
+    SecurityInfo: SECURITY_INFORMATION,
+    ppsidOwner: PVOID | NULL,
+    ppsidGroup: PVOID | NULL,
+    ppDacl: PVOID | NULL,
+    ppSacl: PVOID | NULL,
+    ppSecurityDescriptor: PVOID,
+  ): DWORD {
     return Advapi32.Load('GetNamedSecurityInfoW')(pObjectName, ObjectType, SecurityInfo, ppsidOwner, ppsidGroup, ppDacl, ppSacl, ppSecurityDescriptor);
   }
 
@@ -3220,7 +3273,16 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/aclapi/nf-aclapi-getsecurityinfo
-  public static GetSecurityInfo(handle: HANDLE, ObjectType: DWORD, SecurityInfo: SECURITY_INFORMATION, ppsidOwner: PVOID | NULL, ppsidGroup: PVOID | NULL, ppDacl: PVOID | NULL, ppSacl: PVOID | NULL, ppSecurityDescriptor: PVOID | NULL): DWORD {
+  public static GetSecurityInfo(
+    handle: HANDLE,
+    ObjectType: DWORD,
+    SecurityInfo: SECURITY_INFORMATION,
+    ppsidOwner: PVOID | NULL,
+    ppsidGroup: PVOID | NULL,
+    ppDacl: PVOID | NULL,
+    ppSacl: PVOID | NULL,
+    ppSecurityDescriptor: PVOID | NULL,
+  ): DWORD {
     return Advapi32.Load('GetSecurityInfo')(handle, ObjectType, SecurityInfo, ppsidOwner, ppsidGroup, ppDacl, ppSacl, ppSecurityDescriptor);
   }
 
@@ -3584,12 +3646,28 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/aclapi/nf-aclapi-lookupsecuritydescriptorpartsa
-  public static LookupSecurityDescriptorPartsA(pOwner: PVOID | NULL, pGroup: PVOID | NULL, cCountOfAccessEntries: PULONG | NULL, pListOfAccessEntries: PVOID, cCountOfAuditEntries: PULONG | NULL, pListOfAuditEntries: PVOID, pSD: PSECURITY_DESCRIPTOR): DWORD {
+  public static LookupSecurityDescriptorPartsA(
+    pOwner: PVOID | NULL,
+    pGroup: PVOID | NULL,
+    cCountOfAccessEntries: PULONG | NULL,
+    pListOfAccessEntries: PVOID,
+    cCountOfAuditEntries: PULONG | NULL,
+    pListOfAuditEntries: PVOID,
+    pSD: PSECURITY_DESCRIPTOR,
+  ): DWORD {
     return Advapi32.Load('LookupSecurityDescriptorPartsA')(pOwner, pGroup, cCountOfAccessEntries, pListOfAccessEntries, cCountOfAuditEntries, pListOfAuditEntries, pSD);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/aclapi/nf-aclapi-lookupsecuritydescriptorpartsw
-  public static LookupSecurityDescriptorPartsW(pOwner: PVOID | NULL, pGroup: PVOID | NULL, cCountOfAccessEntries: PULONG | NULL, pListOfAccessEntries: PVOID, cCountOfAuditEntries: PULONG | NULL, pListOfAuditEntries: PVOID, pSD: PSECURITY_DESCRIPTOR): DWORD {
+  public static LookupSecurityDescriptorPartsW(
+    pOwner: PVOID | NULL,
+    pGroup: PVOID | NULL,
+    cCountOfAccessEntries: PULONG | NULL,
+    pListOfAccessEntries: PVOID,
+    cCountOfAuditEntries: PULONG | NULL,
+    pListOfAuditEntries: PVOID,
+    pSD: PSECURITY_DESCRIPTOR,
+  ): DWORD {
     return Advapi32.Load('LookupSecurityDescriptorPartsW')(pOwner, pGroup, cCountOfAccessEntries, pListOfAccessEntries, cCountOfAuditEntries, pListOfAuditEntries, pSD);
   }
 

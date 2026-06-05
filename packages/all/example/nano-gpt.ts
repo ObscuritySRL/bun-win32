@@ -65,52 +65,99 @@ console.log('  Watch it stream · ESC to exit.\n');
 // ── Decode baked weights into named, offset slices (all long-lived) ──────────────
 const W = new Float32Array(Buffer.from(WEIGHTS_B64, 'base64').buffer.slice(0));
 let woff = 0;
-const take = (n: number): Float32Array => { const s = W.subarray(woff, woff + n); woff += n; return s; };
+const take = (n: number): Float32Array => {
+  const s = W.subarray(woff, woff + n);
+  woff += n;
+  return s;
+};
 const wte = take(V * D);
 const wpe = take(T * D);
 interface LW {
-  ln1g: Float32Array; ln1b: Float32Array;
-  wq: Float32Array; bq: Float32Array; wk: Float32Array; bk: Float32Array; wv: Float32Array; bv: Float32Array;
-  wo: Float32Array; bo: Float32Array; ln2g: Float32Array; ln2b: Float32Array;
-  w1: Float32Array; b1: Float32Array; w2: Float32Array; b2: Float32Array;
+  ln1g: Float32Array;
+  ln1b: Float32Array;
+  wq: Float32Array;
+  bq: Float32Array;
+  wk: Float32Array;
+  bk: Float32Array;
+  wv: Float32Array;
+  bv: Float32Array;
+  wo: Float32Array;
+  bo: Float32Array;
+  ln2g: Float32Array;
+  ln2b: Float32Array;
+  w1: Float32Array;
+  b1: Float32Array;
+  w2: Float32Array;
+  b2: Float32Array;
 }
 const LWs: LW[] = [];
 for (let l = 0; l < NL; l += 1) {
   LWs.push({
-    ln1g: take(D), ln1b: take(D),
-    wq: take(D * D), bq: take(D), wk: take(D * D), bk: take(D), wv: take(D * D), bv: take(D),
-    wo: take(D * D), bo: take(D), ln2g: take(D), ln2b: take(D),
-    w1: take(D * DFF), b1: take(DFF), w2: take(DFF * D), b2: take(D),
+    ln1g: take(D),
+    ln1b: take(D),
+    wq: take(D * D),
+    bq: take(D),
+    wk: take(D * D),
+    bk: take(D),
+    wv: take(D * D),
+    bv: take(D),
+    wo: take(D * D),
+    bo: take(D),
+    ln2g: take(D),
+    ln2b: take(D),
+    w1: take(D * DFF),
+    b1: take(DFF),
+    w2: take(DFF * D),
+    b2: take(D),
   });
 }
-const lnfg = take(D); const lnfb = take(D);
-const wout = take(D * V); const bout = take(V);
+const lnfg = take(D);
+const lnfb = take(D);
+const wout = take(D * V);
+const bout = take(V);
 
 const f32 = (s: Float32Array): Buffer => Buffer.from(s.buffer, s.byteOffset, s.byteLength);
 const SB = (s: Float32Array): gpu.StructuredBuffer => gpu.makeStructuredBuffer({ stride: 4, count: s.length, srv: true, initialData: f32(s) });
 
 // ── Weight SRVs (seeded once) ─────────────────────────────────────────────────
-const wteB = SB(wte); const wpeB = SB(wpe);
+const wteB = SB(wte);
+const wpeB = SB(wpe);
 const lwB = LWs.map((L) => ({
-  ln1g: SB(L.ln1g), ln1b: SB(L.ln1b),
-  wq: SB(L.wq), bq: SB(L.bq), wk: SB(L.wk), bk: SB(L.bk), wv: SB(L.wv), bv: SB(L.bv),
-  wo: SB(L.wo), bo: SB(L.bo), ln2g: SB(L.ln2g), ln2b: SB(L.ln2b),
-  w1: SB(L.w1), b1: SB(L.b1), w2: SB(L.w2), b2: SB(L.b2),
+  ln1g: SB(L.ln1g),
+  ln1b: SB(L.ln1b),
+  wq: SB(L.wq),
+  bq: SB(L.bq),
+  wk: SB(L.wk),
+  bk: SB(L.bk),
+  wv: SB(L.wv),
+  bv: SB(L.bv),
+  wo: SB(L.wo),
+  bo: SB(L.bo),
+  ln2g: SB(L.ln2g),
+  ln2b: SB(L.ln2b),
+  w1: SB(L.w1),
+  b1: SB(L.b1),
+  w2: SB(L.w2),
+  b2: SB(L.b2),
 }));
-const lnfgB = SB(lnfg); const lnfbB = SB(lnfb);
-const woutB = SB(wout); const boutB = SB(bout);
+const lnfgB = SB(lnfg);
+const lnfbB = SB(lnfb);
+const woutB = SB(wout);
+const boutB = SB(bout);
 
 // ── Activation buffers (UAV+SRV; reused every layer/token) ───────────────────────
 const mkA = (count: number): gpu.StructuredBuffer => gpu.makeStructuredBuffer({ stride: 4, count, uav: true, srv: true });
-const xBuf = mkA(T * D);        // residual stream (ping target a)
-const xBuf2 = mkA(T * D);       // residual stream (ping target b)
-const normBuf = mkA(T * D);     // LayerNorm output
-const qBuf = mkA(T * D); const kBuf = mkA(T * D); const vBuf = mkA(T * D);
+const xBuf = mkA(T * D); // residual stream (ping target a)
+const xBuf2 = mkA(T * D); // residual stream (ping target b)
+const normBuf = mkA(T * D); // LayerNorm output
+const qBuf = mkA(T * D);
+const kBuf = mkA(T * D);
+const vBuf = mkA(T * D);
 const attBuf = mkA(NH * T * T); // attention weights
-const aoBuf = mkA(T * D);       // attention output (pre-proj)
-const tmpBuf = mkA(T * D);      // generic temp (matmul outputs / residual scratch)
-const hBuf = mkA(T * DFF);      // MLP hidden
-const logitsBuf = mkA(V);       // final logits (last row)
+const aoBuf = mkA(T * D); // attention output (pre-proj)
+const tmpBuf = mkA(T * D); // generic temp (matmul outputs / residual scratch)
+const hBuf = mkA(T * DFF); // MLP hidden
+const logitsBuf = mkA(V); // final logits (last row)
 
 // idsBuf: token ids (uint), uploaded each step. Dynamic.
 const idsBuf = gpu.makeStructuredBuffer({ stride: 4, count: T, srv: true, cpuWritable: true });
@@ -277,7 +324,7 @@ void main(uint3 id : SV_DispatchThreadID) {
 `;
 
 // ── GPU phosphor-text terminal: rasterize a Consolas glyph atlas via GDI once ────
-const GLYPH_CELL = 32;                 // atlas cell px (rasterization res; sampled w/ bilinear)
+const GLYPH_CELL = 32; // atlas cell px (rasterization res; sampled w/ bilinear)
 const ATLAS_COLS = 16;
 const ATLAS_ROWS = Math.ceil(VOCAB.length / ATLAS_COLS);
 const ATLAS_W = GLYPH_CELL * ATLAS_COLS;
@@ -292,10 +339,10 @@ function buildGlyphAtlas(): gpu.TextureResult {
   const bmi = Buffer.alloc(40);
   bmi.writeUInt32LE(40, 0);
   bmi.writeInt32LE(ATLAS_W, 4);
-  bmi.writeInt32LE(-ATLAS_H, 8);   // top-down
+  bmi.writeInt32LE(-ATLAS_H, 8); // top-down
   bmi.writeUInt16LE(1, 12);
   bmi.writeUInt16LE(32, 14);
-  bmi.writeUInt32LE(0, 16);        // BI_RGB
+  bmi.writeUInt32LE(0, 16); // BI_RGB
   const ppv = Buffer.alloc(8);
   const hbmp = GDI32.CreateDIBSection(memDC, bmi.ptr!, 0, ppv.ptr!, 0n, 0);
   const bits = Number(ppv.readBigUInt64LE(0)) as Pointer;
@@ -317,12 +364,13 @@ function buildGlyphAtlas(): gpu.TextureResult {
   const rgba = Buffer.alloc(ATLAS_W * ATLAS_H * 4);
   for (let p = 0; p < ATLAS_W * ATLAS_H; p += 1) {
     const c = read.u8(bits, p * 4); // B channel of white text
-    rgba[p * 4] = c; rgba[p * 4 + 1] = c; rgba[p * 4 + 2] = c; rgba[p * 4 + 3] = 255;
+    rgba[p * 4] = c;
+    rgba[p * 4 + 1] = c;
+    rgba[p * 4 + 2] = c;
+    rgba[p * 4 + 3] = 255;
   }
   const tex = gpu.makeTexture({ w: ATLAS_W, h: ATLAS_H, format: gpu.DXGI_FORMAT_R8G8B8A8_UNORM, srv: true });
-  gpu.vcall(dev.context, gpu.CTX_UPDATE_SUBRESOURCE,
-    [FFIType.u64, FFIType.u32, FFIType.ptr, FFIType.ptr, FFIType.u32, FFIType.u32],
-    [tex.tex, 0, null, rgba.ptr!, ATLAS_W * 4, 0], FFIType.void);
+  gpu.vcall(dev.context, gpu.CTX_UPDATE_SUBRESOURCE, [FFIType.u64, FFIType.u32, FFIType.ptr, FFIType.ptr, FFIType.u32, FFIType.u32], [tex.tex, 0, null, rgba.ptr!, ATLAS_W * 4, 0], FFIType.void);
   GDI32.DeleteObject(font);
   GDI32.DeleteObject(hbmp);
   GDI32.DeleteDC(memDC);
@@ -334,7 +382,7 @@ const atlasSamp = gpu.makeSampler({ filter: gpu.D3D11_FILTER_MIN_MAG_MIP_LINEAR,
 // ── Text-terminal grid (visible glyph ids), attention snapshot, prob bars ────────
 // Layout: text fills the left band; the heatmap + prob bars stack on the right.
 const MARGIN_X = Math.round(clientW * 0.016);
-const TITLE_H = Math.round(clientH * 0.125);                 // reserved for the GDI HUD title band
+const TITLE_H = Math.round(clientH * 0.125); // reserved for the GDI HUD title band
 // Right column: a big attention heatmap with the probability bars beneath it.
 const HEAT_SIZE = Math.round(clientH * 0.52);
 const RIGHT_W = HEAT_SIZE;
@@ -357,7 +405,7 @@ const CHAR_W = Math.max(18, Math.floor(TEXT_BAND_W / COLS));
 const CHAR_H = Math.round(CHAR_W * 1.65);
 const ROWS = Math.min(12, Math.max(4, Math.floor(TEXT_H / CHAR_H)));
 
-const TOPK_BARS = 8;                                         // candidate prob bars (fewer = taller, readable rows)
+const TOPK_BARS = 8; // candidate prob bars (fewer = taller, readable rows)
 
 // glyphGrid: COLS*ROWS uint glyph-ids (0xffffffff = empty); dynamic each frame.
 const glyphGrid = gpu.makeStructuredBuffer({ stride: 4, count: COLS * ROWS, srv: true, cpuWritable: true });
@@ -570,7 +618,10 @@ function clearCsUav(n: number): void {
 function clearCsSrv(n: number): void {
   gpu.vcall(dev.context, gpu.CTX_CS_SET_SHADER_RESOURCES, [FFIType.u32, FFIType.u32, FFIType.ptr], [0, n, nulls.ptr!], FFIType.void);
 }
-function unbind(srvN: number, uavN: number): void { clearCsUav(uavN); clearCsSrv(srvN); }
+function unbind(srvN: number, uavN: number): void {
+  clearCsUav(uavN);
+  clearCsSrv(srvN);
+}
 
 const groups1D = (n: number) => Math.ceil(n / 64);
 function runEmbed(S: number): void {
@@ -636,8 +687,11 @@ function forwardGPU(ids: Int32Array, S: number): void {
 
 // ── Sampling (CPU) from the readback logits ──────────────────────────────────────
 const logitsCpu = new Float32Array(V);
-let rngState = 0xC0FFEE ^ (SELFCHECK ? 1 : Date.now() & 0xffff);
-const rnd = (): number => { rngState = (Math.imul(rngState, 1664525) + 1013904223) >>> 0; return rngState / 0x1_0000_0000; };
+let rngState = 0xc0ffee ^ (SELFCHECK ? 1 : Date.now() & 0xffff);
+const rnd = (): number => {
+  rngState = (Math.imul(rngState, 1664525) + 1013904223) >>> 0;
+  return rngState / 0x1_0000_0000;
+};
 let lastTopIdx: number[] = []; // for prob bars
 let lastTopProb: number[] = [];
 function sampleNext(temp: number, topK: number): number {
@@ -647,14 +701,24 @@ function sampleNext(temp: number, topK: number): number {
   idx.sort((a, b) => logitsCpu[b]! - logitsCpu[a]!);
   const k = Math.min(topK, V);
   let mx = -Infinity;
-  for (let i = 0; i < k; i += 1) { const z = logitsCpu[idx[i]!]! / temp; if (z > mx) mx = z; }
+  for (let i = 0; i < k; i += 1) {
+    const z = logitsCpu[idx[i]!]! / temp;
+    if (z > mx) mx = z;
+  }
   let sum = 0;
   const probs = new Float32Array(k);
-  for (let i = 0; i < k; i += 1) { const e = Math.exp(logitsCpu[idx[i]!]! / temp - mx); probs[i] = e; sum += e; }
+  for (let i = 0; i < k; i += 1) {
+    const e = Math.exp(logitsCpu[idx[i]!]! / temp - mx);
+    probs[i] = e;
+    sum += e;
+  }
   lastTopIdx = idx.slice(0, TOPK_BARS);
   lastTopProb = Array.from({ length: TOPK_BARS }, (_, i) => (i < k ? probs[i]! / sum : 0));
   let r = rnd() * sum;
-  for (let i = 0; i < k; i += 1) { r -= probs[i]!; if (r <= 0) return idx[i]!; }
+  for (let i = 0; i < k; i += 1) {
+    r -= probs[i]!;
+    if (r <= 0) return idx[i]!;
+  }
   return idx[0]!;
 }
 
@@ -693,9 +757,16 @@ function uploadGlyphGrid(caretOn: boolean): void {
   const lines: string[] = [];
   let cur = '';
   for (const chr of generated) {
-    if (chr === '\n') { lines.push(cur); cur = ''; continue; }
+    if (chr === '\n') {
+      lines.push(cur);
+      cur = '';
+      continue;
+    }
     cur += chr;
-    if (cur.length >= COLS) { lines.push(cur); cur = ''; }
+    if (cur.length >= COLS) {
+      lines.push(cur);
+      cur = '';
+    }
   }
   lines.push(cur);
   // Keep the last ROWS lines (scrolling terminal).
@@ -729,17 +800,27 @@ function uploadProbs(): void {
 
 // Numeric structure proof: confirm the attention matrix is a valid causal softmax.
 function attentionStructure(S: number): Record<string, number | boolean> {
-  let rowsSumOk = 0; let upperLeak = 0; let belowMass = 0; let maxRowPeak = 0;
+  let rowsSumOk = 0;
+  let upperLeak = 0;
+  let belowMass = 0;
+  let maxRowPeak = 0;
   for (let i = 0; i < S; i += 1) {
     let rs = 0;
-    for (let j = 0; j <= i; j += 1) { const w = attVisCpu[i * T + j]!; rs += w; if (w > maxRowPeak) maxRowPeak = w; }
+    for (let j = 0; j <= i; j += 1) {
+      const w = attVisCpu[i * T + j]!;
+      rs += w;
+      if (w > maxRowPeak) maxRowPeak = w;
+    }
     belowMass += rs;
     if (Math.abs(rs - 1) < 0.02) rowsSumOk += 1;
     for (let j = i + 1; j < S; j += 1) upperLeak += attVisCpu[i * T + j]!;
   }
   return {
-    rowsSumToOne: rowsSumOk, seqLen: S, upperLeak: +upperLeak.toFixed(5),
-    belowMass: +belowMass.toFixed(2), maxRowPeak: +maxRowPeak.toFixed(4),
+    rowsSumToOne: rowsSumOk,
+    seqLen: S,
+    upperLeak: +upperLeak.toFixed(5),
+    belowMass: +belowMass.toFixed(2),
+    maxRowPeak: +maxRowPeak.toFixed(4),
     causalValid: rowsSumOk === S && upperLeak < 1e-3,
   };
 }
@@ -751,7 +832,7 @@ const uiData = Buffer.alloc(UI_SIZE);
 
 // ── GDI HUD (title band only; the streaming text is GPU-rendered) ────────────────
 const TRANSPARENT_BK = 1;
-const titleFont = GDI32.CreateFontW(-Math.round(clientH * 0.040), 0, 0, 0, 700, 0, 0, 0, 0, 0, 0, 4, 0, encodeWide('Consolas').ptr!);
+const titleFont = GDI32.CreateFontW(-Math.round(clientH * 0.04), 0, 0, 0, 700, 0, 0, 0, 0, 0, 0, 4, 0, encodeWide('Consolas').ptr!);
 const subFont = GDI32.CreateFontW(-Math.round(clientH * 0.026), 0, 0, 0, 500, 0, 0, 0, 0, 0, 0, 4, 0, encodeWide('Consolas').ptr!);
 const labelFont = GDI32.CreateFontW(-Math.round(clientH * 0.024), 0, 0, 0, 600, 0, 0, 0, 0, 0, 0, 4, 0, encodeWide('Consolas').ptr!);
 
@@ -763,9 +844,9 @@ function drawHud(fps: number, tokRate: number): void {
     const title = `nano-gpt · 111,606-param transformer · ${dev.gpuName} · pure TypeScript`;
     const tw = encodeWide(title);
     GDI32.SetTextColor(dc, 0x00100804);
-    GDI32.TextOutW(dc, MARGIN_X + 2, Math.round(clientH * 0.030) + 2, tw.ptr!, title.length);
+    GDI32.TextOutW(dc, MARGIN_X + 2, Math.round(clientH * 0.03) + 2, tw.ptr!, title.length);
     GDI32.SetTextColor(dc, 0x00f2dcaa);
-    GDI32.TextOutW(dc, MARGIN_X, Math.round(clientH * 0.030), tw.ptr!, title.length);
+    GDI32.TextOutW(dc, MARGIN_X, Math.round(clientH * 0.03), tw.ptr!, title.length);
 
     GDI32.SelectObject(dc, subFont);
     const sub = `decoder-only · ${NL} blocks · ${NH} heads · D=${D} · forward pass = D3D11 compute · ${tokRate.toFixed(1)} tok/s · ${fps} fps · ESC`;
@@ -801,11 +882,7 @@ function cleanup(code: number): never {
       GDI32.DeleteObject(titleFont);
       GDI32.DeleteObject(subFont);
       GDI32.DeleteObject(labelFont);
-      const allBufs: gpu.StructuredBuffer[] = [
-        wteB, wpeB, lnfgB, lnfbB, woutB, boutB,
-        xBuf, xBuf2, normBuf, qBuf, kBuf, vBuf, attBuf, aoBuf, tmpBuf, hBuf, logitsBuf, idsBuf,
-        attVisBuf, glyphGrid, probBuf,
-      ];
+      const allBufs: gpu.StructuredBuffer[] = [wteB, wpeB, lnfgB, lnfbB, woutB, boutB, xBuf, xBuf2, normBuf, qBuf, kBuf, vBuf, attBuf, aoBuf, tmpBuf, hBuf, logitsBuf, idsBuf, attVisBuf, glyphGrid, probBuf];
       for (const lw of lwB) for (const b of Object.values(lw)) allBufs.push(b);
       for (const b of allBufs) {
         gpu.comRelease(b.srv ?? 0n);
@@ -828,20 +905,29 @@ function cleanup(code: number): never {
       gpu.comRelease(dev.swapChain);
       gpu.comRelease(dev.context);
       gpu.comRelease(dev.device);
-    } catch { /* best-effort */ }
+    } catch {
+      /* best-effort */
+    }
     win.destroy();
   }
   process.exit(code);
 }
 process.on('SIGINT', () => cleanup(0));
-process.on('uncaughtException', (err) => { console.error(err); cleanup(1); });
+process.on('uncaughtException', (err) => {
+  console.error(err);
+  cleanup(1);
+});
 
 // ── Render loop ───────────────────────────────────────────────────────────────
 const start = performance.now();
 const durationMs = process.env.DEMO_DURATION_MS ? Number(process.env.DEMO_DURATION_MS) : 0;
-let frame = 0; let fps = 0; let fpsFrames = 0; let fpsWindow = start;
-let tokens = 0; let tokRate = 0;
-const TOKENS_PER_FRAME = 2;                  // keep the stream flowing & filling each frame
+let frame = 0;
+let fps = 0;
+let fpsFrames = 0;
+let fpsWindow = start;
+let tokens = 0;
+let tokRate = 0;
+const TOKENS_PER_FRAME = 2; // keep the stream flowing & filling each frame
 
 // Warm-start: pre-generate enough REAL tokens to fill most of the terminal so the
 // gallery frame is a full, alive screen (not 2 sparse lines). Budget-capped.
@@ -901,7 +987,10 @@ while (!win.shouldClose()) {
   const time = (now - start) / 1000;
   const caretOn = (Math.floor(time * 2.5) & 1) === 0;
 
-  for (let t = 0; t < TOKENS_PER_FRAME; t += 1) { decodeStep(); tokens += 1; }
+  for (let t = 0; t < TOKENS_PER_FRAME; t += 1) {
+    decodeStep();
+    tokens += 1;
+  }
   uploadHeatmap();
   uploadProbs();
   uploadGlyphGrid(caretOn);
@@ -914,7 +1003,7 @@ while (!win.shouldClose()) {
   // Self-shot: capture the GPU back buffer of the target frame BEFORE present.
   const lastFrame = (durationMs > 0 && now - start >= durationMs) || (SELFCHECK && frame === 6);
   if (SELFSHOT && lastFrame) {
-    const out = process.env.SELFSHOT_PATH || (`${import.meta.dir}/nano-gpt.selfcheck.png`);
+    const out = process.env.SELFSHOT_PATH || `${import.meta.dir}/nano-gpt.selfcheck.png`;
     const stats = captureBackBuffer(dev, out, { gridW: 48, gridH: 20 });
     console.log(formatGrid(stats));
     console.log(`[selfshot] ok=${stats.ok} nonBlackPct=${(stats.nonBlackFrac * 100).toFixed(1)} meanLuma=${stats.meanLuma.toFixed(3)} -> ${stats.path}`);
@@ -922,11 +1011,13 @@ while (!win.shouldClose()) {
 
   dev.present(false);
 
-  frame += 1; fpsFrames += 1;
+  frame += 1;
+  fpsFrames += 1;
   if (now - fpsWindow >= 500) {
     fps = Math.round((fpsFrames * 1000) / (now - fpsWindow));
     tokRate = (tokens * 1000) / (now - start);
-    fpsFrames = 0; fpsWindow = now;
+    fpsFrames = 0;
+    fpsWindow = now;
   }
 
   if (SELFCHECK && frame === 7) {
@@ -934,7 +1025,9 @@ while (!win.shouldClose()) {
     s.attn = attentionStructure(Math.min(ctx.length, T));
     s.generatedSample = generated.slice(0, 200);
     s.tokensGenerated = tokens;
-    s.cols = COLS; s.rows = ROWS; s.heatSize = HEAT_SIZE;
+    s.cols = COLS;
+    s.rows = ROWS;
+    s.heatSize = HEAT_SIZE;
     console.log('SELFCHECK_STATS ' + JSON.stringify(s));
     break;
   }

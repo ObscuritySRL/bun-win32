@@ -113,9 +113,7 @@ function decodeFlags(value: number, table: [number, string][]): string {
   for (const [bit, label] of table) {
     if (value & bit) matched.push(label);
   }
-  return matched.length > 0
-    ? matched.join(', ')
-    : `Unknown (0x${(value >>> 0).toString(16)})`;
+  return matched.length > 0 ? matched.join(', ') : `Unknown (0x${(value >>> 0).toString(16)})`;
 }
 
 function getDefaultPrinter(): string {
@@ -155,15 +153,7 @@ if (bufSize === 0) {
 }
 
 const printerBuf = Buffer.alloc(bufSize);
-const ok = Winspool.EnumPrintersW(
-  PRINTER_ENUM_LOCAL,
-  null,
-  2,
-  printerBuf.ptr,
-  bufSize,
-  cbNeeded.ptr,
-  cReturned.ptr,
-);
+const ok = Winspool.EnumPrintersW(PRINTER_ENUM_LOCAL, null, 2, printerBuf.ptr, bufSize, cbNeeded.ptr, cReturned.ptr);
 
 if (!ok) {
   console.log('  EnumPrintersW failed on second call.');

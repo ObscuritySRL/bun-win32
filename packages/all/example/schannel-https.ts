@@ -72,8 +72,7 @@ const ISC_REQ_SEQUENCE_DETECT = 0x00000008;
 const ISC_REQ_CONFIDENTIALITY = 0x00000010;
 const ISC_REQ_ALLOCATE_MEMORY = 0x00000100;
 const ISC_REQ_STREAM = 0x00008000;
-const ISC_REQ_FLAGS =
-  ISC_REQ_CONFIDENTIALITY | ISC_REQ_REPLAY_DETECT | ISC_REQ_SEQUENCE_DETECT | ISC_REQ_ALLOCATE_MEMORY | ISC_REQ_STREAM;
+const ISC_REQ_FLAGS = ISC_REQ_CONFIDENTIALITY | ISC_REQ_REPLAY_DETECT | ISC_REQ_SEQUENCE_DETECT | ISC_REQ_ALLOCATE_MEMORY | ISC_REQ_STREAM;
 
 const SECURITY_NATIVE_DREP = 0x00000010;
 
@@ -296,9 +295,7 @@ function printCertChain(remoteCertPtr: bigint): void {
     const subject = getCertName(p, false);
     const issuer = getCertName(p, true);
     const cbEncoded = Buffer.from(toArrayBuffer(p, 0, 24)).readUInt32LE(16);
-    console.log(
-      `  ${C.dim}[${idx}]${C.reset} ${C.brightGreen}${subject}${C.reset} ${C.dim}(${cbEncoded} bytes DER)${C.reset}`,
-    );
+    console.log(`  ${C.dim}[${idx}]${C.reset} ${C.brightGreen}${subject}${C.reset} ${C.dim}(${cbEncoded} bytes DER)${C.reset}`);
     console.log(`      ${C.dim}issued by${C.reset} ${C.yellow}${issuer}${C.reset}`);
     prev = p;
   }
@@ -402,18 +399,8 @@ try {
   schannelCred.writeUInt32LE(SCH_CRED_NO_DEFAULT_CREDS | SCH_CRED_MANUAL_CRED_VALIDATION, 72); // dwFlags
 
   const unispName = Buffer.from(UNISP_NAME + '\0', 'utf16le');
-  const acq = Secur32.AcquireCredentialsHandleW(
-    null,
-    unispName.ptr,
-    SECPKG_CRED_OUTBOUND,
-    null,
-    schannelCred.ptr,
-    null,
-    null,
-    credHandle.ptr,
-    null,
-  );
-  if ((acq >>> 0) !== (SEC_E_OK >>> 0)) fail(`AcquireCredentialsHandleW failed: ${statusName(acq)}`);
+  const acq = Secur32.AcquireCredentialsHandleW(null, unispName.ptr, SECPKG_CRED_OUTBOUND, null, schannelCred.ptr, null, null, credHandle.ptr, null);
+  if (acq >>> 0 !== SEC_E_OK >>> 0) fail(`AcquireCredentialsHandleW failed: ${statusName(acq)}`);
   credAcquired = true;
   info('provider', `${C.brightGreen}${UNISP_NAME}${C.reset}`);
   info('cred', `${C.green}acquired${C.reset} ${C.dim}(SECPKG_CRED_OUTBOUND)${C.reset}`);
@@ -450,20 +437,7 @@ try {
       (inObj as unknown as { _ref: Buffer })._ref = inputData;
     }
 
-    const isc = Secur32.InitializeSecurityContextW(
-      credHandle.ptr,
-      firstCall ? null : ctxHandle.ptr,
-      targetName.ptr,
-      ISC_REQ_FLAGS,
-      0,
-      SECURITY_NATIVE_DREP,
-      inDescPtr,
-      0,
-      ctxHandle.ptr,
-      out.descBuf.ptr,
-      contextAttr.ptr,
-      null,
-    );
+    const isc = Secur32.InitializeSecurityContextW(credHandle.ptr, firstCall ? null : ctxHandle.ptr, targetName.ptr, ISC_REQ_FLAGS, 0, SECURITY_NATIVE_DREP, inDescPtr, 0, ctxHandle.ptr, out.descBuf.ptr, contextAttr.ptr, null);
     ctxCreated = true;
     firstCall = false;
     roundTrips++;
@@ -471,7 +445,7 @@ try {
     const status = isc >>> 0;
 
     // SEC_E_INCOMPLETE_MESSAGE: need more bytes from the wire, keep recvBuf intact.
-    if (status === (SEC_E_INCOMPLETE_MESSAGE_U >>> 0)) {
+    if (status === SEC_E_INCOMPLETE_MESSAGE_U >>> 0) {
       const grow = Buffer.alloc(8192);
       const n = recvOnce(sock, grow, 0);
       if (n <= 0) fail('Connection closed during handshake (incomplete message).');
@@ -479,7 +453,7 @@ try {
       continue;
     }
 
-    if (status !== (SEC_E_OK >>> 0) && status !== (SEC_I_CONTINUE_NEEDED >>> 0)) {
+    if (status !== SEC_E_OK >>> 0 && status !== SEC_I_CONTINUE_NEEDED >>> 0) {
       fail(`InitializeSecurityContextW failed: ${statusName(isc)}`);
     }
 
@@ -504,7 +478,7 @@ try {
       }
     }
 
-    if (status === (SEC_E_OK >>> 0)) break; // handshake complete
+    if (status === SEC_E_OK >>> 0) break; // handshake complete
 
     // SEC_I_CONTINUE_NEEDED: read the server's next flight.
     const grow = Buffer.alloc(16384);
@@ -520,7 +494,7 @@ try {
 
   // CONNECTION_INFO -> TLS version
   const connInfo = Buffer.alloc(64);
-  if ((Secur32.QueryContextAttributesW(ctxHandle.ptr, SECPKG_ATTR_CONNECTION_INFO, connInfo.ptr) >>> 0) === (SEC_E_OK >>> 0)) {
+  if (Secur32.QueryContextAttributesW(ctxHandle.ptr, SECPKG_ATTR_CONNECTION_INFO, connInfo.ptr) >>> 0 === SEC_E_OK >>> 0) {
     const dwProtocol = connInfo.readUInt32LE(0);
     const dwCipherStrength = connInfo.readUInt32LE(8);
     info('tls version', `${C.bold}${C.brightYellow}${tlsVersionName(dwProtocol)}${C.reset}`);
@@ -529,9 +503,12 @@ try {
 
   // CIPHER_INFO -> human cipher-suite name (szCipherSuite WCHAR[64] @ offset 16)
   const cipherInfo = Buffer.alloc(512);
-  if ((Secur32.QueryContextAttributesW(ctxHandle.ptr, SECPKG_ATTR_CIPHER_INFO, cipherInfo.ptr) >>> 0) === (SEC_E_OK >>> 0)) {
+  if (Secur32.QueryContextAttributesW(ctxHandle.ptr, SECPKG_ATTR_CIPHER_INFO, cipherInfo.ptr) >>> 0 === SEC_E_OK >>> 0) {
     const dwCipherSuite = cipherInfo.readUInt32LE(8);
-    const szCipherSuite = cipherInfo.subarray(16, 16 + 64 * 2).toString('utf16le').replace(/\0.*$/, '');
+    const szCipherSuite = cipherInfo
+      .subarray(16, 16 + 64 * 2)
+      .toString('utf16le')
+      .replace(/\0.*$/, '');
     if (szCipherSuite) {
       info('cipher suite', `${C.bold}${C.brightGreen}${szCipherSuite}${C.reset} ${C.dim}(0x${dwCipherSuite.toString(16)})${C.reset}`);
     }
@@ -539,7 +516,7 @@ try {
 
   // STREAM_SIZES -> record framing for app data
   const streamSizes = Buffer.alloc(36);
-  if ((Secur32.QueryContextAttributesW(ctxHandle.ptr, SECPKG_ATTR_STREAM_SIZES, streamSizes.ptr) >>> 0) !== (SEC_E_OK >>> 0)) {
+  if (Secur32.QueryContextAttributesW(ctxHandle.ptr, SECPKG_ATTR_STREAM_SIZES, streamSizes.ptr) >>> 0 !== SEC_E_OK >>> 0) {
     fail('QueryContextAttributesW(STREAM_SIZES) failed.');
   }
   const cbHeader = streamSizes.readUInt32LE(0);
@@ -550,7 +527,7 @@ try {
   // REMOTE_CERT_CONTEXT -> chain
   rule('SERVER CERTIFICATE CHAIN');
   const remoteCertPtrBuf = Buffer.alloc(8);
-  if ((Secur32.QueryContextAttributesW(ctxHandle.ptr, SECPKG_ATTR_REMOTE_CERT_CONTEXT, remoteCertPtrBuf.ptr) >>> 0) === (SEC_E_OK >>> 0)) {
+  if (Secur32.QueryContextAttributesW(ctxHandle.ptr, SECPKG_ATTR_REMOTE_CERT_CONTEXT, remoteCertPtrBuf.ptr) >>> 0 === SEC_E_OK >>> 0) {
     const remoteCertPtr = remoteCertPtrBuf.readBigUInt64LE(0);
     if (remoteCertPtr !== 0n) {
       printCertChain(remoteCertPtr);
@@ -583,7 +560,7 @@ try {
   ]);
 
   const enc = Secur32.EncryptMessage(ctxHandle.ptr, 0, encDesc.descBuf.ptr, 0);
-  if ((enc >>> 0) !== (SEC_E_OK >>> 0)) fail(`EncryptMessage failed: ${statusName(enc)}`);
+  if (enc >>> 0 !== SEC_E_OK >>> 0) fail(`EncryptMessage failed: ${statusName(enc)}`);
 
   // The sealed record length = sum of the three buffers' cb (header/data/trailer may
   // have been adjusted by Schannel).
@@ -629,15 +606,15 @@ try {
       const dec = Secur32.DecryptMessage(ctxHandle.ptr, decDesc.descBuf.ptr, 0, null);
       const ds = dec >>> 0;
 
-      if (ds === (SEC_E_INCOMPLETE_MESSAGE_U >>> 0)) {
+      if (ds === SEC_E_INCOMPLETE_MESSAGE_U >>> 0) {
         // Need more bytes; cipherBuf stays as-is, go read more.
         break;
       }
-      if (ds === (SEC_I_CONTEXT_EXPIRED >>> 0)) {
+      if (ds === SEC_I_CONTEXT_EXPIRED >>> 0) {
         closed = true;
         break;
       }
-      if (ds !== (SEC_E_OK >>> 0)) {
+      if (ds !== SEC_E_OK >>> 0) {
         // Unexpected; stop decrypting but keep what we have.
         closed = true;
         break;

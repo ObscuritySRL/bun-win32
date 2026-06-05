@@ -149,11 +149,11 @@ function releaseObject(address: bigint): void {
 
 const coInitHr = ole32.symbols.CoInitializeEx(null, COINIT_APARTMENTTHREADED);
 const shouldUninitialize = coInitHr >= 0;
-if (coInitHr < 0 && (coInitHr >>> 0) !== RPC_E_CHANGED_MODE) {
+if (coInitHr < 0 && coInitHr >>> 0 !== RPC_E_CHANGED_MODE) {
   console.error(`${ANSI.red}CoInitializeEx failed: ${formatHResult(coInitHr)}${ANSI.reset}`);
   process.exit(1);
 }
-recordCheck('CoInitializeEx', coInitHr >= 0 || (coInitHr >>> 0) === RPC_E_CHANGED_MODE ? 'ok' : 'fail', coInitHr, `apartment = STA`);
+recordCheck('CoInitializeEx', coInitHr >= 0 || coInitHr >>> 0 === RPC_E_CHANGED_MODE ? 'ok' : 'fail', coInitHr, `apartment = STA`);
 
 const mfStartHr = Mfplat.MFStartup(MF_VERSION, MFSTARTUP_LITE);
 recordCheck('MFStartup', mfStartHr >= 0 ? 'ok' : 'fail', mfStartHr, `MF_VERSION = ${formatHResult(MF_VERSION)}, MFSTARTUP_LITE`);
@@ -173,12 +173,7 @@ recordCheck('MFGetSystemTime', deltaUnits > 0 ? 'ok' : 'fail', null, `Δ = ${del
 const attrsOut = Buffer.alloc(POINTER_SIZE);
 const attrsHr = Mfplat.MFCreateAttributes(attrsOut.ptr, 4);
 const attrsAddress = attrsHr === 0 ? attrsOut.readBigUInt64LE(0) : 0n;
-recordCheck(
-  'MFCreateAttributes',
-  attrsHr === 0 && attrsAddress !== 0n ? 'ok' : 'fail',
-  attrsHr,
-  attrsAddress === 0n ? 'no attribute bag' : `IMFAttributes @ ${formatAddress(attrsAddress)}`,
-);
+recordCheck('MFCreateAttributes', attrsHr === 0 && attrsAddress !== 0n ? 'ok' : 'fail', attrsHr, attrsAddress === 0n ? 'no attribute bag' : `IMFAttributes @ ${formatAddress(attrsAddress)}`);
 
 let roundTripOk = false;
 let roundTripValue = -1;
@@ -214,42 +209,22 @@ if (attrsAddress !== 0n) {
     attrLib.close();
   }
 }
-recordCheck(
-  'IMFAttributes::Set/GetUINT32',
-  roundTripOk ? 'ok' : 'fail',
-  null,
-  roundTripOk ? `round-trip 0x${probeValue.toString(16)} matched` : `stored 0x${probeValue.toString(16)}, read 0x${(roundTripValue >>> 0).toString(16)}`,
-);
+recordCheck('IMFAttributes::Set/GetUINT32', roundTripOk ? 'ok' : 'fail', null, roundTripOk ? `round-trip 0x${probeValue.toString(16)} matched` : `stored 0x${probeValue.toString(16)}, read 0x${(roundTripValue >>> 0).toString(16)}`);
 
 const mediaTypeOut = Buffer.alloc(POINTER_SIZE);
 const mediaTypeHr = Mfplat.MFCreateMediaType(mediaTypeOut.ptr);
 const mediaTypeAddress = mediaTypeHr === 0 ? mediaTypeOut.readBigUInt64LE(0) : 0n;
-recordCheck(
-  'MFCreateMediaType',
-  mediaTypeHr === 0 && mediaTypeAddress !== 0n ? 'ok' : 'fail',
-  mediaTypeHr,
-  mediaTypeAddress === 0n ? 'no media type' : `IMFMediaType @ ${formatAddress(mediaTypeAddress)}`,
-);
+recordCheck('MFCreateMediaType', mediaTypeHr === 0 && mediaTypeAddress !== 0n ? 'ok' : 'fail', mediaTypeHr, mediaTypeAddress === 0n ? 'no media type' : `IMFMediaType @ ${formatAddress(mediaTypeAddress)}`);
 
 const bufferOut = Buffer.alloc(POINTER_SIZE);
 const bufferHr = Mfplat.MFCreateMemoryBuffer(4096, bufferOut.ptr);
 const bufferAddress = bufferHr === 0 ? bufferOut.readBigUInt64LE(0) : 0n;
-recordCheck(
-  'MFCreateMemoryBuffer',
-  bufferHr === 0 && bufferAddress !== 0n ? 'ok' : 'fail',
-  bufferHr,
-  bufferAddress === 0n ? '4 KB buffer failed' : `IMFMediaBuffer @ ${formatAddress(bufferAddress)} (4 KB)`,
-);
+recordCheck('MFCreateMemoryBuffer', bufferHr === 0 && bufferAddress !== 0n ? 'ok' : 'fail', bufferHr, bufferAddress === 0n ? '4 KB buffer failed' : `IMFMediaBuffer @ ${formatAddress(bufferAddress)} (4 KB)`);
 
 const sampleOut = Buffer.alloc(POINTER_SIZE);
 const sampleHr = Mfplat.MFCreateSample(sampleOut.ptr);
 const sampleAddress = sampleHr === 0 ? sampleOut.readBigUInt64LE(0) : 0n;
-recordCheck(
-  'MFCreateSample',
-  sampleHr === 0 && sampleAddress !== 0n ? 'ok' : 'fail',
-  sampleHr,
-  sampleAddress === 0n ? 'no sample' : `IMFSample @ ${formatAddress(sampleAddress)}`,
-);
+recordCheck('MFCreateSample', sampleHr === 0 && sampleAddress !== 0n ? 'ok' : 'fail', sampleHr, sampleAddress === 0n ? 'no sample' : `IMFSample @ ${formatAddress(sampleAddress)}`);
 
 let addBufferHr = -1;
 if (sampleAddress !== 0n && bufferAddress !== 0n) {
@@ -268,22 +243,12 @@ if (sampleAddress !== 0n && bufferAddress !== 0n) {
     sampleLib.close();
   }
 }
-recordCheck(
-  'IMFSample::AddBuffer',
-  addBufferHr === 0 ? 'ok' : 'fail',
-  addBufferHr,
-  addBufferHr === 0 ? 'memory buffer attached to sample' : 'no buffer attached',
-);
+recordCheck('IMFSample::AddBuffer', addBufferHr === 0 ? 'ok' : 'fail', addBufferHr, addBufferHr === 0 ? 'memory buffer attached to sample' : 'no buffer attached');
 
 const workQueueOut = Buffer.alloc(4);
 const workQueueHr = Mfplat.MFAllocateWorkQueue(workQueueOut.ptr);
 const workQueueId = workQueueHr === 0 ? workQueueOut.readUInt32LE(0) : 0;
-recordCheck(
-  'MFAllocateWorkQueue',
-  workQueueHr === 0 && workQueueId !== 0 ? 'ok' : 'fail',
-  workQueueHr,
-  workQueueId === 0 ? 'no queue' : `work queue id = 0x${workQueueId.toString(16).padStart(8, '0')}`,
-);
+recordCheck('MFAllocateWorkQueue', workQueueHr === 0 && workQueueId !== 0 ? 'ok' : 'fail', workQueueHr, workQueueId === 0 ? 'no queue' : `work queue id = 0x${workQueueId.toString(16).padStart(8, '0')}`);
 
 if (workQueueId !== 0) {
   const unlockHr = Mfplat.MFUnlockWorkQueue(workQueueId);
@@ -296,12 +261,7 @@ const videoDecoderCategory = guidBytes(MFT_CATEGORY_VIDEO_DECODER);
 const enumHr = Mfplat.MFTEnumEx(videoDecoderCategory.ptr, MFT_ENUM_FLAG_ALL, null, null, activateArrayOut.ptr, countOut.ptr);
 const mftCount = enumHr === 0 ? countOut.readUInt32LE(0) : 0;
 const activateArrayAddress = enumHr === 0 ? activateArrayOut.readBigUInt64LE(0) : 0n;
-recordCheck(
-  'MFTEnumEx · VIDEO_DECODER',
-  enumHr === 0 ? 'ok' : 'fail',
-  enumHr,
-  enumHr === 0 ? `${mftCount} MFT${mftCount === 1 ? '' : 's'} in VIDEO_DECODER` : 'enumeration failed',
-);
+recordCheck('MFTEnumEx · VIDEO_DECODER', enumHr === 0 ? 'ok' : 'fail', enumHr, enumHr === 0 ? `${mftCount} MFT${mftCount === 1 ? '' : 's'} in VIDEO_DECODER` : 'enumeration failed');
 
 if (activateArrayAddress !== 0n) {
   for (let i = 0; i < mftCount; i += 1) {
@@ -357,7 +317,9 @@ const infoCount = checks.filter((c) => c.status === 'info').length;
 const skipCount = checks.filter((c) => c.status === 'skip').length;
 
 console.log();
-console.log(`  ${ANSI.bold}${okCount}${ANSI.reset} ${ANSI.green}ok${ANSI.reset}  ${ANSI.dim}•${ANSI.reset}  ${ANSI.bold}${failCount}${ANSI.reset} ${ANSI.red}fail${ANSI.reset}  ${ANSI.dim}•${ANSI.reset}  ${ANSI.bold}${infoCount}${ANSI.reset} ${ANSI.cyan}info${ANSI.reset}  ${ANSI.dim}•${ANSI.reset}  ${ANSI.bold}${skipCount}${ANSI.reset} ${ANSI.dim}skip${ANSI.reset}`);
+console.log(
+  `  ${ANSI.bold}${okCount}${ANSI.reset} ${ANSI.green}ok${ANSI.reset}  ${ANSI.dim}•${ANSI.reset}  ${ANSI.bold}${failCount}${ANSI.reset} ${ANSI.red}fail${ANSI.reset}  ${ANSI.dim}•${ANSI.reset}  ${ANSI.bold}${infoCount}${ANSI.reset} ${ANSI.cyan}info${ANSI.reset}  ${ANSI.dim}•${ANSI.reset}  ${ANSI.bold}${skipCount}${ANSI.reset} ${ANSI.dim}skip${ANSI.reset}`,
+);
 console.log();
 
 process.exit(failCount > 0 ? 1 : 0);

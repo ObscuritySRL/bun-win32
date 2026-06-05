@@ -25,10 +25,18 @@ import { clamp, clamp01, smoothstep, lerp, mulberry32, TAU } from './_kit';
 
 // Twelve spikes parsed from Anthropic's claude-logo.svg: {degrees, length 0..1}.
 const SPIKES = [
-  { deg: -178.9, len: 0.91 }, { deg: -146.2, len: 0.927 }, { deg: -115.7, len: 1.0 },
-  { deg: -80.1, len: 0.898 }, { deg: -49.1, len: 0.935 }, { deg: -8.6, len: 0.914 },
-  { deg: 13.7, len: 0.931 }, { deg: 42.1, len: 0.935 }, { deg: 57.1, len: 0.9 },
-  { deg: 93.0, len: 0.912 }, { deg: 124.2, len: 0.904 }, { deg: 146.6, len: 0.861 },
+  { deg: -178.9, len: 0.91 },
+  { deg: -146.2, len: 0.927 },
+  { deg: -115.7, len: 1.0 },
+  { deg: -80.1, len: 0.898 },
+  { deg: -49.1, len: 0.935 },
+  { deg: -8.6, len: 0.914 },
+  { deg: 13.7, len: 0.931 },
+  { deg: 42.1, len: 0.935 },
+  { deg: 57.1, len: 0.9 },
+  { deg: 93.0, len: 0.912 },
+  { deg: 124.2, len: 0.904 },
+  { deg: 146.6, len: 0.861 },
 ];
 const N = SPIKES.length;
 
@@ -70,8 +78,11 @@ const buildBgLut = (R: number, maxR: number): void => {
 // Initial values may be set from the env (SPARK_SPIN radians, SPARK_REACH 0.2..2).
 let spin = Number(process.env.SPARK_SPIN) || 0; // Q/E rotate the whole spark
 let reachScale = process.env.SPARK_REACH ? Math.max(0.2, Math.min(2, Number(process.env.SPARK_REACH))) : 1; // [ ] reach
-let kbX = 0, kbY = 0; // WASD / arrow aim target (pixels)
-let lastMouseT = -99, lastKeyT = -99, prevSeq = 0;
+let kbX = 0,
+  kbY = 0; // WASD / arrow aim target (pixels)
+let lastMouseT = -99,
+  lastKeyT = -99,
+  prevSeq = 0;
 let keyDirty = false;
 
 const restPos = (i: number, cx: number, cy: number, R: number): [number, number] => {
@@ -95,14 +106,20 @@ run({
     else if (k === 'e') spin += 0.13;
     else if (k === '[') reachScale = Math.max(0.2, reachScale - 0.1);
     else if (k === ']') reachScale = Math.min(2.0, reachScale + 0.1);
-    else if (k === 'r') { spin = 0; reachScale = 1; kbX = t.width / 2 + Math.min(t.width, t.height) * 0.25; kbY = t.height / 2; }
-    else return;
+    else if (k === 'r') {
+      spin = 0;
+      reachScale = 1;
+      kbX = t.width / 2 + Math.min(t.width, t.height) * 0.25;
+      kbY = t.height / 2;
+    } else return;
     kbX = Math.max(0, Math.min(t.width - 1, kbX));
     kbY = Math.max(0, Math.min(t.height - 1, kbY));
     keyDirty = true;
   },
   init: (t) => {
-    const cx = t.width / 2, cy = t.height / 2, R = Math.min(t.width, t.height) * 0.42;
+    const cx = t.width / 2,
+      cy = t.height / 2,
+      R = Math.min(t.width, t.height) * 0.42;
     buildBgLut(R, Math.hypot(t.width, t.height) * 0.5);
     const rng = mulberry32(0x5afe);
     for (let i = 0; i < N; i++) {
@@ -118,7 +135,8 @@ run({
   },
   frame: (t, time, dt) => {
     const { width: W, height: H } = t;
-    const cx = W / 2, cy = H / 2;
+    const cx = W / 2,
+      cy = H / 2;
     const R = Math.min(W, H) * 0.42;
     if (!inited) return;
 
@@ -127,9 +145,12 @@ run({
     // (no per-pixel sqrt/exp). LUT is rebuilt in init/resize for the current R.
     const maxR = Math.hypot(W, H) * 0.5;
     if (!bgLut) buildBgLut(R, maxR);
-    const lut = bgLut!, lutMax = bgLutR - 1, buf = t.pixels;
+    const lut = bgLut!,
+      lutMax = bgLutR - 1,
+      buf = t.pixels;
     for (let y = 0; y < H; y++) {
-      const dy = y - cy, dy2 = dy * dy;
+      const dy = y - cy,
+        dy2 = dy * dy;
       let i = y * W * 3;
       for (let x = 0; x < W; x++) {
         const dx = x - cx;
@@ -144,30 +165,54 @@ run({
     }
 
     // ── Input mode: most-recently-used of mouse / keyboard wins, else orbit ───
-    if (t.mouse.active && t.mouse.sequence !== prevSeq) { prevSeq = t.mouse.sequence; lastMouseT = time; }
-    if (keyDirty) { lastKeyT = time; keyDirty = false; }
+    if (t.mouse.active && t.mouse.sequence !== prevSeq) {
+      prevSeq = t.mouse.sequence;
+      lastMouseT = time;
+    }
+    if (keyDirty) {
+      lastKeyT = time;
+      keyDirty = false;
+    }
     const useMouse = t.mouse.active && time - lastMouseT < 1.5;
     const useKeys = time - lastKeyT < 4.0;
     let mx: number, my: number, mode: number; // 0 auto · 1 mouse · 2 keys
-    if (useMouse && (!useKeys || lastMouseT >= lastKeyT)) { mx = t.mouse.x; my = t.mouse.y; mode = 1; }
-    else if (useKeys) { mx = kbX; my = kbY; mode = 2; }
-    else { mx = cx + Math.cos(time * 0.5) * R * 0.82; my = cy + Math.sin(time * 0.7) * R * 0.66; mode = 0; } // eased idle orbit
+    if (useMouse && (!useKeys || lastMouseT >= lastKeyT)) {
+      mx = t.mouse.x;
+      my = t.mouse.y;
+      mode = 1;
+    } else if (useKeys) {
+      mx = kbX;
+      my = kbY;
+      mode = 2;
+    } else {
+      mx = cx + Math.cos(time * 0.5) * R * 0.82;
+      my = cy + Math.sin(time * 0.7) * R * 0.66;
+      mode = 0;
+    } // eased idle orbit
     const surge = t.mouse.down ? 1 : 0; // click = stronger reach
     const reachK = (0.5 + 0.4 * surge) * reachScale;
 
-    let tdx = mx - cx, tdy = my - cy;
+    let tdx = mx - cx,
+      tdy = my - cy;
     const md = Math.max(1e-3, Math.hypot(tdx, tdy));
-    const mnx = tdx / md, mny = tdy / md;
+    const mnx = tdx / md,
+      mny = tdy / md;
     const springK = 1 - Math.exp(-dt * (9 + 6 * surge)); // follow rate (snappier on click)
 
     // helper: additive radial-falloff disc (soft glow / bloom).
     const glowDisc = (x: number, y: number, r: number, c: [number, number, number], k = 1): void => {
-      const r2 = r * r, invR2 = 1 / r2;
-      const x0 = Math.max(0, Math.floor(x - r)), x1 = Math.min(W - 1, Math.ceil(x + r));
-      const y0 = Math.max(0, Math.floor(y - r)), y1 = Math.min(H - 1, Math.ceil(y + r));
-      const cr = c[0] * k, cg = c[1] * k, cb = c[2] * k;
+      const r2 = r * r,
+        invR2 = 1 / r2;
+      const x0 = Math.max(0, Math.floor(x - r)),
+        x1 = Math.min(W - 1, Math.ceil(x + r));
+      const y0 = Math.max(0, Math.floor(y - r)),
+        y1 = Math.min(H - 1, Math.ceil(y + r));
+      const cr = c[0] * k,
+        cg = c[1] * k,
+        cb = c[2] * k;
       for (let py = y0; py <= y1; py++) {
-        const dy = py - y, dy2 = dy * dy;
+        const dy = py - y,
+          dy2 = dy * dy;
         for (let px = x0; px <= x1; px++) {
           const dx = px - x;
           const d2 = dx * dx + dy2;
@@ -182,11 +227,15 @@ run({
     // [rim,g,b] sheen blended on the outer shell to give the clay a lit edge.
     const bodyDisc = (x: number, y: number, r: number, cr: number, cg: number, cb: number, rim?: [number, number, number]): void => {
       const r2 = r * r;
-      const inner = Math.max(0, r - 1), inner2 = inner * inner;
-      const x0 = Math.max(0, Math.floor(x - r)), x1 = Math.min(W - 1, Math.ceil(x + r));
-      const y0 = Math.max(0, Math.floor(y - r)), y1 = Math.min(H - 1, Math.ceil(y + r));
+      const inner = Math.max(0, r - 1),
+        inner2 = inner * inner;
+      const x0 = Math.max(0, Math.floor(x - r)),
+        x1 = Math.min(W - 1, Math.ceil(x + r));
+      const y0 = Math.max(0, Math.floor(y - r)),
+        y1 = Math.min(H - 1, Math.ceil(y + r));
       for (let py = y0; py <= y1; py++) {
-        const dy = py - y, dy2 = dy * dy;
+        const dy = py - y,
+          dy2 = dy * dy;
         for (let px = x0; px <= x1; px++) {
           const dx = px - x;
           const d2 = dx * dx + dy2;
@@ -199,7 +248,7 @@ run({
             const d = Math.sqrt(d2);
             const cov = clamp01(r - d);
             if (rim) {
-              const s = (d - inner); // 0 at inner shell → 1 at edge
+              const s = d - inner; // 0 at inner shell → 1 at edge
               t.blendPixel(px, py, lerp(cr, rim[0], s * 0.6), lerp(cg, rim[1], s * 0.6), lerp(cb, rim[2], s * 0.6), cov);
             } else {
               t.blendPixel(px, py, cr, cg, cb, cov);
@@ -215,7 +264,8 @@ run({
     // ── Each tentacle: spring its tip toward (rest blended with reach) ────────
     for (let i = 0; i < N; i++) {
       const a = (SPIKES[i].deg * Math.PI) / 180 + spin; // Q/E rotate the whole burst
-      const dirx = Math.cos(a), diry = Math.sin(a);
+      const dirx = Math.cos(a),
+        diry = Math.sin(a);
       const breath = 1 + 0.05 * Math.sin(time * 1.2 + phase[i]);
       const rx = cx + dirx * R * SPIKES[i].len * breath;
       const ry = cy + diry * R * SPIKES[i].len * breath;
@@ -228,9 +278,12 @@ run({
       const near = smoothstep(R * 2.0, R * 0.5, md);
       const dx = lerp(rx, mx, w) - rx + (mx - rx) * 0.03 * near;
       const dy = lerp(ry, my, w) - ry + (my - ry) * 0.03 * near;
-      let destX = rx + dx, destY = ry + dy;
+      let destX = rx + dx,
+        destY = ry + dy;
       // clamp how far a tentacle can stretch from the centre (keeps it a logo, not a flail)
-      const ex = destX - cx, ey = destY - cy, el = Math.hypot(ex, ey);
+      const ex = destX - cx,
+        ey = destY - cy,
+        el = Math.hypot(ex, ey);
       const cap = R * 1.4;
       if (el > cap) {
         destX = cx + (ex / el) * cap;
@@ -241,11 +294,15 @@ run({
       tipY[i] += (destY - tipY[i]) * springK;
 
       // draw a tapered, gently-curved Bézier stroke center → ctrl → tip
-      const tx = tipX[i], ty = tipY[i];
-      const vx = tx - cx, vy = ty - cy;
+      const tx = tipX[i],
+        ty = tipY[i];
+      const vx = tx - cx,
+        vy = ty - cy;
       const vlen = Math.max(1e-3, Math.hypot(vx, vy));
-      const ux = vx / vlen, uy = vy / vlen;
-      const perpx = -uy, perpy = ux;
+      const ux = vx / vlen,
+        uy = vy / vlen;
+      const perpx = -uy,
+        perpy = ux;
       const sway = vlen * (0.12 * Math.sin(time * 1.4 + phase[i]) + 0.14 * w);
       const ctrlX = cx + vx * 0.5 + perpx * sway;
       const ctrlY = cy + vy * 0.5 + perpy * sway;
@@ -253,7 +310,8 @@ run({
       const steps = Math.max(10, Math.ceil(vlen / 1.1));
       const invSteps = 1 / steps;
       for (let s = 0; s <= steps; s++) {
-        const u = s * invSteps, m = 1 - u;
+        const u = s * invSteps,
+          m = 1 - u;
         const bx = m * m * cx + 2 * m * u * ctrlX + u * u * tx;
         const by = m * m * cy + 2 * m * u * ctrlY + u * u * ty;
         // Wedge profile: a confident tapered spike (full near the hub, steadily

@@ -36,10 +36,10 @@ import { Term, run } from '@bun-win32/terminal';
 import { clamp, clamp01, lerp, smoothstep, aces, mulberry32, hash2, TAU } from './_kit';
 
 // ── Flock parameters ───────────────────────────────────────────────────────────
-const N = 3600;                 // boids — tuned for >=120 fps full-screen at BENCH
-const WORLD = 62;               // half-extent of the cubic world
-const BOUND_R = WORLD * 0.98;   // soft containment radius
-const CELL = 5.2;               // spatial-hash cell size (~= neighbour radius)
+const N = 3600; // boids — tuned for >=120 fps full-screen at BENCH
+const WORLD = 62; // half-extent of the cubic world
+const BOUND_R = WORLD * 0.98; // soft containment radius
+const CELL = 5.2; // spatial-hash cell size (~= neighbour radius)
 const GRID = (Math.ceil((WORLD * 2) / CELL) + 2) | 0; // cells per axis (+pad)
 const GRID2 = GRID * GRID;
 const NCELLS = GRID * GRID2;
@@ -49,26 +49,37 @@ const NCELLS = GRID * GRID2;
 // rather than collapsing to a ball — that openness is what reads as a real
 // murmuration. Alignment is the dominant urge (starlings copy heading first),
 // which is what makes a whole sheet turn and shimmer as one body.
-const R_SEP = 4.6, R_SEP2 = R_SEP * R_SEP;
-const R_NEI = CELL, R_NEI2 = R_NEI * R_NEI;
-const W_SEP = 3.3, W_ALI = 1.7, W_COH = 0.62, W_LURE = 0.20, W_PRED = 1.1, W_BND = 1.8, W_WIND = 0.82;
-const MAX_SPEED = 32, MIN_SPEED = 18, MAX_FORCE = 56;
-const R_PRED = 22, R_PRED2 = R_PRED * R_PRED; // predator avoidance radius
+const R_SEP = 4.6,
+  R_SEP2 = R_SEP * R_SEP;
+const R_NEI = CELL,
+  R_NEI2 = R_NEI * R_NEI;
+const W_SEP = 3.3,
+  W_ALI = 1.7,
+  W_COH = 0.62,
+  W_LURE = 0.2,
+  W_PRED = 1.1,
+  W_BND = 1.8,
+  W_WIND = 0.82;
+const MAX_SPEED = 32,
+  MIN_SPEED = 18,
+  MAX_FORCE = 56;
+const R_PRED = 22,
+  R_PRED2 = R_PRED * R_PRED; // predator avoidance radius
 
 // ── State (typed arrays, allocated in init) ────────────────────────────────────
 let px!: Float32Array, py!: Float32Array, pz!: Float32Array; // positions
 let vx!: Float32Array, vy!: Float32Array, vz!: Float32Array; // velocities
-let order!: Int32Array;        // boid indices sorted by cell (for the grid sweep)
-let cellOf!: Int32Array;       // cell index per boid
-let cellStart!: Int32Array;    // first slot in `order` for each cell (-1 = empty)
-let cellSize!: Int32Array;     // boids per cell (stable across the sweep)
-let cellCursor!: Int32Array;   // scratch write-cursor for the counting sort
+let order!: Int32Array; // boid indices sorted by cell (for the grid sweep)
+let cellOf!: Int32Array; // cell index per boid
+let cellStart!: Int32Array; // first slot in `order` for each cell (-1 = empty)
+let cellSize!: Int32Array; // boids per cell (stable across the sweep)
+let cellCursor!: Int32Array; // scratch write-cursor for the counting sort
 
 // Screen-space scratch (filled each frame, then painted far→near by depth).
 let sx!: Float32Array, sy!: Float32Array, sDepth!: Float32Array;
 let sDirX!: Float32Array, sDirY!: Float32Array; // projected heading (for the streak)
 let sLen!: Float32Array, sBright!: Float32Array, sWarm!: Float32Array, sSize!: Float32Array;
-let sHaze!: Float32Array;       // aerial-perspective blend toward the sky tone (far→1)
+let sHaze!: Float32Array; // aerial-perspective blend toward the sky tone (far→1)
 let zOrder!: Int32Array;
 
 // Starfield (deterministic, screen-fraction space → placed per W/H each frame).
@@ -77,15 +88,27 @@ let starX!: Float32Array, starY!: Float32Array, starB!: Float32Array;
 
 function init(t: Term): void {
   const rnd = mulberry32(0xb0_1d_5eed);
-  px = new Float32Array(N); py = new Float32Array(N); pz = new Float32Array(N);
-  vx = new Float32Array(N); vy = new Float32Array(N); vz = new Float32Array(N);
-  order = new Int32Array(N); cellOf = new Int32Array(N);
-  cellStart = new Int32Array(NCELLS); cellSize = new Int32Array(NCELLS);
+  px = new Float32Array(N);
+  py = new Float32Array(N);
+  pz = new Float32Array(N);
+  vx = new Float32Array(N);
+  vy = new Float32Array(N);
+  vz = new Float32Array(N);
+  order = new Int32Array(N);
+  cellOf = new Int32Array(N);
+  cellStart = new Int32Array(NCELLS);
+  cellSize = new Int32Array(NCELLS);
   cellCursor = new Int32Array(NCELLS);
-  sx = new Float32Array(N); sy = new Float32Array(N); sDepth = new Float32Array(N);
-  sDirX = new Float32Array(N); sDirY = new Float32Array(N);
-  sLen = new Float32Array(N); sBright = new Float32Array(N); sWarm = new Float32Array(N);
-  sSize = new Float32Array(N); sHaze = new Float32Array(N);
+  sx = new Float32Array(N);
+  sy = new Float32Array(N);
+  sDepth = new Float32Array(N);
+  sDirX = new Float32Array(N);
+  sDirY = new Float32Array(N);
+  sLen = new Float32Array(N);
+  sBright = new Float32Array(N);
+  sWarm = new Float32Array(N);
+  sSize = new Float32Array(N);
+  sHaze = new Float32Array(N);
   zOrder = new Int32Array(N);
   bucketCount = new Int32Array(DEPTH_BUCKETS + 1);
   bucketKey = new Int32Array(N);
@@ -98,9 +121,14 @@ function init(t: Term): void {
     const phi = rnd() * TAU;
     const r = WORLD * (0.34 + 0.42 * Math.cbrt(rnd()));
     const s = Math.sqrt(1 - u * u);
-    const x = r * s * Math.cos(phi), y = r * u * 0.65, z = r * s * Math.sin(phi);
-    px[i] = x; py[i] = y; pz[i] = z;
-    const tx = -z, tz = x; // tangent of (x,_,z) about the world Y axis
+    const x = r * s * Math.cos(phi),
+      y = r * u * 0.65,
+      z = r * s * Math.sin(phi);
+    px[i] = x;
+    py[i] = y;
+    pz[i] = z;
+    const tx = -z,
+      tz = x; // tangent of (x,_,z) about the world Y axis
     const tl = Math.hypot(tx, tz) || 1;
     const sp = lerp(MIN_SPEED, MAX_SPEED, rnd());
     vx[i] = (tx / tl) * sp + (rnd() - 0.5) * 5;
@@ -110,10 +138,12 @@ function init(t: Term): void {
 
   // Deterministic starfield, upper sky only.
   const srnd = mulberry32(0x57_a4_f1_e1);
-  starX = new Float32Array(STARS); starY = new Float32Array(STARS); starB = new Float32Array(STARS);
+  starX = new Float32Array(STARS);
+  starY = new Float32Array(STARS);
+  starB = new Float32Array(STARS);
   for (let i = 0; i < STARS; i++) {
     starX[i] = srnd();
-    starY[i] = srnd() * srnd() * 0.72;  // bias toward the very top of the sky
+    starY[i] = srnd() * srnd() * 0.72; // bias toward the very top of the sky
     starB[i] = 0.16 + 0.84 * srnd();
   }
   void t;
@@ -124,9 +154,12 @@ function cellIndex(x: number, y: number, z: number): number {
   let cx = ((x + WORLD) / CELL + 1) | 0;
   let cy = ((y + WORLD) / CELL + 1) | 0;
   let cz = ((z + WORLD) / CELL + 1) | 0;
-  if (cx < 0) cx = 0; else if (cx >= GRID) cx = GRID - 1;
-  if (cy < 0) cy = 0; else if (cy >= GRID) cy = GRID - 1;
-  if (cz < 0) cz = 0; else if (cz >= GRID) cz = GRID - 1;
+  if (cx < 0) cx = 0;
+  else if (cx >= GRID) cx = GRID - 1;
+  if (cy < 0) cy = 0;
+  else if (cy >= GRID) cy = GRID - 1;
+  if (cz < 0) cz = 0;
+  else if (cz >= GRID) cz = GRID - 1;
   return (cz * GRID + cy) * GRID + cx;
 }
 
@@ -143,7 +176,11 @@ function buildGrid(): void {
   }
   let acc = 0;
   for (let c = 0; c < NCELLS; c++) {
-    if (cellSize[c] > 0) { cellStart[c] = acc; cellCursor[c] = acc; acc += cellSize[c]; }
+    if (cellSize[c] > 0) {
+      cellStart[c] = acc;
+      cellCursor[c] = acc;
+      acc += cellSize[c];
+    }
   }
   for (let i = 0; i < N; i++) {
     const c = cellOf[i];
@@ -157,14 +194,14 @@ const pred = new Float32Array(3);
 function attractors(time: number): void {
   // The lure: a slow two-frequency Lissajous the flock chases — keeps the cloud
   // translating and folding across the volume so the silhouette never settles.
-  const a = WORLD * 0.70;
+  const a = WORLD * 0.7;
   lure[0] = a * Math.sin(time * 0.21 + 0.4) * Math.cos(time * 0.13 * 0.6);
-  lure[1] = a * 0.60 * Math.sin(time * 0.17 * 1.3 + 1.7);
+  lure[1] = a * 0.6 * Math.sin(time * 0.17 * 1.3 + 1.7);
   lure[2] = a * Math.cos(time * 0.19 * 0.8) * Math.sin(time * 0.11 * 1.1 + 0.9);
   // The predator: a second, faster, counter-phase path the flock shears away
   // from — this is what carves the dramatic splits and rolling sheets. It eases
   // in and out of relevance so it never feels mechanical.
-  const b = WORLD * 0.80;
+  const b = WORLD * 0.8;
   pred[0] = b * Math.cos(time * 0.37 + 2.1) * Math.sin(time * 0.23 + 0.3);
   pred[1] = b * 0.55 * Math.cos(time * 0.29 + 0.7);
   pred[2] = b * Math.sin(time * 0.31 + 1.2) * Math.cos(time * 0.27 + 1.9);
@@ -177,9 +214,11 @@ function attractors(time: number): void {
 // construction, so it never inflates or collapses the flock, only twists it.
 const wind = new Float32Array(3);
 function curlWind(x: number, y: number, z: number, time: number): void {
-  const s = 0.052;                 // spatial scale of the swirl cells
+  const s = 0.052; // spatial scale of the swirl cells
   const tt = time * 0.18;
-  const X = x * s, Y = y * s, Z = z * s;
+  const X = x * s,
+    Y = y * s,
+    Z = z * s;
   // Curl (∇×A) of a pair of staggered swirl potentials. Only the six partials
   // are needed for the flow, so we evaluate exactly those six trig terms — the
   // potentials themselves never appear, keeping this cheap enough per-boid.
@@ -201,8 +240,12 @@ function simulate(time: number, dt: number): void {
 
   buildGrid();
   attractors(time);
-  const lx = lure[0], ly = lure[1], lz = lure[2];
-  const prx = pred[0], pry = pred[1], prz = pred[2];
+  const lx = lure[0],
+    ly = lure[1],
+    lz = lure[2];
+  const prx = pred[0],
+    pry = pred[1],
+    prz = pred[2];
   // Predator influence and wind both breathe on slow cycles so the flock
   // periodically relaxes into a calm sheet then tears apart again — the rhythm
   // that makes it feel alive.
@@ -210,12 +253,24 @@ function simulate(time: number, dt: number): void {
   const windPulse = W_WIND * (0.5 + 0.5 * smoothstep(0.15, 0.85, 0.5 + 0.5 * Math.sin(time * 0.097 + 1.3)));
 
   for (let i = 0; i < N; i++) {
-    const x = px[i], y = py[i], z = pz[i];
-    const myvx = vx[i], myvy = vy[i], myvz = vz[i];
+    const x = px[i],
+      y = py[i],
+      z = pz[i];
+    const myvx = vx[i],
+      myvy = vy[i],
+      myvz = vz[i];
 
-    let sepX = 0, sepY = 0, sepZ = 0;
-    let aliX = 0, aliY = 0, aliZ = 0, aliN = 0;
-    let cohX = 0, cohY = 0, cohZ = 0, cohN = 0;
+    let sepX = 0,
+      sepY = 0,
+      sepZ = 0;
+    let aliX = 0,
+      aliY = 0,
+      aliZ = 0,
+      aliN = 0;
+    let cohX = 0,
+      cohY = 0,
+      cohZ = 0,
+      cohN = 0;
 
     // Sweep the 27 neighbouring cells.
     const base = cellOf[i];
@@ -233,16 +288,28 @@ function simulate(time: number, dt: number): void {
             if (j === i) continue;
             // Load each neighbour position ONCE and reuse it for both the
             // distance test and the cohesion accumulator (was a double read).
-            const pjx = px[j], pjy = py[j], pjz = pz[j];
-            const ddx = x - pjx, ddy = y - pjy, ddz = z - pjz;
+            const pjx = px[j],
+              pjy = py[j],
+              pjz = pz[j];
+            const ddx = x - pjx,
+              ddy = y - pjy,
+              ddz = z - pjz;
             const d2 = ddx * ddx + ddy * ddy + ddz * ddz;
             if (d2 > R_NEI2 || d2 <= 1e-6) continue;
             if (d2 < R_SEP2) {
               const inv = 1 / d2; // inverse-square push, stronger up close
-              sepX += ddx * inv; sepY += ddy * inv; sepZ += ddz * inv;
+              sepX += ddx * inv;
+              sepY += ddy * inv;
+              sepZ += ddz * inv;
             }
-            aliX += vx[j]; aliY += vy[j]; aliZ += vz[j]; aliN++;
-            cohX += pjx; cohY += pjy; cohZ += pjz; cohN++;
+            aliX += vx[j];
+            aliY += vy[j];
+            aliZ += vz[j];
+            aliN++;
+            cohX += pjx;
+            cohY += pjy;
+            cohZ += pjz;
+            cohN++;
           }
         }
       }
@@ -250,65 +317,125 @@ function simulate(time: number, dt: number): void {
 
     // Steering: each rule yields (desired→MAX_SPEED) − velocity, capped to
     // MAX_FORCE·weight. All inlined so the inner loop allocates nothing.
-    let fx = 0, fy = 0, fz = 0;
+    let fx = 0,
+      fy = 0,
+      fz = 0;
     let dl: number, k: number, gx: number, gy: number, gz: number, fl: number, cap: number;
 
     if (sepX !== 0 || sepY !== 0 || sepZ !== 0) {
       dl = Math.sqrt(sepX * sepX + sepY * sepY + sepZ * sepZ);
       if (dl > 1e-6) {
         k = MAX_SPEED / dl;
-        gx = sepX * k - myvx; gy = sepY * k - myvy; gz = sepZ * k - myvz;
-        fl = Math.sqrt(gx * gx + gy * gy + gz * gz); cap = MAX_FORCE * W_SEP;
-        if (fl > cap) { const c = cap / fl; gx *= c; gy *= c; gz *= c; }
-        fx += gx; fy += gy; fz += gz;
+        gx = sepX * k - myvx;
+        gy = sepY * k - myvy;
+        gz = sepZ * k - myvz;
+        fl = Math.sqrt(gx * gx + gy * gy + gz * gz);
+        cap = MAX_FORCE * W_SEP;
+        if (fl > cap) {
+          const c = cap / fl;
+          gx *= c;
+          gy *= c;
+          gz *= c;
+        }
+        fx += gx;
+        fy += gy;
+        fz += gz;
       }
     }
     if (aliN > 0) {
-      const ix = aliX / aliN, iy = aliY / aliN, iz = aliZ / aliN;
+      const ix = aliX / aliN,
+        iy = aliY / aliN,
+        iz = aliZ / aliN;
       dl = Math.sqrt(ix * ix + iy * iy + iz * iz);
       if (dl > 1e-6) {
         k = MAX_SPEED / dl;
-        gx = ix * k - myvx; gy = iy * k - myvy; gz = iz * k - myvz;
-        fl = Math.sqrt(gx * gx + gy * gy + gz * gz); cap = MAX_FORCE * W_ALI;
-        if (fl > cap) { const c = cap / fl; gx *= c; gy *= c; gz *= c; }
-        fx += gx; fy += gy; fz += gz;
+        gx = ix * k - myvx;
+        gy = iy * k - myvy;
+        gz = iz * k - myvz;
+        fl = Math.sqrt(gx * gx + gy * gy + gz * gz);
+        cap = MAX_FORCE * W_ALI;
+        if (fl > cap) {
+          const c = cap / fl;
+          gx *= c;
+          gy *= c;
+          gz *= c;
+        }
+        fx += gx;
+        fy += gy;
+        fz += gz;
       }
     }
     if (cohN > 0) {
-      const ix = cohX / cohN - x, iy = cohY / cohN - y, iz = cohZ / cohN - z;
+      const ix = cohX / cohN - x,
+        iy = cohY / cohN - y,
+        iz = cohZ / cohN - z;
       dl = Math.sqrt(ix * ix + iy * iy + iz * iz);
       if (dl > 1e-6) {
         k = MAX_SPEED / dl;
-        gx = ix * k - myvx; gy = iy * k - myvy; gz = iz * k - myvz;
-        fl = Math.sqrt(gx * gx + gy * gy + gz * gz); cap = MAX_FORCE * W_COH;
-        if (fl > cap) { const c = cap / fl; gx *= c; gy *= c; gz *= c; }
-        fx += gx; fy += gy; fz += gz;
+        gx = ix * k - myvx;
+        gy = iy * k - myvy;
+        gz = iz * k - myvz;
+        fl = Math.sqrt(gx * gx + gy * gy + gz * gz);
+        cap = MAX_FORCE * W_COH;
+        if (fl > cap) {
+          const c = cap / fl;
+          gx *= c;
+          gy *= c;
+          gz *= c;
+        }
+        fx += gx;
+        fy += gy;
+        fz += gz;
       }
     }
     // Lure (the wandering target the flock chases).
     {
-      const ix = lx - x, iy = ly - y, iz = lz - z;
+      const ix = lx - x,
+        iy = ly - y,
+        iz = lz - z;
       dl = Math.sqrt(ix * ix + iy * iy + iz * iz);
       if (dl > 1e-6) {
         k = MAX_SPEED / dl;
-        gx = ix * k - myvx; gy = iy * k - myvy; gz = iz * k - myvz;
-        fl = Math.sqrt(gx * gx + gy * gy + gz * gz); cap = MAX_FORCE * W_LURE;
-        if (fl > cap) { const c = cap / fl; gx *= c; gy *= c; gz *= c; }
-        fx += gx; fy += gy; fz += gz;
+        gx = ix * k - myvx;
+        gy = iy * k - myvy;
+        gz = iz * k - myvz;
+        fl = Math.sqrt(gx * gx + gy * gy + gz * gz);
+        cap = MAX_FORCE * W_LURE;
+        if (fl > cap) {
+          const c = cap / fl;
+          gx *= c;
+          gy *= c;
+          gz *= c;
+        }
+        fx += gx;
+        fy += gy;
+        fz += gz;
       }
     }
     // Predator (flee — only inside R_PRED, ramping up as it nears).
     {
-      const ix = x - prx, iy = y - pry, iz = z - prz;
+      const ix = x - prx,
+        iy = y - pry,
+        iz = z - prz;
       const d2 = ix * ix + iy * iy + iz * iz;
       if (d2 < R_PRED2 && d2 > 1e-6) {
         dl = Math.sqrt(d2);
         const fear = predPulse * (1 - dl / R_PRED);
         k = MAX_SPEED / dl;
-        gx = ix * k - myvx; gy = iy * k - myvy; gz = iz * k - myvz;
-        fl = Math.sqrt(gx * gx + gy * gy + gz * gz); cap = MAX_FORCE * fear * 2.0;
-        if (fl > cap) { const c = cap / fl; gx *= c; gy *= c; gz *= c; }
-        fx += gx; fy += gy; fz += gz;
+        gx = ix * k - myvx;
+        gy = iy * k - myvy;
+        gz = iz * k - myvz;
+        fl = Math.sqrt(gx * gx + gy * gy + gz * gz);
+        cap = MAX_FORCE * fear * 2.0;
+        if (fl > cap) {
+          const c = cap / fl;
+          gx *= c;
+          gy *= c;
+          gz *= c;
+        }
+        fx += gx;
+        fy += gy;
+        fz += gz;
       }
     }
     // Curl-noise wind: a tangential swirl that shears the volume into ribbons and
@@ -319,10 +446,20 @@ function simulate(time: number, dt: number): void {
       const wlen = Math.sqrt(wind[0] * wind[0] + wind[1] * wind[1] + wind[2] * wind[2]);
       if (wlen > 1e-6) {
         k = MAX_SPEED / wlen;
-        gx = wind[0] * k - myvx; gy = wind[1] * k - myvy; gz = wind[2] * k - myvz;
-        fl = Math.sqrt(gx * gx + gy * gy + gz * gz); cap = MAX_FORCE * windPulse;
-        if (fl > cap) { const c = cap / fl; gx *= c; gy *= c; gz *= c; }
-        fx += gx; fy += gy; fz += gz;
+        gx = wind[0] * k - myvx;
+        gy = wind[1] * k - myvy;
+        gz = wind[2] * k - myvz;
+        fl = Math.sqrt(gx * gx + gy * gy + gz * gz);
+        cap = MAX_FORCE * windPulse;
+        if (fl > cap) {
+          const c = cap / fl;
+          gx *= c;
+          gy *= c;
+          gz *= c;
+        }
+        fx += gx;
+        fy += gy;
+        fz += gz;
       }
     }
     // Soft spherical bound: gentle inward push that ramps past BOUND_R.
@@ -331,19 +468,44 @@ function simulate(time: number, dt: number): void {
       if (d > BOUND_R * 0.64 && d > 1e-6) {
         const push = smoothstep(BOUND_R * 0.64, BOUND_R * 1.14, d) * W_BND;
         k = MAX_SPEED / d;
-        gx = -x * k - myvx; gy = -y * k - myvy; gz = -z * k - myvz;
-        fl = Math.sqrt(gx * gx + gy * gy + gz * gz); cap = MAX_FORCE * push;
-        if (fl > cap) { const c = cap / fl; gx *= c; gy *= c; gz *= c; }
-        fx += gx; fy += gy; fz += gz;
+        gx = -x * k - myvx;
+        gy = -y * k - myvy;
+        gz = -z * k - myvz;
+        fl = Math.sqrt(gx * gx + gy * gy + gz * gz);
+        cap = MAX_FORCE * push;
+        if (fl > cap) {
+          const c = cap / fl;
+          gx *= c;
+          gy *= c;
+          gz *= c;
+        }
+        fx += gx;
+        fy += gy;
+        fz += gz;
       }
     }
 
-    let nvx = myvx + fx * dt, nvy = myvy + fy * dt, nvz = myvz + fz * dt;
+    let nvx = myvx + fx * dt,
+      nvy = myvy + fy * dt,
+      nvz = myvz + fz * dt;
     let sp = Math.sqrt(nvx * nvx + nvy * nvy + nvz * nvz);
-    if (sp > MAX_SPEED) { const c = MAX_SPEED / sp; nvx *= c; nvy *= c; nvz *= c; }
-    else if (sp < MIN_SPEED && sp > 1e-4) { const c = MIN_SPEED / sp; nvx *= c; nvy *= c; nvz *= c; }
-    vx[i] = nvx; vy[i] = nvy; vz[i] = nvz;
-    px[i] = x + nvx * dt; py[i] = y + nvy * dt; pz[i] = z + nvz * dt;
+    if (sp > MAX_SPEED) {
+      const c = MAX_SPEED / sp;
+      nvx *= c;
+      nvy *= c;
+      nvz *= c;
+    } else if (sp < MIN_SPEED && sp > 1e-4) {
+      const c = MIN_SPEED / sp;
+      nvx *= c;
+      nvy *= c;
+      nvz *= c;
+    }
+    vx[i] = nvx;
+    vy[i] = nvy;
+    vz[i] = nvz;
+    px[i] = x + nvx * dt;
+    py[i] = y + nvy * dt;
+    pz[i] = z + nvz * dt;
   }
 }
 
@@ -352,8 +514,12 @@ function simulate(time: number, dt: number): void {
 // pale ember for the near/dense cores. `warm` ∈ [0,1] selects along it.
 function birdColor(warm: number, out: Float32Array): void {
   // cool slate  (low warm)            warm pale ember (high warm)
-  const cr = 104, cg = 138, cb = 196;
-  const wr = 255, wg = 184, wb = 116;
+  const cr = 104,
+    cg = 138,
+    cb = 196;
+  const wr = 255,
+    wg = 184,
+    wb = 116;
   const w = clamp01(warm);
   const w2 = w * w * (1.6 - 0.6 * w); // smooth bias of warmth toward bright cores
   out[0] = lerp(cr, wr, w2);
@@ -373,12 +539,12 @@ let skyRGB!: Float32Array; // 3 floats per row, length H*3
 let skyH = -1;
 // Stops as {y, r,g,b}. y∈[0,1] top→bottom.
 const SKY_STOPS = [
-  [0.00, 4, 6, 20],     // deep indigo zenith
-  [0.46, 11, 13, 38],   // muted blue-violet upper sky
-  [0.72, 33, 23, 52],   // dusty mauve where the afterglow begins
-  [0.88, 96, 54, 66],   // warm rose afterglow lifting off the horizon
-  [0.96, 150, 88, 62],  // brightest amber ember just above the horizon line
-  [1.00, 46, 28, 42],   // cooler dense haze settling at the very base
+  [0.0, 4, 6, 20], // deep indigo zenith
+  [0.46, 11, 13, 38], // muted blue-violet upper sky
+  [0.72, 33, 23, 52], // dusty mauve where the afterglow begins
+  [0.88, 96, 54, 66], // warm rose afterglow lifting off the horizon
+  [0.96, 150, 88, 62], // brightest amber ember just above the horizon line
+  [1.0, 46, 28, 42], // cooler dense haze settling at the very base
 ] as const;
 function buildSky(H: number): void {
   if (skyH === H && skyRGB) return;
@@ -389,7 +555,8 @@ function buildSky(H: number): void {
     // find bracketing stops
     let s = 0;
     while (s < SKY_STOPS.length - 2 && fy > SKY_STOPS[s + 1][0]) s++;
-    const a = SKY_STOPS[s], b = SKY_STOPS[s + 1];
+    const a = SKY_STOPS[s],
+      b = SKY_STOPS[s + 1];
     const span = b[0] - a[0] || 1e-6;
     const tRaw = clamp01((fy - a[0]) / span);
     const tt = tRaw * tRaw * (3 - 2 * tRaw); // smoothstep each segment for a soft blend
@@ -404,7 +571,9 @@ function buildSky(H: number): void {
 function frame(t: Term, time: number, dt: number): void {
   simulate(time, dt);
 
-  const W = t.width, H = t.height, buf = t.pixels;
+  const W = t.width,
+    H = t.height,
+    buf = t.pixels;
   const aspect = t.aspect;
 
   // — Cinematic dusk sky: a designed multi-stop vertical gradient (deep indigo
@@ -414,9 +583,16 @@ function frame(t: Term, time: number, dt: number): void {
   buildSky(H);
   for (let y = 0; y < H; y++) {
     const so = y * 3;
-    const r = skyRGB[so], g = skyRGB[so + 1], b = skyRGB[so + 2];
+    const r = skyRGB[so],
+      g = skyRGB[so + 1],
+      b = skyRGB[so + 2];
     let o = y * W * 3;
-    for (let x = 0; x < W; x++) { buf[o] = r; buf[o + 1] = g; buf[o + 2] = b; o += 3; }
+    for (let x = 0; x < W; x++) {
+      buf[o] = r;
+      buf[o + 1] = g;
+      buf[o + 2] = b;
+      o += 3;
+    }
   }
 
   // — Starfield (deterministic; gentle twinkle from time) —
@@ -432,20 +608,24 @@ function frame(t: Term, time: number, dt: number): void {
   //   Pulled in close and widened so the flock fills the frame. —
   const yaw = time * 0.105;
   const pitch = 0.18 + 0.11 * Math.sin(time * 0.063);
-  const cy = Math.cos(yaw), syy = Math.sin(yaw);
-  const cp = Math.cos(pitch), spp = Math.sin(pitch);
+  const cy = Math.cos(yaw),
+    syy = Math.sin(yaw);
+  const cp = Math.cos(pitch),
+    spp = Math.sin(pitch);
 
-  const CAM_Z = WORLD * 2.05;             // closer camera → bigger flock in frame
-  const FOV = 1.16;                        // wider field of view
+  const CAM_Z = WORLD * 2.05; // closer camera → bigger flock in frame
+  const FOV = 1.16; // wider field of view
   const focal = (H * 0.5) / Math.tan(FOV * 0.5);
   const NEAR = CAM_Z - WORLD * 1.2;
   const FAR = CAM_Z + WORLD * 1.2;
-  const aspX = aspect < 1 ? 1 : aspect;   // keep splats round on non-square grids
+  const aspX = aspect < 1 ? 1 : aspect; // keep splats round on non-square grids
   const aspY = aspect < 1 ? 1 / aspect : 1;
 
   let visible = 0;
   for (let i = 0; i < N; i++) {
-    const x0 = px[i], y0 = py[i], z0 = pz[i];
+    const x0 = px[i],
+      y0 = py[i],
+      z0 = pz[i];
     // yaw about Y, then pitch about X.
     const xr = x0 * cy - z0 * syy;
     const zr = x0 * syy + z0 * cy;
@@ -453,21 +633,31 @@ function frame(t: Term, time: number, dt: number): void {
     const zr2 = y0 * spp + zr * cp;
 
     const camZ = zr2 + CAM_Z;
-    if (camZ < 4) { sDepth[i] = 1e30; continue; }
+    if (camZ < 4) {
+      sDepth[i] = 1e30;
+      continue;
+    }
     const inv = focal / camZ;
     const scrX = W * 0.5 + xr * inv;
     const scrY = H * 0.46 - yr * inv; // bias the flock slightly above centre
-    if (scrX < -30 || scrX > W + 30 || scrY < -30 || scrY > H + 30) { sDepth[i] = 1e30; continue; }
+    if (scrX < -30 || scrX > W + 30 || scrY < -30 || scrY > H + 30) {
+      sDepth[i] = 1e30;
+      continue;
+    }
 
-    sx[i] = scrX; sy[i] = scrY; sDepth[i] = camZ;
+    sx[i] = scrX;
+    sy[i] = scrY;
+    sDepth[i] = camZ;
 
     // Projected heading → a short oriented streak (motion blur along travel).
     const vxr = vx[i] * cy - vz[i] * syy;
     const vzr = vx[i] * syy + vz[i] * cy;
     const vyr = vy[i] * cp - vzr * spp;
-    const hx = vxr, hy = -vyr;           // screen-space heading
+    const hx = vxr,
+      hy = -vyr; // screen-space heading
     const hl = Math.hypot(hx, hy) || 1;
-    sDirX[i] = hx / hl; sDirY[i] = hy / hl;
+    sDirX[i] = hx / hl;
+    sDirY[i] = hy / hl;
 
     // Depth grade in [0,1]: 1 = nearest, 0 = farthest. Graded HARD so far birds
     // are a faint cool mist and near birds are distinct, slightly-larger motes —
@@ -479,7 +669,7 @@ function frame(t: Term, time: number, dt: number): void {
     // slightly longer dash; far = a single point.
     sLen[i] = lerp(0.0, 1.7, d2 * d2) * (0.55 + 0.45 * speed01);
     // Per-bird brightness rises steeply with nearness; far birds are dim motes.
-    sBright[i] = lerp(0.10, 1.0, d2 * d2);
+    sBright[i] = lerp(0.1, 1.0, d2 * d2);
     // Footprint: near birds occupy a touch more than one pixel (soft, not a
     // blob); far birds are sub-pixel points.
     sSize[i] = lerp(0.7, 1.35, d2);
@@ -505,18 +695,23 @@ function frame(t: Term, time: number, dt: number): void {
   //   count and tone, never as a saturated white cloud. —
   for (let n = 0; n < visible; n++) {
     const i = vis[n];
-    const cx = sx[i], cyy = sy[i];
+    const cx = sx[i],
+      cyy = sy[i];
     const len = sLen[i];
     const bright = sBright[i];
     const size = sSize[i];
     birdColor(sWarm[i], colScratch);
-    let cr = colScratch[0], cg = colScratch[1], cb = colScratch[2];
+    let cr = colScratch[0],
+      cg = colScratch[1],
+      cb = colScratch[2];
     // Aerial perspective: pull far birds toward the sky tone directly behind them
     // (sampled from the cached gradient at their screen row), so they recede into
     // atmosphere rather than reading as flat dim dots on a curtain.
     const hz = sHaze[i];
     if (hz > 0.001) {
-      let syRow = cyy | 0; if (syRow < 0) syRow = 0; else if (syRow >= H) syRow = H - 1;
+      let syRow = cyy | 0;
+      if (syRow < 0) syRow = 0;
+      else if (syRow >= H) syRow = H - 1;
       const so = syRow * 3;
       cr += (skyRGB[so] - cr) * hz;
       cg += (skyRGB[so + 1] - cg) * hz;
@@ -536,10 +731,10 @@ function frame(t: Term, time: number, dt: number): void {
       const hy = sDirY[i] * len * aspY;
       const steps = len > 1.0 ? 3 : 2;
       for (let sIdx = 0; sIdx < steps; sIdx++) {
-        const tt = sIdx / (steps - 1);             // 0=tail … 1=head
+        const tt = sIdx / (steps - 1); // 0=tail … 1=head
         const ax = cx + (tt - 0.5) * hx;
         const ay = cyy + (tt - 0.5) * hy;
-        const e = (0.4 + 0.6 * tt) / steps * 1.7;  // ramp toward the head
+        const e = ((0.4 + 0.6 * tt) / steps) * 1.7; // ramp toward the head
         speck(buf, W, H, ax, ay, cr, cg, cb, peak * e, size);
       }
     }
@@ -555,32 +750,39 @@ function frame(t: Term, time: number, dt: number): void {
 // the whole reason the murmuration reads as fine grain instead of a fluffy mass.
 // `size` >1 spills a small soft fraction to the 4-neighbours (near birds only).
 function speck(buf: Uint8Array, W: number, H: number, fx: number, fy: number, r: number, g: number, b: number, a: number, size: number): void {
-  const x0 = Math.floor(fx), y0 = Math.floor(fy);
-  const tx = fx - x0, ty = fy - y0;
+  const x0 = Math.floor(fx),
+    y0 = Math.floor(fy);
+  const tx = fx - x0,
+    ty = fy - y0;
   // Core: 2×2 bilinear coverage of the exact centre.
-  addPx(buf, W, H, x0,     y0,     r, g, b, a * (1 - tx) * (1 - ty));
-  addPx(buf, W, H, x0 + 1, y0,     r, g, b, a * tx * (1 - ty));
-  addPx(buf, W, H, x0,     y0 + 1, r, g, b, a * (1 - tx) * ty);
+  addPx(buf, W, H, x0, y0, r, g, b, a * (1 - tx) * (1 - ty));
+  addPx(buf, W, H, x0 + 1, y0, r, g, b, a * tx * (1 - ty));
+  addPx(buf, W, H, x0, y0 + 1, r, g, b, a * (1 - tx) * ty);
   addPx(buf, W, H, x0 + 1, y0 + 1, r, g, b, a * tx * ty);
   // Near birds get a faint cross-halo so dense cores bloom gently (still small).
   if (size > 1.05) {
     const ha = a * (size - 1.0) * 0.5;
-    addPx(buf, W, H, x0 + 1, y0,     r, g, b, ha);
-    addPx(buf, W, H, x0 - 1, y0,     r, g, b, ha);
-    addPx(buf, W, H, x0,     y0 + 1, r, g, b, ha);
-    addPx(buf, W, H, x0,     y0 - 1, r, g, b, ha);
+    addPx(buf, W, H, x0 + 1, y0, r, g, b, ha);
+    addPx(buf, W, H, x0 - 1, y0, r, g, b, ha);
+    addPx(buf, W, H, x0, y0 + 1, r, g, b, ha);
+    addPx(buf, W, H, x0, y0 - 1, r, g, b, ha);
   }
 }
 function addPx(buf: Uint8Array, W: number, H: number, x: number, y: number, r: number, g: number, b: number, a: number): void {
   if (a <= 0 || x < 0 || y < 0 || x >= W || y >= H) return;
   const o = (y * W + x) * 3;
   const s = a * (1 / 255);
-  let nr = buf[o] + r * s, ng = buf[o + 1] + g * s, nb = buf[o + 2] + b * s;
+  let nr = buf[o] + r * s,
+    ng = buf[o + 1] + g * s,
+    nb = buf[o + 2] + b * s;
   // A faint, slightly-warm white core where accumulated energy is very high → the
   // very densest knots bloom to pale gold rather than flat white, keeping the
   // dusk warmth visible even at saturation.
   const wb = (nr - 232) * 0.34;
-  if (wb > 0) { ng += wb * 0.82; nb += wb * 0.6; }
+  if (wb > 0) {
+    ng += wb * 0.82;
+    nb += wb * 0.6;
+  }
   buf[o] = nr > 255 ? 255 : nr;
   buf[o + 1] = ng > 255 ? 255 : ng;
   buf[o + 2] = nb > 255 ? 255 : nb;
@@ -595,7 +797,7 @@ function addPx(buf: Uint8Array, W: number, H: number, x: number, y: number, r: n
 // precise — visually identical to an exact sort for additive specks, at O(n).
 const DEPTH_BUCKETS = 4096;
 let bucketCount!: Int32Array; // histogram (+1 slot for the running prefix)
-let bucketKey!: Int32Array;   // per-visible-bird bucket, parallel to the input idx
+let bucketKey!: Int32Array; // per-visible-bird bucket, parallel to the input idx
 // Counting sort `idx[0..len)` so that, on return, idx is ordered by depth desc.
 // `zMin`/`zMax` bound the live depth range for this frame's projection.
 function depthSort(idx: Int32Array, len: number, depth: Float32Array, zMin: number, zMax: number): void {
@@ -611,16 +813,24 @@ function depthSort(idx: Int32Array, len: number, depth: Float32Array, zMin: numb
   for (let n = 0; n < len; n++) {
     const i = idx[n];
     let b = ((zMax - depth[i]) * scale) | 0;
-    if (b < 0) b = 0; else if (b >= B) b = B - 1;
+    if (b < 0) b = 0;
+    else if (b >= B) b = B - 1;
     key[n] = b;
     cnt[b]++;
   }
   // Prefix sum → bucket start offsets (write cnt[b] as the running base).
   let acc = 0;
-  for (let b = 0; b < B; b++) { const c = cnt[b]; cnt[b] = acc; acc += c; }
+  for (let b = 0; b < B; b++) {
+    const c = cnt[b];
+    cnt[b] = acc;
+    acc += c;
+  }
   // Scatter into the scratch output, then copy back. Stable within a bucket.
   const out = sortScratch;
-  for (let n = 0; n < len; n++) { const b = key[n]; out[cnt[b]++] = idx[n]; }
+  for (let n = 0; n < len; n++) {
+    const b = key[n];
+    out[cnt[b]++] = idx[n];
+  }
   idx.set(out.subarray(0, len), 0);
 }
 let sortScratch!: Int32Array;
@@ -636,7 +846,8 @@ const TONE = (() => {
 // one sweep over the buffer. The vignette factor is precomputed per-resize would
 // be ideal, but at this resolution a per-pixel cheap form is plenty fast.
 function finish(buf: Uint8Array, W: number, H: number): void {
-  const cx = W * 0.5, cy = H * 0.5;
+  const cx = W * 0.5,
+    cy = H * 0.5;
   const invMax = 1 / (cx * cx + cy * cy);
   let o = 0;
   for (let y = 0; y < H; y++) {
@@ -644,9 +855,11 @@ function finish(buf: Uint8Array, W: number, H: number): void {
     const dy2 = dy * dy;
     for (let x = 0; x < W; x++) {
       const dx = x - cx;
-      const rr = (dx * dx + dy2) * invMax;       // 0 centre → 1 corner
-      const vig = 1 - 0.44 * rr * rr;            // gentle darkening to the edges
-      let r = buf[o] * vig, g = buf[o + 1] * vig, b = buf[o + 2] * vig;
+      const rr = (dx * dx + dy2) * invMax; // 0 centre → 1 corner
+      const vig = 1 - 0.44 * rr * rr; // gentle darkening to the edges
+      let r = buf[o] * vig,
+        g = buf[o + 1] * vig,
+        b = buf[o + 2] * vig;
       buf[o] = TONE[r > 255 ? 255 : r | 0];
       buf[o + 1] = TONE[g > 255 ? 255 : g | 0];
       buf[o + 2] = TONE[b > 255 ? 255 : b | 0];

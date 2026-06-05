@@ -17,13 +17,7 @@ import { join } from 'node:path';
 
 import Kernel32 from '@bun-win32/kernel32';
 
-import Virtdisk, {
-  CREATE_VIRTUAL_DISK_FLAG,
-  CREATE_VIRTUAL_DISK_VERSION,
-  GET_VIRTUAL_DISK_INFO_VERSION,
-  VIRTUAL_DISK_ACCESS_MASK,
-  VIRTUAL_STORAGE_TYPE_DEVICE_VHDX,
-} from '../index';
+import Virtdisk, { CREATE_VIRTUAL_DISK_FLAG, CREATE_VIRTUAL_DISK_VERSION, GET_VIRTUAL_DISK_INFO_VERSION, VIRTUAL_DISK_ACCESS_MASK, VIRTUAL_STORAGE_TYPE_DEVICE_VHDX } from '../index';
 
 const ERROR_SUCCESS = 0;
 const RESET = '\x1b[0m';
@@ -41,8 +35,14 @@ function formatBytes(bytes: bigint): string {
 
 function formatGuid(buf: Buffer, offset: number): string {
   const d1 = buf.readUInt32LE(offset).toString(16).padStart(8, '0');
-  const d2 = buf.readUInt16LE(offset + 4).toString(16).padStart(4, '0');
-  const d3 = buf.readUInt16LE(offset + 6).toString(16).padStart(4, '0');
+  const d2 = buf
+    .readUInt16LE(offset + 4)
+    .toString(16)
+    .padStart(4, '0');
+  const d3 = buf
+    .readUInt16LE(offset + 6)
+    .toString(16)
+    .padStart(4, '0');
   const d4hi = buf.subarray(offset + 8, offset + 10).toString('hex');
   const d4lo = buf.subarray(offset + 10, offset + 16).toString('hex');
   return `{${d1}-${d2}-${d3}-${d4hi}-${d4lo}}`.toUpperCase();

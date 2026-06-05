@@ -173,8 +173,14 @@ function parseIpPacket(buf: Buffer, n: number, now: number): void {
   if (ihl < 20 || ihl > n) return;
   const totalLen = buf.readUInt16BE(2);
   const proto = buf[9]!;
-  const s0 = buf[12]!, s1 = buf[13]!, s2 = buf[14]!, s3 = buf[15]!;
-  const d0 = buf[16]!, d1 = buf[17]!, d2 = buf[18]!, d3 = buf[19]!;
+  const s0 = buf[12]!,
+    s1 = buf[13]!,
+    s2 = buf[14]!,
+    s3 = buf[15]!;
+  const d0 = buf[16]!,
+    d1 = buf[17]!,
+    d2 = buf[18]!,
+    d3 = buf[19]!;
   let sport = 0;
   let dport = 0;
   if ((proto === IP_TCP || proto === IP_UDP) && n >= ihl + 4) {
@@ -218,7 +224,10 @@ function discoverLocalIp(): { ip: string; sin: Buffer } | null {
     const nameLen = Buffer.alloc(4);
     nameLen.writeUInt32LE(16, 0);
     if (Ws2_32.getsockname(u, name.ptr!, nameLen.ptr!) === SOCKET_ERROR) return null;
-    const a = name[4]!, b = name[5]!, c = name[6]!, d = name[7]!;
+    const a = name[4]!,
+      b = name[5]!,
+      c = name[6]!,
+      d = name[7]!;
     if (a === 0 && b === 0 && c === 0 && d === 0) return null;
     const ip = ipStr(a, b, c, d);
     // Build the bind SOCKADDR_IN for the raw socket (same addr, port 0).
@@ -266,9 +275,7 @@ function openCapture(): { ok: true; cap: Capture } | { ok: false; reason: string
   const inOpt = Buffer.alloc(4);
   inOpt.writeUInt32LE(1, 0); // RCVALL_ON
   const bytesRet = Buffer.alloc(4);
-  if (
-    Ws2_32.WSAIoctl(sock, SIO_RCVALL, inOpt.ptr!, 4, null, 0, bytesRet.ptr!, null, null) === SOCKET_ERROR
-  ) {
+  if (Ws2_32.WSAIoctl(sock, SIO_RCVALL, inOpt.ptr!, 4, null, 0, bytesRet.ptr!, null, null) === SOCKET_ERROR) {
     const err = Ws2_32.WSAGetLastError();
     Ws2_32.closesocket(sock);
     return { ok: false, reason: 'WSAIoctl(SIO_RCVALL) failed', err };
@@ -392,20 +399,14 @@ function ovrText(x: number, y: number, text: string, bgr: number): void {
 }
 function uploadOverlay(): void {
   GDI32.GdiFlush();
-  vcall(
-    gpu.context,
-    CTX_UPDATE_SUBRESOURCE,
-    [FFIType.u64, FFIType.u32, FFIType.ptr, FFIType.u64, FFIType.u32, FFIType.u32],
-    [ovrTex.tex, 0, null, ovrBitsPtr, OVR_ROW_PITCH, 0],
-    FFIType.void,
-  );
+  vcall(gpu.context, CTX_UPDATE_SUBRESOURCE, [FFIType.u64, FFIType.u32, FFIType.ptr, FFIType.u64, FFIType.u32, FFIType.u32], [ovrTex.tex, 0, null, ovrBitsPtr, OVR_ROW_PITCH, 0], FFIType.void);
 }
 
 // ── Layout (fractions of the client area) ──────────────────────────────────────
 const WF_X = 0.02; // waterfall left edge (norm)
-const WF_W = 0.50; // waterfall column width (norm) — the hero column
+const WF_W = 0.5; // waterfall column width (norm) — the hero column
 const PANEL_X = 0.555; // right panel left edge (norm)
-const GRAPH_TOP = 0.80; // throughput graph occupies the bottom strip (norm y)
+const GRAPH_TOP = 0.8; // throughput graph occupies the bottom strip (norm y)
 
 // ── Constant buffer ─────────────────────────────────────────────────────────────
 // float2 res; float time; uint rowCount; | float wfX; float wfW; float panelX; float graphTop;
@@ -816,7 +817,7 @@ while (!win.shouldClose()) {
   // ── Build the waterfall row buffer ─────────────────────────────────────────
   // Each recent packet maps to a row; index 0 (newest) sits near the top of the
   // column, scrolling down as newer packets push in. Rows fade with age.
-  const wfTopN = 0.10;
+  const wfTopN = 0.1;
   const wfBotN = GRAPH_TOP - 0.02;
   const wfSpan = wfBotN - wfTopN;
   const visible = Math.min(recent.length, MAX_ROWS);

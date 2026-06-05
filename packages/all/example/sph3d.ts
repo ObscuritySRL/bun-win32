@@ -55,7 +55,7 @@ const SM_CYSCREEN = 1;
 const screenW = User32.GetSystemMetrics(SM_CXSCREEN) || 1920;
 const screenH = User32.GetSystemMetrics(SM_CYSCREEN) || 1080;
 const WIN_H = Math.min(1000, Math.floor(screenH * 0.72));
-const WIN_W = Math.min(Math.floor(screenW * 0.9), Math.round(WIN_H * 16 / 9));
+const WIN_W = Math.min(Math.floor(screenW * 0.9), Math.round((WIN_H * 16) / 9));
 
 const win = gpu.createWindow({ title: 'SPH 3D — 49,152-particle fluid in pure TypeScript', width: WIN_W, height: WIN_H, borderless: true });
 const { w: clientW, h: clientH } = win.clientSize();
@@ -536,31 +536,25 @@ function lookAt(eye: [number, number, number], center: [number, number, number],
   let zy = center[1] - eye[1];
   let zz = center[2] - eye[2];
   const zl = Math.hypot(zx, zy, zz);
-  zx /= zl; zy /= zl; zz /= zl;
+  zx /= zl;
+  zy /= zl;
+  zz /= zl;
   let xx = up[1] * zz - up[2] * zy;
   let xy = up[2] * zx - up[0] * zz;
   let xz = up[0] * zy - up[1] * zx;
   const xl = Math.hypot(xx, xy, xz);
-  xx /= xl; xy /= xl; xz /= xl;
+  xx /= xl;
+  xy /= xl;
+  xz /= xl;
   const yx = zy * xz - zz * xy;
   const yy = zz * xx - zx * xz;
   const yz = zx * xy - zy * xx;
-  return [
-    xx, xy, xz, -(xx * eye[0] + xy * eye[1] + xz * eye[2]),
-    yx, yy, yz, -(yx * eye[0] + yy * eye[1] + yz * eye[2]),
-    zx, zy, zz, -(zx * eye[0] + zy * eye[1] + zz * eye[2]),
-    0, 0, 0, 1,
-  ];
+  return [xx, xy, xz, -(xx * eye[0] + xy * eye[1] + xz * eye[2]), yx, yy, yz, -(yx * eye[0] + yy * eye[1] + yz * eye[2]), zx, zy, zz, -(zx * eye[0] + zy * eye[1] + zz * eye[2]), 0, 0, 0, 1];
 }
 function perspective(fovY: number, aspect: number, near: number, far: number): number[] {
   const ff = 1 / Math.tan(fovY / 2);
   const range = far / (far - near);
-  return [
-    ff / aspect, 0, 0, 0,
-    0, ff, 0, 0,
-    0, 0, range, -near * range,
-    0, 0, 1, 0,
-  ];
+  return [ff / aspect, 0, 0, 0, 0, ff, 0, 0, 0, 0, range, -near * range, 0, 0, 1, 0];
 }
 
 const aspect = clientW / clientH;
@@ -707,7 +701,7 @@ function renderFrame(t: number): void {
   // Render splats additively into HDR.
   gpu.setRenderTargets([hdr.rtv!]);
   gpu.setViewport(clientW, clientH);
-  gpu.clear(hdr.rtv!, [0.004, 0.010, 0.030, 1]); // deep-blue near-black
+  gpu.clear(hdr.rtv!, [0.004, 0.01, 0.03, 1]); // deep-blue near-black
   gpu.setBlendState(additiveBlend);
   gpu.vsSetShaderResources([posBuf.srv!, velBuf.srv!]);
   gpu.vsSet(vsPoints, [rendCb]);
@@ -741,20 +735,12 @@ function mouseToWorld(mx: number, my: number): [number, number, number] {
   const inv = invert4(lastViewProj);
   if (!inv) return [0, 0, 0];
   const wn = transformPoint(inv, ndcX, ndcY, 0.5);
-  return [
-    Math.max(-BOX, Math.min(BOX, wn[0])),
-    Math.max(-BOX, Math.min(BOX, wn[1])),
-    Math.max(-BOX, Math.min(BOX, wn[2])),
-  ];
+  return [Math.max(-BOX, Math.min(BOX, wn[0])), Math.max(-BOX, Math.min(BOX, wn[1])), Math.max(-BOX, Math.min(BOX, wn[2]))];
 }
 function transformPoint(m: number[], x: number, y: number, z: number): [number, number, number] {
   const w = m[12]! * x + m[13]! * y + m[14]! * z + m[15]!;
   const ow = Math.abs(w) < 1e-6 ? 1 : w;
-  return [
-    (m[0]! * x + m[1]! * y + m[2]! * z + m[3]!) / ow,
-    (m[4]! * x + m[5]! * y + m[6]! * z + m[7]!) / ow,
-    (m[8]! * x + m[9]! * y + m[10]! * z + m[11]!) / ow,
-  ];
+  return [(m[0]! * x + m[1]! * y + m[2]! * z + m[3]!) / ow, (m[4]! * x + m[5]! * y + m[6]! * z + m[7]!) / ow, (m[8]! * x + m[9]! * y + m[10]! * z + m[11]!) / ow];
 }
 function invert4(m: number[]): number[] | null {
   const inv = new Array<number>(16);
@@ -818,7 +804,11 @@ while (!win.shouldClose()) {
     selfShotDone = true;
     drawHud(fps);
     const dir = `${import.meta.dir}/screenshots`;
-    try { require('node:fs').mkdirSync(dir, { recursive: true }); } catch { /* exists */ }
+    try {
+      require('node:fs').mkdirSync(dir, { recursive: true });
+    } catch {
+      /* exists */
+    }
     const snap = captureBackBuffer(dev, `${dir}/sph3d.selfcheck.png`, { gridW: 48, gridH: 22 });
     console.log(formatGrid(snap));
     console.log(`  png ok=${snap.ok} ${snap.width}x${snap.height} nonBlackPct=${(snap.nonBlackFrac * 100).toFixed(2)} meanLuma=${snap.meanLuma.toFixed(3)} → ${snap.path}`);

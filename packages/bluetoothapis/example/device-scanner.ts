@@ -133,13 +133,13 @@ for (let ri = 0; ri < radios.length; ri++) {
 
   // Step 2: Find paired/remembered devices
   const searchParams = Buffer.alloc(40);
-  searchParams.writeUInt32LE(40, 0);        // dwSize
-  searchParams.writeInt32LE(1, 8);           // fReturnAuthenticated
-  searchParams.writeInt32LE(1, 12);          // fReturnRemembered
-  searchParams.writeInt32LE(1, 16);          // fReturnUnknown
-  searchParams.writeInt32LE(1, 20);          // fReturnConnected
-  searchParams.writeInt32LE(0, 24);          // fIssueInquiry (skip live scan for speed)
-  searchParams.writeUInt8(0, 28);            // cTimeoutMultiplier
+  searchParams.writeUInt32LE(40, 0); // dwSize
+  searchParams.writeInt32LE(1, 8); // fReturnAuthenticated
+  searchParams.writeInt32LE(1, 12); // fReturnRemembered
+  searchParams.writeInt32LE(1, 16); // fReturnUnknown
+  searchParams.writeInt32LE(1, 20); // fReturnConnected
+  searchParams.writeInt32LE(0, 24); // fIssueInquiry (skip live scan for speed)
+  searchParams.writeUInt8(0, 28); // cTimeoutMultiplier
   searchParams.writeBigUInt64LE(hRadio, 32); // hRadio
 
   const deviceInfoBuf = Buffer.alloc(560);

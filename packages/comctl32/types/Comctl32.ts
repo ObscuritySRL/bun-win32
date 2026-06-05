@@ -1,6 +1,36 @@
 import type { Pointer } from 'bun:ffi';
 
-export type { BOOL, DWORD, DWORD_PTR, HANDLE, HINSTANCE, HRESULT, HWND, INT, INT_PTR, LONG, LONG_PTR, LPARAM, LPCSTR, LPCVOID, LPCWSTR, LPDWORD, LPSTR, LPVOID, LPWSTR, LRESULT, NULL, PVOID, UINT, UINT_PTR, ULONG_PTR, USHORT, VOID, WORD, WPARAM } from '@bun-win32/core';
+export type {
+  BOOL,
+  DWORD,
+  DWORD_PTR,
+  HANDLE,
+  HINSTANCE,
+  HRESULT,
+  HWND,
+  INT,
+  INT_PTR,
+  LONG,
+  LONG_PTR,
+  LPARAM,
+  LPCSTR,
+  LPCVOID,
+  LPCWSTR,
+  LPDWORD,
+  LPSTR,
+  LPVOID,
+  LPWSTR,
+  LRESULT,
+  NULL,
+  PVOID,
+  UINT,
+  UINT_PTR,
+  ULONG_PTR,
+  USHORT,
+  VOID,
+  WORD,
+  WPARAM,
+} from '@bun-win32/core';
 
 // ── Handle types ────────────────────────────────────────────────────────────
 

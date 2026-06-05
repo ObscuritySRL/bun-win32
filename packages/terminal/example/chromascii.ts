@@ -28,13 +28,7 @@ import type { RGB } from '@bun-win32/terminal';
 import { aces, clamp01, hsv, smoothstep } from './_kit';
 
 // ── Glyph density ramps (dark → bright). Cycled with [ ]. ────────────────────────
-const RAMPS: string[] = [
-  ' .:-=+*#%@',
-  ' .,:;irsXA253hMHGS#9B&@',
-  ' .\'`^",:;Il!i><~+_-?][}{1)(|/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$',
-  ' ░▒▓█',
-  ' .oO0@',
-];
+const RAMPS: string[] = [' .:-=+*#%@', ' .,:;irsXA253hMHGS#9B&@', ' .\'`^",:;Il!i><~+_-?][}{1)(|/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$', ' ░▒▓█', ' .oO0@'];
 const RAMP_CODE: Int32Array[] = RAMPS.map((s) => {
   const a = new Int32Array(s.length);
   let i = 0;
@@ -92,20 +86,18 @@ interface Palette {
   rim: RGB; // rim-light tint
 }
 const PALETTES: Palette[] = [
-  { name: 'EMBER', hueBase: 0.04, hueSpan: 0.50, sat: 0.92, warm: [1.0, 0.55, 0.18], fill: [0.10, 0.55, 0.95], rim: [1.0, 0.30, 0.62] },
-  { name: 'NEON', hueBase: 0.52, hueSpan: 0.60, sat: 0.98, warm: [0.15, 0.95, 1.0], fill: [0.65, 0.18, 1.0], rim: [0.30, 1.0, 0.45] },
-  { name: 'JADE', hueBase: 0.34, hueSpan: 0.46, sat: 0.88, warm: [0.45, 1.0, 0.55], fill: [0.12, 0.45, 0.85], rim: [1.0, 0.85, 0.30] },
-  { name: 'GOLD', hueBase: 0.10, hueSpan: 0.34, sat: 0.86, warm: [1.0, 0.78, 0.30], fill: [0.30, 0.45, 0.90], rim: [1.0, 0.40, 0.22] },
-  { name: 'PLASMA', hueBase: 0.80, hueSpan: 0.70, sat: 0.97, warm: [1.0, 0.30, 0.62], fill: [0.25, 0.50, 1.0], rim: [1.0, 0.80, 0.28] },
+  { name: 'EMBER', hueBase: 0.04, hueSpan: 0.5, sat: 0.92, warm: [1.0, 0.55, 0.18], fill: [0.1, 0.55, 0.95], rim: [1.0, 0.3, 0.62] },
+  { name: 'NEON', hueBase: 0.52, hueSpan: 0.6, sat: 0.98, warm: [0.15, 0.95, 1.0], fill: [0.65, 0.18, 1.0], rim: [0.3, 1.0, 0.45] },
+  { name: 'JADE', hueBase: 0.34, hueSpan: 0.46, sat: 0.88, warm: [0.45, 1.0, 0.55], fill: [0.12, 0.45, 0.85], rim: [1.0, 0.85, 0.3] },
+  { name: 'GOLD', hueBase: 0.1, hueSpan: 0.34, sat: 0.86, warm: [1.0, 0.78, 0.3], fill: [0.3, 0.45, 0.9], rim: [1.0, 0.4, 0.22] },
+  { name: 'PLASMA', hueBase: 0.8, hueSpan: 0.7, sat: 0.97, warm: [1.0, 0.3, 0.62], fill: [0.25, 0.5, 1.0], rim: [1.0, 0.8, 0.28] },
 ];
 
 const PI = Math.PI;
 const TWO_PI = 2 * PI;
 
 // 4×4 ordered (Bayer) dither, normalised to (-0.5..0.5).
-const BAYER4 = new Float32Array([
-  0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5,
-].map((v) => v / 16 - 0.5));
+const BAYER4 = new Float32Array([0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5].map((v) => v / 16 - 0.5));
 
 interface Scene {
   cols: number;
@@ -187,9 +179,15 @@ const SHAPE_NAMES = ['SPHERE', 'TORUS', 'TORUS KNOT', 'ROUNDED CUBE', 'CLAUDE SP
 // per-shape hero orientation plus a gentle shared "rock" so it reads as a turning
 // 3D solid without ever rotating a flat shape (torus/spark) edge-on or a cube to
 // an ambiguous corner-on view. Stored as a 3×3 matrix; sceneSDF applies it.
-let m00 = 1, m01 = 0, m02 = 0;
-let m10 = 0, m11 = 1, m12 = 0;
-let m20 = 0, m21 = 0, m22 = 1;
+let m00 = 1,
+  m01 = 0,
+  m02 = 0;
+let m10 = 0,
+  m11 = 1,
+  m12 = 0;
+let m20 = 0,
+  m21 = 0,
+  m22 = 1;
 // Active shape index + (during a dissolve) the previous shape and 0..1 blend.
 let shapeA = SHAPE_SPHERE;
 let shapeB = SHAPE_SPHERE;
@@ -203,33 +201,35 @@ const sdSphere = (x: number, y: number, z: number): number => {
   const r = Math.sqrt(x * x + y * y + z * z);
   let d = r - SPH_R;
   // A shallow great-circle groove on the equator (|y| small) — purely cosmetic.
-  const groove = 0.018 - 0.018 * smoothstep(0.0, 0.10, Math.abs(y));
+  const groove = 0.018 - 0.018 * smoothstep(0.0, 0.1, Math.abs(y));
   d += groove;
   return d;
 };
 
 // Classic donut: torus of major R, tube r, lying in the xz-plane.
 const TOR_R = 0.62;
-const TOR_T = 0.30;
+const TOR_T = 0.3;
 const sdTorus = (x: number, y: number, z: number): number => {
   const q = Math.sqrt(x * x + z * z) - TOR_R;
   return Math.sqrt(q * q + y * y) - TOR_T;
 };
 
 // Clean (2,3) torus knot tube — the legible analytic form, no morph/twist drift.
-const KNT_R = 0.60; // major ring radius
-const KNT_R2 = 0.30; // knot path radius about the ring
+const KNT_R = 0.6; // major ring radius
+const KNT_R2 = 0.3; // knot path radius about the ring
 const KNT_TUBE = 0.165;
 const KNT_P = 2;
 const KNT_Q = 3;
 const sdKnot = (x: number, y: number, z: number): number => {
   const R = KNT_R;
-  const p = KNT_P, q = KNT_Q;
+  const p = KNT_P,
+    q = KNT_Q;
   let a = Math.atan2(z, x);
   const seg = TWO_PI / p;
   const k = Math.round(a / seg);
   a -= k * seg;
-  const ca = Math.cos(a), sa = Math.sin(a);
+  const ca = Math.cos(a),
+    sa = Math.sin(a);
   const xr = x * ca + z * sa;
   const zr = -x * sa + z * ca;
   const rad = xr - R;
@@ -243,7 +243,7 @@ const sdKnot = (x: number, y: number, z: number): number => {
 
 // Rounded cube: box SDF with a corner round, slightly under unit so it sits in
 // the bounding sphere with margin.
-const CUBE_H = 0.60; // half-extent
+const CUBE_H = 0.6; // half-extent
 const CUBE_RND = 0.07; // corner round — small, so the edges read as crisp planes
 const sdCube = (x: number, y: number, z: number): number => {
   const qx = (x < 0 ? -x : x) - CUBE_H;
@@ -270,8 +270,8 @@ const smin = (a: number, b: number, k: number): number => {
 // gently CONCAVE edges between adjacent points that make the Anthropic spark read
 // instantly. The petals are kept blunt-tipped (a min tip radius) so the sphere
 // tracer reliably lands on them and they never vanish to invisible threads.
-const SPK_L = 1.00; // tip reach along each axis
-const SPK_BASE = 0.40; // half-width of a petal at the centre
+const SPK_L = 1.0; // tip reach along each axis
+const SPK_BASE = 0.4; // half-width of a petal at the centre
 const SPK_TIP = 0.05; // half-width at the tip (blunt, so the marcher catches it)
 const SPK_THK = 0.26; // out-of-plane half-thickness (z)
 // One petal along +`along` (also mirrored to -along by using |along|). `perp` is
@@ -303,11 +303,16 @@ const sdSpark = (x: number, y: number, z: number): number => {
 // Evaluate one shape's SDF by index, in MODEL space already de-spun by the caller.
 const shapeSDF = (s: number, x: number, y: number, z: number): number => {
   switch (s) {
-    case SHAPE_SPHERE: return sdSphere(x, y, z);
-    case SHAPE_TORUS: return sdTorus(x, y, z);
-    case SHAPE_KNOT: return sdKnot(x, y, z);
-    case SHAPE_CUBE: return sdCube(x, y, z);
-    default: return sdSpark(x, y, z);
+    case SHAPE_SPHERE:
+      return sdSphere(x, y, z);
+    case SHAPE_TORUS:
+      return sdTorus(x, y, z);
+    case SHAPE_KNOT:
+      return sdKnot(x, y, z);
+    case SHAPE_CUBE:
+      return sdCube(x, y, z);
+    default:
+      return sdSpark(x, y, z);
   }
 };
 
@@ -347,39 +352,75 @@ const setModelRotation = (shape: number, rock: number): void => {
   if (shape === SHAPE_SPARK) {
     // Rz(spin) then a small fixed Rx tilt for depth. World→model = (Rx*Rz).
     const az = rock * 0.5; // gentle in-plane twinkle
-    const cz = Math.cos(az), sz = Math.sin(az);
+    const cz = Math.cos(az),
+      sz = Math.sin(az);
     const tx = 0.22;
-    const cx = Math.cos(tx), sx = Math.sin(tx);
+    const cx = Math.cos(tx),
+      sx = Math.sin(tx);
     // Rz: [ cz -sz 0 ; sz cz 0 ; 0 0 1 ]; Rx: [1 0 0; 0 cx -sx; 0 sx cx]
     // R = Rx*Rz:
-    m00 = cz;        m01 = -sz;       m02 = 0;
-    m10 = cx * sz;   m11 = cx * cz;   m12 = -sx;
-    m20 = sx * sz;   m21 = sx * cz;   m22 = cx;
+    m00 = cz;
+    m01 = -sz;
+    m02 = 0;
+    m10 = cx * sz;
+    m11 = cx * cz;
+    m12 = -sx;
+    m20 = sx * sz;
+    m21 = sx * cz;
+    m22 = cx;
     return;
   }
   let tiltX = 0; // radians about x (down-tilt: positive lifts the top toward viewer)
   let baseY = 0; // radians about y baked into the hero pose
   let yAmp = 1.0; // how much the shared rock applies
   switch (shape) {
-    case SHAPE_TORUS: tiltX = 0.66; yAmp = 1.0; break;
-    case SHAPE_KNOT: tiltX = 0.30; baseY = 0.2; yAmp = 1.0; break;
-    case SHAPE_CUBE: tiltX = 0.42; baseY = 0.62; yAmp = 0.6; break;
-    default: tiltX = 0.0; yAmp = 1.0; break; // sphere
+    case SHAPE_TORUS:
+      tiltX = 0.66;
+      yAmp = 1.0;
+      break;
+    case SHAPE_KNOT:
+      tiltX = 0.3;
+      baseY = 0.2;
+      yAmp = 1.0;
+      break;
+    case SHAPE_CUBE:
+      tiltX = 0.42;
+      baseY = 0.62;
+      yAmp = 0.6;
+      break;
+    default:
+      tiltX = 0.0;
+      yAmp = 1.0;
+      break; // sphere
   }
   const ay = baseY + rock * yAmp;
-  const cy = Math.cos(ay), sy = Math.sin(ay);
-  const cx = Math.cos(tiltX), sx = Math.sin(tiltX);
+  const cy = Math.cos(ay),
+    sy = Math.sin(ay);
+  const cx = Math.cos(tiltX),
+    sx = Math.sin(tiltX);
   // R = Rx(tiltX) * Ry(ay):
-  m00 = cy;        m01 = 0;    m02 = sy;
-  m10 = sx * sy;   m11 = cx;   m12 = -sx * cy;
-  m20 = -cx * sy;  m21 = sx;   m22 = cx * cy;
+  m00 = cy;
+  m01 = 0;
+  m02 = sy;
+  m10 = sx * sy;
+  m11 = cx;
+  m12 = -sx * cy;
+  m20 = -cx * sy;
+  m21 = sx;
+  m22 = cx * cy;
 };
 
 // Lighting directions (normalised, world space): warm key upper-right, cool fill
 // left/front, magenta rim as a confined lower-right side accent.
-const L0x = 0.58, L0y = 0.66, L0z = 0.48; // key (warm)
-const L1x = -0.82, L1y = 0.18, L1z = 0.54; // fill (cool)
-const L2x = 0.66, L2y = -0.44, L2z = -0.32; // rim (magenta)
+const L0x = 0.58,
+  L0y = 0.66,
+  L0z = 0.48; // key (warm)
+const L1x = -0.82,
+  L1y = 0.18,
+  L1z = 0.54; // fill (cool)
+const L2x = 0.66,
+  L2y = -0.44,
+  L2z = -0.32; // rim (magenta)
 
 runText({
   title: 'chromascii — colour ASCII 3D renderer',
@@ -485,7 +526,7 @@ const renderFrame = (t: CharTerm, sc: Scene, time: number): void => {
     // rotated edge-on by a full camera orbit. The form clearly turns; it never
     // becomes unreadable.
     camYaw = yaw + 0.42 + 0.16 * Math.sin(time * 0.23);
-    camPitch = -0.20 + 0.08 * Math.sin(time * 0.19);
+    camPitch = -0.2 + 0.08 * Math.sin(time * 0.19);
     camZoom = 1.46 + 0.09 * Math.sin(time * 0.21);
   }
 
@@ -525,24 +566,32 @@ const renderFrame = (t: CharTerm, sc: Scene, time: number): void => {
   // form visibly turns (revealing its 3D structure) but always returns to — and
   // dwells near — its hero orientation. Range ≈ ±0.85 rad: enough to swing a cube
   // through its faces and roll a torus/knot, never enough to edge-on a flat shape.
-  const rock = 0.85 * Math.sin(time * 0.40);
+  const rock = 0.85 * Math.sin(time * 0.4);
   setModelRotation(labelShape, rock);
 
   // ── Camera basis ──────────────────────────────────────────────────────────────
-  const cp = Math.cos(camPitch), sp = Math.sin(camPitch);
-  const cy = Math.cos(camYaw), sy = Math.sin(camYaw);
+  const cp = Math.cos(camPitch),
+    sp = Math.sin(camPitch);
+  const cy = Math.cos(camYaw),
+    sy = Math.sin(camYaw);
   const D = 3.0 / camZoom;
   const camX = D * cp * sy;
   const camY = D * sp;
   const camZ = D * cp * cy;
-  let fwdX = -camX, fwdY = -camY, fwdZ = -camZ;
+  let fwdX = -camX,
+    fwdY = -camY,
+    fwdZ = -camZ;
   const fl = 1 / Math.sqrt(fwdX * fwdX + fwdY * fwdY + fwdZ * fwdZ);
-  fwdX *= fl; fwdY *= fl; fwdZ *= fl;
+  fwdX *= fl;
+  fwdY *= fl;
+  fwdZ *= fl;
   let rX = fwdZ;
   let rY = 0;
   let rZ = -fwdX;
   const rl = 1 / Math.sqrt(rX * rX + rY * rY + rZ * rZ + 1e-9);
-  rX *= rl; rY *= rl; rZ *= rl;
+  rX *= rl;
+  rY *= rl;
+  rZ *= rl;
   const uX = fwdY * rZ - fwdZ * rY;
   const uY = fwdZ * rX - fwdX * rZ;
   const uZ = fwdX * rY - fwdY * rX;
@@ -566,7 +615,12 @@ const renderFrame = (t: CharTerm, sc: Scene, time: number): void => {
   // ── Adaptive raymarch: coarse 1-ray-per-cell pass drives selective 2×2 SS ──────
   const N = cols * rows;
   for (let i = 0; i < N; i++) {
-    lum[i] = 0; dep[i] = 0; hue[i] = 0; satv[i] = 0; valv[i] = 0; hit[i] = 0;
+    lum[i] = 0;
+    dep[i] = 0;
+    hue[i] = 0;
+    satv[i] = 0;
+    valv[i] = 0;
+    hit[i] = 0;
   }
 
   const invSSx = 1 / ssx;
@@ -577,7 +631,9 @@ const renderFrame = (t: CharTerm, sc: Scene, time: number): void => {
 
   const marchRay = (dirX: number, dirY: number, dirZ: number): number => {
     const tca = -(camX * dirX + camY * dirY + camZ * dirZ);
-    const ox = camX + dirX * tca, oy = camY + dirY * tca, oz = camZ + dirZ * tca;
+    const ox = camX + dirX * tca,
+      oy = camY + dirY * tca,
+      oz = camZ + dirZ * tca;
     const closest2 = ox * ox + oy * oy + oz * oz;
     if (closest2 > BSPHERE2) return -1;
     const half = Math.sqrt(BSPHERE2 - closest2);
@@ -597,9 +653,7 @@ const renderFrame = (t: CharTerm, sc: Scene, time: number): void => {
     return -1;
   };
 
-  const shadeHit = (
-    dirX: number, dirY: number, dirZ: number, hitT: number, ci: number, w: number,
-  ): void => {
+  const shadeHit = (dirX: number, dirY: number, dirZ: number, hitT: number, ci: number, w: number): void => {
     const hx = camX + dirX * hitT;
     const hy = camY + dirY * hitT;
     const hz = camZ + dirZ * hitT;
@@ -612,21 +666,33 @@ const renderFrame = (t: CharTerm, sc: Scene, time: number): void => {
     const ny = -d1 - d2 + d3 + d4;
     const nz = -d1 + d2 - d3 + d4;
     const nl = 1 / Math.sqrt(nx * nx + ny * ny + nz * nz + 1e-12);
-    const Nx = nx * nl, Ny = ny * nl, Nz = nz * nl;
+    const Nx = nx * nl,
+      Ny = ny * nl,
+      Nz = nz * nl;
 
-    const vx = -dirX, vy = -dirY, vz = -dirZ;
+    const vx = -dirX,
+      vy = -dirY,
+      vz = -dirZ;
 
     const ndl0raw = Nx * L0x + Ny * L0y + Nz * L0z;
     const ndl0 = Math.max(0, 0.18 + 0.82 * ndl0raw);
     const ndl1raw = Nx * L1x + Ny * L1y + Nz * L1z;
     const ndl1 = Math.max(0, 0.42 + 0.58 * ndl1raw) * 0.95;
     const ndl2 = Math.max(0, Nx * L2x + Ny * L2y + Nz * L2z);
-    let hX = L0x + vx, hY2 = L0y + vy, hZ = L0z + vz;
+    let hX = L0x + vx,
+      hY2 = L0y + vy,
+      hZ = L0z + vz;
     const hl = 1 / Math.sqrt(hX * hX + hY2 * hY2 + hZ * hZ + 1e-9);
-    hX *= hl; hY2 *= hl; hZ *= hl;
+    hX *= hl;
+    hY2 *= hl;
+    hZ *= hl;
     let sp0 = Nx * hX + Ny * hY2 + Nz * hZ;
     if (sp0 < 0) sp0 = 0;
-    sp0 *= sp0; sp0 *= sp0; sp0 *= sp0; sp0 *= sp0; sp0 *= sp0; // ^32
+    sp0 *= sp0;
+    sp0 *= sp0;
+    sp0 *= sp0;
+    sp0 *= sp0;
+    sp0 *= sp0; // ^32
     const spec = sp0 * 1.1;
 
     const ndv = Math.max(0, Nx * vx + Ny * vy + Nz * vz);
@@ -635,13 +701,19 @@ const renderFrame = (t: CharTerm, sc: Scene, time: number): void => {
     const fres = fr2 * fr2;
 
     const ndl2t = ndl2 * ndl2 * ndl2;
-    const kw = 1.0 * ndl0, kf = 1.0 * ndl1, kr = 0.34 * ndl2t + fres * 0.22;
+    const kw = 1.0 * ndl0,
+      kf = 1.0 * ndl1,
+      kr = 0.34 * ndl2t + fres * 0.22;
     let rr = kw * pal.warm[0] + kf * pal.fill[0] + kr * pal.rim[0] + spec;
     let gg = kw * pal.warm[1] + kf * pal.fill[1] + kr * pal.rim[1] + spec;
     let bb = kw * pal.warm[2] + kf * pal.fill[2] + kr * pal.rim[2] + spec;
-    rr += 0.05; gg += 0.07; bb += 0.13;
+    rr += 0.05;
+    gg += 0.07;
+    bb += 0.13;
 
-    const tr = aces(rr * 1.25), tg = aces(gg * 1.25), tb = aces(bb * 1.25);
+    const tr = aces(rr * 1.25),
+      tg = aces(gg * 1.25),
+      tb = aces(bb * 1.25);
 
     const L = 0.299 * tr + 0.587 * tg + 0.114 * tb;
 
@@ -652,7 +724,7 @@ const renderFrame = (t: CharTerm, sc: Scene, time: number): void => {
     const chroma = mx - mn;
     let hh: number;
     if (chroma < 1e-4) hh = pal.hueBase;
-    else if (mx === tr) hh = ((tg - tb) / chroma) / 6;
+    else if (mx === tr) hh = (tg - tb) / chroma / 6;
     else if (mx === tg) hh = (2 + (tb - tr) / chroma) / 6;
     else hh = (4 + (tr - tg) / chroma) / 6;
     if (hh < 0) hh += 1;
@@ -663,7 +735,7 @@ const renderFrame = (t: CharTerm, sc: Scene, time: number): void => {
     lum[ci] += L * w;
     dep[ci] += dn * w;
     hue[ci] += hh * w;
-    satv[ci] += (ss * (1 - 0.6 * clamp01(spec))) * w;
+    satv[ci] += ss * (1 - 0.6 * clamp01(spec)) * w;
     valv[ci] += clamp01(mx * 1.05) * w;
   };
 
@@ -681,7 +753,9 @@ const renderFrame = (t: CharTerm, sc: Scene, time: number): void => {
       let dirY = fwdY + rY * ndcX + uY * ndcY;
       let dirZ = fwdZ + rZ * ndcX + uZ * ndcY;
       const dl = 1 / Math.sqrt(dirX * dirX + dirY * dirY + dirZ * dirZ);
-      dirX *= dl; dirY *= dl; dirZ *= dl;
+      dirX *= dl;
+      dirY *= dl;
+      dirZ *= dl;
       const hitT = marchRay(dirX, dirY, dirZ);
       if (hitT < 0) {
         chit[ci] = 0;
@@ -711,7 +785,8 @@ const renderFrame = (t: CharTerm, sc: Scene, time: number): void => {
         const dd = row < rows - 1 ? cdep[ci + cols] : d0;
         const dl2 = col > 0 ? cdep[ci - 1] : d0;
         const dr2 = col < cols - 1 ? cdep[ci + 1] : d0;
-        const gxd = dl2 - dr2, gyd = du - dd;
+        const gxd = dl2 - dr2,
+          gyd = du - dd;
         if (gxd * gxd + gyd * gyd > 0.0016) boundary = true;
       }
 
@@ -726,9 +801,14 @@ const renderFrame = (t: CharTerm, sc: Scene, time: number): void => {
         let dirY = fwdY + rY * ndcX + uY * ndcYc;
         let dirZ = fwdZ + rZ * ndcX + uZ * ndcYc;
         const dl = 1 / Math.sqrt(dirX * dirX + dirY * dirY + dirZ * dirZ);
-        dirX *= dl; dirY *= dl; dirZ *= dl;
+        dirX *= dl;
+        dirY *= dl;
+        dirZ *= dl;
         const hitT = marchRay(dirX, dirY, dirZ);
-        if (hitT < 0) { dep[ci] = 1; continue; }
+        if (hitT < 0) {
+          dep[ci] = 1;
+          continue;
+        }
         shadeHit(dirX, dirY, dirZ, hitT, ci, 1);
         hit[ci] = SS * SS;
         continue;
@@ -743,9 +823,14 @@ const renderFrame = (t: CharTerm, sc: Scene, time: number): void => {
           let dirY = fwdY + rY * ndcX + uY * ndcY;
           let dirZ = fwdZ + rZ * ndcX + uZ * ndcY;
           const dl = 1 / Math.sqrt(dirX * dirX + dirY * dirY + dirZ * dirZ);
-          dirX *= dl; dirY *= dl; dirZ *= dl;
+          dirX *= dl;
+          dirY *= dl;
+          dirZ *= dl;
           const hitT = marchRay(dirX, dirY, dirZ);
-          if (hitT < 0) { dep[ci] += ssArea; continue; }
+          if (hitT < 0) {
+            dep[ci] += ssArea;
+            continue;
+          }
           shadeHit(dirX, dirY, dirZ, hitT, ci, ssArea);
           hitCount++;
         }
@@ -775,9 +860,9 @@ const renderFrame = (t: CharTerm, sc: Scene, time: number): void => {
     const f = 1 - v * v;
     gyArr[y] = f > 0 ? f : 0;
   }
-  const glowR = pal.warm[0] * 0.42 + pal.fill[0] * 0.30 + pal.rim[0] * 0.28;
-  const glowG = pal.warm[1] * 0.42 + pal.fill[1] * 0.30 + pal.rim[1] * 0.28;
-  const glowB = pal.warm[2] * 0.42 + pal.fill[2] * 0.30 + pal.rim[2] * 0.28;
+  const glowR = pal.warm[0] * 0.42 + pal.fill[0] * 0.3 + pal.rim[0] * 0.28;
+  const glowG = pal.warm[1] * 0.42 + pal.fill[1] * 0.3 + pal.rim[1] * 0.28;
+  const glowB = pal.warm[2] * 0.42 + pal.fill[2] * 0.3 + pal.rim[2] * 0.28;
   for (let y = 0; y < rows; y++) {
     const rowBase = y * cols;
     const gyv = gyArr[y];
@@ -793,12 +878,15 @@ const renderFrame = (t: CharTerm, sc: Scene, time: number): void => {
         t.put(x, y, ' ', [40, 40, 50], [bgr, bgg, bgb]);
         continue;
       }
-      const bgr = 4, bgg = 4, bgb = 10;
+      const bgr = 4,
+        bgg = 4,
+        bgb = 10;
 
       const L = lum[ci];
       const dith = BAYER4[((y & 3) << 2) | (x & 3)] * 1.5;
       let gi = (clamp01(L * 1.25) * rampMax + 0.5 + dith) | 0;
-      if (gi < 0) gi = 0; else if (gi > rampMax) gi = rampMax;
+      if (gi < 0) gi = 0;
+      else if (gi > rampMax) gi = rampMax;
 
       const hh = hue[ci];
       const ssN = clamp01(satv[ci]);
@@ -808,18 +896,16 @@ const renderFrame = (t: CharTerm, sc: Scene, time: number): void => {
 
       const dn = dep[ci];
       const bgDim = 1 - 0.5 * dn;
-      const bg: RGB = [
-        (col[0] * 0.10 * bgDim + bgr * 0.5) | 0,
-        (col[1] * 0.10 * bgDim + bgg * 0.5) | 0,
-        (col[2] * 0.12 * bgDim + bgb * 0.6) | 0,
-      ];
+      const bg: RGB = [(col[0] * 0.1 * bgDim + bgr * 0.5) | 0, (col[1] * 0.1 * bgDim + bgg * 0.5) | 0, (col[2] * 0.12 * bgDim + bgb * 0.6) | 0];
 
       let cpch = ramp[gi];
       let useBold = L > 0.6;
 
       if (inkOn && x > 0 && x < cols - 1 && y > 0 && y < rows - 1) {
-        const up = (y - 1) * cols + x, dn2 = (y + 1) * cols + x;
-        const lf = y * cols + (x - 1), rt = y * cols + (x + 1);
+        const up = (y - 1) * cols + x,
+          dn2 = (y + 1) * cols + x;
+        const lf = y * cols + (x - 1),
+          rt = y * cols + (x + 1);
         const i00 = lumOrFar(lum, hit, (y - 1) * cols + (x - 1));
         const i01 = lumOrFar(lum, hit, up);
         const i02 = lumOrFar(lum, hit, (y - 1) * cols + (x + 1));
@@ -902,11 +988,7 @@ const drawTitle = (t: CharTerm, name: string, pal: Palette): void => {
   // Skip the giant label on tiny grids — fall back to a single bright line.
   const fitsBig = t.columns >= 60 && t.rows >= 18;
   // Title colour: a warm-cream lifted from the palette key for cohesion.
-  const tc: RGB = [
-    Math.min(255, (180 + pal.warm[0] * 60) | 0),
-    Math.min(255, (185 + pal.warm[1] * 55) | 0),
-    Math.min(255, (200 + pal.warm[2] * 45) | 0),
-  ];
+  const tc: RGB = [Math.min(255, (180 + pal.warm[0] * 60) | 0), Math.min(255, (185 + pal.warm[1] * 55) | 0), Math.min(255, (200 + pal.warm[2] * 45) | 0)];
   const shadow: RGB = [6, 7, 14];
   const subColor: RGB = [120, 132, 158];
   const SUBTITLE = 'REAL-TIME 3D · COLOUR ASCII RAYMARCHER';
@@ -962,8 +1044,7 @@ const drawTitle = (t: CharTerm, name: string, pal: Palette): void => {
   if (subY < t.rows - 1) t.text(subX, subY, SUBTITLE, subColor, undefined, false);
 };
 
-const lumOrFar = (lum: Float32Array, hit: Uint8Array, idx: number): number =>
-  hit[idx] > 0 ? lum[idx] : 0;
+const lumOrFar = (lum: Float32Array, hit: Uint8Array, idx: number): number => (hit[idx] > 0 ? lum[idx] : 0);
 
 const camZoomLabel = (z: number): string => {
   const v = Math.round(z * 100) / 100;

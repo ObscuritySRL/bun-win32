@@ -132,13 +132,7 @@ const PAGE_EXECUTE_READWRITE = 0x40;
 const PAGE_EXECUTE_WRITECOPY = 0x80;
 const PAGE_GUARD = 0x100;
 // Mask of "currently readable via ReadProcessMemory" protections.
-const PAGE_READABLE_MASK =
-  PAGE_READONLY |
-  PAGE_READWRITE |
-  PAGE_WRITECOPY |
-  PAGE_EXECUTE_READ |
-  PAGE_EXECUTE_READWRITE |
-  PAGE_EXECUTE_WRITECOPY;
+const PAGE_READABLE_MASK = PAGE_READONLY | PAGE_READWRITE | PAGE_WRITECOPY | PAGE_EXECUTE_READ | PAGE_EXECUTE_READWRITE | PAGE_EXECUTE_WRITECOPY;
 
 function protectName(p: number): string {
   const base = p & 0xff;
@@ -198,8 +192,7 @@ function regionColor(state: number, protect: number): string {
   if (state === MEM_RESERVE) return BLUE;
   // committed:
   const base = protect & 0xff;
-  if (base & (PAGE_EXECUTE | PAGE_EXECUTE_READ | PAGE_EXECUTE_READWRITE | PAGE_EXECUTE_WRITECOPY))
-    return RED; // executable code
+  if (base & (PAGE_EXECUTE | PAGE_EXECUTE_READ | PAGE_EXECUTE_READWRITE | PAGE_EXECUTE_WRITECOPY)) return RED; // executable code
   if (base & (PAGE_READWRITE | PAGE_WRITECOPY)) return GREEN; // writable data
   if (base === PAGE_READONLY) return CYAN; // read-only data
   if (base === PAGE_NOACCESS || protect & PAGE_GUARD) return MAGENTA; // guard / no-access
@@ -209,8 +202,7 @@ function regionColor(state: number, protect: number): string {
 // ---------------------------------------------------------------------------
 // Target resolution
 // ---------------------------------------------------------------------------
-const PROCESS_QUERY_LIMITED_INFORMATION =
-  ProcessAccessRights.PROCESS_QUERY_LIMITED_INFORMATION;
+const PROCESS_QUERY_LIMITED_INFORMATION = ProcessAccessRights.PROCESS_QUERY_LIMITED_INFORMATION;
 const PROCESS_VM_READ = ProcessAccessRights.PROCESS_VM_READ;
 const DESIRED_ACCESS = PROCESS_QUERY_LIMITED_INFORMATION | PROCESS_VM_READ;
 
@@ -259,10 +251,7 @@ function resolveTarget(): Target {
     } else {
       const found = findPidByName(arg);
       if (found === null) {
-        console.log(
-          `${YELLOW}No running process matched name "${arg}". ` +
-            `Falling back to this bun process (PID ${ownPid}).${RESET}`,
-        );
+        console.log(`${YELLOW}No running process matched name "${arg}". ` + `Falling back to this bun process (PID ${ownPid}).${RESET}`);
       } else {
         requestedPid = found;
       }
@@ -273,14 +262,8 @@ function resolveTarget(): Target {
   let handle = Kernel32.OpenProcess(DESIRED_ACCESS, 0, targetPid);
 
   if (!handle || handle === 0n) {
-    console.log(
-      `${YELLOW}OpenProcess(PID ${targetPid}) was denied — this is expected for ` +
-        `protected, other-user, or elevated processes.${RESET}`,
-    );
-    console.log(
-      `${DIM}Try a same-user process, run this terminal elevated, or omit the argument. ` +
-        `Falling back to this bun process (PID ${ownPid}).${RESET}`,
-    );
+    console.log(`${YELLOW}OpenProcess(PID ${targetPid}) was denied — this is expected for ` + `protected, other-user, or elevated processes.${RESET}`);
+    console.log(`${DIM}Try a same-user process, run this terminal elevated, or omit the argument. ` + `Falling back to this bun process (PID ${ownPid}).${RESET}`);
     handle = Kernel32.OpenProcess(DESIRED_ACCESS, 0, ownPid);
     if (!handle || handle === 0n) {
       // Should never happen for our own PID, but degrade cleanly.
@@ -424,13 +407,7 @@ function walkAddressSpace(h: bigint): Region[] {
 // HEX DUMP — cross-process ReadProcessMemory of the first readable committed region
 // ---------------------------------------------------------------------------
 function hexDump(h: bigint, regions: Region[], wantBytes: number): void {
-  const target = regions.find(
-    (r) =>
-      r.state === MEM_COMMIT &&
-      r.protect & PAGE_READABLE_MASK &&
-      !(r.protect & PAGE_GUARD) &&
-      r.size > 0n,
-  );
+  const target = regions.find((r) => r.state === MEM_COMMIT && r.protect & PAGE_READABLE_MASK && !(r.protect & PAGE_GUARD) && r.size > 0n);
 
   if (!target) {
     console.log(`  ${YELLOW}No readable committed region found to dump.${RESET}`);
@@ -447,14 +424,8 @@ function hexDump(h: bigint, regions: Region[], wantBytes: number): void {
   const ok = Kernel32.ReadProcessMemory(h, target.base, buf.ptr, BigInt(n), 0n);
   const got = ok ? n : 0;
 
-  console.log(
-    `  ${DIM}region ${hex64(target.base)}  ${protectName(target.protect)}  ` +
-      `${typeName(target.type)}  size ${formatBytes(Number(target.size))}${RESET}`,
-  );
-  console.log(
-    `  ${WHITE}ReadProcessMemory returned ${ok ? 'TRUE' : 'FALSE'}, ` +
-      `${got} bytes copied across the process boundary.${RESET}`,
-  );
+  console.log(`  ${DIM}region ${hex64(target.base)}  ${protectName(target.protect)}  ` + `${typeName(target.type)}  size ${formatBytes(Number(target.size))}${RESET}`);
+  console.log(`  ${WHITE}ReadProcessMemory returned ${ok ? 'TRUE' : 'FALSE'}, ` + `${got} bytes copied across the process boundary.${RESET}`);
 
   if (!ok || got === 0) {
     console.log(`  ${YELLOW}(no bytes copied — region became unreadable)${RESET}`);
@@ -481,9 +452,7 @@ function hexDump(h: bigint, regions: Region[], wantBytes: number): void {
       if (c === 7) hexPart += ' ';
     }
     const absOff = target.base + BigInt(off);
-    console.log(
-      `  ${CYAN}${hex64(absOff)}${RESET}  ${WHITE}${hexPart}${RESET}  ${GREEN}${asc}${RESET}`,
-    );
+    console.log(`  ${CYAN}${hex64(absOff)}${RESET}  ${WHITE}${hexPart}${RESET}  ${GREEN}${asc}${RESET}`);
   }
 }
 
@@ -491,27 +460,8 @@ function hexDump(h: bigint, regions: Region[], wantBytes: number): void {
 // MAIN
 // ---------------------------------------------------------------------------
 function main(): void {
-  Kernel32.Preload([
-    'GetCurrentProcessId',
-    'OpenProcess',
-    'CloseHandle',
-    'VirtualQueryEx',
-    'ReadProcessMemory',
-    'CreateToolhelp32Snapshot',
-    'Thread32First',
-    'Thread32Next',
-    'GetStdHandle',
-    'GetConsoleMode',
-    'SetConsoleMode',
-  ]);
-  Psapi.Preload([
-    'EnumProcesses',
-    'GetProcessImageFileNameW',
-    'EnumProcessModules',
-    'GetModuleBaseNameW',
-    'GetModuleInformation',
-    'GetProcessMemoryInfo',
-  ]);
+  Kernel32.Preload(['GetCurrentProcessId', 'OpenProcess', 'CloseHandle', 'VirtualQueryEx', 'ReadProcessMemory', 'CreateToolhelp32Snapshot', 'Thread32First', 'Thread32Next', 'GetStdHandle', 'GetConsoleMode', 'SetConsoleMode']);
+  Psapi.Preload(['EnumProcesses', 'GetProcessImageFileNameW', 'EnumProcessModules', 'GetModuleBaseNameW', 'GetModuleInformation', 'GetProcessMemoryInfo']);
 
   enableVirtualTerminal();
 
@@ -522,23 +472,13 @@ function main(): void {
     // Resolve a friendly image name for the banner.
     const nameBuf = Buffer.alloc(520);
     const nameLen = Psapi.GetProcessImageFileNameW(handle, nameBuf.ptr, 260);
-    const exeName =
-      nameLen > 0 ? (readWide(nameBuf, nameLen).split('\\').pop() ?? '(unknown)') : '(unknown)';
+    const exeName = nameLen > 0 ? (readWide(nameBuf, nameLen).split('\\').pop() ?? '(unknown)') : '(unknown)';
 
     console.log();
-    console.log(
-      `${MAGENTA}${BOLD}  ╔═══════════════════════════════════════════════════════════════════════╗${RESET}`,
-    );
-    console.log(
-      `${MAGENTA}${BOLD}  ║   PROCESS X-RAY  —  cross-process inspection via raw Win32 FFI         ║${RESET}`,
-    );
-    console.log(
-      `${MAGENTA}${BOLD}  ╚═══════════════════════════════════════════════════════════════════════╝${RESET}`,
-    );
-    console.log(
-      `  ${WHITE}Target: ${BOLD}${exeName}${RESET}  ${DIM}PID ${pid}` +
-        `  handle ${hex64(handle)}${target.selfFallback ? '  (own bun process)' : ''}${RESET}`,
-    );
+    console.log(`${MAGENTA}${BOLD}  ╔═══════════════════════════════════════════════════════════════════════╗${RESET}`);
+    console.log(`${MAGENTA}${BOLD}  ║   PROCESS X-RAY  —  cross-process inspection via raw Win32 FFI         ║${RESET}`);
+    console.log(`${MAGENTA}${BOLD}  ╚═══════════════════════════════════════════════════════════════════════╝${RESET}`);
+    console.log(`  ${WHITE}Target: ${BOLD}${exeName}${RESET}  ${DIM}PID ${pid}` + `  handle ${hex64(handle)}${target.selfFallback ? '  (own bun process)' : ''}${RESET}`);
 
     // --- MODULES ---
     header('MODULES — loaded DLLs (base / size / entry point)', BLUE);
@@ -546,17 +486,12 @@ function main(): void {
     if (modules.length === 0) {
       console.log(`  ${YELLOW}(no modules enumerable — access limited)${RESET}`);
     } else {
-      console.log(
-        `  ${BOLD}${'MODULE'.padEnd(26)}${'BASE'.padEnd(16)}${'SIZE'.padStart(11)}   ENTRY POINT${RESET}`,
-      );
+      console.log(`  ${BOLD}${'MODULE'.padEnd(26)}${'BASE'.padEnd(16)}${'SIZE'.padStart(11)}   ENTRY POINT${RESET}`);
       console.log(`  ${rule()}`);
       const show = modules.slice(0, 18);
       for (const m of show) {
         const nm = m.name.length > 25 ? m.name.slice(0, 22) + '...' : m.name;
-        console.log(
-          `  ${WHITE}${nm.padEnd(26)}${RESET}${CYAN}${hex64(m.base).slice(2).padEnd(16)}${RESET}` +
-            `${YELLOW}${formatBytes(m.size).padStart(11)}${RESET}   ${GREY}${hex64(m.entry)}${RESET}`,
-        );
+        console.log(`  ${WHITE}${nm.padEnd(26)}${RESET}${CYAN}${hex64(m.base).slice(2).padEnd(16)}${RESET}` + `${YELLOW}${formatBytes(m.size).padStart(11)}${RESET}   ${GREY}${hex64(m.entry)}${RESET}`);
       }
       if (modules.length > show.length) {
         console.log(`  ${DIM}... and ${modules.length - show.length} more modules${RESET}`);
@@ -586,9 +521,7 @@ function main(): void {
         for (let j = i; j < Math.min(i + cols, threads.length); j++) {
           const t = threads[j]!;
           const label = PRIO[t.basePriority] ?? `pri ${t.basePriority}`;
-          cells.push(
-            `${CYAN}tid ${t.tid.toString().padStart(6)}${RESET} ${DIM}${label.padEnd(13)}${RESET}`,
-          );
+          cells.push(`${CYAN}tid ${t.tid.toString().padStart(6)}${RESET} ${DIM}${label.padEnd(13)}${RESET}`);
         }
         console.log('  ' + cells.join('  '));
       }
@@ -631,27 +564,17 @@ function main(): void {
     }
     if (onLine > 0) console.log(line);
     console.log();
-    console.log(
-      `  Legend  ${RED}█ exec${RESET}  ${GREEN}█ read/write${RESET}  ${CYAN}█ read-only${RESET}  ` +
-        `${MAGENTA}█ guard/no-access${RESET}  ${BLUE}█ reserved${RESET}  ${GREY}█ free${RESET}`,
-    );
+    console.log(`  Legend  ${RED}█ exec${RESET}  ${GREEN}█ read/write${RESET}  ${CYAN}█ read-only${RESET}  ` + `${MAGENTA}█ guard/no-access${RESET}  ${BLUE}█ reserved${RESET}  ${GREY}█ free${RESET}`);
     console.log(`  ${rule()}`);
     console.log(
-      `  ${WHITE}Committed ${BOLD}${formatBytes(Number(committed)).padStart(10)}${RESET}` +
-        `   ${BLUE}Reserved ${formatBytes(Number(reserved)).padStart(10)}${RESET}` +
-        `   ${GREY}Free ${formatBytes(Number(free)).padStart(10)}${RESET}`,
+      `  ${WHITE}Committed ${BOLD}${formatBytes(Number(committed)).padStart(10)}${RESET}` + `   ${BLUE}Reserved ${formatBytes(Number(reserved)).padStart(10)}${RESET}` + `   ${GREY}Free ${formatBytes(Number(free)).padStart(10)}${RESET}`,
     );
-    console.log(
-      `  ${DIM}committed breakdown — image ${formatBytes(Number(imageBytes))}, ` +
-        `private ${formatBytes(Number(privateBytes))}, mapped ${formatBytes(Number(mappedBytes))}${RESET}`,
-    );
+    console.log(`  ${DIM}committed breakdown — image ${formatBytes(Number(imageBytes))}, ` + `private ${formatBytes(Number(privateBytes))}, mapped ${formatBytes(Number(mappedBytes))}${RESET}`);
     console.log(`  ${DIM}${regions.length} regions walked${RESET}`);
 
     // A few representative committed regions with full decode.
     console.log();
-    console.log(
-      `  ${BOLD}${'BASE'.padEnd(16)}${'SIZE'.padStart(11)}  ${'STATE'.padEnd(10)}${'PROTECT'.padEnd(16)}TYPE${RESET}`,
-    );
+    console.log(`  ${BOLD}${'BASE'.padEnd(16)}${'SIZE'.padStart(11)}  ${'STATE'.padEnd(10)}${'PROTECT'.padEnd(16)}TYPE${RESET}`);
     const interesting = regions
       .filter((r) => r.state === MEM_COMMIT)
       .sort((a, b) => Number(b.size - a.size))
@@ -680,8 +603,7 @@ function main(): void {
       const quotaNonPaged = Number(mv.getBigUint64(0x30, true));
       const pagefileUsage = Number(mv.getBigUint64(0x38, true));
       const peakPagefileUsage = Number(mv.getBigUint64(0x40, true));
-      const pair = (label: string, v: string): string =>
-        `  ${WHITE}${label.padEnd(22)}${BOLD}${CYAN}${v.padStart(14)}${RESET}`;
+      const pair = (label: string, v: string): string => `  ${WHITE}${label.padEnd(22)}${BOLD}${CYAN}${v.padStart(14)}${RESET}`;
       console.log(pair('Working Set', formatBytes(workingSet)));
       console.log(pair('Peak Working Set', formatBytes(peakWorkingSet)));
       console.log(pair('Pagefile Usage', formatBytes(pagefileUsage)));
@@ -698,9 +620,7 @@ function main(): void {
     hexDump(handle, regions, 256);
 
     console.log();
-    console.log(
-      `${GREEN}${BOLD}  ✓ X-ray complete — every value above was read live from the kernel.${RESET}`,
-    );
+    console.log(`${GREEN}${BOLD}  ✓ X-ray complete — every value above was read live from the kernel.${RESET}`);
     console.log();
   } finally {
     Kernel32.CloseHandle(handle);

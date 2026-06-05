@@ -65,19 +65,7 @@ const SP_DRVINFO_DATA_W_SIZE = 0x0620;
 const WCHAR_BYTES = 2;
 const WINDOWS_EPOCH_OFFSET_100NS = 116_444_736_000_000_000n;
 
-const PREFERRED_CLASSES = new Set([
-  'Bluetooth',
-  'DiskDrive',
-  'Display',
-  'HDC',
-  'HIDClass',
-  'MEDIA',
-  'Monitor',
-  'Mouse',
-  'Net',
-  'USB',
-  'USBDevice',
-]);
+const PREFERRED_CLASSES = new Set(['Bluetooth', 'DiskDrive', 'Display', 'HDC', 'HIDClass', 'MEDIA', 'Monitor', 'Mouse', 'Net', 'USB', 'USBDevice']);
 
 interface DeviceMetadata {
   className: string;
@@ -143,22 +131,17 @@ function readWideString(valueBuffer: Buffer, byteLength: number): string {
 }
 
 function readWideFixedString(valueBuffer: Buffer, offset: number, characterCount: number): string {
-  return valueBuffer.toString('utf16le', offset, offset + characterCount * WCHAR_BYTES).replace(/\0.*$/, '').trim();
+  return valueBuffer
+    .toString('utf16le', offset, offset + characterCount * WCHAR_BYTES)
+    .replace(/\0.*$/, '')
+    .trim();
 }
 
 function readRegistryProperty(deviceInfoSet: bigint, deviceInfoDataBuffer: Buffer, property: SPDRP): string {
   const propertyBuffer = Buffer.alloc(2_048);
   const propertyTypeBuffer = Buffer.alloc(4);
   const requiredSizeBuffer = Buffer.alloc(4);
-  const success = Setupapi.SetupDiGetDeviceRegistryPropertyW(
-    deviceInfoSet,
-    deviceInfoDataBuffer.ptr!,
-    property,
-    propertyTypeBuffer.ptr!,
-    propertyBuffer.ptr!,
-    propertyBuffer.length,
-    requiredSizeBuffer.ptr!,
-  );
+  const success = Setupapi.SetupDiGetDeviceRegistryPropertyW(deviceInfoSet, deviceInfoDataBuffer.ptr!, property, propertyTypeBuffer.ptr!, propertyBuffer.ptr!, propertyBuffer.length, requiredSizeBuffer.ptr!);
 
   if (!success) {
     return '';
@@ -182,13 +165,7 @@ function readDeviceInstanceId(deviceInfoSet: bigint, deviceInfoDataBuffer: Buffe
   const instanceIdCapacity = 1_024;
   const instanceIdBuffer = Buffer.alloc(instanceIdCapacity * WCHAR_BYTES);
   const requiredSizeBuffer = Buffer.alloc(4);
-  const success = Setupapi.SetupDiGetDeviceInstanceIdW(
-    deviceInfoSet,
-    deviceInfoDataBuffer.ptr!,
-    instanceIdBuffer.ptr!,
-    instanceIdCapacity,
-    requiredSizeBuffer.ptr!,
-  );
+  const success = Setupapi.SetupDiGetDeviceInstanceIdW(deviceInfoSet, deviceInfoDataBuffer.ptr!, instanceIdBuffer.ptr!, instanceIdCapacity, requiredSizeBuffer.ptr!);
 
   if (!success) {
     return '(instance id unavailable)';
@@ -207,12 +184,7 @@ function formatDriverDate(fileTimeValue: bigint): string {
 }
 
 function formatDriverVersion(versionValue: bigint): string {
-  return [
-    Number((versionValue >> 48n) & 0xffffn),
-    Number((versionValue >> 32n) & 0xffffn),
-    Number((versionValue >> 16n) & 0xffffn),
-    Number(versionValue & 0xffffn),
-  ].join('.');
+  return [Number((versionValue >> 48n) & 0xffffn), Number((versionValue >> 32n) & 0xffffn), Number((versionValue >> 16n) & 0xffffn), Number(versionValue & 0xffffn)].join('.');
 }
 
 function parseDriverCandidate(driverInfoDataBuffer: Buffer): DriverCandidate {
@@ -353,10 +325,7 @@ try {
     }
 
     const className = readRegistryProperty(deviceInfoSet, deviceInfoDataBuffer, SPDRP.CLASS) || '(no class)';
-    const displayName =
-      readRegistryProperty(deviceInfoSet, deviceInfoDataBuffer, SPDRP.FRIENDLYNAME) ||
-      readRegistryProperty(deviceInfoSet, deviceInfoDataBuffer, SPDRP.DEVICEDESC) ||
-      '(unnamed device)';
+    const displayName = readRegistryProperty(deviceInfoSet, deviceInfoDataBuffer, SPDRP.FRIENDLYNAME) || readRegistryProperty(deviceInfoSet, deviceInfoDataBuffer, SPDRP.DEVICEDESC) || '(unnamed device)';
     const manufacturer = readRegistryProperty(deviceInfoSet, deviceInfoDataBuffer, SPDRP.MFG) || '(unknown manufacturer)';
     const service = readRegistryProperty(deviceInfoSet, deviceInfoDataBuffer, SPDRP.SERVICE) || '(no service)';
     const instanceId = readDeviceInstanceId(deviceInfoSet, deviceInfoDataBuffer);

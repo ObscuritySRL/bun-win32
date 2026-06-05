@@ -413,14 +413,14 @@ const cb = gpu.makeConstantBuffer(CB_SIZE);
 const cbData = Buffer.alloc(CB_SIZE);
 
 // ── Camera (orbit around the room center) ─────────────────────────────────────────
-let camYaw = 0.0;            // azimuth
-let camPitch = 0.05;         // elevation
-let camDist = 2.45;          // distance from target (INSIDE the box: RZ = 2.6)
+let camYaw = 0.0; // azimuth
+let camPitch = 0.05; // elevation
+let camDist = 2.45; // distance from target (INSIDE the box: RZ = 2.6)
 const target: [number, number, number] = [0, -0.35, 0];
 const fov = 42 * (Math.PI / 180);
 const camFovScale = Math.tan(fov / 2);
 
-let spp = 0;                 // samples accumulated so far
+let spp = 0; // samples accumulated so far
 let frameCounter = 0;
 
 // Mouse-drag orbit state.
@@ -443,7 +443,9 @@ function computeCamera(): { pos: [number, number, number]; fwd: [number, number,
   let fy = target[1] - pos[1];
   let fz = target[2] - pos[2];
   const fl = Math.hypot(fx, fy, fz) || 1;
-  fx /= fl; fy /= fl; fz /= fl;
+  fx /= fl;
+  fy /= fl;
+  fz /= fl;
   // Right vector. cross((0,1,0), fwd) = (fz, 0, -fx); negate it so that the world
   // -X (red) wall lands on SCREEN-LEFT and +X (green) on SCREEN-RIGHT when looking
   // into the box. (Up is then derived from this right, keeping the image upright.)
@@ -451,7 +453,9 @@ function computeCamera(): { pos: [number, number, number]; fwd: [number, number,
   const ry = 0;
   const rz = fx;
   const rl = Math.hypot(rx, ry, rz) || 1;
-  const rnx = rx / rl, rny = ry / rl, rnz = rz / rl;
+  const rnx = rx / rl,
+    rny = ry / rl,
+    rnz = rz / rl;
   // Up = cross(fwd, right).
   const ux = fy * rnz - fz * rny;
   const uy = fz * rnx - fx * rnz;
@@ -483,11 +487,23 @@ function pollInput(): boolean {
 
   // Dolly with W/S or Up/Down arrows. (W/A/S/D are letter VKs == their ASCII codes.)
   // Clamp keeps the camera INSIDE the closed box (RZ = 2.6) so the room stays in view.
-  if (win.keyDown(VK_W) || win.keyDown(VirtualKey.VK_UP)) { camDist = clamp(camDist - 0.06, 1.5, 2.55); moved = true; }
-  if (win.keyDown(VK_S) || win.keyDown(VirtualKey.VK_DOWN)) { camDist = clamp(camDist + 0.06, 1.5, 2.55); moved = true; }
+  if (win.keyDown(VK_W) || win.keyDown(VirtualKey.VK_UP)) {
+    camDist = clamp(camDist - 0.06, 1.5, 2.55);
+    moved = true;
+  }
+  if (win.keyDown(VK_S) || win.keyDown(VirtualKey.VK_DOWN)) {
+    camDist = clamp(camDist + 0.06, 1.5, 2.55);
+    moved = true;
+  }
   // Orbit with A/D or Left/Right arrows.
-  if (win.keyDown(VK_A) || win.keyDown(VirtualKey.VK_LEFT)) { camYaw += 0.02; moved = true; }
-  if (win.keyDown(VK_D) || win.keyDown(VirtualKey.VK_RIGHT)) { camYaw -= 0.02; moved = true; }
+  if (win.keyDown(VK_A) || win.keyDown(VirtualKey.VK_LEFT)) {
+    camYaw += 0.02;
+    moved = true;
+  }
+  if (win.keyDown(VK_D) || win.keyDown(VirtualKey.VK_RIGHT)) {
+    camYaw -= 0.02;
+    moved = true;
+  }
 
   return moved;
 }

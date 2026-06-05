@@ -15,14 +15,7 @@
  * Run: bun run example/controller-report.ts
  */
 
-import Xinput9_1_0, {
-  XUSER_MAX_COUNT,
-  XInputCapsFlags,
-  XInputDevSubType,
-  XInputDevType,
-  XInputGamepadButtons,
-  XInputGetCapabilitiesFlags,
-} from '../index';
+import Xinput9_1_0, { XUSER_MAX_COUNT, XInputCapsFlags, XInputDevSubType, XInputDevType, XInputGamepadButtons, XInputGetCapabilitiesFlags } from '../index';
 
 Xinput9_1_0.Preload(['XInputGetState', 'XInputGetCapabilities', 'XInputGetDSoundAudioDeviceGuids']);
 
@@ -60,8 +53,14 @@ function flagNames(enumObj: Record<string, string | number>, value: number): str
 
 function formatGuid(buf: Buffer, offset: number): string {
   const data1 = buf.readUInt32LE(offset).toString(16).padStart(8, '0');
-  const data2 = buf.readUInt16LE(offset + 4).toString(16).padStart(4, '0');
-  const data3 = buf.readUInt16LE(offset + 6).toString(16).padStart(4, '0');
+  const data2 = buf
+    .readUInt16LE(offset + 4)
+    .toString(16)
+    .padStart(4, '0');
+  const data3 = buf
+    .readUInt16LE(offset + 6)
+    .toString(16)
+    .padStart(4, '0');
   const data4High = buf.subarray(offset + 8, offset + 10).toString('hex');
   const data4Low = buf.subarray(offset + 10, offset + 16).toString('hex');
   return `${data1}-${data2}-${data3}-${data4High}-${data4Low}`;

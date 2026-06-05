@@ -23,13 +23,7 @@ import { ptr } from 'bun:ffi';
 import Psapi from '../index';
 import Kernel32, { ProcessAccessRights } from '@bun-win32/kernel32';
 
-Psapi.Preload([
-  'EnumProcesses',
-  'GetProcessImageFileNameW',
-  'EnumProcessModules',
-  'GetModuleFileNameExW',
-  'GetProcessMemoryInfo',
-]);
+Psapi.Preload(['EnumProcesses', 'GetProcessImageFileNameW', 'EnumProcessModules', 'GetModuleFileNameExW', 'GetProcessMemoryInfo']);
 Kernel32.Preload(['OpenProcess', 'CloseHandle']);
 
 function formatBytes(bytes: number): string {
@@ -114,12 +108,7 @@ for (let i = 0; i < pidCount; i++) {
     const moduleHandleBuf = Buffer.alloc(8 * 256); // up to 256 module handles (HMODULE = 8 bytes on x64)
     const cbNeeded = Buffer.alloc(4);
 
-    const modsOk = Psapi.EnumProcessModules(
-      hProcess,
-      moduleHandleBuf.ptr,
-      moduleHandleBuf.byteLength,
-      cbNeeded.ptr,
-    );
+    const modsOk = Psapi.EnumProcessModules(hProcess, moduleHandleBuf.ptr, moduleHandleBuf.byteLength, cbNeeded.ptr);
 
     if (modsOk) {
       const moduleCount = cbNeeded.readUInt32LE(0) / 8;

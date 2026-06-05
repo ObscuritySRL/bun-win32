@@ -35,7 +35,7 @@ console.log('  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
 console.log('');
 
 // Station 1: Process DPI awareness
-console.log('  Station 1: Charting this process\'s own DPI awareness');
+console.log("  Station 1: Charting this process's own DPI awareness");
 console.log('  ' + divider);
 
 const awarenessBuf = Buffer.alloc(4);
@@ -66,7 +66,7 @@ for (const [device, description] of devices) {
 }
 
 // Station 3: Shell UI DPI
-console.log('  Station 3: DPI of the shell\'s own surfaces');
+console.log("  Station 3: DPI of the shell's own surfaces");
 console.log('  ' + divider);
 
 const components: Array<[ShellUiComponent, string]> = [

@@ -71,9 +71,7 @@ const C = {
 function box(title: string, lines: string[]): string {
   const inner = Math.max(title.length, ...lines.map((l) => stripAnsi(l).length)) + 2;
   const top = `${C.cyan}╭─ ${C.bold}${title}${C.reset}${C.cyan} ${'─'.repeat(Math.max(0, inner - title.length - 1))}╮${C.reset}`;
-  const body = lines
-    .map((l) => `${C.cyan}│${C.reset} ${l}${' '.repeat(Math.max(0, inner - stripAnsi(l).length - 1))}${C.cyan}│${C.reset}`)
-    .join('\n');
+  const body = lines.map((l) => `${C.cyan}│${C.reset} ${l}${' '.repeat(Math.max(0, inner - stripAnsi(l).length - 1))}${C.cyan}│${C.reset}`).join('\n');
   const bottom = `${C.cyan}╰${'─'.repeat(inner + 1)}╯${C.reset}`;
   return `${top}\n${body}\n${bottom}`;
 }
@@ -112,12 +110,7 @@ function renderPage(): string {
   const rows =
     recent.length === 0
       ? '<tr><td colspan="4" class="muted">no requests yet</td></tr>'
-      : recent
-          .map(
-            (c) =>
-              `<tr><td>#${c.n}</td><td class="m">${htmlEscape(c.method)}</td><td>${htmlEscape(c.path)}</td><td class="muted">:${c.peerPort} · ${c.at.toLocaleTimeString()}</td></tr>`,
-          )
-          .join('');
+      : recent.map((c) => `<tr><td>#${c.n}</td><td class="m">${htmlEscape(c.method)}</td><td>${htmlEscape(c.path)}</td><td class="muted">:${c.peerPort} · ${c.at.toLocaleTimeString()}</td></tr>`).join('');
   return `<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta http-equiv="refresh" content="2">
 <title>Raw ws2_32 HTTP server</title>
@@ -157,13 +150,7 @@ function renderPage(): string {
 
 function buildResponse(html: string): Buffer {
   const bodyBytes = Buffer.byteLength(html, 'utf8');
-  const head =
-    'HTTP/1.1 200 OK\r\n' +
-    'Content-Type: text/html; charset=utf-8\r\n' +
-    `Content-Length: ${bodyBytes}\r\n` +
-    'Connection: close\r\n' +
-    'Server: bun-win32-raw-ws2_32\r\n' +
-    '\r\n';
+  const head = 'HTTP/1.1 200 OK\r\n' + 'Content-Type: text/html; charset=utf-8\r\n' + `Content-Length: ${bodyBytes}\r\n` + 'Connection: close\r\n' + 'Server: bun-win32-raw-ws2_32\r\n' + '\r\n';
   return Buffer.concat([Buffer.from(head, 'ascii'), Buffer.from(html, 'utf8')]);
 }
 
@@ -270,9 +257,7 @@ function serveOnce(): void {
     const resp = buildResponse(renderPage());
     Ws2_32.send(client, resp.ptr, resp.length, 0);
 
-    console.log(
-      `${C.gray}${entry.at.toLocaleTimeString()}${C.reset}  ${C.cyan}#${hits}${C.reset}  ${C.green}${method}${C.reset} ${path}  ${C.dim}→ 200 (${resp.length} bytes)${C.reset}`,
-    );
+    console.log(`${C.gray}${entry.at.toLocaleTimeString()}${C.reset}  ${C.cyan}#${hits}${C.reset}  ${C.green}${method}${C.reset} ${path}  ${C.dim}→ 200 (${resp.length} bytes)${C.reset}`);
   } finally {
     Ws2_32.closesocket(client);
   }

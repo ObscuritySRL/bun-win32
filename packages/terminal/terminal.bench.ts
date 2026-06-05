@@ -42,7 +42,11 @@ const padStart = (text: string, width: number): string => text.padStart(width);
 console.log('Part 1 — default path (half / truecolor / exact)\n');
 console.log(`${padEnd('SIZE', 11)}${padEnd('SCENARIO', 12)}${padStart('FPS', 8)}${padStart('ms', 9)}${padStart('KB', 9)}`);
 console.log('-'.repeat(49));
-const sizes: [number, number][] = [[120, 40], [200, 60], [320, 100]];
+const sizes: [number, number][] = [
+  [120, 40],
+  [200, 60],
+  [320, 100],
+];
 const iterationsPart1 = 400;
 for (const [columns, rows] of sizes) {
   const surface = new Term(columns, rows);

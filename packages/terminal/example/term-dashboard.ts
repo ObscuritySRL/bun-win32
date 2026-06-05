@@ -84,11 +84,7 @@ const pushSamples = (time: number): void => {
   }
   for (let s = 0; s < STREAMS; s++) {
     nState[s] = lerp(nState[s], nTarget[s], 0.22);
-    const v =
-      STREAM_BASE[s] +
-      Math.sin(time * STREAM_FREQ[s] * TAU + STREAM_PHASE[s]) * STREAM_AMP[s] +
-      Math.sin(time * STREAM_FREQ[s] * 2.7 * TAU + s) * STREAM_AMP[s] * 0.28 +
-      nState[s] * 0.18;
+    const v = STREAM_BASE[s] + Math.sin(time * STREAM_FREQ[s] * TAU + STREAM_PHASE[s]) * STREAM_AMP[s] + Math.sin(time * STREAM_FREQ[s] * 2.7 * TAU + s) * STREAM_AMP[s] * 0.28 + nState[s] * 0.18;
     series[s][head] = clamp01(v);
   }
   head = (head + 1) % HIST;
@@ -96,7 +92,7 @@ const pushSamples = (time: number): void => {
 };
 // read the sample `agoFromNewest` steps back from the newest (0 = newest)
 const sampleAt = (s: number, agoFromNewest: number): number => {
-  const idx = ((head - 1 - agoFromNewest) % HIST + HIST) % HIST;
+  const idx = (((head - 1 - agoFromNewest) % HIST) + HIST) % HIST;
   return series[s][idx];
 };
 
@@ -169,15 +165,7 @@ const onKey = (key: string, _t: Term): void => {
 
 // ── Drawing helpers ────────────────────────────────────────────────────────────────
 /** Soft rounded panel: drop shadow plate, fill, 1px accent top rule + hairline frame. */
-const panel = (
-  t: Term,
-  x: number,
-  y: number,
-  w: number,
-  h: number,
-  fill: [number, number, number],
-  accent: [number, number, number],
-): void => {
+const panel = (t: Term, x: number, y: number, w: number, h: number, fill: [number, number, number], accent: [number, number, number]): void => {
   // drop shadow (offset, soft)
   t.plate(x + 2, y + 2, w, h, 0.42);
   // fill
@@ -204,17 +192,8 @@ const panel = (
 };
 
 /** Horizontal filled bar with track + value fill (0..1). */
-const bar = (
-  t: Term,
-  x: number,
-  y: number,
-  w: number,
-  h: number,
-  v: number,
-  col: [number, number, number],
-): void => {
-  for (let j = 0; j < h; j++)
-    for (let i = 0; i < w; i++) t.setPixel(x + i, y + j, BG0[0] + 6, BG0[1] + 8, BG0[2] + 12);
+const bar = (t: Term, x: number, y: number, w: number, h: number, v: number, col: [number, number, number]): void => {
+  for (let j = 0; j < h; j++) for (let i = 0; i < w; i++) t.setPixel(x + i, y + j, BG0[0] + 6, BG0[1] + 8, BG0[2] + 12);
   const fw = Math.round(clamp01(v) * (w - 2));
   for (let j = 1; j < h - 1; j++)
     for (let i = 0; i < fw; i++) {
@@ -234,8 +213,10 @@ const fitText = (str: string, maxPx: number, scale = 1): string => {
 /** Soft additive glow centred at (cx,cy) — the cursor flourish. */
 const glow = (t: Term, cx: number, cy: number, radius: number, col: [number, number, number], strength: number): void => {
   const r = Math.ceil(radius);
-  const x0 = Math.max(0, (cx - r) | 0), x1 = Math.min(t.width - 1, (cx + r) | 0);
-  const y0 = Math.max(0, (cy - r) | 0), y1 = Math.min(t.height - 1, (cy + r) | 0);
+  const x0 = Math.max(0, (cx - r) | 0),
+    x1 = Math.min(t.width - 1, (cx + r) | 0);
+  const y0 = Math.max(0, (cy - r) | 0),
+    y1 = Math.min(t.height - 1, (cy + r) | 0);
   const inv = 1 / (radius * radius);
   for (let y = y0; y <= y1; y++) {
     const dy = y - cy;
@@ -324,8 +305,10 @@ run({
       autoPilot = true;
       curDown = false;
       // Lissajous sweep across the interior, easing in from centre
-      const cx = W * 0.5, cy = H * 0.52;
-      const ax = W * 0.34, ay = H * 0.32;
+      const cx = W * 0.5,
+        cy = H * 0.52;
+      const ax = W * 0.34,
+        ay = H * 0.32;
       curX = cx + Math.sin(time * 0.83) * ax;
       curY = cy + Math.sin(time * 1.17 + 1.1) * ay;
     }
@@ -351,7 +334,9 @@ run({
     for (let y = 0; y < H; y++) {
       const fy = y / (H - 1);
       const k = lerp(1.0, 0.62, fy);
-      const r = BG0[0] * k, g = BG0[1] * k, b = BG0[2] * k;
+      const r = BG0[0] * k,
+        g = BG0[1] * k,
+        b = BG0[2] * k;
       for (let x = 0; x < W; x++) t.setPixel(x, y, r, g, b);
     }
 
@@ -361,13 +346,10 @@ run({
     const headTop = PAD + 4; // first text baseline inside the header
     // brand mark: a clay diamond
     {
-      const mx = PAD + 9, my = PAD + Math.round(headerH * 0.5);
-      for (let dy = -4; dy <= 4; dy++)
-        for (let dx = -4; dx <= 4; dx++)
-          if (Math.abs(dx) + Math.abs(dy) <= 4) t.setPixel(mx + dx, my + dy, CLAY[0], CLAY[1], CLAY[2]);
-      for (let dy = -2; dy <= 2; dy++)
-        for (let dx = -2; dx <= 2; dx++)
-          if (Math.abs(dx) + Math.abs(dy) <= 2) t.setPixel(mx + dx, my + dy, 255, 200, 170);
+      const mx = PAD + 9,
+        my = PAD + Math.round(headerH * 0.5);
+      for (let dy = -4; dy <= 4; dy++) for (let dx = -4; dx <= 4; dx++) if (Math.abs(dx) + Math.abs(dy) <= 4) t.setPixel(mx + dx, my + dy, CLAY[0], CLAY[1], CLAY[2]);
+      for (let dy = -2; dy <= 2; dy++) for (let dx = -2; dx <= 2; dx++) if (Math.abs(dx) + Math.abs(dy) <= 2) t.setPixel(mx + dx, my + dy, 255, 200, 170);
     }
     const titleX = PAD + 18;
     t.text(titleX, headTop, 'COMMAND CENTER', INK_HI[0], INK_HI[1], INK_HI[2], 1);
@@ -403,7 +385,8 @@ run({
           const [label, v, col] = stats[i];
           const yy = PAD + 4 + i * rowH;
           t.text(gx, yy + Math.max(0, (rowH - 7) >> 1), label, INK_DIM[0], INK_DIM[1], INK_DIM[2], 1);
-          const bx = gx + 22, bw = gw - 22 - 28;
+          const bx = gx + 22,
+            bw = gw - 22 - 28;
           bar(t, bx, yy + Math.max(0, (rowH - 4) >> 1), Math.max(8, bw), 4, v, col);
           t.text(bx + Math.max(8, bw) + 4, yy + Math.max(0, (rowH - 7) >> 1), Math.round(v * 100) + '%', INK[0], INK[1], INK[2], 1);
         }
@@ -489,7 +472,7 @@ run({
         // precompute y per column
         let prevPy = -1;
         for (let i = 0; i < plW; i++) {
-          const ago = Math.round((plW - 1 - i));
+          const ago = Math.round(plW - 1 - i);
           const v = sampleAt(s, ago);
           const py = plY + Math.round((plH - 1) * (1 - v));
           // gradient fill down from the line (faint, additive so overlaps blend)
@@ -500,7 +483,8 @@ run({
           }
           // line (thicken by connecting to previous column)
           if (prevPy >= 0) {
-            const a = Math.min(py, prevPy), b = Math.max(py, prevPy);
+            const a = Math.min(py, prevPy),
+              b = Math.max(py, prevPy);
             for (let yy = a; yy <= b; yy++) {
               t.setPixel(plX + i, yy, col[0], col[1], col[2]);
               t.blendPixel(plX + i, yy + 1, col[0], col[1], col[2], 0.4);
@@ -585,11 +569,9 @@ run({
               const g = i / listW;
               t.blendPixel(listX + i, ry + j, ACCENT[0], ACCENT[1], ACCENT[2], (0.26 + 0.16 * (1 - g)) * fl + 0.12);
             }
-          for (let j = 0; j < rowH - 2; j++)
-            for (let i = 0; i < 2; i++) t.setPixel(listX + i, ry + j, CLAY[0], CLAY[1], CLAY[2]);
+          for (let j = 0; j < rowH - 2; j++) for (let i = 0; i < 2; i++) t.setPixel(listX + i, ry + j, CLAY[0], CLAY[1], CLAY[2]);
         } else if (isHover) {
-          for (let j = 0; j < rowH - 2; j++)
-            for (let i = 0; i < listW; i++) t.blendPixel(listX + i, ry + j, ACCENT[0], ACCENT[1], ACCENT[2], 0.12);
+          for (let j = 0; j < rowH - 2; j++) for (let i = 0; i < listW; i++) t.blendPixel(listX + i, ry + j, ACCENT[0], ACCENT[1], ACCENT[2], 0.12);
         }
         // status dot (hue → colour) — a tiny health LED
         const [dr, dg, db] = hsv(row.hue, 0.7, 1);
@@ -600,11 +582,11 @@ run({
         const indent = nameX - listX;
         const regW = Term.textWidth(row.region, 1);
         const showReg = listW - indent - 4 - regW - 6 >= Term.textWidth('APIX', 1); // keep a min name width
-        const nameMax = (showReg ? listW - indent - 4 - regW - 6 : listW - indent - 6);
-        const nameCol = isSel ? INK_HI : isHover ? [200, 214, 232] as [number, number, number] : INK;
+        const nameMax = showReg ? listW - indent - 4 - regW - 6 : listW - indent - 6;
+        const nameCol = isSel ? INK_HI : isHover ? ([200, 214, 232] as [number, number, number]) : INK;
         t.text(nameX, ry + 2, fitText(row.name, nameMax, 1), nameCol[0], nameCol[1], nameCol[2], 1);
         if (showReg) {
-          const regCol = isSel ? [210, 196, 180] as [number, number, number] : INK_DIM;
+          const regCol = isSel ? ([210, 196, 180] as [number, number, number]) : INK_DIM;
           t.text(listX + listW - regW - 4, ry + 2, row.region, regCol[0], regCol[1], regCol[2], 1);
         }
       }
@@ -653,8 +635,7 @@ run({
       }
       // newest line gets a faint lime pulse on the left margin
       const pulse = 0.5 + 0.5 * Math.sin(time * 5);
-      for (let j = 0; j < lineH; j++)
-        t.blendPixel(lx - 3, ly0 + (rows - 1) * lineH + j, LIME[0], LIME[1], LIME[2], 0.5 * pulse);
+      for (let j = 0; j < lineH; j++) t.blendPixel(lx - 3, ly0 + (rows - 1) * lineH + j, LIME[0], LIME[1], LIME[2], 0.5 * pulse);
     }
 
     // ══ CURSOR GLOW FLOURISH ══════════════════════════════════════════════════════
@@ -678,8 +659,7 @@ run({
       const fy = menuY + menuH - 10;
       const dotX = PAD + 6;
       const pp = 0.5 + 0.5 * Math.sin(time * 3); // pulsing status dot
-      for (let dy = 0; dy < 3; dy++)
-        for (let dx = 0; dx < 3; dx++) t.setPixel(dotX + dx, fy + 2 + dy, mc[0] * pp, mc[1] * pp, mc[2] * pp);
+      for (let dy = 0; dy < 3; dy++) for (let dx = 0; dx < 3; dx++) t.setPixel(dotX + dx, fy + 2 + dy, mc[0] * pp, mc[1] * pp, mc[2] * pp);
       const textX = dotX + 6;
       const avail = PAD + menuW - 4 - textX;
       const label = Term.textWidth(full, 1) <= avail ? full : short;

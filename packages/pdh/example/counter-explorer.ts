@@ -23,18 +23,7 @@
  */
 import Pdh, { PdhCounterFormat, PdhDetailLevel } from '../index';
 
-Pdh.Preload([
-  'PdhEnumObjectsW',
-  'PdhEnumObjectItemsW',
-  'PdhOpenQueryW',
-  'PdhAddEnglishCounterW',
-  'PdhCollectQueryData',
-  'PdhGetFormattedCounterValue',
-  'PdhGetRawCounterValue',
-  'PdhRemoveCounter',
-  'PdhCloseQuery',
-  'PdhGetDllVersion',
-]);
+Pdh.Preload(['PdhEnumObjectsW', 'PdhEnumObjectItemsW', 'PdhOpenQueryW', 'PdhAddEnglishCounterW', 'PdhCollectQueryData', 'PdhGetFormattedCounterValue', 'PdhGetRawCounterValue', 'PdhRemoveCounter', 'PdhCloseQuery', 'PdhGetDllVersion']);
 
 const W = 76;
 
@@ -120,12 +109,7 @@ for (const objName of interestingObjects) {
   instanceSizeBuf.writeUInt32LE(0, 0);
 
   const objNameBuf = Buffer.from(objName + '\0', 'utf16le');
-  Pdh.PdhEnumObjectItemsW(
-    null, null, objNameBuf.ptr,
-    null, counterSizeBuf.ptr,
-    null, instanceSizeBuf.ptr,
-    PdhDetailLevel.PERF_DETAIL_WIZARD, 0,
-  );
+  Pdh.PdhEnumObjectItemsW(null, null, objNameBuf.ptr, null, counterSizeBuf.ptr, null, instanceSizeBuf.ptr, PdhDetailLevel.PERF_DETAIL_WIZARD, 0);
 
   const counterChars = counterSizeBuf.readUInt32LE(0);
   const instanceChars = instanceSizeBuf.readUInt32LE(0);
@@ -140,12 +124,7 @@ for (const objName of interestingObjects) {
   counterSizeBuf.writeUInt32LE(counterChars, 0);
   instanceSizeBuf.writeUInt32LE(instanceChars, 0);
 
-  const itemStatus = Pdh.PdhEnumObjectItemsW(
-    null, null, objNameBuf.ptr,
-    counterBuf.ptr, counterSizeBuf.ptr,
-    instanceBuf?.ptr ?? null, instanceSizeBuf.ptr,
-    PdhDetailLevel.PERF_DETAIL_WIZARD, 0,
-  );
+  const itemStatus = Pdh.PdhEnumObjectItemsW(null, null, objNameBuf.ptr, counterBuf.ptr, counterSizeBuf.ptr, instanceBuf?.ptr ?? null, instanceSizeBuf.ptr, PdhDetailLevel.PERF_DETAIL_WIZARD, 0);
 
   if (itemStatus !== 0) {
     console.log(`  PdhEnumObjectItemsW failed: 0x${(itemStatus >>> 0).toString(16)}`);

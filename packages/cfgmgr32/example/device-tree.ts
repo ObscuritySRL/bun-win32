@@ -20,14 +20,7 @@
 
 import Cfgmgr32, { CR, CM_LOCATE_DEVNODE, DN } from '../index';
 
-Cfgmgr32.Preload([
-  'CM_Get_Child',
-  'CM_Get_Device_IDW',
-  'CM_Get_Device_ID_Size',
-  'CM_Get_DevNode_Status',
-  'CM_Get_Sibling',
-  'CM_Locate_DevNodeW',
-]);
+Cfgmgr32.Preload(['CM_Get_Child', 'CM_Get_Device_IDW', 'CM_Get_Device_ID_Size', 'CM_Get_DevNode_Status', 'CM_Get_Sibling', 'CM_Locate_DevNodeW']);
 
 const ANSI = {
   bold: '\x1b[1m',

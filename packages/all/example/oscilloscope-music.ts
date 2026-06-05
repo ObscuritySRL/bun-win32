@@ -154,7 +154,7 @@ function strokePath(strokes: ReadonlyArray<ReadonlyArray<[number, number]>>): (u
     }
   }
   return (u: number): [number, number] => {
-    let dist = ((u % 1) + 1) % 1 * total;
+    let dist = (((u % 1) + 1) % 1) * total;
     for (const s of segs) {
       if (dist <= s.len) {
         const t = dist / s.len;
@@ -170,11 +170,34 @@ function strokePath(strokes: ReadonlyArray<ReadonlyArray<[number, number]>>): (u
 // "BUN" stroked in a blocky vector font, centered around the origin in [-1,1].
 const bunStrokes: ReadonlyArray<ReadonlyArray<[number, number]>> = [
   // B
-  [[-0.78, 0.5], [-0.78, -0.5], [-0.5, -0.5], [-0.42, -0.36], [-0.5, -0.22], [-0.78, -0.22], [-0.5, -0.22], [-0.4, -0.06], [-0.5, 0.5], [-0.78, 0.5]],
+  [
+    [-0.78, 0.5],
+    [-0.78, -0.5],
+    [-0.5, -0.5],
+    [-0.42, -0.36],
+    [-0.5, -0.22],
+    [-0.78, -0.22],
+    [-0.5, -0.22],
+    [-0.4, -0.06],
+    [-0.5, 0.5],
+    [-0.78, 0.5],
+  ],
   // U
-  [[-0.18, -0.5], [-0.18, 0.34], [-0.08, 0.5], [0.08, 0.5], [0.18, 0.34], [0.18, -0.5]],
+  [
+    [-0.18, -0.5],
+    [-0.18, 0.34],
+    [-0.08, 0.5],
+    [0.08, 0.5],
+    [0.18, 0.34],
+    [0.18, -0.5],
+  ],
   // N
-  [[0.42, 0.5], [0.42, -0.5], [0.78, 0.5], [0.78, -0.5]],
+  [
+    [0.42, 0.5],
+    [0.42, -0.5],
+    [0.78, 0.5],
+    [0.78, -0.5],
+  ],
 ];
 const bunPath = strokePath(bunStrokes);
 
@@ -192,7 +215,7 @@ const figures: Figure[] = [
     sample: (u) => {
       const t = 2 * Math.PI * u;
       const d = 1 + Math.sin(t) ** 2;
-      return [Math.cos(t) / d, (Math.sin(t) * Math.cos(t)) / d * 1.6];
+      return [Math.cos(t) / d, ((Math.sin(t) * Math.cos(t)) / d) * 1.6];
     },
   },
   {
@@ -260,12 +283,7 @@ if (createHr !== S_OK) {
 const engine = ppEngine.readBigUInt64LE(0);
 
 const ppMaster = Buffer.alloc(8);
-const masterHr = vcall(
-  engine,
-  IXAUDIO2_CREATEMASTERINGVOICE,
-  [FFIType.ptr, FFIType.u32, FFIType.u32, FFIType.u32, FFIType.ptr, FFIType.ptr, FFIType.i32],
-  [ppMaster.ptr!, 0, 0, 0, null, null, AUDIO_CATEGORY_GAME_EFFECTS],
-);
+const masterHr = vcall(engine, IXAUDIO2_CREATEMASTERINGVOICE, [FFIType.ptr, FFIType.u32, FFIType.u32, FFIType.u32, FFIType.ptr, FFIType.ptr, FFIType.i32], [ppMaster.ptr!, 0, 0, 0, null, null, AUDIO_CATEGORY_GAME_EFFECTS]);
 if (masterHr !== S_OK) {
   console.log(`Oscilloscope Music: no audio endpoint (CreateMasteringVoice ${hex(masterHr)}). Exiting cleanly.`);
   vcall(engine, IUNKNOWN_RELEASE, [], [], FFIType.u32);
@@ -284,12 +302,7 @@ wfx.writeUInt16LE(BITS, 14);
 wfx.writeUInt16LE(0, 16);
 
 const ppSource = Buffer.alloc(8);
-const srcHr = vcall(
-  engine,
-  IXAUDIO2_CREATESOURCEVOICE,
-  [FFIType.ptr, FFIType.ptr, FFIType.u32, FFIType.f32, FFIType.ptr, FFIType.ptr, FFIType.ptr],
-  [ppSource.ptr!, wfx.ptr!, 0, XAUDIO2_DEFAULT_FREQ_RATIO, null, null, null],
-);
+const srcHr = vcall(engine, IXAUDIO2_CREATESOURCEVOICE, [FFIType.ptr, FFIType.ptr, FFIType.u32, FFIType.f32, FFIType.ptr, FFIType.ptr, FFIType.ptr], [ppSource.ptr!, wfx.ptr!, 0, XAUDIO2_DEFAULT_FREQ_RATIO, null, null, null]);
 if (srcHr !== S_OK) {
   console.log(`Oscilloscope Music: CreateSourceVoice failed (${hex(srcHr)}). Exiting.`);
   vcall(master, IXAUDIO2VOICE_DESTROYVOICE, [], [], FFIType.void);
@@ -595,20 +608,7 @@ const windowY = Math.max(0, Math.floor((screenHeight - WINDOW_SIZE) / 2));
 
 // WS_OVERLAPPEDWINDOW would add a non-square client area; using WS_POPUP keeps the
 // client area exactly WINDOW_SIZE × WINDOW_SIZE so the scope stays perfectly round.
-const window = User32.CreateWindowExW(
-  ExtendedWindowStyles.WS_EX_APPWINDOW,
-  className.ptr!,
-  windowTitle.ptr!,
-  WindowStyles.WS_POPUP | WindowStyles.WS_VISIBLE,
-  windowX,
-  windowY,
-  WINDOW_SIZE,
-  WINDOW_SIZE,
-  NULL,
-  NULL,
-  NULL,
-  NULL_PTR,
-);
+const window = User32.CreateWindowExW(ExtendedWindowStyles.WS_EX_APPWINDOW, className.ptr!, windowTitle.ptr!, WindowStyles.WS_POPUP | WindowStyles.WS_VISIBLE, windowX, windowY, WINDOW_SIZE, WINDOW_SIZE, NULL, NULL, NULL, NULL_PTR);
 if (!window) {
   console.error('Failed to create window');
   process.exit(1);

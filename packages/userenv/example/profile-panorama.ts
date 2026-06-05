@@ -22,13 +22,7 @@ import { dlopen, FFIType, type Pointer } from 'bun:ffi';
 import Userenv, { PT_MANDATORY, PT_ROAMING, PT_ROAMING_PREEXISTING, PT_TEMPORARY } from '../index';
 import Kernel32 from '@bun-win32/kernel32';
 
-Userenv.Preload([
-  'GetAllUsersProfileDirectoryW',
-  'GetDefaultUserProfileDirectoryW',
-  'GetProfileType',
-  'GetProfilesDirectoryW',
-  'GetUserProfileDirectoryW',
-]);
+Userenv.Preload(['GetAllUsersProfileDirectoryW', 'GetDefaultUserProfileDirectoryW', 'GetProfileType', 'GetProfilesDirectoryW', 'GetUserProfileDirectoryW']);
 Kernel32.Preload(['CloseHandle', 'GetCurrentProcess', 'GetLastError']);
 
 const ANSI = {

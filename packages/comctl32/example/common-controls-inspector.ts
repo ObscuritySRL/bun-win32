@@ -26,7 +26,19 @@
 
 import Comctl32, { DllVersionPlatform, ImageListCreateFlags, InitCommonControlsFlags } from '../index';
 
-Comctl32.Preload(['DllGetVersion', 'ImageList_Create', 'ImageList_Destroy', 'ImageList_Duplicate', 'ImageList_GetBkColor', 'ImageList_GetIconSize', 'ImageList_GetImageCount', 'ImageList_SetBkColor', 'ImageList_SetIconSize', 'InitCommonControls', 'InitCommonControlsEx']);
+Comctl32.Preload([
+  'DllGetVersion',
+  'ImageList_Create',
+  'ImageList_Destroy',
+  'ImageList_Duplicate',
+  'ImageList_GetBkColor',
+  'ImageList_GetIconSize',
+  'ImageList_GetImageCount',
+  'ImageList_SetBkColor',
+  'ImageList_SetIconSize',
+  'InitCommonControls',
+  'InitCommonControlsEx',
+]);
 
 const ANSI = {
   bold: '\x1b[1m',
@@ -189,7 +201,9 @@ for (const matrixEntry of IMAGE_LIST_MATRIX) {
   const resizedIconSize = readImageListIconSize(imageListHandle);
   const duplicatedHandle = Comctl32.ImageList_Duplicate(imageListHandle);
 
-  console.log(`  ${ANSI.green}✓${ANSI.reset} ${padRight(matrixEntry.label, 30)} ${padRight(`0x${imageListHandle.toString(16)}`, 18)} ${padRight(String(imageCount), 6)} ${padRight(sizeText, 10)} ${formatColorRef(previousBackgroundColor)} → ${formatColorRef(appliedBackgroundColor)}`);
+  console.log(
+    `  ${ANSI.green}✓${ANSI.reset} ${padRight(matrixEntry.label, 30)} ${padRight(`0x${imageListHandle.toString(16)}`, 18)} ${padRight(String(imageCount), 6)} ${padRight(sizeText, 10)} ${formatColorRef(previousBackgroundColor)} → ${formatColorRef(appliedBackgroundColor)}`,
+  );
 
   if (resizedIconSize !== null) {
     console.log(`    ${ANSI.dim}resized ${sizeText} → ${resizedIconSize.cx}×${resizedIconSize.cy} (ImageList_SetIconSize clears the list per MSDN)${ANSI.reset}`);

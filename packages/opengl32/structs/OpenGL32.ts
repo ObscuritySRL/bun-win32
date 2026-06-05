@@ -452,8 +452,8 @@ class OpenGL32 extends Win32 {
     glLogicOp: { args: [FFIType.u32], returns: FFIType.void },
     glMap1d: { args: [FFIType.u32, FFIType.f64, FFIType.f64, FFIType.i32, FFIType.i32, FFIType.ptr], returns: FFIType.void },
     glMap1f: { args: [FFIType.u32, FFIType.f32, FFIType.f32, FFIType.i32, FFIType.i32, FFIType.ptr], returns: FFIType.void },
-    glMap2d: { args: [FFIType.u32, FFIType.f64, FFIType.f64, FFIType.i32, FFIType.i32, FFIType.f64, FFIType.f64, FFIType.i32, FFIType.i32, FFIType.ptr], returns: FFIType.void }, // prettier-ignore
-    glMap2f: { args: [FFIType.u32, FFIType.f32, FFIType.f32, FFIType.i32, FFIType.i32, FFIType.f32, FFIType.f32, FFIType.i32, FFIType.i32, FFIType.ptr], returns: FFIType.void }, // prettier-ignore
+    glMap2d: { args: [FFIType.u32, FFIType.f64, FFIType.f64, FFIType.i32, FFIType.i32, FFIType.f64, FFIType.f64, FFIType.i32, FFIType.i32, FFIType.ptr], returns: FFIType.void },
+    glMap2f: { args: [FFIType.u32, FFIType.f32, FFIType.f32, FFIType.i32, FFIType.i32, FFIType.f32, FFIType.f32, FFIType.i32, FFIType.i32, FFIType.ptr], returns: FFIType.void },
     glMapGrid1d: { args: [FFIType.i32, FFIType.f64, FFIType.f64], returns: FFIType.void },
     glMapGrid1f: { args: [FFIType.i32, FFIType.f32, FFIType.f32], returns: FFIType.void },
     glMapGrid2d: { args: [FFIType.i32, FFIType.f64, FFIType.f64, FFIType.i32, FFIType.f64, FFIType.f64], returns: FFIType.void },
@@ -589,13 +589,13 @@ class OpenGL32 extends Win32 {
     glTexGeni: { args: [FFIType.u32, FFIType.u32, FFIType.i32], returns: FFIType.void },
     glTexGeniv: { args: [FFIType.u32, FFIType.u32, FFIType.ptr], returns: FFIType.void },
     glTexImage1D: { args: [FFIType.u32, FFIType.i32, FFIType.i32, FFIType.i32, FFIType.i32, FFIType.i32, FFIType.u32, FFIType.ptr], returns: FFIType.void },
-    glTexImage2D: { args: [FFIType.u32, FFIType.i32, FFIType.i32, FFIType.i32, FFIType.i32, FFIType.i32, FFIType.i32, FFIType.u32, FFIType.ptr], returns: FFIType.void }, // prettier-ignore
+    glTexImage2D: { args: [FFIType.u32, FFIType.i32, FFIType.i32, FFIType.i32, FFIType.i32, FFIType.i32, FFIType.i32, FFIType.u32, FFIType.ptr], returns: FFIType.void },
     glTexParameterf: { args: [FFIType.u32, FFIType.u32, FFIType.f32], returns: FFIType.void },
     glTexParameterfv: { args: [FFIType.u32, FFIType.u32, FFIType.ptr], returns: FFIType.void },
     glTexParameteri: { args: [FFIType.u32, FFIType.u32, FFIType.i32], returns: FFIType.void },
     glTexParameteriv: { args: [FFIType.u32, FFIType.u32, FFIType.ptr], returns: FFIType.void },
     glTexSubImage1D: { args: [FFIType.u32, FFIType.i32, FFIType.i32, FFIType.i32, FFIType.u32, FFIType.u32, FFIType.ptr], returns: FFIType.void },
-    glTexSubImage2D: { args: [FFIType.u32, FFIType.i32, FFIType.i32, FFIType.i32, FFIType.i32, FFIType.i32, FFIType.u32, FFIType.u32, FFIType.ptr], returns: FFIType.void }, // prettier-ignore
+    glTexSubImage2D: { args: [FFIType.u32, FFIType.i32, FFIType.i32, FFIType.i32, FFIType.i32, FFIType.i32, FFIType.u32, FFIType.u32, FFIType.ptr], returns: FFIType.void },
     glTranslated: { args: [FFIType.f64, FFIType.f64, FFIType.f64], returns: FFIType.void },
     glTranslatef: { args: [FFIType.f32, FFIType.f32, FFIType.f32], returns: FFIType.void },
     glVertex2d: { args: [FFIType.f64, FFIType.f64], returns: FFIType.void },
@@ -1470,15 +1470,13 @@ class OpenGL32 extends Win32 {
     return OpenGL32.Load('glMap1f')(target, u1, u2, stride, order, points);
   }
 
-  // prettier-ignore
   // https://learn.microsoft.com/en-us/windows/win32/opengl/glmap2d
-  public static glMap2d(target: GLenum, u1: GLdouble, u2: GLdouble, ustride: GLint, uorder: GLint, v1: GLdouble, v2: GLdouble, vstride: GLint, vorder: GLint, points: GLdouble_) : void {
+  public static glMap2d(target: GLenum, u1: GLdouble, u2: GLdouble, ustride: GLint, uorder: GLint, v1: GLdouble, v2: GLdouble, vstride: GLint, vorder: GLint, points: GLdouble_): void {
     return OpenGL32.Load('glMap2d')(target, u1, u2, ustride, uorder, v1, v2, vstride, vorder, points);
   }
 
-  // prettier-ignore
   // https://learn.microsoft.com/en-us/windows/win32/opengl/glmap2f
-  public static glMap2f(target: GLenum, u1: GLfloat, u2: GLfloat, ustride: GLint, uorder: GLint, v1: GLfloat, v2: GLfloat, vstride: GLint, vorder: GLint, points: GLfloat_) : void {
+  public static glMap2f(target: GLenum, u1: GLfloat, u2: GLfloat, ustride: GLint, uorder: GLint, v1: GLfloat, v2: GLfloat, vstride: GLint, vorder: GLint, points: GLfloat_): void {
     return OpenGL32.Load('glMap2f')(target, u1, u2, ustride, uorder, v1, v2, vstride, vorder, points);
   }
 
@@ -2152,15 +2150,13 @@ class OpenGL32 extends Win32 {
     return OpenGL32.Load('glTexGeniv')(coord, pname, params);
   }
 
-  // prettier-ignore
   // https://learn.microsoft.com/en-us/windows/win32/opengl/glteximage1d
-  public static glTexImage1D(target: GLenum, level: GLint, internalformat: GLint, width: GLsizei, border: GLint, format: GLint, type: GLenum, pixels: GLvoid_ | NULL) : void {
+  public static glTexImage1D(target: GLenum, level: GLint, internalformat: GLint, width: GLsizei, border: GLint, format: GLint, type: GLenum, pixels: GLvoid_ | NULL): void {
     return OpenGL32.Load('glTexImage1D')(target, level, internalformat, width, border, format, type, pixels);
   }
 
-  // prettier-ignore
   // https://learn.microsoft.com/en-us/windows/win32/opengl/glteximage2d
-  public static glTexImage2D(target: GLenum, level: GLint, internalformat: GLint, width: GLsizei, height: GLsizei, border: GLint, format: GLint, type: GLenum, pixels: GLvoid_ | NULL) : void {
+  public static glTexImage2D(target: GLenum, level: GLint, internalformat: GLint, width: GLsizei, height: GLsizei, border: GLint, format: GLint, type: GLenum, pixels: GLvoid_ | NULL): void {
     return OpenGL32.Load('glTexImage2D')(target, level, internalformat, width, height, border, format, type, pixels);
   }
 
@@ -2189,9 +2185,8 @@ class OpenGL32 extends Win32 {
     return OpenGL32.Load('glTexSubImage1D')(target, level, xoffset, width, format, type, pixels);
   }
 
-  // prettier-ignore
   // https://learn.microsoft.com/en-us/windows/win32/opengl/gltexsubimage2d
-  public static glTexSubImage2D(target: GLenum, level: GLint, xoffset: GLint, yoffset: GLint, width: GLsizei, height: GLsizei, format: GLenum, type: GLenum, pixels: GLvoid_) : void {
+  public static glTexSubImage2D(target: GLenum, level: GLint, xoffset: GLint, yoffset: GLint, width: GLsizei, height: GLsizei, format: GLenum, type: GLenum, pixels: GLvoid_): void {
     return OpenGL32.Load('glTexSubImage2D')(target, level, xoffset, yoffset, width, height, format, type, pixels);
   }
 
@@ -2435,15 +2430,13 @@ class OpenGL32 extends Win32 {
     return OpenGL32.Load('wglUseFontBitmapsW')(hdc, first, count, listBase);
   }
 
-  // prettier-ignore
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-wglusefontoutlinesa
-  public static wglUseFontOutlinesA(hdc: HDC, first: DWORD, count: DWORD, listBase: DWORD, deviation: GLfloat, extrusion: GLfloat, format: INT, lpgmf: LPGLYPHMETRICSFLOAT | NULL) : BOOL {
+  public static wglUseFontOutlinesA(hdc: HDC, first: DWORD, count: DWORD, listBase: DWORD, deviation: GLfloat, extrusion: GLfloat, format: INT, lpgmf: LPGLYPHMETRICSFLOAT | NULL): BOOL {
     return OpenGL32.Load('wglUseFontOutlinesA')(hdc, first, count, listBase, deviation, extrusion, format, lpgmf);
   }
 
-  // prettier-ignore
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-wglusefontoutlinesw
-  public static wglUseFontOutlinesW(hdc: HDC, first: DWORD, count: DWORD, listBase: DWORD, deviation: GLfloat, extrusion: GLfloat, format: INT, lpgmf: LPGLYPHMETRICSFLOAT | NULL) : BOOL {
+  public static wglUseFontOutlinesW(hdc: HDC, first: DWORD, count: DWORD, listBase: DWORD, deviation: GLfloat, extrusion: GLfloat, format: INT, lpgmf: LPGLYPHMETRICSFLOAT | NULL): BOOL {
     return OpenGL32.Load('wglUseFontOutlinesW')(hdc, first, count, listBase, deviation, extrusion, format, lpgmf);
   }
 

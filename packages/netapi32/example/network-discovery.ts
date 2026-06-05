@@ -67,17 +67,7 @@ const bufPtrBuf = Buffer.alloc(8);
 const entriesReadBuf = Buffer.alloc(4);
 const totalEntriesBuf = Buffer.alloc(4);
 
-const status = Netapi32.NetServerEnum(
-  null,
-  100,
-  bufPtrBuf.ptr,
-  MAX_PREFERRED_LENGTH,
-  entriesReadBuf.ptr,
-  totalEntriesBuf.ptr,
-  SV_TYPE_ALL,
-  null,
-  null,
-);
+const status = Netapi32.NetServerEnum(null, 100, bufPtrBuf.ptr, MAX_PREFERRED_LENGTH, entriesReadBuf.ptr, totalEntriesBuf.ptr, SV_TYPE_ALL, null, null);
 
 // NERR_Success = 0, ERROR_MORE_DATA = 234
 if (status !== 0 && status !== 234) {

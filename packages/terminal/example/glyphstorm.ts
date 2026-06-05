@@ -97,8 +97,7 @@ for (const [ch, rows] of Object.entries(GLYPHS)) {
   }
   GLYPH_PTS.set(ch, pts);
 }
-const litPoints = (ch: string): Array<[number, number]> =>
-  GLYPH_PTS.get(ch) ?? GLYPH_PTS.get(ch.toUpperCase()) ?? GLYPH_PTS.get(' ')!;
+const litPoints = (ch: string): Array<[number, number]> => GLYPH_PTS.get(ch) ?? GLYPH_PTS.get(ch.toUpperCase()) ?? GLYPH_PTS.get(' ')!;
 
 // ── Particle pool (fixed internal pixel space) ──────────────────────────────────
 const N = 6400;
@@ -209,7 +208,10 @@ const buildNebula = (W: number, H: number): void => {
   const invW = 1 / W;
   const invH = 1 / H;
   // two faint off-center nebula clouds for organic asymmetry (deterministic)
-  const b1x = W * 0.30, b1y = H * 0.34, b2x = W * 0.74, b2y = H * 0.66;
+  const b1x = W * 0.3,
+    b1y = H * 0.34,
+    b2x = W * 0.74,
+    b2y = H * 0.66;
   for (let y = 0; y < H; y++) {
     const ny = (y - cy) * invH * 2; // -1..1
     const yr = y * W;
@@ -219,17 +221,19 @@ const buildNebula = (W: number, H: number): void => {
       const r2 = nx * nx * 0.7 + ny * ny * 1.35;
       const glow = Math.exp(-r2 * 1.9);
       // faint nebula clouds
-      const d1x = (x - b1x) * invW, d1y = (y - b1y) * invH;
-      const d2x = (x - b2x) * invW, d2y = (y - b2y) * invH;
+      const d1x = (x - b1x) * invW,
+        d1y = (y - b1y) * invH;
+      const d2x = (x - b2x) * invW,
+        d2y = (y - b2y) * invH;
       const c1 = Math.exp(-(d1x * d1x + d1y * d1y) * 9) * 0.5;
       const c2 = Math.exp(-(d2x * d2x + d2y * d2y) * 11) * 0.4;
       const cloud = c1 + c2;
       // deep indigo base + blue-violet central lift; B leads, then G, faint R — cohesive
       // with the cyan→magenta word band and never muddy.
       const o = (yr + x) * 3;
-      nebula[o] = 0.006 + glow * 0.022 + cloud * 0.016;       // R
-      nebula[o + 1] = 0.010 + glow * 0.030 + cloud * 0.018;   // G
-      nebula[o + 2] = 0.022 + glow * 0.060 + cloud * 0.040;   // B
+      nebula[o] = 0.006 + glow * 0.022 + cloud * 0.016; // R
+      nebula[o + 1] = 0.01 + glow * 0.03 + cloud * 0.018; // G
+      nebula[o + 2] = 0.022 + glow * 0.06 + cloud * 0.04; // B
     }
   }
 };
@@ -282,7 +286,7 @@ let lineCount = 1;
 // arcs electric-cyan → azure → indigo → violet → magenta. Words rotate through these
 // anchors instead of letting the hue free-drift, so the storm NEVER wanders into the
 // green/yellow zone — the whole piece stays a cohesive, premium cyan-to-magenta gamut.
-const WORD_HUES = [0.515, 0.60, 0.70, 0.80, 0.555, 0.755];
+const WORD_HUES = [0.515, 0.6, 0.7, 0.8, 0.555, 0.755];
 let wordIndex = 0; // advances each word/line; selects the base hue anchor
 const baseHueFor = (idx: number): number => WORD_HUES[((idx % WORD_HUES.length) + WORD_HUES.length) % WORD_HUES.length];
 const HUE_START = WORD_HUES[0];
@@ -295,7 +299,7 @@ const recenterAll = (): void => {
   // measure widths per row to center each line
   const rowWidth = new Map<number, number>();
   for (const s of slots) {
-    const w = (rowWidth.get(s.row) ?? 0);
+    const w = rowWidth.get(s.row) ?? 0;
     if (s.col + 1 > w) rowWidth.set(s.row, s.col + 1);
   }
   for (const s of slots) {
@@ -342,7 +346,7 @@ const addGlyph = (ch: string): void => {
     // Per-word hue RAMP: a gentle sweep across the line so the word reads as a soft
     // gradient WITHIN the curated band (the base hue ± a few percent) instead of a
     // flat fill — tight enough that even a 10-letter word never drifts out of palette.
-    hue: hueBase + curCol * 0.020 + curRow * 0.035,
+    hue: hueBase + curCol * 0.02 + curRow * 0.035,
     born: nowTime,
     parts: [],
   };
@@ -398,9 +402,16 @@ const burstLine = (): void => {
   let cy = 0;
   let nP = 0;
   for (const s of slots) {
-    for (const i of s.parts) { cx += PX[i]; cy += PY[i]; nP++; }
+    for (const i of s.parts) {
+      cx += PX[i];
+      cy += PY[i];
+      nP++;
+    }
   }
-  if (nP > 0) { cx /= nP; cy /= nP; }
+  if (nP > 0) {
+    cx /= nP;
+    cy /= nP;
+  }
   for (const s of slots) {
     for (const i of s.parts) {
       STATE[i] = 2;
@@ -411,7 +422,8 @@ const burstLine = (): void => {
       let dx = PX[i] - cx;
       let dy = PY[i] - cy;
       const d = Math.hypot(dx, dy) + 1e-3;
-      dx /= d; dy /= d;
+      dx /= d;
+      dy /= d;
       const jang = (rngTarget() - 0.5) * 1.1;
       const ca = Math.cos(jang);
       const sa = Math.sin(jang);
@@ -658,7 +670,7 @@ const frame = (t: Term, time: number, dt: number): void => {
         const mdx = mIx - x;
         const mdy = mIy - y;
         const md = Math.hypot(mdx, mdy) + 1e-3;
-        const pull = (MOUSE_PULL / (1 + md * 0.18)) ;
+        const pull = MOUSE_PULL / (1 + md * 0.18);
         ax += (mdx / md) * pull;
         ay += (mdy / md) * pull;
       }
@@ -719,7 +731,7 @@ const frame = (t: Term, time: number, dt: number): void => {
       // Per-particle deposit trimmed (was 0.12 + 0.40·close) to offset the higher
       // particle density so the denser spines stay luminously coloured instead of
       // stacking up past the white-clip threshold.
-      intensity = (0.10 + 0.33 * close) * JIT[i] * shimmer;
+      intensity = (0.1 + 0.33 * close) * JIT[i] * shimmer;
       // Bold per-letter hue ramp: HUE[i] already carries the per-glyph ramp position;
       // add a tight intra-cell gradient down the spine so even one letter is a small
       // cyan→violet sweep, then drift the whole palette slowly.
@@ -766,10 +778,18 @@ const frame = (t: Term, time: number, dt: number): void => {
     const o10 = o00 + 1;
     const o01 = o00 + W;
     const o11 = o01 + 1;
-    accR[o00] += cr * w00; accG[o00] += cg * w00; accB[o00] += cb * w00;
-    accR[o10] += cr * w10; accG[o10] += cg * w10; accB[o10] += cb * w10;
-    accR[o01] += cr * w01; accG[o01] += cg * w01; accB[o01] += cb * w01;
-    accR[o11] += cr * w11; accG[o11] += cg * w11; accB[o11] += cb * w11;
+    accR[o00] += cr * w00;
+    accG[o00] += cg * w00;
+    accB[o00] += cb * w00;
+    accR[o10] += cr * w10;
+    accG[o10] += cg * w10;
+    accB[o10] += cb * w10;
+    accR[o01] += cr * w01;
+    accG[o01] += cg * w01;
+    accB[o01] += cb * w01;
+    accR[o11] += cr * w11;
+    accG[o11] += cg * w11;
+    accB[o11] += cb * w11;
   }
 
   // — bloom: lift a glow off the dense letterform spines —
@@ -790,7 +810,7 @@ const frame = (t: Term, time: number, dt: number): void => {
     // Bloom is tinted slightly cool (more blue) for a clean electric halo. The static
     // nebula base (deep blue-violet vignette + faint clouds) lifts the void off pure
     // black with real depth so the starfield always sits on a premium stage.
-    const R = accR[idx] * EXPOSURE + bl * 0.80 + neb[no];
+    const R = accR[idx] * EXPOSURE + bl * 0.8 + neb[no];
     const G = accG[idx] * EXPOSURE + bl * 0.82 + neb[no + 1];
     const B = accB[idx] * EXPOSURE + bl * 1.14 + neb[no + 2];
     const lum = R * 0.2126 + G * 0.7152 + B * 0.0722 + 1e-6;
@@ -831,7 +851,7 @@ const frame = (t: Term, time: number, dt: number): void => {
 const buildBloom = (W: number, H: number): void => {
   for (let i = 0; i < accR.length; i++) {
     const l = accR[i] * 0.6 + accG[i] * 0.5 + accB[i] * 0.7;
-    const eknee = l - 0.30;
+    const eknee = l - 0.3;
     bloomTmp[i] = eknee > 0 ? eknee : 0;
   }
   for (let y = 0; y < H; y++) {
@@ -841,9 +861,7 @@ const buildBloom = (W: number, H: number): void => {
       const x1 = x > 0 ? x - 1 : 0;
       const x3 = x < W - 1 ? x + 1 : W - 1;
       const x4 = x < W - 2 ? x + 2 : W - 1;
-      bloom[row + x] =
-        bloomTmp[row + x0] * 0.12 + bloomTmp[row + x1] * 0.24 +
-        bloomTmp[row + x] * 0.28 + bloomTmp[row + x3] * 0.24 + bloomTmp[row + x4] * 0.12;
+      bloom[row + x] = bloomTmp[row + x0] * 0.12 + bloomTmp[row + x1] * 0.24 + bloomTmp[row + x] * 0.28 + bloomTmp[row + x3] * 0.24 + bloomTmp[row + x4] * 0.12;
     }
   }
   for (let y = 0; y < H; y++) {
@@ -851,11 +869,13 @@ const buildBloom = (W: number, H: number): void => {
     const y1 = y > 0 ? y - 1 : 0;
     const y3 = y < H - 1 ? y + 1 : H - 1;
     const y4 = y < H - 2 ? y + 2 : H - 1;
-    const r0 = y0 * W, r1 = y1 * W, r = y * W, r3 = y3 * W, r4 = y4 * W;
+    const r0 = y0 * W,
+      r1 = y1 * W,
+      r = y * W,
+      r3 = y3 * W,
+      r4 = y4 * W;
     for (let x = 0; x < W; x++) {
-      bloomTmp[r + x] =
-        bloom[r0 + x] * 0.12 + bloom[r1 + x] * 0.24 +
-        bloom[r + x] * 0.28 + bloom[r3 + x] * 0.24 + bloom[r4 + x] * 0.12;
+      bloomTmp[r + x] = bloom[r0 + x] * 0.12 + bloom[r1 + x] * 0.24 + bloom[r + x] * 0.28 + bloom[r3 + x] * 0.24 + bloom[r4 + x] * 0.12;
     }
   }
   bloom.set(bloomTmp);

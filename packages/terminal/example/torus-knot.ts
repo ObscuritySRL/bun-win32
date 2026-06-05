@@ -175,7 +175,9 @@ const tubeSDF = (x: number, y: number, z: number): number => {
           if (xa >= x0) {
             const c = rowBase + xa;
             for (let q = start[c] * 3, e = start[c + 1] * 3; q < e; q += 3) {
-              const dx = x - P3[q], dy = y - P3[q + 1], dz = z - P3[q + 2];
+              const dx = x - P3[q],
+                dy = y - P3[q + 1],
+                dz = z - P3[q + 2];
               const d2 = dx * dx + dy * dy + dz * dz;
               if (d2 < best) best = d2;
             }
@@ -183,7 +185,9 @@ const tubeSDF = (x: number, y: number, z: number): number => {
           if (xb <= x1 && xb !== xa) {
             const c = rowBase + xb;
             for (let q = start[c] * 3, e = start[c + 1] * 3; q < e; q += 3) {
-              const dx = x - P3[q], dy = y - P3[q + 1], dz = z - P3[q + 2];
+              const dx = x - P3[q],
+                dy = y - P3[q + 1],
+                dz = z - P3[q + 2];
               const d2 = dx * dx + dy * dy + dz * dz;
               if (d2 < best) best = d2;
             }
@@ -196,7 +200,9 @@ const tubeSDF = (x: number, y: number, z: number): number => {
         const q0 = start[rowBase + x0] * 3;
         const q1 = start[rowBase + x1 + 1] * 3;
         for (let q = q0; q < q1; q += 3) {
-          const dx = x - P3[q], dy = y - P3[q + 1], dz = z - P3[q + 2];
+          const dx = x - P3[q],
+            dy = y - P3[q + 1],
+            dz = z - P3[q + 2];
           const d2 = dx * dx + dy * dy + dz * dz;
           if (d2 < best) best = d2;
         }
@@ -277,7 +283,7 @@ run({
       const dyp = (y - cyw) * invR;
       const dy2 = dyp * dyp;
       for (let x = 0; x < W; x++) {
-        const dxp = (x - cxw);
+        const dxp = x - cxw;
         const rr = dxp * dxp * invR2 + dy2; // 0 center .. ~2 corners
         // a soft glow pool at center, falling to near-black at the edges
         let st = rr * sInv;
@@ -444,8 +450,12 @@ run({
       // Sky: bright cool steel-blue, lifting near-white toward the zenith so the
       // chrome catches a clean specular sky. Ground: a deep teal-indigo with a
       // faint warm bounce so the underside reads as polished metal, not a void.
-      const skyR = 0.46, skyG = 0.66, skyB = 0.98;
-      const grR = 0.05, grG = 0.07, grB = 0.13;
+      const skyR = 0.46,
+        skyG = 0.66,
+        skyB = 0.98;
+      const grR = 0.05,
+        grG = 0.07,
+        grB = 0.13;
       // Smooth vertical mix, with a zenith brightening for a crisp sky reflection.
       const m = up * up * (3 - 2 * up);
       const zen = up * up * up; // extra punch overhead
@@ -608,12 +618,36 @@ run({
       const hvt = 1 - sat * (1 - hf);
       let arr: number, agr: number, abr: number;
       switch (hi) {
-        case 0: arr = 1; agr = hvt; abr = hvp; break;
-        case 1: arr = hvq; agr = 1; abr = hvp; break;
-        case 2: arr = hvp; agr = 1; abr = hvt; break;
-        case 3: arr = hvp; agr = hvq; abr = 1; break;
-        case 4: arr = hvt; agr = hvp; abr = 1; break;
-        default: arr = 1; agr = hvp; abr = hvq; break;
+        case 0:
+          arr = 1;
+          agr = hvt;
+          abr = hvp;
+          break;
+        case 1:
+          arr = hvq;
+          agr = 1;
+          abr = hvp;
+          break;
+        case 2:
+          arr = hvp;
+          agr = 1;
+          abr = hvt;
+          break;
+        case 3:
+          arr = hvp;
+          agr = hvq;
+          abr = 1;
+          break;
+        case 4:
+          arr = hvt;
+          agr = hvp;
+          abr = 1;
+          break;
+        default:
+          arr = 1;
+          agr = hvp;
+          abr = hvq;
+          break;
       }
       const albR = ((arr * 255) | 0) / 255,
         albG = ((agr * 255) | 0) / 255,
@@ -734,13 +768,7 @@ run({
       for (let px = 1; px < W - 1; px++) {
         const here = HITMASK[maskRow + px];
         // boundary test: any 4-neighbour differs from this pixel's hit state
-        if (
-          here === HITMASK[maskRow + px - 1] &&
-          here === HITMASK[maskRow + px + 1] &&
-          here === HITMASK[maskRow - W + px] &&
-          here === HITMASK[maskRow + W + px]
-        )
-          continue;
+        if (here === HITMASK[maskRow + px - 1] && here === HITMASK[maskRow + px + 1] && here === HITMASK[maskRow - W + px] && here === HITMASK[maskRow + W + px]) continue;
 
         let sr = 0,
           sg = 0,

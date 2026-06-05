@@ -512,10 +512,7 @@ Hit sceneMap(float3 p) {
 }
 `;
 
-export const SCENE_SDFS: readonly string[] = [
-  SDF_CATHEDRAL, SDF_REEF, SDF_APOLLONIAN, SDF_MANDELBOX, SDF_SEA,
-  SDF_GLASS, SDF_CLOUDS, SDF_JULIA, SDF_SYNTH, SDF_MEMBRANE,
-];
+export const SCENE_SDFS: readonly string[] = [SDF_CATHEDRAL, SDF_REEF, SDF_APOLLONIAN, SDF_MANDELBOX, SDF_SEA, SDF_GLASS, SDF_CLOUDS, SDF_JULIA, SDF_SYNTH, SDF_MEMBRANE];
 
 // ── Shared ray-march engine body (lighting, sky/IBL, shadows, AO, march, glass) ─
 // Concatenated AFTER the cbuffer + helpers and the scene's `sceneMap`/`SCENE_ID`.
@@ -1098,12 +1095,45 @@ function comReleaseSafe(ptr: bigint | undefined): void {
 
 // ── Virtual-key codes for the control scheme ───────────────────────────────────
 const VK = {
-  SPACE: 0x20, TAB: 0x09,
-  A: 0x41, B: 0x42, C: 0x43, D: 0x44, E: 0x45, F: 0x46, G: 0x47, I: 0x49,
-  J: 0x4a, K: 0x4b, M: 0x4d, O: 0x4f, P: 0x50, Q: 0x51, R: 0x52, S: 0x53,
-  T: 0x54, V: 0x56, W: 0x57, X: 0x58, Z: 0x5a,
-  LBRACKET: 0xdb, RBRACKET: 0xdd, MINUS: 0xbd, EQUALS: 0xbb, COMMA: 0xbc, PERIOD: 0xbe,
-  D0: 0x30, D1: 0x31, D2: 0x32, D3: 0x33, D4: 0x34, D5: 0x35, D6: 0x36, D7: 0x37, D8: 0x38, D9: 0x39,
+  SPACE: 0x20,
+  TAB: 0x09,
+  A: 0x41,
+  B: 0x42,
+  C: 0x43,
+  D: 0x44,
+  E: 0x45,
+  F: 0x46,
+  G: 0x47,
+  I: 0x49,
+  J: 0x4a,
+  K: 0x4b,
+  M: 0x4d,
+  O: 0x4f,
+  P: 0x50,
+  Q: 0x51,
+  R: 0x52,
+  S: 0x53,
+  T: 0x54,
+  V: 0x56,
+  W: 0x57,
+  X: 0x58,
+  Z: 0x5a,
+  LBRACKET: 0xdb,
+  RBRACKET: 0xdd,
+  MINUS: 0xbd,
+  EQUALS: 0xbb,
+  COMMA: 0xbc,
+  PERIOD: 0xbe,
+  D0: 0x30,
+  D1: 0x31,
+  D2: 0x32,
+  D3: 0x33,
+  D4: 0x34,
+  D5: 0x35,
+  D6: 0x36,
+  D7: 0x37,
+  D8: 0x38,
+  D9: 0x39,
 } as const;
 
 const QUALITY_STEPS = [96, 160, 256] as const;
@@ -1146,20 +1176,26 @@ function main(): void {
 
   // Per-scene camera framing for manual / SCENE-pinned mode (cinematic mode overrides this).
   const FRAMING: ReadonlyArray<{ yaw: number; pitch: number; dist: number; ty: number; roll: number }> = [
-    { yaw: 0.6, pitch: 0.16, dist: 5.6, ty: 0.15, roll: 0 },   // 0 chrome
-    { yaw: 0.4, pitch: 0.10, dist: 5.6, ty: -0.2, roll: 0 },   // 1 reef
-    { yaw: 0.7, pitch: 0.18, dist: 4.6, ty: 0.0, roll: 0 },    // 2 apollonian
-    { yaw: 0.5, pitch: 0.20, dist: 4.8, ty: 0.0, roll: 0 },    // 3 mandelbox
-    { yaw: 0.3, pitch: -0.04, dist: 6.6, ty: 0.7, roll: 0 },   // 4 sea
-    { yaw: 0.8, pitch: 0.16, dist: 4.2, ty: 0.1, roll: 0 },    // 5 glass
-    { yaw: 1.1, pitch: 0.12, dist: 5.2, ty: 0.9, roll: 0 },    // 6 clouds
-    { yaw: 0.6, pitch: 0.20, dist: 4.0, ty: 0.0, roll: 0 },    // 7 julia
+    { yaw: 0.6, pitch: 0.16, dist: 5.6, ty: 0.15, roll: 0 }, // 0 chrome
+    { yaw: 0.4, pitch: 0.1, dist: 5.6, ty: -0.2, roll: 0 }, // 1 reef
+    { yaw: 0.7, pitch: 0.18, dist: 4.6, ty: 0.0, roll: 0 }, // 2 apollonian
+    { yaw: 0.5, pitch: 0.2, dist: 4.8, ty: 0.0, roll: 0 }, // 3 mandelbox
+    { yaw: 0.3, pitch: -0.04, dist: 6.6, ty: 0.7, roll: 0 }, // 4 sea
+    { yaw: 0.8, pitch: 0.16, dist: 4.2, ty: 0.1, roll: 0 }, // 5 glass
+    { yaw: 1.1, pitch: 0.12, dist: 5.2, ty: 0.9, roll: 0 }, // 6 clouds
+    { yaw: 0.6, pitch: 0.2, dist: 4.0, ty: 0.0, roll: 0 }, // 7 julia
     { yaw: 0.1, pitch: 0.06, dist: 6.2, ty: 1.0, roll: 0.05 }, // 8 synthwave
-    { yaw: 0.7, pitch: 0.16, dist: 4.6, ty: 0.0, roll: 0 },    // 9 membrane
+    { yaw: 0.7, pitch: 0.16, dist: 4.6, ty: 0.0, roll: 0 }, // 9 membrane
   ];
   function frameScene(idx: number): void {
     const f = FRAMING[idx] ?? FRAMING[0]!;
-    cam.yaw = f.yaw; cam.pitch = f.pitch; cam.dist = f.dist; cam.tx = 0; cam.ty = f.ty; cam.tz = 0; cam.roll = f.roll;
+    cam.yaw = f.yaw;
+    cam.pitch = f.pitch;
+    cam.dist = f.dist;
+    cam.tx = 0;
+    cam.ty = f.ty;
+    cam.tz = 0;
+    cam.roll = f.roll;
   }
 
   // ── Compile every stage at runtime (timed for the HUD) ──────────────────────
@@ -1247,8 +1283,10 @@ function main(): void {
   let histPrev = gpu.makeTexture({ w: cw, h: ch, format: F16, rtv: true, srv: true });
   let histCurr = gpu.makeTexture({ w: cw, h: ch, format: F16, rtv: true, srv: true });
   // Clear the accumulation history so a first-frame frozen read can't sample garbage/NaN.
-  gpu.setRenderTargets([histPrev.rtv!]); gpu.clear(histPrev.rtv!, [0, 0, 0, 1]);
-  gpu.setRenderTargets([histCurr.rtv!]); gpu.clear(histCurr.rtv!, [0, 0, 0, 1]);
+  gpu.setRenderTargets([histPrev.rtv!]);
+  gpu.clear(histPrev.rtv!, [0, 0, 0, 1]);
+  gpu.setRenderTargets([histCurr.rtv!]);
+  gpu.clear(histCurr.rtv!, [0, 0, 0, 1]);
   gpu.setRenderTargets([]);
   const samp = gpu.makeSampler({ filter: gpu.D3D11_FILTER_MIN_MAG_MIP_LINEAR, address: gpu.D3D11_TEXTURE_ADDRESS_CLAMP });
 
@@ -1358,7 +1396,9 @@ function main(): void {
       gpu.csSet(simCs, { cb: [cbSim], uav: [simNext.uav!], srv: [simPrev.srv!] });
       gpu.dispatch(SIM_W / 16, SIM_W / 16, 1);
       gpu.csSet(simCs, { uav: [0n], srv: [0n] });
-      const t = simPrev; simPrev = simNext; simNext = t;
+      const t = simPrev;
+      simPrev = simNext;
+      simNext = t;
       simFrame += 1;
     }
   }
@@ -1412,7 +1452,11 @@ function main(): void {
 
     let moved = false;
     let dirty = false; // a non-camera visual change (scene/FX/JIT) this frame
-    const grab = (): void => { if (cinematic) { cinematic = false; } };
+    const grab = (): void => {
+      if (cinematic) {
+        cinematic = false;
+      }
+    };
 
     // Mouse orbit.
     const m = win.getMouse();
@@ -1436,9 +1480,21 @@ function main(): void {
 
     // Wheel / Z X dolly.
     const wheel = win.getWheel();
-    if (wheel !== 0) { grab(); cam.dist = Math.max(1.5, Math.min(20.0, cam.dist * Math.exp(-wheel * 0.12))); moved = true; }
-    if (win.keyDown(VK.Z)) { grab(); cam.dist = Math.max(1.5, cam.dist - 4.0 * dt); moved = true; }
-    if (win.keyDown(VK.X)) { grab(); cam.dist = Math.min(20.0, cam.dist + 4.0 * dt); moved = true; }
+    if (wheel !== 0) {
+      grab();
+      cam.dist = Math.max(1.5, Math.min(20.0, cam.dist * Math.exp(-wheel * 0.12)));
+      moved = true;
+    }
+    if (win.keyDown(VK.Z)) {
+      grab();
+      cam.dist = Math.max(1.5, cam.dist - 4.0 * dt);
+      moved = true;
+    }
+    if (win.keyDown(VK.X)) {
+      grab();
+      cam.dist = Math.min(20.0, cam.dist + 4.0 * dt);
+      moved = true;
+    }
 
     // WASD / QE fly the target (in the camera's ground plane).
     const fwd = [Math.cos(cam.yaw), 0, Math.sin(cam.yaw)] as const;
@@ -1462,37 +1518,112 @@ function main(): void {
     }
 
     // Edge-triggered toggles.
-    if (pressed(curDown, VK.C)) { cinematic = !cinematic; }
-    if (pressed(curDown, VK.SPACE)) { paused = !paused; }
-    if (pressed(curDown, VK.TAB)) { showHud = !showHud; }
-    if (pressed(curDown, VK.B)) { state.bloom = state.bloom > 0.5 ? 0 : 1; dirty = true; }
-    if (pressed(curDown, VK.G)) { state.godrays = state.godrays > 0.5 ? 0 : 1; dirty = true; }
-    if (pressed(curDown, VK.F)) { state.fog = state.fog > 0.5 ? 0 : 1; dirty = true; }
-    if (pressed(curDown, VK.V)) { state.ao = state.ao > 0.5 ? 0 : 1; dirty = true; } // A is the strafe key, so AO toggles on V
-    if (pressed(curDown, VK.R)) { state.reflect = state.reflect > 0.5 ? 0 : 1; dirty = true; }
-    if (pressed(curDown, VK.K)) { state.aberration = state.aberration > 0.5 ? 0 : 1; dirty = true; }
-    if (pressed(curDown, VK.M)) { state.motionBlur = state.motionBlur > 0.5 ? 0 : 0.85; dirty = true; }
-    if (pressed(curDown, VK.O)) { state.dof = state.dof > 0.05 ? 0 : 0.7; dirty = true; }
-    if (pressed(curDown, VK.MINUS)) { state.exposure = Math.max(0.2, state.exposure - 0.08); dirty = true; }
-    if (pressed(curDown, VK.EQUALS)) { state.exposure = Math.min(3.0, state.exposure + 0.08); dirty = true; }
+    if (pressed(curDown, VK.C)) {
+      cinematic = !cinematic;
+    }
+    if (pressed(curDown, VK.SPACE)) {
+      paused = !paused;
+    }
+    if (pressed(curDown, VK.TAB)) {
+      showHud = !showHud;
+    }
+    if (pressed(curDown, VK.B)) {
+      state.bloom = state.bloom > 0.5 ? 0 : 1;
+      dirty = true;
+    }
+    if (pressed(curDown, VK.G)) {
+      state.godrays = state.godrays > 0.5 ? 0 : 1;
+      dirty = true;
+    }
+    if (pressed(curDown, VK.F)) {
+      state.fog = state.fog > 0.5 ? 0 : 1;
+      dirty = true;
+    }
+    if (pressed(curDown, VK.V)) {
+      state.ao = state.ao > 0.5 ? 0 : 1;
+      dirty = true;
+    } // A is the strafe key, so AO toggles on V
+    if (pressed(curDown, VK.R)) {
+      state.reflect = state.reflect > 0.5 ? 0 : 1;
+      dirty = true;
+    }
+    if (pressed(curDown, VK.K)) {
+      state.aberration = state.aberration > 0.5 ? 0 : 1;
+      dirty = true;
+    }
+    if (pressed(curDown, VK.M)) {
+      state.motionBlur = state.motionBlur > 0.5 ? 0 : 0.85;
+      dirty = true;
+    }
+    if (pressed(curDown, VK.O)) {
+      state.dof = state.dof > 0.05 ? 0 : 0.7;
+      dirty = true;
+    }
+    if (pressed(curDown, VK.MINUS)) {
+      state.exposure = Math.max(0.2, state.exposure - 0.08);
+      dirty = true;
+    }
+    if (pressed(curDown, VK.EQUALS)) {
+      state.exposure = Math.min(3.0, state.exposure + 0.08);
+      dirty = true;
+    }
 
     // JIT recompiles (each mutates the HLSL source and re-invokes D3DCompile).
-    if (pressed(curDown, VK.PERIOD)) { state.quality = Math.min(QUALITY_STEPS.length - 1, state.quality + 1); invalidateAllScenes(); dirty = true; }
-    if (pressed(curDown, VK.COMMA)) { state.quality = Math.max(0, state.quality - 1); invalidateAllScenes(); dirty = true; }
-    if (pressed(curDown, VK.I)) { state.iters = (state.iters + 1) % ITER_STEPS.length; invalidateAllScenes(); dirty = true; }
-    if (pressed(curDown, VK.J)) { state.palette = (state.palette + 1) % 4; invalidateAllScenes(); dirty = true; }
-    if (pressed(curDown, VK.T)) { state.tonemap = (state.tonemap + 1) % 3; ensurePost(); dirty = true; }
+    if (pressed(curDown, VK.PERIOD)) {
+      state.quality = Math.min(QUALITY_STEPS.length - 1, state.quality + 1);
+      invalidateAllScenes();
+      dirty = true;
+    }
+    if (pressed(curDown, VK.COMMA)) {
+      state.quality = Math.max(0, state.quality - 1);
+      invalidateAllScenes();
+      dirty = true;
+    }
+    if (pressed(curDown, VK.I)) {
+      state.iters = (state.iters + 1) % ITER_STEPS.length;
+      invalidateAllScenes();
+      dirty = true;
+    }
+    if (pressed(curDown, VK.J)) {
+      state.palette = (state.palette + 1) % 4;
+      invalidateAllScenes();
+      dirty = true;
+    }
+    if (pressed(curDown, VK.T)) {
+      state.tonemap = (state.tonemap + 1) % 3;
+      ensurePost();
+      dirty = true;
+    }
 
     // Photo mode (restore the HUD legend on exit, hide it on entry).
-    if (pressed(curDown, VK.P)) { photoMode = !photoMode; photoFrames = 0; showHud = !photoMode; }
+    if (pressed(curDown, VK.P)) {
+      photoMode = !photoMode;
+      photoFrames = 0;
+      showHud = !photoMode;
+    }
 
     // Scene selection (numbers + brackets).
     const numVks = [VK.D1, VK.D2, VK.D3, VK.D4, VK.D5, VK.D6, VK.D7, VK.D8, VK.D9, VK.D0];
     for (let i = 0; i < numVks.length; i += 1) {
-      if (pressed(curDown, numVks[i]!)) { manualScene = i; cinematic = false; frameScene(i); dirty = true; }
+      if (pressed(curDown, numVks[i]!)) {
+        manualScene = i;
+        cinematic = false;
+        frameScene(i);
+        dirty = true;
+      }
     }
-    if (pressed(curDown, VK.RBRACKET)) { manualScene = (manualScene + 1) % SCENES.length; cinematic = false; frameScene(manualScene); dirty = true; }
-    if (pressed(curDown, VK.LBRACKET)) { manualScene = (manualScene + SCENES.length - 1) % SCENES.length; cinematic = false; frameScene(manualScene); dirty = true; }
+    if (pressed(curDown, VK.RBRACKET)) {
+      manualScene = (manualScene + 1) % SCENES.length;
+      cinematic = false;
+      frameScene(manualScene);
+      dirty = true;
+    }
+    if (pressed(curDown, VK.LBRACKET)) {
+      manualScene = (manualScene + SCENES.length - 1) % SCENES.length;
+      cinematic = false;
+      frameScene(manualScene);
+      dirty = true;
+    }
 
     prevDown.clear();
     for (const vk of curDown) prevDown.add(vk);
@@ -1557,16 +1688,29 @@ function main(): void {
       ty = sceneIdx === 1 ? -0.2 : sceneIdx === 4 ? 0.65 : sceneIdx === 6 ? 0.5 : 0.0;
       tz = 0;
       roll = sceneIdx === 8 ? 0.06 * Math.sin(elapsed * 0.1) : 0.0;
-      cam.yaw = yaw; cam.pitch = pitch; cam.dist = dist; cam.tx = tx; cam.ty = ty; cam.tz = tz; cam.roll = roll;
+      cam.yaw = yaw;
+      cam.pitch = pitch;
+      cam.dist = dist;
+      cam.tx = tx;
+      cam.ty = ty;
+      cam.tz = tz;
+      cam.roll = roll;
     } else {
-      yaw = cam.yaw; pitch = cam.pitch; dist = cam.dist; tx = cam.tx; ty = cam.ty; tz = cam.tz; roll = cam.roll;
+      yaw = cam.yaw;
+      pitch = cam.pitch;
+      dist = cam.dist;
+      tx = cam.tx;
+      ty = cam.ty;
+      tz = cam.tz;
+      roll = cam.roll;
     }
 
     // Screen-space camera velocity (for motion blur), from yaw/pitch deltas. Clamped so the
     // discrete yaw step at a cinematic scene boundary doesn't smear the transition frame.
     const velX = Math.max(-0.25, Math.min(0.25, (yaw - prevYaw) * 0.9));
     const velY = Math.max(-0.25, Math.min(0.25, (pitch - prevPitch) * 0.9));
-    prevYaw = yaw; prevPitch = pitch;
+    prevYaw = yaw;
+    prevPitch = pitch;
 
     // ── PASS A1 — march the active scene into hdrA ─────────────────────────────
     writeFrameCb(yaw, pitch, dist, roll, tx, ty, tz, elapsed);
@@ -1630,14 +1774,20 @@ function main(): void {
     gpu.drawFullscreenTriangle();
     gpu.psSet(psPresent, { srv: [0n, 0n] });
     gpu.setRenderTargets([]);
-    { const t = histPrev; histPrev = histCurr; histCurr = t; }
+    {
+      const t = histPrev;
+      histPrev = histCurr;
+      histCurr = t;
+    }
 
     if (!photoMode && process.env.HIDE_HUD !== '1') drawHud(sceneIdx, activeIdx);
 
     // ── Self-shot ──────────────────────────────────────────────────────────────
     if (SELFSHOT && !selfshotDone && elapsed > 1.0 && totalFrames >= 3) {
       const stats = captureBackBuffer(g, SELFSHOT_PATH);
-      console.log(`SELFSHOT ${JSON.stringify({ ok: stats.ok, w: stats.width, h: stats.height, nonBlackFrac: Number(stats.nonBlackFrac.toFixed(3)), meanLuma: Number(stats.meanLuma.toFixed(3)), fps, scene: SCENES[activeIdx]!.name, path: stats.path })}`);
+      console.log(
+        `SELFSHOT ${JSON.stringify({ ok: stats.ok, w: stats.width, h: stats.height, nonBlackFrac: Number(stats.nonBlackFrac.toFixed(3)), meanLuma: Number(stats.meanLuma.toFixed(3)), fps, scene: SCENES[activeIdx]!.name, path: stats.path })}`,
+      );
       selfshotDone = true;
     }
 
@@ -1667,10 +1817,16 @@ function main(): void {
   comReleaseSafe(cbSim);
   comReleaseSafe(cbPost);
   comReleaseSafe(cbFrame);
-  comReleaseSafe(simPrev.uav); comReleaseSafe(simPrev.srv); comReleaseSafe(simPrev.buffer);
-  comReleaseSafe(simNext.uav); comReleaseSafe(simNext.srv); comReleaseSafe(simNext.buffer);
+  comReleaseSafe(simPrev.uav);
+  comReleaseSafe(simPrev.srv);
+  comReleaseSafe(simPrev.buffer);
+  comReleaseSafe(simNext.uav);
+  comReleaseSafe(simNext.srv);
+  comReleaseSafe(simNext.buffer);
   for (const tex of [histCurr, histPrev, compTex, bloomTex, hdrB, hdrA]) {
-    comReleaseSafe(tex.srv); comReleaseSafe(tex.rtv); comReleaseSafe(tex.tex);
+    comReleaseSafe(tex.srv);
+    comReleaseSafe(tex.rtv);
+    comReleaseSafe(tex.tex);
   }
   comReleaseSafe(simCs);
   comReleaseSafe(psPresent);

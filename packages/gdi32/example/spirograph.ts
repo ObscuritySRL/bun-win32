@@ -24,13 +24,7 @@
 
 import { JSCallback, FFIType, ptr } from 'bun:ffi';
 import Gdi32 from '../index';
-import User32, {
-  WindowStyles,
-  WindowLongIndex,
-  ShowWindowCommand,
-  PeekMessageRemoveFlag,
-  SystemMetric,
-} from '@bun-win32/user32';
+import User32, { WindowStyles, WindowLongIndex, ShowWindowCommand, PeekMessageRemoveFlag, SystemMetric } from '@bun-win32/user32';
 import Kernel32 from '@bun-win32/kernel32';
 
 const WINDOW_WIDTH = 800;

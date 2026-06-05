@@ -129,13 +129,7 @@ console.log('  THEME PREFERENCES (Registry)');
 const subKeyPath = encode('SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize');
 const hKeyBuf = Buffer.alloc(8);
 
-const openResult = Advapi32.RegOpenKeyExW(
-  HKEY_CURRENT_USER,
-  subKeyPath.ptr,
-  0,
-  RegKeyAccessRights.KEY_READ,
-  hKeyBuf.ptr,
-);
+const openResult = Advapi32.RegOpenKeyExW(HKEY_CURRENT_USER, subKeyPath.ptr, 0, RegKeyAccessRights.KEY_READ, hKeyBuf.ptr);
 
 if (openResult !== 0) {
   console.log(`    Registry Key:     FAILED TO OPEN (error: ${openResult})`);

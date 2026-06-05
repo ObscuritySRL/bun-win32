@@ -127,15 +127,7 @@ if (bufSize === 0) {
 }
 
 const printerBuf = Buffer.alloc(bufSize);
-const ok = Winspool.EnumPrintersW(
-  PRINTER_ENUM_LOCAL,
-  null,
-  2,
-  printerBuf.ptr,
-  bufSize,
-  cbNeeded.ptr,
-  cReturned.ptr,
-);
+const ok = Winspool.EnumPrintersW(PRINTER_ENUM_LOCAL, null, 2, printerBuf.ptr, bufSize, cbNeeded.ptr, cReturned.ptr);
 
 if (!ok) {
   console.log('  \x1b[31mEnumPrintersW failed.\x1b[0m');

@@ -97,7 +97,7 @@ for (let i = 0; i < pidCount; i++) {
 
     if (memOk) {
       const memView = new DataView(memBuf.buffer);
-      const workingSet = Number(memView.getBigUint64(0x10, true));    // WorkingSetSize
+      const workingSet = Number(memView.getBigUint64(0x10, true)); // WorkingSetSize
       const pagefileUsage = Number(memView.getBigUint64(0x38, true)); // PagefileUsage
 
       processes.push({
@@ -125,9 +125,7 @@ console.log();
 console.log(`  ${CYAN}${BOLD}PROCESS MEMORY HEATMAP${RESET}`);
 console.log(`  ${WHITE}Top ${top.length} processes by working set (of ${processes.length} accessible)${RESET}`);
 console.log();
-console.log(
-  `  ${BOLD}${'PROCESS'.padEnd(NAME_WIDTH)} ${'PID'.padStart(7)}  ${'WORKING SET'.padStart(10)}  BAR${RESET}`,
-);
+console.log(`  ${BOLD}${'PROCESS'.padEnd(NAME_WIDTH)} ${'PID'.padStart(7)}  ${'WORKING SET'.padStart(10)}  BAR${RESET}`);
 console.log(`  ${DIM}${'─'.repeat(NAME_WIDTH + 7 + 10 + BAR_WIDTH + 8)}${RESET}`);
 
 for (const proc of top) {
@@ -146,18 +144,12 @@ for (const proc of top) {
   }
 
   // Truncate long process names
-  const truncName =
-    proc.name.length > NAME_WIDTH ? proc.name.substring(0, NAME_WIDTH - 3) + '...' : proc.name;
+  const truncName = proc.name.length > NAME_WIDTH ? proc.name.substring(0, NAME_WIDTH - 3) + '...' : proc.name;
 
   // Format the memory value as GB or MB
-  const memStr =
-    proc.workingSetMB >= 1024
-      ? `${(proc.workingSetMB / 1024).toFixed(1)} GB`
-      : `${proc.workingSetMB.toFixed(1)} MB`;
+  const memStr = proc.workingSetMB >= 1024 ? `${(proc.workingSetMB / 1024).toFixed(1)} GB` : `${proc.workingSetMB.toFixed(1)} MB`;
 
-  console.log(
-    `  ${WHITE}${truncName.padEnd(NAME_WIDTH)} ${proc.pid.toString().padStart(7)}  ${BOLD}${memStr.padStart(10)}${RESET}  ${barColor}${bar}${RESET}`,
-  );
+  console.log(`  ${WHITE}${truncName.padEnd(NAME_WIDTH)} ${proc.pid.toString().padStart(7)}  ${BOLD}${memStr.padStart(10)}${RESET}  ${barColor}${bar}${RESET}`);
 }
 
 // Summary
@@ -167,7 +159,5 @@ const totalStr = totalMB >= 1024 ? `${(totalMB / 1024).toFixed(2)} GB` : `${tota
 console.log(`  ${DIM}${'─'.repeat(NAME_WIDTH + 7 + 10 + BAR_WIDTH + 8)}${RESET}`);
 console.log(`  Total accessible memory: ${CYAN}${BOLD}${totalStr}${RESET} across ${processes.length} processes`);
 console.log();
-console.log(
-  `  Legend: ${RED}\u2588 Heavy (>60%)${RESET}  ${YELLOW}\u2588 Medium (25-60%)${RESET}  ${GREEN}\u2588 Light (<25%)${RESET}`,
-);
+console.log(`  Legend: ${RED}\u2588 Heavy (>60%)${RESET}  ${YELLOW}\u2588 Medium (25-60%)${RESET}  ${GREEN}\u2588 Light (<25%)${RESET}`);
 console.log();

@@ -383,23 +383,13 @@ function buildViewProj(eye: Vec3, target: Vec3, fovY: number, aspect: number, ne
   const uz = sx * f[1] - sy * f[0];
 
   // Right-handed view matrix (row-vector form), stored row-major.
-  const view = [
-    sx, sy, sz, -(sx * eye[0] + sy * eye[1] + sz * eye[2]),
-    ux, uy, uz, -(ux * eye[0] + uy * eye[1] + uz * eye[2]),
-    -f[0], -f[1], -f[2], f[0] * eye[0] + f[1] * eye[1] + f[2] * eye[2],
-    0, 0, 0, 1,
-  ];
+  const view = [sx, sy, sz, -(sx * eye[0] + sy * eye[1] + sz * eye[2]), ux, uy, uz, -(ux * eye[0] + uy * eye[1] + uz * eye[2]), -f[0], -f[1], -f[2], f[0] * eye[0] + f[1] * eye[1] + f[2] * eye[2], 0, 0, 0, 1];
 
   // Perspective (right-handed, zero-to-one depth — D3D convention), row-major.
   const yScale = 1 / Math.tan(fovY / 2);
   const xScale = yScale / aspect;
   const zr = far / (near - far);
-  const proj = [
-    xScale, 0, 0, 0,
-    0, yScale, 0, 0,
-    0, 0, zr, zr * near,
-    0, 0, -1, 0,
-  ];
+  const proj = [xScale, 0, 0, 0, 0, yScale, 0, 0, 0, 0, zr, zr * near, 0, 0, -1, 0];
 
   // viewProj = proj * view (both row-major 4x4).
   const m = new Float32Array(16);
@@ -512,11 +502,7 @@ while (!win.shouldClose()) {
   const uy = rz * fn[0] - rx * fn[2];
   const uz = rx * fn[1] - ry * fn[0];
   const spread = WORLD_RADIUS * 0.95;
-  const predTarget: Vec3 = [
-    rx * ndcX * spread + ux * -ndcY * spread,
-    ry * ndcX * spread + uy * -ndcY * spread,
-    rz * ndcX * spread + uz * -ndcY * spread,
-  ];
+  const predTarget: Vec3 = [rx * ndcX * spread + ux * -ndcY * spread, ry * ndcX * spread + uy * -ndcY * spread, rz * ndcX * spread + uz * -ndcY * spread];
   // Smooth the predator so it glides.
   predator[0] += (predTarget[0] - predator[0]) * Math.min(1, dt * 6);
   predator[1] += (predTarget[1] - predator[1]) * Math.min(1, dt * 6);
@@ -543,13 +529,7 @@ while (!win.shouldClose()) {
   csSet(flockCS, { cb: [cb], uav: [bufB.uav!], srv: [bufA.srv!] });
   dispatch(Math.ceil(NUM_BOIDS / THREADS), 1, 1);
   // Unbind the UAV so the same buffer can be read as a VS SRV next.
-  vcall(
-    gpu.context,
-    68 /* CSSetUnorderedAccessViews */,
-    [FFIType.u32, FFIType.u32, FFIType.ptr, FFIType.ptr],
-    [0, 1, emptyBind.ptr!, NULLP],
-    FFIType.void,
-  );
+  vcall(gpu.context, 68 /* CSSetUnorderedAccessViews */, [FFIType.u32, FFIType.u32, FFIType.ptr, FFIType.ptr], [0, 1, emptyBind.ptr!, NULLP], FFIType.void);
   // Swap: bufB now holds the new state.
   const tmp = bufA;
   bufA = bufB;

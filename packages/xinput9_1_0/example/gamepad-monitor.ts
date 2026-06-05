@@ -15,12 +15,7 @@
  * Run: bun run example/gamepad-monitor.ts
  */
 
-import Xinput9_1_0, {
-  XUSER_MAX_COUNT,
-  XInputDevSubType,
-  XInputGamepadButtons,
-  XInputGetCapabilitiesFlags,
-} from '../index';
+import Xinput9_1_0, { XUSER_MAX_COUNT, XInputDevSubType, XInputGamepadButtons, XInputGetCapabilitiesFlags } from '../index';
 
 Xinput9_1_0.Preload(['XInputGetState', 'XInputGetCapabilities', 'XInputSetState']);
 

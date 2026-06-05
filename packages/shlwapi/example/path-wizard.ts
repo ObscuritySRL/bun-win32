@@ -58,7 +58,7 @@ function castSpell(name: string, description: string) {
 
 console.log('');
 console.log('  *~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*');
-console.log('  *       THE PATH WIZARD\'S SPELLBOOK          *');
+console.log("  *       THE PATH WIZARD'S SPELLBOOK          *");
 console.log('  *  "From fragments, I forge complete paths!"  *');
 console.log('  *~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*');
 console.log('');
@@ -87,13 +87,7 @@ for (const test of combineTests) {
 castSpell('REVEAL NAME (PathFindFileNameW)', 'Extracting filenames from full paths');
 console.log('');
 
-const fileNameTests = [
-  'C:\\Users\\Wizard\\Documents\\spellbook.txt',
-  'D:\\Games\\RPG\\saves\\slot1.sav',
-  'C:\\just-a-file.log',
-  '\\\\server\\share\\report.pdf',
-  'no-directory-at-all.exe',
-];
+const fileNameTests = ['C:\\Users\\Wizard\\Documents\\spellbook.txt', 'D:\\Games\\RPG\\saves\\slot1.sav', 'C:\\just-a-file.log', '\\\\server\\share\\report.pdf', 'no-directory-at-all.exe'];
 
 for (const path of fileNameTests) {
   const resultPtr = Shlwapi.PathFindFileNameW(encode(path).ptr);
@@ -107,13 +101,7 @@ for (const path of fileNameTests) {
 castSpell('REVEAL EXTENSION (PathFindExtensionW)', 'Isolating file extensions');
 console.log('');
 
-const extensionTests = [
-  'document.pdf',
-  'archive.tar.gz',
-  'C:\\Windows\\notepad.exe',
-  'no-extension',
-  'tricky.file.name.with.dots.txt',
-];
+const extensionTests = ['document.pdf', 'archive.tar.gz', 'C:\\Windows\\notepad.exe', 'no-extension', 'tricky.file.name.with.dots.txt'];
 
 for (const path of extensionTests) {
   const resultPtr = Shlwapi.PathFindExtensionW(encode(path).ptr);
@@ -127,12 +115,7 @@ for (const path of extensionTests) {
 castSpell('STRIP (PathRemoveFileSpecW)', 'Removing the filename, keeping the directory');
 console.log('');
 
-const removeTests = [
-  'C:\\Users\\Wizard\\Documents\\secrets.txt',
-  'D:\\Projects\\app\\src\\index.ts',
-  'C:\\lonely-file.dat',
-  'C:\\Windows\\',
-];
+const removeTests = ['C:\\Users\\Wizard\\Documents\\secrets.txt', 'D:\\Projects\\app\\src\\index.ts', 'C:\\lonely-file.dat', 'C:\\Windows\\'];
 
 for (const path of removeTests) {
   // PathRemoveFileSpecW modifies in-place, so we need a mutable copy
@@ -153,13 +136,7 @@ for (const path of removeTests) {
 castSpell('DETECT (PathFileExistsW)', 'Sensing whether paths exist in this realm');
 console.log('');
 
-const existenceTests = [
-  'C:\\Windows',
-  'C:\\Windows\\System32\\notepad.exe',
-  'C:\\Windows\\System32\\kernel32.dll',
-  'C:\\Totally\\Fake\\Path\\unicorn.exe',
-  'C:\\pagefile.sys',
-];
+const existenceTests = ['C:\\Windows', 'C:\\Windows\\System32\\notepad.exe', 'C:\\Windows\\System32\\kernel32.dll', 'C:\\Totally\\Fake\\Path\\unicorn.exe', 'C:\\pagefile.sys'];
 
 for (const path of existenceTests) {
   const exists = Shlwapi.PathFileExistsW(encode(path).ptr);
@@ -172,13 +149,7 @@ for (const path of existenceTests) {
 castSpell('CLASSIFY (PathIsDirectoryW)', 'Determining if a path leads to a directory');
 console.log('');
 
-const dirTests = [
-  'C:\\Windows',
-  'C:\\Windows\\System32',
-  'C:\\Windows\\System32\\notepad.exe',
-  'C:\\Users',
-  'C:\\Nonexistent\\Folder',
-];
+const dirTests = ['C:\\Windows', 'C:\\Windows\\System32', 'C:\\Windows\\System32\\notepad.exe', 'C:\\Users', 'C:\\Nonexistent\\Folder'];
 
 for (const path of dirTests) {
   const isDir = Shlwapi.PathIsDirectoryW(encode(path).ptr);
@@ -191,14 +162,7 @@ for (const path of dirTests) {
 castSpell('ORIENT (PathIsRelativeW)', 'Determining if paths are anchored or adrift');
 console.log('');
 
-const relativeTests = [
-  'C:\\absolute\\path.txt',
-  '\\\\server\\share',
-  'relative\\path.txt',
-  '..\\parent\\file.dat',
-  'just-a-file.txt',
-  'D:\\',
-];
+const relativeTests = ['C:\\absolute\\path.txt', '\\\\server\\share', 'relative\\path.txt', '..\\parent\\file.dat', 'just-a-file.txt', 'D:\\'];
 
 for (const path of relativeTests) {
   const isRelative = Shlwapi.PathIsRelativeW(encode(path).ptr);

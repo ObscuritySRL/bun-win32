@@ -627,13 +627,9 @@ const emptyServerVariantBuffer = Buffer.alloc(VARIANT_SIZE);
 const emptyUserVariantBuffer = Buffer.alloc(VARIANT_SIZE);
 const initializeStatus = ole32.symbols.CoInitializeEx(null, COINIT_MULTITHREADED);
 const shouldUninitialize = isSuccessful(initializeStatus);
-const initializeSecurityStatus = isSuccessful(initializeStatus)
-  ? ole32.symbols.CoInitializeSecurity(null, -1, null, null, RPC_C_AUTHN_LEVEL_PKT_PRIVACY, RPC_C_IMP_LEVEL_IMPERSONATE, null, 0, null)
-  : initializeStatus;
+const initializeSecurityStatus = isSuccessful(initializeStatus) ? ole32.symbols.CoInitializeSecurity(null, -1, null, null, RPC_C_AUTHN_LEVEL_PKT_PRIVACY, RPC_C_IMP_LEVEL_IMPERSONATE, null, 0, null) : initializeStatus;
 const classFactoryBuffer = Buffer.alloc(POINTER_SIZE);
-const classObjectStatus = isSuccessful(initializeStatus)
-  ? Taskschd.DllGetClassObject(clsidTaskSchedulerBuffer.ptr, iidIClassFactoryBuffer.ptr, classFactoryBuffer.ptr)
-  : initializeStatus;
+const classObjectStatus = isSuccessful(initializeStatus) ? Taskschd.DllGetClassObject(clsidTaskSchedulerBuffer.ptr, iidIClassFactoryBuffer.ptr, classFactoryBuffer.ptr) : initializeStatus;
 
 let classFactoryAddress = 0n;
 let classFactoryLibrary: ClassFactoryLibrary | null = null;
@@ -792,11 +788,11 @@ function scanFolder(taskFolderAddress: bigint): void {
 }
 
 try {
-  if (!isSuccessful(initializeStatus) && (initializeStatus >>> 0) !== RPC_E_CHANGED_MODE) {
+  if (!isSuccessful(initializeStatus) && initializeStatus >>> 0 !== RPC_E_CHANGED_MODE) {
     throw new Error(`CoInitializeEx failed with ${formatHResult(initializeStatus)}`);
   }
 
-  if (!isSuccessful(initializeSecurityStatus) && (initializeSecurityStatus >>> 0) !== RPC_E_TOO_LATE) {
+  if (!isSuccessful(initializeSecurityStatus) && initializeSecurityStatus >>> 0 !== RPC_E_TOO_LATE) {
     throw new Error(`CoInitializeSecurity failed with ${formatHResult(initializeSecurityStatus)}`);
   }
 
@@ -826,13 +822,7 @@ try {
   }
 
   taskServiceLibrary = createTaskServiceLibrary(taskServiceAddress);
-  connectStatus = taskServiceLibrary.symbols.Connect(
-    taskServiceAddress,
-    emptyServerVariantBuffer.ptr,
-    emptyUserVariantBuffer.ptr,
-    emptyDomainVariantBuffer.ptr,
-    emptyPasswordVariantBuffer.ptr,
-  );
+  connectStatus = taskServiceLibrary.symbols.Connect(taskServiceAddress, emptyServerVariantBuffer.ptr, emptyUserVariantBuffer.ptr, emptyDomainVariantBuffer.ptr, emptyPasswordVariantBuffer.ptr);
 
   if (!isSuccessful(connectStatus)) {
     throw new Error(`ITaskService::Connect failed with ${formatHResult(connectStatus)}`);
@@ -969,9 +959,7 @@ if (failure !== null) {
   console.log(`  ${truncate('Folder', 54)} ${'Tasks'.padStart(5, ' ')} ${'Enabled'.padStart(7, ' ')} ${'Run'.padStart(5, ' ')}`);
 
   for (const folderSummary of busiestFolders) {
-    console.log(
-      `  ${truncate(folderSummary.folderPath, 54)} ${String(folderSummary.taskCount).padStart(5, ' ')} ${String(folderSummary.enabledTaskCount).padStart(7, ' ')} ${String(folderSummary.runningTaskCount).padStart(5, ' ')}`,
-    );
+    console.log(`  ${truncate(folderSummary.folderPath, 54)} ${String(folderSummary.taskCount).padStart(5, ' ')} ${String(folderSummary.enabledTaskCount).padStart(7, ' ')} ${String(folderSummary.runningTaskCount).padStart(5, ' ')}`);
   }
 
   console.log('');
@@ -982,9 +970,7 @@ if (failure !== null) {
     console.log(`  ${ANSI.dim}(no scheduled future runs reported)${ANSI.reset}`);
   } else {
     for (const taskInfo of upcomingTasks) {
-      console.log(
-        `  ${truncate(taskInfo.nextRunLabel ?? 'n/a', 19)} ${truncate(formatStateLabel(taskInfo.state), 9)} ${truncate(formatHResult(taskInfo.lastTaskResult), 10)} ${truncate(taskInfo.path, 62)}`,
-      );
+      console.log(`  ${truncate(taskInfo.nextRunLabel ?? 'n/a', 19)} ${truncate(formatStateLabel(taskInfo.state), 9)} ${truncate(formatHResult(taskInfo.lastTaskResult), 10)} ${truncate(taskInfo.path, 62)}`);
     }
   }
 

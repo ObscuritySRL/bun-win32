@@ -141,12 +141,7 @@ console.log();
 const guidBuf = Buffer.alloc(16);
 Hid.HidD_GetHidGuid(guidBuf.ptr);
 
-const hDevInfo = setupapi.symbols.SetupDiGetClassDevsW(
-  guidBuf.ptr,
-  null,
-  null,
-  DIGCF_PRESENT | DIGCF_DEVICEINTERFACE,
-);
+const hDevInfo = setupapi.symbols.SetupDiGetClassDevsW(guidBuf.ptr, null, null, DIGCF_PRESENT | DIGCF_DEVICEINTERFACE);
 
 if (hDevInfo === INVALID_HANDLE_VALUE) {
   console.log('  Failed to query HID device interfaces.');
@@ -184,24 +179,11 @@ for (let index = 0; ; index++) {
   const interfaceData = Buffer.alloc(32);
   interfaceData.writeUInt32LE(32, 0);
 
-  const enumOk = setupapi.symbols.SetupDiEnumDeviceInterfaces(
-    hDevInfo,
-    null,
-    guidBuf.ptr,
-    index,
-    interfaceData.ptr,
-  );
+  const enumOk = setupapi.symbols.SetupDiEnumDeviceInterfaces(hDevInfo, null, guidBuf.ptr, index, interfaceData.ptr);
   if (!enumOk) break;
 
   const requiredSize = Buffer.alloc(4);
-  setupapi.symbols.SetupDiGetDeviceInterfaceDetailW(
-    hDevInfo,
-    interfaceData.ptr,
-    null,
-    0,
-    requiredSize.ptr,
-    null,
-  );
+  setupapi.symbols.SetupDiGetDeviceInterfaceDetailW(hDevInfo, interfaceData.ptr, null, 0, requiredSize.ptr, null);
 
   const detailSize = requiredSize.readUInt32LE(0);
   if (detailSize === 0) continue;
@@ -209,29 +191,14 @@ for (let index = 0; ; index++) {
   const detailData = Buffer.alloc(detailSize);
   detailData.writeUInt32LE(8, 0); // cbSize = 8 on x64
 
-  const detailOk = setupapi.symbols.SetupDiGetDeviceInterfaceDetailW(
-    hDevInfo,
-    interfaceData.ptr,
-    detailData.ptr,
-    detailSize,
-    null,
-    null,
-  );
+  const detailOk = setupapi.symbols.SetupDiGetDeviceInterfaceDetailW(hDevInfo, interfaceData.ptr, detailData.ptr, detailSize, null, null);
   if (!detailOk) continue;
 
   const devicePath = readWideString(detailData, 4, detailSize - 4);
   if (!devicePath) continue;
 
   const pathBuf = Buffer.from(devicePath + '\0', 'utf16le');
-  const hDevice = Kernel32.CreateFileW(
-    pathBuf.ptr,
-    0,
-    FILE_SHARE_READ | FILE_SHARE_WRITE,
-    null!,
-    OPEN_EXISTING,
-    0,
-    0n,
-  );
+  const hDevice = Kernel32.CreateFileW(pathBuf.ptr, 0, FILE_SHARE_READ | FILE_SHARE_WRITE, null!, OPEN_EXISTING, 0, 0n);
 
   if (hDevice === INVALID_HANDLE_VALUE) continue;
 
@@ -245,7 +212,9 @@ for (let index = 0; ; index++) {
 
   const attrBuf = Buffer.alloc(12);
   attrBuf.writeUInt32LE(12, 0);
-  let vid = 0, pid = 0, version = 0;
+  let vid = 0,
+    pid = 0,
+    version = 0;
   if (Hid.HidD_GetAttributes(hDevice, attrBuf.ptr)) {
     vid = attrBuf.readUInt16LE(4);
     pid = attrBuf.readUInt16LE(6);

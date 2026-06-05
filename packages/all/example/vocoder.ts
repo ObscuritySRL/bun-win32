@@ -109,8 +109,12 @@ function fftForward(re: Float64Array, im: Float64Array): void {
   for (let i = 0; i < FFT_SIZE; i += 1) {
     const j = BITREV[i]!;
     if (j > i) {
-      const tr = re[i]!; re[i] = re[j]!; re[j] = tr;
-      const ti = im[i]!; im[i] = im[j]!; im[j] = ti;
+      const tr = re[i]!;
+      re[i] = re[j]!;
+      re[j] = tr;
+      const ti = im[i]!;
+      im[i] = im[j]!;
+      im[j] = ti;
     }
   }
   for (let stage = 0; stage < LOG2; stage += 1) {
@@ -233,7 +237,8 @@ function processFrame(): void {
     // Subtract the expected per-hop phase advance for this bin, then wrap to ±π.
     delta -= k * EXPECTED_PER_BIN;
     let qpd = Math.round(delta / Math.PI);
-    if (qpd >= 0) qpd += qpd & 1; else qpd -= qpd & 1;
+    if (qpd >= 0) qpd += qpd & 1;
+    else qpd -= qpd & 1;
     delta -= Math.PI * qpd;
     // Deviation (in bins) from the bin centre, → true frequency in Hz.
     const deviation = (OSAMP * delta) / (2 * Math.PI);
@@ -298,7 +303,8 @@ function drainOutput(count: number): Int16Array | null {
     const idx = (outRead + i) % OUT_RING;
     let s = outAccum[idx]!;
     outAccum[idx] = 0; // consume — must clear so the next overlap-add starts from 0
-    if (s > 1) s = 1; else if (s < -1) s = -1;
+    if (s > 1) s = 1;
+    else if (s < -1) s = -1;
     block[i] = Math.round(s * 30_000);
   }
   outRead = (outRead + count) % OUT_RING;
@@ -324,10 +330,7 @@ function synthTestTone(): void {
   const base = 150 + 40 * Math.sin(performance.now() / 900);
   for (let i = 0; i < HOP; i += 1) {
     const t = tonePhase / SAMPLE_RATE;
-    toneScratch[i] =
-      0.5 * Math.sin(2 * Math.PI * base * t) +
-      0.25 * Math.sin(2 * Math.PI * base * 2 * t) +
-      0.12 * Math.sin(2 * Math.PI * base * 3 * t);
+    toneScratch[i] = 0.5 * Math.sin(2 * Math.PI * base * t) + 0.25 * Math.sin(2 * Math.PI * base * 2 * t) + 0.12 * Math.sin(2 * Math.PI * base * 3 * t);
     tonePhase += 1;
   }
   pushSamples(toneScratch, HOP);
@@ -402,8 +405,10 @@ try {
   process.stdin.resume();
   process.stdin.on('data', (chunk: Buffer) => {
     for (const byte of chunk) {
-      if (byte === 0x1b || byte === 0x03) quit = true; // ESC / Ctrl-C
-      else if (byte === 0x20) effectIndex = (effectIndex + 1) % EFFECTS.length; // SPACE
+      if (byte === 0x1b || byte === 0x03)
+        quit = true; // ESC / Ctrl-C
+      else if (byte === 0x20)
+        effectIndex = (effectIndex + 1) % EFFECTS.length; // SPACE
       else if (byte >= 0x31 && byte <= 0x34) effectIndex = (byte - 0x31) % EFFECTS.length; // 1-4
     }
   });
@@ -433,15 +438,28 @@ let tornDown = false;
 function teardown(): void {
   if (tornDown) return;
   tornDown = true;
-  try { mic.close(); } catch { /* ignore */ }
-  try { out.close(); } catch { /* ignore */ }
+  try {
+    mic.close();
+  } catch {
+    /* ignore */
+  }
+  try {
+    out.close();
+  } catch {
+    /* ignore */
+  }
   try {
     if (stdinRaw) process.stdin.setRawMode(false);
     process.stdin.pause();
-  } catch { /* ignore */ }
+  } catch {
+    /* ignore */
+  }
   process.stdout.write(SHOW_CURSOR + RESET + '\n');
 }
-process.on('SIGINT', () => { teardown(); process.exit(0); });
+process.on('SIGINT', () => {
+  teardown();
+  process.exit(0);
+});
 process.on('exit', teardown);
 
 // ── Banner + main loop ──────────────────────────────────────────────────────────
@@ -449,7 +467,7 @@ process.stdout.write(CLEAR + HIDE_CURSOR);
 console.log(`${BOLD}${fg(120, 255, 200)}VOCODER${RESET} ${DIM}· real-time phase-vocoder pitch shift in pure TypeScript${RESET}`);
 console.log(
   `  mic: ${mic.available ? fg(120, 255, 170) + 'live capture' + RESET : fg(255, 200, 120) + 'no mic — internal test tone' + RESET}` +
-  `   speaker: ${out.available ? fg(120, 255, 170) + 'XAudio2 stream' + RESET : fg(255, 200, 120) + 'no endpoint (silent)' + RESET}`,
+    `   speaker: ${out.available ? fg(120, 255, 170) + 'XAudio2 stream' + RESET : fg(255, 200, 120) + 'no endpoint (silent)' + RESET}`,
 );
 console.log(`  ${DIM}FFT ${FFT_SIZE} · hop ${HOP} · ${OSAMP}× overlap · ${SAMPLE_RATE} Hz${RESET}`);
 console.log(`  ${DIM}keys: 1 ROBOT  2 CHIPMUNK  3 DEEP  4 HARMONY  SPACE cycle  ESC quit${RESET}`);
@@ -489,8 +507,7 @@ function loop(): void {
     const e = eff();
     let s = HOME;
     s += '\x1b[6;1H'; // park below the static banner
-    s += `  ${BOLD}${fg(e.color[0], e.color[1], e.color[2])}▶ ${e.name.padEnd(9)}${RESET}` +
-      `  ${DIM}ratio${RESET} ${e.ratio.toFixed(2)}×${e.harmonize ? `${DIM} + fifth${RESET}` : '        '}\x1b[K\n`;
+    s += `  ${BOLD}${fg(e.color[0], e.color[1], e.color[2])}▶ ${e.name.padEnd(9)}${RESET}` + `  ${DIM}ratio${RESET} ${e.ratio.toFixed(2)}×${e.harmonize ? `${DIM} + fifth${RESET}` : '        '}\x1b[K\n`;
     s += `  ${DIM}input  ${RESET}${meter(Math.min(1, mic.level * 8), 32, [120, 200, 255])} ${(mic.level).toFixed(3)}\x1b[K\n`;
     s += `  ${DIM}queued ${RESET}${out.queued()} buffers   ${DIM}frames${RESET} ${frames}   ${DIM}emitted${RESET} ${submitted}\x1b[K\n`;
     s += '\n';
@@ -509,10 +526,7 @@ function finish(): void {
   if (finished) return;
   finished = true;
   teardown();
-  console.log(
-    `${DIM}vocoder offline — ${frames} loop iterations, ${submitted} output blocks streamed ` +
-    `(${((performance.now() - startedAt) / 1000).toFixed(1)}s).${RESET}`,
-  );
+  console.log(`${DIM}vocoder offline — ${frames} loop iterations, ${submitted} output blocks streamed ` + `(${((performance.now() - startedAt) / 1000).toFixed(1)}s).${RESET}`);
   process.exit(0);
 }
 

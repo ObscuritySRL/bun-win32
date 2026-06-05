@@ -166,16 +166,25 @@ const init = (t: CharTerm): void => {
   const W = (frac: number, lo: number, hi: number): number => clamp(round(cols * frac), lo, hi);
   const H = (frac: number, lo: number, hi: number): number => clamp(round(deskH * frac), lo, hi);
 
-  const def = (
-    app: AppId,
-    title: string,
-    fx: number,
-    fy: number,
-    rw: number,
-    rh: number,
-    minW: number,
-    minH: number,
-  ): Win => ({ app, title, x: 0, y: 0, w: rw, h: rh, fx, fy, rw, rh, minW, minH, minimized: false, maximized: false, maxAnim: 0, appear: 0, scroll: 0 });
+  const def = (app: AppId, title: string, fx: number, fy: number, rw: number, rh: number, minW: number, minH: number): Win => ({
+    app,
+    title,
+    x: 0,
+    y: 0,
+    w: rw,
+    h: rh,
+    fx,
+    fy,
+    rw,
+    rh,
+    minW,
+    minH,
+    minimized: false,
+    maximized: false,
+    maxAnim: 0,
+    appear: 0,
+    scroll: 0,
+  });
 
   // Tiled-with-overlap arrangement so the t≈9 hero frame shows every window:
   // browser top-centre, notepad/terminal down the left, video/monitor down the right,
@@ -1551,7 +1560,7 @@ const drawScene = (t: CharTerm, wn: Win, focused: boolean, time: number): void =
         // specular term
         const spec = Math.pow(lum, 6);
         lumBuf[idx] = clamp01(0.12 + 0.7 * lum + 0.5 * spec);
-        hueBuf[idx] = fract(0.58 + theta / TAU * 0.5 + time * 0.05);
+        hueBuf[idx] = fract(0.58 + (theta / TAU) * 0.5 + time * 0.05);
       }
     }
   }
@@ -1628,7 +1637,7 @@ const drawWallpaper = (t: CharTerm, time: number): void => {
   // Parallax bokeh: soft glowing discs drifting upward, blended additively.
   for (const bk of bokeh) {
     const bx = (bk.x + sinT(time * bk.sp * 6 + bk.ph) * 0.04) * cols;
-    const by = ((bk.y - time * bk.sp) % 1 + 1) % 1 * deskH;
+    const by = ((((bk.y - time * bk.sp) % 1) + 1) % 1) * deskH;
     const col = hsv(bk.hue, 0.5, 1);
     const rad = bk.r;
     const x0 = max(0, floor(bx - rad * 2));

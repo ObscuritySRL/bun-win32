@@ -36,8 +36,22 @@ const exactQuantizeTo256 = (red: number, green: number, blue: number): number =>
 };
 
 const palette16 = [
-  [0, 0, 0], [128, 0, 0], [0, 128, 0], [128, 128, 0], [0, 0, 128], [128, 0, 128], [0, 128, 128], [192, 192, 192],
-  [128, 128, 128], [255, 0, 0], [0, 255, 0], [255, 255, 0], [0, 0, 255], [255, 0, 255], [0, 255, 255], [255, 255, 255],
+  [0, 0, 0],
+  [128, 0, 0],
+  [0, 128, 0],
+  [128, 128, 0],
+  [0, 0, 128],
+  [128, 0, 128],
+  [0, 128, 128],
+  [192, 192, 192],
+  [128, 128, 128],
+  [255, 0, 0],
+  [0, 255, 0],
+  [255, 255, 0],
+  [0, 0, 255],
+  [255, 0, 255],
+  [0, 255, 255],
+  [255, 255, 255],
 ];
 
 const lookupTable256 = new Uint8Array(32768);
@@ -82,12 +96,10 @@ export const channelDelta = (packedRgb: number, red: number, green: number, blue
 };
 
 /** Quantise an 8-bit-per-channel colour to the nearest xterm 16-colour palette index. */
-export const quantizeTo16 = (red: number, green: number, blue: number): number =>
-  lookupTable16[((red >> 3) << 10) | ((green >> 3) << 5) | (blue >> 3)];
+export const quantizeTo16 = (red: number, green: number, blue: number): number => lookupTable16[((red >> 3) << 10) | ((green >> 3) << 5) | (blue >> 3)];
 
 /** Quantise an 8-bit-per-channel colour to the nearest xterm 256-colour palette index. */
-export const quantizeTo256 = (red: number, green: number, blue: number): number =>
-  lookupTable256[((red >> 3) << 10) | ((green >> 3) << 5) | (blue >> 3)];
+export const quantizeTo256 = (red: number, green: number, blue: number): number => lookupTable256[((red >> 3) << 10) | ((green >> 3) << 5) | (blue >> 3)];
 
 // Ordered (Bayer) dithering for the palette depths. The 8×8 recursive Bayer matrix
 // (values 0..63) gives each pixel position a stable sub-step threshold; adding it as
@@ -97,7 +109,8 @@ export const quantizeTo256 = (red: number, green: number, blue: number): number 
 // still diff to nothing. The spread is tuned to each palette's dominant step (≈40 for
 // the 256-cube, wider for the sparse 16-colour set). Index by `((y & 7) << 3) | (x & 7)`.
 const bayer8x8 = new Uint8Array([
-  0, 32, 8, 40, 2, 34, 10, 42, 48, 16, 56, 24, 50, 18, 58, 26, 12, 44, 4, 36, 14, 46, 6, 38, 60, 28, 52, 20, 62, 30, 54, 22, 3, 35, 11, 43, 1, 33, 9, 41, 51, 19, 59, 27, 49, 17, 57, 25, 15, 47, 7, 39, 13, 45, 5, 37, 63, 31, 55, 23, 61, 29, 53, 21,
+  0, 32, 8, 40, 2, 34, 10, 42, 48, 16, 56, 24, 50, 18, 58, 26, 12, 44, 4, 36, 14, 46, 6, 38, 60, 28, 52, 20, 62, 30, 54, 22, 3, 35, 11, 43, 1, 33, 9, 41, 51, 19, 59, 27, 49, 17, 57, 25, 15, 47, 7, 39, 13, 45, 5, 37, 63, 31, 55, 23, 61, 29,
+  53, 21,
 ]);
 const DITHER_SPREAD_256 = 40;
 const DITHER_SPREAD_16 = 110;

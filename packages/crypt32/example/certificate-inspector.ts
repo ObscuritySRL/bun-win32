@@ -38,9 +38,7 @@ const CERT_NAME_ISSUER_FLAG = 0x1;
 function getCertName(certContextPtr: Pointer, isIssuer: boolean): string {
   const nameBuf = Buffer.alloc(512);
   const flags = isIssuer ? CERT_NAME_ISSUER_FLAG : 0;
-  const charsCopied = Crypt32.CertGetNameStringW(
-    certContextPtr, CERT_NAME_SIMPLE_DISPLAY_TYPE, flags, null, nameBuf.ptr, 256,
-  );
+  const charsCopied = Crypt32.CertGetNameStringW(certContextPtr, CERT_NAME_SIMPLE_DISPLAY_TYPE, flags, null, nameBuf.ptr, 256);
 
   if (charsCopied <= 1) return '(unknown)';
   return nameBuf.subarray(0, (charsCopied - 1) * 2).toString('utf16le');

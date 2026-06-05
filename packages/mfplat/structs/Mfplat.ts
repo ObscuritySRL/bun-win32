@@ -393,7 +393,12 @@ class Mfplat extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mfapi/nf-mfapi-mfcreatecontentdecryptorcontext
-  public static MFCreateContentDecryptorContext(guidMediaProtectionSystemId: REFGUID, pD3DManager: IMFDXGIDeviceManager | NULL, pContentProtectionDevice: IMFContentProtectionDevice, ppContentDecryptorContext: PIMFContentDecryptorContext): HRESULT {
+  public static MFCreateContentDecryptorContext(
+    guidMediaProtectionSystemId: REFGUID,
+    pD3DManager: IMFDXGIDeviceManager | NULL,
+    pContentProtectionDevice: IMFContentProtectionDevice,
+    ppContentDecryptorContext: PIMFContentDecryptorContext,
+  ): HRESULT {
     return Mfplat.Load('MFCreateContentDecryptorContext')(guidMediaProtectionSystemId, pD3DManager, pContentProtectionDevice, ppContentDecryptorContext);
   }
 
@@ -568,13 +573,55 @@ class Mfplat extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mfapi/nf-mfapi-mfcreatevideomediatypefrombitmapinfoheader
-  public static MFCreateVideoMediaTypeFromBitMapInfoHeader(pbmihBitMapInfoHeader: LPCVOID, dwPixelAspectRatioX: DWORD, dwPixelAspectRatioY: DWORD, InterlaceMode: MFVideoInterlaceMode, VideoFlags: QWORD, qwFramesPerSecondNumerator: QWORD, qwFramesPerSecondDenominator: QWORD, dwMaxBitRate: DWORD, ppIVideoMediaType: PIMFVideoMediaType): HRESULT {
-    return Mfplat.Load('MFCreateVideoMediaTypeFromBitMapInfoHeader')(pbmihBitMapInfoHeader, dwPixelAspectRatioX, dwPixelAspectRatioY, InterlaceMode, VideoFlags, qwFramesPerSecondNumerator, qwFramesPerSecondDenominator, dwMaxBitRate, ppIVideoMediaType);
+  public static MFCreateVideoMediaTypeFromBitMapInfoHeader(
+    pbmihBitMapInfoHeader: LPCVOID,
+    dwPixelAspectRatioX: DWORD,
+    dwPixelAspectRatioY: DWORD,
+    InterlaceMode: MFVideoInterlaceMode,
+    VideoFlags: QWORD,
+    qwFramesPerSecondNumerator: QWORD,
+    qwFramesPerSecondDenominator: QWORD,
+    dwMaxBitRate: DWORD,
+    ppIVideoMediaType: PIMFVideoMediaType,
+  ): HRESULT {
+    return Mfplat.Load('MFCreateVideoMediaTypeFromBitMapInfoHeader')(
+      pbmihBitMapInfoHeader,
+      dwPixelAspectRatioX,
+      dwPixelAspectRatioY,
+      InterlaceMode,
+      VideoFlags,
+      qwFramesPerSecondNumerator,
+      qwFramesPerSecondDenominator,
+      dwMaxBitRate,
+      ppIVideoMediaType,
+    );
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mfapi/nf-mfapi-mfcreatevideomediatypefrombitmapinfoheaderex
-  public static MFCreateVideoMediaTypeFromBitMapInfoHeaderEx(pbmihBitMapInfoHeader: LPCVOID, cbBitMapInfoHeader: UINT32, dwPixelAspectRatioX: DWORD, dwPixelAspectRatioY: DWORD, InterlaceMode: MFVideoInterlaceMode, VideoFlags: QWORD, dwFramesPerSecondNumerator: DWORD, dwFramesPerSecondDenominator: DWORD, dwMaxBitRate: DWORD, ppIVideoMediaType: PIMFVideoMediaType): HRESULT {
-    return Mfplat.Load('MFCreateVideoMediaTypeFromBitMapInfoHeaderEx')(pbmihBitMapInfoHeader, cbBitMapInfoHeader, dwPixelAspectRatioX, dwPixelAspectRatioY, InterlaceMode, VideoFlags, dwFramesPerSecondNumerator, dwFramesPerSecondDenominator, dwMaxBitRate, ppIVideoMediaType);
+  public static MFCreateVideoMediaTypeFromBitMapInfoHeaderEx(
+    pbmihBitMapInfoHeader: LPCVOID,
+    cbBitMapInfoHeader: UINT32,
+    dwPixelAspectRatioX: DWORD,
+    dwPixelAspectRatioY: DWORD,
+    InterlaceMode: MFVideoInterlaceMode,
+    VideoFlags: QWORD,
+    dwFramesPerSecondNumerator: DWORD,
+    dwFramesPerSecondDenominator: DWORD,
+    dwMaxBitRate: DWORD,
+    ppIVideoMediaType: PIMFVideoMediaType,
+  ): HRESULT {
+    return Mfplat.Load('MFCreateVideoMediaTypeFromBitMapInfoHeaderEx')(
+      pbmihBitMapInfoHeader,
+      cbBitMapInfoHeader,
+      dwPixelAspectRatioX,
+      dwPixelAspectRatioY,
+      InterlaceMode,
+      VideoFlags,
+      dwFramesPerSecondNumerator,
+      dwFramesPerSecondDenominator,
+      dwMaxBitRate,
+      ppIVideoMediaType,
+    );
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mfapi/nf-mfapi-mfcreatevideomediatypefromsubtype
@@ -583,7 +630,16 @@ class Mfplat extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mfapi/nf-mfapi-mfcreatevideomediatypefromvideoinfoheader
-  public static MFCreateVideoMediaTypeFromVideoInfoHeader(pVideoInfoHeader: LPCVOID, cbVideoInfoHeader: DWORD, dwPixelAspectRatioX: DWORD, dwPixelAspectRatioY: DWORD, InterlaceMode: MFVideoInterlaceMode, VideoFlags: QWORD, pSubtype: REFGUID | NULL, ppIVideoMediaType: PIMFVideoMediaType): HRESULT {
+  public static MFCreateVideoMediaTypeFromVideoInfoHeader(
+    pVideoInfoHeader: LPCVOID,
+    cbVideoInfoHeader: DWORD,
+    dwPixelAspectRatioX: DWORD,
+    dwPixelAspectRatioY: DWORD,
+    InterlaceMode: MFVideoInterlaceMode,
+    VideoFlags: QWORD,
+    pSubtype: REFGUID | NULL,
+    ppIVideoMediaType: PIMFVideoMediaType,
+  ): HRESULT {
     return Mfplat.Load('MFCreateVideoMediaTypeFromVideoInfoHeader')(pVideoInfoHeader, cbVideoInfoHeader, dwPixelAspectRatioX, dwPixelAspectRatioY, InterlaceMode, VideoFlags, pSubtype, ppIVideoMediaType);
   }
 
@@ -908,7 +964,17 @@ class Mfplat extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mfapi/nf-mfapi-mftregister
-  public static MFTRegister(clsidMFT: REFCLSID, guidCategory: REFGUID, pszName: LPWSTR, Flags: UINT32, cInputTypes: UINT32, pInputTypes: LPVOID | NULL, cOutputTypes: UINT32, pOutputTypes: LPVOID | NULL, pAttributes: IMFAttributes | NULL): HRESULT {
+  public static MFTRegister(
+    clsidMFT: REFCLSID,
+    guidCategory: REFGUID,
+    pszName: LPWSTR,
+    Flags: UINT32,
+    cInputTypes: UINT32,
+    pInputTypes: LPVOID | NULL,
+    cOutputTypes: UINT32,
+    pOutputTypes: LPVOID | NULL,
+    pAttributes: IMFAttributes | NULL,
+  ): HRESULT {
     return Mfplat.Load('MFTRegister')(clsidMFT, guidCategory, pszName, Flags, cInputTypes, pInputTypes, cOutputTypes, pOutputTypes, pAttributes);
   }
 

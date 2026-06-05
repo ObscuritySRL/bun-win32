@@ -323,7 +323,7 @@ const loopbackMono = new Float32Array(FFT_SIZE * 2);
  */
 function startLoopbackCapture(): boolean {
   const coHr = ole32.symbols.CoInitializeEx(null, COINIT_MULTITHREADED);
-  if (coHr < 0 && (coHr >>> 0) !== RPC_E_CHANGED_MODE) {
+  if (coHr < 0 && coHr >>> 0 !== RPC_E_CHANGED_MODE) {
     console.warn(`  loopback: CoInitializeEx → ${hex(coHr)}`);
     return false;
   }
@@ -399,12 +399,7 @@ function startLoopbackCapture(): boolean {
   // IAudioClient::Initialize(SHARED, LOOPBACK, hnsBufferDuration=1s, 0, pWfx, NULL)
   // The format Buffer's pointer must stay valid across the call — pass the
   // DLL-owned mix-format address directly (it lives until CoTaskMemFree below).
-  const initHr = vcall(
-    audioClient,
-    SLOT_AC_INITIALIZE,
-    [FFIType.u32, FFIType.u32, FFIType.i64, FFIType.i64, FFIType.u64, FFIType.ptr],
-    [AUDCLNT_SHAREMODE_SHARED, AUDCLNT_STREAMFLAGS_LOOPBACK, REFTIMES_PER_SEC_1S, 0n, mixFormatAddr, null],
-  );
+  const initHr = vcall(audioClient, SLOT_AC_INITIALIZE, [FFIType.u32, FFIType.u32, FFIType.i64, FFIType.i64, FFIType.u64, FFIType.ptr], [AUDCLNT_SHAREMODE_SHARED, AUDCLNT_STREAMFLAGS_LOOPBACK, REFTIMES_PER_SEC_1S, 0n, mixFormatAddr, null]);
   ole32.symbols.CoTaskMemFree(mixFormatAddr);
   if (initHr !== 0) {
     console.warn(`  loopback: IAudioClient::Initialize(LOOPBACK) → ${hex(initHr)}`);
@@ -453,7 +448,7 @@ function pollLoopbackCapture(): void {
   for (let guard = 0; guard < 64; guard += 1) {
     const sizeHr = vcall(captureClient, SLOT_GET_NEXT_PACKET_SIZE, [FFIType.ptr], [lbPacketOut.ptr!]);
     if (sizeHr !== 0) {
-      if ((sizeHr >>> 0) !== AUDCLNT_S_BUFFER_EMPTY) loopback = null; // hard error → stop draining
+      if (sizeHr >>> 0 !== AUDCLNT_S_BUFFER_EMPTY) loopback = null; // hard error → stop draining
       return;
     }
     if (lbPacketOut.readUInt32LE(0) === 0) return; // nothing pending
@@ -678,13 +673,28 @@ function hslToRgb(hue: number, saturation: number, lightness: number): Color {
   const chroma = (1 - Math.abs(2 * lightness - 1)) * saturation;
   const sextant = (hue - Math.floor(hue)) * 6;
   const x = chroma * (1 - Math.abs((sextant % 2) - 1));
-  let r1 = 0, g1 = 0, b1 = 0;
-  if (sextant < 1) { r1 = chroma; g1 = x; }
-  else if (sextant < 2) { r1 = x; g1 = chroma; }
-  else if (sextant < 3) { g1 = chroma; b1 = x; }
-  else if (sextant < 4) { g1 = x; b1 = chroma; }
-  else if (sextant < 5) { r1 = x; b1 = chroma; }
-  else { r1 = chroma; b1 = x; }
+  let r1 = 0,
+    g1 = 0,
+    b1 = 0;
+  if (sextant < 1) {
+    r1 = chroma;
+    g1 = x;
+  } else if (sextant < 2) {
+    r1 = x;
+    g1 = chroma;
+  } else if (sextant < 3) {
+    g1 = chroma;
+    b1 = x;
+  } else if (sextant < 4) {
+    g1 = x;
+    b1 = chroma;
+  } else if (sextant < 5) {
+    r1 = x;
+    b1 = chroma;
+  } else {
+    r1 = chroma;
+    b1 = x;
+  }
   const m = lightness - chroma / 2;
   return { red: Math.round((r1 + m) * 255), green: Math.round((g1 + m) * 255), blue: Math.round((b1 + m) * 255) };
 }
@@ -698,8 +708,14 @@ let shouldExit = false;
 const wndProc = new JSCallback(
   (hWnd: bigint, msg: number, wParam: bigint, lParam: bigint): bigint => {
     if (msg === WM_TIMER) return 0n; // tick work runs after DispatchMessageW
-    if (msg === WM_CLOSE) { User32.DestroyWindow(hWnd); return 0n; }
-    if (msg === WM_DESTROY) { User32.PostQuitMessage(0); return 0n; }
+    if (msg === WM_CLOSE) {
+      User32.DestroyWindow(hWnd);
+      return 0n;
+    }
+    if (msg === WM_DESTROY) {
+      User32.PostQuitMessage(0);
+      return 0n;
+    }
     return BigInt(User32.DefWindowProcW(hWnd, msg, wParam, lParam));
   },
   { args: ['u64', 'u32', 'u64', 'i64'], returns: 'i64' },
@@ -739,16 +755,18 @@ if (!User32.RegisterClassExW(wndClassBuf.ptr!)) {
 }
 
 overlayHwnd = User32.CreateWindowExW(
-  ExtendedWindowStyles.WS_EX_TOPMOST |
-    ExtendedWindowStyles.WS_EX_LAYERED |
-    ExtendedWindowStyles.WS_EX_TRANSPARENT |
-    ExtendedWindowStyles.WS_EX_TOOLWINDOW |
-    ExtendedWindowStyles.WS_EX_NOACTIVATE,
+  ExtendedWindowStyles.WS_EX_TOPMOST | ExtendedWindowStyles.WS_EX_LAYERED | ExtendedWindowStyles.WS_EX_TRANSPARENT | ExtendedWindowStyles.WS_EX_TOOLWINDOW | ExtendedWindowStyles.WS_EX_NOACTIVATE,
   className.ptr!,
   encode('Sound Bloom').ptr!,
   WindowStyles.WS_POPUP | WindowStyles.WS_VISIBLE,
-  originX, originY, overlayWidth, overlayHeight,
-  NULL, NULL, NULL, NULL_PTR,
+  originX,
+  originY,
+  overlayWidth,
+  overlayHeight,
+  NULL,
+  NULL,
+  NULL,
+  NULL_PTR,
 );
 if (!overlayHwnd) {
   console.error('CreateWindowExW failed');
@@ -864,11 +882,7 @@ const captureBackdrop = process.env.SOUND_BLOOM_BACKDROP === '1';
 
 // Smooth multi-octave value-noise from layered sines — cheap, seamless, organic.
 function smoothNoise(seed: number, t: number): number {
-  return (
-    Math.sin(t * 1.0 + seed * 1.7) * 0.5 +
-    Math.sin(t * 1.7 + seed * 2.3 + 1.3) * 0.3 +
-    Math.sin(t * 2.9 + seed * 0.9 + 4.1) * 0.2
-  );
+  return Math.sin(t * 1.0 + seed * 1.7) * 0.5 + Math.sin(t * 1.7 + seed * 2.3 + 1.3) * 0.3 + Math.sin(t * 2.9 + seed * 0.9 + 4.1) * 0.2;
 }
 
 /** Additively stamp a soft premultiplied glow into the active-region accumulators. */
@@ -973,7 +987,7 @@ function dumpDibToPng(): void {
     for (let ox = -120; ox <= 120; ox += 30) {
       if (Gdiplus.GdipBitmapGetPixel(bitmap, cx + ox, cy + oy, colorOut.ptr!) === Status.Ok) {
         const argb = colorOut.readUInt32LE(0);
-        if ((argb >>> 24) > 12 && (argb & 0x00ffffff) !== 0) bright += 1;
+        if (argb >>> 24 > 12 && (argb & 0x00ffffff) !== 0) bright += 1;
       }
     }
   }

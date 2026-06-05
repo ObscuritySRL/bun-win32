@@ -21,12 +21,7 @@
 import { ptr } from 'bun:ffi';
 import Ntdll, { STATUS_SUCCESS, SystemInformationClass } from '../index';
 
-Ntdll.Preload([
-  'RtlGetVersion',
-  'NtQuerySystemInformation',
-  'NtQuerySystemTime',
-  'NtQueryTimerResolution',
-]);
+Ntdll.Preload(['RtlGetVersion', 'NtQuerySystemInformation', 'NtQuerySystemTime', 'NtQueryTimerResolution']);
 
 const W = 72;
 
@@ -72,7 +67,10 @@ if (versionStatus === STATUS_SUCCESS) {
   const build = versionBuf.readUInt32LE(12);
   const platformId = versionBuf.readUInt32LE(16);
   // Service pack string starts at offset 20, 128 WCHARs (256 bytes)
-  const spStr = versionBuf.subarray(20, 20 + 256).toString('utf16le').replace(/\0.*$/, '');
+  const spStr = versionBuf
+    .subarray(20, 20 + 256)
+    .toString('utf16le')
+    .replace(/\0.*$/, '');
 
   const marketingName = windowsName(major, minor, build);
 
@@ -94,12 +92,7 @@ heading('SYSTEM BASIC INFORMATION (class 0)');
 const basicBuf = Buffer.alloc(64);
 const retLenBuf = Buffer.alloc(4);
 
-const basicStatus = Ntdll.NtQuerySystemInformation(
-  SystemInformationClass.SystemBasicInformation,
-  basicBuf.ptr,
-  basicBuf.byteLength,
-  retLenBuf.ptr,
-);
+const basicStatus = Ntdll.NtQuerySystemInformation(SystemInformationClass.SystemBasicInformation, basicBuf.ptr, basicBuf.byteLength, retLenBuf.ptr);
 
 if (basicStatus === STATUS_SUCCESS) {
   const view = new DataView(basicBuf.buffer);
@@ -131,7 +124,7 @@ if (basicStatus === STATUS_SUCCESS) {
   row('Timer Resolution:', `${timerRes} x 100ns (${(timerRes / 10).toLocaleString()} us)`);
   row('Page Size:', `${pageSize.toLocaleString()} bytes`);
   row('Physical Pages:', `${physPages.toLocaleString()}`);
-  row('Total Physical Mem:', `${(Number(totalMemBytes) / (1024 ** 3)).toFixed(2)} GB`);
+  row('Total Physical Mem:', `${(Number(totalMemBytes) / 1024 ** 3).toFixed(2)} GB`);
   row('Lowest Phys Page:', `${lowestPage}`);
   row('Highest Phys Page:', `${highestPage.toLocaleString()}`);
   row('Alloc Granularity:', `${allocGranularity.toLocaleString()} bytes`);
@@ -151,12 +144,7 @@ heading('PROCESSOR INFORMATION (class 1)');
 const procInfoBuf = Buffer.alloc(12);
 const procRetLen = Buffer.alloc(4);
 
-const procStatus = Ntdll.NtQuerySystemInformation(
-  SystemInformationClass.SystemProcessorInformation,
-  procInfoBuf.ptr,
-  procInfoBuf.byteLength,
-  procRetLen.ptr,
-);
+const procStatus = Ntdll.NtQuerySystemInformation(SystemInformationClass.SystemProcessorInformation, procInfoBuf.ptr, procInfoBuf.byteLength, procRetLen.ptr);
 
 if (procStatus === STATUS_SUCCESS) {
   const view = new DataView(procInfoBuf.buffer);
@@ -197,12 +185,7 @@ heading('PERFORMANCE INFORMATION (class 2)');
 const perfBuf = Buffer.alloc(512);
 const perfRetLen = Buffer.alloc(4);
 
-const perfStatus = Ntdll.NtQuerySystemInformation(
-  SystemInformationClass.SystemPerformanceInformation,
-  perfBuf.ptr,
-  perfBuf.byteLength,
-  perfRetLen.ptr,
-);
+const perfStatus = Ntdll.NtQuerySystemInformation(SystemInformationClass.SystemPerformanceInformation, perfBuf.ptr, perfBuf.byteLength, perfRetLen.ptr);
 
 if (perfStatus === STATUS_SUCCESS) {
   const view = new DataView(perfBuf.buffer);
@@ -278,12 +261,7 @@ heading('TIME-OF-DAY INFORMATION (class 3)');
 const todBuf = Buffer.alloc(48);
 const todRetLen = Buffer.alloc(4);
 
-const todStatus = Ntdll.NtQuerySystemInformation(
-  SystemInformationClass.SystemTimeOfDayInformation,
-  todBuf.ptr,
-  todBuf.byteLength,
-  todRetLen.ptr,
-);
+const todStatus = Ntdll.NtQuerySystemInformation(SystemInformationClass.SystemTimeOfDayInformation, todBuf.ptr, todBuf.byteLength, todRetLen.ptr);
 
 if (todStatus === STATUS_SUCCESS) {
   const view = new DataView(todBuf.buffer);

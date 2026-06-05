@@ -214,11 +214,11 @@ function describeHResult(result: number): string {
     return 'S_FALSE';
   }
 
-  if ((result >>> 0) === RPC_E_CHANGED_MODE) {
+  if (result >>> 0 === RPC_E_CHANGED_MODE) {
     return 'RPC_E_CHANGED_MODE';
   }
 
-  if ((result >>> 0) === RPC_E_TOO_LATE) {
+  if (result >>> 0 === RPC_E_TOO_LATE) {
     return 'RPC_E_TOO_LATE';
   }
 
@@ -275,18 +275,14 @@ function readPointerValue(address: bigint): bigint {
 const baselineUnloadStatus = Taskschd.DllCanUnloadNow();
 const initializeStatus = ole32.symbols.CoInitializeEx(null, COINIT_MULTITHREADED);
 const shouldUninitialize = isSuccessful(initializeStatus);
-const initializeSecurityStatus = isSuccessful(initializeStatus)
-  ? ole32.symbols.CoInitializeSecurity(null, -1, null, null, RPC_C_AUTHN_LEVEL_PKT_PRIVACY, RPC_C_IMP_LEVEL_IMPERSONATE, null, 0, null)
-  : initializeStatus;
+const initializeSecurityStatus = isSuccessful(initializeStatus) ? ole32.symbols.CoInitializeSecurity(null, -1, null, null, RPC_C_AUTHN_LEVEL_PKT_PRIVACY, RPC_C_IMP_LEVEL_IMPERSONATE, null, 0, null) : initializeStatus;
 
 const emptyDomainVariantBuffer = Buffer.alloc(VARIANT_SIZE);
 const emptyPasswordVariantBuffer = Buffer.alloc(VARIANT_SIZE);
 const emptyServerVariantBuffer = Buffer.alloc(VARIANT_SIZE);
 const emptyUserVariantBuffer = Buffer.alloc(VARIANT_SIZE);
 const classFactoryBuffer = Buffer.alloc(POINTER_SIZE);
-const classObjectStatus = isSuccessful(initializeStatus)
-  ? Taskschd.DllGetClassObject(clsidTaskSchedulerBuffer.ptr, iidIClassFactoryBuffer.ptr, classFactoryBuffer.ptr)
-  : initializeStatus;
+const classObjectStatus = isSuccessful(initializeStatus) ? Taskschd.DllGetClassObject(clsidTaskSchedulerBuffer.ptr, iidIClassFactoryBuffer.ptr, classFactoryBuffer.ptr) : initializeStatus;
 
 let afterFactoryUnloadStatus: number | null = null;
 let afterServiceUnloadStatus: number | null = null;
@@ -310,11 +306,11 @@ let connectStatus: number | null = null;
 let failure: Error | null = null;
 
 try {
-  if (!isSuccessful(initializeStatus) && (initializeStatus >>> 0) !== RPC_E_CHANGED_MODE) {
+  if (!isSuccessful(initializeStatus) && initializeStatus >>> 0 !== RPC_E_CHANGED_MODE) {
     throw new Error(`CoInitializeEx failed with ${formatHResult(initializeStatus)}`);
   }
 
-  if (!isSuccessful(initializeSecurityStatus) && (initializeSecurityStatus >>> 0) !== RPC_E_TOO_LATE) {
+  if (!isSuccessful(initializeSecurityStatus) && initializeSecurityStatus >>> 0 !== RPC_E_TOO_LATE) {
     throw new Error(`CoInitializeSecurity failed with ${formatHResult(initializeSecurityStatus)}`);
   }
 
@@ -346,13 +342,7 @@ try {
   }
 
   taskServiceLibrary = createTaskServiceLibrary(taskServiceAddress);
-  connectStatus = taskServiceLibrary.symbols.Connect(
-    taskServiceAddress,
-    emptyServerVariantBuffer.ptr,
-    emptyUserVariantBuffer.ptr,
-    emptyDomainVariantBuffer.ptr,
-    emptyPasswordVariantBuffer.ptr,
-  );
+  connectStatus = taskServiceLibrary.symbols.Connect(taskServiceAddress, emptyServerVariantBuffer.ptr, emptyUserVariantBuffer.ptr, emptyDomainVariantBuffer.ptr, emptyPasswordVariantBuffer.ptr);
 
   if (!isSuccessful(connectStatus)) {
     throw new Error(`ITaskService::Connect failed with ${formatHResult(connectStatus)}`);

@@ -104,16 +104,7 @@ console.log(`Found ${windows.length} visible top-level windows`);
 console.log(`Foreground window handle: ${foregroundHwnd}`);
 console.log('');
 console.log(divider);
-console.log(
-  '  ' +
-    'PID'.padEnd(8) +
-    'TID'.padEnd(8) +
-    'Handle'.padEnd(22) +
-    'Class'.padEnd(28) +
-    'Position'.padEnd(18) +
-    'Size'.padEnd(14) +
-    'Title',
-);
+console.log('  ' + 'PID'.padEnd(8) + 'TID'.padEnd(8) + 'Handle'.padEnd(22) + 'Class'.padEnd(28) + 'Position'.padEnd(18) + 'Size'.padEnd(14) + 'Title');
 console.log(divider);
 
 for (const win of windows) {
@@ -122,16 +113,7 @@ for (const win of windows) {
   const size = `${win.width}x${win.height}`;
   const titleDisplay = win.title.length > 38 ? win.title.substring(0, 35) + '...' : win.title;
 
-  console.log(
-    marker +
-      String(win.pid).padEnd(8) +
-      String(win.tid).padEnd(8) +
-      `0x${win.hwnd.toString(16)}`.padEnd(22) +
-      win.className.substring(0, 26).padEnd(28) +
-      position.padEnd(18) +
-      size.padEnd(14) +
-      titleDisplay,
-  );
+  console.log(marker + String(win.pid).padEnd(8) + String(win.tid).padEnd(8) + `0x${win.hwnd.toString(16)}`.padEnd(22) + win.className.substring(0, 26).padEnd(28) + position.padEnd(18) + size.padEnd(14) + titleDisplay);
 }
 
 console.log(divider);

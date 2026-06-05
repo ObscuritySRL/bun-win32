@@ -29,12 +29,7 @@
  */
 import { Tbs } from '../index';
 import { Kernel32 } from '../index';
-import {
-  TBS_COMMAND_LOCALITY_ZERO,
-  TBS_COMMAND_PRIORITY_NORMAL,
-  TBS_CONTEXT_VERSION_TWO,
-  TBS_SUCCESS,
-} from '@bun-win32/tbs';
+import { TBS_COMMAND_LOCALITY_ZERO, TBS_COMMAND_PRIORITY_NORMAL, TBS_CONTEXT_VERSION_TWO, TBS_SUCCESS } from '@bun-win32/tbs';
 
 Tbs.Preload(['Tbsi_Context_Create', 'Tbsip_Submit_Command', 'Tbsip_Context_Close']);
 Kernel32.Preload(['GetStdHandle', 'GetConsoleMode', 'SetConsoleMode']);
@@ -94,9 +89,7 @@ function box(title: string, lines: string[], color: string): string {
   const inner = lines.reduce((m, l) => Math.max(m, visibleLen(l)), visibleLen(title) + 2);
   const width = Math.min(Math.max(inner + 2, 50), 78);
   const top = `${color}╭─ ${BOLD}${title}${RESET}${color} ${'─'.repeat(Math.max(0, width - visibleLen(title) - 4))}╮${RESET}`;
-  const body = lines
-    .map((l) => `${color}│${RESET} ${l}${' '.repeat(Math.max(0, width - visibleLen(l) - 2))} ${color}│${RESET}`)
-    .join('\n');
+  const body = lines.map((l) => `${color}│${RESET} ${l}${' '.repeat(Math.max(0, width - visibleLen(l) - 2))} ${color}│${RESET}`).join('\n');
   const bot = `${color}╰${'─'.repeat(width)}╯${RESET}`;
   return `${top}\n${body}\n${bot}`;
 }
@@ -143,15 +136,7 @@ function submit(cmd: Buffer): TpmResponse | null {
   const resp = Buffer.alloc(4096);
   const respLen = Buffer.alloc(4);
   respLen.writeUInt32LE(resp.byteLength, 0);
-  const r = Tbs.Tbsip_Submit_Command(
-    hContext,
-    TBS_COMMAND_LOCALITY_ZERO,
-    TBS_COMMAND_PRIORITY_NORMAL,
-    cmd.ptr,
-    cmd.byteLength,
-    resp.ptr,
-    respLen.ptr,
-  );
+  const r = Tbs.Tbsip_Submit_Command(hContext, TBS_COMMAND_LOCALITY_ZERO, TBS_COMMAND_PRIORITY_NORMAL, cmd.ptr, cmd.byteLength, resp.ptr, respLen.ptr);
   if (r !== TBS_SUCCESS) return null;
   // TPM response header: tag u16, responseSize u32, responseCode u32 — all BE
   const size = resp.readUInt32BE(2);
@@ -286,9 +271,9 @@ async function main(): Promise<void> {
   const ccRes = openContext();
   if (ccRes !== TBS_SUCCESS || hContext === null) {
     const friendly =
-      (ccRes >>> 0) === 0x8028400f
+      ccRes >>> 0 === 0x8028400f
         ? 'No TPM was found on this machine. This demo needs a TPM 2.0 chip (or Intel/AMD firmware TPM).'
-        : (ccRes >>> 0) === 0x80284008 || (ccRes >>> 0) === 0x80284010
+        : ccRes >>> 0 === 0x80284008 || ccRes >>> 0 === 0x80284010
           ? 'The TPM Base Services are not running / disabled. Enable the TPM in firmware to run this demo.'
           : 'Could not open a TBS context to the TPM.';
     console.log(box('TPM unavailable', [`${GREY}${friendly}${RESET}`, `${DIM}Tbsi_Context_Create → ${decodeTbs(ccRes)}${RESET}`], RED));
@@ -326,9 +311,7 @@ async function main(): Promise<void> {
   if (pcrResp) {
     const parsed = parsePcrRead(pcrResp, selectedPcrs);
     if (parsed) {
-      const rows: string[] = [
-        `${DIM}PCR  meaning                    SHA-256 boot measurement${RESET}`,
-      ];
+      const rows: string[] = [`${DIM}PCR  meaning                    SHA-256 boot measurement${RESET}`];
       for (const e of parsed.entries) {
         const label = (PCR_LABELS[e.index] ?? '').padEnd(25);
         const idx = String(e.index).padStart(2, '0');

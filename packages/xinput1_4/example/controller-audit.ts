@@ -16,17 +16,7 @@
  * Run: bun run example/controller-audit.ts
  */
 
-import Xinput1_4, {
-  BatteryDevType,
-  BatteryLevel,
-  BatteryType,
-  XUSER_MAX_COUNT,
-  XInputCapsFlags,
-  XInputDevSubType,
-  XInputDevType,
-  XInputGamepadButtons,
-  XInputGetCapabilitiesFlags,
-} from '../index';
+import Xinput1_4, { BatteryDevType, BatteryLevel, BatteryType, XUSER_MAX_COUNT, XInputCapsFlags, XInputDevSubType, XInputDevType, XInputGamepadButtons, XInputGetCapabilitiesFlags } from '../index';
 
 Xinput1_4.Preload(['XInputGetState', 'XInputGetCapabilities', 'XInputGetBatteryInformation', 'XInputGetAudioDeviceIds']);
 

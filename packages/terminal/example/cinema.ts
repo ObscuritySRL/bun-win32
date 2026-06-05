@@ -154,14 +154,14 @@ function sceneNebula(t: Term, local: number, reveal: number, time: number): void
   const cv = time * 0.005;
   const asp = t.aspect;
   // A hero emission core the clouds glow around — anchors the composition off-centre.
-  const heroU = 0.40;
+  const heroU = 0.4;
   const heroV = 0.44;
   // Octave constants (build-time): scale + offset for u,v per octave.
   const NW1 = NEB_W - 1;
   const NH1 = NEB_H - 1;
   const invW = 1 / W;
   // Resolve-driven scalars hoisted out of the pixel loop.
-  const cScale = 0.30 + 0.70 * resolve;
+  const cScale = 0.3 + 0.7 * resolve;
   const haloScale = 10 + 26 * resolve;
   // Skip the letterbox bar rows — they get blacked out after the grade.
   const bar = letterboxBar(t);
@@ -175,39 +175,78 @@ function sceneNebula(t: Term, local: number, reveal: number, time: number): void
     const rowBase = y * W * 3;
     // Per-row v-side of each octave's bilinear sample (loop-invariant in x).
     // octave 0: v*1.15 ; octave 1: v*2.7-1.7 ; octave 2: v*5.9+3.4
-    let vv = v * 1.15; vv = vv - Math.floor(vv);
-    let fy0 = vv * NH1; const y0a = fy0 | 0; const y0b = y0a + 1 < NEB_W ? y0a + 1 : y0a; const ty0 = fy0 - y0a;
-    const r0a = y0a * NEB_W, r0b = y0b * NEB_W;
-    vv = v * 2.7 - 1.7; vv = vv - Math.floor(vv);
-    let fy1 = vv * NH1; const y1a = fy1 | 0; const y1b = y1a + 1 < NEB_W ? y1a + 1 : y1a; const ty1 = fy1 - y1a;
-    const r1a = y1a * NEB_W, r1b = y1b * NEB_W;
-    vv = v * 5.9 + 3.4; vv = vv - Math.floor(vv);
-    let fy2 = vv * NH1; const y2a = fy2 | 0; const y2b = y2a + 1 < NEB_W ? y2a + 1 : y2a; const ty2 = fy2 - y2a;
-    const r2a = y2a * NEB_W, r2b = y2b * NEB_W;
+    let vv = v * 1.15;
+    vv = vv - Math.floor(vv);
+    let fy0 = vv * NH1;
+    const y0a = fy0 | 0;
+    const y0b = y0a + 1 < NEB_W ? y0a + 1 : y0a;
+    const ty0 = fy0 - y0a;
+    const r0a = y0a * NEB_W,
+      r0b = y0b * NEB_W;
+    vv = v * 2.7 - 1.7;
+    vv = vv - Math.floor(vv);
+    let fy1 = vv * NH1;
+    const y1a = fy1 | 0;
+    const y1b = y1a + 1 < NEB_W ? y1a + 1 : y1a;
+    const ty1 = fy1 - y1a;
+    const r1a = y1a * NEB_W,
+      r1b = y1b * NEB_W;
+    vv = v * 5.9 + 3.4;
+    vv = vv - Math.floor(vv);
+    let fy2 = vv * NH1;
+    const y2a = fy2 | 0;
+    const y2b = y2a + 1 < NEB_W ? y2a + 1 : y2a;
+    const ty2 = fy2 - y2a;
+    const r2a = y2a * NEB_W,
+      r2b = y2b * NEB_W;
     for (let x = 0; x < W; x++) {
       const nx = x * invW;
       const u = nx * asp + cu;
       // Three octaves of value noise (nebAt inlined, v-side precomputed).
       // octave 0
-      let uu = u * 1.15; uu = uu - Math.floor(uu);
-      let fx = uu * NW1; let x0 = fx | 0; let x1 = x0 + 1 < NEB_W ? x0 + 1 : x0; let tx = fx - x0;
-      let a = neb[r0a + x0], bb0 = neb[r0a + x1], cc = neb[r0b + x0], dd = neb[r0b + x1];
-      let top = a + (bb0 - a) * tx, bot = cc + (dd - cc) * tx;
+      let uu = u * 1.15;
+      uu = uu - Math.floor(uu);
+      let fx = uu * NW1;
+      let x0 = fx | 0;
+      let x1 = x0 + 1 < NEB_W ? x0 + 1 : x0;
+      let tx = fx - x0;
+      let a = neb[r0a + x0],
+        bb0 = neb[r0a + x1],
+        cc = neb[r0b + x0],
+        dd = neb[r0b + x1];
+      let top = a + (bb0 - a) * tx,
+        bot = cc + (dd - cc) * tx;
       let n = (top + (bot - top) * ty0) * 0.62;
       // octave 1
-      uu = u * 2.7 + 5.2; uu = uu - Math.floor(uu);
-      fx = uu * NW1; x0 = fx | 0; x1 = x0 + 1 < NEB_W ? x0 + 1 : x0; tx = fx - x0;
-      a = neb[r1a + x0]; bb0 = neb[r1a + x1]; cc = neb[r1b + x0]; dd = neb[r1b + x1];
-      top = a + (bb0 - a) * tx; bot = cc + (dd - cc) * tx;
+      uu = u * 2.7 + 5.2;
+      uu = uu - Math.floor(uu);
+      fx = uu * NW1;
+      x0 = fx | 0;
+      x1 = x0 + 1 < NEB_W ? x0 + 1 : x0;
+      tx = fx - x0;
+      a = neb[r1a + x0];
+      bb0 = neb[r1a + x1];
+      cc = neb[r1b + x0];
+      dd = neb[r1b + x1];
+      top = a + (bb0 - a) * tx;
+      bot = cc + (dd - cc) * tx;
       n += (top + (bot - top) * ty1) * 0.26;
       // octave 2
-      uu = u * 5.9 - 2.1; uu = uu - Math.floor(uu);
-      fx = uu * NW1; x0 = fx | 0; x1 = x0 + 1 < NEB_W ? x0 + 1 : x0; tx = fx - x0;
-      a = neb[r2a + x0]; bb0 = neb[r2a + x1]; cc = neb[r2b + x0]; dd = neb[r2b + x1];
-      top = a + (bb0 - a) * tx; bot = cc + (dd - cc) * tx;
+      uu = u * 5.9 - 2.1;
+      uu = uu - Math.floor(uu);
+      fx = uu * NW1;
+      x0 = fx | 0;
+      x1 = x0 + 1 < NEB_W ? x0 + 1 : x0;
+      tx = fx - x0;
+      a = neb[r2a + x0];
+      bb0 = neb[r2a + x1];
+      cc = neb[r2b + x0];
+      dd = neb[r2b + x1];
+      top = a + (bb0 - a) * tx;
+      bot = cc + (dd - cc) * tx;
       n += (top + (bot - top) * ty2) * 0.12;
       // shape into wispy clouds; raise to power so dark voids dominate
-      const cloud = clamp01((n - 0.40) / 0.60);
+      const cloud = clamp01((n - 0.4) / 0.6);
       const dens = cloud * cloud * (0.7 + 0.3 * cloud); // soft cube → crisper voids
       // Distance to the hero core drives an emission glow that lights the gas.
       const dxh = (nx - heroU) * asp;
@@ -253,7 +292,7 @@ function sceneNebula(t: Term, local: number, reveal: number, time: number): void
   }
   // A few hero stars with cross-glints near the core for scale and sparkle.
   for (let k = 0; k < 5; k++) {
-    const hx = (0.20 + 0.62 * hash2(k, 91)) * W;
+    const hx = (0.2 + 0.62 * hash2(k, 91)) * W;
     const hy = (0.22 + 0.58 * hash2(k, 53)) * H;
     const tw = 0.6 + 0.4 * SIN(time * (1.1 + k * 0.3) + k * 12);
     const hb = tw * reveal * resolve;
@@ -296,9 +335,9 @@ function sceneGalaxy(t: Term, local: number, reveal: number, time: number): void
     if (b < 0.012) continue;
     // Palette: hot blue-white core → warm gold arms → faint rose tips.
     const inner = clamp01(1 - r * 1.25);
-    const rr8 = (255 * (0.45 + 0.55 * (1 - inner * 0.6))) * b;
-    const gg8 = (210 * (0.5 + 0.5 * hue)) * b;
-    const bb8 = (255 * (0.35 + 0.65 * inner)) * b;
+    const rr8 = 255 * (0.45 + 0.55 * (1 - inner * 0.6)) * b;
+    const gg8 = 210 * (0.5 + 0.5 * hue) * b;
+    const bb8 = 255 * (0.35 + 0.65 * inner) * b;
     t.addPixel(px | 0, py | 0, rr8, gg8, bb8);
   }
 
@@ -341,10 +380,30 @@ const WDX = WAVES.map((w) => COS(w.dir));
 const WDZ = WAVES.map((w) => SIN(w.dir));
 const WK = WAVES.map((w) => TAU / w.len);
 // Per-wave packed scalars used by the unrolled inline ocean (4 waves).
-const W0_DX = WDX[0], W0_DZ = WDZ[0], W0_K = WK[0], W0_A = WAVES[0].amp, W0_AK = WAVES[0].amp * WK[0], W0_S = WAVES[0].spd;
-const W1_DX = WDX[1], W1_DZ = WDZ[1], W1_K = WK[1], W1_A = WAVES[1].amp, W1_AK = WAVES[1].amp * WK[1], W1_S = WAVES[1].spd;
-const W2_DX = WDX[2], W2_DZ = WDZ[2], W2_K = WK[2], W2_A = WAVES[2].amp, W2_AK = WAVES[2].amp * WK[2], W2_S = WAVES[2].spd;
-const W3_DX = WDX[3], W3_DZ = WDZ[3], W3_K = WK[3], W3_A = WAVES[3].amp, W3_AK = WAVES[3].amp * WK[3], W3_S = WAVES[3].spd;
+const W0_DX = WDX[0],
+  W0_DZ = WDZ[0],
+  W0_K = WK[0],
+  W0_A = WAVES[0].amp,
+  W0_AK = WAVES[0].amp * WK[0],
+  W0_S = WAVES[0].spd;
+const W1_DX = WDX[1],
+  W1_DZ = WDZ[1],
+  W1_K = WK[1],
+  W1_A = WAVES[1].amp,
+  W1_AK = WAVES[1].amp * WK[1],
+  W1_S = WAVES[1].spd;
+const W2_DX = WDX[2],
+  W2_DZ = WDZ[2],
+  W2_K = WK[2],
+  W2_A = WAVES[2].amp,
+  W2_AK = WAVES[2].amp * WK[2],
+  W2_S = WAVES[2].spd;
+const W3_DX = WDX[3],
+  W3_DZ = WDZ[3],
+  W3_K = WK[3],
+  W3_A = WAVES[3].amp,
+  W3_AK = WAVES[3].amp * WK[3],
+  W3_S = WAVES[3].spd;
 
 function sceneOcean(t: Term, local: number, reveal: number, time: number): void {
   const W = t.width;
@@ -454,18 +513,36 @@ function sceneOcean(t: Term, local: number, reveal: number, time: number): void 
     let p0_1 = W1_K * (W1_DX * wx0 + W1_DZ * wz) - W1_S * time * W1_K;
     let p0_2 = W2_K * (W2_DX * wx0 + W2_DZ * wz) - W2_S * time * W2_K;
     let p0_3 = W3_K * (W3_DX * wx0 + W3_DZ * wz) - W3_S * time * W3_K;
-    const dp_0 = W0_K * W0_DX * dwx, dp_1 = W1_K * W1_DX * dwx, dp_2 = W2_K * W2_DX * dwx, dp_3 = W3_K * W3_DX * dwx;
+    const dp_0 = W0_K * W0_DX * dwx,
+      dp_1 = W1_K * W1_DX * dwx,
+      dp_2 = W2_K * W2_DX * dwx,
+      dp_3 = W3_K * W3_DX * dwx;
     // recurrence rotators (cos/sin of the per-step delta)
-    const cd0 = COS(dp_0), sd0 = SIN(dp_0), cd1 = COS(dp_1), sd1 = SIN(dp_1);
-    const cd2 = COS(dp_2), sd2 = SIN(dp_2), cd3 = COS(dp_3), sd3 = SIN(dp_3);
+    const cd0 = COS(dp_0),
+      sd0 = SIN(dp_0),
+      cd1 = COS(dp_1),
+      sd1 = SIN(dp_1);
+    const cd2 = COS(dp_2),
+      sd2 = SIN(dp_2),
+      cd3 = COS(dp_3),
+      sd3 = SIN(dp_3);
     // running sin/cos of each wave's phase (seeded at x=0)
-    let s0 = SIN(p0_0), c0 = COS(p0_0), s1 = SIN(p0_1), c1 = COS(p0_1);
-    let s2 = SIN(p0_2), c2 = COS(p0_2), s3 = SIN(p0_3), c3 = COS(p0_3);
+    let s0 = SIN(p0_0),
+      c0 = COS(p0_0),
+      s1 = SIN(p0_1),
+      c1 = COS(p0_1);
+    let s2 = SIN(p0_2),
+      c2 = COS(p0_2),
+      s3 = SIN(p0_3),
+      c3 = COS(p0_3);
     let resync = RESYNC;
     for (let x = 0; x < W; x++) {
       // height + slope from the running sin/cos (Gerstner sum, unrolled)
       const h = W0_A * s0 + W1_A * s1 + W2_A * s2 + W3_A * s3;
-      const sl0 = W0_AK * c0, sl1 = W1_AK * c1, sl2 = W2_AK * c2, sl3 = W3_AK * c3;
+      const sl0 = W0_AK * c0,
+        sl1 = W1_AK * c1,
+        sl2 = W2_AK * c2,
+        sl3 = W3_AK * c3;
       const nx = -(W0_DX * sl0 + W1_DX * sl1 + W2_DX * sl2 + W3_DX * sl3);
       const nz = -(W0_DZ * sl0 + W1_DZ * sl1 + W2_DZ * sl2 + W3_DZ * sl3);
       // Surface normal (y up) → simple sun diffuse term.
@@ -494,8 +571,8 @@ function sceneOcean(t: Term, local: number, reveal: number, time: number): void 
       // Stochastic specular glitter on up-facing crests within the road.
       if (road > 0.04 && h > 0.18) {
         const spark = hash2((x * 1.7 + sparkGp) | 0, yh13);
-        if (spark > 0.80) {
-          const s = (spark - 0.80) * 5.2 * road;
+        if (spark > 0.8) {
+          const s = (spark - 0.8) * 5.2 * road;
           r += 255 * s;
           g += 222 * s;
           b += 152 * s;
@@ -511,15 +588,31 @@ function sceneOcean(t: Term, local: number, reveal: number, time: number): void 
       // advance the sin/cos recurrence one x-step; resync periodically.
       if (--resync === 0) {
         resync = RESYNC;
-        p0_0 += dp_0 * RESYNC; s0 = SIN(p0_0); c0 = COS(p0_0);
-        p0_1 += dp_1 * RESYNC; s1 = SIN(p0_1); c1 = COS(p0_1);
-        p0_2 += dp_2 * RESYNC; s2 = SIN(p0_2); c2 = COS(p0_2);
-        p0_3 += dp_3 * RESYNC; s3 = SIN(p0_3); c3 = COS(p0_3);
+        p0_0 += dp_0 * RESYNC;
+        s0 = SIN(p0_0);
+        c0 = COS(p0_0);
+        p0_1 += dp_1 * RESYNC;
+        s1 = SIN(p0_1);
+        c1 = COS(p0_1);
+        p0_2 += dp_2 * RESYNC;
+        s2 = SIN(p0_2);
+        c2 = COS(p0_2);
+        p0_3 += dp_3 * RESYNC;
+        s3 = SIN(p0_3);
+        c3 = COS(p0_3);
       } else {
-        let ns = s0 * cd0 + c0 * sd0; c0 = c0 * cd0 - s0 * sd0; s0 = ns;
-        ns = s1 * cd1 + c1 * sd1; c1 = c1 * cd1 - s1 * sd1; s1 = ns;
-        ns = s2 * cd2 + c2 * sd2; c2 = c2 * cd2 - s2 * sd2; s2 = ns;
-        ns = s3 * cd3 + c3 * sd3; c3 = c3 * cd3 - s3 * sd3; s3 = ns;
+        let ns = s0 * cd0 + c0 * sd0;
+        c0 = c0 * cd0 - s0 * sd0;
+        s0 = ns;
+        ns = s1 * cd1 + c1 * sd1;
+        c1 = c1 * cd1 - s1 * sd1;
+        s1 = ns;
+        ns = s2 * cd2 + c2 * sd2;
+        c2 = c2 * cd2 - s2 * sd2;
+        s2 = ns;
+        ns = s3 * cd3 + c3 * sd3;
+        c3 = c3 * cd3 - s3 * sd3;
+        s3 = ns;
       }
     }
   }
@@ -556,12 +649,12 @@ function sceneAurora(t: Term, local: number, reveal: number, time: number): void
     const env = clamp01(0.35 + 0.65 * (0.5 + 0.5 * SIN(u * 9.0 + time * 0.4)));
     // ribbon striations: high-frequency pleats that drift, like folded silk
     const ribbon = 0.45 + 0.55 * Math.pow(0.5 + 0.5 * SIN(u * 70.0 + SIN(u * 7.0) * 4.0 - time * 1.1), 1.6);
-    const widthTop = H * (0.20 + 0.12 * (0.5 + 0.5 * SIN(u * 4.0 - time * 0.5)));
+    const widthTop = H * (0.2 + 0.12 * (0.5 + 0.5 * SIN(u * 4.0 - time * 0.5)));
     const widthBot = H * 0.045;
     // hue drifts along x and slowly in time: emerald → teal → violet
-    const hue = 0.30 + 0.40 * (0.5 + 0.5 * SIN(u * 2.2 + time * 0.25));
+    const hue = 0.3 + 0.4 * (0.5 + 0.5 * SIN(u * 2.2 + time * 0.25));
     const toViolet = smoothstep(0.46, 0.74, hue);
-    const toTeal = smoothstep(0.30, 0.52, hue);
+    const toTeal = smoothstep(0.3, 0.52, hue);
     // hand-tuned emerald/teal/violet ramp (no full HSV rainbow)
     const cr = 30 + 28 * toTeal + 150 * toViolet;
     const cg = 195 - 50 * toTeal - 90 * toViolet;
@@ -744,13 +837,7 @@ run({
           const xp = (x + 1) % NEB_W;
           const ym = (y - 1 + NEB_H) % NEB_H;
           const yp = (y + 1) % NEB_H;
-          tmp[y * NEB_W + x] =
-            (neb[y * NEB_W + x] * 4 +
-              neb[y * NEB_W + xm] +
-              neb[y * NEB_W + xp] +
-              neb[ym * NEB_W + x] +
-              neb[yp * NEB_W + x]) /
-            8;
+          tmp[y * NEB_W + x] = (neb[y * NEB_W + x] * 4 + neb[y * NEB_W + xm] + neb[y * NEB_W + xp] + neb[ym * NEB_W + x] + neb[yp * NEB_W + x]) / 8;
         }
       }
       neb.set(tmp);

@@ -1,17 +1,6 @@
 import { bayerThreshold, channelDelta, quantizeTo16, quantizeTo16Dithered, quantizeTo256, quantizeTo256Dithered } from './color';
 import { PIXEL_FONT_HEIGHT, PIXEL_FONT_WIDTH, pixelFont } from './font5x7';
-import {
-  MODE_DIMENSIONS,
-  asciiRampBytes,
-  brailleBitLayout,
-  brailleGlyphs,
-  octantBitLayout,
-  octantGlyphs,
-  quadrantBitLayout,
-  quadrantGlyphs,
-  sextantBitLayout,
-  sextantGlyphs,
-} from './glyphs';
+import { MODE_DIMENSIONS, asciiRampBytes, brailleBitLayout, brailleGlyphs, octantBitLayout, octantGlyphs, quadrantBitLayout, quadrantGlyphs, sextantBitLayout, sextantGlyphs } from './glyphs';
 import { OutputBuffer } from './output';
 import { encodePNG } from './png';
 import { SYNCHRONIZED_OUTPUT_BEGIN, SYNCHRONIZED_OUTPUT_END, standardOutput } from './stdout';

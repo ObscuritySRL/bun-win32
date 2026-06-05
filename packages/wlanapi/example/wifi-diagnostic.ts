@@ -110,8 +110,14 @@ function readWideString(buf: Buffer, offset: number, maxChars: number): string {
 
 function formatGuid(buf: Buffer, offset: number): string {
   const d1 = buf.readUInt32LE(offset).toString(16).padStart(8, '0');
-  const d2 = buf.readUInt16LE(offset + 4).toString(16).padStart(4, '0');
-  const d3 = buf.readUInt16LE(offset + 6).toString(16).padStart(4, '0');
+  const d2 = buf
+    .readUInt16LE(offset + 4)
+    .toString(16)
+    .padStart(4, '0');
+  const d3 = buf
+    .readUInt16LE(offset + 6)
+    .toString(16)
+    .padStart(4, '0');
   const d4 = Array.from(buf.subarray(offset + 8, offset + 10), (b) => b.toString(16).padStart(2, '0')).join('');
   const d5 = Array.from(buf.subarray(offset + 10, offset + 16), (b) => b.toString(16).padStart(2, '0')).join('');
   return `{${d1}-${d2}-${d3}-${d4}-${d5}}`;

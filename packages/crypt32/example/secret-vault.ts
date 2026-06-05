@@ -68,10 +68,10 @@ const encryptedBlob = Buffer.alloc(16); // output DATA_BLOB
 const encryptOk = Crypt32.CryptProtectData(
   inputBlob.ptr,
   descriptionWide.ptr,
-  null,  // no optional entropy
-  null,  // reserved
-  null,  // no prompt struct
-  0,     // no flags
+  null, // no optional entropy
+  null, // reserved
+  null, // no prompt struct
+  0, // no flags
   encryptedBlob.ptr,
 );
 
@@ -85,7 +85,11 @@ const encryptedBytes = Buffer.from(toArrayBuffer(encrypted.pbData as unknown as 
 
 console.log(`  Encrypted blob size: ${encrypted.cbData} bytes`);
 console.log(`  First 64 bytes (hex):`);
-const hexPreview = encryptedBytes.subarray(0, 64).toString('hex').match(/.{1,32}/g) || [];
+const hexPreview =
+  encryptedBytes
+    .subarray(0, 64)
+    .toString('hex')
+    .match(/.{1,32}/g) || [];
 for (const line of hexPreview) {
   console.log(`    ${line}`);
 }
@@ -100,9 +104,7 @@ const b64CharsNeeded = b64SizeBuf.readUInt32LE(0);
 
 const b64Buf = Buffer.alloc(b64CharsNeeded * 2);
 b64SizeBuf.writeUInt32LE(b64CharsNeeded);
-const b64Ok = Crypt32.CryptBinaryToStringW(
-  encryptedBytes.ptr, encrypted.cbData, CRYPT_STRING_BASE64, b64Buf.ptr, b64SizeBuf.ptr,
-);
+const b64Ok = Crypt32.CryptBinaryToStringW(encryptedBytes.ptr, encrypted.cbData, CRYPT_STRING_BASE64, b64Buf.ptr, b64SizeBuf.ptr);
 
 if (b64Ok) {
   const b64String = b64Buf.toString('utf16le').replace(/\0.*$/, '').trim();
@@ -123,17 +125,14 @@ if (b64Ok) {
 
   const decodedBinaryBuf = Buffer.alloc(decodeBytesNeeded);
   decodeSizeBuf.writeUInt32LE(decodeBytesNeeded);
-  const decodeOk = Crypt32.CryptStringToBinaryW(
-    b64Wide.ptr, 0, CRYPT_STRING_BASE64, decodedBinaryBuf.ptr, decodeSizeBuf.ptr, null, null,
-  );
+  const decodeOk = Crypt32.CryptStringToBinaryW(b64Wide.ptr, 0, CRYPT_STRING_BASE64, decodedBinaryBuf.ptr, decodeSizeBuf.ptr, null, null);
 
   if (decodeOk) {
     const actualDecoded = decodeSizeBuf.readUInt32LE(0);
     console.log(`  Decoded ${actualDecoded} bytes from Base64`);
 
     // Verify the decoded bytes match the original encrypted blob
-    const match = actualDecoded === encrypted.cbData &&
-      decodedBinaryBuf.subarray(0, actualDecoded).equals(encryptedBytes.subarray(0, encrypted.cbData));
+    const match = actualDecoded === encrypted.cbData && decodedBinaryBuf.subarray(0, actualDecoded).equals(encryptedBytes.subarray(0, encrypted.cbData));
     console.log(`  Matches original encrypted blob: ${match ? 'YES' : 'NO'}`);
   } else {
     console.log('  CryptStringToBinaryW FAILED');
@@ -147,15 +146,15 @@ console.log('\n--- Step 5: Decrypting with DPAPI ---\n');
 
 const ciphertextBlob = makeDataBlob(encryptedBytes);
 const decryptedBlob = Buffer.alloc(16); // output DATA_BLOB
-const descPtrBuf = Buffer.alloc(8);     // output description pointer
+const descPtrBuf = Buffer.alloc(8); // output description pointer
 
 const decryptOk = Crypt32.CryptUnprotectData(
   ciphertextBlob.ptr,
   descPtrBuf.ptr,
-  null,  // no entropy
-  null,  // reserved
-  null,  // no prompt struct
-  0,     // no flags
+  null, // no entropy
+  null, // reserved
+  null, // no prompt struct
+  0, // no flags
   decryptedBlob.ptr,
 );
 

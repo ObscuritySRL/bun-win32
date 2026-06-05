@@ -2,7 +2,73 @@ import { type FFIFunction, FFIType } from 'bun:ffi';
 
 import { Win32 } from '@bun-win32/core';
 
-import type { AsyncContentLoadedState, AutomationIdentifierType, BOOL, BSTR, DWORD, DockPosition, EVENTID, GUID, HRESULT, HUIAEVENT, HUIANODE, HUIAPATTERNOBJECT, HUIATEXTRANGE, HWND, IAccessible, IRawElementProviderSimple, ITextRangeProvider, LONG, LPARAM, LPCWSTR, LRESULT, NULL, NavigateDirection, NormalizeState, NotificationKind, NotificationProcessing, PATTERNID, PBOOL, PBSTR, PHUIAEVENT, PHUIANODE, PHUIAPATTERNOBJECT, PHUIATEXTRANGE, PINT, PPIAccessible, PPIRawElementProviderSimple, PPIUnknown, PPROPERTYID, PPVOID, PROPERTYID, PSAFEARRAY, PSupportedTextSelection, PVARIANT, REFCLSID, REFIID, SAFEARRAY, ScrollAmount, StructureChangeType, SynchronizedInputType, TEXTATTRIBUTEID, TextEditChangeType, TextPatternRangeEndpoint, TextUnit, TreeScope, UiaCacheRequest, UiaChangeInfo, UiaCondition, UiaEventCallback, UiaFindParams, UiaPoint, UiaProviderCallback, VARIANT, WPARAM, WindowVisualState, int } from '../types/UIAutomationCore';
+import type {
+  AsyncContentLoadedState,
+  AutomationIdentifierType,
+  BOOL,
+  BSTR,
+  DWORD,
+  DockPosition,
+  EVENTID,
+  GUID,
+  HRESULT,
+  HUIAEVENT,
+  HUIANODE,
+  HUIAPATTERNOBJECT,
+  HUIATEXTRANGE,
+  HWND,
+  IAccessible,
+  IRawElementProviderSimple,
+  ITextRangeProvider,
+  LONG,
+  LPARAM,
+  LPCWSTR,
+  LRESULT,
+  NULL,
+  NavigateDirection,
+  NormalizeState,
+  NotificationKind,
+  NotificationProcessing,
+  PATTERNID,
+  PBOOL,
+  PBSTR,
+  PHUIAEVENT,
+  PHUIANODE,
+  PHUIAPATTERNOBJECT,
+  PHUIATEXTRANGE,
+  PINT,
+  PPIAccessible,
+  PPIRawElementProviderSimple,
+  PPIUnknown,
+  PPROPERTYID,
+  PPVOID,
+  PROPERTYID,
+  PSAFEARRAY,
+  PSupportedTextSelection,
+  PVARIANT,
+  REFCLSID,
+  REFIID,
+  SAFEARRAY,
+  ScrollAmount,
+  StructureChangeType,
+  SynchronizedInputType,
+  TEXTATTRIBUTEID,
+  TextEditChangeType,
+  TextPatternRangeEndpoint,
+  TextUnit,
+  TreeScope,
+  UiaCacheRequest,
+  UiaChangeInfo,
+  UiaCondition,
+  UiaEventCallback,
+  UiaFindParams,
+  UiaPoint,
+  UiaProviderCallback,
+  VARIANT,
+  WPARAM,
+  WindowVisualState,
+  int,
+} from '../types/UIAutomationCore';
 
 /**
  * Thin, lazy-loaded FFI bindings for `UIAutomationCore.dll`.
@@ -640,7 +706,6 @@ class UIAutomationCore extends Win32 {
   public static WindowPattern_WaitForInputIdle(hobj: HUIAPATTERNOBJECT, milliseconds: int, pResult: PBOOL): HRESULT {
     return UIAutomationCore.Load('WindowPattern_WaitForInputIdle')(hobj, milliseconds, pResult);
   }
-
 }
 
 export default UIAutomationCore;

@@ -46,16 +46,7 @@ import { JSCallback, type Pointer, toArrayBuffer } from 'bun:ffi';
 import Dxva2, { MC_CAPS, PHYSICAL_MONITOR_DESCRIPTION_SIZE, PHYSICAL_MONITOR_SIZE } from '../index';
 import User32 from '@bun-win32/user32';
 
-Dxva2.Preload([
-  'DestroyPhysicalMonitors',
-  'GetMonitorBrightness',
-  'GetMonitorCapabilities',
-  'GetMonitorContrast',
-  'GetNumberOfPhysicalMonitorsFromHMONITOR',
-  'GetPhysicalMonitorsFromHMONITOR',
-  'SetMonitorBrightness',
-  'SetMonitorContrast',
-]);
+Dxva2.Preload(['DestroyPhysicalMonitors', 'GetMonitorBrightness', 'GetMonitorCapabilities', 'GetMonitorContrast', 'GetNumberOfPhysicalMonitorsFromHMONITOR', 'GetPhysicalMonitorsFromHMONITOR', 'SetMonitorBrightness', 'SetMonitorContrast']);
 User32.Preload(['EnumDisplayMonitors']);
 
 const ANSI = {
@@ -262,7 +253,7 @@ async function runBreath(targetCycles: number): Promise<void> {
   let cycleIndex = 0;
   while (cycleIndex < targetCycles) {
     if (isShuttingDown) return;
-    const cycleFraction = ((performance.now() - startTime) / durationMs) - cycleIndex;
+    const cycleFraction = (performance.now() - startTime) / durationMs - cycleIndex;
     if (cycleFraction >= 1) {
       cycleIndex += 1;
       continue;
@@ -285,7 +276,7 @@ async function runPulse(targetCycles: number): Promise<void> {
       if (isShuttingDown) return;
       const fraction = (performance.now() - pulseStart) / pulseDuration;
       // ramp up to 1.0 in the first 30% of the burst, then ease back down
-      const intensity = fraction < 0.3 ? fraction / 0.3 : 1 - ((fraction - 0.3) / 0.7);
+      const intensity = fraction < 0.3 ? fraction / 0.3 : 1 - (fraction - 0.3) / 0.7;
       applyIntensityToAll(intensity);
       renderProgressBar(`pulse ${pulseIndex + 1}/${targetCycles}`, intensity);
       await Bun.sleep(frameIntervalMs);

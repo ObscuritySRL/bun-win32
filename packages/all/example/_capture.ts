@@ -144,18 +144,7 @@ function createDevice(driverType: D3D_DRIVER_TYPE): Device | null {
   const ppDevice = Buffer.alloc(8);
   const pFeatureLevel = Buffer.alloc(4);
   const ppContext = Buffer.alloc(8);
-  const hr = D3d11.D3D11CreateDevice(
-    null,
-    driverType,
-    0n,
-    D3D11_CREATE_DEVICE_BGRA_SUPPORT,
-    featureLevels.ptr!,
-    1,
-    D3D11_SDK_VERSION,
-    ppDevice.ptr!,
-    pFeatureLevel.ptr!,
-    ppContext.ptr!,
-  );
+  const hr = D3d11.D3D11CreateDevice(null, driverType, 0n, D3D11_CREATE_DEVICE_BGRA_SUPPORT, featureLevels.ptr!, 1, D3D11_SDK_VERSION, ppDevice.ptr!, pFeatureLevel.ptr!, ppContext.ptr!);
   if (hr !== S_OK) return null;
   return {
     device: ppDevice.readBigUInt64LE(0),
@@ -192,7 +181,7 @@ const adapter = ppAdapter.readBigUInt64LE(0);
 
 const ppOutput = Buffer.alloc(8);
 const enumHr = vcall(adapter, DXGIADAPTER_ENUM_OUTPUTS, [FFIType.u32, FFIType.ptr], [0, ppOutput.ptr!]);
-if ((enumHr >>> 0) === DXGI_ERROR_NOT_FOUND) bail(3, 'No connected output on the adapter (EnumOutputs → NOT_FOUND).');
+if (enumHr >>> 0 === DXGI_ERROR_NOT_FOUND) bail(3, 'No connected output on the adapter (EnumOutputs → NOT_FOUND).');
 if (enumHr !== S_OK) bail(3, `IDXGIAdapter::EnumOutputs failed ${hex(enumHr)}.`);
 const output = ppOutput.readBigUInt64LE(0);
 
@@ -205,7 +194,7 @@ const output1 = ppOutput1.readBigUInt64LE(0);
 // ── IDXGIOutput1::DuplicateOutput(device) ─────────────────────────────────────
 const ppDupl = Buffer.alloc(8);
 const dupHr = vcall(output1, DXGIOUTPUT1_DUPLICATE_OUTPUT, [FFIType.u64, FFIType.ptr], [device, ppDupl.ptr!]);
-if ((dupHr >>> 0) === E_ACCESSDENIED) {
+if (dupHr >>> 0 === E_ACCESSDENIED) {
   bail(4, 'DuplicateOutput → E_ACCESSDENIED: another Desktop Duplication is already active (close other capture/recording tools and retry).');
 }
 if (dupHr !== S_OK) bail(4, `IDXGIOutput1::DuplicateOutput failed ${hex(dupHr)}.`);
@@ -237,7 +226,7 @@ let good = 0;
 for (let i = 0; i < MAX_ATTEMPTS && good < TARGET_GOOD; i += 1) {
   ppResource.writeBigUInt64LE(0n, 0);
   const hr = vcall(dupl, DUPL_ACQUIRE_NEXT_FRAME, [FFIType.u32, FFIType.ptr, FFIType.ptr], [500, frameInfo.ptr!, ppResource.ptr!]);
-  if ((hr >>> 0) === DXGI_ERROR_WAIT_TIMEOUT) {
+  if (hr >>> 0 === DXGI_ERROR_WAIT_TIMEOUT) {
     await Bun.sleep(40);
     continue;
   }

@@ -161,18 +161,30 @@ const quadTest = (setup: (surface: Term) => void, expectedCodePoint: number, nam
 };
 quadTest((surface) => surface.setPixel(0, 0, 255, 0, 0), 0x2598, 'TL ▘');
 quadTest((surface) => surface.setPixel(1, 0, 255, 0, 0), 0x259d, 'TR ▝');
-quadTest((surface) => {
-  surface.setPixel(0, 0, 255, 0, 0);
-  surface.setPixel(1, 0, 255, 0, 0);
-}, 0x2580, 'top ▀');
-quadTest((surface) => {
-  surface.setPixel(1, 0, 255, 0, 0);
-  surface.setPixel(1, 1, 255, 0, 0);
-}, 0x2590, 'right ▐');
-quadTest((surface) => {
-  surface.setPixel(0, 0, 255, 0, 0);
-  surface.setPixel(0, 1, 255, 0, 0);
-}, 0x258c, 'left ▌');
+quadTest(
+  (surface) => {
+    surface.setPixel(0, 0, 255, 0, 0);
+    surface.setPixel(1, 0, 255, 0, 0);
+  },
+  0x2580,
+  'top ▀',
+);
+quadTest(
+  (surface) => {
+    surface.setPixel(1, 0, 255, 0, 0);
+    surface.setPixel(1, 1, 255, 0, 0);
+  },
+  0x2590,
+  'right ▐',
+);
+quadTest(
+  (surface) => {
+    surface.setPixel(0, 0, 255, 0, 0);
+    surface.setPixel(0, 1, 255, 0, 0);
+  },
+  0x258c,
+  'left ▌',
+);
 
 const sextantTest = (setup: (surface: Term) => void, expectedCodePoint: number, name: string): void => {
   const surface = new Term(1, 1, { mode: 'sextant' });
@@ -181,16 +193,24 @@ const sextantTest = (setup: (surface: Term) => void, expectedCodePoint: number, 
   check(`sextant ${name} ${hex(expectedCodePoint)}`, decode(surface.frameBytes(), 1, 1)[0].codePoint === expectedCodePoint);
 };
 sextantTest((surface) => surface.setPixel(0, 0, 255, 0, 0), 0x1fb00, 'TL only');
-sextantTest((surface) => {
-  surface.setPixel(0, 0, 255, 0, 0);
-  surface.setPixel(0, 1, 255, 0, 0);
-  surface.setPixel(0, 2, 255, 0, 0);
-}, 0x258c, 'left col ▌');
-sextantTest((surface) => {
-  surface.setPixel(1, 0, 255, 0, 0);
-  surface.setPixel(1, 1, 255, 0, 0);
-  surface.setPixel(1, 2, 255, 0, 0);
-}, 0x2590, 'right col ▐');
+sextantTest(
+  (surface) => {
+    surface.setPixel(0, 0, 255, 0, 0);
+    surface.setPixel(0, 1, 255, 0, 0);
+    surface.setPixel(0, 2, 255, 0, 0);
+  },
+  0x258c,
+  'left col ▌',
+);
+sextantTest(
+  (surface) => {
+    surface.setPixel(1, 0, 255, 0, 0);
+    surface.setPixel(1, 1, 255, 0, 0);
+    surface.setPixel(1, 2, 255, 0, 0);
+  },
+  0x2590,
+  'right col ▐',
+);
 
 const brailleTest = (setup: (surface: Term) => void, expectedCodePoint: number, name: string): void => {
   const surface = new Term(1, 1, { mode: 'braille' });
@@ -214,26 +234,42 @@ const octantTest = (setup: (surface: Term) => void, expectedCodePoint: number, n
   check(`octant ${name} ${hex(expectedCodePoint)}`, decode(surface.frameBytes(), 1, 1)[0].codePoint === expectedCodePoint);
 };
 octantTest((surface) => surface.setPixel(0, 0, 255, 255, 255), 0x1cea8, 'octant-1 (0,0)'); // mask 1 → reused U+1CEA8
-octantTest((surface) => {
-  surface.setPixel(0, 0, 255, 255, 255);
-  surface.setPixel(0, 1, 255, 255, 255);
-  surface.setPixel(0, 2, 255, 255, 255);
-  surface.setPixel(0, 3, 255, 255, 255);
-}, 0x258c, 'left column ▌'); // mask 0x55 → LEFT HALF BLOCK
-octantTest((surface) => {
-  surface.setPixel(1, 0, 255, 255, 255);
-  surface.setPixel(1, 1, 255, 255, 255);
-  surface.setPixel(1, 2, 255, 255, 255);
-  surface.setPixel(1, 3, 255, 255, 255);
-}, 0x2590, 'right column ▐'); // mask 0xAA → RIGHT HALF BLOCK
-octantTest((surface) => {
-  surface.setPixel(0, 0, 255, 255, 255);
-  surface.setPixel(1, 0, 255, 255, 255);
-}, 0x1fb82, 'top eighth row'); // mask 3 → UPPER ONE QUARTER BLOCK
-octantTest((surface) => {
-  surface.setPixel(0, 3, 255, 255, 255);
-  surface.setPixel(1, 3, 255, 255, 255);
-}, 0x2582, 'bottom eighth row'); // mask 0xC0 → LOWER ONE QUARTER BLOCK
+octantTest(
+  (surface) => {
+    surface.setPixel(0, 0, 255, 255, 255);
+    surface.setPixel(0, 1, 255, 255, 255);
+    surface.setPixel(0, 2, 255, 255, 255);
+    surface.setPixel(0, 3, 255, 255, 255);
+  },
+  0x258c,
+  'left column ▌',
+); // mask 0x55 → LEFT HALF BLOCK
+octantTest(
+  (surface) => {
+    surface.setPixel(1, 0, 255, 255, 255);
+    surface.setPixel(1, 1, 255, 255, 255);
+    surface.setPixel(1, 2, 255, 255, 255);
+    surface.setPixel(1, 3, 255, 255, 255);
+  },
+  0x2590,
+  'right column ▐',
+); // mask 0xAA → RIGHT HALF BLOCK
+octantTest(
+  (surface) => {
+    surface.setPixel(0, 0, 255, 255, 255);
+    surface.setPixel(1, 0, 255, 255, 255);
+  },
+  0x1fb82,
+  'top eighth row',
+); // mask 3 → UPPER ONE QUARTER BLOCK
+octantTest(
+  (surface) => {
+    surface.setPixel(0, 3, 255, 255, 255);
+    surface.setPixel(1, 3, 255, 255, 255);
+  },
+  0x2582,
+  'bottom eighth row',
+); // mask 0xC0 → LOWER ONE QUARTER BLOCK
 octantTest((surface) => surface.setPixel(0, 1, 255, 255, 255), 0x1cd00, 'octant-3 (0,1)'); // mask 4 → first U+1CD00 glyph
 
 {
