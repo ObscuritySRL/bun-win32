@@ -1,1 +1,0 @@
-galaxy-tty|DETERMINISTIC|27097|both runs byte-identical

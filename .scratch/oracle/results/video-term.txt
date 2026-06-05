@@ -1,1 +1,0 @@
-video-term|DETERMINISTIC|35105|default CS2 mp4; fixed-timestep CAPTURE_T=4; byte-identical across runs

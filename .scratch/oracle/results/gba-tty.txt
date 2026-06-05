@@ -1,1 +1,0 @@
-gba-tty|FAILED|0|needs-asset: no bundled GBA ROM; requires argv .gba (no ROM is bundled — bring your own legally-dumped cartridge); none on disk

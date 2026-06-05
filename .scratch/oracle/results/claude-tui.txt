@@ -1,1 +1,0 @@
-claude-tui|DETERMINISTIC|18965|both runs byte-identical at 160x50 t=4

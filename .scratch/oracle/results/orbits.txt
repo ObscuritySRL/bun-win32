@@ -1,1 +1,0 @@
-orbits|DETERMINISTIC|12336|cols=160 rows=50 t=4

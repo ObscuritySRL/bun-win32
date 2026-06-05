@@ -1,1 +1,0 @@
-gameboy-tty|DETERMINISTIC|1773|bundled Libbet homebrew ROM; scripted joypad; byte-identical across runs

@@ -2,6 +2,10 @@ AGENTS.*.md
 .claude/
 ignore*
 
+# Scratch / working dirs — never commit
+/.scratch/
+packages/*/.scratch/
+
 # tools
 cloc-2.08.exe
 DISCORD_POST.md
