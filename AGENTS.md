@@ -43,7 +43,8 @@ There are 117 packages. Class names are PascalCase; a few preserve native DLL ca
 
 ```
 packages/{name}/
-  index.ts                 import {Class} from './structs/{Class}'; export * from './types/{Class}'; export default {Class};
+  index.ts                 default-import the class, re-export types — e.g. for psapi:
+                             import Psapi from './structs/Psapi'; export * from './types/Psapi'; export default Psapi;
   structs/{Class}.ts       Symbols (FFI decls) + public static methods
   types/{Class}.ts         type aliases, enums, constants (re-export shared types from core)
   example/                 runnable demos (≥ 2: one creative, one professional)
@@ -171,7 +172,7 @@ cd packages/{name} && bun publish --access public --otp <code>
 ```
 
 - **Always `bun publish`, never `npm publish`** — only Bun resolves the `workspace:*` references.
-- **Always `--access public`** — `@bun-win32` is private-by-default (the `publishConfig` is set, but the flag is still required).
+- **Always `--access public`** — `@bun-win32` is private-by-default on npm. Pass the flag on every publish; most packages have no `publishConfig`, so do not rely on it.
 - **Batch the whole release on a single OTP.** Loop every package's `bun publish` on one code; never prompt per package.
 
 ---
