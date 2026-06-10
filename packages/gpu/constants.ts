@@ -78,6 +78,7 @@ export const DEV_CREATE_TEXTURE_2D = 5;
 export const DEV_CREATE_UNORDERED_ACCESS_VIEW = 8;
 export const DEV_CREATE_VERTEX_SHADER = 12;
 export const DEV_GET_DEVICE_REMOVED_REASON = 39;
+export const DEV_GET_FEATURE_LEVEL = 37;
 export const DXGIADAPTER1_GET_DESC1 = 10;
 export const DXGIADAPTER_GET_DESC = 8;
 export const DXGIDEVICE_GET_ADAPTER = 7;
