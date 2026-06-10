@@ -1,4 +1,5 @@
 import Kernel32 from '@bun-win32/kernel32';
+import PowrProf, { POWER_INFORMATION_LEVEL } from '@bun-win32/powrprof';
 import Ntdll, { STATUS_SUCCESS, SystemInformationClass } from '@bun-win32/ntdll';
 import { type CpuTime, parseProcessorTimes } from './structs';
 import { cpuLayout } from './system';
@@ -6,6 +7,8 @@ import { cpuLayout } from './system';
 Kernel32.Preload(['GetSystemTimes']);
 Ntdll.Preload(['NtQuerySystemInformation']);
 const { GetSystemTimes } = Kernel32;
+PowrProf.Preload(['CallNtPowerInformation']);
+const { CallNtPowerInformation } = PowrProf;
 const { NtQuerySystemInformation } = Ntdll;
 
 const PROCESSOR_TIMES_STRIDE = 48;
@@ -111,4 +114,33 @@ export class CpuSampler {
     this.#primed = true;
     return result;
   }
+}
+
+export interface CpuFrequency {
+  /** Live throttle-aware clock in MHz (power management's current target, not the instantaneous turbo boost). */
+  currentMhz: number;
+  /** Power-management clamp; equals maxMhz when unclamped. */
+  limitMhz: number;
+  maxMhz: number;
+  /** Logical core index. */
+  number: number;
+}
+
+/** Per-core live CPU frequency (CallNtPowerInformation ProcessorInformation; PROCESSOR_POWER_INFORMATION 24 B/core: Number u32@0, MaxMhz@4, CurrentMhz@8, MhzLimit@12) — the live value systeminformation's cpuCurrentSpeed never reports (it returns the base clock, si#359). */
+export function cpuFrequency(): CpuFrequency[] {
+  const coreCount = cpuLayout().logicalProcessorCount;
+  const frequencyBuffer = Buffer.alloc(coreCount * 24);
+  const status = CallNtPowerInformation(POWER_INFORMATION_LEVEL.ProcessorInformation, null, 0, frequencyBuffer.ptr, frequencyBuffer.byteLength);
+  if (status !== 0) throw new Error(`CallNtPowerInformation(ProcessorInformation) failed: NTSTATUS 0x${(status >>> 0).toString(16)}`);
+  const rows: CpuFrequency[] = new Array(coreCount);
+  for (let core = 0; core < coreCount; core += 1) {
+    const offset = core * 24;
+    rows[core] = {
+      currentMhz: frequencyBuffer.readUInt32LE(offset + 8),
+      limitMhz: frequencyBuffer.readUInt32LE(offset + 12),
+      maxMhz: frequencyBuffer.readUInt32LE(offset + 4),
+      number: frequencyBuffer.readUInt32LE(offset),
+    };
+  }
+  return rows;
 }
