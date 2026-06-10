@@ -102,6 +102,10 @@ And the capabilities **no npm package offers**:
 - **Disk I/O counters** — `diskIoCounters()` + `processIoCounters(pid)` (systeminformation returns null on Windows, [#274](https://github.com/sebhildebrandt/systeminformation/issues/274)).
 - Plus `cpuFrequency()` (live, not the base clock), `sessions()` (real RDP/console attribution), `powerStatus()`/`batteryState()`/`powerScheme()`, handle/GDI/USER object counts, and a high-res `watch()` that samples at ~700 Hz for the CPU cost systeminformation's `observe()` spends on 1 Hz.
 
+![sysmon-report](https://raw.githubusercontent.com/ObscuritySRL/bun-win32/main/packages/all/screenshots/sysmon-report.png)
+
+*`example/sysmon-report.ts` — the full census on one page: SMBIOS identity, memory + commit, top processes, drives, socket owners, sessions — zero spawns.*
+
 ## Honest scoping
 
 - **Windows 10/11 + Server, Bun ≥ 1.1, x64.** Not a cross-platform library — that's systeminformation's value, not this package's. Windows-native depth is the thesis.

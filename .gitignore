@@ -62,6 +62,7 @@ packages/all/screenshots/*
 !packages/all/screenshots/raymarch.png
 !packages/all/screenshots/shader-tty.png
 !packages/all/screenshots/taskman.png
+!packages/all/screenshots/sysmon-report.png
 !packages/all/screenshots/voxelscape.png
 packages/all/replay-*.gif
 packages/all/bun-win32-wallpaper.png
