@@ -20,6 +20,14 @@ import {
   CpuSampler,
   EtwSession,
   ProcessSampler,
+  cpuFrequency,
+  diskIoCounters,
+  gpuUsageByProcess,
+  processIoCounters,
+  processObjectCounts,
+  sampleCounters,
+  watch,
+  whoLocks,
   batteryState,
   bootTime,
   channels,
@@ -403,6 +411,87 @@ section('19 determinism / no handle leak', () => {
   void GetProcessHandleCount(currentProcess, handleCountBuffer.ptr);
   const after = handleCountBuffer.readUInt32LE(0);
   check(Math.abs(after - before) <= 4, `200 × processes()+memory() leaked no handles (${before} → ${after})`);
+});
+
+await section('20 extras: per-process GPU% (npm monopoly)', () => {
+  const gpuRows = gpuUsageByProcess(300);
+  if (gpuRows.length === 0) {
+    skip('no active GPU engine instances right now');
+    return;
+  }
+  check(
+    gpuRows.every((row) => row.maxEnginePercent >= 0 && row.maxEnginePercent <= 100 && row.pid > 0),
+    `${gpuRows.length} pids with GPU time (top: pid ${gpuRows[0]?.pid} @ ${gpuRows[0]?.maxEnginePercent.toFixed(1)}%)`,
+  );
+});
+
+await section('21 extras: I/O counters (si#274 gap)', async () => {
+  const before = processIoCounters(ownPid);
+  await Bun.file(import.meta.path).arrayBuffer();
+  const after = processIoCounters(ownPid);
+  check(before !== null && after !== null && after.readBytes > before.readBytes, `own readBytes grew after a file read (${before?.readBytes} → ${after?.readBytes})`);
+  const rates = diskIoCounters(200);
+  check(
+    rates.some((rate) => rate.instance === '_Total'),
+    `diskIoCounters returned ${rates.length} PhysicalDisk instances incl. _Total`,
+  );
+});
+
+section('22 extras: live CPU frequency (si#359 gap)', () => {
+  const frequencies = cpuFrequency();
+  check(frequencies.length === cpuLayout().logicalProcessorCount, `one entry per logical core (${frequencies.length})`);
+  check(
+    frequencies.every((row) => row.currentMhz > 0 && row.currentMhz <= row.maxMhz * 1.6),
+    `currentMhz ${frequencies[0]?.currentMhz} / max ${frequencies[0]?.maxMhz} MHz plausible`,
+  );
+});
+
+await section('23 extras: whoLocks (file-lock forensics)', async () => {
+  const lockPath = `${Bun.env.TEMP ?? 'C:/Windows/Temp'}/bun-sysmon-selftest-lock.txt`;
+  await Bun.write(lockPath, 'lock me');
+  const holder = Bun.spawn(['powershell.exe', '-NoProfile', '-Command', `$f=[System.IO.File]::Open('${lockPath}','Open','Read','None'); Start-Sleep -Seconds 6; $f.Close()`]);
+  await Bun.sleep(2_500);
+  const holders = whoLocks([lockPath]);
+  check(
+    holders.some((row) => row.pid === holder.pid),
+    `locking pid ${holder.pid} named (${holders.map((row) => row.applicationName).join(', ')})`,
+  );
+  holder.kill();
+  await holder.exited;
+  await Bun.sleep(300);
+  check(
+    whoLocks([lockPath]).every((row) => row.pid !== holder.pid),
+    'holder gone after release',
+  );
+  (await import('node:fs')).unlinkSync(lockPath);
+});
+
+section('24 extras: sampleCounters (the one-shot PDH helper)', () => {
+  const processorPath = '\\Processor(_Total)\\% Processor Time';
+  const values = sampleCounters([processorPath], 200);
+  const processor = values[processorPath]!;
+  check(processor >= 0 && processor <= 100, `one-shot % Processor Time ${processor.toFixed(1)} in [0,100] (two-sample rule handled internally)`);
+});
+
+await section('25 extras: watch (the observe() answer)', async () => {
+  const controller = new AbortController();
+  setTimeout(() => controller.abort(), 1_000);
+  const cpuBefore = process.cpuUsage();
+  const count = await watch(memory, 1, () => {}, { signal: controller.signal });
+  const cpuAfter = process.cpuUsage(cpuBefore);
+  check(count >= 400, `watch(memory) @1 ms → ${count} samples/s at ${(((cpuAfter.user + cpuAfter.system) / 1_000_000) * 100).toFixed(1)}% CPU (si#626's 1 Hz pegged a core)`);
+});
+
+section('26 extras: handle/GDI/USER object counts', () => {
+  const counts = processObjectCounts(ownPid);
+  check(counts !== null && counts.handleCount > 20, `own handles ${counts?.handleCount}`);
+  const explorer = processes().find((row) => row.name.toLowerCase() === 'explorer.exe');
+  if (explorer === undefined) {
+    skip('explorer.exe not running');
+    return;
+  }
+  const explorerCounts = processObjectCounts(explorer.pid);
+  check(explorerCounts !== null && explorerCounts.gdiObjects > 0 && explorerCounts.userObjects > 0, `explorer GDI ${explorerCounts?.gdiObjects} / USER ${explorerCounts?.userObjects}`);
 });
 
 console.log(
