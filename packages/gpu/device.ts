@@ -5,13 +5,19 @@ import { FFIType } from 'bun:ffi';
 import D3d11 from '@bun-win32/d3d11';
 import { D3D11_SDK_VERSION, D3D_DRIVER_TYPE } from '@bun-win32/d3d11';
 
-import { comRelease, guidBytes, vcall } from './com';
+import { comRelease, guidBytes, hex, vcall } from './com';
 import {
   D3D11_CREATE_DEVICE_BGRA_SUPPORT,
   D3D_FEATURE_LEVEL_11_0,
   DEV_CREATE_RENDER_TARGET_VIEW,
+  DEV_GET_DEVICE_REMOVED_REASON,
   DXGIADAPTER_GET_DESC,
   DXGIDEVICE_GET_ADAPTER,
+  DXGI_ERROR_DEVICE_HUNG,
+  DXGI_ERROR_DEVICE_REMOVED,
+  DXGI_ERROR_DEVICE_RESET,
+  DXGI_ERROR_DRIVER_INTERNAL_ERROR,
+  DXGI_ERROR_INVALID_CALL,
   DXGI_FORMAT_B8G8R8A8_UNORM,
   DXGI_SWAP_EFFECT_DISCARD,
   DXGI_USAGE_RENDER_TARGET_OUTPUT,
@@ -83,7 +89,6 @@ let activeGpu: Gpu | null = null;
  * Gpu becomes the engine's active target for all helper functions.
  */
 export function createDevice(hwnd: bigint, size: { width: number; height: number }, options: CreateDeviceOptions = {}): Gpu {
-  D3d11.Preload(['D3D11CreateDeviceAndSwapChain']);
   const order: readonly D3D_DRIVER_TYPE[] =
     options.driver === 'warp' ? [D3D_DRIVER_TYPE.D3D_DRIVER_TYPE_WARP] : options.driver === 'hardware' ? [D3D_DRIVER_TYPE.D3D_DRIVER_TYPE_HARDWARE] : [D3D_DRIVER_TYPE.D3D_DRIVER_TYPE_HARDWARE, D3D_DRIVER_TYPE.D3D_DRIVER_TYPE_WARP];
   let created: { swap: bigint; device: bigint; context: bigint } | null = null;
@@ -139,7 +144,6 @@ export function createDevice(hwnd: bigint, size: { width: number; height: number
  * partial Gpu (swapChain/backBufferRTV are 0; present/recreateRTV throw).
  */
 export function createComputeDevice(options: CreateDeviceOptions = {}): Gpu {
-  D3d11.Preload(['D3D11CreateDevice']);
   const featureLevels = Buffer.alloc(4);
   featureLevels.writeUInt32LE(D3D_FEATURE_LEVEL_11_0, 0);
 
@@ -185,6 +189,23 @@ export function createComputeDevice(options: CreateDeviceOptions = {}): Gpu {
   return gpu;
 }
 
+/**
+ * Format a D3D11/DXGI HRESULT for humans. Device-loss codes get the removed
+ * reason (when a device is active) plus the TDR-watchdog explanation — Windows
+ * kills any GPU kernel that runs longer than ~2 s and resets the driver.
+ */
+export function describeDeviceError(hr: number): string {
+  const code = hr >>> 0;
+  if (code === DXGI_ERROR_DEVICE_REMOVED || code === DXGI_ERROR_DEVICE_RESET || code === DXGI_ERROR_DEVICE_HUNG) {
+    const name = code === DXGI_ERROR_DEVICE_REMOVED ? 'DXGI_ERROR_DEVICE_REMOVED' : code === DXGI_ERROR_DEVICE_RESET ? 'DXGI_ERROR_DEVICE_RESET' : 'DXGI_ERROR_DEVICE_HUNG';
+    const reason = activeGpu === null ? '' : ` GetDeviceRemovedReason=${hex(getDeviceRemovedReason())}.`;
+    return `${hex(code)} ${name}.${reason} The GPU device was removed or reset — on Windows this is usually the TDR watchdog killing a kernel that ran longer than ~2 s. Split long dispatches into smaller chunks, or reduce the per-dispatch workload.`;
+  }
+  if (code === DXGI_ERROR_INVALID_CALL) return `${hex(code)} DXGI_ERROR_INVALID_CALL. A parameter or call ordering is invalid — enable the D3D11 debug layer to see the validation message.`;
+  if (code === DXGI_ERROR_DRIVER_INTERNAL_ERROR) return `${hex(code)} DXGI_ERROR_DRIVER_INTERNAL_ERROR. The driver hit an internal error — usually recoverable only by recreating the device.`;
+  return hex(code);
+}
+
 /** Release the active device's RTV/swap chain/context/device (reverse creation order) and clear the active state. */
 export function destroyDevice(): void {
   if (activeGpu === null) return;
@@ -193,6 +214,11 @@ export function destroyDevice(): void {
   comRelease(activeGpu.context);
   comRelease(activeGpu.device);
   activeGpu = null;
+}
+
+/** ID3D11Device::GetDeviceRemovedReason on the active device — 0 while healthy, a DXGI_ERROR_* code after device loss. */
+export function getDeviceRemovedReason(): number {
+  return vcall(requireGpu().device, DEV_GET_DEVICE_REMOVED_REASON, [], []);
 }
 
 /** True when an active device exists (createDevice/createComputeDevice succeeded and destroyDevice has not run). */

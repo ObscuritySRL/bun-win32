@@ -1,6 +1,8 @@
+export { makeConstantBuffer, makeStructuredBuffer, readbackBuffer, updateConstantBuffer, updateDynamicBuffer } from './buffer';
+export type { StructuredBuffer, StructuredBufferOptions } from './buffer';
 export { blobRelease, comRelease, guidBytes, hex, vcall } from './com';
 export * from './constants';
-export { createComputeDevice, createDevice, destroyDevice, hasDevice, requireGpu } from './device';
+export { createComputeDevice, createDevice, describeDeviceError, destroyDevice, getDeviceRemovedReason, hasDevice, requireGpu } from './device';
 export type { CreateDeviceOptions, Gpu } from './device';
 export { compile, disassemble, makeComputeShader, makePixelShader, makeVertexShader, preprocessHLSL } from './shader';
 export type { CompileOptions, CompiledShader } from './shader';
