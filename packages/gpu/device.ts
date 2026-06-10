@@ -1,10 +1,11 @@
 // D3D11 device + DXGI swap-chain creation with hardware → WARP fallback, and the engine's active-device state.
 
-import { FFIType } from 'bun:ffi';
+import { FFIType, type Pointer } from 'bun:ffi';
 
 import D3d11 from '@bun-win32/d3d11';
 import { D3D11_SDK_VERSION, D3D_DRIVER_TYPE } from '@bun-win32/d3d11';
 
+import { openAdapter } from './adapter';
 import { comRelease, guidBytes, hex, vcall } from './com';
 import { reportLeaksAndReset } from './memory';
 import {
@@ -45,6 +46,8 @@ export interface Gpu {
 }
 
 export interface CreateDeviceOptions {
+  /** Pin device creation to a specific DXGI adapter (listAdapters() index). Takes precedence over `driver` — D3D11 requires DRIVER_TYPE_UNKNOWN with an explicit adapter. */
+  adapter?: number;
   /** Pin the driver type; default tries hardware first, then falls back to WARP. */
   driver?: 'hardware' | 'warp';
 }
@@ -148,24 +151,44 @@ export function createComputeDevice(options: CreateDeviceOptions = {}): Gpu {
   const featureLevels = Buffer.alloc(4);
   featureLevels.writeUInt32LE(D3D_FEATURE_LEVEL_11_0, 0);
 
-  function tryCreate(driverType: D3D_DRIVER_TYPE): { device: bigint; context: bigint } | null {
+  function tryCreate(driverType: D3D_DRIVER_TYPE, adapterPointer = 0n): { device: bigint; context: bigint } | null {
     const ppDevice = Buffer.alloc(8);
     const pFeatureLevel = Buffer.alloc(4);
     const ppContext = Buffer.alloc(8);
-    const hr = D3d11.D3D11CreateDevice(null, driverType, 0n, D3D11_CREATE_DEVICE_BGRA_SUPPORT, featureLevels.ptr!, 1, D3D11_SDK_VERSION, ppDevice.ptr!, pFeatureLevel.ptr!, ppContext.ptr!);
+    const hr = D3d11.D3D11CreateDevice(
+      adapterPointer === 0n ? null : (Number(adapterPointer) as Pointer),
+      driverType,
+      0n,
+      D3D11_CREATE_DEVICE_BGRA_SUPPORT,
+      featureLevels.ptr!,
+      1,
+      D3D11_SDK_VERSION,
+      ppDevice.ptr!,
+      pFeatureLevel.ptr!,
+      ppContext.ptr!,
+    );
     if (hr !== 0) return null;
     return { device: ppDevice.readBigUInt64LE(0), context: ppContext.readBigUInt64LE(0) };
   }
 
-  const order: readonly D3D_DRIVER_TYPE[] =
-    options.driver === 'warp' ? [D3D_DRIVER_TYPE.D3D_DRIVER_TYPE_WARP] : options.driver === 'hardware' ? [D3D_DRIVER_TYPE.D3D_DRIVER_TYPE_HARDWARE] : [D3D_DRIVER_TYPE.D3D_DRIVER_TYPE_HARDWARE, D3D_DRIVER_TYPE.D3D_DRIVER_TYPE_WARP];
   let created: { device: bigint; context: bigint } | null = null;
   let driver: 'hardware' | 'WARP' = 'hardware';
-  for (const driverType of order) {
-    created = tryCreate(driverType);
-    if (created !== null) {
-      driver = driverType === D3D_DRIVER_TYPE.D3D_DRIVER_TYPE_WARP ? 'WARP' : 'hardware';
-      break;
+  if (options.adapter !== undefined) {
+    const adapterPointer = openAdapter(options.adapter);
+    created = tryCreate(D3D_DRIVER_TYPE.D3D_DRIVER_TYPE_UNKNOWN, adapterPointer);
+    comRelease(adapterPointer);
+    if (created === null) throw new Error(`D3D11CreateDevice failed on adapter ${options.adapter} (DRIVER_TYPE_UNKNOWN).`);
+    const name = readGpuName(created.device, 'adapter');
+    driver = name.includes('Basic Render Driver') ? 'WARP' : 'hardware';
+  } else {
+    const order: readonly D3D_DRIVER_TYPE[] =
+      options.driver === 'warp' ? [D3D_DRIVER_TYPE.D3D_DRIVER_TYPE_WARP] : options.driver === 'hardware' ? [D3D_DRIVER_TYPE.D3D_DRIVER_TYPE_HARDWARE] : [D3D_DRIVER_TYPE.D3D_DRIVER_TYPE_HARDWARE, D3D_DRIVER_TYPE.D3D_DRIVER_TYPE_WARP];
+    for (const driverType of order) {
+      created = tryCreate(driverType);
+      if (created !== null) {
+        driver = driverType === D3D_DRIVER_TYPE.D3D_DRIVER_TYPE_WARP ? 'WARP' : 'hardware';
+        break;
+      }
     }
   }
   if (created === null) {

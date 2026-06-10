@@ -1,4 +1,4 @@
-export { listAdapters } from './adapter';
+export { listAdapters, openAdapter } from './adapter';
 export type { AdapterInfo } from './adapter';
 export { appendCount, makeConstantBuffer, makeStructuredBuffer, readbackBuffer, readbackBufferAsync, updateConstantBuffer, updateDynamicBuffer } from './buffer';
 export type { StructuredBuffer, StructuredBufferOptions } from './buffer';

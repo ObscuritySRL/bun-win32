@@ -20,6 +20,20 @@ export interface AdapterInfo {
   vendorId: number;
 }
 
+/** Open IDXGIAdapter1 #index (EnumAdapters1 order — match against listAdapters()). Caller owns the returned COM pointer: comRelease it. */
+export function openAdapter(index: number): bigint {
+  const iid = guidBytes(IID_IDXGIFACTORY1);
+  const ppFactory = Buffer.alloc(8);
+  const hr = Dxgi.CreateDXGIFactory1(iid.ptr!, ppFactory.ptr!);
+  if (hr !== 0) throw new Error(`CreateDXGIFactory1 failed ${hex(hr)}.`);
+  const factory = ppFactory.readBigUInt64LE(0);
+  const ppAdapter = Buffer.alloc(8);
+  const enumHr = vcall(factory, DXGIFACTORY1_ENUM_ADAPTERS1, [FFIType.u32, FFIType.ptr], [index, ppAdapter.ptr!]);
+  comRelease(factory);
+  if (enumHr !== 0) throw new Error(`EnumAdapters1(${index}) failed ${hex(enumHr)} — run listAdapters() to see the valid indices.`);
+  return ppAdapter.readBigUInt64LE(0);
+}
+
 /**
  * Enumerate DXGI adapters in DXGI order (hardware first, WARP — "Microsoft Basic
  * Render Driver" — last). https://learn.microsoft.com/en-us/windows/win32/api/dxgi/nf-dxgi-idxgifactory1-enumadapters1

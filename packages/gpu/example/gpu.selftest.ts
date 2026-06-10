@@ -22,12 +22,18 @@
  *
  * Run: bun run example/gpu.selftest.ts
  */
+import { FFIType } from 'bun:ffi';
+
 import {
   type CreateDeviceOptions,
+  DXGIADAPTER_GET_DESC,
+  DXGIDEVICE_GET_ADAPTER,
   DXGI_ERROR_DEVICE_HUNG,
   DXGI_ERROR_DEVICE_REMOVED,
   DXGI_ERROR_DEVICE_RESET,
   GpuArray,
+  IID_IDXGIDEVICE,
+  IUNKNOWN_QUERY_INTERFACE,
   Kernel,
   appendCount,
   captureBackBuffer,
@@ -48,6 +54,7 @@ import {
   drawTriangles,
   getDeviceRemovedReason,
   gpuMemory,
+  guidBytes,
   listAdapters,
   makeComputeShader,
   makeConstantBuffer,
@@ -67,6 +74,7 @@ import {
   setRenderTargetsWithDepth,
   setViewport,
   textureFromPixels,
+  vcall,
   vsSet,
 } from '@bun-win32/gpu';
 
@@ -578,6 +586,40 @@ function runSections(label: string, options: CreateDeviceOptions): void {
     comRelease(kept.buffer);
     comRelease(source.srv!);
     comRelease(source.buffer);
+  }
+
+  {
+    const adapters = listAdapters();
+    const warpIndex = adapters.findIndex((adapter) => adapter.description.includes('Basic Render Driver'));
+    if (warpIndex === -1) {
+      check(tag('26 adapter-pinned'), false, 'no WARP adapter in the census');
+    } else {
+      destroyDevice();
+      const pinned = createComputeDevice({ adapter: warpIndex });
+      // Verify the live device sits on the requested adapter by LUID, via the raw COM escape hatch.
+      const ppDxgiDevice = Buffer.alloc(8);
+      const iid = guidBytes(IID_IDXGIDEVICE);
+      let luidMatch = false;
+      if (vcall(pinned.device, IUNKNOWN_QUERY_INTERFACE, [FFIType.ptr, FFIType.ptr], [iid.ptr!, ppDxgiDevice.ptr!]) === 0) {
+        const dxgiDevice = ppDxgiDevice.readBigUInt64LE(0);
+        const ppAdapter = Buffer.alloc(8);
+        if (vcall(dxgiDevice, DXGIDEVICE_GET_ADAPTER, [FFIType.ptr], [ppAdapter.ptr!]) === 0) {
+          const adapterPointer = ppAdapter.readBigUInt64LE(0);
+          const desc = Buffer.alloc(312);
+          if (vcall(adapterPointer, DXGIADAPTER_GET_DESC, [FFIType.ptr], [desc.ptr!]) === 0) {
+            luidMatch = desc.readUInt32LE(296) === adapters[warpIndex]!.luidLowPart && desc.readInt32LE(300) === adapters[warpIndex]!.luidHighPart;
+          }
+          comRelease(adapterPointer);
+        }
+        comRelease(dxgiDevice);
+      }
+      check(tag('26 adapter-pinned-luid'), luidMatch, `device created on adapter[${warpIndex}] — GetAdapter→GetDesc LUID matches the census (${adapters[warpIndex]!.description})`);
+      const canary = new Float32Array([4, 9]);
+      run('RWStructuredBuffer<float> data : register(u0);\n[numthreads(64,1,1)] void main(uint3 id : SV_DispatchThreadID) { data[id.x] = sqrt(data[id.x]); }', { data: canary });
+      check(tag('26 adapter-pinned-canary'), canary[0] === 2 && canary[1] === 3 && pinned.driver === 'WARP', `canary kernel ran on ${pinned.gpuName} (driver=${pinned.driver})`);
+      destroyDevice();
+      createComputeDevice(options);
+    }
   }
 
   {
