@@ -2,7 +2,7 @@
 
 import { FFIType } from 'bun:ffi';
 
-import { vcall } from './com';
+import { setComReleaseHook, vcall } from './com';
 import {
   CTX_CLEAR_RENDER_TARGET_VIEW,
   CTX_COPY_RESOURCE,
@@ -33,7 +33,7 @@ import {
   DEV_CREATE_BLEND_STATE,
   DEV_CREATE_SAMPLER_STATE,
 } from './constants';
-import { requireGpu } from './device';
+import { describeDeviceError, requireGpu } from './device';
 
 // Per-call scratch, allocated once — binding/state setters run in per-frame and
 // per-dispatch loops where a Buffer.alloc costs ~1 us (perf doctrine). `.ptr` is
@@ -46,6 +46,45 @@ const factorScratch = Buffer.alloc(16);
 const handleScratch = Buffer.alloc(8 * 128);
 const secondaryHandleScratch = Buffer.alloc(8 * 128);
 const viewportScratch = Buffer.alloc(24);
+
+// CS bind cache (depth 1): skip re-issuing byte-identical compute binds — the D3D11
+// runtime runs hazard tracking on every UAV bind (~200 ns measured), so redundant
+// sets are NOT cheap. Outputs win in D3D11 hazard resolution: an issued UAV bind can
+// null a conflicting CS SRV, so issuing UAVs invalidates the SRV cache; graphics-side
+// setters invalidate the whole cache; comRelease invalidates on a cached handle's
+// release (a new object can land on the same address — an elided rebind would leave
+// a dead object bound).
+let csCacheDevice = 0n;
+let csCacheShader = -1n;
+const csCacheCb: bigint[] = [];
+const csCacheSrv: bigint[] = [];
+const csCacheUav: bigint[] = [];
+let csCacheCbValid = false;
+let csCacheSrvValid = false;
+let csCacheUavValid = false;
+
+setComReleaseHook((handle) => {
+  if (handle === csCacheShader || csCacheCb.includes(handle) || csCacheSrv.includes(handle) || csCacheUav.includes(handle)) invalidateCsCache();
+});
+
+function cacheHandles(incoming: readonly bigint[], cached: bigint[]): void {
+  cached.length = incoming.length;
+  for (let index = 0; index < incoming.length; index += 1) cached[index] = incoming[index];
+}
+
+function sameHandles(incoming: readonly bigint[], cached: bigint[], valid: boolean): boolean {
+  if (!valid || incoming.length !== cached.length) return false;
+  for (let index = 0; index < incoming.length; index += 1) if (incoming[index] !== cached[index]) return false;
+  return true;
+}
+
+/** Drop the compute-bind elision cache — the next csSet re-issues everything. Raw vcall(context, CTX_CS_*) users must call this; destroyDevice does. */
+export function invalidateCsCache(): void {
+  csCacheShader = -1n;
+  csCacheCbValid = false;
+  csCacheSrvValid = false;
+  csCacheUavValid = false;
+}
 
 export interface PsBindings {
   cb?: readonly bigint[];
@@ -90,28 +129,43 @@ export function copyStructureCount(targetBuffer: bigint, alignedByteOffset: numb
   vcall(context, CTX_COPY_STRUCTURE_COUNT, [FFIType.u64, FFIType.u32, FFIType.u64], [targetBuffer, alignedByteOffset, uav], FFIType.void);
 }
 
-/** Bind the compute shader plus optional constant buffers, UAVs, and SRVs. */
+/** Bind the compute shader plus optional constant buffers, UAVs, and SRVs. Byte-identical re-binds are elided (see invalidateCsCache). */
 export function csSet(shader: bigint, bindings: CsBindings = {}): void {
-  const { context } = requireGpu();
-  vcall(context, CTX_CS_SET_SHADER, [FFIType.u64, FFIType.ptr, FFIType.u32], [shader, null, 0], FFIType.void);
-  if (bindings.cb && bindings.cb.length > 0) {
-    bindings.cb.forEach((c, i) => handleScratch.writeBigUInt64LE(c, i * 8));
-    vcall(context, CTX_CS_SET_CONSTANT_BUFFERS, [FFIType.u32, FFIType.u32, FFIType.ptr], [0, bindings.cb.length, handleScratch.ptr!], FFIType.void);
+  const { device, context } = requireGpu();
+  if (csCacheDevice !== device) {
+    invalidateCsCache();
+    csCacheDevice = device;
   }
-  if (bindings.uav && bindings.uav.length > 0) {
-    bindings.uav.forEach((u, i) => handleScratch.writeBigUInt64LE(u, i * 8));
+  if (shader !== csCacheShader) {
+    vcall(context, CTX_CS_SET_SHADER, [FFIType.u64, FFIType.ptr, FFIType.u32], [shader, null, 0], FFIType.void);
+    csCacheShader = shader;
+  }
+  if (bindings.cb && bindings.cb.length > 0 && !sameHandles(bindings.cb, csCacheCb, csCacheCbValid)) {
+    for (let index = 0; index < bindings.cb.length; index += 1) handleScratch.writeBigUInt64LE(bindings.cb[index], index * 8);
+    vcall(context, CTX_CS_SET_CONSTANT_BUFFERS, [FFIType.u32, FFIType.u32, FFIType.ptr], [0, bindings.cb.length, handleScratch.ptr!], FFIType.void);
+    cacheHandles(bindings.cb, csCacheCb);
+    csCacheCbValid = true;
+  }
+  if (bindings.uav && bindings.uav.length > 0 && (bindings.uavInitialCounts !== undefined || !sameHandles(bindings.uav, csCacheUav, csCacheUavValid))) {
+    for (let index = 0; index < bindings.uav.length; index += 1) handleScratch.writeBigUInt64LE(bindings.uav[index], index * 8);
     let counts = false;
     if (bindings.uavInitialCounts !== undefined) {
       if (bindings.uavInitialCounts.length !== bindings.uav.length) throw new Error(`csSet: uavInitialCounts has ${bindings.uavInitialCounts.length} entries but uav has ${bindings.uav.length}.`);
-      bindings.uavInitialCounts.forEach((count, i) => countScratch.writeInt32LE(count, i * 4));
+      for (let index = 0; index < bindings.uavInitialCounts.length; index += 1) countScratch.writeInt32LE(bindings.uavInitialCounts[index], index * 4);
       counts = true;
     }
     // CSSetUnorderedAccessViews: StartSlot, NumUAVs, ppUAVs, pUAVInitialCounts.
+    // Passing counts resets append counters — a side effect that must always re-issue.
     vcall(context, CTX_CS_SET_UNORDERED_ACCESS_VIEWS, [FFIType.u32, FFIType.u32, FFIType.ptr, FFIType.ptr], [0, bindings.uav.length, handleScratch.ptr!, counts ? countScratch.ptr! : null], FFIType.void);
+    cacheHandles(bindings.uav, csCacheUav);
+    csCacheUavValid = true;
+    csCacheSrvValid = false; // the UAV bind may have nulled a conflicting CS SRV slot
   }
-  if (bindings.srv && bindings.srv.length > 0) {
-    bindings.srv.forEach((s, i) => secondaryHandleScratch.writeBigUInt64LE(s, i * 8));
+  if (bindings.srv && bindings.srv.length > 0 && !sameHandles(bindings.srv, csCacheSrv, csCacheSrvValid)) {
+    for (let index = 0; index < bindings.srv.length; index += 1) secondaryHandleScratch.writeBigUInt64LE(bindings.srv[index], index * 8);
     vcall(context, CTX_CS_SET_SHADER_RESOURCES, [FFIType.u32, FFIType.u32, FFIType.ptr], [0, bindings.srv.length, secondaryHandleScratch.ptr!], FFIType.void);
+    cacheHandles(bindings.srv, csCacheSrv);
+    csCacheSrvValid = true;
   }
 }
 
@@ -174,9 +228,8 @@ export function makeAdditiveBlendState(premultiplied = true): bigint {
   desc.writeUInt32LE(D3D11_BLEND_OP_ADD, rt + 24); // BlendOpAlpha
   desc.writeUInt32LE(0x0f, rt + 28); // RenderTargetWriteMask = ALL
   const pp = Buffer.alloc(8);
-  if (vcall(device, DEV_CREATE_BLEND_STATE, [FFIType.ptr, FFIType.ptr], [desc.ptr!, pp.ptr!]) !== 0) {
-    throw new Error('CreateBlendState failed.');
-  }
+  const hr = vcall(device, DEV_CREATE_BLEND_STATE, [FFIType.ptr, FFIType.ptr], [desc.ptr!, pp.ptr!]);
+  if (hr !== 0) throw new Error(`CreateBlendState failed: ${describeDeviceError(hr)}`);
   return pp.readBigUInt64LE(0);
 }
 
@@ -201,9 +254,8 @@ export function makeSampler(options: SamplerOptions = {}): bigint {
   desc.writeFloatLE(-3.4e38, 44); // MinLOD
   desc.writeFloatLE(3.4e38, 48); // MaxLOD
   const pp = Buffer.alloc(8);
-  if (vcall(device, DEV_CREATE_SAMPLER_STATE, [FFIType.ptr, FFIType.ptr], [desc.ptr!, pp.ptr!]) !== 0) {
-    throw new Error('CreateSamplerState failed.');
-  }
+  const hr = vcall(device, DEV_CREATE_SAMPLER_STATE, [FFIType.ptr, FFIType.ptr], [desc.ptr!, pp.ptr!]);
+  if (hr !== 0) throw new Error(`CreateSamplerState failed: ${describeDeviceError(hr)}`);
   return pp.readBigUInt64LE(0);
 }
 
@@ -220,6 +272,7 @@ export function setBlendState(blendState: bigint, blendFactor: readonly [number,
 /** Bind render targets (OMSetRenderTargets). Pass [] to unbind. */
 export function setRenderTargets(rtvs: readonly bigint[]): void {
   const { context } = requireGpu();
+  invalidateCsCache(); // an OM output bind can null conflicting CS SRVs (outputs win)
   if (rtvs.length === 0) {
     vcall(context, CTX_OM_SET_RENDER_TARGETS, [FFIType.u32, FFIType.ptr, FFIType.u64], [0, null, 0n], FFIType.void);
     return;

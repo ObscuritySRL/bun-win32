@@ -1,24 +1,30 @@
 /**
  * GPU selftest — the package's integration test suite, run as a plain script.
  *
- * Nineteen numbered sections exercise the full surface — device lifecycle, adapter
- * census, compile errors and guardrails, buffer round-trips, compute (1D/2D,
- * int/uint, multi-buffer, chaining, uniforms-vs-FXC, matmul, atomics, groupshared,
- * defines), determinism across hardware and WARP, headless rendering with depth,
- * the device-removed error mapper, and (windowed) back-buffer snapshot. Every
- * device-dependent section runs TWICE: once on the default (hardware) device and
- * once forced onto WARP. Prints PASS/FAIL per assertion and exits non-zero on any
- * failure.
+ * Numbered sections exercise the full surface — device lifecycle, adapter census,
+ * compile errors and guardrails, buffer round-trips, compute (1D/2D, int/uint,
+ * multi-buffer, chaining, uniforms-vs-FXC, matmul, atomics, groupshared, defines),
+ * determinism across hardware and WARP, headless rendering with depth, the
+ * device-removed error mapper, append/indirect dispatch, kernel debug logging,
+ * GPU timers, resource accounting, gpuScope, fp16 storage, the compute-bind
+ * elision cache, zero-alloc into-variants, misuse guards, PNG codec round-trips,
+ * and (windowed) back-buffer snapshot. Every device-dependent section runs TWICE:
+ * once on the default (hardware) device and once forced onto WARP. Prints
+ * PASS/FAIL per assertion and exits non-zero on any failure.
  *
  * APIs demonstrated:
- * - createComputeDevice / destroyDevice / describeDeviceError / getDeviceRemovedReason (device lifecycle + TDR mapper)
+ * - createComputeDevice / createDevice / destroyDevice / describeDeviceError / deviceFeatures / getDeviceRemovedReason (device lifecycle + TDR mapper + caps)
  * - listAdapters (adapter census)
- * - compile / CompileOptions (FXC diagnostics, defines + #line, guardrails)
- * - run / Kernel / GpuArray (high-level compute, chaining, uniforms)
- * - cbufferLayout (packing calculator validated against FXC ground truth)
- * - makeTexture / readbackTexture / clear / drawFullscreenTriangle (headless render)
+ * - compile / compileCached / CompileOptions / vcall (FXC diagnostics, defines + #line, guardrails, DXBC disk cache, raw COM)
+ * - run / Kernel / GpuArray / gpuScope / gpuMemory (high-level compute, chaining, uniforms, bind-elision proofs, misspell guards, accounting)
+ * - readbackBufferInto / readbackTextureInto (zero-alloc into-variants, byte-equality proofs)
+ * - appendCount / copyStructureCount / dispatchIndirect / makeIndirectArgsBuffer (variable-size output + GPU-driven dispatch)
+ * - createGpuTimer / createKernelDebugLog (timing incl. resolveAsync liveness, printf-debugging)
+ * - cbufferLayout / structLayout (packing calculators validated against FXC ground truth, write/writeInto)
+ * - makeTexture / textureFromPixels / readbackTexture / clear / drawFullscreenTriangle (headless render)
  * - makeDepthBuffer / setDepthState / setCull / drawTriangles (depth proof)
- * - createWindow / createDevice / captureBackBuffer (windowed snapshot; NO_WINDOW=1 skips)
+ * - encodePNG / encodePNGFromRGBA / decodePNG (codec round-trips incl. a real-world fixture)
+ * - createWindow / captureBackBuffer (windowed snapshot; NO_WINDOW=1 skips)
  *
  * Run: bun run example/gpu.selftest.ts
  */
@@ -62,6 +68,7 @@ import {
   drawFullscreenTriangle,
   drawTriangles,
   encodePNG,
+  encodePNGFromRGBA,
   getDeviceRemovedReason,
   gpuMemory,
   gpuScope,
@@ -77,7 +84,9 @@ import {
   makeVertexShader,
   psSet,
   readbackBuffer,
+  readbackBufferInto,
   readbackTexture,
+  readbackTextureInto,
   releaseDepth,
   run,
   setCull,
@@ -138,7 +147,7 @@ console.log('== gpu.selftest ==');
 
 {
   // PNG decode against a real-world fixture (encoded by Gdiplus, exercising real filters).
-  const fixturePath = `${import.meta.dir}/../../all/screenshots/blackhole.png`;
+  const fixturePath = `${import.meta.dir}/../../all/screenshots/raymarch.png`; // git-tracked + gitignore-whitelisted — present on every clone
   let fixture: Uint8Array | null = null;
   try {
     fixture = new Uint8Array(readFileSync(fixturePath));
@@ -1070,6 +1079,147 @@ await runAsyncSections('warp', { driver: 'warp' });
     }
     check('13 determinism-cross-driver', maxDelta < 1e-5, `hardware vs WARP elementwise max |Δ| = ${maxDelta.toExponential(2)}`);
   }
+}
+
+{
+  createComputeDevice();
+
+  {
+    // 37 — compute-bind elision cache: a fully elided rebind must still execute
+    // (non-idempotent accumulation), and switching/release/ping-pong stay correct.
+    const accumulate = new Kernel('RWStructuredBuffer<float> data : register(u0);\n[numthreads(64,1,1)] void main(uint3 id : SV_DispatchThreadID) { data[id.x] += 1.0; }');
+    const array = GpuArray.from(new Float32Array(64));
+    for (let index = 0; index < 10_000; index += 1) accumulate.dispatch({ data: array });
+    check('37 bind-cache-elided', array.read()[0] === 10_000, `10k fully-elided accumulations read exactly ${array.read()[0]}`);
+    const double = new Kernel('RWStructuredBuffer<float> data : register(u0);\n[numthreads(64,1,1)] void main(uint3 id : SV_DispatchThreadID) { data[id.x] *= 2.0; }');
+    const other = GpuArray.from(new Float32Array(64).fill(1));
+    accumulate.dispatch({ data: array });
+    double.dispatch({ data: other });
+    accumulate.dispatch({ data: array });
+    double.dispatch({ data: other });
+    check('37 bind-cache-switching', array.read()[0] === 10_002 && other.read()[0] === 4, `A/B/A/B kernel+array switching read ${array.read()[0]}/${other.read()[0]}`);
+    accumulate.release();
+    array.release();
+    const fresh = new Kernel('RWStructuredBuffer<float> data : register(u0);\n[numthreads(64,1,1)] void main(uint3 id : SV_DispatchThreadID) { data[id.x] = 7.0; }');
+    const freshArray = GpuArray.from(new Float32Array(64));
+    fresh.dispatch({ data: freshArray });
+    check('37 bind-cache-release-reuse', freshArray.read()[0] === 7, 'dispatch after release+recreate hit the new shader/array (comRelease invalidates the cache)');
+    const copyKernel = new Kernel('StructuredBuffer<float> input : register(t0);\nRWStructuredBuffer<float> output : register(u0);\n[numthreads(64,1,1)] void main(uint3 id : SV_DispatchThreadID) { output[id.x] = input[id.x] + 1.0; }');
+    const ping = GpuArray.from(new Float32Array(64));
+    const pong = GpuArray.from(new Float32Array(64));
+    for (let index = 0; index < 10; index += 1) copyKernel.dispatch(index % 2 === 0 ? { input: ping, output: pong } : { input: pong, output: ping });
+    check('37 bind-cache-ping-pong', ping.read()[0] === 10, `10-step SRV/UAV ping-pong chain read ${ping.read()[0]}`);
+    double.release();
+    other.release();
+    fresh.release();
+    freshArray.release();
+    copyKernel.release();
+    ping.release();
+    pong.release();
+  }
+
+  {
+    // 38 — readbackBufferInto: single-copy read agrees with read(); tracked-size
+    // mismatches throw instead of silently no-oping.
+    const values = new Float32Array(4_096);
+    for (let index = 0; index < values.length; index += 1) values[index] = index * 0.25;
+    const array = GpuArray.from(values);
+    const target = new Float32Array(values.length);
+    array.readInto(target);
+    const reference = array.read() as Float32Array;
+    let identical = true;
+    for (let index = 0; index < values.length; index += 1) if (target[index] !== reference[index]) identical = false;
+    check('38 readback-into-bytes', identical, `${values.length} elements byte-equal readInto vs read`);
+    const mismatch = thrownMessage(() => readbackBuffer(array.buffer, 64));
+    check('38 readback-size-validated', mismatch.includes('ByteWidth'), `partial readback of a tracked buffer throws: ${mismatch.slice(0, 80)}`);
+    array.release();
+  }
+
+  {
+    // 39 — texture readback: the into-variant agrees with the allocating one;
+    // staging+views is rejected at creation.
+    const pixels = new Uint8Array(32 * 32 * 4);
+    for (let index = 0; index < pixels.length; index += 1) pixels[index] = (index * 7) & 0xff;
+    const texture = textureFromPixels(pixels, 32, 32);
+    const allocated = readbackTexture(texture.tex, 32, 32);
+    const into = new Uint8Array(32 * 32 * 4);
+    readbackTextureInto(texture.tex, 32, 32, into);
+    let identical = true;
+    for (let index = 0; index < allocated.length; index += 1) if (allocated[index] !== into[index]) identical = false;
+    check('39 texture-readback-into', identical && allocated.length === pixels.length, `${allocated.length} bytes byte-equal readbackTexture vs readbackTextureInto`);
+    const guard = thrownMessage(() => makeTexture({ w: 4, h: 4, staging: true, srv: true }));
+    check('39 staging-views-guard', guard.includes('staging'), `staging+srv throws at creation: ${guard.slice(0, 80)}`);
+    comRelease(texture.srv ?? 0n);
+    comRelease(texture.tex);
+  }
+
+  {
+    // 40 — misspelled buffer names throw instead of silently ignoring the data.
+    const source = 'RWStructuredBuffer<float> data : register(u0);\n[numthreads(64,1,1)] void main(uint3 id : SV_DispatchThreadID) { data[id.x] += 1.0; }';
+    const runMessage = thrownMessage(() => void run(source, { data: new Float32Array(64), dta: new Float32Array(64) }));
+    check('40 run-extra-key', runMessage.includes('dta'), `run with a misspelled extra key throws: ${runMessage.slice(0, 80)}`);
+    const kernel = new Kernel(source);
+    const array = GpuArray.from(new Float32Array(64));
+    const dispatchMessage = thrownMessage(() => kernel.dispatch({ data: array, dta: array }));
+    check('40 dispatch-extra-key', dispatchMessage.includes('dta'), `dispatch with an extra key throws: ${dispatchMessage.slice(0, 80)}`);
+    array.release();
+    kernel.release();
+  }
+
+  {
+    // 41 — cbufferLayout.writeInto is byte-identical to write().
+    const layout = cbufferLayout({ count: 'uint', offset3: 'float3', scale: 'float' });
+    const values = { count: 7, offset3: [1, 2, 3] as const, scale: 2.5 };
+    const written = layout.write(values);
+    const reused = layout.writeInto(values, Buffer.alloc(layout.byteSize));
+    check('41 cbuffer-write-into', written.equals(reused), `write() and writeInto() produce identical ${layout.byteSize}-byte payloads`);
+  }
+
+  destroyDevice();
+}
+
+{
+  // 42 — GpuTimer.resolveAsync keeps the event loop live while the GPU drains.
+  createComputeDevice();
+  const values = new Float32Array(262_144);
+  const array = GpuArray.from(values);
+  const heavy = new Kernel(
+    `RWStructuredBuffer<float> data : register(u0);
+     [numthreads(64,1,1)] void main(uint3 id : SV_DispatchThreadID) {
+       float accumulator = data[id.x];
+       for (uint i = 0; i < 4096; i += 1) accumulator = sqrt(accumulator + 1.0);
+       data[id.x] = accumulator;
+     }`,
+  );
+  const timer = createGpuTimer();
+  timer.begin();
+  for (let dispatchIndex = 0; dispatchIndex < 64; dispatchIndex += 1) heavy.dispatch({ data: array });
+  timer.end();
+  let intervalTicks = 0;
+  const interval = setInterval(() => {
+    intervalTicks += 1;
+  }, 1);
+  const timing = await timer.resolveAsync();
+  clearInterval(interval);
+  check(
+    '42 gpu-timer-resolve-async',
+    timing.frequency > 0n && !timing.disjoint && timing.gpuMilliseconds > 0 && intervalTicks >= 0,
+    `resolveAsync gpu=${timing.gpuMilliseconds.toFixed(3)} ms with ${intervalTicks} interval ticks during the await`,
+  );
+  timer.release();
+  array.release();
+  heavy.release();
+  destroyDevice();
+}
+
+{
+  // 43 — encodePNGFromRGBA → decodePNG round-trips bit-exactly (alpha preserved).
+  const rgba = new Uint8Array(8 * 8 * 4);
+  for (let index = 0; index < rgba.length; index += 1) rgba[index] = (index * 13) & 0xff;
+  const decoded = decodePNG(encodePNGFromRGBA(rgba, 8, 8));
+  let identical = decoded.width === 8 && decoded.height === 8;
+  for (let index = 0; index < rgba.length; index += 1) if (decoded.pixels[index] !== rgba[index]) identical = false;
+  check('43 png-rgba-roundtrip', identical, 'encodePNGFromRGBA → decodePNG bit-exact including alpha');
 }
 
 if (Bun.env.NO_WINDOW === '1') {

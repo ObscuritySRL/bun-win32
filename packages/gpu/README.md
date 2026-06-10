@@ -82,15 +82,20 @@ Measured on an NVIDIA GeForce RTX 4090, Windows 11, Bun 1.4.0 — reproduce with
 
 | Metric | NVIDIA GeForce RTX 4090 (hardware) | Microsoft Basic Render Driver (WARP) |
 |---|---|---|
-| kernel compile (cold / warm) | 3.7 ms / 1.6 ms | 1.7 ms / 1.5 ms |
-| empty dispatch (avg of 1,000) | 5.5 µs | 3.1 µs |
-| readback 1 MB | 2190 MB/s | 2334 MB/s |
-| readback 16 MB | 3748 MB/s | 2730 MB/s |
-| readback 64 MB | 5269 MB/s | 2664 MB/s |
-| SAXPY 1M elements | 43.00 Gelem/s | 1.99 Gelem/s |
-| matmul 256×256 | 1489.7 GFLOPS | 17.9 GFLOPS |
+| kernel compile (cold / warm) | 3.4 ms / 0.8 ms | 0.9 ms / 0.8 ms |
+| empty dispatch (avg of 1,000) | 2.7 µs | 1.3 µs |
+| readback 1 MB | 3970 MB/s | 2621 MB/s |
+| readback 16 MB | 5819 MB/s | 4011 MB/s |
+| readback 64 MB | 9016 MB/s | 4694 MB/s |
+| SAXPY 1M elements | 86.53 Gelem/s | 2.01 Gelem/s |
+| matmul 256×256 | 1841.1 GFLOPS | 20.2 GFLOPS |
+| gpuSum 1M (cold / warm) | 13.49 ms / 0.08 ms | 12.85 ms / 0.25 ms |
+| gpuMatmul 256×256 (cold / warm) | 89.52 ms / 0.43 ms (79 GFLOPS warm) | 88.88 ms / 1.55 ms (22 GFLOPS warm) |
+| gpuHistogram 256 bins (warm) | 83726 Melem/s @ 16M | 1726 Melem/s @ 4M |
+| gpuSort 1M (warm, incl. readback) | 2.0 ms (CPU sort 51.7 ms) | 55.5 ms (CPU sort 51.9 ms) |
+| gpuPrefixScan 1M (warm, incl. readback) | 1.0 ms | 5.3 ms |
 
-The integration selftest (134 exact-value assertions: buffer round-trips, atomics histograms, groupshared reductions, cbuffer-vs-FXC layout proofs, depth-test proofs, determinism) passes on hardware **and** WARP: `bun run example/gpu.selftest.ts`.
+The `matmul` row is an inline device-capability kernel; the `gpu*` rows are the exported std functions (memoized per device — cold pays one FXC compile, warm is pure dispatch). The integration selftest (129 exact-value assertions: buffer round-trips, atomics histograms, groupshared reductions, cbuffer-vs-FXC layout proofs, depth-test proofs, bind-elision proofs, determinism) passes on hardware **and** WARP: `bun run example/gpu.selftest.ts`.
 
 ## Gallery
 

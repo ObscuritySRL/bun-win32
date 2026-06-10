@@ -8,8 +8,12 @@ import { D3D11_SDK_VERSION, D3D_DRIVER_TYPE } from '@bun-win32/d3d11';
 import { openAdapter } from './adapter';
 import { releaseReadbackStaging } from './buffer';
 import { comRelease, guidBytes, hex, vcall } from './com';
+import { releaseDepth } from './depth';
 import { flushRunCache } from './kernel';
 import { reportLeaksAndReset } from './memory';
+import { invalidateCsCache } from './pipeline';
+import { flushStdKernelCache } from './std';
+import { releaseTextureReadbackStaging } from './texture';
 import {
   D3D11_CREATE_DEVICE_BGRA_SUPPORT,
   D3D11_FEATURE_DOUBLES,
@@ -27,6 +31,8 @@ import {
   DXGI_FORMAT_B8G8R8A8_UNORM,
   DXGI_SWAP_EFFECT_DISCARD,
   DXGI_USAGE_RENDER_TARGET_OUTPUT,
+  E_INVALIDARG,
+  E_OUTOFMEMORY,
   IID_ID3D11TEXTURE2D,
   IID_IDXGIDEVICE,
   IUNKNOWN_QUERY_INTERFACE,
@@ -122,6 +128,7 @@ export function createDevice(hwnd: bigint, size: { width: number; height: number
     driver,
     present(vsync = false) {
       vcall(swap, SWAP_PRESENT, [FFIType.u32, FFIType.u32], [vsync ? 1 : 0, 0]);
+      invalidateCsCache(); // Present can disturb output-merger/compute bindings
     },
     recreateRTV() {
       if (gpu.backBufferRTV !== 0n) {
@@ -130,14 +137,12 @@ export function createDevice(hwnd: bigint, size: { width: number; height: number
       }
       const ppBackBuffer = Buffer.alloc(8);
       const tex2dIid = guidBytes(IID_ID3D11TEXTURE2D);
-      if (vcall(swap, SWAP_GET_BUFFER, [FFIType.u32, FFIType.ptr, FFIType.ptr], [0, tex2dIid.ptr!, ppBackBuffer.ptr!]) !== 0) {
-        throw new Error('IDXGISwapChain::GetBuffer failed.');
-      }
+      const getBufferHr = vcall(swap, SWAP_GET_BUFFER, [FFIType.u32, FFIType.ptr, FFIType.ptr], [0, tex2dIid.ptr!, ppBackBuffer.ptr!]);
+      if (getBufferHr !== 0) throw new Error(`IDXGISwapChain::GetBuffer failed: ${describeDeviceError(getBufferHr)}`);
       const backBuffer = ppBackBuffer.readBigUInt64LE(0);
       const ppRtv = Buffer.alloc(8);
-      if (vcall(device, DEV_CREATE_RENDER_TARGET_VIEW, [FFIType.u64, FFIType.ptr, FFIType.ptr], [backBuffer, null, ppRtv.ptr!]) !== 0) {
-        throw new Error('CreateRenderTargetView (back buffer) failed.');
-      }
+      const rtvHr = vcall(device, DEV_CREATE_RENDER_TARGET_VIEW, [FFIType.u64, FFIType.ptr, FFIType.ptr], [backBuffer, null, ppRtv.ptr!]);
+      if (rtvHr !== 0) throw new Error(`CreateRenderTargetView (back buffer) failed: ${describeDeviceError(rtvHr)}`);
       gpu.backBufferRTV = ppRtv.readBigUInt64LE(0);
       comRelease(backBuffer); // the RTV holds its own reference
     },
@@ -231,6 +236,8 @@ export function describeDeviceError(hr: number): string {
   }
   if (code === DXGI_ERROR_INVALID_CALL) return `${hex(code)} DXGI_ERROR_INVALID_CALL. A parameter or call ordering is invalid — enable the D3D11 debug layer to see the validation message.`;
   if (code === DXGI_ERROR_DRIVER_INTERNAL_ERROR) return `${hex(code)} DXGI_ERROR_DRIVER_INTERNAL_ERROR. The driver hit an internal error — usually recoverable only by recreating the device.`;
+  if (code === E_INVALIDARG) return `${hex(code)} E_INVALIDARG. A desc field or flag combination is invalid — check format/usage/bind-flag compatibility.`;
+  if (code === E_OUTOFMEMORY) return `${hex(code)} E_OUTOFMEMORY. Allocation failed — check the requested size and gpuMemory().totalBytes.`;
   return hex(code);
 }
 
@@ -238,8 +245,12 @@ export function describeDeviceError(hr: number): string {
 export function destroyDevice(): void {
   if (activeGpu === null) return;
   flushRunCache(); // run()'s kernels + pooled buffers are engine-owned, not user leaks
+  flushStdKernelCache();
+  releaseDepth(); // depth/raster state caches are keyed without a device — stale entries bind dead-device states after recreate
   reportLeaksAndReset();
   releaseReadbackStaging();
+  releaseTextureReadbackStaging();
+  invalidateCsCache();
   comRelease(activeGpu.backBufferRTV);
   comRelease(activeGpu.swapChain);
   comRelease(activeGpu.context);

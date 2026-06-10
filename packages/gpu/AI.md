@@ -16,9 +16,10 @@ Escalation rule: start at layer 1; drop a layer only when you need something the
 
 - **The device is module-level state.** `createComputeDevice()` (headless) or `createDevice(hwnd, size)` (windowed swap chain) once; every helper targets it. `destroyDevice()` tears it down and warns about leaked resources. Failure throws (never exits).
 - **HLSL compiles at runtime** via FXC (`cs_5_0`/`vs_5_0`/`ps_5_0`). Kernels are HLSL **strings** — this package never transpiles JavaScript (gpu.js's `fn.toString()` transpiler was its defining failure mode; bundlers/minifiers cannot break a string).
-- **Buffers are explicit.** `GpuArray` stays on the GPU across dispatches (the chaining primitive — zero readbacks between kernels); `run()` is the one-shot sugar that uploads, dispatches, reads back **in place**, and releases the uploads. `run()` memoizes compiled kernels per source AND pools its GPU buffers per (kind, length) — repeat calls with the same source and shapes touch FXC and the allocator zero times. Full-control hot loops still hold `Kernel` + `GpuArray`s directly.
+- **Buffers are explicit.** `GpuArray` stays on the GPU across dispatches (the chaining primitive — zero readbacks between kernels); `run()` is the one-shot sugar that uploads, dispatches, reads back **in place**, and releases the uploads (memoized + pooled — see kernel.ts API). Full-control hot loops still hold `Kernel` + `GpuArray`s directly.
+- **The engine caches aggressively.** `run()` and the `gpu*` std kernels memoize compiles per device; `csSet` elides byte-identical re-binds; readback staging buffers are pooled. Warm hot loops compile nothing and allocate nothing.
 - **WARP is the universal fallback** — always present, deterministic, slow. Force it with `{ driver: 'warp' }` for reproducible CI and as your debug target.
-- **Readback synchronizes the GPU** (the perf cliff). `readbackBuffer`/`GpuArray.read()` block; `readbackBufferAsync`/`GpuArray.readAsync()` poll across `setImmediate` turns so the event loop stays live.
+- **Readback synchronizes the GPU** (the perf cliff). Sync reads block; the `*Async` variants keep the event loop live.
 - **GPU memory is never garbage-collected.** Every buffer/texture/shader/`GpuArray` owns a native resource: call `release()` (idempotent; use-after-release throws) or wrap batch jobs in `gpuScope(work)` (auto-releases everything created inside except what `work` returns), and assert `gpuMemory().liveResources === 0` between jobs in long-running processes.
 
 ## Capability → API
@@ -27,27 +28,30 @@ Escalation rule: start at layer 1; drop a layer only when you need something the
 | --- | --- |
 | Run one compute kernel over typed arrays | `run(hlsl, { name: Float32Array \| Int32Array \| Uint32Array }, options?)` — mutates writable arrays in place, returns the same record |
 | Chain kernels with no readback | `GpuArray.from(data)` / `GpuArray.alloc(kind, length)` → `new Kernel(hlsl).dispatch({ name: array })` ×N → `array.read()` |
+| Read back without blocking the event loop | `array.readAsync()` / `readbackBufferAsync(buffer, byteSize)` — polls across `setImmediate` turns |
+| Read back with zero allocation (hot loops) | `array.readInto(target)` / `readbackBufferInto(buffer, byteSize, target)` — single copy into caller memory |
+| Re-upload CPU data into a live GpuArray | `array.write(data)` — same buffer, no reallocation (lengths/kinds must match) |
 | Pass uniforms | `kernel.dispatch(buffers, { uniforms: cbufferLayout({...}).write({...}) })` — kernel declares `cbuffer X : register(b0)` |
 | 1D/2D/3D dispatch | `[numthreads(x,y,z)]` in HLSL + `{ groups: [gx, gy, gz] }` (default `ceil(maxLength / numthreadsX)`) |
 | Compile-time constants / `[unroll]` bounds | `{ compile: { defines: { N: 64 } } }` (a `#line 1` keeps FXC errors on your line numbers) |
-| Sum / matmul / histogram / scan / sort | `gpuSum` `gpuMatmul` `gpuHistogram` `gpuPrefixScan` `gpuSort` (std kernels, CPU-verified on hardware AND WARP) |
-| Image-process pixels | `textureFromPixels(rgba, w, h)` → `Texture2D` SRV in, `RWTexture2D` UAV out (`makeTexture({ uav: true })`) → `readbackTexture` |
+| Sum / matmul / histogram / scan / sort | `gpuSum` `gpuMatmul` `gpuHistogram` `gpuPrefixScan` `gpuSort` (std kernels, memoized per device, CPU-verified on hardware AND WARP) |
+| Image-process pixels | `textureFromPixels(rgba, w, h)` → `Texture2D` SRV in, `RWTexture2D` UAV out (`makeTexture({ uav: true })`) → `readbackTexture` / `readbackTextureInto` (per-frame, zero-alloc) |
 | Render to texture, read pixels | `makeTexture({ rtv: true })` + `setRenderTargets`/`setViewport`/`clear`/`drawFullscreenTriangle` → `readbackTexture` (RowPitch-correct) |
 | Render to a window | `createWindow` → `createDevice(win.hwnd, …)` → draw → `gpu.present(vsync?)` (pace with `present(true)`, never `Bun.sleep`) |
 | Depth-tested 3D | `makeDepthBuffer` `setRenderTargetsWithDepth` `clearDepth` `setDepthState` `setCull` `drawTriangles` (`bindDepth` pins a device; `releaseDepth` frees) |
-| PNG in / PNG out | `decodePNG(bytes)` / `encodePNG(rgb, w, h)` / `encodePNGFromBGRA(bgra, w, h, stride?)` — pure TS |
-| Capture + verify a frame | `captureBackBuffer(gpu, path)` (BEFORE `present()`) → `SnapshotStats` → `formatGrid(stats)` ASCII preview — then look at the PNG |
+| PNG in / PNG out | `decodePNG(bytes)` / `encodePNG(rgb, w, h)` / `encodePNGFromRGBA(rgba, w, h)` / `encodePNGFromBGRA(bgra, w, h, stride?)` — pure TS |
+| Capture + verify a frame | `captureBackBuffer(gpu, path)` (BEFORE `present()`) → `SnapshotStats` → `formatGrid(stats)` ASCII preview |
 | Census the hardware | `listAdapters()` → name/VRAM/vendor/LUID/software flag; `deviceFeatures()` → fp64 support |
 | Pick a GPU on multi-GPU boxes | `createComputeDevice({ adapter: index })` (indices = `listAdapters()` order; `openAdapter` for raw COM) |
-| Time a kernel honestly | `createGpuTimer()` → `begin()` … `end()` → `resolve()` → GPU milliseconds (not CPU wall-clock) |
+| Time a kernel honestly | `createGpuTimer()` → `begin()` … `end()` → `resolve()` (or `resolveAsync()` in frame loops) → GPU milliseconds (not CPU wall-clock) |
 | Variable-size GPU output | `makeStructuredBuffer({ appendCounter: true, uav: true, … })` + `AppendStructuredBuffer` + `csSet(…, { uavInitialCounts: [0] })` → `appendCount(uav)` |
 | GPU-driven dispatch | `makeIndirectArgsBuffer([0,1,1])` → `copyStructureCount(args, 0, uav)` → `dispatchIndirect(args)` — the count never touches the CPU |
 | printf-debug a kernel | `createKernelDebugLog(capacity, register)` → paste `log.hlslPrelude`, call `DEBUG_LOG(threadId, value)`, bind `log.uav`, `log.read()` |
-| Skip FXC on warm starts | `compileCached(source, entry, target, options?, cacheDirectory?)` — DXBC disk cache, corrupt entries silently recompile |
+| Skip FXC on warm starts | `compileCached(source, entry, target, options?, cacheDirectory?)` — DXBC disk cache |
 | Inspect generated code | `disassemble(compiledShader)` → numbered DXBC assembly text |
 | Watch GPU memory | `gpuMemory()` → `{ liveResources, totalBytes, bytesByCategory }` |
 | Auto-release a batch of arrays | `gpuScope(() => { … return kept; })` — tf.tidy-style; synchronous work only |
-| Drop run()'s caches explicitly | `flushRunCache()` (destroyDevice does it automatically) |
+| Drop the engine caches explicitly | `flushRunCache()` / `flushStdKernelCache()` / `invalidateCsCache()` (destroyDevice does all three) |
 | Decode a device-loss error | `describeDeviceError(hr)` (names `DXGI_ERROR_*`, explains the 2 s TDR watchdog), `getDeviceRemovedReason()` |
 | Call any other D3D11 method | `vcall(thisPtr, slot, argTypes, args, returns?)` + the `DEV_*`/`CTX_*`/`SWAP_*` slot constants (layer 3, below) |
 
@@ -55,10 +59,10 @@ Escalation rule: start at layer 1; drop a layer only when you need something the
 
 ### kernel.ts — the flagship compute API
 
-- `run<T>(source: string, buffers: T, options?: RunOptions): T` — compile (memoized per source + compile options) → upload into pooled GPU buffers → dispatch → read back **in place**. Repeat calls with the same source and shapes perform zero FXC compiles and zero GPU allocations. `T` is a record of `KernelArray`s keyed by the kernel's buffer names.
-- `class Kernel` — `new Kernel(source, options?: CompileOptions)`; `.dispatch(buffers: Record<string, GpuArray>, options?: DispatchOptions)`; `.bindings` (parsed `KernelBinding[]`); `.threads` (`[x,y,z]` from `[numthreads]`); `.release()`.
-- `class GpuArray` — `GpuArray.from(data: KernelArray)`, `GpuArray.alloc(kind: ScalarKind, length: number)`; `.read(): KernelArray`; `.readAsync(): Promise<KernelArray>` (event loop stays live); `.readInto(target)`; `.write(data)` (upload into the existing buffer — no reallocation); `.kind`; `.length`; `.buffer`/`.srv`/`.uav` (raw handles); `.release()` (idempotent; any use after release throws).
-- `parseKernelBindings(source): KernelBinding[]` — the textual contract: explicit `StructuredBuffer<float|int|uint> name : register(tN)` / `RWStructuredBuffer<…> : register(uN)`, registers dense from 0 per kind. Throws actionable errors (wrong register space, sparse registers, no bindings, non-string source).
+- `run<T>(source: string, buffers: T, options?: RunOptions): T` — compile (memoized per source + compile options, bounded LRU of 64 — template-interpolated sources cannot grow shaders without limit) → upload into pooled GPU buffers → dispatch → read back **in place**. Repeat calls with the same source and shapes perform zero FXC compiles and zero GPU allocations. `T` is a record of `KernelArray`s keyed by the kernel's buffer names; a key that matches no kernel buffer throws (misspell guard).
+- `class Kernel` — `new Kernel(source, options?: CompileOptions)`; `.dispatch(buffers: Record<string, GpuArray>, options?: DispatchOptions)` (extra keys throw); `.bindings` (parsed `KernelBinding[]`); `.threads` (`[x,y,z]` from `[numthreads]`); `.release()`.
+- `class GpuArray` — `GpuArray.from(data: KernelArray)`, `GpuArray.alloc(kind: ScalarKind, length: number)`; `.read(): KernelArray`; `.readAsync(): Promise<KernelArray>` (event loop stays live); `.readInto(target)` (single copy into caller memory, zero allocation — the hot-loop read); `.write(data)` (upload into the existing buffer — no reallocation, no per-call wrappers; ≥ 32 MiB uploads on hardware go through chunked staging, ~1.3-1.8×); `.kind`; `.length`; `.buffer`/`.srv`/`.uav` (raw handles); `.release()` (idempotent; any use after release throws).
+- `parseKernelBindings(source): KernelBinding[]` — the textual contract: explicit `StructuredBuffer<float|int|uint> name : register(tN)` / `RWStructuredBuffer<…> : register(uN)`, registers dense from 0 per kind. Comments are stripped before parsing (a commented-out declaration or `[numthreads]` never wins). Throws actionable errors (wrong register space, sparse registers, no bindings, non-string source).
 - `parseNumthreads(source): [number, number, number]`.
 - Types: `KernelArray` (`Float32Array | Int32Array | Uint32Array`), `ScalarKind` (`'float' | 'int' | 'uint'`), `KernelBinding`, `DispatchOptions` (`groups?`, `uniforms?: Buffer | KernelArray`), `RunOptions` (`+ compile?: CompileOptions`).
 - `gpuScope<T>(work: () => T): T` — releases every GpuArray created during synchronous `work` except those returned (a GpuArray or an array of them; kept arrays transfer to an enclosing scope). Throws if `work` returns a Promise.
@@ -87,15 +91,16 @@ Escalation rule: start at layer 1; drop a layer only when you need something the
 ### buffer.ts
 
 - `makeStructuredBuffer(options: StructuredBufferOptions): StructuredBuffer` — `{ stride, count, uav?, srv?, appendCounter?, cpuWritable?, initialData? }` → `{ buffer, uav?, srv? }`.
-- `makeConstantBuffer(byteSize): bigint` (rounds up to 16) · `updateConstantBuffer(buffer, data: Buffer)` · `updateDynamicBuffer(buffer, data)` (Map WRITE_DISCARD; needs `cpuWritable`).
-- `readbackBuffer(buffer, byteSize): ArrayBuffer` — **byteSize must equal the buffer's full ByteWidth** (CopyResource silently no-ops on size mismatch; slice afterwards for partial reads). Synchronous.
-- `readbackBufferAsync(buffer, byteSize): Promise<ArrayBuffer>` — Flush + Map(DO_NOT_WAIT) polled via `setImmediate`.
-- `appendCount(uav): number` — read an append/consume hidden counter (CPU-side).
+- `makeConstantBuffer(byteSize): bigint` (rounds up to 16) · `updateConstantBuffer(buffer, data: Buffer)` (UpdateSubresource reads the destination's full 16-rounded size from `data.ptr` — `data` must be at least that large) · `updateDynamicBuffer(buffer, data)` (Map WRITE_DISCARD; needs `cpuWritable`).
+- `readbackBuffer(buffer, byteSize): ArrayBuffer` — **byteSize must equal the buffer's full ByteWidth**; a mismatch on a package-created buffer throws (raw buffers are unvalidated — CopyResource silently no-ops there). Synchronous. Staging buffers are pooled per byteSize (LRU, 8 entries), so mixed-size readback loops create zero GPU resources. ≥ 16 MiB structured-buffer reads split into stride-aligned chunks so GPU DMA overlaps the CPU copy (~1.2-1.4×, both drivers).
+- `readbackBufferInto(buffer, byteSize, target: ArrayBufferView): void` — same contract, single copy into caller memory, zero allocation (the hot-loop variant).
+- `readbackBufferAsync(buffer, byteSize): Promise<ArrayBuffer>` — Flush, then up to 128 synchronous Map(DO_NOT_WAIT) retries (~25 µs worst case — small readbacks resolve with zero yields, matching sync latency) before polling via `setImmediate`; staging freelist pooled per (device, byteSize). Its win is event-loop liveness, not throughput.
+- `appendCount(uav): number` — read an append/consume hidden counter (CPU-side; copies into a persistent 4-byte staging target — zero per-call resource churn).
 - `makeIndirectArgsBuffer(initial = [1, 1, 1]): bigint` — 12-byte dispatch-args buffer for `dispatchIndirect`.
 
 ### pipeline.ts
 
-- Compute: `csSet(shader, { cb?, srv?, uav?, uavInitialCounts? })` · `dispatch(x, y?, z?)` · `dispatchIndirect(argsBuffer, alignedByteOffset?)`.
+- Compute: `csSet(shader, { cb?, srv?, uav?, uavInitialCounts? })` · `dispatch(x, y?, z?)` · `dispatchIndirect(argsBuffer, alignedByteOffset?)`. csSet elides byte-identical re-binds (a redundant UAV bind costs ~200 ns of runtime hazard tracking); passing `uavInitialCounts` always re-issues. `invalidateCsCache()` drops the elision cache — **raw `vcall(context, CTX_CS_*)` users must call it**; in-package setters, `comRelease`, present, and destroyDevice handle it automatically.
 - Draw: `vsSet(shader, cbs?)` · `psSet(shader, { cb?, srv?, samp? })` · `drawFullscreenTriangle()` (3 verts, `SV_VertexID`, no IA) · `drawPoints(count)` · `vsSetShaderResources(srvs, startSlot?)`.
 - Targets/state: `setRenderTargets(rtvs)` (pass `[]` to unbind) · `setViewport(w, h)` · `clear(rtv, [r,g,b,a])` · `makeSampler({ filter?, address? })` · `makeAdditiveBlendState(premultiplied?)` · `setBlendState(state, factor?, mask?)` (0n restores opaque).
 - Resources: `copyResource(dst, src)` · `copyStructureCount(targetBuffer, alignedByteOffset, uav)` · `generateMips(srv)`.
@@ -103,35 +108,37 @@ Escalation rule: start at layer 1; drop a layer only when you need something the
 
 ### texture.ts
 
-- `makeTexture(options: TextureOptions): TextureResult` — `{ w, h, format?, rtv?, srv?, uav?, staging? }` → `{ tex, rtv?, srv?, uav? }`. Default format R8G8B8A8_UNORM.
+- `makeTexture(options: TextureOptions): TextureResult` — `{ w, h, format?, rtv?, srv?, uav?, staging? }` → `{ tex, rtv?, srv?, uav? }`. Default format R8G8B8A8_UNORM. `staging` + any view flag throws (D3D11 forbids bind flags on USAGE_STAGING).
 - `textureFromPixels(pixels, w, h, options?): TextureResult` — UpdateSubresource upload of tightly packed pixels; defaults to an SRV. Unbind the SRV before re-uploading.
-- `readbackTexture(tex, w, h, bytesPerPixel = 4, format = DXGI_FORMAT_R8G8B8A8_UNORM): Uint8Array` — staging + Map with the **RowPitch walk** (RowPitch ≠ w×bpp on many GPUs); returns tightly packed rows. `format` must match the source.
+- `readbackTexture(tex, w, h, bytesPerPixel = 4, format = DXGI_FORMAT_R8G8B8A8_UNORM): Uint8Array` — pooled staging + Map honoring the **RowPitch** (RowPitch ≠ w×bpp on many GPUs); returns tightly packed rows. `format` must match the source.
+- `readbackTextureInto(tex, w, h, target: Uint8Array, bytesPerPixel?, format?): Uint8Array` — same, into caller memory with zero per-call allocation (the per-frame variant). ≥ 16 MiB textures read back in 4 row bands so DMA overlaps the copy (~1.3× at 4K).
 
 ### depth.ts
 
 - `makeDepthBuffer(w, h): DepthBuffer` (`{ tex, dsv }`, D32_FLOAT) · `setRenderTargetsWithDepth(rtvs, dsv)` · `clearDepth(dsv, depth = 1)` · `setDepthState(enable, write = true)` (LESS) · `setCull('none' | 'back' | 'front')` · `drawTriangles(vertexCount)` · `releaseDepth()` (frees cached states + owned depth buffers) · `bindDepth(gpu)` (pin; default = active device).
 
-### std.ts — verified standard kernels
+### std.ts — verified standard kernels (memoized per device — warm calls compile nothing and allocate no GPU resources; internal scratch draws from run()'s pool, reported live by gpuMemory until destroyDevice)
 
-- `gpuSum(input: GpuArray): number` — multi-pass groupshared tree reduction, any length (float).
-- `gpuMatmul(a, b, n): GpuArray` — n×n row-major float, 16×16 groupshared tiles, any n; caller releases the result.
-- `gpuHistogram(values: GpuArray, bins): Uint32Array` — `InterlockedAdd` binning, exact (uint; values ≥ bins ignored).
+- `gpuSum(input: GpuArray): number` — 16×-coarsened multi-pass groupshared tree reduction, any length (float).
+- `gpuMatmul(a, b, n): GpuArray` — n×n row-major float, 32×32 tiles with 2×2 register blocking, any n; caller releases the result.
+- `gpuHistogram(values: GpuArray, bins): Uint32Array` — privatized 16×-coarsened groupshared binning for bins ≤ 4096 (both drivers), global-atomic fallback above; exact (uint; values ≥ bins ignored).
 - `gpuPrefixScan(values: GpuArray): GpuArray` — exclusive uint scan, exact, any length (group totals recurse); caller releases.
-- `gpuSort(values: GpuArray): GpuArray` — ascending bitonic uint sort (pads with 0xFFFFFFFF, trims); exact; caller releases.
+- `gpuSort(values: GpuArray): GpuArray` — ascending bitonic uint sort, low-order steps fused in groupshared (pads with 0xFFFFFFFF, trims; power-of-two inputs skip the trim pass); exact; caller releases.
+- `flushStdKernelCache(): void` — release the memoized std kernels (automatic on destroyDevice).
 
 ### Diagnostics & introspection
 
 - `listAdapters(): AdapterInfo[]` — `{ description, vendorId, deviceId, dedicatedVideoMemory, dedicatedSystemMemory, sharedSystemMemory, isSoftware, luidHighPart, luidLowPart }`.
 - `openAdapter(index): bigint` — raw `IDXGIAdapter1` COM pointer (caller `comRelease`s).
-- `createGpuTimer(): GpuTimer` — `{ begin, end, resolve, release }`; `resolve(): GpuTimerResult` = `{ gpuMilliseconds, frequency, disjoint }` (discard + retry when `disjoint`).
-- `createKernelDebugLog(capacity = 1024, register = 0): KernelDebugLog` — `{ hlslPrelude, uav, capacity, read(): { attempted, entries: DebugLogEntry[] }, release }`. Entries past capacity are counted but dropped (not ring-wrapped). The `register` must equal the log UAV's position in your `csSet` uav array.
-- `gpuMemory(): GpuMemoryReport` — `{ liveResources, totalBytes, bytesByCategory }` for resources made through the package's creators (views and call-transient staging excluded).
+- `createGpuTimer(): GpuTimer` — `{ begin, end, resolve, resolveAsync, release }`; `resolve(): GpuTimerResult` = `{ gpuMilliseconds, frequency, disjoint }` (discard + retry when `disjoint`). `resolve()` blocks the event loop for the full GPU drain; `resolveAsync()` polls across `setImmediate` turns (frame-loop instrumentation) — do not re-enter `begin()`/`end()` until it settles. `release()` is idempotent; any use after release throws.
+- `createKernelDebugLog(capacity = 1024, register = 0): KernelDebugLog` — `{ hlslPrelude, uav, capacity, read(): { attempted, entries: DebugLogEntry[] }, release }`. Entries past capacity are counted but dropped (not ring-wrapped). The `register` must equal the log UAV's position in your `csSet` uav array. `release()` is idempotent; `read()` after release throws.
+- `gpuMemory(): GpuMemoryReport` — `{ liveResources, totalBytes, bytesByCategory }` for buffers/textures/depth targets made through the package's creators. Shaders, samplers, states, queries, views, and engine-pooled staging are NOT tracked.
 
 ### Snapshot & PNG
 
-- `captureBackBuffer(gpu, outPath, opts?: CaptureOptions): SnapshotStats` — never throws (`ok: false` + `note`). Stats: `{ ok, width, height, nonBlackFrac, meanLuma, grid, gridW, gridH, path, note }`.
+- `captureBackBuffer(gpu, outPath, opts?: CaptureOptions): SnapshotStats` — never throws (`ok: false` + `note`); pooled staging, so per-frame capture loops create zero GPU resources; bare filenames work (`CAPTURE_PNG=frame.png`). Stats: `{ ok, width, height, nonBlackFrac, meanLuma, grid, gridW, gridH, path, note }`.
 - `formatGrid(stats): string` — ASCII luminance preview of the captured frame.
-- `encodePNG(rgb, w, h): Uint8Array` (tightly packed RGB8) · `encodePNGFromBGRA(bgra, w, h, rowStride?)` · `decodePNG(bytes): DecodedPNG` (`{ width, height, pixels }` RGBA; 8-bit non-interlaced color types 0/2/3/6 only — explicit errors otherwise).
+- `encodePNG(rgb, w, h): Uint8Array` (tightly packed RGB8) · `encodePNGFromRGBA(rgba, w, h)` (alpha preserved — pairs with `readbackTexture`) · `encodePNGFromBGRA(bgra, w, h, rowStride?)` · `decodePNG(bytes): DecodedPNG` (`{ width, height, pixels }` RGBA; 8-bit non-interlaced color types 0/2/3/6 only — explicit errors otherwise).
 
 ### window.ts
 
@@ -139,17 +146,17 @@ Escalation rule: start at layer 1; drop a layer only when you need something the
 
 ### Layer 3 — the raw COM escape hatch (com.ts + constants.ts)
 
-- `vcall(thisPtr: bigint, slot: number, argTypes: readonly FFIType[], args: readonly unknown[], returns = FFIType.i32): number` — invoke vtable slot `slot` on any COM interface pointer. **argTypes/args EXCLUDE the implicit `this`** (the invoker prepends it). Invokers are memoized per (method, signature). A wrong slot segfaults.
+- `vcall(thisPtr: bigint, slot: number, argTypes: readonly FFIType[], args: readonly unknown[], returns = FFIType.i32): number` — invoke vtable slot `slot` on any COM interface pointer. **argTypes/args EXCLUDE the implicit `this`** (the invoker prepends it). Invokers are memoized per resolved method pointer — a COM method has one true signature, so the FIRST call's argTypes/returns are baked into the cached trampoline; later vcalls on the same method with a different signature silently reuse it. A wrong slot segfaults. With `returns: FFIType.u64` the runtime value is a **bigint** despite the number return type. Raw `CTX_CS_*` binds bypass csSet's elision cache — call `invalidateCsCache()` after them.
 - `comRelease(ptr)` (IUnknown::Release, 0n-safe) · `blobRelease(blob)` (ID3DBlob) · `guidBytes(guidString): Buffer` (16-byte COM GUID layout) · `hex(hr): string` (HRESULT formatting).
-- Vtable slots (Windows 10 SDK `d3d11.h` declaration order, runtime-verified — wrong slot segfaults):
-  - `ID3D11Device`: `DEV_CREATE_BUFFER` 3 · `DEV_CREATE_TEXTURE_2D` 5 · `DEV_CREATE_SHADER_RESOURCE_VIEW` 7 · `DEV_CREATE_UNORDERED_ACCESS_VIEW` 8 · `DEV_CREATE_RENDER_TARGET_VIEW` 9 · `DEV_CREATE_DEPTH_STENCIL_VIEW` 10 · `DEV_CREATE_VERTEX_SHADER` 12 · `DEV_CREATE_PIXEL_SHADER` 15 · `DEV_CREATE_COMPUTE_SHADER` 18 · `DEV_CREATE_BLEND_STATE` 20 · `DEV_CREATE_DEPTH_STENCIL_STATE` 21 · `DEV_CREATE_RASTERIZER_STATE` 22 (21/22: a published cheat-sheet had these swapped; these are runtime-verified) · `DEV_CREATE_SAMPLER_STATE` 23 · `DEV_CREATE_QUERY` 24 · `DEV_CHECK_FEATURE_SUPPORT` 33 · `DEV_GET_FEATURE_LEVEL` 37 · `DEV_GET_DEVICE_REMOVED_REASON` 39
-  - `ID3D11DeviceContext`: `CTX_VS_SET_CONSTANT_BUFFERS` 7 · `CTX_PS_SET_SHADER_RESOURCES` 8 · `CTX_PS_SET_SHADER` 9 · `CTX_PS_SET_SAMPLERS` 10 · `CTX_VS_SET_SHADER` 11 · `CTX_DRAW` 13 · `CTX_MAP` 14 · `CTX_UNMAP` 15 · `CTX_PS_SET_CONSTANT_BUFFERS` 16 · `CTX_IA_SET_PRIMITIVE_TOPOLOGY` 24 · `CTX_VS_SET_SHADER_RESOURCES` 25 · `CTX_BEGIN` 27 · `CTX_END` 28 · `CTX_GET_DATA` 29 · `CTX_OM_SET_RENDER_TARGETS` 33 · `CTX_OM_SET_BLEND_STATE` 35 · `CTX_OM_SET_DEPTH_STENCIL_STATE` 36 · `CTX_DISPATCH` 41 · `CTX_DISPATCH_INDIRECT` 42 · `CTX_RS_SET_STATE` 43 · `CTX_RS_SET_VIEWPORTS` 44 · `CTX_COPY_RESOURCE` 47 · `CTX_UPDATE_SUBRESOURCE` 48 · `CTX_COPY_STRUCTURE_COUNT` 49 · `CTX_CLEAR_RENDER_TARGET_VIEW` 50 · `CTX_CLEAR_DEPTH_STENCIL_VIEW` 53 · `CTX_GENERATE_MIPS` 54 · `CTX_CS_SET_SHADER_RESOURCES` 67 · `CTX_CS_SET_UNORDERED_ACCESS_VIEWS` 68 · `CTX_CS_SET_SHADER` 69 · `CTX_CS_SET_CONSTANT_BUFFERS` 71 · `CTX_FLUSH` 111
-  - Other interfaces: `SWAP_RELEASE` 2 · `SWAP_PRESENT` 8 · `SWAP_GET_BUFFER` 9 (IDXGISwapChain) · `TEX2D_GET_DESC` 10 (ID3D11Texture2D) · `BLOB_RELEASE` 2 · `BLOB_GET_BUFFER_POINTER` 3 · `BLOB_GET_BUFFER_SIZE` 4 (ID3DBlob) · `IUNKNOWN_QUERY_INTERFACE` 0 · `IUNKNOWN_RELEASE` 2 · `DXGIDEVICE_GET_ADAPTER` 7 · `DXGIADAPTER_GET_DESC` 8 · `DXGIADAPTER1_GET_DESC1` 10 · `DXGIFACTORY1_ENUM_ADAPTERS1` 12
-- Format/flag/enum constants (all exported for layer-3 use): `DXGI_FORMAT_UNKNOWN` `DXGI_FORMAT_R8G8B8A8_UNORM` `DXGI_FORMAT_B8G8R8A8_UNORM` `DXGI_FORMAT_R16G16B16A16_FLOAT` `DXGI_FORMAT_R32G32B32A32_FLOAT` `DXGI_FORMAT_R32_FLOAT` `DXGI_FORMAT_R32_UINT` `DXGI_FORMAT_D32_FLOAT` · `D3D11_USAGE_DEFAULT` `D3D11_USAGE_DYNAMIC` `D3D11_USAGE_STAGING` · `D3D11_BIND_CONSTANT_BUFFER` `D3D11_BIND_SHADER_RESOURCE` `D3D11_BIND_RENDER_TARGET` `D3D11_BIND_UNORDERED_ACCESS` `D3D11_BIND_DEPTH_STENCIL` · `D3D11_CPU_ACCESS_READ` `D3D11_CPU_ACCESS_WRITE` · `D3D11_MAP_READ` `D3D11_MAP_WRITE_DISCARD` `D3D11_MAP_FLAG_DO_NOT_WAIT` · `D3D11_RESOURCE_MISC_BUFFER_STRUCTURED` `D3D11_RESOURCE_MISC_DRAWINDIRECT_ARGS` `D3D11_BUFFER_UAV_FLAG_APPEND` · `D3D11_UAV_DIMENSION_BUFFER` `D3D11_SRV_DIMENSION_BUFFER` `D3D11_SRV_DIMENSION_TEXTURE2D` `D3D11_DSV_DIMENSION_TEXTURE2D` · `D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST` `D3D11_PRIMITIVE_TOPOLOGY_POINTLIST` · `D3D11_FILTER_MIN_MAG_MIP_POINT` `D3D11_FILTER_MIN_MAG_MIP_LINEAR` `D3D11_TEXTURE_ADDRESS_WRAP` `D3D11_TEXTURE_ADDRESS_CLAMP` · `D3D11_CULL_NONE` `D3D11_CULL_FRONT` `D3D11_CULL_BACK` `D3D11_FILL_SOLID` · `D3D11_COMPARISON_LESS` `D3D11_DEPTH_WRITE_MASK_ZERO` `D3D11_DEPTH_WRITE_MASK_ALL` `D3D11_CLEAR_DEPTH` · `D3D11_QUERY_TIMESTAMP` `D3D11_QUERY_TIMESTAMP_DISJOINT` `D3D11_FEATURE_DOUBLES` · `D3D11_CREATE_DEVICE_BGRA_SUPPORT` `D3D_FEATURE_LEVEL_11_0` · `DXGI_SWAP_EFFECT_DISCARD` `DXGI_USAGE_RENDER_TARGET_OUTPUT` `DXGI_ADAPTER_FLAG_SOFTWARE` · `DXGI_ERROR_DEVICE_REMOVED` `DXGI_ERROR_DEVICE_HUNG` `DXGI_ERROR_DEVICE_RESET` `DXGI_ERROR_INVALID_CALL` `DXGI_ERROR_DRIVER_INTERNAL_ERROR` `DXGI_ERROR_NOT_FOUND` `DXGI_ERROR_WAS_STILL_DRAWING` · `IID_ID3D11TEXTURE2D` `IID_IDXGIDEVICE` `IID_IDXGIFACTORY1`.
+- Vtable slot constants (import them — the numeric values live in constants.ts, follow Windows 10 SDK `d3d11.h` declaration order, and are runtime-verified; do not hand-derive slots from header cheat-sheets, a published one had `DEV_CREATE_DEPTH_STENCIL_STATE`/`DEV_CREATE_RASTERIZER_STATE` swapped):
+  - `ID3D11Device`: `DEV_CHECK_FEATURE_SUPPORT` `DEV_CREATE_BLEND_STATE` `DEV_CREATE_BUFFER` `DEV_CREATE_COMPUTE_SHADER` `DEV_CREATE_DEPTH_STENCIL_STATE` `DEV_CREATE_DEPTH_STENCIL_VIEW` `DEV_CREATE_PIXEL_SHADER` `DEV_CREATE_QUERY` `DEV_CREATE_RASTERIZER_STATE` `DEV_CREATE_RENDER_TARGET_VIEW` `DEV_CREATE_SAMPLER_STATE` `DEV_CREATE_SHADER_RESOURCE_VIEW` `DEV_CREATE_TEXTURE_2D` `DEV_CREATE_UNORDERED_ACCESS_VIEW` `DEV_CREATE_VERTEX_SHADER` `DEV_GET_DEVICE_REMOVED_REASON` `DEV_GET_FEATURE_LEVEL`
+  - `ID3D11DeviceContext`: `CTX_BEGIN` `CTX_CLEAR_DEPTH_STENCIL_VIEW` `CTX_CLEAR_RENDER_TARGET_VIEW` `CTX_COPY_RESOURCE` `CTX_COPY_STRUCTURE_COUNT` `CTX_CS_SET_CONSTANT_BUFFERS` `CTX_CS_SET_SHADER` `CTX_CS_SET_SHADER_RESOURCES` `CTX_CS_SET_UNORDERED_ACCESS_VIEWS` `CTX_DISPATCH` `CTX_DISPATCH_INDIRECT` `CTX_DRAW` `CTX_END` `CTX_FLUSH` `CTX_GENERATE_MIPS` `CTX_GET_DATA` `CTX_IA_SET_PRIMITIVE_TOPOLOGY` `CTX_MAP` `CTX_OM_SET_BLEND_STATE` `CTX_OM_SET_DEPTH_STENCIL_STATE` `CTX_OM_SET_RENDER_TARGETS` `CTX_PS_SET_CONSTANT_BUFFERS` `CTX_PS_SET_SAMPLERS` `CTX_PS_SET_SHADER` `CTX_PS_SET_SHADER_RESOURCES` `CTX_RS_SET_STATE` `CTX_RS_SET_VIEWPORTS` `CTX_UNMAP` `CTX_UPDATE_SUBRESOURCE` `CTX_VS_SET_CONSTANT_BUFFERS` `CTX_VS_SET_SHADER` `CTX_VS_SET_SHADER_RESOURCES`
+  - Other interfaces: `SWAP_RELEASE` `SWAP_PRESENT` `SWAP_GET_BUFFER` (IDXGISwapChain) · `TEX2D_GET_DESC` (ID3D11Texture2D) · `BLOB_RELEASE` `BLOB_GET_BUFFER_POINTER` `BLOB_GET_BUFFER_SIZE` (ID3DBlob) · `IUNKNOWN_QUERY_INTERFACE` `IUNKNOWN_RELEASE` · `DXGIDEVICE_GET_ADAPTER` `DXGIADAPTER_GET_DESC` `DXGIADAPTER1_GET_DESC1` `DXGIFACTORY1_ENUM_ADAPTERS1`
+- Format/flag/enum constants (all exported for layer-3 use): `DXGI_FORMAT_UNKNOWN` `DXGI_FORMAT_R8G8B8A8_UNORM` `DXGI_FORMAT_B8G8R8A8_UNORM` `DXGI_FORMAT_R16G16B16A16_FLOAT` `DXGI_FORMAT_R32G32B32A32_FLOAT` `DXGI_FORMAT_R32_FLOAT` `DXGI_FORMAT_R32_UINT` `DXGI_FORMAT_D32_FLOAT` · `D3D11_USAGE_DEFAULT` `D3D11_USAGE_DYNAMIC` `D3D11_USAGE_STAGING` · `D3D11_BIND_CONSTANT_BUFFER` `D3D11_BIND_SHADER_RESOURCE` `D3D11_BIND_RENDER_TARGET` `D3D11_BIND_UNORDERED_ACCESS` `D3D11_BIND_DEPTH_STENCIL` · `D3D11_CPU_ACCESS_READ` `D3D11_CPU_ACCESS_WRITE` · `D3D11_MAP_READ` `D3D11_MAP_WRITE_DISCARD` `D3D11_MAP_FLAG_DO_NOT_WAIT` · `D3D11_RESOURCE_MISC_BUFFER_STRUCTURED` `D3D11_RESOURCE_MISC_DRAWINDIRECT_ARGS` `D3D11_BUFFER_UAV_FLAG_APPEND` · `D3D11_UAV_DIMENSION_BUFFER` `D3D11_SRV_DIMENSION_BUFFER` `D3D11_SRV_DIMENSION_TEXTURE2D` `D3D11_DSV_DIMENSION_TEXTURE2D` · `D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST` `D3D11_PRIMITIVE_TOPOLOGY_POINTLIST` · `D3D11_FILTER_MIN_MAG_MIP_POINT` `D3D11_FILTER_MIN_MAG_MIP_LINEAR` `D3D11_TEXTURE_ADDRESS_WRAP` `D3D11_TEXTURE_ADDRESS_CLAMP` · `D3D11_CULL_NONE` `D3D11_CULL_FRONT` `D3D11_CULL_BACK` `D3D11_FILL_SOLID` · `D3D11_COMPARISON_LESS` `D3D11_DEPTH_WRITE_MASK_ZERO` `D3D11_DEPTH_WRITE_MASK_ALL` `D3D11_CLEAR_DEPTH` · `D3D11_QUERY_TIMESTAMP` `D3D11_QUERY_TIMESTAMP_DISJOINT` `D3D11_FEATURE_DOUBLES` · `D3D11_CREATE_DEVICE_BGRA_SUPPORT` `D3D_FEATURE_LEVEL_11_0` · `DXGI_SWAP_EFFECT_DISCARD` `DXGI_USAGE_RENDER_TARGET_OUTPUT` `DXGI_ADAPTER_FLAG_SOFTWARE` · `DXGI_ERROR_DEVICE_REMOVED` `DXGI_ERROR_DEVICE_HUNG` `DXGI_ERROR_DEVICE_RESET` `DXGI_ERROR_INVALID_CALL` `DXGI_ERROR_DRIVER_INTERNAL_ERROR` `DXGI_ERROR_NOT_FOUND` `DXGI_ERROR_WAS_STILL_DRAWING` `E_INVALIDARG` `E_OUTOFMEMORY` · `IID_ID3D11TEXTURE2D` `IID_IDXGIDEVICE` `IID_IDXGIFACTORY1`.
 
 ### Layout calculators (cbuffer.ts)
 
-- `cbufferLayout(fields): CBufferLayout` — HLSL **cbuffer** packing (4-byte alignment, never straddle a 16-byte register, float4x4 on a register boundary, total rounds to 16). `{ byteSize, offsets, write(values): Buffer }`. Matrices: HLSL is column-major by default — transpose or declare `row_major`.
+- `cbufferLayout(fields): CBufferLayout` — HLSL **cbuffer** packing (4-byte alignment, never straddle a 16-byte register, float4x4 on a register boundary, total rounds to 16). `{ byteSize, offsets, write(values): Buffer, writeInto(values, target): Buffer }`. `writeInto` is the zero-alloc per-dispatch path (write() ~208 ns vs writeInto() ~25 ns measured; safe — uniform consumers copy synchronously); use `write()` when retaining the result.
 - `structLayout(fields): CBufferLayout` — **StructuredBuffer** element packing (tight, 4-byte, NO register rule; `byteSize` is the stride). Use with `makeStructuredBuffer({ stride: layout.byteSize, … })`.
 - Field types (`CBufferFieldType`): `float float2 float3 float4 float4x4 int int2 int3 int4 uint uint2 uint3 uint4`.
 
@@ -225,7 +232,7 @@ await Bun.write('frame.png', encodePNG(rgb, 512, 512));
 ### Windowed loop with vsync pacing + headless hooks
 
 ```ts
-import { captureBackBuffer, clear, createDevice, createWindow, setRenderTargets, setViewport } from '@bun-win32/gpu';
+import { captureBackBuffer, clear, createDevice, createWindow, formatGrid, setRenderTargets, setViewport } from '@bun-win32/gpu';
 
 const win = createWindow({ title: 'demo', width: 960, height: 540 });
 const { w, h } = win.clientSize();
@@ -239,22 +246,17 @@ while (!win.shouldClose()) {
   setViewport(w, h);
   clear(gpu.backBufferRTV, [0.1, 0.2, 0.3, 1]);
   // … vsSet/psSet/drawFullscreenTriangle your scene here …
-  if (lastFrame && Bun.env.CAPTURE_PNG) void captureBackBuffer(gpu, Bun.env.CAPTURE_PNG); // BEFORE present
+  if (lastFrame && Bun.env.CAPTURE_PNG) {
+    // Verify-a-visual-demo doctrine: capture after the final draw, BEFORE present.
+    const stats = captureBackBuffer(gpu, Bun.env.CAPTURE_PNG);
+    console.log(formatGrid(stats)); // coarse ASCII luminance preview
+    if (!stats.ok || stats.nonBlackFrac < 0.5) throw new Error(`black frame: ${stats.note}`);
+    // then OPEN the PNG and look at it — numeric checks get fooled.
+  }
   gpu.present(true); // vsync paces the loop — never Bun.sleep (15.6 ms quantization)
   if (lastFrame) break;
 }
 win.destroy();
-```
-
-### Verify a visual demo (the repo doctrine)
-
-```ts
-import { captureBackBuffer, formatGrid } from '@bun-win32/gpu';
-
-const stats = captureBackBuffer(gpu, 'out/frame.png'); // after the final draw, before present()
-console.log(formatGrid(stats));                        // coarse ASCII luminance preview
-if (!stats.ok || stats.nonBlackFrac < 0.5) throw new Error(`black frame: ${stats.note}`);
-// then OPEN the PNG and look at it — numeric checks get fooled.
 ```
 
 ### Raw COM call the package didn't wrap (layer 3)
@@ -276,7 +278,8 @@ const featureLevel = vcall(gpu.device, DEV_GET_FEATURE_LEVEL, [], [], FFIType.u3
 - **Matrices are column-major in HLSL** by default — pass transposed data from row-major TS or declare `row_major` in the shader.
 - **GC window:** assemble pointer-bearing structs immediately before the FFI call and read `.ptr` at call time — an `await` invalidates baked-in `Buffer` pointers, and Bun small-`Buffer` backing stores can RELOCATE after later allocations, so a cached `.ptr` dangles even synchronously (measured ground truth; engine paths stay synchronous and read `.ptr` live for this reason).
 - **Same resource as SRV and UAV in one dispatch** is invalid D3D11 — the runtime silently nulls the binding. Chain sequential kernels instead.
-- **`readbackBuffer` needs the full ByteWidth** — CopyResource silently no-ops on a size mismatch. Read everything, slice on the CPU.
+- **`readbackBuffer` needs the full ByteWidth** — a mismatch throws for package-created buffers; on raw (untracked) buffers CopyResource silently no-ops. Read everything, slice on the CPU.
+- **Raw `vcall(context, CTX_CS_*)` binds desync csSet's elision cache** — call `invalidateCsCache()` after them (everything in-package handles it automatically).
 - **Readback synchronizes the GPU.** Batch dispatches, read once; or `readAsync` to keep the event loop live.
 - **`Bun.sleep` quantizes to 15.6 ms** (≈30 fps cap). Pace windowed loops with `present(true)` (vsync).
 - **GPU memory is never GC'd.** `release()` everything; `gpuMemory().liveResources` should be 0 between jobs; `destroyDevice()` warns if not.
@@ -288,19 +291,4 @@ const featureLevel = vcall(gpu.device, DEV_GET_FEATURE_LEVEL, [], [], FFIType.u3
 
 - `DEMO_DURATION_MS` — self-exit for headless runs. `CAPTURE_PNG` — capture the last frame. `NO_WINDOW=1` — skip windowed selftest sections.
 
-## Where to look (source)
-
-One line per file — open exactly one:
-
-- `kernel.ts` — run/Kernel/GpuArray + the binding/numthreads parsers.
-- `device.ts` — creation (driver/adapter pinning), teardown, feature probe, TDR error mapper.
-- `shader.ts` — compile/compileCached/guardrails/preprocessor/disassemble.
-- `buffer.ts` — structured/constant buffers, readback (sync + async), append counters, indirect args.
-- `pipeline.ts` — all per-draw/per-dispatch state setting.
-- `texture.ts` — textures, upload, RowPitch-correct readback.
-- `depth.ts` — depth buffer/state, cull, triangle draws.
-- `std.ts` — sum/matmul/histogram/scan/sort kernels.
-- `cbuffer.ts` — cbufferLayout/structLayout packing calculators.
-- `query.ts` — GPU timestamp timers. `debug.ts` — kernel debug log. `memory.ts` — resource accounting.
-- `adapter.ts` — DXGI census + openAdapter. `snapshot.ts` — back-buffer capture + stats. `png.ts` — encode/decode. `window.ts` — Win32 window + pump.
-- `com.ts` — vcall/comRelease/blobRelease/guidBytes/hex. `constants.ts` — every slot/flag/format constant.
+Source files not named by a Full API header above: `query.ts` (timers) · `debug.ts` (kernel log) · `memory.ts` (accounting) · `adapter.ts` (census) · `snapshot.ts` (capture) · `png.ts` (codec).

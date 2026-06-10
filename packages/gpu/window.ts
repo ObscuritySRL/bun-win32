@@ -127,7 +127,7 @@ export function createWindow(options: CreateWindowOptions): Win {
 
   if (!User32.RegisterClassExW(wndClass.ptr!)) {
     wndProc.close();
-    throw new Error('RegisterClassExW failed.');
+    throw new Error('RegisterClassExW failed — the class registration was rejected (invalid wndProc callback, or the session ATOM table is exhausted).');
   }
 
   const screenW = User32.GetSystemMetrics(SystemMetric.SM_CXSCREEN);
@@ -140,7 +140,7 @@ export function createWindow(options: CreateWindowOptions): Win {
   if (!hwnd) {
     User32.UnregisterClassW(className.ptr!, 0n);
     wndProc.close();
-    throw new Error('CreateWindowExW failed.');
+    throw new Error('CreateWindowExW failed — likely no interactive desktop (headless session/CI service) or an invalid style combination.');
   }
 
   // Mandatory visibility fix: WS_VISIBLE alone is not enough — a prior batch

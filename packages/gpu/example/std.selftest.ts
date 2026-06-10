@@ -5,7 +5,7 @@
  *
  * APIs demonstrated:
  * - gpuSum (multi-pass groupshared tree reduction)
- * - gpuMatmul (16×16 tiled groupshared matrix multiply, bounds-guarded)
+ * - gpuMatmul (32×32 tiled, 2×2 register-blocked groupshared matrix multiply, bounds-guarded)
  * - gpuHistogram (InterlockedAdd binning, exact)
  * - gpuPrefixScan (exclusive uint scan, exact)
  * - gpuSort (bitonic uint sort, exact)

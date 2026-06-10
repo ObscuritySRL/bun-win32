@@ -8,13 +8,15 @@ import { D3DCOMPILE_ENABLE_STRICTNESS, D3DCOMPILE_OPTIMIZATION_LEVEL3, D3D_DISAS
 
 import { blobRelease, hex, vcall } from './com';
 import { BLOB_GET_BUFFER_POINTER, BLOB_GET_BUFFER_SIZE, DEV_CREATE_COMPUTE_SHADER, DEV_CREATE_PIXEL_SHADER, DEV_CREATE_VERTEX_SHADER } from './constants';
-import { requireGpu } from './device';
+import { describeDeviceError, requireGpu } from './device';
 
 /** A compiled DXBC blob: a pointer/size view into the blob plus the blob handle. */
 export interface CompiledShader {
   ptr: bigint;
   size: number;
   blob: bigint;
+  /** Cache hits carry the DXBC bytes here — consumers re-read `bytes.ptr` at call time (a Buffer's backing store can relocate; `ptr` is a creation-time snapshot). */
+  bytes?: Buffer;
 }
 
 export interface CompileOptions {
@@ -29,9 +31,13 @@ export interface CompileOptions {
 }
 
 export interface CachedShader extends CompiledShader {
-  /** Owns the DXBC bytes on cache hits (blob is 0n then) — keep the object referenced while ptr is in use. */
-  bytes?: Buffer;
   fromCache: boolean;
+}
+
+// Cache hits hold the DXBC in a JS Buffer whose backing store CAN relocate —
+// read the pointer at the FFI call, never trust the creation-time snapshot.
+function shaderPointer(code: CompiledShader): bigint {
+  return code.bytes !== undefined ? BigInt(code.bytes.ptr!) : code.ptr;
 }
 
 const INCLUDE_PATTERN = /^[ \t]*#include[ \t]+"([^"]+)"[ \t]*$/gm;
@@ -50,16 +56,28 @@ function blobAsString(blob: bigint): string {
   return new TextDecoder('utf-8').decode(new Uint8Array(bytes));
 }
 
+// Memoized per resolved method pointer — CFunction creation builds a native
+// trampoline (~246 µs, never freed); vcall is unusable here (it coerces the
+// u64 return to number). Both blob methods share the ([u64]) → u64 signature.
+const blobInvokers = new Map<number, ReturnType<typeof CFunction>>();
+
+function blobMethod(blob: bigint, slot: number): ReturnType<typeof CFunction> {
+  const vtable = read.ptr(Number(blob) as Pointer, 0);
+  const method = read.ptr(vtable as Pointer, slot * 8);
+  let invoke = blobInvokers.get(method);
+  if (invoke === undefined) {
+    invoke = CFunction({ ptr: method as Pointer, args: [FFIType.u64], returns: FFIType.u64 });
+    blobInvokers.set(method, invoke);
+  }
+  return invoke;
+}
+
 function blobBufferPointer(blob: bigint): bigint {
-  const vtable = read.u64(Number(blob) as Pointer, 0);
-  const fn = read.u64(Number(vtable) as Pointer, BLOB_GET_BUFFER_POINTER * 8);
-  return CFunction({ ptr: Number(fn) as Pointer, args: [FFIType.u64], returns: FFIType.u64 })(blob) as bigint;
+  return blobMethod(blob, BLOB_GET_BUFFER_POINTER)(blob) as bigint;
 }
 
 function blobBufferSize(blob: bigint): bigint {
-  const vtable = read.u64(Number(blob) as Pointer, 0);
-  const fn = read.u64(Number(vtable) as Pointer, BLOB_GET_BUFFER_SIZE * 8);
-  return CFunction({ ptr: Number(fn) as Pointer, args: [FFIType.u64], returns: FFIType.u64 })(blob) as bigint;
+  return blobMethod(blob, BLOB_GET_BUFFER_SIZE)(blob) as bigint;
 }
 
 const NOISE_INTRINSIC_PATTERN = /\bnoise\s*\(/;
@@ -134,7 +152,7 @@ export function compileCached(source: string, entry: string, target: string, opt
 /** Disassemble compiled DXBC to numbered shader assembly text (D3DDisassemble). */
 export function disassemble(code: CompiledShader): string {
   const ppDisassembly = Buffer.alloc(8);
-  const hr = D3dcompiler_47.D3DDisassemble(Number(code.ptr) as Pointer, BigInt(code.size), D3D_DISASM_ENABLE_INSTRUCTION_NUMBERING, null, ppDisassembly.ptr!);
+  const hr = D3dcompiler_47.D3DDisassemble(Number(shaderPointer(code)) as Pointer, BigInt(code.size), D3D_DISASM_ENABLE_INSTRUCTION_NUMBERING, null, ppDisassembly.ptr!);
   if (hr !== 0) throw new Error(`D3DDisassemble failed ${hex(hr)}.`);
   const blob = ppDisassembly.readBigUInt64LE(0);
   const text = blobAsString(blob);
@@ -146,9 +164,8 @@ export function disassemble(code: CompiledShader): string {
 export function makeComputeShader(code: CompiledShader): bigint {
   const { device } = requireGpu();
   const pp = Buffer.alloc(8);
-  if (vcall(device, DEV_CREATE_COMPUTE_SHADER, [FFIType.u64, FFIType.u64, FFIType.u64, FFIType.ptr], [code.ptr, BigInt(code.size), 0n, pp.ptr!]) !== 0) {
-    throw new Error('CreateComputeShader failed.');
-  }
+  const hr = vcall(device, DEV_CREATE_COMPUTE_SHADER, [FFIType.u64, FFIType.u64, FFIType.u64, FFIType.ptr], [shaderPointer(code), BigInt(code.size), 0n, pp.ptr!]);
+  if (hr !== 0) throw new Error(`CreateComputeShader failed: ${describeDeviceError(hr)}`);
   return pp.readBigUInt64LE(0);
 }
 
@@ -156,9 +173,8 @@ export function makeComputeShader(code: CompiledShader): bigint {
 export function makePixelShader(code: CompiledShader): bigint {
   const { device } = requireGpu();
   const pp = Buffer.alloc(8);
-  if (vcall(device, DEV_CREATE_PIXEL_SHADER, [FFIType.u64, FFIType.u64, FFIType.u64, FFIType.ptr], [code.ptr, BigInt(code.size), 0n, pp.ptr!]) !== 0) {
-    throw new Error('CreatePixelShader failed.');
-  }
+  const hr = vcall(device, DEV_CREATE_PIXEL_SHADER, [FFIType.u64, FFIType.u64, FFIType.u64, FFIType.ptr], [shaderPointer(code), BigInt(code.size), 0n, pp.ptr!]);
+  if (hr !== 0) throw new Error(`CreatePixelShader failed: ${describeDeviceError(hr)}`);
   return pp.readBigUInt64LE(0);
 }
 
@@ -166,9 +182,8 @@ export function makePixelShader(code: CompiledShader): bigint {
 export function makeVertexShader(code: CompiledShader): bigint {
   const { device } = requireGpu();
   const pp = Buffer.alloc(8);
-  if (vcall(device, DEV_CREATE_VERTEX_SHADER, [FFIType.u64, FFIType.u64, FFIType.u64, FFIType.ptr], [code.ptr, BigInt(code.size), 0n, pp.ptr!]) !== 0) {
-    throw new Error('CreateVertexShader failed.');
-  }
+  const hr = vcall(device, DEV_CREATE_VERTEX_SHADER, [FFIType.u64, FFIType.u64, FFIType.u64, FFIType.ptr], [shaderPointer(code), BigInt(code.size), 0n, pp.ptr!]);
+  if (hr !== 0) throw new Error(`CreateVertexShader failed: ${describeDeviceError(hr)}`);
   return pp.readBigUInt64LE(0);
 }
 

@@ -10,7 +10,7 @@
  *
  * APIs demonstrated:
  * - @bun-win32/gpu: compile / makeVertexShader / makePixelShader (runtime HLSL)
- * - @bun-win32/gpu: makeTexture / readbackTexture (offscreen RTV → CPU pixels)
+ * - @bun-win32/gpu: makeTexture / readbackTextureInto (offscreen RTV → CPU pixels, zero-alloc per frame)
  * - @bun-win32/gpu: makeConstantBuffer / updateConstantBuffer / drawFullscreenTriangle
  * - @bun-win32/terminal: Term.pixels / present / toPNG (pixel framebuffer sink)
  *
@@ -28,7 +28,7 @@ import {
   makeTexture,
   makeVertexShader,
   psSet,
-  readbackTexture,
+  readbackTextureInto,
   setRenderTargets,
   setViewport,
   updateConstantBuffer,
@@ -70,6 +70,7 @@ const ps = makePixelShader(
 const frameConstants = makeConstantBuffer(16);
 const constantBytes = Buffer.alloc(16);
 const rgb = new Uint8Array(W * H * 3);
+const rgba = new Uint8Array(W * H * 4); // persistent target for the per-frame zero-alloc readback
 
 const durationMs = Bun.env.DEMO_DURATION_MS ? Math.max(0, Number(Bun.env.DEMO_DURATION_MS)) : 0;
 const capturePath = Bun.env.CAPTURE_PNG ?? '';
@@ -91,7 +92,7 @@ for (;;) {
   psSet(ps, { cb: [frameConstants] });
   drawFullscreenTriangle();
 
-  const rgba = readbackTexture(target.tex, W, H);
+  readbackTextureInto(target.tex, W, H, rgba);
   for (let index = 0; index < W * H; index += 1) {
     rgb[index * 3] = rgba[index * 4]!;
     rgb[index * 3 + 1] = rgba[index * 4 + 1]!;

@@ -12,26 +12,41 @@ export interface CBufferLayout<T extends Record<string, CBufferFieldType>> {
   byteSize: number;
   offsets: { readonly [K in keyof T]: number };
   write(values: { readonly [K in keyof T]: CBufferValue<T[K]> }): Buffer;
+  /** Like write(), but into a caller-owned Buffer (returned) — the zero-alloc per-dispatch path (~8× faster; uniform consumers copy synchronously, so reuse is safe). Callers that retain results must use write(). */
+  writeInto(values: { readonly [K in keyof T]: CBufferValue<T[K]> }, target: Buffer): Buffer;
 }
 
-function writeFieldValues(fields: Record<string, CBufferFieldType>, offsets: Record<string, number>, values: { readonly [key: string]: number | readonly number[] }, out: Buffer): Buffer {
-  for (const [name, type] of Object.entries(fields)) {
-    const offset = offsets[name]!;
-    const value = values[name]!;
-    const integer = type.startsWith('int') ? 'int' : type.startsWith('uint') ? 'uint' : 'float';
+// Precompiled per-layout write plan — names/offsets/kinds resolved once at layout
+// build, so write() is an index loop (no Object.entries/startsWith/forEach per call).
+interface WritePlan {
+  kinds: Uint8Array; // 0 = int, 1 = uint, 2 = float
+  names: string[];
+  offsets: number[];
+}
+
+function writePlanned(plan: WritePlan, values: { readonly [key: string]: number | readonly number[] }, out: Buffer): Buffer {
+  const { kinds, names, offsets } = plan;
+  for (let index = 0; index < names.length; index += 1) {
+    const value = values[names[index]!]!;
+    const offset = offsets[index]!;
+    const kind = kinds[index];
     if (typeof value === 'number') {
-      if (integer === 'int') out.writeInt32LE(value, offset);
-      else if (integer === 'uint') out.writeUInt32LE(value, offset);
+      if (kind === 0) out.writeInt32LE(value, offset);
+      else if (kind === 1) out.writeUInt32LE(value, offset);
       else out.writeFloatLE(value, offset);
     } else {
-      value.forEach((component, index) => {
-        if (integer === 'int') out.writeInt32LE(component, offset + index * 4);
-        else if (integer === 'uint') out.writeUInt32LE(component, offset + index * 4);
-        else out.writeFloatLE(component, offset + index * 4);
-      });
+      for (let component = 0; component < value.length; component += 1) {
+        if (kind === 0) out.writeInt32LE(value[component]!, offset + component * 4);
+        else if (kind === 1) out.writeUInt32LE(value[component]!, offset + component * 4);
+        else out.writeFloatLE(value[component]!, offset + component * 4);
+      }
     }
   }
   return out;
+}
+
+function planKind(type: CBufferFieldType): number {
+  return type.startsWith('int') ? 0 : type.startsWith('uint') ? 1 : 2;
 }
 
 /**
@@ -44,12 +59,16 @@ function writeFieldValues(fields: Record<string, CBufferFieldType>, offsets: Rec
 export function cbufferLayout<T extends Record<string, CBufferFieldType>>(fields: T): CBufferLayout<T>;
 export function cbufferLayout(fields: Record<string, CBufferFieldType>): CBufferLayout<Record<string, CBufferFieldType>> {
   const offsets: Record<string, number> = {};
+  const plan: WritePlan = { kinds: new Uint8Array(Object.keys(fields).length), names: [], offsets: [] };
   let cursor = 0;
   for (const [name, type] of Object.entries(fields)) {
     const bytes = FIELD_BYTES[type];
     if (type === 'float4x4') cursor = Math.ceil(cursor / 16) * 16;
     else if (Math.floor(cursor / 16) !== Math.floor((cursor + bytes - 1) / 16)) cursor = Math.ceil(cursor / 16) * 16;
     offsets[name] = cursor;
+    plan.kinds[plan.names.length] = planKind(type);
+    plan.names.push(name);
+    plan.offsets.push(cursor);
     cursor += bytes;
   }
   const byteSize = Math.ceil(cursor / 16) * 16;
@@ -57,7 +76,10 @@ export function cbufferLayout(fields: Record<string, CBufferFieldType>): CBuffer
     byteSize,
     offsets,
     write(values) {
-      return writeFieldValues(fields, offsets, values, Buffer.alloc(byteSize));
+      return writePlanned(plan, values, Buffer.alloc(byteSize));
+    },
+    writeInto(values, target) {
+      return writePlanned(plan, values, target);
     },
   };
 }
@@ -71,9 +93,13 @@ export function cbufferLayout(fields: Record<string, CBufferFieldType>): CBuffer
 export function structLayout<T extends Record<string, CBufferFieldType>>(fields: T): CBufferLayout<T>;
 export function structLayout(fields: Record<string, CBufferFieldType>): CBufferLayout<Record<string, CBufferFieldType>> {
   const offsets: Record<string, number> = {};
+  const plan: WritePlan = { kinds: new Uint8Array(Object.keys(fields).length), names: [], offsets: [] };
   let cursor = 0;
   for (const [name, type] of Object.entries(fields)) {
     offsets[name] = cursor;
+    plan.kinds[plan.names.length] = planKind(type);
+    plan.names.push(name);
+    plan.offsets.push(cursor);
     cursor += FIELD_BYTES[type];
   }
   const byteSize = cursor;
@@ -81,7 +107,10 @@ export function structLayout(fields: Record<string, CBufferFieldType>): CBufferL
     byteSize,
     offsets,
     write(values) {
-      return writeFieldValues(fields, offsets, values, Buffer.alloc(byteSize));
+      return writePlanned(plan, values, Buffer.alloc(byteSize));
+    },
+    writeInto(values, target) {
+      return writePlanned(plan, values, target);
     },
   };
 }

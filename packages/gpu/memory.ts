@@ -1,7 +1,7 @@
 // GPU resource accounting — pure-TS bookkeeping at the create/release chokepoints.
 // GPU memory is invisible to JS heap tools; this is the only observability available.
 
-const tracked = new Map<bigint, { byteSize: number; category: string }>();
+const tracked = new Map<bigint, { byteSize: number; category: string; stride: number }>();
 
 export interface GpuMemoryReport {
   bytesByCategory: Record<string, number>;
@@ -9,7 +9,7 @@ export interface GpuMemoryReport {
   totalBytes: number;
 }
 
-/** Live GPU resources created through the package's make* helpers (views are not counted; call-transient staging never appears). */
+/** Live GPU resources created through the package's make* helpers — buffers, textures, depth targets. Shaders, samplers, blend/raster/depth states, queries, and views are NOT tracked; engine-pooled staging never appears. */
 export function gpuMemory(): GpuMemoryReport {
   const bytesByCategory: Record<string, number> = {};
   let totalBytes = 0;
@@ -30,9 +30,19 @@ export function reportLeaksAndReset(): void {
   tracked.clear();
 }
 
-/** Internal: register a created resource (the make* creators call this). */
-export function trackResource(handle: bigint, byteSize: number, category: string): void {
-  if (handle !== 0n) tracked.set(handle, { byteSize, category });
+/** Internal: register a created resource (the make* creators call this). `stride` is the structure stride for STRUCTURED buffers (chunked readback needs stride-aligned edges); 0 elsewhere. */
+export function trackResource(handle: bigint, byteSize: number, category: string, stride = 0): void {
+  if (handle !== 0n) tracked.set(handle, { byteSize, category, stride });
+}
+
+/** Internal: byteSize of a tracked resource, or undefined when untracked (readback size validation uses this). */
+export function trackedByteSize(handle: bigint): number | undefined {
+  return tracked.get(handle)?.byteSize;
+}
+
+/** Internal: structure stride of a tracked resource (0 when non-structured or untracked). */
+export function trackedStride(handle: bigint): number {
+  return tracked.get(handle)?.stride ?? 0;
 }
 
 /** Internal: forget a released resource (comRelease calls this). */

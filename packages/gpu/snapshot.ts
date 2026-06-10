@@ -10,9 +10,10 @@ import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname } from 'node:path';
 
 import { comRelease, guidBytes, vcall } from './com';
-import { CTX_COPY_RESOURCE, CTX_MAP, CTX_UNMAP, D3D11_CPU_ACCESS_READ, D3D11_MAP_READ, D3D11_USAGE_STAGING, DEV_CREATE_TEXTURE_2D, DXGI_FORMAT_B8G8R8A8_UNORM, IID_ID3D11TEXTURE2D, SWAP_GET_BUFFER, TEX2D_GET_DESC } from './constants';
+import { CTX_COPY_RESOURCE, CTX_MAP, CTX_UNMAP, D3D11_MAP_READ, DXGI_FORMAT_B8G8R8A8_UNORM, IID_ID3D11TEXTURE2D, SWAP_GET_BUFFER, TEX2D_GET_DESC } from './constants';
 import type { Gpu } from './device';
 import { encodePNGFromBGRA } from './png';
+import { acquireTextureStaging } from './texture';
 
 /** Screen-space statistics for a captured back-buffer frame. */
 export interface SnapshotStats {
@@ -79,31 +80,21 @@ export function captureBackBuffer(gpu: Gpu, outPath: string, opts: CaptureOption
     return fail('back buffer reported 0 dimensions');
   }
 
-  const sdesc = Buffer.alloc(44);
-  sdesc.writeUInt32LE(width, 0);
-  sdesc.writeUInt32LE(height, 4);
-  sdesc.writeUInt32LE(1, 8); // MipLevels
-  sdesc.writeUInt32LE(1, 12); // ArraySize
-  sdesc.writeUInt32LE(DXGI_FORMAT_B8G8R8A8_UNORM, 16);
-  sdesc.writeUInt32LE(1, 20); // SampleDesc.Count
-  sdesc.writeUInt32LE(0, 24);
-  sdesc.writeUInt32LE(D3D11_USAGE_STAGING, 28);
-  sdesc.writeUInt32LE(0, 32); // BindFlags
-  sdesc.writeUInt32LE(D3D11_CPU_ACCESS_READ, 36);
-  sdesc.writeUInt32LE(0, 40);
-  const ppStaging = Buffer.alloc(8);
-  if (vcall(gpu.device, DEV_CREATE_TEXTURE_2D, [FFIType.ptr, FFIType.ptr, FFIType.ptr], [sdesc.ptr!, null, ppStaging.ptr!]) !== 0) {
+  // Pooled staging (shared with readbackTextureInto) — a per-frame capture loop
+  // creates zero GPU resources. acquireTextureStaging throws; this function never does.
+  let staging: bigint;
+  try {
+    staging = acquireTextureStaging(gpu.device, width, height, DXGI_FORMAT_B8G8R8A8_UNORM);
+  } catch (error) {
     comRelease(backBuffer);
-    return fail('CreateTexture2D (staging) failed', width, height);
+    return fail(error instanceof Error ? error.message : String(error), width, height);
   }
-  const staging = ppStaging.readBigUInt64LE(0);
 
   vcall(gpu.context, CTX_COPY_RESOURCE, [FFIType.u64, FFIType.u64], [staging, backBuffer], FFIType.void);
 
   const mapped = Buffer.alloc(16);
   if (vcall(gpu.context, CTX_MAP, [FFIType.u64, FFIType.u32, FFIType.u32, FFIType.u32, FFIType.ptr], [staging, 0, D3D11_MAP_READ, 0, mapped.ptr!]) !== 0) {
-    comRelease(staging);
-    comRelease(backBuffer);
+    comRelease(backBuffer); // the pooled staging stays alive in the pool
     return fail('Map(staging) failed', width, height);
   }
   const dataPtr = Number(mapped.readBigUInt64LE(0)) as Pointer;
@@ -111,7 +102,7 @@ export function captureBackBuffer(gpu: Gpu, outPath: string, opts: CaptureOption
 
   // Pack a tightly-strided top-down BGRA buffer.
   const dstStride = width * 4;
-  const pixels = Buffer.alloc(dstStride * height);
+  const pixels = Buffer.allocUnsafeSlow(dstStride * height); // every byte is overwritten by the row-pack loop
   const src = new Uint8Array(toArrayBuffer(dataPtr, 0, rowPitch * height));
   for (let y = 0; y < height; y += 1) {
     pixels.set(src.subarray(y * rowPitch, y * rowPitch + dstStride), y * dstStride);
@@ -148,15 +139,17 @@ export function captureBackBuffer(gpu: Gpu, outPath: string, opts: CaptureOption
   let ok = false;
   let note = '';
   try {
-    mkdirSync(dirname(outPath), { recursive: true });
+    // Bun-on-Windows mkdirSync('.', { recursive: true }) throws EEXIST — bare
+    // filenames (dirname '.') need no directory creation at all.
+    const directory = dirname(outPath);
+    if (directory !== '.') mkdirSync(directory, { recursive: true });
     writeFileSync(outPath, encodePNGFromBGRA(pixels, width, height, dstStride));
     ok = true;
   } catch (error) {
     note = `PNG write failed: ${error instanceof Error ? error.message : String(error)}`;
   }
 
-  comRelease(staging);
-  comRelease(backBuffer);
+  comRelease(backBuffer); // staging is pooled — not released per call
 
   return {
     ok,

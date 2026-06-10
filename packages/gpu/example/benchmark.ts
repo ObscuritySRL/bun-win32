@@ -2,19 +2,23 @@
  * Benchmark — the README's numbers, printed as a markdown table, on hardware AND WARP.
  *
  * Measures kernel compile latency (cold/warm), empty-dispatch submission cost,
- * staging-readback bandwidth at 1/16/64 MB, 1M-element SAXPY throughput, and
- * 256×256 matmul GFLOPS. Every figure comes from a real run on this machine —
- * the README quotes this table verbatim and never claims numbers it didn't print.
+ * staging-readback bandwidth at 1/16/64 MB, 1M-element SAXPY throughput, 256×256
+ * matmul GFLOPS (an inline device-capability kernel AND the exported gpuMatmul),
+ * and the exported std kernels cold/warm — the cold/warm pair is the
+ * compile-churn detector: warm must not pay FXC. Every figure comes from a real
+ * run on this machine — the README quotes this table verbatim and never claims
+ * numbers it didn't print.
  *
  * APIs demonstrated:
  * - createComputeDevice (forced hardware and forced WARP passes)
  * - compile (FXC latency)
  * - Kernel / GpuArray (dispatch throughput, SAXPY, matmul)
  * - makeStructuredBuffer / readbackBuffer (bandwidth)
+ * - gpuSum / gpuMatmul / gpuHistogram / gpuSort / gpuPrefixScan (std kernels, exported surface)
  *
  * Run: bun run example/benchmark.ts
  */
-import { type CreateDeviceOptions, GpuArray, Kernel, comRelease, compile, createComputeDevice, destroyDevice, makeStructuredBuffer, readbackBuffer } from '@bun-win32/gpu';
+import { type CreateDeviceOptions, GpuArray, Kernel, comRelease, compile, createComputeDevice, destroyDevice, gpuHistogram, gpuMatmul, gpuPrefixScan, gpuSort, gpuSum, makeStructuredBuffer, readbackBuffer } from '@bun-win32/gpu';
 
 interface BenchmarkRow {
   metric: string;
@@ -114,6 +118,83 @@ function measure(options: CreateDeviceOptions): { device: string; rows: Benchmar
     b.release();
     c.release();
     matmul.release();
+  }
+
+  {
+    // The exported std kernels, cold then warm. Cold pays one FXC compile per
+    // kernel (memoized per device); warm is pure dispatch+readback.
+    const sumInput = GpuArray.from(new Float32Array(1_000_000).fill(0.5));
+    const coldWarm = (work: () => void): [number, number] => {
+      const coldStart = performance.now();
+      work();
+      const cold = performance.now() - coldStart;
+      const warmStart = performance.now();
+      work();
+      const warm = performance.now() - warmStart;
+      return [cold, warm];
+    };
+    const [sumCold, sumWarm] = coldWarm(() => void gpuSum(sumInput));
+    rows.push({ metric: 'gpuSum 1M (cold / warm)', value: `${sumCold.toFixed(2)} ms / ${sumWarm.toFixed(2)} ms` });
+    sumInput.release();
+
+    const N = 256;
+    const a = GpuArray.from(new Float32Array(N * N).fill(1.25));
+    const b = GpuArray.from(new Float32Array(N * N).fill(0.75));
+    let warmMatmulMs = 0;
+    const [matmulCold] = coldWarm(() => {
+      const start = performance.now();
+      const c = gpuMatmul(a, b, N);
+      void c.read();
+      warmMatmulMs = performance.now() - start;
+      c.release();
+    });
+    const matmulGflops = (2 * N * N * N) / (warmMatmulMs / 1000) / 1e9;
+    rows.push({ metric: `gpuMatmul ${N}×${N} (cold / warm)`, value: `${matmulCold.toFixed(2)} ms / ${warmMatmulMs.toFixed(2)} ms (${matmulGflops.toFixed(0)} GFLOPS warm)` });
+    a.release();
+    b.release();
+
+    const histogramElements = options.driver === 'warp' ? 4_000_000 : 16_000_000;
+    const histogramValues = new Uint32Array(histogramElements);
+    for (let index = 0; index < histogramElements; index += 1) histogramValues[index] = index & 0xff;
+    const histogramInput = GpuArray.from(histogramValues);
+    let warmHistogramMs = 0;
+    coldWarm(() => {
+      const start = performance.now();
+      void gpuHistogram(histogramInput, 256);
+      warmHistogramMs = performance.now() - start;
+    });
+    rows.push({ metric: 'gpuHistogram 256 bins (warm)', value: `${(histogramElements / 1e6 / (warmHistogramMs / 1000)).toFixed(0)} Melem/s @ ${histogramElements / 1e6}M` });
+    histogramInput.release();
+
+    const sortValues = new Uint32Array(1_000_000);
+    for (let index = 0; index < sortValues.length; index += 1) sortValues[index] = (index * 2_654_435_761) >>> 0;
+    const sortInput = GpuArray.from(sortValues);
+    let warmSortMs = 0;
+    coldWarm(() => {
+      const start = performance.now();
+      const sorted = gpuSort(sortInput);
+      void sorted.read();
+      warmSortMs = performance.now() - start;
+      sorted.release();
+    });
+    const cpuSortStart = performance.now();
+    void sortValues.slice().sort();
+    const cpuSortMs = performance.now() - cpuSortStart;
+    rows.push({ metric: 'gpuSort 1M (warm, incl. readback)', value: `${warmSortMs.toFixed(1)} ms (CPU sort ${cpuSortMs.toFixed(1)} ms)` });
+    sortInput.release();
+
+    const scanValues = new Uint32Array(1_000_000).fill(3);
+    const scanInput = GpuArray.from(scanValues);
+    let warmScanMs = 0;
+    coldWarm(() => {
+      const start = performance.now();
+      const scanned = gpuPrefixScan(scanInput);
+      void scanned.read();
+      warmScanMs = performance.now() - start;
+      scanned.release();
+    });
+    rows.push({ metric: 'gpuPrefixScan 1M (warm, incl. readback)', value: `${warmScanMs.toFixed(1)} ms` });
+    scanInput.release();
   }
 
   const device = `${gpu.gpuName} (${gpu.driver})`;

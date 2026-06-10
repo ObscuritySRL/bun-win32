@@ -1,9 +1,12 @@
 // run() / Kernel / GpuArray — the high-level compute API: textual register parsing,
 // retained GPU arrays for zero-readback chaining, and one-shot in-place execution.
 
-import { comRelease } from './com';
+import { FFIType } from 'bun:ffi';
+
+import { comRelease, vcall } from './com';
+import { CTX_UPDATE_SUBRESOURCE } from './constants';
 import { createComputeDevice, hasDevice, requireGpu } from './device';
-import { makeConstantBuffer, makeStructuredBuffer, readbackBuffer, readbackBufferAsync, updateConstantBuffer, type StructuredBuffer } from './buffer';
+import { makeConstantBuffer, makeStructuredBuffer, readbackBuffer, readbackBufferAsync, readbackBufferInto, updateConstantBuffer, uploadBufferChunked, type StructuredBuffer } from './buffer';
 import { csSet, dispatch } from './pipeline';
 import { compile, makeComputeShader, type CompileOptions } from './shader';
 
@@ -32,6 +35,13 @@ const BUFFER_PATTERN = /\b(RW)?StructuredBuffer\s*<\s*(float|int|uint)\s*>\s+([A
 const CBUFFER_PATTERN = /\bcbuffer\s+\w+\s*:\s*register\(\s*b0\s*\)/;
 const NUMTHREADS_PATTERN = /\[\s*numthreads\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)\s*\]/;
 
+// Comments must never reach the parsers — a commented-out declaration would still
+// match (a commented [numthreads] silently shrank a real dispatch). FXC compiles
+// the ORIGINAL source; block comments become a space so tokens cannot fuse across /* */.
+function stripComments(source: string): string {
+  return source.replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/\/\/[^\n]*/g, '');
+}
+
 /** Parse explicit register() buffer declarations. Throws actionable errors — this is the API contract, not a heuristic. */
 export function parseKernelBindings(source: string): KernelBinding[] {
   if (typeof source !== 'string') {
@@ -40,7 +50,7 @@ export function parseKernelBindings(source: string): KernelBinding[] {
     );
   }
   const bindings: KernelBinding[] = [];
-  for (const match of source.matchAll(BUFFER_PATTERN)) {
+  for (const match of stripComments(source).matchAll(BUFFER_PATTERN)) {
     const [, readWrite, kind, name, space, register] = match;
     const writable = readWrite === 'RW';
     if (writable && space !== 'u') throw new Error(`Kernel buffer "${name}": RWStructuredBuffer must use a u register — write : register(u${register}).`);
@@ -62,7 +72,7 @@ export function parseKernelBindings(source: string): KernelBinding[] {
 
 /** Parse the [numthreads(x,y,z)] attribute. Throws when absent. */
 export function parseNumthreads(source: string): readonly [number, number, number] {
-  const match = NUMTHREADS_PATTERN.exec(source);
+  const match = NUMTHREADS_PATTERN.exec(stripComments(source));
   if (match === null) throw new Error('Kernel source has no [numthreads(x,y,z)] attribute on its entry point.');
   return [Number(match[1]), Number(match[2]), Number(match[3])];
 }
@@ -138,22 +148,25 @@ export class GpuArray {
     return this.kind === 'float' ? new Float32Array(bytes) : this.kind === 'int' ? new Int32Array(bytes) : new Uint32Array(bytes);
   }
 
-  /** Read back into a caller-owned typed array (cast-free typed reads). */
+  /** Read back into a caller-owned typed array — single copy, zero allocation (the hot-loop read). */
   readInto<A extends KernelArray>(target: A): A {
     this.#requireLive('readInto');
     if (kindOf(target) !== this.kind) throw new Error(`GpuArray.readInto: target is ${kindOf(target)} but the array holds ${this.kind}.`);
-    const bytes = readbackBuffer(this.#resource.buffer, this.length * 4);
-    target.set(this.kind === 'float' ? new Float32Array(bytes) : this.kind === 'int' ? new Int32Array(bytes) : new Uint32Array(bytes));
+    readbackBufferInto(this.#resource.buffer, this.length * 4, target);
     return target;
   }
 
-  /** Upload CPU data into the existing GPU buffer (UpdateSubresource) — no reallocation. */
+  /** Upload CPU data into the existing GPU buffer (UpdateSubresource) — no reallocation, zero per-call wrappers. */
   write(data: KernelArray): void {
     this.#requireLive('write');
     if (kindOf(data) !== this.kind) throw new Error(`GpuArray.write: data is ${kindOf(data)} but the array holds ${this.kind}.`);
     if (data.length !== this.length) throw new Error(`GpuArray.write: data has ${data.length} elements but the array holds ${this.length}.`);
-    // Full-resource UpdateSubresource — same path as constant-buffer upload.
-    updateConstantBuffer(this.#resource.buffer, Buffer.from(data.buffer, data.byteOffset, data.byteLength));
+    // ≥32 MiB on hardware: chunked staging upload overlaps CPU memcpy with GPU DMA
+    // (1.3-1.8× measured); otherwise full-resource UpdateSubresource from the
+    // typed array's pointer.
+    if (uploadBufferChunked(this.#resource.buffer, data, 4)) return;
+    const { context } = requireGpu();
+    vcall(context, CTX_UPDATE_SUBRESOURCE, [FFIType.u64, FFIType.u32, FFIType.ptr, FFIType.ptr, FFIType.u32, FFIType.u32], [this.#resource.buffer, 0, null, data.ptr!, 0, 0], FFIType.void);
   }
 
   /** Idempotent: a second release is a no-op; any use after release throws. */
@@ -167,18 +180,30 @@ export class GpuArray {
   }
 }
 
+// Per-dispatch scratch, allocated once — Kernel.dispatch runs in hot loops. Safe to
+// share: dispatch is synchronous and csSet copies these into FFI scratch Buffers
+// (and its own cache arrays) during the call, so they never escape.
+const dispatchConstantBuffers: bigint[] = [];
+const dispatchShaderResources: bigint[] = [];
+const dispatchUnorderedAccess: bigint[] = [];
+const dispatchBindings = { cb: dispatchConstantBuffers, srv: dispatchShaderResources, uav: dispatchUnorderedAccess };
+
 export class Kernel {
   #bindings: readonly KernelBinding[];
   #constantBuffer = 0n;
   #constantBufferByteSize = 0;
   #shader: bigint;
+  #shaderResourceViewCount: number;
   #threads: readonly [number, number, number];
+  #unorderedAccessViewCount: number;
   #usesUniforms: boolean;
 
   constructor(source: string, options: CompileOptions = {}) {
     this.#bindings = parseKernelBindings(source);
     this.#threads = parseNumthreads(source);
-    this.#usesUniforms = CBUFFER_PATTERN.test(source);
+    this.#unorderedAccessViewCount = this.#bindings.filter((binding) => binding.writable).length;
+    this.#shaderResourceViewCount = this.#bindings.length - this.#unorderedAccessViewCount;
+    this.#usesUniforms = CBUFFER_PATTERN.test(stripComments(source));
     ensureDevice();
     this.#shader = makeComputeShader(compile(source, 'main', 'cs_5_0', options));
   }
@@ -193,17 +218,25 @@ export class Kernel {
 
   dispatch(buffers: Record<string, GpuArray>, options: DispatchOptions = {}): void {
     if (this.#shader === 0n) throw new Error('Kernel.dispatch: the kernel was released.');
-    const uav: bigint[] = [];
-    const srv: bigint[] = [];
+    dispatchUnorderedAccess.length = this.#unorderedAccessViewCount;
+    dispatchShaderResources.length = this.#shaderResourceViewCount;
     let maxLength = 1;
     for (const binding of this.#bindings) {
       const array = buffers[binding.name];
       if (array === undefined) throw new Error(`Kernel.dispatch: no GpuArray passed for buffer "${binding.name}".`);
       if (array.kind !== binding.kind) throw new Error(`Kernel.dispatch: buffer "${binding.name}" is declared ${binding.kind} but the GpuArray holds ${array.kind}.`);
-      (binding.writable ? uav : srv)[binding.register] = binding.writable ? array.uav : array.srv;
+      if (binding.writable) dispatchUnorderedAccess[binding.register] = array.uav;
+      else dispatchShaderResources[binding.register] = array.srv;
       if (array.length > maxLength) maxLength = array.length;
     }
-    const cb: bigint[] = [];
+    let bufferCount = 0;
+    for (const name in buffers) bufferCount += 1;
+    if (bufferCount > this.#bindings.length) {
+      for (const name in buffers) {
+        if (!this.#bindings.some((binding) => binding.name === name)) throw new Error(`Kernel.dispatch: "${name}" does not match any kernel buffer (kernel declares: ${this.#bindings.map((binding) => binding.name).join(', ')}).`);
+      }
+    }
+    dispatchConstantBuffers.length = 0;
     if (options.uniforms !== undefined) {
       if (!this.#usesUniforms) throw new Error('Kernel.dispatch: uniforms were passed but the kernel declares no cbuffer at register(b0).');
       const raw = Buffer.isBuffer(options.uniforms) ? options.uniforms : Buffer.from(options.uniforms.buffer, options.uniforms.byteOffset, options.uniforms.byteLength);
@@ -220,10 +253,18 @@ export class Kernel {
         this.#constantBufferByteSize = paddedByteSize;
       }
       updateConstantBuffer(this.#constantBuffer, bytes);
-      cb.push(this.#constantBuffer);
+      dispatchConstantBuffers[0] = this.#constantBuffer;
     }
-    const [x = Math.ceil(maxLength / this.#threads[0]), y = 1, z = 1] = options.groups ?? [];
-    csSet(this.#shader, { cb, srv, uav });
+    let x: number;
+    let y = 1;
+    let z = 1;
+    if (options.groups === undefined) x = Math.ceil(maxLength / this.#threads[0]);
+    else {
+      x = options.groups[0];
+      if (options.groups[1] !== undefined) y = options.groups[1];
+      if (options.groups[2] !== undefined) z = options.groups[2];
+    }
+    csSet(this.#shader, dispatchBindings);
     dispatch(x, y, z);
   }
 
@@ -241,11 +282,16 @@ export class Kernel {
 // same shapes allocate no GPU resources at all (perf doctrine). Both caches are keyed
 // to the live device and are released + rebuilt after a device change.
 const runKernelCache = new Map<string, { device: bigint; kernel: Kernel }>();
+// Bounded LRU (insertion order; first key is the victim) — template-interpolated
+// sources would otherwise grow compiled shaders without limit, invisible to
+// gpuMemory() (shaders are untracked). 64 covers any sane working set.
+const RUN_KERNEL_CACHE_LIMIT = 64;
 const runArrayPool = new Map<string, GpuArray[]>();
 let runPoolDevice = 0n;
 const RUN_POOL_LIMIT_PER_SHAPE = 8;
 
-function acquireRunArray(kind: ScalarKind, length: number): GpuArray {
+/** Internal: pooled GPU scratch acquisition (std.ts shares run()'s pool; not re-exported from index.ts). Created scope-suppressed — pooled arrays are owned by the pool, never by a user gpuScope. */
+export function acquireRunArray(kind: ScalarKind, length: number): GpuArray {
   if (runPoolDevice !== requireGpu().device) {
     flushRunArrayPool();
     runPoolDevice = requireGpu().device;
@@ -268,7 +314,8 @@ function flushRunArrayPool(): void {
   runArrayPool.clear();
 }
 
-function releaseRunArray(array: GpuArray): void {
+/** Internal: return a pooled GPU scratch array (capped per shape; overflow releases). */
+export function releaseRunArray(array: GpuArray): void {
   const key = `${array.kind}|${array.length}`;
   let pooled = runArrayPool.get(key);
   if (pooled === undefined) {
@@ -337,7 +384,16 @@ export function run<T extends Record<string, KernelArray>>(source: string, buffe
   let entry = runKernelCache.get(cacheKey);
   if (entry === undefined || entry.device !== device) {
     if (entry !== undefined) entry.kernel.release();
+    else if (runKernelCache.size >= RUN_KERNEL_CACHE_LIMIT) {
+      const victim = runKernelCache.keys().next().value!;
+      runKernelCache.get(victim)!.kernel.release();
+      runKernelCache.delete(victim);
+    }
+    runKernelCache.delete(cacheKey);
     entry = { device, kernel: new Kernel(source, options.compile) };
+    runKernelCache.set(cacheKey, entry);
+  } else {
+    runKernelCache.delete(cacheKey); // LRU touch — re-insertion moves it to the back
     runKernelCache.set(cacheKey, entry);
   }
   const kernel = entry.kernel;
@@ -351,6 +407,13 @@ export function run<T extends Record<string, KernelArray>>(source: string, buffe
       uploaded.set(binding.name, array); // registered before write() so a kind-mismatch throw still returns it to the pool
       array.write(data);
       bound[binding.name] = array;
+    }
+    let bufferCount = 0;
+    for (const name in buffers) bufferCount += 1;
+    if (bufferCount > kernel.bindings.length) {
+      for (const name in buffers) {
+        if (!kernel.bindings.some((binding) => binding.name === name)) throw new Error(`run: "${name}" does not match any kernel buffer (kernel declares: ${kernel.bindings.map((binding) => binding.name).join(', ')}).`);
+      }
     }
     kernel.dispatch(bound, options);
     for (const binding of kernel.bindings) {

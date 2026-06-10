@@ -2,7 +2,7 @@
 
 import { FFIType } from 'bun:ffi';
 
-import { comRelease, hex, vcall } from './com';
+import { comRelease, vcall } from './com';
 import {
   CTX_CLEAR_DEPTH_STENCIL_VIEW,
   CTX_DRAW,
@@ -28,8 +28,13 @@ import {
   DEV_CREATE_TEXTURE_2D,
   DXGI_FORMAT_D32_FLOAT,
 } from './constants';
-import { requireGpu, type Gpu } from './device';
+import { describeDeviceError, requireGpu, type Gpu } from './device';
 import { trackResource } from './memory';
+import { invalidateCsCache } from './pipeline';
+
+// Per-call scratch, allocated once (same doctrine as pipeline.ts): `.ptr` is read
+// at call time, never cached.
+const renderTargetScratch = Buffer.alloc(8 * 128);
 
 /** A depth texture and its depth-stencil view. */
 export interface DepthBuffer {
@@ -91,9 +96,8 @@ export function makeDepthBuffer(w: number, h: number): DepthBuffer {
   desc.writeUInt32LE(0, 40); // MiscFlags
 
   const ppTex = Buffer.alloc(8);
-  if (vcall(device, DEV_CREATE_TEXTURE_2D, [FFIType.ptr, FFIType.ptr, FFIType.ptr], [desc.ptr!, null, ppTex.ptr!]) !== 0) {
-    throw new Error('CreateTexture2D (depth) failed.');
-  }
+  const texHr = vcall(device, DEV_CREATE_TEXTURE_2D, [FFIType.ptr, FFIType.ptr, FFIType.ptr], [desc.ptr!, null, ppTex.ptr!]);
+  if (texHr !== 0) throw new Error(`CreateTexture2D (depth) failed: ${describeDeviceError(texHr)}`);
   const tex = ppTex.readBigUInt64LE(0);
   trackResource(tex, w * h * 4, 'depth');
 
@@ -106,9 +110,10 @@ export function makeDepthBuffer(w: number, h: number): DepthBuffer {
   dsvDesc.writeUInt32LE(0, 12); // Texture2D.MipSlice
 
   const ppDsv = Buffer.alloc(8);
-  if (vcall(device, DEV_CREATE_DEPTH_STENCIL_VIEW, [FFIType.u64, FFIType.ptr, FFIType.ptr], [tex, dsvDesc.ptr!, ppDsv.ptr!]) !== 0) {
+  const dsvHr = vcall(device, DEV_CREATE_DEPTH_STENCIL_VIEW, [FFIType.u64, FFIType.ptr, FFIType.ptr], [tex, dsvDesc.ptr!, ppDsv.ptr!]);
+  if (dsvHr !== 0) {
     comRelease(tex);
-    throw new Error('CreateDepthStencilView failed.');
+    throw new Error(`CreateDepthStencilView failed: ${describeDeviceError(dsvHr)}`);
   }
   const dsv = ppDsv.readBigUInt64LE(0);
 
@@ -157,9 +162,8 @@ export function setCull(mode: 'none' | 'back' | 'front'): void {
     desc.writeUInt32LE(0, 36); // AntialiasedLineEnable
 
     const pp = Buffer.alloc(8);
-    if (vcall(device, DEV_CREATE_RASTERIZER_STATE, [FFIType.ptr, FFIType.ptr], [desc.ptr!, pp.ptr!]) !== 0) {
-      throw new Error('CreateRasterizerState failed.');
-    }
+    const hr = vcall(device, DEV_CREATE_RASTERIZER_STATE, [FFIType.ptr, FFIType.ptr], [desc.ptr!, pp.ptr!]);
+    if (hr !== 0) throw new Error(`CreateRasterizerState failed: ${describeDeviceError(hr)}`);
     state = pp.readBigUInt64LE(0);
     rasterStates.set(mode, state);
   }
@@ -205,7 +209,7 @@ export function setDepthState(enable: boolean, write = true): void {
     const pp = Buffer.alloc(8);
     const hr = vcall(device, DEV_CREATE_DEPTH_STENCIL_STATE, [FFIType.ptr, FFIType.ptr], [desc.ptr!, pp.ptr!]);
     if (hr !== 0) {
-      throw new Error(`CreateDepthStencilState failed ${hex(hr)}.`);
+      throw new Error(`CreateDepthStencilState failed: ${describeDeviceError(hr)}`);
     }
     state = pp.readBigUInt64LE(0);
     depthStates.set(key, state);
@@ -220,11 +224,11 @@ export function setDepthState(enable: boolean, write = true): void {
  */
 export function setRenderTargetsWithDepth(rtvs: readonly bigint[], dsv: bigint): void {
   const { context } = depthTarget();
+  invalidateCsCache(); // an OM output bind can null conflicting CS SRVs (outputs win)
   if (rtvs.length === 0) {
     vcall(context, CTX_OM_SET_RENDER_TARGETS, [FFIType.u32, FFIType.ptr, FFIType.u64], [0, null, dsv], FFIType.void);
     return;
   }
-  const arr = Buffer.alloc(8 * rtvs.length);
-  rtvs.forEach((r, i) => arr.writeBigUInt64LE(r, i * 8));
-  vcall(context, CTX_OM_SET_RENDER_TARGETS, [FFIType.u32, FFIType.ptr, FFIType.u64], [rtvs.length, arr.ptr!, dsv], FFIType.void);
+  for (let index = 0; index < rtvs.length; index += 1) renderTargetScratch.writeBigUInt64LE(rtvs[index]!, index * 8);
+  vcall(context, CTX_OM_SET_RENDER_TARGETS, [FFIType.u32, FFIType.ptr, FFIType.u64], [rtvs.length, renderTargetScratch.ptr!, dsv], FFIType.void);
 }

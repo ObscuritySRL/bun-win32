@@ -33,6 +33,7 @@ export function createKernelDebugLog(capacity = 1024, register = 0): KernelDebug
   const elementCount = 1 + capacity * 2;
   const zero = Buffer.alloc(elementCount * 4);
   const resource = makeStructuredBuffer({ count: elementCount, initialData: zero, stride: 4, uav: true });
+  let released = false;
   const hlslPrelude = `RWStructuredBuffer<uint> _debugLog : register(u${register});
 #define DEBUG_LOG(threadId, value) { uint _slot; InterlockedAdd(_debugLog[0], 1u, _slot); if (_slot < ${capacity}u) { _debugLog[1 + _slot * 2] = (threadId); _debugLog[2 + _slot * 2] = asuint((float)(value)); } }
 `;
@@ -41,6 +42,7 @@ export function createKernelDebugLog(capacity = 1024, register = 0): KernelDebug
     hlslPrelude,
     uav: resource.uav!,
     read() {
+      if (released) throw new Error('KernelDebugLog.read: the log was released.');
       const words = new Uint32Array(readbackBuffer(resource.buffer, elementCount * 4));
       const attempted = words[0]!;
       const stored = Math.min(attempted, capacity);
@@ -49,7 +51,10 @@ export function createKernelDebugLog(capacity = 1024, register = 0): KernelDebug
       for (let index = 0; index < stored; index += 1) entries.push({ threadId: words[1 + index * 2]!, value: floats[2 + index * 2]! });
       return { attempted, entries };
     },
+    // Idempotent: a second release is a no-op; read after release throws.
     release() {
+      if (released) return;
+      released = true;
       comRelease(resource.uav ?? 0n);
       comRelease(resource.buffer);
     },
