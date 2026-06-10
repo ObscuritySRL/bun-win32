@@ -49,6 +49,7 @@ import {
   csSet,
   describeDeviceError,
   destroyDevice,
+  deviceFeatures,
   dispatch,
   drawFullscreenTriangle,
   drawTriangles,
@@ -586,6 +587,29 @@ function runSections(label: string, options: CreateDeviceOptions): void {
     comRelease(kept.buffer);
     comRelease(source.srv!);
     comRelease(source.buffer);
+  }
+
+  {
+    const features = deviceFeatures();
+    if (!features.doublePrecisionFloatShaderOps) {
+      skip(tag('27 fp64'), 'device reports no double-precision shader ops');
+    } else {
+      const bits = new Uint32Array(2);
+      run(
+        `RWStructuredBuffer<uint> bits : register(u0);
+         [numthreads(1,1,1)] void main() {
+           double value = 0.1l + 0.2l;
+           uint low;
+           uint high;
+           asuint(value, low, high);
+           bits[0] = low;
+           bits[1] = high;
+         }`,
+        { bits },
+      );
+      const reference = new Uint32Array(new Float64Array([0.1 + 0.2]).buffer);
+      check(tag('27 fp64'), bits[0] === reference[0] && bits[1] === reference[1], `0.1 + 0.2 in shader doubles is bit-faithful to CPU Float64 (0x${bits[1]!.toString(16)}${bits[0]!.toString(16).padStart(8, '0')}) — provably not f32`);
+    }
   }
 
   {

@@ -10,7 +10,9 @@ import { comRelease, guidBytes, hex, vcall } from './com';
 import { reportLeaksAndReset } from './memory';
 import {
   D3D11_CREATE_DEVICE_BGRA_SUPPORT,
+  D3D11_FEATURE_DOUBLES,
   D3D_FEATURE_LEVEL_11_0,
+  DEV_CHECK_FEATURE_SUPPORT,
   DEV_CREATE_RENDER_TARGET_VIEW,
   DEV_GET_DEVICE_REMOVED_REASON,
   DXGIADAPTER_GET_DESC,
@@ -239,6 +241,17 @@ export function destroyDevice(): void {
   comRelease(activeGpu.context);
   comRelease(activeGpu.device);
   activeGpu = null;
+}
+
+/**
+ * Probe optional device capabilities (ID3D11Device::CheckFeatureSupport).
+ * doublePrecisionFloatShaderOps gates HLSL `double` math (dadd/dmul/dfma; division
+ * additionally needs 11.1 extended doubles). https://learn.microsoft.com/en-us/windows/win32/api/d3d11/nf-d3d11-id3d11device-checkfeaturesupport
+ */
+export function deviceFeatures(): { doublePrecisionFloatShaderOps: boolean } {
+  const data = Buffer.alloc(4); // D3D11_FEATURE_DATA_DOUBLES { BOOL DoublePrecisionFloatShaderOps }
+  const hr = vcall(requireGpu().device, DEV_CHECK_FEATURE_SUPPORT, [FFIType.u32, FFIType.ptr, FFIType.u32], [D3D11_FEATURE_DOUBLES, data.ptr!, 4]);
+  return { doublePrecisionFloatShaderOps: hr === 0 && data.readUInt32LE(0) !== 0 };
 }
 
 /** ID3D11Device::GetDeviceRemovedReason on the active device — 0 while healthy, a DXGI_ERROR_* code after device loss. */
