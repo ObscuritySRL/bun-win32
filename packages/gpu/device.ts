@@ -6,6 +6,7 @@ import D3d11 from '@bun-win32/d3d11';
 import { D3D11_SDK_VERSION, D3D_DRIVER_TYPE } from '@bun-win32/d3d11';
 
 import { openAdapter } from './adapter';
+import { releaseReadbackStaging } from './buffer';
 import { comRelease, guidBytes, hex, vcall } from './com';
 import { reportLeaksAndReset } from './memory';
 import {
@@ -236,6 +237,7 @@ export function describeDeviceError(hr: number): string {
 export function destroyDevice(): void {
   if (activeGpu === null) return;
   reportLeaksAndReset();
+  releaseReadbackStaging();
   comRelease(activeGpu.backBufferRTV);
   comRelease(activeGpu.swapChain);
   comRelease(activeGpu.context);

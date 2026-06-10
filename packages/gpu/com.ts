@@ -5,7 +5,10 @@ import { CFunction, FFIType, read, type Pointer } from 'bun:ffi';
 import { BLOB_RELEASE, IUNKNOWN_RELEASE } from './constants';
 import { untrackResource } from './memory';
 
-const invokers = new Map<string, ReturnType<typeof CFunction>>();
+// Keyed by the resolved method pointer — a COM method has one signature, and the
+// per-call vtable walk stays (an address can be reallocated to a different object;
+// the method pointer cannot lie). No string key on the hottest path (perf doctrine).
+const invokers = new Map<bigint, ReturnType<typeof CFunction>>();
 
 /** Release an ID3DBlob. No-op on a null handle. */
 export function blobRelease(blob: bigint): void {
@@ -45,11 +48,10 @@ export function hex(hr: number): string {
 export function vcall(thisPtr: bigint, slot: number, argTypes: readonly FFIType[], args: readonly unknown[], returns: FFIType = FFIType.i32): number {
   const vtable = read.u64(Number(thisPtr) as Pointer, 0);
   const method = read.u64(Number(vtable) as Pointer, slot * 8);
-  const key = `${method}|${returns}|${argTypes.join(',')}`;
-  let invoke = invokers.get(key);
+  let invoke = invokers.get(method);
   if (invoke === undefined) {
     invoke = CFunction({ ptr: Number(method) as Pointer, args: [FFIType.u64, ...argTypes], returns });
-    invokers.set(key, invoke);
+    invokers.set(method, invoke);
   }
   return invoke(thisPtr, ...args) as number;
 }

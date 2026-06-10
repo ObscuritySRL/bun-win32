@@ -203,38 +203,58 @@ export function appendCount(uav: bigint): number {
  * when source and destination sizes differ. Slice the result for partial reads.
  * Returns a detached ArrayBuffer. Synchronizes the GPU (the perf cliff to know about).
  */
+// Sync-readback hot-path state, allocated once (perf doctrine): the staging buffer
+// is pooled per (device, byteSize) so a readback loop creates zero GPU resources.
+// `.ptr` is read at call time, never cached — Bun small-Buffer stores can relocate.
+const readbackDescScratch = Buffer.alloc(24);
+const readbackHandleScratch = Buffer.alloc(8);
+const readbackMappedScratch = Buffer.alloc(16); // pData@0, RowPitch u32@8, DepthPitch u32@12
+let cachedStaging = 0n;
+let cachedStagingByteSize = -1;
+let cachedStagingDevice = 0n;
+
 export function readbackBuffer(buffer: bigint, byteSize: number): ArrayBuffer {
   const { device, context } = requireGpu();
-  // Staging buffer: same ByteWidth, USAGE_STAGING, CPU_ACCESS_READ, no bind flags.
-  const desc = Buffer.alloc(24);
-  desc.writeUInt32LE(byteSize, 0);
-  desc.writeUInt32LE(D3D11_USAGE_STAGING, 4);
-  desc.writeUInt32LE(0, 8); // BindFlags
-  desc.writeUInt32LE(D3D11_CPU_ACCESS_READ, 12);
-  desc.writeUInt32LE(0, 16); // MiscFlags
-  desc.writeUInt32LE(0, 20); // StructureByteStride
-  const pp = Buffer.alloc(8);
-  if (vcall(device, DEV_CREATE_BUFFER, [FFIType.ptr, FFIType.ptr, FFIType.ptr], [desc.ptr!, null, pp.ptr!]) !== 0) {
-    throw new Error('CreateBuffer (readback staging) failed.');
+  if (cachedStaging === 0n || cachedStagingByteSize !== byteSize || cachedStagingDevice !== device) {
+    comRelease(cachedStaging);
+    // Staging buffer: same ByteWidth, USAGE_STAGING, CPU_ACCESS_READ, no bind flags.
+    readbackDescScratch.writeUInt32LE(byteSize, 0);
+    readbackDescScratch.writeUInt32LE(D3D11_USAGE_STAGING, 4);
+    readbackDescScratch.writeUInt32LE(0, 8); // BindFlags
+    readbackDescScratch.writeUInt32LE(D3D11_CPU_ACCESS_READ, 12);
+    readbackDescScratch.writeUInt32LE(0, 16); // MiscFlags
+    readbackDescScratch.writeUInt32LE(0, 20); // StructureByteStride
+    const createHr = vcall(device, DEV_CREATE_BUFFER, [FFIType.ptr, FFIType.ptr, FFIType.ptr], [readbackDescScratch.ptr!, null, readbackHandleScratch.ptr!]);
+    if (createHr !== 0) {
+      throw new Error(`CreateBuffer (readback staging) failed: ${describeDeviceError(createHr)}`);
+    }
+    cachedStaging = readbackHandleScratch.readBigUInt64LE(0);
+    cachedStagingByteSize = byteSize;
+    cachedStagingDevice = device;
   }
-  const staging = pp.readBigUInt64LE(0);
+  const staging = cachedStaging;
 
   vcall(context, CTX_COPY_RESOURCE, [FFIType.u64, FFIType.u64], [staging, buffer], FFIType.void);
 
-  const mapped = Buffer.alloc(16); // pData@0, RowPitch u32@8, DepthPitch u32@12
-  const hr = vcall(context, CTX_MAP, [FFIType.u64, FFIType.u32, FFIType.u32, FFIType.u32, FFIType.ptr], [staging, 0, D3D11_MAP_READ, 0, mapped.ptr!]);
+  const hr = vcall(context, CTX_MAP, [FFIType.u64, FFIType.u32, FFIType.u32, FFIType.u32, FFIType.ptr], [staging, 0, D3D11_MAP_READ, 0, readbackMappedScratch.ptr!]);
   if (hr !== 0) {
-    comRelease(staging);
     throw new Error(`ID3D11DeviceContext::Map (readback) failed: ${describeDeviceError(hr)}`);
   }
-  const dataPtr = mapped.readBigUInt64LE(0);
+  const dataPtr = readbackMappedScratch.readBigUInt64LE(0);
   // Bulk-copy the mapped region into an owned Uint8Array BEFORE Unmap (the mapped
   // pointer dies at Unmap; the copy detaches the result from driver memory).
   const out = new Uint8Array(byteSize);
   out.set(new Uint8Array(toArrayBuffer(Number(dataPtr) as Pointer, 0, byteSize)));
   vcall(context, CTX_UNMAP, [FFIType.u64, FFIType.u32], [staging, 0], FFIType.void);
-  comRelease(staging);
   return out.buffer;
+}
+
+/** Internal: drop the pooled readback staging buffer (destroyDevice calls this). */
+export function releaseReadbackStaging(): void {
+  comRelease(cachedStaging);
+  cachedStaging = 0n;
+  cachedStagingByteSize = -1;
+  cachedStagingDevice = 0n;
 }
 
 /**

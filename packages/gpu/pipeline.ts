@@ -35,6 +35,18 @@ import {
 } from './constants';
 import { requireGpu } from './device';
 
+// Per-call scratch, allocated once — binding/state setters run in per-frame and
+// per-dispatch loops where a Buffer.alloc costs ~1 us (perf doctrine). `.ptr` is
+// read AT CALL TIME, never cached: Bun small-Buffer backing stores can relocate
+// after later allocations (measured ground truth — a cached pointer dangles).
+// Safe to share: every vcall is synchronous and D3D11 copies the arrays during the call.
+const colorScratch = Buffer.alloc(16);
+const countScratch = Buffer.alloc(4 * 128);
+const factorScratch = Buffer.alloc(16);
+const handleScratch = Buffer.alloc(8 * 128);
+const secondaryHandleScratch = Buffer.alloc(8 * 128);
+const viewportScratch = Buffer.alloc(24);
+
 export interface PsBindings {
   cb?: readonly bigint[];
   srv?: readonly bigint[];
@@ -59,12 +71,11 @@ export interface SamplerOptions {
 /** Clear a render-target view to the given RGBA color. */
 export function clear(rtv: bigint, color: readonly [number, number, number, number]): void {
   const { context } = requireGpu();
-  const c = Buffer.alloc(16);
-  c.writeFloatLE(color[0], 0);
-  c.writeFloatLE(color[1], 4);
-  c.writeFloatLE(color[2], 8);
-  c.writeFloatLE(color[3], 12);
-  vcall(context, CTX_CLEAR_RENDER_TARGET_VIEW, [FFIType.u64, FFIType.ptr], [rtv, c.ptr!], FFIType.void);
+  colorScratch.writeFloatLE(color[0], 0);
+  colorScratch.writeFloatLE(color[1], 4);
+  colorScratch.writeFloatLE(color[2], 8);
+  colorScratch.writeFloatLE(color[3], 12);
+  vcall(context, CTX_CLEAR_RENDER_TARGET_VIEW, [FFIType.u64, FFIType.ptr], [rtv, colorScratch.ptr!], FFIType.void);
 }
 
 /** Copy an entire resource (CopyResource). */
@@ -84,26 +95,23 @@ export function csSet(shader: bigint, bindings: CsBindings = {}): void {
   const { context } = requireGpu();
   vcall(context, CTX_CS_SET_SHADER, [FFIType.u64, FFIType.ptr, FFIType.u32], [shader, null, 0], FFIType.void);
   if (bindings.cb && bindings.cb.length > 0) {
-    const arr = Buffer.alloc(8 * bindings.cb.length);
-    bindings.cb.forEach((c, i) => arr.writeBigUInt64LE(c, i * 8));
-    vcall(context, CTX_CS_SET_CONSTANT_BUFFERS, [FFIType.u32, FFIType.u32, FFIType.ptr], [0, bindings.cb.length, arr.ptr!], FFIType.void);
+    bindings.cb.forEach((c, i) => handleScratch.writeBigUInt64LE(c, i * 8));
+    vcall(context, CTX_CS_SET_CONSTANT_BUFFERS, [FFIType.u32, FFIType.u32, FFIType.ptr], [0, bindings.cb.length, handleScratch.ptr!], FFIType.void);
   }
   if (bindings.uav && bindings.uav.length > 0) {
-    const arr = Buffer.alloc(8 * bindings.uav.length);
-    bindings.uav.forEach((u, i) => arr.writeBigUInt64LE(u, i * 8));
-    let counts: Buffer | null = null;
+    bindings.uav.forEach((u, i) => handleScratch.writeBigUInt64LE(u, i * 8));
+    let counts = false;
     if (bindings.uavInitialCounts !== undefined) {
       if (bindings.uavInitialCounts.length !== bindings.uav.length) throw new Error(`csSet: uavInitialCounts has ${bindings.uavInitialCounts.length} entries but uav has ${bindings.uav.length}.`);
-      counts = Buffer.alloc(4 * bindings.uavInitialCounts.length);
-      bindings.uavInitialCounts.forEach((count, i) => counts!.writeInt32LE(count, i * 4));
+      bindings.uavInitialCounts.forEach((count, i) => countScratch.writeInt32LE(count, i * 4));
+      counts = true;
     }
     // CSSetUnorderedAccessViews: StartSlot, NumUAVs, ppUAVs, pUAVInitialCounts.
-    vcall(context, CTX_CS_SET_UNORDERED_ACCESS_VIEWS, [FFIType.u32, FFIType.u32, FFIType.ptr, FFIType.ptr], [0, bindings.uav.length, arr.ptr!, counts === null ? null : counts.ptr!], FFIType.void);
+    vcall(context, CTX_CS_SET_UNORDERED_ACCESS_VIEWS, [FFIType.u32, FFIType.u32, FFIType.ptr, FFIType.ptr], [0, bindings.uav.length, handleScratch.ptr!, counts ? countScratch.ptr! : null], FFIType.void);
   }
   if (bindings.srv && bindings.srv.length > 0) {
-    const arr = Buffer.alloc(8 * bindings.srv.length);
-    bindings.srv.forEach((s, i) => arr.writeBigUInt64LE(s, i * 8));
-    vcall(context, CTX_CS_SET_SHADER_RESOURCES, [FFIType.u32, FFIType.u32, FFIType.ptr], [0, bindings.srv.length, arr.ptr!], FFIType.void);
+    bindings.srv.forEach((s, i) => secondaryHandleScratch.writeBigUInt64LE(s, i * 8));
+    vcall(context, CTX_CS_SET_SHADER_RESOURCES, [FFIType.u32, FFIType.u32, FFIType.ptr], [0, bindings.srv.length, secondaryHandleScratch.ptr!], FFIType.void);
   }
 }
 
@@ -202,12 +210,11 @@ export function makeSampler(options: SamplerOptions = {}): bigint {
 /** Bind a blend state (OMSetBlendState, slot 35). Pass 0n to restore the default opaque blend. */
 export function setBlendState(blendState: bigint, blendFactor: readonly [number, number, number, number] = [0, 0, 0, 0], sampleMask = 0xffffffff): void {
   const { context } = requireGpu();
-  const factor = Buffer.alloc(16);
-  factor.writeFloatLE(blendFactor[0], 0);
-  factor.writeFloatLE(blendFactor[1], 4);
-  factor.writeFloatLE(blendFactor[2], 8);
-  factor.writeFloatLE(blendFactor[3], 12);
-  vcall(context, CTX_OM_SET_BLEND_STATE, [FFIType.u64, FFIType.ptr, FFIType.u32], [blendState, blendState === 0n ? null : factor.ptr!, sampleMask], FFIType.void);
+  factorScratch.writeFloatLE(blendFactor[0], 0);
+  factorScratch.writeFloatLE(blendFactor[1], 4);
+  factorScratch.writeFloatLE(blendFactor[2], 8);
+  factorScratch.writeFloatLE(blendFactor[3], 12);
+  vcall(context, CTX_OM_SET_BLEND_STATE, [FFIType.u64, FFIType.ptr, FFIType.u32], [blendState, blendState === 0n ? null : factorScratch.ptr!, sampleMask], FFIType.void);
 }
 
 /** Bind render targets (OMSetRenderTargets). Pass [] to unbind. */
@@ -217,22 +224,20 @@ export function setRenderTargets(rtvs: readonly bigint[]): void {
     vcall(context, CTX_OM_SET_RENDER_TARGETS, [FFIType.u32, FFIType.ptr, FFIType.u64], [0, null, 0n], FFIType.void);
     return;
   }
-  const arr = Buffer.alloc(8 * rtvs.length);
-  rtvs.forEach((r, i) => arr.writeBigUInt64LE(r, i * 8));
-  vcall(context, CTX_OM_SET_RENDER_TARGETS, [FFIType.u32, FFIType.ptr, FFIType.u64], [rtvs.length, arr.ptr!, 0n], FFIType.void);
+  rtvs.forEach((r, i) => handleScratch.writeBigUInt64LE(r, i * 8));
+  vcall(context, CTX_OM_SET_RENDER_TARGETS, [FFIType.u32, FFIType.ptr, FFIType.u64], [rtvs.length, handleScratch.ptr!, 0n], FFIType.void);
 }
 
 /** Set a single full-size viewport (RSSetViewports). */
 export function setViewport(w: number, h: number): void {
   const { context } = requireGpu();
-  const vp = Buffer.alloc(24); // 6 floats
-  vp.writeFloatLE(0, 0);
-  vp.writeFloatLE(0, 4);
-  vp.writeFloatLE(w, 8);
-  vp.writeFloatLE(h, 12);
-  vp.writeFloatLE(0, 16);
-  vp.writeFloatLE(1, 20);
-  vcall(context, CTX_RS_SET_VIEWPORTS, [FFIType.u32, FFIType.ptr], [1, vp.ptr!], FFIType.void);
+  viewportScratch.writeFloatLE(0, 0); // 6 floats
+  viewportScratch.writeFloatLE(0, 4);
+  viewportScratch.writeFloatLE(w, 8);
+  viewportScratch.writeFloatLE(h, 12);
+  viewportScratch.writeFloatLE(0, 16);
+  viewportScratch.writeFloatLE(1, 20);
+  vcall(context, CTX_RS_SET_VIEWPORTS, [FFIType.u32, FFIType.ptr], [1, viewportScratch.ptr!], FFIType.void);
 }
 
 /** Bind the pixel shader plus optional constant buffers, SRVs, and samplers. */
@@ -240,19 +245,16 @@ export function psSet(shader: bigint, bindings: PsBindings = {}): void {
   const { context } = requireGpu();
   vcall(context, CTX_PS_SET_SHADER, [FFIType.u64, FFIType.ptr, FFIType.u32], [shader, null, 0], FFIType.void);
   if (bindings.cb && bindings.cb.length > 0) {
-    const arr = Buffer.alloc(8 * bindings.cb.length);
-    bindings.cb.forEach((c, i) => arr.writeBigUInt64LE(c, i * 8));
-    vcall(context, CTX_PS_SET_CONSTANT_BUFFERS, [FFIType.u32, FFIType.u32, FFIType.ptr], [0, bindings.cb.length, arr.ptr!], FFIType.void);
+    bindings.cb.forEach((c, i) => handleScratch.writeBigUInt64LE(c, i * 8));
+    vcall(context, CTX_PS_SET_CONSTANT_BUFFERS, [FFIType.u32, FFIType.u32, FFIType.ptr], [0, bindings.cb.length, handleScratch.ptr!], FFIType.void);
   }
   if (bindings.srv && bindings.srv.length > 0) {
-    const arr = Buffer.alloc(8 * bindings.srv.length);
-    bindings.srv.forEach((s, i) => arr.writeBigUInt64LE(s, i * 8));
-    vcall(context, CTX_PS_SET_SHADER_RESOURCES, [FFIType.u32, FFIType.u32, FFIType.ptr], [0, bindings.srv.length, arr.ptr!], FFIType.void);
+    bindings.srv.forEach((s, i) => handleScratch.writeBigUInt64LE(s, i * 8));
+    vcall(context, CTX_PS_SET_SHADER_RESOURCES, [FFIType.u32, FFIType.u32, FFIType.ptr], [0, bindings.srv.length, handleScratch.ptr!], FFIType.void);
   }
   if (bindings.samp && bindings.samp.length > 0) {
-    const arr = Buffer.alloc(8 * bindings.samp.length);
-    bindings.samp.forEach((s, i) => arr.writeBigUInt64LE(s, i * 8));
-    vcall(context, CTX_PS_SET_SAMPLERS, [FFIType.u32, FFIType.u32, FFIType.ptr], [0, bindings.samp.length, arr.ptr!], FFIType.void);
+    bindings.samp.forEach((s, i) => secondaryHandleScratch.writeBigUInt64LE(s, i * 8));
+    vcall(context, CTX_PS_SET_SAMPLERS, [FFIType.u32, FFIType.u32, FFIType.ptr], [0, bindings.samp.length, secondaryHandleScratch.ptr!], FFIType.void);
   }
 }
 
@@ -261,16 +263,14 @@ export function vsSet(shader: bigint, cbs: readonly bigint[] = []): void {
   const { context } = requireGpu();
   vcall(context, CTX_VS_SET_SHADER, [FFIType.u64, FFIType.ptr, FFIType.u32], [shader, null, 0], FFIType.void);
   if (cbs.length > 0) {
-    const arr = Buffer.alloc(8 * cbs.length);
-    cbs.forEach((c, i) => arr.writeBigUInt64LE(c, i * 8));
-    vcall(context, CTX_VS_SET_CONSTANT_BUFFERS, [FFIType.u32, FFIType.u32, FFIType.ptr], [0, cbs.length, arr.ptr!], FFIType.void);
+    cbs.forEach((c, i) => handleScratch.writeBigUInt64LE(c, i * 8));
+    vcall(context, CTX_VS_SET_CONSTANT_BUFFERS, [FFIType.u32, FFIType.u32, FFIType.ptr], [0, cbs.length, handleScratch.ptr!], FFIType.void);
   }
 }
 
 /** Bind shader-resource views to the vertex shader (VSSetShaderResources). */
 export function vsSetShaderResources(srvs: readonly bigint[], startSlot = 0): void {
   const { context } = requireGpu();
-  const arr = Buffer.alloc(8 * srvs.length);
-  srvs.forEach((s, i) => arr.writeBigUInt64LE(s, i * 8));
-  vcall(context, CTX_VS_SET_SHADER_RESOURCES, [FFIType.u32, FFIType.u32, FFIType.ptr], [startSlot, srvs.length, arr.ptr!], FFIType.void);
+  srvs.forEach((s, i) => handleScratch.writeBigUInt64LE(s, i * 8));
+  vcall(context, CTX_VS_SET_SHADER_RESOURCES, [FFIType.u32, FFIType.u32, FFIType.ptr], [startSlot, srvs.length, handleScratch.ptr!], FFIType.void);
 }

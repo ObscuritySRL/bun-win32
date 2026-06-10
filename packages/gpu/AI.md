@@ -16,7 +16,7 @@ Escalation rule: start at layer 1; drop a layer only when you need something the
 
 - **The device is module-level state.** `createComputeDevice()` (headless) or `createDevice(hwnd, size)` (windowed swap chain) once; every helper targets it. `destroyDevice()` tears it down and warns about leaked resources. Failure throws (never exits).
 - **HLSL compiles at runtime** via FXC (`cs_5_0`/`vs_5_0`/`ps_5_0`). Kernels are HLSL **strings** — this package never transpiles JavaScript (gpu.js's `fn.toString()` transpiler was its defining failure mode; bundlers/minifiers cannot break a string).
-- **Buffers are explicit.** `GpuArray` stays on the GPU across dispatches (the chaining primitive — zero readbacks between kernels); `run()` is the one-shot sugar that uploads, dispatches, reads back **in place**, and releases. Hot loops: build `Kernel` + `GpuArray`s once, dispatch many times — zero per-iteration allocations.
+- **Buffers are explicit.** `GpuArray` stays on the GPU across dispatches (the chaining primitive — zero readbacks between kernels); `run()` is the one-shot sugar that uploads, dispatches, reads back **in place**, and releases the uploads. `run()` memoizes compiled kernels per source, so repeat calls skip FXC — but it still creates and destroys every GPU buffer per call. Hot loops: build `Kernel` + `GpuArray`s once, dispatch many times — zero per-iteration GPU allocations.
 - **WARP is the universal fallback** — always present, deterministic, slow. Force it with `{ driver: 'warp' }` for reproducible CI and as your debug target.
 - **Readback synchronizes the GPU** (the perf cliff). `readbackBuffer`/`GpuArray.read()` block; `readbackBufferAsync`/`GpuArray.readAsync()` poll across `setImmediate` turns so the event loop stays live.
 - **GPU memory is never garbage-collected.** Every buffer/texture/shader/`GpuArray` owns a native resource: call `release()`/`comRelease()` and assert `gpuMemory().liveResources === 0` between jobs in long-running processes.
@@ -53,7 +53,7 @@ Escalation rule: start at layer 1; drop a layer only when you need something the
 
 ### kernel.ts — the flagship compute API
 
-- `run<T>(source: string, buffers: T, options?: RunOptions): T` — compile → upload → dispatch → read back **in place** → release. `T` is a record of `KernelArray`s keyed by the kernel's buffer names.
+- `run<T>(source: string, buffers: T, options?: RunOptions): T` — compile (memoized per source + compile options; repeat calls skip FXC) → upload → dispatch → read back **in place** → release the uploads. `T` is a record of `KernelArray`s keyed by the kernel's buffer names.
 - `class Kernel` — `new Kernel(source, options?: CompileOptions)`; `.dispatch(buffers: Record<string, GpuArray>, options?: DispatchOptions)`; `.bindings` (parsed `KernelBinding[]`); `.threads` (`[x,y,z]` from `[numthreads]`); `.release()`.
 - `class GpuArray` — `GpuArray.from(data: KernelArray)`, `GpuArray.alloc(kind: ScalarKind, length: number)`; `.read(): KernelArray`; `.readAsync(): Promise<KernelArray>` (event loop stays live); `.readInto(target)`; `.kind`; `.length`; `.buffer`/`.srv`/`.uav` (raw handles); `.release()`.
 - `parseKernelBindings(source): KernelBinding[]` — the textual contract: explicit `StructuredBuffer<float|int|uint> name : register(tN)` / `RWStructuredBuffer<…> : register(uN)`, registers dense from 0 per kind. Throws actionable errors (wrong register space, sparse registers, no bindings, non-string source).
@@ -270,7 +270,7 @@ const featureLevel = vcall(gpu.device, DEV_GET_FEATURE_LEVEL, [], [], FFIType.u3
 - **HLSL reserved words can't name kernel buffers** — `out`, `signed`, and friends produce FXC syntax errors (X3000). Pick another name.
 - **Capture before present.** With `DXGI_SWAP_EFFECT_DISCARD` the back buffer is undefined after `Present` — `captureBackBuffer` must run after the final draw, before `present()`.
 - **Matrices are column-major in HLSL** by default — pass transposed data from row-major TS or declare `row_major` in the shader.
-- **GC window:** assemble pointer-bearing structs immediately before the FFI call — an `await` between invalidates baked-in `Buffer` pointers (engine paths stay synchronous internally for this reason).
+- **GC window:** assemble pointer-bearing structs immediately before the FFI call and read `.ptr` at call time — an `await` invalidates baked-in `Buffer` pointers, and Bun small-`Buffer` backing stores can RELOCATE after later allocations, so a cached `.ptr` dangles even synchronously (measured ground truth; engine paths stay synchronous and read `.ptr` live for this reason).
 - **Same resource as SRV and UAV in one dispatch** is invalid D3D11 — the runtime silently nulls the binding. Chain sequential kernels instead.
 - **`readbackBuffer` needs the full ByteWidth** — CopyResource silently no-ops on a size mismatch. Read everything, slice on the CPU.
 - **Readback synchronizes the GPU.** Batch dispatches, read once; or `readAsync` to keep the event loop live.

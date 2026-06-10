@@ -2,7 +2,7 @@
 // retained GPU arrays for zero-readback chaining, and one-shot in-place execution.
 
 import { comRelease } from './com';
-import { createComputeDevice, hasDevice } from './device';
+import { createComputeDevice, hasDevice, requireGpu } from './device';
 import { makeConstantBuffer, makeStructuredBuffer, readbackBuffer, readbackBufferAsync, updateConstantBuffer, type StructuredBuffer } from './buffer';
 import { csSet, dispatch } from './pipeline';
 import { compile, makeComputeShader, type CompileOptions } from './shader';
@@ -202,9 +202,27 @@ export class Kernel {
   }
 }
 
-/** One-shot: compile, upload, dispatch, read back (in place), release. The 10-line-wow API. */
+// run() memoizes compiled kernels per (source, compile options) so repeat calls skip
+// FXC entirely (the compile-per-call cliff, perf doctrine). Entries are keyed to the
+// device that compiled them and are released + rebuilt after a device change.
+const runKernelCache = new Map<string, { device: bigint; kernel: Kernel }>();
+
+/**
+ * One-shot: compile (memoized per source), upload, dispatch, read back (in place),
+ * release the uploads. The 10-line-wow API. Hot loops should hold a Kernel +
+ * GpuArrays instead — run() still creates and destroys every GPU buffer per call.
+ */
 export function run<T extends Record<string, KernelArray>>(source: string, buffers: T, options: RunOptions = {}): T {
-  const kernel = new Kernel(source, options.compile);
+  ensureDevice();
+  const device = requireGpu().device;
+  const cacheKey = options.compile === undefined ? source : `${source}|${JSON.stringify(options.compile)}`;
+  let entry = runKernelCache.get(cacheKey);
+  if (entry === undefined || entry.device !== device) {
+    if (entry !== undefined) entry.kernel.release();
+    entry = { device, kernel: new Kernel(source, options.compile) };
+    runKernelCache.set(cacheKey, entry);
+  }
+  const kernel = entry.kernel;
   const uploaded = new Map<string, GpuArray>();
   try {
     const bound: Record<string, GpuArray> = {};
@@ -222,6 +240,5 @@ export function run<T extends Record<string, KernelArray>>(source: string, buffe
     return buffers;
   } finally {
     for (const array of uploaded.values()) array.release();
-    kernel.release();
   }
 }
