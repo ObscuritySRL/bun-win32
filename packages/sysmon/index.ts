@@ -1,3 +1,5 @@
+export { CounterSet, expandCounterPath, listCounterItems, listCounterObjects } from './counters';
+export type { CounterHandle, CounterItems } from './counters';
 export { CpuSampler, cpuTimes, systemTimes } from './cpu';
 export type { CpuSample, SystemTimes } from './cpu';
 export { diskSpace, drives } from './disk';
