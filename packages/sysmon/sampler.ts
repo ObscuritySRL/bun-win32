@@ -79,3 +79,30 @@ export function monotonicMicroseconds(): number {
   void QueryPerformanceCounter(counterBuffer.ptr);
   return (counterBuffer.readUInt32LE(4) * 4_294_967_296 + counterBuffer.readUInt32LE(0)) * microsecondsPerTick;
 }
+
+export interface WatchOptions {
+  signal?: AbortSignal;
+}
+
+/**
+ * High-rate paced polling that still yields to the event loop: each tick waits on the
+ * high-resolution ticker (NOT the ~15.6 ms-quantized `setInterval`), calls `fn`, hands the
+ * value to `onSample`, then yields a microtask turn so timers/IO keep running. Resolves with
+ * the sample count when the signal aborts — the systeminformation `observe()` analog with
+ * in-process calls instead of per-tick spawns.
+ */
+export async function watch<T>(fn: () => T, intervalMs: number, onSample: (value: T) => void, options?: WatchOptions): Promise<number> {
+  const ticker = createTicker(intervalMs);
+  let count = 0;
+  try {
+    while (options?.signal === undefined || !options.signal.aborted) {
+      ticker.wait();
+      onSample(fn());
+      count += 1;
+      await new Promise<void>((resolve) => setImmediate(resolve)); // MACROTASK yield — a bare Promise.resolve() would starve timers (the abort signal could never fire)
+    }
+  } finally {
+    ticker.dispose();
+  }
+  return count;
+}
