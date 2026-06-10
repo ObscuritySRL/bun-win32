@@ -1,6 +1,7 @@
 // Runtime HLSL toolchain: FXC compile with trap guardrails, TS-side #include preprocessing, DXBC disassembly, and shader-object creation.
 
-import { CFunction, FFIType, read, type Pointer } from 'bun:ffi';
+import { CFunction, FFIType, read, toArrayBuffer, type Pointer } from 'bun:ffi';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 
 import D3dcompiler_47 from '@bun-win32/d3dcompiler_47';
 import { D3DCOMPILE_ENABLE_STRICTNESS, D3DCOMPILE_OPTIMIZATION_LEVEL3, D3D_DISASM_ENABLE_INSTRUCTION_NUMBERING } from '@bun-win32/d3dcompiler_47';
@@ -25,6 +26,12 @@ export interface CompileOptions {
   flags?: number;
   /** Named include sources, resolved TS-side. `#include "name"` is replaced textually. */
   includes?: Record<string, string>;
+}
+
+export interface CachedShader extends CompiledShader {
+  /** Owns the DXBC bytes on cache hits (blob is 0n then) — keep the object referenced while ptr is in use. */
+  bytes?: Buffer;
+  fromCache: boolean;
 }
 
 const INCLUDE_PATTERN = /^[ \t]*#include[ \t]+"([^"]+)"[ \t]*$/gm;
@@ -91,6 +98,32 @@ export function compile(source: string, entry: string, target: string, options: 
   }
   const blob = ppCode.readBigUInt64LE(0);
   return { blob, ptr: blobBufferPointer(blob), size: Number(blobBufferSize(blob)) };
+}
+
+/**
+ * compile() with a DXBC disk cache keyed by Bun.hash over every codegen input.
+ * Warm hits skip FXC entirely (blob is 0n; the returned object owns the bytes).
+ * Corrupt cache entries (bad DXBC magic) silently recompile and repair the file.
+ */
+export function compileCached(source: string, entry: string, target: string, options: CompileOptions = {}, cacheDirectory = '.gpu-cache'): CachedShader {
+  const flags = options.flags ?? D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_OPTIMIZATION_LEVEL3;
+  const definesKey = options.defines === undefined ? '' : JSON.stringify(options.defines);
+  const includesKey = options.includes === undefined ? '' : JSON.stringify(options.includes);
+  const key = Bun.hash(`${source}|${entry}|${target}|${flags}|${definesKey}|${includesKey}`).toString(16);
+  const cachePath = `${cacheDirectory}/${key}.dxbc`;
+  try {
+    const bytes = readFileSync(cachePath);
+    if (bytes.byteLength > 4 && bytes.toString('latin1', 0, 4) === 'DXBC') {
+      return { blob: 0n, bytes, fromCache: true, ptr: BigInt(bytes.ptr!), size: bytes.byteLength };
+    }
+  } catch {}
+  const code = compile(source, entry, target, options);
+  const bytes = Buffer.from(toArrayBuffer(Number(code.ptr) as Pointer, 0, code.size).slice(0));
+  try {
+    mkdirSync(cacheDirectory, { recursive: true });
+    writeFileSync(cachePath, bytes);
+  } catch {}
+  return { blob: code.blob, fromCache: false, ptr: code.ptr, size: code.size };
 }
 
 /** Disassemble compiled DXBC to numbered shader assembly text (D3DDisassemble). */

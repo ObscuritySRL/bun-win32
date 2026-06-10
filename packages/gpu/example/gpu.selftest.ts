@@ -23,8 +23,10 @@
  * Run: bun run example/gpu.selftest.ts
  */
 import { FFIType } from 'bun:ffi';
+import { readdirSync, rmSync, writeFileSync } from 'node:fs';
 
 import {
+  type CompiledShader,
   type CreateDeviceOptions,
   DXGIADAPTER_GET_DESC,
   DXGIDEVICE_GET_ADAPTER,
@@ -36,12 +38,14 @@ import {
   IUNKNOWN_QUERY_INTERFACE,
   Kernel,
   appendCount,
+  blobRelease,
   captureBackBuffer,
   cbufferLayout,
   clear,
   clearDepth,
   comRelease,
   compile,
+  compileCached,
   createComputeDevice,
   createDevice,
   createGpuTimer,
@@ -588,6 +592,48 @@ function runSections(label: string, options: CreateDeviceOptions): void {
     comRelease(kept.buffer);
     comRelease(source.srv!);
     comRelease(source.buffer);
+  }
+
+  {
+    const cacheDirectory = `${import.meta.dir}/../.scratch/shader-cache`;
+    rmSync(cacheDirectory, { force: true, recursive: true });
+    const SOURCE = `RWStructuredBuffer<float> data : register(u0);
+[numthreads(64,1,1)] void main(uint3 id : SV_DispatchThreadID) { data[id.x] = data[id.x] * 4.0 + 0.25; }`;
+
+    const coldStart = performance.now();
+    const cold = compileCached(SOURCE, 'main', 'cs_5_0', {}, cacheDirectory);
+    const coldMs = performance.now() - coldStart;
+    const warmStart = performance.now();
+    const warm = compileCached(SOURCE, 'main', 'cs_5_0', {}, cacheDirectory);
+    const warmMs = performance.now() - warmStart;
+    check(tag('29 cache-hit'), !cold.fromCache && warm.fromCache, `cold compile ${coldMs.toFixed(2)} ms (FXC) → warm load ${warmMs.toFixed(2)} ms (disk, no FXC)`);
+
+    const runWith = (code: CompiledShader): Float32Array => {
+      const shader = makeComputeShader(code);
+      const values = new Float32Array(64);
+      for (let index = 0; index < values.length; index += 1) values[index] = index;
+      const array = GpuArray.from(values);
+      csSet(shader, { uav: [array.uav] });
+      dispatch(1);
+      csSet(0n, { uav: [0n] });
+      const result = new Float32Array(array.read());
+      array.release();
+      comRelease(shader);
+      return result;
+    };
+    const coldResult = runWith(cold);
+    const warmResult = runWith(warm);
+    let identical = true;
+    for (let index = 0; index < 64; index += 1) if (coldResult[index] !== warmResult[index]) identical = false;
+    check(tag('29 cache-dispatch'), identical && warmResult[1] === 4.25, 'CreateComputeShader from cached bytes dispatches identically to the cold path');
+
+    const cacheFiles = readdirSync(cacheDirectory);
+    writeFileSync(`${cacheDirectory}/${cacheFiles[0]}`, Buffer.from('corrupted, not DXBC'));
+    const repaired = compileCached(SOURCE, 'main', 'cs_5_0', {}, cacheDirectory);
+    const reloaded = compileCached(SOURCE, 'main', 'cs_5_0', {}, cacheDirectory);
+    check(tag('29 cache-corrupt'), !repaired.fromCache && reloaded.fromCache, 'corrupt cache entry silently recompiles and repairs the file');
+    blobRelease(cold.blob);
+    blobRelease(repaired.blob);
   }
 
   {
