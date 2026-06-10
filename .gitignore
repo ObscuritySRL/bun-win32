@@ -46,6 +46,7 @@ report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
 # Finder (MacOS) folder config
 .DS_Store
 DISCORD_POST*.md
+BUN_GPU_POST.md
 TODO.md
 
 # MNIST dataset (downloaded locally by digit-oracle.train.ts; ~65 MB, not committed)
@@ -54,55 +55,13 @@ packages/all/example/.mnist/
 # Local-only triage/capture scratch from the terminal demos
 packages/all/example/.triage-logs/
 
-# Showcase capture output (local-only) — except the curated hero shots used in the README
+# Showcase capture output (local-only) — except the shots hot-linked by package READMEs (gpu, bun-gpu, sysmon, bun-sysmon)
 packages/all/screenshots/*
-!packages/all/screenshots/shader-forge.png
-!packages/all/screenshots/sound-bloom.png
-!packages/all/screenshots/event-horizon.png
-!packages/all/screenshots/oscilloscope-music.png
-!packages/all/screenshots/particle-galaxy.png
-!packages/all/screenshots/blackhole.png
-!packages/all/screenshots/fluid.png
-!packages/all/screenshots/taskman.png
-!packages/all/screenshots/slime.png
-!packages/all/screenshots/mandelbulb.png
-!packages/all/screenshots/pathtracer.png
-!packages/all/screenshots/clouds.png
-!packages/all/screenshots/reaction-diffusion.png
-!packages/all/screenshots/gameboy.png
-!packages/all/screenshots/voxelscape.png
 !packages/all/screenshots/neural-descent.png
-!packages/all/screenshots/cloth.png
-!packages/all/screenshots/cam-filter.png
-!packages/all/screenshots/cam-filter-thermal.png
-!packages/all/screenshots/cam-filter-sobel.png
-!packages/all/screenshots/cam-filter-ascii.png
-!packages/all/screenshots/cam-filter-kaleidoscope.png
-!packages/all/screenshots/core-scope.png
-!packages/all/screenshots/digit-oracle.png
-!packages/all/screenshots/lenia.png
-!packages/all/screenshots/midi-music.png
-!packages/all/screenshots/nano-gpt.png
-!packages/all/screenshots/net-xray.png
-!packages/all/screenshots/ocean.png
-!packages/all/screenshots/raycaster.png
 !packages/all/screenshots/raymarch.png
-!packages/all/screenshots/rf-radar.png
 !packages/all/screenshots/shader-tty.png
-!packages/all/screenshots/sph3d.png
-!packages/all/screenshots/webcam.png
-!packages/all/screenshots/clawd.png
-!packages/all/screenshots/claude-spark.png
-!packages/all/screenshots/galaxy-tty.png
-!packages/all/screenshots/torus-knot.png
-!packages/all/screenshots/blackhole-tty.png
-!packages/all/screenshots/mandel-dive.png
-!packages/all/screenshots/fluid-ink.png
-!packages/all/screenshots/flowfield.png
-!packages/all/screenshots/swarm3d.png
-!packages/all/screenshots/reaction.png
-!packages/all/screenshots/cinema.png
-!packages/all/screenshots/gameboy-tty.png
+!packages/all/screenshots/taskman.png
+!packages/all/screenshots/voxelscape.png
 packages/all/replay-*.gif
 packages/all/bun-win32-wallpaper.png
 

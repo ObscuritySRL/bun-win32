@@ -1,192 +1,65 @@
 # @bun-win32/all
 
-> Every `@bun-win32/*` package in one install — the full Win32 surface area for [Bun](https://bun.sh) on Windows. **Pure TypeScript. Zero native addons. Zero C. Zero build step.**
+Every Win32 FFI binding for [Bun](https://bun.sh) on Windows, in one install.
 
-```sh
-bun add @bun-win32/all     # scoped meta-package
-bun add bun-win32          # unscoped alias (re-exports the same surface)
-```
+## Overview
 
----
+`@bun-win32/all` re-exports the default class of every published `@bun-win32/*` binding package — `Kernel32`, `User32`, `D3d11`, `Xaudio2_9`, and 100+ more — plus the shared `Win32` namespace from `@bun-win32/core`. Each class lazily binds native symbols on first use; every call after that is a direct native pointer invocation.
 
-## 🤯 The Showcase
+The bindings are strongly typed for a smooth DX in TypeScript. The unscoped [`bun-win32`](../bun-win32) package is an alias that re-exports this surface verbatim.
 
-The browser confined TypeScript to a `<canvas>` and `fetch`. `@bun-win32` hands it the **entire machine** — the GPU, the audio stack, the TPM, the kernel's event stream, your monitor's firmware, another process's memory. Every demo below is one `.ts` file calling Windows directly through Bun's FFI. No addon, no Electron, no wrapper — the same native pointer calls a C program would make.
+## Features
 
-> Clone and run any of them: `git clone https://github.com/ObscuritySRL/bun-win32 && cd bun-win32 && bun install && cd packages/all` then `bun run <demo>`.
->
-> They're powered by [`example/_gpu.ts`](./example/_gpu.ts) — a ~pure-TypeScript **Direct3D 11 engine** (runtime HLSL compile, compute shaders, structured buffers/UAVs, textures, the whole COM vtable), [`example/_gpu3d.ts`](./example/_gpu3d.ts) (depth buffer + triangle-mesh drawing for the 3D demos), [`example/_audio.ts`](./example/_audio.ts) (WinMM capture + FFT + XAudio2 streaming), and [`example/_term.ts`](./example/_term.ts) — a **truecolor terminal framebuffer** that turns the console itself into a 24-bit RGB canvas.
-
-### Terminal — the whole console is a framebuffer, at 100s of fps
-
-> No window. No GPU. These render **inside your terminal** in 24-bit truecolor: every character cell is two stacked pixels (the `▀` upper-half-block trick), driven by [`example/_term.ts`](./example/_term.ts) — a hand-written **diffing renderer** that only repaints the cells that changed and only re-emits an escape when it must, streaming each frame in a single `write`. The result **scales to any terminal size** (resize the window and the picture reflows), carries a **live FPS counter**, and runs **far above 60fps** — the engine alone tops **2,000fps**, and every demo below benchmarks at the rate shown. Pure TypeScript over Win32 console FFI; `ESC`/`q` to quit, `SPACE` to pause — and **claude-spark even tracks your mouse**.
-
-<table>
-<tr>
-<td colspan="2"><img src="https://raw.githubusercontent.com/ObscuritySRL/bun-win32/main/packages/all/screenshots/claude-spark.png" alt="claude-spark"><br><b>claude-spark</b> — <b>interactive.</b> The Claude <b>spark logo</b>, alive: twelve tapered tentacles whose rest pose is parsed straight from the official SVG, that <b>reach and curl toward your cursor</b>. Drive it with the <b>mouse</b> (real xterm SGR tracking off stdin) or <b>WASD / arrow keys</b>; <b>Q / E</b> spin the whole mark, <b>[ ]</b> dial the reach, click to <b>surge</b>. Idle — or headless — a virtual cursor roams so it's always alive. <b>≈1800fps</b>. <code>bun run claude-spark</code></td>
-</tr>
-<tr>
-<td width="50%"><img src="https://raw.githubusercontent.com/ObscuritySRL/bun-win32/main/packages/all/screenshots/clawd.png" alt="clawd"><br><b>clawd</b> — Anthropic's pixel mascot <b>Claw'd</b> brought to life: the blocky terracotta critter from the <i>"Welcome, Claw'd"</i> card, hopping across the cream stage with springy squash-&amp;-stretch, legs that tuck mid-air, a bouncing drop-shadow and eased blinks. Faithful to the artwork. <b>≈9600fps</b>. <code>bun run clawd</code></td>
-<td width="50%"><img src="https://raw.githubusercontent.com/ObscuritySRL/bun-win32/main/packages/all/screenshots/galaxy-tty.png" alt="galaxy-tty"><br><b>galaxy-tty</b> — a living <b>grand-design spiral galaxy</b>: 30k stars on differential-rotation orbits streaming through a rotating <b>log-spiral density wave</b>, with dust lanes, a legible golden nucleus, HDR additive bloom and an ACES filmic grade. <b>≈380fps</b>. <code>bun run galaxy-tty</code></td>
-</tr>
-<tr>
-<td><img src="https://raw.githubusercontent.com/ObscuritySRL/bun-win32/main/packages/all/screenshots/blackhole-tty.png" alt="blackhole-tty"><br><b>blackhole-tty</b> — a <b>gravitationally-lensed black hole</b>, the Interstellar look in text: a photon ring, a Doppler-beamed accretion disk whose far side arcs up <i>over</i> the shadow, and a starfield that warps around the silhouette. <b>≈140fps</b>. <code>bun run blackhole-tty</code></td>
-<td><img src="https://raw.githubusercontent.com/ObscuritySRL/bun-win32/main/packages/all/screenshots/torus-knot.png" alt="torus-knot"><br><b>torus-knot</b> — the spinning-donut demo, reborn: a glossy <b>chrome (2,3) torus knot ray-marched per pixel</b> against a hash-grid SDF, with soft shadows, ambient occlusion, fresnel and speculars that slide across the metal as it tumbles. <b>≈180fps</b>. <code>bun run torus-knot</code></td>
-</tr>
-<tr>
-<td><img src="https://raw.githubusercontent.com/ObscuritySRL/bun-win32/main/packages/all/screenshots/fluid-ink.png" alt="fluid-ink"><br><b>fluid-ink</b> — a real-time <b>Stam stable-fluids</b> solver (semi-Lagrangian advection + Jacobi pressure projection + vorticity confinement): luminous indigo–magenta–amber ink folds into vortices and filaments through clean dark water. <b>≈640fps</b>. <code>bun run fluid-ink</code></td>
-<td><img src="https://raw.githubusercontent.com/ObscuritySRL/bun-win32/main/packages/all/screenshots/flowfield.png" alt="flowfield"><br><b>flowfield</b> — thousands of particles riding a <b>divergence-free curl-noise current</b> into designed ribbons of light, with HDR trail bloom and a cohesive indigo-to-gold grade. Generative art, rendered as text. <b>≈770fps</b>. <code>bun run flowfield</code></td>
-</tr>
-<tr>
-<td><img src="https://raw.githubusercontent.com/ObscuritySRL/bun-win32/main/packages/all/screenshots/swarm3d.png" alt="swarm3d"><br><b>swarm3d</b> — a <b>3,600-starling 3D murmuration</b>: spatial-hash Reynolds boids sheared by curl-noise wind into morphing sheets and filaments, depth-graded over a dusk sky. It splits, swirls and reforms like the real thing. <b>≈265fps</b>. <code>bun run swarm3d</code></td>
-<td><img src="https://raw.githubusercontent.com/ObscuritySRL/bun-win32/main/packages/all/screenshots/reaction.png" alt="reaction"><br><b>reaction</b> — a <b>Gray-Scott reaction-diffusion</b> organism under glass: spots, worms and coral morph endlessly across a drifting feed/kill phase field, with wet-membrane shading and breathing voids. <b>≈270fps</b>. <code>bun run reaction</code></td>
-</tr>
-<tr>
-<td><img src="https://raw.githubusercontent.com/ObscuritySRL/bun-win32/main/packages/all/screenshots/mandel-dive.png" alt="mandel-dive"><br><b>mandel-dive</b> — an endless eased plunge into the <b>Mandelbrot</b> seahorse valley: smooth-iteration velvet interior, distance-estimate <b>gold filigree</b> on the boundary, ACES-graded, band-free, seamlessly looping. <b>≈145fps</b>. <code>bun run mandel-dive</code></td>
-<td><img src="https://raw.githubusercontent.com/ObscuritySRL/bun-win32/main/packages/all/screenshots/cinema.png" alt="cinema"><br><b>cinema</b> — <b>a self-playing film in your terminal</b>: a 2.39:1 letterboxed reel that dissolves through a nebula, a log-spiral galaxy, a Gerstner-wave <b>ocean sunrise</b> and an aurora — film grain, vignette and a warm/teal grade throughout. <b>≈1290fps</b>. <code>bun run cinema</code></td>
-</tr>
-</table>
-
-### GPU — a million things at 60fps
-
-<table>
-<tr>
-<td width="50%"><img src="https://raw.githubusercontent.com/ObscuritySRL/bun-win32/main/packages/all/screenshots/particle-galaxy.png" alt="particle-galaxy"><br><b>particle-galaxy</b> — <b>1,048,576</b> particles on a GPU compute shader, orbiting in a softened-gravity disk with curl-noise arms. Hold the mouse to drag a black-hole attractor. <code>bun run particle-galaxy</code></td>
-<td width="50%"><img src="https://raw.githubusercontent.com/ObscuritySRL/bun-win32/main/packages/all/screenshots/blackhole.png" alt="blackhole"><br><b>blackhole</b> — a Schwarzschild black hole ray-traced on the GPU: 1/r² light-bending lenses the starfield into Einstein rings around a Doppler-beamed accretion disk. <code>bun run blackhole</code></td>
-</tr>
-<tr>
-<td><img src="https://raw.githubusercontent.com/ObscuritySRL/bun-win32/main/packages/all/screenshots/fluid.png" alt="fluid"><br><b>fluid</b> — a real-time Navier–Stokes solver (advect → vorticity → 36 Jacobi pressure iters). Stir the ink with your mouse. <code>bun run fluid</code></td>
-<td><img src="https://raw.githubusercontent.com/ObscuritySRL/bun-win32/main/packages/all/screenshots/slime.png" alt="slime"><br><b>slime</b> — <b>1,000,000</b> Physarum agents sensing & depositing on a trail map, growing a living vein network (compute + diffuse). <code>bun run slime</code></td>
-</tr>
-<tr>
-<td><img src="https://raw.githubusercontent.com/ObscuritySRL/bun-win32/main/packages/all/screenshots/mandelbulb.png" alt="mandelbulb"><br><b>mandelbulb</b> — the power-8 3D fractal, ray-marched with soft shadows, AO and orbit-trap iridescence. <code>bun run mandelbulb</code></td>
-<td><img src="https://raw.githubusercontent.com/ObscuritySRL/bun-win32/main/packages/all/screenshots/pathtracer.png" alt="pathtracer"><br><b>pathtracer</b> — a progressive Monte-Carlo path tracer (Cornell box, mirror + glass) that boils with noise then resolves to a clean render live. <code>bun run pathtracer</code></td>
-</tr>
-<tr>
-<td><img src="https://raw.githubusercontent.com/ObscuritySRL/bun-win32/main/packages/all/screenshots/clouds.png" alt="clouds"><br><b>clouds</b> — volumetric ray-marched cloudscape with Beer–Lambert extinction, Henyey–Greenstein scatter and god rays. <code>bun run clouds</code></td>
-<td><img src="https://raw.githubusercontent.com/ObscuritySRL/bun-win32/main/packages/all/screenshots/reaction-diffusion.png" alt="reaction-diffusion"><br><b>reaction-diffusion</b> — Gray–Scott Turing patterns morphing across spatially-varied feed/kill regimes; click to seed. <code>bun run reaction-diffusion</code></td>
-</tr>
-<tr>
-<td><img src="https://raw.githubusercontent.com/ObscuritySRL/bun-win32/main/packages/all/screenshots/lenia.png" alt="lenia"><br><b>lenia</b> — <b>Lenia</b> continuous cellular automata: a smooth convolution-kernel + Gaussian growth field on a GPU compute shader grows organic, gliding lifeforms. <code>bun run lenia</code></td>
-<td><img src="https://raw.githubusercontent.com/ObscuritySRL/bun-win32/main/packages/all/screenshots/ocean.png" alt="ocean"><br><b>ocean</b> — a real <b>3D ocean</b>: a sum-of-Gerstner-waves surface with per-vertex normals, sun glint, Fresnel sky reflection and foam, rendered as a depth-buffered triangle mesh (<code>example/_gpu3d.ts</code>). <code>bun run ocean</code></td>
-</tr>
-</table>
-
-…plus **`shader-forge`** (JIT-compile **ten** HLSL ray-marchers at runtime and fly a free camera through them with live cinematic post — glass dispersion, volumetric clouds, a compute reaction-diffusion creature, DOF/bloom, hot-recompiled on a keystroke), **`mandelbrot`** (infinite df64 deep-zoom), **`boids`** (GPU murmuration), and **`desktop-shader`** (DXGI-duplicate your *live desktop* and run CRT / underwater / ASCII shaders on it).
-
-### The *"wait — that's TypeScript?!"* tier — a console, a brain, and a world
-
-Not effects on a triangle: an actual emulated game console, neural nets that learn / classify / write text in front of you, an explorable 3D world, a 3D fluid, your live network, and a raycast maze — each one `.ts` file on the same engine.
-
-<table>
-<tr>
-<td width="50%"><img src="https://raw.githubusercontent.com/ObscuritySRL/bun-win32/main/packages/all/screenshots/gameboy.png" alt="gameboy"><br><b>gameboy</b> — a complete <b>Game Boy (DMG)</b> emulated in pure TypeScript: full SM83 CPU + scanline PPU + 4-channel APU audio, GPU-rendered through D3D11. <code>bun run gameboy</code> plays a real homebrew game — <i>Libbet and the Magic Floor</i> (zlib) — and it also passes the <code>dmg-acid2</code> PPU test (<code>GB_ROM=acid2</code>). Keyboard + XInput gamepad.</td>
-<td width="50%"><img src="https://raw.githubusercontent.com/ObscuritySRL/bun-win32/main/packages/all/screenshots/neural-descent.png" alt="neural-descent"><br><b>neural-descent</b> — a real <b>neural network that trains itself live on the GPU</b>: forward pass, backprop and an Adam optimizer all hand-written D3D11 compute shaders. Watch the <code>NEURAL NET</code> half snap into focus to match the <code>TARGET</code> as the loss falls. <code>bun run neural-descent</code></td>
-</tr>
-<tr>
-<td colspan="2"><img src="https://raw.githubusercontent.com/ObscuritySRL/bun-win32/main/packages/all/screenshots/gameboy-tty.png" alt="gameboy-tty"><br><b>gameboy-tty</b> — the same pure-TypeScript emulator, now <b>playing real ROMs inside your terminal</b>: the 160×144 LCD is drawn with half-block truecolor "pixels", and it covers <b>Game Boy <i>and</i> Game Boy Color</b> — MBC1/2/3/5 cartridges, MBC3 real-time clock, battery <code>.sav</code> files, CGB color (palettes, double-speed, HDMA) and 4-channel APU sound on XAudio2. Input feels like real hardware: raw Win32 <code>ReadConsoleInput</code> gives <b>true key down/up</b> for a held D-pad (XInput pad too). Drop any cart on it — <code>bun run gameboy-tty path/to/rom.gbc</code> — or just <code>bun run gameboy-tty</code> for the bundled homebrew; <code>GB_ROM=acid2</code>/<code>cgbacid2</code> run the bundled <code>dmg-acid2</code>/<code>cgb-acid2</code> PPU tests, both of which it passes. Arrows = D-pad · <code>Z</code>/<code>X</code> = A/B · <code>Enter</code>/<code>RShift</code> = Start/Select · <code>Tab</code> turbo · <code>M</code> mute · <code>[ ]</code> palette.</td>
-</tr>
-<tr>
-<td><img src="https://raw.githubusercontent.com/ObscuritySRL/bun-win32/main/packages/all/screenshots/voxelscape.png" alt="voxelscape"><br><b>voxelscape</b> — a raytraced voxel <b>survival sandbox</b> on an <b>enormous 384³ world</b> that regenerates at a keypress: build by day, then defend against escalating <b>night waves of mobs that hunt you down</b> (seek/hop AI, glowing eyes) with melee, bombs, TNT traps, lava and <b>meteor airstrikes</b>. Falling sand, flooding water, lava+water→obsidian, spreading fire, chain-reaction TNT with bullet-time, fleeing wildlife, flying debris, smooth shadows + AO, real water reflections + a fixed underwater view, an animated day/night sky, a health/wave/score HUD and procedural audio — all Amanatides–Woo DDA in one pixel shader. <code>bun run voxelscape</code></td>
-<td><img src="https://raw.githubusercontent.com/ObscuritySRL/bun-win32/main/packages/all/screenshots/net-xray.png" alt="net-xray"><br><b>net-xray</b> — every <b>live TCP/UDP connection</b> on your machine (<code>iphlpapi</code>) as a force-directed <b>constellation</b>: local processes as glowing hubs, remote endpoints as nodes, edges igniting as sockets open and fading as they close, with a live top-talkers list. <code>bun run net-xray</code></td>
-</tr>
-<tr>
-<td><img src="https://raw.githubusercontent.com/ObscuritySRL/bun-win32/main/packages/all/screenshots/cloth.png" alt="cloth"><br><b>cloth</b> — a <b>65,536-node GPU soft-body</b> you can play with: a Verlet + XPBD constraint solver in compute shaders, rendered as a lit, shaded surface. Pinned by its top corners (<code>P</code> cycles pin modes), <b>drag with the mouse to brush the fabric</b>, arrow keys orbit, <code>Q</code>/<code>E</code> zoom, <code>Z</code>/<code>X</code> wind. <code>bun run cloth</code></td>
-<td><img src="https://raw.githubusercontent.com/ObscuritySRL/bun-win32/main/packages/all/screenshots/cam-filter.png" alt="cam-filter"><br><b>cam-filter</b> — your <b>live desktop</b> (DXGI Desktop Duplication) re-imagined in real time through cycling GPU pixel-shader effects: Predator thermal, Sobel edge/toon, ASCII mosaic, and a kaleidoscope. <code>bun run cam-filter</code></td>
-</tr>
-<tr>
-<td><img src="https://raw.githubusercontent.com/ObscuritySRL/bun-win32/main/packages/all/screenshots/digit-oracle.png" alt="digit-oracle"><br><b>digit-oracle</b> — draw a digit with the mouse and a real <b>784→128→10 neural network</b> classifies it live, every matrix multiply a D3D11 <b>compute shader</b> (weights trained offline, baked in). Confidence bars react in real time. <code>bun run digit-oracle</code></td>
-<td><img src="https://raw.githubusercontent.com/ObscuritySRL/bun-win32/main/packages/all/screenshots/nano-gpt.png" alt="nano-gpt"><br><b>nano-gpt</b> — a <b>111K-parameter character transformer</b> running its entire forward pass (multi-head causal attention + MLP) as D3D11 <b>compute shaders</b>, streaming generated text live beside a real causal-attention heatmap. <code>bun run nano-gpt</code></td>
-</tr>
-<tr>
-<td><img src="https://raw.githubusercontent.com/ObscuritySRL/bun-win32/main/packages/all/screenshots/sph3d.png" alt="sph3d"><br><b>sph3d</b> — a <b>3D SPH fluid</b>: tens of thousands of GPU particles with an atomic spatial-hash neighbour grid, poured and sloshed in a box and stirred with the mouse, rendered as a glowing additive volume. <code>bun run sph3d</code></td>
-<td><img src="https://raw.githubusercontent.com/ObscuritySRL/bun-win32/main/packages/all/screenshots/raycaster.png" alt="raycaster"><br><b>raycaster</b> — a <b>Wolfenstein-3D-style</b> textured maze rendered entirely in one pixel shader: DDA wall casting, procedural brick/stone textures, depth-shaded floor &amp; ceiling, sprites and a minimap. Walk it with WASD. <code>bun run raycaster</code></td>
-</tr>
-</table>
-
-### Hardware & OS X-ray — your machine, live
-
-<table>
-<tr>
-<td width="50%"><img src="https://raw.githubusercontent.com/ObscuritySRL/bun-win32/main/packages/all/screenshots/core-scope.png" alt="core-scope"><br><b>core-scope</b> — a live <b>per-CPU-core scheduler X-ray</b>: <code>ntdll</code> <code>NtQuerySystemInformation</code> sampled into a scrolling per-core utilisation <b>heatmap waterfall</b>, with the busiest processes ranked alongside. <code>bun run core-scope</code></td>
-<td width="50%"><img src="https://raw.githubusercontent.com/ObscuritySRL/bun-win32/main/packages/all/screenshots/rf-radar.png" alt="rf-radar"><br><b>rf-radar</b> — a <b>WiFi RF radar</b>: real access points scanned via <code>wlanapi</code>, plotted on a green-phosphor scope by signal strength with a sweeping beam, channel/auth colours and live SSID labels. <code>bun run rf-radar</code></td>
-</tr>
-<tr>
-<td><img src="https://raw.githubusercontent.com/ObscuritySRL/bun-win32/main/packages/all/screenshots/webcam.png" alt="webcam"><br><b>webcam</b> — your <b>webcam through Media Foundation</b> in pure TS (<code>mfreadwrite</code> <code>IMFSourceReader</code>), uploaded to the GPU and run through live pixel-shader effects — thermal, Sobel edge, ASCII, CRT. <code>bun run webcam</code></td>
-<td></td>
-</tr>
-</table>
-
-### Audio — sound you can see
-
-- **`sound-bloom`** — mic FFT painted as a click-through, full-desktop bloom overlay.
-- **`oscilloscope-music`** — synthesized **stereo** PCM whose X/Y waveform *draws vector art* (it spells `BUN`).
-- **`audio-visualizer`** — a MilkDrop-grade feedback visualizer reacting to your mic.
-- **`vocoder`** — real-time mic → phase-vocoder pitch-shift/harmonize → speakers.
-- **`midi-music`** — generative music played live through the **Windows General-MIDI synthesizer** (`winmm` `midiOut`) — chords, arpeggios, bass and melody across GM instruments — visualised as a glowing piano-roll note-rain.
-- **`event-horizon`** — a black hole that gravitationally lenses your *real, live desktop* via the Magnification compositor.
-
-### Native power — *"wait, you can't do that in TypeScript"*
-
-These touch hardware and the OS where JavaScript has never been allowed. Real output from this machine:
-
-**`schannel-https`** — a real HTTPS request with **zero `fetch` / `node:https`**: a raw `ws2_32` socket carrying TLS records produced by the OS Schannel (SSPI) provider, driven by a hand-written TLS state machine.
-
-```text
-── TLS HANDSHAKE ─────────────────────────────────────────────────
-  handshake     complete (3 ISC round-trips)
-  tls version   TLS 1.2          cipher  TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256 (0xc02b)
-── SERVER CERTIFICATE CHAIN ──────────────────────────────────────
-  [1] example.com → Cloudflare TLS Issuing ECC CA 1 → SSL.com TLS Transit ECC CA R2 → SSL.com TLS ECC Root CA 2022
-── APPLICATION DATA (HTTP/1.1) ───────────────────────────────────
-  │ HTTP/1.1 200 OK   (838 plaintext bytes decrypted by Schannel AEAD)
-```
-
-**`firmware-inventory`** — your machine's true hardware identity, parsed by hand out of the raw SMBIOS blob from `GetSystemFirmwareTable`:
-
-```text
-BIOS         American Megatrends Inc.  v2103 (09/30/2022)
-SYSTEM       ASUS · ROG MAXIMUS Z690 HERO · UUID C7F1320B-…
-PROCESSOR    12th Gen Intel(R) Core(TM) i9-12900KS · LGA1700 · 5148 MHz
-MEMORY       2/4 slots · 64 GB · DIMM1 32 GB @ 5600 MT/s (Corsair)
-```
-
-| Demo | What it does that JS "can't" |
-|------|------------------------------|
-| **`http-server`** | A working HTTP/1.1 server on a raw `ws2_32` socket — no `node:http`, no `Bun.serve`. Open it in a browser. |
-| **`tpm-oracle`** | Hand-crafts raw **TPM 2.0** command bytes to the security chip (`tbs`): true silicon RNG, the SHA-256 boot-attestation PCR banks, manufacturer/firmware. |
-| **`crypto-forge`** | OS-native CNG (`bcrypt`): true RNG, SHA-256/512, AES-256-GCM + ECDSA/RSA sign/verify — with tamper-rejection round-trips. |
-| **`etw-firehose`** | Subscribes to the kernel's **ETW** event stream — a live Procmon (process/image events) in TypeScript. |
-| **`process-xray`** | Opens another process and reads its **live memory**, modules, threads, and full virtual-address-space map. |
-| **`ddc-monitor`** | Talks **DDC/CI** over I²C to your physical monitor's firmware — read/set brightness, contrast, input source. |
-| **`uia-automation`** | Drives another app's UI via **UI Automation** — walks the control tree and *clicks real buttons* (computes 5+3 in Calculator). |
-| **`packet-sniffer`** | Puts a raw `ws2_32` socket into **promiscuous mode** (`SIO_RCVALL`) and decodes live **IP / TCP / UDP / ICMP** packets straight off the wire into a streaming protocol waterfall. *(Run as Administrator.)* |
-
-## What's inside
-
-Every published `@bun-win32/*` package — kernel32, user32, gdi32, gdiplus, d2d1, **d3d11**, dxgi, **d3dcompiler_47**, dwrite, dcomp, **xaudio2**, mfreadwrite, **secur32**, **bcrypt**, **tbs**, **dxva2**, **advapi32**/**tdh** (ETW), ws2_32, magnification, uiautomationcore, and 90+ more — re-exported as named bindings, plus the shared `Win32` namespace from `@bun-win32/core`. Methods bind lazily on first call; every call after that is a direct native pointer invocation with zero marshaling overhead.
-
-```ts
-import { D3d11, Kernel32, Secur32, Xaudio2_9 } from '@bun-win32/all';
-```
-
-For TypeScript enums, struct helpers, and packed-struct types, import from the specific package (those would collide across the namespace):
-
-```ts
-import { User32 } from '@bun-win32/all';
-import { WindowStyles, ShowWindowCommand } from '@bun-win32/user32';
-```
+- [Bun](https://bun.sh)-first ergonomics on Windows 10/11.
+- The entire `@bun-win32/*` ecosystem behind a single `bun add`.
+- Zero runtime cost — an index of re-exports; importing only what you use stays tree-shakeable.
+- Lazy binding on first call; optional eager preload per class (`Kernel32.Preload()`).
+- No wrapper overhead; calls map 1:1 to native APIs.
 
 ## Requirements
 
-- [Bun](https://bun.sh) >= 1.1.0
-- Windows 10 or later (the showcase GPU demos want a Direct3D 11 GPU)
+- [Bun](https://bun.sh) runtime
+- Windows 10 or later
+
+## Installation
+
+```sh
+bun add @bun-win32/all
+```
+
+## Quick Start
+
+```ts
+import { Kernel32, User32 } from '@bun-win32/all';
+
+Kernel32.GetCurrentProcessId();
+User32.GetForegroundWindow();
+```
+
+Types, enums, and packed-struct helpers are not re-exported (the namespace would collide); import those from the specific package:
+
+```ts
+import { User32 } from '@bun-win32/all';
+import { ShowWindowCommand, WindowStyles } from '@bun-win32/user32';
+```
+
+> [!NOTE]
+> AI agents: see `AI.md` for the package binding contract and source-navigation guidance. It explains how to use the package without scanning the entire implementation.
+
+## Examples
+
+`example/` is the repository's showcase — GPU compute and rendering, audio, terminal engines, emulation, and hardware/OS diagnostics, each demo a single `.ts` file:
+
+```sh
+bun run particle-galaxy       # 1,048,576 particles on a GPU compute shader
+bun run gameboy               # a complete Game Boy emulated in pure TypeScript
+bun run firmware-inventory    # your hardware identity parsed from the raw SMBIOS blob
+```
 
 ## Notes
 
-- This package has zero runtime cost — it's an index of re-exports; importing only what you use stays tree-shakeable.
-- For FFI calling conventions, handle lifetimes, and pointer/buffer rules, see [`@bun-win32/core`](../core/AI.md) and individual package READMEs.
-- AI agents: see `AI.md`.
+- Either rely on lazy binding or call `Preload()` on the classes you use.
+- Windows only. Bun runtime required.
 
 ## License
 
