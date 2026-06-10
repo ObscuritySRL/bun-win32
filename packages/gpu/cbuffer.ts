@@ -1,5 +1,6 @@
-// HLSL constant-buffer layout calculator — encodes the FXC packing rules so TS
-// write offsets always byte-match the shader (the bug class that burned demos).
+// HLSL layout calculators — cbufferLayout (16-byte register rules) and structLayout
+// (StructuredBuffer tight packing) — so TS write offsets always byte-match the
+// shader (the bug class that burned demos; a wrong stride fails silently).
 
 export type CBufferFieldType = 'float' | 'float2' | 'float3' | 'float4' | 'float4x4' | 'int' | 'int2' | 'int3' | 'int4' | 'uint' | 'uint2' | 'uint3' | 'uint4';
 
@@ -11,6 +12,26 @@ export interface CBufferLayout<T extends Record<string, CBufferFieldType>> {
   byteSize: number;
   offsets: { readonly [K in keyof T]: number };
   write(values: { readonly [K in keyof T]: CBufferValue<T[K]> }): Buffer;
+}
+
+function writeFieldValues(fields: Record<string, CBufferFieldType>, offsets: Record<string, number>, values: { readonly [key: string]: number | readonly number[] }, out: Buffer): Buffer {
+  for (const [name, type] of Object.entries(fields)) {
+    const offset = offsets[name]!;
+    const value = values[name]!;
+    const integer = type.startsWith('int') ? 'int' : type.startsWith('uint') ? 'uint' : 'float';
+    if (typeof value === 'number') {
+      if (integer === 'int') out.writeInt32LE(value, offset);
+      else if (integer === 'uint') out.writeUInt32LE(value, offset);
+      else out.writeFloatLE(value, offset);
+    } else {
+      value.forEach((component, index) => {
+        if (integer === 'int') out.writeInt32LE(component, offset + index * 4);
+        else if (integer === 'uint') out.writeUInt32LE(component, offset + index * 4);
+        else out.writeFloatLE(component, offset + index * 4);
+      });
+    }
+  }
+  return out;
 }
 
 /**
@@ -36,24 +57,31 @@ export function cbufferLayout(fields: Record<string, CBufferFieldType>): CBuffer
     byteSize,
     offsets,
     write(values) {
-      const out = Buffer.alloc(byteSize);
-      for (const [name, type] of Object.entries(fields)) {
-        const offset = offsets[name]!;
-        const value = values[name]!;
-        const integer = type.startsWith('int') ? 'int' : type.startsWith('uint') ? 'uint' : 'float';
-        if (typeof value === 'number') {
-          if (integer === 'int') out.writeInt32LE(value, offset);
-          else if (integer === 'uint') out.writeUInt32LE(value, offset);
-          else out.writeFloatLE(value, offset);
-        } else {
-          value.forEach((component, index) => {
-            if (integer === 'int') out.writeInt32LE(component, offset + index * 4);
-            else if (integer === 'uint') out.writeUInt32LE(component, offset + index * 4);
-            else out.writeFloatLE(component, offset + index * 4);
-          });
-        }
-      }
-      return out;
+      return writeFieldValues(fields, offsets, values, Buffer.alloc(byteSize));
+    },
+  };
+}
+
+/**
+ * Compute StructuredBuffer element packing for `fields` (declaration order):
+ * members pack tightly on 4-byte alignment with NO 16-byte register rule —
+ * float3 followed by float2 is offsets 0, 12 and a 20-byte stride. byteSize is
+ * the stride for makeStructuredBuffer. GPU-validated against FXC in the selftest.
+ */
+export function structLayout<T extends Record<string, CBufferFieldType>>(fields: T): CBufferLayout<T>;
+export function structLayout(fields: Record<string, CBufferFieldType>): CBufferLayout<Record<string, CBufferFieldType>> {
+  const offsets: Record<string, number> = {};
+  let cursor = 0;
+  for (const [name, type] of Object.entries(fields)) {
+    offsets[name] = cursor;
+    cursor += FIELD_BYTES[type];
+  }
+  const byteSize = cursor;
+  return {
+    byteSize,
+    offsets,
+    write(values) {
+      return writeFieldValues(fields, offsets, values, Buffer.alloc(byteSize));
     },
   };
 }

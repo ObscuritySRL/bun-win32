@@ -79,6 +79,7 @@ import {
   setRenderTargets,
   setRenderTargetsWithDepth,
   setViewport,
+  structLayout,
   textureFromPixels,
   vcall,
   vsSet,
@@ -590,6 +591,50 @@ function runSections(label: string, options: CreateDeviceOptions): void {
     comRelease(compaction);
     comRelease(kept.uav!);
     comRelease(kept.buffer);
+    comRelease(source.srv!);
+    comRelease(source.buffer);
+  }
+
+  {
+    const layout = structLayout({ a: 'float', b: 'float3', c: 'uint' });
+    const N = 16;
+    const items: Buffer[] = [];
+    for (let index = 0; index < N; index += 1) {
+      items.push(layout.write({ a: index + 0.5, b: [index * 2, index * 3, index * 4], c: index * 7 }));
+    }
+    const initialData = Buffer.concat(items);
+    const source = makeStructuredBuffer({ count: N, initialData, srv: true, stride: layout.byteSize });
+    const flat = new Float32Array(N * 5);
+    const flatArray = GpuArray.from(flat);
+    const unpack = makeComputeShader(
+      compile(
+        `struct Item { float a; float3 b; uint c; };
+         StructuredBuffer<Item> items : register(t0);
+         RWStructuredBuffer<float> flat : register(u0);
+         [numthreads(16,1,1)] void main(uint3 id : SV_DispatchThreadID) {
+           Item item = items[id.x];
+           flat[id.x * 5 + 0] = item.a;
+           flat[id.x * 5 + 1] = item.b.x;
+           flat[id.x * 5 + 2] = item.b.y;
+           flat[id.x * 5 + 3] = item.b.z;
+           flat[id.x * 5 + 4] = (float)item.c;
+         }`,
+        'main',
+        'cs_5_0',
+      ),
+    );
+    csSet(unpack, { srv: [source.srv!], uav: [flatArray.uav] });
+    dispatch(1);
+    csSet(0n, { srv: [0n], uav: [0n] });
+    const unpacked = flatArray.read();
+    let exact = true;
+    for (let index = 0; index < N; index += 1) {
+      const expected = [index + 0.5, index * 2, index * 3, index * 4, index * 7];
+      for (let field = 0; field < 5; field += 1) if (unpacked[index * 5 + field] !== expected[field]) exact = false;
+    }
+    check(tag('30 struct-layout'), exact, `AoS buffer from structLayout (stride ${layout.byteSize}, offsets ${JSON.stringify(layout.offsets)}) unpacks field-exact through FXC`);
+    comRelease(unpack);
+    flatArray.release();
     comRelease(source.srv!);
     comRelease(source.buffer);
   }

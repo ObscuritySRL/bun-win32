@@ -70,6 +70,7 @@
     "query.ts",
     "shader.ts",
     "snapshot.ts",
+    "std.ts",
     "texture.ts",
     "window.ts"
   ],
@@ -81,7 +82,9 @@
     "example:benchmark": "bun ./example/benchmark.ts",
     "example:gpu-report": "bun ./example/gpu-report.ts",
     "example:hello-gpu": "bun ./example/hello-gpu.ts",
+    "example:blur": "bun ./example/blur.ts",
     "example:raymarch": "bun ./example/raymarch.ts",
-    "example:selftest": "bun ./example/gpu.selftest.ts"
+    "example:selftest": "bun ./example/gpu.selftest.ts",
+    "example:std-selftest": "bun ./example/std.selftest.ts"
   }
 }
