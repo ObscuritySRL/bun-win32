@@ -8,6 +8,7 @@ import { D3D11_SDK_VERSION, D3D_DRIVER_TYPE } from '@bun-win32/d3d11';
 import { openAdapter } from './adapter';
 import { releaseReadbackStaging } from './buffer';
 import { comRelease, guidBytes, hex, vcall } from './com';
+import { flushRunCache } from './kernel';
 import { reportLeaksAndReset } from './memory';
 import {
   D3D11_CREATE_DEVICE_BGRA_SUPPORT,
@@ -236,6 +237,7 @@ export function describeDeviceError(hr: number): string {
 /** Release the active device's RTV/swap chain/context/device (reverse creation order) and clear the active state. Warns when tracked resources are still alive. */
 export function destroyDevice(): void {
   if (activeGpu === null) return;
+  flushRunCache(); // run()'s kernels + pooled buffers are engine-owned, not user leaks
   reportLeaksAndReset();
   releaseReadbackStaging();
   comRelease(activeGpu.backBufferRTV);

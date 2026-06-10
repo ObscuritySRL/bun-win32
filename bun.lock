@@ -41,7 +41,7 @@
     },
     "packages/all": {
       "name": "@bun-win32/all",
-      "version": "1.1.0",
+      "version": "1.1.1",
       "dependencies": {
         "@bun-win32/activeds": "workspace:*",
         "@bun-win32/advapi32": "workspace:*",
@@ -237,7 +237,7 @@
     },
     "packages/bun-gpu": {
       "name": "bun-gpu",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "dependencies": {
         "@bun-win32/gpu": "workspace:*",
       },
@@ -250,7 +250,7 @@
     },
     "packages/bun-win32": {
       "name": "bun-win32",
-      "version": "1.0.1",
+      "version": "1.0.2",
       "dependencies": {
         "@bun-win32/all": "workspace:*",
       },
@@ -738,7 +738,7 @@
     },
     "packages/gpu": {
       "name": "@bun-win32/gpu",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
         "@bun-win32/d3d11": "workspace:*",

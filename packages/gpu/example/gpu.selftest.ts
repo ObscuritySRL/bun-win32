@@ -64,6 +64,7 @@ import {
   encodePNG,
   getDeviceRemovedReason,
   gpuMemory,
+  gpuScope,
   guidBytes,
   listAdapters,
   makeComputeShader,
@@ -628,6 +629,73 @@ function runSections(label: string, options: CreateDeviceOptions): void {
     comRelease(kept.buffer);
     comRelease(source.srv!);
     comRelease(source.buffer);
+  }
+
+  {
+    const array = GpuArray.from(new Float32Array([1, 2, 3, 4]));
+    array.release();
+    array.release(); // must be a no-op, not a second COM Release
+    const readAfterRelease = thrownMessage(() => array.read());
+    check(tag('33 release-idempotent'), readAfterRelease.includes('released'), 'GpuArray double release is safe; use-after-release throws a clear error');
+    const kernel = new Kernel('RWStructuredBuffer<float> data : register(u0);\n[numthreads(1,1,1)] void main() { data[0] = 1; }');
+    kernel.release();
+    kernel.release();
+    const live = GpuArray.from(new Float32Array(1));
+    const dispatchAfterRelease = thrownMessage(() => kernel.dispatch({ data: live }));
+    live.release();
+    check(tag('33 kernel-release-idempotent'), dispatchAfterRelease.includes('released'), 'Kernel double release is safe; dispatch-after-release throws');
+  }
+
+  {
+    const before = gpuMemory();
+    const kept = gpuScope(() => {
+      const first = GpuArray.from(new Float32Array(256).fill(1));
+      const second = GpuArray.from(new Float32Array(256).fill(2));
+      const third = GpuArray.from(new Float32Array(256).fill(3));
+      second.release(); // manual release inside a scope is fine (idempotency)
+      void third;
+      return first;
+    });
+    const after = gpuMemory();
+    const survived = new Float32Array(kept.readInto(new Float32Array(256)));
+    kept.release();
+    check(tag('34 scope-releases'), after.liveResources === before.liveResources + 1, `gpuScope auto-released all but the returned array (live ${before.liveResources} → ${after.liveResources})`);
+    check(tag('34 scope-keeps-return'), survived[0] === 1 && survived[255] === 1, 'the returned GpuArray survives the scope and reads back');
+  }
+
+  {
+    // Exactly-half-representable values — f32tof16/f16tof32 must round-trip bit-perfectly.
+    const values = new Float32Array([1.5, -2, 0.25, 65504, 0.0009765625, 0]);
+    const floatScratch = new Float32Array(1);
+    const floatBits = new Uint32Array(floatScratch.buffer);
+    const halfBits = (value: number): number => {
+      floatScratch[0] = value;
+      const bits = floatBits[0]!;
+      const sign = (bits >>> 16) & 0x8000;
+      const exponent = ((bits >>> 23) & 0xff) - 127 + 15;
+      if (exponent <= 0) return sign; // zero (subnormals excluded from the test set)
+      return sign | (exponent << 10) | ((bits >>> 13) & 0x3ff);
+    };
+    const halfWords = new Uint32Array(values.length);
+    run(
+      `StructuredBuffer<float> source : register(t0);
+       RWStructuredBuffer<uint> halfWords : register(u0);
+       [numthreads(64,1,1)] void main(uint3 id : SV_DispatchThreadID) { halfWords[id.x] = f32tof16(source[id.x]); }`,
+      { halfWords, source: values },
+    );
+    let packExact = true;
+    for (let index = 0; index < values.length; index += 1) if (halfWords[index] !== halfBits(values[index]!)) packExact = false;
+    check(tag('35 fp16-pack'), packExact, 'f32tof16 matches the CPU half encoding bit-for-bit');
+    const unpacked = new Float32Array(values.length);
+    run(
+      `StructuredBuffer<uint> halfWords : register(t0);
+       RWStructuredBuffer<float> unpacked : register(u0);
+       [numthreads(64,1,1)] void main(uint3 id : SV_DispatchThreadID) { unpacked[id.x] = f16tof32(halfWords[id.x]); }`,
+      { halfWords, unpacked },
+    );
+    let roundTripExact = true;
+    for (let index = 0; index < values.length; index += 1) if (unpacked[index] !== values[index]) roundTripExact = false;
+    check(tag('35 fp16-roundtrip'), roundTripExact, 'f16tof32(f32tof16(x)) returns x exactly for half-representable values — fp16 storage on uint buffers works with zero extra surface');
   }
 
   {

@@ -127,23 +127,19 @@ export function gpuMatmul(a: GpuArray, b: GpuArray, n: number): GpuArray {
   return c;
 }
 
-/** Exclusive prefix scan over a uint GpuArray (≤ 65,536 elements in v1). Returns a new GpuArray (caller releases). Exact. */
+/** Exclusive prefix scan over a uint GpuArray — any length (group totals recurse per 256× level). Returns a new GpuArray (caller releases). Exact. */
 export function gpuPrefixScan(values: GpuArray): GpuArray {
   if (values.kind !== 'uint') throw new Error(`gpuPrefixScan: values must be a uint GpuArray (got ${values.kind}).`);
-  if (values.length > 65_536) throw new Error(`gpuPrefixScan: v1 supports up to 65,536 elements (256 groups × 256); got ${values.length}.`);
   const groups = Math.ceil(values.length / 256);
   const groupKernel = new Kernel(SCAN_GROUP_SOURCE);
   const exclusive = GpuArray.alloc('uint', values.length);
   const groupTotals = GpuArray.alloc('uint', groups);
   groupKernel.dispatch({ data: values, exclusive, groupTotals }, { groups: [groups], uniforms: new Uint32Array([values.length, 0, 0, 0]) });
   if (groups > 1) {
-    const scannedTotals = GpuArray.alloc('uint', groups);
-    const totalsOfTotals = GpuArray.alloc('uint', 1);
-    groupKernel.dispatch({ data: groupTotals, exclusive: scannedTotals, groupTotals: totalsOfTotals }, { groups: [1], uniforms: new Uint32Array([groups, 0, 0, 0]) });
+    const scannedTotals = gpuPrefixScan(groupTotals);
     const applyKernel = new Kernel(SCAN_APPLY_SOURCE);
     applyKernel.dispatch({ data: exclusive, groupOffsets: scannedTotals }, { groups: [groups], uniforms: new Uint32Array([values.length, 0, 0, 0]) });
     applyKernel.release();
-    totalsOfTotals.release();
     scannedTotals.release();
   }
   groupTotals.release();

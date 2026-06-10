@@ -91,7 +91,7 @@ function runSuite(label: string, options: CreateDeviceOptions): void {
     check(tag(`histogram N=${N}`), exact, `${BINS} bins EXACT (out-of-range values ignored)`);
   }
 
-  for (const N of [1000, 60_000]) {
+  for (const N of [1000, 60_000, 1_000_000]) {
     const values = new Uint32Array(N);
     for (let index = 0; index < N; index += 1) values[index] = nextRandom(state) & 0x3ff;
     const array = GpuArray.from(values);

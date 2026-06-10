@@ -12,7 +12,7 @@ export { bindDepth, clearDepth, drawTriangles, makeDepthBuffer, releaseDepth, se
 export type { DepthBuffer } from './depth';
 export { createComputeDevice, createDevice, describeDeviceError, destroyDevice, deviceFeatures, getDeviceRemovedReason, hasDevice, requireGpu } from './device';
 export type { CreateDeviceOptions, Gpu } from './device';
-export { GpuArray, Kernel, parseKernelBindings, parseNumthreads, run } from './kernel';
+export { GpuArray, Kernel, flushRunCache, gpuScope, parseKernelBindings, parseNumthreads, run } from './kernel';
 export type { DispatchOptions, KernelArray, KernelBinding, RunOptions, ScalarKind } from './kernel';
 export { gpuMemory } from './memory';
 export type { GpuMemoryReport } from './memory';

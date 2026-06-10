@@ -90,7 +90,7 @@ Measured on an NVIDIA GeForce RTX 4090, Windows 11, Bun 1.4.0 — reproduce with
 | SAXPY 1M elements | 43.00 Gelem/s | 1.99 Gelem/s |
 | matmul 256×256 | 1489.7 GFLOPS | 17.9 GFLOPS |
 
-The integration selftest (120 exact-value assertions: buffer round-trips, atomics histograms, groupshared reductions, cbuffer-vs-FXC layout proofs, depth-test proofs, determinism) passes on hardware **and** WARP: `bun run example/gpu.selftest.ts`.
+The integration selftest (134 exact-value assertions: buffer round-trips, atomics histograms, groupshared reductions, cbuffer-vs-FXC layout proofs, depth-test proofs, determinism) passes on hardware **and** WARP: `bun run example/gpu.selftest.ts`.
 
 ## Gallery
 

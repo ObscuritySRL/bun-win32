@@ -75,8 +75,15 @@ function ensureDevice(): void {
   if (!hasDevice()) createComputeDevice();
 }
 
+// gpuScope bookkeeping: GpuArrays register with the innermost open scope at creation.
+// run()'s internal pool acquisitions suppress registration — pooled arrays are
+// owned by the pool, never by a user scope.
+const scopeStack: GpuArray[][] = [];
+let scopeSuppressed = false;
+
 /** A GPU-resident array (UAV + SRV). Survives across dispatches — the kernel-chaining primitive. */
 export class GpuArray {
+  #released = false;
   #resource: StructuredBuffer;
   readonly kind: ScalarKind;
   readonly length: number;
@@ -85,6 +92,7 @@ export class GpuArray {
     this.#resource = resource;
     this.kind = kind;
     this.length = length;
+    if (!scopeSuppressed && scopeStack.length > 0) scopeStack[scopeStack.length - 1]!.push(this);
   }
 
   static alloc(kind: ScalarKind, length: number): GpuArray {
@@ -98,41 +106,64 @@ export class GpuArray {
     return new GpuArray(makeStructuredBuffer({ count: data.length, initialData, srv: true, stride: 4, uav: true }), kindOf(data), data.length);
   }
 
+  #requireLive(operation: string): void {
+    if (this.#released) throw new Error(`GpuArray.${operation}: the array was released.`);
+  }
+
   get buffer(): bigint {
+    this.#requireLive('buffer');
     return this.#resource.buffer;
   }
 
   get srv(): bigint {
+    this.#requireLive('srv');
     return this.#resource.srv!;
   }
 
   get uav(): bigint {
+    this.#requireLive('uav');
     return this.#resource.uav!;
   }
 
   read(): KernelArray {
+    this.#requireLive('read');
     const bytes = readbackBuffer(this.#resource.buffer, this.length * 4);
     return this.kind === 'float' ? new Float32Array(bytes) : this.kind === 'int' ? new Int32Array(bytes) : new Uint32Array(bytes);
   }
 
   /** Like read(), but never blocks the event loop — the GPU copy is polled across setImmediate turns. */
   async readAsync(): Promise<KernelArray> {
+    this.#requireLive('readAsync');
     const bytes = await readbackBufferAsync(this.#resource.buffer, this.length * 4);
     return this.kind === 'float' ? new Float32Array(bytes) : this.kind === 'int' ? new Int32Array(bytes) : new Uint32Array(bytes);
   }
 
   /** Read back into a caller-owned typed array (cast-free typed reads). */
   readInto<A extends KernelArray>(target: A): A {
+    this.#requireLive('readInto');
     if (kindOf(target) !== this.kind) throw new Error(`GpuArray.readInto: target is ${kindOf(target)} but the array holds ${this.kind}.`);
     const bytes = readbackBuffer(this.#resource.buffer, this.length * 4);
     target.set(this.kind === 'float' ? new Float32Array(bytes) : this.kind === 'int' ? new Int32Array(bytes) : new Uint32Array(bytes));
     return target;
   }
 
+  /** Upload CPU data into the existing GPU buffer (UpdateSubresource) — no reallocation. */
+  write(data: KernelArray): void {
+    this.#requireLive('write');
+    if (kindOf(data) !== this.kind) throw new Error(`GpuArray.write: data is ${kindOf(data)} but the array holds ${this.kind}.`);
+    if (data.length !== this.length) throw new Error(`GpuArray.write: data has ${data.length} elements but the array holds ${this.length}.`);
+    // Full-resource UpdateSubresource — same path as constant-buffer upload.
+    updateConstantBuffer(this.#resource.buffer, Buffer.from(data.buffer, data.byteOffset, data.byteLength));
+  }
+
+  /** Idempotent: a second release is a no-op; any use after release throws. */
   release(): void {
+    if (this.#released) return;
+    this.#released = true;
     comRelease(this.#resource.uav ?? 0n);
     comRelease(this.#resource.srv ?? 0n);
     comRelease(this.#resource.buffer);
+    this.#resource = { buffer: 0n };
   }
 }
 
@@ -161,6 +192,7 @@ export class Kernel {
   }
 
   dispatch(buffers: Record<string, GpuArray>, options: DispatchOptions = {}): void {
+    if (this.#shader === 0n) throw new Error('Kernel.dispatch: the kernel was released.');
     const uav: bigint[] = [];
     const srv: bigint[] = [];
     let maxLength = 1;
@@ -195,22 +227,108 @@ export class Kernel {
     dispatch(x, y, z);
   }
 
+  /** Idempotent: a second release is a no-op; dispatch after release throws. */
   release(): void {
     comRelease(this.#constantBuffer);
     comRelease(this.#shader);
     this.#constantBuffer = 0n;
+    this.#shader = 0n;
   }
 }
 
 // run() memoizes compiled kernels per (source, compile options) so repeat calls skip
-// FXC entirely (the compile-per-call cliff, perf doctrine). Entries are keyed to the
-// device that compiled them and are released + rebuilt after a device change.
+// FXC entirely, and pools its GPU buffers per (kind, length) so repeat calls with the
+// same shapes allocate no GPU resources at all (perf doctrine). Both caches are keyed
+// to the live device and are released + rebuilt after a device change.
 const runKernelCache = new Map<string, { device: bigint; kernel: Kernel }>();
+const runArrayPool = new Map<string, GpuArray[]>();
+let runPoolDevice = 0n;
+const RUN_POOL_LIMIT_PER_SHAPE = 8;
+
+function acquireRunArray(kind: ScalarKind, length: number): GpuArray {
+  if (runPoolDevice !== requireGpu().device) {
+    flushRunArrayPool();
+    runPoolDevice = requireGpu().device;
+  }
+  const pooled = runArrayPool.get(`${kind}|${length}`);
+  const existing = pooled?.pop();
+  if (existing !== undefined) return existing;
+  scopeSuppressed = true;
+  try {
+    return GpuArray.alloc(kind, length);
+  } finally {
+    scopeSuppressed = false;
+  }
+}
+
+function flushRunArrayPool(): void {
+  for (const pooled of runArrayPool.values()) {
+    for (const array of pooled) array.release();
+  }
+  runArrayPool.clear();
+}
+
+function releaseRunArray(array: GpuArray): void {
+  const key = `${array.kind}|${array.length}`;
+  let pooled = runArrayPool.get(key);
+  if (pooled === undefined) {
+    pooled = [];
+    runArrayPool.set(key, pooled);
+  }
+  if (pooled.length < RUN_POOL_LIMIT_PER_SHAPE) pooled.push(array);
+  else array.release();
+}
+
+/** Release run()'s memoized kernels and pooled GPU buffers. destroyDevice() does this automatically. */
+export function flushRunCache(): void {
+  for (const entry of runKernelCache.values()) entry.kernel.release();
+  runKernelCache.clear();
+  flushRunArrayPool();
+  runPoolDevice = 0n;
+}
 
 /**
- * One-shot: compile (memoized per source), upload, dispatch, read back (in place),
- * release the uploads. The 10-line-wow API. Hot loops should hold a Kernel +
- * GpuArrays instead — run() still creates and destroys every GPU buffer per call.
+ * Run synchronous `work`, then release every GpuArray it created except those it
+ * returns (a GpuArray, or an array containing GpuArrays — kept arrays transfer to
+ * the enclosing scope, if any). The tf.tidy-style leak guard for batch jobs.
+ * Synchronous only: async work must manage releases itself.
+ */
+export function gpuScope<T>(work: () => T): T {
+  const created: GpuArray[] = [];
+  scopeStack.push(created);
+  let result: T;
+  try {
+    result = work();
+  } catch (error) {
+    scopeStack.pop();
+    for (const array of created) array.release();
+    throw error;
+  }
+  scopeStack.pop();
+  if (result instanceof Promise) {
+    for (const array of created) array.release();
+    throw new Error('gpuScope: work returned a Promise — gpuScope is synchronous-only (arrays would be released before the work completes). Manage releases manually for async work.');
+  }
+  const kept = new Set<GpuArray>();
+  if (result instanceof GpuArray) kept.add(result);
+  else if (Array.isArray(result)) {
+    for (const item of result) if (item instanceof GpuArray) kept.add(item);
+  }
+  for (const array of created) {
+    if (!kept.has(array)) array.release();
+  }
+  if (scopeStack.length > 0) {
+    const parent = scopeStack[scopeStack.length - 1]!;
+    for (const array of kept) parent.push(array);
+  }
+  return result;
+}
+
+/**
+ * One-shot: compile (memoized per source), upload into pooled GPU buffers, dispatch,
+ * read back (in place). The 10-line-wow API — repeat calls with the same source and
+ * shapes touch FXC and the allocator zero times. Hot loops that want full control
+ * still hold a Kernel + GpuArrays directly.
  */
 export function run<T extends Record<string, KernelArray>>(source: string, buffers: T, options: RunOptions = {}): T {
   ensureDevice();
@@ -229,8 +347,9 @@ export function run<T extends Record<string, KernelArray>>(source: string, buffe
     for (const binding of kernel.bindings) {
       const data = buffers[binding.name];
       if (data === undefined) throw new Error(`run: kernel declares buffer "${binding.name}" but no typed array was passed for it.`);
-      const array = GpuArray.from(data);
-      uploaded.set(binding.name, array);
+      const array = acquireRunArray(binding.kind, data.length);
+      uploaded.set(binding.name, array); // registered before write() so a kind-mismatch throw still returns it to the pool
+      array.write(data);
       bound[binding.name] = array;
     }
     kernel.dispatch(bound, options);
@@ -239,6 +358,6 @@ export function run<T extends Record<string, KernelArray>>(source: string, buffe
     }
     return buffers;
   } finally {
-    for (const array of uploaded.values()) array.release();
+    for (const array of uploaded.values()) releaseRunArray(array);
   }
 }

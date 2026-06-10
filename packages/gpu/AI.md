@@ -16,10 +16,10 @@ Escalation rule: start at layer 1; drop a layer only when you need something the
 
 - **The device is module-level state.** `createComputeDevice()` (headless) or `createDevice(hwnd, size)` (windowed swap chain) once; every helper targets it. `destroyDevice()` tears it down and warns about leaked resources. Failure throws (never exits).
 - **HLSL compiles at runtime** via FXC (`cs_5_0`/`vs_5_0`/`ps_5_0`). Kernels are HLSL **strings** — this package never transpiles JavaScript (gpu.js's `fn.toString()` transpiler was its defining failure mode; bundlers/minifiers cannot break a string).
-- **Buffers are explicit.** `GpuArray` stays on the GPU across dispatches (the chaining primitive — zero readbacks between kernels); `run()` is the one-shot sugar that uploads, dispatches, reads back **in place**, and releases the uploads. `run()` memoizes compiled kernels per source, so repeat calls skip FXC — but it still creates and destroys every GPU buffer per call. Hot loops: build `Kernel` + `GpuArray`s once, dispatch many times — zero per-iteration GPU allocations.
+- **Buffers are explicit.** `GpuArray` stays on the GPU across dispatches (the chaining primitive — zero readbacks between kernels); `run()` is the one-shot sugar that uploads, dispatches, reads back **in place**, and releases the uploads. `run()` memoizes compiled kernels per source AND pools its GPU buffers per (kind, length) — repeat calls with the same source and shapes touch FXC and the allocator zero times. Full-control hot loops still hold `Kernel` + `GpuArray`s directly.
 - **WARP is the universal fallback** — always present, deterministic, slow. Force it with `{ driver: 'warp' }` for reproducible CI and as your debug target.
 - **Readback synchronizes the GPU** (the perf cliff). `readbackBuffer`/`GpuArray.read()` block; `readbackBufferAsync`/`GpuArray.readAsync()` poll across `setImmediate` turns so the event loop stays live.
-- **GPU memory is never garbage-collected.** Every buffer/texture/shader/`GpuArray` owns a native resource: call `release()`/`comRelease()` and assert `gpuMemory().liveResources === 0` between jobs in long-running processes.
+- **GPU memory is never garbage-collected.** Every buffer/texture/shader/`GpuArray` owns a native resource: call `release()` (idempotent; use-after-release throws) or wrap batch jobs in `gpuScope(work)` (auto-releases everything created inside except what `work` returns), and assert `gpuMemory().liveResources === 0` between jobs in long-running processes.
 
 ## Capability → API
 
@@ -46,6 +46,8 @@ Escalation rule: start at layer 1; drop a layer only when you need something the
 | Skip FXC on warm starts | `compileCached(source, entry, target, options?, cacheDirectory?)` — DXBC disk cache, corrupt entries silently recompile |
 | Inspect generated code | `disassemble(compiledShader)` → numbered DXBC assembly text |
 | Watch GPU memory | `gpuMemory()` → `{ liveResources, totalBytes, bytesByCategory }` |
+| Auto-release a batch of arrays | `gpuScope(() => { … return kept; })` — tf.tidy-style; synchronous work only |
+| Drop run()'s caches explicitly | `flushRunCache()` (destroyDevice does it automatically) |
 | Decode a device-loss error | `describeDeviceError(hr)` (names `DXGI_ERROR_*`, explains the 2 s TDR watchdog), `getDeviceRemovedReason()` |
 | Call any other D3D11 method | `vcall(thisPtr, slot, argTypes, args, returns?)` + the `DEV_*`/`CTX_*`/`SWAP_*` slot constants (layer 3, below) |
 
@@ -53,12 +55,14 @@ Escalation rule: start at layer 1; drop a layer only when you need something the
 
 ### kernel.ts — the flagship compute API
 
-- `run<T>(source: string, buffers: T, options?: RunOptions): T` — compile (memoized per source + compile options; repeat calls skip FXC) → upload → dispatch → read back **in place** → release the uploads. `T` is a record of `KernelArray`s keyed by the kernel's buffer names.
+- `run<T>(source: string, buffers: T, options?: RunOptions): T` — compile (memoized per source + compile options) → upload into pooled GPU buffers → dispatch → read back **in place**. Repeat calls with the same source and shapes perform zero FXC compiles and zero GPU allocations. `T` is a record of `KernelArray`s keyed by the kernel's buffer names.
 - `class Kernel` — `new Kernel(source, options?: CompileOptions)`; `.dispatch(buffers: Record<string, GpuArray>, options?: DispatchOptions)`; `.bindings` (parsed `KernelBinding[]`); `.threads` (`[x,y,z]` from `[numthreads]`); `.release()`.
-- `class GpuArray` — `GpuArray.from(data: KernelArray)`, `GpuArray.alloc(kind: ScalarKind, length: number)`; `.read(): KernelArray`; `.readAsync(): Promise<KernelArray>` (event loop stays live); `.readInto(target)`; `.kind`; `.length`; `.buffer`/`.srv`/`.uav` (raw handles); `.release()`.
+- `class GpuArray` — `GpuArray.from(data: KernelArray)`, `GpuArray.alloc(kind: ScalarKind, length: number)`; `.read(): KernelArray`; `.readAsync(): Promise<KernelArray>` (event loop stays live); `.readInto(target)`; `.write(data)` (upload into the existing buffer — no reallocation); `.kind`; `.length`; `.buffer`/`.srv`/`.uav` (raw handles); `.release()` (idempotent; any use after release throws).
 - `parseKernelBindings(source): KernelBinding[]` — the textual contract: explicit `StructuredBuffer<float|int|uint> name : register(tN)` / `RWStructuredBuffer<…> : register(uN)`, registers dense from 0 per kind. Throws actionable errors (wrong register space, sparse registers, no bindings, non-string source).
 - `parseNumthreads(source): [number, number, number]`.
 - Types: `KernelArray` (`Float32Array | Int32Array | Uint32Array`), `ScalarKind` (`'float' | 'int' | 'uint'`), `KernelBinding`, `DispatchOptions` (`groups?`, `uniforms?: Buffer | KernelArray`), `RunOptions` (`+ compile?: CompileOptions`).
+- `gpuScope<T>(work: () => T): T` — releases every GpuArray created during synchronous `work` except those returned (a GpuArray or an array of them; kept arrays transfer to an enclosing scope). Throws if `work` returns a Promise.
+- `flushRunCache(): void` — release run()'s memoized kernels and pooled buffers (automatic on destroyDevice).
 - Kernel entry point must be `main`. The uniforms cbuffer must sit at `register(b0)`. Element stride is 4 (struct-typed buffers: use `structLayout` + `makeStructuredBuffer` directly).
 
 ### device.ts
@@ -112,7 +116,7 @@ Escalation rule: start at layer 1; drop a layer only when you need something the
 - `gpuSum(input: GpuArray): number` — multi-pass groupshared tree reduction, any length (float).
 - `gpuMatmul(a, b, n): GpuArray` — n×n row-major float, 16×16 groupshared tiles, any n; caller releases the result.
 - `gpuHistogram(values: GpuArray, bins): Uint32Array` — `InterlockedAdd` binning, exact (uint; values ≥ bins ignored).
-- `gpuPrefixScan(values: GpuArray): GpuArray` — exclusive uint scan, exact; ≤ 65,536 elements in v1; caller releases.
+- `gpuPrefixScan(values: GpuArray): GpuArray` — exclusive uint scan, exact, any length (group totals recurse); caller releases.
 - `gpuSort(values: GpuArray): GpuArray` — ascending bitonic uint sort (pads with 0xFFFFFFFF, trims); exact; caller releases.
 
 ### Diagnostics & introspection
@@ -278,7 +282,7 @@ const featureLevel = vcall(gpu.device, DEV_GET_FEATURE_LEVEL, [], [], FFIType.u3
 - **GPU memory is never GC'd.** `release()` everything; `gpuMemory().liveResources` should be 0 between jobs; `destroyDevice()` warns if not.
 - **TDR watchdog:** Windows kills any kernel running longer than ~2 s and resets the driver (`DXGI_ERROR_DEVICE_REMOVED`). Split long work into chunks; `describeDeviceError` explains it when it happens.
 - **`vcall` argTypes exclude the implicit `this`** — the invoker prepends it. A spurious leading u64 segfaults.
-- **Double-precision division** needs 11.1 extended doubles; the `deviceFeatures()` fp64 cap covers add/mul/fma. fp16 storage: use `f16tof32`/`f32tof16` on uint buffers (SM5 ships them; no extra surface needed).
+- **Double-precision division** needs 11.1 extended doubles; the `deviceFeatures()` fp64 cap covers add/mul/fma. fp16 storage: use `f16tof32`/`f32tof16` on uint buffers — SM5 ships them, no extra surface needed, and the selftest proves the bit-exact round trip.
 
 ## Env conventions (examples honor these)
 
