@@ -85,6 +85,7 @@
     "example:blur": "bun ./example/blur.ts",
     "example:raymarch": "bun ./example/raymarch.ts",
     "example:selftest": "bun ./example/gpu.selftest.ts",
+    "example:shader-tty": "bun ./example/shader-tty.ts",
     "example:std-selftest": "bun ./example/std.selftest.ts"
   }
 }
