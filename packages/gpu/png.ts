@@ -74,6 +74,128 @@ export const encodePNG = (rgbPixels: Uint8Array, width: number, height: number):
   return png;
 };
 
+export interface DecodedPNG {
+  height: number;
+  /** Tightly packed RGBA8 (palette/grayscale expanded; alpha 255 where the source has none). */
+  pixels: Uint8Array;
+  width: number;
+}
+
+function paethPredictor(left: number, up: number, upLeft: number): number {
+  const estimate = left + up - upLeft;
+  const deltaLeft = Math.abs(estimate - left);
+  const deltaUp = Math.abs(estimate - up);
+  const deltaUpLeft = Math.abs(estimate - upLeft);
+  if (deltaLeft <= deltaUp && deltaLeft <= deltaUpLeft) return left;
+  return deltaUp <= deltaUpLeft ? up : upLeft;
+}
+
+/**
+ * Decode an 8-bit non-interlaced PNG (color types 0 grayscale, 2 RGB, 3 palette,
+ * 6 RGBA) to tightly packed RGBA. Throws explicit errors for 16-bit, interlaced,
+ * and grayscale+alpha inputs — the pinned v1 scope.
+ */
+export const decodePNG = (bytes: Uint8Array): DecodedPNG => {
+  const signature = [137, 80, 78, 71, 13, 10, 26, 10];
+  for (let index = 0; index < 8; index += 1) {
+    if (bytes[index] !== signature[index]) throw new Error('decodePNG: not a PNG (bad signature).');
+  }
+  const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+  let width = 0;
+  let height = 0;
+  let colorType = 0;
+  let palette: Uint8Array | null = null;
+  const idatParts: Uint8Array[] = [];
+  let offset = 8;
+  while (offset + 8 <= bytes.length) {
+    const length = view.getUint32(offset);
+    const type = String.fromCharCode(bytes[offset + 4]!, bytes[offset + 5]!, bytes[offset + 6]!, bytes[offset + 7]!);
+    const data = bytes.subarray(offset + 8, offset + 8 + length);
+    if (type === 'IHDR') {
+      width = view.getUint32(offset + 8);
+      height = view.getUint32(offset + 12);
+      const bitDepth = bytes[offset + 16]!;
+      colorType = bytes[offset + 17]!;
+      const interlace = bytes[offset + 20]!;
+      if (bitDepth !== 8) throw new Error(`decodePNG: only 8-bit channels are supported (got ${bitDepth}-bit).`);
+      if (interlace !== 0) throw new Error('decodePNG: interlaced (Adam7) PNGs are not supported.');
+      if (colorType !== 0 && colorType !== 2 && colorType !== 3 && colorType !== 6) throw new Error(`decodePNG: color type ${colorType} is not supported (grayscale 0, RGB 2, palette 3, RGBA 6 only).`);
+    } else if (type === 'PLTE') {
+      palette = data.slice();
+    } else if (type === 'IDAT') {
+      idatParts.push(data);
+    } else if (type === 'IEND') {
+      break;
+    }
+    offset += 12 + length;
+  }
+  if (width === 0 || height === 0) throw new Error('decodePNG: missing IHDR.');
+  let zlibLength = 0;
+  for (const part of idatParts) zlibLength += part.length;
+  const zlib = new Uint8Array(zlibLength);
+  let zlibOffset = 0;
+  for (const part of idatParts) {
+    zlib.set(part, zlibOffset);
+    zlibOffset += part.length;
+  }
+  if ((zlib[0]! & 0x0f) !== 8) throw new Error('decodePNG: IDAT is not zlib/deflate.');
+  if ((zlib[1]! & 0x20) !== 0) throw new Error('decodePNG: zlib preset dictionaries are not supported.');
+  const raw = Bun.inflateSync(zlib.subarray(2, zlib.length - 4));
+
+  const channels = colorType === 2 ? 3 : colorType === 6 ? 4 : 1;
+  const stride = width * channels;
+  if (raw.length < (stride + 1) * height) throw new Error('decodePNG: truncated pixel data.');
+  const unfiltered = new Uint8Array(stride * height);
+  for (let row = 0; row < height; row += 1) {
+    const filter = raw[row * (stride + 1)]!;
+    const lineStart = row * (stride + 1) + 1;
+    const outStart = row * stride;
+    for (let column = 0; column < stride; column += 1) {
+      const value = raw[lineStart + column]!;
+      const left = column >= channels ? unfiltered[outStart + column - channels]! : 0;
+      const up = row > 0 ? unfiltered[outStart - stride + column]! : 0;
+      const upLeft = row > 0 && column >= channels ? unfiltered[outStart - stride + column - channels]! : 0;
+      let decoded: number;
+      if (filter === 0) decoded = value;
+      else if (filter === 1) decoded = value + left;
+      else if (filter === 2) decoded = value + up;
+      else if (filter === 3) decoded = value + Math.floor((left + up) / 2);
+      else if (filter === 4) decoded = value + paethPredictor(left, up, upLeft);
+      else throw new Error(`decodePNG: unknown filter type ${filter} on row ${row}.`);
+      unfiltered[outStart + column] = decoded & 0xff;
+    }
+  }
+
+  const pixels = new Uint8Array(width * height * 4);
+  for (let index = 0; index < width * height; index += 1) {
+    if (colorType === 0) {
+      const value = unfiltered[index]!;
+      pixels[index * 4] = value;
+      pixels[index * 4 + 1] = value;
+      pixels[index * 4 + 2] = value;
+      pixels[index * 4 + 3] = 255;
+    } else if (colorType === 2) {
+      pixels[index * 4] = unfiltered[index * 3]!;
+      pixels[index * 4 + 1] = unfiltered[index * 3 + 1]!;
+      pixels[index * 4 + 2] = unfiltered[index * 3 + 2]!;
+      pixels[index * 4 + 3] = 255;
+    } else if (colorType === 3) {
+      if (palette === null) throw new Error('decodePNG: palette image without a PLTE chunk.');
+      const entry = unfiltered[index]! * 3;
+      pixels[index * 4] = palette[entry]!;
+      pixels[index * 4 + 1] = palette[entry + 1]!;
+      pixels[index * 4 + 2] = palette[entry + 2]!;
+      pixels[index * 4 + 3] = 255;
+    } else {
+      pixels[index * 4] = unfiltered[index * 4]!;
+      pixels[index * 4 + 1] = unfiltered[index * 4 + 1]!;
+      pixels[index * 4 + 2] = unfiltered[index * 4 + 2]!;
+      pixels[index * 4 + 3] = unfiltered[index * 4 + 3]!;
+    }
+  }
+  return { height, pixels, width };
+};
+
 /** Encode a BGRA buffer with an arbitrary row stride (the swap-chain layout) to a PNG byte array. */
 export const encodePNGFromBGRA = (bgraPixels: Uint8Array, width: number, height: number, rowStride = width * 4): Uint8Array => {
   const rgb = new Uint8Array(width * height * 3);

@@ -36,7 +36,8 @@ export {
   vsSetShaderResources,
 } from './pipeline';
 export type { CsBindings, PsBindings, SamplerOptions } from './pipeline';
-export { encodePNG, encodePNGFromBGRA } from './png';
+export { decodePNG, encodePNG, encodePNGFromBGRA } from './png';
+export type { DecodedPNG } from './png';
 export { createGpuTimer } from './query';
 export type { GpuTimer, GpuTimerResult } from './query';
 export { compile, compileCached, disassemble, makeComputeShader, makePixelShader, makeVertexShader, preprocessHLSL } from './shader';

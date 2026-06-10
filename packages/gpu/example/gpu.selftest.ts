@@ -23,7 +23,7 @@
  * Run: bun run example/gpu.selftest.ts
  */
 import { FFIType } from 'bun:ffi';
-import { readdirSync, rmSync, writeFileSync } from 'node:fs';
+import { readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 
 import {
   type CompiledShader,
@@ -53,6 +53,7 @@ import {
   createKernelDebugLog,
   createWindow,
   csSet,
+  decodePNG,
   describeDeviceError,
   destroyDevice,
   deviceFeatures,
@@ -60,6 +61,7 @@ import {
   dispatchIndirect,
   drawFullscreenTriangle,
   drawTriangles,
+  encodePNG,
   getDeviceRemovedReason,
   gpuMemory,
   guidBytes,
@@ -131,6 +133,36 @@ console.log('== gpu.selftest ==');
   const again = createComputeDevice();
   check('1 device-recreate', again.device !== 0n, 'destroyDevice then re-create works');
   destroyDevice();
+}
+
+{
+  // PNG decode against a real-world fixture (encoded by Gdiplus, exercising real filters).
+  const fixturePath = `${import.meta.dir}/../../all/screenshots/blackhole.png`;
+  let fixture: Uint8Array | null = null;
+  try {
+    fixture = new Uint8Array(readFileSync(fixturePath));
+  } catch {
+    skip('32 png-decode-fixture', 'repo screenshot fixture not present (registry install)');
+  }
+  if (fixture !== null) {
+    const decoded = decodePNG(fixture);
+    const plausible = decoded.width > 100 && decoded.height > 100 && decoded.pixels.byteLength === decoded.width * decoded.height * 4;
+    const rgb = new Uint8Array(decoded.width * decoded.height * 3);
+    for (let index = 0; index < decoded.width * decoded.height; index += 1) {
+      rgb[index * 3] = decoded.pixels[index * 4]!;
+      rgb[index * 3 + 1] = decoded.pixels[index * 4 + 1]!;
+      rgb[index * 3 + 2] = decoded.pixels[index * 4 + 2]!;
+    }
+    const recoded = decodePNG(encodePNG(rgb, decoded.width, decoded.height));
+    // Compare RGB only — the RGB re-encode deliberately drops the fixture's alpha channel.
+    let identical = true;
+    for (let index = 0; index < decoded.width * decoded.height; index += 1) {
+      for (let channel = 0; channel < 3; channel += 1) {
+        if (recoded.pixels[index * 4 + channel] !== decoded.pixels[index * 4 + channel]) identical = false;
+      }
+    }
+    check('32 png-decode-fixture', plausible && identical, `decoded ${decoded.width}×${decoded.height} external PNG; re-encode → re-decode RGB is byte-identical`);
+  }
 }
 
 {
