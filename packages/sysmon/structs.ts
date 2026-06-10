@@ -2,6 +2,15 @@
 
 const FILETIME_EPOCH_OFFSET_MS = 11_644_473_600_000; // 1601-01-01 → 1970-01-01
 
+export interface CpuTime {
+  /** 100 ns ticks spent idle. */
+  idle: bigint;
+  /** 100 ns ticks in kernel mode — INCLUDES idle (NT convention). */
+  kernel: bigint;
+  /** 100 ns ticks in user mode. */
+  user: bigint;
+}
+
 export interface MemoryStatus {
   availablePageFileBytes: bigint;
   availablePhysicalBytes: bigint;
@@ -176,4 +185,18 @@ export function parseProcessSnapshot(buffer: Buffer, bufferBase: number): Proces
     offset += next;
   }
   return rows;
+}
+
+/** SYSTEM_PROCESSOR_PERFORMANCE_INFORMATION array (48 B per core): IdleTime i64@0x00, KernelTime i64@0x08 (INCLUDES idle), UserTime i64@0x10; Dpc/Interrupt/InterruptCount fill the rest of the stride. */
+export function parseProcessorTimes(buffer: Buffer, coreCount: number): CpuTime[] {
+  const times: CpuTime[] = new Array(coreCount);
+  for (let core = 0; core < coreCount; core += 1) {
+    const offset = core * 48;
+    times[core] = {
+      idle: buffer.readBigInt64LE(offset),
+      kernel: buffer.readBigInt64LE(offset + 8),
+      user: buffer.readBigInt64LE(offset + 16),
+    };
+  }
+  return times;
 }

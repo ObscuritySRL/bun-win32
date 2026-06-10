@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test';
-import { decodeUnicodeString, filetimeDeltaMs, filetimeToDate, parseMemoryStatusEx, parseMultiSz, parsePerformanceInfo } from './structs';
+import { decodeUnicodeString, filetimeDeltaMs, filetimeToDate, parseMemoryStatusEx, parseMultiSz, parsePerformanceInfo, parseProcessorTimes } from './structs';
 
 describe('decodeUnicodeString', () => {
   test('decodes UTF-16LE bytes at an offset', () => {
@@ -100,5 +100,21 @@ describe('parsePerformanceInfo', () => {
     expect(counts.handleCount).toBe(250_000);
     expect(counts.processCount).toBe(441);
     expect(counts.threadCount).toBe(8_943);
+  });
+});
+
+describe('parseProcessorTimes', () => {
+  test('decodes a hand-built 2-core buffer at stride 48', () => {
+    const buffer = Buffer.alloc(96);
+    buffer.writeBigInt64LE(1_000_000n, 0); // core 0 idle
+    buffer.writeBigInt64LE(1_500_000n, 8); // core 0 kernel (includes idle)
+    buffer.writeBigInt64LE(700_000n, 16); // core 0 user
+    buffer.writeBigInt64LE(2_000_000n, 48); // core 1 idle
+    buffer.writeBigInt64LE(2_100_000n, 56); // core 1 kernel
+    buffer.writeBigInt64LE(50_000n, 64); // core 1 user
+    const times = parseProcessorTimes(buffer, 2);
+    expect(times).toHaveLength(2);
+    expect(times[0]).toEqual({ idle: 1_000_000n, kernel: 1_500_000n, user: 700_000n });
+    expect(times[1]).toEqual({ idle: 2_000_000n, kernel: 2_100_000n, user: 50_000n });
   });
 });

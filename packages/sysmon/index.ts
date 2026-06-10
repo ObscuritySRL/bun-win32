@@ -1,10 +1,12 @@
+export { CpuSampler, cpuTimes, systemTimes } from './cpu';
+export type { CpuSample, SystemTimes } from './cpu';
 export { memory, performanceInfo } from './memory';
 export type { PerformanceInfo } from './memory';
 export { ProcessSampler, pidStats, processImagePath, processTree, processes } from './process';
 export type { PidStats, ProcessSample, ProcessTreeNode } from './process';
 export { createSpinTicker, createTicker, monotonicMicroseconds } from './sampler';
 export type { Ticker } from './sampler';
-export { decodeUnicodeString, filetimeDeltaMs, filetimeToDate, parseMemoryStatusEx, parseMultiSz, parsePerformanceInfo, parseProcessSnapshot } from './structs';
-export type { MemoryStatus, PerformanceCounts, ProcessInfo } from './structs';
+export { decodeUnicodeString, filetimeDeltaMs, filetimeToDate, parseMemoryStatusEx, parseMultiSz, parsePerformanceInfo, parseProcessSnapshot, parseProcessorTimes } from './structs';
+export type { CpuTime, MemoryStatus, PerformanceCounts, ProcessInfo } from './structs';
 export { bootTime, computerName, cpuLayout, isElevated, osInfo, uptimeMs, userName } from './system';
 export type { CpuLayout, OsInfo } from './system';
