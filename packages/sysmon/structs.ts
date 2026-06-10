@@ -28,6 +28,34 @@ export interface PerformanceCounts {
   threadCount: number;
 }
 
+export interface ProcessInfo {
+  basePriority: number;
+  createTime: Date;
+  handleCount: number;
+  ioOtherBytes: number;
+  ioOtherOperations: number;
+  ioReadBytes: number;
+  ioReadOperations: number;
+  ioWriteBytes: number;
+  ioWriteOperations: number;
+  /** CPU time in kernel mode, 100 ns units. */
+  kernelTime: bigint;
+  name: string;
+  pageFaultCount: number;
+  peakWorkingSetBytes: number;
+  pid: number;
+  ppid: number;
+  /** Committed private bytes (PagefileUsage) — Task Manager's "Commit size". */
+  privateBytes: number;
+  sessionId: number;
+  threadCount: number;
+  /** CPU time in user mode, 100 ns units. */
+  userTime: bigint;
+  virtualBytes: number;
+  /** Physical RAM in the working set — Task Manager's default "Memory" comparison point. */
+  workingSetBytes: number;
+}
+
 /** UTF-16LE bytes at [offset, offset + byteLength) → string (Bun's TextDecoder rejects 'utf-16le'; Buffer.toString is the repo convention). */
 export function decodeUnicodeString(buffer: Buffer, offset: number, byteLength: number): string {
   return buffer.subarray(offset, offset + byteLength).toString('utf16le');
@@ -93,4 +121,59 @@ export function parsePerformanceInfo(buffer: Buffer): PerformanceCounts {
     systemCachePages: Number(buffer.readBigUInt64LE(48)),
     threadCount: buffer.readUInt32LE(96),
   };
+}
+
+/**
+ * SYSTEM_PROCESS_INFORMATION (x64) walker over an NtQuerySystemInformation(class 5) buffer.
+ * Offsets are SDK-header-derived (winternl.h) and referee-verified against
+ * GetProcessTimes/GetProcessMemoryInfo/GetProcessHandleCount/GetProcessIoCounters:
+ * NextEntryOffset u32@0x00 (0 terminates), NumberOfThreads u32@0x04, CreateTime FILETIME@0x20,
+ * UserTime i64@0x28, KernelTime i64@0x30, ImageName{Length u16@0x38, Buffer VA@0x40},
+ * BasePriority i32@0x48, UniqueProcessId@0x50, InheritedFromUniqueProcessId@0x58,
+ * HandleCount u32@0x60, SessionId u32@0x64, VirtualSize@0x78, PageFaultCount u32@0x80,
+ * PeakWorkingSetSize@0x88, WorkingSetSize@0x90, PagefileUsage@0xB8, IO counters@0xD0..0xF8.
+ * (NOT 0x110/0x118 — those land inside Threads[0].) ImageName.Buffer is a VA into this same
+ * buffer; pass the buffer's own base address (`buffer.ptr`) for the relative resolve.
+ */
+export function parseProcessSnapshot(buffer: Buffer, bufferBase: number): ProcessInfo[] {
+  const view = new DataView(buffer.buffer, buffer.byteOffset, buffer.byteLength); // once per syscall, never per row
+  const rows: ProcessInfo[] = [];
+  let offset = 0;
+  for (let guard = 0; guard < 200_000 && offset + 0x100 <= buffer.byteLength; guard += 1) {
+    const pid = view.getUint32(offset + 0x50, true);
+    const nameLength = view.getUint16(offset + 0x38, true);
+    let name = pid === 0 ? 'Idle' : pid === 4 ? 'System' : '';
+    if (nameLength > 0 && nameLength < 1024) {
+      const nameAddress = view.getUint32(offset + 0x40, true) + view.getUint32(offset + 0x44, true) * 4_294_967_296;
+      const relative = nameAddress - bufferBase;
+      if (relative > 0 && relative + nameLength <= buffer.byteLength) name = decodeUnicodeString(buffer, relative, nameLength);
+    }
+    rows.push({
+      basePriority: view.getInt32(offset + 0x48, true),
+      createTime: filetimeToDate(view.getUint32(offset + 0x20, true), view.getUint32(offset + 0x24, true)),
+      handleCount: view.getUint32(offset + 0x60, true),
+      ioOtherBytes: view.getUint32(offset + 0xf8, true) + view.getUint32(offset + 0xfc, true) * 4_294_967_296,
+      ioOtherOperations: view.getUint32(offset + 0xe0, true) + view.getUint32(offset + 0xe4, true) * 4_294_967_296,
+      ioReadBytes: view.getUint32(offset + 0xe8, true) + view.getUint32(offset + 0xec, true) * 4_294_967_296,
+      ioReadOperations: view.getUint32(offset + 0xd0, true) + view.getUint32(offset + 0xd4, true) * 4_294_967_296,
+      ioWriteBytes: view.getUint32(offset + 0xf0, true) + view.getUint32(offset + 0xf4, true) * 4_294_967_296,
+      ioWriteOperations: view.getUint32(offset + 0xd8, true) + view.getUint32(offset + 0xdc, true) * 4_294_967_296,
+      kernelTime: view.getBigUint64(offset + 0x30, true),
+      name,
+      pageFaultCount: view.getUint32(offset + 0x80, true),
+      peakWorkingSetBytes: view.getUint32(offset + 0x88, true) + view.getUint32(offset + 0x8c, true) * 4_294_967_296,
+      pid,
+      ppid: view.getUint32(offset + 0x58, true),
+      privateBytes: view.getUint32(offset + 0xb8, true) + view.getUint32(offset + 0xbc, true) * 4_294_967_296,
+      sessionId: view.getUint32(offset + 0x64, true),
+      threadCount: view.getUint32(offset + 0x04, true),
+      userTime: view.getBigUint64(offset + 0x28, true),
+      virtualBytes: view.getUint32(offset + 0x78, true) + view.getUint32(offset + 0x7c, true) * 4_294_967_296,
+      workingSetBytes: view.getUint32(offset + 0x90, true) + view.getUint32(offset + 0x94, true) * 4_294_967_296,
+    });
+    const next = view.getUint32(offset, true);
+    if (next === 0) break;
+    offset += next;
+  }
+  return rows;
 }
