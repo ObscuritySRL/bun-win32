@@ -4,6 +4,8 @@ export { CpuSampler, cpuTimes, systemTimes } from './cpu';
 export type { CpuSample, SystemTimes } from './cpu';
 export { diskSpace, drives } from './disk';
 export type { DiskSpace, DriveInfo } from './disk';
+export { channels, formatMessage, queryEvents, tailEvents } from './eventlog';
+export type { EventRecord, QueryOptions, TailOptions } from './eventlog';
 export { memory, performanceInfo } from './memory';
 export type { PerformanceInfo } from './memory';
 export { NetSampler, interfaceCounters, tcpSockets, udpSockets } from './net';
