@@ -29,6 +29,7 @@
   .warn { background:#2d1a1a; border:1px solid var(--red); border-radius:8px; padding: .8rem 1rem; margin:1rem 0; }
   .note { background:#1a2233; border:1px solid var(--accent); border-radius:8px; padding:.8rem 1rem; margin:1rem 0; }
   .doctrine { background:#1f2a1f; border:1px solid var(--green); border-radius:8px; padding:.8rem 1rem; margin:1rem 0; }
+  .perf { background:#2a2418; border:1px solid var(--amber); border-radius:8px; padding:.8rem 1rem; margin:1rem 0; }
   .tag { display:inline-block; font-size:.75em; font-weight:700; border-radius:10px; padding:.05em .6em; margin-left:.4em; vertical-align:middle; }
   .tag.test { background:#1f3d2b; color:var(--green); }
   .tag.ffi { background:#3d2b1f; color:var(--amber); }
@@ -62,6 +63,23 @@
 <li><strong>When a step's verification fails, stop and debug</strong> (use superpowers:systematic-debugging). Do not pile changes on a broken state. Do not "fix" by weakening the verification.</li>
 <li><strong>If you discover something this plan got wrong, fix the plan's assumption in your head AND record it</strong> — a one-line note in the final summary so the human learns what drifted.</li>
 <li><strong>Verify visually where the deliverable is visual.</strong> A PNG you have actually looked at beats any numeric proxy (repo ground truth).</li>
+</ul>
+</div>
+
+<div class="perf">
+<h4>⚡ The performance doctrine (this is a GPU engine — read before every hot-path phase)</h4>
+<p>A GPU engine that leaves cycles on the table is a contradiction. Performance is a <strong>standing, always-on audit</strong>, not a closing benchmark — every hot-path phase ends by analyzing its inner loop down to allocations, FFI-boundary crossings, the COM vtable call, and CPU cycles. <strong>Treat every number below as a floor, not a finish line</strong> — while building, keep actively hunting for wins this plan never anticipated; the listed levers are where to start, not where to stop (see the generative pass, G.3). The rules (measured on the authoring machine 2026-06-09 — <strong>Bun runs on JavaScriptCore, not V8; re-verify per host, and treat V8 folklore as suspect until measured</strong>; full data in Appendix G):</p>
+<ul>
+<li><strong>Reuse, never re-allocate, in any per-dispatch / per-readback / per-frame loop.</strong> A <code>Buffer.alloc</code> per iteration measured <strong>~1064&nbsp;ns</strong>; reuse is ~free (<strong>~1600×</strong>); a fresh <code>DataView</code> per parse is <strong>+20&nbsp;ns</strong>. Allocate desc/scratch buffers and views ONCE (the proven <code>core-scope.ts</code> / <code>_gpu.ts</code> pattern — the <code>D3D11_BOX</code> and desc buffers are module/loop-hoisted). <code>run()</code> and <code>readbackBuffer</code> must not allocate a staging resource or a <code>new Float32Array(bytes)</code> copy per call where a reused buffer or a view suffices — pool them.</li>
+<li><strong>Cache <code>buffer.ptr</code> once.</strong> The <code>.ptr</code> getter re-runs <code>ptr(this)</code> on every access (<strong>~7.3&nbsp;ns</strong>) — ~19% off a real FFI loop. Never write <code>nativeFn(buf.ptr)</code> inside <code>GpuArray.from</code>/<code>readbackBuffer</code>/the dispatch path; hoist the pointer.</li>
+<li><strong>Mind the <code>vcall</code> hot path — it is the hottest code in the engine.</strong> The invoker builds a template-string key <code>`${method}|${returns}|${argTypes.join(',')}`</code> and does a <code>Map.get</code> on EVERY COM call — per-call string allocation in the inner loop. Microbench it (S5.x); if it shows up, key the cache more cheaply (e.g. by the resolved method pointer) — but only with a measurement, and never change <code>vcall</code>'s argument contract (the <code>this</code>-excluded rule is load-bearing, ground truth).</li>
+<li><strong>Avoid bigint in the hot path; minimize FFI crossings.</strong> The FFI floor is ~5&nbsp;ns/call; a u64→bigint return adds ~10&nbsp;ns; a fresh <code>BigInt()</code> arg per call is ~16&nbsp;ns (hoist constant handle args out of loops). Pass <code>Number(x) as Pointer</code> (the sanctioned narrowing) rather than re-boxing. The whole compute model is the macro-opt: one dispatch over a big buffer, not N tiny calls.</li>
+<li><strong>Use <code>DataView</code> typed accessors, not hand-rolled byte math</strong> (on JSC manual byte-OR is ~1.13× <em>slower</em> — the opposite of V8 lore); Big(U)int64Array <em>views</em> are the <strong>slowest</strong> u64 path and often unaligned-illegal; JSC shows <strong>no</strong> monomorphism penalty — don't contort for it. Spend the effort on alloc + <code>.ptr</code> + the readback loop.</li>
+<li><strong>The readback cliff is real.</strong> Readback synchronizes the GPU (stated in the mental model). The per-byte <code>read.u8</code> loop in <code>readbackBuffer</code> is not just to A/B once (S4.2) — it must be eliminated (bulk copy / view) and the staging buffer reused; and the async-readback extra (Phase 10b #2) is the structural fix for the stall. Pace windowed demos with <code>present(true)</code> vsync, never <code>Bun.sleep</code> (async sleep is ~15.6&nbsp;ms quantized; <code>Bun.sleepSync</code> is NOT, ~1.5&nbsp;ms — a useful distinction the plan should not blur).</li>
+<li><strong><code>run()</code> has a compile-per-call cliff.</strong> The one-shot API compiles HLSL + allocates + releases every call (S8.1 finally). Flag it loudly, wire the shader bytecode cache (Phase 10b #9) into <code>run()</code>, and ship a Kernel/GpuArray-reuse recipe so the hot path compiles once and pools resources.</li>
+<li><strong>Every hot path gets an isolated microbenchmark</strong> (<code>Bun.nanoseconds()</code>, 200k+ warm-up, dead-code sink, median ns/op — the <code>terminal.bench.ts</code> convention) — single dispatch, single readback element, <code>vcall</code> overhead, <code>run()</code> per-element, cbuffer write. Benchmarks DRIVE optimization, not just the README table. A perf baseline is recorded in Phase 0 and <strong>gated at release</strong> (S14.x) exactly like a tsc error.</li>
+<li><strong>Prove it, don't hope — Bun ships <code>bun:jsc</code>.</strong> Because this is Bun-only, every hot path can be <em>verified</em> optimized: <code>numberOfDFGCompiles(fn)&nbsp;&gt;&nbsp;0</code> (timing optimized code, not the interpreter), <code>profile(cb)</code> tier breakdown (a warmed loop measured <strong>99.3% FTL</strong> on this machine — assert FTL/DFG dominates the dispatch/readback decode), <code>reoptimizationRetryCount(fn)</code> (climbing = type-unstable deopt — fix the polymorphism, e.g. the <code>vcall</code> call sites, not the body), <code>jscDescribe(obj)</code> (Structure/IndexingType X-ray), and <code>heapStats().objectTypeCounts</code> deltas (gate per-dispatch/per-readback allocation at zero). Full verified toolkit + measured shape/array/alloc/native-read levers in Appendix G.4/G.5 — use them in every microbench and audit.</li>
+<li><strong>Don't satisfice — beating the baseline is the job, not meeting it.</strong> Correctness plus the known levers is the START of a hot-path audit, never the end. Once a path is correct, <code>profile()</code> it to find the ACTUAL dominant cost (often something this plan never listed — the <code>vcall</code> cache-key build, a redundant readback copy, a per-call compile), form a hypothesis, microbench an alternative, and keep it only if it wins AND stays correct, cast-free, and readable — then go again until returns genuinely diminish. Interrogate every read, branch, allocation, dispatch, and pass: can it be hoisted, precomputed, batched, fused, made async/lazy, or eliminated? Can the <em>algorithm</em> change (a better tiling, fewer barriers, one dispatch instead of many), not just the constant factor? The S14.6 gate only enforces "no regression"; the standing goal is to <strong>beat the prior baseline every phase</strong>. Any lever you discover that this plan didn't list — prove it with the G.4 tools (and the GPU timestamp queries for kernel-ms) and <strong>add it to Appendix G.5</strong>. Never stop at "fast enough."</li>
 </ul>
 </div>
 
@@ -169,7 +187,7 @@
 <li><a href="#p13">Phase 13 — Documentation: AI.md, README, screenshots</a></li>
 <li><a href="#p14">Phase 14 — Quality gates + self-review</a></li>
 <li><a href="#p15">Phase 15 — Release: versions, lockfile, publish (one OTP), post-publish acceptance</a></li>
-<li><a href="#appendix">Appendices A–F</a></li>
+<li><a href="#appendix">Appendices A–G</a> (incl. <a href="#appG">G — Performance: hot-path budgets, measured JSC levers, the regression gate</a>)</li>
 </ol>
 
 <h2 id="p0">Phase 0 — Preflight: environment, ground-truth re-verification, baselines</h2>
@@ -223,6 +241,8 @@ If <code>bun-gpu</code> got squatted since 2026-06-09, ship <code>@bun-win32/gpu
 bun run scripts/audit.ts --all 2&gt;&amp;1 | tail -5   &gt; .scratch/baseline-audit.txt
 bun run scripts/nullcheck.ts --all 2&gt;&amp;1 | tail -5 &gt; .scratch/baseline-nullcheck.txt</code></pre>
 Note: audit <code>--all</code> emits ~241 accepted-convention notices on mature packages (ground truth — they are NOT bugs; never "fix" shipped bindings to silence them). The baseline exists so you can prove the counts didn't change.</div>
+
+<div class="step verify"><span class="id">S0.6b</span><strong>Capture the PERFORMANCE baseline</strong> (gated in S14.6 — perf regressions are release-blocking, like tsc errors; performance doctrine). Pin the timer resolution and warm up, then record into <code>.scratch/baseline-perf.txt</code> the floors every later hot path is measured against: median ns/op (via <code>Bun.nanoseconds()</code>, 200k+ warm-up, dead-code sink) of a <code>vcall</code> into a trivial COM method, a single empty <code>dispatch</code>, and a 1&nbsp;MB <code>readbackBuffer</code> (ns/MB). Record the machine spec + adapter (CPU, GPU, driver, Bun version, Windows build) — every ns/µs/MB-s figure in Appendix G and the README is host-specific and re-verified here, never copied from this plan.</div>
 
 <div class="step research"><span class="id">S0.7</span><strong>Read the five source-of-truth files end to end</strong> (budget real time for this — the extraction's fidelity depends on it):
 <ul>
@@ -535,6 +555,8 @@ for (let index = 0; index &lt; 256; index += 1) {
 console.log(`compute OK on ${gpu.gpuName} (${gpu.driver})`);</code></pre>
 Run on default device AND with <code>createComputeDevice({ driver: 'warp' })</code>. Expected: both exit 0. <strong>This is the package's reason to exist working end to end — do not proceed past a failure here.</strong></div>
 
+<div class="step verify"><span class="id">S4.4b</span><strong>Readback hot-path audit</strong> <span class="tag test">microbench</span> (performance doctrine). S4.2 only A/B-tests the readback once — this step makes it a discipline. Microbench <code>readbackBuffer</code> in isolation at <strong>ns/MB and ns/element</strong>; <strong>eliminate the per-byte <code>read.u8</code> loop</strong> in favor of a bulk copy/view (keep only if the loop provably wins, which it will not); <strong>reuse a single staging buffer across readbacks</strong> instead of S4.1's per-call staging; and avoid the <code>new Float32Array(bytes)</code> copy where a view over the mapped/owned bytes suffices. Cache <code>buffer.ptr</code>. Record ns/MB into the baseline — it is the README's readback-bandwidth claim.</div>
+
 <div class="step commit"><span class="id">S4.5</span>
 <pre><code>git add packages/gpu
 git commit -m "feat(gpu): structured/constant buffers, dynamic upload, staging readback"</code></pre></div>
@@ -553,6 +575,8 @@ git commit -m "feat(gpu): structured/constant buffers, dynamic upload, staging r
 <div class="step verify"><span class="id">S5.5</span><strong>Pixel-exact render proof.</strong> Probe <code>.scratch/probe-render.ts</code>: compute device → <code>makeTexture({ w: 64, h: 64, rtv: true })</code> → <code>setRenderTargets([tex.rtv!])</code> + <code>setViewport(64, 64)</code> → <code>clear(tex.rtv!, [1, 0, 0, 1])</code> → <code>readbackTexture</code> → assert pixel (0,0) is red (remember the texture default format is B8G8R8A8: byte order B,G,R,A → expect <code>[0, 0, 255, 255]</code> — verify the actual default in <code>makeTexture</code>, R8G8B8A8 vs B8G8R8A8 changes byte order; read the code, then assert accordingly). Then a second probe stage: fullscreen-triangle PS writing a UV gradient, readback, assert corner pixels differ monotonically. Expected: exit 0.</div>
 
 <div class="step verify"><span class="id">S5.6</span><strong>Depth-test proof (the honest one).</strong> Port <code>_gpu3d.ts</code>'s self-test trick into <code>.scratch/probe-depth.ts</code>: render a NEAR green quad FIRST and a FAR red quad LAST with depth enabled; readback; assert the overlap is green. The draw order makes depth the only possible cause of green winning (ground-truth methodology — keep the explanatory comment). Expected: exit 0.</div>
+
+<div class="step verify"><span class="id">S5.6b</span><strong>Dispatch + vcall hot-path audit</strong> <span class="tag test">microbench</span> (performance doctrine — <code>vcall</code> is the hottest code in the engine). Microbench <code>vcall</code> overhead in isolation (ns/call) and a single empty <code>dispatch</code>. Three checks: (1) the invoker cache builds a per-call template-string key + <code>Map.get</code> — measure whether the string construction shows up at dispatch rates and, if so, key by the resolved method pointer instead (NEVER change vcall's <code>this</code>-excluded argument contract — ground truth); (2) cache <code>buffer.ptr</code> and hoist constant bigint handle args out of any per-dispatch loop (a fresh <code>BigInt()</code> is ~16&nbsp;ns); (3) assert zero allocation per dispatch in <code>csSet</code>/<code>dispatch</code>. <code>Preload</code>+destructure the dispatch/CSSet native functions (correctness ordering — captures the native fn, not the lazy wrapper). Record empty-dispatch + vcall ns into the baseline.</div>
 
 <div class="step commit"><span class="id">S5.7</span>
 <pre><code>git add packages/gpu
@@ -796,6 +820,8 @@ Notes for the executor: (1) <code>Kernel</code> needs a public readonly <code>bi
 <pre><code>bun test packages/gpu/kernel.test.ts</code></pre></div>
 
 <div class="step verify"><span class="id">S8.3</span><strong>Integration probes</strong> (rolled into the Phase 10 selftest, but prove the core now): <code>.scratch/probe-kernel.ts</code> — (a) the in-place <code>run()</code> sqrt example returns the same Float32Array instance with correct values; (b) chaining: <code>GpuArray.from</code> → kernel1 doubles → kernel2 adds 1 → <code>read()</code> equals <code>x*2+1</code> with NO intermediate readback; (c) multi-output: one kernel writing two RW buffers; (d) uniforms: cbuffer scale factor applied. Expect exit 0 on hardware AND WARP.</div>
+
+<div class="step verify"><span class="id">S8.3b</span><strong>run() perf audit + the compile-per-call caveat</strong> <span class="tag test">microbench</span> (performance doctrine). <code>run()</code> compiles HLSL and allocates+releases all GPU resources on EVERY call (S8.1 finally) — an unflagged cliff for the headline "wow" API. Required: (1) add an explicit <strong>Kernel/GpuArray-reuse recipe</strong> and resource pooling so the hot path compiles once and reuses buffers across calls; (2) wire the shader bytecode cache (Phase 10b #9) into <code>run()</code> so repeat sources skip FXC; (3) cache <code>buffer.ptr</code>; (4) avoid the per-call <code>new Float32Array</code> readback copy where a view works. Microbench <code>run()</code> per-element throughput vs a reused-<code>Kernel</code> loop and record BOTH — the gap is the caveat the AI.md/README must state, and the reused number is the real saxpy/matmul throughput claim.</div>
 
 <div class="step commit"><span class="id">S8.4</span>
 <pre><code>git add packages/gpu
@@ -1080,6 +1106,8 @@ bun run scripts/nullcheck.ts --all 2&gt;&amp;1 | tail -5   # counts match baseli
 
 <div class="step verify"><span class="id">S14.4</span><strong>Docs-completeness gate.</strong> For every exported name in <code>packages/gpu/index.ts</code>, grep AI.md for it. Zero misses allowed. Then the skill's self-review: (1) product-brief coverage — PROJECTS.md §4's promises (vendor-universal, WARP fallback, compile/disassemble toolchain, vcall as public primitive, guardrails, adapter introspection) each map to a shipped feature; (2) placeholder scan over AI.md/READMEs — no TBD/TODO/"coming soon"; (3) name consistency — the plan's identifiers (<code>run</code>, <code>Kernel</code>, <code>GpuArray</code>, <code>listAdapters</code>, <code>releaseDepth</code>…) match what the code actually exports.</div>
 
+<div class="step verify"><span class="id">S14.6</span><strong>Performance-regression gate</strong> <span class="tag test">microbench</span> (release-blocking, like a tsc error; performance doctrine). Re-run <code>example/benchmark.ts</code> + the per-phase microbenchmarks on the release tree (timer resolution pinned, warmed up) and assert <strong>no hot-path number regressed beyond ~10%</strong> vs <code>.scratch/baseline-perf.txt</code> (and vs the per-phase ns/op from Phases 4/5/8). A regression blocks release. Separately assert the always-on rules held with <code>bun:jsc</code> (Appendix G.4), not just by eye: (1) grep the shipped modules for forbidden hot-loop patterns — <code>Buffer.alloc</code>/<code>new DataView</code>/<code>new Float32Array</code> inside <code>readbackBuffer</code>/<code>dispatch</code>/<code>vcall</code>/<code>run</code>/<code>GpuArray.from</code> bodies, <code>BigInt(</code> rebuilt per call, <code>.ptr</code> re-read in a loop; (2) for the hottest paths (<code>vcall</code>, <code>dispatch</code>, the readback decode) assert <code>numberOfDFGCompiles(fn)&nbsp;&gt;&nbsp;0</code> and a <code>profile()</code> breakdown dominated by FTL/DFG; (3) wrap one dispatch+readback in a <code>heapStats().objectTypeCounts</code> delta and assert zero objects allocated after warmup. Justify or fix each violation. The README's GFLOPS/MB-s/µs figures MUST come from this gated run, not from the plan.</div>
+
 <div class="step commit"><span class="id">S14.5</span>Commit any gate fixes: <code>fix(gpu): &lt;specific thing the gates caught&gt;</code>.</div>
 
 <h2 id="p15">Phase 15 — Release: versions, lockfile, publish (one OTP), post-publish acceptance</h2>
@@ -1174,6 +1202,15 @@ IDXGIDevice:         7 GetAdapter        IDXGIAdapter: 8 GetDesc</code></pre>
 <tr><td>Stale <code>bun.lock</code> workspace records</td><td>Dependents publish pinned to OLD versions</td><td><code>rm bun.lock &amp;&amp; bun install</code> + preflight gate (S15.2)</td></tr>
 <tr><td>Same resource bound as SRV and UAV in one dispatch</td><td>D3D11 runtime nulls the binding silently</td><td>AI.md gotcha; chaining recipe uses sequential kernels (S8.1)</td></tr>
 <tr><td>repo is autocrlf=true with LF blobs</td><td>Forcing autocrlf=false makes ~200 files look modified</td><td>Never touch line-ending config; LF→CRLF warnings are noise</td></tr>
+<tr><td><strong>perf:</strong> <code>Buffer.alloc</code>/<code>new DataView</code>/<code>new Float32Array</code> inside a per-dispatch/readback loop</td><td>~1064&nbsp;ns/alloc + GC stalls; staging churn</td><td>Allocate desc/scratch/staging ONCE and reuse; pool resources across <code>run()</code> calls; zero-alloc assertion (S14.6)</td></tr>
+<tr><td><strong>perf:</strong> <code>buffer.ptr</code> getter re-read in <code>vcall</code>/<code>readbackBuffer</code>/<code>GpuArray.from</code></td><td>~7.3&nbsp;ns/access; getter re-runs <code>ptr(this)</code></td><td>Hoist/cache <code>.ptr</code> once before the loop</td></tr>
+<tr><td><strong>perf:</strong> per-byte <code>read.u8</code> readback loop</td><td>Dominates readback time; the README's bandwidth claim suffers</td><td>Bulk copy/view (S4.4b); reuse the staging buffer; async readback (10b #2) for the stall</td></tr>
+<tr><td><strong>perf:</strong> <code>vcall</code> per-call template-string cache key</td><td>String alloc + <code>Map.get</code> on the hottest path</td><td>Microbench (S5.6b); key by resolved method pointer if it shows — never touch the <code>this</code>-excluded arg contract</td></tr>
+<tr><td><strong>perf:</strong> <code>run()</code> compiles HLSL + allocs/frees every call</td><td>FXC compile-per-call cliff for the "wow" API</td><td>Kernel/GpuArray-reuse recipe + bytecode cache (10b #9) wired into <code>run()</code>; document the gap (S8.3b)</td></tr>
+<tr><td><strong>perf:</strong> assuming V8 micro-opt lore</td><td>Bun is JavaScriptCore — manual byte math, bigint typed-arrays, monomorphism contortions all mislead; async <code>Bun.sleep</code> is quantized but <code>sleepSync</code> is not</td><td>Decide every micro-opt empirically with a <code>Bun.nanoseconds()</code> microbench (Appendix G); re-verify per host</td></tr>
+<tr><td><strong>perf:</strong> per-element <code>new DataView(toArrayBuffer(ptr,…))</code> in <code>readbackBuffer</code></td><td>Per-read allocation ⇒ ~29× slower than one reused DataView</td><td>Wrap the mapped region ONCE; reuse one DataView for ≤32-bit, <code>read.u64</code> for 64-bit (G.5)</td></tr>
+<tr><td><strong>perf:</strong> benchmarking under <code>bun --smol</code></td><td>1.75–4.12× slower; misrepresents the ceiling</td><td><code>--smol</code> is RSS-only; bench on normal heap</td></tr>
+<tr><td><strong>perf:</strong> trusting <code>heapStats().objectCount</code> / <code>totalCompileTime()</code> on this build</td><td>Both read stale/0 — false "zero alloc"/"zero compile" conclusions</td><td>Sum <code>heapStats().objectTypeCounts</code>; gate tiering on <code>numberOfDFGCompiles</code>/<code>profile</code> (G.4)</td></tr>
 </table>
 
 <h3 id="appD">Appendix D — Competitive parity matrix ("everything they do, only better")</h3>
@@ -1260,6 +1297,67 @@ rm bun.lock &amp;&amp; bun install
 <li><strong>AI-first docs are a release gate, not a nicety:</strong> AI.md = complete surface + capability table + recipes + gotchas + where-to-look; every index.ts export greppable in AI.md; every doc code block executed before commit.</li>
 <li><strong>Every phase commits; the OTP is requested exactly once, after every gate is green.</strong></li>
 </ol>
+
+<h3 id="appG">Appendix G — Performance: hot-path budgets, measured JSC levers, the regression gate</h3>
+<p>A GPU engine that wastes cycles is a contradiction, so performance is audited every phase (the ⚡ doctrine box), not benchmarked once. <strong>Bun runs on JavaScriptCore, not V8</strong> — the numbers below were measured on the authoring machine (Windows 11, Bun 1.4.0-canary, JSC) on 2026-06-09 with <code>Bun.nanoseconds()</code>, 200k+ warm-up, a dead-code-elimination sink, median of 5 trials. <strong>Reference, not gospel: re-measure on the release host (S0.6b).</strong> The GPU-side numbers (dispatch µs, readback MB/s, GFLOPS) are produced by this plan's own benchmarks, not here; this appendix is the JS/FFI-side discipline that surrounds them.</p>
+
+<h4>G.1 — Measured FFI/JS levers (ns/op on the authoring host; re-verify; several contradict V8 lore)</h4>
+<table>
+<tr><th>Decision</th><th>Fast</th><th>Slow</th><th>Factor</th><th>Rule</th></tr>
+<tr><td><code>Buffer.alloc</code> per iter vs reuse</td><td>reuse ≈ free</td><td>~1064&nbsp;ns</td><td><strong>~1600×</strong></td><td>Allocate desc/scratch/staging ONCE; pool across <code>run()</code></td></tr>
+<tr><td>new <code>DataView</code> per parse vs cached</td><td>~0.3&nbsp;ns</td><td>~20.8&nbsp;ns</td><td>~72×</td><td>Hold the view as a persistent field</td></tr>
+<tr><td><code>buffer.ptr</code> getter vs cached const</td><td>~0.2&nbsp;ns</td><td>~7.3&nbsp;ns</td><td>~34× (~19% on a real FFI loop)</td><td>Cache <code>.ptr</code> once before any loop</td></tr>
+<tr><td>FFI floor / u64→bigint return / fresh <code>BigInt()</code> arg</td><td>—</td><td>~5 / +10 / +16&nbsp;ns</td><td>—</td><td>Batch into one native call; prefer non-bigint returns; hoist constant handle args</td></tr>
+<tr><td>u32 read: <code>DataView.getUint32</code> vs manual byte-OR</td><td>~1.17&nbsp;ns</td><td>~1.31&nbsp;ns</td><td>1.13× (DataView wins)</td><td>Use the typed accessor; <em>don't hand-roll</em> (V8-contradiction)</td></tr>
+<tr><td>u64 read: <code>DataView</code> vs Big(U)int64Array view</td><td>~10&nbsp;ns</td><td>~12.6&nbsp;ns</td><td>1.15× (view SLOWEST)</td><td>Never use bigint typed-array views for speed (V8-contradiction; also alignment-illegal)</td></tr>
+<tr><td>monomorphic vs polymorphic receiver</td><td colspan="2">no measurable difference</td><td>1.00×</td><td>Don't contort for it; spend effort on alloc/<code>.ptr</code></td></tr>
+<tr><td><code>Preload</code>+destructure vs post-Preload static call</td><td colspan="2">no measurable difference</td><td>1.00×</td><td>Destructure for correctness (native fn not lazy wrapper), not speed</td></tr>
+<tr><td>pacing: async <code>Bun.sleep(1)</code> vs <code>sleepSync(1)</code></td><td>sleepSync ~1.5&nbsp;ms</td><td>async ~15.5&nbsp;ms</td><td>15.5×</td><td>Demos pace with <code>present(true)</code> vsync; <code>sleepSync</code> is NOT quantized (only async is)</td></tr>
+</table>
+
+<h4>G.2 — Hot-path inventory (each gets a microbenchmark + a baseline entry)</h4>
+<table>
+<tr><th>Hot path</th><th>Budget</th><th>Phase</th></tr>
+<tr><td><code>vcall</code> COM invoke (the engine's hottest code)</td><td>ns/call; cache-key cost; 0 alloc</td><td>S5.6b</td></tr>
+<tr><td>empty <code>dispatch</code></td><td>ns/dispatch; 0 alloc</td><td>S5.6b</td></tr>
+<tr><td><code>readbackBuffer</code></td><td>ns/MB + ns/element; staging reused; no per-byte loop</td><td>S4.4b</td></tr>
+<tr><td><code>run()</code> one-shot vs reused-Kernel loop</td><td>per-element throughput, both; compile-per-call gap</td><td>S8.3b</td></tr>
+<tr><td>whole-table (compile cold/warm, saxpy elem/s, matmul GFLOPS, readback MB/s)</td><td>the README numbers — from the gated run only</td><td>S10.5 benchmark.ts</td></tr>
+</table>
+
+<h4>G.3 — The discipline</h4>
+<ol>
+<li><strong>Baseline (S0.6b)</strong> records the FFI/dispatch/readback floors on the release host before any work.</li>
+<li><strong>Every hot-path phase</strong> (4, 5, 8) ends with a microbenchmark step recording ns/op and asserting zero per-dispatch/per-readback allocation.</li>
+<li><strong>Release gate (S14.6)</strong> re-runs everything; a &gt;~10% regression vs baseline OR any forbidden hot-loop pattern blocks release.</li>
+<li><strong>README numbers</strong> (GFLOPS/MB-s/µs) come only from the gated run — never copied from this appendix.</li>
+<li><strong>Generative pass (the real spirit — do this every hot-path phase).</strong> An audit does not just apply G.5's levers and check the gate. It <code>profile()</code>s the path (plus GPU timestamp queries for kernel-ms) to locate the true hot spot, then actively tries at least one optimization this plan did NOT anticipate — a fused dispatch, a reused staging buffer, a cheaper vcall key, a precomputed layout, a barrier removed, a better tiling — measures it, and folds any proven win back into G.5. "Meets baseline" is the floor; the work is to beat it. Stop only at real diminishing returns, never at "good enough." The agent that ships the fastest correct engine, not the one that merely passes the gate, did the job.</li>
+<li><strong>Methodology</strong> (verified on Bun 1.4.0/JSC, this machine): <code>Bun.nanoseconds()</code>; warm <strong>≥200k iterations</strong> (1k is too few) to trigger tier-up; <strong>assert <code>numberOfDFGCompiles(fn)&nbsp;&gt;&nbsp;0</code></strong> and abort if 0 (else you're timing LLInt/Baseline); folded sink to defeat dead-code elimination; vary offsets per-iteration to defeat hoisting; <code>gcAndSweep()</code> between (not within) trials; median of ≥5 — the <code>terminal.bench.ts</code> convention. For GPU-side timing, the GPU timestamp queries (Phase 10b #1) give honest kernel-ms; wall-clock CPU timing alone over-counts the sync.</li>
+</ol>
+
+<h4>G.4 — The <code>bun:jsc</code> optimization toolkit (Bun-only: prove the JS/FFI side is optimized, don't hope)</h4>
+<p>The repo is Bun-only, so <code>bun:jsc</code> (internal/debug namespace — version-specific; enumerated and run on Bun 1.4.0 this machine) makes "is this optimized?" a measured assertion. Use it in the per-phase audits (S4.4b/S5.6b/S8.3b) and the S14.6 gate — it covers the JS/FFI dispatch+readback side; GPU-side timing comes from the timestamp queries (10b #1).</p>
+<table>
+<tr><th><code>bun:jsc</code> export</th><th>Use</th></tr>
+<tr><td><code>numberOfDFGCompiles(fn)</code></td><td>≥1 after warmup ⇒ timing optimized code (0 ⇒ never got hot; need ~200k–1M iters). Gate every microbench on it.</td></tr>
+<tr><td><code>profile(cb)</code> + <code>startSamplingProfiler()</code>/<code>samplingProfilerStackTraces()</code></td><td>Tier breakdown + hottest frames. A warmed loop hit <strong>99.3% FTL</strong> here. Assert FTL/≥DFG dominates the <code>vcall</code>/dispatch/readback-decode path; finds the real hot frame to optimize.</td></tr>
+<tr><td><code>reoptimizationRetryCount(fn)</code></td><td>Climbs on OSR-exit churn (type instability / megamorphic <code>vcall</code> sites). Rising ⇒ stabilize types / split call sites rather than micro-opt the body.</td></tr>
+<tr><td><code>jscDescribe(obj)</code> / <code>jscDescribeArray(arr)</code></td><td>X-ray the JSC <strong>Structure</strong> (StructureID, butterfly, inline capacity) and array <strong>IndexingType</strong>; reveals holes and shape transitions in result objects / readback arrays.</td></tr>
+<tr><td><code>heapStats().objectTypeCounts</code></td><td>Sum before/after a loop for the real allocated-object delta — the <strong>zero-allocation-per-dispatch/readback gate</strong>. (Top-level <code>objectCount</code> reads stale/0 on this build — sum <code>objectTypeCounts</code>.)</td></tr>
+<tr><td><code>estimateShallowMemoryUsageOf(obj)</code></td><td>Bytes per object for AoS-vs-SoA / view-vs-copy readback-return decisions.</td></tr>
+<tr><td><code>edenGC()</code>/<code>fullGC()</code>/<code>gcAndSweep()</code> · <code>isRope</code> · <code>setRandomSeed</code></td><td>Quiesce the heap between trials; assert no rope in a measured loop; seed inputs. (<code>totalCompileTime()</code> reads 0 on this build — don't use it.)</td></tr>
+</table>
+
+<h4>G.5 — Measured JSC alloc / array / native-read levers (host-specific factors; re-verify; directions are JSC-structural)</h4>
+<table>
+<tr><th>Lever</th><th>Fast</th><th>Slow</th><th>Factor</th><th>Rule</th></tr>
+<tr><td>native read from a mapped/returned <code>Pointer</code>: DataView (≤32-bit) + <code>read.u64</code> (handles), wrap region ONCE</td><td>DataView u32 3.26&nbsp;ns / read.u64 26.6&nbsp;ns</td><td>read.u32 5.89&nbsp;ns / per-read <code>toArrayBuffer</code>+DataView 171&nbsp;ns</td><td>1.8× / <strong>29×</strong></td><td>In <code>readbackBuffer</code>: <code>toArrayBuffer</code> the mapped region ONCE, then a single reused DataView for ≤32-bit elements (DataView is a JSC intrinsic, ~1.8× faster than <code>read.u32</code>); <code>read.u64</code> for 64-bit; NEVER a DataView/toArrayBuffer per element (~29×) and never the per-byte <code>read.u8</code> loop</td></tr>
+<tr><td>scratch/staging alloc: <code>Bun.allocUnsafe</code> vs <code>Buffer.alloc</code></td><td>396&nbsp;ns</td><td>1644&nbsp;ns</td><td><strong>~4×</strong></td><td>Allocate staging/desc buffers ONCE via <code>Bun.allocUnsafe</code> (Uint8Array — wrap in a cached DataView; overwrite bytes you read) or <code>Buffer.allocUnsafe</code>; never <code>Buffer.alloc</code> per dispatch/readback (the memset is the cost)</td></tr>
+<tr><td>return array (adapters / readback rows): pre-sized + index vs push / holey; typed columns</td><td>Int32Array 1.06 / presized 1.64&nbsp;ns/el</td><td>push 2.80 / holey 2.39&nbsp;ns/el</td><td>1.54× / 1.71×</td><td>Pre-size by count, fill by index, no holes; prefer <code>Float32Array</code>/<code>Int32Array</code> views over <code>number[]</code> for numeric readback (and avoid the <code>new Float32Array(bytes)</code> copy where a view works)</td></tr>
+<tr><td>result-object shape (<code>AdapterInfo</code>, kernel binding records): class/ctor fixed-order vs literal + late adds</td><td>4.10&nbsp;ns</td><td>8.72&nbsp;ns</td><td><strong>2.13×</strong> (read side)</td><td>Build with a class, all fields up front, sentinels not missing keys; same StructureID across the run (verify with <code>jscDescribe</code>)</td></tr>
+<tr><td><code>bun --smol</code> for a render/dispatch loop</td><td>normal heap</td><td><code>--smol</code></td><td><strong>1.75–4.12× slower</strong></td><td>RSS-only knob; bench on normal heap; never present a <code>--smol</code> number as the engine's ceiling</td></tr>
+</table>
+<p><strong>Name JSC primitives correctly</strong> (Node lore misleads): tiers are LLInt → Baseline → DFG → FTL (B3+Air) — no Maglev/Sparkplug; shapes are <strong>Structures</strong> with a <strong>butterfly</strong> and <strong>IndexingType</strong>, not V8 hidden-class Maps; the GC is <strong>Riptide</strong>, concurrent mark-<em>sweep</em> generational (eden) — "avoid intermediate objects" transfers, the copy-vs-sweep cost model does not. Tier thresholds are heuristic/version-dependent — verify with the G.4 tools, never hardcode.</p>
 
 <p style="color:var(--dim); margin-top:3rem;">Plan authored 2026-06-09 against repo state <code>e975ea4</code> (+ uncommitted PROJECTS.md). Facts verified same day: npm <code>bun-gpu</code> 404; <code>packages/gpu</code> absent; _gpu.ts at 1,340 lines. Executor: re-verify, then build relentlessly.</p>
 

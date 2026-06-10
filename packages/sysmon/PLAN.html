@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BUN_SYSMON — Implementation Plan for @bun-win32/sysmon + bun-sysmon</title>
+<style>
+  :root { --bg:#0d1117; --panel:#161b22; --border:#30363d; --fg:#e6edf3; --dim:#8b949e; --accent:#58a6ff; --green:#3fb950; --amber:#d29922; --red:#f85149; --purple:#bc8cff; }
+  * { box-sizing: border-box; }
+  body { background:var(--bg); color:var(--fg); font:15px/1.6 -apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; margin:0; padding:2rem; max-width:1100px; margin-inline:auto; }
+  h1 { font-size:1.9rem; border-bottom:2px solid var(--accent); padding-bottom:.4rem; }
+  h2 { font-size:1.45rem; color:var(--accent); border-bottom:1px solid var(--border); padding-bottom:.3rem; margin-top:3rem; }
+  h3 { font-size:1.15rem; color:var(--purple); margin-top:2rem; }
+  h4 { font-size:1rem; color:var(--fg); margin-bottom:.3rem; }
+  code { background:var(--panel); border:1px solid var(--border); border-radius:4px; padding:.1em .35em; font:13px/1.5 ui-monospace,"Cascadia Code",Consolas,monospace; }
+  pre { background:var(--panel); border:1px solid var(--border); border-radius:8px; padding:1rem; overflow-x:auto; }
+  pre code { background:none; border:none; padding:0; }
+  table { border-collapse:collapse; width:100%; margin:1rem 0; font-size:.92em; }
+  th,td { border:1px solid var(--border); padding:.45rem .6rem; text-align:left; vertical-align:top; }
+  th { background:var(--panel); }
+  .step { background:var(--panel); border:1px solid var(--border); border-left:4px solid var(--accent); border-radius:6px; padding:.7rem 1rem; margin:.8rem 0; }
+  .step .id { color:var(--accent); font-weight:700; font-family:ui-monospace,Consolas,monospace; margin-right:.5rem; }
+  .verify { border-left-color:var(--green); }
+  .verify .id { color:var(--green); }
+  .commit { border-left-color:var(--amber); }
+  .commit .id { color:var(--amber); }
+  .research { border-left-color:var(--purple); }
+  .research .id { color:var(--purple); }
+  .warn { background:#2d1a1a; border:1px solid var(--red); border-radius:8px; padding: .8rem 1rem; margin:1rem 0; }
+  .note { background:#1a2233; border:1px solid var(--accent); border-radius:8px; padding:.8rem 1rem; margin:1rem 0; }
+  .doctrine { background:#1f2a1f; border:1px solid var(--green); border-radius:8px; padding:.8rem 1rem; margin:1rem 0; }
+  .perf { background:#2a2418; border:1px solid var(--amber); border-radius:8px; padding:.8rem 1rem; margin:1rem 0; }
+  .tag { display:inline-block; font-size:.75em; font-weight:700; border-radius:10px; padding:.05em .6em; margin-left:.4em; vertical-align:middle; }
+  .tag.test { background:#1f3d2b; color:var(--green); }
+  .tag.ffi { background:#3d2b1f; color:var(--amber); }
+  .tag.new { background:#2b1f3d; color:var(--purple); }
+  a { color:var(--accent); }
+  .toc li { margin:.2rem 0; }
+  summary { cursor:pointer; color:var(--accent); font-weight:600; }
+</style>
+</head>
+<body>
+
+<h1>BUN_SYSMON — Implementation Plan: <code>@bun-win32/sysmon</code> + <code>bun-sysmon</code></h1>
+
+<p><strong>For agentic workers:</strong> this plan is designed for end-to-end execution by Claude (Fable 5, ultracode) via a <code>/goal</code>. Track phases with TaskCreate/TaskUpdate. Execute tasks in order; each task is bite-sized, verified, and committed before moving on. <strong>Never leave the repo in a broken state.</strong> The goal is complete when <code>bun-sysmon@1.0.0</code> and <code>@bun-win32/sysmon@1.0.0</code> are live on npm, installable, and the post-publish acceptance test (Phase 15, S15.7) passes.</p>
+
+<p><strong>This document instantiates the house standard</strong> — <a href="../gpu/PLAN.html">packages/gpu/PLAN.html</a>, whose Appendix F is the cloning guide — for the #1-ranked proposal in <code>PROJECTS.md</code> §1. Structure and discipline are reproduced, not the GPU content: ground-truth dossier → research-while-building doctrine → execute-time competitive intelligence with a parity matrix ("everything the incumbents do, only better" — gated at release) → bite-sized verified phases → real tests → AI-first docs → one-OTP release → clean-room acceptance. <strong>Do not take this plan's word for anything you can re-verify cheaply</strong> — it was correct on its authoring date; you execute it later. The repo, the SDK headers, the live npm registry, and observed runtime behavior outrank every sentence below.</p>
+
+<p><strong>Goal:</strong> Productize the proven system-observability surface scattered across ~10 battle-tested examples (<code>core-scope.ts</code>, <code>system-internals.ts</code>, <code>process-xray.ts</code>, <code>live-dashboard.ts</code>, <code>net-xray.ts</code>, <code>etw-firehose.ts</code>, <code>event-tail.ts</code>, <code>firmware-inventory.ts</code>, …) into a first-class, zero-dependency-beyond-workspace, AI-first package <code>@bun-win32/sysmon</code>: CPU / memory / disk / process / socket metrics at microsecond latency, a typed Windows Event Log tail, a decoded real-time ETW firehose, native PDH performance counters, and SMBIOS firmware inventory — <strong>no PowerShell spawn, no <code>wmic</code>, no <code>node-gyp</code>, no vendored .exe</strong>. Publish it plus an unscoped <code>bun-sysmon</code> alias to npm, with real tests at every step.</p>
+
+<p><strong>Architecture:</strong> A non-binding "engine" package (precedent: <code>@bun-win32/terminal</code>, <code>@bun-win32/gpu</code>) of flat root modules over the existing binding packages <code>@bun-win32/{advapi32, core, iphlpapi, kernel32, ntdll, pdh, powrprof, psapi, tdh, wevtapi, wtsapi32}</code>. Every metric is a direct <code>bun:ffi</code> pointer call into a DLL that ships in <code>C:\Windows\System32</code> on every Windows installation. The design splits each data source into a <strong>fetch half</strong> (FFI call returning an owned <code>Buffer</code>) and a <strong>parse half</strong> (pure function over that Buffer) — so struct decoders are unit-testable with byte fixtures and <code>bun:test</code> never touches FFI.</p>
+
+<p><strong>Tech stack:</strong> Bun (<code>bun:ffi</code>), TypeScript strict, Biome formatter. Windows-only, Bun-only — stated proudly, not apologetically. The market context (verified, receipts in Appendix D): Microsoft removed <code>wmic</code> from Windows 11 24H2/25H2 and Server 2025, hard-breaking the ~20M-download/week monitoring cluster whose universal "fix" was to spawn <code>powershell.exe</code> instead — 100&nbsp;ms-class latency, AV-scanned per call, blocked by enterprise script policy, and the architecture behind systeminformation's 16-advisory command-injection CVE history. bun-sysmon's answer is the same data in microseconds, typed, with <code>bun add</code> as the entire install story.</p>
+
+<div class="doctrine">
+<h4>⚖ The research-while-building doctrine (read this before every phase)</h4>
+<p>This plan was written on 2026-06-09 against a verified snapshot of the repo (HEAD <code>3819241</code>). It is a <strong>map, not the territory</strong>. Rules of engagement:</p>
+<ul>
+<li><strong>The repo, the SDK headers, and observed runtime behavior outrank this plan.</strong> When a quoted line number, signature, struct offset, or version has drifted, trust the file. Update your approach, note the deviation in the commit message, and keep going.</li>
+<li><strong>Every phase begins by reading the actual source files it touches.</strong> Code references give line anchors as of 2026-06-09 — re-locate them with Grep if they moved. Another agent is executing the gpu plan (<code>packages/gpu/PLAN.html</code>) in this repo concurrently (ground truth: gpu Phases 1–3 landed while this plan was being authored) — expect HEAD to move; never build on an unread diff.</li>
+<li><strong>Code blocks marked <span class="tag new">NEW</span> are reference implementations written ahead of time, unexecuted.</strong> They are your starting point, not gospel. Run them, fix them, prefer the runtime's truth. Struct offsets this plan could not anchor to runtime-proven code are marked <strong>UNVERIFIED</strong> — derive them from the SDK header and prove them with the listed cross-check before shipping.</li>
+<li><strong>When a step's verification fails, stop and debug</strong> (superpowers:systematic-debugging). Do not pile changes on a broken state. Do not "fix" by weakening the verification.</li>
+<li><strong>If you discover something this plan got wrong, fix the assumption AND record it</strong> — a one-line entry in the deviation ledger (S0.9) so the human learns what drifted.</li>
+<li><strong>Numbers are printed by benchmarks or they are not claimed.</strong> Every latency/Hz figure in the README must come verbatim from <code>example/benchmark.ts</code> output on the release machine.</li>
+</ul>
+</div>
+
+<div class="perf">
+<h4>⚡ The performance doctrine (this product IS performance — read before every hot-path phase)</h4>
+<p>bun-sysmon's entire reason to exist is "the same data in microseconds, not 100&nbsp;ms." A correct-but-slow metric defeats the product. Performance is therefore a <strong>standing, always-on audit</strong>, not a final benchmark — every hot-path phase ends by analyzing its inner loop down to allocations, FFI-boundary crossings, and CPU cycles. <strong>Treat every number below as a floor, not a finish line</strong> — while building, keep actively hunting for wins this plan never anticipated; the listed levers are where to start, not where to stop (see the generative pass, G.3). The rules (measured on the authoring machine 2026-06-09 — <strong>Bun runs on JavaScriptCore, not V8; re-verify per host, and treat any V8 folklore as suspect until measured</strong>; full data in Appendix G):</p>
+<ul>
+<li><strong>ZERO allocation inside any sampling / decode / per-row loop.</strong> The single biggest lever: <code>Buffer.alloc(19&nbsp;KB)</code> per tick measured <strong>~1064&nbsp;ns</strong>; reusing one buffer is ~free (<strong>~1600×</strong>). Allocate every scratch buffer, <code>DataView</code>, and typed-array view ONCE at sampler construction and reuse it every tick (the proven <code>core-scope.ts</code> pattern: <code>perfBuf</code>/<code>procBuf</code> allocated outside the loop, grow-only realloc). A fresh <code>DataView</code> per parse costs <strong>+20&nbsp;ns</strong>; hold <code>{buffer, dataView, u8}</code> as persistent sampler fields. No per-row object/array/closure/template-string in the hot path either — budget the GC cost of returning <code>ProcessInfo[]</code> (object-per-row + <code>Date</code>) and offer a struct-of-arrays path for high-frequency consumers.</li>
+<li><strong>Avoid bigint in the hot path.</strong> A u64 FILETIME delta as <code>Number(a&nbsp;-&nbsp;b)</code> measured <strong>~41&nbsp;ns</strong>; reading the two u32 halves and doing number math is <strong>~3&nbsp;ns (13×)</strong>. Per-core CPU times swept as two-u32-halves are <strong>8×</strong> faster than <code>DataView.getBigInt64</code>. Reserve bigint for handles/pointers (correct + unavoidable) and magnitudes that truly exceed 2^53. <em>Caveat:</em> the absolute FILETIME exceeds 2^53 — only the small <em>delta</em> fits the Number path; subtract the hi/lo halves before widening.</li>
+<li><strong>Cache <code>buffer.ptr</code> once per loop.</strong> The <code>.ptr</code> getter (core extensions) re-runs <code>ptr(this)</code> on every access (<strong>~7.3&nbsp;ns</strong>); a cached const is ~free — ~19% off a real <code>QueryPerformanceCounter(buf.ptr)</code> loop. Never write <code>nativeFn(buf.ptr)</code> inside a per-tick loop. Highest-leverage, lowest-risk FFI micro-opt.</li>
+<li><strong>Use <code>DataView</code> typed accessors, not hand-rolled byte math.</strong> On JSC <code>DataView.getUint32(o,true)</code> ties <code>Buffer.readUInt32LE</code> (~1.2&nbsp;ns) and <strong>beats</strong> manual <code>(b[o]|b[o+1]&lt;&lt;8|…)</code> — the opposite of V8 lore. Big(U)int64Array <em>views</em> are the <strong>slowest</strong> u64 path (BigInt-box per element) and often illegal on unaligned Win32 structs — do not reach for them. JSC shows <strong>no measurable monomorphism penalty</strong> for Buffer/Uint8Array/subarray/DataView receivers — don't contort the design for it; spend the effort on alloc + bigint discipline.</li>
+<li><strong>Minimize FFI crossings and JSCallback invocations.</strong> The FFI floor is ~5&nbsp;ns/call; a u64→bigint return adds ~10&nbsp;ns. The whole product thesis is the macro-opt: ONE <code>NtQuerySystemInformation</code> for the whole process list, not N per-PID calls. A native→JS <code>JSCallback</code> costs <strong>~39&nbsp;ns/invocation</strong> — the ETW firehose must do the absolute minimum per callback (defer decode/format to a drain pass), never N callbacks where one buffered delivery would do. Hoist constant bigint args out of loops (a fresh <code>BigInt()</code> per call is ~16&nbsp;ns). <code>Preload</code> then destructure hot exports (repo doctrine — captures the native fn, not the lazy wrapper; it is a correctness ordering, measured ~0&nbsp;ns faster than the post-Preload static call, so don't expect speed from it — the levers above are where the time is).</li>
+<li><strong>Pace correctly.</strong> Async <code>Bun.sleep(1)</code> IS quantized to ~15.6&nbsp;ms (≈30–60&nbsp;Hz cap) — but <code>Bun.sleepSync(1)</code> is <strong>not</strong> (~1.5&nbsp;ms ≈ 600&nbsp;Hz), and <code>CreateWaitableTimerExW</code> gave <strong>no measurable edge over <code>sleepSync</code></strong> at 1&nbsp;ms. True 1000&nbsp;Hz/1&nbsp;ms with sub-10&nbsp;µs jitter needs a busy-spin on <code>Bun.nanoseconds()</code> (pegs a core). <code>sampler.ts</code> must offer both: jitter-tolerant (<code>sleepSync</code>, low CPU) and precise (busy-spin, the literal 1000&nbsp;Hz claim) — and the 1000&nbsp;Hz number must be re-proven, not assumed from the timer.</li>
+<li><strong>Every hot path gets an isolated microbenchmark</strong> (<code>Bun.nanoseconds()</code>, 200k+ warm-up iterations to trigger JSC's JIT tiers, dead-code-elimination sink, median ns/op — the repo's <code>terminal.bench.ts</code> convention). Benchmarks DRIVE optimization at the unit level (per-row decode, per-tick sample, ticker jitter, single FFI call), not just produce a README table. A perf baseline is recorded in Phase 0 and <strong>gated at release</strong> (S14.x) exactly like a tsc error.</li>
+<li><strong>Prove it, don't hope — Bun ships <code>bun:jsc</code>.</strong> Because this is Bun-only, every hot path can be <em>verified</em> optimized, not assumed: <code>numberOfDFGCompiles(fn)&nbsp;&gt;&nbsp;0</code> (timing optimized code, not the interpreter), <code>profile(cb)</code> tier breakdown (a warmed loop measured <strong>99.3% FTL</strong> on this machine — assert FTL/DFG dominates), <code>reoptimizationRetryCount(fn)</code> (climbing = type-unstable deopt — fix the polymorphism, not the body), <code>jscDescribe(obj)</code> (same StructureID across the run = monomorphic shape), and <code>heapStats().objectTypeCounts</code> deltas (gate per-tick allocation at literally zero). The full verified toolkit + the measured shape/array/alloc/string levers are Appendix G.4/G.5 — use them in every microbench and audit step.</li>
+<li><strong>Don't satisfice — beating the baseline is the job, not meeting it.</strong> Correctness plus the known levers is the START of a hot-path audit, never the end. Once a path is correct, <code>profile()</code> it to find the ACTUAL dominant cost (often something this plan never listed), form a hypothesis, microbench an alternative, and keep it only if it wins AND stays correct, cast-free, and readable — then go again until returns genuinely diminish. Interrogate every read, branch, allocation, and pass: can it be hoisted, precomputed, cached, batched, fused into one pass, made lazy, or eliminated outright? Can the <em>algorithm</em> change, not just the constant factor? The S14.6 gate only enforces "no regression"; the standing goal is to <strong>beat the prior baseline every phase</strong>. Any lever you discover that this plan didn't list — prove it with the G.4 tools and <strong>add it to Appendix G.5</strong>, so the house standard compounds. Never stop at "fast enough."</li>
+</ul>
+</div>
+
+<div class="warn">
+<h4>⚠ Non-negotiable repo rules (from AGENTS.md — these override your defaults)</h4>
+<ul>
+<li><strong>No type casts. Ever.</strong> No <code>as any</code>, no <code>as unknown as T</code>. The one shipped exception you copy verbatim where it already exists: <code>Number(x) as Pointer</code> — Bun's branded-Pointer narrowing (used by <code>channel-report.ts</code>'s <code>ReadProcessMemory</code> dereference). Copy it where it exists; do not invent new casts.</li>
+<li><strong>Alphabetize everything</strong> ASCIIbetically: exports in <code>index.ts</code>, package.json keys per precedent, deps.</li>
+<li><strong>No abbreviations</strong> in identifiers (exception: preserved Win32 parameter names). <code>workingSetBytes</code>, not <code>ws</code>.</li>
+<li><strong>No section comment headers</strong> (<code>// ====</code>). Terse, value-add comments only (struct offsets, two-call patterns, non-obvious ordering).</li>
+<li><strong>Biome formats</strong> (2-space, width 240, single quotes, semicolons, LF). Run <code>bunx biome format --write</code> on files you create. Never reintroduce Prettier.</li>
+<li><strong>Bun-native APIs</strong>: <code>Bun.env</code>, <code>Bun.argv</code>, <code>bun run</code>; never npm/npx/yarn/node.</li>
+<li><strong>Conventional commits</strong>, lowercase imperative: <code>feat(sysmon): process snapshot via NtQuerySystemInformation</code>. Commit early and often — this is a multi-agent repo; uncommitted work gets destroyed (ground truth).</li>
+<li><strong>Hex literals with separators</strong> for flags/sizes/offsets: <code>0x0000_0010</code>, <code>0x110</code>.</li>
+<li><strong>Tests never live in a <code>test/</code> directory.</strong> Pure-logic tests are root <code>*.test.ts</code> (terminal precedent); FFI integration tests live in <code>example/</code> (and may BE examples).</li>
+<li><strong>git from repo root</strong>; never <code>git add</code> gitignored files (<code>.scratch/</code>, <code>DISCORD_POST.md</code>, <code>MISSING_APIS.md</code>, screenshots except <code>!</code>-whitelisted).</li>
+<li><strong>Console rendering uses ANSI escape codes</strong> via <code>console.log</code>/<code>process.stdout</code> — never <code>WriteConsoleW</code> (fails silently in ConPTY).</li>
+</ul>
+</div>
+
+<h2 id="dossier">0. Ground-truth dossier (verified 2026-06-09)</h2>
+
+<p>Everything below was verified against the live repo, the live npm registry, and a 9-agent research workflow (4 repo agents with file-level reads, 5 web agents with fetched receipts) on 2026-06-09. <strong>Re-verify the load-bearing rows in Phase 0.</strong></p>
+
+<table>
+<tr><th>Fact</th><th>Value</th><th>Why it matters</th></tr>
+<tr><td>npm names <code>bun-sysmon</code>, <code>@bun-win32/sysmon</code></td><td><strong>both 404 — available</strong></td><td>Re-check in Phase 0; if <code>bun-sysmon</code> got squatted, ship <code>@bun-win32/sysmon</code> regardless and surface the alias problem — do not silently pick a different unscoped name.</td></tr>
+<tr><td><code>packages/sysmon</code>, <code>packages/bun-sysmon</code></td><td>Do not exist</td><td>Clean namespace.</td></tr>
+<tr><td><strong>All 126 APIs this plan needs are already bound</strong></td><td>Audited one by one across pdh/psapi/ntdll/kernel32/advapi32/tdh/wevtapi/iphlpapi/powrprof/wtsapi32/rstrtmgr — zero missing (e.g. <code>NtQuerySystemInformation</code> Ntdll.ts:1200, <code>PdhAddEnglishCounterW</code> Pdh.ts:185, <code>EvtQuery</code> Wevtapi.ts:275, <code>StartTraceW</code> Advapi32.ts:5414, <code>GetExtendedTcpTable</code> Iphlpapi.ts:578, <code>GetSystemFirmwareTable</code> Kernel32.ts:4943)</td><td><strong>Zero new bindings, zero binding work.</strong> This plan is pure productization: wrappers, parsers, examples, docs.</td></tr>
+<tr><td>Process-list-in-one-syscall proof</td><td><code>packages/all/example/core-scope.ts</code> (~470 lines) walks <code>SystemProcessInformation</code> (class 5) with the <code>STATUS_INFO_LENGTH_MISMATCH</code> grow-retry, decodes pid/name/KernelTime/UserTime at runtime-proven x64 offsets, and samples <code>SystemProcessorPerformanceInformation</code> (class 8) per-core deltas at ~10&nbsp;Hz under a GPU render loop</td><td>The heart of <code>process.ts</code> and <code>cpu.ts</code>. Offsets in Appendix B. <strong>Caveat:</strong> it reads only 6 fields of SYSTEM_PROCESS_INFORMATION — the full-row walker (ppid, handles, threads, working set, IO, create time) extends these offsets from the SDK header and must cross-check against proven per-process APIs (S3.4).</td></tr>
+<tr><td>NT system classes 0–3 proof</td><td><code>packages/ntdll/example/system-internals.ts</code> (341 lines): RtlGetVersion, SystemBasicInformation (64&nbsp;B), SystemProcessorInformation, SystemPerformanceInformation, SystemTimeOfDayInformation — every offset DataView-verified</td><td>Feeds <code>system.ts</code>/<code>memory.ts</code>. The <code>dwOSVersionInfoSize</code>-preset and exact-buffer-size traps are documented (Appendix C).</td></tr>
+<tr><td>Process forensics proof</td><td><code>packages/all/example/process-xray.ts</code> (630 lines) + <code>packages/psapi/example/process-forensics.ts</code> (183 lines): EnumProcesses, OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION), GetProcessMemoryInfo (PROCESS_MEMORY_COUNTERS 72&nbsp;B, <code>cb</code> preset), QueryFullProcessImageNameW, module/thread walks</td><td>Feeds <code>process.ts</code>'s per-PID deep-dive path and the offsets cross-check.</td></tr>
+<tr><td>PDH proof</td><td><code>packages/pdh/example/live-dashboard.ts</code> (180 lines): open→addEnglish→collect→format chain, two-sample rule, PDH_FMT_COUNTERVALUE double@8; <code>counter-explorer.ts</code> (229 lines): PdhEnumObjectsW/PdhEnumObjectItemsW two-call enumeration + parseMultiSz</td><td>Feeds <code>counters.ts</code> nearly verbatim.</td></tr>
+<tr><td>Socket→PID proof</td><td><code>packages/all/example/net-xray.ts</code> (919 lines): GetExtendedTcpTable(TCP_TABLE_OWNER_PID_ALL=5) with ERROR_INSUFFICIENT_BUFFER retry, TCP row stride 24 (state@0, remoteAddr@12, remotePort@16, pid@20), UDP stride 12 (pid@8), network-order port swap, PID→name cache</td><td>Feeds <code>net.ts</code>. GetExtendedUdpTable + GetIfTable2/GetIfEntry2/FreeMibTable are bound; <strong>MIB_IF_ROW2 throughput decode is NOT exercised by any example — NEW work</strong> (S5.4).</td></tr>
+<tr><td>ETW real-time proof</td><td><code>packages/all/example/etw-firehose.ts</code> (520 lines): EVENT_TRACE_PROPERTIES (120&nbsp;B), StartTraceW, EnableTraceEx2, OpenTraceW (EVENT_TRACE_LOGFILEW 448&nbsp;B, callbacks @+400/+424), ProcessTrace pump with BufferCallback-deadline exit, TdhGetEventInformation decode, ERROR_ALREADY_EXISTS recovery, ERROR_ACCESS_DENIED → wevtapi fallback. <code>packages/tdh/example/provider-explorer.ts</code> (247 lines): no-admin provider census + manifest schemas</td><td>Feeds <code>etw.ts</code>. The blocking-pump model and elevation gate are architectural constraints, not bugs (Appendix C).</td></tr>
+<tr><td>Event Log proof</td><td><code>packages/wevtapi/example/event-tail.ts</code> (247 lines): EvtQuery + <code>*[System[EventRecordID &gt; N]]</code> XPath tail, EvtNext batching, EvtRender XML two-call, EvtFormatMessage two-call; <code>channel-report.ts</code> (306 lines): channel enum + EVT_VARIANT string dereference via ReadProcessMemory</td><td>Feeds <code>eventlog.ts</code>. Pull + poll only — EvtSubscribe push is bound but forbidden (foreign-thread callback, repo ground truth).</td></tr>
+<tr><td>SMBIOS proof</td><td><code>packages/all/example/firmware-inventory.ts</code> (402 lines): GetSystemFirmwareTable('RSMB') two-call, full SMBIOS structure walk (1-based string table, type 0/1/2/4/17 decoders, UUID mixed-endian, type-17 0x7FFF extended-size sentinel)</td><td>Feeds <code>firmware.ts</code> nearly verbatim — no npm package reads SMBIOS without WMI (verified monopoly, Appendix D.6).</td></tr>
+<tr><td>Census trio proofs</td><td><code>powrprof/example/battery-advisor.ts</code> (221 lines, SYSTEM_POWER_STATUS 12&nbsp;B + SystemBatteryState 64&nbsp;B), <code>wtsapi32/example/session-monitor.ts</code> (205 lines, WTS_SESSION_INFOW 24&nbsp;B — State@16, not 20), <code>rstrtmgr/example/lock-atlas.ts</code> (319 lines, RM_PROCESS_INFO 668&nbsp;B)</td><td>Feed <code>power.ts</code>, <code>sessions.ts</code>, and the <code>whoLocks</code> extra.</td></tr>
+<tr><td>High-res pacing precedent</td><td><code>packages/terminal/pacing.ts</code> (34 lines): CreateWaitableTimerExW(HIGH_RESOLUTION) + negative-relative 100&nbsp;ns dueTime + WaitForSingleObject; returns null pre-1803</td><td>Feeds <code>sampler.ts</code> — <code>Bun.sleep</code> quantizes to ~15.6&nbsp;ms (ground truth), capping naive pollers at ~30–60&nbsp;Hz; the 1000&nbsp;Hz claim depends on this timer.</td></tr>
+<tr><td>Packaging precedent</td><td><code>@bun-win32/terminal</code> v1.1.1 (shipped) and <code>packages/gpu</code> (scaffold + Phases 2–3 landed mid-authoring; its package.json IS the gold-standard shape)</td><td>Copy gpu's package.json key order verbatim (S1.1). Engine packages: flat root modules, named exports only, root <code>*.test.ts</code> pure-logic tests, <code>example/</code> with <code>example:*</code> scripts, AI.md + README.md, <code>publishConfig.access: public</code>. <code>packages/all</code> does NOT re-export engine packages.</td></tr>
+<tr><td><code>scripts/audit.ts</code> / <code>nullcheck.ts</code></td><td>Both skip packages without a <code>structs/</code> dir</td><td><code>sysmon</code> is non-binding → automatically skipped. Run <code>--all</code> anyway to prove no regression elsewhere (expect the ~241 accepted-convention notices — NOT bugs).</td></tr>
+<tr><td><code>bun:test</code> + FFI</td><td>Ground truth: segfaults repo-wide when tests touch FFI; terminal/gpu logic tests pass because they are pure</td><td>Phase 0 re-probes on current Bun. Pure parsers → <code>bun:test</code>. FFI integration → <code>example/sysmon.selftest.ts</code> plain script with assertions + exit code.</td></tr>
+<tr><td>Concurrent execution</td><td>The gpu plan (<code>packages/gpu/PLAN.html</code>) is being executed by another agent in this repo (commits <code>5c123bd</code>, <code>2b5e388</code>, <code>3819241</code> landed 2026-06-09)</td><td>Pull/rebase before every commit; never touch <code>packages/gpu</code>; expect <code>bun.lock</code> and baselines to move; re-run <code>git log --oneline -5</code> at each phase boundary.</td></tr>
+<tr><td>Why this wins (market)</td><td>systeminformation 7,065,100 dl/wk (PowerShell-spawn architecture, 16 injection advisories incl. CISA-KEV CVE-2021-21315, CVE-2024-56334, CVE-2025-68154); pidusage 4,458,787 (wmic→gwmi fallback broken by construction — its own TODO admits it); ps-tree 3,345,462 (abandoned 2018, hard-broken on Server 2025); check-disk-space 3,408,373 (stale 3&nbsp;yr, PowerShell spawn per check); ps-list 1,621,894 (vendored fastlist.exe — AV-flagged, dies under single-file bundling); @vscode/windows-process-tree 68,433 (<code>node-gyp rebuild</code> every install); <strong>no npm package consumes real-time ETW, tails the modern Event Log, binds PDH, or parses SMBIOS without WMI</strong> (adversarially verified 2026-06-09)</td><td>Source: PROJECTS.md §1 + the 9-agent refresh. This is the README's comparison table (Appendix D) — re-validated at execute time (Phase 0b).</td></tr>
+</table>
+
+<h2 id="map">1. Deliverables &amp; file map</h2>
+
+<h3>1.1 What ships</h3>
+<table>
+<tr><th>Package</th><th>Version</th><th>Contents</th></tr>
+<tr><td><code>@bun-win32/sysmon</code></td><td>1.0.0</td><td>The engine: snapshot metrics (system, memory, cpu, process, disk, net), PDH counters, Event Log query/tail, ETW census + firehose, SMBIOS, power, sessions + AI.md + README + 7 examples + tests.</td></tr>
+<tr><td><code>bun-sysmon</code></td><td>1.0.0</td><td>Unscoped alias: <code>export * from '@bun-win32/sysmon';</code> + the full marketing README. The discoverable front door.</td></tr>
+</table>
+<div class="note"><strong>Deliberate deviation from the BUN_GPU template:</strong> no <code>@bun-win32/all</code> bump and no shim/migration phase — sysmon extracts from many self-contained examples, not from shared helper modules with ~30 importers. The regression analog is Phase 11's <strong>cross-validation suite</strong>: sysmon's numbers proven against independent OS ground truth. <code>all</code>/<code>bun-win32</code> are republished only if the concurrent gpu execution hasn't already done so AND they actually changed — by default they are untouched.</div>
+
+<h3>1.2 <code>packages/sysmon/</code> file map (flat modules, terminal/gpu precedent)</h3>
+<pre><code>packages/sysmon/
+  AI.md             complete AI-first surface contract (Phase 13) — an agent never needs the source
+  README.md         product README: gripes table, 10-line wow, benchmarks, screenshot (Phase 13)
+  counters.ts       PDH: CounterSet (open/add/collect/value), listCounterObjects, listCounterItems,
+                    expandCounterPath (wildcards — the per-process GPU% gateway) (Phase 6)
+  cpu.ts            cpuTimes() per-core (NtQSI class 8), CpuSampler (two-sample deltas),
+                    systemTimes() (GetSystemTimes), cpuLayout() (GetNativeSystemInfo) (Phase 4)
+  disk.ts           drives() (GetLogicalDriveStringsW/GetDriveTypeW/GetVolumeInformationW/GetDiskFreeSpaceExW),
+                    diskSpace(path) — UNC-capable (Phase 5)
+  eventlog.ts       channels(), queryEvents(), tailEvents() AsyncIterable (pull+poll), formatMessage (Phase 7)
+  etw.ts            etwProviders(), etwProviderSchema() (no admin); EtwSession blocking pump (admin) (Phase 8)
+  firmware.ts       smbios(): bios/system/baseboard/memoryDevices from GetSystemFirmwareTable (Phase 9)
+  index.ts          alphabetized named re-exports (no default — terminal/gpu precedent)
+  memory.ts         memory() (GlobalMemoryStatusEx), performanceInfo() (GetPerformanceInfo) (Phase 2)
+  net.ts            tcpSockets()/udpSockets() v4+v6 with PIDs, interfaceCounters() (GetIfTable2), NetSampler (Phase 5)
+  package.json
+  power.ts          powerStatus() (GetSystemPowerStatus), batteryState() (CallNtPowerInformation), powerScheme() (Phase 9)
+  process.ts        processes() (one-syscall snapshot), processTree(), pidStats() (pidusage shape),
+                    processImagePath(), ProcessSampler (cpu%) (Phase 3)
+  sampler.ts        createTicker(intervalMs) high-res waitable-timer pacer, monotonicMicroseconds() (QPC) (Phase 2)
+  sessions.ts       sessions() (WTSEnumerateSessionsW + per-session queries) (Phase 9)
+  structs.ts        pure decoders/builders: filetimeToDate, filetimeDeltaMs, parseProcessSnapshot,
+                    parseTcpTable/parseUdpTable, parseMemoryStatusEx, parseMultiSz, parseSmbios… (Phase 2+)
+  structs.test.ts   byte-fixture tests for every parser (bun:test, zero FFI)
+  system.ts         osInfo() (RtlGetVersion), uptimeMs(), bootTime() (class 3), computerName(), userName(),
+                    isElevated() (CheckTokenMembership) (Phase 2)
+  tsconfig.json
+  example/
+    benchmark.ts          sampling-latency table incl. honest PowerShell-spawn comparison (Phase 10)
+    etw-firehose.ts       Procmon-lite: decoded kernel-process events, admin-gated w/ fallback (Phase 10)
+    event-tail.ts         colorized live Event Log tail with publisher message formatting (Phase 10)
+    hello-sysmon.ts       the 10-line wow (Phase 10)
+    sysmon-report.ts      professional diagnostic: full system census, richly formatted (Phase 10)
+    sysmon.selftest.ts    THE integration suite — 19 sections of real assertions, exit code (Phase 10)
+    taskman.ts            flagship: task-manager-in-the-terminal at 1000 Hz sampling (Phase 10)
+    crosscheck.ts         cross-validation vs OS ground truth — the honest referee (Phase 11)
+</code></pre>
+
+<div class="note"><strong>Dependency policy:</strong> <code>@bun-win32/{advapi32, core, iphlpapi, kernel32, ntdll, pdh, powrprof, psapi, tdh, wevtapi, wtsapi32}</code> via <code>workspace:*</code> — nothing else. (<code>rstrtmgr</code> joins ONLY if extra #4 lands.) <code>taskman.ts</code> imports <code>@bun-win32/terminal</code> as an example-only cross-package import (gpu precedent: examples are not shipped in the tarball, workspace hoisting resolves it in-repo — verify how gpu/terminal examples handle this and mirror it). Elevation detection uses advapi32's <code>CheckTokenMembership</code>, not shell32's <code>IsUserAnAdmin</code> — no extra dependency for one call. The install story: <em>"bun add bun-sysmon" pulls kilobytes of TypeScript and zero native code.</em></div>
+
+<h3>1.3 Phase map</h3>
+<ol class="toc">
+<li><a href="#p0">Phase 0 — Preflight: environment, ground-truth re-verification, baselines</a> (+ 0b competitive intelligence)</li>
+<li><a href="#p1">Phase 1 — Package skeleton + early commit</a></li>
+<li><a href="#p2">Phase 2 — Foundations: structs.ts, sampler.ts, system.ts, memory.ts</a></li>
+<li><a href="#p3">Phase 3 — process.ts: the one-syscall snapshot (🏁 the wedge)</a></li>
+<li><a href="#p4">Phase 4 — cpu.ts: per-core times + samplers</a></li>
+<li><a href="#p5">Phase 5 — disk.ts + net.ts</a></li>
+<li><a href="#p6">Phase 6 — counters.ts: native PDH</a></li>
+<li><a href="#p7">Phase 7 — eventlog.ts: query + tail</a></li>
+<li><a href="#p8">Phase 8 — etw.ts: census, schemas, firehose</a></li>
+<li><a href="#p9">Phase 9 — The census trio: firmware.ts, power.ts, sessions.ts</a></li>
+<li><a href="#p10">Phase 10 — Examples + the integration selftest + benchmark</a></li>
+<li><a href="#p10b">Phase 10b — Extras wave: capabilities no npm package offers</a></li>
+<li><a href="#p11">Phase 11 — Cross-validation vs OS ground truth (regression analog)</a></li>
+<li><a href="#p12">Phase 12 — bun-sysmon unscoped alias</a></li>
+<li><a href="#p13">Phase 13 — Documentation: AI.md, README, screenshot</a></li>
+<li><a href="#p14">Phase 14 — Quality gates + self-review</a></li>
+<li><a href="#p15">Phase 15 — Release: versions, lockfile, publish (one OTP), post-publish acceptance</a></li>
+<li><a href="#appendix">Appendices A–G</a> (incl. <a href="#appG">G — Performance: hot-path budgets, measured JSC levers, the regression gate</a>)</li>
+</ol>
+
+<p style="color:var(--dim)"><em>The remaining phase detail (0 through 15) and Appendices A–F continue below; this plan is authored top-down and each phase block is self-contained per the doctrine above.</em></p>
+
+<h2 id="p0">Phase 0 — Preflight: environment, ground-truth re-verification, baselines</h2>
+<p><em>Purpose: prove the machine, the toolchain, and this plan's load-bearing assumptions before writing a line. Capture baselines you will diff against in Phase 14.</em></p>
+
+<div class="step research"><span class="id">S0.1</span><strong>Read the law.</strong> Read <code>AGENTS.md</code> (repo root) in full. Read <code>PROJECTS.md</code> §1 (bun-sysmon, ~lines 38–69) — it is the product brief. Skim <code>packages/gpu/PLAN.html</code> Appendix F (the cloning guide this plan instantiates). The rules there override your instincts.</div>
+
+<div class="step"><span class="id">S0.2</span><strong>Environment + concurrency check.</strong>
+<pre><code>bun --version
+bun run scripts/doctor.ts
+git status &amp;&amp; git log --oneline -8</code></pre>
+Expected: Bun ≥ 1.1, doctor OK (dumpbin not needed — sysmon is non-binding), working tree clean or only known files. <strong>Check where the concurrent BUN_GPU execution stands</strong> (gpu commits in the log; possibly a release). If the tree has uncommitted changes from another agent, stop and surface them rather than building on top.</div>
+
+<div class="step"><span class="id">S0.2b</span><strong>Keep the machine awake for the entire run.</strong> Use the bound <code>Kernel32.SetThreadExecutionState</code> (verified <code>packages/kernel32/structs/Kernel32.ts:7720</code>). Write <code>.scratch/keep-awake.ts</code> setting <code>ES_CONTINUOUS | ES_SYSTEM_REQUIRED | ES_DISPLAY_REQUIRED</code> on a 60&nbsp;s interval, launch as a BACKGROUND process, kill it as the final act of Phase 15. State clears automatically on process exit.</div>
+
+<div class="step verify"><span class="id">S0.3</span><strong>Prove the observability surface works on this machine.</strong>
+<pre><code>bun run packages/ntdll/example/system-internals.ts     # expect OS version, core count, mem stats
+bun run packages/pdh/example/live-dashboard.ts          # expect live CPU%/mem counters; Ctrl-C after a few ticks</code></pre>
+If either errors or prints garbage offsets, the machine/Bun has drifted from the dossier: stop, debug, record before building.</div>
+
+<div class="step research"><span class="id">S0.4</span><strong>Re-probe the bun:test + FFI ground truth.</strong> Write <code>.scratch/ffi-probe.test.ts</code> importing <code>@bun-win32/kernel32</code> and asserting <code>typeof Kernel32.GetTickCount64() === 'bigint'</code>; run <code>bun test .scratch/ffi-probe.test.ts</code> 3×. <strong>Decision gate:</strong> reliable pass → FFI integration tests MAY use <code>bun:test</code> (<code>example/sysmon.integration.test.ts</code>); segfault/flake → use the plan default <code>example/sysmon.selftest.ts</code> (plain script, assertions, exit code). The pure parsers in <code>structs.ts</code> are ALWAYS <code>bun:test</code> (no FFI imports). Delete the probe afterwards.</div>
+
+<div class="step research"><span class="id">S0.5</span><strong>Re-verify npm name availability.</strong>
+<pre><code>curl -s -o /dev/null -w "%{http_code}\n" https://registry.npmjs.org/bun-sysmon              # expect 404
+curl -s -o /dev/null -w "%{http_code}\n" "https://registry.npmjs.org/@bun-win32%2Fsysmon"  # expect 404</code></pre>
+If squatted since 2026-06-09, ship the scoped package regardless and surface the alias problem in the final summary.</div>
+
+<div class="step"><span class="id">S0.6</span><strong>Capture quality-gate baselines</strong> (diffed in Phase 14):
+<pre><code>bunx tsc --noEmit                                          # zero; if not, STOP (or gpu mid-edit: re-run after its next commit)
+bun run scripts/audit.ts --all 2&gt;&amp;1 | tail -5     &gt; .scratch/baseline-audit.txt
+bun run scripts/nullcheck.ts --all 2&gt;&amp;1 | tail -5 &gt; .scratch/baseline-nullcheck.txt</code></pre>
+audit <code>--all</code> emits ~241 accepted-convention notices (ground truth — NOT bugs; never "fix" shipped bindings to silence them). The baseline proves the counts didn't change.</div>
+
+<div class="step research"><span class="id">S0.7</span><strong>Read the source-of-truth files end to end</strong> (budget real time — extraction fidelity depends on it), noting the exact offsets/traps Appendix B/C list and re-locating anchors with Grep: <code>core-scope.ts</code> (class 5 + class 8 decode, grow-retry, embedded-VA→offset name resolution); <code>system-internals.ts</code> (classes 0–3, size-preset traps); <code>process-xray.ts</code> + <code>process-forensics.ts</code> (per-PID, PROCESS_MEMORY_COUNTERS, QueryFullProcessImageNameW); <code>pdh/{live-dashboard,counter-explorer}.ts</code>; <code>net-xray.ts</code>; <code>etw-firehose.ts</code> + <code>provider-explorer.ts</code>; <code>wevtapi/{event-tail,channel-report}.ts</code>; <code>firmware-inventory.ts</code>; <code>{powrprof,wtsapi32,rstrtmgr}/example/*</code> + <code>kernel32/example/system-diagnostic.ts</code>; <code>terminal/{pacing.ts,package.json,AI.md}</code> and <code>gpu/{package.json,index.ts}</code>.</div>
+
+<div class="step research"><span class="id">S0.8</span><strong>Resolve the <code>.ptr</code> extension question.</strong> Every parser path relies on <code>buffer.ptr</code> from <code>core/runtime/extensions.ts</code> (side-effect import). Find how it reaches the examples (<code>grep -rn "runtime/extensions" packages/core packages/terminal packages/gpu packages/ntdll</code>) — likely a binding-package class module imports it transitively. <code>packages/sysmon</code> must get it the same way. Record the answer; S2.7 verifies <code>buffer.ptr</code> is defined at runtime.</div>
+
+<div class="step verify"><span class="id">S0.6b</span><strong>Capture the PERFORMANCE baseline</strong> (gated in S14.6 — perf regressions are release-blocking, like tsc errors). Pin the timer resolution and warm up, then record pre-work timing of the proven surface into <code>.scratch/baseline-perf.txt</code>: median ns/op (via <code>Bun.nanoseconds()</code>, 200k+ warm-up, dead-code sink) of a no-arg FFI call (e.g. <code>Kernel32.GetTickCount64()</code>), a single <code>NtQuerySystemInformation</code>(class 5) call, and a <code>DataView</code> u32 read — the floors every later hot path is measured against. Also record the machine spec (CPU, cores, Bun version, Windows build) — every ns figure in Appendix G and the README is host-specific and re-verified here, never copied from this plan.</div>
+
+<div class="step"><span class="id">S0.9</span><strong>Open the deviation ledger</strong> <code>.scratch/bun-sysmon-ledger.md</code>: <code>git rev-parse HEAD</code>, Bun version, the S0.4 harness decision, the S0.8 extensions answer, the gpu-execution state. Every deviation gets a one-line entry → the "what drifted" section of the final report (S15.8).</div>
+
+<h3>Phase 0b — Competitive intelligence (execute-time)</h3>
+<p><em>The parity bar: bun-sysmon must do everything the incumbents do — only better — or document a deliberate non-goal with a reason and a roadmap line. Appendix D is the plan-time matrix (verified 2026-06-09); these steps re-validate and extend it, because incumbents move and Microsoft keeps removing the crutches they stand on.</em></p>
+
+<div class="step research"><span class="id">S0.10</span><strong>Fan out research agents over the incumbents</strong> (parallel; web-capable). For each, build a current capability checklist + the top gripes with links:
+<ul>
+<li><strong>systeminformation</strong> — confirm it is still PowerShell-spawn on Windows (read <code>lib/util.js</code> on master), capture the full <code>processes()</code>/<code>currentLoad()</code>/<code>mem()</code>/<code>fsSize()</code>/<code>networkConnections()</code> result-shape fields (parity targets), re-check the CVE page for post-2026-06 advisories.</li>
+<li><strong>pidusage</strong> — confirm the shape <code>{cpu, memory, ppid, pid, ctime, elapsed, timestamp}</code> (the pm2 compatibility contract) and whether the wmic→gwmi fallback bug (issues #190/#191) is still open.</li>
+<li><strong>ps-list / ps-tree / pidtree / @vscode/windows-process-tree</strong> — Windows field sets, current install model, whether any added prebuilt binaries or a Bun path since.</li>
+<li><strong>NEW ENTRANTS</strong> — search npm for actively-published (last 12&nbsp;mo) Windows system/process-metrics packages, especially any zero-build native-speed one (napi/Rust). The 2026-06-09 sweep found none with process APIs (@napi-rs/sysinfo exposes zero); re-confirm. If a credible competitor appeared, the README table must include it honestly.</li>
+<li><strong>Monopoly claims</strong> — re-verify that no npm package (a) consumes real-time ETW, (b) tails the modern Event Log via wevtapi with message formatting, (c) binds PDH directly, (d) reads SMBIOS without WMI, (e) returns socket→PID without spawning. Be adversarial: if a rival exists, name it and its limits.</li>
+</ul></div>
+
+<div class="step research"><span class="id">S0.11</span><strong>Reconcile against Appendix D.</strong> Every capability the agents found that Appendix D missed: add a row and decide — parity feature (schedule into a phase with a concrete proof artifact) or deliberate non-goal (reason + roadmap line for README/AI.md). No third option, no silent drops. The updated matrix is the release gate's checklist (S14.3). <strong>Honest-scope reminder:</strong> sysmon is Windows-only/Bun-only — cross-platform breadth is systeminformation's value, not a parity target; and Node's built-in <code>os</code>/<code>process</code>/<code>fs.statfs</code> already cover basic CPU%/mem/disk-space — the README must say what you genuinely add over core (other-process metrics, load average, disk/net counters, socket→PID, ETW, Event Log, PDH, SMBIOS), not overclaim.</div>
+
+<div class="step research"><span class="id">S0.12</span><strong>Harvest the gripes into design.</strong> Each top gripe becomes an API guardrail, an error-message improvement, a README selling point with the receipt linked, or an AI.md gotcha. Seeds: pidusage CPU% "Not Accurate" → match Task Manager's definition and document it; systeminformation 1&nbsp;Hz loop pegs a core (#626) → prove a 1000&nbsp;Hz loop at near-zero CPU in benchmark.ts; memory-vs-Task-Manager mismatch (#94) → name fields by their Task Manager equivalents; "PowerShell not on PATH / blocked by policy" (#654/#957, desktop#3105) → sysmon needs no PowerShell, say so. Keep the list; it seeds the README's "why this exists" and the final report.</div>
+
+<div class="step commit"><span class="id">S0.13</span><strong>No commit</strong> — Phase 0 produces no tracked changes (baselines/notes live in <code>.scratch/</code>, gitignored).</div>
+
+<h2 id="p1">Phase 1 — Package skeleton + early commit</h2>
+<p><em>Purpose: claim the package directory in git immediately (multi-agent repo: uncommitted work gets <code>git clean</code>ed — ground truth), with a loadable skeleton.</em></p>
+
+<div class="step"><span class="id">S1.1</span><strong>Create <code>packages/sysmon/package.json</code></strong> — modeled byte-for-byte on <code>packages/gpu/package.json</code>'s shape and key order (read it first). Sysmon-specific fields:
+<pre><code>"name": "@bun-win32/sysmon",
+"description": "Native-speed Windows system metrics, PDH counters, Event Log tail, and a decoded real-time ETW firehose for Bun — CPU/memory/disk/process/socket data via direct FFI, no PowerShell, no wmic, no node-gyp.",
+"dependencies": {
+  "@bun-win32/advapi32": "workspace:*", "@bun-win32/core": "workspace:*", "@bun-win32/iphlpapi": "workspace:*",
+  "@bun-win32/kernel32": "workspace:*", "@bun-win32/ntdll": "workspace:*", "@bun-win32/pdh": "workspace:*",
+  "@bun-win32/powrprof": "workspace:*", "@bun-win32/psapi": "workspace:*", "@bun-win32/tdh": "workspace:*",
+  "@bun-win32/wevtapi": "workspace:*", "@bun-win32/wtsapi32": "workspace:*"
+},
+"keywords": ["bun","cpu","etw","eventlog","ffi","memory","metrics","monitoring","pdh","process","sysmon","systeminformation","windows","wmic"],
+"scripts": {
+  "example:benchmark": "bun ./example/benchmark.ts", "example:etw-firehose": "bun ./example/etw-firehose.ts",
+  "example:event-tail": "bun ./example/event-tail.ts", "example:hello-sysmon": "bun ./example/hello-sysmon.ts",
+  "example:selftest": "bun ./example/sysmon.selftest.ts", "example:sysmon-report": "bun ./example/sysmon-report.ts",
+  "example:taskman": "bun ./example/taskman.ts"
+}</code></pre>
+The <code>files</code> array lists every shipped <code>.ts</code> module (NOT <code>example/</code>, NOT <code>*.test.ts</code>) — alphabetized, matching gpu. Copy <code>author</code>, <code>bugs</code>, <code>license</code>, <code>repository</code> (<code>directory: "packages/sysmon"</code>), <code>publishConfig.access: public</code>, <code>engines</code>, <code>type</code>, <code>module</code>, <code>main</code>, <code>exports</code>, <code>peerDependencies</code>, <code>sideEffects</code> exactly from gpu (resolve <code>sideEffects</code> per S0.8 — if a module must side-effect-import core extensions, keep that import in an always-loaded module or drop <code>sideEffects</code>; decide and record).</div>
+
+<div class="step"><span class="id">S1.2</span><strong>Create <code>packages/sysmon/tsconfig.json</code></strong> — copy <code>packages/gpu/tsconfig.json</code> verbatim.</div>
+
+<div class="step"><span class="id">S1.3</span><strong>Placeholder <code>index.ts</code></strong>: <code>export const SYSMON_PACKAGE = '@bun-win32/sysmon';</code> (replaced as modules land).</div>
+
+<div class="step"><span class="id">S1.4</span><strong>Stub <code>AI.md</code> and <code>README.md</code></strong> — one line each (<code># @bun-win32/sysmon</code> + "Under construction — completed in Phase 13"), so <code>files</code> globs and early <code>bun publish --dry-run</code> checks don't fail.</div>
+
+<div class="step verify"><span class="id">S1.5</span><strong>Register + smoke-test.</strong>
+<pre><code>bun install
+bun run packages/sysmon/index.ts            # exits 0, no output
+bunx tsc --noEmit                            # zero errors</code></pre></div>
+
+<div class="step commit"><span class="id">S1.6</span><strong>Commit the claim</strong> (from repo root; pull/rebase first — gpu is moving):
+<pre><code>git add packages/sysmon
+git commit -m "feat(sysmon): scaffold @bun-win32/sysmon observability package"</code></pre></div>
+
+<h2 id="p2">Phase 2 — Foundations: structs.ts, sampler.ts, system.ts, memory.ts</h2>
+<p><em>Purpose: the pure-decoder toolkit (unit-testable, zero FFI), the high-res pacer, and the two simplest end-to-end metric sources. After this phase a script prints OS version, uptime, computer/user name, elevation, and a full memory snapshot from the package — and the parser test file proves the decode layer without a kernel call.</em></p>
+
+<div class="step"><span class="id">S2.1</span><strong>Create <code>packages/sysmon/structs.ts</code> — the pure-decode core <span class="tag new">NEW</span>.</strong> No FFI imports — only <code>Buffer</code>/<code>DataView</code>. Every Appendix B offset lives here as a small exported function taking a <code>Buffer</code> + base offset and returning a typed object. Lift the helpers proven across the examples:
+<pre><code>export function filetimeToDate(low: number, high: number): Date { /* (high*2^32+low) 100ns since 1601 → Date; lift from process-xray fileTimeToDate */ }
+export function filetimeDeltaMs(a: bigint, b: bigint): number { return Number(a - b) / 10_000; }   // 100ns → ms
+export function parseMultiSz(buffer: Buffer, maxChars: number): string[] { /* double-NUL UTF-16LE array; lift counter-explorer:37-54 */ }
+export function decodeUnicodeString(buffer: Buffer, offset: number, byteLength: number): string { /* buffer.subarray(...).toString('utf16le') — NOT TextDecoder('utf-16le') */ }
+export function parseMemoryStatusEx(buffer: Buffer): MemoryStatus { /* 64B: memoryLoad u32@4, totalPhys u64@8, availPhys u64@16, totalPageFile u64@24, availPageFile u64@32, totalVirtual u64@40, availVirtual u64@48 */ }</code></pre>
+Each parser gets its struct's byte size + field offsets in a one-line comment (Appendix B). Keep them branchless and allocation-light — these run in hot sampling loops.</div>
+
+<div class="step verify"><span class="id">S2.2</span><strong>Parser tests</strong> <span class="tag test">bun:test</span> — <code>packages/sysmon/structs.test.ts</code>. Build a Buffer by hand (known bytes at known offsets), assert the decoded object exactly:
+<pre><code>import { describe, expect, test } from 'bun:test';
+import { parseMemoryStatusEx } from './structs';
+describe('parseMemoryStatusEx', () =&gt; {
+  test('decodes the documented offsets', () =&gt; {
+    const buffer = Buffer.alloc(64);
+    buffer.writeUInt32LE(37, 4); buffer.writeBigUInt64LE(34_280_000_000n, 8); buffer.writeBigUInt64LE(12_000_000_000n, 16);
+    const status = parseMemoryStatusEx(buffer);
+    expect(status.memoryLoadPercent).toBe(37);
+    expect(status.totalPhysicalBytes).toBe(34_280_000_000n);
+    expect(status.availablePhysicalBytes).toBe(12_000_000_000n);
+  });
+});</code></pre>
+Add <code>filetimeToDate</code>, <code>filetimeDeltaMs</code>, <code>parseMultiSz</code> (incl. empty-tail). <code>bun test packages/sysmon/structs.test.ts</code> → all pass, zero FFI loaded.</div>
+
+<div class="step"><span class="id">S2.3</span><strong>Create <code>packages/sysmon/sampler.ts</code></strong> — pacing + timing:
+<ul>
+<li><code>createTicker(intervalMs): { wait(): void; dispose(): void }</code> — port <code>terminal/pacing.ts</code>: CreateWaitableTimerExW(HIGH_RESOLUTION 0x2, 0x1f_0003); SetWaitableTimer with a NEGATIVE relative dueTime in 100&nbsp;ns units in a BigInt64Array; WaitForSingleObject(INFINITE). Fallback (busy-spin/<code>Bun.sleepSync</code>) when the timer is null (pre-1803). This makes 1000&nbsp;Hz real vs ~30&nbsp;Hz <code>Bun.sleep</code>-quantized.</li>
+<li><code>monotonicMicroseconds(): number</code> — QueryPerformanceCounter/Frequency → µs Number. Timestamps samples and computes benchmark deltas.</li>
+</ul>
+Apply S0.8's extensions answer so <code>buffer.ptr</code> resolves.</div>
+
+<div class="step"><span class="id">S2.4</span><strong>Create <code>packages/sysmon/system.ts</code></strong> — from <code>system-internals.ts</code> + <code>system-diagnostic.ts</code>: <code>osInfo()</code> (RtlGetVersion, <code>dwOSVersionInfoSize</code> preset <code>0x11C</code> — trap), <code>uptimeMs()</code> (GetTickCount64), <code>bootTime()</code> (NtQSI class 3, BootTime@0 FILETIME), <code>cpuLayout()</code> (GetNativeSystemInfo, SYSTEM_INFO 48&nbsp;B), <code>computerName()</code> (GetComputerNameExW, in/out size buffer — trap), <code>userName()</code> (GetUserNameW), and <code>isElevated()</code> <span class="tag new">NEW</span> (AllocateAndInitializeSid BUILTIN\Administrators + CheckTokenMembership(0n, sid, &amp;isMember) + FreeSid — <strong>verify SID authority {0,0,0,0,0,5} + DOMAIN_ALIAS_RID_ADMINS 0x220 against the SDK; prove elevated AND non-elevated</strong>). Each function: assemble buffer → single FFI call → hand to a <code>structs.ts</code> parser. Keep assembly synchronous (GC-window rule, Appendix C).</div>
+
+<div class="step"><span class="id">S2.5</span><strong>Create <code>packages/sysmon/memory.ts</code></strong>: <code>memory()</code> (GlobalMemoryStatusEx, 64&nbsp;B, <code>dwLength</code> preset 64 — trap → <code>parseMemoryStatusEx</code>; field names mirror Task Manager, JSDoc the Working-Set/Private/Commit distinction — answers systeminformation #94) and <code>performanceInfo()</code> (psapi GetPerformanceInfo, <code>cb</code> preset — the standby/commit numbers systeminformation hard-zeros on Windows).</div>
+
+<div class="step"><span class="id">S2.6</span><strong>Update <code>index.ts</code></strong> — alphabetized named re-exports (functions via <code>export</code>, types via <code>export type</code>). <code>bunx tsc --noEmit</code> → zero; <code>bunx biome format --write packages/sysmon</code>.</div>
+
+<div class="step verify"><span class="id">S2.7</span><strong>Runtime proof — first metrics from the package.</strong> <code>.scratch/probe-foundations.ts</code> imports <code>computerName, isElevated, memory, osInfo, uptimeMs</code>, prints them, exits 1 if <code>memory().totalPhysicalBytes &lt;= 0n</code>. <strong>Sanity-check against the OS</strong> (Task Manager memory tab, <code>winver</code>) — a parser returning a number is not the same as a CORRECT number. If <code>buffer.ptr</code> is undefined, S0.8's answer was wrong — fix the extensions import now.</div>
+
+<div class="step verify"><span class="id">S2.7b</span><strong>Decode + pacing perf audit</strong> <span class="tag test">microbench</span> (performance doctrine). Write <code>.scratch/perf-probes/decode.ts</code> and <strong>decide empirically on JSC</strong>, don't assume: (1) <code>DataView</code> vs <code>Buffer.readXXXLE</code> vs manual byte-OR for the parsers' u32/u16 fields — expect DataView to win or tie (manual is ~1.13× slower on JSC, contradicting V8); (2) confirm reading contiguous u64s as two-u32-halves beats bigint for any field used in a delta. Then microbench <code>createTicker</code> jitter at a 1&nbsp;ms target across <code>Bun.sleepSync</code> vs the high-res timer vs busy-spin (Appendix G data: sleepSync ≈ 1.5&nbsp;ms, timer no better, busy-spin ≈ 1.0&nbsp;ms) — record the achievable rate + jitter so the 1000&nbsp;Hz claim is grounded. Assert the ticker loop and every parser allocate <strong>nothing</strong> per call. Record ns/field + ticker jitter into <code>.scratch/baseline-perf.txt</code>.</div>
+
+<div class="step commit"><span class="id">S2.8</span>
+<pre><code>git add packages/sysmon
+git commit -m "feat(sysmon): struct decoders, high-res sampler, system + memory snapshots"</code></pre></div>
+
+<h2 id="p3">Phase 3 — process.ts: the one-syscall snapshot (🏁 the wedge)</h2>
+<p><em>Purpose: the headline capability — the entire process list, with per-process CPU/memory/IO, from a single <code>NtQuerySystemInformation</code> call in microseconds. This is what pidusage spawns a process PER PID to approximate and what ps-tree can no longer do at all. After this phase, bun-sysmon already beats the entire 20M-dl/wk per-process cluster.</em></p>
+
+<div class="step research"><span class="id">S3.1</span><strong>Re-read the proof.</strong> <code>core-scope.ts</code> (~lines 150–215) is the working <code>SystemProcessInformation</code> (class 5) walker: the grow-retry on <code>STATUS_INFO_LENGTH_MISMATCH</code> (0xc0000004), the per-entry stride via <code>NextEntryOffset</code> u32@0x00 (0 terminates), and the embedded-VA name decode (ImageName.Buffer is a VA into the returned buffer; resolve as <code>nameVA - bufBase</code> offset). Runtime-proven offsets: NumberOfThreads@0x04, ImageName.Length u16@0x38, ImageName.Buffer ptr@0x40, UniqueProcessId ptr@0x50, KernelTime i64@0x110, UserTime i64@0x118. <strong>Lift this loop verbatim into <code>structs.ts</code> as <code>parseProcessSnapshot(buffer): RawProcess[]</code></strong> — a pure function over the kernel-filled Buffer (it needs the buffer's own base address for VA resolution: pass <code>bufBase</code> as a parameter, computed in <code>process.ts</code> from <code>buffer.ptr</code>).</div>
+
+<div class="step"><span class="id">S3.2</span><strong>Extend the row with the SDK header offsets <span class="tag new">NEW / UNVERIFIED</span>.</strong> The proven walker reads 6 fields; the product needs the full SYSTEM_PROCESS_INFORMATION (x64). Derive these from the SDK/ntded header and <strong>mark UNVERIFIED until S3.4 cross-checks them</strong>: HandleCount u32@0x08, InheritedFromUniqueProcessId (ppid) ptr@0x58, BasePriority i32 (near the time fields), CreateTime i64@0x108 (FILETIME), and the embedded <code>VM_COUNTERS</code> block (PeakVirtualSize, VirtualSize, PageFaultCount, PeakWorkingSetSize, WorkingSetSize@~0x90, QuotaPagedPoolUsage, PagefileUsage, PeakPagefileUsage) plus <code>IO_COUNTERS</code> (ReadOperationCount, WriteOperationCount, ReadTransferCount, WriteTransferCount) — the IO_COUNTERS block trails the VM block. <strong>Do not trust these offsets from memory</strong> — the struct has version-dependent padding; the only trustworthy source is the header plus the S3.4 cross-check. Where an offset can't be confirmed, omit the field and note it in the ledger rather than shipping a wrong number.</div>
+
+<div class="step"><span class="id">S3.3</span><strong>Create <code>packages/sysmon/process.ts</code></strong> <span class="tag new">NEW</span>:
+<ul>
+<li><code>processes(): ProcessInfo[]</code> — one NtQSI(class 5) call with grow-retry → <code>parseProcessSnapshot</code>. The default snapshot. <code>ProcessInfo</code> includes pid, ppid, name, threadCount, handleCount, workingSetBytes, privateBytes (PagefileUsage), kernelTime/userTime (bigint, 100&nbsp;ns), createTime (Date). Names use the system-process convention (pid 0 → "Idle", pid 4 → "System").</li>
+<li><code>pidStats(pid | pids): PidStats | Record&lt;number, PidStats&gt;</code> <span class="tag new">NEW</span> — <strong>the pidusage drop-in</strong>. Returns exactly <code>{ cpu, memory, ppid, pid, ctime, elapsed, timestamp }</code> (the pm2 compatibility contract from Appendix D). <code>cpu</code> is the two-sample delta percentage; first call returns the since-start average like pidusage. Computed from the snapshot's kernel+user time deltas — NO per-PID process spawn. Document the CPU% definition (normalize by core count, matching Task Manager) — directly answers pidusage's "Not Accurate" gripe.</li>
+<li><code>processTree(rootPid?): ProcessTreeNode</code> — build the parent→children tree from the snapshot's ppid edges (the ps-tree replacement that works on Server 2025). One snapshot, zero spawns.</li>
+<li><code>processImagePath(pid): string | null</code> — OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION) + QueryFullProcessImageNameW (lift from process-xray; returns null on access-denied, where <code>OpenProcess</code> yields 0n).</li>
+<li><code>ProcessSampler</code> — a class holding the previous snapshot's per-PID times + a high-res <code>createTicker</code>; <code>sample()</code> returns ranked <code>{ pid, name, cpuPercent, workingSetBytes }</code>. The engine behind <code>taskman.ts</code>.</li>
+</ul></div>
+
+<div class="step verify"><span class="id">S3.4</span><strong>Cross-check the UNVERIFIED offsets against proven per-process APIs.</strong> This is the offsets referee — do NOT ship S3.2's fields until they pass. <code>.scratch/probe-process.ts</code>: take a known PID (e.g. <code>Bun.pid</code> or explorer.exe), read its row from <code>processes()</code>, then independently fetch the SAME values via the proven path — <code>GetProcessMemoryInfo</code> for WorkingSet/Pagefile (PROCESS_MEMORY_COUNTERS 72&nbsp;B, <code>cb</code>=72; from <code>process-forensics.ts</code>), <code>GetProcessHandleCount</code> for handles, <code>GetProcessTimes</code> for kernel/user/create time — and assert they MATCH (working set within a small tolerance for sampling skew; handle count exact ± a couple; times monotonic and close). Any field that doesn't match has a wrong offset: fix it from the header, re-run, and only then keep it. Record every confirmed offset in the ledger (they become Appendix B truth for the next plan).</div>
+
+<div class="step verify"><span class="id">S3.5</span><strong>🏁 MILESTONE: the snapshot beats the cluster.</strong> <code>.scratch/probe-snapshot.ts</code>: time <code>processes()</code> with <code>monotonicMicroseconds()</code> over 100 iterations; assert it returns &gt; 100 processes and the median call is &lt; 2&nbsp;ms (it will be far less — this is the number that, against pidusage's per-PID PowerShell spawn, is the entire product thesis). Assert <code>processTree()</code> contains <code>Bun.pid</code> under its real parent. Assert <code>pidStats(Bun.pid)</code> has all 7 pidusage fields with correct types. Print the median µs — it goes in the README. <strong>Do not proceed past a failure here.</strong></div>
+
+<div class="step verify"><span class="id">S3.5b</span><strong>Process hot-path audit</strong> <span class="tag test">microbench</span> (performance doctrine — this is the product's hottest loop). Beyond S3.5's &lt; 2&nbsp;ms whole-call median, budget the inner walk: (1) microbench <code>parseProcessSnapshot</code> at <strong>ns-per-row</strong> over a real ~300-entry snapshot — the <code>NextEntryOffset</code> walk + VA-name resolve runs N times; (2) <strong>reuse the grow-retry Buffer across calls</strong> (allocate once on the module/sampler, grow-only — never <code>Buffer.alloc</code> per <code>processes()</code> call; ~1064&nbsp;ns/alloc saved) and hold a cached <code>DataView</code> + <code>u8</code> view; (3) cache <code>buffer.ptr</code> for the VA-base computation rather than re-reading the getter; (4) compute the kernel+user time sums needed for <code>pidStats</code> via the two-u32-halves number path where the delta fits 2^53, not bigint; (5) weigh a struct-of-arrays return vs <code>ProcessInfo[]</code>-with-<code>Date</code> object-per-row for high-frequency consumers — document the GC cost and offer the lean path. Record ns/row + per-call alloc count (must be 0 after warm-up) into the baseline.</div>
+
+<div class="step commit"><span class="id">S3.6</span>
+<pre><code>git add packages/sysmon
+git commit -m "feat(sysmon): one-syscall process snapshot, tree, pidStats, image path"</code></pre></div>
+
+<h2 id="p4">Phase 4 — cpu.ts: per-core times + samplers</h2>
+<p><em>Purpose: per-core CPU utilization the way Task Manager computes it (kernel/user/idle tick deltas), plus the whole-system roll-up. <code>core-scope.ts</code> already does this at ~10&nbsp;Hz under a GPU render loop — lift it.</em></p>
+
+<div class="step"><span class="id">S4.1</span><strong>Create <code>packages/sysmon/cpu.ts</code></strong> lifting <code>core-scope.ts</code>'s <code>readPerf</code>/<code>deriveBusy</code> (~lines 95–140):
+<ul>
+<li><code>cpuTimes(): CpuTime[]</code> — NtQSI(class 8, SystemProcessorPerformanceInformation) into a <code>cores * PERF_STRIDE</code> buffer; <code>parseProcessorTimes</code> in <code>structs.ts</code> decodes per-core idle@0x00, kernel@0x08 (INCLUDES idle), user@0x10 (all i64). Core count from <code>cpuLayout()</code>.</li>
+<li><code>CpuSampler</code> — holds the previous sample; <code>sample(): { perCore: number[]; total: number; userFraction: number[] }</code> computes <code>busy = 1 - dIdle/(dKernel+dUser)</code> per core (the exact <code>deriveBusy</code> math, which correctly accounts for kernel-includes-idle). Pair with a <code>createTicker</code> for fixed-rate sampling.</li>
+<li><code>systemTimes(): { idle, kernel, user }</code> — GetSystemTimes (bound) as the simple whole-box roll-up (3 FILETIMEs), an independent cross-check for <code>CpuSampler</code>'s aggregate.</li>
+<li><code>cpuLayout()</code> — re-export from <code>system.ts</code> (or keep there; just ensure cpu.ts can read core count without a circular import — if circular, move the shared bit into <code>structs.ts</code> or a tiny internal module and record it).</li>
+</ul></div>
+
+<div class="step verify"><span class="id">S4.2</span><strong>Parser test + runtime proof.</strong> <span class="tag test">bun:test</span> add <code>parseProcessorTimes</code> to <code>structs.test.ts</code> with a hand-built 2-core buffer. Then <code>.scratch/probe-cpu.ts</code>: <code>CpuSampler</code> across a 200&nbsp;ms ticker while a busy-loop pegs one core; assert every per-core value ∈ [0,1], the total tracks the per-core mean, and the busy core reads high. <strong>Sanity vs Task Manager</strong> (open the Performance tab, eyeball per-core graphs). Also assert <code>CpuSampler</code>'s aggregate is within a few % of a <code>systemTimes()</code>-derived total over the same window (two independent kernel sources agreeing = correctness).</div>
+
+<div class="step verify"><span class="id">S4.2b</span><strong>Sampler perf audit</strong> <span class="tag test">microbench</span> (performance doctrine). <code>CpuSampler</code>/<code>ProcessSampler.sample()</code> must allocate <strong>nothing</strong> per tick: <strong>double-buffer</strong> the previous/current snapshots (swap two pre-allocated buffers, don't allocate a new one each tick), reuse the cached <code>DataView</code>. Read the per-core idle/kernel/user i64s as two-u32-halves and do the <code>busy = 1 - dIdle/(dKernel+dUser)</code> math in Number space (the delta fits 2^53) — measured 8× faster than the bigint path. Then the gated claim: run the sampler at 1000&nbsp;Hz for ≥ 1&nbsp;s and assert <strong>this process's own CPU% stays near-zero</strong> (the direct answer to systeminformation #626's "1&nbsp;Hz loop pegs a core") — a measured number, not a demo assertion. Record per-tick ns + own-CPU% into the baseline.</div>
+
+<div class="step commit"><span class="id">S4.3</span>
+<pre><code>git add packages/sysmon
+git commit -m "feat(sysmon): per-core cpu times + sampler, system times rollup"</code></pre></div>
+
+<h2 id="p5">Phase 5 — disk.ts + net.ts</h2>
+<p><em>Purpose: volume enumeration + free space (UNC-capable, unlike check-disk-space), and socket→PID tables + interface throughput counters (locale-proof, no netstat spawn). Both replace whole clusters of spawn-based packages.</em></p>
+
+<div class="step"><span class="id">S5.1</span><strong>Create <code>packages/sysmon/disk.ts</code></strong> from <code>system-diagnostic.ts</code>'s disk block:
+<ul>
+<li><code>drives(): DriveInfo[]</code> — GetLogicalDriveStringsW → split the multi-sz → per root: GetDriveTypeW (fixed/removable/network/cdrom/ramdisk), GetVolumeInformationW (label, filesystem, serial, flags), GetDiskFreeSpaceExW (freeBytesAvailableToCaller, totalBytes, totalFreeBytes — the quota-aware "available vs free" distinction <code>fs.statfs</code> can't give on Windows). Tolerate per-drive failures (an empty CD drive returns an error — skip it, don't throw).</li>
+<li><code>diskSpace(path): { availableBytes, totalBytes, freeBytes }</code> — GetDiskFreeSpaceExW on an arbitrary path including <strong>UNC</strong> (<code>\\server\share</code>) — the exact thing check-disk-space rejects by design (Appendix D). Honor the trailing-backslash + NUL trap (Appendix C).</li>
+</ul>
+README must honestly note Node's <code>fs.statfs</code> covers basic single-path free space — sysmon adds enumeration, UNC, the available-vs-free split, drive type, and volume metadata.</div>
+
+<div class="step"><span class="id">S5.2</span><strong>Create <code>packages/sysmon/net.ts</code> — socket tables</strong> from <code>net-xray.ts</code>:
+<ul>
+<li><code>tcpSockets({ family }): TcpSocket[]</code> — GetExtendedTcpTable(TCP_TABLE_OWNER_PID_ALL=5) with the ERROR_INSUFFICIENT_BUFFER retry; <code>parseTcpTable</code> in <code>structs.ts</code> walks rows at stride 24 (state@0, localAddr@4, localPort@8, remoteAddr@12, remotePort@16, pid@20), decodes state (1–12; ESTABLISHED=5, LISTEN=2), and swaps the network-order ports. Default family AF_INET; support AF_INET6 (the v6 row layout differs — read the SDK MIB_TCP6ROW_OWNER_PID and add <code>parseTcp6Table</code>; mark UNVERIFIED, prove against <code>netstat -ano</code> in S5.5).</li>
+<li><code>udpSockets({ family }): UdpSocket[]</code> — GetExtendedUdpTable, stride 12, pid@8 (v6 separately).</li>
+<li>PID→name join via <code>processImagePath</code>/<code>processes()</code> with a per-call cache (lift the cache pattern from net-xray) — gives socket→process attribution systeminformation leaves unresolved on Windows.</li>
+</ul></div>
+
+<div class="step"><span class="id">S5.3</span><strong>Parser tests</strong> <span class="tag test">bun:test</span> — <code>parseTcpTable</code>/<code>parseUdpTable</code> over hand-built tables (dwNumEntries@0 then N rows): assert ports byte-swapped, states decoded, PIDs correct, the empty-table case. Pure, no FFI.</div>
+
+<div class="step"><span class="id">S5.4</span><strong>Interface throughput counters <span class="tag new">NEW / UNVERIFIED</span>.</strong> <code>interfaceCounters(): InterfaceCounter[]</code> — GetIfTable2 (bound) returns MIB_IF_TABLE2; walk MIB_IF_ROW2 rows reading InOctets/OutOctets/InUcastPkts/OutUcastPkts/InErrors/OutErrors plus the interface alias/description (wide strings) and OperStatus. <strong>No example decodes MIB_IF_ROW2 — derive every offset from the SDK header (netioapi.h); the struct is large (~1352&nbsp;B) with embedded wide-string arrays and alignment, so this is the riskiest decode in the plan.</strong> Free the table with FreeMibTable. Pair with <code>NetSampler</code> for bytes/sec deltas. If the offsets resist verification within a reasonable spike, ship sockets in v1 and move <code>interfaceCounters</code> to the roadmap with an honest line (S15.8) rather than shipping wrong throughput numbers.</div>
+
+<div class="step verify"><span class="id">S5.5</span><strong>Runtime proof + ground-truth cross-check.</strong> <code>.scratch/probe-net.ts</code>: assert <code>tcpSockets()</code> contains a known listener (or an established connection you create to <code>example.com:443</code>) with the right PID; spot-check 3 rows against <code>netstat -ano</code> output (proto/local/remote/state/PID must agree — this is the locale-proof claim made honest). For <code>interfaceCounters()</code>: assert your active adapter's InOctets/OutOctets are nonzero and monotonically increase across two samples while you generate traffic. If v6 or counters don't verify, record and defer per S5.4.</div>
+
+<div class="step commit"><span class="id">S5.6</span>
+<pre><code>git add packages/sysmon
+git commit -m "feat(sysmon): drives + UNC disk space, tcp/udp socket tables with PIDs, interface counters"</code></pre></div>
+
+<h2 id="p6">Phase 6 — counters.ts: native PDH</h2>
+<p><em>Purpose: the first and only npm binding of PDH (Performance Data Helper) — the same counter model Task Manager and perfmon use, locale-independent via the English-counter API. Wildcard expansion unlocks the per-process GPU% capability nothing on npm offers.</em></p>
+
+<div class="step"><span class="id">S6.1</span><strong>Create <code>packages/sysmon/counters.ts</code></strong> from <code>live-dashboard.ts</code> + <code>counter-explorer.ts</code>:
+<ul>
+<li><code>class CounterSet</code> — wraps the PDH query lifecycle: <code>PdhOpenQueryW(null, 0n, &amp;hQuery)</code> → <code>add(path): CounterHandle</code> (<code>PdhAddEnglishCounterW</code>, locale-proof) → <code>collect()</code> (<code>PdhCollectQueryData</code>) → <code>value(handle): number</code> (<code>PdhGetFormattedCounterValue</code>, PDH_FMT_DOUBLE, double@offset 8 of the 24&nbsp;B value buffer) → <code>dispose()</code> (<code>PdhRemoveCounter</code> + <code>PdhCloseQuery</code>). <strong>Encode the two-sample rule</strong>: the first <code>collect()</code> on a rate counter returns <code>PDH_INVALID_DATA</code> (0x800007d5) — <code>value()</code> must surface a clear "call collect() twice for rate counters; the first sample establishes a baseline" error rather than a raw hex code (the gripe→error-message principle). Document which common counters are instantaneous vs rate.</li>
+<li><code>listCounterObjects(): string[]</code> — <code>PdhEnumObjectsW</code> two-call (size=0 probe, then PERF_DETAIL_WIZARD fetch) → <code>parseMultiSz</code>.</li>
+<li><code>listCounterItems(object): { counters: string[]; instances: string[] }</code> — <code>PdhEnumObjectItemsW</code> two-call (the dual size-buffer pattern from counter-explorer).</li>
+<li><code>expandCounterPath(wildcard): string[]</code> <span class="tag new">NEW</span> — <code>PdhExpandWildCardPathW</code> (bound) two-call. This is the gateway to <strong>per-process GPU usage</strong>: expand <code>\GPU Engine(*)\Utilization Percentage</code> to the live <code>pid_*_engtype_*</code> instances, exactly how Task Manager's GPU column works (Appendix D — a documented npm monopoly).</li>
+</ul></div>
+
+<div class="step verify"><span class="id">S6.2</span><strong>Runtime proof.</strong> <code>.scratch/probe-pdh.ts</code>: a <code>CounterSet</code> with <code>\Processor(_Total)\% Processor Time</code> and <code>\Memory\Available MBytes</code>; collect, sleep one ticker interval, collect again, read both; assert processor time ∈ [0,100] and available-MBytes is positive and within ~10% of <code>memory().availablePhysicalBytes/1e6</code> (two independent sources agreeing). Assert <code>listCounterObjects()</code> contains "Processor" and "Memory". Assert <code>expandCounterPath('\\GPU Engine(*)\\Utilization Percentage')</code> returns ≥ 1 instance on a machine with a GPU (skip with a SKIP line if none) — and verify those instances are valid by adding one to a CounterSet and reading it. Cross-check the <code>%Processor Time</code> against <code>CpuSampler</code>'s total over the same window.</div>
+
+<div class="step verify"><span class="id">S6.2b</span><strong>PDH hot-path note</strong> <span class="tag test">microbench</span> (performance doctrine). Microbench <code>CounterSet.collect()</code> + <code>value()</code> per counter at sustained rate; reuse the 24&nbsp;B formatted-value scratch buffer (allocate once per counter, not per read) and cache its <code>.ptr</code>; confirm repeated <code>collect()</code> allocates nothing per sample. Record per-collect µs into the baseline. (PDH itself does kernel work, so this won't hit the FFI floor — the point is to ensure the wrapper adds no avoidable allocation on top.)</div>
+
+<div class="step commit"><span class="id">S6.3</span>
+<pre><code>git add packages/sysmon
+git commit -m "feat(sysmon): native PDH counter sets, object/item enumeration, wildcard expansion (per-process GPU)"</code></pre></div>
+
+<h2 id="p7">Phase 7 — eventlog.ts: query + tail</h2>
+<p><em>Purpose: read and live-tail any modern Windows Event Log channel (Application, Security, System, and every <code>Microsoft-Windows-*/Operational</code> channel) with publisher message formatting — a capability no maintained npm package has (the only one, windows-eventlog-reader, is a ~2016 legacy-API polling addon abandoned by its own author; everything else writes events or parses offline .evtx files — Appendix D).</em></p>
+
+<div class="step"><span class="id">S7.1</span><strong>Create <code>packages/sysmon/eventlog.ts</code></strong> from <code>event-tail.ts</code> + <code>channel-report.ts</code>:
+<ul>
+<li><code>channels(): string[]</code> — <code>EvtOpenChannelEnum</code> + <code>EvtNextChannelPath</code> two-call loop (returns null on enum end); <code>EvtClose</code> the enum.</li>
+<li><code>queryEvents({ channel, xpath?, reverse?, max? }): EventRecord[]</code> — <code>EvtQuery</code> (EvtQueryChannelPath | direction flag) → <code>EvtNext</code> batches of 16 → per handle <code>EvtRender</code>(EvtRenderEventXml) two-call → parse the XML to <code>{ recordId, eventId, level, providerName, timeCreated, computer, channel, message?, xml }</code>. Default direction reverse (newest first) with a <code>max</code> cap. <code>EvtClose</code> every event handle and the query (lifecycle discipline — Appendix C).</li>
+<li><code>formatMessage(providerName, eventHandle): string | null</code> — <code>EvtOpenPublisherMetadata</code> + <code>EvtFormatMessage</code>(EvtFormatMessageEvent) two-call; returns the human-readable message. Cache publisher-metadata handles per provider; close them on disposal.</li>
+<li><code>tailEvents({ channel, xpath?, intervalMs? }): AsyncIterable&lt;EventRecord&gt;</code> <span class="tag new">NEW</span> — the live tail. Pull + poll only (NOT EvtSubscribe — its push callback fires on a foreign thread, repo ground truth): track the last seen <code>EventRecordID</code>, re-query forward with <code>*[System[EventRecordID &gt; N]]</code> each tick, yield new records, sleep one interval (default 1000&nbsp;ms) via a <code>createTicker</code> or <code>Bun.sleep</code> between iterations (the tail is not a 1000&nbsp;Hz path — readability over latency). Honor an <code>AbortSignal</code> for clean shutdown.</li>
+</ul></div>
+
+<div class="step research"><span class="id">S7.2</span><strong>EVT_VARIANT string dereference.</strong> <code>channel-report.ts</code> (~lines 71–101) shows the trap: EVT_VARIANT string values are u64 pointers into a buffer the API filled; reading them requires <code>ReadProcessMemory(GetCurrentProcess(), pointer, readBuffer, byteCount, 0n)</code> then <code>.toString('utf16le')</code> (the branded-Pointer narrowing <code>Number(ptr) as Pointer</code> is the sanctioned cast). Lift this exact pattern wherever channel-config or variant properties are read; never dereference the pointer directly from JS (Appendix C).</div>
+
+<div class="step verify"><span class="id">S7.3</span><strong>Runtime proof.</strong> <code>.scratch/probe-eventlog.ts</code>: assert <code>channels()</code> includes "Application", "Security", "System"; <code>queryEvents({ channel: 'Application', max: 5 })</code> returns 5 records with sane fields (recordId increasing toward newest, valid timeCreated, a non-empty providerName); at least one <code>formatMessage</code> yields a readable string. Then start <code>tailEvents({ channel: 'Application' })</code>, write a synthetic event (advapi32 <code>RegisterEventSourceW</code> + <code>ReportEventW</code> — both bound; use a generic source), and assert the tail yields it within ~2 ticks. Abort the tail cleanly. <strong>Security channel needs elevation</strong> — if <code>isElevated()</code> is false, SKIP the Security-channel assertion with a SKIP line, don't fail.</div>
+
+<div class="step commit"><span class="id">S7.4</span>
+<pre><code>git add packages/sysmon
+git commit -m "feat(sysmon): event log channels, query, publisher message formatting, live tail"</code></pre></div>
+
+<h2 id="p8">Phase 8 — etw.ts: census, schemas, firehose</h2>
+<p><em>Purpose: the deepest moat — a no-admin census of every instrumented ETW provider and its event schemas, plus an elevated real-time decoded kernel firehose (Procmon-lite). No npm package consumes real-time ETW at all (the field is write-only providers, offline .etl parsers, and abandoned proofs-of-concept — Appendix D). This phase ships the capability AND the honest elevation/blocking caveats.</em></p>
+
+<div class="step"><span class="id">S8.1</span><strong>No-admin census first (the safe, always-works surface).</strong> Create <code>packages/sysmon/etw.ts</code> from <code>provider-explorer.ts</code>:
+<ul>
+<li><code>etwProviders(): EtwProvider[]</code> — <code>TdhEnumerateProviders</code> two-call; <code>parseProviderEnumeration</code> in <code>structs.ts</code> walks PROVIDER_ENUMERATION_INFO (count u32@0; per provider @8+i*24: GUID[0..16], SchemaSource u32@16, NameOffset u32@20 → UTF-16LE at offset). Sorted by name. <strong>No elevation required.</strong></li>
+<li><code>etwProviderSchema(guid): EtwEventSchema[]</code> — <code>TdhEnumerateManifestProviderEvents</code> → per EVENT_DESCRIPTOR (eventId u16@0, version u8@2, level u8@4, opcode u8@5) call <code>TdhGetManifestEventInformation</code> → TRACE_EVENT_INFO (TaskNameOffset@68, OpcodeNameOffset@72, MessageOffset@76, PropertyCount u32@104; EventPropertyInfoArray @112, per property NameOffset@4, InType u16@8, OutType u16@10). The full event template for any provider — also no elevation.</li>
+</ul></div>
+
+<div class="step"><span class="id">S8.2</span><strong>The real-time firehose (elevated) <span class="tag new">NEW, lifted from etw-firehose.ts</span>.</strong> Add <code>class EtwSession</code> wrapping the proven pump:
+<ul>
+<li>Construction: build EVENT_TRACE_PROPERTIES (120&nbsp;B: ClientContext@40=1 QPC, Wnode.Flags@44=0x0002_0000, LogFileMode@64=0x0000_0100 REAL_TIME, LoggerNameOffset@116=120), <code>StartTraceW</code> (recover from ERROR_ALREADY_EXISTS=183 by <code>ControlTraceW</code> STOP then retry), <code>EnableTraceEx2</code>(provider GUID, ENABLE=1, level VERBOSE=5).</li>
+<li>Pump: <code>OpenTraceW</code> (EVENT_TRACE_LOGFILEW 448&nbsp;B: LoggerName u64@8, ProcessTraceMode@28=0x1000_0100, BufferCallback u64@400, EventRecordCallback u64@424); <code>ProcessTrace</code> BLOCKS the calling thread until the BufferCallback returns 0. The EventRecordCallback (JSCallback firing on the SAME Bun thread) reads EVENT_RECORD (processId u32@12, eventId u16@40, opcode u8@45) and decodes via <code>TdhGetEventInformation</code> two-call.</li>
+<li>API shape: expose it as <code>run(onEvent, { durationMs | signal })</code> — because ProcessTrace blocks, this is explicitly a <strong>blocking, foreground</strong> call that pumps until the deadline/abort; the BufferCallback returns 0 once the deadline passes. Document loudly that it monopolizes the thread while running (no concurrent JS), and that an AsyncIterable would require a Worker owning its own session (NOT in v1 — sharing Buffer pointers across worker_threads segfaults, repo ground truth; note it as roadmap). Teardown in a finally: <code>CloseTrace</code>, <code>ControlTraceW</code> STOP, <code>callback.close()</code> on both callbacks.</li>
+<li><strong>Elevation gate:</strong> <code>StartTraceW</code>/<code>EnableTraceEx2</code> return ERROR_ACCESS_DENIED=5 unelevated. <code>EtwSession.run</code> must detect this and throw a clear "real-time ETW requires an elevated process; the provider census and Event Log tail work without admin" error (gripe→error-message). Lead the product's marketing with the no-admin surface; the firehose is the elevated bonus.</li>
+</ul></div>
+
+<div class="step verify"><span class="id">S8.3</span><strong>Runtime proof (two paths).</strong> <code>.scratch/probe-etw.ts</code>: (no-admin) assert <code>etwProviders()</code> returns &gt; 100 providers and includes "Microsoft-Windows-Kernel-Process"; assert <code>etwProviderSchema</code> for that provider returns events with non-empty task names. (admin, guarded by <code>isElevated()</code>) run <code>EtwSession</code> on the Kernel-Process provider with <code>durationMs: 3000</code>, spawn a throwaway child (<code>Bun.spawn(['cmd','/c','exit'])</code>) to generate ProcessStart/Stop events, and assert ≥ 1 decoded event arrives with a resolved provider/task name; if not elevated, SKIP that section with a SKIP line. <strong>Never leave a trace session running</strong> — the finally must always stop it; verify with a second <code>StartTraceW</code> succeeding (no ERROR_ALREADY_EXISTS) after the probe.</div>
+
+<div class="step verify"><span class="id">S8.3b</span><strong>Callback-cost audit</strong> <span class="tag test">microbench</span> (performance doctrine — the firehose is a per-event hot path). A native→JS <code>JSCallback</code> costs <strong>~39&nbsp;ns/invocation</strong> before the handler does any work (measured), so at high event rates the trampoline dominates. The <code>EventRecordCallback</code> body must do the <strong>absolute minimum</strong>: read the few fixed-offset EVENT_RECORD fields (processId@12, eventId@40, opcode@45) into a reused row object or a pre-sized output array and return — defer <code>TdhGetEventInformation</code> decode/formatting to a drain pass after <code>ProcessTrace</code> returns, or throttle it. Reuse the TDH decode buffer across events (grow-only), cache its <code>.ptr</code>, and never allocate per event in the callback. Microbench decoded-events/sec and assert the callback body allocates nothing per event. (Document that a buffered/ring-delivery design is roadmap — v1 keeps the decode lean.)</div>
+
+<div class="step commit"><span class="id">S8.4</span>
+<pre><code>git add packages/sysmon
+git commit -m "feat(sysmon): etw provider census + schemas (no admin), real-time decoded firehose (elevated)"</code></pre></div>
+
+<h2 id="p9">Phase 9 — The census trio: firmware.ts, power.ts, sessions.ts</h2>
+<p><em>Purpose: three self-contained "inventory" modules, each lifted nearly verbatim from a proven example. firmware.ts is a documented npm monopoly (SMBIOS without WMI); power and sessions fill systeminformation's skeletal Windows coverage.</em></p>
+
+<div class="step"><span class="id">S9.1</span><strong>Create <code>packages/sysmon/firmware.ts</code></strong> from <code>firmware-inventory.ts</code> (the SMBIOS walk is the richest decoder in the repo — port it carefully):
+<ul>
+<li><code>smbios(): { bios, system, baseboard, memoryDevices }</code> — GetSystemFirmwareTable('RSMB'=0x52534d42) two-call; <code>parseSmbios</code> in <code>structs.ts</code> walks RawSMBIOSData (version@1/2, structures@8): per structure type@0, length@1, handle u16@2, then the formatted area + the 1-based NUL-terminated string table (double-NUL ends a structure). Decoders: type 0 (BIOS vendor/version/date), type 1 (System manufacturer/product/serial/UUID — the mixed-endian UUID: first 3 fields LE, last 2 BE), type 2 (Baseboard), type 4 (Processor), type 17 (Memory device — size@0x0C with the 0x7FFF→extended-32-bit-size@0x1C sentinel and the KB/MB bit). Honor the 1-based string-index trap (0 = unset; bounds-check <code>strings[idx-1]</code>) and the non-null-probe-buffer trap (Appendix C).</li>
+</ul></div>
+
+<div class="step verify"><span class="id">S9.2</span><strong>SMBIOS parser test + proof.</strong> <span class="tag test">bun:test</span> Build a minimal SMBIOS byte fixture (a type-1 structure with a known UUID + a two-entry string table) and assert <code>parseSmbios</code> decodes manufacturer/product and the UUID byte-order exactly. Then <code>.scratch/probe-firmware.ts</code>: assert <code>smbios().system.manufacturer</code> is non-empty and <code>memoryDevices</code> sums to roughly <code>memory().totalPhysicalBytes</code> (installed RAM SMBIOS vs OS-visible RAM agree within a margin). Cross-check BIOS version against <code>msinfo32</code> if convenient.</div>
+
+<div class="step"><span class="id">S9.3</span><strong>Create <code>packages/sysmon/power.ts</code></strong> from <code>battery-advisor.ts</code>: <code>powerStatus(): { acLine, batteryFlag, batteryPercent, secondsRemaining }</code> (GetSystemPowerStatus, SYSTEM_POWER_STATUS 12&nbsp;B: ACLineStatus@0, BatteryFlag@1, BatteryLifePercent@2, BatteryLifeTime i32@4), <code>batteryState(): { acOnline, charging, discharging, maxCapacity, remainingCapacity, rate, estimatedTimeSeconds }</code> (CallNtPowerInformation(SystemBatteryState), 64&nbsp;B layout from the dossier), <code>powerScheme(): { guid, name }</code> (PowerGetActiveScheme + PowerReadFriendlyName — note PowerReadFriendlyName buffer is bytes, the friendly name is a wide string). On a desktop with no battery, <code>batteryState</code> reports <code>batteryPresent=false</code> — handle gracefully, don't throw.</div>
+
+<div class="step"><span class="id">S9.4</span><strong>Create <code>packages/sysmon/sessions.ts</code></strong> from <code>session-monitor.ts</code>: <code>sessions(): SessionInfo[]</code> — WTSEnumerateSessionsW (WTS_SESSION_INFOW 24&nbsp;B: SessionId u32@0, pWinStationName ptr@8, State u32@<strong>16</strong> — not 20, the documented trap) then per session WTSQuerySessionInformationW for user/domain/client-name/connect-state; WTSFreeMemory the enumeration buffer. This gives RDP/console session attribution with real client info — what systeminformation's <code>users()</code> leaves empty on Windows.</div>
+
+<div class="step verify"><span class="id">S9.5</span><strong>Proof.</strong> <code>.scratch/probe-census.ts</code>: assert <code>sessions()</code> contains the current console session with your username; assert <code>powerStatus()</code> returns a sane <code>acLine</code> (0/1) and, if a battery exists, a percent ∈ [0,100]; assert <code>powerScheme().name</code> is non-empty (e.g. "Balanced"). Each module: run, sanity-check against the OS (Task Manager Users tab, the battery flyout, <code>powercfg /getactivescheme</code>).</div>
+
+<div class="step commit"><span class="id">S9.6</span>
+<pre><code>git add packages/sysmon
+git commit -m "feat(sysmon): smbios firmware inventory, power/battery, terminal sessions"</code></pre></div>
+
+<h2 id="p10">Phase 10 — Examples, the integration selftest, the benchmark</h2>
+<p><em>Purpose: the runnable proof corpus. The selftest is the REAL test suite (FFI integration); the examples are the marketing; the benchmark produces the README's numbers. Every example carries the mandatory JSDoc header (Title, Description, "APIs demonstrated" bullets grouped by package, Run line) — repo rule.</em></p>
+
+<div class="step"><span class="id">S10.1</span><strong><code>example/hello-sysmon.ts</code> — the 10-line wow:</strong>
+<pre><code>/**
+ * Hello sysmon — your machine, no PowerShell, no wmic, no build step.
+ *
+ * Reads OS, memory, the top-CPU process, and the active TCP socket count via direct
+ * FFI into System32 DLLs — microseconds per call, typed end to end.
+ *
+ * APIs demonstrated:
+ * - osInfo, memory (system + memory snapshots)
+ * - processes (the one-syscall process list)
+ * - tcpSockets (socket table with PIDs)
+ *
+ * Run: bun run example/hello-sysmon.ts
+ */
+import { memory, osInfo, processes, tcpSockets } from '@bun-win32/sysmon';
+
+const os = osInfo();
+const mem = memory();
+const top = processes().sort((a, b) =&gt; Number(b.kernelTime + b.userTime - a.kernelTime - a.userTime)).slice(0, 5);
+console.log(`Windows ${os.major}.${os.minor}.${os.build} · ${mem.memoryLoadPercent}% RAM used · ${tcpSockets().length} TCP sockets`);
+console.log('Top processes by CPU time:', top.map((p) =&gt; p.name).join(', '));</code></pre>
+Verify: <code>bun run packages/sysmon/example/hello-sysmon.ts</code> prints plausible, OS-matching values. (Confirm the self-name import resolves under workspace linking, mirroring terminal/gpu; if they use relative imports, match that.)</div>
+
+<div class="step"><span class="id">S10.2</span><strong><code>example/sysmon.selftest.ts</code> — the integration suite <span class="tag test">REAL TESTS</span>.</strong> Plain Bun script (or <code>bun:test</code> if S0.4 passed): numbered sections, each printing <code>PASS</code>/<code>FAIL name: detail</code>, a summary line, <code>process.exitCode = failures &gt; 0 ? 1 : 0</code>. Sections:
+<ol>
+<li><strong>system:</strong> osInfo build matches <code>RtlGetVersion</code> re-read; uptimeMs &gt; 0; bootTime is in the past; computerName non-empty; isElevated returns a boolean.</li>
+<li><strong>memory:</strong> total &gt; 0; available ≤ total; memoryLoadPercent ∈ [0,100]; performanceInfo processCount &gt; 10.</li>
+<li><strong>memory-vs-pdh:</strong> <code>memory().availablePhysicalBytes/1e6</code> within ~10% of PDH <code>\Memory\Available MBytes</code> (two kernel sources agree).</li>
+<li><strong>process-snapshot:</strong> &gt; 50 processes; the current <code>Bun.pid</code> present with correct name; median <code>processes()</code> call &lt; 2&nbsp;ms over 50 iterations.</li>
+<li><strong>process-offsets:</strong> for <code>Bun.pid</code>, snapshot workingSet/handleCount/times match <code>GetProcessMemoryInfo</code>/<code>GetProcessHandleCount</code>/<code>GetProcessTimes</code> (S3.4's cross-check, now permanent).</li>
+<li><strong>process-tree:</strong> tree contains <code>Bun.pid</code> under its real parent; node count equals snapshot length.</li>
+<li><strong>pidStats:</strong> all 7 pidusage fields present + correct types for <code>Bun.pid</code>; two calls produce a numeric cpu.</li>
+<li><strong>cpu:</strong> per-core values ∈ [0,1]; under a 200&nbsp;ms busy-loop one core reads high; aggregate within a few % of <code>systemTimes()</code> delta.</li>
+<li><strong>disk:</strong> <code>drives()</code> includes C: with free ≤ total; <code>diskSpace('C:\\')</code> agrees with the C: drive row.</li>
+<li><strong>net-tcp:</strong> ≥ 1 socket; 3 rows agree with <code>netstat -ano</code> (proto/local/remote/state/PID).</li>
+<li><strong>net-counters:</strong> active adapter InOctets increases across two samples (SKIP if S5.4 was deferred).</li>
+<li><strong>pdh:</strong> processor-time ∈ [0,100] after two collects; the first-collect rate-counter error message fires; wildcard GPU-engine expansion returns instances (SKIP if no GPU).</li>
+<li><strong>eventlog-query:</strong> Application channel returns records with formatted messages; recordIds descend in reverse mode.</li>
+<li><strong>eventlog-tail:</strong> a <code>ReportEventW</code>-written event appears in <code>tailEvents</code> within ~2 ticks; abort is clean.</li>
+<li><strong>etw-census:</strong> &gt; 100 providers; Kernel-Process present; its schema lists events with task names (no admin).</li>
+<li><strong>etw-firehose:</strong> (elevated only) a spawned child yields a decoded ProcessStart event; SKIP unelevated; the session always stops in finally.</li>
+<li><strong>firmware:</strong> smbios system manufacturer non-empty; memoryDevices total ≈ physical RAM.</li>
+<li><strong>power+sessions:</strong> powerScheme name non-empty; sessions contains the console session with the current user.</li>
+<li><strong>determinism/no-leak:</strong> 200 consecutive <code>processes()</code> + <code>memory()</code> calls don't grow handle count (re-read own handle count before/after via <code>GetProcessHandleCount</code> — proves the FFI paths free everything).</li>
+</ol>
+Sections needing elevation or specific hardware are guarded with SKIP lines (never a silent skip; print what was skipped and why). Total runtime budget &lt; 60&nbsp;s.
+<pre><code>bun run packages/sysmon/example/sysmon.selftest.ts             # expect: all PASS/SKIP, exit 0
+# then run once from an ELEVATED shell to exercise the Security-channel + firehose sections</code></pre></div>
+
+<div class="step"><span class="id">S10.3</span><strong><code>example/sysmon-report.ts</code> — the professional diagnostic.</strong> Richly formatted (ANSI via console.log — never WriteConsoleW): system census (OS, uptime, CPU layout, SMBIOS bios/board/RAM), memory + commit, top-15 processes by CPU and by working set, drive table, listening sockets with process names, active power scheme + battery, session list, and a one-line provider/channel count footer. Verify by running and reading the output for plausibility against Task Manager / msinfo32.</div>
+
+<div class="step"><span class="id">S10.4</span><strong><code>example/taskman.ts</code> — the flagship creative demo (1000&nbsp;Hz).</strong> A task-manager-in-the-terminal on <code>@bun-win32/terminal</code> (example-only cross-package import): a live per-core CPU bar graph (<code>CpuSampler</code>), a top-N process table by CPU% (<code>ProcessSampler</code>), memory + socket-count headers — refreshed on a high-res <code>createTicker</code>. Prove the 1000&nbsp;Hz claim: sample the metrics at 1000&nbsp;Hz internally even if the render is throttled to ~60&nbsp;Hz, and print the achieved sample rate + this process's own CPU% (must stay low — the answer to systeminformation #626's "1&nbsp;Hz loop pegs a core"). Honor <code>DEMO_DURATION_MS</code> (self-exit) for headless runs. Verify by running it and watching the bars track a stress load; in headless mode assert it self-exits and printed a sample-rate ≥ 500&nbsp;Hz.</div>
+
+<div class="step"><span class="id">S10.5</span><strong><code>example/event-tail.ts</code> and <code>example/etw-firehose.ts</code> — the observability demos.</strong> <code>event-tail.ts</code>: colorized live tail of a chosen channel (default Application) with publisher message formatting, level-colored, honoring <code>DEMO_DURATION_MS</code>. <code>etw-firehose.ts</code>: Procmon-lite — decoded kernel-process events streamed for a duration, admin-gated with the no-admin census shown as the fallback (mirrors the proven <code>etw-firehose.ts</code> example's auto-fallback). Both verified by running (elevated and not) and reading the stream.</div>
+
+<div class="step"><span class="id">S10.6</span><strong><code>example/benchmark.ts</code> — the README's numbers.</strong> Prints a markdown table: median latency (µs) of <code>processes()</code>, <code>memory()</code>, <code>cpuTimes()</code>, <code>tcpSockets()</code>, <code>pidStats(pid)</code> over 1000 iterations each; sustained <code>ProcessSampler</code> sample rate (Hz) and the demo's own CPU% at that rate; and — the honest, devastating comparison — the wall-clock of spawning <code>powershell.exe -NoProfile -Command "Get-CimInstance Win32_Process | Measure"</code> ONCE (the per-sample cost pidusage/systeminformation pay), measured on the same machine. These numbers go verbatim into the README (Phase 13) — never claim a number the benchmark didn't print. Run twice; confirm stability within ~20%.</div>
+
+<div class="step verify"><span class="id">S10.7</span><strong>Gate.</strong> <code>bunx tsc --noEmit</code>; <code>bun test packages/sysmon</code> (logic tests only — confirm it does NOT pick up the selftest and segfault; if it does, the selftest is correctly named away from <code>.test.ts</code>); full selftest PASS (unelevated AND elevated passes); biome format.</div>
+
+<div class="step commit"><span class="id">S10.8</span>
+<pre><code>git add packages/sysmon
+git commit -m "feat(sysmon): examples — hello, selftest suite, report, taskman, event-tail, etw-firehose, benchmark"</code></pre></div>
+
+<h2 id="p10b">Phase 10b — Extras wave (post-selftest, pre-cross-validation)</h2>
+<p><em>Purpose: capability extras that no npm package offers, each over the bound surface this plan already uses. <strong>Execution rule:</strong> start only when S10.7 is fully green. Work the table top-down. Each extra ships ONLY with its proof artifact passing — an extra without its proof is deleted, not shipped half-done. Any extra you skip moves to the S15.8 roadmap with one honest line. Each landed extra gets: an index.ts export, a <code>files</code> entry if it adds a module, an AI.md capability row + recipe, a README feature bullet, and a selftest section.</em></p>
+
+<table>
+<tr><th>#</th><th>Extra</th><th>Cost</th><th>What + why it's a moat</th><th>Proof artifact (gates shipping)</th></tr>
+<tr><td>1</td><td><strong>Per-process GPU usage</strong> (<code>gpuUsageByProcess()</code>)</td><td>small</td><td>Built on Phase 6's <code>expandCounterPath('\\GPU Engine(*)\\Utilization Percentage')</code> + per-instance CounterSet; parse the <code>pid_NNNN_engtype_X</code> instance names → aggregate per PID, join to <code>processes()</code>. <strong>Documented npm monopoly</strong> — pidusage#131 has begged for this since 2021; the standing answer is "open Task Manager."</td><td>Selftest: on a GPU machine, the busiest GPU process matches a known workload; sum ≤ 100%·engineCount; SKIP cleanly with no GPU.</td></tr>
+<tr><td>2</td><td><strong>Disk I/O counters</strong> (<code>diskIoCounters()</code>, <code>processIoCounters(pid)</code>)</td><td>small</td><td>Per-process via <code>GetProcessIoCounters</code> (bound — IO_COUNTERS: read/write/other ops + bytes); system/per-disk via PDH <code>\PhysicalDisk(*)\Disk Bytes/sec</code>. systeminformation returns <code>disksIO()</code>=null unconditionally on Windows (#274, 2nd-most-reacted open issue).</td><td>Selftest: <code>processIoCounters(Bun.pid)</code> read-bytes increases after the process reads a file; PDH per-disk counter positive under load.</td></tr>
+<tr><td>3</td><td><strong>CPU frequency (live)</strong> (<code>cpuFrequency()</code>)</td><td>small</td><td>CallNtPowerInformation(ProcessorInformation) → per-core current vs max MHz (PROCESSOR_POWER_INFORMATION array). systeminformation's <code>cpuCurrentSpeed</code> returns the base clock (<code>os.cpus().speed</code>), never the live frequency (#359).</td><td>Selftest: returns one entry per logical core; currentMhz &gt; 0 and ≤ ~1.5×maxMhz (turbo); under load currentMhz rises vs idle.</td></tr>
+<tr><td>4</td><td><strong>File-lock forensics</strong> (<code>whoLocks(paths)</code>)</td><td>small</td><td>Restart Manager: <code>RmStartSession</code>/<code>RmRegisterResources</code>/<code>RmGetList</code>/<code>RmEndSession</code> (all bound; RM_PROCESS_INFO 668&nbsp;B from <code>lock-atlas.ts</code>) → which processes hold a file open. Adds <code>@bun-win32/rstrtmgr</code> as a dep (only if this lands). No npm package offers this.</td><td>Selftest: open a file handle to a temp file, assert <code>whoLocks([path])</code> returns <code>Bun.pid</code>; release, assert empty.</td></tr>
+<tr><td>5</td><td><strong>Counter-snapshot helper</strong> (<code>sampleCounters(paths, ms)</code>)</td><td>small</td><td>Ergonomic wrapper: open a CounterSet over N counter paths, collect twice <code>ms</code> apart, return <code>{ path: value }</code> — the "I just want these 5 numbers once" API that hides the two-sample rule. Closes the plan's own "PDH is fiddly" gap.</td><td>Selftest: <code>sampleCounters(['\\Processor(_Total)\\% Processor Time'], 200)</code> returns a value ∈ [0,100].</td></tr>
+<tr><td>6</td><td><strong>Watch helper</strong> (<code>watch(fn, intervalMs, onSample)</code>)</td><td>small</td><td>A high-res-paced <code>setInterval</code> analog over <code>createTicker</code> + <code>setImmediate</code> yield, with an <code>AbortSignal</code> — the substrate for any dashboard, proving low-overhead polling (the systeminformation <code>observe()</code> analog without the per-tick spawn).</td><td>Selftest: watch <code>memory</code> at 1000&nbsp;Hz for 500&nbsp;ms; assert ≥ 400 samples collected and this process's CPU% stayed low.</td></tr>
+<tr><td>7</td><td><strong>Handle/GDI/User object counts</strong> (<code>processObjectCounts(pid)</code>)</td><td>small</td><td><code>GetProcessHandleCount</code> (bound) + <code>GetGuiResources</code> (verify bound; if not, document as roadmap) for GDI/USER object counts — leak-hunting metrics no JS package exposes.</td><td>Selftest: handle count matches the snapshot's; counts are positive for a GUI process.</td></tr>
+</table>
+
+<div class="note"><strong>Judged and explicitly NOT in v1</strong> (document, don't build — S15.8 roadmap + README honest-scoping):
+<ul>
+<li><strong>EvtSubscribe push-mode Event Log + worker-thread ETW AsyncIterable:</strong> both require foreign-thread callbacks / cross-worker Buffer pointers (repo ground truth: segfault). v1 ships pull+poll tail and a blocking ETW pump; a Worker-owned-session design is roadmap.</li>
+<li><strong>CPU temperature / S.M.A.R.T. / fan speed:</strong> needs ACPI thermal-zone or vendor IOCTLs with no universal path (systeminformation needs admin + OEM support and usually returns null). Document as a deliberate non-goal, not a half-working guess.</li>
+<li><strong>Cross-platform anything:</strong> the repo thesis is Windows-native depth. Stated, owned.</li>
+<li><strong>GPU VRAM/temperature for all vendors:</strong> DXGI/D3DKMT territory overlapping <code>@bun-win32/gpu</code>'s domain — point users there rather than duplicating; sysmon ships per-process GPU% via PDH (extra #1) and stops there.</li>
+</ul></div>
+
+<div class="step commit"><span class="id">S10b.1</span>One commit per landed extra: <code>feat(sysmon): &lt;extra&gt; with selftest section</code>. Update the S14.3 parity walk to include every landed extra's matrix row.</div>
+
+<h2 id="p11">Phase 11 — Cross-validation vs OS ground truth (the regression analog)</h2>
+<p><em>Purpose: bun-sysmon's deliverable is NUMBERS, and a wrong number is worse than a missing one. Where BUN_GPU re-ran 30 demos, sysmon proves its numbers against independent OS ground truth. This is the honest referee — the difference between "returns a value" and "returns the CORRECT value."</em></p>
+
+<div class="step"><span class="id">S11.1</span><strong>Create <code>example/crosscheck.ts</code></strong> — each metric checked against a SECOND, independent source, with explicit tolerances and a PASS/FAIL/SKIP line per check:
+<table>
+<tr><th>sysmon value</th><th>Independent ground truth</th><th>Tolerance</th></tr>
+<tr><td><code>memory().totalPhysicalBytes</code></td><td><code>GlobalMemoryStatusEx</code> vs <code>smbios()</code> memoryDevices sum vs <code>performanceInfo()</code> physical</td><td>installed RAM ≥ OS-visible; available within margin</td></tr>
+<tr><td><code>processes()</code> count + names</td><td><code>tasklist /NH /FO CSV</code> (spawned ONCE, only for the cross-check, never in the library)</td><td>count within ±2 (processes start/exit between samples); ≥ 95% of names intersect</td></tr>
+<tr><td><code>pidStats(pid).memory</code></td><td><code>GetProcessMemoryInfo</code> WorkingSetSize for the same PID</td><td>exact at the same instant (re-read both back-to-back)</td></tr>
+<tr><td><code>CpuSampler</code> total</td><td><code>systemTimes()</code> delta AND PDH <code>\Processor(_Total)\% Processor Time</code></td><td>all three within a few % over the same window</td></tr>
+<tr><td><code>tcpSockets()</code> rows</td><td><code>netstat -ano</code> (spawned once for the check)</td><td>every sysmon row present in netstat output (proto/local/remote/PID)</td></tr>
+<tr><td><code>drives()</code> free/total for C:</td><td><code>fs.statfsSync('C:\\')</code> (Node core) AND <code>GetDiskFreeSpaceExW</code></td><td>free within 1 allocation unit</td></tr>
+<tr><td><code>osInfo()</code> build</td><td><code>RtlGetVersion</code> re-read AND the registry CurrentBuild value</td><td>exact</td></tr>
+</table>
+The spawned-CLI cross-checks (tasklist/netstat) live ONLY in this example — they are the referee, never shipped in the library (the whole point is that the library doesn't spawn). Print a summary; exit nonzero on any FAIL.</div>
+
+<div class="step verify"><span class="id">S11.2</span><strong>Run the referee.</strong> <code>bun run packages/sysmon/example/crosscheck.ts</code> → every check PASS (or SKIP with reason for hardware-absent ones). A FAIL here means a real correctness bug — debug systematically (a wrong offset, a byte-order slip, a tolerance that's actually masking a bug). This is the closest sysmon gets to BUN_GPU's "look at the PNG" — the numbers must agree with the OS or the extraction is wrong.</div>
+
+<div class="step commit"><span class="id">S11.3</span>
+<pre><code>git add packages/sysmon
+git commit -m "test(sysmon): cross-validation suite vs OS ground truth (tasklist/netstat/statfs/registry)"</code></pre></div>
+
+<h2 id="p12">Phase 12 — <code>bun-sysmon</code> unscoped alias</h2>
+<p><em>Purpose: the discoverable front door. Mirrors <code>packages/bun-win32</code> / <code>packages/bun-gpu</code> exactly.</em></p>
+
+<div class="step"><span class="id">S12.1</span><strong>Create <code>packages/bun-sysmon/</code></strong> — three files. <code>index.ts</code>: <code>export * from '@bun-win32/sysmon';</code>. <code>package.json</code>: copy <code>packages/bun-win32/package.json</code> (or <code>packages/bun-gpu/package.json</code> if it exists by now — read whichever the concurrent gpu run left) and change <code>name: "bun-sysmon"</code>, the description (marketing flavor: "Native-speed Windows system monitoring for Bun — metrics, PDH, Event Log, ETW. No PowerShell, no wmic, no node-gyp."), <code>dependencies: { "@bun-win32/sysmon": "workspace:*" }</code>, <code>repository.directory: "packages/bun-sysmon"</code>, <code>version: "1.0.0"</code>, and the S1.1 keywords. Mirror whatever the alias precedent does about <code>publishConfig</code> (unscoped names are public by default — but pass <code>--access public</code> on every publish regardless, repo rule). <code>README.md</code>: placeholder until Phase 13.</div>
+
+<div class="step verify"><span class="id">S12.2</span><code>bun install</code> → <code>bun run packages/bun-sysmon/index.ts</code> (exit 0) → <code>bunx tsc --noEmit</code>. Functional proof: a one-liner importing <code>{ processes }</code> from <code>'bun-sysmon'</code> and printing the count.</div>
+
+<div class="step commit"><span class="id">S12.3</span>
+<pre><code>git add packages/bun-sysmon
+git commit -m "feat(bun-sysmon): unscoped alias package over @bun-win32/sysmon"</code></pre></div>
+
+<h2 id="p13">Phase 13 — Documentation: AI.md, README, screenshot</h2>
+<p><em>Purpose: the AI-first contract. Success criterion from the product brief: an AI should never need to read the source to use the package — but when it must, AI.md tells it exactly which file, so it never loads more than one module into context.</em></p>
+
+<div class="step"><span class="id">S13.1</span><strong>Write <code>packages/sysmon/AI.md</code></strong> — model on <code>packages/terminal/AI.md</code> (read it again; match register and density). Sections, in order:
+<ol>
+<li><strong>Preamble</strong> — "Everything below is reachable from <code>@bun-win32/sysmon</code> alone. Bun + Windows only. This file is the complete surface — an agent should not need to read source to use it."</li>
+<li><strong>What it is</strong> — the mental model: snapshot functions (synchronous, microseconds, return owned data); samplers (hold previous sample, compute deltas, pace with the high-res ticker); the ETW/Event Log streams (one blocking/foreground, one pull-poll AsyncIterable). State the no-spawn/no-admin-by-default thesis up front.</li>
+<li><strong>Capability → API table</strong> — every row "I want to … → call …": OS/uptime, memory, per-core CPU, the whole process list, one process's stats (pidusage shape), the process tree, socket→PID, drive free space, a perfmon counter, per-process GPU%, tail the Event Log, census ETW providers, stream kernel events, SMBIOS, battery, sessions.</li>
+<li><strong>Full API reference</strong> — every export of <code>index.ts</code> with exact signature + a one-liner. Generate the list with <code>grep -E "^export" packages/sysmon/index.ts</code> and cross off every name — completeness is gated in S14.4.</li>
+<li><strong>Recipes</strong> — copy-paste blocks: the top-5-CPU-processes loop; a 1000&nbsp;Hz <code>watch</code> dashboard; socket→process attribution; tail Security events (with the elevation note); the ETW firehose with the admin gate + fallback; "is this process leaking handles" via the snapshot.</li>
+<li><strong>Gotchas (the traps ledger)</strong> — every Appendix C row that survived into the API as behavior: the GC-window rule, the two-sample PDH rule, ETW needs elevation + blocks the thread, EvtSubscribe is forbidden (pull+poll instead), struct size-preset fields, the per-process CPU% definition (normalized to match Task Manager), <code>Bun.sleep</code> 15.6&nbsp;ms quantization (use the ticker for high-rate sampling).</li>
+<li><strong>Where to look (source)</strong> — one line per file so an agent that must read source opens exactly one: "<code>process.ts</code> — snapshot/tree/pidStats; <code>etw.ts</code> — census + firehose; …".</li>
+</ol></div>
+
+<div class="step"><span class="id">S13.2</span><strong>Write the README</strong> (two variants, ~90% shared): <code>packages/sysmon/README.md</code> (install <code>bun add @bun-win32/sysmon</code>) and <code>packages/bun-sysmon/README.md</code> (install <code>bun add bun-sysmon</code> — the marketing flagship). Structure:
+<ol>
+<li><strong>Hero</strong> — one sentence + the hello-sysmon block + its real output.</li>
+<li><strong>Why this exists</strong> — the comparison table from Appendix D (downloads, install model, the wmic-removal + PowerShell-spawn + node-gyp + CVE receipts linked), closing line: "bun-sysmon is kilobytes of TypeScript over DLLs already in System32. <code>bun add bun-sysmon</code> is the entire install story — no PowerShell, no wmic, no build."</li>
+<li><strong>What you can do</strong> — parity-framed feature list (Appendix D rows: everything the cluster does, plus what it never could — ETW, live Event Log, PDH, per-process GPU%, SMBIOS, socket→PID), each with a 3–6 line code block.</li>
+<li><strong>Benchmarks</strong> — the <code>example/benchmark.ts</code> table verbatim, with the machine spec and the PowerShell-spawn comparison line, and "run <code>bun run example/benchmark.ts</code> to reproduce". Only printed numbers.</li>
+<li><strong>Honest scoping</strong> — Windows 10/11 + Server, Bun ≥ 1.1. What Node core already covers (link <code>os</code>/<code>process</code>/<code>fs.statfs</code>) and what sysmon adds over it. Real-time ETW needs an elevated process; everything else is no-admin. Not a cross-platform library — owned, not apologized for.</li>
+<li><strong>Note to AI agents</strong> — "Read <code>AI.md</code>; it is the complete surface."</li>
+<li>License MIT.</li>
+</ol></div>
+
+<div class="step"><span class="id">S13.3</span><strong>Screenshot.</strong> Capture <code>taskman.ts</code> (the terminal task manager) as a PNG — use the same capture mechanism terminal's demos use (grep terminal examples for <code>CAPTURE_PNG</code> / its screenshot path), place it under <code>packages/all/screenshots/</code>, add the matching <code>!packages/all/screenshots/{name}.png</code> whitelist line to <code>.gitignore</code>, and reference it in both READMEs via the <code>raw.githubusercontent.com/.../main/...</code> URL (match how existing READMEs reference images — grep one for <code>raw.githubusercontent</code>). <strong>Look at the PNG before committing it.</strong></div>
+
+<div class="step research"><span class="id">S13.4</span><strong>Root README.</strong> Check whether the repo's root <code>README.md</code> enumerates packages (grep for <code>terminal</code>). If yes, add <code>sysmon</code> and <code>bun-sysmon</code> rows in the same format. If no, skip — do not invent new top-level docs.</div>
+
+<div class="step verify"><span class="id">S13.5</span><strong>Docs gate.</strong> Every code block in AI.md and the READMEs must run: extract each into <code>.scratch/doccheck-N.ts</code> and execute it. A README whose hero snippet doesn't run is a product defect of the highest order for an AI-first package.</div>
+
+<div class="step commit"><span class="id">S13.6</span>
+<pre><code>git add packages/sysmon packages/bun-sysmon packages/all/screenshots .gitignore README.md
+git commit -m "docs(sysmon): AI.md surface contract, READMEs with benchmarks and screenshot"</code></pre>
+(Adjust paths to what actually changed; never add stray screenshots that weren't whitelisted.)</div>
+
+<h2 id="p14">Phase 14 — Quality gates + self-review</h2>
+<p><em>Purpose: prove nothing regressed anywhere in the 118-package repo, and that the new surface is complete, consistent, and parity-true before versions are touched.</em></p>
+
+<div class="step verify"><span class="id">S14.1</span><strong>Full matrix</strong> (pull/rebase first — gpu may have moved):
+<pre><code>bunx tsc --noEmit                                  # zero errors, whole repo
+bunx biome format --write packages/sysmon packages/bun-sysmon &amp;&amp; git diff --stat   # formatting settled, no surprise diffs elsewhere
+bun test packages/sysmon                            # all parser logic tests pass
+bun run packages/sysmon/example/sysmon.selftest.ts  # all sections PASS/SKIP (unelevated)
+bun run packages/sysmon/example/crosscheck.ts       # ground-truth checks PASS
+bun run scripts/audit.ts --all 2&gt;&amp;1 | tail -5       # counts match .scratch/baseline-audit.txt
+bun run scripts/nullcheck.ts --all 2&gt;&amp;1 | tail -5   # counts match baseline</code></pre>
+Then re-run the selftest once from an ELEVATED shell (Security channel + ETW firehose sections).</div>
+
+<div class="step verify"><span class="id">S14.2</span><strong>Tarball audit.</strong> In <code>packages/sysmon</code> and <code>packages/bun-sysmon</code>: <code>bun pm pack --dry-run</code> — confirm the tarball contains exactly the <code>files</code> array (AI.md + README present, all modules, NO <code>example/</code>, NO <code>*.test.ts</code>). The published artifact is TypeScript source — confirm nothing extra leaks.</div>
+
+<div class="step verify"><span class="id">S14.3</span><strong>Parity gate.</strong> Walk Appendix D row by row: every "ours" cell must be demonstrably true via a selftest section, a crosscheck row, an example, or an AI.md recipe. Any row you cannot point at is unfinished scope — finish it before release. Record the row→proof mapping in the final summary.</div>
+
+<div class="step verify"><span class="id">S14.4</span><strong>Docs-completeness + self-review.</strong> For every exported name in <code>packages/sysmon/index.ts</code>, grep AI.md for it — zero misses. Then: (1) product-brief coverage — PROJECTS.md §1's promises (µs sampling, no shell, socket→PID, decoded ETW firehose, typed Event Log tail, English-name PDH) each map to a shipped feature; (2) placeholder scan over AI.md/READMEs — no TBD/TODO/"coming soon"; (3) name consistency — the plan's identifiers (<code>processes</code>, <code>pidStats</code>, <code>cpuTimes</code>, <code>tcpSockets</code>, <code>tailEvents</code>, <code>EtwSession</code>, <code>smbios</code>…) match what the code actually exports.</div>
+
+<div class="step verify"><span class="id">S14.6</span><strong>Performance-regression gate</strong> <span class="tag test">microbench</span> (release-blocking, like a tsc error). Re-run <code>example/benchmark.ts</code> + the per-phase microbenchmarks on the release tree (timer resolution pinned, warmed up) and assert <strong>no hot-path number regressed beyond ~10%</strong> vs <code>.scratch/baseline-perf.txt</code> (and vs the per-phase ns/op recorded in Phases 2–8). A regression blocks release. Separately assert the always-on rules held, with <code>bun:jsc</code> (Appendix G.4), not just by eye: (1) grep the shipped modules for forbidden hot-loop patterns — <code>Buffer.alloc</code>/<code>new DataView</code>/<code>new Float32Array</code> inside any <code>sample()</code>/parser/loop body, <code>BigInt(</code> rebuilt per call, <code>.ptr</code> re-read in a loop; (2) for the hottest paths (<code>parseProcessSnapshot</code>, <code>CpuSampler.sample</code>) assert <code>numberOfDFGCompiles(fn)&nbsp;&gt;&nbsp;0</code> and a <code>profile()</code> tier breakdown dominated by FTL/DFG; (3) wrap one <code>sample()</code> tick in a <code>heapStats().objectTypeCounts</code> delta and assert it allocates zero objects after warmup. Justify or fix each violation. The README's µs/Hz figures and the 1000&nbsp;Hz/near-zero-CPU claim MUST come from this gated run, not from the plan.</div>
+
+<div class="step commit"><span class="id">S14.5</span>Commit any gate fixes: <code>fix(sysmon): &lt;specific thing the gates caught&gt;</code>.</div>
+
+<h2 id="p15">Phase 15 — Release: versions, lockfile, publish (one OTP), post-publish acceptance</h2>
+<p><em>Purpose: ship. The user provides ONE npm OTP; everything else is automated and pre-verified so the OTP is never burned on a failable publish (a 402 after OTP wastes the code — ground truth).</em></p>
+
+<div class="step"><span class="id">S15.1</span><strong>Versions.</strong> <code>packages/sysmon</code> and <code>packages/bun-sysmon</code> are already 1.0.0. <strong>No <code>all</code>/<code>bun-win32</code> bump</strong> — sysmon is not a dependency of <code>all</code> (deliberate, §1.1). Confirm with <code>grep -rn "@bun-win32/sysmon" packages/all packages/bun-win32</code> → expect nothing. Only the two new packages publish.</div>
+
+<div class="step"><span class="id">S15.2</span><strong>Lockfile refresh — the order is law (ground truth):</strong>
+<pre><code>rm bun.lock &amp;&amp; bun install        # plain bun install does NOT rewrite workspace version records
+bun run scripts/preflight.ts       # expect: zero mismatches
+bun run scripts/nullcheck.ts --all # expect: baseline counts
+bun run scripts/audit.ts --all     # expect: baseline counts
+bunx tsc --noEmit                  # expect: zero</code></pre>
+<strong>Concurrent-run caution:</strong> if the gpu execution is mid-release, coordinate — do not <code>rm bun.lock</code> while its publish is in flight. If unsure, finish a clean <code>git pull --rebase</code> first and re-run the gates.</div>
+
+<div class="step verify"><span class="id">S15.3</span><strong>Final pre-OTP rehearsal.</strong> Re-run the selftest + crosscheck + hello-sysmon on the release tree. Then <code>bun publish --dry-run --access public</code> in <code>packages/sysmon</code> and <code>packages/bun-sysmon</code> — any failure here is one you just saved the OTP from.</div>
+
+<div class="step commit"><span class="id">S15.4</span>
+<pre><code>git pull --rebase
+git add -A -- packages bun.lock
+git commit -m "chore(release): sysmon 1.0.0 + bun-sysmon 1.0.0"
+git push origin main</code></pre>
+(Publishing makes the README repo links load-bearing — the push is part of the release. If pushing is blocked, publish anyway and flag it.)</div>
+
+<div class="step"><span class="id">S15.5</span><strong>Get the OTP — the only human step.</strong> Ask the user for a fresh npm OTP (AskUserQuestion or end the turn with a single clear request). Have the publish loop READY before asking; TOTP codes rotate in ~30&nbsp;s.</div>
+
+<div class="step"><span class="id">S15.6</span><strong>Publish — dependency order, one OTP, never prompt per package (repo rule):</strong>
+<pre><code>OTP=&lt;code&gt;
+for directory in sysmon bun-sysmon; do
+  (cd packages/$directory &amp;&amp; bun publish --access public --otp $OTP) || { echo "FAILED at $directory"; break; }
+done</code></pre>
+Always <code>bun publish</code> (never npm — only Bun resolves <code>workspace:*</code>), always <code>--access public</code> (the scope is private-by-default). Order: <code>sysmon</code> before <code>bun-sysmon</code> (the alias depends on it). If the second fails after the OTP expires, request ONE new OTP and resume from <code>bun-sysmon</code> only.</div>
+
+<div class="step verify"><span class="id">S15.7</span><strong>Post-publish acceptance (the goal's finish line).</strong> The registry read-lags for minutes (ground truth) — poll with backoff:
+<pre><code>for i in 1 2 3 4 5 6; do curl -s -o /dev/null -w "%{http_code}\n" https://registry.npmjs.org/bun-sysmon &amp;&amp; sleep $((i*20)); done</code></pre>
+Once 200: in a temp dir OUTSIDE the repo (e.g. <code>$TMP/bun-sysmon-accept</code>): <code>bun init -y &amp;&amp; bun add bun-sysmon</code>, write the hello-sysmon snippet importing from <code>'bun-sysmon'</code>, run it. Expected: plausible OS/memory/process/socket output from the REGISTRY artifact, not the workspace. Repeat the import with <code>@bun-win32/sysmon</code>. Both green = goal complete.</div>
+
+<div class="step"><span class="id">S15.8</span><strong>Final report to the user:</strong> published versions + links, the benchmark table (incl. the PowerShell-spawn comparison), the parity row→proof mapping (S14.3), every recorded plan deviation (the research-while-building ledger), and known future work — each with one honest line: worker-owned ETW AsyncIterable + EvtSubscribe push, CPU temperature / S.M.A.R.T., any Phase 10b extra that didn't land, and any UNVERIFIED struct (S3.2 fields, MIB_IF_ROW2 counters, v6 socket rows) that was deferred rather than shipped wrong. Kill the keep-awake background process.</div>
+
+<h2 id="appendix">Appendices</h2>
+
+<h3 id="appA">Appendix A — source-example → target-module map (inventory as of 2026-06-09)</h3>
+<p>Every public export lands in exactly one module and is re-exported by <code>index.ts</code>. Line anchors are approximate — re-locate with Grep. <strong>Nothing here requires a new binding</strong> (dossier: all 126 APIs already bound).</p>
+<table>
+<tr><th>Source example(s)</th><th>What to lift</th><th>Target module</th></tr>
+<tr><td><code>all/example/core-scope.ts</code> (~95–215)</td><td>SYSTEM_PROCESS_INFORMATION (class 5) grow-retry walker + embedded-VA name decode; per-core perf (class 8) decode + <code>deriveBusy</code></td><td><code>structs.ts</code> (<code>parseProcessSnapshot</code>, <code>parseProcessorTimes</code>), <code>process.ts</code>, <code>cpu.ts</code></td></tr>
+<tr><td><code>ntdll/example/system-internals.ts</code> (59–340)</td><td>RtlGetVersion + NtQSI classes 0–3 decoders; size-preset discipline</td><td><code>system.ts</code>, <code>structs.ts</code></td></tr>
+<tr><td><code>all/example/process-xray.ts</code> (308–481), <code>psapi/example/process-forensics.ts</code> (41–146)</td><td>OpenProcess, GetProcessMemoryInfo (72&nbsp;B), QueryFullProcessImageNameW, readWideString; the offsets cross-check</td><td><code>process.ts</code> (<code>processImagePath</code>, S3.4 referee)</td></tr>
+<tr><td><code>pdh/example/live-dashboard.ts</code> (79–120), <code>counter-explorer.ts</code> (37–178)</td><td>open→addEnglish→collect→format chain, two-sample rule, PdhEnumObjectsW/ItemsW two-call, parseMultiSz</td><td><code>counters.ts</code>, <code>structs.ts</code> (<code>parseMultiSz</code>)</td></tr>
+<tr><td><code>all/example/net-xray.ts</code> (60–256)</td><td>GetExtendedTcpTable/UDP retry, stride/offset decode, port byte-swap, PID→name cache</td><td><code>net.ts</code>, <code>structs.ts</code> (<code>parseTcpTable</code>, <code>parseUdpTable</code>)</td></tr>
+<tr><td><code>all/example/etw-firehose.ts</code> (150–296, 366–390), <code>tdh/example/provider-explorer.ts</code> (109–238)</td><td>EVENT_TRACE_PROPERTIES build, StartTraceW/EnableTraceEx2/OpenTraceW/ProcessTrace pump, TDH decode, provider census + manifest schema walk, ACCESS_DENIED→fallback</td><td><code>etw.ts</code>, <code>structs.ts</code> (<code>parseProviderEnumeration</code>)</td></tr>
+<tr><td><code>wevtapi/example/event-tail.ts</code> (51–141), <code>channel-report.ts</code> (71–141)</td><td>EvtQuery XPath tail, EvtNext batching, EvtRender/EvtFormatMessage two-call, channel enum, EVT_VARIANT ReadProcessMemory dereference</td><td><code>eventlog.ts</code></td></tr>
+<tr><td><code>all/example/firmware-inventory.ts</code> (117–291)</td><td>GetSystemFirmwareTable('RSMB') two-call, full SMBIOS walk (types 0/1/2/4/17, 1-based strings, mixed-endian UUID, type-17 extended-size)</td><td><code>firmware.ts</code>, <code>structs.ts</code> (<code>parseSmbios</code>)</td></tr>
+<tr><td><code>powrprof/example/{battery-advisor,power-audit}.ts</code></td><td>GetSystemPowerStatus, CallNtPowerInformation(SystemBatteryState/ProcessorInformation), PowerGetActiveScheme/ReadFriendlyName</td><td><code>power.ts</code></td></tr>
+<tr><td><code>wtsapi32/example/session-monitor.ts</code> (116–129)</td><td>WTSEnumerateSessionsW (State@16) + per-session WTSQuerySessionInformationW, WTSFreeMemory</td><td><code>sessions.ts</code></td></tr>
+<tr><td><code>rstrtmgr/example/lock-atlas.ts</code> (27–35, 62–102)</td><td>RmStartSession/RegisterResources/GetList/EndSession, RM_PROCESS_INFO 668&nbsp;B</td><td>extra #4 <code>whoLocks</code> (only if it lands)</td></tr>
+<tr><td><code>terminal/pacing.ts</code> (20–34)</td><td>CreateWaitableTimerExW high-res + negative-relative dueTime + WaitForSingleObject</td><td><code>sampler.ts</code></td></tr>
+<tr><td><code>kernel32/example/system-diagnostic.ts</code> (113–202)</td><td>SYSTEM_INFO/MEMORYSTATUSEX decode, GetLogicalDrives bitmask, GetDiskFreeSpaceExW</td><td><code>system.ts</code>, <code>memory.ts</code>, <code>disk.ts</code></td></tr>
+</table>
+
+<h3 id="appB">Appendix B — Struct offsets (x64). PROVEN = runtime-verified in a shipped example; UNVERIFIED = derive from SDK header + cross-check before shipping</h3>
+<pre><code>// PROVEN (DataView-verified in the cited example)
+RTL_OSVERSIONINFOW (284B): dwOSVersionInfoSize u32@0 (PRESET 0x11C), Major@4, Minor@8, Build@12, PlatformId@16, ServicePack wchar[128]@20      // system-internals.ts
+SYSTEM_BASIC_INFORMATION (64B): TimerResolution@0x04, PageSize@0x08, NumberOfPhysicalPages@0x0C, AllocationGranularity@0x18, ActiveProcessorsAffinityMask u64@0x2C, NumberOfProcessors u8@0x34   // system-internals.ts
+SYSTEM_TIMEOFDAY_INFORMATION (48B): BootTime i64@0x00, CurrentTime@0x08, TimeZoneBias@0x10   // system-internals.ts (class 3)
+SYSTEM_PROCESSOR_PERFORMANCE_INFORMATION (per core): IdleTime i64@0x00, KernelTime i64@0x08 (INCLUDES idle), UserTime i64@0x10   // core-scope.ts readPerf
+SYSTEM_PROCESS_INFORMATION (partial, x64): NextEntryOffset u32@0x00, NumberOfThreads u32@0x04, ImageName.Length u16@0x38, ImageName.Buffer ptr@0x40, UniqueProcessId ptr@0x50, KernelTime i64@0x110, UserTime i64@0x118   // core-scope.ts sampleProcesses
+MEMORYSTATUSEX (64B): dwLength u32@0 (PRESET 64), MemoryLoad u32@4, TotalPhys u64@8, AvailPhys u64@16, TotalPageFile u64@24, AvailPageFile u64@32, TotalVirtual u64@40, AvailVirtual u64@48   // system-diagnostic.ts
+SYSTEM_INFO (48B): ProcessorArch u16@0, PageSize u32@4, MinAppAddr u64@8, MaxAppAddr u64@16, ActiveProcessorMask u64@24, ProcessorCount u32@32, ProcessorType u32@36, AllocationGranularity u16@40, ProcessorLevel u16@42, ProcessorRevision u16@44   // system-diagnostic.ts
+PROCESS_MEMORY_COUNTERS (72B): cb u32@0 (PRESET 72), PageFaultCount@0x04, PeakWorkingSet u64@0x08, WorkingSet u64@0x10, QuotaPeakPaged@0x18, QuotaPaged@0x20, QuotaPeakNonPaged@0x28, QuotaNonPaged@0x30, PagefileUsage u64@0x38, PeakPagefileUsage u64@0x40   // process-forensics.ts
+MODULEINFO (24B): lpBaseOfDll u64@0, SizeOfImage u32@8, EntryPoint u64@16   // process-xray.ts (note: entry@16 not 12)
+MIB_TCPROW_OWNER_PID (stride 24): state u32@0, localAddr@4, localPort@8, remoteAddr@12, remotePort@16, pid u32@20   // net-xray.ts (ports are network byte order)
+MIB_UDPROW_OWNER_PID (stride 12): localAddr@0, localPort@4, pid u32@8   // net-xray.ts
+PDH_FMT_COUNTERVALUE (24B): CStatus u32@0, double value@8   // live-dashboard.ts
+PDH_RAW_COUNTER (40B): i64 value@8   // counter-explorer.ts
+EVENT_TRACE_PROPERTIES (120B): ClientContext u32@40 (1=QPC), Wnode.Flags@44 (0x0002_0000), LogFileMode@64 (0x0000_0100 REAL_TIME), LoggerNameOffset@116 (=120)   // etw-firehose.ts
+EVENT_TRACE_LOGFILEW (448B): LoggerName u64@8, ProcessTraceMode u32@28 (0x1000_0100), BufferCallback u64@400, EventRecordCallback u64@424   // etw-firehose.ts
+EVENT_RECORD (read in callback): ProcessId u32@12, EventId u16@40, Opcode u8@45   // etw-firehose.ts
+PROVIDER_ENUMERATION_INFO: NumberOfProviders u32@0; per provider @8+i*24: GUID[0..16], SchemaSource u32@16, NameOffset u32@20   // provider-explorer.ts
+TRACE_EVENT_INFO: ProviderNameOffset@52, TaskNameOffset@68, OpcodeNameOffset@72, MessageOffset@76, PropertyCount u32@104; EventPropertyInfoArray@112 (NameOffset@4, InType u16@8, OutType u16@10)   // provider-explorer.ts
+SYSTEM_POWER_STATUS (12B): ACLineStatus u8@0, BatteryFlag u8@1, BatteryLifePercent u8@2, BatteryLifeTime i32@4, BatteryFullLifeTime i32@8   // battery-advisor.ts
+SYSTEM_BATTERY_STATE (64B): AcOnline u8@0, BatteryPresent@1, Charging@2, Discharging@3, MaxCapacity u32@8, RemainingCapacity@12, Rate i32@16, EstimatedTime u32@24   // battery-advisor.ts
+WTS_SESSION_INFOW (24B): SessionId u32@0, pWinStationName ptr@8, State u32@16 (NOT 20)   // session-monitor.ts
+RM_PROCESS_INFO (668B): Process.dwProcessId@0, START_TIME i64@4, APP_NAME@12, SERVICE_NAME@524, TYPE i32@652, STATUS u32@656, SESSION i32@660, RESTARTABLE i32@664   // lock-atlas.ts
+RawSMBIOSData: Major u8@1, Minor u8@2, structures@8; per struct: Type u8@0, Length u8@1, Handle u16@2; 1-based NUL string table after formatted area (double-NUL ends struct)   // firmware-inventory.ts
+
+// UNVERIFIED — DERIVE FROM SDK HEADER, PROVE WITH THE LISTED CROSS-CHECK (do not ship from memory)
+SYSTEM_PROCESS_INFORMATION (full): HandleCount u32@0x08, CreateTime i64@0x108, InheritedFromUniqueProcessId(ppid) ptr@0x58, embedded VM_COUNTERS (WorkingSetSize @~0x90, PagefileUsage…) + IO_COUNTERS (trailing) — version-padding sensitive; CROSS-CHECK S3.4 vs GetProcessMemoryInfo/HandleCount/Times
+MIB_IF_ROW2 (~1352B, netioapi.h): InterfaceLuid@0, InterfaceIndex@8, Alias/Description wchar arrays, OperStatus, InOctets/OutOctets/InUcastPkts/OutUcastPkts/InErrors/OutErrors u64 — large + embedded wide strings; CROSS-CHECK S5.5 (octets increase under traffic) — DEFER if unconfirmable
+MIB_TCP6ROW_OWNER_PID / MIB_UDP6ROW_OWNER_PID: v6 row layouts (16B addresses + scope id) — CROSS-CHECK vs netstat -ano; DEFER v6 if unconfirmable
+PROCESSOR_POWER_INFORMATION (per core, CallNtPowerInformation ProcessorInformation): Number, MaxMhz, CurrentMhz, MhzLimit, MaxIdleState, CurrentIdleState — extra #3; verify count == logical cores</code></pre>
+
+<h3 id="appC">Appendix C — Known-traps ledger (every row = a guardrail, an error message, or an AI.md gotcha)</h3>
+<table>
+<tr><th>Trap (ground truth)</th><th>Consequence</th><th>Plan response</th></tr>
+<tr><td>FFI struct GC window: awaits between assembling a buffer and the call</td><td>Baked-in pointers dangle → E_INVALIDARG/segfault</td><td>All fetch paths stay synchronous (assemble → call); AI.md gotcha</td></tr>
+<tr><td><code>NtQuerySystemInformation</code> undersized buffer → STATUS_INFO_LENGTH_MISMATCH (0xc0000004)</td><td>No data; class 5 needs grow-retry</td><td><code>processes()</code> grows + retries (core-scope pattern); record needed size from <code>ReturnLength</code></td></tr>
+<tr><td>Size-preset fields: <code>dwOSVersionInfoSize</code>=0x11C, <code>dwLength</code>=64, <code>cb</code>=72</td><td>Buffer overflow / garbage</td><td>Each fetcher presets before the call; parser tests assert the presets are honored</td></tr>
+<tr><td>PDH rate counter: first <code>PdhCollectQueryData</code> → PDH_INVALID_DATA</td><td>Raw hex error on first sample</td><td>Two-sample rule encoded; <code>value()</code> throws an actionable "collect twice for rate counters" message</td></tr>
+<tr><td>ETW <code>ProcessTrace</code> blocks the calling thread; callbacks fire on the same Bun thread; no timeout param</td><td>Monopolizes the thread; can't be an AsyncIterable in v1</td><td><code>EtwSession.run</code> is explicitly blocking/foreground; deadline enforced by BufferCallback return; finally-stops the session</td></tr>
+<tr><td>Real-time ETW needs elevation (StartTraceW/EnableTraceEx2 → ERROR_ACCESS_DENIED=5)</td><td>Silent failure unelevated</td><td>Detect + throw a clear "needs elevated process; census + Event Log tail are no-admin" message; lead marketing with the no-admin surface</td></tr>
+<tr><td><code>EvtSubscribe</code> push callback fires on a foreign thread</td><td>Crash class</td><td>Never use it; <code>tailEvents</code> is pull+poll (proven pattern); AI.md gotcha</td></tr>
+<tr><td>EVT_VARIANT string values are pointers into an API-filled buffer</td><td>Direct JS deref invalid</td><td><code>ReadProcessMemory(GetCurrentProcess(), ptr, buf, n, 0n)</code> + <code>Number(ptr) as Pointer</code> (sanctioned narrowing); lift from channel-report</td></tr>
+<tr><td>SMBIOS string indices are 1-based (0 = unset); double-NUL ends a structure</td><td>Off-by-one / wrong string</td><td><code>parseSmbios</code> bounds-checks <code>strings[idx-1]</code>; parser test covers it</td></tr>
+<tr><td>Type-17 memory size: 0x7FFF sentinel → 32-bit extended size at +0x1C; bit-15 selects KB vs MB</td><td>Wrong RAM size for ≥32&nbsp;GB modules</td><td><code>parseSmbios</code> honors the sentinel; cross-check sum ≈ physical RAM (S9.2)</td></tr>
+<tr><td>WTS_SESSION_INFOW State is at offset 16, not 20</td><td>Wrong session state</td><td>Documented offset; <code>session-monitor.ts</code> precedent</td></tr>
+<tr><td>TCP/UDP ports are network byte order</td><td>Byte-swapped port numbers</td><td><code>parseTcpTable</code> swaps; parser test asserts</td></tr>
+<tr><td>GetExtendedTcpTable/GetComputerNameExW/PdhEnumObjectsW/EvtRender all need the two-call size-probe</td><td>ERROR_INSUFFICIENT_BUFFER if guessed</td><td>Every variable-length fetch probes size first, then fetches</td></tr>
+<tr><td><code>ReadProcessMemory</code> lpNumberOfBytesRead must be <code>0n</code> (null)</td><td>FFI rejects a non-null bigint there</td><td>Pass <code>0n</code>; process-xray precedent</td></tr>
+<tr><td><code>GetDiskFreeSpaceExW</code> root path needs trailing backslash + NUL (UTF-16LE)</td><td>Wrong/empty result</td><td><code>disk.ts</code> normalizes the path</td></tr>
+<tr><td><code>Bun.sleep</code> quantizes to ~15.6&nbsp;ms</td><td>~30&nbsp;Hz cap; the 1000&nbsp;Hz claim impossible</td><td>Pace high-rate sampling with <code>createTicker</code> (high-res waitable timer); AI.md gotcha</td></tr>
+<tr><td>CreateWaitableTimerExW returns null pre-Windows 10 1803</td><td>No high-res timer</td><td><code>createTicker</code> falls back; never assume the timer exists</td></tr>
+<tr><td>Sharing a Buffer pointer across <code>worker_threads</code> segfaults</td><td>Worker-owned ETW session is unsafe naively</td><td>v1 ETW is single-thread blocking; worker design is roadmap (S15.8)</td></tr>
+<tr><td><code>bun:test</code> + FFI segfaults repo-wide (historic)</td><td>Test runner unusable for FFI paths</td><td>S0.4 re-probe gates the harness; parsers stay pure; FFI proof is the selftest script</td></tr>
+<tr><td>Bun <code>Pointer</code> is branded; raw bigint addresses not assignable</td><td>Type errors / wrong reads</td><td><code>Number(x) as Pointer</code> — the one sanctioned narrowing, copied where it exists</td></tr>
+<tr><td>repo is autocrlf=true with LF blobs</td><td>Forcing autocrlf=false makes ~200 files look modified</td><td>Never touch line-ending config; LF→CRLF warnings are noise</td></tr>
+<tr><td>Heavy capture/teardown segfault at process exit (Bun bug)</td><td>Nonzero exit AFTER correct output</td><td>Judge demos by their output, not exit code, where this applies (taskman headless)</td></tr>
+<tr><td>npm registry read-lag after publish</td><td>False "publish failed" panic</td><td>Poll with backoff (S15.7)</td></tr>
+<tr><td>Stale <code>bun.lock</code> workspace records</td><td>Dependents publish pinned to OLD versions</td><td><code>rm bun.lock &amp;&amp; bun install</code> + preflight gate (S15.2)</td></tr>
+<tr><td>Concurrent gpu execution moving HEAD/lockfile</td><td>Rebase conflicts, stale baselines</td><td>Pull/rebase before each commit; never touch <code>packages/gpu</code>; re-read HEAD per phase</td></tr>
+<tr><td><strong>perf:</strong> <code>Buffer.alloc</code>/<code>new DataView</code>/typed-array inside a sampling or per-row loop</td><td>~1064&nbsp;ns/alloc + GC stalls at high rate; kills the 1000&nbsp;Hz claim</td><td>Allocate scratch buffer + views ONCE at sampler construction; double-buffer; zero-alloc-per-tick assertion (S14.6)</td></tr>
+<tr><td><strong>perf:</strong> bigint arithmetic per sample (FILETIME/time-delta math)</td><td>~38&nbsp;ns/delta boxing tax (13× slower than Number)</td><td>Read u64 as two u32 halves, do Number math where the delta fits 2^53; reserve bigint for handles + true &gt;2^53 magnitudes</td></tr>
+<tr><td><strong>perf:</strong> <code>buffer.ptr</code> getter re-read inside a hot loop</td><td>~7.3&nbsp;ns/access; the getter re-runs <code>ptr(this)</code> every time</td><td>Hoist/cache <code>.ptr</code> in a const once before the loop (buffer must stay alive + unmoved)</td></tr>
+<tr><td><strong>perf:</strong> hand-rolled byte-OR or Big(U)int64Array views for struct decode</td><td>Manual u32 is ~1.13× slower; bigint views are the slowest u64 path + often unaligned-illegal — opposite of V8 lore</td><td>Use <code>DataView</code>/<code>Buffer.readXXXLE</code>; avoid bigint entirely for hot 64-bit fields (two u32 halves)</td></tr>
+<tr><td><strong>perf:</strong> async <code>Bun.sleep(1)</code> to pace a fast loop</td><td>Quantized to ~15.6&nbsp;ms (≈30–60&nbsp;Hz)</td><td><code>Bun.sleepSync</code> (~1.5&nbsp;ms, NOT quantized) for jitter-tolerant; busy-spin on <code>Bun.nanoseconds()</code> for true 1000&nbsp;Hz (pegs a core); the hi-res timer gives no edge over sleepSync</td></tr>
+<tr><td><strong>perf:</strong> heavy work inside the ETW <code>JSCallback</code> body</td><td>~39&nbsp;ns trampoline/event before any work; dominates at high rates</td><td>Minimal callback (read fixed fields, return); defer TDH decode to a drain pass; reuse decode buffer</td></tr>
+<tr><td><strong>perf:</strong> assuming V8 micro-opt lore</td><td>Bun is JavaScriptCore — manual byte math, bigint typed-arrays, monomorphism contortions, and "Bun.sleep is always quantized" are all wrong here</td><td>Decide every micro-opt empirically with a <code>Bun.nanoseconds()</code> microbench (Appendix G); re-verify per host</td></tr>
+<tr><td><strong>perf:</strong> result row built as a literal with conditional/late property adds</td><td>Distinct JSC Structures per add-path ⇒ ~2.13× polymorphic read on the consumer</td><td>Build rows with a class/ctor, ALL fields fixed-order, sentinels not missing keys; verify same StructureID via <code>jscDescribe</code> (G.4)</td></tr>
+<tr><td><strong>perf:</strong> per-field <code>new DataView(toArrayBuffer(ptr,…))</code> when a DLL returns a pointer</td><td>Per-read allocation ⇒ ~29× slower</td><td>Wrap the region ONCE (<code>toArrayBuffer</code>), reuse one DataView for ≤32-bit fields, <code>read.u64</code> for handles (G.5)</td></tr>
+<tr><td><strong>perf:</strong> benchmarking under <code>bun --smol</code>, or using it for a high-Hz sampler</td><td>1.75–4.12× slower (more frequent GC); misrepresents the ceiling</td><td><code>--smol</code> is RSS-only; bench on normal heap; make the loop allocation-free first</td></tr>
+<tr><td><strong>perf:</strong> trusting <code>heapStats().objectCount</code> / <code>totalCompileTime()</code> on this build</td><td>Both read stale/0 — false "zero allocation" / "zero compile" conclusions</td><td>Sum <code>heapStats().objectTypeCounts</code> for real alloc deltas; gate tiering on <code>numberOfDFGCompiles</code>/<code>profile</code>, not <code>totalCompileTime</code></td></tr>
+</table>
+
+<h3 id="appD">Appendix D — Competitive parity matrix ("everything they do, only better")</h3>
+<p><strong>Standing requirement:</strong> the package must cover every capability of the packages it replaces — at the capability level, demonstrably, with a proof artifact — or the gap is a documented, deliberate scope decision with a roadmap line. S0.10–S0.12 re-validate this at execution time; S14.3 gates release on it. Downloads/status verified 2026-06-09 (PROJECTS.md §1 + the 9-agent refresh carry the receipts/URLs).</p>
+
+<h4>D.1 — systeminformation (7,065,100 dl/wk; active solo maintainer; on Windows it is a PowerShell/text-parse shim, not a system-API library)</h4>
+<table>
+<tr><th>systeminformation capability (Windows)</th><th>bun-sysmon answer</th><th>Better because</th><th>Proof artifact</th></tr>
+<tr><td><code>processes()</code> / <code>processLoad()</code> — list with pid/ppid/cpu/mem/name/path (state/user/params empty on Windows; cpu can go negative)</td><td><code>processes()</code> + <code>pidStats()</code></td><td>One NtQSI syscall in µs vs a per-call PowerShell <code>Get-CimInstance</code> spawn (100&nbsp;ms-class); real ppid/handles/IO/createTime; no CVE-class string concatenation; CPU% matched to Task Manager's definition</td><td>selftest §4–§7; crosscheck vs tasklist; benchmark µs vs powershell-spawn ms</td></tr>
+<tr><td><code>currentLoad()</code> — per-core load from <code>os.cpus()</code> deltas</td><td><code>cpuTimes()</code> + <code>CpuSampler</code></td><td>Direct NtQSI class 8; idle/kernel/user the way Task Manager computes; cross-checked against GetSystemTimes + PDH</td><td>selftest §8; crosscheck (3 sources agree)</td></tr>
+<tr><td><code>mem()</code> — RAM via <code>os</code>; swap via PowerShell; cached/standby hard-0</td><td><code>memory()</code> + <code>performanceInfo()</code></td><td>GlobalMemoryStatusEx + GetPerformanceInfo gives commit/standby numbers systeminformation zeros; fields named to match Task Manager (#94)</td><td>selftest §2–§3; crosscheck</td></tr>
+<tr><td><code>fsSize()</code> — drives via <code>Get-CimInstance Win32_LogicalDisk</code> (CVE-2025-68154 here)</td><td><code>drives()</code> + <code>diskSpace()</code></td><td>Direct Win32; UNC-capable; available-vs-free split; no shell, no injection surface</td><td>selftest §9; crosscheck vs fs.statfs</td></tr>
+<tr><td><code>networkConnections()</code> — spawns <code>netstat -nao</code>, locale-fragile, process name unresolved</td><td><code>tcpSockets()</code> / <code>udpSockets()</code></td><td>GetExtendedTcpTable binary structs (locale-proof) with PID→name join; v4+v6</td><td>selftest §10; crosscheck vs netstat -ano</td></tr>
+<tr><td><code>networkStats()</code> — PowerShell perf-counter raw data</td><td><code>interfaceCounters()</code> + <code>NetSampler</code></td><td>GetIfTable2 in-process; no 500&nbsp;ms cache, no spawn</td><td>selftest §11 (or roadmap if MIB_IF_ROW2 deferred, S5.4)</td></tr>
+<tr><td><code>battery()</code> / <code>osInfo()</code> / <code>system()</code>/<code>bios()</code>/<code>baseboard()</code> / <code>users()</code></td><td><code>power.ts</code> / <code>system.ts</code> / <code>firmware.ts</code> / <code>sessions.ts</code></td><td>GetSystemPowerStatus / RtlGetVersion / SMBIOS-without-WMI / WTS with real client info — no PowerShell, populated fields systeminformation leaves null</td><td>selftest §1, §17, §18; firmware/sessions probes</td></tr>
+<tr><td><code>observe(fn, interval)</code> — setInterval of spawns (1&nbsp;Hz = 100% CPU, #626)</td><td><code>watch()</code> (extra #6)</td><td>High-res ticker + in-process calls; 1000&nbsp;Hz at near-zero CPU</td><td>benchmark (own CPU% at 1000&nbsp;Hz); selftest extra §6</td></tr>
+<tr><td>Cross-platform (Linux/macOS), <code>cpuTemperature()</code>, S.M.A.R.T., GPU temp for all vendors, USB/Bluetooth descriptors</td><td><strong>Deliberate non-goals (v1)</strong></td><td>Windows-native depth is the thesis; temperature/SMART need ACPI/vendor IOCTLs with no universal path (systeminformation needs admin + OEM support and usually returns null anyway)</td><td>README honest-scoping; S15.8 roadmap</td></tr>
+</table>
+
+<h4>D.2 — The per-process cluster: pidusage (4,458,787), ps-tree (3,345,462), ps-list (1,621,894), pidtree (19.5M), @vscode/windows-process-tree (68,433)</h4>
+<table>
+<tr><th>Capability</th><th>bun-sysmon answer</th><th>Better because</th><th>Proof</th></tr>
+<tr><td>pidusage: <code>{cpu, memory, ppid, pid, ctime, elapsed, timestamp}</code> per PID (the pm2 contract)</td><td><code>pidStats(pid|pids)</code> — same 7-field shape</td><td>Drop-in shape from the snapshot, zero per-PID spawn; pidusage's wmic→gwmi fallback is broken by construction (its own TODO admits it) and CPU% is "Not Accurate" on Windows — ours matches Task Manager</td><td>selftest §7; benchmark vs powershell-spawn</td></tr>
+<tr><td>ps-tree / pidtree: descendant PIDs (kill-tree); ps-tree hard-broken on Server 2025</td><td><code>processTree(rootPid?)</code></td><td>One snapshot's ppid edges; works on 24H2/25H2/Server 2025 where wmic is gone</td><td>selftest §6; crosscheck</td></tr>
+<tr><td>ps-list: pid/ppid/name only on Windows (vendored fastlist.exe — AV-flagged, dies under bundling, no ARM64)</td><td><code>processes()</code> — full field set</td><td>No vendored .exe; survives <code>bun build --compile</code>; native ARM64 (System32 DLLs exist there)</td><td>selftest §4; tarball audit (no .exe leaks)</td></tr>
+<tr><td>@vscode/windows-process-tree: native &lt;20&nbsp;ms tree, but <code>node-gyp rebuild</code> every install, Windows-only, minimal fields, no Bun</td><td><code>processes()</code> + <code>processTree()</code></td><td>Same native-speed class, zero compile, richer fields (IO/handles/createTime), runs on Bun directly</td><td>selftest §4 (median &lt; 2&nbsp;ms); install story</td></tr>
+<tr><td>Per-process CPU%/memory without spawning a process per query</td><td>The whole snapshot model</td><td>No mainstream package does this on Windows without a spawn or a node-gyp addon — sysmon does it in one syscall</td><td>benchmark; the §1.0 dossier "no zero-build native-speed competitor exists" verdict</td></tr>
+</table>
+
+<h4>D.3 — The disk/os-utils cluster: check-disk-space (3,408,373), diskusage (55,361), node-os-utils (128,732), node-disk-info, windows-cpu, loadavg-windows</h4>
+<table>
+<tr><th>Capability</th><th>bun-sysmon answer</th><th>Better because</th><th>Proof</th></tr>
+<tr><td>check-disk-space: <code>{free, size}</code> via PowerShell spawn; rejects UNC by design; NaN on profile-altered output</td><td><code>diskSpace(path)</code> + <code>drives()</code></td><td>Direct Win32, UNC-capable, available-vs-free split, drive type + volume metadata, no spawn, no NaN-on-locale</td><td>selftest §9; crosscheck vs fs.statfs</td></tr>
+<tr><td>diskusage: <code>{available, free, total}</code> via node-gyp/nan (breaks every Node major)</td><td><code>diskSpace(path)</code></td><td>Same quota-aware <code>available</code>, zero compile, never an ABI mismatch</td><td>selftest §9</td></tr>
+<tr><td>node-os-utils / os-utils: cpu/mem pure-JS; drive/netstat/proc "not supported" on Windows or PowerShell-spawned</td><td><code>cpu.ts</code>/<code>memory.ts</code>/<code>disk.ts</code>/<code>net.ts</code></td><td>Everything supported on Windows, natively, no "not supported" strings, no spawn</td><td>selftest §8–§11</td></tr>
+<tr><td>loadavg-windows / windows-cpu: monkey-patch <code>os.loadavg</code> / wmic-spawn (dead on 24H2)</td><td><code>CpuSampler</code> + <code>cpuTimes()</code></td><td>Real per-core data, not an in-process loadavg approximation; no wmic dependency</td><td>selftest §8</td></tr>
+<tr><td>Basic single-path disk free / RAM / self-CPU</td><td><strong>Defer to Node core</strong> (honestly)</td><td>README leads with: <code>fs.statfs</code>, <code>os.freemem</code>, <code>process.cpuUsage</code> already cover the trivial cases — sysmon adds enumeration, other-process metrics, load, disk/net counters, socket→PID, ETW, Event Log, PDH, SMBIOS</td><td>README honest-scoping</td></tr>
+</table>
+
+<h4>D.4 — Capabilities NO npm package offers (the moat — each needs a proof artifact; all adversarially re-verified 2026-06-09)</h4>
+<table>
+<tr><th>Capability</th><th>npm reality (nearest rival + its limit)</th><th>bun-sysmon</th><th>Proof</th></tr>
+<tr><td>Real-time ETW consumption</td><td><strong>MONOPOLY</strong> — every "etw" package is write-only, an offline .etl parser, or an abandoned PoC (node-etw, @microsoft/typescript-etw "no longer supported")</td><td><code>EtwSession.run</code> (elevated) — decoded live kernel-process firehose</td><td>selftest §16 (elevated); etw-firehose.ts demo</td></tr>
+<tr><td>ETW provider census + event schemas (no admin)</td><td><strong>MONOPOLY</strong> — no npm package enumerates providers/schemas</td><td><code>etwProviders()</code> + <code>etwProviderSchema()</code></td><td>selftest §15 (no admin)</td></tr>
+<tr><td>Live Event Log tail w/ message formatting</td><td><strong>MONOPOLY</strong> on the modern API — windows-eventlog-reader is a ~2016 legacy-API 3&nbsp;s poller, author-disowned; @ts-evtx is offline .evtx only; rest are write-only or Get-WinEvent spawns</td><td><code>tailEvents()</code> AsyncIterable + <code>formatMessage</code></td><td>selftest §13–§14; event-tail.ts demo</td></tr>
+<tr><td>Native PDH performance counters</td><td><strong>MONOPOLY</strong> — node-perfmon/windows-perfcounters are 404; the 3 npm "perfmon" packages spawn typeperf.exe; native PDH exists only in Go/Rust</td><td><code>CounterSet</code> + enumeration + wildcard expansion</td><td>selftest §12; counters probe</td></tr>
+<tr><td>Per-process GPU usage</td><td><strong>MONOPOLY</strong> — pidusage#131 open since 2021; standing answer is "open Task Manager"</td><td><code>gpuUsageByProcess()</code> (extra #1) via PDH GPU-Engine wildcard</td><td>selftest extra §1 (SKIP if no GPU)</td></tr>
+<tr><td>SMBIOS/BIOS/baseboard without WMI</td><td><strong>MONOPOLY</strong> on "without WMI" — @oxmc/node-smbios (Jan 2026) exists but its Windows path is WMI COM; no package reads GetSystemFirmwareTable('RSMB')</td><td><code>smbios()</code></td><td>selftest §17; firmware probe (sum ≈ RAM)</td></tr>
+<tr><td>socket→PID without spawning netstat</td><td><strong>NEAR-MONOPOLY</strong> — windows-netstat (native, TCP-only, 33 dl/mo, untouched since 2021) is the only non-spawn rival; everything with adoption parses netstat text</td><td><code>tcpSockets()</code>/<code>udpSockets()</code> v4+v6, maintained, full-protocol</td><td>selftest §10; crosscheck vs netstat</td></tr>
+<tr><td>Disk I/O counters (system + per-process)</td><td><strong>GAP</strong> — systeminformation <code>disksIO()</code> returns null on Windows (#274, 2nd-most-reacted open issue)</td><td><code>diskIoCounters()</code> / <code>processIoCounters()</code> (extra #2)</td><td>selftest extra §2</td></tr>
+<tr><td>The raw FFI escape hatch</td><td>—</td><td>Any System32 metric the package didn't wrap is one <code>@bun-win32/{dll}</code> import away; AI.md documents the pattern</td><td>AI.md "where to look"</td></tr>
+<tr><td>AI-first documentation contract (AI.md)</td><td>No incumbent has anything comparable</td><td>The complete surface in one file</td><td>S13.1; S14.4 completeness gate</td></tr>
+</table>
+
+<h4>D.5 — What "replace" honestly means (audit-verified caveats — these words go in the README, not under the rug)</h4>
+<table>
+<tr><th>Incumbent</th><th>What bun-sysmon replaces</th><th>What it honestly does NOT</th></tr>
+<tr><td><strong>systeminformation</strong></td><td>The Windows fast path: processes, cpu, mem, disk, network, sockets, osinfo, bios/board, sessions, battery — natively, no spawn, no CVE-class string concatenation, plus ETW/Event Log/PDH/per-process-GPU it never had.</td><td>Cross-platform (Linux/macOS are most of its value); the niche inventory bits (printer/audio/usb/bluetooth — though those are skeletal on Windows anyway); CPU temperature / S.M.A.R.T. (no universal Windows path). Say "the Windows backend done right," not "a drop-in replacement everywhere."</td></tr>
+<tr><td><strong>pidusage</strong></td><td>The metric and the shape (<code>{cpu,memory,ppid,pid,ctime,elapsed,timestamp}</code>), at native speed with zero spawn, with a CPU% that matches Task Manager.</td><td>Not auto-magically pm2's internal API — it is a shape-compatible function, not a fork of pm2's plumbing; Bun-only (pidusage runs on Node). Don't claim "pm2 works on us" without pm2 actually swapping its dependency.</td></tr>
+<tr><td><strong>ps-tree / pidtree / ps-list</strong></td><td>The capability (tree, descendants, list) on current Windows where wmic-based ones are broken, with no vendored .exe and no node-gyp.</td><td>Not the exact module API (these have their own signatures); no cross-platform. A migration is a code change, not a drop-in <code>require</code> swap.</td></tr>
+<tr><td><strong>check-disk-space / diskusage / node-os-utils</strong></td><td>Disk free (UNC + available-vs-free), volume enumeration, and the os-utils metric set — natively, no spawn, no compile.</td><td>Node's own <code>fs.statfs</code> already covers single-path free space — the README says so; sysmon's value is the residue (enumeration, UNC, quota split, other-process metrics, counters) core can't provide. Bun-only.</td></tr>
+<tr><td><strong>ETW / Event Log / PDH consumers</strong></td><td>The capability outright (these have no working npm equivalent).</td><td>Real-time ETW needs an elevated process (census + tail are no-admin); the ETW pump is blocking/foreground in v1 (a worker-owned AsyncIterable is roadmap); EvtSubscribe push is deliberately omitted (foreign-thread hazard). Own these limits in the docs.</td></tr>
+</table>
+
+<h3 id="appE">Appendix E — Command cheat sheet</h3>
+<pre><code># verify constantly
+bun run packages/sysmon/index.ts                       # loads?
+bunx tsc --noEmit                                      # types, whole repo
+bun test packages/sysmon                               # pure-parser tests
+bun run packages/sysmon/example/sysmon.selftest.ts     # FFI integration suite (also run elevated once)
+bun run packages/sysmon/example/crosscheck.ts          # numbers vs OS ground truth
+bunx biome format --write packages/sysmon              # format
+
+# regression + gates
+bun run scripts/audit.ts --all                         # binding packages unchanged (sysmon auto-skipped)
+bun run scripts/nullcheck.ts --all
+bun run scripts/preflight.ts                           # lockfile freshness (release gate)
+
+# release
+rm bun.lock &amp;&amp; bun install
+(cd packages/&lt;name&gt; &amp;&amp; bun publish --access public --otp &lt;code&gt;)   # order: sysmon, bun-sysmon</code></pre>
+
+<h3 id="appF">Appendix F — Deviations from the gpu-plan template (for the next plan author)</h3>
+<p>This plan follows packages/gpu/PLAN.html's Appendix F contract. Where it deliberately diverges — and why — so the house standard evolves honestly:</p>
+<ol>
+<li><strong>Zero binding/extraction risk, all decode risk.</strong> GPU extracted one 1,340-line engine; sysmon assembles ~12 modules from ~10 independent examples over an already-bound surface (dossier: 126/126 APIs bound). So the dominant risk shifts from "does the COM call work" to "is the struct offset right" — hence the PROVEN/UNVERIFIED split in Appendix B and the S3.4 offsets-referee + Phase 11 cross-validation that have no GPU analog.</li>
+<li><strong>No <code>all</code> shim/migration phase.</strong> GPU's Phase 11 re-ran 30 demos through re-export shims because they shared helper modules. sysmon's examples are self-contained, so the regression analog is cross-validation against OS ground truth (tasklist/netstat/statfs/registry), not a demo sweep. No <code>all</code>/<code>bun-win32</code> bump.</li>
+<li><strong>Correctness is verified numerically against a SECOND source, not visually.</strong> GPU's doctrine is "look at the PNG." sysmon's is "two independent kernel sources must agree" (NtQSI vs PDH vs GetSystemTimes; snapshot vs GetProcessMemoryInfo; sysmon vs netstat) — a number that merely returns is not a number that is correct.</li>
+<li><strong>Elevation + blocking are first-class API shapes, not afterthoughts.</strong> The ETW firehose is honestly a blocking, elevated, foreground call; the plan ships the no-admin census/tail as the lead surface and gates the firehose behind <code>isElevated()</code> with an actionable error — rather than pretending it's a clean AsyncIterable.</li>
+<li><strong>Honest-scope against Node core is mandatory.</strong> Unlike GPU (where Node has no equivalent), Node's <code>os</code>/<code>process</code>/<code>fs.statfs</code> already cover the trivial metrics — the README must say what sysmon adds over core, or it overclaims. This is the one place the "everything they do, only better" framing needs the "core already does the easy part" caveat.</li>
+<li><strong>Concurrency with a sibling plan.</strong> This plan was authored while the gpu plan was being executed in the same repo. Every phase pulls/rebases and never touches <code>packages/gpu</code> — a discipline the GPU plan (authored first) didn't need.</li>
+<li><strong>Everything else is identical:</strong> ground-truth dossier → research-while-building doctrine → execute-time competitive intel with a parity matrix gated at release → bite-sized verified phases with a runtime proof per phase → pure-logic <code>bun:test</code> where FFI-free → AI.md docs with a run gate → one-OTP ordered publish → registry-poll + clean-room acceptance → final report with the deviation ledger.</li>
+</ol>
+
+<h3 id="appG">Appendix G — Performance: hot-path budgets, measured JSC levers, the regression gate</h3>
+<p>This product's value IS its speed, so performance is audited every phase (the ⚡ doctrine box), not benchmarked once. <strong>Bun runs on JavaScriptCore, not V8</strong> — the numbers below were measured on the authoring machine (Windows 11, Bun 1.4.0-canary, JSC) on 2026-06-09 with <code>Bun.nanoseconds()</code>, 200k+ warm-up iterations, a dead-code-elimination sink, median of 5 trials. <strong>They are reference, not gospel: re-measure on the release host (S0.6b) and let the runtime, not this table, decide.</strong> Several contradict V8 folklore — those are flagged.</p>
+
+<h4>G.1 — Measured levers (ns/op on the authoring host; re-verify)</h4>
+<table>
+<tr><th>Decision (hot path)</th><th>Fast</th><th>Slow</th><th>Factor</th><th>Rule</th></tr>
+<tr><td><code>Buffer.alloc(19KB)</code> per tick vs reuse one buffer</td><td>reuse ≈ free</td><td>alloc ~1064&nbsp;ns (allocUnsafe ~389)</td><td><strong>~1600×</strong></td><td>Allocate scratch + views ONCE; the #1 sampler rule</td></tr>
+<tr><td>new <code>DataView</code> per parse vs cached</td><td>cached ≈ 0.3&nbsp;ns</td><td>new ~20.8&nbsp;ns</td><td>~72×</td><td>Hold <code>{buffer, dataView, u8}</code> as persistent fields</td></tr>
+<tr><td>u64 FILETIME delta: two-u32-halves vs bigint+Number</td><td>~3.1&nbsp;ns</td><td>~41&nbsp;ns</td><td><strong>13×</strong></td><td>Number math when the delta fits 2^53 (absolute FILETIME does NOT — subtract halves first)</td></tr>
+<tr><td>N contiguous i64 (per-core times): u32-halves vs DataView-bigint vs view</td><td>2.6&nbsp;ns/elem</td><td>18 / 21&nbsp;ns/elem</td><td><strong>8×</strong></td><td>Avoid bigint for swept 64-bit fields; <em>view is the SLOWEST</em> (V8-contradiction)</td></tr>
+<tr><td><code>buffer.ptr</code> getter re-read vs cached const</td><td>~0.2&nbsp;ns</td><td>~7.3&nbsp;ns</td><td>~34× (~19% on a real FFI loop)</td><td>Cache <code>.ptr</code> once before any loop</td></tr>
+<tr><td>u32 read: <code>DataView.getUint32</code> vs manual byte-OR</td><td>~1.17&nbsp;ns</td><td>~1.31&nbsp;ns</td><td>1.13× (DataView wins)</td><td>Use the typed accessor; <em>do NOT hand-roll bytes</em> (V8-contradiction)</td></tr>
+<tr><td>FFI floor: trivial export vs empty JS call</td><td>—</td><td>~5&nbsp;ns (u32) / ~15.7&nbsp;ns (u64→bigint)</td><td>—</td><td>Batch into one native call; prefer i32/u32/f64 returns; ~10&nbsp;ns bigint-box tax</td></tr>
+<tr><td>native→JS <code>JSCallback</code> invocation</td><td>—</td><td>~39&nbsp;ns/call</td><td>134× vs plain JS call</td><td>Minimal callback body; defer decode; never N callbacks where one buffered pass works</td></tr>
+<tr><td>fresh <code>BigInt()</code> arg per call vs hoisted const</td><td>hoisted</td><td>+16&nbsp;ns</td><td>—</td><td>Hoist constant handle/bigint args out of loops</td></tr>
+<tr><td>1&nbsp;ms pacing: busy-spin vs <code>sleepSync</code> vs async <code>sleep</code></td><td>busy-spin 1.00&nbsp;ms (&lt;10&nbsp;µs jitter)</td><td>async sleep ~15.5&nbsp;ms</td><td>15.5×</td><td><code>sleepSync</code> ≈ 1.5&nbsp;ms (NOT quantized); hi-res timer no better; busy-spin for true 1000&nbsp;Hz (V8/repo-memory contradiction)</td></tr>
+<tr><td>monomorphic vs polymorphic parse receiver (Buffer/U8/subarray/DataView)</td><td colspan="2">no measurable difference</td><td>1.00×</td><td>Don't contort for monomorphism (V8-contradiction); spend effort on alloc + bigint</td></tr>
+<tr><td><code>Preload</code>+destructure vs post-Preload static FFI call</td><td colspan="2">no measurable difference</td><td>1.00×</td><td>Destructure for correctness (capture native fn not lazy wrapper), NOT for speed — <code>Load</code> already shadows the method with the native pointer</td></tr>
+</table>
+
+<h4>G.2 — Hot-path inventory (each gets a microbenchmark + a baseline entry)</h4>
+<table>
+<tr><th>Hot path</th><th>Budget to record</th><th>Phase</th></tr>
+<tr><td><code>parseProcessSnapshot</code> per-row walk (~300 rows × 1000&nbsp;Hz)</td><td>ns/row; 0 alloc/call after warm-up</td><td>S3.5b</td></tr>
+<tr><td><code>CpuSampler</code>/<code>ProcessSampler.sample()</code> per tick</td><td>ns/tick; own-CPU% at 1000&nbsp;Hz near-zero</td><td>S4.2b</td></tr>
+<tr><td><code>createTicker</code> jitter at 1&nbsp;ms</td><td>median + p95 interval; achievable Hz</td><td>S2.7b</td></tr>
+<tr><td>struct parsers (tcp/udp/memory/processor/smbios)</td><td>ns/field; DataView-vs-Buffer decided empirically</td><td>S2.7b</td></tr>
+<tr><td><code>CounterSet.collect()</code>+<code>value()</code></td><td>µs/collect; 0 alloc/sample</td><td>S6.2b</td></tr>
+<tr><td>ETW <code>EventRecordCallback</code></td><td>decoded events/sec; 0 alloc/event in body</td><td>S8.3b</td></tr>
+<tr><td>whole-call latencies (<code>processes</code>/<code>memory</code>/<code>cpuTimes</code>/<code>tcpSockets</code>/<code>pidStats</code>)</td><td>median µs over 1000 iters; vs powershell-spawn ms</td><td>S10.6 benchmark.ts</td></tr>
+</table>
+
+<h4>G.3 — The discipline</h4>
+<ol>
+<li><strong>Baseline (S0.6b)</strong> records the floors on the release host before any work.</li>
+<li><strong>Every hot-path phase</strong> (2, 3, 4, 6, 8) ends with a microbenchmark step that records ns/op and asserts zero per-tick/per-row/per-event allocation.</li>
+<li><strong>Release gate (S14.6)</strong> re-runs everything and blocks release on a &gt;~10% regression vs baseline AND on any forbidden hot-loop pattern (per-iteration <code>Buffer.alloc</code>/<code>new DataView</code>/typed-array, rebuilt <code>BigInt()</code>, re-read <code>.ptr</code>).</li>
+<li><strong>README numbers</strong> come only from the gated run — never copied from this appendix.</li>
+<li><strong>Generative pass (the real spirit — do this every hot-path phase).</strong> An audit does not just apply G.5's levers and check the gate. It <code>profile()</code>s the path to locate the true hot spot, then actively tries at least one optimization this plan did NOT anticipate — a fused pass, a precomputed table, a branch eliminated, a read avoided, an allocation hoisted, a better algorithm — measures it, and folds any proven win back into G.5. "Meets baseline" is the floor; the work is to beat it. Stop only at real diminishing returns, never at "good enough." The agent that ships the fastest correct path, not the one that merely passes the gate, did the job.</li>
+<li><strong>Methodology</strong> for every microbench (all verified on Bun 1.4.0/JSC, this machine): <code>Bun.nanoseconds()</code>; warm <strong>≥200k iterations</strong> (1k is NOT enough — <code>numberOfDFGCompiles</code> was still 0) to trigger JSC's tier-up; <strong>assert <code>numberOfDFGCompiles(fn)&nbsp;&gt;&nbsp;0</code></strong> and abort the bench if 0 (else you're timing LLInt/Baseline); fold results into a process-lived sink to defeat dead-code elimination; vary at least one offset per iteration to defeat loop-invariant hoisting; <code>gcAndSweep()</code>+<code>fullGC()</code> between (never within) trials; median of ≥5 trials. The repo's <code>terminal.bench.ts</code> is the convention to mirror.</li>
+</ol>
+
+<h4>G.4 — The <code>bun:jsc</code> optimization toolkit (Bun-only: prove the hot path is optimized, don't hope)</h4>
+<p>Because the whole repo is Bun-only, <code>bun:jsc</code> (an internal/debug namespace — names are version-specific; all of the below were enumerated and run on Bun 1.4.0 this machine) turns "is this optimized?" into a measured assertion. Use it in the per-phase audits and the S14.6 gate.</p>
+<table>
+<tr><th><code>bun:jsc</code> export</th><th>Use</th></tr>
+<tr><td><code>numberOfDFGCompiles(fn)</code></td><td>≥1 after warmup ⇒ you are timing optimized code. 0 ⇒ the bench never got hot (1k iters is too few; need ~200k–1M). Stays low/stable for a healthy fn — gate every microbench on this.</td></tr>
+<tr><td><code>profile(cb)</code> + <code>startSamplingProfiler()</code>/<code>samplingProfilerStackTraces()</code></td><td>Tier breakdown (LLInt/Baseline/DFG/FTL %) + hottest frames. A warmed hot loop measured <strong>99.3% FTL</strong> here. <strong>Assert FTL (or ≥DFG) dominates</strong> for any claimed hot path; LLInt/Baseline appearing means it never tiered up.</td></tr>
+<tr><td><code>reoptimizationRetryCount(fn)</code></td><td>Climbs when a function is jettisoned + reoptimized (OSR-exit churn from type instability / megamorphic access). A rising count across a run ⇒ fix the polymorphism (stabilize arg/return types, split call sites), don't micro-opt the body.</td></tr>
+<tr><td><code>jscDescribe(obj)</code> / <code>jscDescribeArray(arr)</code></td><td>X-ray the live JSC <strong>Structure</strong> (StructureID, butterfly ptr, inline capacity, property→slot table) and array <strong>IndexingType</strong> (ArrayWithInt32/Double/Contiguous, CopyOnWrite). Same StructureID across the run ⇒ the row shape stayed monomorphic; <code>jscDescribeArray</code> reveals holes (public length &lt; vector length).</td></tr>
+<tr><td><code>heapStats().objectTypeCounts</code></td><td>Sum it before/after a loop for the real allocated-object delta — <strong>the zero-allocation-per-tick gate</strong>. (The top-level <code>objectCount</code> field reads stale/0 on this build — sum <code>objectTypeCounts</code> instead.)</td></tr>
+<tr><td><code>estimateShallowMemoryUsageOf(obj)</code></td><td>Bytes per object for the AoS-vs-SoA decision: a 6-field <code>ProcessInfo</code> ≈ 64&nbsp;B (×N rows) vs a struct-of-arrays of typed columns ≈ <strong>2.6× smaller</strong> (and faster + monomorphic).</td></tr>
+<tr><td><code>edenGC()</code>/<code>fullGC()</code>/<code>gcAndSweep()</code></td><td>Quiesce the heap to a clean, comparable baseline between trials (never inside the timed region).</td></tr>
+<tr><td><code>isRope(str)</code> · <code>setRandomSeed(n)</code></td><td>Assert no unflattened rope crosses into a measured string loop; seed the PRNG for reproducible bench inputs. (<code>totalCompileTime()</code> returns 0 on this build — don't rely on it.)</td></tr>
+</table>
+
+<h4>G.5 — Measured JSC shape / array / alloc / string levers (host-specific factors; re-verify, but the directions are JSC-structural)</h4>
+<table>
+<tr><th>Lever</th><th>Fast</th><th>Slow</th><th>Factor</th><th>Rule</th></tr>
+<tr><td>result-row shape: class/ctor all-fields-fixed-order vs literal + conditional <code>o.x=</code> adds</td><td>4.10&nbsp;ns</td><td>8.72&nbsp;ns</td><td><strong>2.13×</strong> (read side)</td><td>Build every row with a class/ctor assigning ALL fields up front in one order; absent values get a sentinel (0/null), never a missing key; never add/delete props after construction (distinct StructureIDs ⇒ polymorphic IC miss on the consumer)</td></tr>
+<tr><td>numeric column: <code>Int32Array</code> vs <code>Object[]</code> row</td><td>1.06&nbsp;ns/el</td><td>1.64&nbsp;ns/el</td><td><strong>1.54×</strong></td><td>Return struct-of-arrays (typed columns) for bulk rows; <code>Int32Array</code> for int32, <code>Float64Array</code> for wide/byte columns (RSS); keep u64 handles as bigint <em>outside</em> the typed array</td></tr>
+<tr><td>return array: pre-sized + index vs push-growth / holey</td><td>1.64&nbsp;ns/el</td><td>2.80 / 2.39&nbsp;ns/el</td><td>1.71× / 1.46×</td><td>Pre-size to the row count and fill by index; never push-grow, never write a high index first (holes demote the IndexingType)</td></tr>
+<tr><td>scratch alloc: <code>Bun.allocUnsafe</code> vs <code>Buffer.alloc</code></td><td>396&nbsp;ns</td><td>1644&nbsp;ns</td><td><strong>~4×</strong></td><td>Reuse ONE scratch via <code>Bun.allocUnsafe</code> (returns a <code>Uint8Array</code> — wrap in a cached DataView; overwrite every byte you read, no zeroing). <code>Buffer.allocUnsafe</code> (455&nbsp;ns) if you need Buffer methods. Never <code>Buffer.alloc</code> per call (the memset is the cost)</td></tr>
+<tr><td>per-row name: lazy getter vs eager <code>toString('utf16le')</code></td><td>materialize only what's read</td><td>63&nbsp;ns/row eager</td><td><strong>86%</strong> saved (1-in-8 read)</td><td>Return rows holding <code>{backingBuffer, offset, length}</code> and expose the name via a lazy getter; callers that read a fraction never pay. Avoid concat/template name-building (produces ropes that flatten on read anyway)</td></tr>
+<tr><td>native read from a DLL <code>Pointer</code>: DataView (≤32-bit) + <code>read.u64</code> (handles), wrap region ONCE</td><td>DataView u32 3.26&nbsp;ns / read.u64 26.6&nbsp;ns</td><td>read.u32 5.89&nbsp;ns / per-read <code>toArrayBuffer</code>+DataView 171&nbsp;ns</td><td>1.8× / <strong>29×</strong></td><td><code>toArrayBuffer</code>/<code>toBuffer</code> the whole region ONCE, then a single reused DataView for ≤32-bit fields (DataView is a JSC intrinsic, ~1.8× faster than <code>read.u32</code>); use <code>read.u64</code>/<code>read.intptr</code> for bigint handles (~15% faster than DataView). NEVER allocate a DataView/toArrayBuffer per field (~29×)</td></tr>
+<tr><td><code>bun --smol</code> for a 1000&nbsp;Hz sampler</td><td>normal heap</td><td><code>--smol</code></td><td><strong>1.75–4.12× slower</strong></td><td>Only for RSS-constrained multi-process deploys, and only after the loop is allocation-free; never benchmark under <code>--smol</code> and present it as the ceiling</td></tr>
+</table>
+<p><strong>Name JSC primitives correctly</strong> (Node lore misleads): the tiers are LLInt → Baseline → DFG → FTL (B3+Air) — there is no Maglev/Sparkplug equivalent; object shapes are <strong>Structures</strong> with a <strong>butterfly</strong> and an <strong>IndexingType</strong> (not V8 hidden-class Maps); the GC is <strong>Riptide</strong>, a concurrent mark-<em>sweep</em> generational collector (eden) — "avoid intermediate objects" transfers but the copy-vs-sweep cost model does not. Tier-up thresholds are heuristic and version-dependent — never hardcode them; verify with the G.4 tools.</p>
+
+<p style="color:var(--dim); margin-top:3rem;">Plan authored 2026-06-09 against repo state <code>3819241</code> (+ concurrent BUN_GPU execution). Facts verified same day: npm <code>bun-sysmon</code> &amp; <code>@bun-win32/sysmon</code> both 404; <code>packages/sysmon</code> absent; all 126 needed Win32 APIs already bound; 9-agent research workflow (4 repo + 5 web) confirmed the dossier offsets, the incumbent download/CVE/wmic-removal receipts, and the ETW/Event-Log/PDH/SMBIOS/socket→PID monopolies. Executor: re-verify, then build relentlessly. The numbers must agree with the OS or the extraction is wrong.</p>
+
+</body>
+</html>
