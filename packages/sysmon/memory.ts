@@ -1,9 +1,10 @@
 import Kernel32 from '@bun-win32/kernel32';
 import Psapi from '@bun-win32/psapi';
+import { preloadPending } from './preload';
 import { type MemoryStatus, type PerformanceCounts, parseMemoryStatusEx, parsePerformanceInfo } from './structs';
 
-Kernel32.Preload(['GlobalMemoryStatusEx']);
-Psapi.Preload(['GetPerformanceInfo']);
+preloadPending(Kernel32, ['GlobalMemoryStatusEx']);
+preloadPending(Psapi, ['GetPerformanceInfo']);
 const { GlobalMemoryStatusEx } = Kernel32;
 const { GetPerformanceInfo } = Psapi;
 

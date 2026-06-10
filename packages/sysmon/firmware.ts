@@ -1,7 +1,8 @@
 import Kernel32 from '@bun-win32/kernel32';
+import { preloadPending } from './preload';
 import { type SmbiosInfo, parseSmbios } from './structs';
 
-Kernel32.Preload(['GetSystemFirmwareTable']);
+preloadPending(Kernel32, ['GetSystemFirmwareTable']);
 const { GetSystemFirmwareTable } = Kernel32;
 
 const RSMB = 0x5253_4d42;

@@ -3,10 +3,11 @@ import Advapi32 from '@bun-win32/advapi32';
 import Kernel32 from '@bun-win32/kernel32';
 import Ntdll, { STATUS_SUCCESS, SystemInformationClass } from '@bun-win32/ntdll';
 import { filetimeToDate } from './structs';
+import { preloadPending } from './preload';
 
-Advapi32.Preload(['AllocateAndInitializeSid', 'CheckTokenMembership', 'FreeSid', 'GetUserNameW']);
-Kernel32.Preload(['GetActiveProcessorCount', 'GetComputerNameExW', 'GetNativeSystemInfo', 'GetTickCount64']);
-Ntdll.Preload(['NtQuerySystemInformation', 'RtlGetVersion']);
+preloadPending(Advapi32, ['AllocateAndInitializeSid', 'CheckTokenMembership', 'FreeSid', 'GetUserNameW']);
+preloadPending(Kernel32, ['GetActiveProcessorCount', 'GetComputerNameExW', 'GetNativeSystemInfo', 'GetTickCount64']);
+preloadPending(Ntdll, ['NtQuerySystemInformation', 'RtlGetVersion']);
 const { AllocateAndInitializeSid, CheckTokenMembership, FreeSid, GetUserNameW } = Advapi32;
 const { GetActiveProcessorCount, GetComputerNameExW, GetNativeSystemInfo, GetTickCount64 } = Kernel32;
 const { NtQuerySystemInformation, RtlGetVersion } = Ntdll;

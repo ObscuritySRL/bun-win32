@@ -1,8 +1,9 @@
 import Kernel32 from '@bun-win32/kernel32';
 import { CounterSet, expandCounterPath } from './counters';
 import { parseMultiSz } from './structs';
+import { preloadPending } from './preload';
 
-Kernel32.Preload(['GetDiskFreeSpaceExW', 'GetDriveTypeW', 'GetLogicalDriveStringsW', 'GetVolumeInformationW']);
+preloadPending(Kernel32, ['GetDiskFreeSpaceExW', 'GetDriveTypeW', 'GetLogicalDriveStringsW', 'GetVolumeInformationW']);
 const { GetDiskFreeSpaceExW, GetDriveTypeW, GetLogicalDriveStringsW, GetVolumeInformationW } = Kernel32;
 
 const DRIVE_TYPE_NAMES = ['unknown', 'no_root_dir', 'removable', 'fixed', 'remote', 'cdrom', 'ramdisk'] as const;

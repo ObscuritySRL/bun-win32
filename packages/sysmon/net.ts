@@ -1,10 +1,11 @@
 import { toArrayBuffer, type Pointer } from 'bun:ffi';
 import Iphlpapi from '@bun-win32/iphlpapi';
-import { processImagePath } from './process';
 import { monotonicMicroseconds } from './sampler';
+import { preloadPending } from './preload';
+import { processImagePath } from './process';
 import { type InterfaceCounter, type TcpSocket, type UdpSocket, parseInterfaceTable, parseTcp6Table, parseTcpTable, parseUdp6Table, parseUdpTable } from './structs';
 
-Iphlpapi.Preload(['FreeMibTable', 'GetExtendedTcpTable', 'GetExtendedUdpTable', 'GetIfTable2']);
+preloadPending(Iphlpapi, ['FreeMibTable', 'GetExtendedTcpTable', 'GetExtendedUdpTable', 'GetIfTable2']);
 const { FreeMibTable, GetExtendedTcpTable, GetExtendedUdpTable, GetIfTable2 } = Iphlpapi;
 
 const AF_INET = 2;

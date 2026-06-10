@@ -1,7 +1,8 @@
 import Rstrtmgr from '@bun-win32/rstrtmgr';
 import { decodeNulTerminatedUnicodeString } from './structs';
+import { preloadPending } from './preload';
 
-Rstrtmgr.Preload(['RmEndSession', 'RmGetList', 'RmRegisterResources', 'RmStartSession']);
+preloadPending(Rstrtmgr, ['RmEndSession', 'RmGetList', 'RmRegisterResources', 'RmStartSession']);
 const { RmEndSession, RmGetList, RmRegisterResources, RmStartSession } = Rstrtmgr;
 
 const ERROR_MORE_DATA = 234;

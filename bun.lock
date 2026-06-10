@@ -250,7 +250,7 @@
     },
     "packages/bun-sysmon": {
       "name": "bun-sysmon",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "dependencies": {
         "@bun-win32/sysmon": "workspace:*",
       },
@@ -1310,7 +1310,7 @@
     },
     "packages/sysmon": {
       "name": "@bun-win32/sysmon",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "dependencies": {
         "@bun-win32/advapi32": "workspace:*",
         "@bun-win32/core": "workspace:*",

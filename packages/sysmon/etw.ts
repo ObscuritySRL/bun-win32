@@ -1,11 +1,12 @@
 import { JSCallback, type Pointer, read } from 'bun:ffi';
 import Advapi32 from '@bun-win32/advapi32';
 import Tdh from '@bun-win32/tdh';
-import { type EtwProvider, decodeNulTerminatedUnicodeString, guidToBytes, parseProviderEnumeration } from './structs';
 import { isElevated } from './system';
+import { preloadPending } from './preload';
+import { type EtwProvider, decodeNulTerminatedUnicodeString, guidToBytes, parseProviderEnumeration } from './structs';
 
-Advapi32.Preload(['CloseTrace', 'ControlTraceW', 'EnableTraceEx2', 'OpenTraceW', 'ProcessTrace', 'StartTraceW']);
-Tdh.Preload(['TdhEnumerateManifestProviderEvents', 'TdhEnumerateProviders', 'TdhGetEventInformation', 'TdhGetManifestEventInformation']);
+preloadPending(Advapi32, ['CloseTrace', 'ControlTraceW', 'EnableTraceEx2', 'OpenTraceW', 'ProcessTrace', 'StartTraceW']);
+preloadPending(Tdh, ['TdhEnumerateManifestProviderEvents', 'TdhEnumerateProviders', 'TdhGetEventInformation', 'TdhGetManifestEventInformation']);
 const { CloseTrace, ControlTraceW, EnableTraceEx2, OpenTraceW, ProcessTrace, StartTraceW } = Advapi32;
 const { TdhEnumerateManifestProviderEvents, TdhEnumerateProviders, TdhGetEventInformation, TdhGetManifestEventInformation } = Tdh;
 

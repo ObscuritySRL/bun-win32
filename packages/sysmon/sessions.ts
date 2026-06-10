@@ -1,8 +1,9 @@
 import { type Pointer, toArrayBuffer } from 'bun:ffi';
 import Wtsapi32, { WTS_INFO_CLASS } from '@bun-win32/wtsapi32';
 import { decodeNulTerminatedUnicodeString } from './structs';
+import { preloadPending } from './preload';
 
-Wtsapi32.Preload(['WTSEnumerateSessionsW', 'WTSFreeMemory', 'WTSQuerySessionInformationW']);
+preloadPending(Wtsapi32, ['WTSEnumerateSessionsW', 'WTSFreeMemory', 'WTSQuerySessionInformationW']);
 const { WTSEnumerateSessionsW, WTSFreeMemory, WTSQuerySessionInformationW } = Wtsapi32;
 
 const SESSION_STATE_NAMES = ['active', 'connected', 'connect_query', 'shadow', 'disconnected', 'idle', 'listen', 'reset', 'down', 'init'] as const;

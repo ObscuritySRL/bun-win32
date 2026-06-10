@@ -1,13 +1,14 @@
 import Kernel32 from '@bun-win32/kernel32';
 import PowrProf, { POWER_INFORMATION_LEVEL } from '@bun-win32/powrprof';
 import Ntdll, { STATUS_SUCCESS, SystemInformationClass } from '@bun-win32/ntdll';
-import { type CpuTime, parseProcessorTimes } from './structs';
 import { cpuLayout } from './system';
+import { preloadPending } from './preload';
+import { type CpuTime, parseProcessorTimes } from './structs';
 
-Kernel32.Preload(['GetSystemTimes']);
-Ntdll.Preload(['NtQuerySystemInformation']);
+preloadPending(Kernel32, ['GetSystemTimes']);
+preloadPending(Ntdll, ['NtQuerySystemInformation']);
 const { GetSystemTimes } = Kernel32;
-PowrProf.Preload(['CallNtPowerInformation']);
+preloadPending(PowrProf, ['CallNtPowerInformation']);
 const { CallNtPowerInformation } = PowrProf;
 const { NtQuerySystemInformation } = Ntdll;
 

@@ -2,9 +2,10 @@ import { type Pointer, toArrayBuffer } from 'bun:ffi';
 import Kernel32 from '@bun-win32/kernel32';
 import PowrProf, { POWER_INFORMATION_LEVEL } from '@bun-win32/powrprof';
 import { formatGuid } from './structs';
+import { preloadPending } from './preload';
 
-Kernel32.Preload(['GetSystemPowerStatus', 'LocalFree']);
-PowrProf.Preload(['CallNtPowerInformation', 'PowerGetActiveScheme', 'PowerReadFriendlyName']);
+preloadPending(Kernel32, ['GetSystemPowerStatus', 'LocalFree']);
+preloadPending(PowrProf, ['CallNtPowerInformation', 'PowerGetActiveScheme', 'PowerReadFriendlyName']);
 const { GetSystemPowerStatus, LocalFree } = Kernel32;
 const { CallNtPowerInformation, PowerGetActiveScheme, PowerReadFriendlyName } = PowrProf;
 

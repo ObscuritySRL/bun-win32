@@ -1,9 +1,10 @@
 import Kernel32, { INFINITE } from '@bun-win32/kernel32';
+import { preloadPending } from './preload';
 
 const CREATE_WAITABLE_TIMER_HIGH_RESOLUTION = 0x2;
 const TIMER_ALL_ACCESS = 0x1f_0003;
 
-Kernel32.Preload(['CloseHandle', 'CreateWaitableTimerExW', 'QueryPerformanceCounter', 'QueryPerformanceFrequency', 'SetWaitableTimer', 'WaitForSingleObject']);
+preloadPending(Kernel32, ['CloseHandle', 'CreateWaitableTimerExW', 'QueryPerformanceCounter', 'QueryPerformanceFrequency', 'SetWaitableTimer', 'WaitForSingleObject']);
 const { CloseHandle, CreateWaitableTimerExW, QueryPerformanceCounter, QueryPerformanceFrequency, SetWaitableTimer, WaitForSingleObject } = Kernel32;
 
 export interface Ticker {

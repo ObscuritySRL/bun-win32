@@ -42,7 +42,7 @@
     "directory": "packages/sysmon"
   },
   "type": "module",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "main": "./index.ts",
   "keywords": [
     "bun",
@@ -74,6 +74,7 @@
     "memory.ts",
     "net.ts",
     "power.ts",
+    "preload.ts",
     "process.ts",
     "sampler.ts",
     "sessions.ts",

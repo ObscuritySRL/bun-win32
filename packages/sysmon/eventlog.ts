@@ -1,7 +1,8 @@
 import Wevtapi, { EvtFormatMessageFlags, EvtQueryFlags, EvtRenderFlags } from '@bun-win32/wevtapi';
 import { decodeNulTerminatedUnicodeString } from './structs';
+import { preloadPending } from './preload';
 
-Wevtapi.Preload(['EvtClose', 'EvtFormatMessage', 'EvtNext', 'EvtNextChannelPath', 'EvtOpenChannelEnum', 'EvtOpenPublisherMetadata', 'EvtQuery', 'EvtRender']);
+preloadPending(Wevtapi, ['EvtClose', 'EvtFormatMessage', 'EvtNext', 'EvtNextChannelPath', 'EvtOpenChannelEnum', 'EvtOpenPublisherMetadata', 'EvtQuery', 'EvtRender']);
 const { EvtClose, EvtFormatMessage, EvtNext, EvtNextChannelPath, EvtOpenChannelEnum, EvtOpenPublisherMetadata, EvtQuery, EvtRender } = Wevtapi;
 
 export interface EventRecord {

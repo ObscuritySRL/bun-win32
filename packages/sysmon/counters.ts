@@ -1,7 +1,8 @@
 import Pdh, { PdhCounterFormat, PdhDetailLevel } from '@bun-win32/pdh';
 import { parseMultiSz } from './structs';
+import { preloadPending } from './preload';
 
-Pdh.Preload(['PdhAddEnglishCounterW', 'PdhCloseQuery', 'PdhCollectQueryData', 'PdhEnumObjectItemsW', 'PdhEnumObjectsW', 'PdhExpandWildCardPathW', 'PdhGetFormattedCounterValue', 'PdhOpenQueryW', 'PdhRemoveCounter']);
+preloadPending(Pdh, ['PdhAddEnglishCounterW', 'PdhCloseQuery', 'PdhCollectQueryData', 'PdhEnumObjectItemsW', 'PdhEnumObjectsW', 'PdhExpandWildCardPathW', 'PdhGetFormattedCounterValue', 'PdhOpenQueryW', 'PdhRemoveCounter']);
 const { PdhAddEnglishCounterW, PdhCloseQuery, PdhCollectQueryData, PdhEnumObjectItemsW, PdhEnumObjectsW, PdhExpandWildCardPathW, PdhGetFormattedCounterValue, PdhOpenQueryW, PdhRemoveCounter } = Pdh;
 
 const PDH_CALC_NEGATIVE_DENOMINATOR = 0x8000_07d6;

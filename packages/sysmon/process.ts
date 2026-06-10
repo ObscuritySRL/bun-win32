@@ -1,13 +1,14 @@
 import Kernel32, { ProcessAccessRights } from '@bun-win32/kernel32';
 import User32 from '@bun-win32/user32';
 import Ntdll, { STATUS_SUCCESS, SystemInformationClass } from '@bun-win32/ntdll';
-import { monotonicMicroseconds } from './sampler';
-import { type ProcessInfo, decodeUnicodeString, parseProcessSnapshot } from './structs';
 import { cpuLayout } from './system';
+import { monotonicMicroseconds } from './sampler';
+import { preloadPending } from './preload';
+import { type ProcessInfo, decodeUnicodeString, parseProcessSnapshot } from './structs';
 
-Kernel32.Preload(['CloseHandle', 'GetProcessHandleCount', 'GetProcessIoCounters', 'OpenProcess', 'QueryFullProcessImageNameW']);
-User32.Preload(['GetGuiResources']);
-Ntdll.Preload(['NtQuerySystemInformation']);
+preloadPending(Kernel32, ['CloseHandle', 'GetProcessHandleCount', 'GetProcessIoCounters', 'OpenProcess', 'QueryFullProcessImageNameW']);
+preloadPending(User32, ['GetGuiResources']);
+preloadPending(Ntdll, ['NtQuerySystemInformation']);
 const { CloseHandle, GetProcessHandleCount, GetProcessIoCounters, OpenProcess, QueryFullProcessImageNameW } = Kernel32;
 const { GetGuiResources } = User32;
 const { NtQuerySystemInformation } = Ntdll;
