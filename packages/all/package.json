@@ -133,6 +133,7 @@
     "blackhole": "bun run example/blackhole.ts",
     "boids": "bun run example/boids.ts",
     "cam-filter": "bun run example/cam-filter.ts",
+    "claude-usage-taskbar": "bun run example/claude-usage-taskbar.ts",
     "cloth": "bun run example/cloth.ts",
     "clouds": "bun run example/clouds.ts",
     "core-scope": "bun run example/core-scope.ts",
