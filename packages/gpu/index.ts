@@ -1,3 +1,5 @@
+export { listAdapters } from './adapter';
+export type { AdapterInfo } from './adapter';
 export { makeConstantBuffer, makeStructuredBuffer, readbackBuffer, updateConstantBuffer, updateDynamicBuffer } from './buffer';
 export type { StructuredBuffer, StructuredBufferOptions } from './buffer';
 export { blobRelease, comRelease, guidBytes, hex, vcall } from './com';
