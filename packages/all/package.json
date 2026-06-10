@@ -46,6 +46,7 @@
     "@bun-win32/gdi32": "workspace:*",
     "@bun-win32/gdiplus": "workspace:*",
     "@bun-win32/glu32": "workspace:*",
+    "@bun-win32/gpu": "workspace:*",
     "@bun-win32/hid": "workspace:*",
     "@bun-win32/httpapi": "workspace:*",
     "@bun-win32/iphlpapi": "workspace:*",

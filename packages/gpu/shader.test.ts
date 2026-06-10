@@ -31,4 +31,13 @@ describe('compile guardrails (throw before any FFI call)', () => {
     const source = '[unroll] for (int i = 0; i < 4; i += 1) { value += noise(uv * i); }';
     expect(() => compile(source, 'main', 'ps_5_0')).toThrow('noise()');
   });
+  test('prose "noise (" inside a comment passes the guard (comments stripped)', () => {
+    const source = '// wipe the last per-pixel fit noise (scene detail is below cutoff) `\n[unroll] for (int i = 0; i < 4; i += 1) { value += 1.0; }';
+    expect(() => compile(source, 'main', 'ps_5_0')).toThrow('backtick');
+  });
+  test('user-defined vnoise() with [unroll] passes the guard (word boundary)', () => {
+    const source = 'float vnoise(float2 p) { return frac(sin(dot(p, float2(12.9, 78.2))) * 43758.5); } `';
+    // The backtick keeps this pre-FFI; the throw must be the backtick guard, not the noise guard.
+    expect(() => compile(`${source}\n[unroll] for (int i = 0; i < 4; i += 1) { value += vnoise(uv * i); }`, 'main', 'ps_5_0')).toThrow('backtick');
+  });
 });

@@ -62,11 +62,16 @@ function blobBufferSize(blob: bigint): bigint {
   return CFunction({ ptr: Number(fn) as Pointer, args: [FFIType.u64], returns: FFIType.u64 })(blob) as bigint;
 }
 
+const NOISE_INTRINSIC_PATTERN = /\bnoise\s*\(/;
+
 function guardSource(source: string, options: CompileOptions): void {
   if (source.includes('`')) {
     throw new Error('HLSL source contains a backtick. If this shader lives in a JS template literal, the literal terminated early and FXC is seeing truncated source (repo ground truth: this is the #1 demo-author trap).');
   }
-  if (options.allowNoise !== true && source.includes('noise(') && source.includes('[unroll')) {
+  // Strip comments (prose like "fit noise (scene…)" must not trip the guard), then
+  // match with a word boundary so user helpers like vnoise()/snoise() pass too.
+  const stripped = source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/[^\n]*/g, '');
+  if (options.allowNoise !== true && NOISE_INTRINSIC_PATTERN.test(stripped) && stripped.includes('[unroll')) {
     throw new Error('HLSL source combines noise() with [unroll] — FXC can hang for minutes compiling this (repo ground truth). Replace noise() with a hash function, or pass { allowNoise: true } to proceed anyway.');
   }
 }
