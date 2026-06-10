@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test';
-import { decodeUnicodeString, filetimeDeltaMs, filetimeToDate, parseMemoryStatusEx, parseMultiSz, parsePerformanceInfo, parseProcessorTimes } from './structs';
+import { decodeUnicodeString, filetimeDeltaMs, filetimeToDate, formatIpv6Address, parseMemoryStatusEx, parseMultiSz, parsePerformanceInfo, parseProcessorTimes, parseTcp6Table, parseTcpTable, parseUdpTable } from './structs';
 
 describe('decodeUnicodeString', () => {
   test('decodes UTF-16LE bytes at an offset', () => {
@@ -116,5 +116,75 @@ describe('parseProcessorTimes', () => {
     expect(times).toHaveLength(2);
     expect(times[0]).toEqual({ idle: 1_000_000n, kernel: 1_500_000n, user: 700_000n });
     expect(times[1]).toEqual({ idle: 2_000_000n, kernel: 2_100_000n, user: 50_000n });
+  });
+});
+
+describe('formatIpv6Address', () => {
+  test('compresses the longest zero run', () => {
+    const buffer = Buffer.alloc(16);
+    buffer[15] = 1; // ::1
+    expect(formatIpv6Address(buffer, 0)).toBe('::1');
+    const linkLocal = Buffer.alloc(16);
+    linkLocal.writeUInt16BE(0xfe80, 0);
+    linkLocal.writeUInt16BE(0x1234, 14);
+    expect(formatIpv6Address(linkLocal, 0)).toBe('fe80::1234');
+  });
+});
+
+describe('parseTcpTable', () => {
+  test('decodes rows, byte-swaps ports, reads PIDs', () => {
+    const buffer = Buffer.alloc(4 + 2 * 24);
+    buffer.writeUInt32LE(2, 0);
+    buffer.writeUInt32LE(2, 4); // state LISTEN
+    buffer.writeUInt32LE(0x0100_007f, 8); // 127.0.0.1 in memory order
+    buffer.writeUInt32LE(0x5000_0000 >>> 16, 12); // port 80 network order = 0x0050 → low u16 bytes 00 50
+    buffer.writeUInt16BE(80, 12); // dwLocalPort: network-order low word
+    buffer.writeUInt32LE(0, 16); // remote 0.0.0.0
+    buffer.writeUInt32LE(0, 20);
+    buffer.writeUInt32LE(4321, 24);
+    buffer.writeUInt32LE(5, 4 + 24); // state ESTABLISHED
+    buffer.writeUInt32LE(0x0a0a_0a0a, 4 + 24 + 4); // 10.10.10.10
+    buffer.writeUInt16BE(54321, 4 + 24 + 8);
+    buffer.writeUInt32LE(0x08080808, 4 + 24 + 12); // 8.8.8.8
+    buffer.writeUInt16BE(443, 4 + 24 + 16);
+    buffer.writeUInt32LE(9876, 4 + 24 + 20);
+    const rows = parseTcpTable(buffer);
+    expect(rows).toHaveLength(2);
+    expect(rows[0]).toMatchObject({ family: 4, localAddress: '127.0.0.1', localPort: 80, state: 2, stateName: 'LISTEN' });
+    expect(rows[1]).toMatchObject({ family: 4, localAddress: '10.10.10.10', localPort: 54321, remoteAddress: '8.8.8.8', remotePort: 443, state: 5, stateName: 'ESTABLISHED', pid: 9876 });
+  });
+
+  test('empty table', () => {
+    const buffer = Buffer.alloc(4);
+    expect(parseTcpTable(buffer)).toEqual([]);
+  });
+});
+
+describe('parseTcp6Table', () => {
+  test('decodes 56-byte rows with 16-byte addresses', () => {
+    const buffer = Buffer.alloc(4 + 56);
+    buffer.writeUInt32LE(1, 0);
+    buffer[4 + 15] = 1; // local ::1
+    buffer.writeUInt16BE(8080, 4 + 20); // local port network order
+    buffer.writeUInt16BE(0x2001, 4 + 24); // remote 2001::42
+    buffer[4 + 24 + 15] = 0x42;
+    buffer.writeUInt16BE(443, 4 + 44);
+    buffer.writeUInt32LE(5, 4 + 48); // ESTABLISHED
+    buffer.writeUInt32LE(1234, 4 + 52);
+    const rows = parseTcp6Table(buffer);
+    expect(rows).toHaveLength(1);
+    expect(rows[0]).toMatchObject({ family: 6, localAddress: '::1', localPort: 8080, remoteAddress: '2001::42', remotePort: 443, state: 5, pid: 1234 });
+  });
+});
+
+describe('parseUdpTable', () => {
+  test('decodes 12-byte rows', () => {
+    const buffer = Buffer.alloc(4 + 12);
+    buffer.writeUInt32LE(1, 0);
+    buffer.writeUInt32LE(0, 4); // 0.0.0.0
+    buffer.writeUInt16BE(53, 4 + 4);
+    buffer.writeUInt32LE(999, 4 + 8);
+    const rows = parseUdpTable(buffer);
+    expect(rows[0]).toMatchObject({ family: 4, localAddress: '0.0.0.0', localPort: 53, pid: 999 });
   });
 });
