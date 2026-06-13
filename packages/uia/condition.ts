@@ -8,7 +8,7 @@ import { FFIType } from 'bun:ffi';
 import Oleaut32 from '@bun-win32/oleaut32';
 
 import { comRelease, vcall } from './com';
-import { type ControlType, PropertyId, S_OK, SLOT, VT_BSTR, VT_I4 } from './constants';
+import { ControlType, PropertyId, S_OK, SLOT, VT_BSTR, VT_I4 } from './constants';
 
 export interface Selector {
   automationId?: string;
@@ -26,6 +26,24 @@ export interface ElementProperties {
   className: string;
   controlType: number;
   name: string;
+}
+
+/** Render a selector as a readable string for error messages. */
+export function selectorToString(selector: Selector): string {
+  const parts: string[] = [];
+  if (selector.controlType !== undefined) parts.push(`controlType: ${ControlType[selector.controlType] ?? selector.controlType}`);
+  if (selector.name !== undefined) parts.push(`name: ${selector.name instanceof RegExp ? selector.name.toString() : JSON.stringify(selector.name)}`);
+  if (selector.nameContains !== undefined) parts.push(`nameContains: ${JSON.stringify(selector.nameContains)}`);
+  if (selector.automationId !== undefined) parts.push(`automationId: ${JSON.stringify(selector.automationId)}`);
+  if (selector.className !== undefined) parts.push(`className: ${JSON.stringify(selector.className)}`);
+  return `{ ${parts.join(', ')} }`;
+}
+
+/** Build the actionable "no element matched … nearest were …" message (the gripe→error design). */
+export function formatNoMatch(selector: Selector, windowName: string, candidateNames: readonly string[]): string {
+  const nearest = candidateNames.filter((candidate) => candidate.trim().length > 0).slice(0, 8);
+  const tail = nearest.length > 0 ? ` — nearest: ${nearest.map((candidate) => JSON.stringify(candidate)).join(', ')}` : '';
+  return `no element matched ${selectorToString(selector)} in "${windowName}"${tail}`;
 }
 
 /** Match a (already-read) element against a selector — all fields AND together. Pure logic. */

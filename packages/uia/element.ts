@@ -8,7 +8,7 @@ import User32 from '@bun-win32/user32';
 import { automation } from './automation';
 import type { CacheRequest } from './cache';
 import { comRelease, hresult, vcall } from './com';
-import { compileCondition, type ElementProperties, matches, type Selector } from './condition';
+import { compileCondition, type ElementProperties, formatNoMatch, matches, type Selector } from './condition';
 import { ControlType, S_OK, SLOT, TreeScope } from './constants';
 import { clickAt, type as inputType } from './input';
 import {
@@ -166,6 +166,31 @@ export class Element {
     } finally {
       comRelease(condition);
     }
+  }
+
+  /**
+   * Poll `find` until the selector matches or `timeout` (ms) elapses — the killer feature for flaky
+   * native UIs. Paced by an async sleep (never busy-spins). On timeout, throws an error quoting the
+   * selector, this element's name, and the nearest candidates.
+   */
+  async waitFor(selector: Selector, options: { timeout?: number; interval?: number } = {}): Promise<Element> {
+    const timeout = options.timeout ?? 5000;
+    const interval = options.interval ?? 100;
+    const start = Bun.nanoseconds();
+    for (;;) {
+      const found = this.find(selector);
+      if (found !== null) return found;
+      if ((Bun.nanoseconds() - start) / 1e6 >= timeout) throw new Error(this.describeNoMatch(selector));
+      await Bun.sleep(interval);
+    }
+  }
+
+  /** Build the actionable no-match message by scanning the candidate set under this element. */
+  describeNoMatch(selector: Selector): string {
+    const candidates = this.findAll(selector.controlType !== undefined ? { controlType: selector.controlType } : {});
+    const names = candidates.map((candidate) => candidate.name);
+    for (const candidate of candidates) candidate.release();
+    return formatNoMatch(selector, this.name, names);
   }
 
   /** Every descendant (by default) matching the selector. The caller owns and should release them. */
@@ -382,4 +407,48 @@ export function root(): Element {
   const pointer = scratch8.readBigUInt64LE(0);
   if (hr !== S_OK || pointer === 0n) throw new Error(`GetRootElement failed: ${hresult(hr)}`);
   return new Element(pointer);
+}
+
+/** A top-level window — an Element scoped to a window handle, with `using`-friendly disposal. */
+export class Window extends Element {
+  readonly hWnd: bigint;
+
+  constructor(ptr: bigint, hWnd: bigint) {
+    super(ptr);
+    this.hWnd = hWnd;
+  }
+
+  /** Bring the window to the foreground (best-effort; blocked on a locked session). */
+  activate(): this {
+    User32.SetForegroundWindow(this.hWnd);
+    return this;
+  }
+
+  /** Release the window element. Enables `using app = uia.attach(...)`. */
+  dispose(): void {
+    this.release();
+  }
+
+  [Symbol.dispose](): void {
+    this.dispose();
+  }
+}
+
+function resolveWindow(target: string | bigint | { className?: string; title?: string }): bigint {
+  if (typeof target === 'bigint') return target;
+  const title = typeof target === 'string' ? target : target.title;
+  const className = typeof target === 'string' ? undefined : target.className;
+  const classBuffer = className === undefined ? null : Buffer.from(`${className}\0`, 'utf16le').ptr!;
+  const titleBuffer = title === undefined ? null : Buffer.from(`${title}\0`, 'utf16le').ptr!;
+  return User32.FindWindowW(classBuffer, titleBuffer);
+}
+
+/** Attach to a top-level window by title, window handle, or `{ title, className }`. Throws if absent. */
+export function attach(target: string | bigint | { className?: string; title?: string }): Window {
+  const hWnd = resolveWindow(target);
+  if (hWnd === 0n) throw new Error(`attach: no window found for ${JSON.stringify(target, (_key, value) => (typeof value === 'bigint' ? `0x${value.toString(16)}` : value))}`);
+  const hr = vcall(automation(), SLOT.ElementFromHandle, [FFIType.u64, FFIType.ptr], [hWnd, scratch8.ptr!]);
+  const pointer = scratch8.readBigUInt64LE(0);
+  if (hr !== S_OK || pointer === 0n) throw new Error(`attach: ElementFromHandle failed: ${hresult(hr)}`);
+  return new Window(pointer, hWnd);
 }
