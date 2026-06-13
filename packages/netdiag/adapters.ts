@@ -1,6 +1,6 @@
 import { decodeSockaddr, macFromBytes } from './addr';
 import { addressFamilyValue, type AddressFamilyName } from './constants';
-import { Iphlpapi, SizedBufferState, walkList } from './win32';
+import { Iphlpapi, readAnsiAt, readWideAt, SizedBufferState, walkList } from './win32';
 
 // IP_ADAPTER_ADDRESSES_LH (x64) field offsets — verified vs iptypes.h + ipconfig /all (S3.3).
 const NODE_IF_INDEX = 4;
@@ -56,19 +56,6 @@ export interface Adapter {
 }
 
 const adapterState = new SizedBufferState(0x0000_8000);
-
-function readAnsiAt(base: Buffer, offset: number): string {
-  if (offset < 0) return '';
-  const end = base.indexOf(0, offset);
-  return base.toString('ascii', offset, end < 0 ? base.byteLength : end);
-}
-
-function readWideAt(base: Buffer, offset: number): string {
-  if (offset < 0) return '';
-  let end = offset;
-  while (end + 1 < base.byteLength && base.readUInt16LE(end) !== 0) end += 2;
-  return base.toString('utf16le', offset, end);
-}
 
 function pointerToOffset(base: Buffer, baseAddress: number, fieldOffset: number): number {
   const pointer = Number(base.readBigUInt64LE(fieldOffset));

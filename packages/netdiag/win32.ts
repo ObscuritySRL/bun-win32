@@ -103,6 +103,21 @@ export function* walkList(base: Buffer, headPointer: number, nextOffset: number)
   }
 }
 
+/** ASCII string from `offset` up to NUL (or buffer end). Negative offset ⇒ ''. */
+export function readAnsiAt(base: Buffer, offset: number): string {
+  if (offset < 0) return '';
+  const end = base.indexOf(0, offset);
+  return base.toString('ascii', offset, end < 0 ? base.byteLength : end);
+}
+
+/** UTF-16LE string from `offset` up to the NUL terminator. Negative offset ⇒ '' (repo memory: Bun's TextDecoder rejects 'utf-16le'; use Buffer). */
+export function readWideAt(base: Buffer, offset: number): string {
+  if (offset < 0) return '';
+  let end = offset;
+  while (end + 1 < base.byteLength && base.readUInt16LE(end) !== 0) end += 2;
+  return base.toString('utf16le', offset, end);
+}
+
 const mibTableOut = Buffer.allocUnsafeSlow(8);
 
 /**
