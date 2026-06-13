@@ -2,6 +2,8 @@ export * from './adapters';
 export * from './addr';
 export * from './arp';
 export * from './constants';
+export * from './ping';
 export * from './routes';
 export * from './sockets';
+export * from './traceroute';
 export * from './win32';
