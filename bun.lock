@@ -41,7 +41,7 @@
     },
     "packages/all": {
       "name": "@bun-win32/all",
-      "version": "1.1.4",
+      "version": "1.2.0",
       "dependencies": {
         "@bun-win32/activeds": "workspace:*",
         "@bun-win32/advapi32": "workspace:*",
@@ -290,7 +290,7 @@
     },
     "packages/bun-win32": {
       "name": "bun-win32",
-      "version": "1.0.4",
+      "version": "1.0.5",
       "dependencies": {
         "@bun-win32/all": "workspace:*",
       },
@@ -371,7 +371,7 @@
     },
     "packages/combase": {
       "name": "@bun-win32/combase",
-      "version": "1.0.1",
+      "version": "1.1.0",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -1456,7 +1456,6 @@
         "@bun-win32/gdi32": "workspace:*",
         "@bun-win32/oleacc": "workspace:*",
         "@bun-win32/oleaut32": "workspace:*",
-        "@bun-win32/uiautomationcore": "workspace:*",
         "@bun-win32/user32": "workspace:*",
       },
       "devDependencies": {
