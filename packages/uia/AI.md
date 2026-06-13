@@ -57,7 +57,10 @@ Escalation rule: stay on the `uia` facade. Drop to a lower engine (`msaaTree`, t
 Adds `hWnd: bigint`, `activate()`, `screenshot(): Uint8Array`, `dispose()` / `[Symbol.dispose]`.
 
 ### Selector & matching
-`interface Selector { controlType?, name? (string | RegExp), nameContains?, automationId?, className? }`. `matches(props, selector)`, `selectorToString(selector)`, `formatNoMatch(selector, windowName, candidateNames)`.
+`interface Selector { controlType?, name? (string | RegExp), nameContains?, automationId?, className? }`. `interface ElementProperties { name, controlType, automationId, className }` (what `matches` reads). `matches(props, selector)`, `selectorToString(selector)`, `formatNoMatch(selector, windowName, candidateNames)`.
+
+### Root accessors (return a live `Element`/`Window`)
+`fromHandle(hWnd)` (an `Element` for a window handle — `attach` wraps this in a `Window`), `focused()`, `fromPoint(x, y)`, `root()`.
 
 ### Constants / enums
 `ControlType` (Button=50000 … AppBar=50040), `PatternId` (10000–10033), `PropertyId` (30000–30024), `TreeScope`, `PropertyConditionFlags`, `ToggleState`, `ExpandCollapseState`, `WindowVisualState`, `SLOT` (verified vtable slots).
@@ -66,7 +69,7 @@ Adds `hWnd: bigint`, `activate()`, `screenshot(): Uint8Array`, `dispose()` / `[S
 `createCacheRequest(properties?, scope?, mode?)`, `class CacheRequest { property, pattern, treeScope, elementMode, release }`, `DEFAULT_CACHE_PROPERTIES`, `AutomationElementMode`.
 
 ### Tree / agent
-`serialize(element, options?): UiaNode`, `interface UiaNode { role, name, automationId?, className?, bounds?, enabled?, children }`, `countNodes`, `estimateTokens`, `execute(element, actions): AgentActionResult[]`, `AGENT_TOOLS`, `groundingTree(element)`, `type AgentAction`.
+`serialize(element, options?: SerializeOptions): UiaNode`, `interface SerializeOptions { maxDepth?, agentProfile? }`, `interface UiaNode { role, name, automationId?, className?, bounds?, enabled?, children }`, `countNodes`, `estimateTokens`, `execute(element, actions): AgentActionResult[]`, `AGENT_TOOLS`, `groundingTree(element)`, `type AgentAction`.
 
 ### Windows / input / msaa / low-level
 `findWindow`, `listWindows`, `windowForProcess`, `screenshot`, `type WindowInfo`; `sendKeys`, `clickAt`, `virtualKeyCode`, `INPUT_SIZE`, `packKeyboardInput`, `packMouseInput`; `msaaTree`, `accessibleFromWindow`, `type MsaaNode`; `vcall`, `comRelease`, `guid`, `hresult`, `getBstr`, `getLong`, `getRect`, `getHandle`, `decodeBstr`, `encodePNG`, `initialize`, `uninitialize`, `automation`, `type Rect`.
