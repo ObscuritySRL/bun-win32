@@ -1,0 +1,83 @@
+{
+  "author": "Stev Peifer <stev.p@outlook.com>",
+  "bugs": {
+    "url": "https://github.com/ObscuritySRL/bun-win32/issues"
+  },
+  "dependencies": {
+    "@bun-win32/combase": "workspace:*",
+    "@bun-win32/core": "workspace:*",
+    "@bun-win32/oleacc": "workspace:*",
+    "@bun-win32/oleaut32": "workspace:*",
+    "@bun-win32/uiautomationcore": "workspace:*",
+    "@bun-win32/user32": "workspace:*"
+  },
+  "description": "Playwright for Windows desktop apps — query the UI Automation accessibility tree, invoke controls by name, type, and assert, from Bun. Zero native dependencies, no node-gyp, no server.",
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "exports": {
+    ".": "./index.ts"
+  },
+  "license": "MIT",
+  "module": "index.ts",
+  "name": "@bun-win32/uia",
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "private": false,
+  "publishConfig": {
+    "access": "public"
+  },
+  "homepage": "https://github.com/ObscuritySRL/bun-win32#readme",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/ObscuritySRL/bun-win32.git",
+    "directory": "packages/uia"
+  },
+  "type": "module",
+  "version": "1.0.0",
+  "main": "./index.ts",
+  "keywords": [
+    "accessibility",
+    "automation",
+    "bun",
+    "desktop",
+    "e2e",
+    "ffi",
+    "playwright",
+    "testing",
+    "typescript",
+    "uiautomation",
+    "win32",
+    "windows"
+  ],
+  "files": [
+    "AI.md",
+    "README.md",
+    "automation.ts",
+    "cache.ts",
+    "com.ts",
+    "condition.ts",
+    "constants.ts",
+    "element.ts",
+    "index.ts",
+    "input.ts",
+    "msaa.ts",
+    "patterns.ts",
+    "tree.ts",
+    "window.ts"
+  ],
+  "sideEffects": false,
+  "engines": {
+    "bun": ">=1.1.0"
+  },
+  "scripts": {
+    "example:agent-grounding": "bun ./example/agent-grounding.ts",
+    "example:automate-calculator": "bun ./example/automate-calculator.ts",
+    "example:benchmark": "bun ./example/benchmark.ts",
+    "example:hello-uia": "bun ./example/hello-uia.ts",
+    "example:inspector": "bun ./example/inspector.ts",
+    "example:selftest": "bun ./example/uia.selftest.ts",
+    "example:uia-report": "bun ./example/uia-report.ts"
+  }
+}
