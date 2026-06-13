@@ -96,7 +96,7 @@ export function sendEcho(destination: number, ttl: number, timeoutMs: number, pa
     optionsBuffer.writeUInt32LE(0, 4); // OptionsData = NULL
     optionsPointer = optionsBuffer.ptr;
   }
-  const size = payloadSize < 0 ? 0 : payloadSize > requestData.byteLength ? requestData.byteLength : payloadSize;
+  const size = payloadSize < 0 ? 0 : payloadSize > 0xffff ? 0xffff : payloadSize; // RequestSize is a WORD
   const replies = Iphlpapi.IcmpSendEcho(handle(), destination, requestData.ptr, size, optionsPointer, replyBuffer.ptr, replyBuffer.byteLength, timeoutMs);
   if (replies === 0) {
     // 0 replies = no echo arrived. GetLastError carries the IP_STATUS, but Bun's FFI does not
@@ -156,6 +156,9 @@ export async function pingSweep(prefix: string, options: { timeoutMs?: number } 
     .replace(/\/\d+$/, '')
     .split('.')
     .map(Number); // accepts '192.168.0', '192.168.0.0', '192.168.0.0/24'
+  if (octets.length < 3 || octets.slice(0, 3).some((octet) => !Number.isInteger(octet) || octet < 0 || octet > 255)) {
+    throw new Error(`pingSweep prefix must be a /24 base like '192.168.0' (got "${prefix}")`);
+  }
   const prefixWord = (octets[0] | (octets[1] << 8) | (octets[2] << 16)) >>> 0;
   const icmpHandle = handle();
 
