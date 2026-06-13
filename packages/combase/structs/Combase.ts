@@ -5,6 +5,7 @@ import { Win32 } from '@bun-win32/core';
 import type {
   AgileReferenceOptions,
   BOOL,
+  DWORD,
   HRESULT,
   HSTRING,
   HSTRING_BUFFER,
@@ -13,10 +14,12 @@ import type {
   IRoMetaDataLocator,
   IUnknown,
   LPBOOL,
+  LPCLSID,
   LPGUID,
   LPLPVOID,
   LPLPWSTR,
   LPPCWSTR,
+  LPUNKNOWN,
   LPVOID,
   NULL,
   PAPARTMENT_SHUTDOWN_REGISTRATION_COOKIE,
@@ -39,6 +42,7 @@ import type {
   PUINT_PTR,
   PULONG,
   PVOID,
+  REFCLSID,
   REFIID,
   RO_INIT_TYPE,
   RO_REGISTRATION_COOKIE,
@@ -79,6 +83,11 @@ class Combase extends Win32 {
 
   /** @inheritdoc */
   protected static override readonly Symbols = {
+    // real combase exports, verified by dumpbin (ole32 only forwards these)
+    CLSIDFromString: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
+    CoCreateInstance: { args: [FFIType.ptr, FFIType.u64, FFIType.u32, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
+    CoInitializeEx: { args: [FFIType.ptr, FFIType.u32], returns: FFIType.i32 },
+    CoUninitialize: { args: [], returns: FFIType.void },
     GetRestrictedErrorInfo: { args: [FFIType.ptr], returns: FFIType.i32 },
     HSTRING_UserFree: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.void },
     HSTRING_UserMarshal: { args: [FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.ptr },
@@ -136,6 +145,26 @@ class Combase extends Win32 {
     WindowsTrimStringEnd: { args: [FFIType.u64, FFIType.u64, FFIType.ptr], returns: FFIType.i32 },
     WindowsTrimStringStart: { args: [FFIType.u64, FFIType.u64, FFIType.ptr], returns: FFIType.i32 },
   } as const satisfies Record<string, FFIFunction>;
+
+  // https://learn.microsoft.com/en-us/windows/win32/api/combaseapi/nf-combaseapi-clsidfromstring
+  public static CLSIDFromString(lpsz: PCWSTR, pclsid: LPCLSID): HRESULT {
+    return Combase.Load('CLSIDFromString')(lpsz, pclsid);
+  }
+
+  // https://learn.microsoft.com/en-us/windows/win32/api/combaseapi/nf-combaseapi-cocreateinstance
+  public static CoCreateInstance(rclsid: REFCLSID, pUnkOuter: LPUNKNOWN | 0n, dwClsContext: DWORD, riid: REFIID, ppv: LPLPVOID): HRESULT {
+    return Combase.Load('CoCreateInstance')(rclsid, pUnkOuter, dwClsContext, riid, ppv);
+  }
+
+  // https://learn.microsoft.com/en-us/windows/win32/api/combaseapi/nf-combaseapi-coinitializeex
+  public static CoInitializeEx(pvReserved: LPVOID | NULL, dwCoInit: DWORD): HRESULT {
+    return Combase.Load('CoInitializeEx')(pvReserved, dwCoInit);
+  }
+
+  // https://learn.microsoft.com/en-us/windows/win32/api/combaseapi/nf-combaseapi-couninitialize
+  public static CoUninitialize(): void {
+    return Combase.Load('CoUninitialize')();
+  }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/roerrorapi/nf-roerrorapi-getrestrictederrorinfo
   public static GetRestrictedErrorInfo(ppRestrictedErrorInfo: LPLPVOID): HRESULT {
