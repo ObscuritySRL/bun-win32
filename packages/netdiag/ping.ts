@@ -130,7 +130,61 @@ export async function ping(host: string, options: PingOptions = {}): Promise<Pin
   };
 }
 
-/** Ping several hosts — no N-process fork (the async /24 sweep, 10b, adds true concurrency over IcmpSendEcho2). */
+/** Ping several hosts — no N-process fork (the async /24 sweep, pingSweep, adds true concurrency over IcmpSendEcho2). */
 export function pingMany(hosts: string[], options: PingOptions = {}): Promise<PingReply[]> {
   return Promise.all(hosts.map((host) => ping(host, options)));
+}
+
+export interface SweepReply {
+  address: string;
+  alive: boolean;
+  roundTripMs: number;
+}
+
+const sweepRequest = Buffer.allocUnsafeSlow(32);
+sweepRequest.fill(0x61);
+
+/**
+ * Async /24 subnet sweep: fan out IcmpSendEcho2 with a Win32 Event per host (NOT
+ * the ApcRoutine — that fires on a foreign alertable thread, a JSCallback crash
+ * class), then collect. Wall time ≈ one timeout, not N×timeout — the thing
+ * scrapers can't do without forking N processes. `prefix` is a /24 base.
+ */
+export async function pingSweep(prefix: string, options: { timeoutMs?: number } = {}): Promise<SweepReply[]> {
+  const timeoutMs = options.timeoutMs ?? 1000;
+  const octets = prefix
+    .replace(/\/\d+$/, '')
+    .split('.')
+    .map(Number); // accepts '192.168.0', '192.168.0.0', '192.168.0.0/24'
+  const prefixWord = (octets[0] | (octets[1] << 8) | (octets[2] << 16)) >>> 0;
+  const icmpHandle = handle();
+
+  const addresses: string[] = [];
+  const events: bigint[] = [];
+  const replyBuffers: Buffer[] = [];
+  for (let host = 1; host <= 254; host++) {
+    const destination = (prefixWord | (host << 24)) >>> 0;
+    const event = Kernel32.CreateEventW(null, 1, 0, null); // manual-reset, non-signaled
+    const reply = Buffer.allocUnsafeSlow(256);
+    addresses.push(`${octets[0]}.${octets[1]}.${octets[2]}.${host}`);
+    events.push(event);
+    replyBuffers.push(reply);
+    Iphlpapi.IcmpSendEcho2(icmpHandle, event, null, null, destination, sweepRequest.ptr, 32, null, reply.ptr, reply.byteLength, timeoutMs); // ERROR_IO_PENDING
+  }
+
+  await Bun.sleep(timeoutMs + 250); // all events signal by completion/timeout
+
+  const result: SweepReply[] = [];
+  for (let index = 0; index < addresses.length; index++) {
+    let alive = false;
+    let roundTripMs = 0;
+    if (Kernel32.WaitForSingleObject(events[index], 0) === 0 && Iphlpapi.IcmpParseReplies(replyBuffers[index].ptr, replyBuffers[index].byteLength) > 0) {
+      const view = new DataView(replyBuffers[index].buffer, replyBuffers[index].byteOffset, replyBuffers[index].byteLength);
+      alive = view.getUint32(4, true) === ICMP_SUCCESS;
+      roundTripMs = view.getUint32(8, true);
+    }
+    result.push({ address: addresses[index], alive, roundTripMs });
+    Kernel32.CloseHandle(events[index]);
+  }
+  return result;
 }

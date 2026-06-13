@@ -7,6 +7,7 @@ const WLAN_API_VERSION_2_0 = 0x0000_0002;
 const WLAN_INTF_OPCODE_CURRENT_CONNECTION = 0x0000_0007;
 const WLAN_CONNECTION_MODE_PROFILE = 0x0000_0000;
 const DOT11_BSS_TYPE_INFRASTRUCTURE = 0x0000_0001;
+const DOT11_BSS_TYPE_ANY = 0x0000_0003;
 const INTERFACE_ENTRY_SIZE = 532; // WLAN_INTERFACE_INFO
 const NETWORK_ENTRY_SIZE = 628; // WLAN_AVAILABLE_NETWORK
 const LIST_HEADER_SIZE = 8; // dwNumberOfItems + dwIndex
@@ -95,6 +96,15 @@ export interface WifiConnection {
   secured: boolean;
   authAlgorithm: string;
   cipherAlgorithm: string;
+}
+
+export interface WifiBss {
+  ssid: string;
+  bssid: string;
+  rssi: number;
+  linkQuality: number;
+  phyType: string;
+  channelFrequencyKhz: number;
 }
 
 export interface WifiScanOptions {
@@ -260,6 +270,52 @@ export function wifiConnection(interfaceGuid?: string): WifiConnection | null {
   } finally {
     if (listPointer !== 0) Wlanapi.WlanFreeMemory(listPointer as Pointer);
   }
+}
+
+// WLAN_BSS_ENTRY (x64) — netdiag authors this decoder; entries are VARIABLE length (advance by ulIeOffset + ulIeSize).
+const BSS_ENTRY_SSID = 0;
+const BSS_ENTRY_BSSID = 40;
+const BSS_ENTRY_PHY_TYPE = 52;
+const BSS_ENTRY_RSSI = 56; // LONG — SIGNED dBm, distinct from the 0–100 signalQuality
+const BSS_ENTRY_LINK_QUALITY = 60;
+const BSS_ENTRY_CHANNEL_FREQUENCY = 92;
+const BSS_ENTRY_IE_OFFSET = 352;
+const BSS_ENTRY_IE_SIZE = 356;
+
+/** Per-BSSID census with signed-dBm RSSI + channel-center frequency via WlanGetNetworkBssList. WLAN_BSS_LIST: dwTotalSize@0, dwNumberOfItems@4. */
+export function wifiBssList(interfaceGuid?: string): WifiBss[] {
+  const { listPointer, interfaces } = enumerateInterfaces();
+  const result: WifiBss[] = [];
+  try {
+    const target = selectInterface(interfaces, interfaceGuid);
+    if (target === undefined) return result;
+    const bssListBuffer = Buffer.allocUnsafeSlow(8);
+    if (Wlanapi.WlanGetNetworkBssList(handle(), target.pointer, null, DOT11_BSS_TYPE_ANY, 0, null, bssListBuffer.ptr) !== 0) return result;
+    const bssListPointer = Number(bssListBuffer.readBigUInt64LE(0));
+    if (bssListPointer === 0) return result;
+    try {
+      const totalSize = Buffer.from(toArrayBuffer(bssListPointer as Pointer, 0, LIST_HEADER_SIZE)).readUInt32LE(0);
+      const blob = Buffer.from(toArrayBuffer(bssListPointer as Pointer, 0, totalSize));
+      const count = blob.readUInt32LE(4);
+      let offset = LIST_HEADER_SIZE;
+      for (let index = 0; index < count && offset + BSS_ENTRY_IE_SIZE + 4 <= totalSize; index++) {
+        result.push({
+          ssid: readSsid(blob, offset + BSS_ENTRY_SSID),
+          bssid: macFromBytes(blob, offset + BSS_ENTRY_BSSID, 6),
+          rssi: blob.readInt32LE(offset + BSS_ENTRY_RSSI),
+          linkQuality: blob.readUInt32LE(offset + BSS_ENTRY_LINK_QUALITY),
+          phyType: PHY_NAMES.get(blob.readUInt32LE(offset + BSS_ENTRY_PHY_TYPE)) ?? 'unknown',
+          channelFrequencyKhz: blob.readUInt32LE(offset + BSS_ENTRY_CHANNEL_FREQUENCY),
+        });
+        offset = (offset + blob.readUInt32LE(offset + BSS_ENTRY_IE_OFFSET) + blob.readUInt32LE(offset + BSS_ENTRY_IE_SIZE) + 7) & ~7; // entries are 8-aligned
+      }
+    } finally {
+      Wlanapi.WlanFreeMemory(bssListPointer as Pointer);
+    }
+  } finally {
+    if (listPointer !== 0) Wlanapi.WlanFreeMemory(listPointer as Pointer);
+  }
+  return result;
 }
 
 function reasonCodeToString(reasonCode: number): string {
