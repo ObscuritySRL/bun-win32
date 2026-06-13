@@ -6,6 +6,7 @@
   "dependencies": {
     "@bun-win32/combase": "workspace:*",
     "@bun-win32/core": "workspace:*",
+    "@bun-win32/gdi32": "workspace:*",
     "@bun-win32/oleacc": "workspace:*",
     "@bun-win32/oleaut32": "workspace:*",
     "@bun-win32/uiautomationcore": "workspace:*",
@@ -64,6 +65,8 @@
     "input.ts",
     "msaa.ts",
     "patterns.ts",
+    "png.ts",
+    "reads.ts",
     "tree.ts",
     "window.ts"
   ],

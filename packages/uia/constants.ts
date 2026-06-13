@@ -28,6 +28,7 @@ export const IID_IUIAutomation = '{30CBE57D-D9D0-452A-AB13-7AC5AC4825EE}';
 export const VT_I4 = 0x0003;
 export const VT_R8 = 0x0005;
 export const VT_BSTR = 0x0008;
+export const VT_DISPATCH = 0x0009;
 export const VT_BOOL = 0x000b;
 
 export enum TreeScope {
@@ -176,6 +177,7 @@ export const SLOT = {
   FindAll: 6, // PROVEN
   FindFirstBuildCache: 7,
   FindAllBuildCache: 8,
+  BuildUpdatedCache: 9,
   GetCachedParent: 18,
   GetCachedChildren: 19,
   GetCurrentPattern: 16, // PROVEN
@@ -188,6 +190,7 @@ export const SLOT = {
   get_CurrentBoundingRectangle: 43, // PROVEN (RECT = 4x LONG, 16 bytes; matches GetWindowRect)
   get_CachedControlType: 53,
   get_CachedName: 55,
+  get_CachedIsEnabled: 60,
   get_CachedAutomationId: 61,
   get_CachedClassName: 62,
   get_CachedBoundingRectangle: 75,

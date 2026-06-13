@@ -11,6 +11,7 @@ import { comRelease, hresult, vcall } from './com';
 import { compileCondition, type ElementProperties, formatNoMatch, matches, type Selector } from './condition';
 import { ControlType, S_OK, SLOT, TreeScope } from './constants';
 import { clickAt, type as inputType } from './input';
+import { screenshot as windowScreenshot, windowForProcess } from './window';
 import {
   collapse,
   expand,
@@ -242,7 +243,39 @@ export class Element {
     }
   }
 
-  // --- cached property reads (valid only on elements returned by findAllCached) ---
+  /** Refresh this element's cache (properties + structure) per the request. Returns the cached element. */
+  buildUpdatedCache(request: CacheRequest): Element {
+    if (vcall(this.ptr, SLOT.BuildUpdatedCache, [FFIType.u64, FFIType.ptr], [request.ptr, scratch8.ptr!]) !== S_OK) return this;
+    const pointer = scratch8.readBigUInt64LE(0);
+    return pointer === 0n ? this : new Element(pointer);
+  }
+
+  // --- cached property reads (valid only on elements returned by findAllCached / buildUpdatedCache) ---
+
+  /** Cached immediate children (in-proc; valid after a Subtree-scoped buildUpdatedCache). */
+  get cachedChildren(): Element[] {
+    if (vcall(this.ptr, SLOT.GetCachedChildren, [FFIType.ptr], [scratch8.ptr!]) !== S_OK) return [];
+    const pArray = scratch8.readBigUInt64LE(0);
+    if (pArray === 0n) return [];
+    try {
+      if (vcall(pArray, SLOT.get_Length, [FFIType.ptr], [scratch4.ptr!]) !== S_OK) return [];
+      const length = scratch4.readInt32LE(0);
+      const children: Element[] = new Array(length);
+      let count = 0;
+      for (let index = 0; index < length; index += 1) {
+        if (vcall(pArray, SLOT.GetElement, [FFIType.i32, FFIType.ptr], [index, scratch8.ptr!]) !== S_OK) continue;
+        const pointer = scratch8.readBigUInt64LE(0);
+        if (pointer !== 0n) {
+          children[count] = new Element(pointer);
+          count += 1;
+        }
+      }
+      children.length = count;
+      return children;
+    } finally {
+      comRelease(pArray);
+    }
+  }
 
   get cachedAutomationId(): string {
     return getBstr(this.ptr, SLOT.get_CachedAutomationId);
@@ -258,6 +291,10 @@ export class Element {
 
   get cachedControlType(): number {
     return getLong(this.ptr, SLOT.get_CachedControlType);
+  }
+
+  get cachedIsEnabled(): boolean {
+    return getLong(this.ptr, SLOT.get_CachedIsEnabled) !== 0;
   }
 
   get cachedName(): string {
@@ -424,6 +461,11 @@ export class Window extends Element {
     return this;
   }
 
+  /** Capture the window via PrintWindow as PNG bytes (blank on a locked session). */
+  screenshot(): Uint8Array {
+    return windowScreenshot(this.hWnd);
+  }
+
   /** Release the window element. Enables `using app = uia.attach(...)`. */
   dispose(): void {
     this.release();
@@ -434,8 +476,9 @@ export class Window extends Element {
   }
 }
 
-function resolveWindow(target: string | bigint | { className?: string; title?: string }): bigint {
+function resolveWindow(target: string | bigint | { className?: string; process?: number; title?: string }): bigint {
   if (typeof target === 'bigint') return target;
+  if (typeof target !== 'string' && target.process !== undefined) return windowForProcess(target.process);
   const title = typeof target === 'string' ? target : target.title;
   const className = typeof target === 'string' ? undefined : target.className;
   const classBuffer = className === undefined ? null : Buffer.from(`${className}\0`, 'utf16le').ptr!;
@@ -443,8 +486,8 @@ function resolveWindow(target: string | bigint | { className?: string; title?: s
   return User32.FindWindowW(classBuffer, titleBuffer);
 }
 
-/** Attach to a top-level window by title, window handle, or `{ title, className }`. Throws if absent. */
-export function attach(target: string | bigint | { className?: string; title?: string }): Window {
+/** Attach to a top-level window by title, handle, `{ title, className }`, or `{ process }`. Throws if absent. */
+export function attach(target: string | bigint | { className?: string; process?: number; title?: string }): Window {
   const hWnd = resolveWindow(target);
   if (hWnd === 0n) throw new Error(`attach: no window found for ${JSON.stringify(target, (_key, value) => (typeof value === 'bigint' ? `0x${value.toString(16)}` : value))}`);
   const hr = vcall(automation(), SLOT.ElementFromHandle, [FFIType.u64, FFIType.ptr], [hWnd, scratch8.ptr!]);
