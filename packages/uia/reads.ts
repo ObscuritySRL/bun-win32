@@ -1,0 +1,66 @@
+// Typed property readers built on the COM vtable invoker. Out-parameters use hoisted, reused scratch
+// buffers (no per-read allocation); each value is read out immediately so the buffers never alias a
+// live value, and `.ptr` is read inline at each call (small Buffers relocate — never cache it). BSTR
+// names are bulk-copied in one operation BEFORE SysFreeString (never per-character, never after free).
+
+import { FFIType, type Pointer, toArrayBuffer } from 'bun:ffi';
+
+import Oleaut32 from '@bun-win32/oleaut32';
+
+import { vcall } from './com';
+import { S_OK } from './constants';
+
+export interface Rect {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+const scratch8 = Buffer.alloc(8);
+const scratch4 = Buffer.alloc(4);
+const scratch16 = Buffer.alloc(16);
+
+/** Bulk-copy a BSTR's UTF-16 region into a string in one operation, then free it. No-op on null. */
+export function decodeBstr(bstr: bigint): string {
+  if (bstr === 0n) return '';
+  const pointer = Number(bstr) as Pointer;
+  const length = Oleaut32.SysStringLen(pointer); // characters, not bytes
+  const text = length === 0 ? '' : Buffer.from(toArrayBuffer(pointer, 0, length * 2)).toString('utf16le');
+  Oleaut32.SysFreeString(pointer);
+  return text;
+}
+
+/** Read a `[propget] BSTR*` accessor, bulk-copying the UTF-16 region before freeing the BSTR. */
+export function getBstr(ptr: bigint, slot: number): string {
+  if (vcall(ptr, slot, [FFIType.ptr], [scratch8.ptr!]) !== S_OK) return '';
+  return decodeBstr(scratch8.readBigUInt64LE(0));
+}
+
+/** Read a `[propget] LONG*` (or BOOL*) accessor. */
+export function getLong(ptr: bigint, slot: number): number {
+  if (vcall(ptr, slot, [FFIType.ptr], [scratch4.ptr!]) !== S_OK) return 0;
+  return scratch4.readInt32LE(0);
+}
+
+/** Read a `[propget] double*` accessor (e.g. RangeValuePattern values). */
+export function getDouble(ptr: bigint, slot: number): number {
+  if (vcall(ptr, slot, [FFIType.ptr], [scratch8.ptr!]) !== S_OK) return Number.NaN;
+  return scratch8.readDoubleLE(0);
+}
+
+/** Read a `[propget] UIA_HWND*` / handle accessor. */
+export function getHandle(ptr: bigint, slot: number): bigint {
+  if (vcall(ptr, slot, [FFIType.ptr], [scratch8.ptr!]) !== S_OK) return 0n;
+  return scratch8.readBigUInt64LE(0);
+}
+
+/** Read a `[propget] RECT*` accessor (4× LONG) into an {x,y,width,height} rectangle. */
+export function getRect(ptr: bigint, slot: number): Rect {
+  if (vcall(ptr, slot, [FFIType.ptr], [scratch16.ptr!]) !== S_OK) return { x: 0, y: 0, width: 0, height: 0 };
+  const left = scratch16.readInt32LE(0);
+  const top = scratch16.readInt32LE(4);
+  const right = scratch16.readInt32LE(8);
+  const bottom = scratch16.readInt32LE(12);
+  return { x: left, y: top, width: right - left, height: bottom - top };
+}

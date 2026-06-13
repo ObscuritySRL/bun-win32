@@ -198,4 +198,27 @@ export const SLOT = {
   GetParentElement: 3,
   // IUIAutomationInvokePattern
   Invoke: 3, // PROVEN (Calculator 5+3=8)
+  // IUIAutomationValuePattern + IUIAutomationRangeValuePattern (SetValue/get_CurrentValue share slot numbers)
+  SetValue: 3,
+  get_CurrentValue: 4,
+  // IUIAutomationTogglePattern
+  Toggle: 3,
+  get_CurrentToggleState: 4,
+  // IUIAutomationExpandCollapsePattern
+  Expand: 3,
+  Collapse: 4,
+  get_CurrentExpandCollapseState: 5,
+  // IUIAutomationSelectionItemPattern
+  Select: 3,
+  get_CurrentIsSelected: 6,
+  // IUIAutomationScrollItemPattern
+  ScrollIntoView: 3,
+  // IUIAutomationWindowPattern
+  Close: 3,
+  WaitForInputIdle: 4,
+  SetWindowVisualState: 5,
+  get_CurrentWindowVisualState: 10,
+  // IUIAutomationTextPattern + IUIAutomationTextRange
+  get_DocumentRange: 7,
+  GetText: 12,
 } as const;

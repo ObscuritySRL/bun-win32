@@ -1,62 +1,36 @@
-// Element: a live IUIAutomationElement pointer with typed property reads and tree search.
-// Property reads use hoisted, reused scratch buffers (no per-read allocation); BSTR names are
-// bulk-copied in one operation BEFORE SysFreeString (never a per-character loop, never read-after-free).
+// Element: a live IUIAutomationElement pointer with typed property reads, tree search, and the
+// proven control-pattern actions. Property readers live in reads.ts; pattern actions in patterns.ts.
 
-import { FFIType, type Pointer, toArrayBuffer } from 'bun:ffi';
-
-import Oleaut32 from '@bun-win32/oleaut32';
+import { FFIType } from 'bun:ffi';
 
 import { automation } from './automation';
 import { comRelease, hresult, vcall } from './com';
 import { compileCondition, type ElementProperties, matches, type Selector } from './condition';
 import { ControlType, S_OK, SLOT, TreeScope } from './constants';
+import {
+  collapse,
+  expand,
+  expandCollapseState,
+  getValue,
+  invoke,
+  isSelected,
+  rangeValue,
+  readText,
+  scrollIntoView,
+  select,
+  setRangeValue,
+  setValue,
+  setWindowVisualState,
+  toggle,
+  toggleState,
+  windowClose,
+  type WindowVisualState,
+} from './patterns';
+import { getBstr, getHandle, getLong, getRect, type Rect } from './reads';
 
-export interface Rect {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-}
-
-// Reused scratch for out-parameters. Each value is read out immediately, so the buffers never alias
-// across a live value. `.ptr` is read inline at each call (small Buffers relocate; never cache it).
+// Reused scratch for out-parameters in the tree-search path. Each value is read out immediately.
 const scratch8 = Buffer.alloc(8);
 const scratch4 = Buffer.alloc(4);
-const scratch16 = Buffer.alloc(16);
-
-/** Read a `[propget] BSTR*` accessor, bulk-copying the UTF-16 region before freeing the BSTR. */
-export function getBstr(ptr: bigint, slot: number): string {
-  if (vcall(ptr, slot, [FFIType.ptr], [scratch8.ptr!]) !== S_OK) return '';
-  const bstr = scratch8.readBigUInt64LE(0);
-  if (bstr === 0n) return '';
-  const pointer = Number(bstr) as Pointer;
-  const length = Oleaut32.SysStringLen(pointer); // characters, not bytes
-  const text = length === 0 ? '' : Buffer.from(toArrayBuffer(pointer, 0, length * 2)).toString('utf16le');
-  Oleaut32.SysFreeString(pointer);
-  return text;
-}
-
-/** Read a `[propget] LONG*` (or BOOL*) accessor. */
-export function getLong(ptr: bigint, slot: number): number {
-  if (vcall(ptr, slot, [FFIType.ptr], [scratch4.ptr!]) !== S_OK) return 0;
-  return scratch4.readInt32LE(0);
-}
-
-/** Read a `[propget] UIA_HWND*` / handle accessor. */
-export function getHandle(ptr: bigint, slot: number): bigint {
-  if (vcall(ptr, slot, [FFIType.ptr], [scratch8.ptr!]) !== S_OK) return 0n;
-  return scratch8.readBigUInt64LE(0);
-}
-
-/** Read a `[propget] RECT*` accessor (4× LONG) into an {x,y,width,height} rectangle. */
-export function getRect(ptr: bigint, slot: number): Rect {
-  if (vcall(ptr, slot, [FFIType.ptr], [scratch16.ptr!]) !== S_OK) return { x: 0, y: 0, width: 0, height: 0 };
-  const left = scratch16.readInt32LE(0);
-  const top = scratch16.readInt32LE(4);
-  const right = scratch16.readInt32LE(8);
-  const bottom = scratch16.readInt32LE(12);
-  return { x: left, y: top, width: right - left, height: bottom - top };
-}
 
 /** Read the four properties the client-side matcher needs, in one pass. */
 function readProperties(ptr: bigint): ElementProperties {
@@ -201,6 +175,88 @@ export class Element {
   /** Release the underlying COM pointer. */
   release(): void {
     comRelease(this.ptr);
+  }
+
+  // --- control-pattern actions (each proven against a real control in Phase 5) ---
+
+  /** Press via InvokePattern. Throws if unsupported (try `.click()`). */
+  invoke(): void {
+    invoke(this.ptr);
+  }
+
+  /** Read a ValuePattern value (e.g. a text box), or '' if unsupported. */
+  get value(): string {
+    return getValue(this.ptr);
+  }
+
+  /** Set a ValuePattern value in one call — no keystrokes. Throws if unsupported (try `.type()`). */
+  setValue(text: string): void {
+    setValue(this.ptr, text);
+  }
+
+  /** Read the TextPattern document text, or '' if unsupported. */
+  text(): string {
+    return readText(this.ptr);
+  }
+
+  /** Toggle a checkbox via TogglePattern. Throws if unsupported. */
+  toggle(): void {
+    toggle(this.ptr);
+  }
+
+  /** TogglePattern state (0 Off, 1 On, 2 Indeterminate), or -1 if unsupported. */
+  get toggleState(): number {
+    return toggleState(this.ptr);
+  }
+
+  /** Expand via ExpandCollapsePattern. Throws if unsupported. */
+  expand(): void {
+    expand(this.ptr);
+  }
+
+  /** Collapse via ExpandCollapsePattern. Throws if unsupported. */
+  collapse(): void {
+    collapse(this.ptr);
+  }
+
+  /** ExpandCollapsePattern state (0 Collapsed, 1 Expanded, 2 Partial, 3 Leaf), or -1 if unsupported. */
+  get expandCollapseState(): number {
+    return expandCollapseState(this.ptr);
+  }
+
+  /** Select via SelectionItemPattern, replacing the selection. Throws if unsupported. */
+  select(): void {
+    select(this.ptr);
+  }
+
+  /** Whether selected (SelectionItemPattern); false if unsupported. */
+  get isSelected(): boolean {
+    return isSelected(this.ptr);
+  }
+
+  /** Scroll into view via ScrollItemPattern. Throws if unsupported. */
+  scrollIntoView(): void {
+    scrollIntoView(this.ptr);
+  }
+
+  /** RangeValuePattern value (slider), or NaN if unsupported. */
+  get rangeValue(): number {
+    return rangeValue(this.ptr);
+  }
+
+  /** Set a RangeValuePattern value (slider). Throws if unsupported. */
+  setRangeValue(value: number): void {
+    setRangeValue(this.ptr, value);
+  }
+
+  /** Close a window via WindowPattern. Throws if unsupported. */
+  close(): void {
+    windowClose(this.ptr);
+  }
+
+  /** Set a window's visual state (WindowVisualState) via WindowPattern. Throws if unsupported. */
+  setVisualState(state: WindowVisualState): void {
+    setWindowVisualState(this.ptr, state);
   }
 }
 
