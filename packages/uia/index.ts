@@ -1,5 +1,6 @@
+import { execute } from './agent';
 import { initialize, uninitialize } from './automation';
-import { attach, focused, fromPoint, root } from './element';
+import { attach, focused, fromPoint, launch, root } from './element';
 import { clickAt, sendKeys, type } from './input';
 import { msaaTree } from './msaa';
 import { serialize } from './tree';
@@ -9,9 +10,11 @@ import { listWindows } from './window';
 export const uia = {
   attach,
   click: clickAt,
+  execute,
   focused,
   fromPoint,
   initialize,
+  launch,
   msaaTree,
   root,
   sendKeys,
@@ -21,12 +24,13 @@ export const uia = {
   windows: listWindows,
 };
 
+export { type AgentAction, type AgentActionResult, AGENT_TOOLS, execute, groundingTree } from './agent';
 export { automation, initialize, uninitialize } from './automation';
 export { AutomationElementMode, CacheRequest, createCacheRequest, DEFAULT_CACHE_PROPERTIES } from './cache';
 export { comRelease, guid, hresult, vcall } from './com';
 export { type ElementProperties, formatNoMatch, matches, selectorToString, type Selector } from './condition';
 export { ControlType, PatternId, PropertyConditionFlags, PropertyId, SLOT, TreeScope } from './constants';
-export { attach, Element, focused, fromHandle, fromPoint, root, Window } from './element';
+export { attach, Element, focused, fromHandle, fromPoint, launch, root, Window } from './element';
 export { clickAt, INPUT_SIZE, packKeyboardInput, packMouseInput, sendKeys, type, virtualKeyCode } from './input';
 export { accessibleFromWindow, type MsaaNode, msaaTree } from './msaa';
 export { ExpandCollapseState, ToggleState, WindowVisualState } from './patterns';

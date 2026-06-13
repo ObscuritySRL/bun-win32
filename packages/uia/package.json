@@ -55,6 +55,7 @@
   "files": [
     "AI.md",
     "README.md",
+    "agent.ts",
     "automation.ts",
     "cache.ts",
     "com.ts",

@@ -495,3 +495,18 @@ export function attach(target: string | bigint | { className?: string; process?:
   if (hr !== S_OK || pointer === 0n) throw new Error(`attach: ElementFromHandle failed: ${hresult(hr)}`);
   return new Window(pointer, hWnd);
 }
+
+/** Spawn a process and wait for its window to appear, then attach — no hand-rolled FindWindow loop. */
+export async function launch(command: string | readonly string[], target: { className?: string; title?: string }, timeout = 8000): Promise<Window> {
+  Bun.spawn(typeof command === 'string' ? command.split(' ') : [...command], { stdout: 'ignore', stderr: 'ignore' });
+  const start = Bun.nanoseconds();
+  for (;;) {
+    const hWnd = resolveWindow(target);
+    if (hWnd !== 0n) {
+      Bun.sleepSync(400); // let the content realize
+      return attach(hWnd);
+    }
+    if ((Bun.nanoseconds() - start) / 1e6 >= timeout) throw new Error(`launch: window ${JSON.stringify(target)} did not appear within ${timeout}ms`);
+    await Bun.sleep(150);
+  }
+}
