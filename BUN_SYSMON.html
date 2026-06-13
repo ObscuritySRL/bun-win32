@@ -878,7 +878,7 @@ rm bun.lock &amp;&amp; bun install
 (cd packages/&lt;name&gt; &amp;&amp; bun publish --access public --otp &lt;code&gt;)   # order: combase, [uiautomationcore], uia, all, bun-win32, bun-uia</code></pre>
 
 <h3 id="appF">Appendix F — This plan as a clone of the house standard</h3>
-<p>This document is the second product plan in the series (after <code>packages/gpu/PLAN.html</code> = BUN_GPU; <code>packages/sysmon/PLAN.html</code> = BUN_SYSMON). It reproduces BUN_GPU's <em>structure and discipline</em>, adapted to a product built on bindings rather than an engine extraction:</p>
+<p>This document follows the house standard set by <code>packages/gpu/PLAN.html</code> (BUN_GPU — the gold standard). It reproduces BUN_GPU's <em>structure and discipline</em>, adapted to a product built on bindings rather than an engine extraction:</p>
 <ol>
 <li><strong>Ground-truth dossier first</strong> — every load-bearing fact verified against the live repo + npm + <code>dumpbin</code> + MSDN on the day of writing (2026-06-12), date-stamped, with the Phase-0 re-verify rows flagged. Parallel research agents mapped the assets AND the competition — <em>and their mistakes were caught and recorded</em> (the koffi claim, the slot miscount), which is itself the doctrine in action.</li>
 <li><strong>The research-while-building doctrine block</strong> — files outrank plans; deviations get recorded; failures stop the line; <strong>verify the agents, not just the plan</strong>.</li>
