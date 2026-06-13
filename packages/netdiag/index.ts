@@ -6,6 +6,7 @@ export * from './dns';
 export * from './ping';
 export * from './routes';
 export * from './sockets';
+export * from './stats';
 export * from './traceroute';
 export * from './wifi';
 export * from './win32';
