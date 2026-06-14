@@ -1,6 +1,11 @@
 # @bun-win32/uia
 
-**Playwright for Windows desktop apps.** Query the live UI Automation accessibility tree by name and role, invoke controls, type, wait for elements, and serialize a window to JSON for an LLM agent — from Bun, with **zero native dependencies**. No node-gyp, no prebuild matrix, no Appium server, no .NET.
+**Playwright for the Windows desktop — and an MCP server that hands Claude a whole Windows machine.** Find controls by **name, not pixels**, then click, type, wait, read, and assert across any native app — through the live UI Automation accessibility tree, from Bun, with **zero native dependencies**. No node-gyp, no prebuild matrix, no Appium server, no .NET.
+
+**Two ways to use it:**
+
+- **In your project** — E2E-test and automate Windows GUIs the way Playwright tests the web: `find({ name })` → `waitFor` → `invoke`/`setValue`/`type` → assert `value`/`text()`. Semantic targeting survives the DPI, theme, and layout shifts that break pixel scripts.
+- **As an AI agent's hands** — `claude mcp add uia -- bunx bun-uia-mcp` and Claude (or any MCP client) drives the entire desktop through the a11y tree: by name, **cursor-free**, ~15 ms/step, even on a locked session.
 
 > The unscoped alias [`bun-uia`](https://www.npmjs.com/package/bun-uia) re-exports this package — `bun add bun-uia` is the discoverable front door.
 
