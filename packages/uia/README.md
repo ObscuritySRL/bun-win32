@@ -48,12 +48,28 @@ The Windows desktop-automation cluster on npm is a field of native-addon pain, p
 - **Screenshot** any window via PrintWindow (works even on a locked session).
 - **MSAA fallback** (`uia.msaaTree`) for legacy / owner-draw windows.
 - **Crash-safe input observation** via `GetAsyncKeyState` polling — no foreign-thread hook, no message-pump assert.
+- **Cursor-free interaction** — `invoke()`/`setValue()`/`toggle()` and `postClick(x, y)` move no real cursor and work on a locked session (UIA's "fake mouse").
+- **Native window introspection** — `windowTree(hWnd)` dumps the raw HWND hierarchy (class, control id, decoded `WS_*`/`WS_EX_*` styles) like Spy++/Winspector, reaching the classic-Win32 controls UIA can't see.
+- **Pixel fallback for no-a11y surfaces** — `captureScreen()` (full desktop or region), `locateOnScreen(needle)` template matching, `pixelColor(x, y)` — the nut.js/robotjs niche, in-process, for games/canvas/browsers with no a11y tree.
+- **Clipboard** — `readClipboard()`/`writeClipboard()`/`paste()` (the reliable large-text path, no per-keystroke corruption) and `copy()` (Ctrl+C + read the selection from any app).
 
 ## For AI agents
 
 Frontier computer-use agents ground actions in **screenshots** and the literature calls it fragile and expensive. Microsoft **UFO2** (arXiv 2504.14603) fuses the **UI Automation tree first, vision second**, to fix *"fragile screenshot-based interaction"*; OmniParser exists because VLMs can't reliably locate clickable elements from a bitmap; and **OSWorld-Human** (arXiv 2506.16042) reports a11y-tree builds taking **3–26 seconds** and "thousands more tokens per step."
 
-@bun-win32/uia is exactly that UIA-first substrate — served **fast and in-process**. `uia.tree(app, { agentProfile: true })` walks a window's subtree in **one cached round-trip** and emits ground-truth `{ role, name, automationId, bounds, children }` an agent acts on without pixel-counting. The measured build time below beats the OSWorld 3–26 s reference by **two-to-three orders of magnitude**. `uia.execute(app, actions)` runs a JSON action list; `AGENT_TOOLS` is a ready LLM tool schema. Honest limit: UIA can't see owner-draw/canvas/games, so this **complements** a vision agent rather than replacing screenshots.
+@bun-win32/uia is exactly that UIA-first substrate — served **fast and in-process**. `uia.tree(app, { agentProfile: true })` walks a window's subtree in **one cached round-trip** and emits ground-truth `{ role, name, automationId, bounds, children }` an agent acts on without pixel-counting. The measured build time below beats the OSWorld 3–26 s reference by **two-to-three orders of magnitude**. `uia.execute(app, actions)` runs a JSON action list; `AGENT_TOOLS` is a ready LLM tool schema.
+
+## Drive Windows with Claude — MCP server + computer-use
+
+A zero-dependency **MCP server** ships in the box. Register it with one line and Claude (Desktop, Code, or any MCP client) drives Windows through the accessibility tree:
+
+```
+claude mcp add uia -- bunx bun-uia-mcp
+```
+
+It exposes 14 snapshot-first tools: `desktop_snapshot` returns a ref-keyed tree — `Button "Five" [ref=e49]` — then `click`/`invoke`/`type`/`set_value` target a ref, and every action returns a fresh snapshot so the model re-grounds. A thrown tool error comes back as `isError` so the loop self-corrects instead of stopping.
+
+`uia.dispatch(window, action)` runs the **literal Anthropic `computer` and OpenAI CUA action sets** against Windows — but **semantic-first and cursor-free**: a coordinate `left_click` resolves the element under the point and `invoke()`s it, so the real mouse never moves, it works on a locked session, and every pixel action becomes a ground-truth semantic one (erasing the coordinate-hallucination and click-miss failure modes of screenshot-only agents). `screenshotWithMarks(app, uia.snapshot(app))` overlays numbered **Set-of-Marks** boxes derived from UIA bounds — the grounding the literature (Set-of-Mark, UFO2, Windows Agent Arena: **+57% from UIA-derived marks**) shows lifts task success, with no vision model. Honest limit: UIA can't see owner-draw/canvas/games, so the pixel layer (`locateOnScreen`) is the fallback there.
 
 ## Benchmarks
 
@@ -70,7 +86,7 @@ Measured on Windows 11, Bun 1.4, by `bun run example/benchmark.ts` (run it to re
 ## Requirements & honest scoping
 
 - **Windows 10/11, Bun ≥ 1.1.** Windows-only and Bun-only — the owned trade-off (nut.js/robotjs/uiohook are genuinely cross-platform; this is not).
-- **UIA-tree based.** Apps with no accessibility tree (games, canvas/WebGL, custom-draw) get MSAA + screenshots + coordinate `click()`, not vision matching — a complement to screenshot tools, not a replacement.
+- **UIA-tree first, pixels where there's no tree.** Apps with no accessibility tree (games, canvas/WebGL, custom-draw, browsers that don't expose content) fall back to the built-in pixel layer — full-screen capture + `locateOnScreen` template matching + coordinate `click()` — plus MSAA. UIA-native where there's a tree, pixels where there isn't.
 - **Synthetic input (`type`/`sendKeys`/`click`) needs an unlocked, interactive desktop.** UIA queries, `invoke`, `setValue`, and `screenshot` work on a locked session; prefer them.
 - **Selectors are client-side for regex/substring** (exact scalars are server-side). **UIA events are roadmap** — poll with `waitFor`. `scrollIntoView` is implemented but not yet proven against a real list.
 
