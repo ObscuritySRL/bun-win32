@@ -277,7 +277,7 @@
     },
     "packages/bun-uia": {
       "name": "bun-uia",
-      "version": "1.2.0",
+      "version": "1.3.0",
       "bin": {
         "bun-uia": "./mcp.ts",
         "bun-uia-mcp": "./mcp.ts",
@@ -1453,13 +1453,14 @@
     },
     "packages/uia": {
       "name": "@bun-win32/uia",
-      "version": "1.2.0",
+      "version": "1.3.0",
       "bin": {
         "bun-uia-mcp": "./mcp.ts",
       },
       "dependencies": {
         "@bun-win32/combase": "workspace:*",
         "@bun-win32/core": "workspace:*",
+        "@bun-win32/d3d11": "workspace:*",
         "@bun-win32/gdi32": "workspace:*",
         "@bun-win32/kernel32": "workspace:*",
         "@bun-win32/oleacc": "workspace:*",

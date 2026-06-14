@@ -5,6 +5,8 @@
 // `postClickAt` is the CURSOR-FREE coordinate click: it posts WM_*BUTTON to the window under the
 // point, so the real mouse never moves (prefer Element.invoke(); this is the no-pattern fallback).
 
+import { FFIType, JSCallback } from 'bun:ffi';
+
 import User32 from '@bun-win32/user32';
 
 import { Element, fromPoint } from './element';
@@ -32,6 +34,17 @@ export interface PointDescription {
   bounds: Rect;
 }
 
+export interface MonitorInfo {
+  handle: bigint;
+  /** The full monitor rectangle in virtual-screen pixels. */
+  bounds: Rect;
+  /** The work area (monitor minus the taskbar / app bars). */
+  workArea: Rect;
+  primary: boolean;
+}
+
+const MONITORINFOF_PRIMARY = 0x0000_0001;
+
 /** Pack a POINT (x low dword, y high dword) for the by-value WindowFromPoint argument. */
 function packPoint(x: number, y: number): bigint {
   return (BigInt(y >>> 0) << 32n) | BigInt(x >>> 0);
@@ -45,6 +58,31 @@ export function virtualScreen(): Rect {
     width: User32.GetSystemMetrics(SM_CXVIRTUALSCREEN),
     height: User32.GetSystemMetrics(SM_CYVIRTUALSCREEN),
   };
+}
+
+/** Enumerate the physical monitors (handle, full bounds, work area, primary flag). EnumDisplayMonitors
+ *  invokes its callback synchronously on the calling thread, so the JSCallback is safe (no foreign thread). */
+export function listMonitors(): MonitorInfo[] {
+  const monitors: MonitorInfo[] = [];
+  const callback = new JSCallback(
+    (hMonitor: bigint) => {
+      const info = Buffer.alloc(40); // MONITORINFO: cbSize@0, rcMonitor@4, rcWork@20, dwFlags@36
+      info.writeUInt32LE(40, 0);
+      if (User32.GetMonitorInfoW(hMonitor, info.ptr!) !== 0) {
+        const rect = (offset: number): Rect => {
+          const left = info.readInt32LE(offset);
+          const top = info.readInt32LE(offset + 4);
+          return { x: left, y: top, width: info.readInt32LE(offset + 8) - left, height: info.readInt32LE(offset + 12) - top };
+        };
+        monitors.push({ handle: hMonitor, bounds: rect(4), workArea: rect(20), primary: (info.readUInt32LE(36) & MONITORINFOF_PRIMARY) !== 0 });
+      }
+      return 1;
+    },
+    { args: [FFIType.u64, FFIType.u64, FFIType.ptr, FFIType.i64], returns: FFIType.i32 },
+  );
+  User32.EnumDisplayMonitors(0n, null, callback.ptr!, 0n);
+  callback.close();
+  return monitors;
 }
 
 /** The window handle directly under a screen point (the deepest visible child), or 0n. */

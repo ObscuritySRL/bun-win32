@@ -5,7 +5,7 @@ import { FFIType } from 'bun:ffi';
 
 import User32 from '@bun-win32/user32';
 
-import { automation } from './automation';
+import { automation, controlViewWalker } from './automation';
 import type { CacheRequest } from './cache';
 import { comRelease, hresult, vcall } from './com';
 import { compileCondition, type ElementProperties, formatNoMatch, matches, type Selector } from './condition';
@@ -147,16 +147,11 @@ export class Element {
 
   /** The control-view parent, or null at a root. The caller owns the returned Element. */
   get parent(): Element | null {
-    if (vcall(automation(), SLOT.get_ControlViewWalker, [FFIType.ptr], [scratch8.ptr!]) !== S_OK) return null;
-    const walker = scratch8.readBigUInt64LE(0);
+    const walker = controlViewWalker();
     if (walker === 0n) return null;
-    try {
-      if (vcall(walker, SLOT.GetParentElement, [FFIType.u64, FFIType.ptr], [this.ptr, scratch8.ptr!]) !== S_OK) return null;
-      const pointer = scratch8.readBigUInt64LE(0);
-      return pointer === 0n ? null : new Element(pointer);
-    } finally {
-      comRelease(walker);
-    }
+    if (vcall(walker, SLOT.GetParentElement, [FFIType.u64, FFIType.ptr], [this.ptr, scratch8.ptr!]) !== S_OK) return null;
+    const pointer = scratch8.readBigUInt64LE(0);
+    return pointer === 0n ? null : new Element(pointer);
   }
 
   /** The first descendant (by default) matching the selector, or null. Releases the non-matches. */

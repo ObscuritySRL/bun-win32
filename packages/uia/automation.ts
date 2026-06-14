@@ -1,12 +1,15 @@
 // The UI Automation root: the COM apartment plus the in-process IUIAutomation client, created once.
 
+import { FFIType } from 'bun:ffi';
+
 import Combase from '@bun-win32/combase';
 import User32 from '@bun-win32/user32';
 
-import { comRelease, guid, hresult } from './com';
-import { CLSCTX_INPROC_SERVER, CLSID_CUIAutomation, COINIT_APARTMENTTHREADED, IID_IUIAutomation, S_FALSE, S_OK } from './constants';
+import { comRelease, guid, hresult, vcall } from './com';
+import { CLSCTX_INPROC_SERVER, CLSID_CUIAutomation, COINIT_APARTMENTTHREADED, IID_IUIAutomation, S_FALSE, S_OK, SLOT } from './constants';
 
 let pAutomation = 0n;
+let pControlWalker = 0n;
 let comInitialized = false;
 
 /**
@@ -38,8 +41,22 @@ export function automation(): bigint {
   return pAutomation !== 0n ? pAutomation : initialize();
 }
 
+/** The cached control-view TreeWalker (get_ControlViewWalker) — a stable client singleton, acquired once and
+ *  released on uninitialize. Memoizing it drops two cross-process round-trips per parent navigation. */
+export function controlViewWalker(): bigint {
+  if (pControlWalker !== 0n) return pControlWalker;
+  const out = Buffer.alloc(8);
+  if (vcall(automation(), SLOT.get_ControlViewWalker, [FFIType.ptr], [out.ptr!]) !== S_OK) return 0n;
+  pControlWalker = out.readBigUInt64LE(0);
+  return pControlWalker;
+}
+
 /** Release the IUIAutomation client and uninitialize COM. Safe to call when never initialized. */
 export function uninitialize(): void {
+  if (pControlWalker !== 0n) {
+    comRelease(pControlWalker);
+    pControlWalker = 0n;
+  }
   if (pAutomation !== 0n) {
     comRelease(pAutomation);
     pAutomation = 0n;

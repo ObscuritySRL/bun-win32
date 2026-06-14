@@ -13,8 +13,11 @@ const INTERACTIVE = new Set<number>([
   ControlType.Button,
   ControlType.CheckBox,
   ControlType.ComboBox,
+  ControlType.DataItem,
   ControlType.Document,
   ControlType.Edit,
+  ControlType.Header,
+  ControlType.HeaderItem,
   ControlType.Hyperlink,
   ControlType.ListItem,
   ControlType.MenuItem,
@@ -22,9 +25,17 @@ const INTERACTIVE = new Set<number>([
   ControlType.Slider,
   ControlType.Spinner,
   ControlType.SplitButton,
+  ControlType.Tab,
   ControlType.TabItem,
   ControlType.TreeItem,
 ]);
+
+/** Whether a control should get an actionable [ref] — the interactive set plus a named Custom (WPF/WinUI
+ *  custom-draw invokables surface as Custom; gate on a name + bounds so non-interactive Customs stay unlabeled). */
+function isActionable(controlType: number, name: string, hasBounds: boolean): boolean {
+  if (!hasBounds) return false;
+  return INTERACTIVE.has(controlType) || (controlType === ControlType.Custom && name.trim().length > 0);
+}
 
 export interface Mark {
   ref: string;
@@ -55,7 +66,7 @@ function walk(element: Element, depth: number, maxDepth: number, counter: { valu
   const hasBounds = bounds.width !== 0 || bounds.height !== 0;
   if (hasBounds) node.bounds = bounds;
   node.enabled = element.cachedIsEnabled;
-  if (INTERACTIVE.has(controlType) && hasBounds) {
+  if (isActionable(controlType, name, hasBounds)) {
     const ref = `e${counter.value}`;
     counter.value += 1;
     node.ref = ref;

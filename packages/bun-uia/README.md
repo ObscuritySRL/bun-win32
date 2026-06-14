@@ -43,9 +43,13 @@ The Windows desktop-automation cluster on npm is a field of native-addon pain, p
 - **`waitFor`** — Playwright-class auto-retry for flaky native UIs. No other Windows-desktop npm tool has it. Timeouts quote the selector, the window, and the nearest candidates.
 - **Read & assert** — `value`, `text()`, `isEnabled`, `boundingRectangle`, `toggleState`. Read state back through the tree to assert — pixel tools can't.
 - **Serialize the tree to JSON** for an LLM agent (`uia.tree`), with a token-svelte agent profile.
-- **Screenshot** any window via PrintWindow (works even on a locked session).
-- **MSAA fallback** (`uia.msaaTree`) for legacy / owner-draw windows.
-- **Crash-safe input observation** via `GetAsyncKeyState` polling — no foreign-thread hook, no message-pump assert.
+- **Drive in the dark** — `invoke`/`setValue`/`toggle`/`scroll` + `postClick` need no cursor and no focus; they drive a **minimized, background, occluded, or locked** window. The AI default, not a fallback.
+- **See a window even when it isn't visible** — `captureWindowLive(hWnd)` reads the live pixels of any window via **Windows.Graphics.Capture**, even occluded / background / GPU-composited, where `PrintWindow` goes blank.
+- **Window & monitor control** — move/min/max/restore/raise/close windows (no foreground), `listMonitors()`, per-window exe + state.
+- **Pixel + clipboard layer** — `captureScreen`/`locateOnScreen`/`pixelColor` for no-a11y surfaces; `readClipboard`/`writeClipboard`/`paste`/`copy`.
+- **Screenshot** any window via PrintWindow (works even on a locked session; auto-falls-back to WGC when blank).
+- **MSAA fallback** (`uia.msaaTree`) and **native HWND introspection** (`uia.windowTree`, Spy++-style) for legacy / owner-draw windows.
+- **MCP server for Claude** — `claude mcp add uia -- bunx bun-uia` exposes the whole surface as 36 policy-gated tools; the agent drives Windows cursor-free, sees the desktop, and (when enabled) launches apps and reads/writes files.
 
 ## For AI agents
 

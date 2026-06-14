@@ -1,7 +1,7 @@
 import { execute } from './agent';
 import { initialize, uninitialize } from './automation';
 import { copy, paste, readClipboard, writeClipboard } from './clipboard';
-import { elementAt, postClickAt, scrollAt } from './coords';
+import { elementAt, listMonitors, postClickAt, scrollAt } from './coords';
 import { diffTrees } from './diff';
 import { attach, focused, fromPoint, launch, root } from './element';
 import { waitForIdle } from './idle';
@@ -12,12 +12,14 @@ import { snapshot } from './refmap';
 import { captureScreen, pixelColor, screenshotScreen } from './screen';
 import { windowTree } from './spy';
 import { serialize } from './tree';
+import { captureWindowLive } from './wgc';
 import { listWindows } from './window';
 
 /** The Playwright-for-desktop facade: attach to a window, then find/waitFor/act/serialize. */
 export const uia = {
   attach,
   captureScreen,
+  captureWindowLive,
   click: clickAt,
   copy,
   diff: diffTrees,
@@ -27,6 +29,7 @@ export const uia = {
   fromPoint,
   initialize,
   launch,
+  listMonitors,
   locateOnScreen,
   msaaTree,
   paste,
@@ -55,7 +58,7 @@ export { comRelease, guid, hresult, vcall } from './com';
 export { type ComputerAction, type ComputerResult, dispatch, type DispatchOptions, fromCuaAction, normalizeKey } from './computer';
 export { type ElementProperties, formatNoMatch, matches, selectorToString, type Selector } from './condition';
 export { ControlType, PatternId, PropertyConditionFlags, PropertyId, SLOT, TreeScope } from './constants';
-export { elementAt, type PointDescription, postClickAt, scrollAt, virtualScreen, windowAt } from './coords';
+export { elementAt, listMonitors, type MonitorInfo, type PointDescription, postClickAt, scrollAt, virtualScreen, windowAt } from './coords';
 export { diffTrees, type RenameChange, type TreeChange, type TreeDiff } from './diff';
 export { attach, Element, focused, fromHandle, fromPoint, launch, root, Window } from './element';
 export { type IdleOptions, waitForIdle } from './idle';
@@ -91,4 +94,23 @@ export { type AuditRecord, redactTree, safeExecute, type SafeOptions, toToolResu
 export { type Bitmap, captureScreen, pixelColor, screenshotScreen } from './screen';
 export { type NativeWindow, renderWindowTree, windowStyles, windowTree } from './spy';
 export { countNodes, estimateTokens, serialize, type SerializeOptions, type UiaNode } from './tree';
-export { captureWindowRGB, findWindow, listWindows, screenshot, type WindowCapture, type WindowInfo, windowForProcess } from './window';
+export { captureWindowLive, wgcAvailable } from './wgc';
+export {
+  captureWindowRGB,
+  closeWindow,
+  findWindow,
+  foregroundWindow,
+  isMaximized,
+  isMinimized,
+  listWindows,
+  maximizeWindow,
+  minimizeWindow,
+  moveWindow,
+  processImagePath,
+  raiseWindow,
+  restoreWindow,
+  screenshot,
+  type WindowCapture,
+  type WindowInfo,
+  windowForProcess,
+} from './window';
