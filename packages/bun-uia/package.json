@@ -6,12 +6,16 @@
   "dependencies": {
     "@bun-win32/uia": "workspace:*"
   },
-  "description": "Playwright for Windows desktop apps — drive and test native Windows GUIs from Bun by querying the UI Automation tree, invoking controls by name, typing, and asserting. Zero native dependencies, no node-gyp, no server.",
+  "description": "Playwright for the Windows desktop, from Bun — drive and test native GUIs via the UI Automation tree (find by name, invoke, type, assert), plus synthetic input, full-screen capture + image matching, native-window introspection (Spy++-style), an LLM computer-use adapter, and an MCP server. Zero native dependencies, no node-gyp, no server.",
   "devDependencies": {
     "@types/bun": "latest"
   },
   "exports": {
-    ".": "./index.ts"
+    ".": "./index.ts",
+    "./mcp": "./mcp.ts"
+  },
+  "bin": {
+    "bun-uia-mcp": "./mcp.ts"
   },
   "license": "MIT",
   "module": "index.ts",
@@ -45,7 +49,8 @@
   ],
   "files": [
     "README.md",
-    "index.ts"
+    "index.ts",
+    "mcp.ts"
   ],
   "sideEffects": false,
   "engines": {

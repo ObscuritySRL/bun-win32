@@ -11,12 +11,16 @@
     "@bun-win32/oleaut32": "workspace:*",
     "@bun-win32/user32": "workspace:*"
   },
-  "description": "Playwright for Windows desktop apps — query the UI Automation accessibility tree, invoke controls by name, type, and assert, from Bun. Zero native dependencies, no node-gyp, no server.",
+  "description": "Playwright for the Windows desktop, from Bun — drive the UI Automation accessibility tree (find by name, invoke, type, assert), plus synthetic input, full-screen capture + image matching, native-window introspection (Spy++-style), an LLM computer-use adapter, and an MCP server. Zero native dependencies, no node-gyp, no server.",
   "devDependencies": {
     "@types/bun": "latest"
   },
   "exports": {
-    ".": "./index.ts"
+    ".": "./index.ts",
+    "./mcp": "./mcp.ts"
+  },
+  "bin": {
+    "bun-uia-mcp": "./mcp.ts"
   },
   "license": "MIT",
   "module": "index.ts",
@@ -58,15 +62,26 @@
     "automation.ts",
     "cache.ts",
     "com.ts",
+    "computer.ts",
     "condition.ts",
     "constants.ts",
+    "coords.ts",
+    "diff.ts",
     "element.ts",
+    "idle.ts",
     "index.ts",
     "input.ts",
+    "marks.ts",
+    "match.ts",
+    "mcp.ts",
     "msaa.ts",
     "patterns.ts",
     "png.ts",
     "reads.ts",
+    "refmap.ts",
+    "safety.ts",
+    "screen.ts",
+    "spy.ts",
     "tree.ts",
     "window.ts"
   ],
@@ -78,9 +93,13 @@
     "example:agent-grounding": "bun ./example/agent-grounding.ts",
     "example:automate-calculator": "bun ./example/automate-calculator.ts",
     "example:benchmark": "bun ./example/benchmark.ts",
+    "example:computer-use": "bun ./example/computer-use.ts",
+    "example:desktop-mcp": "bun ./example/desktop-mcp.ts",
     "example:hello-uia": "bun ./example/hello-uia.ts",
     "example:inspector": "bun ./example/inspector.ts",
     "example:selftest": "bun ./example/uia.selftest.ts",
-    "example:uia-report": "bun ./example/uia-report.ts"
+    "example:set-of-marks": "bun ./example/set-of-marks.ts",
+    "example:uia-report": "bun ./example/uia-report.ts",
+    "example:window-spy": "bun ./example/window-spy.ts"
   }
 }

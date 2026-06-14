@@ -18,8 +18,15 @@ export const MOUSEEVENTF_LEFTDOWN = 0x0000_0002;
 export const MOUSEEVENTF_LEFTUP = 0x0000_0004;
 export const MOUSEEVENTF_RIGHTDOWN = 0x0000_0008;
 export const MOUSEEVENTF_RIGHTUP = 0x0000_0010;
+export const MOUSEEVENTF_MIDDLEDOWN = 0x0000_0020;
+export const MOUSEEVENTF_MIDDLEUP = 0x0000_0040;
 export const MOUSEEVENTF_ABSOLUTE = 0x0000_8000;
 export const MOUSEEVENTF_VIRTUALDESK = 0x0000_4000;
+export const MOUSEEVENTF_WHEEL = 0x0000_0800;
+export const MOUSEEVENTF_HWHEEL = 0x0000_1000;
+
+/** One wheel notch, in the units SendInput's mouseData expects. */
+export const WHEEL_DELTA = 120;
 
 /** sizeof(INPUT) on x64 — pass this as cbSize, or SendInput injects nothing. */
 export const INPUT_SIZE = 40;
@@ -146,4 +153,104 @@ export function clickAt(x: number, y: number): void {
   packMouseInput(buffer, 0, 0, 0, 0, MOUSEEVENTF_LEFTDOWN);
   packMouseInput(buffer, INPUT_SIZE, 0, 0, 0, MOUSEEVENTF_LEFTUP);
   User32.SendInput(2, buffer.ptr!, INPUT_SIZE);
+}
+
+/** The current cursor position in physical screen pixels. */
+export function cursorPosition(): { x: number; y: number } {
+  const point = Buffer.alloc(8);
+  User32.GetCursorPos(point.ptr!);
+  return { x: point.readInt32LE(0), y: point.readInt32LE(4) };
+}
+
+/** Move the cursor to a screen point (physical pixels). Moves the REAL cursor. */
+export function moveTo(x: number, y: number): void {
+  User32.SetCursorPos(x, y);
+}
+
+/** Right-click at a screen point via SendInput (moves the real cursor; needs an unlocked desktop). */
+export function rightClickAt(x: number, y: number): void {
+  User32.SetCursorPos(x, y);
+  const buffer = Buffer.alloc(2 * INPUT_SIZE);
+  packMouseInput(buffer, 0, 0, 0, 0, MOUSEEVENTF_RIGHTDOWN);
+  packMouseInput(buffer, INPUT_SIZE, 0, 0, 0, MOUSEEVENTF_RIGHTUP);
+  User32.SendInput(2, buffer.ptr!, INPUT_SIZE);
+}
+
+/** Middle-click at a screen point via SendInput. */
+export function middleClickAt(x: number, y: number): void {
+  User32.SetCursorPos(x, y);
+  const buffer = Buffer.alloc(2 * INPUT_SIZE);
+  packMouseInput(buffer, 0, 0, 0, 0, MOUSEEVENTF_MIDDLEDOWN);
+  packMouseInput(buffer, INPUT_SIZE, 0, 0, 0, MOUSEEVENTF_MIDDLEUP);
+  User32.SendInput(2, buffer.ptr!, INPUT_SIZE);
+}
+
+/** Double left-click at a screen point in one atomic SendInput (down/up/down/up). */
+export function doubleClickAt(x: number, y: number): void {
+  User32.SetCursorPos(x, y);
+  const buffer = Buffer.alloc(4 * INPUT_SIZE);
+  packMouseInput(buffer, 0, 0, 0, 0, MOUSEEVENTF_LEFTDOWN);
+  packMouseInput(buffer, INPUT_SIZE, 0, 0, 0, MOUSEEVENTF_LEFTUP);
+  packMouseInput(buffer, 2 * INPUT_SIZE, 0, 0, 0, MOUSEEVENTF_LEFTDOWN);
+  packMouseInput(buffer, 3 * INPUT_SIZE, 0, 0, 0, MOUSEEVENTF_LEFTUP);
+  User32.SendInput(4, buffer.ptr!, INPUT_SIZE);
+}
+
+/** Scroll the wheel `clicks` notches at a screen point (positive = up/right, negative = down/left). */
+export function scrollWheel(x: number, y: number, clicks: number, horizontal = false): void {
+  User32.SetCursorPos(x, y);
+  const buffer = Buffer.alloc(INPUT_SIZE);
+  packMouseInput(buffer, 0, 0, 0, (clicks * WHEEL_DELTA) >>> 0, horizontal ? MOUSEEVENTF_HWHEEL : MOUSEEVENTF_WHEEL);
+  User32.SendInput(1, buffer.ptr!, INPUT_SIZE);
+}
+
+/** Press-drag-release from one screen point to another via SendInput. Moves the real cursor. */
+export function dragTo(fromX: number, fromY: number, toX: number, toY: number): void {
+  User32.SetCursorPos(fromX, fromY);
+  const down = Buffer.alloc(INPUT_SIZE);
+  packMouseInput(down, 0, 0, 0, 0, MOUSEEVENTF_LEFTDOWN);
+  User32.SendInput(1, down.ptr!, INPUT_SIZE);
+  User32.SetCursorPos(toX, toY);
+  const up = Buffer.alloc(INPUT_SIZE);
+  packMouseInput(up, 0, 0, 0, 0, MOUSEEVENTF_LEFTUP);
+  User32.SendInput(1, up.ptr!, INPUT_SIZE);
+}
+
+/** Press a key down (no release) — pair with `keyUp`, or use `sendKeys` for a full chord. */
+export function keyDown(name: string): void {
+  const keyCode = virtualKeyCode(name);
+  const buffer = Buffer.alloc(INPUT_SIZE);
+  packKeyboardInput(buffer, 0, keyCode, 0, EXTENDED_KEYS.has(keyCode) ? KEYEVENTF_EXTENDEDKEY : 0);
+  User32.SendInput(1, buffer.ptr!, INPUT_SIZE);
+}
+
+/** Release a previously pressed key. */
+export function keyUp(name: string): void {
+  const keyCode = virtualKeyCode(name);
+  const buffer = Buffer.alloc(INPUT_SIZE);
+  packKeyboardInput(buffer, 0, keyCode, 0, KEYEVENTF_KEYUP | (EXTENDED_KEYS.has(keyCode) ? KEYEVENTF_EXTENDEDKEY : 0));
+  User32.SendInput(1, buffer.ptr!, INPUT_SIZE);
+}
+
+/** Hold a key down for `durationMs`, then release (the Anthropic `hold_key` action). */
+export async function holdKey(name: string, durationMs: number): Promise<void> {
+  keyDown(name);
+  await Bun.sleep(durationMs);
+  keyUp(name);
+}
+
+/** Press the left mouse button down at a screen point (pair with `mouseUp`; the drag primitive). */
+export function mouseDown(x: number, y: number): void {
+  User32.SetCursorPos(x, y);
+  const buffer = Buffer.alloc(INPUT_SIZE);
+  packMouseInput(buffer, 0, 0, 0, 0, MOUSEEVENTF_LEFTDOWN);
+  User32.SendInput(1, buffer.ptr!, INPUT_SIZE);
+}
+
+/** Release the left mouse button at a screen point. */
+export function mouseUp(x: number, y: number): void {
+  User32.SetCursorPos(x, y);
+  const buffer = Buffer.alloc(INPUT_SIZE);
+  packMouseInput(buffer, 0, 0, 0, 0, MOUSEEVENTF_LEFTUP);
+  User32.SendInput(1, buffer.ptr!, INPUT_SIZE);
 }

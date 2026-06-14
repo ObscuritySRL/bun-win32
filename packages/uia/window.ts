@@ -67,14 +67,25 @@ export function windowForProcess(processId: number): bigint {
   return 0n;
 }
 
-/** Capture a window via PrintWindow and encode it as PNG bytes (BGRA→RGB). Empty Uint8Array on failure. */
-export function screenshot(hWnd: bigint): Uint8Array {
+export interface WindowCapture {
+  rgb: Uint8Array;
+  width: number;
+  height: number;
+  /** The window's top-left in virtual-screen pixels — subtract from UIA bounds to get window-local. */
+  originX: number;
+  originY: number;
+}
+
+/** Capture a window via PrintWindow into a tightly packed RGB buffer (BGRA→RGB). Null on failure. */
+export function captureWindowRGB(hWnd: bigint): WindowCapture | null {
   const PW_RENDERFULLCONTENT = 0x0000_0002;
   const rect = Buffer.alloc(16);
-  if (User32.GetWindowRect(hWnd, rect.ptr!) === 0) return new Uint8Array(0);
-  const width = rect.readInt32LE(8) - rect.readInt32LE(0);
-  const height = rect.readInt32LE(12) - rect.readInt32LE(4);
-  if (width <= 0 || height <= 0) return new Uint8Array(0);
+  if (User32.GetWindowRect(hWnd, rect.ptr!) === 0) return null;
+  const originX = rect.readInt32LE(0);
+  const originY = rect.readInt32LE(4);
+  const width = rect.readInt32LE(8) - originX;
+  const height = rect.readInt32LE(12) - originY;
+  if (width <= 0 || height <= 0) return null;
 
   const hdcWindow = User32.GetWindowDC(hWnd);
   const hdcMem = Gdi32.CreateCompatibleDC(hdcWindow);
@@ -103,5 +114,12 @@ export function screenshot(hWnd: bigint): Uint8Array {
     rgb[target + 1] = bgra[source + 1]!; // G
     rgb[target + 2] = bgra[source]!; // B
   }
-  return encodePNG(rgb, width, height);
+  return { rgb, width, height, originX, originY };
+}
+
+/** Capture a window via PrintWindow and encode it as PNG bytes. Empty Uint8Array on failure. */
+export function screenshot(hWnd: bigint): Uint8Array {
+  const capture = captureWindowRGB(hWnd);
+  if (capture === null) return new Uint8Array(0);
+  return encodePNG(capture.rgb, capture.width, capture.height);
 }
