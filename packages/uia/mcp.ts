@@ -232,7 +232,10 @@ function requireAttached(): Window {
 function attachByClassName(className: string): Window {
   const matches = uia.windows({ includeUntitled: true }).filter((window) => window.className === className);
   if (matches.length === 0) throw new Error(`no VISIBLE window has class ${JSON.stringify(className)} — FindWindowW would match an invisible helper. Call list_windows and attach by an exact title or an hWnd.`);
-  if (matches.length > 1) throw new Error(`${matches.length} visible windows have class ${JSON.stringify(className)} — attach by hWnd to pick one:\n${matches.map((window) => `  - ${JSON.stringify(window.title)} [hWnd=0x${window.hWnd.toString(16)}] [pid=${window.processId}]`).join('\n')}`);
+  if (matches.length > 1)
+    throw new Error(
+      `${matches.length} visible windows have class ${JSON.stringify(className)} — attach by hWnd to pick one:\n${matches.map((window) => `  - ${JSON.stringify(window.title)} [hWnd=0x${window.hWnd.toString(16)}] [pid=${window.processId}]`).join('\n')}`,
+    );
   return uia.attach(matches[0]!.hWnd);
 }
 
@@ -333,7 +336,8 @@ function snapshotText(maxDepth?: number, rootName?: string): string {
   const window = requireAttached();
   let root: Element | undefined;
   if (rootName !== undefined && rootName.length > 0) {
-    if (/^e\d+(#\d+)?$/.test(rootName)) throw new Error(`desktop_snapshot {root} takes a node NAME or automationId, not a [ref] — refs (${rootName}) address controls only on action tools; omit root and use maxDepth, or pass the name/automationId shown for that node`);
+    if (/^e\d+(#\d+)?$/.test(rootName))
+      throw new Error(`desktop_snapshot {root} takes a node NAME or automationId, not a [ref] — refs (${rootName}) address controls only on action tools; omit root and use maxDepth, or pass the name/automationId shown for that node`);
     root = window.find({ name: rootName }) ?? window.find({ automationId: rootName }) ?? undefined;
     if (root === undefined) throw new Error(`desktop_snapshot: no element named or automationId ${JSON.stringify(rootName)} under the attached window — omit root, or pick a name/id from a full snapshot`);
   }
@@ -357,7 +361,8 @@ function resolveRef(ref: string): Element {
   if (current === null) throw new Error('no snapshot yet — call list_windows then attach (attach returns a snapshot), or desktop_snapshot, before using a ref');
   // A ref carrying a stale generation provably no longer denotes the same control — fail loud instead of acting on
   // whatever now occupies that traversal slot. A bare ref (no #) is accepted leniently as current-generation.
-  if (hash >= 0 && Number(ref.slice(hash + 1)) !== refGen) throw new Error(`ref ${id} is from an earlier snapshot generation (the tree was re-grounded since) — read the latest snapshot above and use ITS refs, or use find_and_act {selector} / reveal {selector}, which need no ref`);
+  if (hash >= 0 && Number(ref.slice(hash + 1)) !== refGen)
+    throw new Error(`ref ${id} is from an earlier snapshot generation (the tree was re-grounded since) — read the latest snapshot above and use ITS refs, or use find_and_act {selector} / reveal {selector}, which need no ref`);
   const element = current?.resolve(id) ?? null;
   if (element === null) throw new Error(`ref ${id} not in the current snapshot (epoch ${epoch}) — re-ground with desktop_snapshot, or use find_and_act {selector} / reveal {selector}, which need no ref`);
   return element;
@@ -374,6 +379,12 @@ function errorResult(text: string): object {
 function imageResult(png: Uint8Array, note?: string): object {
   const image = { type: 'image', data: Buffer.from(png).toString('base64'), mimeType: 'image/png' };
   return { content: note !== undefined ? [image, { type: 'text', text: note }] : [image] };
+}
+
+// A window/region capture is window-LOCAL pixels; click_point/inspect_point want screen-absolute coords. Carry the
+// capture's screen origin so the model can map a pixel it eyeballs here to the screen point before clicking it.
+function originNote(originX: number, originY: number, width: number, height: number): string {
+  return `window-local pixels — this image's top-left is screen ${originX},${originY} (size ${width}×${height}); add ${originX},${originY} to any pixel here to get the screen point for click_point / inspect_point (or use screenshot_marked to act by ref instead)`;
 }
 
 /**
@@ -598,7 +609,8 @@ function resolveFsPath(path: string): string {
 }
 
 const ELEMENT_DESC = 'Human-readable element description, used for the permission prompt and intent.';
-const REF_DESC = 'Exact target element reference from the LATEST snapshot, passed verbatim including its #generation tag (e.g. e49#3). A ref from before a re-render is rejected (so you never act on the wrong control) — re-read the latest snapshot and use its refs.';
+const REF_DESC =
+  'Exact target element reference from the LATEST snapshot, passed verbatim including its #generation tag (e.g. e49#3). A ref from before a re-render is rejected (so you never act on the wrong control) — re-read the latest snapshot and use its refs.';
 const HWND_DESC = 'Target window handle — a decimal/0x-hex string or a JSON number; omit to use the attached window.';
 const SELECTOR_SCHEMA = {
   type: 'object',
@@ -612,24 +624,41 @@ const SELECTOR_SCHEMA = {
 };
 
 const TOOLS: McpTool[] = [
-  { name: 'list_windows', category: 'read', description: "List visible top-level windows (title, className, processId, exe, hWnd, minimized/maximized/foreground, integrity). Start here. Set includePopups:true to ALSO list untitled popups — a combobox dropdown, classic #32768 context menu, or WPF/WinUI Popup opens in its own untitled window; list it, then attach it by hWnd to see + invoke its items.", inputSchema: { type: 'object', properties: { includePopups: { type: 'boolean', description: 'Also include untitled popup windows (dropdowns / context menus / autocomplete) so you can attach + drive them.' } } } },
+  {
+    name: 'list_windows',
+    category: 'read',
+    description:
+      'List visible top-level windows (title, className, processId, exe, hWnd, minimized/maximized/foreground, integrity). Start here. Set includePopups:true to ALSO list untitled popups — a combobox dropdown, classic #32768 context menu, or WPF/WinUI Popup opens in its own untitled window; list it, then attach it by hWnd to see + invoke its items.',
+    inputSchema: { type: 'object', properties: { includePopups: { type: 'boolean', description: 'Also include untitled popup windows (dropdowns / context menus / autocomplete) so you can attach + drive them.' } } },
+  },
   {
     name: 'attach',
     category: 'read',
-    description: 'Attach to a top-level window as the active root for snapshots and actions. Prefer an hWnd from list_windows or an exact title. className attaches only to the single VISIBLE window of that class — reliable for single-window classes (e.g. Shell_TrayWnd, the taskbar + system tray) but it refuses or asks you to disambiguate for the Chromium/Electron family (Discord, Slack, VS Code, Teams, Edge — all Chrome_WidgetWin_1), where it would otherwise grab an invisible helper. Provide a title (exact), a className, an hWnd, or a processId. Works on a minimized/background window. Returns a fresh ref-keyed snapshot immediately — act on those refs; no follow-up desktop_snapshot is needed.',
-    inputSchema: { type: 'object', properties: { title: { type: 'string' }, hWnd: { type: ['string', 'number'], description: 'Handle as a decimal/0x-hex string or a JSON number' }, processId: { type: 'number' }, className: { type: 'string' } } },
+    description:
+      'Attach to a top-level window as the active root for snapshots and actions. Prefer an hWnd from list_windows or an exact title. className attaches only to the single VISIBLE window of that class — reliable for single-window classes (e.g. Shell_TrayWnd, the taskbar + system tray) but it refuses or asks you to disambiguate for the Chromium/Electron family (Discord, Slack, VS Code, Teams, Edge — all Chrome_WidgetWin_1), where it would otherwise grab an invisible helper. Provide a title (exact), a className, an hWnd, or a processId. Works on a minimized/background window. Returns a fresh ref-keyed snapshot immediately — act on those refs; no follow-up desktop_snapshot is needed.',
+    inputSchema: {
+      type: 'object',
+      properties: { title: { type: 'string' }, hWnd: { type: ['string', 'number'], description: 'Handle as a decimal/0x-hex string or a JSON number' }, processId: { type: 'number' }, className: { type: 'string' } },
+    },
   },
   {
     name: 'desktop_snapshot',
     category: 'read',
     description:
       'Capture the attached window as a compact ref-keyed UIA tree (e.g. Button "Five" [ref=e49#1]). Better than a screenshot for acting; every interactable node carries a [ref=eN#G] you pass VERBATIM to action tools. Refs are valid ONLY until the next re-render — a stale-generation ref is rejected, not mis-resolved.',
-    inputSchema: { type: 'object', properties: { maxDepth: { type: 'number', description: 'Cap tree depth (default 40)' }, root: { type: 'string', description: "Re-ground on just one element's subtree (zoom into a large window): the name or automationId of a node from a prior snapshot. Combine with maxDepth." } } },
+    inputSchema: {
+      type: 'object',
+      properties: {
+        maxDepth: { type: 'number', description: 'Cap tree depth (default 40)' },
+        root: { type: 'string', description: "Re-ground on just one element's subtree (zoom into a large window): the name or automationId of a node from a prior snapshot. Combine with maxDepth." },
+      },
+    },
   },
   {
     name: 'find_and_act',
     category: 'input',
-    description: 'Find a control and act in one call. Target by ref (from the latest snapshot) OR selector. A selector acts on the FIRST match — if it could be ambiguous, pass a ref or a tighter selector (add automationId/controlType). Action is invoke|click|type|set_value|toggle|expand|collapse|read.',
+    description:
+      'Find a control and act in one call. Target by ref (from the latest snapshot) OR selector. A selector acts on the FIRST match — if it could be ambiguous, pass a ref or a tighter selector (add automationId/controlType). Action is invoke|click|type|set_value|toggle|expand|collapse|read.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -713,7 +742,8 @@ const TOOLS: McpTool[] = [
   {
     name: 'expand',
     category: 'input',
-    description: 'Expand a control via the UIA ExpandCollapse pattern — a combobox dropdown, tree node, split button, or menu — cursor-free, no focus (Invoke/posted clicks do NOT open these on WinUI/WPF/Chromium). Then desktop_snapshot to read the revealed items.',
+    description:
+      'Expand a control via the UIA ExpandCollapse pattern — a combobox dropdown, tree node, split button, or menu — cursor-free, no focus (Invoke/posted clicks do NOT open these on WinUI/WPF/Chromium). Then desktop_snapshot to read the revealed items.',
     inputSchema: { type: 'object', properties: { element: { type: 'string', description: ELEMENT_DESC }, ref: { type: 'string', description: REF_DESC } }, required: ['ref'] },
   },
   {
@@ -767,7 +797,8 @@ const TOOLS: McpTool[] = [
   {
     name: 'wait_for_process',
     category: 'read',
-    description: 'Wait until a process whose image name contains the given text is running (e.g. "chrome.exe"), then return its pid. Resolves immediately if already running. Use to trigger work the moment a process the agent is waiting on spawns.',
+    description:
+      'Wait until a process whose image name contains the given text is running (e.g. "chrome.exe"), then return its pid. Resolves immediately if already running. Use to trigger work the moment a process the agent is waiting on spawns.',
     inputSchema: { type: 'object', properties: { name: { type: 'string' }, timeout: { type: 'number', description: 'Milliseconds (default 30000)' } }, required: ['name'] },
   },
   {
@@ -793,7 +824,7 @@ const TOOLS: McpTool[] = [
     name: 'click_point',
     category: 'input',
     description:
-      'Click at absolute SCREEN pixel coordinates — a cursor-free posted click by default (no real cursor move), or cursor:true for a real SendInput click. The posted click goes to whatever window is TOPMOST at that pixel, so confirm the pixel belongs to your target (inspect_point / capture_window) when windows overlap; for a known control prefer click/invoke by ref, which targets the control\'s OWN window even when occluded. Pairs with ocr / inspect_point / screenshot_marked to click something that has no ref (pixel-only UI).',
+      "Click at absolute SCREEN pixel coordinates — a cursor-free posted click by default (no real cursor move), or cursor:true for a real SendInput click. The posted click goes to whatever window is TOPMOST at that pixel, so confirm the pixel belongs to your target (inspect_point / capture_window) when windows overlap; for a known control prefer click/invoke by ref, which targets the control's OWN window even when occluded. Pairs with ocr / inspect_point / screenshot_marked to click something that has no ref (pixel-only UI).",
     inputSchema: {
       type: 'object',
       properties: { x: { type: 'number' }, y: { type: 'number' }, button: { type: 'string', enum: ['left', 'right'] }, cursor: { type: 'boolean', description: 'Force a real SendInput cursor click' } },
@@ -862,14 +893,20 @@ const TOOLS: McpTool[] = [
   {
     name: 'list_views',
     category: 'read',
-    description: "List a container's view modes (UIA MultipleViewPattern) — e.g. File Explorer's Items View: current + supported {id, name} like Details/List/Large icons/Tiles/Content. Target the ref of the List/DataGrid/items container. Empty if the control has no MultipleView pattern.",
+    description:
+      "List a container's view modes (UIA MultipleViewPattern) — e.g. File Explorer's Items View: current + supported {id, name} like Details/List/Large icons/Tiles/Content. Target the ref of the List/DataGrid/items container. Empty if the control has no MultipleView pattern.",
     inputSchema: { type: 'object', properties: { element: { type: 'string', description: ELEMENT_DESC }, ref: { type: 'string', description: REF_DESC } }, required: ['ref'] },
   },
   {
     name: 'set_view',
     category: 'input',
-    description: 'Switch a container to a view mode CURSOR-FREE (UIA MultipleViewPattern.SetCurrentView) — e.g. flip File Explorer to Details to make read_table work. Pass a view `id` from list_views. No focus, no cursor, works on a background window.',
-    inputSchema: { type: 'object', properties: { element: { type: 'string', description: ELEMENT_DESC }, ref: { type: 'string', description: REF_DESC }, id: { type: 'number', description: 'A view id from list_views' } }, required: ['ref', 'id'] },
+    description:
+      'Switch a container to a view mode CURSOR-FREE (UIA MultipleViewPattern.SetCurrentView) — e.g. flip File Explorer to Details to make read_table work. Pass a view `id` from list_views. No focus, no cursor, works on a background window.',
+    inputSchema: {
+      type: 'object',
+      properties: { element: { type: 'string', description: ELEMENT_DESC }, ref: { type: 'string', description: REF_DESC }, id: { type: 'number', description: 'A view id from list_views' } },
+      required: ['ref', 'id'],
+    },
   },
   {
     name: 'native_tree',
@@ -893,7 +930,8 @@ const TOOLS: McpTool[] = [
   {
     name: 'press_key',
     category: 'input',
-    description: 'Send a key or chord, e.g. "Enter", "Control+S", "Control+Shift+Tab", "F4". With a ref AND a single key (no chord), posts the key to that control cursor-free (background/occluded/locked OK, no focus). Otherwise sends to the focused control via synthetic input (needs an unlocked foregrounded desktop).',
+    description:
+      'Send a key or chord, e.g. "Enter", "Control+S", "Control+Shift+Tab", "F4". With a ref AND a single key (no chord), posts the key to that control cursor-free (background/occluded/locked OK, no focus). Otherwise sends to the focused control via synthetic input (needs an unlocked foregrounded desktop).',
     inputSchema: { type: 'object', properties: { key: { type: 'string' }, element: { type: 'string', description: ELEMENT_DESC }, ref: { type: 'string', description: REF_DESC } }, required: ['key'] },
   },
   {
@@ -961,7 +999,13 @@ const TOOLS: McpTool[] = [
       properties: { element: { type: 'string', description: ELEMENT_DESC }, ref: { type: 'string', description: REF_DESC }, text: { type: 'string', description: 'Text to paste (omit to paste the current clipboard)' } },
     },
   },
-  { name: 'copy', category: 'input', description: "Copy selected text and return it. With a ref, reads that ref's selection via UIA TextPattern and writes the clipboard CURSOR-FREE (no focus, works locked/background; composes with find_text, which selects a substring cursor-free). Without a ref, falls back to Ctrl+C of the active control (works on an app with no a11y tree).", inputSchema: { type: 'object', properties: { ref: { type: 'string', description: 'Ref whose current selection to copy cursor-free (TextPattern → clipboard).' } } } },
+  {
+    name: 'copy',
+    category: 'input',
+    description:
+      "Copy selected text and return it. With a ref, reads that ref's selection via UIA TextPattern and writes the clipboard CURSOR-FREE (no focus, works locked/background; composes with find_text, which selects a substring cursor-free). Without a ref, falls back to Ctrl+C of the active control (works on an app with no a11y tree).",
+    inputSchema: { type: 'object', properties: { ref: { type: 'string', description: 'Ref whose current selection to copy cursor-free (TextPattern → clipboard).' } } },
+  },
   {
     name: 'launch_app',
     category: 'os',
@@ -1016,9 +1060,15 @@ for (const tool of TOOLS) {
 // so a near-empty tree is NOT a cold tree or a pixel-only surface. Steer the agent to the pixel/OCR path (and, for
 // Java, to the Access Bridge) instead of letting it stall on an empty tree.
 const BLIND_SPOTS: { test: RegExp; note: string }[] = [
-  { test: /^SunAwt/, note: 'Java Swing/AWT window — its controls are invisible to UIA and MSAA (you will see only the frame). Java exposes its tree via the Java Access Bridge: run `jabswitch /enable` and RESTART the app, then re-attach. Until then, screen_capture + ocr / click_text is the only way to read/drive it.' },
+  {
+    test: /^SunAwt/,
+    note: 'Java Swing/AWT window — its controls are invisible to UIA and MSAA (you will see only the frame). Java exposes its tree via the Java Access Bridge: run `jabswitch /enable` and RESTART the app, then re-attach. Until then, screen_capture + ocr / click_text is the only way to read/drive it.',
+  },
   { test: /^Tk/, note: 'Tk/Tkinter window — its widgets are custom-drawn with no a11y bridge, invisible to UIA and MSAA (you will see only anonymous panes). screen_capture + ocr / click_text is the only way to read/drive it.' },
-  { test: /^FLUTTER_RUNNER_WIN32_WINDOW$/, note: 'Flutter desktop window — it renders into a child FLUTTERVIEW whose semantics tree is often NOT exposed to generic UIA clients (you may see a single pane / near-empty tree). It MAY populate — re-snapshot once; if it stays near-empty, screen_capture + ocr / click_text is the way to read/drive it.' },
+  {
+    test: /^FLUTTER_RUNNER_WIN32_WINDOW$/,
+    note: 'Flutter desktop window — it renders into a child FLUTTERVIEW whose semantics tree is often NOT exposed to generic UIA clients (you may see a single pane / near-empty tree). It MAY populate — re-snapshot once; if it stays near-empty, screen_capture + ocr / click_text is the way to read/drive it.',
+  },
 ];
 
 /** Run a pattern action; on a "not supported" throw, append the recovery hint that points at inspect_element's
@@ -1050,7 +1100,9 @@ const HANDLERS: Record<string, ToolHandler> = {
     });
     // A UAC consent / secure desktop is invisible and undrivable from this session (no UIA, no capture) — say so, so
     // the agent does not loop waiting on a prompt it cannot see; a human must respond at the console, or run elevated.
-    const secure = isSecureDesktopActive() ? '⚠ A UAC consent / secure desktop is active — it is INVISIBLE and undrivable from this session (no UIA, no capture, screenshots freeze). A human must respond at the physical console, or relaunch the host elevated.\n\n' : '';
+    const secure = isSecureDesktopActive()
+      ? '⚠ A UAC consent / secure desktop is active — it is INVISIBLE and undrivable from this session (no UIA, no capture, screenshots freeze). A human must respond at the physical console, or relaunch the host elevated.\n\n'
+      : '';
     return textResult(`${secure}${lines.length > 0 ? lines.join('\n') : '(no visible top-level windows)'}`);
   },
   attach: (args) => {
@@ -1111,7 +1163,10 @@ const HANDLERS: Record<string, ToolHandler> = {
       await Bun.sleep(80);
       popup = uia.windows({ includeUntitled: true }).find((window) => !before.has(window.hWnd) && (window.className === '#32768' || /Popup|Menu|Flyout|DropDown/i.test(window.className)));
     }
-    if (popup === undefined) return errorResult("ShowContextMenu returned OK but no menu popup appeared — this provider does not raise one via UIA. Use a real-cursor right-click instead: click {ref, button:'right', cursor:true} (needs an unlocked foreground desktop).");
+    if (popup === undefined)
+      return errorResult(
+        "ShowContextMenu returned OK but no menu popup appeared — this provider does not raise one via UIA. Use a real-cursor right-click instead: click {ref, button:'right', cursor:true} (needs an unlocked foreground desktop).",
+      );
     return textResult(`context menu opened: [hWnd=0x${popup.hWnd.toString(16)}] [class=${popup.className}] — attach it (attach {hWnd}) to read + invoke its items (a WinUI flyout's items may need a re-snapshot).`);
   },
   invoke: (args) => {
@@ -1119,6 +1174,7 @@ const HANDLERS: Record<string, ToolHandler> = {
     return withSnapshot(`invoked ${quote(args.element)}`);
   },
   type: (args) => {
+    if (cursorDenied) return errorResult('type focuses the control and sends synthetic keystrokes (SendInput) — disabled by BUN_UIA_CURSOR=never. Use set_value to write the field cursor-free (WM_SETTEXT).');
     resolveRef(requireString(args, 'ref')).type(requireString(args, 'text'));
     if (args.submit === true) uia.sendKeys('Enter');
     return withSnapshot(`typed into ${quote(args.element)}${args.submit === true ? ' and pressed Enter' : ''}`);
@@ -1190,7 +1246,12 @@ const HANDLERS: Record<string, ToolHandler> = {
     let origin: string;
     if (region !== null && typeof region === 'object' && !Array.isArray(region)) {
       const r = region as Record<string, unknown>;
-      result = await uia.ocrScreen({ x: typeof r.x === 'number' ? r.x : undefined, y: typeof r.y === 'number' ? r.y : undefined, width: typeof r.width === 'number' ? r.width : undefined, height: typeof r.height === 'number' ? r.height : undefined });
+      result = await uia.ocrScreen({
+        x: typeof r.x === 'number' ? r.x : undefined,
+        y: typeof r.y === 'number' ? r.y : undefined,
+        width: typeof r.width === 'number' ? r.width : undefined,
+        height: typeof r.height === 'number' ? r.height : undefined,
+      });
       origin = 'screen region';
     } else {
       const hWnd = hwndArg(args) ?? attached?.hWnd ?? 0n;
@@ -1249,18 +1310,22 @@ const HANDLERS: Record<string, ToolHandler> = {
   screenshot: async () => {
     const window = requireAttached();
     const capture = captureWindowRGB(window.hWnd);
-    if (capture !== null && !isNearUniform(capture.rgb)) return imageResult(encodePNG(capture.rgb, capture.width, capture.height));
+    if (capture !== null && !isNearUniform(capture.rgb)) return imageResult(encodePNG(capture.rgb, capture.width, capture.height), `(${originNote(capture.originX, capture.originY, capture.width, capture.height)})`);
     const live = await captureWindowLive(window.hWnd);
-    if (live !== null && !isNearUniform(live.rgb)) return imageResult(encodePNG(live.rgb, live.width, live.height), '(PrintWindow was blank — Windows.Graphics.Capture live frame of the GPU/occluded surface)');
+    if (live !== null && !isNearUniform(live.rgb))
+      return imageResult(encodePNG(live.rgb, live.width, live.height), `(PrintWindow was blank — Windows.Graphics.Capture live frame of the GPU/occluded surface; ${originNote(live.originX, live.originY, live.width, live.height)})`);
     const bounds = window.boundingRectangle;
     if (bounds.width > 0 && bounds.height > 0)
-      return imageResult(uia.screenshotScreen({ x: bounds.x, y: bounds.y, width: bounds.width, height: bounds.height }), '(PrintWindow + WGC blank — desktop-region fallback; only the on-screen, non-occluded part)');
+      return imageResult(
+        uia.screenshotScreen({ x: bounds.x, y: bounds.y, width: bounds.width, height: bounds.height }),
+        `(PrintWindow + WGC blank — desktop-region fallback; only the on-screen, non-occluded part; ${originNote(bounds.x, bounds.y, bounds.width, bounds.height)})`,
+      );
     return errorResult('screenshot was empty (locked session, zero-size, or fully off-screen window)');
   },
   capture_window: async (args) => {
     const live = await captureWindowLive(resolveHwnd(args));
     if (live === null) return errorResult('Windows.Graphics.Capture could not capture this window (minimized with no surface, protected/DRM content, or WGC unavailable)');
-    return imageResult(encodePNG(live.rgb, live.width, live.height));
+    return imageResult(encodePNG(live.rgb, live.width, live.height), `(${originNote(live.originX, live.originY, live.width, live.height)})`);
   },
   screen_capture: (args) => {
     const region =
@@ -1349,7 +1414,8 @@ const HANDLERS: Record<string, ToolHandler> = {
     // scrollback; fall back to the full document for a non-scrollable text control. Capped either way.
     const visible = isPassword ? '' : element.visibleText();
     const text = isPassword ? '' : visible.length > 0 ? visible : element.text();
-    if (text.length > 0 && text !== value && text !== element.name) lines.push(`${visible.length > 0 ? 'visible text' : 'text'} (${text.length} chars):\n${text.length > 2000 ? `${text.slice(0, 2000)} …(+${text.length - 2000} more chars)` : text}`);
+    if (text.length > 0 && text !== value && text !== element.name)
+      lines.push(`${visible.length > 0 ? 'visible text' : 'text'} (${text.length} chars):\n${text.length > 2000 ? `${text.slice(0, 2000)} …(+${text.length - 2000} more chars)` : text}`);
     return textResult(lines.join('\n'));
   },
   read_table: (args) => {
@@ -1398,9 +1464,15 @@ const HANDLERS: Record<string, ToolHandler> = {
       if (handle !== 0n && postKey(handle, key)) return withSnapshot(`pressed ${JSON.stringify(key)} cursor-free`);
       // The ref has no native window handle (WinUI/WPF/Chromium sub-control) — fall back to the FOCUSED control and
       // SAY so, rather than reporting a plain success that hides the target change.
+      if (cursorDenied)
+        return errorResult(`${JSON.stringify(key)} could not be posted cursor-free (the ref has no native window handle) and the SendInput fallback is disabled by BUN_UIA_CURSOR=never — focus the control first, or use set_value`);
       uia.sendKeys(key);
       return withSnapshot(`pressed ${JSON.stringify(key)} on the FOCUSED control — the ref has no native window handle, so it could not be targeted cursor-free (focus it first, or use type/set_value)`);
     }
+    if (cursorDenied)
+      return errorResult(
+        `a key chord like ${JSON.stringify(key)} is delivered with synthetic input (SendInput) to the focused control — disabled by BUN_UIA_CURSOR=never. Post a single key to a control by ref (press_key {ref,key}) instead.`,
+      );
     uia.sendKeys(key);
     return withSnapshot(`pressed ${JSON.stringify(key)}`);
   },
@@ -1441,6 +1513,7 @@ const HANDLERS: Record<string, ToolHandler> = {
     return withSnapshot(`dragged ${fromX},${fromY} → ${toX},${toY}`);
   },
   hold_key: async (args) => {
+    if (cursorDenied) return errorResult('hold_key holds a key down with synthetic input (SendInput) — disabled by BUN_UIA_CURSOR=never');
     await holdKey(normalizeKey(requireString(args, 'key')), typeof args.durationMs === 'number' ? args.durationMs : 1000);
     return withSnapshot(`held ${JSON.stringify(args.key)} for ${typeof args.durationMs === 'number' ? args.durationMs : 1000}ms`);
   },

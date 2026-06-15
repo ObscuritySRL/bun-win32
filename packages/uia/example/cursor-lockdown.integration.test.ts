@@ -1,14 +1,18 @@
 /**
- * cursor-lockdown — BUN_UIA_CURSOR=never must be ENFORCED on every real-cursor path, including click_point and
- * click_text (both category 'input', reachable under the default safe profile).
+ * cursor-lockdown — BUN_UIA_CURSOR=never must be ENFORCED on every real-cursor path: the MOUSE tools (click_point,
+ * click_text, drag) AND the synthetic-KEYBOARD tools (hold_key, press_key chords / no-handle fallback, type) — all
+ * category 'input', reachable under the default safe profile.
  *
  * cursorDenied was consulted only by clickElement and drag, so click_point/click_text still moved the physical
  * mouse — on the explicit cursor:true branch AND the silent clickAt fallback when a posted click reaches no window
- * (the common case on Chromium/Electron/game pixels). Both now return isError so the agent re-routes to a ref.
+ * (the common case on Chromium/Electron/game pixels). Both now return isError so the agent re-routes to a ref. The
+ * keyboard side was likewise open: hold_key/press_key-chord/type inject SendInput keystrokes with no gate (the
+ * cycle-44 mouse fix missed them). All now refuse, while the cursor-free postKey branch (press_key {ref,key} on a
+ * native-handle control) stays live.
  *
- * Proof (drives the real MCP server with BUN_UIA_CURSOR=never): both real-cursor paths refuse with NO cursor
- * movement — the cursor:true branch, and the posted-fail→fallback branch (an off-screen pixel where no window
- * exists). Side-effect-free (no click is ever delivered; nothing moves). click_text uses the identical guard.
+ * Proof (drives the real MCP server with BUN_UIA_CURSOR=never): every real-cursor path refuses with NO input
+ * delivered — the mouse cursor:true branch, the posted-fail→fallback branch (an off-screen pixel where no window
+ * exists), and the three keyboard SendInput tools. Side-effect-free (nothing is clicked, nothing is typed).
  *
  * bun test is broken repo-wide — runnable harness (only the MCP subprocess):
  * Run: bun run example/cursor-lockdown.integration.test.ts
@@ -67,9 +71,24 @@ try {
   // Off-screen pixel: no window there → the posted click fails → the real-cursor fallback must ALSO be refused.
   const fallback = await call('tools/call', { name: 'click_point', arguments: { x: -30000, y: -30000 } });
   assert(isErr(fallback) && /BUN_UIA_CURSOR=never/.test(textOf(fallback)), 'click_point real-cursor FALLBACK (posted click reached no window) is refused under BUN_UIA_CURSOR=never');
+
+  // Keyboard SendInput tools — the gate is the FIRST statement in each handler, so they refuse with zero synthetic
+  // keystrokes (no attach/ref needed). All three are category 'input', reachable under the default safe profile.
+  const held = await call('tools/call', { name: 'hold_key', arguments: { key: 'a', durationMs: 50 } });
+  assert(isErr(held) && /BUN_UIA_CURSOR=never/.test(textOf(held)), 'hold_key (SendInput key-down) is refused under BUN_UIA_CURSOR=never (no key held)');
+
+  const chord = await call('tools/call', { name: 'press_key', arguments: { key: 'Control+a' } });
+  assert(isErr(chord) && /BUN_UIA_CURSOR=never/.test(textOf(chord)), 'press_key chord (SendInput to the focused control) is refused under BUN_UIA_CURSOR=never (no keys sent)');
+
+  const typed = await call('tools/call', { name: 'type', arguments: { ref: 'e1', text: 'leak' } });
+  assert(isErr(typed) && /BUN_UIA_CURSOR=never/.test(textOf(typed)) && /set_value/.test(textOf(typed)), 'type (focus+SendInput) is refused under BUN_UIA_CURSOR=never and steers to set_value (the cursor-free WM_SETTEXT path)');
 } finally {
   proc.kill();
 }
 
-console.log(failures === 0 ? '\nPASS — BUN_UIA_CURSOR=never is enforced on click_point (both real-cursor paths); click_text shares the guard.' : `\nFAILED — ${failures} assertion(s)`);
+console.log(
+  failures === 0
+    ? '\nPASS — BUN_UIA_CURSOR=never is enforced on every real-cursor path: mouse (click_point ×2, click_text/drag share the guard) AND keyboard (hold_key, press_key chord, type→set_value).'
+    : `\nFAILED — ${failures} assertion(s)`,
+);
 process.exit(failures === 0 ? 0 : 1);
