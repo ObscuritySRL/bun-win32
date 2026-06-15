@@ -45,6 +45,20 @@ try {
       app.release();
     }
   }
+  // Library attach({className}) prefers a VISIBLE window of that class (not FindWindowW's first Z-order match, which
+  // for the Chromium/Electron family is an invisible helper).
+  const visible = uia.windows({ includeUntitled: true });
+  const klass = visible.find((window) => visible.filter((other) => other.className === window.className).length >= 1)?.className;
+  if (klass === undefined) console.log('  skip: no class to exercise library className attach');
+  else {
+    const visibleHandles = new Set(visible.filter((window) => window.className === klass).map((window) => window.hWnd));
+    const byClass = uia.attach({ className: klass });
+    try {
+      assert(visibleHandles.has(byClass.nativeWindowHandle), `library attach({className:${JSON.stringify(klass)}}) lands on a VISIBLE window of that class`);
+    } finally {
+      byClass.release();
+    }
+  }
 } finally {
   uia.uninitialize();
 }

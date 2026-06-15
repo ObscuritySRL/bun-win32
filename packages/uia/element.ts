@@ -11,7 +11,7 @@ import { comRelease, hresult, vcall } from './com';
 import { type CompiledCondition, compileCondition, type ElementProperties, formatNoMatch, matches, type Selector } from './condition';
 import { ControlType, PropertyId, S_OK, SLOT, TreeScope } from './constants';
 import { clickAt, type as inputType } from './input';
-import { renderWidgetHandles, screenshot as windowScreenshot, windowForProcess } from './window';
+import { listWindows, renderWidgetHandles, screenshot as windowScreenshot, windowForProcess } from './window';
 import {
   addToSelection,
   canSelectMultiple,
@@ -690,6 +690,13 @@ function resolveWindow(target: string | bigint | { className?: string; process?:
   if (typeof target !== 'string' && target.process !== undefined) return windowForProcess(target.process);
   const title = typeof target === 'string' ? target : target.title;
   const className = typeof target === 'string' ? undefined : target.className;
+  // className without an exact title: FindWindowW(class, NULL) returns the first top-level match in Z-order, which for
+  // the whole Chromium/Electron family (Chrome_WidgetWin_1) is an INVISIBLE helper window. Prefer a VISIBLE window of
+  // that class; fall back to FindWindowW only when none is visible (a legitimately hidden target).
+  if (className !== undefined && title === undefined) {
+    const visible = listWindows({ includeUntitled: true }).find((window) => window.className === className);
+    if (visible !== undefined) return visible.hWnd;
+  }
   const classBuffer = className === undefined ? null : Buffer.from(`${className}\0`, 'utf16le').ptr!;
   const titleBuffer = title === undefined ? null : Buffer.from(`${title}\0`, 'utf16le').ptr!;
   return User32.FindWindowW(classBuffer, titleBuffer);

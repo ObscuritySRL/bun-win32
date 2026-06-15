@@ -27,7 +27,7 @@ Escalation rule: stay on the `uia` facade. Drop to a lower engine (`msaaTree`, t
 
 | I want to … | call |
 | --- | --- |
-| attach to an app | `uia.attach('Calculator')` · `uia.attach({ className })` · `uia.attach({ process: pid })` · `uia.attach(hWnd)` |
+| attach to an app | `uia.attach('Calculator')` · `uia.attach({ className })` (resolves to the first VISIBLE window of that class, so the Chromium/Electron family lands on the real window, not an invisible helper) · `uia.attach({ process: pid })` · `uia.attach(hWnd)` |
 | spawn + wait for an app | `await uia.launch(['notepad.exe'], { className: 'Notepad' })` |
 | find by name/type/automationId | `app.find({ controlType: ControlType.Button, name: 'Five' })` |
 | find all matches | `app.findAll({ controlType: ControlType.Button })` |
@@ -58,8 +58,8 @@ Escalation rule: stay on the `uia` facade. Drop to a lower engine (`msaaTree`, t
 | capture the whole screen / a region | `uia.screenshotScreen()` · `uia.captureScreen({ x, y, width, height })` |
 | see a SPECIFIC window even occluded / background / GPU | `await uia.captureWindowLive(hWnd)` (Windows.Graphics.Capture) |
 | list the physical monitors | `uia.listMonitors()` → `{ bounds, workArea, primary }[]` |
-| move / min / max / restore / close a window (no foreground) | `moveWindow(hWnd,…)` · `minimizeWindow` · `maximizeWindow` · `restoreWindow` · `raiseWindow` · `closeWindow` |
-| the exe + state of every window | `uia.windows()` + `processImagePath(pid)` · `isMinimized(hWnd)` · `isMaximized(hWnd)` · `foregroundWindow()` |
+| move / min / max / restore / close / snap a window (no foreground) | `moveWindow(hWnd,…)` · `minimizeWindow` · `maximizeWindow` · `restoreWindow` · `raiseWindow` · `closeWindow` · `snapWindow(hWnd, 'left'|'right'|'top'|'bottom'|'center')` |
+| the exe + state + integrity of every window | `uia.windows()` + `processImagePath(pid)` · `isMinimized(hWnd)` · `isMaximized(hWnd)` · `foregroundWindow()` · `integrityLevel(pid)` (the UIPI wall — `'high'`/`'system'` needs YOUR host elevated too) |
 | find an image on screen (no a11y) | `uia.locateOnScreen(needle)` → `{ x, y, score }` · `findImage(haystack, needle)` |
 | read a pixel color | `uia.pixelColor(x, y)` → `{ r, g, b }` |
 | clipboard read / write / paste / copy | `uia.readClipboard()` · `uia.writeClipboard(text)` · `uia.paste(text)` · `await uia.copy()` |
@@ -71,7 +71,7 @@ Escalation rule: stay on the `uia` facade. Drop to a lower engine (`msaaTree`, t
 ## Full API
 
 ### `uia` — the facade object
-`attach(target)`, `launch(command, target, timeout?)`, `focused()`, `fromPoint(x, y)`, `elementAt(x, y)`, `root()`, `windows()`, `tree(element, options?)`, `snapshot(window, options?)`, `diff(before, after)`, `waitForIdle(element, options?)`, `execute(element, actions)`, `msaaTree(hWnd, maxDepth?)`, `windowTree(hWnd, maxDepth?)`, `click(x, y)`, `postClick(x, y, button?)`, `postKey(hWnd, key)`, `postText(hWnd, text)`, `setControlText(hWnd, text)`, `scrollAt(x, y, dir, amount?)`, `sendKeys(combo)`, `type(text)`, `captureScreen(region?)`, `screenshotScreen(region?)`, `captureWindowLive(hWnd, options?)`, `pixelColor(x, y)`, `listMonitors()`, `locateOnScreen(needle, options?)`, `readClipboard()`, `writeClipboard(text)`, `paste(text)`, `copy()`, `dispatch(window, action, options?)` (computer-use), `listProcesses()`, `waitForWindow(match, options?)`, `waitForProcess(imageName, options?)`, `watchWindows(handler, options?)`, `ocrWindow(hWnd, options?)`, `ocrScreen(region?, options?)`, `ocrBitmap(bitmap, options?)`, `initialize()`, `uninitialize()`.
+`attach(target)`, `launch(command, target, timeout?)`, `focused()`, `fromPoint(x, y)`, `elementAt(x, y)`, `root()`, `windows()`, `tree(element, options?)`, `snapshot(window, options?)`, `diff(before, after)`, `waitForIdle(element, options?)`, `execute(element, actions)`, `msaaTree(hWnd, maxDepth?)`, `windowTree(hWnd, maxDepth?)`, `click(x, y)`, `postClick(x, y, button?)`, `postKey(hWnd, key)`, `postText(hWnd, text)`, `setControlText(hWnd, text)`, `scrollAt(x, y, dir, amount?)`, `sendKeys(combo)`, `type(text)`, `captureScreen(region?)`, `screenshotScreen(region?)`, `captureWindowLive(hWnd, options?)`, `pixelColor(x, y)`, `listMonitors()`, `locateOnScreen(needle, options?)`, `readClipboard()`, `writeClipboard(text)`, `paste(text)`, `copy()`, `dispatch(window, action, options?)` (computer-use), `listProcesses()`, `waitForWindow(match, options?)`, `waitForProcess(imageName, options?)`, `watchWindows(handler, options?)`, `ocrWindow(hWnd, options?)`, `ocrScreen(region?, options?)`, `ocrBitmap(bitmap, options?)`, `ocrAvailable()`, `disposeOcr()`, `initialize()`, `uninitialize()`.
 
 **Drive in the dark (the doctrine):** an AI is not a human at a screen — it does not need a window foregrounded, visible, under a cursor, or on the active desktop. Cursor-free / no-foreground is the **default**: `invoke` / `setValue` / `toggle` / `scroll`, `postClick`, and the posted key/text path (`setControlText` / `postKey` / `postText` → a control's `nativeWindowHandle`) act on a minimized, background, occluded, or locked window with no focus theft and no real cursor; `captureWindowLive` SEES such a window; the whole UIA/native/MSAA tree of a background window is readable untouched. SendInput (`type` / `click` / `sendKeys` / `drag`) and `PrintWindow` are only for (a) a human watching or (b) a pixel-only surface with no semantic layer.
 
