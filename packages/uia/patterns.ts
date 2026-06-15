@@ -155,6 +155,20 @@ export function expandCollapseState(ptr: bigint): number {
   }
 }
 
+/** Invoke a control's DEFAULT ACTION via the LegacyIAccessible (MSAA) pattern — cursor-free, no focus, works
+ *  on a background/locked window. The MSAA "accDoDefaultAction" (e.g. "Press" a button). A fallback activate for
+ *  controls with no Invoke pattern; note some shell items (Explorer drives/folders) accept it as a silent no-op,
+ *  so prefer Invoke there. Throws if the element has no LegacyIAccessible pattern. */
+export function doDefaultAction(ptr: bigint): void {
+  const pattern = getPattern(ptr, PatternId.LegacyIAccessible);
+  if (pattern === 0n) throw new Error('element does not support LegacyIAccessiblePattern (no default action)');
+  try {
+    invokeNoArg(pattern, SLOT.DoDefaultAction, 'DoDefaultAction');
+  } finally {
+    comRelease(pattern);
+  }
+}
+
 /** Select a SelectionItemPattern control (list item, radio button), replacing the selection. */
 export function select(ptr: bigint): void {
   const pattern = getPattern(ptr, PatternId.SelectionItem);

@@ -278,6 +278,23 @@ function clickPoint(element: Element): { x: number; y: number } {
  * left double / right / middle click or when the cursor-free paths fail (and BUN_UIA_CURSOR!=='never').
  */
 function clickElement(element: Element, button: 'left' | 'right' | 'middle', doubleClick: boolean, forceCursor: boolean): string {
+  if (!forceCursor && doubleClick) {
+    // A double-click means "open/activate". Invoke is the pattern that actually navigates an Explorer
+    // folder/drive cursor-free on a background window (LegacyIAccessible.DoDefaultAction is a silent no-op on
+    // those shell items, so it is only a secondary fallback). A real double-click is the last resort.
+    try {
+      element.invoke();
+      return 'opened (cursor-free, invoke)';
+    } catch {
+      // no Invoke pattern — try the MSAA default action
+    }
+    try {
+      element.doDefaultAction();
+      return 'opened (cursor-free, default action)';
+    } catch {
+      // no LegacyIAccessible pattern either — fall back to the real double-click below
+    }
+  }
   if (!forceCursor && !doubleClick) {
     if (button === 'left') {
       try {

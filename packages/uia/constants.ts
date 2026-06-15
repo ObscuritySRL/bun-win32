@@ -241,6 +241,8 @@ export const SLOT = {
   AddToSelection: 4,
   RemoveFromSelection: 5,
   get_CurrentIsSelected: 6,
+  // IUIAutomationLegacyIAccessiblePattern (the MSAA bridge — DoDefaultAction = "Open" a folder/drive, "Press" a button, …)
+  DoDefaultAction: 4,
   // IUIAutomationSelectionPattern (container)
   GetCurrentSelection: 3,
   get_CurrentCanSelectMultiple: 4,

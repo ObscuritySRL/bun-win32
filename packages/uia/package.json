@@ -102,6 +102,7 @@
     "example:condition-perf": "bun ./example/condition-perf.integration.test.ts",
     "example:desktop-mcp": "bun ./example/desktop-mcp.ts",
     "example:drive-in-the-dark": "bun ./example/drive-in-the-dark.ts",
+    "example:explorer-in-the-dark": "bun ./example/explorer-in-the-dark.integration.test.ts",
     "example:find-text": "bun ./example/find-text.integration.test.ts",
     "example:get-variant": "bun ./example/get-variant.integration.test.ts",
     "example:hello-uia": "bun ./example/hello-uia.ts",

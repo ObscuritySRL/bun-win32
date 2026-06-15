@@ -16,6 +16,7 @@ import {
   addToSelection,
   canSelectMultiple,
   collapse,
+  doDefaultAction,
   expand,
   expandCollapseState,
   getSelectedText,
@@ -337,6 +338,12 @@ export class Element {
   /** Press via InvokePattern. Throws if unsupported (try `.click()`). */
   invoke(): void {
     invoke(this.ptr);
+  }
+
+  /** Invoke the control's MSAA default action (LegacyIAccessible) — cursor-free, no focus (e.g. "Press" a button).
+   *  A fallback activate for controls with no Invoke pattern; Explorer shell items take it as a no-op, so prefer invoke() there. Throws if unsupported. */
+  doDefaultAction(): void {
+    doDefaultAction(this.ptr);
   }
 
   /** Read a ValuePattern value (e.g. a text box), or '' if unsupported. */
