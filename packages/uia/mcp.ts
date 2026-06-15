@@ -553,8 +553,27 @@ const TOOLS: McpTool[] = [
     name: 'wait_idle',
     category: 'read',
     description:
-      'Block until the attached window stops changing (its tree is stable for quietMs), then return a fresh snapshot — the supported substitute for UIA events (a foreign-thread FFI dead-end). Use after an action that triggers async rendering.',
+      'Block until the attached window stops changing (its tree is stable for quietMs), then return a fresh snapshot. Use after an action that triggers async rendering; pair with wait_for_window when you are waiting on a NEW window rather than the current one settling.',
     inputSchema: { type: 'object', properties: { quietMs: { type: 'number', description: 'Stable-for window in ms (default 400)' }, timeout: { type: 'number', description: 'Max wait in ms (default 5000)' } } },
+  },
+  {
+    name: 'wait_for_window',
+    category: 'read',
+    description:
+      'Wait until a top-level window matching title (substring) / className / process appears ANYWHERE on the desktop — driven by a SetWinEventHook event hook, not polling — then return its title/className/processId/hWnd. Resolves immediately if one is already open. Use to gate on a dialog, a just-launched app, or a page finishing navigation. Omit all fields to wait for any new window.',
+    inputSchema: { type: 'object', properties: { title: { type: 'string' }, className: { type: 'string' }, process: { type: 'number' }, timeout: { type: 'number', description: 'Milliseconds (default 30000)' } } },
+  },
+  {
+    name: 'wait_for_process',
+    category: 'read',
+    description: 'Wait until a process whose image name contains the given text is running (e.g. "chrome.exe"), then return its pid. Resolves immediately if already running. Use to trigger work the moment a process the agent is waiting on spawns.',
+    inputSchema: { type: 'object', properties: { name: { type: 'string' }, timeout: { type: 'number', description: 'Milliseconds (default 30000)' } }, required: ['name'] },
+  },
+  {
+    name: 'list_processes',
+    category: 'read',
+    description: 'List running processes as {processId, name} (optionally filtered by an image-name substring). Pair with wait_for_process / launch_app / attach by process.',
+    inputSchema: { type: 'object', properties: { filter: { type: 'string', description: 'Case-insensitive image-name substring' } } },
   },
   {
     name: 'screenshot',
@@ -835,6 +854,27 @@ const HANDLERS: Record<string, ToolHandler> = {
   wait_idle: async (args) => {
     const settled = await uia.waitForIdle(requireAttached(), { quietMs: typeof args.quietMs === 'number' ? args.quietMs : 400, timeout: typeof args.timeout === 'number' ? args.timeout : 5000 });
     return withSnapshot(settled ? 'UI settled' : 'UI still changing at timeout');
+  },
+  wait_for_window: async (args) => {
+    const match: { title?: string; className?: string; process?: number } = {};
+    if (typeof args.title === 'string') match.title = args.title;
+    if (typeof args.className === 'string') match.className = args.className;
+    if (typeof args.process === 'number') match.process = args.process;
+    const info = await uia.waitForWindow(match, { timeout: typeof args.timeout === 'number' ? args.timeout : 30000 });
+    return textResult(`window: ${JSON.stringify(info.title)} [${info.className}] pid=${info.processId} hWnd=0x${info.hWnd.toString(16)} — attach by hWnd to drive it`);
+  },
+  wait_for_process: async (args) => {
+    const name = requireString(args, 'name');
+    const pid = await uia.waitForProcess(name, { timeout: typeof args.timeout === 'number' ? args.timeout : 30000 });
+    return textResult(`process running: ${name} pid=${pid}`);
+  },
+  list_processes: (args) => {
+    const filter = typeof args.filter === 'string' ? args.filter.toLowerCase() : null;
+    const processes = uia
+      .listProcesses()
+      .filter((process) => filter === null || process.name.toLowerCase().includes(filter))
+      .sort((first, second) => first.name.localeCompare(second.name));
+    return textResult(`${processes.length} process(es)${filter !== null ? ` matching ${JSON.stringify(filter)}` : ''}:\n${processes.map((process) => `  ${String(process.processId).padStart(6)}  ${process.name}`).join('\n')}`);
   },
   screenshot: async () => {
     const window = requireAttached();

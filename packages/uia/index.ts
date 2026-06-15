@@ -4,6 +4,7 @@ import { copy, paste, readClipboard, writeClipboard } from './clipboard';
 import { elementAt, listMonitors, postClickAt, scrollAt } from './coords';
 import { diffTrees } from './diff';
 import { attach, focused, fromPoint, launch, root } from './element';
+import { listProcesses, waitForProcess, waitForWindow, watchWindows } from './events';
 import { waitForIdle } from './idle';
 import { clickAt, sendKeys, type } from './input';
 import { locateOnScreen } from './match';
@@ -30,6 +31,7 @@ export const uia = {
   initialize,
   launch,
   listMonitors,
+  listProcesses,
   locateOnScreen,
   msaaTree,
   paste,
@@ -45,6 +47,9 @@ export const uia = {
   type,
   uninitialize,
   waitForIdle,
+  waitForProcess,
+  waitForWindow,
+  watchWindows,
   windowTree,
   windows: listWindows,
   writeClipboard,
@@ -61,6 +66,7 @@ export { ControlType, PatternId, PropertyConditionFlags, PropertyId, SLOT, TreeS
 export { elementAt, listMonitors, type MonitorInfo, type PointDescription, postClickAt, scrollAt, virtualScreen, windowAt } from './coords';
 export { type DiffNode, diffTrees, type RenameChange, renderDiff, type StateChange, type TreeChange, type TreeDiff } from './diff';
 export { attach, Element, focused, fromHandle, fromPoint, launch, root, Window } from './element';
+export { listProcesses, waitForProcess, waitForWindow, watchWindows, type WindowEvent, type WindowEventType, type WindowMatch, type WindowWatcher } from './events';
 export { type IdleOptions, waitForIdle } from './idle';
 export {
   clickAt,
