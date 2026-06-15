@@ -62,6 +62,7 @@ Escalation rule: stay on the `uia` facade. Drop to a lower engine (`msaaTree`, t
 | list the physical monitors | `uia.listMonitors()` → `{ bounds, workArea, primary }[]` |
 | move / min / max / restore / close / snap a window (no foreground) | `moveWindow(hWnd,…)` · `minimizeWindow` · `maximizeWindow` · `restoreWindow` · `raiseWindow` · `closeWindow` · `snapWindow(hWnd, 'left'|'right'|'top'|'bottom'|'center')` |
 | the exe + state + integrity of every window | `uia.windows()` + `processImagePath(pid)` · `isMinimized(hWnd)` · `isMaximized(hWnd)` · `foregroundWindow()` · `integrityLevel(pid)` (the UIPI wall — `'high'`/`'system'` needs YOUR host elevated too) |
+| detect a UAC / secure desktop (undrivable OS wall) | `isSecureDesktopActive()` · `inputDesktopName()` (`'Default'` normal, `'Winlogon'` = a UAC consent / lock screen — invisible, no UIA, no capture; a human must respond at the console) |
 | find an image on screen (no a11y) | `uia.locateOnScreen(needle)` → `{ x, y, score }` · `findImage(haystack, needle)` |
 | read a pixel color | `uia.pixelColor(x, y)` → `{ r, g, b }` |
 | clipboard read / write / paste / copy | `uia.readClipboard()` · `uia.writeClipboard(text)` · `uia.paste(text)` · `await uia.copy()` |

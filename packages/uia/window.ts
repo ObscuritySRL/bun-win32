@@ -227,6 +227,42 @@ export function integrityLevel(processId: number): '' | 'untrusted' | 'low' | 'm
   }
 }
 
+const UOI_NAME = 0x0000_0002;
+const DESKTOP_READOBJECTS = 0x0000_0001;
+
+/** The name of the current INPUT desktop — 'Default' in normal use; 'Winlogon' when the SECURE desktop is up
+ *  (a UAC consent prompt, Ctrl+Alt+Del, the lock/credential screen). '' when it cannot be opened from this session
+ *  (typically because a secure desktop is active and inaccessible from a medium-integrity process). */
+export function inputDesktopName(): string {
+  const desktop = User32.OpenInputDesktop(0, 0, DESKTOP_READOBJECTS);
+  if (desktop === 0n) return '';
+  try {
+    const buffer = Buffer.alloc(256); // wchar_t[128]
+    const needed = Buffer.alloc(4);
+    if (User32.GetUserObjectInformationW(desktop, UOI_NAME, buffer.ptr!, 256, needed.ptr!) === 0) return '';
+    return buffer.toString('utf16le', 0, Math.max(0, needed.readUInt32LE(0) - 2)); // drop the trailing null
+  } finally {
+    User32.CloseDesktop(desktop);
+  }
+}
+
+/** Whether a UAC consent / SECURE desktop is currently active — the input desktop is not 'Default' (e.g. 'Winlogon'),
+ *  or it cannot be opened from this session at all. Such a prompt is INVISIBLE and UNDRIVABLE by OS design (no UIA, no
+ *  capture); a human must respond at the physical console, or the host must run elevated. Detection only — a true OS
+ *  wall, like driving an elevated window from medium integrity. */
+export function isSecureDesktopActive(): boolean {
+  const desktop = User32.OpenInputDesktop(0, 0, DESKTOP_READOBJECTS);
+  if (desktop === 0n) return true; // the input desktop is not openable from this session → a secure desktop is up
+  try {
+    const buffer = Buffer.alloc(256);
+    const needed = Buffer.alloc(4);
+    if (User32.GetUserObjectInformationW(desktop, UOI_NAME, buffer.ptr!, 256, needed.ptr!) === 0) return false;
+    return buffer.toString('utf16le', 0, Math.max(0, needed.readUInt32LE(0) - 2)).toLowerCase() !== 'default';
+  } finally {
+    User32.CloseDesktop(desktop);
+  }
+}
+
 /** Whether a window is minimized (iconic) — readable for any top-level window without touching it. */
 export function isMinimized(hWnd: bigint): boolean {
   return User32.IsIconic(hWnd) !== 0;

@@ -33,6 +33,7 @@ import {
   integrityLevel,
   isMaximized,
   isMinimized,
+  isSecureDesktopActive,
   listMonitors,
   maximizeWindow,
   middleClickAt,
@@ -1047,7 +1048,10 @@ const HANDLERS: Record<string, ToolHandler> = {
       const wall = integrity === 'high' || integrity === 'system' ? ` [${integrity}-integrity — UIPI wall: drivable only if YOUR host runs elevated too]` : integrity === 'low' || integrity === 'untrusted' ? ` [${integrity}-integrity]` : '';
       return `- ${JSON.stringify(window.title)} [class=${window.className}] [pid=${window.processId}${exe ? ` ${exe}` : ''}] [hWnd=0x${window.hWnd.toString(16)}]${state ? ` (${state})` : ''}${wall}`;
     });
-    return textResult(lines.length > 0 ? lines.join('\n') : '(no visible top-level windows)');
+    // A UAC consent / secure desktop is invisible and undrivable from this session (no UIA, no capture) — say so, so
+    // the agent does not loop waiting on a prompt it cannot see; a human must respond at the console, or run elevated.
+    const secure = isSecureDesktopActive() ? '⚠ A UAC consent / secure desktop is active — it is INVISIBLE and undrivable from this session (no UIA, no capture, screenshots freeze). A human must respond at the physical console, or relaunch the host elevated.\n\n' : '';
+    return textResult(`${secure}${lines.length > 0 ? lines.join('\n') : '(no visible top-level windows)'}`);
   },
   attach: (args) => {
     current?.dispose();
@@ -1145,7 +1149,9 @@ const HANDLERS: Record<string, ToolHandler> = {
     return withSnapshot(`${mode === 'add' ? 'added to selection' : mode === 'remove' ? 'removed from selection' : 'selected'} ${quote(args.element)}`);
   },
   find_text: (args) => {
-    const matched = resolveRef(requireString(args, 'ref')).selectText(requireString(args, 'text'), { ignoreCase: args.ignoreCase === true });
+    const element = resolveRef(requireString(args, 'ref'));
+    if (element.isPassword) return textResult('(password — withheld) — find_text will not extract text from a secret field'); // the one read path that was missing the gate every sibling applies
+    const matched = element.selectText(requireString(args, 'text'), { ignoreCase: args.ignoreCase === true });
     return textResult(matched === null ? `text not found (or the control has no TextPattern): ${JSON.stringify(args.text)}` : `found and selected ${JSON.stringify(matched)} — now the active text selection (copy / set_value / read it)`);
   },
   wait_for: async (args) => {
