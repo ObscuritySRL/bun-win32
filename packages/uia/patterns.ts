@@ -436,6 +436,21 @@ export function readTable(ptr: bigint, maxRows = 100): TableData | null {
   }
 }
 
+/** The cell Element pointer at (row, column) of a GridPattern container — compose setValue / invoke / toggle on
+ *  it for a cursor-free grid-cell edit (the caller owns and releases it). 0n if there is no Grid pattern or no
+ *  such cell. Reuses the already-bound GridPattern.GetItem (no new vtable slot). */
+export function getCell(ptr: bigint, row: number, column: number): bigint {
+  const grid = getPattern(ptr, PatternId.Grid);
+  if (grid === 0n) return 0n;
+  try {
+    const out = Buffer.alloc(8);
+    if (vcall(grid, SLOT.GetItem, [FFIType.i32, FFIType.i32, FFIType.ptr], [row, column, out.ptr!]) !== S_OK) return 0n;
+    return out.readBigUInt64LE(0);
+  } finally {
+    comRelease(grid);
+  }
+}
+
 // IUIAutomationTextRange::Select — slot 16. Kept local (not in SLOT) because the name collides with
 // IUIAutomationSelectionItemPattern::Select=3; verified against the header by slot-gate's scoped block.
 const TEXTRANGE_SELECT = 16;

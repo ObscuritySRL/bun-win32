@@ -19,6 +19,7 @@ import {
   doDefaultAction,
   expand,
   expandCollapseState,
+  getCell,
   getSelectedText,
   getSelectionPointers,
   getValue,
@@ -420,6 +421,13 @@ export class Element {
   /** Read a GridPattern container (data grid / details list / table) as headers + rows of text, or null if unsupported. */
   readTable(maxRows?: number): TableData | null {
     return readTable(this.ptr, maxRows);
+  }
+
+  /** The cell Element at (row, column) of a GridPattern container — compose setValue()/invoke()/toggle() on it
+   *  for a cursor-free grid-cell edit. The caller owns the returned Element. Null if no GridPattern / no such cell. */
+  cell(row: number, column: number): Element | null {
+    const pointer = getCell(this.ptr, row, column);
+    return pointer === 0n ? null : new Element(pointer);
   }
 
   /** Read any UIA property by id (PropertyId.*) via GetCurrentPropertyValue — HelpText, IsOffscreen,
