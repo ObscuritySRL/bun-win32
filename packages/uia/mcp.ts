@@ -184,13 +184,26 @@ function resolveHwnd(args: Record<string, unknown>): bigint {
   return requireAttached().hWnd;
 }
 
-/** Rebuild the ref-keyed snapshot of the attached window, releasing the prior generation. */
+/** Rebuild the ref-keyed snapshot of the attached window, releasing the prior generation. Retries once after a
+ *  short settle: BuildUpdatedCache can transiently fail while the view is mid-render. Leaves `current` null (not
+ *  a dangling disposed snapshot) and rethrows if it cannot rebuild. */
 function rebuildSnapshot(maxDepth?: number): { header: string; tree: RefNode } {
   const window = requireAttached();
   current?.dispose();
-  current = uia.snapshot(window, maxDepth !== undefined ? { maxDepth } : {});
+  current = null;
+  let snapshot: Snapshot | null = null;
+  for (let attempt = 0; ; attempt += 1) {
+    try {
+      snapshot = uia.snapshot(window, maxDepth !== undefined ? { maxDepth } : {});
+      break;
+    } catch (error) {
+      if (attempt >= 1) throw error;
+      Bun.sleepSync(150);
+    }
+  }
+  current = snapshot;
   epoch += 1;
-  return { header: `### Snapshot (epoch ${epoch}): ${JSON.stringify(window.name)}`, tree: current.tree };
+  return { header: `### Snapshot (epoch ${epoch}): ${JSON.stringify(window.name)}`, tree: snapshot.tree };
 }
 
 /** Render a snapshot tree to the token-economical body an agent reads: pruned of ref-less noise, size-capped. */
@@ -235,7 +248,16 @@ function imageResult(png: Uint8Array, note?: string): object {
  */
 function withSnapshot(message: string): object {
   const prior = lastSnapshotTree;
-  const { header, tree } = rebuildSnapshot();
+  let rebuilt: { header: string; tree: RefNode };
+  try {
+    rebuilt = rebuildSnapshot();
+  } catch (error) {
+    // The action already ran — only the post-action snapshot refresh failed (a transient BuildUpdatedCache
+    // race while the view re-renders). Never mask a successful action as an error: report success and tell the
+    // agent its refs are stale so it re-grounds with desktop_snapshot.
+    return textResult(`${message}\n\n(snapshot not refreshed — ${error instanceof Error ? error.message : String(error)}; refs are stale, call desktop_snapshot to re-ground)`);
+  }
+  const { header, tree } = rebuilt;
   const body = renderTree(tree);
   lastSnapshotTree = tree;
   if (body === lastSnapshotBody) return textResult(`${message}\n\n${header}\n(no UI change since the last snapshot — refs unchanged)`);
@@ -432,6 +454,22 @@ const TOOLS: McpTool[] = [
         text: { type: 'string', description: 'Text for type / set_value' },
       },
       required: ['do'],
+    },
+  },
+  {
+    name: 'reveal',
+    category: 'input',
+    description:
+      'Scroll a VIRTUALIZED / off-screen list, grid, or tree item into view by selector, then optionally act on it. Use when a desktop_snapshot omits an item because it is scrolled below the fold (Explorer folders, long lists, data grids) — those rows are not in the a11y tree until realized. Cursor-free, no focus. do = invoke|click|type|set_value|toggle|read; omit do to just bring it into the next snapshot (it then has a ref).',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        element: { type: 'string', description: ELEMENT_DESC },
+        selector: SELECTOR_SCHEMA,
+        do: { type: 'string', enum: ['invoke', 'click', 'type', 'set_value', 'toggle', 'read'] },
+        text: { type: 'string', description: 'Text for type / set_value' },
+      },
+      required: ['selector'],
     },
   },
   {
@@ -733,6 +771,18 @@ const HANDLERS: Record<string, ToolHandler> = {
     if (element === null) throw new Error(window.describeNoMatch(selector));
     try {
       return withSnapshot(act(element, action, typeof args.text === 'string' ? args.text : undefined));
+    } finally {
+      element.release();
+    }
+  },
+  reveal: (args) => {
+    const window = requireAttached();
+    const selector = selectorFrom(args.selector);
+    const element = window.reveal(selector);
+    if (element === null) throw new Error(`reveal could not surface a match by scrolling — ${window.describeNoMatch(selector)}`);
+    try {
+      const outcome = typeof args.do === 'string' ? act(element, args.do, typeof args.text === 'string' ? args.text : undefined) : 'revealed';
+      return withSnapshot(`${outcome} ${quote(args.element)}`);
     } finally {
       element.release();
     }

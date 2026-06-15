@@ -9,7 +9,7 @@ import { automation, controlViewWalker } from './automation';
 import type { CacheRequest } from './cache';
 import { comRelease, hresult, vcall } from './com';
 import { type CompiledCondition, compileCondition, type ElementProperties, formatNoMatch, matches, type Selector } from './condition';
-import { ControlType, S_OK, SLOT, TreeScope } from './constants';
+import { ControlType, PropertyId, S_OK, SLOT, TreeScope } from './constants';
 import { clickAt, type as inputType } from './input';
 import { screenshot as windowScreenshot, windowForProcess } from './window';
 import {
@@ -24,11 +24,13 @@ import {
   getValue,
   invoke,
   isSelected,
+  NoScroll,
   rangeValue,
   readTable,
   readText,
   removeFromSelection,
   scroll,
+  ScrollAmount,
   scrollInfo,
   scrollIntoView,
   select,
@@ -40,7 +42,6 @@ import {
   toggle,
   toggleState,
   windowClose,
-  type ScrollAmount,
   type ScrollInfo,
   type TableData,
   type WindowVisualState,
@@ -152,6 +153,12 @@ export class Element {
     return getLong(this.ptr, SLOT.get_CurrentIsEnabled) !== 0;
   }
 
+  /** Whether the element is scrolled/clipped out of the visible area (UIA IsOffscreen) — true items are still
+   *  in the tree but not painted; reveal() scrolls them back into view. False if the provider omits it. */
+  get isOffscreen(): boolean {
+    return getPropertyValue(this.ptr, PropertyId.IsOffscreen) === true;
+  }
+
   get name(): string {
     return getBstr(this.ptr, SLOT.get_CurrentName);
   }
@@ -190,6 +197,45 @@ export class Element {
       return findFirstMatch(this.ptr, compiled, selector, scope);
     } finally {
       if (compiled.owned) comRelease(compiled.condition);
+    }
+  }
+
+  /**
+   * Find a descendant that may be VIRTUALIZED or scrolled below the fold. Tries find() first; if it misses,
+   * scrolls a scrollable container from the top down a page at a time, re-running find() after each step until
+   * the item realizes into the tree — cursor-free, no focus, works on a background/occluded window. Returns the
+   * realized Element (caller owns it) or null after exhausting the container.
+   *
+   * `container` overrides the auto-picked scroll container (default: the first List/DataGrid/Tree/Table under
+   * this element). This scroll-reveal is the reliable path because ItemContainer.FindItemByProperty — the
+   * one-call alternative — segfaults uiautomationcore.dll under Bun FFI on a VT_BSTR VARIANT-by-value (the
+   * cross-process marshaling proxy faults), so it is not bound.
+   */
+  reveal(selector: Selector, options: { container?: Element; maxSteps?: number; fromTop?: boolean } = {}): Element | null {
+    const direct = this.find(selector);
+    if (direct !== null) return direct;
+    const container = options.container ?? this.find({ controlType: ControlType.List }) ?? this.find({ controlType: ControlType.DataGrid }) ?? this.find({ controlType: ControlType.Tree }) ?? this.find({ controlType: ControlType.Table });
+    if (container === null) return null;
+    try {
+      const info = container.scrollInfo;
+      if (info === null || !info.verticallyScrollable) return this.find(selector);
+      if (options.fromTop !== false && info.verticalPercent > 0) {
+        container.setScrollPercent(NoScroll, 0);
+        Bun.sleepSync(120);
+      }
+      const maxSteps = options.maxSteps ?? 80;
+      for (let step = 0; step < maxSteps; step += 1) {
+        const found = this.find(selector);
+        if (found !== null) return found;
+        const before = container.scrollInfo?.verticalPercent ?? 100;
+        if (before >= 100) break;
+        container.scroll(ScrollAmount.NoAmount, ScrollAmount.LargeIncrement);
+        Bun.sleepSync(120);
+        if ((container.scrollInfo?.verticalPercent ?? 100) <= before) break; // reached the end / no progress
+      }
+      return this.find(selector);
+    } finally {
+      if (container !== options.container) container.release();
     }
   }
 
