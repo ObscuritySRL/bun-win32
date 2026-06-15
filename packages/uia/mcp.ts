@@ -538,14 +538,14 @@ const TOOLS: McpTool[] = [
         doubleClick: { type: 'boolean' },
         cursor: { type: 'boolean', description: 'Force a real SendInput cursor click instead of the cursor-free path' },
       },
-      required: ['element', 'ref'],
+      required: ['ref'],
     },
   },
   {
     name: 'invoke',
     category: 'input',
     description: 'Invoke a control via the UIA Invoke pattern (buttons, links) — cursor-free, works on a background/locked window.',
-    inputSchema: { type: 'object', properties: { element: { type: 'string', description: ELEMENT_DESC }, ref: { type: 'string', description: REF_DESC } }, required: ['element', 'ref'] },
+    inputSchema: { type: 'object', properties: { element: { type: 'string', description: ELEMENT_DESC }, ref: { type: 'string', description: REF_DESC } }, required: ['ref'] },
   },
   {
     name: 'type',
@@ -554,20 +554,20 @@ const TOOLS: McpTool[] = [
     inputSchema: {
       type: 'object',
       properties: { element: { type: 'string', description: ELEMENT_DESC }, ref: { type: 'string', description: REF_DESC }, text: { type: 'string' }, submit: { type: 'boolean', description: 'Press Enter after' } },
-      required: ['element', 'ref', 'text'],
+      required: ['ref', 'text'],
     },
   },
   {
     name: 'set_value',
     category: 'input',
     description: 'Set a control value directly via the UIA Value pattern — no keystrokes, works on a background/locked window.',
-    inputSchema: { type: 'object', properties: { element: { type: 'string', description: ELEMENT_DESC }, ref: { type: 'string', description: REF_DESC }, value: { type: 'string' } }, required: ['element', 'ref', 'value'] },
+    inputSchema: { type: 'object', properties: { element: { type: 'string', description: ELEMENT_DESC }, ref: { type: 'string', description: REF_DESC }, value: { type: 'string' } }, required: ['ref', 'value'] },
   },
   {
     name: 'toggle',
     category: 'input',
     description: 'Toggle a checkbox or toggle button via the UIA Toggle pattern (cursor-free).',
-    inputSchema: { type: 'object', properties: { element: { type: 'string', description: ELEMENT_DESC }, ref: { type: 'string', description: REF_DESC } }, required: ['element', 'ref'] },
+    inputSchema: { type: 'object', properties: { element: { type: 'string', description: ELEMENT_DESC }, ref: { type: 'string', description: REF_DESC } }, required: ['ref'] },
   },
   {
     name: 'select',
@@ -577,7 +577,7 @@ const TOOLS: McpTool[] = [
     inputSchema: {
       type: 'object',
       properties: { element: { type: 'string', description: ELEMENT_DESC }, ref: { type: 'string', description: REF_DESC }, mode: { type: 'string', enum: ['replace', 'add', 'remove'] } },
-      required: ['element', 'ref'],
+      required: ['ref'],
     },
   },
   {
@@ -744,7 +744,7 @@ const TOOLS: McpTool[] = [
         direction: { type: 'string', enum: ['up', 'down', 'left', 'right'] },
         amount: { type: 'number', description: 'Scroll steps (default 3)' },
       },
-      required: ['element', 'ref'],
+      required: ['ref'],
     },
   },
   {
@@ -874,13 +874,14 @@ const HANDLERS: Record<string, ToolHandler> = {
   desktop_snapshot: (args) => textResult(snapshotText(typeof args.maxDepth === 'number' ? args.maxDepth : undefined, typeof args.root === 'string' ? args.root : undefined)),
   find_and_act: (args) => {
     const action = requireString(args, 'do');
-    if (typeof args.ref === 'string') return withSnapshot(act(resolveRef(args.ref), action, typeof args.text === 'string' ? args.text : undefined));
+    const observe = (message: string): object => (action === 'read' ? textResult(message) : withSnapshot(message)); // a pure read owes no full re-grounding snapshot
+    if (typeof args.ref === 'string') return observe(act(resolveRef(args.ref), action, typeof args.text === 'string' ? args.text : undefined));
     const window = requireAttached();
     const selector = selectorFrom(args.selector);
     const element = window.find(selector);
     if (element === null) throw new Error(window.describeNoMatch(selector));
     try {
-      return withSnapshot(act(element, action, typeof args.text === 'string' ? args.text : undefined));
+      return observe(act(element, action, typeof args.text === 'string' ? args.text : undefined));
     } finally {
       element.release();
     }
