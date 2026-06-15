@@ -19,7 +19,7 @@
  *
  * Run: bun run example/uia.selftest.ts
  */
-import { ControlType, countNodes, createCacheRequest, msaaTree, NoScroll, screenshot, ScrollAmount, uia } from '@bun-win32/uia';
+import { closeWindow, ControlType, countNodes, createCacheRequest, msaaTree, NoScroll, screenshot, ScrollAmount, uia } from '@bun-win32/uia';
 import User32 from '@bun-win32/user32';
 
 let failures = 0;
@@ -49,6 +49,21 @@ function findWindow(title: string): bigint {
     hWnd = User32.FindWindowW(null, buffer.ptr!);
   }
   return hWnd;
+}
+/** Close the throwaway Notepad, dismissing the unsaved-changes prompt with "Don't save" (it holds test junk). */
+async function closeNotepad(hWnd: bigint): Promise<void> {
+  if (hWnd === 0n) return;
+  closeWindow(hWnd);
+  await Bun.sleep(700);
+  try {
+    const notepad = uia.attach(hWnd);
+    const dontSave = notepad.find({ name: /Don.?t save/i });
+    dontSave?.invoke();
+    dontSave?.release();
+    notepad.dispose();
+  } catch {
+    // already gone
+  }
 }
 
 uia.initialize();
@@ -206,11 +221,13 @@ if (!skipWindows) {
   section('13. ScrollPattern — container scroll (cursor-free, works locked)');
   Bun.spawn(['explorer.exe', 'C:\\Windows\\System32'], { stdout: 'ignore', stderr: 'ignore' });
   let explorer: ReturnType<typeof uia.attach> | null = null;
+  let explorerHwnd = 0n;
   let scrollList: ReturnType<typeof calc.find> = null;
   for (let i = 0; i < 25 && scrollList === null; i += 1) {
     Bun.sleepSync(300);
     const info = uia.windows().find((window) => window.className === 'CabinetWClass' && /System32/i.test(window.title));
     if (info === undefined) continue;
+    explorerHwnd = info.hWnd;
     try {
       explorer = uia.attach(info.hWnd);
     } catch {
@@ -257,6 +274,11 @@ if (!skipWindows) {
   edit?.release();
   notepad.dispose();
   calc.dispose();
+
+  // Close every window this test opened — leave the desktop as we found it.
+  closeWindow(calcHwnd);
+  if (explorerHwnd !== 0n) closeWindow(explorerHwnd);
+  await closeNotepad(npHwnd);
 } else {
   skip('window-dependent sections', 'NO_WINDOW=1');
 }
