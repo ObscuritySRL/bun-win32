@@ -86,11 +86,11 @@ Measured on Windows 11, Bun 1.4, by `bun run example/benchmark.ts` (run it to re
 
 | operation | result |
 | --- | --- |
-| single property read (cross-process) | ~55 µs |
-| naive subtree walk (65 nodes) | ~44 ms |
-| **cached subtree walk** (one round-trip) | **~37 ms** (1.2× faster; the gap widens with tree size) |
-| agent-grounding tree build | ~9 ms, ~2.7k tokens |
-| **vs OSWorld a11y-tree build (3–26 s)** | **~345–2987× faster** |
+| single property read (cross-process) | ~58 µs |
+| naive subtree walk (73 nodes) | ~35 ms |
+| cached subtree walk (one round-trip) | ~45 ms (slower on this tiny 73-node tree — the BuildCache round-trip is a fixed cost it amortizes only as the tree grows; on a large cross-process tree it wins) |
+| **agent-grounding tree build** | **~13 ms, ~2.95k tokens** |
+| **vs OSWorld a11y-tree build (3–26 s)** | **~230–2000× faster** |
 
 ## Requirements & honest scoping
 

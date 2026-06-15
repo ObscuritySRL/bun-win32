@@ -156,6 +156,7 @@ export enum PropertyId {
   IsExpandCollapsePatternAvailable = 30028,
   IsGridPatternAvailable = 30030,
   IsInvokePatternAvailable = 30031,
+  IsMultipleViewPatternAvailable = 30032,
   IsRangeValuePatternAvailable = 30033,
   IsScrollPatternAvailable = 30034,
   IsScrollItemPatternAvailable = 30035,

@@ -1309,6 +1309,7 @@ const HANDLERS: Record<string, ToolHandler> = {
     if (element.getProperty(PropertyId.IsScrollItemPatternAvailable) === true) can.push('scroll-into-view');
     if (element.getProperty(PropertyId.IsTextPatternAvailable) === true) can.push('read-text');
     if (element.getProperty(PropertyId.IsGridPatternAvailable) === true) can.push('read-table');
+    if (element.getProperty(PropertyId.IsMultipleViewPatternAvailable) === true) can.push('set-view (list_views/set_view)');
     if (can.length > 0) lines.push(`can: ${can.join(', ')}`);
     // TextPattern content (terminals, documents, read-only multiline text) — the buffer the ValuePattern `value`
     // does not carry. Prefer the ON-SCREEN text (GetVisibleRanges): bounded + relevant + cheap for a huge
@@ -1561,6 +1562,8 @@ async function main(): Promise<void> {
     }
   }
   log('stdin closed, exiting');
+  await pending; // drain the in-flight async dispatch chain before teardown — else a host's graceful stdin-close can
+  // kill an async handler mid-await (write_file truncates-then-dies → an EMPTY target file; the reply is dropped).
   current?.dispose();
   attached?.dispose();
   uia.uninitialize();
