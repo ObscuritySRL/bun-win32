@@ -272,7 +272,7 @@ function snapshotText(maxDepth?: number, rootName?: string): string {
 
 function resolveRef(ref: string): Element {
   const element = current?.resolve(ref) ?? null;
-  if (element === null) throw new Error(`ref ${ref} not in the current snapshot (epoch ${epoch}) — capture a new desktop_snapshot`);
+  if (element === null) throw new Error(`ref ${ref} not in the current snapshot (epoch ${epoch}) — re-ground with desktop_snapshot, or use find_and_act {selector} / reveal {selector}, which need no ref`);
   return element;
 }
 
@@ -1049,7 +1049,7 @@ const HANDLERS: Record<string, ToolHandler> = {
   screenshot_marked: () => {
     const window = requireAttached();
     current?.dispose();
-    current = uia.snapshot(window);
+    current = buildWindowSnapshot(window).snapshot; // splice Chromium web roots so web-DOM controls get marks too (consistent with desktop_snapshot)
     epoch += 1;
     lastSnapshotTree = current.tree;
     lastSnapshotBody = renderTree(current.tree);
