@@ -795,7 +795,7 @@ const TOOLS: McpTool[] = [
       properties: { element: { type: 'string', description: ELEMENT_DESC }, ref: { type: 'string', description: REF_DESC }, text: { type: 'string', description: 'Text to paste (omit to paste the current clipboard)' } },
     },
   },
-  { name: 'copy', category: 'input', description: 'Copy the current selection (Ctrl+C) and return it — pull selected text from any app, even one with no a11y tree.', inputSchema: { type: 'object', properties: {} } },
+  { name: 'copy', category: 'input', description: "Copy selected text and return it. With a ref, reads that ref's selection via UIA TextPattern and writes the clipboard CURSOR-FREE (no focus, works locked/background; composes with find_text, which selects a substring cursor-free). Without a ref, falls back to Ctrl+C of the active control (works on an app with no a11y tree).", inputSchema: { type: 'object', properties: { ref: { type: 'string', description: 'Ref whose current selection to copy cursor-free (TextPattern → clipboard).' } } } },
   {
     name: 'launch_app',
     category: 'os',
@@ -1200,7 +1200,16 @@ const HANDLERS: Record<string, ToolHandler> = {
     const into = typeof args.ref === 'string' ? ` into ${quote(args.element)}` : '';
     return withSnapshot(typeof args.text === 'string' ? `pasted ${args.text.length} chars${into}` : `pasted clipboard${into}`);
   },
-  copy: async () => textResult((await uia.copy()) || '(no selection / clipboard empty)'),
+  copy: async (args) => {
+    if (typeof args.ref === 'string') {
+      const selected = resolveRef(args.ref).getSelectedText(); // cursor-free: TextPattern selection, no focus, works locked/background
+      if (selected.length > 0) {
+        uia.writeClipboard(selected);
+        return textResult(selected);
+      }
+    }
+    return textResult((await uia.copy()) || '(no selection / clipboard empty)');
+  },
   launch_app: async (args) => {
     const command = requireString(args, 'command');
     if (typeof args.title === 'string' || typeof args.className === 'string') {

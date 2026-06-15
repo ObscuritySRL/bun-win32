@@ -104,6 +104,7 @@
     "example:cold-tree-note": "bun ./example/cold-tree-note.integration.test.ts",
     "example:computer-use": "bun ./example/computer-use.ts",
     "example:condition-perf": "bun ./example/condition-perf.integration.test.ts",
+    "example:cursor-free-copy": "bun ./example/cursor-free-copy.integration.test.ts",
     "example:desktop-mcp": "bun ./example/desktop-mcp.ts",
     "example:drive-in-the-dark": "bun ./example/drive-in-the-dark.ts",
     "example:explorer-in-the-dark": "bun ./example/explorer-in-the-dark.integration.test.ts",
