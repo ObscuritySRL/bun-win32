@@ -11,8 +11,9 @@
 // thread; dispatch is serialized so two calls never overlap the apartment. Newline-delimited JSON-RPC 2.0
 // over stdin/stdout (no SDK); every diagnostic goes to stderr.
 
+import { realpathSync } from 'node:fs';
 import { readdir } from 'node:fs/promises';
-import { resolve } from 'node:path';
+import { resolve, sep } from 'node:path';
 
 import {
   capSnapshot,
@@ -126,6 +127,17 @@ const policyAllow = envSet('BUN_UIA_ALLOW');
 const policyDeny = envSet('BUN_UIA_DENY');
 const cursorDenied = (Bun.env.BUN_UIA_CURSOR ?? '').toLowerCase() === 'never';
 const fsRoot = Bun.env.BUN_UIA_FS_ROOT !== undefined ? resolve(Bun.env.BUN_UIA_FS_ROOT) : undefined;
+// The root canonicalized past any reparse points, so the sandbox check compares REAL paths.
+const fsRootReal =
+  fsRoot !== undefined
+    ? (() => {
+        try {
+          return realpathSync.native(fsRoot);
+        } catch {
+          return fsRoot;
+        }
+      })()
+    : undefined;
 
 /** Whether a tool is reachable under the resolved policy (deny wins, then explicit allow, then the profile). */
 function toolAllowed(tool: McpTool): boolean {
@@ -487,12 +499,29 @@ function renderTable(table: TableData): string {
   return hidden > 0 ? `${lines.join('\n')}\n…(${hidden} more rows — raise maxRows)` : lines.join('\n');
 }
 
-/** Resolve a file-tool path, enforcing the BUN_UIA_FS_ROOT sandbox when one is set. */
+/** Resolve a file-tool path, enforcing the BUN_UIA_FS_ROOT sandbox when one is set. A purely lexical prefix check
+ *  is escapable: a junction/symlink INSIDE the root pointing out passes it, then Bun.file follows the reparse
+ *  point out (verified). So after the lexical check, realpath the deepest EXISTING ancestor (a write target may not
+ *  exist yet) and re-assert it canonicalizes under the REAL root. */
 function resolveFsPath(path: string): string {
   if (fsRoot === undefined) return path;
   const resolved = resolve(fsRoot, path);
   if (resolved !== fsRoot && !resolved.startsWith(`${fsRoot}\\`) && !resolved.startsWith(`${fsRoot}/`)) throw new Error(`path is outside the allowed root ${fsRoot}`);
-  return resolved;
+  const root = fsRootReal ?? fsRoot;
+  let ancestor = resolved;
+  for (;;) {
+    try {
+      const real = realpathSync.native(ancestor);
+      const candidate = ancestor === resolved ? real : resolve(real, resolved.slice(ancestor.length + 1));
+      if (candidate !== root && !candidate.startsWith(root + sep)) throw new Error(`path escaped the allowed root ${fsRoot} via a reparse point`);
+      return resolved;
+    } catch (error) {
+      if ((error as { code?: string }).code !== 'ENOENT') throw error;
+      const parent = resolve(ancestor, '..');
+      if (parent === ancestor) throw new Error(`path is outside the allowed root ${fsRoot}`);
+      ancestor = parent;
+    }
+  }
 }
 
 const ELEMENT_DESC = 'Human-readable element description, used for the permission prompt and intent.';
