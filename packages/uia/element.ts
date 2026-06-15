@@ -6,7 +6,7 @@ import { FFIType } from 'bun:ffi';
 import User32 from '@bun-win32/user32';
 
 import { automation, controlViewWalker } from './automation';
-import type { CacheRequest } from './cache';
+import { AutomationElementMode, type CacheRequest, createCacheRequest } from './cache';
 import { comRelease, hresult, vcall } from './com';
 import { type CompiledCondition, compileCondition, type ElementProperties, formatNoMatch, matches, type Selector } from './condition';
 import { ControlType, PropertyId, S_OK, SLOT, TreeScope } from './constants';
@@ -54,15 +54,9 @@ import { getBstr, getHandle, getLong, getPropertyValue, getRect, type Rect, type
 const scratch8 = Buffer.alloc(8);
 const scratch4 = Buffer.alloc(4);
 
-/** Read the four properties the client-side matcher needs, in one pass (live). */
-function readProperties(ptr: bigint): ElementProperties {
-  return {
-    automationId: getBstr(ptr, SLOT.get_CurrentAutomationId),
-    className: getBstr(ptr, SLOT.get_CurrentClassName),
-    controlType: getLong(ptr, SLOT.get_CurrentControlType),
-    name: getBstr(ptr, SLOT.get_CurrentName),
-  };
-}
+// The four properties the client-side matcher (regex/substring) needs. The client-filter find path prefetches
+// them in ONE FindAllBuildCache round-trip, so each candidate is matched from cache instead of 4 live reads.
+const MATCHER_PROPERTIES: readonly number[] = [PropertyId.AutomationId, PropertyId.ClassName, PropertyId.ControlType, PropertyId.Name];
 
 /** Read the matcher's four properties from the prefetched cache (zero further round-trips). */
 function readCachedProperties(ptr: bigint): ElementProperties {
@@ -87,20 +81,54 @@ function findFirstMatch(scopeElement: bigint, compiled: CompiledCondition, selec
     const pointer = findFirstPointer(scopeElement, scope, compiled.condition);
     return pointer === 0n ? null : new Element(pointer);
   }
-  const pointers = findAllPointers(scopeElement, scope, compiled.condition);
-  for (let index = 0; index < pointers.length; index += 1) {
-    const pointer = pointers[index]!;
-    if (matches(readProperties(pointer), selector)) {
-      for (let rest = index + 1; rest < pointers.length; rest += 1) comRelease(pointers[rest]!);
-      return new Element(pointer);
+  // Regex/substring client filter: prefetch the matcher props in ONE FindAllBuildCache round-trip, then match
+  // each candidate from cache (zero further round-trips) instead of 4 live reads per candidate. The CacheRequest
+  // is a client-side object (in-proc to build/release); the returned Elements are Full-mode (actionable).
+  const request = createCacheRequest(MATCHER_PROPERTIES, TreeScope.TreeScope_Element, AutomationElementMode.Full);
+  try {
+    const pointers = findAllCachedPointers(scopeElement, scope, compiled.condition, request.ptr);
+    for (let index = 0; index < pointers.length; index += 1) {
+      const pointer = pointers[index]!;
+      if (matches(readCachedProperties(pointer), selector)) {
+        for (let rest = index + 1; rest < pointers.length; rest += 1) comRelease(pointers[rest]!);
+        return new Element(pointer);
+      }
+      comRelease(pointer);
     }
-    comRelease(pointer);
+    return null;
+  } finally {
+    request.release();
   }
-  return null;
 }
 
 function findAllPointers(scopeElement: bigint, scope: number, condition: bigint): bigint[] {
   if (vcall(scopeElement, SLOT.FindAll, [FFIType.i32, FFIType.u64, FFIType.ptr], [scope, condition, scratch8.ptr!]) !== S_OK) return [];
+  const pArray = scratch8.readBigUInt64LE(0);
+  if (pArray === 0n) return [];
+  try {
+    if (vcall(pArray, SLOT.get_Length, [FFIType.ptr], [scratch4.ptr!]) !== S_OK) return [];
+    const length = scratch4.readInt32LE(0);
+    const pointers: bigint[] = new Array(length);
+    let count = 0;
+    for (let index = 0; index < length; index += 1) {
+      if (vcall(pArray, SLOT.GetElement, [FFIType.i32, FFIType.ptr], [index, scratch8.ptr!]) !== S_OK) continue;
+      const pointer = scratch8.readBigUInt64LE(0);
+      if (pointer !== 0n) {
+        pointers[count] = pointer;
+        count += 1;
+      }
+    }
+    pointers.length = count;
+    return pointers;
+  } finally {
+    comRelease(pArray);
+  }
+}
+
+/** FindAllBuildCache variant of findAllPointers: one round-trip prefetches `requestPtr`'s properties onto every
+ *  match, so the caller reads them from cache (zero further round-trips). Returns the cached, Full-mode pointers. */
+function findAllCachedPointers(scopeElement: bigint, scope: number, condition: bigint, requestPtr: bigint): bigint[] {
+  if (vcall(scopeElement, SLOT.FindAllBuildCache, [FFIType.i32, FFIType.u64, FFIType.u64, FFIType.ptr], [scope, condition, requestPtr, scratch8.ptr!]) !== S_OK) return [];
   const pArray = scratch8.readBigUInt64LE(0);
   if (pArray === 0n) return [];
   try {
@@ -275,14 +303,20 @@ export class Element {
   findAll(selector: Selector, scope: number = TreeScope.TreeScope_Descendants): Element[] {
     const compiled = compileCondition(automation(), selector);
     try {
-      const pointers = findAllPointers(this.ptr, scope, compiled.condition);
-      if (!compiled.needsClientFilter) return pointers.map((pointer) => new Element(pointer));
-      const result: Element[] = [];
-      for (const pointer of pointers) {
-        if (matches(readProperties(pointer), selector)) result.push(new Element(pointer));
-        else comRelease(pointer);
+      if (!compiled.needsClientFilter) return findAllPointers(this.ptr, scope, compiled.condition).map((pointer) => new Element(pointer));
+      // Regex/substring client filter: one cached round-trip prefetches the matcher props, so each candidate is
+      // matched in-proc instead of 4 live cross-process reads each (the dominant cost on a large window).
+      const request = createCacheRequest(MATCHER_PROPERTIES, TreeScope.TreeScope_Element, AutomationElementMode.Full);
+      try {
+        const result: Element[] = [];
+        for (const pointer of findAllCachedPointers(this.ptr, scope, compiled.condition, request.ptr)) {
+          if (matches(readCachedProperties(pointer), selector)) result.push(new Element(pointer));
+          else comRelease(pointer);
+        }
+        return result;
+      } finally {
+        request.release();
       }
-      return result;
     } finally {
       if (compiled.owned) comRelease(compiled.condition);
     }

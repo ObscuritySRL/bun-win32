@@ -109,6 +109,7 @@
     "example:desktop-mcp": "bun ./example/desktop-mcp.ts",
     "example:drive-in-the-dark": "bun ./example/drive-in-the-dark.ts",
     "example:explorer-in-the-dark": "bun ./example/explorer-in-the-dark.integration.test.ts",
+    "example:find-cached": "bun ./example/find-cached.integration.test.ts",
     "example:find-text": "bun ./example/find-text.integration.test.ts",
     "example:get-variant": "bun ./example/get-variant.integration.test.ts",
     "example:grid-cell": "bun ./example/grid-cell.integration.test.ts",
