@@ -22,6 +22,7 @@ import {
   clickAt,
   closeWindow,
   coldTreeNote,
+  ControlType,
   diffTrees,
   doubleClickAt,
   dragTo,
@@ -188,6 +189,19 @@ function quote(value: unknown): string {
   return typeof value === 'string' ? JSON.stringify(value) : JSON.stringify(value ?? 'element');
 }
 
+/** Resolve a controlType selector value to its numeric UIA id — a number, a numeric string ("50000"), OR a role
+ *  NAME ("Button", "list", "tree item"), case- and separator-insensitive. undefined for an unknown name. */
+function controlTypeId(value: number | string): number | undefined {
+  if (typeof value === 'number') return value;
+  if (/^\d+$/.test(value)) return Number(value);
+  const normalized = value.toLowerCase().replace(/[\s_-]/g, '');
+  for (const key of Object.keys(ControlType)) {
+    if (!Number.isNaN(Number(key))) continue; // skip the reverse numeric→name entries
+    if (key.toLowerCase() === normalized) return ControlType[key as keyof typeof ControlType];
+  }
+  return undefined;
+}
+
 function selectorFrom(value: unknown): Selector {
   const raw = record(value);
   const selector: Selector = {};
@@ -195,10 +209,13 @@ function selectorFrom(value: unknown): Selector {
   if (typeof raw.nameContains === 'string') selector.nameContains = raw.nameContains;
   if (typeof raw.automationId === 'string') selector.automationId = raw.automationId;
   if (typeof raw.className === 'string') selector.className = raw.className;
-  if (typeof raw.controlType === 'number') selector.controlType = raw.controlType;
-  else if (typeof raw.controlType === 'string' && /^\d+$/.test(raw.controlType)) selector.controlType = Number(raw.controlType); // honor a numeric-string controlType (a common model slip) instead of silently dropping it
+  if (typeof raw.controlType === 'number' || typeof raw.controlType === 'string') {
+    const id = controlTypeId(raw.controlType); // honor a number, a numeric string, OR a role name ("Button") — never silently drop it
+    if (id === undefined) throw new Error(`unknown controlType ${JSON.stringify(raw.controlType)} — pass a UIA number (e.g. 50000 = Button) or a role name (Button, Edit, List, Tree, TreeItem, …)`);
+    selector.controlType = id;
+  }
   // An empty selector would silently match the window ROOT (a wrong target an AI can't self-correct from) — refuse.
-  if (Object.keys(selector).length === 0) throw new Error('empty selector — pass a non-empty selector with name / nameContains / automationId / className / controlType (a NUMBER, e.g. 50000 = Button), or target by ref');
+  if (Object.keys(selector).length === 0) throw new Error('empty selector — pass a non-empty selector with name / nameContains / automationId / className / controlType (a number e.g. 50000, or a role name like Button), or target by ref');
   return selector;
 }
 
@@ -589,7 +606,7 @@ const SELECTOR_SCHEMA = {
     nameContains: { type: 'string' },
     automationId: { type: 'string' },
     className: { type: 'string' },
-    controlType: { type: 'number', description: 'UIA control-type id, e.g. 50000 Button, 50004 Edit' },
+    controlType: { type: ['number', 'string'], description: 'UIA control-type — a number (50000), or a role NAME (Button, Edit, List, Tree, TreeItem, …)' },
   },
 };
 
@@ -1000,6 +1017,7 @@ for (const tool of TOOLS) {
 const BLIND_SPOTS: { test: RegExp; note: string }[] = [
   { test: /^SunAwt/, note: 'Java Swing/AWT window — its controls are invisible to UIA and MSAA (you will see only the frame). Java exposes its tree via the Java Access Bridge: run `jabswitch /enable` and RESTART the app, then re-attach. Until then, screen_capture + ocr / click_text is the only way to read/drive it.' },
   { test: /^Tk/, note: 'Tk/Tkinter window — its widgets are custom-drawn with no a11y bridge, invisible to UIA and MSAA (you will see only anonymous panes). screen_capture + ocr / click_text is the only way to read/drive it.' },
+  { test: /^FLUTTER_RUNNER_WIN32_WINDOW$/, note: 'Flutter desktop window — it renders into a child FLUTTERVIEW whose semantics tree is often NOT exposed to generic UIA clients (you may see a single pane / near-empty tree). It MAY populate — re-snapshot once; if it stays near-empty, screen_capture + ocr / click_text is the way to read/drive it.' },
 ];
 
 /** A steering note when the attached window is a known a11y blind spot (class-prefix match), else ''. */
