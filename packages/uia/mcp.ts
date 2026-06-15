@@ -42,6 +42,8 @@ import {
   ownerHwnd,
   postClickAt,
   postClickToHwnd,
+  postDoubleClickAt,
+  postDoubleClickToHwnd,
   postKey,
   processImagePath,
   PropertyId,
@@ -447,8 +449,8 @@ function clickElement(element: Element, button: 'left' | 'right' | 'middle', dou
       // no LegacyIAccessible pattern either — fall back to the real double-click below
     }
   }
-  if (!forceCursor && !doubleClick) {
-    if (button === 'left') {
+  if (!forceCursor) {
+    if (button === 'left' && !doubleClick) {
       try {
         element.invoke();
         return 'invoked (cursor-free)';
@@ -458,10 +460,14 @@ function clickElement(element: Element, button: 'left' | 'right' | 'middle', dou
     }
     const point = clickPoint(element);
     // Post to the element's OWN owner window, never WindowFromPoint — so the click lands on the target even when
-    // another window occludes the pixel (the 'drive in the dark' doctrine). Falls back to the topmost only if the
-    // element has no native window in its ancestry.
+    // another window occludes the pixel (the 'drive in the dark' doctrine). Falls back to the topmost-at-pixel
+    // (*At) only if the element has no native window in its ancestry. Double + middle get a cursor-free path too.
     const owner = ownerHwnd(element);
-    if (owner !== 0n ? postClickToHwnd(owner, point.x, point.y, button === 'right' ? 'right' : 'left') : postClickAt(point.x, point.y, button === 'right' ? 'right' : 'left')) return `posted ${button} click (cursor-free)`;
+    if (doubleClick) {
+      if (owner !== 0n ? postDoubleClickToHwnd(owner, point.x, point.y) : postDoubleClickAt(point.x, point.y)) return 'posted double-click (cursor-free)';
+    } else if (owner !== 0n ? postClickToHwnd(owner, point.x, point.y, button) : postClickAt(point.x, point.y, button)) {
+      return `posted ${button} click (cursor-free)`;
+    }
   }
   if (cursorDenied) throw new Error('cursor-free click was not possible and the real cursor is disabled (BUN_UIA_CURSOR=never)');
   const point = clickPoint(element);

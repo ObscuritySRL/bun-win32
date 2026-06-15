@@ -6,7 +6,7 @@
 // one — erasing the coordinate-hallucination, downscaling click-miss, and scroll-no-op failure modes
 // that the computer-use literature attributes to screenshot-only grounding.
 
-import { ownerHwnd, postClickAt, postClickToHwnd, scrollAt } from './coords';
+import { ownerHwnd, postClickAt, postClickToHwnd, postDoubleClickAt, scrollAt } from './coords';
 import { fromPoint, type Window } from './element';
 import { clickAt, cursorPosition, doubleClickAt, dragTo, holdKey, middleClickAt, mouseDown, mouseUp, moveTo, rightClickAt, scrollWheel, sendKeys, type as typeText } from './input';
 
@@ -112,9 +112,11 @@ export async function dispatch(window: Window, action: ComputerAction, options: 
         rightClickAt(x, y);
         return { ok: true };
       case 'middle_click':
+        if (cursorless && postClickAt(x, y, 'middle')) return { ok: true, output: 'posted middle-click (cursor-free)' };
         middleClickAt(x, y);
         return { ok: true };
       case 'double_click':
+        if (cursorless && postDoubleClickAt(x, y)) return { ok: true, output: 'posted double-click (cursor-free)' };
         doubleClickAt(x, y);
         return { ok: true };
       case 'triple_click':
