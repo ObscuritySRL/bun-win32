@@ -9,7 +9,7 @@
  * bun test is broken repo-wide for FFI; runnable harness:
  * Run: bun run example/get-variant.integration.test.ts
  */
-import { ControlType, PropertyId, uia } from '@bun-win32/uia';
+import { closeWindow, ControlType, PropertyId, uia } from '@bun-win32/uia';
 
 let failures = 0;
 function assert(condition: boolean, message: string): void {
@@ -59,6 +59,7 @@ try {
   }
   assert(sink === 5000 * String(frameworkId).length, `5000 VT_BSTR reads are stable (no crash, no corruption; sink=${sink})`);
 } finally {
+  closeWindow(calc.hWnd); // close the throwaway Calculator we launched
   calc.dispose();
   uia.uninitialize();
 }

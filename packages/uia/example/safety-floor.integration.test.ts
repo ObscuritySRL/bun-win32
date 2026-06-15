@@ -16,7 +16,7 @@
  * bun test is broken repo-wide for FFI; this is a standalone harness:
  * Run: bun run example/safety-floor.integration.test.ts
  */
-import { captureWindowLive, disposeWgc, Element, findWindow, msaaTree, uia, vcall, wgcAvailable } from '@bun-win32/uia';
+import { captureWindowLive, closeWindow, disposeWgc, Element, findWindow, msaaTree, uia, vcall, wgcAvailable } from '@bun-win32/uia';
 
 // --- child mode: the WGC lifecycle loop, run in a subprocess so a segfault surfaces as a non-zero exit ---
 if (Bun.env.SAFETY_CHILD === 'wgc') {
@@ -35,6 +35,7 @@ if (Bun.env.SAFETY_CHILD === 'wgc') {
     uia.uninitialize(); // disposeWgc() runs first → bundle released + nulled, RoUninitialize paired
   }
   disposeWgc(); // idempotent no-op (already disposed) — proves the self-guard
+  if (hWnd !== 0n) closeWindow(hWnd); // close the throwaway Calculator
   // If WGC is available, the final capture (bundle rebuilt after two uninitialize cycles) must succeed.
   process.exit(available && hWnd !== 0n && !lastCaptureOk ? 2 : 0);
 }
@@ -79,6 +80,7 @@ for (let attempt = 0; attempt < 20 && calcHwnd === 0n; attempt += 1) {
 }
 const tree = calcHwnd !== 0n ? msaaTree(calcHwnd, 3) : null;
 assert(tree !== null, 'msaaTree still returns a tree (the hoisted IID did not break the walk)');
+if (calcHwnd !== 0n) closeWindow(calcHwnd); // close the throwaway Calculator
 uia.uninitialize();
 
 // --- A. WGC bundle lifecycle subprocess: init → capture → uninitialize → capture ×3, clean + rebuilt ---

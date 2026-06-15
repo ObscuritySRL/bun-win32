@@ -16,7 +16,7 @@
  * bun test is broken repo-wide — this is a runnable harness:
  * Run: bun run example/snapshot-economy.integration.test.ts
  */
-import { capSnapshot, ControlType, diffTrees, pruneRefTree, type RefNode, renderDiff, renderSnapshot, uia } from '@bun-win32/uia';
+import { capSnapshot, closeWindow, ControlType, diffTrees, pruneRefTree, type RefNode, renderDiff, renderSnapshot, uia } from '@bun-win32/uia';
 
 function refs(text: string): Set<string> {
   const found = new Set<string>();
@@ -67,7 +67,14 @@ function syntheticChurn(): void {
       { role: 'Button', name: 'Five', ref: 'e1', children: [] },
     ],
   };
-  const renamed: RefNode = { role: 'Window', name: 'App', children: [{ role: 'Text', name: 'Display is 55', children: [] }, { role: 'Button', name: 'Five', ref: 'e1', children: [] }] };
+  const renamed: RefNode = {
+    role: 'Window',
+    name: 'App',
+    children: [
+      { role: 'Text', name: 'Display is 55', children: [] },
+      { role: 'Button', name: 'Five', ref: 'e1', children: [] },
+    ],
+  };
   const added: RefNode = { role: 'Window', name: 'App', children: [...base.children, { role: 'Button', name: 'Clear entry', ref: 'e2', children: [] }] };
   const renameDiff = diffTrees(base, renamed);
   const renameChurn = renameDiff.appeared.some((c) => c.ref !== undefined) || renameDiff.disappeared.some((c) => c.ref !== undefined);
@@ -129,6 +136,7 @@ async function live(): Promise<void> {
       const settingsSnap = uia.snapshot(settings);
       measurePrune('Settings', settingsSnap.tree);
       settingsSnap.dispose();
+      closeWindow(settings.hWnd); // close the throwaway Settings we launched
       settings.dispose();
     }
 
@@ -152,13 +160,19 @@ async function live(): Promise<void> {
     const refChurn = diff.appeared.some((c) => c.ref !== undefined) || diff.disappeared.some((c) => c.ref !== undefined);
     const delta = renderDiff(diff);
     console.log(`  full re-dump ~${tokens(fullBody)} tok vs delta ~${tokens(delta.text)} tok (${delta.count} lines), refChurn=${refChurn}`);
-    console.log(`  delta:\n${delta.text.split('\n').map((line) => `    ${line}`).join('\n')}`);
+    console.log(
+      `  delta:\n${delta.text
+        .split('\n')
+        .map((line) => `    ${line}`)
+        .join('\n')}`,
+    );
     assert(delta.count > 0, 'the digit press produced a non-empty delta');
     assert(!refChurn, 'a digit-into-entry-mode press is a pure display rename — no ref churn, so MCP takes the delta branch');
     assert(tokens(delta.text) * 3 < tokens(fullBody), `delta is far cheaper than the full re-dump (${tokens(delta.text)} vs ${tokens(fullBody)})`);
     assert(/Display is/.test(delta.text), 'the delta NAMES the changed display text');
     renameNext.dispose();
   } finally {
+    closeWindow(calc.hWnd); // close the throwaway Calculator we launched
     calc.dispose();
     uia.uninitialize();
   }

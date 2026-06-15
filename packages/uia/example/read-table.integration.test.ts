@@ -11,7 +11,7 @@
  * bun test is broken repo-wide for FFI; runnable harness:
  * Run: bun run example/read-table.integration.test.ts
  */
-import { ControlType, type TableData, uia } from '@bun-win32/uia';
+import { closeWindow, ControlType, type TableData, uia } from '@bun-win32/uia';
 
 let failures = 0;
 function assert(condition: boolean, message: string): void {
@@ -23,10 +23,17 @@ function assert(condition: boolean, message: string): void {
 }
 
 // Open a folder that reliably shows a details grid; also scan any already-open Explorer windows.
+uia.initialize();
+const priorExplorers = new Set(
+  uia
+    .windows()
+    .filter((window) => window.className === 'CabinetWClass')
+    .map((window) => window.hWnd),
+);
 Bun.spawn(['explorer.exe', 'C:\\Windows\\System32'], { stdout: 'ignore', stderr: 'ignore' });
 await Bun.sleep(2500);
-
-uia.initialize();
+// The CabinetWClass window WE just opened (diff vs prior) — close only this one, never a pre-existing user folder.
+const spawnedHwnd = uia.windows().find((window) => window.className === 'CabinetWClass' && /System32/i.test(window.title) && !priorExplorers.has(window.hWnd))?.hWnd ?? 0n;
 let found: { label: string; table: TableData; columns: number } | null = null;
 try {
   for (const info of uia.windows()) {
@@ -70,6 +77,7 @@ try {
     assert(table.rows.length <= 8, 'maxRows bound is honored (read <= 8 of the rows)');
   }
 } finally {
+  if (spawnedHwnd !== 0n) closeWindow(spawnedHwnd); // close the Explorer window we opened
   uia.uninitialize();
 }
 
