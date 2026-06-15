@@ -100,7 +100,7 @@ export { disposeOcr, ocrAvailable, ocrBitmap, ocrScreen, type OcrLine, type OcrT
 export { ExpandCollapseState, NoScroll, ScrollAmount, type ScrollInfo, type TableData, ToggleState, WindowVisualState } from './patterns';
 export { encodePNG } from './png';
 export { decodeBstr, getBstr, getCachedPropertyValue, getHandle, getLong, getPropertyValue, getRect, type Rect, type VariantValue } from './reads';
-export { capSnapshot, type Mark, pruneRefTree, type RefNode, renderSnapshot, snapshot, Snapshot } from './refmap';
+export { capSnapshot, coldTreeNote, type Mark, pruneRefTree, type RefNode, renderSnapshot, snapshot, Snapshot } from './refmap';
 export { type AuditRecord, redactTree, safeExecute, type SafeOptions, toToolResult } from './safety';
 export { type Bitmap, captureScreen, pixelColor, screenshotScreen } from './screen';
 export { type NativeWindow, renderWindowTree, windowStyles, windowTree } from './spy';

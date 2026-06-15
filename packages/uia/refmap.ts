@@ -307,3 +307,12 @@ export function capSnapshot(text: string, maxChars: number): string {
   }
   return `${kept.join('\n')}\n…(${lines.length - kept.length} more nodes — narrow with desktop_snapshot {maxDepth} or {root:"<a node name above>"})`;
 }
+
+/** A recovery note for a whole-window snapshot that found NO actionable controls. UWP/WinUI and Chromium build
+ *  their UIA/a11y tree on demand and tear it down when idle, so a just-attached or long-idle window can read
+ *  empty on the first snapshot; a genuinely tree-less surface (game/canvas/custom-draw) also reads empty. The
+ *  note tells the agent how to recover rather than give up. Empty string when there ARE controls. */
+export function coldTreeNote(markCount: number): string {
+  if (markCount > 0) return '';
+  return '\n\n(0 actionable controls — if this window has visible UI its UIA tree may be COLD: UWP/WinUI and Chromium build it on demand and tear it down when idle, so call desktop_snapshot again to build it (or briefly activate the window). If it is a game / canvas / custom-draw surface with no accessibility, use ocr / screen_capture / inspect_point for the pixels.)';
+}

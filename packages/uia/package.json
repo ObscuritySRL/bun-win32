@@ -100,6 +100,7 @@
     "example:agent-loop": "bun ./example/agent-loop.ts",
     "example:automate-calculator": "bun ./example/automate-calculator.ts",
     "example:benchmark": "bun ./example/benchmark.ts",
+    "example:cold-tree-note": "bun ./example/cold-tree-note.integration.test.ts",
     "example:computer-use": "bun ./example/computer-use.ts",
     "example:condition-perf": "bun ./example/condition-perf.integration.test.ts",
     "example:desktop-mcp": "bun ./example/desktop-mcp.ts",

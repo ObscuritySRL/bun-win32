@@ -20,6 +20,7 @@ import {
   captureWindowRGB,
   clickAt,
   closeWindow,
+  coldTreeNote,
   diffTrees,
   doubleClickAt,
   dragTo,
@@ -185,6 +186,28 @@ function resolveHwnd(args: Record<string, unknown>): bigint {
   return requireAttached().hWnd;
 }
 
+const SNAPSHOT_COLD_REFS = 5; // a Chromium window with web roots but fewer refs than this is a cold / torn-down a11y tree
+const SNAPSHOT_WARMUP_MAX = 6; // bounded re-queries to warm a cold Chromium tree
+const SNAPSHOT_WARMUP_INTERVAL = 200; // ms between warm-up re-queries
+
+/** Build one ref-keyed snapshot of the whole window, splicing in any Chromium web roots; retries once on a
+ *  transient cache fail. Also reports whether the window is Chromium (has web roots) for the cold-tree warm-up. */
+function buildWindowSnapshot(window: Window, maxDepth?: number): { snapshot: Snapshot; chromium: boolean } {
+  for (let attempt = 0; ; attempt += 1) {
+    // Chromium/Electron host their web/editor DOM in a child fragment the top-level walk misses — splice it in.
+    const webRoots = window.webRoots();
+    const chromium = webRoots.length > 0;
+    try {
+      return { snapshot: uia.snapshot(window, { ...(maxDepth !== undefined ? { maxDepth } : {}), extraRoots: webRoots }), chromium };
+    } catch (error) {
+      if (attempt >= 1) throw error;
+      Bun.sleepSync(150);
+    } finally {
+      for (const webRoot of webRoots) webRoot.release();
+    }
+  }
+}
+
 /** Rebuild the ref-keyed snapshot of the attached window, releasing the prior generation. Retries once after a
  *  short settle: BuildUpdatedCache can transiently fail while the view is mid-render. Leaves `current` null (not
  *  a dangling disposed snapshot) and rethrows if it cannot rebuild. */
@@ -197,18 +220,23 @@ function rebuildSnapshot(maxDepth?: number, root?: Element): { header: string; t
     // Scoped re-grounding on a sub-element: just that subtree, no window-level web-root splice.
     snapshot = uia.snapshot(root, maxDepth !== undefined ? { maxDepth } : {});
   } else {
-    let built: Snapshot | null = null;
-    for (let attempt = 0; ; attempt += 1) {
-      // Chromium/Electron host their web/editor DOM in a child fragment the top-level walk misses — splice it in.
-      const webRoots = window.webRoots();
-      try {
-        built = uia.snapshot(window, { ...(maxDepth !== undefined ? { maxDepth } : {}), extraRoots: webRoots });
-        break;
-      } catch (error) {
-        if (attempt >= 1) throw error;
-        Bun.sleepSync(150);
-      } finally {
-        for (const webRoot of webRoots) webRoot.release();
+    let { snapshot: built, chromium } = buildWindowSnapshot(window, maxDepth);
+    current = built; // hold a disposable handle so a throw mid-warm-up can't orphan it (the next rebuild disposes it; dispose is idempotent)
+    // Chromium/Electron build their a11y tree on demand and tear it down when idle, so a just-attached or
+    // long-idle browser's first snapshot can be sparse. Re-querying triggers the rebuild; poll (bounded) until
+    // the ref count grows past the cold threshold or plateaus. Warm windows (many refs) skip this entirely.
+    if (chromium && built.marks.length < SNAPSHOT_COLD_REFS) {
+      for (let attempt = 0; attempt < SNAPSHOT_WARMUP_MAX; attempt += 1) {
+        Bun.sleepSync(SNAPSHOT_WARMUP_INTERVAL);
+        const next = buildWindowSnapshot(window, maxDepth).snapshot;
+        if (next.marks.length <= built.marks.length) {
+          next.dispose();
+          break;
+        }
+        built.dispose();
+        built = next;
+        current = built;
+        if (built.marks.length >= SNAPSHOT_COLD_REFS) break;
       }
     }
     snapshot = built;
@@ -236,7 +264,7 @@ function snapshotText(maxDepth?: number, rootName?: string): string {
     const body = renderTree(tree);
     lastSnapshotTree = tree;
     lastSnapshotBody = body;
-    return `${header}\n${body}`;
+    return `${header}\n${body}${root === undefined ? coldTreeNote(current?.marks.length ?? 0) : ''}`;
   } finally {
     root?.release();
   }
