@@ -75,12 +75,12 @@ console.log('\n[2] action observation: Δ delta on a pure-rename step (vs a full
 // pure display rename (no control added/removed) and MUST come back as a compact Δ delta. A full re-dump
 // (epoch + every [ref=]) is the baseline we compare against.
 const fullBody = textOf(deep);
-const fiveRef = textOf(deep).match(/"Five" \[ref=(e\d+)\]/)?.[1];
+const fiveRef = textOf(deep).match(/"Five" \[ref=(e\d+(?:#\d+)?)\]/)?.[1];
 assert(fiveRef !== undefined, `located the Five button ref (${fiveRef})`);
 await call('tools/call', { name: 'invoke', arguments: { element: 'Five', ref: fiveRef } });
 
 const reground = await call('tools/call', { name: 'desktop_snapshot', arguments: {} });
-const fiveRef2 = textOf(reground).match(/"Five" \[ref=(e\d+)\]/)?.[1];
+const fiveRef2 = textOf(reground).match(/"Five" \[ref=(e\d+(?:#\d+)?)\]/)?.[1];
 const press = await call('tools/call', { name: 'invoke', arguments: { element: 'Five', ref: fiveRef2 } });
 const pressText = textOf(press);
 console.log(`  pure-rename invoke → ${pressText.split('\n').length} lines:\n${pressText.split('\n').map((line) => `    ${line}`).join('\n')}`);

@@ -83,7 +83,7 @@ const PROTOCOL_VERSION = '2025-11-25';
 const SUPPORTED_VERSIONS = new Set(['2025-11-25', '2025-06-18', '2025-03-26', '2024-11-05']);
 const SERVER_INFO = { name: 'bun-uia', version: '1.5.0' };
 const INSTRUCTIONS =
-  'Drive Windows desktop apps via the UI Automation tree — and beyond it. Call list_windows, then attach (by hWnd or exact title — className is reliable only for single-window classes like Shell_TrayWnd, not the Chromium/Electron family). Call desktop_snapshot for a ref-keyed tree (e.g. Button "Five" [ref=e49]); pass that ref to click/invoke/type/toggle/set_value/inspect_element. Refs are valid ONLY for the most recent snapshot — every action returns a fresh one; re-ground from it. To stay cheap, an action that changes little returns just a "Δ" delta (the +/-/~ changes, with refs on appeared/renamed) instead of the full tree — your other refs stay valid; desktop_snapshot {maxDepth} bounds the tree size when a window is large. Prefer invoke/set_value/toggle/scroll (cursor-free — they need no focus and work on a minimized, background, occluded, or locked window) over click. To SEE beyond the attached window (a 2nd monitor, a game/browser, a composited surface, or anything with no window) use screen_capture; to see a SPECIFIC window even when occluded, in the background, or GPU-composited (where a plain screenshot is blank) use capture_window (Windows.Graphics.Capture); turn a pixel into a control with inspect_point. screenshot auto-falls-back PrintWindow → WGC → desktop-region. Read legacy/owner-draw windows with native_tree/msaa_tree. drag/hold_key and real-cursor clicks move the actual mouse and need an unlocked, foregrounded desktop. launch/run/file tools and manage_window may be disabled by the server policy (BUN_UIA_PROFILE).';
+  'Drive Windows desktop apps via the UI Automation tree — and beyond it. Call list_windows, then attach (by hWnd or exact title — className is reliable only for single-window classes like Shell_TrayWnd, not the Chromium/Electron family). Call desktop_snapshot for a ref-keyed tree (e.g. Button "Five" [ref=e49#1]); pass that ref VERBATIM (with its #generation tag) to click/invoke/type/toggle/set_value/inspect_element. Refs are valid ONLY for the most recent snapshot — every action returns a fresh one; re-ground from it. A ref from before a re-render is REJECTED (not silently mis-resolved), so always use the refs from the latest snapshot/delta. To stay cheap, an action that changes little returns just a "Δ" delta (the +/-/~ changes, with refs on appeared/renamed) instead of the full tree — your other refs stay valid; desktop_snapshot {maxDepth} bounds the tree size when a window is large. Prefer invoke/set_value/toggle/scroll (cursor-free — they need no focus and work on a minimized, background, occluded, or locked window) over click. To SEE beyond the attached window (a 2nd monitor, a game/browser, a composited surface, or anything with no window) use screen_capture; to see a SPECIFIC window even when occluded, in the background, or GPU-composited (where a plain screenshot is blank) use capture_window (Windows.Graphics.Capture); turn a pixel into a control with inspect_point. screenshot auto-falls-back PrintWindow → WGC → desktop-region. Read legacy/owner-draw windows with native_tree/msaa_tree. drag/hold_key and real-cursor clicks move the actual mouse and need an unlocked, foregrounded desktop. launch/run/file tools and manage_window may be disabled by the server policy (BUN_UIA_PROFILE).';
 
 const encoder = new TextEncoder();
 const decoder = new TextDecoder();
@@ -91,6 +91,12 @@ const decoder = new TextDecoder();
 let attached: Window | null = null;
 let current: Snapshot | null = null;
 let epoch = 0;
+// A ref-generation tag stamped onto every emitted ref (`e5#3`). It bumps ONLY when refs are renumbered — a full
+// re-dump (structural churn), an explicit desktop_snapshot re-ground, or screenshot_marked — and is HELD across a
+// value-change delta / no-change (where the same ref still denotes the same control). So a ref the model carries
+// over from before a re-render is rejected by resolveRef instead of silently resolving to a DIFFERENT control,
+// while a ref that is still valid after a cheap delta keeps working.
+let refGen = 0;
 let lastSnapshotBody = '';
 let lastSnapshotTree: RefNode | null = null;
 
@@ -278,6 +284,12 @@ function renderTree(tree: RefNode): string {
   return capSnapshot(renderSnapshot(pruneRefTree(tree) ?? tree), SNAPSHOT_MAX_CHARS);
 }
 
+/** Stamp the current ref-generation onto every `[ref=eN]` token in AI-facing text (`[ref=eN#G]`). Applied only to
+ *  the returned copy — the stored `lastSnapshotBody` stays bare so the byte-equality / diff economy is unaffected. */
+function stampRefs(text: string): string {
+  return text.replace(/\[ref=(e\d+)\]/g, (_match, id) => `[ref=${id}#${refGen}]`);
+}
+
 function snapshotText(maxDepth?: number, rootName?: string): string {
   const window = requireAttached();
   let root: Element | undefined;
@@ -290,15 +302,21 @@ function snapshotText(maxDepth?: number, rootName?: string): string {
     const body = renderTree(tree);
     lastSnapshotTree = tree;
     lastSnapshotBody = body;
-    return `${header}\n${body}${root === undefined ? coldTreeNote(current?.marks.length ?? 0) : ''}`;
+    refGen += 1; // an explicit re-ground renumbers refs — invalidate any the model still holds
+    return stampRefs(`${header}\n${body}${root === undefined ? coldTreeNote(current?.marks.length ?? 0) : ''}`);
   } finally {
     root?.release();
   }
 }
 
 function resolveRef(ref: string): Element {
-  const element = current?.resolve(ref) ?? null;
-  if (element === null) throw new Error(`ref ${ref} not in the current snapshot (epoch ${epoch}) — re-ground with desktop_snapshot, or use find_and_act {selector} / reveal {selector}, which need no ref`);
+  const hash = ref.indexOf('#');
+  const id = hash >= 0 ? ref.slice(0, hash) : ref;
+  // A ref carrying a stale generation provably no longer denotes the same control — fail loud instead of acting on
+  // whatever now occupies that traversal slot. A bare ref (no #) is accepted leniently as current-generation.
+  if (hash >= 0 && Number(ref.slice(hash + 1)) !== refGen) throw new Error(`ref ${id} is from an earlier snapshot generation (the tree was re-grounded since) — read the latest snapshot above and use ITS refs, or use find_and_act {selector} / reveal {selector}, which need no ref`);
+  const element = current?.resolve(id) ?? null;
+  if (element === null) throw new Error(`ref ${id} not in the current snapshot (epoch ${epoch}) — re-ground with desktop_snapshot, or use find_and_act {selector} / reveal {selector}, which need no ref`);
   return element;
 }
 
@@ -337,7 +355,7 @@ function withSnapshot(message: string): object {
   const { header, tree } = rebuilt;
   const body = renderTree(tree);
   lastSnapshotTree = tree;
-  if (body === lastSnapshotBody) return textResult(`${message}\n\n${header}\n(no UI change since the last snapshot — refs unchanged)`);
+  if (body === lastSnapshotBody) return textResult(`${message}\n\n${header}\n(no UI change since the last snapshot — refs unchanged)`); // refs identical → generation held
   if (prior !== null) {
     const diff = diffTrees(prior, tree);
     const refChurn = diff.appeared.some((change) => change.ref !== undefined) || diff.disappeared.some((change) => change.ref !== undefined);
@@ -345,12 +363,13 @@ function withSnapshot(message: string): object {
       const delta = renderDiff(diff);
       if (delta.count > 0 && delta.count <= DIFF_MAX_CHANGES) {
         lastSnapshotBody = body;
-        return textResult(`${message}\n\n${header} — Δ ${delta.count} change${delta.count === 1 ? '' : 's'} (other refs unchanged)\n${delta.text}`);
+        return textResult(stampRefs(`${message}\n\n${header} — Δ ${delta.count} change${delta.count === 1 ? '' : 's'} (other refs unchanged)\n${delta.text}`)); // no churn → generation held, prior refs stay valid
       }
     }
   }
   lastSnapshotBody = body;
-  return textResult(`${message}\n\n${header}\n${body}${coldTreeNote(current?.marks.length ?? 0)}`);
+  refGen += 1; // a full re-dump renumbers refs in traversal order — bump so the model's pre-re-render refs are rejected
+  return textResult(stampRefs(`${message}\n\n${header}\n${body}${coldTreeNote(current?.marks.length ?? 0)}`));
 }
 
 /** ValuePattern set, falling back to RangeValuePattern for a numeric value on a slider/spinner (ValuePattern
@@ -525,7 +544,7 @@ function resolveFsPath(path: string): string {
 }
 
 const ELEMENT_DESC = 'Human-readable element description, used for the permission prompt and intent.';
-const REF_DESC = 'Exact target element reference from the latest desktop_snapshot (e.g. e49).';
+const REF_DESC = 'Exact target element reference from the LATEST snapshot, passed verbatim including its #generation tag (e.g. e49#3). A ref from before a re-render is rejected (so you never act on the wrong control) — re-read the latest snapshot and use its refs.';
 const HWND_DESC = 'Target window handle as a decimal or 0x-hex string; omit to use the attached window.';
 const SELECTOR_SCHEMA = {
   type: 'object',
@@ -550,7 +569,7 @@ const TOOLS: McpTool[] = [
     name: 'desktop_snapshot',
     category: 'read',
     description:
-      'Capture the attached window as a compact ref-keyed UIA tree (e.g. Button "Five" [ref=e49]). Better than a screenshot for acting; every interactable node carries a [ref=eN] you pass to action tools. Refs are valid ONLY until the next snapshot.',
+      'Capture the attached window as a compact ref-keyed UIA tree (e.g. Button "Five" [ref=e49#1]). Better than a screenshot for acting; every interactable node carries a [ref=eN#G] you pass VERBATIM to action tools. Refs are valid ONLY until the next re-render — a stale-generation ref is rejected, not mis-resolved.',
     inputSchema: { type: 'object', properties: { maxDepth: { type: 'number', description: 'Cap tree depth (default 40)' }, root: { type: 'string', description: "Re-ground on just one element's subtree (zoom into a large window): the name or automationId of a node from a prior snapshot. Combine with maxDepth." } } },
   },
   {
@@ -1140,11 +1159,12 @@ const HANDLERS: Record<string, ToolHandler> = {
     current = null; // if the rebuild throws (window closing), don't leave `current` pointing at the disposed snapshot
     current = buildWindowSnapshot(window).snapshot; // splice Chromium web roots so web-DOM controls get marks too (consistent with desktop_snapshot)
     epoch += 1;
+    refGen += 1; // a fresh marked render renumbers refs — invalidate any the model still holds
     lastSnapshotTree = current.tree;
     lastSnapshotBody = renderTree(current.tree);
     const marked = screenshotWithMarks(window, current);
     if (marked.png.length === 0) return errorResult('screenshot_marked was blank (locked session / PrintWindow); use screen_capture for the visible pixels and desktop_snapshot for the refs');
-    const legend = marked.marks.map((mark) => `[${mark.label}] ${mark.role} ${JSON.stringify(mark.name)} → ${mark.ref}`).join('\n');
+    const legend = marked.marks.map((mark) => `[${mark.label}] ${mark.role} ${JSON.stringify(mark.name)} → ${mark.ref}#${refGen}`).join('\n');
     return {
       content: [
         { type: 'image', data: Buffer.from(marked.png).toString('base64'), mimeType: 'image/png' },

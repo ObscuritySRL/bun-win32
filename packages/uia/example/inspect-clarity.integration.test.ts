@@ -101,7 +101,7 @@ try {
   await call(1, 'initialize', { protocolVersion: '2025-11-25', capabilities: {}, clientInfo: { name: 'test', version: '0' } });
   await call(2, 'tools/call', { name: 'attach', arguments: { className: 'Shell_TrayWnd' } });
   const snap = await call(3, 'tools/call', { name: 'desktop_snapshot', arguments: {} });
-  const ref = /\[ref=(e\d+)\]/.exec(textOf(snap))?.[1];
+  const ref = /\[ref=(e\d+(?:#\d+)?)\]/.exec(textOf(snap))?.[1];
   if (ref === undefined) console.log('  skip: taskbar snapshot had no ref to inspect');
   else {
     const inspected = await call(4, 'tools/call', { name: 'inspect_element', arguments: { ref } });
