@@ -8,8 +8,8 @@ import { FFIType, type Pointer } from 'bun:ffi';
 import Oleaut32 from '@bun-win32/oleaut32';
 
 import { comRelease, hresult, vcall } from './com';
-import { PatternId, S_OK, SLOT } from './constants';
-import { decodeBstr, getBstr, getDouble, getLong } from './reads';
+import { PatternId, PropertyId, S_OK, SLOT } from './constants';
+import { decodeBstr, getBstr, getDouble, getLong, getPropertyValue } from './reads';
 
 export enum ToggleState {
   Off = 0,
@@ -462,7 +462,11 @@ export function readTable(ptr: bigint, maxRows = 100): TableData | null {
         const cell = cellOut.readBigUInt64LE(0);
         if (cell === 0n) continue;
         const name = getBstr(cell, SLOT.get_CurrentName);
-        cells[column] = name.length > 0 ? name : getValue(cell);
+        if (name.length > 0) cells[column] = name;
+        else {
+          const value = getPropertyValue(cell, PropertyId.ValueValue); // one round-trip via the property, not acquire+read+release of the Value pattern per blank cell
+          cells[column] = typeof value === 'string' ? value : '';
+        }
         comRelease(cell);
       }
       rows.push(cells);

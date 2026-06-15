@@ -63,7 +63,7 @@ try {
         }
       }
     } finally {
-      win.dispose();
+      win.release();
     }
   }
   if (checked === 0) console.log('  skip: no ComboBox/SplitButton/Slider in any running app to exercise');

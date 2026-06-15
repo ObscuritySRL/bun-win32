@@ -294,7 +294,7 @@ export class Element {
   /** Build the actionable no-match message by scanning the candidate set under this element. */
   describeNoMatch(selector: Selector): string {
     const candidates = this.findAll(selector.controlType !== undefined ? { controlType: selector.controlType } : {});
-    const names = candidates.map((candidate) => candidate.name);
+    const names = candidates.slice(0, 20).map((candidate) => candidate.name); // cap live Name reads — the no-match hint only needs the nearest few
     for (const candidate of candidates) candidate.release();
     return formatNoMatch(selector, this.name, names);
   }
