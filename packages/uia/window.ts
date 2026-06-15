@@ -212,6 +212,36 @@ export function raiseWindow(hWnd: bigint): boolean {
   return User32.SetWindowPos(hWnd, HWND_TOP, 0, 0, 0, 0, (SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE) >>> 0) !== 0;
 }
 
+/** Snap a window to half/quadrant/centre of its monitor's work area, cursor-free (no Win+arrow, no activation) —
+ *  works on a background window. `edge`: left/right/top/bottom half, or a centred 3/4 rectangle. Returns false if
+ *  the monitor info is unavailable. Restores first so it snaps cleanly from a maximized/minimized state. */
+export function snapWindow(hWnd: bigint, edge: 'left' | 'right' | 'top' | 'bottom' | 'center'): boolean {
+  const MONITOR_DEFAULTTONEAREST = 0x0000_0002;
+  const monitor = User32.MonitorFromWindow(hWnd, MONITOR_DEFAULTTONEAREST);
+  if (monitor === 0n) return false;
+  const info = Buffer.alloc(40); // MONITORINFO: cbSize, rcMonitor[16], rcWork[16], dwFlags
+  info.writeUInt32LE(40, 0);
+  if (User32.GetMonitorInfoW(monitor, info.ptr!) === 0) return false;
+  const left = info.readInt32LE(20); // rcWork
+  const top = info.readInt32LE(24);
+  const width = info.readInt32LE(28) - left;
+  const height = info.readInt32LE(32) - top;
+  const halfWidth = Math.floor(width / 2);
+  const halfHeight = Math.floor(height / 2);
+  const rect =
+    edge === 'left'
+      ? { x: left, y: top, width: halfWidth, height }
+      : edge === 'right'
+        ? { x: left + halfWidth, y: top, width: width - halfWidth, height }
+        : edge === 'top'
+          ? { x: left, y: top, width, height: halfHeight }
+          : edge === 'bottom'
+            ? { x: left, y: top + halfHeight, width, height: height - halfHeight }
+            : { x: left + Math.floor(width / 8), y: top + Math.floor(height / 8), width: Math.floor((width * 3) / 4), height: Math.floor((height * 3) / 4) };
+  User32.ShowWindow(hWnd, SW_RESTORE);
+  return User32.MoveWindow(hWnd, rect.x, rect.y, rect.width, rect.height, 1) !== 0;
+}
+
 /** Ask a window to close (PostMessage WM_CLOSE) — universal, unlike WindowPattern which UWP apps lack;
  *  the app may still prompt to save. Posts cross-process, so it works on a background window. */
 export function closeWindow(hWnd: bigint): boolean {

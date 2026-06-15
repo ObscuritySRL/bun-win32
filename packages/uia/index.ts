@@ -116,6 +116,7 @@ export {
   raiseWindow,
   restoreWindow,
   screenshot,
+  snapWindow,
   type WindowCapture,
   type WindowInfo,
   windowForProcess,

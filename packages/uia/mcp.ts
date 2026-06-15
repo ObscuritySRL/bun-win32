@@ -50,6 +50,7 @@ import {
   screenshotWithMarks,
   scrollAt,
   type Selector,
+  snapWindow,
   type Snapshot,
   type TableData,
   uia,
@@ -684,13 +685,15 @@ const TOOLS: McpTool[] = [
   {
     name: 'manage_window',
     category: 'window',
-    description: 'Move/resize/minimize/maximize/restore/raise/close a window WITHOUT activating it (works on a background window; raise is a best-effort z-order restack, not a true bring-to-front). move needs x,y,width,height.',
+    description:
+      'Move/resize/minimize/maximize/restore/raise/snap/close a window WITHOUT activating it (works on a background window; raise is a best-effort z-order restack, not a true bring-to-front). move needs x,y,width,height. snap needs edge (left/right/top/bottom half, or center) — tiles the window on its monitor cursor-free, no Win+arrow.',
     inputSchema: {
       type: 'object',
       properties: {
         hWnd: { type: 'string', description: HWND_DESC },
         ref: { type: 'string', description: REF_DESC },
-        action: { type: 'string', enum: ['move', 'minimize', 'maximize', 'restore', 'raise', 'close'] },
+        action: { type: 'string', enum: ['move', 'minimize', 'maximize', 'restore', 'raise', 'snap', 'close'] },
+        edge: { type: 'string', enum: ['left', 'right', 'top', 'bottom', 'center'], description: 'Target for snap' },
         x: { type: 'number' },
         y: { type: 'number' },
         width: { type: 'number' },
@@ -1038,8 +1041,12 @@ const HANDLERS: Record<string, ToolHandler> = {
     else if (action === 'raise') raiseWindow(hWnd);
     else if (action === 'close') closeWindow(hWnd);
     else if (action === 'move') moveWindow(hWnd, requireNumber(args, 'x'), requireNumber(args, 'y'), requireNumber(args, 'width'), requireNumber(args, 'height'));
-    else throw new Error(`unknown manage_window action: ${action}`);
-    return textResult(`window ${action} (hWnd=0x${hWnd.toString(16)})`);
+    else if (action === 'snap') {
+      const edge = requireString(args, 'edge');
+      if (edge !== 'left' && edge !== 'right' && edge !== 'top' && edge !== 'bottom' && edge !== 'center') throw new Error(`snap edge must be left/right/top/bottom/center, got ${JSON.stringify(edge)}`);
+      snapWindow(hWnd, edge);
+    } else throw new Error(`unknown manage_window action: ${action}`);
+    return textResult(`window ${action}${action === 'snap' ? ` ${args.edge}` : ''} (hWnd=0x${hWnd.toString(16)})`);
   },
   read_clipboard: () => textResult(uia.readClipboard() || '(clipboard empty or not text)'),
   set_clipboard: (args) => textResult(uia.writeClipboard(requireString(args, 'text')) ? 'clipboard set' : 'failed to set clipboard'),
