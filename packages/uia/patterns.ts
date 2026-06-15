@@ -11,6 +11,11 @@ import { comRelease, guid, hresult, vcall } from './com';
 import { IID_IUIAutomationElement3, PatternId, PropertyId, S_OK, SLOT } from './constants';
 import { decodeBstr, getBstr, getDouble, getLong, getPropertyValue } from './reads';
 
+export interface ViewState {
+  current: number;
+  supported: { id: number; name: string }[];
+}
+
 export enum ToggleState {
   Off = 0,
   On = 1,
@@ -512,6 +517,43 @@ export function showContextMenu(ptr: bigint): boolean {
     return vcall(element3, SLOT.ShowContextMenu, [], []) === S_OK;
   } finally {
     comRelease(element3);
+  }
+}
+
+/** Read a MultipleViewPattern container's current view + its supported views (id + name) — e.g. File Explorer's
+ *  Details/List/Icons/Tiles/Content, a calendar's Day/Week/Month. null when the control has no MultipleView pattern.
+ *  Supported views are enumerated by probing GetViewName over the standard id range (the SAFEARRAY from
+ *  GetCurrentSupportedViews is a u64-address out-param incompatible with the local-Pointer SafeArray* bindings);
+ *  GetViewName returns a non-success HRESULT for an unsupported id, so only real views are kept. */
+export function views(ptr: bigint): ViewState | null {
+  const pattern = getPattern(ptr, PatternId.MultipleView);
+  if (pattern === 0n) return null;
+  try {
+    const out = Buffer.alloc(8);
+    if (vcall(pattern, SLOT.get_CurrentCurrentView, [FFIType.ptr], [out.ptr!]) !== S_OK) return null;
+    const current = out.readInt32LE(0);
+    const supported: { id: number; name: string }[] = [];
+    for (let id = 0; id <= 15; id += 1) {
+      const nameOut = Buffer.alloc(8);
+      if (vcall(pattern, SLOT.GetViewName, [FFIType.i32, FFIType.ptr], [id, nameOut.ptr!]) !== S_OK) continue;
+      const name = decodeBstr(nameOut.readBigUInt64LE(0));
+      if (name.length > 0) supported.push({ id, name });
+    }
+    return { current, supported };
+  } finally {
+    comRelease(pattern);
+  }
+}
+
+/** Switch a MultipleViewPattern container to view `id` CURSOR-FREE (MultipleView.SetCurrentView) — no focus, no
+ *  cursor, works on a background window. Returns false if the control has no MultipleView pattern or the id is invalid. */
+export function setView(ptr: bigint, id: number): boolean {
+  const pattern = getPattern(ptr, PatternId.MultipleView);
+  if (pattern === 0n) return false;
+  try {
+    return vcall(pattern, SLOT.SetCurrentView, [FFIType.i32], [id]) === S_OK;
+  } finally {
+    comRelease(pattern);
   }
 }
 

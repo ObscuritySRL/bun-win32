@@ -107,7 +107,7 @@ export { drawMarks, type MarkedScreenshot, type PlacedMark, screenshotWithMarks 
 export { findImage, locateOnScreen, type Match } from './match';
 export { accessibleFromWindow, type MsaaNode, msaaTree } from './msaa';
 export { disposeOcr, ocrAvailable, ocrBitmap, ocrScreen, type OcrLine, type OcrText, ocrWindow, type OcrWord } from './ocr';
-export { ExpandCollapseState, NoScroll, ScrollAmount, type ScrollInfo, type TableData, ToggleState, WindowVisualState } from './patterns';
+export { ExpandCollapseState, NoScroll, ScrollAmount, type ScrollInfo, type TableData, ToggleState, type ViewState, WindowVisualState } from './patterns';
 export { encodePNG } from './png';
 export { decodeBstr, getBstr, getCachedPropertyValue, getHandle, getLong, getPropertyValue, getRect, type Rect, type VariantValue } from './reads';
 export { capSnapshot, coldTreeNote, type Mark, pruneRefTree, type RefNode, renderSnapshot, snapshot, Snapshot } from './refmap';

@@ -842,6 +842,18 @@ const TOOLS: McpTool[] = [
     inputSchema: { type: 'object', properties: { ref: { type: 'string', description: REF_DESC }, maxRows: { type: 'number', description: 'Cap rows read (default 100)' } }, required: ['ref'] },
   },
   {
+    name: 'list_views',
+    category: 'read',
+    description: "List a container's view modes (UIA MultipleViewPattern) — e.g. File Explorer's Items View: current + supported {id, name} like Details/List/Large icons/Tiles/Content. Target the ref of the List/DataGrid/items container. Empty if the control has no MultipleView pattern.",
+    inputSchema: { type: 'object', properties: { element: { type: 'string', description: ELEMENT_DESC }, ref: { type: 'string', description: REF_DESC } }, required: ['ref'] },
+  },
+  {
+    name: 'set_view',
+    category: 'input',
+    description: 'Switch a container to a view mode CURSOR-FREE (UIA MultipleViewPattern.SetCurrentView) — e.g. flip File Explorer to Details to make read_table work. Pass a view `id` from list_views. No focus, no cursor, works on a background window.',
+    inputSchema: { type: 'object', properties: { element: { type: 'string', description: ELEMENT_DESC }, ref: { type: 'string', description: REF_DESC }, id: { type: 'number', description: 'A view id from list_views' } }, required: ['ref', 'id'] },
+  },
+  {
     name: 'native_tree',
     category: 'read',
     description: 'The raw native Win32 window hierarchy (HWND class, control id, WS_*/WS_EX_* styles, rect) — the Spy++ view, for classic-Win32 / owner-draw windows where the UIA tree is sparse. Reads any window, foreground or not.',
@@ -1309,6 +1321,17 @@ const HANDLERS: Record<string, ToolHandler> = {
   read_table: (args) => {
     const table = resolveRef(requireString(args, 'ref')).readTable(typeof args.maxRows === 'number' ? args.maxRows : undefined);
     return textResult(table === null ? '(no table at this ref — it does not expose the UIA Grid pattern; try a different ref, e.g. the List/DataGrid node)' : renderTable(table));
+  },
+  list_views: (args) => {
+    const state = resolveRef(requireString(args, 'ref')).views();
+    if (state === null) return textResult('(no view modes — this control has no MultipleView pattern; target the items List/DataGrid container)');
+    return textResult(`current view: ${state.current}\nsupported:\n${state.supported.map((view) => `  ${view.id}: ${view.name}${view.id === state.current ? ' (current)' : ''}`).join('\n')}`);
+  },
+  set_view: (args) => {
+    const element = resolveRef(requireString(args, 'ref'));
+    const id = requireNumber(args, 'id');
+    if (!element.setView(id)) return errorResult(`set_view: could not switch to view ${id} — the control has no MultipleView pattern or ${id} is not a supported id (call list_views).`);
+    return withSnapshot(`switched ${quote(args.element)} to view ${id}`);
   },
   native_tree: (args) => textResult(renderWindowTree(uia.windowTree(resolveHwnd(args), typeof args.maxDepth === 'number' ? args.maxDepth : 12))),
   msaa_tree: (args) => {

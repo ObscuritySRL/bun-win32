@@ -40,13 +40,16 @@ import {
   setRangeValue,
   setScrollPercent,
   setValue,
+  setView,
   setWindowVisualState,
   showContextMenu,
   toggle,
   toggleState,
+  views,
   windowClose,
   type ScrollInfo,
   type TableData,
+  type ViewState,
   type WindowVisualState,
 } from './patterns';
 import { getBstr, getHandle, getLong, getPropertyValue, getRect, type Rect, type VariantValue } from './reads';
@@ -461,6 +464,17 @@ export class Element {
    *  find it with listWindows({includeUntitled}) and attach it. Returns false if the provider lacks Element3. */
   showContextMenu(): boolean {
     return showContextMenu(this.ptr);
+  }
+
+  /** This container's current view + supported views (MultipleViewPattern) — e.g. File Explorer Details/List/Icons.
+   *  null when the control has no MultipleView pattern. */
+  views(): ViewState | null {
+    return views(this.ptr);
+  }
+
+  /** Switch this container to view `id` CURSOR-FREE (MultipleView.SetCurrentView). False if unsupported / invalid id. */
+  setView(id: number): boolean {
+    return setView(this.ptr, id);
   }
 
   /** Find a substring in this text/document control and SELECT it cursor-free (the desktop getByText). Returns the matched text, or null if unsupported / not found. */

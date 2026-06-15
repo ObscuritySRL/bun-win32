@@ -286,4 +286,9 @@ export const SLOT = {
   get_CurrentColumnCount: 5,
   // IUIAutomationTablePattern
   GetCurrentColumnHeaders: 4,
+  // IUIAutomationMultipleViewPattern (view-mode switch — verified vs UIAutomationClient.h IUIAutomationMultipleViewPatternVtbl)
+  GetViewName: 3,
+  SetCurrentView: 4,
+  get_CurrentCurrentView: 5,
+  GetCurrentSupportedViews: 6,
 } as const;
