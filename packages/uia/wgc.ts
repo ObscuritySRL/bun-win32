@@ -65,7 +65,9 @@ const invokers = new Map<string, ReturnType<typeof CFunction>>();
 function vcall(thisPtr: bigint, slot: number, argTypes: readonly FFIType[], args: readonly unknown[], returns: FFIType = FFIType.i32): number {
   if (thisPtr === 0n) throw new Error(`vcall: null interface pointer (slot ${slot})`); // predicted-not-taken; turns a segfault into a catchable error
   const vtable = read.u64(Number(thisPtr) as Pointer, 0);
+  if (vtable === 0n) throw new Error(`vcall: null vtable at interface 0x${thisPtr.toString(16)} (slot ${slot}) — use-after-free or invalid interface pointer`); // a freed/zeroed object reads vtable 0; without this the next read segfaults uncatchably
   const method = read.u64(Number(vtable) as Pointer, slot * 8);
+  if (method === 0n) throw new Error(`vcall: null method pointer at slot ${slot} (vtable 0x${vtable.toString(16)})`); // a corrupt/short vtable yields a null method; calling it would crash
   const key = `${method}|${returns}|${argTypes.join(',')}`;
   let invoke = invokers.get(key);
   if (invoke === undefined) {

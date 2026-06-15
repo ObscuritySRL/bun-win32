@@ -20,7 +20,9 @@ const invokers = new Map<number, ReturnType<typeof CFunction>>();
 export function vcall(thisPtr: bigint, slot: number, argTypes: readonly FFIType[], args: readonly unknown[]): number {
   if (thisPtr === 0n) throw new Error(`vcall: null interface pointer (slot ${slot})`); // predicted-not-taken; turns a segfault into a catchable error
   const vtable = read.ptr(Number(thisPtr) as Pointer, 0);
+  if (!vtable) throw new Error(`vcall: null vtable at interface 0x${thisPtr.toString(16)} (slot ${slot}) — use-after-free or invalid interface pointer`); // a freed/zeroed object reads vtable 0; without this the next read segfaults uncatchably
   const method = read.ptr(Number(vtable) as Pointer, slot * 8);
+  if (!method) throw new Error(`vcall: null method pointer at slot ${slot} (vtable 0x${vtable.toString(16)})`); // a corrupt/short vtable yields a null method; calling it would crash
   let invoke = invokers.get(method);
   if (invoke === undefined) {
     invoke = CFunction({ ptr: Number(method) as Pointer, args: [FFIType.u64, ...argTypes], returns: FFIType.i32 });
