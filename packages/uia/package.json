@@ -41,7 +41,7 @@
     "directory": "packages/uia"
   },
   "type": "module",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "main": "./index.ts",
   "keywords": [
     "accessibility",
@@ -71,6 +71,7 @@
     "coords.ts",
     "diff.ts",
     "element.ts",
+    "events.ts",
     "idle.ts",
     "index.ts",
     "input.ts",
@@ -78,6 +79,7 @@
     "match.ts",
     "mcp.ts",
     "msaa.ts",
+    "ocr.ts",
     "patterns.ts",
     "png.ts",
     "reads.ts",
