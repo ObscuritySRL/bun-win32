@@ -59,7 +59,7 @@ export { type ComputerAction, type ComputerResult, dispatch, type DispatchOption
 export { type CompiledCondition, compileCondition, type ElementProperties, formatNoMatch, matches, selectorToString, type Selector } from './condition';
 export { ControlType, PatternId, PropertyConditionFlags, PropertyId, SLOT, TreeScope } from './constants';
 export { elementAt, listMonitors, type MonitorInfo, type PointDescription, postClickAt, scrollAt, virtualScreen, windowAt } from './coords';
-export { type DiffNode, diffTrees, type RenameChange, renderDiff, type TreeChange, type TreeDiff } from './diff';
+export { type DiffNode, diffTrees, type RenameChange, renderDiff, type StateChange, type TreeChange, type TreeDiff } from './diff';
 export { attach, Element, focused, fromHandle, fromPoint, launch, root, Window } from './element';
 export { type IdleOptions, waitForIdle } from './idle';
 export {

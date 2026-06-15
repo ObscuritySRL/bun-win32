@@ -12,6 +12,8 @@ export interface DiffNode {
   automationId?: string;
   /** The actionable ref (RefNode only); carried into the change so the delta is directly actionable. */
   ref?: string;
+  /** Inline dynamic-state suffix (RefNode only), e.g. ` (on)` — diffed so a toggle/select stays on the delta path. */
+  state?: string;
   children: DiffNode[];
 }
 
@@ -19,7 +21,7 @@ export interface TreeChange {
   key: string;
   role: string;
   name: string;
-  /** The after-tree node's actionable ref (appeared/renamed); absent for disappeared or ref-less nodes. */
+  /** The after-tree node's actionable ref (appeared/renamed/restated); absent for disappeared or ref-less nodes. */
   ref?: string;
 }
 
@@ -28,10 +30,17 @@ export interface RenameChange extends TreeChange {
   after: string;
 }
 
+/** A same-node change to inline dynamic state only (e.g. `(off)` → `(on)`) — the node's name/position are unchanged. */
+export interface StateChange extends TreeChange {
+  before: string;
+  after: string;
+}
+
 export interface TreeDiff {
   appeared: TreeChange[];
   disappeared: TreeChange[];
   renamed: RenameChange[];
+  restated: StateChange[];
 }
 
 function flatten(node: DiffNode, path: string, into: Map<string, DiffNode>): void {
@@ -48,15 +57,17 @@ export function diffTrees(before: DiffNode, after: DiffNode): TreeDiff {
   const appeared: TreeChange[] = [];
   const disappeared: TreeChange[] = [];
   const renamed: RenameChange[] = [];
+  const restated: StateChange[] = [];
   for (const [key, node] of nexts) {
     const prior = priors.get(key);
     if (prior === undefined) appeared.push({ key, role: node.role, name: node.name, ref: node.ref });
     else if (prior.name !== node.name) renamed.push({ key, role: node.role, name: node.name, before: prior.name, after: node.name, ref: node.ref });
+    else if ((prior.state ?? '') !== (node.state ?? '')) restated.push({ key, role: node.role, name: node.name, before: prior.state ?? '', after: node.state ?? '', ref: node.ref });
   }
   for (const [key, node] of priors) {
     if (!nexts.has(key)) disappeared.push({ key, role: node.role, name: node.name, ref: node.ref });
   }
-  return { appeared, disappeared, renamed };
+  return { appeared, disappeared, renamed, restated };
 }
 
 /**
@@ -72,6 +83,8 @@ export function renderDiff(diff: TreeDiff): { text: string; count: number } {
     lines.push(`+ ${change.role}${change.name.trim().length > 0 ? ` ${JSON.stringify(change.name)}` : ''}${change.ref !== undefined ? ` [ref=${change.ref}]` : ''}`);
   }
   for (const change of diff.renamed) lines.push(`~ ${change.role} ${JSON.stringify(change.before)} → ${JSON.stringify(change.after)}${change.ref !== undefined ? ` [ref=${change.ref}]` : ''}`);
+  for (const change of diff.restated)
+    lines.push(`~ ${change.role}${change.name.trim().length > 0 ? ` ${JSON.stringify(change.name)}` : ''}${change.ref !== undefined ? ` [ref=${change.ref}]` : ''} ${change.before.trim() || '(—)'} → ${change.after.trim() || '(—)'}`);
   for (const change of diff.disappeared) {
     if (change.name.trim().length === 0) continue;
     lines.push(`- ${change.role} ${JSON.stringify(change.name)}`);

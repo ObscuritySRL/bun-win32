@@ -82,6 +82,14 @@ function syntheticChurn(): void {
   const addDiff = diffTrees(base, added);
   const addChurn = addDiff.appeared.some((c) => c.ref !== undefined) || addDiff.disappeared.some((c) => c.ref !== undefined);
   assert(addChurn, 'an appeared actionable [ref] node is detected as churn → MCP falls back to the full tree (refs may shift)');
+  // State-only change (e.g. a toggle): same name/position, only the inline state differs → must stay on the delta path.
+  const offState: RefNode = { role: 'Window', name: 'App', children: [{ role: 'CheckBox', name: 'Wi-Fi', ref: 'e1', state: ' (off)', children: [] }] };
+  const onState: RefNode = { role: 'Window', name: 'App', children: [{ role: 'CheckBox', name: 'Wi-Fi', ref: 'e1', state: ' (on)', children: [] }] };
+  const stateDiff = diffTrees(offState, onState);
+  const stateChurn = stateDiff.appeared.some((c) => c.ref !== undefined) || stateDiff.disappeared.some((c) => c.ref !== undefined);
+  const stateDelta = renderDiff(stateDiff);
+  console.log(`  state-only delta: ${JSON.stringify(stateDelta.text)} (count ${stateDelta.count}, churn ${stateChurn})`);
+  assert(!stateChurn && stateDelta.count === 1 && /\(off\) → \(on\)/.test(stateDelta.text), 'a state-only change (off→on) is ONE Δ line, no churn → cheap delta, not a full dump');
 }
 
 // ---- C. budget cap (deterministic; no app) -------------------------------------------------------
