@@ -311,6 +311,7 @@ function snapshotText(maxDepth?: number, rootName?: string): string {
   const window = requireAttached();
   let root: Element | undefined;
   if (rootName !== undefined && rootName.length > 0) {
+    if (/^e\d+(#\d+)?$/.test(rootName)) throw new Error(`desktop_snapshot {root} takes a node NAME or automationId, not a [ref] — refs (${rootName}) address controls only on action tools; omit root and use maxDepth, or pass the name/automationId shown for that node`);
     root = window.find({ name: rootName }) ?? window.find({ automationId: rootName }) ?? undefined;
     if (root === undefined) throw new Error(`desktop_snapshot: no element named or automationId ${JSON.stringify(rootName)} under the attached window — omit root, or pick a name/id from a full snapshot`);
   }
@@ -1382,7 +1383,9 @@ const HANDLERS: Record<string, ToolHandler> = {
   },
   copy: async (args) => {
     if (typeof args.ref === 'string') {
-      const selected = resolveRef(args.ref).getSelectedText(); // cursor-free: TextPattern selection, no focus, works locked/background
+      const element = resolveRef(args.ref);
+      if (element.isPassword) return textResult('(password — withheld)'); // never clipboard a secret field's selection (matches read / inspect_element)
+      const selected = element.getSelectedText(); // cursor-free: TextPattern selection, no focus, works locked/background
       if (selected.length > 0) {
         uia.writeClipboard(selected);
         return textResult(selected);

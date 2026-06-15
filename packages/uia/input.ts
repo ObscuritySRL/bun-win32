@@ -232,8 +232,16 @@ export function keyUp(name: string): void {
   User32.SendInput(1, buffer.ptr!, INPUT_SIZE);
 }
 
+/** Whether a key is physically down RIGHT NOW (GetAsyncKeyState high bit). Crash-safe input OBSERVATION by polling
+ *  on the JS tick — no SetWindowsHookEx foreign-thread callback (the uiohook/JSCallback hazard) and no message pump.
+ *  Read-only; call it in a poll loop to watch input. Accepts the same key names as sendKeys ('Shift', 'Control',
+ *  'A', 'F4'). */
+export function isKeyDown(name: string): boolean {
+  return (User32.GetAsyncKeyState(virtualKeyCode(name)) & 0x8000) !== 0;
+}
+
 // Cursor-free input via WINDOW MESSAGES posted/sent to a control's HWND — no focus, no foreground, no real cursor,
-// and works on a background/occluded window (the AHK ControlSetText / ControlSend path). SendInput, by contrast,
+// and works on a background/occluded window. SendInput, by contrast,
 // goes to whatever owns the system focus. The HWND must be a real control window (Element.nativeWindowHandle != 0);
 // modern WinUI/WPF/Chromium sub-controls without their own HWND fall back to ValuePattern/SendInput.
 const WM_SETTEXT = 0x0000_000c;
@@ -242,7 +250,7 @@ const WM_KEYUP = 0x0000_0101;
 const WM_CHAR = 0x0000_0102;
 
 /** Set a control's text cursor-free via SendMessageW(WM_SETTEXT) — no keystrokes/focus, works on a background
- *  window (AHK ControlSetText). SendMessageW is synchronous, so the wide-string buffer is valid for the call.
+ *  window. SendMessageW is synchronous, so the wide-string buffer is valid for the call.
  *  Returns false for a 0 handle or a control that rejects WM_SETTEXT. */
 export function setControlText(hWnd: bigint, text: string): boolean {
   if (hWnd === 0n) return false;
@@ -251,7 +259,7 @@ export function setControlText(hWnd: bigint, text: string): boolean {
 }
 
 /** Press a key (WM_KEYDOWN + WM_KEYUP) on a control's HWND cursor-free — Enter / Tab / Escape / arrows / a single
- *  key to a background/occluded window without focus (AHK ControlSend). False for a 0 handle. */
+ *  key to a background/occluded window without focus. False for a 0 handle. */
 export function postKey(hWnd: bigint, name: string): boolean {
   if (hWnd === 0n) return false;
   const keyCode = BigInt(virtualKeyCode(name));

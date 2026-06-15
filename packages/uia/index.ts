@@ -7,7 +7,7 @@ import { diffTrees } from './diff';
 import { attach, focused, fromPoint, launch, root } from './element';
 import { listProcesses, waitForProcess, waitForWindow, watchWindows } from './events';
 import { waitForIdle } from './idle';
-import { clickAt, postKey, postText, sendKeys, setControlText, type } from './input';
+import { clickAt, isKeyDown, postKey, postText, sendKeys, setControlText, type } from './input';
 import { locateOnScreen } from './match';
 import { msaaTree } from './msaa';
 import { ocrBitmap, ocrScreen, ocrWindow } from './ocr';
@@ -32,6 +32,7 @@ export const uia = {
   focused,
   fromPoint,
   initialize,
+  isKeyDown,
   launch,
   listMonitors,
   listProcesses,
@@ -84,6 +85,7 @@ export {
   dragTo,
   holdKey,
   INPUT_SIZE,
+  isKeyDown,
   keyDown,
   keyUp,
   middleClickAt,

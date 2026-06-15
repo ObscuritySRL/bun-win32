@@ -1,5 +1,5 @@
 /**
- * cursor-free-input — prove the AHK ControlSetText / ControlSend parity: drive a control's text and keys with NO
+ * cursor-free-input — prove cursor-free text/key input: drive a control's text and keys with NO
  * focus, NO foreground, NO real cursor, on a MINIMIZED window. `setControlText` (WM_SETTEXT) and `postText`
  * (WM_CHAR) and `postKey` (WM_KEYDOWN/UP) route to a control's `nativeWindowHandle` — the path SendInput can't take
  * (it goes to whatever owns the system focus). This is the headline no-focus input gap the MCP `press_key` (ref +
@@ -68,5 +68,5 @@ try {
   uia.uninitialize();
 }
 
-console.log(failures === 0 ? '\nPASS — text + keys drive a minimized window cursor-free (AHK ControlSetText/ControlSend parity).' : `\nFAILED — ${failures} assertion(s)`);
+console.log(failures === 0 ? '\nPASS — text + keys drive a minimized window cursor-free (posted window messages).' : `\nFAILED — ${failures} assertion(s)`);
 process.exit(failures === 0 ? 0 : 1);

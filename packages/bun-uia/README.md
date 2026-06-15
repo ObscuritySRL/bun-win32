@@ -98,7 +98,7 @@ Measured on Windows 11, Bun 1.4, by `bun run example/benchmark.ts` (run it to re
 - **Windows 10/11, Bun ≥ 1.1.** Windows-only and Bun-only — the owned trade-off (nut.js/robotjs/uiohook are genuinely cross-platform; this is not).
 - **UIA-tree based.** Apps with no accessibility tree (games, canvas/WebGL, custom-draw) get MSAA + screenshots + coordinate `click()`, not vision matching — a complement to screenshot tools, not a replacement.
 - **Synthetic input (`type`/`sendKeys`/`click`) needs an unlocked, interactive desktop.** UIA queries, `invoke`, `setValue`, and `screenshot` work on a locked session; prefer them.
-- **Selectors are client-side for regex/substring** (exact scalars are server-side). **UIA events are roadmap** — poll with `waitFor`. `scrollIntoView` is implemented but not yet proven against a real list.
+- **Selectors are client-side for regex/substring** (exact scalars are server-side). **Window/process lifecycle events ship** (`waitForWindow` via `SetWinEventHook`; `waitForProcess` polls a toolhelp32 snapshot); UIA property/structure event subscription is still roadmap — poll with `waitFor` / `waitForIdle`.
 
 Read [`AI.md`](https://github.com/ObscuritySRL/bun-win32/blob/main/packages/uia/AI.md) — it is the complete surface; an agent should not need the source.
 
