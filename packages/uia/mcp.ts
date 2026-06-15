@@ -1101,9 +1101,11 @@ const HANDLERS: Record<string, ToolHandler> = {
     const frameworkId = element.getProperty(PropertyId.FrameworkId);
     if (typeof frameworkId === 'string' && frameworkId.length > 0) lines.push(`frameworkId: ${frameworkId}`);
     // TextPattern content (terminals, documents, read-only multiline text) — the buffer the ValuePattern `value`
-    // does not carry. Capped so a long scrollback can't dump unbounded tokens.
-    const text = element.text();
-    if (text.length > 0 && text !== value && text !== element.name) lines.push(`text (${text.length} chars):\n${text.length > 2000 ? `${text.slice(0, 2000)} …(+${text.length - 2000} more chars)` : text}`);
+    // does not carry. Prefer the ON-SCREEN text (GetVisibleRanges): bounded + relevant + cheap for a huge
+    // scrollback; fall back to the full document for a non-scrollable text control. Capped either way.
+    const visible = element.visibleText();
+    const text = visible.length > 0 ? visible : element.text();
+    if (text.length > 0 && text !== value && text !== element.name) lines.push(`${visible.length > 0 ? 'visible text' : 'text'} (${text.length} chars):\n${text.length > 2000 ? `${text.slice(0, 2000)} …(+${text.length - 2000} more chars)` : text}`);
     return textResult(lines.join('\n'));
   },
   read_table: (args) => {

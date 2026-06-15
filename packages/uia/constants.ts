@@ -265,6 +265,7 @@ export const SLOT = {
   // IUIAutomationTextPattern + IUIAutomationTextRange (TextRange.Select=16 collides by name with
   // SelectionItem.Select=3 — it lives as a local const in patterns.ts, verified by slot-gate's scoped block)
   GetSelection: 5,
+  GetVisibleRanges: 6, // IUIAutomationTextPattern — verified vs UIAutomationClient.h (RangeFromPoint 3, RangeFromChild 4, GetSelection 5, GetVisibleRanges 6, get_DocumentRange 7)
   get_DocumentRange: 7,
   FindText: 8,
   GetText: 12,

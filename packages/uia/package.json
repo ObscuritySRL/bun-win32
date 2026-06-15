@@ -133,6 +133,7 @@
     "example:uia-report": "bun ./example/uia-report.ts",
     "example:uwp-content": "bun ./example/uwp-content.integration.test.ts",
     "example:vcall-safety": "bun ./example/vcall-safety.integration.test.ts",
+    "example:visible-text": "bun ./example/visible-text.integration.test.ts",
     "example:web-content": "bun ./example/web-content.integration.test.ts",
     "example:window-events": "bun ./example/window-events.integration.test.ts",
     "example:window-spy": "bun ./example/window-spy.ts"

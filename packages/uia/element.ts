@@ -29,6 +29,7 @@ import {
   rangeValue,
   readTable,
   readText,
+  readVisibleText,
   removeFromSelection,
   scroll,
   ScrollAmount,
@@ -406,6 +407,12 @@ export class Element {
   /** Read the TextPattern document text, or '' if unsupported. */
   text(): string {
     return readText(this.ptr);
+  }
+
+  /** Read only the ON-SCREEN text of a TextPattern document (GetVisibleRanges) — bounded to what's visible, the
+   *  right read for a huge terminal / editor (text() pulls the whole scrollback). '' if unsupported / nothing visible. */
+  visibleText(): string {
+    return readVisibleText(this.ptr);
   }
 
   /** Find a substring in this text/document control and SELECT it cursor-free (the desktop getByText). Returns the matched text, or null if unsupported / not found. */

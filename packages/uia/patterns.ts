@@ -340,6 +340,43 @@ export function readText(ptr: bigint): string {
   }
 }
 
+/** The ON-SCREEN text of a TextPattern document — only the currently-visible ranges (GetVisibleRanges), not the
+ *  whole scrollback. The right read for a huge terminal / editor: bounded to what's on screen and far cheaper
+ *  than GetText(-1) over the full document. '' if unsupported / nothing visible. */
+export function readVisibleText(ptr: bigint): string {
+  const pattern = getPattern(ptr, PatternId.Text);
+  if (pattern === 0n) return '';
+  try {
+    const arrayOut = Buffer.alloc(8);
+    if (vcall(pattern, SLOT.GetVisibleRanges, [FFIType.ptr], [arrayOut.ptr!]) !== S_OK) return '';
+    const array = arrayOut.readBigUInt64LE(0);
+    if (array === 0n) return '';
+    try {
+      const lengthOut = Buffer.alloc(4);
+      if (vcall(array, SLOT.get_Length, [FFIType.ptr], [lengthOut.ptr!]) !== S_OK) return '';
+      const length = lengthOut.readInt32LE(0);
+      const parts: string[] = [];
+      for (let index = 0; index < length; index += 1) {
+        const rangeOut = Buffer.alloc(8);
+        if (vcall(array, SLOT.GetElement, [FFIType.i32, FFIType.ptr], [index, rangeOut.ptr!]) !== S_OK) continue;
+        const range = rangeOut.readBigUInt64LE(0);
+        if (range === 0n) continue;
+        try {
+          const textOut = Buffer.alloc(8);
+          if (vcall(range, SLOT.GetText, [FFIType.i32, FFIType.ptr], [-1, textOut.ptr!]) === S_OK) parts.push(decodeBstr(textOut.readBigUInt64LE(0)));
+        } finally {
+          comRelease(range);
+        }
+      }
+      return parts.join('\n');
+    } finally {
+      comRelease(array);
+    }
+  } finally {
+    comRelease(pattern);
+  }
+}
+
 /** A grid/table read as text: optional column headers, a 2D array of cell strings, and the full row count. */
 export interface TableData {
   headers: string[];
