@@ -11,6 +11,16 @@ import { CLSCTX_INPROC_SERVER, CLSID_CUIAutomation, COINIT_APARTMENTTHREADED, II
 let pAutomation = 0n;
 let pControlWalker = 0n;
 let comInitialized = false;
+let wgcBundleDisposer: (() => void) | null = null;
+
+/**
+ * Register wgc.ts's device-bundle teardown so uninitialize() can free it WITHOUT a static automation→wgc
+ * import (which would eager-`dlopen` d3d11 on core init and form a cycle). wgc.ts calls this once it builds
+ * its cached bundle; uninitialize() invokes it (a no-op when WGC was never used).
+ */
+export function setWgcBundleDisposer(dispose: () => void): void {
+  wgcBundleDisposer = dispose;
+}
 
 /**
  * Initialize COM (single-threaded apartment) and create the in-process IUIAutomation client.
@@ -53,6 +63,10 @@ export function controlViewWalker(): bigint {
 
 /** Release the IUIAutomation client and uninitialize COM. Safe to call when never initialized. */
 export function uninitialize(): void {
+  if (wgcBundleDisposer !== null) {
+    wgcBundleDisposer(); // free the WGC bundle while its apartment is still alive (before CoUninitialize)
+    wgcBundleDisposer = null;
+  }
   if (pControlWalker !== 0n) {
     comRelease(pControlWalker);
     pControlWalker = 0n;

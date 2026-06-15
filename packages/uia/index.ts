@@ -94,7 +94,7 @@ export { type AuditRecord, redactTree, safeExecute, type SafeOptions, toToolResu
 export { type Bitmap, captureScreen, pixelColor, screenshotScreen } from './screen';
 export { type NativeWindow, renderWindowTree, windowStyles, windowTree } from './spy';
 export { countNodes, estimateTokens, serialize, type SerializeOptions, type UiaNode } from './tree';
-export { captureWindowLive, wgcAvailable } from './wgc';
+export { captureWindowLive, dispose as disposeWgc, wgcAvailable } from './wgc';
 export {
   captureWindowRGB,
   closeWindow,

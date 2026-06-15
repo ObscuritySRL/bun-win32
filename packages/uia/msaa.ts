@@ -18,6 +18,10 @@ const IACC_GET_ACCNAME = 10;
 const IACC_GET_ACCROLE = 13;
 const VARIANT_SIZE = 16;
 const CHILDID_SELF = 0;
+const MAX_ACC_CHILDREN = 0x0001_0000; // 65536 — generous for any real container; bounds a hostile/buggy provider's child count
+
+// The IAccessible IID is a compile-time constant — parse it once, not per node (the walk recurses).
+const IID_IACCESSIBLE_GUID = guid(`{${IID_IAccessible}}`);
 
 export interface MsaaNode {
   name: string;
@@ -53,14 +57,14 @@ function accChildCount(accessible: bigint): number {
 /** Acquire the root IAccessible for a window via MSAA (OBJID_WINDOW). Returns 0n on failure. */
 export function accessibleFromWindow(hWnd: bigint): bigint {
   const out = Buffer.alloc(8);
-  if (Oleacc.AccessibleObjectFromWindow(hWnd, OBJID.OBJID_WINDOW >>> 0, guid(`{${IID_IAccessible}}`).ptr!, out.ptr!) !== S_OK) return 0n;
+  if (Oleacc.AccessibleObjectFromWindow(hWnd, OBJID.OBJID_WINDOW >>> 0, IID_IACCESSIBLE_GUID.ptr!, out.ptr!) !== S_OK) return 0n;
   return out.readBigUInt64LE(0);
 }
 
 function walk(accessible: bigint, childId: number, maxDepth: number, depth: number): MsaaNode {
   const node: MsaaNode = { name: accName(accessible, childId), role: accRole(accessible, childId), children: [] };
   if (childId !== CHILDID_SELF || depth >= maxDepth) return node;
-  const count = accChildCount(accessible);
+  const count = Math.min(accChildCount(accessible), MAX_ACC_CHILDREN);
   if (count <= 0) return node;
   const children = Buffer.alloc(VARIANT_SIZE * count);
   const obtained = Buffer.alloc(4);
@@ -73,7 +77,7 @@ function walk(accessible: bigint, childId: number, maxDepth: number, depth: numb
       const dispatch = children.readBigUInt64LE(base + 8);
       if (dispatch === 0n) continue;
       const childOut = Buffer.alloc(8);
-      const queried = vcall(dispatch, IACC_QUERYINTERFACE, [FFIType.ptr, FFIType.ptr], [guid(`{${IID_IAccessible}}`).ptr!, childOut.ptr!]);
+      const queried = vcall(dispatch, IACC_QUERYINTERFACE, [FFIType.ptr, FFIType.ptr], [IID_IACCESSIBLE_GUID.ptr!, childOut.ptr!]);
       const childAccessible = childOut.readBigUInt64LE(0);
       if (queried === S_OK && childAccessible !== 0n) {
         node.children.push(walk(childAccessible, CHILDID_SELF, maxDepth, depth + 1));

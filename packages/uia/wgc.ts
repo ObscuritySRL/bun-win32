@@ -15,7 +15,7 @@ import Combase from '@bun-win32/combase';
 import D3d11 from '@bun-win32/d3d11';
 import User32 from '@bun-win32/user32';
 
-import { initialize } from './automation';
+import { initialize, setWgcBundleDisposer } from './automation';
 import type { Bitmap } from './screen';
 
 const S_OK = 0;
@@ -63,6 +63,7 @@ const { symbols: D3D11Interop } = dlopen('d3d11.dll', { CreateDirect3D11DeviceFr
 const invokers = new Map<string, ReturnType<typeof CFunction>>();
 /** Cast-free COM vtable invoker with an explicit return type (the D3D11 readback needs void/u32 returns). */
 function vcall(thisPtr: bigint, slot: number, argTypes: readonly FFIType[], args: readonly unknown[], returns: FFIType = FFIType.i32): number {
+  if (thisPtr === 0n) throw new Error(`vcall: null interface pointer (slot ${slot})`); // predicted-not-taken; turns a segfault into a catchable error
   const vtable = read.u64(Number(thisPtr) as Pointer, 0);
   const method = read.u64(Number(vtable) as Pointer, slot * 8);
   const key = `${method}|${returns}|${argTypes.join(',')}`;
@@ -123,6 +124,7 @@ interface DeviceBundle {
   framePoolStatics: bigint;
 }
 let bundle: DeviceBundle | null = null;
+let roInitialized = false; // whether RoInitialize succeeded (so dispose pairs RoUninitialize 1:1, never over-decrementing)
 
 function createDevice(driverType: number): { device: bigint; context: bigint } | null {
   const featureLevels = Buffer.alloc(4);
@@ -137,7 +139,7 @@ function createDevice(driverType: number): { device: bigint; context: bigint } |
 function ensureBundle(): DeviceBundle {
   if (bundle !== null) return bundle;
   initialize(); // ensure COM is initialized (uia's STA is fine — WGC activation is apartment-agnostic)
-  Combase.RoInitialize(1); // RO_INIT_MULTITHREADED; RPC_E_CHANGED_MODE under the existing STA is expected + harmless
+  roInitialized = Combase.RoInitialize(1) === S_OK; // RO_INIT_MULTITHREADED; RPC_E_CHANGED_MODE under the existing STA is expected (then no RoUninitialize)
   const device = createDevice(1 /* HARDWARE */) ?? createDevice(5 /* WARP */);
   if (device === null) throw new Error('WGC: D3D11CreateDevice failed (HARDWARE and WARP)');
   const dxgiDevice = queryInterface(device.device, IID_IDXGIDevice);
@@ -154,7 +156,28 @@ function ensureBundle(): DeviceBundle {
     interop: activationFactory(RC_GraphicsCaptureItem, IID_IGraphicsCaptureItemInterop),
     framePoolStatics: activationFactory(RC_FramePool, IID_IDirect3D11CaptureFramePoolStatics2),
   };
+  setWgcBundleDisposer(dispose); // let automation.uninitialize() free this bundle before CoUninitialize (no static automation→wgc dep)
   return bundle;
+}
+
+/**
+ * Release the cached D3D11 + WinRT bundle and pair the RoInitialize. Self-guarded (no bundle → no-op),
+ * so safe when WGC was never used or already disposed. Called by automation.uninitialize() (registered
+ * via setWgcBundleDisposer) so a later captureWindowLive rebuilds the bundle instead of vcalling freed
+ * interfaces; also exported for callers that use captureWindowLive directly.
+ */
+export function dispose(): void {
+  if (bundle === null) return;
+  release(bundle.framePoolStatics);
+  release(bundle.interop);
+  release(bundle.winrtDevice);
+  release(bundle.context); // the immediate context holds a device ref — release it before the device
+  release(bundle.device);
+  bundle = null;
+  if (roInitialized) {
+    Combase.RoUninitialize();
+    roInitialized = false;
+  }
 }
 
 /** Whether WGC is usable on this OS (Windows 10 1809+; the env on test boxes is 26200). Best-effort — a

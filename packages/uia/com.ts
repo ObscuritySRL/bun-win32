@@ -18,6 +18,7 @@ const invokers = new Map<number, ReturnType<typeof CFunction>>();
  * leading u64 segfaults multi-pointer calls). `argTypes` must match the method's real signature.
  */
 export function vcall(thisPtr: bigint, slot: number, argTypes: readonly FFIType[], args: readonly unknown[]): number {
+  if (thisPtr === 0n) throw new Error(`vcall: null interface pointer (slot ${slot})`); // predicted-not-taken; turns a segfault into a catchable error
   const vtable = read.ptr(Number(thisPtr) as Pointer, 0);
   const method = read.ptr(Number(vtable) as Pointer, slot * 8);
   let invoke = invokers.get(method);

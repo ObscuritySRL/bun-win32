@@ -103,8 +103,11 @@
     "example:drive-in-the-dark": "bun ./example/drive-in-the-dark.ts",
     "example:hello-uia": "bun ./example/hello-uia.ts",
     "example:inspector": "bun ./example/inspector.ts",
+    "example:mcp-snapshot-economy": "bun ./example/mcp-snapshot-economy.integration.test.ts",
+    "example:safety-floor": "bun ./example/safety-floor.integration.test.ts",
     "example:selftest": "bun ./example/uia.selftest.ts",
     "example:set-of-marks": "bun ./example/set-of-marks.ts",
+    "example:snapshot-economy": "bun ./example/snapshot-economy.integration.test.ts",
     "example:uia-report": "bun ./example/uia-report.ts",
     "example:window-spy": "bun ./example/window-spy.ts"
   }
