@@ -95,9 +95,9 @@ Measured on Windows 11, Bun 1.4, by `bun run example/benchmark.ts` (run it to re
 ## Requirements & honest scoping
 
 - **Windows 10/11, Bun ≥ 1.1.** Windows-only and Bun-only — the owned trade-off (nut.js/robotjs/uiohook are genuinely cross-platform; this is not).
-- **UIA-tree first, pixels where there's no tree.** Apps with no accessibility tree (games, canvas/WebGL, custom-draw, browsers that don't expose in-page content) fall back to the built-in pixel layer — full-screen capture + `locateOnScreen` template matching + coordinate `click()` — plus MSAA. Those GPU/composited surfaces, even occluded or in the background, are still **seen** via `captureWindowLive` (Windows.Graphics.Capture) where `PrintWindow` goes blank. UIA-native where there's a tree, pixels where there isn't.
+- **UIA-tree first, pixels where there's no tree.** Apps with no accessibility tree (games, canvas/WebGL, custom-draw) fall back to the built-in pixel layer — full-screen capture + `locateOnScreen` template matching + coordinate `click()` — plus MSAA. (Chromium/Edge/Electron in-page DOM is NOT a no-tree case — `webRoots()` reads it as UIA; the pixel layer is only for genuinely tree-less surfaces.) Those GPU/composited surfaces, even occluded or in the background, are still **seen** via `captureWindowLive` (Windows.Graphics.Capture) where `PrintWindow` goes blank. UIA-native where there's a tree, pixels where there isn't.
 - **Synthetic input (`type`/`sendKeys`/`click`) needs an unlocked, interactive desktop.** UIA queries, `invoke`, `setValue`, and `screenshot` work on a locked session; prefer them.
-- **Selectors are client-side for regex/substring** (exact scalars are server-side). **UIA events are roadmap** — poll with `waitFor`. `scrollIntoView` is implemented but not yet proven against a real list.
+- **Selectors are client-side for regex/substring** (exact scalars are server-side). **Window/process lifecycle events ship** (`waitForWindow` / `waitForProcess`, via `SetWinEventHook`); UIA property/structure event subscription is still roadmap — poll with `waitFor` / `waitForIdle`.
 
 Read [`AI.md`](./AI.md) — it is the complete surface; an agent should not need the source.
 
