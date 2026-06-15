@@ -20,6 +20,30 @@ console.log(calc.find({ automationId: 'CalculatorResults' })?.name); // → "Dis
 
 `bun add bun-uia` is the entire install story.
 
+## Use as an MCP server
+
+Listed in the official **[MCP Registry](https://registry.modelcontextprotocol.io/v0/servers?search=io.github.ObscuritySRL/bun-uia)** as `io.github.ObscuritySRL/bun-uia`. It exposes the whole surface as **36 policy-gated tools** so an agent drives Windows cursor-free, sees the desktop, and (when enabled) launches apps and reads/writes files. Needs **Bun on `PATH`**.
+
+**Claude Code / Claude Desktop** — one line:
+
+```bash
+claude mcp add uia -- bunx bun-uia
+```
+
+**VS Code** (Agent mode) — Command Palette → `MCP: Add Server` → Command, or paste into `.vscode/mcp.json`:
+
+```jsonc
+{
+  "servers": {
+    "bun-uia": { "type": "stdio", "command": "bunx", "args": ["bun-uia"], "env": { "BUN_UIA_PROFILE": "safe" } }
+  }
+}
+```
+
+> Use **`bunx`**, not `npx` — `bun-uia` is TypeScript that runs under Bun.
+
+**Pick a comfort level** with `BUN_UIA_PROFILE`: `readonly` (inspect only), `safe` (read + input + window — default), or `full` (also `os` + `fs` tools). Fine-tune with `BUN_UIA_OS`, `BUN_UIA_ALLOW`, `BUN_UIA_DENY`, `BUN_UIA_CURSOR`, `BUN_UIA_FS_ROOT`.
+
 ## Why this exists
 
 The Windows desktop-automation cluster on npm is a field of native-addon pain, paywalls, and abandoned daemons. Downloads verified against `api.npmjs.org` for the week of 2026-06-05→11.
