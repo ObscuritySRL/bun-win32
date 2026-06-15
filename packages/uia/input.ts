@@ -263,7 +263,9 @@ export function postKey(hWnd: bigint, name: string): boolean {
 export function postText(hWnd: bigint, text: string): boolean {
   if (hWnd === 0n) return false;
   let ok = true;
-  for (const unit of text) if (User32.PostMessageW(hWnd, WM_CHAR, BigInt(unit.codePointAt(0) ?? 0), 0n) === 0) ok = false;
+  // Iterate UTF-16 code UNITS (charCodeAt), not code points — WM_CHAR carries one UTF-16 unit, so an astral char
+  // must post as its two surrogate halves (for..of would yield one out-of-range code point and truncate it).
+  for (let index = 0; index < text.length; index += 1) if (User32.PostMessageW(hWnd, WM_CHAR, BigInt(text.charCodeAt(index)), 0n) === 0) ok = false;
   return ok;
 }
 

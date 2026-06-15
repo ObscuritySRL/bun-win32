@@ -329,6 +329,9 @@ function snapshotText(maxDepth?: number, rootName?: string): string {
 function resolveRef(ref: string): Element {
   const hash = ref.indexOf('#');
   const id = hash >= 0 ? ref.slice(0, hash) : ref;
+  // No snapshot exists yet (fresh server, a failed attach, or a ref copied from a different session) — there is no
+  // tree "above" to re-read, so say that plainly instead of the stale-generation message.
+  if (current === null) throw new Error('no snapshot yet — call list_windows then attach (attach returns a snapshot), or desktop_snapshot, before using a ref');
   // A ref carrying a stale generation provably no longer denotes the same control — fail loud instead of acting on
   // whatever now occupies that traversal slot. A bare ref (no #) is accepted leniently as current-generation.
   if (hash >= 0 && Number(ref.slice(hash + 1)) !== refGen) throw new Error(`ref ${id} is from an earlier snapshot generation (the tree was re-grounded since) — read the latest snapshot above and use ITS refs, or use find_and_act {selector} / reveal {selector}, which need no ref`);

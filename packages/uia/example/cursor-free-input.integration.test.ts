@@ -50,6 +50,15 @@ try {
     assert(afterAppend.includes('APND'), `editor reads back the WM_CHAR-typed text cursor-free ("${afterAppend.slice(0, 40)}")`);
 
     assert(postKey(editHwnd, 'End'), 'postKey (WM_KEYDOWN/UP) posts a navigation key to the control cursor-free');
+
+    // Astral (non-BMP) text must post as surrogate-pair WM_CHARs, not be truncated to one out-of-range code point.
+    setControlText(editHwnd, '');
+    await Bun.sleep(80);
+    const astral = '𝐀𝐁'; // U+1D400 U+1D401 — each a UTF-16 surrogate pair
+    assert(postText(editHwnd, astral), 'postText reported success for astral (non-BMP) text');
+    await Bun.sleep(150);
+    const afterAstral = editor.value || editor.text();
+    assert(afterAstral.includes(astral), `editor reads back astral text intact, not truncated ("${afterAstral.slice(0, 20)}")`);
   }
 } finally {
   if (editHwnd !== 0n) User32.SendMessageW(editHwnd, EM_SETMODIFY, 0n, 0n); // clear dirty so WM_CLOSE raises no Save prompt

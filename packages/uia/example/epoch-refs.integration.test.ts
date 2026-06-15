@@ -64,6 +64,12 @@ function assert(condition: boolean, message: string): void {
 
 try {
   await call('initialize', { protocolVersion: '2025-11-25', capabilities: {}, clientInfo: { name: 'epoch-test', version: '1' } });
+
+  // Before any snapshot exists, a tagged ref must report "no snapshot yet" — not a contradictory "re-ground / read the
+  // latest snapshot above" (there is none above on a fresh server / after a failed attach / for a copied ref).
+  const noSnap = await call('tools/call', { name: 'invoke', arguments: { ref: 'e1#1' } });
+  assert(noSnap.result?.isError === true && /no snapshot yet/.test(textOf(noSnap)), 'a tagged ref before any snapshot reports "no snapshot yet" (not a contradictory re-ground message)');
+
   await call('tools/call', { name: 'attach', arguments: { title: 'Calculator' } });
 
   const snap1 = textOf(await call('tools/call', { name: 'desktop_snapshot', arguments: {} }));
