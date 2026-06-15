@@ -19,6 +19,7 @@
     "bun-uia-mcp": "./mcp.ts"
   },
   "license": "MIT",
+  "mcpName": "io.github.ObscuritySRL/bun-uia",
   "module": "index.ts",
   "name": "bun-uia",
   "peerDependencies": {
