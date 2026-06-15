@@ -208,12 +208,23 @@ function attachByClassName(className: string): Window {
   return uia.attach(matches[0]!.hWnd);
 }
 
+/** An hWnd argument as a bigint, or undefined if absent — accepts both a string ('0x1234' / '4660') AND a JSON
+ *  number (the form a model overwhelmingly emits for an integer handle; the string-only gate silently ignored it,
+ *  so window-scoped tools mis-targeted the attached window with a success message). BigInt() accepts either. */
+function hwndArg(args: Record<string, unknown>): bigint | undefined {
+  const value = args.hWnd;
+  if (typeof value === 'string' && value.length > 0) return BigInt(value);
+  if (typeof value === 'number' && Number.isInteger(value)) return BigInt(value);
+  return undefined;
+}
+
 /** The handle a window-scoped tool targets: an explicit hWnd arg, a ref's native window, else the attached window. */
 function resolveHwnd(args: Record<string, unknown>): bigint {
-  if (typeof args.hWnd === 'string') return BigInt(args.hWnd);
+  const handle = hwndArg(args);
+  if (handle !== undefined) return handle;
   if (typeof args.ref === 'string') {
-    const handle = resolveRef(args.ref).nativeWindowHandle;
-    if (handle !== 0n) return handle;
+    const refHandle = resolveRef(args.ref).nativeWindowHandle;
+    if (refHandle !== 0n) return refHandle;
   }
   return requireAttached().hWnd;
 }
@@ -545,7 +556,7 @@ function resolveFsPath(path: string): string {
 
 const ELEMENT_DESC = 'Human-readable element description, used for the permission prompt and intent.';
 const REF_DESC = 'Exact target element reference from the LATEST snapshot, passed verbatim including its #generation tag (e.g. e49#3). A ref from before a re-render is rejected (so you never act on the wrong control) — re-read the latest snapshot and use its refs.';
-const HWND_DESC = 'Target window handle as a decimal or 0x-hex string; omit to use the attached window.';
+const HWND_DESC = 'Target window handle — a decimal/0x-hex string or a JSON number; omit to use the attached window.';
 const SELECTOR_SCHEMA = {
   type: 'object',
   properties: {
@@ -563,7 +574,7 @@ const TOOLS: McpTool[] = [
     name: 'attach',
     category: 'read',
     description: 'Attach to a top-level window as the active root for snapshots and actions. Prefer an hWnd from list_windows or an exact title. className attaches only to the single VISIBLE window of that class — reliable for single-window classes (e.g. Shell_TrayWnd, the taskbar + system tray) but it refuses or asks you to disambiguate for the Chromium/Electron family (Discord, Slack, VS Code, Teams, Edge — all Chrome_WidgetWin_1), where it would otherwise grab an invisible helper. Provide a title (exact), a className, an hWnd, or a processId. Works on a minimized/background window.',
-    inputSchema: { type: 'object', properties: { title: { type: 'string' }, hWnd: { type: 'string', description: 'Handle as a decimal or 0x-hex string' }, processId: { type: 'number' }, className: { type: 'string' } } },
+    inputSchema: { type: 'object', properties: { title: { type: 'string' }, hWnd: { type: ['string', 'number'], description: 'Handle as a decimal/0x-hex string or a JSON number' }, processId: { type: 'number' }, className: { type: 'string' } } },
   },
   {
     name: 'desktop_snapshot',
@@ -723,7 +734,7 @@ const TOOLS: McpTool[] = [
     inputSchema: {
       type: 'object',
       properties: {
-        hWnd: { type: 'string', description: HWND_DESC },
+        hWnd: { type: ['string', 'number'], description: HWND_DESC },
         region: { type: 'object', description: 'Screen region {x,y,width,height} to OCR instead of a window', properties: { x: { type: 'number' }, y: { type: 'number' }, width: { type: 'number' }, height: { type: 'number' } } },
       },
     },
@@ -746,7 +757,7 @@ const TOOLS: McpTool[] = [
       'OCR the attached window (or a hWnd) and click the on-screen text matching `text` (case-insensitive substring) at its box centre — cursor-free. The one-call "click what it says" for a PIXEL-ONLY surface with no ref/a11y (game, <canvas>/WebGL, remote desktop, video). Prefer a snapshot ref when one exists; this is the fallback. Returns what was clicked, or the nearest text it did find.',
     inputSchema: {
       type: 'object',
-      properties: { text: { type: 'string' }, hWnd: { type: 'string', description: HWND_DESC }, cursor: { type: 'boolean', description: 'Force a real SendInput cursor click' } },
+      properties: { text: { type: 'string' }, hWnd: { type: ['string', 'number'], description: HWND_DESC }, cursor: { type: 'boolean', description: 'Force a real SendInput cursor click' } },
       required: ['text'],
     },
   },
@@ -762,7 +773,7 @@ const TOOLS: McpTool[] = [
     category: 'read',
     description:
       'Capture the LIVE pixels of a window via Windows.Graphics.Capture — sees it even when occluded, in the background, minimized-then-restored, or GPU-composited (hardware-accel Chromium/Edge/Electron, games, WinUI) that the plain screenshot returns blank for, the way Alt+Tab previews do. No foregrounding. Target a ref or hWnd; omit both for the attached window.',
-    inputSchema: { type: 'object', properties: { ref: { type: 'string', description: REF_DESC }, hWnd: { type: 'string', description: HWND_DESC } } },
+    inputSchema: { type: 'object', properties: { ref: { type: 'string', description: REF_DESC }, hWnd: { type: ['string', 'number'], description: HWND_DESC } } },
   },
   {
     name: 'screen_capture',
@@ -802,13 +813,13 @@ const TOOLS: McpTool[] = [
     name: 'native_tree',
     category: 'read',
     description: 'The raw native Win32 window hierarchy (HWND class, control id, WS_*/WS_EX_* styles, rect) — the Spy++ view, for classic-Win32 / owner-draw windows where the UIA tree is sparse. Reads any window, foreground or not.',
-    inputSchema: { type: 'object', properties: { hWnd: { type: 'string', description: HWND_DESC }, maxDepth: { type: 'number', description: 'Default 12' } } },
+    inputSchema: { type: 'object', properties: { hWnd: { type: ['string', 'number'], description: HWND_DESC }, maxDepth: { type: 'number', description: 'Default 12' } } },
   },
   {
     name: 'msaa_tree',
     category: 'read',
     description: 'The MSAA (oleacc IAccessible) tree of a window — the legacy fallback for owner-draw apps that expose no useful UIA tree.',
-    inputSchema: { type: 'object', properties: { hWnd: { type: 'string', description: HWND_DESC }, maxDepth: { type: 'number', description: 'Default 8' } } },
+    inputSchema: { type: 'object', properties: { hWnd: { type: ['string', 'number'], description: HWND_DESC }, maxDepth: { type: 'number', description: 'Default 8' } } },
   },
   {
     name: 'list_monitors',
@@ -864,7 +875,7 @@ const TOOLS: McpTool[] = [
     inputSchema: {
       type: 'object',
       properties: {
-        hWnd: { type: 'string', description: HWND_DESC },
+        hWnd: { type: ['string', 'number'], description: HWND_DESC },
         ref: { type: 'string', description: REF_DESC },
         action: { type: 'string', enum: ['move', 'minimize', 'maximize', 'restore', 'raise', 'snap', 'close'] },
         edge: { type: 'string', enum: ['left', 'right', 'top', 'bottom', 'center'], description: 'Target for snap' },
@@ -957,9 +968,10 @@ const HANDLERS: Record<string, ToolHandler> = {
     attached = null;
     lastSnapshotBody = '';
     lastSnapshotTree = null;
+    const handle = hwndArg(args);
     if (typeof args.title === 'string') attached = uia.attach({ title: args.title, ...(typeof args.className === 'string' ? { className: args.className } : {}) });
     else if (typeof args.className === 'string') attached = attachByClassName(args.className);
-    else if (typeof args.hWnd === 'string') attached = uia.attach(BigInt(args.hWnd));
+    else if (handle !== undefined) attached = uia.attach(handle);
     else if (typeof args.processId === 'number') attached = uia.attach({ process: args.processId });
     else throw new Error('attach requires one of: title, className, hWnd, processId');
     return withSnapshot(`attached to ${JSON.stringify(attached.name)}`);
@@ -1076,7 +1088,7 @@ const HANDLERS: Record<string, ToolHandler> = {
       result = await uia.ocrScreen({ x: typeof r.x === 'number' ? r.x : undefined, y: typeof r.y === 'number' ? r.y : undefined, width: typeof r.width === 'number' ? r.width : undefined, height: typeof r.height === 'number' ? r.height : undefined });
       origin = 'screen region';
     } else {
-      const hWnd = typeof args.hWnd === 'string' ? BigInt(args.hWnd) : (attached?.hWnd ?? 0n);
+      const hWnd = hwndArg(args) ?? attached?.hWnd ?? 0n;
       if (hWnd === 0n) throw new Error('ocr: pass hWnd or region, or attach a window first');
       const windowResult = await uia.ocrWindow(hWnd);
       if (windowResult === null) throw new Error('ocr: could not capture the window (minimized / protected / no surface)');
@@ -1102,7 +1114,7 @@ const HANDLERS: Record<string, ToolHandler> = {
   },
   click_text: async (args) => {
     const want = requireString(args, 'text').toLowerCase();
-    const hWnd = typeof args.hWnd === 'string' ? BigInt(args.hWnd) : (attached?.hWnd ?? 0n);
+    const hWnd = hwndArg(args) ?? attached?.hWnd ?? 0n;
     if (hWnd === 0n) throw new Error('click_text: attach a window or pass hWnd');
     const result = await uia.ocrWindow(hWnd);
     if (result === null) throw new Error('click_text: could not capture the window (minimized / protected / no surface)');
