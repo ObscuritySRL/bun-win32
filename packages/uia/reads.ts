@@ -8,7 +8,7 @@ import { FFIType, type Pointer, toArrayBuffer } from 'bun:ffi';
 import Oleaut32 from '@bun-win32/oleaut32';
 
 import { vcall } from './com';
-import { S_OK } from './constants';
+import { S_OK, SLOT, VT_BOOL, VT_BSTR, VT_I4, VT_R8 } from './constants';
 
 export interface Rect {
   x: number;
@@ -53,6 +53,38 @@ export function getDouble(ptr: bigint, slot: number): number {
 export function getHandle(ptr: bigint, slot: number): bigint {
   if (vcall(ptr, slot, [FFIType.ptr], [scratch8.ptr!]) !== S_OK) return 0n;
   return scratch8.readBigUInt64LE(0);
+}
+
+/** A decoded VARIANT scalar — the subset of property-value types worth surfacing (the rest decode to null). */
+export type VariantValue = string | number | boolean | null;
+
+/**
+ * Read ANY property by id via GetCurrentPropertyValue (one binding for HelpText, IsOffscreen,
+ * HasKeyboardFocus, ItemStatus, FrameworkId, … and pattern-state-via-propertyId), decoding the VARIANT by
+ * its `vt` tag. Returns null for empty/unsupported/non-scalar values. The VARIANT out-param is a full
+ * 24-byte x64 VARIANT (NOT condition.ts's 16-byte input VARIANT). Always VariantClear's it — that frees a
+ * returned BSTR (copied out first, never freed twice) or releases a returned interface, so no leak.
+ */
+export function getPropertyValue(ptr: bigint, propertyId: number): VariantValue {
+  const variant = Buffer.alloc(24);
+  if (vcall(ptr, SLOT.GetCurrentPropertyValue, [FFIType.i32, FFIType.ptr], [propertyId, variant.ptr!]) !== S_OK) return null;
+  const vt = variant.readUInt16LE(0);
+  let value: VariantValue = null;
+  if (vt === VT_I4) value = variant.readInt32LE(8);
+  else if (vt === VT_R8) value = variant.readDoubleLE(8);
+  else if (vt === VT_BOOL)
+    value = variant.readInt16LE(8) !== 0; // VARIANT_BOOL: 0 false, -1 true
+  else if (vt === VT_BSTR) {
+    const bstr = variant.readBigUInt64LE(8);
+    if (bstr === 0n) value = '';
+    else {
+      const pointer = Number(bstr) as Pointer;
+      const length = Oleaut32.SysStringLen(pointer);
+      value = length === 0 ? '' : Buffer.from(toArrayBuffer(pointer, 0, length * 2)).toString('utf16le'); // copy, don't free — VariantClear frees the BSTR
+    }
+  }
+  Oleaut32.VariantClear(variant.ptr!);
+  return value;
 }
 
 /** Read a `[propget] RECT*` accessor (4× LONG) into an {x,y,width,height} rectangle. */

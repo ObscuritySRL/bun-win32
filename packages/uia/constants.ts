@@ -136,6 +136,8 @@ export enum PropertyId {
   ControlType = 30003,
   LocalizedControlType = 30004,
   Name = 30005,
+  AcceleratorKey = 30006,
+  AccessKey = 30007,
   HasKeyboardFocus = 30008,
   IsKeyboardFocusable = 30009,
   IsEnabled = 30010,
@@ -145,8 +147,10 @@ export enum PropertyId {
   IsControlElement = 30016,
   IsContentElement = 30017,
   NativeWindowHandle = 30020,
+  ItemType = 30021,
   IsOffscreen = 30022,
   FrameworkId = 30024,
+  ItemStatus = 30026,
 }
 
 /**
@@ -178,6 +182,7 @@ export const SLOT = {
   FindFirstBuildCache: 7,
   FindAllBuildCache: 8,
   BuildUpdatedCache: 9,
+  GetCurrentPropertyValue: 10,
   GetCachedParent: 18,
   GetCachedChildren: 19,
   GetCurrentPattern: 16, // PROVEN

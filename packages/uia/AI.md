@@ -36,6 +36,7 @@ Escalation rule: stay on the `uia` facade. Drop to a lower engine (`msaaTree`, t
 | type | `el.type('text')` (Unicode keystrokes) · `uia.sendKeys('Control+S')` |
 | set / read a value | `el.setValue('text')` · `el.value` · `el.text()` (TextPattern) |
 | read a data grid / list / table | `el.readTable()` → `{ headers, rows, totalRows }` (GridPattern, cell-by-cell) |
+| read any property / hidden state | `el.getProperty(PropertyId.IsOffscreen)` · `PropertyId.HelpText` · `PropertyId.FrameworkId` · `PropertyId.ItemStatus` |
 | toggle / expand / select / slider | `el.toggle()` · `el.expand()`/`el.collapse()` · `el.select()` · `el.setRangeValue(n)` |
 | scroll a container (cursor-free, works locked) | `el.scroll(ScrollAmount.NoAmount, ScrollAmount.LargeIncrement)` · `el.setScrollPercent(NoScroll, 50)` · `el.scrollInfo` · `uia.scrollAt(x, y, 'down', 3)` |
 | a guaranteed-hittable point inside a control | `el.clickablePoint` → `{ x, y } | null` (UIA GetClickablePoint; `click()` uses it) |
@@ -74,7 +75,7 @@ Escalation rule: stay on the `uia` facade. Drop to a lower engine (`msaaTree`, t
 ### `class Element`
 - Live properties (getters): `name`, `controlType`, `controlTypeName`, `automationId`, `className`, `isEnabled`, `boundingRectangle: Rect`, `nativeWindowHandle: bigint`, `clickablePoint: {x,y} | null` (UIA GetClickablePoint), `value`, `toggleState`, `expandCollapseState`, `isSelected`, `rangeValue`, `scrollInfo: ScrollInfo | null`.
 - Tree: `find(selector, scope?)`, `findAll(selector, scope?)`, `findAllCached(selector, request, scope?)`, `children`, `parent`, `await waitFor(selector, { timeout?, interval? })`, `describeNoMatch(selector)`, `buildUpdatedCache(request)`, `cachedChildren`, `cached{Name,ControlType,AutomationId,ClassName,BoundingRectangle,IsEnabled}`.
-- Reads (return null/empty if unsupported): `readTable(maxRows?)` → `TableData { headers, rows, totalRows } | null` (GridPattern data grids / details lists / tables, cell-by-cell, column headers via TablePattern).
+- Reads (return null/empty if unsupported): `readTable(maxRows?)` → `TableData { headers, rows, totalRows } | null` (GridPattern data grids / details lists / tables, cell-by-cell, column headers via TablePattern); `getProperty(propertyId)` → `string | number | boolean | null` (ANY UIA property via GetCurrentPropertyValue — `PropertyId.HelpText`/`IsOffscreen`/`HasKeyboardFocus`/`ItemStatus`/`FrameworkId`/… — the VARIANT is decoded by its vt tag and freed).
 - Patterns (throw if unsupported): `invoke()`, `setValue(text)`, `text()`, `toggle()`, `expand()`, `collapse()`, `select()`, `scrollIntoView()`, `scroll(horizontalAmount, verticalAmount)` + `setScrollPercent(h%, v%)` (container ScrollPattern — cursor-free, works locked), `setRangeValue(n)`, `close()`, `setVisualState(WindowVisualState)`.
 - Input (need an unlocked session): `focus()`, `type(text)`, `click()`.
 - Lifecycle: `release()`, `ptr: bigint`.
@@ -89,7 +90,7 @@ Adds `hWnd: bigint`, `activate()`, `screenshot(): Uint8Array`, `dispose()` / `[S
 `fromHandle(hWnd)` (an `Element` for a window handle — `attach` wraps this in a `Window`), `focused()`, `fromPoint(x, y)`, `root()`.
 
 ### Constants / enums
-`ControlType` (Button=50000 … AppBar=50040), `PatternId` (10000–10033), `PropertyId` (30000–30024), `TreeScope`, `PropertyConditionFlags`, `ToggleState`, `ExpandCollapseState`, `WindowVisualState`, `ScrollAmount` (LargeDecrement=0 … SmallIncrement=4), `NoScroll` (-1, SetScrollPercent "leave this axis"), `type ScrollInfo`, `SLOT` (verified vtable slots).
+`ControlType` (Button=50000 … AppBar=50040), `PatternId` (10000–10033), `PropertyId` (30000–30026), `TreeScope`, `PropertyConditionFlags`, `ToggleState`, `ExpandCollapseState`, `WindowVisualState`, `ScrollAmount` (LargeDecrement=0 … SmallIncrement=4), `NoScroll` (-1, SetScrollPercent "leave this axis"), `type ScrollInfo`, `SLOT` (verified vtable slots).
 
 ### Cache
 `createCacheRequest(properties?, scope?, mode?)`, `class CacheRequest { property, pattern, treeScope, elementMode, release }`, `DEFAULT_CACHE_PROPERTIES`, `AutomationElementMode`.

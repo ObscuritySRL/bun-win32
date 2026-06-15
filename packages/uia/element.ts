@@ -38,7 +38,7 @@ import {
   type TableData,
   type WindowVisualState,
 } from './patterns';
-import { getBstr, getHandle, getLong, getRect, type Rect } from './reads';
+import { getBstr, getHandle, getLong, getPropertyValue, getRect, type Rect, type VariantValue } from './reads';
 
 // Reused scratch for out-parameters in the tree-search path. Each value is read out immediately.
 const scratch8 = Buffer.alloc(8);
@@ -342,6 +342,12 @@ export class Element {
   /** Read a GridPattern container (data grid / details list / table) as headers + rows of text, or null if unsupported. */
   readTable(maxRows?: number): TableData | null {
     return readTable(this.ptr, maxRows);
+  }
+
+  /** Read any UIA property by id (PropertyId.*) via GetCurrentPropertyValue — HelpText, IsOffscreen,
+   *  HasKeyboardFocus, ItemStatus, FrameworkId, … decoded from the VARIANT. Null if empty/unsupported. */
+  getProperty(propertyId: number): VariantValue {
+    return getPropertyValue(this.ptr, propertyId);
   }
 
   /** Toggle a checkbox via TogglePattern. Throws if unsupported. */

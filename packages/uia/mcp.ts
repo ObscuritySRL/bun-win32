@@ -37,6 +37,7 @@ import {
   normalizeKey,
   postClickAt,
   processImagePath,
+  PropertyId,
   pruneRefTree,
   raiseWindow,
   type RefNode,
@@ -801,6 +802,14 @@ const HANDLERS: Record<string, ToolHandler> = {
     if (clickable !== null) lines.push(`clickablePoint: ${clickable.x},${clickable.y}`);
     const handle = element.nativeWindowHandle;
     if (handle !== 0n) lines.push(`nativeWindowHandle: 0x${handle.toString(16)}`);
+    const helpText = element.getProperty(PropertyId.HelpText);
+    if (typeof helpText === 'string' && helpText.length > 0) lines.push(`helpText: ${JSON.stringify(helpText)}`);
+    const itemStatus = element.getProperty(PropertyId.ItemStatus);
+    if (typeof itemStatus === 'string' && itemStatus.length > 0) lines.push(`itemStatus: ${JSON.stringify(itemStatus)}`);
+    if (element.getProperty(PropertyId.HasKeyboardFocus) === true) lines.push('hasKeyboardFocus: true');
+    if (element.getProperty(PropertyId.IsOffscreen) === true) lines.push('offscreen: true');
+    const frameworkId = element.getProperty(PropertyId.FrameworkId);
+    if (typeof frameworkId === 'string' && frameworkId.length > 0) lines.push(`frameworkId: ${frameworkId}`);
     return textResult(lines.join('\n'));
   },
   read_table: (args) => {

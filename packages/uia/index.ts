@@ -88,7 +88,7 @@ export { findImage, locateOnScreen, type Match } from './match';
 export { accessibleFromWindow, type MsaaNode, msaaTree } from './msaa';
 export { ExpandCollapseState, NoScroll, ScrollAmount, type ScrollInfo, type TableData, ToggleState, WindowVisualState } from './patterns';
 export { encodePNG } from './png';
-export { decodeBstr, getBstr, getHandle, getLong, getRect, type Rect } from './reads';
+export { decodeBstr, getBstr, getHandle, getLong, getPropertyValue, getRect, type Rect, type VariantValue } from './reads';
 export { capSnapshot, type Mark, pruneRefTree, type RefNode, renderSnapshot, snapshot, Snapshot } from './refmap';
 export { type AuditRecord, redactTree, safeExecute, type SafeOptions, toToolResult } from './safety';
 export { type Bitmap, captureScreen, pixelColor, screenshotScreen } from './screen';
