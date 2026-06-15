@@ -1137,11 +1137,13 @@ const HANDLERS: Record<string, ToolHandler> = {
     const y = requireNumber(args, 'y');
     const button = args.button === 'right' ? 'right' : 'left';
     if (args.cursor === true) {
+      if (cursorDenied) return errorResult('click_point {cursor:true} moves the real cursor — disabled by BUN_UIA_CURSOR=never. Omit cursor for a posted cursor-free click, or target a control by ref (click/invoke).');
       if (button === 'right') rightClickAt(x, y);
       else clickAt(x, y);
       return textResult(`clicked (real cursor) ${button} at ${x},${y}`);
     }
     if (postClickAt(x, y, button)) return textResult(`posted ${button} click at ${x},${y} (cursor-free)`);
+    if (cursorDenied) return errorResult(`the posted ${button} click reached no window at ${x},${y} and the real-cursor fallback is disabled by BUN_UIA_CURSOR=never — target a control by ref (click/invoke) instead`);
     clickAt(x, y);
     return textResult(`clicked ${button} at ${x},${y} (real cursor fallback)`);
   },
@@ -1163,10 +1165,12 @@ const HANDLERS: Record<string, ToolHandler> = {
     const centerX = hit.bounds.x + Math.floor(hit.bounds.width / 2);
     const centerY = hit.bounds.y + Math.floor(hit.bounds.height / 2);
     if (args.cursor === true) {
+      if (cursorDenied) return errorResult('click_text {cursor:true} moves the real cursor — disabled by BUN_UIA_CURSOR=never. Omit cursor for a posted cursor-free click.');
       clickAt(centerX, centerY);
       return textResult(`clicked text ${JSON.stringify(hit.text)} (real cursor) at ${centerX},${centerY}`);
     }
     if (postClickAt(centerX, centerY, 'left')) return textResult(`clicked text ${JSON.stringify(hit.text)} at ${centerX},${centerY} (cursor-free)`);
+    if (cursorDenied) return errorResult(`the posted click did not reach the text's pixel at ${centerX},${centerY} and the real-cursor fallback is disabled by BUN_UIA_CURSOR=never — target a control by ref (click/invoke) instead`);
     clickAt(centerX, centerY);
     return textResult(`clicked text ${JSON.stringify(hit.text)} at ${centerX},${centerY} (real cursor fallback)`);
   },
