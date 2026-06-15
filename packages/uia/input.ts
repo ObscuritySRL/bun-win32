@@ -232,6 +232,41 @@ export function keyUp(name: string): void {
   User32.SendInput(1, buffer.ptr!, INPUT_SIZE);
 }
 
+// Cursor-free input via WINDOW MESSAGES posted/sent to a control's HWND — no focus, no foreground, no real cursor,
+// and works on a background/occluded window (the AHK ControlSetText / ControlSend path). SendInput, by contrast,
+// goes to whatever owns the system focus. The HWND must be a real control window (Element.nativeWindowHandle != 0);
+// modern WinUI/WPF/Chromium sub-controls without their own HWND fall back to ValuePattern/SendInput.
+const WM_SETTEXT = 0x0000_000c;
+const WM_KEYDOWN = 0x0000_0100;
+const WM_KEYUP = 0x0000_0101;
+const WM_CHAR = 0x0000_0102;
+
+/** Set a control's text cursor-free via SendMessageW(WM_SETTEXT) — no keystrokes/focus, works on a background
+ *  window (AHK ControlSetText). SendMessageW is synchronous, so the wide-string buffer is valid for the call.
+ *  Returns false for a 0 handle or a control that rejects WM_SETTEXT. */
+export function setControlText(hWnd: bigint, text: string): boolean {
+  if (hWnd === 0n) return false;
+  const buffer = Buffer.from(`${text}\0`, 'utf16le');
+  return User32.SendMessageW(hWnd, WM_SETTEXT, 0n, BigInt(buffer.ptr!)) !== 0n;
+}
+
+/** Press a key (WM_KEYDOWN + WM_KEYUP) on a control's HWND cursor-free — Enter / Tab / Escape / arrows / a single
+ *  key to a background/occluded window without focus (AHK ControlSend). False for a 0 handle. */
+export function postKey(hWnd: bigint, name: string): boolean {
+  if (hWnd === 0n) return false;
+  const keyCode = BigInt(virtualKeyCode(name));
+  User32.PostMessageW(hWnd, WM_KEYDOWN, keyCode, 0x0000_0001n); // lParam: repeat count 1
+  return User32.PostMessageW(hWnd, WM_KEYUP, keyCode, 0xc000_0001n) !== 0; // lParam: key-up transition + previously down
+}
+
+/** Type Unicode text (WM_CHAR per code unit) into a control's HWND cursor-free — no focus, background-capable. */
+export function postText(hWnd: bigint, text: string): boolean {
+  if (hWnd === 0n) return false;
+  let ok = true;
+  for (const unit of text) if (User32.PostMessageW(hWnd, WM_CHAR, BigInt(unit.codePointAt(0) ?? 0), 0n) === 0) ok = false;
+  return ok;
+}
+
 /** Hold a key down for `durationMs`, then release (the Anthropic `hold_key` action). */
 export async function holdKey(name: string, durationMs: number): Promise<void> {
   keyDown(name);

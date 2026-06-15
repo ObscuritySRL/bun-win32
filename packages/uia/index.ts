@@ -7,7 +7,7 @@ import { diffTrees } from './diff';
 import { attach, focused, fromPoint, launch, root } from './element';
 import { listProcesses, waitForProcess, waitForWindow, watchWindows } from './events';
 import { waitForIdle } from './idle';
-import { clickAt, sendKeys, type } from './input';
+import { clickAt, postKey, postText, sendKeys, setControlText, type } from './input';
 import { locateOnScreen } from './match';
 import { msaaTree } from './msaa';
 import { ocrBitmap, ocrScreen, ocrWindow } from './ocr';
@@ -43,11 +43,14 @@ export const uia = {
   paste,
   pixelColor,
   postClick: postClickAt,
+  postKey,
+  postText,
   readClipboard,
   root,
   screenshotScreen,
   scrollAt,
   sendKeys,
+  setControlText,
   snapshot,
   tree: serialize,
   type,
@@ -89,9 +92,12 @@ export {
   moveTo,
   packKeyboardInput,
   packMouseInput,
+  postKey,
+  postText,
   rightClickAt,
   scrollWheel,
   sendKeys,
+  setControlText,
   type,
   virtualKeyCode,
 } from './input';

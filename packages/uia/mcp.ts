@@ -38,6 +38,7 @@ import {
   type MsaaNode,
   normalizeKey,
   postClickAt,
+  postKey,
   processImagePath,
   PropertyId,
   pruneRefTree,
@@ -51,6 +52,7 @@ import {
   ScrollAmount,
   screenshotWithMarks,
   scrollAt,
+  setControlText,
   type Selector,
   snapWindow,
   type Snapshot,
@@ -340,6 +342,7 @@ function setValueSmart(element: Element, value: string): string {
       element.setRangeValue(number);
       return `set range value ${number}`;
     }
+    if (setControlText(element.nativeWindowHandle, value)) return 'set text cursor-free (WM_SETTEXT)'; // a no-ValuePattern classic Edit with its own HWND
     throw error;
   }
 }
@@ -520,7 +523,7 @@ const TOOLS: McpTool[] = [
         element: { type: 'string', description: ELEMENT_DESC },
         ref: { type: 'string', description: REF_DESC },
         selector: SELECTOR_SCHEMA,
-        do: { type: 'string', enum: ['invoke', 'click', 'type', 'set_value', 'toggle', 'read'] },
+        do: { type: 'string', enum: ['invoke', 'click', 'type', 'set_value', 'toggle', 'expand', 'collapse', 'read'] },
         text: { type: 'string', description: 'Text for type / set_value' },
       },
       required: ['do'],
@@ -758,8 +761,8 @@ const TOOLS: McpTool[] = [
   {
     name: 'press_key',
     category: 'input',
-    description: 'Send a key or chord to the focused control, e.g. "Enter", "Control+S", "Control+Shift+Tab", "F4". Needs an unlocked desktop.',
-    inputSchema: { type: 'object', properties: { key: { type: 'string' } }, required: ['key'] },
+    description: 'Send a key or chord, e.g. "Enter", "Control+S", "Control+Shift+Tab", "F4". With a ref AND a single key (no chord), posts the key to that control cursor-free (background/occluded/locked OK, no focus). Otherwise sends to the focused control via synthetic input (needs an unlocked foregrounded desktop).',
+    inputSchema: { type: 'object', properties: { key: { type: 'string' }, element: { type: 'string', description: ELEMENT_DESC }, ref: { type: 'string', description: REF_DESC } }, required: ['key'] },
   },
   {
     name: 'scroll',
@@ -1178,8 +1181,10 @@ const HANDLERS: Record<string, ToolHandler> = {
     }
   },
   press_key: (args) => {
-    uia.sendKeys(requireString(args, 'key'));
-    return withSnapshot(`pressed ${JSON.stringify(args.key)}`);
+    const key = requireString(args, 'key');
+    if (typeof args.ref === 'string' && !key.includes('+') && postKey(resolveRef(args.ref).nativeWindowHandle, key)) return withSnapshot(`pressed ${JSON.stringify(key)} cursor-free`);
+    uia.sendKeys(key);
+    return withSnapshot(`pressed ${JSON.stringify(key)}`);
   },
   scroll: (args) => {
     const element = resolveRef(requireString(args, 'ref'));
