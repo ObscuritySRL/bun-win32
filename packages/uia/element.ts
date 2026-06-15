@@ -11,7 +11,7 @@ import { comRelease, hresult, vcall } from './com';
 import { type CompiledCondition, compileCondition, type ElementProperties, formatNoMatch, matches, type Selector } from './condition';
 import { ControlType, PropertyId, S_OK, SLOT, TreeScope } from './constants';
 import { clickAt, type as inputType } from './input';
-import { screenshot as windowScreenshot, windowForProcess } from './window';
+import { renderWidgetHandles, screenshot as windowScreenshot, windowForProcess } from './window';
 import {
   addToSelection,
   canSelectMultiple,
@@ -603,6 +603,21 @@ export class Window extends Element {
   /** Capture the window via PrintWindow as PNG bytes (blank on a locked session). */
   screenshot(): Uint8Array {
     return windowScreenshot(this.hWnd);
+  }
+
+  /** The web/editor-DOM roots of a Chromium/CEF/Electron window (browsers, VS Code, Discord, …): an Element
+   *  attached to each `Chrome_RenderWidgetHostHWND` child, whose page content the top-level walk does not bridge.
+   *  Empty for non-Chromium windows. The caller owns and should release the returned Elements. */
+  webRoots(): Element[] {
+    const roots: Element[] = [];
+    for (const handle of renderWidgetHandles(this.hWnd)) {
+      try {
+        roots.push(fromHandle(handle));
+      } catch {
+        // a render widget can be transient (mid-navigation / just destroyed) — skip it
+      }
+    }
+    return roots;
   }
 
   /** Release the window element. Enables `using app = uia.attach(...)`. */

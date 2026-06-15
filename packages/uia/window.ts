@@ -60,6 +60,28 @@ export function listWindows(): WindowInfo[] {
   return windows;
 }
 
+/**
+ * The Chromium render-widget child windows (`Chrome_RenderWidgetHostHWND`) hosting a window's web / editor
+ * DOM. Chromium, CEF, and Electron (browsers, VS Code, Discord, Slack, Teams, …) put their page content in a
+ * child window whose UIA fragment the top-level walk does NOT bridge — attach to these directly to see the DOM.
+ * Returns [] for non-Chromium windows (gated on the host class, so it costs one GetClassNameW there).
+ * EnumChildWindows already recurses the whole child tree, so one pass finds nested (out-of-process iframe) widgets.
+ */
+export function renderWidgetHandles(hWnd: bigint): bigint[] {
+  if (!readClassName(hWnd).startsWith('Chrome_WidgetWin')) return [];
+  const handles: bigint[] = [];
+  const callback = new JSCallback(
+    (child: bigint) => {
+      if (readClassName(child) === 'Chrome_RenderWidgetHostHWND') handles.push(child);
+      return 1;
+    },
+    { args: [FFIType.u64, FFIType.i64], returns: FFIType.i32 },
+  );
+  User32.EnumChildWindows(hWnd, callback.ptr!, 0n);
+  callback.close();
+  return handles;
+}
+
 /** The first visible, titled top-level window owned by the process, or 0n. */
 export function windowForProcess(processId: number): bigint {
   for (const window of listWindows()) {

@@ -168,17 +168,36 @@ export class Snapshot {
   }
 }
 
-/** Build a ref-keyed Snapshot of a window's subtree in one cached round-trip. The caller disposes it. */
-export function snapshot(window: Element, options: { maxDepth?: number } = {}): Snapshot {
+/**
+ * Build a ref-keyed Snapshot of a window's subtree in one cached round-trip. `extraRoots` are additional
+ * fragment roots whose subtrees are appended under the main tree's root — used to splice in the web/editor DOM
+ * of a Chromium/Electron window (its `Chrome_RenderWidgetHostHWND` children, which the top-level walk does not
+ * bridge). Each extra root is cached independently; a transient one (mid-navigation / empty) is skipped. The
+ * caller disposes the Snapshot (and owns the `extraRoots` Elements it passed in). */
+export function snapshot(window: Element, options: { maxDepth?: number; extraRoots?: readonly Element[] } = {}): Snapshot {
   const maxDepth = options.maxDepth ?? 40;
   const request = createCacheRequest([...DEFAULT_CACHE_PROPERTIES, ...STATE_PROPERTIES], TreeScope.TreeScope_Subtree, AutomationElementMode.Full);
   const cached = window.buildUpdatedCache(request);
+  const mainOk = cached.ptr !== window.ptr;
   const byRef = new Map<string, Element>();
   const owned: Element[] = [];
   const marks: Mark[] = [];
+  const counter = { value: 1 };
   try {
-    if (cached.ptr === window.ptr) throw new Error('snapshot: BuildUpdatedCache failed (no cached clone)');
-    const tree = walk(cached, 0, maxDepth, { value: 1 }, byRef, owned, marks);
+    // Some Chromium top-levels (e.g. Opera) refuse a subtree cache yet still host reachable web roots — fall
+    // back to a synthetic root so the page DOM below still snapshots instead of failing the whole call.
+    const tree = mainOk ? walk(cached, 0, maxDepth, counter, byRef, owned, marks) : { role: ControlType[window.controlType] ?? 'Window', name: window.name, children: [] };
+    for (const extra of options.extraRoots ?? []) {
+      try {
+        const cachedExtra = extra.buildUpdatedCache(request);
+        if (cachedExtra.ptr === extra.ptr) continue; // BuildUpdatedCache failed for this root — skip
+        const subtree = walk(cachedExtra, 1, maxDepth, counter, byRef, owned, marks);
+        if (subtree.children.length > 0 || subtree.ref !== undefined) tree.children.push(subtree); // skip an empty render widget
+      } catch {
+        // a render widget can be mid-navigation — its absence must not fail the whole snapshot
+      }
+    }
+    if (!mainOk && tree.children.length === 0) throw new Error('snapshot: BuildUpdatedCache failed (no cached clone)');
     return new Snapshot(tree, marks, byRef, owned);
   } catch (error) {
     for (const element of owned) element.release();

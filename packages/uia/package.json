@@ -117,6 +117,7 @@
     "example:set-of-marks": "bun ./example/set-of-marks.ts",
     "example:snapshot-economy": "bun ./example/snapshot-economy.integration.test.ts",
     "example:uia-report": "bun ./example/uia-report.ts",
+    "example:web-content": "bun ./example/web-content.integration.test.ts",
     "example:window-spy": "bun ./example/window-spy.ts"
   }
 }

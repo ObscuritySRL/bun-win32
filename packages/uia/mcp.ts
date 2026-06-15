@@ -193,12 +193,16 @@ function rebuildSnapshot(maxDepth?: number): { header: string; tree: RefNode } {
   current = null;
   let snapshot: Snapshot | null = null;
   for (let attempt = 0; ; attempt += 1) {
+    // Chromium/Electron host their web/editor DOM in a child fragment the top-level walk misses — splice it in.
+    const webRoots = window.webRoots();
     try {
-      snapshot = uia.snapshot(window, maxDepth !== undefined ? { maxDepth } : {});
+      snapshot = uia.snapshot(window, { ...(maxDepth !== undefined ? { maxDepth } : {}), extraRoots: webRoots });
       break;
     } catch (error) {
       if (attempt >= 1) throw error;
       Bun.sleepSync(150);
+    } finally {
+      for (const root of webRoots) root.release();
     }
   }
   current = snapshot;
