@@ -1905,7 +1905,14 @@ const HANDLERS: Record<string, ToolHandler> = {
     try {
       const bounds = element.boundingRectangle;
       const id = element.automationId.length > 0 ? ` [automationId=${element.automationId}]` : '';
-      return textResult(`${element.controlTypeName} ${JSON.stringify(element.name)}${id} {x:${bounds.x},y:${bounds.y} w:${bounds.width} h:${bounds.height}}`);
+      // className + clickablePoint + own hWnd turn an UNNAMED focused control from a dead-end into an actionable identity
+      // (className to recognize it, clickablePoint for click_point/inspect_point, hWnd for the cursor-free posted paths).
+      const cls = element.className.length > 0 ? ` [class=${element.className}]` : '';
+      const handle = element.nativeWindowHandle;
+      const hwnd = handle !== 0n ? ` [hWnd=0x${handle.toString(16)}]` : '';
+      const point = element.clickablePoint;
+      const click = point !== null ? ` clickablePoint:${point.x},${point.y}` : '';
+      return textResult(`${element.controlTypeName} ${JSON.stringify(element.name)}${id}${cls} {x:${bounds.x},y:${bounds.y} w:${bounds.width} h:${bounds.height}}${click}${hwnd}`);
     } finally {
       element.release();
     }
