@@ -457,6 +457,23 @@ function foregroundNudge(): string {
   return '';
 }
 
+/** A snapshot of the top-level window set — used to tell which untitled popup an action just opened. */
+function popupSnapshot(): Set<bigint> {
+  return new Set(uia.windows({ includeUntitled: true }).map((window) => window.hWnd));
+}
+
+/** Poll for a NEW untitled popup window (dropdown / flyout / context menu / combobox list) that appeared since `before`.
+ *  Checks FIRST so a popup created synchronously by the action costs nothing; `attempts` bounds the wait when none
+ *  appears (the common case) — keep it small for invoke/expand, large for the provider-dependent context menu. */
+async function pollForNewPopup(before: Set<bigint>, attempts: number): Promise<{ hWnd: bigint; className: string } | undefined> {
+  for (let attempt = 0; ; attempt += 1) {
+    const popup = uia.windows({ includeUntitled: true }).find((window) => !before.has(window.hWnd) && (window.className === '#32768' || /Combo|DropDown|Flyout|Menu|Popup/i.test(window.className)));
+    if (popup !== undefined) return popup;
+    if (attempt + 1 >= attempts) return undefined;
+    await Bun.sleep(80);
+  }
+}
+
 function snapshotText(maxDepth?: number, rootName?: string): string {
   const window = requireAttached();
   let root: Element | undefined;
@@ -910,7 +927,7 @@ const TOOLS: McpTool[] = [
   {
     name: 'invoke',
     category: 'input',
-    description: 'Invoke a control via the UIA Invoke pattern (buttons, links) — cursor-free, works on a background/locked window.',
+    description: 'Invoke a control via the UIA Invoke pattern (buttons, links) — cursor-free, works on a background/locked window. If it opens a flyout/menu in its OWN window, that popup\'s hWnd is returned automatically — attach it to drive its items.',
     inputSchema: { type: 'object', properties: { element: { type: 'string', description: ELEMENT_DESC }, ref: { type: 'string', description: REF_DESC } }, required: ['ref'] },
   },
   {
@@ -947,7 +964,7 @@ const TOOLS: McpTool[] = [
     name: 'expand',
     category: 'input',
     description:
-      'Expand a control via the UIA ExpandCollapse pattern — a combobox dropdown, tree node, split button, or menu — cursor-free, no focus (Invoke/posted clicks do NOT open these on WinUI/WPF/Chromium). Then desktop_snapshot to read the revealed items.',
+      'Expand a control via the UIA ExpandCollapse pattern — a combobox dropdown, tree node, split button, or menu — cursor-free, no focus (Invoke/posted clicks do NOT open these on WinUI/WPF/Chromium). If the list opens in its OWN window, that popup\'s hWnd is returned automatically (attach it to select items); otherwise desktop_snapshot to read the revealed items.',
     inputSchema: { type: 'object', properties: { element: { type: 'string', description: ELEMENT_DESC }, ref: { type: 'string', description: REF_DESC } }, required: ['ref'] },
   },
   {
@@ -1399,40 +1416,38 @@ const HANDLERS: Record<string, ToolHandler> = {
   },
   context_menu: async (args) => {
     const element = resolveRef(requireString(args, 'ref'));
-    // ShowContextMenu / a posted right-click both return S_OK even when no menu appears, so poll for the REAL popup.
-    const pollForPopup = async (before: Set<bigint>): Promise<{ hWnd: bigint; className: string } | undefined> => {
-      for (let attempt = 0; attempt < 12; attempt += 1) {
-        await Bun.sleep(80);
-        const popup = uia.windows({ includeUntitled: true }).find((window) => !before.has(window.hWnd) && (window.className === '#32768' || /Popup|Menu|Flyout|DropDown/i.test(window.className)));
-        if (popup !== undefined) return popup;
-      }
-      return undefined;
-    };
     const opened = (popup: { hWnd: bigint; className: string }): object =>
       textResult(`context menu opened: [hWnd=0x${popup.hWnd.toString(16)}] [class=${popup.className}] — attach it (attach {hWnd}) to read + invoke its items (a WinUI flyout's items may need a re-snapshot).`);
-    // 1) UIA ShowContextMenu (cursor-free, IUIAutomationElement3).
+    // 1) UIA ShowContextMenu (cursor-free, IUIAutomationElement3). ShowContextMenu / a posted right-click both return
+    //    S_OK even when no menu appears, so poll for the REAL popup.
+    const beforeMenu = popupSnapshot();
     if (element.showContextMenu()) {
-      const popup = await pollForPopup(new Set(uia.windows({ includeUntitled: true }).map((window) => window.hWnd)));
+      const popup = await pollForNewPopup(beforeMenu, 12);
       if (popup !== undefined) return opened(popup);
     }
     // 2) Fallback: a POSTED right-click (WM_RBUTTON to the control's own window) — also cursor-free, and it raises a
     //    menu on the modern WinUI/Chromium controls where ShowContextMenu has no Element3 or returns S_OK with no menu.
     const owner = ownerHwnd(element);
     if (owner !== 0n) {
-      const before = new Set(uia.windows({ includeUntitled: true }).map((window) => window.hWnd));
+      const before = popupSnapshot();
       const point = clickPoint(element);
       if (postClickToHwnd(owner, point.x, point.y, 'right')) {
-        const popup = await pollForPopup(before);
+        const popup = await pollForNewPopup(before, 12);
         if (popup !== undefined) return opened(popup);
       }
     }
     // 3) Both cursor-free paths failed — only a real-cursor right-click will raise this provider's menu.
     return errorResult("no context menu appeared via UIA ShowContextMenu OR a posted right-click — this provider raises one only on a real right-click: click {ref, button:'right', cursor:true} (needs an unlocked, foregrounded desktop).");
   },
-  invoke: (args) => {
+  invoke: async (args) => {
     const element = resolveRef(requireString(args, 'ref'));
     const target = named(element);
+    const before = popupSnapshot();
     patternAction('invoke', () => element.invoke());
+    // A button/menu-item that opens a flyout or menu in its OWN window: auto-return it (like context_menu) so the agent
+    // need not hand-hunt it with list_windows{includePopups}.
+    const popup = await pollForNewPopup(before, 3);
+    if (popup !== undefined) return withSnapshot(`invoked ${target} — it opened a flyout/menu in its OWN window: [hWnd=0x${popup.hWnd.toString(16)}] [class=${popup.className}] — attach it (attach {hWnd}) to drive its items.`);
     return withSnapshot(`invoked ${target}`);
   },
   focus: (args) => {
@@ -1473,11 +1488,15 @@ const HANDLERS: Record<string, ToolHandler> = {
     patternAction('toggle', () => element.toggle());
     return withSnapshot(`toggled ${target} (state ${element.toggleState})`);
   },
-  expand: (args) => {
+  expand: async (args) => {
     const element = resolveRef(requireString(args, 'ref'));
     const target = named(element);
+    const before = popupSnapshot();
     patternAction('expand', () => element.expand());
-    return withSnapshot(`expanded ${target} (state ${element.expandCollapseState}) — desktop_snapshot to see revealed items; a dropdown that opens in its own window needs list_windows{includePopups}`);
+    // A combobox/menu whose list opens in its OWN window: auto-return it instead of telling the agent to go find it.
+    const popup = await pollForNewPopup(before, 3);
+    if (popup !== undefined) return withSnapshot(`expanded ${target} (state ${element.expandCollapseState}) — its list opened in its OWN window: [hWnd=0x${popup.hWnd.toString(16)}] [class=${popup.className}] — attach it (attach {hWnd}) to see + select its items.`);
+    return withSnapshot(`expanded ${target} (state ${element.expandCollapseState}) — desktop_snapshot to see revealed items.`);
   },
   collapse: (args) => {
     const element = resolveRef(requireString(args, 'ref'));
