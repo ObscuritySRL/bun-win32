@@ -69,9 +69,15 @@ function flatten(node: DiffNode, path: string, into: Map<string, DiffNode>): voi
   // click outcome — a status/result Text appearing) from cascading every later child's key and falsely renumbering
   // their refs; the positional fallback keeps the prior behavior for the controls that expose no automationId (so a
   // name change at a fixed position still reads as a rename, not appear+disappear).
+  // An automationId is a stable key ONLY when it is UNIQUE among its siblings. Two siblings sharing an aid (some
+  // virtualized lists / repeated rows) would collide to the SAME key — the map silently drops one, so a non-last
+  // sibling's rename is swallowed and refsRenumbered under-reports churn (a stale ref then survives + mis-resolves).
+  // A duplicated aid falls back to the positional index.
+  const aidCounts = new Map<string, number>();
+  for (const child of node.children) if (child.automationId !== undefined && child.automationId.length > 0) aidCounts.set(child.automationId, (aidCounts.get(child.automationId) ?? 0) + 1);
   for (let index = 0; index < node.children.length; index += 1) {
     const child = node.children[index]!;
-    const segment = child.automationId !== undefined && child.automationId.length > 0 ? `#${child.automationId}` : `${index}`;
+    const segment = child.automationId !== undefined && child.automationId.length > 0 && aidCounts.get(child.automationId) === 1 ? `#${child.automationId}` : `${index}`;
     flatten(child, `${path}/${segment}`, into);
   }
 }
