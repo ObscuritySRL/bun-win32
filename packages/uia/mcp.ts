@@ -1588,19 +1588,24 @@ const HANDLERS: Record<string, ToolHandler> = {
     return textResult(`${secure}${lines.length > 0 ? lines.join('\n') : '(no visible top-level windows)'}`);
   },
   attach: (args) => {
+    // Resolve the NEW window FIRST — attachBy*/uia.attach throw on not-found/ambiguous. A failed/ambiguous/typo
+    // re-attach must NOT destroy the working attachment (which would leave the very next action with "no window
+    // attached"); the error (and any disambiguation list) surfaces while the existing attachment keeps working. Dispose
+    // + swap only AFTER a successful resolve (mirrors launch_app's dispose-after-success ordering).
+    const handle = hwndArg(args);
+    let next: Window;
+    if (typeof args.title === 'string') next = attachByTitle(args.title, typeof args.className === 'string' ? args.className : undefined);
+    else if (typeof args.className === 'string') next = attachByClassName(args.className);
+    else if (handle !== undefined) next = uia.attach(handle);
+    else if (typeof args.processId === 'number') next = attachByProcess(args.processId);
+    else throw new Error('attach requires one of: title, className, hWnd, processId');
     current?.dispose();
     current = null;
     attached?.dispose();
-    attached = null;
+    attached = next;
     lastSnapshotBody = '';
     lastSnapshotTree = null;
-    const handle = hwndArg(args);
-    if (typeof args.title === 'string') attached = attachByTitle(args.title, typeof args.className === 'string' ? args.className : undefined);
-    else if (typeof args.className === 'string') attached = attachByClassName(args.className);
-    else if (handle !== undefined) attached = uia.attach(handle);
-    else if (typeof args.processId === 'number') attached = attachByProcess(args.processId);
-    else throw new Error('attach requires one of: title, className, hWnd, processId');
-    return withSnapshot(`attached to ${JSON.stringify(attached.name)}${blindSpotNote(attached.className)}`);
+    return withSnapshot(`attached to ${JSON.stringify(next.name)}${blindSpotNote(next.className)}`);
   },
   desktop_snapshot: (args) => textResult(snapshotText(typeof args.maxDepth === 'number' ? args.maxDepth : undefined, typeof args.root === 'string' ? args.root : undefined)),
   find_and_act: (args) => {
