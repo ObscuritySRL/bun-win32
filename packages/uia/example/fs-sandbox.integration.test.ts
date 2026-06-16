@@ -90,6 +90,14 @@ try {
 
   const traversal = await call(6, 'tools/call', { name: 'read_file', arguments: { path: '../outside/SECRET.txt' } });
   assert(isErr(traversal), 'read_file with ../ traversal is BLOCKED');
+
+  // Case-insensitive root compare (Windows): a LOWERCASED absolute in-root path must READ (not over-block), while a
+  // lowercased ../ escape must still BLOCK (the relax cannot introduce an under-block).
+  const lowerAbs = resolve(root, 'legit.txt').toLowerCase();
+  const caseRead = await call(7, 'tools/call', { name: 'read_file', arguments: { path: lowerAbs } });
+  assert(!isErr(caseRead) && textOf(caseRead).includes('ok'), 'a lowercased absolute in-root path READS (case-insensitive root, no over-block)');
+  const caseEscape = await call(8, 'tools/call', { name: 'read_file', arguments: { path: resolve(outside, 'SECRET.txt').toLowerCase() } });
+  assert(isErr(caseEscape) && !textOf(caseEscape).includes('TOP-SECRET-EXFIL'), 'a lowercased OUT-of-root absolute path is still BLOCKED (no under-block)');
 } finally {
   proc.kill();
   await Bun.$`cmd /c rmdir ${junction}`.quiet().nothrow();

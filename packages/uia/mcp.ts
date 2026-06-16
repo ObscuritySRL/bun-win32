@@ -166,6 +166,11 @@ const fsRootReal =
         }
       })()
     : undefined;
+// Lowercased roots for the sandbox prefix check — Windows is case-INSENSITIVE, so a case-sensitive compare would
+// over-block a legitimate case-variant path (e.g. c:\sandbox vs C:\Sandbox). Lowercasing only RELAXES the check;
+// resolve() collapses `..` before the compare, so every escape (dotdot/absolute/UNC/reparse) stays outside the root.
+const fsRootLower = fsRoot?.toLowerCase();
+const fsRootRealLower = fsRootReal?.toLowerCase();
 
 /** Whether a tool is reachable under the resolved policy (deny wins, then explicit allow, then the profile). */
 function toolAllowed(tool: McpTool): boolean {
@@ -693,10 +698,11 @@ function renderTable(table: TableData): string {
  *  point out (verified). So after the lexical check, realpath the deepest EXISTING ancestor (a write target may not
  *  exist yet) and re-assert it canonicalizes under the REAL root. */
 function resolveFsPath(path: string): string {
-  if (fsRoot === undefined) return path;
+  if (fsRoot === undefined || fsRootLower === undefined) return path;
   const resolved = resolve(fsRoot, path);
-  if (resolved !== fsRoot && !resolved.startsWith(`${fsRoot}\\`) && !resolved.startsWith(`${fsRoot}/`)) throw new Error(`path is outside the allowed root ${fsRoot}`);
-  const root = fsRootReal ?? fsRoot;
+  const resolvedLower = resolved.toLowerCase(); // case-insensitive compare (Windows FS); resolved (original case) is returned for the real read
+  if (resolvedLower !== fsRootLower && !resolvedLower.startsWith(`${fsRootLower}\\`) && !resolvedLower.startsWith(`${fsRootLower}/`)) throw new Error(`path is outside the allowed root ${fsRoot}`);
+  const rootLower = fsRootRealLower ?? fsRootLower;
   let ancestor = resolved;
   for (;;) {
     try {
@@ -705,7 +711,8 @@ function resolveFsPath(path: string): string {
       // does not drop the first char of the remainder (the off-by-one that wrongly blocked a not-yet-created child
       // of a bare drive root).
       const candidate = ancestor === resolved ? real : resolve(real, relative(ancestor, resolved));
-      if (candidate !== root && !candidate.startsWith(root + sep)) throw new Error(`path escaped the allowed root ${fsRoot} via a reparse point`);
+      const candidateLower = candidate.toLowerCase();
+      if (candidateLower !== rootLower && !candidateLower.startsWith(rootLower + sep)) throw new Error(`path escaped the allowed root ${fsRoot} via a reparse point`);
       return resolved;
     } catch (error) {
       if ((error as { code?: string }).code !== 'ENOENT') throw error;
