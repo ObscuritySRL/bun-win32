@@ -323,7 +323,9 @@ export function capSnapshot(text: string, maxChars: number): string {
  *  their UIA/a11y tree on demand and tear it down when idle, so a just-attached or long-idle window can read
  *  empty on the first snapshot; a genuinely tree-less surface (game/canvas/custom-draw) also reads empty. The
  *  note tells the agent how to recover rather than give up. Empty string when there ARE controls. */
-export function coldTreeNote(markCount: number): string {
+export function coldTreeNote(markCount: number, minimized = false): string {
   if (markCount > 0) return '';
+  if (minimized)
+    return '\n\n(0 actionable controls AND this window is MINIMIZED — a UWP/WinUI window tears its UIA tree down while minimized, so re-snapshotting alone will NOT repopulate it. Restore it CURSOR-FREE with manage_window {action:"restore"} (SW_RESTORE — no focus theft, no foregrounding), then desktop_snapshot. If it is still empty after restoring, it may be a game / canvas / custom-draw surface — use ocr / screen_capture / inspect_point.)';
   return '\n\n(0 actionable controls — if this window has visible UI its UIA tree may be COLD: UWP/WinUI and Chromium build it on demand and tear it down when idle, so call desktop_snapshot again to build it (or briefly activate the window). If it is a game / canvas / custom-draw surface with no accessibility, use ocr / screen_capture / inspect_point for the pixels.)';
 }

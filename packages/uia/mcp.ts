@@ -359,7 +359,7 @@ function snapshotText(maxDepth?: number, rootName?: string): string {
     lastSnapshotTree = tree;
     lastSnapshotBody = body;
     refGen += 1; // an explicit re-ground renumbers refs — invalidate any the model still holds
-    return stampRefs(`${header}\n${body}${root === undefined ? coldTreeNote(current?.marks.length ?? 0) : ''}`);
+    return stampRefs(`${header}\n${body}${root === undefined ? coldTreeNote(current?.marks.length ?? 0, attached !== null && isMinimized(attached.hWnd)) : ''}`);
   } finally {
     root?.release();
   }
@@ -435,7 +435,7 @@ function withSnapshot(message: string): object {
   }
   lastSnapshotBody = body;
   refGen += 1; // a full re-dump renumbers refs in traversal order — bump so the model's pre-re-render refs are rejected
-  return textResult(stampRefs(`${message}\n\n${header}\n${body}${coldTreeNote(current?.marks.length ?? 0)}`));
+  return textResult(stampRefs(`${message}\n\n${header}\n${body}${coldTreeNote(current?.marks.length ?? 0, attached !== null && isMinimized(attached.hWnd))}`));
 }
 
 /** ValuePattern set, falling back to RangeValuePattern for a numeric value on a slider/spinner (ValuePattern
