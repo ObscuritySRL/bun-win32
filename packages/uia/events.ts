@@ -170,8 +170,12 @@ export function waitForWindow(match: WindowMatch, options: { timeout?: number } 
       const info: WindowInfo = { hWnd: event.hWnd, title: event.title, className: event.className, processId: event.processId };
       if (predicate(info)) {
         clearTimeout(timer);
-        watcher.stop();
         resolve(info);
+        // Defer stop() OUT of this synchronous frame: we are inside the SetWinEventHook JSCallback's own native
+        // invocation, and stop()→callback.close() frees that trampoline while it is still on the stack — a
+        // use-after-free that segfaults the process the instant the awaited window appears. resolve() is idempotent
+        // and stop() guards on `running`, so the deferred (possibly double) stop is harmless.
+        queueMicrotask(() => watcher.stop());
       }
     });
     const timer = setTimeout(() => {
