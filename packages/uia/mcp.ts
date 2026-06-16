@@ -939,7 +939,10 @@ function formatMsaa(node: MsaaNode, depth = 0): string {
   const indent = '  '.repeat(depth);
   const role = MSAA_ROLES[node.role] ?? `role(${node.role})`;
   const name = node.name.trim().length > 0 ? ` ${JSON.stringify(node.name)}` : '';
-  let out = `${indent}- ${role}${name}`;
+  // accLocation rect → a click_point target: MSAA-only (owner-draw/legacy) content has no UIA ref, but a cursor-free
+  // click_point at the element's center acts on it. Emit the center so the agent can drive what UIA can't see.
+  const at = node.bounds !== undefined ? ` @${Math.round(node.bounds.x + node.bounds.width / 2)},${Math.round(node.bounds.y + node.bounds.height / 2)} (click_point)` : '';
+  let out = `${indent}- ${role}${name}${at}`;
   for (const child of node.children) out += `\n${formatMsaa(child, depth + 1)}`;
   return out;
 }

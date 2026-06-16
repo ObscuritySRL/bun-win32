@@ -16,6 +16,7 @@ const IACC_QUERYINTERFACE = 0;
 const IACC_GET_ACCCHILDCOUNT = 8;
 const IACC_GET_ACCNAME = 10;
 const IACC_GET_ACCROLE = 13;
+const IACC_ACCLOCATION = 22; // IAccessible::accLocation (after IDispatch 3-6: parent7 childCount8 child9 name10 value11 desc12 role13 state14 help15 helpTopic16 kbd17 focus18 sel19 defAction20 select21 LOCATION22) — verified vs oleacc V_ACCLOCATION=0xb0
 const VARIANT_SIZE = 16;
 const CHILDID_SELF = 0;
 const MAX_ACC_CHILDREN = 0x0001_0000; // 65536 — generous for any real container; bounds a hostile/buggy provider's child count
@@ -26,6 +27,9 @@ const IID_IACCESSIBLE_GUID = guid(`{${IID_IAccessible}}`);
 export interface MsaaNode {
   name: string;
   role: number;
+  /** Screen rect from IAccessible::accLocation — present when the element exposes a usable location. Lets an agent
+   *  act on MSAA-only (owner-draw/legacy) content via the cursor-free click_point, which UIA/native trees can't reach. */
+  bounds?: { x: number; y: number; width: number; height: number };
   children: MsaaNode[];
 }
 
@@ -48,6 +52,21 @@ function accRole(accessible: bigint, childId: number): number {
   return roleVariant.readUInt16LE(0) === VT_I4 ? roleVariant.readInt32LE(8) : -1;
 }
 
+function accLocation(accessible: bigint, childId: number): { x: number; y: number; width: number; height: number } | undefined {
+  // Allocate ALL out-buffers + the child VARIANT BEFORE the call, then read .ptr inline in the args array with no
+  // intervening allocation — a later Buffer.alloc can relocate an earlier small buffer's storage (the .ptr hazard).
+  const cv = childVariant(childId);
+  const left = Buffer.alloc(4);
+  const top = Buffer.alloc(4);
+  const width = Buffer.alloc(4);
+  const height = Buffer.alloc(4);
+  if (vcall(accessible, IACC_ACCLOCATION, [FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.ptr], [left.ptr!, top.ptr!, width.ptr!, height.ptr!, cv.ptr!]) !== S_OK) return undefined;
+  const w = width.readInt32LE(0);
+  const h = height.readInt32LE(0);
+  if (w <= 0 || h <= 0) return undefined; // no usable on-screen rect (0×0 / off-screen / unsupported)
+  return { x: left.readInt32LE(0), y: top.readInt32LE(0), width: w, height: h };
+}
+
 function accChildCount(accessible: bigint): number {
   const out = Buffer.alloc(4);
   if (vcall(accessible, IACC_GET_ACCCHILDCOUNT, [FFIType.ptr], [out.ptr!]) !== S_OK) return 0;
@@ -63,6 +82,8 @@ export function accessibleFromWindow(hWnd: bigint): bigint {
 
 function walk(accessible: bigint, childId: number, maxDepth: number, depth: number): MsaaNode {
   const node: MsaaNode = { name: accName(accessible, childId), role: accRole(accessible, childId), children: [] };
+  const bounds = accLocation(accessible, childId);
+  if (bounds !== undefined) node.bounds = bounds;
   if (childId !== CHILDID_SELF || depth >= maxDepth) return node;
   const count = Math.min(accChildCount(accessible), MAX_ACC_CHILDREN);
   if (count <= 0) return node;
