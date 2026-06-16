@@ -122,23 +122,31 @@ export interface CompiledCondition {
 export function compileCondition(pAutomation: bigint, selector: Selector): CompiledCondition {
   const parts: bigint[] = [];
   let needsClientFilter = false;
+  // For each exact scalar: if the server-side property condition FAILS to build (part === 0n), do NOT silently drop the
+  // predicate — force the client-side matches() pass so the dropped field is still verified exactly. Otherwise the
+  // surviving server condition (or TrueCondition, when all parts drop) over-matches and the fast path would act on the
+  // WRONG control (or the window root). A built predicate keeps the cheap server-only fast path.
   if (selector.controlType !== undefined) {
     const part = propertyConditionInt(pAutomation, PropertyId.ControlType, selector.controlType);
     if (part !== 0n) parts.push(part);
+    else needsClientFilter = true;
   }
   if (typeof selector.name === 'string') {
     const part = propertyConditionString(pAutomation, PropertyId.Name, selector.name);
     if (part !== 0n) parts.push(part);
+    else needsClientFilter = true;
   } else if (selector.name instanceof RegExp) {
     needsClientFilter = true;
   }
   if (selector.automationId !== undefined) {
     const part = propertyConditionString(pAutomation, PropertyId.AutomationId, selector.automationId);
     if (part !== 0n) parts.push(part);
+    else needsClientFilter = true;
   }
   if (selector.className !== undefined) {
     const part = propertyConditionString(pAutomation, PropertyId.ClassName, selector.className);
     if (part !== 0n) parts.push(part);
+    else needsClientFilter = true;
   }
   if (selector.nameContains !== undefined) needsClientFilter = true;
   if (parts.length === 0) return { condition: trueCondition(), needsClientFilter, owned: false }; // empty selector → TrueCondition matches everything server-side, no client pass (needsClientFilter stays true only for a regex/substring-only selector)
