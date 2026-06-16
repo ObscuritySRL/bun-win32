@@ -38,6 +38,7 @@ import {
   isMaximized,
   isMinimized,
   isSecureDesktopActive,
+  isWindow,
   isWindowVisible,
   listMonitors,
   maximizeWindow,
@@ -1758,11 +1759,22 @@ const HANDLERS: Record<string, ToolHandler> = {
   manage_window: (args) => {
     const hWnd = resolveHwnd(args);
     const action = requireString(args, 'action');
+    if (action === 'close') {
+      closeWindow(hWnd);
+      Bun.sleepSync(250); // let a blocking modal (a "Save changes?" dialog) raise before we judge whether the close took
+      if (isWindow(hWnd)) {
+        // The window SURVIVED WM_CLOSE — a modal needs a choice, or a multi-tab app only closed a tab. Do NOT report a
+        // false "closed"; re-ground (when it is the attached window, the same-window WinUI ContentDialog is now in the tree).
+        if (attached !== null && attached.hWnd === hWnd)
+          return withSnapshot(`close was BLOCKED — window 0x${hWnd.toString(16)} is still open (a modal likely needs a choice — act on its Save / Don't save / Cancel buttons; a separate dialog window may need list_windows + attach)`);
+        return textResult(`close was BLOCKED — window 0x${hWnd.toString(16)} is still open (a modal may need a choice; attach it or call list_windows to find the dialog)`);
+      }
+      return textResult(`window closed (hWnd=0x${hWnd.toString(16)})`);
+    }
     if (action === 'minimize') minimizeWindow(hWnd);
     else if (action === 'maximize') maximizeWindow(hWnd);
     else if (action === 'restore') restoreWindow(hWnd);
     else if (action === 'raise') raiseWindow(hWnd);
-    else if (action === 'close') closeWindow(hWnd);
     else if (action === 'move') moveWindow(hWnd, requireNumber(args, 'x'), requireNumber(args, 'y'), requireNumber(args, 'width'), requireNumber(args, 'height'));
     else if (action === 'snap') {
       const edge = requireString(args, 'edge');

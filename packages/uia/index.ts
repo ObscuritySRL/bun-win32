@@ -132,6 +132,7 @@ export {
   isMaximized,
   isMinimized,
   isSecureDesktopActive,
+  isWindow,
   isWindowVisible,
   listWindows,
   maximizeWindow,

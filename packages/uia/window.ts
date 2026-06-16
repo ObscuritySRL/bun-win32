@@ -51,6 +51,12 @@ export function isWindowVisible(hWnd: bigint): boolean {
   return hWnd !== 0n && User32.IsWindowVisible(hWnd) !== 0;
 }
 
+/** Whether a window handle still refers to a live window (User32.IsWindow) — used to tell a real close from one a
+ *  modal (a "Save changes?" dialog) blocked. False for a 0 handle. */
+export function isWindow(hWnd: bigint): boolean {
+  return hWnd !== 0n && User32.IsWindow(hWnd) !== 0;
+}
+
 /** Enumerate visible top-level windows with their class and owning process id. Titled windows always; with
  *  `includeUntitled`, also visible non-zero-size UNTITLED top-levels — the popups (combobox dropdowns, classic
  *  #32768 context menus, WPF/WinUI Popups, autocomplete lists) that open in their own window and would otherwise
