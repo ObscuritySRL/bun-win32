@@ -446,17 +446,20 @@ function setValueSmart(element: Element, value: string): string {
 }
 
 function act(element: Element, action: string, text: string | undefined): string {
-  if (action === 'invoke') return patternAction('invoke', () => (element.invoke(), 'invoked'));
-  if (action === 'click') return clickElement(element, 'left', false, false), 'clicked';
+  if (action === 'read') return element.isPassword ? 'value: (password — withheld)' : `value: ${JSON.stringify(element.value || element.text() || element.name)}`;
+  // Name the RESOLVED control in every result so an LLM gets target confirmation on an ambiguous selector match
+  // (the named-result contract computer.ts:77/88 + AI.md:181 already document). One name/role read per action.
+  const target = `${element.controlTypeName} ${JSON.stringify(element.name)}`;
+  if (action === 'invoke') return patternAction('invoke', () => (element.invoke(), `invoked ${target}`));
+  if (action === 'click') return clickElement(element, 'left', false, false), `clicked ${target}`;
   if (action === 'type') {
     if (cursorDenied) throw new Error('type sends synthetic keystrokes (SendInput) — disabled by BUN_UIA_CURSOR=never; use set_value (cursor-free WM_SETTEXT / ValuePattern)');
-    return element.type(text ?? ''), 'typed';
+    return element.type(text ?? ''), `typed into ${target}`;
   }
-  if (action === 'set_value') return patternAction('set_value', () => setValueSmart(element, text ?? ''));
-  if (action === 'toggle') return patternAction('toggle', () => (element.toggle(), `toggled (state ${element.toggleState})`));
-  if (action === 'expand') return patternAction('expand', () => (element.expand(), 'expanded'));
-  if (action === 'collapse') return patternAction('collapse', () => (element.collapse(), 'collapsed'));
-  if (action === 'read') return element.isPassword ? 'value: (password — withheld)' : `value: ${JSON.stringify(element.value || element.text() || element.name)}`;
+  if (action === 'set_value') return patternAction('set_value', () => `${setValueSmart(element, text ?? '')} ${target}`);
+  if (action === 'toggle') return patternAction('toggle', () => (element.toggle(), `toggled ${target} (state ${element.toggleState})`));
+  if (action === 'expand') return patternAction('expand', () => (element.expand(), `expanded ${target}`));
+  if (action === 'collapse') return patternAction('collapse', () => (element.collapse(), `collapsed ${target}`));
   throw new Error(`unknown action: ${action}`);
 }
 
