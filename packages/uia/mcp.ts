@@ -656,7 +656,7 @@ function withPopupNote(run: () => string): string {
   return popup !== undefined ? `${message} — it opened a flyout/menu in its OWN window: [hWnd=0x${popup.hWnd.toString(16)}] [class=${popup.className}] — attach it (attach {hWnd}) to drive its items.` : message;
 }
 
-function act(element: Element, action: string, text: string | undefined): string {
+function act(element: Element, action: string, text: string | undefined, submit = false): string {
   if (action === 'read') {
     if (element.isPassword) return 'value: (password — withheld)';
     const content = element.value || element.text(); // NOT element.name — returning the label dressed as `value:` is a silent wrong read
@@ -669,11 +669,18 @@ function act(element: Element, action: string, text: string | undefined): string
   if (action === 'click') return clickElement(element, 'left', false, false), `clicked ${target}`;
   if (action === 'focus') return element.focus(), `focused ${target}`; // UIA SetFocus — cursor-free, no SendInput, so never gated
   if (action === 'type') {
-    // Mirror the dedicated `type` tool: cursor-free WM_CHAR to an own-HWND control; SendInput only for a no-own-HWND sub-control.
+    // Mirror the dedicated `type` tool: cursor-free WM_CHAR to an own-HWND control; SendInput only for a no-own-HWND
+    // sub-control. submit presses Enter after (the dedicated type tool's `submit`, which the selector idioms dropped).
     const handle = element.nativeWindowHandle;
-    if (handle !== 0n) return postText(handle, text ?? ''), `typed into ${target} cursor-free`;
+    if (handle !== 0n) {
+      postText(handle, text ?? '');
+      if (submit) postKey(handle, 'Enter');
+      return `typed into ${target} cursor-free${submit ? ' and pressed Enter' : ''}`;
+    }
     if (cursorDenied) throw new Error('this control has no native window handle for the cursor-free WM_CHAR path, so type would need SendInput — disabled by BUN_UIA_CURSOR=never; use set_value (ValuePattern), or focus it then press_key');
-    return element.type(text ?? ''), `typed into ${target}`;
+    element.type(text ?? '');
+    if (submit) uia.sendKeys('Enter');
+    return `typed into ${target}${submit ? ' and pressed Enter' : ''}`;
   }
   if (action === 'set_value') return patternAction('set_value', () => `${setValueSmart(element, text ?? '')} ${target}`);
   if (action === 'toggle') return patternAction('toggle', () => (element.toggle(), `toggled ${target} (state ${element.toggleState})`));
@@ -957,6 +964,7 @@ const TOOLS: McpTool[] = [
         selector: SELECTOR_SCHEMA,
         do: { type: 'string', enum: ['invoke', 'click', 'type', 'set_value', 'toggle', 'expand', 'collapse', 'select', 'focus', 'read'] },
         text: { type: 'string', description: 'Text for type / set_value' },
+        submit: { type: 'boolean', description: 'Press Enter after a type' },
       },
       required: ['do'],
     },
@@ -973,6 +981,7 @@ const TOOLS: McpTool[] = [
         selector: SELECTOR_SCHEMA,
         do: { type: 'string', enum: ['invoke', 'click', 'type', 'set_value', 'toggle', 'select', 'focus', 'read'] },
         text: { type: 'string', description: 'Text for type / set_value' },
+        submit: { type: 'boolean', description: 'Press Enter after a type' },
       },
       required: ['selector'],
     },
@@ -1465,7 +1474,7 @@ const HANDLERS: Record<string, ToolHandler> = {
     const action = requireString(args, 'do');
     const baseline = current?.marks.length ?? 0; // captured before the action so an expand can settle for its revealed in-process items
     const observe = (message: string): object => (action === 'read' ? textResult(message) : withActSnapshot(action, message, baseline)); // a pure read owes no full re-grounding snapshot; an expand settles for revealed items
-    if (typeof args.ref === 'string') return observe(act(resolveRef(args.ref), action, typeof args.text === 'string' ? args.text : undefined));
+    if (typeof args.ref === 'string') return observe(act(resolveRef(args.ref), action, typeof args.text === 'string' ? args.text : undefined, args.submit === true));
     const window = requireAttached();
     const selector = selectorFrom(args.selector);
     const matches = window.findAll(selector); // findAll, not find — so an AMBIGUOUS selector is caught, not silently acted on
@@ -1480,7 +1489,7 @@ const HANDLERS: Record<string, ToolHandler> = {
             .map((match) => `  - ${match.controlTypeName} ${JSON.stringify(match.name)}${match.automationId.length > 0 ? ` [automationId=${match.automationId}]` : ''} {x:${match.boundingRectangle.x},y:${match.boundingRectangle.y}}`)
             .join('\n')}${matches.length > 10 ? `\n  … +${matches.length - 10} more` : ''}`,
         );
-      const outcome = act(matches[0]!, action, typeof args.text === 'string' ? args.text : undefined);
+      const outcome = act(matches[0]!, action, typeof args.text === 'string' ? args.text : undefined, args.submit === true);
       return observe(matches.length > 1 ? `${outcome} (read the first of ${matches.length} matches)` : outcome);
     } finally {
       for (const match of matches) match.release();
@@ -1492,7 +1501,7 @@ const HANDLERS: Record<string, ToolHandler> = {
     const element = window.reveal(selector);
     if (element === null) throw new Error(`reveal could not surface a match by scrolling — ${window.describeNoMatch(selector)}`);
     try {
-      return withSnapshot(typeof args.do === 'string' ? act(element, args.do, typeof args.text === 'string' ? args.text : undefined) : `revealed ${named(element)}`);
+      return withSnapshot(typeof args.do === 'string' ? act(element, args.do, typeof args.text === 'string' ? args.text : undefined, args.submit === true) : `revealed ${named(element)}`);
     } finally {
       element.release();
     }
