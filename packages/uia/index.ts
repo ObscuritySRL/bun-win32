@@ -80,7 +80,9 @@ export { listProcesses, waitForProcess, waitForWindow, watchWindows, type Window
 export { type IdleOptions, waitForIdle } from './idle';
 export {
   clickAt,
+  copyFromControl,
   cursorPosition,
+  cutFromControl,
   doubleClickAt,
   dragTo,
   holdKey,
@@ -99,6 +101,7 @@ export {
   postText,
   rightClickAt,
   scrollWheel,
+  selectAllInControl,
   sendKeys,
   setControlText,
   type,

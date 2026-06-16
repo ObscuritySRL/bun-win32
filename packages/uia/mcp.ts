@@ -23,6 +23,8 @@ import {
   closeWindow,
   coldTreeNote,
   ControlType,
+  copyFromControl,
+  cutFromControl,
   diffTrees,
   doubleClickAt,
   dragTo,
@@ -64,6 +66,7 @@ import {
   ScrollAmount,
   screenshotWithMarks,
   scrollAt,
+  selectAllInControl,
   setControlText,
   type Selector,
   snapWindow,
@@ -1066,8 +1069,15 @@ const TOOLS: McpTool[] = [
     name: 'copy',
     category: 'input',
     description:
-      "Copy selected text and return it. With a ref, reads that ref's selection via UIA TextPattern and writes the clipboard CURSOR-FREE (no focus, works locked/background; composes with find_text, which selects a substring cursor-free). Without a ref, falls back to Ctrl+C of the active control (works on an app with no a11y tree).",
+      "Copy selected text and return it. With a ref, reads that ref's selection via UIA TextPattern and writes the clipboard CURSOR-FREE (no focus, works locked/background; composes with find_text, which selects a substring cursor-free). If the ref has no TextPattern selection but is a classic Edit with its own HWND, it select-alls + WM_COPYs that control cursor-free. Without a ref, falls back to Ctrl+C of the active control (works on an app with no a11y tree).",
     inputSchema: { type: 'object', properties: { ref: { type: 'string', description: 'Ref whose current selection to copy cursor-free (TextPattern → clipboard).' } } },
+  },
+  {
+    name: 'cut',
+    category: 'input',
+    description:
+      "Cut a control's text to the clipboard and return it. Cursor-free for a classic Edit with its own window handle (select-all when nothing is selected, then WM_CUT — no focus, works minimized/background/locked); for a WinUI/Chromium sub-control with no own HWND it focuses + Ctrl+X via SendInput (needs an unlocked desktop, refused under BUN_UIA_CURSOR=never). Refuses a password field.",
+    inputSchema: { type: 'object', properties: { element: { type: 'string', description: ELEMENT_DESC }, ref: { type: 'string', description: REF_DESC } }, required: ['ref'] },
   },
   {
     name: 'launch_app',
@@ -1669,12 +1679,38 @@ const HANDLERS: Record<string, ToolHandler> = {
         uia.writeClipboard(selected);
         return textResult(selected);
       }
-      // This ref has no active selection — do NOT silently Ctrl+C the FOCUSED control and pass its clipboard off as
+      // No TextPattern selection — for a classic Edit with its OWN HWND, select-all + WM_COPY cursor-free (no focus,
+      // works minimized/background/locked), the path TextPattern-less Win32 Edits need.
+      const handle = element.nativeWindowHandle;
+      if (handle !== 0n) {
+        selectAllInControl(handle);
+        copyFromControl(handle);
+        const text = uia.readClipboard();
+        if (text.length > 0) return textResult(text);
+      }
+      // No selection and no own-HWND Edit — do NOT silently Ctrl+C the FOCUSED control and pass its clipboard off as
       // THIS ref's content (a target-confusion lie). Tell the agent to select first; never reach the SendInput path.
-      return textResult('(this ref has no active text selection — select text first with find_text {ref, text}, or call copy with no ref to Ctrl+C the focused control)');
+      return textResult('(this ref has no active text selection and no own-HWND Edit to copy — select text first with find_text {ref, text}, or call copy with no ref to Ctrl+C the focused control)');
     }
     if (cursorDenied) return errorResult('copy with no ref falls through to a real Ctrl+C (SendInput) on the focused control — disabled by BUN_UIA_CURSOR=never; select text cursor-free with find_text {ref, text}, then copy {ref}');
     return textResult((await uia.copy()) || '(no selection / clipboard empty)');
+  },
+  cut: (args) => {
+    const element = resolveRef(requireString(args, 'ref'));
+    if (element.isPassword) return errorResult('refusing to cut a password field to the clipboard'); // a secret must never reach the clipboard (matches copy/read/inspect_element)
+    const target = named(element);
+    const handle = element.nativeWindowHandle;
+    if (handle !== 0n) {
+      // Cursor-free: select the control's text (when nothing is selected) then WM_CUT to its OWN HWND — no focus, works minimized/background/locked.
+      if (element.getSelectedText().length === 0) selectAllInControl(handle);
+      cutFromControl(handle);
+      return withSnapshot(`cut ${target} to the clipboard cursor-free — ${JSON.stringify(uia.readClipboard())}`);
+    }
+    // WinUI/WPF/Chromium sub-control with no own HWND — only SendInput Ctrl+X reaches it.
+    if (cursorDenied) return errorResult('this control has no native window handle for the cursor-free WM_CUT path, so cut would need SendInput Ctrl+X — disabled by BUN_UIA_CURSOR=never');
+    element.focus();
+    uia.sendKeys('Control+X');
+    return withSnapshot(`cut ${target} (SendInput Ctrl+X) — ${JSON.stringify(uia.readClipboard())}`);
   },
   launch_app: async (args) => {
     const command = requireString(args, 'command');

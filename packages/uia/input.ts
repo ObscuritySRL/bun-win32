@@ -248,7 +248,10 @@ const WM_SETTEXT = 0x0000_000c;
 const WM_KEYDOWN = 0x0000_0100;
 const WM_KEYUP = 0x0000_0101;
 const WM_CHAR = 0x0000_0102;
+const WM_CUT = 0x0000_0300;
+const WM_COPY = 0x0000_0301;
 const WM_PASTE = 0x0000_0302;
+const EM_SETSEL = 0x0000_00b1;
 
 /** Set a control's text cursor-free via SendMessageW(WM_SETTEXT) — no keystrokes/focus, works on a background
  *  window. SendMessageW is synchronous, so the wide-string buffer is valid for the call.
@@ -274,6 +277,30 @@ export function postKey(hWnd: bigint, name: string): boolean {
 export function pasteToControl(hWnd: bigint): boolean {
   if (hWnd === 0n) return false;
   User32.SendMessageW(hWnd, WM_PASTE, 0n, 0n);
+  return true;
+}
+
+/** Select ALL text in a classic Edit cursor-free via EM_SETSEL(0, -1) — no focus, background-capable. False for a 0
+ *  handle. (Edit/RichEdit honor EM_SETSEL; a non-Edit control ignores it.) */
+export function selectAllInControl(hWnd: bigint): boolean {
+  if (hWnd === 0n) return false;
+  User32.SendMessageW(hWnd, EM_SETSEL, 0n, -1n);
+  return true;
+}
+
+/** Copy a control's current selection to the clipboard cursor-free via SendMessageW(WM_COPY) — no Ctrl+C keystroke,
+ *  works on a background/minimized window. Best-effort (read the clipboard after): false only for a 0 handle. */
+export function copyFromControl(hWnd: bigint): boolean {
+  if (hWnd === 0n) return false;
+  User32.SendMessageW(hWnd, WM_COPY, 0n, 0n);
+  return true;
+}
+
+/** Cut a control's current selection to the clipboard cursor-free via SendMessageW(WM_CUT) — no Ctrl+X keystroke,
+ *  works on a background/minimized window. Best-effort (read the clipboard after): false only for a 0 handle. */
+export function cutFromControl(hWnd: bigint): boolean {
+  if (hWnd === 0n) return false;
+  User32.SendMessageW(hWnd, WM_CUT, 0n, 0n);
   return true;
 }
 
