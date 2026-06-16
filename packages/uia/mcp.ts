@@ -462,12 +462,18 @@ function popupSnapshot(): Set<bigint> {
   return new Set(uia.windows({ includeUntitled: true }).map((window) => window.hWnd));
 }
 
-/** Poll for a NEW untitled popup window (dropdown / flyout / context menu / combobox list) that appeared since `before`.
- *  Checks FIRST so a popup created synchronously by the action costs nothing; `attempts` bounds the wait when none
- *  appears (the common case) — keep it small for invoke/expand, large for the provider-dependent context menu. */
+/** The NEW untitled popup window (dropdown / flyout / context menu / combobox list) that appeared since `before`, or
+ *  undefined. A single synchronous scan — no sleep. */
+function newPopup(before: Set<bigint>): { hWnd: bigint; className: string } | undefined {
+  return uia.windows({ includeUntitled: true }).find((window) => !before.has(window.hWnd) && (window.className === '#32768' || /Combo|DropDown|Flyout|Menu|Popup/i.test(window.className)));
+}
+
+/** Poll for newPopup() over time. Checks FIRST so a popup created synchronously by the action costs nothing; `attempts`
+ *  bounds the wait when none appears — only the provider-dependent context_menu needs the slow poll (invoke/expand use
+ *  the sleep-free newPopup() bracketed around their withSnapshot rebuild instead). */
 async function pollForNewPopup(before: Set<bigint>, attempts: number): Promise<{ hWnd: bigint; className: string } | undefined> {
   for (let attempt = 0; ; attempt += 1) {
-    const popup = uia.windows({ includeUntitled: true }).find((window) => !before.has(window.hWnd) && (window.className === '#32768' || /Combo|DropDown|Flyout|Menu|Popup/i.test(window.className)));
+    const popup = newPopup(before);
     if (popup !== undefined) return popup;
     if (attempt + 1 >= attempts) return undefined;
     await Bun.sleep(80);
@@ -1442,16 +1448,19 @@ const HANDLERS: Record<string, ToolHandler> = {
     // 3) Both cursor-free paths failed — only a real-cursor right-click will raise this provider's menu.
     return errorResult("no context menu appeared via UIA ShowContextMenu OR a posted right-click — this provider raises one only on a real right-click: click {ref, button:'right', cursor:true} (needs an unlocked, foregrounded desktop).");
   },
-  invoke: async (args) => {
+  invoke: (args) => {
     const element = resolveRef(requireString(args, 'ref'));
     const target = named(element);
     const before = popupSnapshot();
     patternAction('invoke', () => element.invoke());
-    // A button/menu-item that opens a flyout or menu in its OWN window: auto-return it (like context_menu) so the agent
-    // need not hand-hunt it with list_windows{includePopups}.
-    const popup = await pollForNewPopup(before, 3);
-    if (popup !== undefined) return withSnapshot(`invoked ${target} — it opened a flyout/menu in its OWN window: [hWnd=0x${popup.hWnd.toString(16)}] [class=${popup.className}] — attach it (attach {hWnd}) to drive its items.`);
-    return withSnapshot(`invoked ${target}`);
+    // Auto-return a flyout/menu that opened in its OWN window (so the agent need not hand-hunt it) — with NO dead poll
+    // sleep: check once immediately (most providers create the popup synchronously) and once after the withSnapshot
+    // rebuild, whose ~13ms cache build doubles as settle time for a slow provider.
+    const note = (popup: { hWnd: bigint; className: string }): string => `invoked ${target} — it opened a flyout/menu in its OWN window: [hWnd=0x${popup.hWnd.toString(16)}] [class=${popup.className}] — attach it (attach {hWnd}) to drive its items.`;
+    const early = newPopup(before);
+    const result = withSnapshot(early !== undefined ? note(early) : `invoked ${target}`);
+    const late = early === undefined ? newPopup(before) : undefined;
+    return late !== undefined ? withSnapshot(note(late)) : result;
   },
   focus: (args) => {
     // UIA SetFocus — cursor-free (no SendInput), so it works under BUN_UIA_CURSOR=never and on a no-own-HWND
@@ -1491,15 +1500,18 @@ const HANDLERS: Record<string, ToolHandler> = {
     patternAction('toggle', () => element.toggle());
     return withSnapshot(`toggled ${target} (state ${element.toggleState})`);
   },
-  expand: async (args) => {
+  expand: (args) => {
     const element = resolveRef(requireString(args, 'ref'));
     const target = named(element);
     const before = popupSnapshot();
     patternAction('expand', () => element.expand());
-    // A combobox/menu whose list opens in its OWN window: auto-return it instead of telling the agent to go find it.
-    const popup = await pollForNewPopup(before, 3);
-    if (popup !== undefined) return withSnapshot(`expanded ${target} (state ${element.expandCollapseState}) — its list opened in its OWN window: [hWnd=0x${popup.hWnd.toString(16)}] [class=${popup.className}] — attach it (attach {hWnd}) to see + select its items.`);
-    return withSnapshot(`expanded ${target} (state ${element.expandCollapseState}) — desktop_snapshot to see revealed items.`);
+    // A combobox/menu whose list opens in its OWN window: auto-return it — sleep-free, checked immediately and again
+    // after the withSnapshot rebuild (whose cache build doubles as settle), so a popup-less expand pays no poll latency.
+    const note = (popup: { hWnd: bigint; className: string }): string => `expanded ${target} (state ${element.expandCollapseState}) — its list opened in its OWN window: [hWnd=0x${popup.hWnd.toString(16)}] [class=${popup.className}] — attach it (attach {hWnd}) to see + select its items.`;
+    const early = newPopup(before);
+    const result = withSnapshot(early !== undefined ? note(early) : `expanded ${target} (state ${element.expandCollapseState}) — desktop_snapshot to see revealed items.`);
+    const late = early === undefined ? newPopup(before) : undefined;
+    return late !== undefined ? withSnapshot(note(late)) : result;
   },
   collapse: (args) => {
     const element = resolveRef(requireString(args, 'ref'));
