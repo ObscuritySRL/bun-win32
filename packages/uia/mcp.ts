@@ -446,7 +446,10 @@ function setValueSmart(element: Element, value: string): string {
 function act(element: Element, action: string, text: string | undefined): string {
   if (action === 'invoke') return element.invoke(), 'invoked';
   if (action === 'click') return clickElement(element, 'left', false, false), 'clicked';
-  if (action === 'type') return element.type(text ?? ''), 'typed';
+  if (action === 'type') {
+    if (cursorDenied) throw new Error('type sends synthetic keystrokes (SendInput) — disabled by BUN_UIA_CURSOR=never; use set_value (cursor-free WM_SETTEXT / ValuePattern)');
+    return element.type(text ?? ''), 'typed';
+  }
   if (action === 'set_value') return setValueSmart(element, text ?? '');
   if (action === 'toggle') return element.toggle(), `toggled (state ${element.toggleState})`;
   if (action === 'expand') return element.expand(), 'expanded';
@@ -1536,6 +1539,7 @@ const HANDLERS: Record<string, ToolHandler> = {
   read_clipboard: () => textResult(uia.readClipboard() || '(clipboard empty or not text)'),
   set_clipboard: (args) => textResult(uia.writeClipboard(requireString(args, 'text')) ? 'clipboard set' : 'failed to set clipboard'),
   paste: (args) => {
+    if (cursorDenied) return errorResult('paste focuses the control and injects Ctrl+V via SendInput — disabled by BUN_UIA_CURSOR=never; use set_value to write the field cursor-free (WM_SETTEXT / ValuePattern)');
     if (typeof args.ref === 'string') resolveRef(args.ref).focus();
     if (typeof args.text === 'string') uia.paste(args.text);
     else uia.sendKeys('Control+V');
@@ -1551,7 +1555,11 @@ const HANDLERS: Record<string, ToolHandler> = {
         uia.writeClipboard(selected);
         return textResult(selected);
       }
+      // This ref has no active selection — do NOT silently Ctrl+C the FOCUSED control and pass its clipboard off as
+      // THIS ref's content (a target-confusion lie). Tell the agent to select first; never reach the SendInput path.
+      return textResult('(this ref has no active text selection — select text first with find_text {ref, text}, or call copy with no ref to Ctrl+C the focused control)');
     }
+    if (cursorDenied) return errorResult('copy with no ref falls through to a real Ctrl+C (SendInput) on the focused control — disabled by BUN_UIA_CURSOR=never; select text cursor-free with find_text {ref, text}, then copy {ref}');
     return textResult((await uia.copy()) || '(no selection / clipboard empty)');
   },
   launch_app: async (args) => {

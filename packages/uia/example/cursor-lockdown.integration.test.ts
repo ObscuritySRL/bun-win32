@@ -1,7 +1,8 @@
 /**
- * cursor-lockdown — BUN_UIA_CURSOR=never must be ENFORCED on every real-cursor path: the MOUSE tools (click_point,
- * click_text, drag) AND the synthetic-KEYBOARD tools (hold_key, press_key chords / no-handle fallback, type) — all
- * category 'input', reachable under the default safe profile.
+ * cursor-lockdown — BUN_UIA_CURSOR=never must be ENFORCED on every SendInput path: the MOUSE tools (click_point,
+ * click_text, drag), the synthetic-KEYBOARD tools (hold_key, press_key chords / no-handle fallback, type), the
+ * CLIPBOARD SendInput tools (paste = Ctrl+V, bare copy = Ctrl+C), and find_and_act/reveal {do:'type'} (which route
+ * through act()) — all category 'input', reachable under the default safe profile.
  *
  * cursorDenied was consulted only by clickElement and drag, so click_point/click_text still moved the physical
  * mouse — on the explicit cursor:true branch AND the silent clickAt fallback when a posted click reaches no window
@@ -82,13 +83,27 @@ try {
 
   const typed = await call('tools/call', { name: 'type', arguments: { ref: 'e1', text: 'leak' } });
   assert(isErr(typed) && /BUN_UIA_CURSOR=never/.test(textOf(typed)) && /set_value/.test(textOf(typed)), 'type (focus+SendInput) is refused under BUN_UIA_CURSOR=never and steers to set_value (the cursor-free WM_SETTEXT path)');
+
+  // Clipboard SendInput tools — paste (Ctrl+V) and bare copy (Ctrl+C on the focused control) gate too; the gate is
+  // first/early so no synthetic input fires (copy {ref} from a TextPattern selection stays cursor-free, not tested here).
+  const pasted = await call('tools/call', { name: 'paste', arguments: { text: 'leak' } });
+  assert(isErr(pasted) && /BUN_UIA_CURSOR=never/.test(textOf(pasted)), 'paste (Ctrl+V via SendInput) is refused under BUN_UIA_CURSOR=never (nothing pasted)');
+
+  const copied = await call('tools/call', { name: 'copy', arguments: {} });
+  assert(isErr(copied) && /BUN_UIA_CURSOR=never/.test(textOf(copied)), 'bare copy (Ctrl+C via SendInput) is refused under BUN_UIA_CURSOR=never');
+
+  // find_and_act {do:'type'} routes through act() — the same SendInput type path, previously ungated. Attach the
+  // taskbar (always present) and aim a Button selector: act('type') must hit the gate BEFORE any keystroke.
+  await call('tools/call', { name: 'attach', arguments: { className: 'Shell_TrayWnd' } });
+  const acted = await call('tools/call', { name: 'find_and_act', arguments: { selector: { controlType: 'Button' }, do: 'type', text: 'leak' } });
+  assert(isErr(acted) && /BUN_UIA_CURSOR=never/.test(textOf(acted)), 'find_and_act {do:type} routes through act() and is refused under BUN_UIA_CURSOR=never (the act-type bypass is closed)');
 } finally {
   proc.kill();
 }
 
 console.log(
   failures === 0
-    ? '\nPASS — BUN_UIA_CURSOR=never is enforced on every real-cursor path: mouse (click_point ×2, click_text/drag share the guard) AND keyboard (hold_key, press_key chord, type→set_value).'
+    ? '\nPASS — BUN_UIA_CURSOR=never is enforced on every SendInput path: mouse (click_point ×2, click_text/drag share the guard), keyboard (hold_key, press_key chord, type→set_value), clipboard (paste, bare copy), and find_and_act/reveal {do:type}.'
     : `\nFAILED — ${failures} assertion(s)`,
 );
 process.exit(failures === 0 ? 0 : 1);
