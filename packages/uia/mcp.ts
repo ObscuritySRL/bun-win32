@@ -1797,17 +1797,23 @@ const HANDLERS: Record<string, ToolHandler> = {
     // Available actions, from each Is*PatternAvailable — a control's ROLE lies (a 'Button' may only ExpandCollapse, and
     // invoke() can no-op silently), so report what it actually supports rather than letting the agent guess the verb.
     const can: string[] = [];
+    const hasValuePattern = element.getProperty(PropertyId.IsValuePatternAvailable) === true;
+    const hasTextPattern = element.getProperty(PropertyId.IsTextPatternAvailable) === true;
     if (element.getProperty(PropertyId.IsInvokePatternAvailable) === true) can.push('invoke');
-    if (element.getProperty(PropertyId.IsValuePatternAvailable) === true) can.push('set_value');
+    if (hasValuePattern) can.push('set_value');
     if (element.getProperty(PropertyId.IsTogglePatternAvailable) === true) can.push('toggle');
     if (element.getProperty(PropertyId.IsExpandCollapsePatternAvailable) === true) can.push('expand/collapse');
     if (element.getProperty(PropertyId.IsSelectionItemPatternAvailable) === true) can.push('select');
     if (element.getProperty(PropertyId.IsRangeValuePatternAvailable) === true) can.push('set_value(numeric)');
     if (element.getProperty(PropertyId.IsScrollPatternAvailable) === true) can.push('scroll');
     if (element.getProperty(PropertyId.IsScrollItemPatternAvailable) === true) can.push('scroll-into-view');
-    if (element.getProperty(PropertyId.IsTextPatternAvailable) === true) can.push('read-text');
+    if (hasTextPattern) can.push('read-text');
     if (element.getProperty(PropertyId.IsGridPatternAvailable) === true) can.push('read-table');
     if (element.getProperty(PropertyId.IsMultipleViewPatternAvailable) === true) can.push('set-view (list_views/set_view)');
+    // Own-HWND text control → the cursor-free posted-message text verbs work (WM_CHAR/WM_PASTE/WM_COPY/WM_CUT); the
+    // documented can: list must name them or the agent (told to drive off this list) won't know it can type into a
+    // classic Win32 Edit (Notepad/WordPad/Run dialog/address bars) without focus. handle + patterns already in hand.
+    if (handle !== 0n && (hasValuePattern || hasTextPattern)) can.push('type/paste/copy/cut (cursor-free, own HWND)');
     lines.push(can.length > 0 ? `can: ${can.join(', ')}` : 'can: (none — a static/container node with no actionable UIA pattern; act on a CHILD control instead, or use ocr / screen_capture / inspect_point for its pixels)');
     // TextPattern content (terminals, documents, read-only multiline text) — the buffer the ValuePattern `value`
     // does not carry. Prefer the ON-SCREEN text (GetVisibleRanges): bounded + relevant + cheap for a huge
