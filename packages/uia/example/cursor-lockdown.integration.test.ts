@@ -103,7 +103,10 @@ try {
   assert(isErr(copied) && /BUN_UIA_CURSOR=never/.test(textOf(copied)), 'bare copy (Ctrl+C via SendInput) is refused under BUN_UIA_CURSOR=never');
 
   // find_and_act {do:'type'} routes through act() — the same SendInput type path. act('type') must hit the gate.
-  const acted = await call('tools/call', { name: 'find_and_act', arguments: { selector: { controlType: 'Button' }, do: 'type', text: 'leak' } });
+  // Target StartButton specifically: it is exactly ONE no-own-HWND Button on the taskbar, so the act('type') SendInput
+  // gate fires — {controlType:'Button'} would hit the ambiguity guard first (the taskbar now exposes ~26 Buttons) and
+  // never exercise the cursor gate this assertion guards.
+  const acted = await call('tools/call', { name: 'find_and_act', arguments: { selector: { automationId: 'StartButton' }, do: 'type', text: 'leak' } });
   assert(isErr(acted) && /BUN_UIA_CURSOR=never/.test(textOf(acted)), 'find_and_act {do:type} routes through act() and is refused under BUN_UIA_CURSOR=never (the act-type bypass is closed)');
 } finally {
   proc.kill();
