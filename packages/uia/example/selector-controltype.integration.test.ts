@@ -68,6 +68,11 @@ try {
 
   const empty = await call('tools/call', { name: 'find_and_act', arguments: { do: 'read', selector: {} } });
   assert(empty.result?.isError === true && /empty selector/.test(textOf(empty)), 'a genuinely empty selector still refuses with the empty-selector error');
+
+  // An UNKNOWN selector key (the common role/label/id alias mistake) must be REJECTED with the alias map, not
+  // silently dropped onto the wrong control with a confident success.
+  const alias = await call('tools/call', { name: 'find_and_act', arguments: { do: 'read', selector: { role: 'Button', label: 'Start' } } });
+  assert(alias.result?.isError === true && /unknown selector key/.test(textOf(alias)) && /role\/type → controlType/.test(textOf(alias)), 'an unknown selector key (role/label) is rejected with the alias map, not silently dropped');
 } finally {
   proc.kill();
 }

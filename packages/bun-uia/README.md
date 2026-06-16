@@ -67,7 +67,7 @@ The Windows desktop-automation cluster on npm is a field of native-addon pain, p
 - **`waitFor`** — Playwright-class auto-retry for flaky native UIs. No other Windows-desktop npm tool has it. Timeouts quote the selector, the window, and the nearest candidates.
 - **Read & assert** — `value`, `text()`, `isEnabled`, `boundingRectangle`, `toggleState`. Read state back through the tree to assert — pixel tools can't.
 - **Serialize the tree to JSON** for an LLM agent (`uia.tree`), with a token-svelte agent profile.
-- **Drive in the dark** — `invoke`/`setValue`/`toggle`/`scroll` + `postClick` need no cursor and no focus; they drive a **minimized, background, occluded, or locked** window. The AI default, not a fallback.
+- **Drive in the dark** — `invoke`/`setValue`/`toggle`/`scroll` need no cursor and no focus; they drive a **minimized, background, occluded, or locked** window. The AI default, not a fallback. (A bare `postClick(x, y)` posts to whatever window owns that on-screen pixel — for a minimized/occluded target use the element/ref path, which posts to the control's own window.)
 - **See a window even when it isn't visible** — `captureWindowLive(hWnd)` reads the live pixels of any window via **Windows.Graphics.Capture**, even occluded / background / GPU-composited, where `PrintWindow` goes blank.
 - **Window & monitor control** — move/min/max/restore/raise/close windows (no foreground), `listMonitors()`, per-window exe + state.
 - **Pixel + clipboard layer** — `captureScreen`/`locateOnScreen`/`pixelColor` for no-a11y surfaces; `readClipboard`/`writeClipboard`/`paste`/`copy`.

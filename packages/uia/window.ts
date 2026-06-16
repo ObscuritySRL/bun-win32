@@ -44,6 +44,13 @@ export function findWindow(target: { className?: string; title?: string }): bigi
   return User32.FindWindowW(classBuffer, titleBuffer);
 }
 
+/** Whether a window handle is currently visible (User32.IsWindowVisible). Lets a FindWindowW fallback accept a
+ *  titleless single-window class (the taskbar Shell_TrayWnd) while still rejecting an invisible Chromium/Electron
+ *  helper window. False for a 0 handle. */
+export function isWindowVisible(hWnd: bigint): boolean {
+  return hWnd !== 0n && User32.IsWindowVisible(hWnd) !== 0;
+}
+
 /** Enumerate visible top-level windows with their class and owning process id. Titled windows always; with
  *  `includeUntitled`, also visible non-zero-size UNTITLED top-levels — the popups (combobox dropdowns, classic
  *  #32768 context menus, WPF/WinUI Popups, autocomplete lists) that open in their own window and would otherwise
@@ -58,7 +65,8 @@ export function listWindows(options: { includeUntitled?: boolean } = {}): Window
         if (title.length > 0) windows.push({ hWnd, title, className: readClassName(hWnd), processId: readProcessId(hWnd) });
         else if (includeUntitled) {
           const rect = Buffer.alloc(16); // per-call so .ptr can't be stale from a sibling alloc
-          if (User32.GetWindowRect(hWnd, rect.ptr!) !== 0 && rect.readInt32LE(8) > rect.readInt32LE(0) && rect.readInt32LE(12) > rect.readInt32LE(4)) windows.push({ hWnd, title, className: readClassName(hWnd), processId: readProcessId(hWnd) });
+          if (User32.GetWindowRect(hWnd, rect.ptr!) !== 0 && rect.readInt32LE(8) > rect.readInt32LE(0) && rect.readInt32LE(12) > rect.readInt32LE(4))
+            windows.push({ hWnd, title, className: readClassName(hWnd), processId: readProcessId(hWnd) });
         }
       }
       return 1;

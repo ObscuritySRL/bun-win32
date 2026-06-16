@@ -30,12 +30,14 @@ import {
   dragTo,
   type Element,
   encodePNG,
+  findWindow,
   foregroundWindow,
   holdKey,
   integrityLevel,
   isMaximized,
   isMinimized,
   isSecureDesktopActive,
+  isWindowVisible,
   listMonitors,
   maximizeWindow,
   middleClickAt,
@@ -215,8 +217,17 @@ function controlTypeId(value: number | string): number | undefined {
   return undefined;
 }
 
+const SELECTOR_KEYS = new Set(['name', 'nameContains', 'automationId', 'className', 'controlType']);
+
 function selectorFrom(value: unknown): Selector {
   const raw = record(value);
+  // Reject UNKNOWN keys (a silently-dropped alias would act on the WRONG control with a confident success). Map the
+  // common agent mistakes to the real key rather than ignoring them.
+  const unknown = Object.keys(raw).filter((key) => !SELECTOR_KEYS.has(key));
+  if (unknown.length > 0)
+    throw new Error(
+      `unknown selector key${unknown.length > 1 ? 's' : ''} ${JSON.stringify(unknown)} — valid keys: name, nameContains, automationId, className, controlType. (Aliases: role/type → controlType; label/accessibleName/title → name or nameContains; id → automationId.)`,
+    );
   const selector: Selector = {};
   if (typeof raw.name === 'string') selector.name = raw.name;
   if (typeof raw.nameContains === 'string') selector.nameContains = raw.nameContains;
@@ -243,12 +254,17 @@ function requireAttached(): Window {
  *  to disambiguate rather than silently grabbing the wrong one. */
 function attachByClassName(className: string): Window {
   const matches = uia.windows({ includeUntitled: true }).filter((window) => window.className === className);
-  if (matches.length === 0) throw new Error(`no VISIBLE window has class ${JSON.stringify(className)} — FindWindowW would match an invisible helper. Call list_windows and attach by an exact title or an hWnd.`);
   if (matches.length > 1)
     throw new Error(
       `${matches.length} visible windows have class ${JSON.stringify(className)} — attach by hWnd to pick one:\n${matches.map((window) => `  - ${JSON.stringify(window.title)} [hWnd=0x${window.hWnd.toString(16)}] [pid=${window.processId}]`).join('\n')}`,
     );
-  return uia.attach(matches[0]!.hWnd);
+  if (matches.length === 1) return uia.attach(matches[0]!.hWnd);
+  // uia.windows (EnumWindows) can miss a present single-window class — the taskbar Shell_TrayWnd is intermittently not
+  // enumerated. Fall back to FindWindowW, accepting it ONLY if VISIBLE: a titleless single-window class (taskbar)
+  // attaches, while the INVISIBLE Chromium/Electron helper (Chrome_WidgetWin_1) is still rejected.
+  const hWnd = findWindow({ className });
+  if (isWindowVisible(hWnd)) return uia.attach(hWnd);
+  throw new Error(`no VISIBLE window has class ${JSON.stringify(className)}${hWnd !== 0n ? ' (FindWindowW matched only an invisible helper)' : ''} — call list_windows and attach by an exact title or an hWnd.`);
 }
 
 /** An hWnd argument as a bigint, or undefined if absent — accepts both a string ('0x1234' / '4660') AND a JSON
@@ -1338,8 +1354,9 @@ const HANDLERS: Record<string, ToolHandler> = {
   },
   wait_for: async (args) => {
     const found = await requireAttached().waitFor(selectorFrom(args.selector), { timeout: typeof args.timeout === 'number' ? args.timeout : 5000 });
+    const target = named(found); // name the RESOLVED control, not a double-JSON-encoded echo of the selector
     found.release();
-    return withSnapshot(`matched ${quote(JSON.stringify(args.selector))}`);
+    return withSnapshot(`matched ${target}`);
   },
   wait_idle: async (args) => {
     const settled = await uia.waitForIdle(requireAttached(), { quietMs: typeof args.quietMs === 'number' ? args.quietMs : 400, timeout: typeof args.timeout === 'number' ? args.timeout : 5000 });
