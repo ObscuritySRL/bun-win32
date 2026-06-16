@@ -81,20 +81,28 @@ try {
   const chord = await call('tools/call', { name: 'press_key', arguments: { key: 'Control+a' } });
   assert(isErr(chord) && /BUN_UIA_CURSOR=never/.test(textOf(chord)), 'press_key chord (SendInput to the focused control) is refused under BUN_UIA_CURSOR=never (no keys sent)');
 
-  const typed = await call('tools/call', { name: 'type', arguments: { ref: 'e1', text: 'leak' } });
-  assert(isErr(typed) && /BUN_UIA_CURSOR=never/.test(textOf(typed)) && /set_value/.test(textOf(typed)), 'type (focus+SendInput) is refused under BUN_UIA_CURSOR=never and steers to set_value (the cursor-free WM_SETTEXT path)');
+  // type is cursor-free for an own-HWND control (WM_CHAR) but needs SendInput for a WinUI control with no handle.
+  // A taskbar Button is exactly that no-handle case → under `never` it must refuse and steer to set_value.
+  const snap = textOf(await call('tools/call', { name: 'attach', arguments: { className: 'Shell_TrayWnd' } }));
+  const buttonRef = /(?:Start|Search)"? \[ref=(e\d+(?:#\d+)?)\]/.exec(snap)?.[1] ?? /Button "[^"]*" \[ref=(e\d+(?:#\d+)?)\]/.exec(snap)?.[1];
+  if (buttonRef === undefined) console.log('  skip: no no-handle taskbar Button ref to exercise type/paste refusal');
+  else {
+    const typed = await call('tools/call', { name: 'type', arguments: { ref: buttonRef, text: 'leak' } });
+    assert(isErr(typed) && /BUN_UIA_CURSOR=never/.test(textOf(typed)) && /set_value/.test(textOf(typed)), 'type on a no-handle control (SendInput) is refused under BUN_UIA_CURSOR=never and steers to set_value');
 
-  // Clipboard SendInput tools — paste (Ctrl+V) and bare copy (Ctrl+C on the focused control) gate too; the gate is
-  // first/early so no synthetic input fires (copy {ref} from a TextPattern selection stays cursor-free, not tested here).
+    const pastedRef = await call('tools/call', { name: 'paste', arguments: { ref: buttonRef, text: 'leak' } });
+    assert(isErr(pastedRef) && /BUN_UIA_CURSOR=never/.test(textOf(pastedRef)), 'paste on a no-handle control (SendInput Ctrl+V) is refused under BUN_UIA_CURSOR=never');
+  }
+
+  // Clipboard SendInput tools with NO ref — paste (Ctrl+V) and bare copy (Ctrl+C on the focused control) gate too
+  // (copy {ref} from a TextPattern selection stays cursor-free, not tested here).
   const pasted = await call('tools/call', { name: 'paste', arguments: { text: 'leak' } });
-  assert(isErr(pasted) && /BUN_UIA_CURSOR=never/.test(textOf(pasted)), 'paste (Ctrl+V via SendInput) is refused under BUN_UIA_CURSOR=never (nothing pasted)');
+  assert(isErr(pasted) && /BUN_UIA_CURSOR=never/.test(textOf(pasted)), 'paste with no ref (Ctrl+V via SendInput) is refused under BUN_UIA_CURSOR=never (nothing pasted)');
 
   const copied = await call('tools/call', { name: 'copy', arguments: {} });
   assert(isErr(copied) && /BUN_UIA_CURSOR=never/.test(textOf(copied)), 'bare copy (Ctrl+C via SendInput) is refused under BUN_UIA_CURSOR=never');
 
-  // find_and_act {do:'type'} routes through act() — the same SendInput type path, previously ungated. Attach the
-  // taskbar (always present) and aim a Button selector: act('type') must hit the gate BEFORE any keystroke.
-  await call('tools/call', { name: 'attach', arguments: { className: 'Shell_TrayWnd' } });
+  // find_and_act {do:'type'} routes through act() — the same SendInput type path. act('type') must hit the gate.
   const acted = await call('tools/call', { name: 'find_and_act', arguments: { selector: { controlType: 'Button' }, do: 'type', text: 'leak' } });
   assert(isErr(acted) && /BUN_UIA_CURSOR=never/.test(textOf(acted)), 'find_and_act {do:type} routes through act() and is refused under BUN_UIA_CURSOR=never (the act-type bypass is closed)');
 } finally {

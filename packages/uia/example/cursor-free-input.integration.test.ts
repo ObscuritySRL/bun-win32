@@ -1,9 +1,10 @@
 /**
  * cursor-free-input — prove cursor-free text/key input: drive a control's text and keys with NO
- * focus, NO foreground, NO real cursor, on a MINIMIZED window. `setControlText` (WM_SETTEXT) and `postText`
- * (WM_CHAR) and `postKey` (WM_KEYDOWN/UP) route to a control's `nativeWindowHandle` — the path SendInput can't take
- * (it goes to whatever owns the system focus). This is the headline no-focus input gap the MCP `press_key` (ref +
- * single key) and `set_value` (WM_SETTEXT fallback) now wire.
+ * focus, NO foreground, NO real cursor, on a MINIMIZED window. `setControlText` (WM_SETTEXT), `postText` (WM_CHAR),
+ * `postKey` (WM_KEYDOWN/UP), and `pasteToControl` (WM_PASTE) route to a control's `nativeWindowHandle` — the path
+ * SendInput can't take (it goes to whatever owns the system focus). This is the headline no-focus input gap the MCP
+ * `press_key` (ref + single key), `type` (WM_CHAR for an own-HWND control), `set_value` (WM_SETTEXT fallback), and
+ * `paste` (WM_PASTE for an own-HWND control) now wire.
  *
  * Proof: spawn Notepad, MINIMIZE it (so it is provably not foreground), then set + append text cursor-free and read
  * it back through UIA. Skips cleanly if the editor has no per-control HWND (modern WinUI Notepad — the ValuePattern
@@ -13,7 +14,7 @@
  * Run: bun run example/cursor-free-input.integration.test.ts
  */
 import User32 from '@bun-win32/user32';
-import { ControlType, closeWindow, foregroundWindow, minimizeWindow, postKey, postText, setControlText, uia } from '@bun-win32/uia';
+import { ControlType, closeWindow, foregroundWindow, minimizeWindow, pasteToControl, postKey, postText, setControlText, uia, writeClipboard } from '@bun-win32/uia';
 
 const EM_SETMODIFY = 0x00b9;
 
@@ -59,6 +60,16 @@ try {
     await Bun.sleep(150);
     const afterAstral = editor.value || editor.text();
     assert(afterAstral.includes(astral), `editor reads back astral text intact, not truncated ("${afterAstral.slice(0, 20)}")`);
+
+    // Cursor-free PASTE (the MCP `paste {ref}` tool's cursor-free path): set the clipboard, then WM_PASTE into the
+    // minimized control — no focus, no Ctrl+V keystroke.
+    setControlText(editHwnd, '');
+    await Bun.sleep(80);
+    writeClipboard('cursor-free-paste-7421');
+    assert(pasteToControl(editHwnd), 'pasteToControl (WM_PASTE) reported success on a minimized window');
+    await Bun.sleep(150);
+    const afterPaste = editor.value || editor.text();
+    assert(afterPaste.includes('cursor-free-paste-7421'), `editor reads back the WM_PASTE clipboard text cursor-free ("${afterPaste.slice(0, 40)}")`);
   }
 } finally {
   if (editHwnd !== 0n) User32.SendMessageW(editHwnd, EM_SETMODIFY, 0n, 0n); // clear dirty so WM_CLOSE raises no Save prompt

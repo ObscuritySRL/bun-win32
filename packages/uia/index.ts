@@ -94,6 +94,7 @@ export {
   moveTo,
   packKeyboardInput,
   packMouseInput,
+  pasteToControl,
   postKey,
   postText,
   rightClickAt,

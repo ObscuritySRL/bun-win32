@@ -43,11 +43,13 @@ import {
   normalizeKey,
   openPath,
   ownerHwnd,
+  pasteToControl,
   postClickAt,
   postClickToHwnd,
   postDoubleClickAt,
   postDoubleClickToHwnd,
   postKey,
+  postText,
   processImagePath,
   PropertyId,
   pruneRefTree,
@@ -92,7 +94,7 @@ const PROTOCOL_VERSION = '2025-11-25';
 const SUPPORTED_VERSIONS = new Set(['2025-11-25', '2025-06-18', '2025-03-26', '2024-11-05']);
 const SERVER_INFO = { name: 'bun-uia', version: '1.5.0' };
 const INSTRUCTIONS =
-  'Drive Windows desktop apps via the UI Automation tree — and beyond it. Call list_windows, then attach (by hWnd or exact title — className is reliable only for single-window classes like Shell_TrayWnd, not the Chromium/Electron family) — attach ALREADY returns a ref-keyed tree, so act on those refs directly; call desktop_snapshot only to RE-ground after refs go stale (e.g. Button "Five" [ref=e49#1]); pass that ref VERBATIM (with its #generation tag) to click/invoke/type/toggle/set_value/inspect_element. Refs are valid ONLY for the most recent snapshot — every action returns a fresh one; re-ground from it. A ref from before a re-render is REJECTED (not silently mis-resolved), so always use the refs from the latest snapshot/delta. To stay cheap, an action that changes little returns just a "Δ" delta (the +/-/~ changes, with refs on appeared/renamed) instead of the full tree — your other refs stay valid; desktop_snapshot {maxDepth} bounds the tree size when a window is large. Prefer invoke/set_value/toggle/scroll (cursor-free — they need no focus and work on a minimized, background, occluded, or locked window) over click. To SEE beyond the attached window (a 2nd monitor, a game/browser, a composited surface, or anything with no window) use screen_capture; to see a SPECIFIC window even when occluded, in the background, or GPU-composited (where a plain screenshot is blank) use capture_window (Windows.Graphics.Capture); turn a pixel into a control with inspect_point. screenshot auto-falls-back PrintWindow → WGC → desktop-region. Read legacy/owner-draw windows with native_tree/msaa_tree. drag and real-cursor clicks move the actual mouse; SendInput-based input (type/sendKeys/press_key without a ref/hold_key/drag) needs an unlocked, foregrounded desktop (the posted cursor-free paths do not). launch/run/file tools and manage_window may be disabled by the server policy (BUN_UIA_PROFILE).';
+  'Drive Windows desktop apps via the UI Automation tree — and beyond it. Call list_windows, then attach (by hWnd or exact title — className is reliable only for single-window classes like Shell_TrayWnd, not the Chromium/Electron family) — attach ALREADY returns a ref-keyed tree, so act on those refs directly; call desktop_snapshot only to RE-ground after refs go stale (e.g. Button "Five" [ref=e49#1]); pass that ref VERBATIM (with its #generation tag) to click/invoke/type/toggle/set_value/inspect_element. Refs are valid ONLY for the most recent snapshot — every action returns a fresh one; re-ground from it. A ref from before a re-render is REJECTED (not silently mis-resolved), so always use the refs from the latest snapshot/delta. To stay cheap, an action that changes little returns just a "Δ" delta (the +/-/~ changes, with refs on appeared/renamed) instead of the full tree — your other refs stay valid; desktop_snapshot {maxDepth} bounds the tree size when a window is large. Prefer invoke/set_value/toggle/scroll (cursor-free — they need no focus and work on a minimized, background, occluded, or locked window) over click. To SEE beyond the attached window (a 2nd monitor, a game/browser, a composited surface, or anything with no window) use screen_capture; to see a SPECIFIC window even when occluded, in the background, or GPU-composited (where a plain screenshot is blank) use capture_window (Windows.Graphics.Capture); turn a pixel into a control with inspect_point. screenshot auto-falls-back PrintWindow → WGC → desktop-region. Read legacy/owner-draw windows with native_tree/msaa_tree. drag and real-cursor clicks move the actual mouse; SendInput-based input (sendKeys, press_key chord, hold_key, drag, and the type/paste fallback for a control with no own HWND) needs an unlocked, foregrounded desktop — the posted cursor-free paths do not: type (WM_CHAR) / paste (WM_PASTE) / press_key {ref} on an own-HWND control, plus set_value/invoke/toggle. launch/run/file tools and manage_window may be disabled by the server policy (BUN_UIA_PROFILE).';
 
 const encoder = new TextEncoder();
 const decoder = new TextDecoder();
@@ -723,7 +725,8 @@ const TOOLS: McpTool[] = [
   {
     name: 'type',
     category: 'input',
-    description: 'Type Unicode text into an editable control (focuses it, then sends keystrokes). Needs an unlocked desktop; prefer set_value when the control supports the Value pattern.',
+    description:
+      'Type Unicode text into an editable control. Cursor-free when the control has its own window handle (WM_CHAR — no focus, works minimized/background/locked); falls back to SendInput keystrokes for a WinUI/WPF/Chromium sub-control with no own HWND (that path needs an unlocked desktop and is refused under BUN_UIA_CURSOR=never). Prefer set_value when the control supports the Value pattern.',
     inputSchema: {
       type: 'object',
       properties: { element: { type: 'string', description: ELEMENT_DESC }, ref: { type: 'string', description: REF_DESC }, text: { type: 'string' }, submit: { type: 'boolean', description: 'Press Enter after' } },
@@ -996,7 +999,7 @@ const TOOLS: McpTool[] = [
     name: 'paste',
     category: 'input',
     description:
-      'Paste text into the focused control via the clipboard + Ctrl+V — the reliable large-text path. Optionally focus a ref first; omit text to paste the current clipboard. Prefer set_value (cursor-free) when the control supports the Value pattern.',
+      'Paste text via the clipboard — the reliable large-text path. With a ref whose control has its own window handle it is cursor-free (sets the clipboard, then WM_PASTE — no focus, works minimized/background/locked); otherwise it focuses + Ctrl+V via SendInput (needs an unlocked desktop, refused under BUN_UIA_CURSOR=never). Omit text to paste the current clipboard. Prefer set_value when the control supports the Value pattern.',
     inputSchema: {
       type: 'object',
       properties: { element: { type: 'string', description: ELEMENT_DESC }, ref: { type: 'string', description: REF_DESC }, text: { type: 'string', description: 'Text to paste (omit to paste the current clipboard)' } },
@@ -1180,8 +1183,18 @@ const HANDLERS: Record<string, ToolHandler> = {
     return withSnapshot(`invoked ${quote(args.element)}`);
   },
   type: (args) => {
-    if (cursorDenied) return errorResult('type focuses the control and sends synthetic keystrokes (SendInput) — disabled by BUN_UIA_CURSOR=never. Use set_value to write the field cursor-free (WM_SETTEXT).');
-    resolveRef(requireString(args, 'ref')).type(requireString(args, 'text'));
+    const element = resolveRef(requireString(args, 'ref'));
+    const text = requireString(args, 'text');
+    const handle = element.nativeWindowHandle;
+    if (handle !== 0n) {
+      // Cursor-free: WM_CHAR per code unit to the control's OWN HWND — no focus, works minimized/background/locked (the SendInput path can't).
+      postText(handle, text);
+      if (args.submit === true) postKey(handle, 'Enter');
+      return withSnapshot(`typed into ${quote(args.element)} cursor-free${args.submit === true ? ' and pressed Enter' : ''}`);
+    }
+    // WinUI/WPF/Chromium sub-control with no own HWND — only SendInput reaches it (needs an unlocked, foregrounded desktop).
+    if (cursorDenied) return errorResult('this control has no native window handle for the cursor-free WM_CHAR path, so type would need SendInput — disabled by BUN_UIA_CURSOR=never. Use set_value (ValuePattern) to write it cursor-free.');
+    element.type(text);
     if (args.submit === true) uia.sendKeys('Enter');
     return withSnapshot(`typed into ${quote(args.element)}${args.submit === true ? ' and pressed Enter' : ''}`);
   },
@@ -1543,12 +1556,27 @@ const HANDLERS: Record<string, ToolHandler> = {
   read_clipboard: () => textResult(uia.readClipboard() || '(clipboard empty or not text)'),
   set_clipboard: (args) => textResult(uia.writeClipboard(requireString(args, 'text')) ? 'clipboard set' : 'failed to set clipboard'),
   paste: (args) => {
-    if (cursorDenied) return errorResult('paste focuses the control and injects Ctrl+V via SendInput — disabled by BUN_UIA_CURSOR=never; use set_value to write the field cursor-free (WM_SETTEXT / ValuePattern)');
-    if (typeof args.ref === 'string') resolveRef(args.ref).focus();
+    if (typeof args.ref === 'string') {
+      const element = resolveRef(args.ref);
+      const handle = element.nativeWindowHandle;
+      if (handle !== 0n) {
+        // Cursor-free: set the clipboard (when text given), then WM_PASTE to the control's OWN HWND — no focus, works minimized/background/locked.
+        if (typeof args.text === 'string') uia.writeClipboard(args.text);
+        pasteToControl(handle);
+        return withSnapshot(`pasted ${typeof args.text === 'string' ? `${args.text.length} chars` : 'clipboard'} into ${quote(args.element)} cursor-free`);
+      }
+      // WinUI/WPF/Chromium sub-control with no own HWND — only SendInput Ctrl+V reaches it.
+      if (cursorDenied) return errorResult('this control has no native window handle for the cursor-free WM_PASTE path, so paste would need SendInput Ctrl+V — disabled by BUN_UIA_CURSOR=never. Use set_value to write it cursor-free.');
+      element.focus();
+      if (typeof args.text === 'string') uia.paste(args.text);
+      else uia.sendKeys('Control+V');
+      return withSnapshot(`pasted ${typeof args.text === 'string' ? `${args.text.length} chars` : 'clipboard'} into ${quote(args.element)}`);
+    }
+    // No ref → Ctrl+V on whatever owns focus (SendInput).
+    if (cursorDenied) return errorResult('paste with no ref injects Ctrl+V via SendInput on the focused control — disabled by BUN_UIA_CURSOR=never; target a control by ref for the cursor-free WM_PASTE path, or use set_value');
     if (typeof args.text === 'string') uia.paste(args.text);
     else uia.sendKeys('Control+V');
-    const into = typeof args.ref === 'string' ? ` into ${quote(args.element)}` : '';
-    return withSnapshot(typeof args.text === 'string' ? `pasted ${args.text.length} chars${into}` : `pasted clipboard${into}`);
+    return withSnapshot(typeof args.text === 'string' ? `pasted ${args.text.length} chars` : 'pasted clipboard');
   },
   copy: async (args) => {
     if (typeof args.ref === 'string') {

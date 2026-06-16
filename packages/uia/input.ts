@@ -248,6 +248,7 @@ const WM_SETTEXT = 0x0000_000c;
 const WM_KEYDOWN = 0x0000_0100;
 const WM_KEYUP = 0x0000_0101;
 const WM_CHAR = 0x0000_0102;
+const WM_PASTE = 0x0000_0302;
 
 /** Set a control's text cursor-free via SendMessageW(WM_SETTEXT) — no keystrokes/focus, works on a background
  *  window. SendMessageW is synchronous, so the wide-string buffer is valid for the call.
@@ -265,6 +266,15 @@ export function postKey(hWnd: bigint, name: string): boolean {
   const keyCode = BigInt(virtualKeyCode(name));
   User32.PostMessageW(hWnd, WM_KEYDOWN, keyCode, 0x0000_0001n); // lParam: repeat count 1
   return User32.PostMessageW(hWnd, WM_KEYUP, keyCode, 0xc000_0001n) !== 0; // lParam: key-up transition + previously down
+}
+
+/** Paste the clipboard into a control's HWND cursor-free via SendMessageW(WM_PASTE) — no focus/keystrokes, works on
+ *  a background/occluded/minimized window. WM_PASTE returns 0 regardless of outcome, so this is best-effort: false
+ *  only for a 0 handle (a WinUI/WPF/Chromium sub-control with no own HWND — paste it via SendInput Ctrl+V instead). */
+export function pasteToControl(hWnd: bigint): boolean {
+  if (hWnd === 0n) return false;
+  User32.SendMessageW(hWnd, WM_PASTE, 0n, 0n);
+  return true;
 }
 
 /** Type Unicode text (WM_CHAR per code unit) into a control's HWND cursor-free — no focus, background-capable. */
