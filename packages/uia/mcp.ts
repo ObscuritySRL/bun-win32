@@ -462,6 +462,13 @@ function popupSnapshot(): Set<bigint> {
   return new Set(uia.windows({ includeUntitled: true }).map((window) => window.hWnd));
 }
 
+/** The cursor-free restore steer for a capture/OCR tool that hit a MINIMIZED window — a minimized window has no
+ *  on-screen surface to capture or OCR, so steer to the cursor-free restore that unblocks it instead of a dead error
+ *  or a useless taskbar-button sliver. Mirrors the click path's restore wording. */
+function minimizedCaptureSteer(hWnd: bigint, tool: string): string {
+  return `${tool}: 0x${hWnd.toString(16)} is MINIMIZED, so it has no on-screen surface to capture. Restore it first (manage_window {action:"restore"} — cursor-free, no foreground), then retry.`;
+}
+
 /** The NEW untitled popup window (dropdown / flyout / context menu / combobox list) that appeared since `before`, or
  *  undefined. A single synchronous scan — no sleep. */
 function newPopup(before: Set<bigint>): { hWnd: bigint; className: string } | undefined {
@@ -1589,7 +1596,10 @@ const HANDLERS: Record<string, ToolHandler> = {
       const hWnd = hwndArg(args) ?? attached?.hWnd ?? 0n;
       if (hWnd === 0n) throw new Error('ocr: pass hWnd or region, or attach a window first');
       const windowResult = await uia.ocrWindow(hWnd);
-      if (windowResult === null) throw new Error('ocr: could not capture the window (minimized / protected / no surface)');
+      if (windowResult === null) {
+        if (isMinimized(hWnd)) return errorResult(minimizedCaptureSteer(hWnd, 'ocr'));
+        throw new Error('ocr: could not capture the window (protected / no surface)');
+      }
       result = windowResult;
       origin = `hWnd 0x${hWnd.toString(16)}`;
     }
@@ -1617,7 +1627,10 @@ const HANDLERS: Record<string, ToolHandler> = {
     const hWnd = hwndArg(args) ?? attached?.hWnd ?? 0n;
     if (hWnd === 0n) throw new Error('click_text: attach a window or pass hWnd');
     const result = await uia.ocrWindow(hWnd);
-    if (result === null) throw new Error('click_text: could not capture the window (minimized / protected / no surface)');
+    if (result === null) {
+      if (isMinimized(hWnd)) return errorResult(minimizedCaptureSteer(hWnd, 'click_text'));
+      throw new Error('click_text: could not capture the window (protected / no surface)');
+    }
     const words = result.lines.flatMap((line) => line.words);
     const hit = words.find((word) => word.text.toLowerCase().includes(want)) ?? result.lines.find((line) => line.text.toLowerCase().includes(want)) ?? null;
     if (hit === null) {
@@ -1646,6 +1659,9 @@ const HANDLERS: Record<string, ToolHandler> = {
     const live = await captureWindowLive(window.hWnd);
     if (live !== null && !isNearUniform(live.rgb))
       return imageResult(encodePNG(live.rgb, live.width, live.height), `(PrintWindow was blank — Windows.Graphics.Capture live frame of the GPU/occluded surface; ${originNote(live.originX, live.originY, live.width, live.height)})`);
+    // A minimized window has no surface — both PrintWindow and WGC came back blank. Steer to the cursor-free restore
+    // BEFORE the desktop-region fallback, which would otherwise grab a useless taskbar-button sliver.
+    if (isMinimized(window.hWnd)) return errorResult(minimizedCaptureSteer(window.hWnd, 'screenshot'));
     const bounds = window.boundingRectangle;
     if (bounds.width > 0 && bounds.height > 0)
       return imageResult(
@@ -1655,8 +1671,12 @@ const HANDLERS: Record<string, ToolHandler> = {
     return errorResult('screenshot was empty (locked session, zero-size, or fully off-screen window)');
   },
   capture_window: async (args) => {
-    const live = await captureWindowLive(resolveHwnd(args));
-    if (live === null) return errorResult('Windows.Graphics.Capture could not capture this window (minimized with no surface, protected/DRM content, or WGC unavailable)');
+    const hWnd = resolveHwnd(args);
+    const live = await captureWindowLive(hWnd);
+    if (live === null) {
+      if (isMinimized(hWnd)) return errorResult(minimizedCaptureSteer(hWnd, 'capture_window'));
+      return errorResult('Windows.Graphics.Capture could not capture this window (protected/DRM content, or WGC unavailable)');
+    }
     return imageResult(encodePNG(live.rgb, live.width, live.height), `(${originNote(live.originX, live.originY, live.width, live.height)})`);
   },
   screen_capture: (args) => {
