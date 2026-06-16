@@ -542,7 +542,10 @@ function snapshotText(maxDepth?: number, rootName?: string): string {
     // structurally identical rebuild reassigned the same ref ids to the same controls, so the model's current-gen
     // refs still resolve. Return a one-line "no change" (saves the full re-dump) and keep refs valid (mirrors the
     // withSnapshot action-path contract). A scoped (root/maxDepth) snapshot always renders fully.
-    if (root === undefined && body === lastSnapshotBody)
+    // A CAPPED (truncated) body can be byte-identical while content below the cap changed — never short-circuit "no
+    // change" on it; re-dump the full current tree so an explicit re-ground reflects below-fold changes (and the agent
+    // can narrow with {maxDepth}/{root}).
+    if (root === undefined && body === lastSnapshotBody && !body.includes('more nodes — narrow with'))
       return stampRefs(
         `${header}\n(no UI change since the last snapshot — refs unchanged)${coldTreeNote(current?.marks.length ?? 0, attached !== null && isMinimized(attached.hWnd), attached !== null && isUipiWalled(attached.hWnd), maxDepth)}${foregroundNudge()}`,
       ); // coldTreeNote is '' for a warm tree; on a still-COLD re-snapshot it re-surfaces the restore/activate/elevate steer the bare line would have suppressed (or a maxDepth-cap steer)
@@ -640,16 +643,24 @@ function withSnapshot(message: string): object {
     }
   }
   lastSnapshotTree = tree;
-  if (body === lastSnapshotBody)
-    return textResult(
+  // The rendered body is CAPPED (renderTree → capSnapshot at SNAPSHOT_MAX_CHARS), so on a heavy window a byte-identical
+  // body can still hide a change BELOW the cap. Only take the cheap "no UI change" short-circuit when the body is NOT
+  // truncated; when it is, the authoritative comparison is the full-tree diff below (which sees the whole tree, uncapped).
+  const truncated = body.includes('more nodes — narrow with');
+  const bodyUnchanged = body === lastSnapshotBody;
+  const noUiChange = (): object =>
+    textResult(
       `${message}\n\n${header}\n(no UI change since the last snapshot — refs unchanged)${coldTreeNote(current?.marks.length ?? 0, attached !== null && isMinimized(attached.hWnd), attached !== null && isUipiWalled(attached.hWnd))}${foregroundNudge()}`,
     ); // refs identical → generation held; coldTreeNote ('' when warm) re-surfaces recovery steer on a still-cold tree
+  if (bodyUnchanged && !truncated) return noUiChange();
   if (prior !== null) {
     const diff = diffTrees(prior, tree);
     const refChurn = diff.appeared.some((change) => change.ref !== undefined) || diff.disappeared.some((change) => change.ref !== undefined);
     if (!refChurn && !diff.refsRenumbered) {
       // diff.refsRenumbered is computed in diffTrees' single flatten pass — no second pair of flattens per action.
       const delta = renderDiff(diff);
+      // A truncated byte-identical body whose FULL-tree diff is empty really is unchanged — keep refs, don't re-dump a heavy window.
+      if (delta.count === 0 && bodyUnchanged) return noUiChange();
       if (delta.count > 0 && delta.count <= DIFF_MAX_CHANGES) {
         lastSnapshotBody = body;
         return textResult(stampRefs(`${message}\n\n${header} — Δ ${delta.count} change${delta.count === 1 ? '' : 's'} (other refs unchanged)\n${delta.text}${foregroundNudge()}`)); // no churn → generation held, prior refs stay valid
