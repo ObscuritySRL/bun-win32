@@ -601,6 +601,26 @@ function withSnapshot(message: string): object {
   return textResult(stampRefs(`${message}\n\n${header}\n${body}${coldTreeNote(current?.marks.length ?? 0, attached !== null && isMinimized(attached.hWnd), attached !== null && isUipiWalled(attached.hWnd))}${foregroundNudge()}`));
 }
 
+/** Like withSnapshot, but for an expand whose dropdown items render IN-PROCESS (a WinUI/UWP combobox/menu surfaces its
+ *  items into the SAME tree, not an own window — verified: Settings' combobox reveals ref'd ListItems under itself).
+ *  Those items race the ~13ms rebuild, so poll the rebuilt snapshot until its ref count grows past the pre-expand
+ *  `baseline` (the items appeared) or plateaus. Bounded (a few 60ms ticks); an expand that reveals nothing returns at
+ *  the cap with no harm, and an instant render returns immediately (no added latency). */
+function withSettledSnapshot(message: string, baseline: number): object {
+  let result = withSnapshot(message);
+  for (let attempt = 0; attempt < 6 && (current?.marks.length ?? 0) <= baseline; attempt += 1) {
+    Bun.sleepSync(60);
+    result = withSnapshot(message);
+  }
+  return result;
+}
+
+/** Snapshot an act() outcome: an expand that did NOT open an own-window popup may have revealed in-process items that
+ *  race the rebuild — settle for them; everything else gets one snapshot. */
+function withActSnapshot(action: string, message: string, baseline: number): object {
+  return action === 'expand' && !/OWN window/.test(message) ? withSettledSnapshot(message, baseline) : withSnapshot(message);
+}
+
 /** ValuePattern set, falling back to RangeValuePattern for a numeric value on a slider/spinner (ValuePattern
  *  throws there) — so set_value drives both cursor-free. */
 function setValueSmart(element: Element, value: string): string {
@@ -1403,7 +1423,8 @@ const HANDLERS: Record<string, ToolHandler> = {
   desktop_snapshot: (args) => textResult(snapshotText(typeof args.maxDepth === 'number' ? args.maxDepth : undefined, typeof args.root === 'string' ? args.root : undefined)),
   find_and_act: (args) => {
     const action = requireString(args, 'do');
-    const observe = (message: string): object => (action === 'read' ? textResult(message) : withSnapshot(message)); // a pure read owes no full re-grounding snapshot
+    const baseline = current?.marks.length ?? 0; // captured before the action so an expand can settle for its revealed in-process items
+    const observe = (message: string): object => (action === 'read' ? textResult(message) : withActSnapshot(action, message, baseline)); // a pure read owes no full re-grounding snapshot; an expand settles for revealed items
     if (typeof args.ref === 'string') return observe(act(resolveRef(args.ref), action, typeof args.text === 'string' ? args.text : undefined));
     const window = requireAttached();
     const selector = selectorFrom(args.selector);
@@ -1523,13 +1544,17 @@ const HANDLERS: Record<string, ToolHandler> = {
     const element = resolveRef(requireString(args, 'ref'));
     const target = named(element);
     const before = popupSnapshot();
+    const baseline = current?.marks.length ?? 0;
     patternAction('expand', () => element.expand());
-    // A combobox/menu whose list opens in its OWN window: auto-return it — sleep-free, checked immediately and again
-    // after the withSnapshot rebuild (whose cache build doubles as settle), so a popup-less expand pays no poll latency.
+    // Classic combobox / WinUI 3 desktop flyout opens its list in its OWN untitled window — auto-return it (sleep-free).
     const note = (popup: { hWnd: bigint; className: string }): string => `expanded ${target} (state ${element.expandCollapseState}) — its list opened in its OWN window: [hWnd=0x${popup.hWnd.toString(16)}] [class=${popup.className}] — attach it (attach {hWnd}) to see + select its items.`;
     const early = newPopup(before);
-    const result = withSnapshot(early !== undefined ? note(early) : `expanded ${target} (state ${element.expandCollapseState}) — desktop_snapshot to see revealed items.`);
-    const late = early === undefined ? newPopup(before) : undefined;
+    if (early !== undefined) return withSnapshot(note(early));
+    // In-process WinUI/UWP combobox/menu: items render into the SAME tree after a brief render race — settle until the
+    // revealed items appear so the returned snapshot actually contains them (the old "desktop_snapshot to see them"
+    // steer was a dead end against that race).
+    const result = withSettledSnapshot(`expanded ${target} (state ${element.expandCollapseState})`, baseline);
+    const late = newPopup(before);
     return late !== undefined ? withSnapshot(note(late)) : result;
   },
   collapse: (args) => {
