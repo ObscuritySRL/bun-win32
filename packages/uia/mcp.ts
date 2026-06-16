@@ -1247,7 +1247,7 @@ const TOOLS: McpTool[] = [
     name: 'press_key',
     category: 'input',
     description:
-      'Send a key or chord, e.g. "Enter", "Control+S", "Control+Shift+Tab", "F4". With a ref AND a single key (no chord), posts the key to that control cursor-free (background/occluded/locked OK, no focus). With a ref AND a chord (or a single key on a control with no own window handle), the ref is FOCUSED first (cursor-free UIA SetFocus) so the synthetic input lands on it (needs an unlocked foregrounded desktop). With no ref, the key/chord goes to whatever currently holds focus.',
+      'Send a key or chord, e.g. "Enter", "Control+S", "Control+Shift+Tab", "F4". With a ref AND a single key (no chord), posts the key to that control cursor-free (background/occluded/locked OK, no focus). On a control with its OWN window handle the everyday edit chords are ALSO cursor-free — Control+A/C/X/V/Z map to posted EM_SETSEL/WM_COPY/WM_CUT/WM_PASTE/EM_UNDO (no focus, locked/background OK). Any other chord with a ref FOCUSES it first (cursor-free UIA SetFocus) then sends synthetic input (needs an unlocked foregrounded desktop). With no ref, the key/chord goes to whatever currently holds focus.',
     inputSchema: { type: 'object', properties: { key: { type: 'string' }, element: { type: 'string', description: ELEMENT_DESC }, ref: { type: 'string', description: REF_DESC } }, required: ['key'] },
   },
   {
@@ -1926,6 +1926,27 @@ const HANDLERS: Record<string, ToolHandler> = {
       const element = resolveRef(args.ref);
       const handle = element.nativeWindowHandle;
       if (handle !== 0n && undoControl(handle)) return withSnapshot(`undid the last edit in ${named(element)} cursor-free (EM_UNDO)`);
+    }
+    // The everyday edit chords on an own-HWND control go CURSOR-FREE via the posted-message primitives (no SendInput, no
+    // foreground), mirroring the Control+Z special-case: Ctrl+A select-all, Ctrl+V paste, Ctrl+C copy, Ctrl+X cut.
+    if (typeof args.ref === 'string' && key.includes('+')) {
+      const chord = key.toLowerCase().replace(/\s/g, '').replace('ctrl', 'control');
+      if (chord === 'control+a' || chord === 'control+c' || chord === 'control+x' || chord === 'control+v') {
+        const element = resolveRef(args.ref);
+        const handle = element.nativeWindowHandle;
+        if (handle !== 0n) {
+          if (chord === 'control+a') return selectAllInControl(handle), withSnapshot(`selected all in ${named(element)} cursor-free (EM_SETSEL)`);
+          if (chord === 'control+v') return pasteToControl(handle), withSnapshot(`pasted the clipboard into ${named(element)} cursor-free (WM_PASTE)`);
+          if (element.isPassword) return errorResult(`refusing to ${chord === 'control+c' ? 'copy' : 'cut'} a password field to the clipboard`);
+          if (element.getSelectedText().length === 0) selectAllInControl(handle);
+          const before = clipboardSequence();
+          if (chord === 'control+c') copyFromControl(handle);
+          else cutFromControl(handle);
+          // Only trust the clipboard if WM_COPY/CUT actually moved the counter; else the control ignored it — fall
+          // through to the SendInput chord path rather than claim a stale clipboard.
+          if (clipboardSequence() !== before) return withSnapshot(`${chord === 'control+c' ? 'copied' : 'cut'} ${named(element)} to the clipboard cursor-free — ${JSON.stringify(capText(uia.readClipboard()))}`);
+        }
+      }
     }
     if (typeof args.ref === 'string' && !key.includes('+')) {
       const element = resolveRef(args.ref);
