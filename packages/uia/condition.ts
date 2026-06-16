@@ -40,11 +40,26 @@ export function selectorToString(selector: Selector): string {
   return `{ ${parts.join(', ')} }`;
 }
 
-/** Build the actionable "no element matched … nearest were …" message (the gripe→error design). */
+/** Lower = more relevant to the requested name. Substring matches (either direction) float to the top; everything else
+ *  keeps its original (tree) order via a stable tie-break, so the "nearest" list leads with the likeliest intended target. */
+function nameRelevance(candidate: string, want: string): number {
+  const lower = candidate.toLowerCase();
+  if (lower === want) return 0;
+  if (lower.includes(want) || want.includes(lower)) return 1;
+  return 2;
+}
+
+/** Build the actionable "no element matched … nearest were …" message (the gripe→error design). Candidates are
+ *  de-duplicated and ranked by relevance to the requested name, and when a candidate's name CONTAINS the requested
+ *  exact name (so a name-exact match failed but a substring would hit) the message steers to {nameContains}. */
 export function formatNoMatch(selector: Selector, windowName: string, candidateNames: readonly string[]): string {
-  const nearest = candidateNames.filter((candidate) => candidate.trim().length > 0).slice(0, 8);
+  const want = (typeof selector.name === 'string' ? selector.name : (selector.nameContains ?? '')).toLowerCase();
+  const unique = [...new Set(candidateNames.filter((candidate) => candidate.trim().length > 0))];
+  const ranked = want.length > 0 ? unique.map((name, index) => ({ name, index })).sort((a, b) => nameRelevance(a.name, want) - nameRelevance(b.name, want) || a.index - b.index).map((entry) => entry.name) : unique;
+  const nearest = ranked.slice(0, 8);
   const tail = nearest.length > 0 ? ` — nearest: ${nearest.map((candidate) => JSON.stringify(candidate)).join(', ')}` : '';
-  return `no element matched ${selectorToString(selector)} in "${windowName}"${tail}`;
+  const containsHint = want.length > 0 && typeof selector.name === 'string' && unique.some((candidate) => candidate.toLowerCase().includes(want)) ? ` (a control's name CONTAINS ${JSON.stringify(selector.name)} — retry with {nameContains:${JSON.stringify(selector.name)}})` : '';
+  return `no element matched ${selectorToString(selector)} in "${windowName}"${tail}${containsHint}`;
 }
 
 /** Match a (already-read) element against a selector — all fields AND together. Pure logic. */

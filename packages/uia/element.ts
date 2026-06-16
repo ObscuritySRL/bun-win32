@@ -293,7 +293,8 @@ export class Element {
       for (;;) {
         const found = findFirstMatch(this.ptr, compiled, selector, TreeScope.TreeScope_Descendants);
         if (found !== null) return found;
-        if ((Bun.nanoseconds() - start) / 1e6 >= timeout) throw new Error(this.describeNoMatch(selector));
+        const elapsed = (Bun.nanoseconds() - start) / 1e6;
+        if (elapsed >= timeout) throw new Error(`timed out after ${Math.round(elapsed)} ms — ${this.describeNoMatch(selector)}`);
         await Bun.sleep(interval);
       }
     } finally {
