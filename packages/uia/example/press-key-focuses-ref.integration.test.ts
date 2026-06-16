@@ -59,6 +59,7 @@ function assert(condition: boolean, message: string): void {
 }
 
 uia.initialize();
+const priorCalc = new Set(uia.windows({ includeUntitled: true }).filter((window) => /Calcul/i.test(window.title)).map((window) => window.hWnd));
 const calc = await uia.launch(['cmd', '/c', 'start', 'calc'], { title: 'Calculator' });
 try {
   await call('initialize', { protocolVersion: '2025-11-25', capabilities: {}, clientInfo: { name: 'press-key-focus', version: '1' } });
@@ -95,6 +96,7 @@ try {
   proc.kill();
   closeWindow(calc.hWnd);
   calc.dispose();
+  for (const window of uia.windows({ includeUntitled: true }).filter((w) => /Calcul/i.test(w.title) && !priorCalc.has(w.hWnd))) closeWindow(window.hWnd); // sweep any sibling calc the single-instance relaunch spawned
   uia.uninitialize();
 }
 
