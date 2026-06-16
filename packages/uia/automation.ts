@@ -3,6 +3,7 @@
 import { FFIType } from 'bun:ffi';
 
 import Combase from '@bun-win32/combase';
+import Shcore, { ProcessDpiAwareness } from '@bun-win32/shcore';
 import User32 from '@bun-win32/user32';
 
 import { comRelease, guid, hresult, vcall } from './com';
@@ -38,8 +39,14 @@ export function setOcrDisposer(dispose: () => void): void {
 export function initialize(): bigint {
   if (pAutomation !== 0n) return pAutomation;
   if (!comInitialized) {
-    // Physical-pixel coordinates so SendInput clicks match UIA bounding rectangles (best-effort).
-    User32.SetProcessDPIAware();
+    // Per-monitor DPI awareness so UIA bounding rectangles and click/SendInput coordinates share ONE physical-pixel
+    // space across every monitor. The old system-DPI awareness (SetProcessDPIAware) is aware of only the PRIMARY
+    // monitor's scale, so on a mixed-DPI multi-monitor desktop (e.g. a 150% laptop + a 100% external) the OS
+    // bitmap-virtualizes a secondary monitor's coordinates — UIA bounds and click_point/SendInput then disagree and
+    // clicks land in the wrong place. shcore PROCESS_PER_MONITOR_DPI_AWARE (=2) takes a plain int (no pseudo-handle
+    // pointer marshal, unlike SetProcessDpiAwarenessContext's -4), and we fall back to the user32 system-aware call
+    // on pre-8.1 systems or when awareness is already fixed by the host's manifest (E_ACCESSDENIED). Both best-effort.
+    if (Shcore.SetProcessDpiAwareness(ProcessDpiAwareness.PROCESS_PER_MONITOR_DPI_AWARE) !== S_OK) User32.SetProcessDPIAware();
     const initHr = Combase.CoInitializeEx(null, COINIT_APARTMENTTHREADED);
     if (initHr !== S_OK && initHr !== S_FALSE) throw new Error(`CoInitializeEx failed: ${hresult(initHr)}`);
     comInitialized = true;

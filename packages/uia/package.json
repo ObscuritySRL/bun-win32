@@ -12,6 +12,7 @@
     "@bun-win32/kernel32": "workspace:*",
     "@bun-win32/oleacc": "workspace:*",
     "@bun-win32/oleaut32": "workspace:*",
+    "@bun-win32/shcore": "workspace:*",
     "@bun-win32/shell32": "workspace:*",
     "@bun-win32/user32": "workspace:*"
   },
