@@ -99,6 +99,7 @@ export {
   pasteToControl,
   postKey,
   postText,
+  postWheel,
   rightClickAt,
   scrollWheel,
   selectAllInControl,

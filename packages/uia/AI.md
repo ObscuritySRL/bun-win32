@@ -41,7 +41,7 @@ Escalation rule: stay on the `uia` facade. Drop to a lower engine (`msaaTree`, t
 | read any property / hidden state | `el.getProperty(PropertyId.IsOffscreen)` · `PropertyId.HelpText` · `PropertyId.FrameworkId` · `PropertyId.ItemStatus` |
 | toggle / expand / select / slider | `el.toggle()` · `el.expand()`/`el.collapse()` · `el.select()` · `el.setRangeValue(n)` |
 | select / multi-select / deselect (cursor-free) | `el.select()` (replace) · `el.addToSelection()` · `el.removeFromSelection()` · `el.getSelection()` · `el.canSelectMultiple` |
-| scroll a container (cursor-free, works locked) | `el.scroll(ScrollAmount.NoAmount, ScrollAmount.LargeIncrement)` · `el.setScrollPercent(NoScroll, 50)` · `el.scrollInfo` · `uia.scrollAt(x, y, 'down', 3)` |
+| scroll a container (cursor-free, works locked) | `el.scroll(ScrollAmount.NoAmount, ScrollAmount.LargeIncrement)` · `el.setScrollPercent(NoScroll, 50)` · `el.scrollInfo` · `uia.scrollAt(x, y, 'down', 3)` · `postWheel(hWnd, x, y, notches)` (posted WM_MOUSEWHEEL — scrolls a ScrollPattern-less classic control with its own HWND, background/minimized) |
 | a guaranteed-hittable point inside a control | `el.clickablePoint` → `{ x, y } | null` (UIA GetClickablePoint; `click()` uses it) |
 | read state | `el.name` `el.controlType` `el.controlTypeName` `el.automationId` `el.className` `el.isEnabled` `el.boundingRectangle` |
 | serialize the tree for an LLM | `uia.tree(app, { agentProfile: true })` |

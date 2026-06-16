@@ -252,6 +252,7 @@ const WM_CUT = 0x0000_0300;
 const WM_COPY = 0x0000_0301;
 const WM_PASTE = 0x0000_0302;
 const EM_SETSEL = 0x0000_00b1;
+const WM_MOUSEWHEEL = 0x0000_020a;
 
 /** Set a control's text cursor-free via SendMessageW(WM_SETTEXT) — no keystrokes/focus, works on a background
  *  window. SendMessageW is synchronous, so the wide-string buffer is valid for the call.
@@ -260,6 +261,17 @@ export function setControlText(hWnd: bigint, text: string): boolean {
   if (hWnd === 0n) return false;
   const buffer = Buffer.from(`${text}\0`, 'utf16le');
   return User32.SendMessageW(hWnd, WM_SETTEXT, 0n, BigInt(buffer.ptr!)) !== 0n;
+}
+
+/** Scroll a control's HWND cursor-free via posted WM_MOUSEWHEEL — no real wheel/cursor, works on a background /
+ *  occluded / minimized window. `notches` > 0 scrolls up/away, < 0 down/toward (one notch = WHEEL_DELTA 120).
+ *  `screenX`/`screenY` is the point the wheel is reported over (the control's center). False for a 0 handle. */
+export function postWheel(hWnd: bigint, screenX: number, screenY: number, notches: number): boolean {
+  if (hWnd === 0n) return false;
+  const delta = Math.trunc(notches) * 120;
+  const wParam = BigInt(((delta & 0xffff) << 16) >>> 0); // hiword = wheel delta (signed short), loword = key flags (none)
+  const lParam = BigInt((((screenY & 0xffff) << 16) | (screenX & 0xffff)) >>> 0); // loword = x, hiword = y (screen coords)
+  return User32.PostMessageW(hWnd, WM_MOUSEWHEEL, wParam, lParam) !== 0;
 }
 
 /** Press a key (WM_KEYDOWN + WM_KEYUP) on a control's HWND cursor-free — Enter / Tab / Escape / arrows / a single

@@ -55,6 +55,7 @@ import {
   postDoubleClickToHwnd,
   postKey,
   postText,
+  postWheel,
   processImagePath,
   PropertyId,
   pruneRefTree,
@@ -1079,7 +1080,7 @@ const TOOLS: McpTool[] = [
     name: 'scroll',
     category: 'input',
     description:
-      'Scroll a control. With a direction, scrolls the nearest ScrollPattern container by `amount` steps (cursor-free, works on a locked/background window); without a direction, scrolls the ref into view via the ScrollItem pattern.',
+      'Scroll a control. With a direction, scrolls the nearest ScrollPattern container by `amount` steps; if the control has no ScrollPattern but its own window handle, a posted WM_MOUSEWHEEL scrolls it up/down — both cursor-free, working on a locked/background/minimized window; only then does it fall to a real wheel. Without a direction, scrolls the ref into view via the ScrollItem pattern.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -1706,7 +1707,15 @@ const HANDLERS: Record<string, ToolHandler> = {
         return withSnapshot(`scrolled ${target} ${direction} ${amount}`);
       }
       const bounds = element.boundingRectangle;
-      if (scrollAt(bounds.x + Math.floor(bounds.width / 2), bounds.y + Math.floor(bounds.height / 2), direction, amount)) return withSnapshot(`scrolled ${target} ${direction} ${amount}`);
+      const centerX = bounds.x + Math.floor(bounds.width / 2);
+      const centerY = bounds.y + Math.floor(bounds.height / 2);
+      // No ScrollPattern — for a classic control with its own HWND, a posted WM_MOUSEWHEEL scrolls it CURSOR-FREE
+      // (works minimized/background/locked), the path a ScrollPattern-less ListView/Edit/TreeView needs. Vertical only
+      // (WM_MOUSEWHEEL); horizontal falls through to the SendInput wheel.
+      const handle = element.nativeWindowHandle !== 0n ? element.nativeWindowHandle : ownerHwnd(element);
+      if ((direction === 'up' || direction === 'down') && handle !== 0n && postWheel(handle, centerX, centerY, direction === 'up' ? Math.max(1, amount) : -Math.max(1, amount)))
+        return withSnapshot(`scrolled ${target} ${direction} ${amount} (posted wheel, cursor-free)`);
+      if (scrollAt(centerX, centerY, direction, amount)) return withSnapshot(`scrolled ${target} ${direction} ${amount}`);
       return withSnapshot(`no scrollable container at ${target}`);
     }
     element.scrollIntoView();
