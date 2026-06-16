@@ -147,4 +147,5 @@ export {
   type WindowCapture,
   type WindowInfo,
   windowForProcess,
+  windowProcessId,
 } from './window';

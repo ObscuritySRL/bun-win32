@@ -80,6 +80,7 @@ import {
   undoControl,
   virtualScreen,
   type Window,
+  windowProcessId,
 } from './index';
 
 type JsonRpcId = string | number | null;
@@ -151,6 +152,25 @@ function envSet(name: string): Set<string> {
       .map((part) => part.trim())
       .filter((part) => part.length > 0),
   );
+}
+
+// This MCP host's own integrity level, read once — a window that outranks it is behind the UIPI wall (UIA reads,
+// capture, and input all silently fail), which an empty-tree snapshot must NOT misdiagnose as a recoverable cold tree.
+const INTEGRITY_RANK: Record<string, number> = { '': 2, untrusted: 0, low: 1, medium: 2, high: 3, system: 4 };
+const hostIntegrityRank = (() => {
+  try {
+    return INTEGRITY_RANK[integrityLevel(process.pid)] ?? 2;
+  } catch {
+    return 2;
+  }
+})();
+/** True if a window's process outranks this host on integrity — its tree is unreachable across the UIPI wall. */
+function isUipiWalled(hWnd: bigint): boolean {
+  try {
+    return (INTEGRITY_RANK[integrityLevel(windowProcessId(hWnd))] ?? 2) > hostIntegrityRank;
+  } catch {
+    return false;
+  }
 }
 
 const enabledCategories = new Set<ToolCategory>(PROFILES[(Bun.env.BUN_UIA_PROFILE ?? 'safe').toLowerCase()] ?? PROFILES.safe);
@@ -423,7 +443,7 @@ function snapshotText(maxDepth?: number, rootName?: string): string {
     if (root === undefined && body === lastSnapshotBody) return stampRefs(`${header}\n(no UI change since the last snapshot — refs unchanged)`);
     lastSnapshotBody = body;
     refGen += 1; // an explicit re-ground renumbers refs — invalidate any the model still holds
-    return stampRefs(`${header}\n${body}${root === undefined ? coldTreeNote(current?.marks.length ?? 0, attached !== null && isMinimized(attached.hWnd)) : ''}`);
+    return stampRefs(`${header}\n${body}${root === undefined ? coldTreeNote(current?.marks.length ?? 0, attached !== null && isMinimized(attached.hWnd), attached !== null && isUipiWalled(attached.hWnd)) : ''}`);
   } finally {
     root?.release();
   }
@@ -500,7 +520,7 @@ function withSnapshot(message: string): object {
   }
   lastSnapshotBody = body;
   refGen += 1; // a full re-dump renumbers refs in traversal order — bump so the model's pre-re-render refs are rejected
-  return textResult(stampRefs(`${message}\n\n${header}\n${body}${coldTreeNote(current?.marks.length ?? 0, attached !== null && isMinimized(attached.hWnd))}`));
+  return textResult(stampRefs(`${message}\n\n${header}\n${body}${coldTreeNote(current?.marks.length ?? 0, attached !== null && isMinimized(attached.hWnd), attached !== null && isUipiWalled(attached.hWnd))}`));
 }
 
 /** ValuePattern set, falling back to RangeValuePattern for a numeric value on a slider/spinner (ValuePattern

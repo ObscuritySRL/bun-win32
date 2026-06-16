@@ -57,6 +57,11 @@ export function isWindow(hWnd: bigint): boolean {
   return hWnd !== 0n && User32.IsWindow(hWnd) !== 0;
 }
 
+/** The owning process id of a window handle (GetWindowThreadProcessId). 0 for a 0 handle. */
+export function windowProcessId(hWnd: bigint): number {
+  return hWnd === 0n ? 0 : readProcessId(hWnd);
+}
+
 /** Enumerate visible top-level windows with their class and owning process id. Titled windows always; with
  *  `includeUntitled`, also visible non-zero-size UNTITLED top-levels — the popups (combobox dropdowns, classic
  *  #32768 context menus, WPF/WinUI Popups, autocomplete lists) that open in their own window and would otherwise
