@@ -43,6 +43,21 @@ export interface TreeDiff {
   disappeared: TreeChange[];
   renamed: RenameChange[];
   restated: StateChange[];
+  /** True if any ref id now denotes a DIFFERENT structural node than before — the delta's "your other refs are
+   *  unchanged" invariant. Computed in the SAME flatten pass as the diff, so a caller never needs a second
+   *  flatten via the standalone refsRenumbered(). */
+  refsRenumbered: boolean;
+}
+
+/** Whether any ref id maps to a different node between the two already-flattened trees (the maps diffTrees builds). */
+function refsRenumberedFromMaps(priors: Map<string, DiffNode>, nexts: Map<string, DiffNode>): boolean {
+  const priorRefs = new Map<string, string>();
+  const nextRefs = new Map<string, string>();
+  for (const [key, node] of priors) if (node.ref !== undefined) priorRefs.set(key, node.ref);
+  for (const [key, node] of nexts) if (node.ref !== undefined) nextRefs.set(key, node.ref);
+  if (priorRefs.size !== nextRefs.size) return true;
+  for (const [key, ref] of nextRefs) if (priorRefs.get(key) !== ref) return true;
+  return false;
 }
 
 function flatten(node: DiffNode, path: string, into: Map<string, DiffNode>): void {
@@ -78,7 +93,7 @@ export function diffTrees(before: DiffNode, after: DiffNode): TreeDiff {
   for (const [key, node] of priors) {
     if (!nexts.has(key)) disappeared.push({ key, role: node.role, name: node.name, ref: node.ref });
   }
-  return { appeared, disappeared, renamed, restated };
+  return { appeared, disappeared, renamed, restated, refsRenumbered: refsRenumberedFromMaps(priors, nexts) };
 }
 
 /** True if any ref id now denotes a DIFFERENT structural node than in `before` — the real invariant behind a delta's
@@ -90,16 +105,7 @@ export function refsRenumbered(before: DiffNode, after: DiffNode): boolean {
   const nexts = new Map<string, DiffNode>();
   flatten(before, '0', priors);
   flatten(after, '0', nexts);
-  const refOf = (nodes: Map<string, DiffNode>): Map<string, string> => {
-    const refs = new Map<string, string>();
-    for (const [key, node] of nodes) if (node.ref !== undefined) refs.set(key, node.ref);
-    return refs;
-  };
-  const a = refOf(priors);
-  const b = refOf(nexts);
-  if (a.size !== b.size) return true;
-  for (const [key, ref] of b) if (a.get(key) !== ref) return true;
-  return false;
+  return refsRenumberedFromMaps(priors, nexts);
 }
 
 /**

@@ -60,7 +60,6 @@ import {
   pruneRefTree,
   raiseWindow,
   type RefNode,
-  refsRenumbered,
   renderDiff,
   renderSnapshot,
   renderWindowTree,
@@ -442,7 +441,8 @@ function withSnapshot(message: string): object {
   if (prior !== null) {
     const diff = diffTrees(prior, tree);
     const refChurn = diff.appeared.some((change) => change.ref !== undefined) || diff.disappeared.some((change) => change.ref !== undefined);
-    if (!refChurn && !refsRenumbered(prior, tree)) {
+    if (!refChurn && !diff.refsRenumbered) {
+      // diff.refsRenumbered is computed in diffTrees' single flatten pass — no second pair of flattens per action.
       const delta = renderDiff(diff);
       if (delta.count > 0 && delta.count <= DIFF_MAX_CHANGES) {
         lastSnapshotBody = body;
