@@ -1064,7 +1064,7 @@ const TOOLS: McpTool[] = [
     name: 'find_text',
     category: 'input',
     description:
-      'Find a substring inside a text/document control and SELECT it — cursor-free, the desktop analog of getByText. Target the Document/Edit ref; the match becomes the active text selection so you can then copy it, replace it (set_value/type), or read it. Returns the matched text, or "not found".',
+      'Find a substring inside a text/document control and SELECT it — cursor-free, the desktop analog of getByText. Target the Document/Edit ref; the match becomes the active text selection so you can then copy it, replace just that match (type or paste over it — NOT set_value, which overwrites the WHOLE control), or read it. Returns the matched text, or "not found".',
     inputSchema: {
       type: 'object',
       properties: { element: { type: 'string', description: ELEMENT_DESC }, ref: { type: 'string', description: REF_DESC }, text: { type: 'string' }, ignoreCase: { type: 'boolean' } },
@@ -1617,7 +1617,7 @@ const HANDLERS: Record<string, ToolHandler> = {
     return textResult(
       matched === null
         ? `text not present in this control: ${JSON.stringify(args.text)} — try a shorter / exact substring, mind case (ignoreCase:true), or it may be scrolled/virtualized off-screen (reveal it first)`
-        : `found and selected ${JSON.stringify(matched)} — now the active text selection (copy / set_value / read it)`,
+        : `found and selected ${JSON.stringify(matched)} — the active text selection; type or paste over it to REPLACE just this match (NOT set_value, which overwrites the WHOLE control), or copy / read it`,
     );
   },
   wait_for: async (args) => {
