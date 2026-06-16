@@ -936,7 +936,7 @@ const TOOLS: McpTool[] = [
     name: 'reveal',
     category: 'input',
     description:
-      'Scroll a VIRTUALIZED / off-screen list, grid, or tree item into view by selector, then optionally act on it. Use when a desktop_snapshot omits an item because it is scrolled below the fold (Explorer folders, long lists, data grids) — those rows are not in the a11y tree until realized. Cursor-free, no focus. do = invoke|click|type|set_value|toggle|read; omit do to just bring it into the next snapshot (it then has a ref).',
+      'Scroll a VIRTUALIZED / off-screen list, grid, or tree item into view by selector, then optionally act on it. Use when a desktop_snapshot omits an item because it is scrolled out of view (Explorer folders, long lists, data grids, horizontal carousels) — those rows are not in the a11y tree until realized. Scans the container vertically (primary) and, when it only scrolls horizontally, along the horizontal axis. Cursor-free, no focus. do = invoke|click|type|set_value|toggle|read; omit do to just bring it into the next snapshot (it then has a ref).',
     inputSchema: {
       type: 'object',
       properties: {

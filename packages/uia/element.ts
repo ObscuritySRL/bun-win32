@@ -258,22 +258,33 @@ export class Element {
     if (container === null) return null;
     try {
       const info = container.scrollInfo;
-      if (info === null || !info.verticallyScrollable) return this.find(selector);
-      if (options.fromTop !== false && info.verticalPercent > 0) {
-        container.setScrollPercent(NoScroll, 0);
-        Bun.sleepSync(120);
-      }
+      if (info === null) return this.find(selector);
       const maxSteps = options.maxSteps ?? 80;
-      for (let step = 0; step < maxSteps; step += 1) {
-        const found = this.find(selector);
-        if (found !== null) return found;
-        const before = container.scrollInfo?.verticalPercent ?? 100;
-        if (before >= 100) break;
-        container.scroll(ScrollAmount.NoAmount, ScrollAmount.LargeIncrement);
-        Bun.sleepSync(120);
-        if ((container.scrollInfo?.verticalPercent ?? 100) <= before) break; // reached the end / no progress
-      }
-      return this.find(selector);
+      // Scan ONE axis: rewind to its start (unless fromTop:false), then step in LargeIncrements until the item is found
+      // or the axis stops progressing. Used for the vertical axis (primary) and, when an item is horizontally scrolled
+      // off (carousels, wide lists, horizontally-virtualized panes), the horizontal axis a vertical-only scan misses.
+      const scan = (scrollable: boolean, percent: () => number, toStart: () => void, step: () => void): Element | null => {
+        if (!scrollable) return null;
+        if (options.fromTop !== false && percent() > 0) {
+          toStart();
+          Bun.sleepSync(120);
+        }
+        for (let count = 0; count < maxSteps; count += 1) {
+          const found = this.find(selector);
+          if (found !== null) return found;
+          const before = percent();
+          if (before >= 100) break;
+          step();
+          Bun.sleepSync(120);
+          if (percent() <= before) break; // reached the end / no progress
+        }
+        return null;
+      };
+      return (
+        scan(info.verticallyScrollable, () => container.scrollInfo?.verticalPercent ?? 100, () => container.setScrollPercent(NoScroll, 0), () => container.scroll(ScrollAmount.NoAmount, ScrollAmount.LargeIncrement)) ??
+        scan(container.scrollInfo?.horizontallyScrollable ?? false, () => container.scrollInfo?.horizontalPercent ?? 100, () => container.setScrollPercent(0, NoScroll), () => container.scroll(ScrollAmount.LargeIncrement, ScrollAmount.NoAmount)) ??
+        this.find(selector)
+      );
     } finally {
       if (container !== options.container) container.release();
     }
