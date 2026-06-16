@@ -619,6 +619,25 @@ function withSnapshot(message: string): object {
   }
   const { header, tree } = rebuilt;
   const body = renderTree(tree);
+  // A close-the-window action (a dialog's OK/Cancel/Close, a menu Exit) leaves an EMPTY rebuilt tree while the window
+  // tears down ASYNCHRONOUSLY — at this instant isWindow can still be true (so assertAttachedAlive in the rebuild did
+  // not fire), and the empty tree would otherwise read as a misleading "cold tree — re-snapshot to build it" loop that
+  // only errors one round-trip later. When the new tree has 0 actionable controls but the PRIOR snapshot had refs,
+  // settle briefly and re-check: if the window is now gone, report the close cleanly and drop the dead state. Gated on
+  // prior-had-refs + post-settle isWindow===false, so a genuinely cold/minimized (but alive) tree falls through unchanged.
+  if (current !== null && current.marks.length === 0 && attached !== null && lastSnapshotBody.includes('[ref=')) {
+    Bun.sleepSync(200);
+    if (!isWindow(attached.hWnd)) {
+      const dead = attached.hWnd;
+      current.dispose();
+      current = null;
+      attached.dispose();
+      attached = null;
+      lastSnapshotBody = '';
+      lastSnapshotTree = null;
+      return textResult(`${message}\n\n(the attached window (hWnd 0x${dead.toString(16)}) has CLOSED — the action succeeded and the window is gone; call list_windows then attach a live window)`);
+    }
+  }
   lastSnapshotTree = tree;
   if (body === lastSnapshotBody)
     return textResult(
