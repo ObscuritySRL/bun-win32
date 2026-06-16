@@ -268,6 +268,31 @@ function attachByClassName(className: string): Window {
   throw new Error(`no VISIBLE window has class ${JSON.stringify(className)}${hWnd !== 0n ? ' (FindWindowW matched only an invisible helper)' : ''} — call list_windows and attach by an exact title or an hWnd.`);
 }
 
+/** Pick a window by exact title (optionally refined by className), disambiguating MANY matches with their hWnds the
+ *  way attachByClassName does — so attach never silently grabs an arbitrary same-titled window. Falls back to the
+ *  library resolveWindow (FindWindowW) when uia.windows/EnumWindows enumerates none (the Shell_TrayWnd-miss case). */
+function attachByTitle(title: string, className: string | undefined): Window {
+  const matches = uia.windows({ includeUntitled: true }).filter((window) => window.title === title && (className === undefined || window.className === className));
+  if (matches.length > 1)
+    throw new Error(
+      `${matches.length} visible windows have title ${JSON.stringify(title)} — attach by hWnd to pick one:\n${matches.map((window) => `  - [class=${window.className}] [hWnd=0x${window.hWnd.toString(16)}] [pid=${window.processId}]`).join('\n')}`,
+    );
+  if (matches.length === 1) return uia.attach(matches[0]!.hWnd);
+  return uia.attach({ title, ...(className !== undefined ? { className } : {}) }); // EnumWindows-miss fallback (matches the library's first-match semantics)
+}
+
+/** Pick a window by owning processId, disambiguating MANY top-level windows of that process with their hWnds rather
+ *  than silently grabbing the first — a multi-window app (Explorer, a browser) otherwise lands on an arbitrary one. */
+function attachByProcess(processId: number): Window {
+  const matches = uia.windows({ includeUntitled: true }).filter((window) => window.processId === processId);
+  if (matches.length > 1)
+    throw new Error(
+      `process ${processId} has ${matches.length} visible windows — attach by hWnd (or title + className) to pick one:\n${matches.map((window) => `  - ${JSON.stringify(window.title)} [class=${window.className}] [hWnd=0x${window.hWnd.toString(16)}]`).join('\n')}`,
+    );
+  if (matches.length === 1) return uia.attach(matches[0]!.hWnd);
+  return uia.attach({ process: processId }); // EnumWindows-miss fallback (library first-match)
+}
+
 /** An hWnd argument as a bigint, or undefined if absent — accepts both a string ('0x1234' / '4660') AND a JSON
  *  number (the form a model overwhelmingly emits for an integer handle; the string-only gate silently ignored it,
  *  so window-scoped tools mis-targeted the attached window with a success message). BigInt() accepts either. */
@@ -1230,10 +1255,10 @@ const HANDLERS: Record<string, ToolHandler> = {
     lastSnapshotBody = '';
     lastSnapshotTree = null;
     const handle = hwndArg(args);
-    if (typeof args.title === 'string') attached = uia.attach({ title: args.title, ...(typeof args.className === 'string' ? { className: args.className } : {}) });
+    if (typeof args.title === 'string') attached = attachByTitle(args.title, typeof args.className === 'string' ? args.className : undefined);
     else if (typeof args.className === 'string') attached = attachByClassName(args.className);
     else if (handle !== undefined) attached = uia.attach(handle);
-    else if (typeof args.processId === 'number') attached = uia.attach({ process: args.processId });
+    else if (typeof args.processId === 'number') attached = attachByProcess(args.processId);
     else throw new Error('attach requires one of: title, className, hWnd, processId');
     return withSnapshot(`attached to ${JSON.stringify(attached.name)}${blindSpotNote(attached.className)}`);
   },
@@ -1244,12 +1269,22 @@ const HANDLERS: Record<string, ToolHandler> = {
     if (typeof args.ref === 'string') return observe(act(resolveRef(args.ref), action, typeof args.text === 'string' ? args.text : undefined));
     const window = requireAttached();
     const selector = selectorFrom(args.selector);
-    const element = window.find(selector);
-    if (element === null) throw new Error(window.describeNoMatch(selector));
+    const matches = window.findAll(selector); // findAll, not find — so an AMBIGUOUS selector is caught, not silently acted on
+    if (matches.length === 0) throw new Error(window.describeNoMatch(selector));
     try {
-      return observe(act(element, action, typeof args.text === 'string' ? args.text : undefined));
+      // A destructive verb on >1 matches would hit an arbitrary control with a confident success — refuse and list
+      // the candidates (the same discipline attach uses), so the agent narrows by automationId/controlType or a ref.
+      if (matches.length > 1 && action !== 'read')
+        return errorResult(
+          `selector matched ${matches.length} controls — refusing to ${action} an ambiguous target. Narrow with automationId / controlType, or pass a specific ref:\n${matches
+            .slice(0, 10)
+            .map((match) => `  - ${match.controlTypeName} ${JSON.stringify(match.name)}${match.automationId.length > 0 ? ` [automationId=${match.automationId}]` : ''} {x:${match.boundingRectangle.x},y:${match.boundingRectangle.y}}`)
+            .join('\n')}${matches.length > 10 ? `\n  … +${matches.length - 10} more` : ''}`,
+        );
+      const outcome = act(matches[0]!, action, typeof args.text === 'string' ? args.text : undefined);
+      return observe(matches.length > 1 ? `${outcome} (read the first of ${matches.length} matches)` : outcome);
     } finally {
-      element.release();
+      for (const match of matches) match.release();
     }
   },
   reveal: (args) => {
