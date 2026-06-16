@@ -2123,10 +2123,14 @@ const HANDLERS: Record<string, ToolHandler> = {
       if (chord === 'control+a' || chord === 'control+c' || chord === 'control+x' || chord === 'control+v') {
         const element = resolveRef(args.ref);
         const handle = element.nativeWindowHandle;
+        // Refuse to copy/cut a password field to the clipboard REGARDLESS of native handle. This MUST run before the
+        // handle guard: a no-own-HWND password input (WinUI/WPF/Electron, handle===0n) skips the cursor-free block and
+        // falls through to the SendInput chord path below, which would copy the secret as cleartext that read_clipboard
+        // then returns. isPassword is a UIA property readable on any element.
+        if ((chord === 'control+c' || chord === 'control+x') && element.isPassword) return errorResult(`refusing to ${chord === 'control+c' ? 'copy' : 'cut'} a password field to the clipboard`);
         if (handle !== 0n) {
           if (chord === 'control+a') return selectAllInControl(handle), withSnapshot(`selected all in ${named(element)} cursor-free (EM_SETSEL)`);
           if (chord === 'control+v') return pasteToControl(handle), withSnapshot(`pasted the clipboard into ${named(element)} cursor-free (WM_PASTE)`);
-          if (element.isPassword) return errorResult(`refusing to ${chord === 'control+c' ? 'copy' : 'cut'} a password field to the clipboard`);
           if (element.getSelectedText().length === 0) selectAllInControl(handle);
           const before = clipboardSequence();
           if (chord === 'control+c') copyFromControl(handle);
