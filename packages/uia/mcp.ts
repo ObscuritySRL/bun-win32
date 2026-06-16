@@ -453,7 +453,10 @@ function snapshotText(maxDepth?: number, rootName?: string): string {
     // structurally identical rebuild reassigned the same ref ids to the same controls, so the model's current-gen
     // refs still resolve. Return a one-line "no change" (saves the full re-dump) and keep refs valid (mirrors the
     // withSnapshot action-path contract). A scoped (root/maxDepth) snapshot always renders fully.
-    if (root === undefined && body === lastSnapshotBody) return stampRefs(`${header}\n(no UI change since the last snapshot — refs unchanged)${foregroundNudge()}`);
+    if (root === undefined && body === lastSnapshotBody)
+      return stampRefs(
+        `${header}\n(no UI change since the last snapshot — refs unchanged)${coldTreeNote(current?.marks.length ?? 0, attached !== null && isMinimized(attached.hWnd), attached !== null && isUipiWalled(attached.hWnd))}${foregroundNudge()}`,
+      ); // coldTreeNote is '' for a warm tree; on a still-COLD re-snapshot it re-surfaces the restore/activate/elevate steer the bare line would have suppressed
     lastSnapshotBody = body;
     refGen += 1; // an explicit re-ground renumbers refs — invalidate any the model still holds
     return stampRefs(`${header}\n${body}${root === undefined ? coldTreeNote(current?.marks.length ?? 0, attached !== null && isMinimized(attached.hWnd), attached !== null && isUipiWalled(attached.hWnd)) + foregroundNudge() : ''}`);
@@ -468,8 +471,16 @@ function resolveRef(ref: string): Element {
   // No snapshot exists yet (fresh server, a failed attach, or a ref copied from a different session) — there is no
   // tree "above" to re-read, so say that plainly instead of the stale-generation message.
   if (current === null) throw new Error('no snapshot yet — call list_windows then attach (attach returns a snapshot), or desktop_snapshot, before using a ref');
+  // A bare ref (no #generation) can no longer be PROVEN current once any re-render has happened — silently resolving it
+  // to whatever now occupies that traversal slot would act on the WRONG control, breaking the "rejected, not
+  // mis-resolved" guarantee. At refGen 0 (nothing re-rendered yet) a bare ref is still legitimately current; after the
+  // first re-render every live ref carries #G≥1 (stampRefs), so a bare ref is provably stale/mangled.
+  if (hash < 0 && refGen > 0)
+    throw new Error(
+      `ref ${id} is missing its #generation tag — pass it VERBATIM from the latest snapshot (e.g. ${id}#${refGen}); a bare ref can no longer be proven current, so it is rejected rather than mis-resolved — re-read the snapshot above and use ITS refs`,
+    );
   // A ref carrying a stale generation provably no longer denotes the same control — fail loud instead of acting on
-  // whatever now occupies that traversal slot. A bare ref (no #) is accepted leniently as current-generation.
+  // whatever now occupies that traversal slot.
   if (hash >= 0 && Number(ref.slice(hash + 1)) !== refGen)
     throw new Error(`ref ${id} is from an earlier snapshot generation (the tree was re-grounded since) — read the latest snapshot above and use ITS refs, or use find_and_act {selector} / reveal {selector}, which need no ref`);
   const element = current?.resolve(id) ?? null;
@@ -518,7 +529,10 @@ function withSnapshot(message: string): object {
   const { header, tree } = rebuilt;
   const body = renderTree(tree);
   lastSnapshotTree = tree;
-  if (body === lastSnapshotBody) return textResult(`${message}\n\n${header}\n(no UI change since the last snapshot — refs unchanged)${foregroundNudge()}`); // refs identical → generation held
+  if (body === lastSnapshotBody)
+    return textResult(
+      `${message}\n\n${header}\n(no UI change since the last snapshot — refs unchanged)${coldTreeNote(current?.marks.length ?? 0, attached !== null && isMinimized(attached.hWnd), attached !== null && isUipiWalled(attached.hWnd))}${foregroundNudge()}`,
+    ); // refs identical → generation held; coldTreeNote ('' when warm) re-surfaces recovery steer on a still-cold tree
   if (prior !== null) {
     const diff = diffTrees(prior, tree);
     const refChurn = diff.appeared.some((change) => change.ref !== undefined) || diff.disappeared.some((change) => change.ref !== undefined);
