@@ -75,6 +75,7 @@ import {
   type Snapshot,
   type TableData,
   uia,
+  virtualScreen,
   type Window,
 } from './index';
 
@@ -568,6 +569,15 @@ function clickElement(element: Element, button: 'left' | 'right' | 'middle', dou
     // another window occludes the pixel (the 'drive in the dark' doctrine). Falls back to the topmost-at-pixel
     // (*At) only if the element has no native window in its ancestry. Double + middle get a cursor-free path too.
     const owner = ownerHwnd(element);
+    // A posted COORDINATE click cannot land on a window whose pixels are OFF-SCREEN (a minimized window's bounds are
+    // ~-32000) — the message would target a phantom point and we'd report a false success. Invoke (above) already
+    // handles minimized windows cursor-free; reaching here means this control has no Invoke pattern, so steer the
+    // agent to restore the window or use a pattern verb rather than silently miss.
+    const screen = virtualScreen();
+    if (point.x < screen.x || point.y < screen.y || point.x >= screen.x + screen.width || point.y >= screen.y + screen.height || (owner !== 0n && isMinimized(owner)))
+      throw new Error(
+        `cannot click ${named(element)} by coordinate — it is off-screen / its window is minimized and it has no Invoke pattern for a cursor-free activate. Restore the window first (manage_window {action:"restore"} — cursor-free, no foreground), then click; or use a pattern verb from inspect_element's can: list (select / toggle / expand).`,
+      );
     if (doubleClick) {
       if (owner !== 0n ? postDoubleClickToHwnd(owner, point.x, point.y) : postDoubleClickAt(point.x, point.y)) return 'posted double-click (cursor-free)';
     } else if (owner !== 0n ? postClickToHwnd(owner, point.x, point.y, button) : postClickAt(point.x, point.y, button)) {
