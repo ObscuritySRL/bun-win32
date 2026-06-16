@@ -5,7 +5,7 @@
 // inspects the target's name/controlType BEFORE acting — a semantic guardrail pixel agents can't build.
 // This is a client-side GATE, not a sandbox; it sits inside, not instead of, VM/container isolation.
 
-import type { AgentAction, AgentActionResult } from './agent';
+import { type AgentAction, type AgentActionResult, performAgentAction } from './agent';
 import type { Element } from './element';
 import type { UiaNode } from './tree';
 
@@ -57,13 +57,7 @@ export function safeExecute(window: Element, actions: readonly AgentAction[], op
         continue;
       }
       if (STATE_CHANGING.has(action.do) && options.confirm !== undefined && !options.confirm(action, target)) throw new Error(`action "${action.do}" on ${target} was not confirmed`);
-      let value: string | undefined;
-      if (action.do === 'invoke') element.invoke();
-      else if (action.do === 'click') element.click();
-      else if (action.do === 'type') element.type(action.text ?? '');
-      else if (action.do === 'setValue') element.setValue(action.text ?? '');
-      else if (action.do === 'toggle') element.toggle();
-      else value = element.isPassword ? '(password — withheld)' : element.value || element.text() || ''; // withhold secret-field values — safeExecute is the TRUST layer (it ships redactTree); NOT element.name (no label-as-value)
+      const value = performAgentAction(element, action); // cursor-free first (invoke / posted click / posted WM_CHAR) — the trust layer honors the drive-in-the-dark doctrine too
       options.onAction?.({ action, target, ok: true, dryRun: false });
       results.push({ action, ok: true, value });
     } catch (error) {

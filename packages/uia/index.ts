@@ -66,7 +66,7 @@ export const uia = {
   writeClipboard,
 };
 
-export { type AgentAction, type AgentActionResult, AGENT_TOOLS, execute, groundingTree } from './agent';
+export { type AgentAction, type AgentActionResult, AGENT_TOOLS, execute, groundingTree, performAgentAction } from './agent';
 export { automation, initialize, trueCondition, uninitialize } from './automation';
 export { AutomationElementMode, CacheRequest, createCacheRequest, DEFAULT_CACHE_PROPERTIES } from './cache';
 export { clipboardSequence, copy, paste, readClipboard, readClipboardFiles, writeClipboard } from './clipboard';

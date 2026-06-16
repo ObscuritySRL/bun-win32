@@ -4,7 +4,9 @@
 // structured alternative the computer-use literature (UFO2, OSWorld) is converging on.
 
 import type { Selector } from './condition';
+import { ownerHwnd, postClickToHwnd } from './coords';
 import type { Element } from './element';
+import { postText } from './input';
 import { serialize, type UiaNode } from './tree';
 
 export interface AgentAction {
@@ -20,6 +22,34 @@ export interface AgentActionResult {
   error?: string;
 }
 
+/** Perform one resolved action CURSOR-FREE first — mirroring the MCP layer so the library facades honor the same
+ *  drive-in-the-dark doctrine: invoke() before a real click, a posted click to the owner before SendInput, and a posted
+ *  WM_CHAR before a SendInput type. So execute()/safeExecute() do NOT steal foreground, move the real cursor, or fail on
+ *  a locked session when a cursor-free path exists. Returns the read value for 'read', else undefined. */
+export function performAgentAction(element: Element, action: AgentAction): string | undefined {
+  if (action.do === 'invoke') return void element.invoke();
+  if (action.do === 'toggle') return void element.toggle();
+  if (action.do === 'setValue') return void element.setValue(action.text ?? '');
+  if (action.do === 'read') return element.isPassword ? '(password — withheld)' : element.value || element.text() || ''; // withhold secret-field values; NOT element.name (no label-as-value)
+  if (action.do === 'type') {
+    const handle = element.nativeWindowHandle;
+    if (handle !== 0n) return void postText(handle, action.text ?? ''); // cursor-free WM_CHAR to the control's own HWND
+    return void element.type(action.text ?? ''); // no own HWND — SendInput (needs focus)
+  }
+  // 'click' — invoke (cursor-free, works locked/minimized/background); else a posted click to the OWNER window; else
+  // a real SendInput click as the last resort.
+  try {
+    return void element.invoke();
+  } catch {
+    // no Invoke pattern — try a posted click
+  }
+  const owner = ownerHwnd(element);
+  const bounds = element.boundingRectangle;
+  const point = element.clickablePoint ?? { x: bounds.x + Math.floor(bounds.width / 2), y: bounds.y + Math.floor(bounds.height / 2) };
+  if (owner !== 0n && postClickToHwnd(owner, point.x, point.y, 'left')) return undefined;
+  return void element.click();
+}
+
 /** Execute a JSON action list against a window: each step finds an element by selector, then acts. */
 export function execute(window: Element, actions: readonly AgentAction[]): AgentActionResult[] {
   const results: AgentActionResult[] = [];
@@ -30,13 +60,7 @@ export function execute(window: Element, actions: readonly AgentAction[]): Agent
       continue;
     }
     try {
-      let value: string | undefined;
-      if (action.do === 'invoke') element.invoke();
-      else if (action.do === 'click') element.click();
-      else if (action.do === 'type') element.type(action.text ?? '');
-      else if (action.do === 'setValue') element.setValue(action.text ?? '');
-      else if (action.do === 'toggle') element.toggle();
-      else value = element.isPassword ? '(password — withheld)' : element.value || element.text() || ''; // withhold secret-field values (matches the MCP read gate); NOT element.name — never return the label dressed as the read value
+      const value = performAgentAction(element, action); // cursor-free first (invoke / posted click / posted WM_CHAR)
       results.push({ action, ok: true, value });
     } catch (error) {
       results.push({ action, ok: false, error: (error as Error).message });
