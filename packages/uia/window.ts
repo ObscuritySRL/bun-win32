@@ -66,26 +66,34 @@ export function windowProcessId(hWnd: bigint): number {
  *  `includeUntitled`, also visible non-zero-size UNTITLED top-levels — the popups (combobox dropdowns, classic
  *  #32768 context menus, WPF/WinUI Popups, autocomplete lists) that open in their own window and would otherwise
  *  be invisible: enumerate them, then `attach` the popup by hWnd to see + invoke its items. */
-export function listWindows(options: { includeUntitled?: boolean } = {}): WindowInfo[] {
-  const windows: WindowInfo[] = [];
-  const includeUntitled = options.includeUntitled === true;
-  const callback = new JSCallback(
-    (hWnd: bigint) => {
-      if (User32.IsWindowVisible(hWnd) !== 0) {
-        const title = readWindowText(hWnd);
-        if (title.length > 0) windows.push({ hWnd, title, className: readClassName(hWnd), processId: readProcessId(hWnd) });
-        else if (includeUntitled) {
-          const rect = Buffer.alloc(16); // per-call so .ptr can't be stale from a sibling alloc
-          if (User32.GetWindowRect(hWnd, rect.ptr!) !== 0 && rect.readInt32LE(8) > rect.readInt32LE(0) && rect.readInt32LE(12) > rect.readInt32LE(4))
-            windows.push({ hWnd, title, className: readClassName(hWnd), processId: readProcessId(hWnd) });
-        }
+// One PERSISTENT EnumWindows callback reused across every listWindows call — a fresh JSCallback per call costs a
+// ~233µs trampoline allocation on what is now a hot path (popupSnapshot/newPopup run it on every invoke/expand).
+// Reentrancy-safe: EnumWindows runs the callback synchronously to completion on this thread before returning, and JS is
+// single-threaded, so no two listWindows passes overlap; the module accumulator is reset at the start of each call.
+let listWindowsAccumulator: WindowInfo[] = [];
+let listWindowsIncludeUntitled = false;
+const listWindowsCallback = new JSCallback(
+  (hWnd: bigint) => {
+    if (User32.IsWindowVisible(hWnd) !== 0) {
+      const title = readWindowText(hWnd);
+      if (title.length > 0) listWindowsAccumulator.push({ hWnd, title, className: readClassName(hWnd), processId: readProcessId(hWnd) });
+      else if (listWindowsIncludeUntitled) {
+        const rect = Buffer.alloc(16); // per-call so .ptr can't be stale from a sibling alloc
+        if (User32.GetWindowRect(hWnd, rect.ptr!) !== 0 && rect.readInt32LE(8) > rect.readInt32LE(0) && rect.readInt32LE(12) > rect.readInt32LE(4))
+          listWindowsAccumulator.push({ hWnd, title, className: readClassName(hWnd), processId: readProcessId(hWnd) });
       }
-      return 1;
-    },
-    { args: [FFIType.u64, FFIType.i64], returns: FFIType.i32 },
-  );
-  User32.EnumWindows(callback.ptr!, 0n);
-  callback.close();
+    }
+    return 1;
+  },
+  { args: [FFIType.u64, FFIType.i64], returns: FFIType.i32 },
+);
+
+export function listWindows(options: { includeUntitled?: boolean } = {}): WindowInfo[] {
+  listWindowsAccumulator = [];
+  listWindowsIncludeUntitled = options.includeUntitled === true;
+  User32.EnumWindows(listWindowsCallback.ptr!, 0n);
+  const windows = listWindowsAccumulator;
+  listWindowsAccumulator = []; // drop the module reference so the returned array isn't aliased by the next call
   return windows;
 }
 
@@ -96,18 +104,23 @@ export function listWindows(options: { includeUntitled?: boolean } = {}): Window
  * Returns [] for non-Chromium windows (gated on the host class, so it costs one GetClassNameW there).
  * EnumChildWindows already recurses the whole child tree, so one pass finds nested (out-of-process iframe) widgets.
  */
+// One PERSISTENT EnumChildWindows callback (reused like listWindowsCallback above) — webRoots() runs this on EVERY
+// action against a Chromium/Electron target, so a per-call JSCallback was ~233µs of avoidable trampoline churn.
+let renderWidgetAccumulator: bigint[] = [];
+const renderWidgetCallback = new JSCallback(
+  (child: bigint) => {
+    if (readClassName(child) === 'Chrome_RenderWidgetHostHWND') renderWidgetAccumulator.push(child);
+    return 1;
+  },
+  { args: [FFIType.u64, FFIType.i64], returns: FFIType.i32 },
+);
+
 export function renderWidgetHandles(hWnd: bigint): bigint[] {
   if (!readClassName(hWnd).startsWith('Chrome_WidgetWin')) return [];
-  const handles: bigint[] = [];
-  const callback = new JSCallback(
-    (child: bigint) => {
-      if (readClassName(child) === 'Chrome_RenderWidgetHostHWND') handles.push(child);
-      return 1;
-    },
-    { args: [FFIType.u64, FFIType.i64], returns: FFIType.i32 },
-  );
-  User32.EnumChildWindows(hWnd, callback.ptr!, 0n);
-  callback.close();
+  renderWidgetAccumulator = [];
+  User32.EnumChildWindows(hWnd, renderWidgetCallback.ptr!, 0n);
+  const handles = renderWidgetAccumulator;
+  renderWidgetAccumulator = [];
   return handles;
 }
 
