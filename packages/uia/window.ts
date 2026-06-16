@@ -297,6 +297,17 @@ export function foregroundWindow(): bigint {
   return User32.GetForegroundWindow();
 }
 
+/** If a DIFFERENT top-level window now holds the foreground AND `owner` is its root owner — a dialog / picker / modal
+ *  that `owner` just spawned (GetAncestor GA_ROOTOWNER) — return that window's hWnd, else 0n. Lets a post-action
+ *  snapshot warn that the agent's action opened a NEW window its refs do not cover, WITHOUT false-firing while
+ *  driving `owner` cursor-free in the background (a background owner does not own the unrelated foreground window). */
+export function ownedForegroundDialog(owner: bigint): bigint {
+  const GA_ROOTOWNER = 0x0000_0003;
+  const fg = User32.GetForegroundWindow();
+  if (fg === 0n || fg === owner) return 0n;
+  return User32.GetAncestor(fg, GA_ROOTOWNER) === owner ? fg : 0n;
+}
+
 /** Move + resize a window to an absolute screen rectangle. Works on a background window (no activation). */
 export function moveWindow(hWnd: bigint, x: number, y: number, width: number, height: number): boolean {
   return User32.MoveWindow(hWnd, x, y, width, height, 1) !== 0;

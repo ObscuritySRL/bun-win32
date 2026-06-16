@@ -48,6 +48,7 @@ import {
   type MsaaNode,
   normalizeKey,
   openPath,
+  ownedForegroundDialog,
   ownerHwnd,
   pasteToControl,
   postClickAt,
@@ -423,6 +424,18 @@ function stampRefs(text: string): string {
   return text.replace(/\[ref=(e\d+)\]/g, (_match, id) => `[ref=${id}#${refGen}]`);
 }
 
+// A one-line warning, appended to every post-action / re-ground snapshot, when the agent's action left a DIFFERENT
+// top-level window owned by the attached one (a dialog / file picker / confirm / color picker) holding the foreground:
+// the snapshot above is the OLD window (its refs are stale for the new one), so the agent must attach the new hWnd.
+// Empty when nothing new owns the foreground (the steady-state path — zero token cost, never fires on background drive).
+function foregroundNudge(): string {
+  if (attached === null) return '';
+  const dialog = ownedForegroundDialog(attached.hWnd);
+  if (dialog === 0n) return '';
+  const info = uia.windows({ includeUntitled: true }).find((window) => window.hWnd === dialog);
+  return `\n\n⚠ this action left a dialog/window it opened in the FOREGROUND: ${info !== undefined ? JSON.stringify(info.title) : '(untitled)'} [hWnd=0x${dialog.toString(16)}] — the snapshot above is the PREVIOUS window; attach {hWnd} to drive the new one.`;
+}
+
 function snapshotText(maxDepth?: number, rootName?: string): string {
   const window = requireAttached();
   let root: Element | undefined;
@@ -440,10 +453,10 @@ function snapshotText(maxDepth?: number, rootName?: string): string {
     // structurally identical rebuild reassigned the same ref ids to the same controls, so the model's current-gen
     // refs still resolve. Return a one-line "no change" (saves the full re-dump) and keep refs valid (mirrors the
     // withSnapshot action-path contract). A scoped (root/maxDepth) snapshot always renders fully.
-    if (root === undefined && body === lastSnapshotBody) return stampRefs(`${header}\n(no UI change since the last snapshot — refs unchanged)`);
+    if (root === undefined && body === lastSnapshotBody) return stampRefs(`${header}\n(no UI change since the last snapshot — refs unchanged)${foregroundNudge()}`);
     lastSnapshotBody = body;
     refGen += 1; // an explicit re-ground renumbers refs — invalidate any the model still holds
-    return stampRefs(`${header}\n${body}${root === undefined ? coldTreeNote(current?.marks.length ?? 0, attached !== null && isMinimized(attached.hWnd), attached !== null && isUipiWalled(attached.hWnd)) : ''}`);
+    return stampRefs(`${header}\n${body}${root === undefined ? coldTreeNote(current?.marks.length ?? 0, attached !== null && isMinimized(attached.hWnd), attached !== null && isUipiWalled(attached.hWnd)) + foregroundNudge() : ''}`);
   } finally {
     root?.release();
   }
@@ -505,7 +518,7 @@ function withSnapshot(message: string): object {
   const { header, tree } = rebuilt;
   const body = renderTree(tree);
   lastSnapshotTree = tree;
-  if (body === lastSnapshotBody) return textResult(`${message}\n\n${header}\n(no UI change since the last snapshot — refs unchanged)`); // refs identical → generation held
+  if (body === lastSnapshotBody) return textResult(`${message}\n\n${header}\n(no UI change since the last snapshot — refs unchanged)${foregroundNudge()}`); // refs identical → generation held
   if (prior !== null) {
     const diff = diffTrees(prior, tree);
     const refChurn = diff.appeared.some((change) => change.ref !== undefined) || diff.disappeared.some((change) => change.ref !== undefined);
@@ -514,13 +527,13 @@ function withSnapshot(message: string): object {
       const delta = renderDiff(diff);
       if (delta.count > 0 && delta.count <= DIFF_MAX_CHANGES) {
         lastSnapshotBody = body;
-        return textResult(stampRefs(`${message}\n\n${header} — Δ ${delta.count} change${delta.count === 1 ? '' : 's'} (other refs unchanged)\n${delta.text}`)); // no churn → generation held, prior refs stay valid
+        return textResult(stampRefs(`${message}\n\n${header} — Δ ${delta.count} change${delta.count === 1 ? '' : 's'} (other refs unchanged)\n${delta.text}${foregroundNudge()}`)); // no churn → generation held, prior refs stay valid
       }
     }
   }
   lastSnapshotBody = body;
   refGen += 1; // a full re-dump renumbers refs in traversal order — bump so the model's pre-re-render refs are rejected
-  return textResult(stampRefs(`${message}\n\n${header}\n${body}${coldTreeNote(current?.marks.length ?? 0, attached !== null && isMinimized(attached.hWnd), attached !== null && isUipiWalled(attached.hWnd))}`));
+  return textResult(stampRefs(`${message}\n\n${header}\n${body}${coldTreeNote(current?.marks.length ?? 0, attached !== null && isMinimized(attached.hWnd), attached !== null && isUipiWalled(attached.hWnd))}${foregroundNudge()}`));
 }
 
 /** ValuePattern set, falling back to RangeValuePattern for a numeric value on a slider/spinner (ValuePattern

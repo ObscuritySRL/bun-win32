@@ -139,6 +139,7 @@ export {
   minimizeWindow,
   moveWindow,
   openPath,
+  ownedForegroundDialog,
   processImagePath,
   raiseWindow,
   restoreWindow,
