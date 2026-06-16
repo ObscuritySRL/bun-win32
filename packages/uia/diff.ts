@@ -16,6 +16,8 @@ export interface DiffNode {
   ref?: string;
   /** Inline dynamic-state suffix (RefNode only), e.g. ` (on)` — diffed so a toggle/select stays on the delta path. */
   state?: string;
+  /** Whether the control is enabled — diffed so a disabled↔enabled gate flip (a wizard's Next/OK) is reported. */
+  enabled?: boolean;
   children: DiffNode[];
 }
 
@@ -89,6 +91,8 @@ export function diffTrees(before: DiffNode, after: DiffNode): TreeDiff {
     if (prior === undefined) appeared.push({ key, role: node.role, name: node.name, ref: node.ref });
     else if (prior.name !== node.name) renamed.push({ key, role: node.role, name: node.name, before: prior.name, after: node.name, ref: node.ref });
     else if ((prior.state ?? '') !== (node.state ?? '')) restated.push({ key, role: node.role, name: node.name, before: prior.state ?? '', after: node.state ?? '', ref: node.ref });
+    else if (node.ref !== undefined && prior.enabled !== node.enabled)
+      restated.push({ key, role: node.role, name: node.name, before: prior.enabled === false ? 'disabled' : 'enabled', after: node.enabled === false ? 'disabled' : 'enabled', ref: node.ref }); // a gate flip (Next/OK/Submit greying in or out)
   }
   for (const [key, node] of priors) {
     if (!nexts.has(key)) disappeared.push({ key, role: node.role, name: node.name, ref: node.ref });

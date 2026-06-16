@@ -269,7 +269,10 @@ export function renderSnapshot(node: RefNode, depth = 0): string {
   const label = node.name.trim().length > 0 ? ` ${JSON.stringify(node.name)}` : '';
   const ref = node.ref !== undefined ? ` [ref=${node.ref}]` : '';
   const id = node.automationId !== undefined ? ` id=${node.automationId}` : '';
-  let out = `${indent}- ${node.role}${label}${ref}${id}${node.state ?? ''}`;
+  // Surface greyed-out actionable controls — a disabled Next/OK/Submit reads identically to an enabled one otherwise,
+  // hiding the gate state of every wizard/form. Only ref'd (actionable) nodes, so the token cost is near-zero.
+  const disabled = node.ref !== undefined && node.enabled === false ? ' (disabled)' : '';
+  let out = `${indent}- ${node.role}${label}${ref}${id}${node.state ?? ''}${disabled}`;
   for (const child of node.children) out += `\n${renderSnapshot(child, depth + 1)}`;
   return out;
 }
