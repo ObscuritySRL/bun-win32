@@ -324,13 +324,23 @@ export function cutFromControl(hWnd: bigint): boolean {
   return true;
 }
 
-/** Type Unicode text (WM_CHAR per code unit) into a control's HWND cursor-free — no focus, background-capable. */
+/** Type Unicode text (WM_CHAR per code unit) into a control's HWND cursor-free — no focus, background-capable.
+ *  A newline is mapped to carriage return (0x0D): an Edit/RichEdit inserts a line break on WM_CHAR with 0x0D, NOT
+ *  0x0A — a posted 0x0A is swallowed, so a multi-line string would otherwise collapse to one line. A `\r\n` pair
+ *  posts as ONE break (the `\n` after a `\r` is dropped). */
 export function postText(hWnd: bigint, text: string): boolean {
   if (hWnd === 0n) return false;
   let ok = true;
   // Iterate UTF-16 code UNITS (charCodeAt), not code points — WM_CHAR carries one UTF-16 unit, so an astral char
   // must post as its two surrogate halves (for..of would yield one out-of-range code point and truncate it).
-  for (let index = 0; index < text.length; index += 1) if (User32.PostMessageW(hWnd, WM_CHAR, BigInt(text.charCodeAt(index)), 0n) === 0) ok = false;
+  for (let index = 0; index < text.length; index += 1) {
+    let code = text.charCodeAt(index);
+    if (code === 0x0a) {
+      if (index > 0 && text.charCodeAt(index - 1) === 0x0d) continue; // the `\n` half of a `\r\n` — already posted the break
+      code = 0x0d; // a lone LF → CR so the edit control inserts a line break
+    }
+    if (User32.PostMessageW(hWnd, WM_CHAR, BigInt(code), 0n) === 0) ok = false;
+  }
   return ok;
 }
 
