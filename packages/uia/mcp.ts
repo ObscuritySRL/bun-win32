@@ -932,8 +932,26 @@ const TOOLS: McpTool[] = [
     name: 'read_table',
     category: 'read',
     description:
-      'Read a data grid / list / table (Explorer details view, a DataGrid, a spreadsheet-like control) as structured rows — UIA GridPattern cell-by-cell, with column headers when available. Target a ref from the latest snapshot (the List/DataGrid/Table node). Returns a markdown table; far cheaper and more reliable than reading cells from a screenshot.',
+      'Read a data grid / list / table (Explorer details view, a DataGrid, a spreadsheet-like control) as structured rows — UIA GridPattern cell-by-cell, with column headers when available. Target a ref from the latest snapshot (the List/DataGrid/Table node). Returns a markdown table; far cheaper and more reliable than reading cells from a screenshot. To ACT on one cell (edit/toggle/invoke/select it), use grid_cell {ref, row, column, do}.',
     inputSchema: { type: 'object', properties: { ref: { type: 'string', description: REF_DESC }, maxRows: { type: 'number', description: 'Cap rows read (default 100)' } }, required: ['ref'] },
+  },
+  {
+    name: 'grid_cell',
+    category: 'input',
+    description:
+      'Act on a single data-grid cell by (row, column) — the editable-grid path read_table (read-only) cannot reach. Target the GridPattern container ref (the List/DataGrid/Table node, same as read_table), give 0-based row+column, and a verb: read (default), set_value, invoke, toggle, select, click. Cursor-free (UIA pattern on the cell). Use read_table first to see the extent + which column is which.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        element: { type: 'string', description: ELEMENT_DESC },
+        ref: { type: 'string', description: REF_DESC },
+        row: { type: 'number', description: '0-based row index' },
+        column: { type: 'number', description: '0-based column index' },
+        do: { type: 'string', enum: ['read', 'set_value', 'invoke', 'toggle', 'select', 'click'], description: 'What to do to the cell (default read)' },
+        text: { type: 'string', description: 'Value for set_value' },
+      },
+      required: ['ref', 'row', 'column'],
+    },
   },
   {
     name: 'list_views',
@@ -1490,6 +1508,18 @@ const HANDLERS: Record<string, ToolHandler> = {
   read_table: (args) => {
     const table = resolveRef(requireString(args, 'ref')).readTable(typeof args.maxRows === 'number' ? args.maxRows : undefined);
     return textResult(table === null ? '(no table at this ref — it does not expose the UIA Grid pattern; try a different ref, e.g. the List/DataGrid node)' : renderTable(table));
+  },
+  grid_cell: (args) => {
+    const grid = resolveRef(requireString(args, 'ref'));
+    const cell = grid.cell(requireNumber(args, 'row'), requireNumber(args, 'column'));
+    if (cell === null) return errorResult(`no cell at (${args.row}, ${args.column}) — this ref has no UIA Grid pattern, or that cell is out of range. Target the List/DataGrid/Table node and check read_table for the grid's extent.`);
+    try {
+      const action = typeof args.do === 'string' ? args.do : 'read';
+      const outcome = act(cell, action, typeof args.text === 'string' ? args.text : undefined);
+      return action === 'read' ? textResult(`cell (${args.row}, ${args.column}) ${outcome}`) : withSnapshot(`cell (${args.row}, ${args.column}): ${outcome}`);
+    } finally {
+      cell.release();
+    }
   },
   list_views: (args) => {
     const state = resolveRef(requireString(args, 'ref')).views();

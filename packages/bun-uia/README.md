@@ -22,7 +22,7 @@ console.log(calc.find({ automationId: 'CalculatorResults' })?.name); // → "Dis
 
 ## Use as an MCP server
 
-Listed in the official **[MCP Registry](https://registry.modelcontextprotocol.io/v0/servers?search=io.github.ObscuritySRL/bun-uia)** as `io.github.ObscuritySRL/bun-uia`. It exposes the whole surface as **51 policy-gated tools** (45 under the default `safe` profile; 22 under `readonly`) so an agent drives Windows cursor-free, sees the desktop, and (when enabled) launches apps and reads/writes files. Needs **Bun on `PATH`**.
+Listed in the official **[MCP Registry](https://registry.modelcontextprotocol.io/v0/servers?search=io.github.ObscuritySRL/bun-uia)** as `io.github.ObscuritySRL/bun-uia`. It exposes the whole surface as **52 policy-gated tools** (46 under the default `safe` profile; 22 under `readonly`) so an agent drives Windows cursor-free, sees the desktop, and (when enabled) launches apps and reads/writes files. Needs **Bun on `PATH`**.
 
 **Claude Code / Claude Desktop** — one line:
 
@@ -73,7 +73,7 @@ The Windows desktop-automation cluster on npm is a field of native-addon pain, p
 - **Pixel + clipboard layer** — `captureScreen`/`locateOnScreen`/`pixelColor` for no-a11y surfaces; `readClipboard`/`writeClipboard`/`paste`/`copy`.
 - **Screenshot** any window via PrintWindow; the MCP `screenshot` tool auto-falls-back to Windows.Graphics.Capture when PrintWindow is blank (`captureWindowLive` for the library). Both can come back blank on a locked / secure-desktop session (DWM stops compositing) — rely on UIA reads + `invoke`/`setValue` there.
 - **MSAA fallback** (`uia.msaaTree`) and **native HWND introspection** (`uia.windowTree`, Spy++-style) for legacy / owner-draw windows.
-- **MCP server for Claude** — `claude mcp add uia -- bunx bun-uia` exposes the whole surface as 51 policy-gated tools (45 under the default `safe` profile); the agent drives Windows cursor-free, sees the desktop, and (when enabled) launches apps and reads/writes files.
+- **MCP server for Claude** — `claude mcp add uia -- bunx bun-uia` exposes the whole surface as 52 policy-gated tools (46 under the default `safe` profile); the agent drives Windows cursor-free, sees the desktop, and (when enabled) launches apps and reads/writes files.
 
 ## For AI agents
 
