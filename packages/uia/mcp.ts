@@ -244,9 +244,11 @@ function quote(value: unknown): string {
 
 // The RESOLVED control's identity for an action result — so the agent gets target confirmation grounded in what the
 // ref actually resolved to, NOT an echo of its own (possibly hallucinated) `element` description. Matches the named
-// results act()/find_and_act/reveal already return; one cheap name read.
+// results act()/find_and_act/reveal already return. A ref-path element comes from the snapshot's BuildUpdatedCache (Full
+// mode, Name+ControlType cached — the very values the rendered tree shows), so read cached to skip two cross-process
+// round-trips; a find()-resolved element has nothing cached (cachedControlType===0) → read live.
 function named(element: Element): string {
-  return `${element.controlTypeName} ${JSON.stringify(element.name)}`;
+  return element.cachedControlType === 0 ? `${element.controlTypeName} ${JSON.stringify(element.name)}` : `${element.cachedControlTypeName} ${JSON.stringify(element.cachedName)}`;
 }
 
 /** Resolve a controlType selector value to its numeric UIA id — a number, a numeric string ("50000"), OR a role

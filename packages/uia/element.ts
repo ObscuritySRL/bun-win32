@@ -281,8 +281,18 @@ export class Element {
         return null;
       };
       return (
-        scan(info.verticallyScrollable, () => container.scrollInfo?.verticalPercent ?? 100, () => container.setScrollPercent(NoScroll, 0), () => container.scroll(ScrollAmount.NoAmount, ScrollAmount.LargeIncrement)) ??
-        scan(container.scrollInfo?.horizontallyScrollable ?? false, () => container.scrollInfo?.horizontalPercent ?? 100, () => container.setScrollPercent(0, NoScroll), () => container.scroll(ScrollAmount.LargeIncrement, ScrollAmount.NoAmount)) ??
+        scan(
+          info.verticallyScrollable,
+          () => container.scrollInfo?.verticalPercent ?? 100,
+          () => container.setScrollPercent(NoScroll, 0),
+          () => container.scroll(ScrollAmount.NoAmount, ScrollAmount.LargeIncrement),
+        ) ??
+        scan(
+          container.scrollInfo?.horizontallyScrollable ?? false,
+          () => container.scrollInfo?.horizontalPercent ?? 100,
+          () => container.setScrollPercent(0, NoScroll),
+          () => container.scroll(ScrollAmount.LargeIncrement, ScrollAmount.NoAmount),
+        ) ??
         this.find(selector)
       );
     } finally {
@@ -446,6 +456,11 @@ export class Element {
 
   get cachedControlType(): number {
     return getLong(this.ptr, SLOT.get_CachedControlType);
+  }
+
+  get cachedControlTypeName(): string {
+    const id = this.cachedControlType;
+    return ControlType[id] ?? `Type(${id})`;
   }
 
   get cachedIsEnabled(): boolean {
