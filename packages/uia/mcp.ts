@@ -324,12 +324,17 @@ function attachByClassName(className: string): Window {
  *  way attachByClassName does — so attach never silently grabs an arbitrary same-titled window. Falls back to the
  *  library resolveWindow (FindWindowW) when uia.windows/EnumWindows enumerates none (the Shell_TrayWnd-miss case). */
 function attachByTitle(title: string, className: string | undefined): Window {
-  const matches = uia.windows({ includeUntitled: true }).filter((window) => window.title === title && (className === undefined || window.className === className));
-  if (matches.length > 1)
-    throw new Error(
-      `${matches.length} visible windows have title ${JSON.stringify(title)} — attach by hWnd to pick one:\n${matches.map((window) => `  - [class=${window.className}] [hWnd=0x${window.hWnd.toString(16)}] [pid=${window.processId}]`).join('\n')}`,
-    );
-  if (matches.length === 1) return uia.attach(matches[0]!.hWnd);
+  const all = uia.windows({ includeUntitled: true }).filter((window) => className === undefined || window.className === className);
+  const candidates = (list: typeof all): string => list.map((window) => `  - ${JSON.stringify(window.title)} [class=${window.className}] [hWnd=0x${window.hWnd.toString(16)}] [pid=${window.processId}]`).join('\n');
+  const exact = all.filter((window) => window.title === title);
+  if (exact.length > 1) throw new Error(`${exact.length} visible windows have title ${JSON.stringify(title)} — attach by hWnd to pick one:\n${candidates(exact)}`);
+  if (exact.length === 1) return uia.attach(exact[0]!.hWnd);
+  // No exact match — try a case-insensitive SUBSTRING match (attach by app name / a volatile title) before the
+  // FindWindowW fallback. Exact always wins; a substring that is ambiguous lists candidates rather than guessing.
+  const lower = title.toLowerCase();
+  const substring = all.filter((window) => window.title.length > 0 && window.title.toLowerCase().includes(lower));
+  if (substring.length > 1) throw new Error(`${substring.length} visible windows have a title CONTAINING ${JSON.stringify(title)} — attach by hWnd to pick one:\n${candidates(substring)}`);
+  if (substring.length === 1) return uia.attach(substring[0]!.hWnd);
   return uia.attach({ title, ...(className !== undefined ? { className } : {}) }); // EnumWindows-miss fallback (matches the library's first-match semantics)
 }
 
@@ -898,7 +903,7 @@ const TOOLS: McpTool[] = [
     name: 'attach',
     category: 'read',
     description:
-      'Attach to a top-level window as the active root for snapshots and actions. Prefer an hWnd from list_windows or an exact title. className attaches only to the single VISIBLE window of that class — reliable for single-window classes (e.g. Shell_TrayWnd, the taskbar + system tray) but it refuses or asks you to disambiguate for the Chromium/Electron family (Discord, Slack, VS Code, Teams, Edge — all Chrome_WidgetWin_1), where it would otherwise grab an invisible helper. Provide a title (exact), a className, an hWnd, or a processId. Works on a minimized/background window. Returns a fresh ref-keyed snapshot immediately — act on those refs; no follow-up desktop_snapshot is needed.',
+      'Attach to a top-level window as the active root for snapshots and actions. Prefer an hWnd from list_windows or an exact title. className attaches only to the single VISIBLE window of that class — reliable for single-window classes (e.g. Shell_TrayWnd, the taskbar + system tray) but it refuses or asks you to disambiguate for the Chromium/Electron family (Discord, Slack, VS Code, Teams, Edge — all Chrome_WidgetWin_1), where it would otherwise grab an invisible helper. Provide a title (matched exactly, or as a case-insensitive substring when no exact match — ambiguous substrings list candidates to pick by hWnd), a className, an hWnd, or a processId. Works on a minimized/background window. Returns a fresh ref-keyed snapshot immediately — act on those refs; no follow-up desktop_snapshot is needed.',
     inputSchema: {
       type: 'object',
       properties: { title: { type: 'string' }, hWnd: { type: ['string', 'number'], description: 'Handle as a decimal/0x-hex string or a JSON number' }, processId: { type: 'number' }, className: { type: 'string' } },
