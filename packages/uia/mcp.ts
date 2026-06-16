@@ -1403,7 +1403,11 @@ function patternAction<T>(verb: string, run: () => T): T {
   try {
     return run();
   } catch (error) {
-    throw new Error(`${error instanceof Error ? error.message : String(error)} — this control may not support ${verb}; call inspect_element {ref} and pick a verb from its 'can:' list`);
+    const message = error instanceof Error ? error.message : String(error);
+    // A MINIMIZED WinUI/UWP window suspends its UIA tree, so a pattern verb fails with a misleading error — steer to the
+    // cursor-free restore (the real unblock) rather than the generic "this control may not support …" can:-list loop.
+    if (attached !== null && isMinimized(attached.hWnd)) throw new Error(`${message} — the attached window is MINIMIZED, so its WinUI/UWP UIA tree may be suspended; restore it first (manage_window {action:"restore"} — cursor-free, no foreground), then retry ${verb}.`);
+    throw new Error(`${message} — this control may not support ${verb}; call inspect_element {ref} and pick a verb from its 'can:' list`);
   }
 }
 
