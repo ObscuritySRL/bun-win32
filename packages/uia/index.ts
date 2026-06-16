@@ -75,7 +75,7 @@ export { comRelease, guid, hresult, vcall } from './com';
 export { type ComputerAction, type ComputerResult, dispatch, type DispatchOptions, fromCuaAction, normalizeKey } from './computer';
 export { type CompiledCondition, compileCondition, type ElementProperties, formatNoMatch, matches, selectorToString, type Selector } from './condition';
 export { ControlType, PatternId, PropertyConditionFlags, PropertyId, SLOT, TreeScope } from './constants';
-export { elementAt, listMonitors, type MonitorInfo, ownerHwnd, type PointDescription, postClickAt, postClickToHwnd, postDoubleClickAt, postDoubleClickToHwnd, scrollAt, virtualScreen, windowAt } from './coords';
+export { elementAt, listMonitors, type MonitorInfo, ownerHwnd, type PointDescription, postClickAt, postClickToHwnd, postDoubleClickAt, postDoubleClickToHwnd, postDragToHwnd, scrollAt, virtualScreen, windowAt } from './coords';
 export { type DiffNode, diffTrees, refsRenumbered, type RenameChange, renderDiff, type StateChange, type TreeChange, type TreeDiff } from './diff';
 export { attach, Element, focused, fromHandle, fromPoint, launch, root, Window } from './element';
 export { listProcesses, waitForProcess, waitForWindow, waitForWindowGone, watchWindows, type WindowEvent, type WindowEventType, type WindowMatch, type WindowWatcher } from './events';

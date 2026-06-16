@@ -193,6 +193,25 @@ export function postDoubleClickAt(x: number, y: number): boolean {
   return postDoubleClickToHwnd(User32.WindowFromPoint(packPoint(x, y)), x, y);
 }
 
+/** Post a cursor-free left-button DRAG (down → interpolated moves carrying MK_LBUTTON → up) from one screen point to
+ *  another, to a SPECIFIC window — drag-selects text in a classic Edit/RichEdit or marquee-selects items in a ListView/
+ *  ListBox with no real cursor (works background/occluded/locked). Both points convert to `hWnd` client coords. False
+ *  for a 0 handle. (Chromium/Electron/games that read GetCursorPos ignore posted moves — those need the real-cursor drag,
+ *  as does an OLE drag-DROP.) */
+export function postDragToHwnd(hWnd: bigint, fromX: number, fromY: number, toX: number, toY: number): boolean {
+  if (hWnd === 0n) return false;
+  const steps = 8;
+  User32.PostMessageW(hWnd, WM_MOUSEMOVE, 0n, clientLParam(hWnd, fromX, fromY));
+  User32.PostMessageW(hWnd, WM_LBUTTONDOWN, BigInt(MK_LBUTTON), clientLParam(hWnd, fromX, fromY));
+  for (let step = 1; step <= steps; step += 1) {
+    const x = Math.round(fromX + ((toX - fromX) * step) / steps);
+    const y = Math.round(fromY + ((toY - fromY) * step) / steps);
+    User32.PostMessageW(hWnd, WM_MOUSEMOVE, BigInt(MK_LBUTTON), clientLParam(hWnd, x, y));
+  }
+  User32.PostMessageW(hWnd, WM_LBUTTONUP, 0n, clientLParam(hWnd, toX, toY));
+  return true;
+}
+
 /** The HWND that owns an element's posted-message input: its own native window, else the nearest ancestor that has
  *  one. Posting to THIS (not WindowFromPoint) makes a cursor-free click occlusion-correct — it reaches the target's
  *  own window even when another window overlaps the pixel. 0n if no ancestor has a native window. */

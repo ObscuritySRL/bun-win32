@@ -57,6 +57,7 @@ import {
   postClickToHwnd,
   postDoubleClickAt,
   postDoubleClickToHwnd,
+  postDragToHwnd,
   postHWheel,
   postHoldKey,
   postKey,
@@ -1361,10 +1362,18 @@ const TOOLS: McpTool[] = [
     name: 'drag',
     category: 'input',
     description:
-      'Press-drag-release with the REAL mouse — drag-select text, drag-drop an icon/file, move a slider. Target raw points {fromX,fromY,toX,toY} or a ref start {ref,toX,toY}. Needs an unlocked foregrounded desktop; disabled by BUN_UIA_CURSOR=never.',
+      'Press-drag-release. By DEFAULT uses the REAL mouse (drag-drop an icon/file, move a slider) — needs an unlocked, foregrounded desktop. {select:true} instead does a CURSOR-FREE drag (text selection / marquee-select) by posting mouse messages to a {ref} control with its OWN window handle (classic Edit/RichEdit/ListView) — works background/occluded/locked, but it cannot drag-DROP (for a drop use the real-mouse default). Target raw points {fromX,fromY,toX,toY} or a ref start {ref,toX,toY}. Under BUN_UIA_CURSOR=never a real drag is disabled, but a {ref} with its own window handle auto-falls-back to the cursor-free drag-select.',
     inputSchema: {
       type: 'object',
-      properties: { element: { type: 'string', description: ELEMENT_DESC }, ref: { type: 'string', description: REF_DESC }, fromX: { type: 'number' }, fromY: { type: 'number' }, toX: { type: 'number' }, toY: { type: 'number' } },
+      properties: {
+        element: { type: 'string', description: ELEMENT_DESC },
+        ref: { type: 'string', description: REF_DESC },
+        fromX: { type: 'number' },
+        fromY: { type: 'number' },
+        toX: { type: 'number' },
+        toY: { type: 'number' },
+        select: { type: 'boolean', description: 'Cursor-free drag-SELECT (text / marquee) via posted mouse messages on an own-HWND {ref} — no real cursor; cannot drag-drop' },
+      },
       required: ['toX', 'toY'],
     },
   },
@@ -2158,23 +2167,32 @@ const HANDLERS: Record<string, ToolHandler> = {
     return withSnapshot(`scrolled ${target} into view`);
   },
   drag: (args) => {
-    if (cursorDenied) return errorResult('drag moves the real cursor, disabled by BUN_UIA_CURSOR=never');
     let fromX: number;
     let fromY: number;
+    let owner = 0n;
     if (typeof args.ref === 'string') {
       const element = resolveRef(args.ref);
       const point = clickPoint(element);
       if (point === null) return errorResult(`cannot drag from ${named(element)} — it has no on-screen location (0×0 bounds, no clickable point). Pass explicit fromX/fromY, or target a control with a visible rectangle.`);
       fromX = point.x;
       fromY = point.y;
+      owner = ownerHwnd(element);
     } else {
       fromX = requireNumber(args, 'fromX');
       fromY = requireNumber(args, 'fromY');
     }
     const toX = requireNumber(args, 'toX');
     const toY = requireNumber(args, 'toY');
+    // Cursor-free drag-SELECT (text selection / marquee) via posted mouse messages — when explicitly requested
+    // ({select:true}) or as the automatic fallback under cursor=never where a real drag is impossible. Requires an
+    // own-HWND target; it CANNOT perform an OLE drag-DROP (that needs the real cursor), so the default stays real-mouse.
+    if (args.select === true || cursorDenied) {
+      if (owner !== 0n && postDragToHwnd(owner, fromX, fromY, toX, toY)) return withSnapshot(`drag-selected ${fromX},${fromY} → ${toX},${toY} cursor-free (posted — text selection / marquee, NOT a drag-drop)`);
+      if (cursorDenied) return errorResult('drag needs the real cursor — disabled by BUN_UIA_CURSOR=never; a cursor-free drag-SELECT works ONLY on a {ref} to a control with its own window handle (a classic Edit/RichEdit/ListView)');
+      return errorResult('cursor-free drag-select ({select:true}) needs a {ref} to a control with its own window handle (a classic Edit/RichEdit/ListView); for a raw-point drag or a drag-DROP, drop {select} to use the real cursor');
+    }
     dragTo(fromX, fromY, toX, toY);
-    return withSnapshot(`dragged ${fromX},${fromY} → ${toX},${toY}`);
+    return withSnapshot(`dragged ${fromX},${fromY} → ${toX},${toY} (real cursor)`);
   },
   hold_key: async (args) => {
     const key = requireString(args, 'key');
