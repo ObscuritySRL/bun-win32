@@ -119,6 +119,11 @@ let lastSnapshotTree: RefNode | null = null;
 
 /** Hard char budget for an auto-appended snapshot body (~2k tokens) — bounds a heavy window per step. */
 const SNAPSHOT_MAX_CHARS = 8_000;
+const READ_TEXT_MAX = 4_000; // cap a single text read (a control value / clipboard / copy-cut) so a huge editor/terminal buffer can't blow the context budget the snapshot/inspect/file reads already bound
+/** Cap free text dumped into the model's context, with a pointer to the narrower reads. */
+function capText(text: string): string {
+  return text.length <= READ_TEXT_MAX ? text : `${text.slice(0, READ_TEXT_MAX)}…(+${text.length - READ_TEXT_MAX} more chars — read the on-screen text via inspect_element {ref}, or narrow with find_text {ref, text})`;
+}
 /** Above this many delta lines an action returns the full pruned tree instead of the change list. */
 const DIFF_MAX_CHANGES = 8;
 
@@ -499,7 +504,7 @@ function setValueSmart(element: Element, value: string): string {
 }
 
 function act(element: Element, action: string, text: string | undefined): string {
-  if (action === 'read') return element.isPassword ? 'value: (password — withheld)' : `value: ${JSON.stringify(element.value || element.text() || element.name)}`;
+  if (action === 'read') return element.isPassword ? 'value: (password — withheld)' : `value: ${JSON.stringify(capText(element.value || element.text() || element.name))}`;
   // Name the RESOLVED control in every result so an LLM gets target confirmation on an ambiguous selector match
   // (the named-result contract computer.ts:77/88 + AI.md:181 already document). One name/role read per action.
   const target = `${element.controlTypeName} ${JSON.stringify(element.name)}`;
@@ -1738,7 +1743,7 @@ const HANDLERS: Record<string, ToolHandler> = {
     } else throw new Error(`unknown manage_window action: ${action}`);
     return textResult(`window ${action}${action === 'snap' ? ` ${args.edge}` : ''} (hWnd=0x${hWnd.toString(16)})`);
   },
-  read_clipboard: () => textResult(uia.readClipboard() || '(clipboard empty or not text)'),
+  read_clipboard: () => textResult(capText(uia.readClipboard()) || '(clipboard empty or not text)'),
   set_clipboard: (args) => textResult(uia.writeClipboard(requireString(args, 'text')) ? 'clipboard set' : 'failed to set clipboard'),
   paste: (args) => {
     if (typeof args.ref === 'string') {
@@ -1771,7 +1776,7 @@ const HANDLERS: Record<string, ToolHandler> = {
       const selected = element.getSelectedText(); // cursor-free: TextPattern selection, no focus, works locked/background
       if (selected.length > 0) {
         uia.writeClipboard(selected);
-        return textResult(selected);
+        return textResult(capText(selected));
       }
       // No TextPattern selection — for a classic Edit with its OWN HWND, select-all + WM_COPY cursor-free (no focus,
       // works minimized/background/locked), the path TextPattern-less Win32 Edits need.
@@ -1784,7 +1789,7 @@ const HANDLERS: Record<string, ToolHandler> = {
         // not this control's content; fall through to the honest "select first" message rather than leak a stale value.
         if (clipboardSequence() !== before) {
           const text = uia.readClipboard();
-          if (text.length > 0) return textResult(text);
+          if (text.length > 0) return textResult(capText(text));
         }
       }
       // No selection and no own-HWND Edit — do NOT silently Ctrl+C the FOCUSED control and pass its clipboard off as
@@ -1807,13 +1812,13 @@ const HANDLERS: Record<string, ToolHandler> = {
       // WM_CUT is synchronous; if the clipboard counter did not move the control ignored it (not a classic Edit / nothing to cut) — do not report a stale clipboard as the cut text.
       if (clipboardSequence() === before)
         return errorResult(`nothing was cut from ${target} — it did not honor WM_CUT (not a classic Edit, or nothing selected). Select text first (find_text {ref, text}), or target a classic Edit control.`);
-      return withSnapshot(`cut ${target} to the clipboard cursor-free — ${JSON.stringify(uia.readClipboard())}`);
+      return withSnapshot(`cut ${target} to the clipboard cursor-free — ${JSON.stringify(capText(uia.readClipboard()))}`);
     }
     // WinUI/WPF/Chromium sub-control with no own HWND — only SendInput Ctrl+X reaches it.
     if (cursorDenied) return errorResult('this control has no native window handle for the cursor-free WM_CUT path, so cut would need SendInput Ctrl+X — disabled by BUN_UIA_CURSOR=never');
     element.focus();
     uia.sendKeys('Control+X');
-    return withSnapshot(`cut ${target} (SendInput Ctrl+X) — ${JSON.stringify(uia.readClipboard())}`);
+    return withSnapshot(`cut ${target} (SendInput Ctrl+X) — ${JSON.stringify(capText(uia.readClipboard()))}`);
   },
   launch_app: async (args) => {
     const command = requireString(args, 'command');
