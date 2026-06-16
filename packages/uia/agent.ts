@@ -36,7 +36,7 @@ export function execute(window: Element, actions: readonly AgentAction[]): Agent
       else if (action.do === 'type') element.type(action.text ?? '');
       else if (action.do === 'setValue') element.setValue(action.text ?? '');
       else if (action.do === 'toggle') element.toggle();
-      else value = element.value || element.text() || element.name;
+      else value = element.value || element.text() || ''; // NOT element.name — never return the label dressed as the read value
       results.push({ action, ok: true, value });
     } catch (error) {
       results.push({ action, ok: false, error: (error as Error).message });

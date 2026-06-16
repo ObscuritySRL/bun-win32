@@ -650,7 +650,11 @@ function withPopupNote(run: () => string): string {
 }
 
 function act(element: Element, action: string, text: string | undefined): string {
-  if (action === 'read') return element.isPassword ? 'value: (password — withheld)' : `value: ${JSON.stringify(capText(element.value || element.text() || element.name))}`;
+  if (action === 'read') {
+    if (element.isPassword) return 'value: (password — withheld)';
+    const content = element.value || element.text(); // NOT element.name — returning the label dressed as `value:` is a silent wrong read
+    return content.length > 0 ? `value: ${JSON.stringify(capText(content))}` : `(no readable value — control name is ${JSON.stringify(element.name)}; it may be empty or expose no Value/Text pattern — try inspect_element {ref} or read_table)`;
+  }
   // Name the RESOLVED control in every result so an LLM gets target confirmation on an ambiguous selector match
   // (the named-result contract computer.ts:77/88 + AI.md:181 already document). One name/role read per action.
   const target = `${element.controlTypeName} ${JSON.stringify(element.name)}`;
