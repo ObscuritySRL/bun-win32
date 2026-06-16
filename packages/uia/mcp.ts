@@ -711,6 +711,27 @@ function notificationWindows(): { hWnd: bigint; label: string }[] {
   return found;
 }
 
+// The system-tray "Show hidden icons" overflow flyout opens as a root-child window of class
+// TopLevelWindowForOverflowXamlIsland that EnumWindows (and so list_windows) does NOT return — exactly like the
+// CoreWindow toasts above. Surface it (when open) so the agent can attach it + invoke a hidden NotifyItemIcon.
+// Best-effort: returns undefined on any failure.
+function trayFlyoutWindow(): { hWnd: bigint; label: string } | undefined {
+  let root: Element;
+  try {
+    root = uia.root();
+  } catch {
+    return undefined;
+  }
+  const children = root.children;
+  try {
+    for (const child of children) if (child.className === 'TopLevelWindowForOverflowXamlIsland' && child.nativeWindowHandle !== 0n) return { hWnd: child.nativeWindowHandle, label: child.name.length > 0 ? child.name : 'system tray overflow' };
+    return undefined;
+  } finally {
+    for (const child of children) child.release();
+    root.release();
+  }
+}
+
 /** A guaranteed-hittable screen point for an element (UIA clickable point, else bounds center). */
 function clickPoint(element: Element): { x: number; y: number } {
   const clickable = element.clickablePoint;
@@ -1414,6 +1435,9 @@ const HANDLERS: Record<string, ToolHandler> = {
     // Toasts/notification popups never come back from EnumWindows — surface them so the documented list_windows→attach flow finds them.
     for (const toast of notificationWindows())
       lines.push(`- ${JSON.stringify(toast.label)} [class=Windows.UI.Core.CoreWindow] [notification popup — attach by hWnd to read its text + invoke its Dismiss/Settings/action buttons] [hWnd=0x${toast.hWnd.toString(16)}]`);
+    // The open system-tray overflow flyout is also a root-child window EnumWindows misses — surface it so a hidden NotifyItemIcon is reachable.
+    const trayFlyout = trayFlyoutWindow();
+    if (trayFlyout !== undefined) lines.push(`- ${JSON.stringify(trayFlyout.label)} [class=TopLevelWindowForOverflowXamlIsland] [system-tray overflow flyout — attach by hWnd to invoke a hidden tray icon] [hWnd=0x${trayFlyout.hWnd.toString(16)}]`);
     return textResult(`${secure}${lines.length > 0 ? lines.join('\n') : '(no visible top-level windows)'}`);
   },
   attach: (args) => {
