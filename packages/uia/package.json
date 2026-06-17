@@ -154,6 +154,7 @@
     "example:snapshot-scope": "bun ./example/snapshot-scope.integration.test.ts",
     "example:terminal-scrollback": "bun ./example/terminal-scrollback.integration.test.ts",
     "example:text-content": "bun ./example/text-content.integration.test.ts",
+    "example:transform-pattern": "bun ./example/transform-pattern.integration.test.ts",
     "example:type-cursorfree": "bun ./example/type-cursorfree.integration.test.ts",
     "example:uia-report": "bun ./example/uia-report.ts",
     "example:uwp-content": "bun ./example/uwp-content.integration.test.ts",

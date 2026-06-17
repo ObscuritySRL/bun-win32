@@ -301,6 +301,76 @@ export function scrollInfo(ptr: bigint): ScrollInfo | null {
   }
 }
 
+/** Move an element via TransformPattern to screen coords (x,y) — reaches an HWND-less child (MDI/dockable/floating pane)
+ *  that SetWindowPos cannot target, cursor-free (works locked/background). Throws if unsupported. */
+export function move(ptr: bigint, x: number, y: number): void {
+  const pattern = getPattern(ptr, PatternId.Transform);
+  if (pattern === 0n) throw new Error('element does not support TransformPattern');
+  try {
+    const hr = vcall(pattern, SLOT.Move, [FFIType.f64, FFIType.f64], [x, y]);
+    if (hr !== S_OK) throw new Error(`TransformPattern.Move failed: ${hresult(hr)}`);
+  } finally {
+    comRelease(pattern);
+  }
+}
+
+/** Resize an element via TransformPattern to width×height — cursor-free, reaches an HWND-less child. Throws if unsupported. */
+export function resize(ptr: bigint, width: number, height: number): void {
+  const pattern = getPattern(ptr, PatternId.Transform);
+  if (pattern === 0n) throw new Error('element does not support TransformPattern');
+  try {
+    const hr = vcall(pattern, SLOT.Resize, [FFIType.f64, FFIType.f64], [width, height]);
+    if (hr !== S_OK) throw new Error(`TransformPattern.Resize failed: ${hresult(hr)}`);
+  } finally {
+    comRelease(pattern);
+  }
+}
+
+/** Rotate an element via TransformPattern by `degrees` — cursor-free. Rare (most controls report CanRotate=0). Throws if unsupported. */
+export function rotate(ptr: bigint, degrees: number): void {
+  const pattern = getPattern(ptr, PatternId.Transform);
+  if (pattern === 0n) throw new Error('element does not support TransformPattern');
+  try {
+    const hr = vcall(pattern, SLOT.Rotate, [FFIType.f64], [degrees]);
+    if (hr !== S_OK) throw new Error(`TransformPattern.Rotate failed: ${hresult(hr)}`);
+  } finally {
+    comRelease(pattern);
+  }
+}
+
+/** Whether the element can be moved (TransformPattern CanMove); false if unsupported. */
+export function canMove(ptr: bigint): boolean {
+  const pattern = getPattern(ptr, PatternId.Transform);
+  if (pattern === 0n) return false;
+  try {
+    return getLong(pattern, SLOT.get_CurrentCanMove) !== 0;
+  } finally {
+    comRelease(pattern);
+  }
+}
+
+/** Whether the element can be resized (TransformPattern CanResize); false if unsupported. */
+export function canResize(ptr: bigint): boolean {
+  const pattern = getPattern(ptr, PatternId.Transform);
+  if (pattern === 0n) return false;
+  try {
+    return getLong(pattern, SLOT.get_CurrentCanResize) !== 0;
+  } finally {
+    comRelease(pattern);
+  }
+}
+
+/** Whether the element can be rotated (TransformPattern CanRotate); false if unsupported. */
+export function canRotate(ptr: bigint): boolean {
+  const pattern = getPattern(ptr, PatternId.Transform);
+  if (pattern === 0n) return false;
+  try {
+    return getLong(pattern, SLOT.get_CurrentCanRotate) !== 0;
+  } finally {
+    comRelease(pattern);
+  }
+}
+
 /** Set a RangeValuePattern control's value (slider). Throws if unsupported. */
 export function setRangeValue(ptr: bigint, value: number): void {
   const pattern = getPattern(ptr, PatternId.RangeValue);

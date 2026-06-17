@@ -15,6 +15,9 @@ import { clickAt, type as inputType } from './input';
 import { listWindows, renderWidgetHandles, screenshot as windowScreenshot, windowForProcess } from './window';
 import {
   addToSelection,
+  canMove,
+  canResize,
+  canRotate,
   canSelectMultiple,
   collapse,
   doDefaultAction,
@@ -28,12 +31,15 @@ import {
   gridItemPosition,
   invoke,
   isSelected,
+  move,
   NoScroll,
   rangeValue,
   readTable,
   readText,
   readVisibleText,
   removeFromSelection,
+  resize,
+  rotate,
   scroll,
   ScrollAmount,
   scrollInfo,
@@ -768,6 +774,37 @@ export class Element {
   /** Whether this SelectionPattern container allows multiple simultaneous selections. */
   get canSelectMultiple(): boolean {
     return canSelectMultiple(this.ptr);
+  }
+
+  /** Whether the element can be moved via TransformPattern (FlaUI's Transform.CanMove); false if unsupported. */
+  get canMove(): boolean {
+    return canMove(this.ptr);
+  }
+
+  /** Whether the element can be resized via TransformPattern (FlaUI's Transform.CanResize); false if unsupported. */
+  get canResize(): boolean {
+    return canResize(this.ptr);
+  }
+
+  /** Whether the element can be rotated via TransformPattern (FlaUI's Transform.CanRotate); false if unsupported. */
+  get canRotate(): boolean {
+    return canRotate(this.ptr);
+  }
+
+  /** Move the element to screen coords (x,y) via TransformPattern — cursor-free, reaches an HWND-less child (MDI / dockable
+   *  / floating pane) that moveWindow (SetWindowPos) cannot target. Throws if unsupported (check .canMove). */
+  move(x: number, y: number): void {
+    move(this.ptr, x, y);
+  }
+
+  /** Resize the element to width×height via TransformPattern — cursor-free, reaches an HWND-less child. Throws if unsupported (check .canResize). */
+  resize(width: number, height: number): void {
+    resize(this.ptr, width, height);
+  }
+
+  /** Rotate the element by `degrees` via TransformPattern — cursor-free. Rare (most controls report CanRotate=false). Throws if unsupported. */
+  rotate(degrees: number): void {
+    rotate(this.ptr, degrees);
   }
 
   /** Scroll into view via ScrollItemPattern. Throws if unsupported. */

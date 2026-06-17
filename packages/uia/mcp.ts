@@ -2556,6 +2556,10 @@ const HANDLERS: Record<string, ToolHandler> = {
     if (element.getProperty(PropertyId.IsRangeValuePatternAvailable) === true) can.push(rangeReadOnly ? 'read rangeValue (read-only — set_value will fail)' : 'set_value(numeric)');
     if (element.getProperty(PropertyId.IsScrollPatternAvailable) === true) can.push('scroll');
     if (element.getProperty(PropertyId.IsScrollItemPatternAvailable) === true) can.push('scroll-into-view');
+    if (element.getProperty(PropertyId.IsTransformPatternAvailable) === true) {
+      const verbs = [element.canMove ? 'move' : '', element.canResize ? 'resize' : '', element.canRotate ? 'rotate' : ''].filter((verb) => verb.length > 0); // CanMove/CanResize/CanRotate gate each verb — a Transform control may allow only some
+      if (verbs.length > 0) can.push(`${verbs.join('/')} (manage_element, cursor-free)`);
+    }
     if (hasTextPattern) can.push('read-text');
     if (element.getProperty(PropertyId.IsGridPatternAvailable) === true) can.push('read-table');
     if (element.getProperty(PropertyId.IsMultipleViewPatternAvailable) === true) can.push('set-view (list_views/set_view)');

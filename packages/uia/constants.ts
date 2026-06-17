@@ -164,6 +164,7 @@ export enum PropertyId {
   IsSelectionItemPatternAvailable = 30036,
   IsTextPatternAvailable = 30040,
   IsTogglePatternAvailable = 30041,
+  IsTransformPatternAvailable = 30042,
   IsValuePatternAvailable = 30043,
   ValueValue = 30045,
   ValueIsReadOnly = 30046,
@@ -279,6 +280,13 @@ export const SLOT = {
   get_CurrentVerticalViewSize: 8,
   get_CurrentHorizontallyScrollable: 9,
   get_CurrentVerticallyScrollable: 10,
+  // IUIAutomationTransformPattern (PROVEN live: Notepad moved+resized via slots 3,4; CanMove/CanResize/CanRotate read 1/1/0 on slots 6,7,8)
+  Move: 3,
+  Resize: 4,
+  Rotate: 5,
+  get_CurrentCanMove: 6,
+  get_CurrentCanResize: 7,
+  get_CurrentCanRotate: 8,
   // IUIAutomationWindowPattern
   Close: 3,
   WaitForInputIdle: 4,
