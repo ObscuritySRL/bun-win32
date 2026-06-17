@@ -13,7 +13,7 @@
  * bun test is broken repo-wide — runnable harness (spawns + closes Notepad):
  * Run: bun run example/virtual-desktop.integration.test.ts
  */
-import { closeWindow, uia, windowDesktopId, windowOnCurrentDesktop } from '@bun-win32/uia';
+import { closeWindow, uia, windowDesktopId, windowOnCurrentDesktop, windowProcessId } from '@bun-win32/uia';
 import User32 from '@bun-win32/user32';
 
 let failures = 0;
@@ -60,6 +60,8 @@ try {
     assert(windowOnCurrentDesktop(hWnd) === true, 'after uninitialize → initialize, windowOnCurrentDesktop still works (no use-after-free)');
   }
 } finally {
+  const notepadPid = hWnd !== 0n ? windowProcessId(hWnd) : 0;
+  if (notepadPid) Bun.spawnSync(['taskkill', '/F', '/PID', String(notepadPid)]);
   if (hWnd !== 0n) closeWindow(hWnd);
   notepad?.kill();
   uia.uninitialize();

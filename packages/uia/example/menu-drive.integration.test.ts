@@ -10,7 +10,7 @@
  * bun test is broken repo-wide for FFI; runnable harness:
  * Run: bun run example/menu-drive.integration.test.ts
  */
-import { closeWindow, ControlType, type Element, uia } from '@bun-win32/uia';
+import { closeWindow, ControlType, type Element, uia, windowProcessId } from '@bun-win32/uia';
 
 let failures = 0;
 function assert(condition: boolean, message: string): void {
@@ -59,6 +59,8 @@ try {
     win.dispose();
   }
 } finally {
+  const notepadPid = notepad !== 0n ? windowProcessId(notepad) : 0;
+  if (notepadPid) Bun.spawnSync(['taskkill', '/F', '/PID', String(notepadPid)]);
   if (notepad !== 0n) closeWindow(notepad);
   uia.uninitialize();
 }

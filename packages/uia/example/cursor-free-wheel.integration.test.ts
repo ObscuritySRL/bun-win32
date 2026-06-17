@@ -11,7 +11,7 @@
  * Run: bun run example/cursor-free-wheel.integration.test.ts
  */
 import User32 from '@bun-win32/user32';
-import { ControlType, closeWindow, minimizeWindow, postWheel, setControlText, uia } from '@bun-win32/uia';
+import { ControlType, closeWindow, minimizeWindow, postWheel, setControlText, uia, windowProcessId } from '@bun-win32/uia';
 
 const EM_GETFIRSTVISIBLELINE = 0x00ce;
 const EM_SETMODIFY = 0x00b9;
@@ -48,6 +48,8 @@ try {
     assert(back && up < after, `and back UP cursor-free (first visible line ${after} → ${up})`);
   }
 } finally {
+  const notepadPid = windowProcessId(window.hWnd);
+  if (notepadPid) Bun.spawnSync(['taskkill', '/F', '/PID', String(notepadPid)]);
   if (editHwnd !== 0n) User32.SendMessageW(editHwnd, EM_SETMODIFY, 0n, 0n);
   editor?.release();
   window.dispose();

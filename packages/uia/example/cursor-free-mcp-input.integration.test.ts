@@ -12,7 +12,7 @@
  * Run: bun run example/cursor-free-mcp-input.integration.test.ts
  */
 import User32 from '@bun-win32/user32';
-import { closeWindow } from '@bun-win32/uia';
+import { closeWindow, windowProcessId } from '@bun-win32/uia';
 
 type Rpc = { id?: number; result?: { isError?: boolean; content?: { text?: string }[] } };
 const proc = Bun.spawn(['bun', 'run', `${import.meta.dir}/../mcp.ts`], { stdin: 'pipe', stdout: 'pipe', stderr: 'ignore', env: { ...Bun.env, BUN_UIA_PROFILE: 'safe' } });
@@ -104,6 +104,8 @@ try {
     }
   }
 } finally {
+  const notepadPid = notepadHwnd !== 0n ? windowProcessId(notepadHwnd) : 0;
+  if (notepadPid) Bun.spawnSync(['taskkill', '/F', '/PID', String(notepadPid)]);
   if (editHwnd !== 0n) User32.SendMessageW(editHwnd, EM_SETMODIFY, 0n, 0n);
   proc.kill();
   if (notepadHwnd !== 0n) closeWindow(notepadHwnd); // close the Notepad we spawned (best-effort; modify flag cleared above)

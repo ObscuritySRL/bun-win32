@@ -19,7 +19,7 @@
  *
  * Run: bun run example/uia.selftest.ts
  */
-import { closeWindow, ControlType, countNodes, createCacheRequest, msaaTree, NoScroll, screenshot, ScrollAmount, uia } from '@bun-win32/uia';
+import { closeWindow, ControlType, countNodes, createCacheRequest, msaaTree, NoScroll, screenshot, ScrollAmount, uia, windowProcessId } from '@bun-win32/uia';
 import User32 from '@bun-win32/user32';
 
 let failures = 0;
@@ -53,6 +53,8 @@ function findWindow(title: string): bigint {
 /** Close the throwaway Notepad, dismissing the unsaved-changes prompt with "Don't save" (it holds test junk). */
 async function closeNotepad(hWnd: bigint): Promise<void> {
   if (hWnd === 0n) return;
+  const notepadPid = windowProcessId(hWnd);
+  if (notepadPid) Bun.spawnSync(['taskkill', '/F', '/PID', String(notepadPid)]);
   closeWindow(hWnd);
   await Bun.sleep(700);
   try {

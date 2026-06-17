@@ -14,7 +14,7 @@
  * Run: bun run example/cursor-free-input.integration.test.ts
  */
 import User32 from '@bun-win32/user32';
-import { ControlType, closeWindow, foregroundWindow, minimizeWindow, pasteToControl, postKey, postText, setControlText, uia, writeClipboard } from '@bun-win32/uia';
+import { ControlType, closeWindow, foregroundWindow, minimizeWindow, pasteToControl, postKey, postText, setControlText, uia, windowProcessId, writeClipboard } from '@bun-win32/uia';
 
 const EM_SETMODIFY = 0x00b9;
 
@@ -72,6 +72,8 @@ try {
     assert(afterPaste.includes('cursor-free-paste-7421'), `editor reads back the WM_PASTE clipboard text cursor-free ("${afterPaste.slice(0, 40)}")`);
   }
 } finally {
+  const notepadPid = window.hWnd !== 0n ? windowProcessId(window.hWnd) : 0;
+  if (notepadPid) Bun.spawnSync(['taskkill', '/F', '/PID', String(notepadPid)]);
   if (editHwnd !== 0n) User32.SendMessageW(editHwnd, EM_SETMODIFY, 0n, 0n); // clear dirty so WM_CLOSE raises no Save prompt
   editor?.release();
   window.dispose();

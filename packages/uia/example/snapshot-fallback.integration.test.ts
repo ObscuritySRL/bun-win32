@@ -13,7 +13,7 @@
  * bun test is broken repo-wide for FFI; runnable harness:
  * Run: bun run example/snapshot-fallback.integration.test.ts
  */
-import { closeWindow, snapshot, uia } from '@bun-win32/uia';
+import { closeWindow, snapshot, uia, windowProcessId } from '@bun-win32/uia';
 import { createCacheRequest, AutomationElementMode, DEFAULT_CACHE_PROPERTIES } from '@bun-win32/uia';
 import { TreeScope } from '@bun-win32/uia';
 
@@ -85,6 +85,8 @@ try {
     console.log('  skip: no cache-hostile Chromium running (open Opera to exercise the auto-fallback live)');
   }
 } finally {
+  const notepadPid = windowProcessId(notepad);
+  if (notepadPid) Bun.spawnSync(['taskkill', '/F', '/PID', String(notepadPid)]);
   if (notepad !== 0n) closeWindow(notepad);
   uia.uninitialize();
 }

@@ -10,7 +10,7 @@
  * Run: bun run example/close-modal-honest.integration.test.ts
  */
 import User32 from '@bun-win32/user32';
-import { closeWindow, isWindow, uia } from '@bun-win32/uia';
+import { closeWindow, isWindow, uia, windowProcessId } from '@bun-win32/uia';
 
 type Rpc = { id?: number; result?: { isError?: boolean; content?: { text?: string }[] } };
 const proc = Bun.spawn(['bun', 'run', `${import.meta.dir}/../mcp.ts`], { stdin: 'pipe', stdout: 'pipe', stderr: 'ignore', env: { ...Bun.env, BUN_UIA_PROFILE: 'safe' } });
@@ -83,6 +83,8 @@ try {
     else console.log(`  note: could not auto-find "Don't save" (${textOf(faa).slice(0, 50)}) — closing forcibly in teardown`);
   }
 } finally {
+  const notepadPid = windowProcessId(notepad.hWnd);
+  if (notepadPid) Bun.spawnSync(['taskkill', '/F', '/PID', String(notepadPid)]);
   if (editHwnd !== 0n) User32.SendMessageW(editHwnd, EM_SETMODIFY, 0n, 0n); // clear dirty so the backup close raises no prompt
   proc.kill();
   editor?.release();

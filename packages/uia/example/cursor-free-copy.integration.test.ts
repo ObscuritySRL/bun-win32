@@ -10,7 +10,7 @@
  * bun test is broken repo-wide for FFI; runnable harness:
  * Run: bun run example/cursor-free-copy.integration.test.ts
  */
-import { closeWindow, ControlType, type Element, uia } from '@bun-win32/uia';
+import { closeWindow, ControlType, type Element, uia, windowProcessId } from '@bun-win32/uia';
 import User32 from '@bun-win32/user32';
 
 let failures = 0;
@@ -66,6 +66,8 @@ try {
     win.dispose();
   }
 } finally {
+  const notepadPid = notepad !== 0n ? windowProcessId(notepad) : 0;
+  if (notepadPid) Bun.spawnSync(['taskkill', '/F', '/PID', String(notepadPid)]);
   if (notepad !== 0n) closeWindow(notepad);
   uia.uninitialize();
 }

@@ -9,7 +9,7 @@
  * bun test is broken repo-wide for FFI; runnable harness:
  * Run: bun run example/find-text.integration.test.ts
  */
-import { closeWindow, ControlType, uia } from '@bun-win32/uia';
+import { closeWindow, ControlType, uia, windowProcessId } from '@bun-win32/uia';
 import User32 from '@bun-win32/user32';
 
 let failures = 0;
@@ -63,6 +63,8 @@ try {
   }
   notepad.dispose();
 } finally {
+  const notepadPid = npHwnd !== 0n ? windowProcessId(npHwnd) : 0;
+  if (notepadPid) Bun.spawnSync(['taskkill', '/F', '/PID', String(notepadPid)]);
   uia.uninitialize();
 }
 

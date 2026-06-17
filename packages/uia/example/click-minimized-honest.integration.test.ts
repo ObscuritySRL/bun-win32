@@ -12,7 +12,7 @@
  * bun test is broken repo-wide — runnable harness (MCP subprocess + a spawned Notepad):
  * Run: bun run example/click-minimized-honest.integration.test.ts
  */
-import { closeWindow, uia } from '@bun-win32/uia';
+import { closeWindow, uia, windowProcessId } from '@bun-win32/uia';
 
 type Rpc = { id?: number; result?: { isError?: boolean; content?: { text?: string }[] } };
 const proc = Bun.spawn(['bun', 'run', `${import.meta.dir}/../mcp.ts`], { stdin: 'pipe', stdout: 'pipe', stderr: 'ignore', env: { ...Bun.env, BUN_UIA_PROFILE: 'safe' } });
@@ -80,6 +80,8 @@ try {
       );
   }
 } finally {
+  const notepadPid = windowProcessId(notepad.hWnd);
+  if (notepadPid) Bun.spawnSync(['taskkill', '/F', '/PID', String(notepadPid)]);
   proc.kill();
   closeWindow(notepad.hWnd);
   notepad.dispose();

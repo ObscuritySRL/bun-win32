@@ -11,7 +11,7 @@
  * Run: bun run example/cursor-free-undo.integration.test.ts
  */
 import User32 from '@bun-win32/user32';
-import { closeWindow, uia } from '@bun-win32/uia';
+import { closeWindow, uia, windowProcessId } from '@bun-win32/uia';
 
 type Rpc = { id?: number; result?: { isError?: boolean; content?: { text?: string }[] } };
 const proc = Bun.spawn(['bun', 'run', `${import.meta.dir}/../mcp.ts`], { stdin: 'pipe', stdout: 'pipe', stderr: 'ignore', env: { ...Bun.env, BUN_UIA_PROFILE: 'safe' } });
@@ -82,6 +82,8 @@ try {
     assert(before.includes('UNDO-ME-7421') && !after.includes('UNDO-ME-7421'), `the edit was undone cursor-free (before ${JSON.stringify(before.slice(0, 20))} → after ${JSON.stringify(after.slice(0, 20))})`);
   }
 } finally {
+  const notepadPid = windowProcessId(notepad.hWnd);
+  if (notepadPid) Bun.spawnSync(['taskkill', '/F', '/PID', String(notepadPid)]);
   if (editHwnd !== 0n) User32.SendMessageW(editHwnd, EM_SETMODIFY, 0n, 0n);
   proc.kill();
   editor?.release();

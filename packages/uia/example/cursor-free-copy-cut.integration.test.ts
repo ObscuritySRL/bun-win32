@@ -11,7 +11,7 @@
  * Run: bun run example/cursor-free-copy-cut.integration.test.ts
  */
 import User32 from '@bun-win32/user32';
-import { closeWindow, uia } from '@bun-win32/uia';
+import { closeWindow, uia, windowProcessId } from '@bun-win32/uia';
 
 type Rpc = { id?: number; result?: { isError?: boolean; content?: { text?: string }[] } };
 const proc = Bun.spawn(['bun', 'run', `${import.meta.dir}/../mcp.ts`], { stdin: 'pipe', stdout: 'pipe', stderr: 'ignore', env: { ...Bun.env, BUN_UIA_PROFILE: 'safe' } });
@@ -94,6 +94,8 @@ try {
     assert(!/STALE-SENTINEL-9999/.test(textOf(stale)), `copy on an empty control does NOT return the stale clipboard as its content (got: ${JSON.stringify(textOf(stale).slice(0, 50))})`);
   }
 } finally {
+  const notepadPid = notepad.hWnd !== 0n ? windowProcessId(notepad.hWnd) : 0;
+  if (notepadPid) Bun.spawnSync(['taskkill', '/F', '/PID', String(notepadPid)]);
   if (editHwnd !== 0n) User32.SendMessageW(editHwnd, EM_SETMODIFY, 0n, 0n);
   proc.kill();
   editor?.release();

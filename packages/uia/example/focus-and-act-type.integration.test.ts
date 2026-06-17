@@ -12,7 +12,7 @@
  * Run: bun run example/focus-and-act-type.integration.test.ts
  */
 import User32 from '@bun-win32/user32';
-import { closeWindow, uia } from '@bun-win32/uia';
+import { closeWindow, uia, windowProcessId } from '@bun-win32/uia';
 
 type Rpc = { id?: number; result?: { isError?: boolean; content?: { text?: string }[] } };
 const proc = Bun.spawn(['bun', 'run', `${import.meta.dir}/../mcp.ts`], { stdin: 'pipe', stdout: 'pipe', stderr: 'ignore', env: { ...Bun.env, BUN_UIA_PROFILE: 'safe' } });
@@ -93,6 +93,8 @@ try {
     } else console.log('  skip: WinUI Notepad with no per-control HWND — act() type cursor-free path N/A');
   }
 } finally {
+  const notepadPid = notepad.hWnd !== 0n ? windowProcessId(notepad.hWnd) : 0;
+  if (notepadPid) Bun.spawnSync(['taskkill', '/F', '/PID', String(notepadPid)]);
   if (editHwnd !== 0n) User32.SendMessageW(editHwnd, EM_SETMODIFY, 0n, 0n);
   proc.kill();
   editor?.release();

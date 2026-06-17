@@ -10,7 +10,7 @@
  * bun test is broken repo-wide — runnable harness (spawned Notepad):
  * Run: bun run example/triple-click-cursorfree.integration.test.ts
  */
-import { closeWindow, uia } from '@bun-win32/uia';
+import { closeWindow, uia, windowProcessId } from '@bun-win32/uia';
 import User32 from '@bun-win32/user32';
 
 const cursor = (): { x: number; y: number } => {
@@ -50,6 +50,8 @@ try {
   }
 } finally {
   if (notepad !== null) {
+    const notepadPid = windowProcessId(notepad.hWnd);
+    if (notepadPid) Bun.spawnSync(['taskkill', '/F', '/PID', String(notepadPid)]);
     closeWindow(notepad.hWnd);
     notepad.dispose();
   }
