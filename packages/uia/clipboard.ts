@@ -3,7 +3,7 @@
 // a creative "read selected text from any app" (copy → read) that works even where there's no a11y
 // tree. CF_UNICODETEXT via OpenClipboard + the Global* heap; zero new bindings.
 
-import { type Pointer, toArrayBuffer } from 'bun:ffi';
+import { toArrayBuffer } from 'bun:ffi';
 
 import Kernel32 from '@bun-win32/kernel32';
 import User32 from '@bun-win32/user32';
@@ -34,7 +34,7 @@ export function readClipboard(): string {
     if (pointer === null) return '';
     try {
       const size = Number(Kernel32.GlobalSize(handle));
-      const text = Buffer.from(toArrayBuffer(pointer as Pointer, 0, size)).toString('utf16le');
+      const text = Buffer.from(toArrayBuffer(pointer, 0, size)).toString('utf16le');
       const terminator = text.indexOf('\0');
       return terminator === -1 ? text : text.slice(0, terminator);
     } finally {
@@ -58,10 +58,10 @@ export function readClipboardFiles(): readonly string[] {
     if (pointer === null) return [];
     try {
       const size = Number(Kernel32.GlobalSize(handle));
-      const view = new DataView(toArrayBuffer(pointer as Pointer, 0, size));
+      const view = new DataView(toArrayBuffer(pointer, 0, size));
       const listOffset = view.getUint32(0, true); // DROPFILES.pFiles
       const wide = view.getUint32(16, true) !== 0; // DROPFILES.fWide
-      const bytes = Buffer.from(toArrayBuffer(pointer as Pointer, 0, size)).subarray(listOffset);
+      const bytes = Buffer.from(toArrayBuffer(pointer, 0, size)).subarray(listOffset);
       const blob = wide ? bytes.toString('utf16le') : bytes.toString('latin1');
       return blob.split('\0').filter((path) => path.length > 0); // entries are NUL-separated; list ends with a double-NUL
     } finally {
@@ -91,7 +91,7 @@ export function writeClipboardFiles(paths: readonly string[]): boolean {
     Kernel32.GlobalFree(handle);
     return false;
   }
-  new Uint8Array(toArrayBuffer(pointer as Pointer, 0, blob.length)).set(blob);
+  new Uint8Array(toArrayBuffer(pointer, 0, blob.length)).set(blob);
   Kernel32.GlobalUnlock(handle);
   if (User32.OpenClipboard(0n) === 0) {
     Kernel32.GlobalFree(handle);
@@ -180,7 +180,7 @@ export function readClipboardImage(): Bitmap | null {
     if (pointer === null) return null;
     try {
       const size = Number(Kernel32.GlobalSize(handle));
-      return decodeDib(Buffer.from(toArrayBuffer(pointer as Pointer, 0, size)));
+      return decodeDib(Buffer.from(toArrayBuffer(pointer, 0, size)));
     } finally {
       Kernel32.GlobalUnlock(handle);
     }
@@ -200,7 +200,7 @@ export function writeClipboardImage(image: { rgb: Uint8Array; width: number; hei
     Kernel32.GlobalFree(handle);
     return false;
   }
-  new Uint8Array(toArrayBuffer(pointer as Pointer, 0, dib.length)).set(dib);
+  new Uint8Array(toArrayBuffer(pointer, 0, dib.length)).set(dib);
   Kernel32.GlobalUnlock(handle);
   if (User32.OpenClipboard(0n) === 0) {
     Kernel32.GlobalFree(handle);
@@ -228,7 +228,7 @@ export function writeClipboard(text: string): boolean {
     Kernel32.GlobalFree(handle);
     return false;
   }
-  new Uint8Array(toArrayBuffer(pointer as Pointer, 0, bytes.length)).set(bytes);
+  new Uint8Array(toArrayBuffer(pointer, 0, bytes.length)).set(bytes);
   Kernel32.GlobalUnlock(handle);
   if (User32.OpenClipboard(0n) === 0) {
     Kernel32.GlobalFree(handle);
