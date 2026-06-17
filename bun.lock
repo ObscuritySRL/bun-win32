@@ -290,7 +290,7 @@
     },
     "packages/bun-uia": {
       "name": "bun-uia",
-      "version": "1.7.0",
+      "version": "1.8.0",
       "bin": {
         "bun-uia": "./mcp.ts",
         "bun-uia-mcp": "./mcp.ts",
@@ -1466,7 +1466,7 @@
     },
     "packages/uia": {
       "name": "@bun-win32/uia",
-      "version": "1.7.0",
+      "version": "1.8.0",
       "bin": {
         "bun-uia-mcp": "./mcp.ts",
       },
