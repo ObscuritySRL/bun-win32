@@ -191,5 +191,30 @@ try {
   errParity.kill();
 }
 
-console.log(failures === 0 ? '\nPASS — audit trail on (calls AND policy-refusals), clipboard least-privilege + redacted + fenced, readonly+OS instructions consistent, thrown-error text un-prefixed.' : `\nFAILED — ${failures} assertion(s)`);
+// 6 — inline command-line credentials: a secret pasted into run_program / launch_app `command` must NOT reach stderr
+// (audit + trace) NOR the returned error/observation text. maskArgs collapses the `command` to its exe token + a length,
+// and the launch_app/run_program echo sites interpolate that masked form — only WHICH program ran survives, never its args.
+const osSecret = spawnServer({ BUN_UIA_PROFILE: 'full' });
+try {
+  await osSecret.call('initialize', init);
+  // launch_app: a bogus exe with the secret as a flag — fails (not on PATH), so the error text is the echo channel under test.
+  const launched = await osSecret.call('tools/call', { name: 'launch_app', arguments: { command: `no-such-app-xyz --password=${SECRET}` } });
+  const launchText = textOf(launched);
+  assert(!launchText.includes(SECRET), `launch_app's error text MASKS an inline credential in \`command\` (got: ${JSON.stringify(launchText.slice(0, 60))})`);
+  assert(/no-such-app-xyz <\d+ chars>/.test(launchText), 'launch_app keeps the exe token + a remainder length (which program ran survives; the args/credential do not)');
+  // run_program: a bogus exe with the secret as a flag — the audit args.command is the channel under test (stdout would carry a program's OWN output, out of scope).
+  await osSecret.call('tools/call', { name: 'run_program', arguments: { command: `no-such-prog-xyz --password=${SECRET}` } });
+  await Bun.sleep(80); // let both async dispatches flush their audit lines to stderr
+  const err = osSecret.stderr();
+  assert(!err.includes(SECRET), 'NEITHER the run_program nor launch_app audit/trace line leaks an inline `command` credential to stderr');
+  const lines = auditLines(err);
+  const launchAudit = lines.find((line) => line.tool === 'launch_app');
+  assert(launchAudit !== undefined && launchAudit.error !== undefined && !launchAudit.error.includes(SECRET), 'the launch_app audit `error` field MASKS the inline credential (no error/observation echo leak)');
+  const runAudit = lines.find((line) => line.tool === 'run_program');
+  assert(runAudit !== undefined, 'run_program leaves an audit line (its `command` arg masked by maskArgs, not logged verbatim)');
+} finally {
+  osSecret.kill();
+}
+
+console.log(failures === 0 ? '\nPASS — audit trail on (calls AND policy-refusals), clipboard least-privilege + redacted + fenced, readonly+OS instructions consistent, thrown-error text un-prefixed, inline command-line credentials masked everywhere.' : `\nFAILED — ${failures} assertion(s)`);
 process.exit(failures === 0 ? 0 : 1);

@@ -730,6 +730,18 @@ function errorResult(text: string): object {
 // Args whose value is free text the model wrote — masked in the trace to its length, so a recorded journal never
 // leaks pasted secrets / typed credentials while still telling you HOW MUCH text the step carried.
 const TRACE_MASK_KEYS = new Set(['content', 'text', 'value']);
+// Args whose value is a whole command LINE the model wrote (run_program/launch_app `command`) — the inline home of
+// credentials (`mysql --password=…`, `curl -H 'Authorization: Bearer …'`). Unlike an args[] array (collapsed to a count)
+// the string carries the secret verbatim, so it must be masked to its leading executable token + a remainder length.
+const COMMAND_KEYS = new Set(['command']);
+/** Mask a whole command line (run_program/launch_app `command`) for any forensic sink — the journal, the SIEM audit line,
+ *  AND the error/observation echo. Keeps only the leading executable token (which program ran is the forensic signal that
+ *  survives) and collapses the rest — flags, paths, `--password=…`, bearer tokens — to a character count, so a planted
+ *  credential never reaches a recorded surface verbatim. A no-space command (a bare exe) is already secret-free. */
+function maskCommand(value: string): string {
+  const space = value.indexOf(' ');
+  return space < 0 ? value : `${value.slice(0, space)} <${value.length - space - 1} chars>`;
+}
 /** Mask a press_key/hold_key `key` for the journal: a bare single printable char is one keystroke of a credential being
  *  spelled out char-by-char (the SendInput fallback to a no-own-HWND password box), so it collapses to `<char>` — but a
  *  chord (Control+S) or a named key (Enter, F4) is intentional forensic signal and stays legible. */
@@ -739,12 +751,13 @@ function maskKey(value: string): string {
 /** A masked, JSON-safe copy of a tool's arguments for the trace/audit line — long free-text fields become `<N chars>` and
  *  any array-of-args (run_program.args, copy_files.paths) collapses to its element count. Command-line args are THE canonical
  *  home of credentials (--password=, -psecret, Authorization: Bearer …), so they must never reach the journal/SIEM verbatim;
- *  the element count is the forensic signal (HOW MANY args/paths) that survives. */
+ *  the element count is the forensic signal (HOW MANY args/paths) that survives — and a whole-command-LINE string (the
+ *  `command` arg) keeps only its leading executable token, the remainder collapsed to a length by maskCommand. */
 function maskArgs(args: Record<string, unknown>): Record<string, unknown> {
   const masked: Record<string, unknown> = {};
   for (const [key, value] of Object.entries(args)) {
     if (Array.isArray(value)) masked[key] = `<${value.length} arg${value.length === 1 ? '' : 's'}>`;
-    else masked[key] = typeof value === 'string' ? (TRACE_MASK_KEYS.has(key) ? `<${value.length} chars>` : key === 'key' ? maskKey(value) : value) : value;
+    else masked[key] = typeof value === 'string' ? (TRACE_MASK_KEYS.has(key) ? `<${value.length} chars>` : COMMAND_KEYS.has(key) ? maskCommand(value) : key === 'key' ? maskKey(value) : value) : value;
   }
   return masked;
 }
@@ -1611,10 +1624,11 @@ const TOOLS: McpTool[] = [
     name: 'ocr',
     category: 'read',
     description:
-      'READ TEXT out of the raw PIXELS of the attached window (or a given hWnd, or a screen region) via Windows OCR — for surfaces with NO accessibility tree: a <canvas>/WebGL app, a game, a video frame, a remote-desktop session, a chart, a scanned document, an image. Captures even occluded/GPU/background windows (WGC). Returns each line with a SCREEN-pixel bounding box; click recognized text with click_point at a box centre.',
+      'READ TEXT out of the raw PIXELS of one control (pass `ref` — OCCLUSION-CORRECT, just that <canvas>/chart/custom control), the attached window, a given hWnd, or a screen region, via Windows OCR — for surfaces with NO accessibility tree: a <canvas>/WebGL app, a game, a video frame, a remote-desktop session, a chart, a scanned document, an image. Captures even occluded/GPU/background windows (WGC). Returns each line with a SCREEN-pixel bounding box; click recognized text with click_point at a box centre.',
     inputSchema: {
       type: 'object',
       properties: {
+        ref: { type: 'string', description: REF_DESC },
         hWnd: { type: ['string', 'number'], description: HWND_DESC },
         region: { type: 'object', description: 'Screen region {x,y,width,height} to OCR instead of a window', properties: { x: { type: 'number' }, y: { type: 'number' }, width: { type: 'number' }, height: { type: 'number' } } },
       },
@@ -1653,7 +1667,7 @@ const TOOLS: McpTool[] = [
     name: 'capture_window',
     category: 'read',
     description:
-      'Capture the LIVE pixels of a window via Windows.Graphics.Capture — sees it even when occluded, in the background, minimized-then-restored, or GPU-composited (hardware-accel Chromium/Edge/Electron, games, WinUI) that the plain screenshot returns blank for, the way Alt+Tab previews do. No foregrounding. Target a ref or hWnd; omit both for the attached window.',
+      'Capture the LIVE pixels of a window via Windows.Graphics.Capture — sees it even when occluded, in the background, minimized-then-restored, or GPU-composited (hardware-accel Chromium/Edge/Electron, games, WinUI) that the plain screenshot returns blank for, the way Alt+Tab previews do. No foregrounding. Pass a `ref` to capture JUST that one control (OCCLUSION-CORRECT, cropped from its own window — a <canvas>/chart/custom control), an hWnd for a whole window, or omit both for the attached window.',
     inputSchema: { type: 'object', properties: { ref: { type: 'string', description: REF_DESC }, hWnd: { type: ['string', 'number'], description: HWND_DESC } } },
   },
   {
@@ -2367,7 +2381,15 @@ const HANDLERS: Record<string, ToolHandler> = {
     const region = args.region;
     let result: { text: string; lines: { text: string; bounds: { x: number; y: number; width: number; height: number } }[] };
     let origin: string;
-    if (region !== null && typeof region === 'object' && !Array.isArray(region)) {
+    if (typeof args.ref === 'string') {
+      // Element-scoped, OCCLUSION-CORRECT (FlaUI Capture.Element / Playwright locator.screenshot): OCR just this
+      // control's pixels, sourced from its OWN window — never the whatever-is-topmost pixels a screen-region grab blits.
+      const element = resolveRef(args.ref);
+      const elementResult = await element.ocr();
+      if (elementResult === null) return errorResult('ocr {ref}: the control has no capturable surface (its window is minimized, protected, or off-screen) — restore/raise the window, or OCR the whole window via hWnd.');
+      result = elementResult;
+      origin = `ref ${args.ref}`;
+    } else if (region !== null && typeof region === 'object' && !Array.isArray(region)) {
       const regionRecord = record(region);
       result = await uia.ocrScreen({
         x: typeof regionRecord.x === 'number' ? regionRecord.x : undefined,
@@ -2457,6 +2479,15 @@ const HANDLERS: Record<string, ToolHandler> = {
     return errorResult('screenshot was empty (locked session, zero-size, or fully off-screen window)');
   },
   capture_window: async (args) => {
+    if (typeof args.ref === 'string') {
+      // Element-scoped, OCCLUSION-CORRECT (FlaUI Capture.Element / Playwright locator.screenshot): just this control's
+      // pixels, cropped from its OWN window — so an agent holding a ref for a <canvas>/chart/custom control snapshots
+      // exactly it, not the surrounding window or whatever overlaps those screen pixels.
+      const element = resolveRef(args.ref);
+      const crop = await element.capture();
+      if (crop === null) return errorResult('capture_window {ref}: the control has no capturable surface (its window is minimized, protected, or off-screen) — restore/raise the window, or capture the whole window via hWnd.');
+      return imageResult(encodePNG(crop.rgb, crop.width, crop.height), `(control-scoped crop; ${originNote(crop.originX, crop.originY, crop.width, crop.height)})`);
+    }
     const hWnd = resolveHwnd(args);
     const live = await captureWindowLiveWarm(hWnd);
     if (live === null) {
@@ -3029,6 +3060,9 @@ const HANDLERS: Record<string, ToolHandler> = {
   },
   launch_app: async (args) => {
     const command = requireString(args, 'command');
+    // The exact string the model passed — re-emitting it to the result re-exposes any inline credential to the SIEM
+    // (the result text becomes the audit `error` field + the trace `observation`). Echo the exe-token-masked form only.
+    const safeCommand = maskCommand(command);
     const timeout = typeof args.timeout === 'number' ? args.timeout : 8000;
     const target: { title?: string; className?: string } = {};
     if (typeof args.title === 'string') target.title = args.title;
@@ -3060,9 +3094,9 @@ const HANDLERS: Record<string, ToolHandler> = {
       spawned = false;
     }
     if (!spawned && !openPath(command))
-      return errorResult(`could not launch ${JSON.stringify(command)} — not on PATH and ShellExecuteW could not resolve it. Check the name, pass a full path, or use run_program for a command line with arguments.`);
+      return errorResult(`could not launch ${JSON.stringify(safeCommand)} — not on PATH and ShellExecuteW could not resolve it. Check the name, pass a full path, or use run_program for a command line with arguments.`);
     const via = spawned ? '' : ' (via shell — App-Paths/alias)';
-    if (typeof args.title !== 'string' && typeof args.className !== 'string') return textResult(`launched${via}: ${command}`);
+    if (typeof args.title !== 'string' && typeof args.className !== 'string') return textResult(`launched${via}: ${safeCommand}`);
     // Poll for the first matching window NOT in `before`. When the direct CreateProcess spawn succeeded prefer one whose
     // processId === the spawned pid; UWP/ShellExecute reparent into a host process, so fall back to any not-in-before match.
     const start = Bun.nanoseconds();
@@ -3080,12 +3114,15 @@ const HANDLERS: Record<string, ToolHandler> = {
         return withLaunchSettledSnapshot(`launched${via} and attached to ${JSON.stringify(window.name)}`);
       }
       if ((Bun.nanoseconds() - start) / 1e6 >= timeout)
-        return errorResult(`launched${via} ${JSON.stringify(command)} but no NEW window matching ${JSON.stringify(target)} appeared within ${timeout}ms — call list_windows / wait_for_window, then attach by hWnd.`);
+        return errorResult(`launched${via} ${JSON.stringify(safeCommand)} but no NEW window matching ${JSON.stringify(target)} appeared within ${timeout}ms — call list_windows / wait_for_window, then attach by hWnd.`);
       await Bun.sleep(64);
     }
   },
   run_program: async (args) => {
     const command = requireString(args, 'command');
+    // Echo only the exe-token-masked command in the result text — the raw string carries any inline `--password=…` into the
+    // audit `error`/trace `observation`. (Captured stdout/stderr below is the program's own output the agent asked for.)
+    const safeCommand = maskCommand(command);
     const extra = Array.isArray(args.args) ? args.args.filter((part): part is string => typeof part === 'string') : [];
     const timeoutMs = typeof args.timeoutMs === 'number' && Number.isFinite(args.timeoutMs) && args.timeoutMs > 0 ? Math.min(args.timeoutMs, 300_000) : 30_000;
     const proc = Bun.spawn(extra.length > 0 ? [command, ...extra] : command.split(' '), { stdout: 'pipe', stderr: 'pipe' });
@@ -3120,7 +3157,7 @@ const HANDLERS: Record<string, ToolHandler> = {
     if (outcome === 'timeout') {
       proc.kill();
       return textResult(
-        `run_program: ${JSON.stringify(command)} did not exit within ${timeoutMs}ms — killed it. That usually means a GUI app or a long-running/server process; launch GUI apps with launch_app (it attaches to the window), or pass a larger timeoutMs.\n--- stdout (partial) ---\n${out.slice(0, 8000)}${err.length > 0 ? `\n--- stderr (partial) ---\n${err.slice(0, 2000)}` : ''}`,
+        `run_program: ${JSON.stringify(safeCommand)} did not exit within ${timeoutMs}ms — killed it. That usually means a GUI app or a long-running/server process; launch GUI apps with launch_app (it attaches to the window), or pass a larger timeoutMs.\n--- stdout (partial) ---\n${out.slice(0, 8000)}${err.length > 0 ? `\n--- stderr (partial) ---\n${err.slice(0, 2000)}` : ''}`,
       );
     }
     if (timer !== undefined) clearTimeout(timer);
