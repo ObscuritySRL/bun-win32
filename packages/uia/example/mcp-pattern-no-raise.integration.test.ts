@@ -77,9 +77,20 @@ try {
     assert(isMinimized(charmapHwnd), 'charmap is minimized before any pattern-tool act');
     assert(foregroundWindow() !== charmapHwnd, 'charmap is provably NOT the foreground window before any act');
 
+    // Re-read the "Characters to copy" Edit's live value (inspect_element on a fresh ref) — the readback the EFFECT
+    // assertions lean on: set_value stamps it, the "Select" button (invoke) prepends the selected glyph to it.
+    const charmapEditValue = async (): Promise<string> => {
+      const tree = textOf(await call('tools/call', { name: 'attach', arguments: { hWnd: `0x${hwndHex}` } }));
+      const ref = /Edit[^\n]*?\[ref=(e\d+(?:#\d+)?)\]/i.exec(tree)?.[1];
+      if (ref === undefined) return '';
+      return /^value:\s*(.*)$/im.exec(textOf(await call('tools/call', { name: 'inspect_element', arguments: { ref } })))?.[1] ?? '';
+    };
+
     // The STRONGER guard the fix delivers: the foreground is FULLY UNCHANGED across the tool call (not just "not the
     // parent window"). Re-attach right before each act to get a CURRENT ref (every mutating tool re-grounds + renumbers).
-    const guard = async (label: string, namePattern: RegExp, tool: string, args: object): Promise<void> => {
+    // `effect` runs AFTER the act and asserts the act actually LANDED — a silently-dropped post (wrong HWND, BM_CLICK
+    // no-op) keeps the foreground put and still names BM_CLICK, so the no-steal half alone would pass it; this closes that.
+    const guard = async (label: string, namePattern: RegExp, tool: string, args: object, effect: (result: Rpc) => Promise<void>): Promise<void> => {
       const tree = textOf(await call('tools/call', { name: 'attach', arguments: { hWnd: `0x${hwndHex}` } }));
       const ref = namePattern.exec(tree)?.[1];
       if (ref === undefined) {
@@ -94,11 +105,21 @@ try {
       assert(after === before, `${label}: foreground FULLY UNCHANGED across the tool call (before=0x${before.toString(16)} after=0x${after.toString(16)})`);
       assert(isMinimized(charmapHwnd), `${label}: charmap stays minimized`);
       assert(/cursor-free|focus-clean|WM_SETTEXT|BM_CLICK/i.test(textOf(result)), `${label}: result names the focus-clean posted path (${textOf(result).slice(0, 90)})`);
+      await effect(result);
     };
 
-    await guard('set_value', /Edit[^\n]*?\[ref=(e\d+(?:#\d+)?)\]/i, 'set_value', { value: 'mcp-no-raise-7421' });
-    await guard('toggle', /Advanced view[^\n]*?\[ref=(e\d+(?:#\d+)?)\]/i, 'toggle', {});
-    await guard('invoke', /Select[^\n]*?\[ref=(e\d+(?:#\d+)?)\]/i, 'invoke', {});
+    await guard('set_value', /Edit[^\n]*?\[ref=(e\d+(?:#\d+)?)\]/i, 'set_value', { value: 'mcp-no-raise-7421' }, async () => {
+      assert((await charmapEditValue()).includes('mcp-no-raise-7421'), 'set_value: the stamped text actually LANDED in the Edit (inspect_element value contains it)');
+    });
+    await guard('toggle', /Advanced view[^\n]*?\[ref=(e\d+(?:#\d+)?)\]/i, 'toggle', {}, async (result) => {
+      const transition = /state\s+(\w+)\s*→\s*(\w+)/.exec(textOf(result));
+      assert(transition !== null && transition[1] !== transition[2], `toggle: the toggleState actually FLIPPED (${transition?.[1]} → ${transition?.[2]}), not a no-op BM_CLICK`);
+    });
+    // The Edit before invoke (set_value stamped it); the "Select" button prepends the selected glyph, so the value GROWS.
+    const beforeInvoke = await charmapEditValue();
+    await guard('invoke', /Select[^\n]*?\[ref=(e\d+(?:#\d+)?)\]/i, 'invoke', {}, async () => {
+      assert((await charmapEditValue()).length > beforeInvoke.length, `invoke: the "Select" click actually FIRED — it appended the selected glyph to the Edit (len ${beforeInvoke.length} → grew)`);
+    });
   }
 } finally {
   const charmapPid = charmapHwnd !== 0n ? windowProcessId(charmapHwnd) : 0;
