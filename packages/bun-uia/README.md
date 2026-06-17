@@ -22,7 +22,7 @@ console.log(calc.find({ automationId: 'CalculatorResults' })?.name); // → "Dis
 
 ## Use as an MCP server
 
-Listed in the official **[MCP Registry](https://registry.modelcontextprotocol.io/v0/servers?search=io.github.ObscuritySRL/bun-uia)** as `io.github.ObscuritySRL/bun-uia`. It exposes the whole surface as **59 policy-gated tools** (53 under the default `safe` profile; 23 under `readonly`) so an agent drives Windows cursor-free, sees the desktop, and (when enabled) launches apps and reads/writes files. Needs **Bun on `PATH`**.
+Listed in the official **[MCP Registry](https://registry.modelcontextprotocol.io/v0/servers?search=io.github.ObscuritySRL/bun-uia)** as `io.github.ObscuritySRL/bun-uia`. It exposes the whole surface as **59 policy-gated tools** (53 under the default `safe` profile; 22 under `readonly`) so an agent drives Windows cursor-free, sees the desktop, and (when enabled) launches apps and reads/writes files. Needs **Bun on `PATH`**.
 
 **Claude Code / Claude Desktop** — one line:
 
