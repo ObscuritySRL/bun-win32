@@ -169,9 +169,9 @@ export function postClickToHwnd(hWnd: bigint, x: number, y: number, button: Post
   const lParam = clientLParam(hWnd, x, y);
   const message = BUTTON_MESSAGES[button];
   User32.PostMessageW(hWnd, WM_MOUSEMOVE, 0n, lParam);
-  User32.PostMessageW(hWnd, message.down, BigInt(message.mk), lParam);
-  User32.PostMessageW(hWnd, message.up, 0n, lParam);
-  return true;
+  const down = User32.PostMessageW(hWnd, message.down, BigInt(message.mk), lParam);
+  const up = User32.PostMessageW(hWnd, message.up, 0n, lParam);
+  return down !== 0 && up !== 0;
 }
 
 /** Post a cursor-free DOUBLE left-click (down/up/DBLCLK/up) to a specific window — occlusion-correct like
@@ -180,11 +180,11 @@ export function postDoubleClickToHwnd(hWnd: bigint, x: number, y: number): boole
   if (hWnd === 0n) return false;
   const lParam = clientLParam(hWnd, x, y);
   User32.PostMessageW(hWnd, WM_MOUSEMOVE, 0n, lParam);
-  User32.PostMessageW(hWnd, WM_LBUTTONDOWN, BigInt(MK_LBUTTON), lParam);
+  const down = User32.PostMessageW(hWnd, WM_LBUTTONDOWN, BigInt(MK_LBUTTON), lParam);
   User32.PostMessageW(hWnd, WM_LBUTTONUP, 0n, lParam);
   User32.PostMessageW(hWnd, WM_LBUTTONDBLCLK, BigInt(MK_LBUTTON), lParam);
-  User32.PostMessageW(hWnd, WM_LBUTTONUP, 0n, lParam);
-  return true;
+  const up = User32.PostMessageW(hWnd, WM_LBUTTONUP, 0n, lParam);
+  return down !== 0 && up !== 0;
 }
 
 /** Cursor-free double left-click at a screen point, posted to the TOPMOST window there (prefer the element/ref path
@@ -201,13 +201,13 @@ export function postTripleClickToHwnd(hWnd: bigint, x: number, y: number): boole
   if (hWnd === 0n) return false;
   const lParam = clientLParam(hWnd, x, y);
   User32.PostMessageW(hWnd, WM_MOUSEMOVE, 0n, lParam);
-  User32.PostMessageW(hWnd, WM_LBUTTONDOWN, BigInt(MK_LBUTTON), lParam);
+  const down = User32.PostMessageW(hWnd, WM_LBUTTONDOWN, BigInt(MK_LBUTTON), lParam);
   User32.PostMessageW(hWnd, WM_LBUTTONUP, 0n, lParam);
   User32.PostMessageW(hWnd, WM_LBUTTONDBLCLK, BigInt(MK_LBUTTON), lParam);
   User32.PostMessageW(hWnd, WM_LBUTTONUP, 0n, lParam);
   User32.PostMessageW(hWnd, WM_LBUTTONDOWN, BigInt(MK_LBUTTON), lParam);
-  User32.PostMessageW(hWnd, WM_LBUTTONUP, 0n, lParam);
-  return true;
+  const up = User32.PostMessageW(hWnd, WM_LBUTTONUP, 0n, lParam);
+  return down !== 0 && up !== 0;
 }
 
 /** Cursor-free triple left-click at a screen point, posted to the TOPMOST window there (prefer the element/ref path
@@ -225,14 +225,14 @@ export function postDragToHwnd(hWnd: bigint, fromX: number, fromY: number, toX: 
   if (hWnd === 0n) return false;
   const steps = 8;
   User32.PostMessageW(hWnd, WM_MOUSEMOVE, 0n, clientLParam(hWnd, fromX, fromY));
-  User32.PostMessageW(hWnd, WM_LBUTTONDOWN, BigInt(MK_LBUTTON), clientLParam(hWnd, fromX, fromY));
+  const down = User32.PostMessageW(hWnd, WM_LBUTTONDOWN, BigInt(MK_LBUTTON), clientLParam(hWnd, fromX, fromY));
   for (let step = 1; step <= steps; step += 1) {
     const x = Math.round(fromX + ((toX - fromX) * step) / steps);
     const y = Math.round(fromY + ((toY - fromY) * step) / steps);
     User32.PostMessageW(hWnd, WM_MOUSEMOVE, BigInt(MK_LBUTTON), clientLParam(hWnd, x, y));
   }
-  User32.PostMessageW(hWnd, WM_LBUTTONUP, 0n, clientLParam(hWnd, toX, toY));
-  return true;
+  const up = User32.PostMessageW(hWnd, WM_LBUTTONUP, 0n, clientLParam(hWnd, toX, toY));
+  return down !== 0 && up !== 0;
 }
 
 /** The HWND that owns an element's posted-message input: its own native window, else the nearest ancestor that has

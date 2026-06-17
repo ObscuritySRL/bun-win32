@@ -137,6 +137,7 @@
     "example:ocr-window": "bun ./example/ocr-window.integration.test.ts",
     "example:perf-gate": "bun ./example/perf-gate.integration.test.ts",
     "example:popup-windows": "bun ./example/popup-windows.integration.test.ts",
+    "example:posted-click-dead-window-honest": "bun ./example/posted-click-dead-window-honest.integration.test.ts",
     "example:read-table": "bun ./example/read-table.integration.test.ts",
     "example:reveal-offscreen": "bun ./example/reveal-offscreen.integration.test.ts",
     "example:safety-floor": "bun ./example/safety-floor.integration.test.ts",
