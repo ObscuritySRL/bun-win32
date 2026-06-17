@@ -71,11 +71,9 @@ export function execute(window: Element, actions: readonly AgentAction[]): Agent
   return results;
 }
 
-/** Serialize a window for an agent — the compact, interactive-only grounding profile. `maxNodes` caps total nodes
- *  walked (default 1500, the snapshot budget) so a dense flat LOB grid/toolbar/icon-wall stops fast and truncates
- *  with a marker instead of marshaling its whole subtree (the ~7s flat-tree wall). */
-export function groundingTree(window: Element, maxNodes?: number): UiaNode {
-  return serialize(window, { agentProfile: true, ...(maxNodes !== undefined ? { maxNodes } : {}) });
+/** Serialize a window for an agent — the compact, interactive-only grounding profile. */
+export function groundingTree(window: Element): UiaNode {
+  return serialize(window, { agentProfile: true });
 }
 
 /** LLM tool definitions (Anthropic/OpenAI tool-use shape) for desktop grounding. */
@@ -104,15 +102,6 @@ export const AGENT_TOOLS = [
   {
     name: 'read_tree',
     description: 'Serialize the target window accessibility tree to JSON (role, name, automationId, bounds) for grounding actions.',
-    input_schema: {
-      type: 'object',
-      properties: {
-        agentProfile: { type: 'boolean', description: 'prune to interactive/named controls' },
-        maxNodes: {
-          type: 'number',
-          description: 'Cap TOTAL nodes walked (default 1500) — the lever for a dense window with thousands of sibling controls; the tree is truncated with a "raise maxNodes" marker when hit. maxDepth canNOT bound a flat/wide tree.',
-        },
-      },
-    },
+    input_schema: { type: 'object', properties: { agentProfile: { type: 'boolean', description: 'prune to interactive/named controls' } } },
   },
 ] as const;

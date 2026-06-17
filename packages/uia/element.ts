@@ -842,6 +842,35 @@ export class Element {
     return canSelectMultiple(this.ptr);
   }
 
+  /** Pick a value from a combo box / list / tree by its visible text in ONE call (Playwright `selectOption({label})`,
+   *  FlaUI `comboBox.Select(value)`) — pure composition of shipped patterns, no new FFI. Expands this element first if
+   *  it is an ExpandCollapse combo (so the popup list realizes), reveal()s the matching ListItem/TreeItem/DataItem by
+   *  Name (scroll-revealing a virtualized list), then selects it (SelectionItem, falling back to Invoke), and collapses
+   *  the combo again. Cursor-free, no focus, works on a background/occluded window. Returns true on a pick, false if no
+   *  item matched. `ignoreCase` matches the text case-insensitively (anchored, whole-name). */
+  selectOption(text: string, options: { ignoreCase?: boolean } = {}): boolean {
+    const name = options.ignoreCase ? new RegExp(`^${text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i') : text;
+    const wasCollapsed = this.expandCollapseState === ExpandCollapseState.Collapsed;
+    if (wasCollapsed) this.expand();
+    const item = this.reveal({ controlTypes: [ControlType.DataItem, ControlType.ListItem, ControlType.MenuItem, ControlType.TreeItem], name });
+    if (item === null) {
+      if (wasCollapsed) this.collapse();
+      return false;
+    }
+    try {
+      if (item.isSelected) return true;
+      try {
+        item.select();
+      } catch {
+        item.invoke();
+      }
+      return true;
+    } finally {
+      item.release();
+      if (wasCollapsed) this.collapse();
+    }
+  }
+
   /** Whether the element can be moved via TransformPattern (FlaUI's Transform.CanMove); false if unsupported. */
   get canMove(): boolean {
     return canMove(this.ptr);

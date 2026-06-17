@@ -14,17 +14,13 @@
  *    walker enumeration sees the same tree the old Subtree cache did).
  *  - the new IUIAutomationTreeWalker BuildCache slots (GetFirstChildElementBuildCache=10, GetNextSiblingElementBuildCache
  *    =12) do NOT segfault — a wrong slot would crash the process here, so a clean run is itself the slot proof.
- *  - uia.tree (== serialize == groundingTree == the AGENT_TOOLS read_tree tool) now threads the SAME maxNodes budget
- *    through the per-parent BuildCache walk instead of an unbounded BuildUpdatedCache(TreeScope_Subtree): a budgeted
- *    uia.tree caps the nodes/tokens and truncates FAST (the old path walled ~5s + ~99k tokens on this flat form), and
- *    an unbounded budget still recovers the whole tree.
  * The PowerShell process is killed + window closed in finally. SKIPS cleanly if PowerShell / WinForms is absent.
  *
  * bun test is broken repo-wide for FFI — runnable harness (spawns a real window):
  * Run: bun run example/dense-tree-budget.integration.test.ts
  */
 import User32 from '@bun-win32/user32';
-import { closeWindow, attach, countNodes, estimateTokens, renderSnapshot, uia, windowProcessId } from '@bun-win32/uia';
+import { closeWindow, attach, renderSnapshot, uia, windowProcessId } from '@bun-win32/uia';
 
 let failures = 0;
 function assert(condition: boolean, message: string): void {
@@ -89,28 +85,6 @@ try {
       console.log(`  [unbounded] → ${fullMarks} marks in ${fullMs.toFixed(0)} ms (truncated=${fullTruncated})`);
       assert(fullMarks >= BUTTON_COUNT, `the unbounded walk recovers all ${BUTTON_COUNT} buttons (${fullMarks} marks)`);
       assert(!fullTruncated, 'an unbounded snapshot is NOT truncated');
-
-      // uia.tree (== serialize == groundingTree == the AGENT_TOOLS read_tree tool) used to run an UNBOUNDED
-      // BuildUpdatedCache(TreeScope_Subtree) — the exact ~7s flat-tree wall + ~99k tokens this gate now also covers.
-      // It threads the SAME maxNodes budget through the per-parent BuildCache walk, so a dense LOB grid stops fast.
-      const treeStart = Bun.nanoseconds();
-      const tree = uia.tree(window, { agentProfile: true, maxNodes: 400 });
-      const treeMs = (Bun.nanoseconds() - treeStart) / 1e6;
-      const treeNodes = countNodes(tree);
-      const treeTokens = estimateTokens(tree);
-      const treeTruncated = tree.truncated === true;
-      console.log(`  [tree maxNodes:400] → ${treeNodes} nodes, ~${treeTokens} tokens in ${treeMs.toFixed(0)} ms (truncated=${treeTruncated})`);
-      assert(treeNodes <= 401, `uia.tree maxNodes:400 caps the nodes at the budget (${treeNodes} ≤ 401), not the full ${BUTTON_COUNT}`);
-      assert(treeTruncated, 'uia.tree sets node.truncated when the budget cut the walk short');
-      assert(treeTokens < 30_000, `uia.tree maxNodes:400 stays token-economical (~${treeTokens} ≪ the old ~99k-token blob)`);
-      assert(treeMs < 2500, `uia.tree maxNodes:400 ${treeMs.toFixed(0)} ms < 2500 ms (the old unbounded path walled ~5–7s)`);
-
-      // Correctness: an unbounded uia.tree budget recovers the whole flat tree (the budget is the only behavioral change).
-      const treeFull = uia.tree(window, { maxNodes: 100_000 });
-      const treeFullNodes = countNodes(treeFull);
-      console.log(`  [tree unbounded] → ${treeFullNodes} nodes (truncated=${treeFull.truncated === true})`);
-      assert(treeFullNodes >= BUTTON_COUNT, `an unbounded uia.tree recovers all ${BUTTON_COUNT} buttons (${treeFullNodes} nodes)`);
-      assert(treeFull.truncated !== true, 'an unbounded uia.tree is NOT truncated');
     } finally {
       window.dispose();
     }

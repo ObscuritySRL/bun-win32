@@ -1553,6 +1553,17 @@ const TOOLS: McpTool[] = [
     },
   },
   {
+    name: 'select_option',
+    category: 'input',
+    description:
+      'Pick a value from a combobox / dropdown / list / tree by its visible TEXT in ONE call (Playwright selectOption({label}), FlaUI comboBox.Select(value)) — cursor-free, no focus. Target the COMBO/LIST ref (not an item): it expands if needed, scroll-reveals the matching item even when virtualized, selects it (SelectionItem, Invoke fallback), then collapses. ignoreCase matches the text case-insensitively. Errors if no item matches.',
+    inputSchema: {
+      type: 'object',
+      properties: { element: { type: 'string', description: ELEMENT_DESC }, ref: { type: 'string', description: REF_DESC }, text: { type: 'string', description: 'The visible item text to pick.' }, ignoreCase: { type: 'boolean' } },
+      required: ['ref', 'text'],
+    },
+  },
+  {
     name: 'find_text',
     category: 'input',
     description:
@@ -2299,6 +2310,15 @@ const HANDLERS: Record<string, ToolHandler> = {
     const mode = args.mode === 'add' ? 'add' : args.mode === 'remove' ? 'remove' : 'replace';
     patternAction('select', () => (mode === 'add' ? element.addToSelection() : mode === 'remove' ? element.removeFromSelection() : element.select()));
     return withSnapshot(`${mode === 'add' ? 'added to selection' : mode === 'remove' ? 'removed from selection' : 'selected'} ${target}`);
+  },
+  select_option: (args) => {
+    const element = resolveRef(requireString(args, 'ref'));
+    const text = requireString(args, 'text');
+    const target = named(element);
+    const picked = patternAction('select_option', () => element.selectOption(text, { ignoreCase: args.ignoreCase === true }));
+    return picked
+      ? withSettledSnapshot(`selected ${JSON.stringify(text)} in ${target}`, current?.marks.length ?? 0)
+      : errorResult(`no item named ${JSON.stringify(text)} under ${target} — expand it and desktop_snapshot to see the options, mind case (ignoreCase:true), or it may be virtualized (the scan covers ~80 pages)`);
   },
   find_text: (args) => {
     const element = resolveRef(requireString(args, 'ref'));

@@ -152,6 +152,7 @@
     "example:read-table": "bun ./example/read-table.integration.test.ts",
     "example:reveal-offscreen": "bun ./example/reveal-offscreen.integration.test.ts",
     "example:safety-floor": "bun ./example/safety-floor.integration.test.ts",
+    "example:select-option": "bun ./example/select-option.integration.test.ts",
     "example:selftest": "bun ./example/uia.selftest.ts",
     "example:set-of-marks": "bun ./example/set-of-marks.ts",
     "example:snapshot-economy": "bun ./example/snapshot-economy.integration.test.ts",
