@@ -10,7 +10,7 @@
  * bun test is broken repo-wide — runnable harness (only the MCP subprocess):
  * Run: bun run example/instructions-readonly.integration.test.ts
  */
-type Rpc = { id?: number; result?: { isError?: boolean; instructions?: string; content?: { text?: string }[] } };
+type Rpc = { id?: number; result?: { isError?: boolean; instructions?: string; serverInfo?: { name?: string; version?: string }; tools?: Record<string, unknown>[]; content?: { text?: string }[] } };
 const proc = Bun.spawn(['bun', 'run', `${import.meta.dir}/../mcp.ts`], { stdin: 'pipe', stdout: 'pipe', stderr: 'ignore', env: { ...Bun.env, BUN_UIA_PROFILE: 'readonly' } });
 const reader = proc.stdout.getReader();
 const decoder = new TextDecoder();
@@ -58,6 +58,16 @@ try {
   const init = await call('initialize', { protocolVersion: '2025-11-25', capabilities: {}, clientInfo: { name: 'ro', version: '1' } });
   const instructions = init.result?.instructions ?? '';
   assert(/READ-ONLY/.test(instructions) && !/Prefer invoke\/set_value/.test(instructions), 'readonly profile gets READ-ONLY instructions with no action-tool guidance');
+
+  const manifest: { version: string } = await Bun.file(`${import.meta.dir}/../package.json`).json();
+  assert(init.result?.serverInfo?.version === manifest.version, `initialize serverInfo.version (${init.result?.serverInfo?.version}) matches package.json (${manifest.version}) — no drift`);
+
+  const list = await call('tools/list', {});
+  const tools = list.result?.tools ?? [];
+  assert(tools.length > 0 && tools.every((tool) => !('category' in tool)), 'tools/list entries carry no internal `category` field (MCP Tool wire shape only)');
+  // read_clipboard is gated as the 'input' category (NOT 'read'), so the read-only profile must NOT auto-expose the
+  // secret-bearing global clipboard — a deployer opts in with BUN_UIA_ALLOW=read_clipboard.
+  assert(!tools.some((tool) => tool.name === 'read_clipboard'), 'readonly does NOT expose read_clipboard (clipboard is a plaintext secret store — opt in with BUN_UIA_ALLOW=read_clipboard)');
 
   const click = await call('tools/call', { name: 'click', arguments: { ref: 'e1' } });
   assert(click.result?.isError === true && /BUN_UIA_PROFILE=safe/.test(textOf(click)) && !/BUN_UIA_OS=1/.test(textOf(click)), 'a disabled INPUT tool (click) steers to BUN_UIA_PROFILE, NOT the inapplicable BUN_UIA_OS=1');
