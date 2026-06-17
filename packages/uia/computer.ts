@@ -6,7 +6,7 @@
 // one — erasing the coordinate-hallucination, downscaling click-miss, and scroll-no-op failure modes
 // that the computer-use literature attributes to screenshot-only grounding.
 
-import { ownerHwnd, postClickAt, postClickToHwnd, postDoubleClickAt, scrollAt } from './coords';
+import { ownerHwnd, postClickAt, postClickToHwnd, postDoubleClickAt, postTripleClickAt, scrollAt } from './coords';
 import { fromPoint, type Window } from './element';
 import { clickAt, cursorPosition, doubleClickAt, dragTo, holdKey, middleClickAt, mouseDown, mouseUp, moveTo, rightClickAt, scrollWheel, sendKeys, type as typeText } from './input';
 
@@ -74,9 +74,25 @@ function semanticClick(x: number, y: number, cursorless: boolean): ComputerResul
     const element = fromPoint(x, y);
     try {
       resolved = { role: element.controlTypeName, name: element.name };
-      element.invoke();
-      return { ok: true, semantic: resolved, output: `invoked ${resolved.role} ${JSON.stringify(resolved.name)} (cursor-free)` };
-    } catch {
+      try {
+        element.invoke();
+        return { ok: true, semantic: resolved, output: `invoked ${resolved.role} ${JSON.stringify(resolved.name)} (cursor-free)` };
+      } catch {
+        // no Invoke — try the semantic activations a left-click maps to (cursor-free + verifiable on a no-own-HWND
+        // WinUI control, exactly where a posted COORDINATE click is silently dropped — mirrors the MCP click path)
+      }
+      try {
+        element.toggle();
+        return { ok: true, semantic: resolved, output: `toggled ${resolved.role} ${JSON.stringify(resolved.name)} (cursor-free, state ${element.toggleState})` };
+      } catch {
+        // not a TogglePattern control
+      }
+      try {
+        element.select();
+        return { ok: true, semantic: resolved, output: `selected ${resolved.role} ${JSON.stringify(resolved.name)} (cursor-free)` };
+      } catch {
+        // not a SelectionItemPattern control
+      }
       owner = ownerHwnd(element); // capture the element's own window for the posted fallback before releasing it
     } finally {
       element.release();
@@ -123,6 +139,8 @@ export async function dispatch(window: Window, action: ComputerAction, options: 
         doubleClickAt(x, y);
         return { ok: true };
       case 'triple_click':
+        // honor cursorless (the doctrine) — a posted triple-click selects the line/paragraph without moving the real mouse
+        if (cursorless && postTripleClickAt(x, y)) return { ok: true, output: 'posted triple-click (cursor-free)' };
         clickAt(x, y);
         clickAt(x, y);
         clickAt(x, y);

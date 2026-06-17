@@ -2,7 +2,7 @@
  * named-result — find_and_act / reveal (via act()) AND the dedicated verb tools (invoke/toggle/set_value/…) must
  * NAME the resolved control in their success message, not a bare verb ("invoked") nor an echo of the agent's own
  * optional `element` description (which silently confirms a wrong-target hallucination). That target confirmation is
- * the only way an LLM knows WHICH control it hit — the named-result contract the library keeps in computer.ts:77/88
+ * the only way an LLM knows WHICH control it hit — the named-result contract the library keeps in computer.ts semanticClick
  * and documents at AI.md:181. act() and every dedicated handler now name the RESOLVED control.
  *
  * Proof: launch Calculator, find_and_act {selector:{name:'Five'}, do:'invoke'} over the MCP wire → the result names

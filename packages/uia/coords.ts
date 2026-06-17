@@ -193,6 +193,29 @@ export function postDoubleClickAt(x: number, y: number): boolean {
   return postDoubleClickToHwnd(User32.WindowFromPoint(packPoint(x, y)), x, y);
 }
 
+/** Post a cursor-free TRIPLE left-click (down/up · DBLCLK/up · down/up) to a SPECIFIC window — selects the whole
+ *  line/paragraph in a RichEdit / modern editor that honors triple-click (a plain Win32 EDIT does not line-select);
+ *  occlusion-correct like postClickToHwnd. A plain double-then-single would collapse the word selection to a caret,
+ *  so the third press follows the DBLCLK directly. Chromium/Electron ignore posted clicks. 0n handle returns false. */
+export function postTripleClickToHwnd(hWnd: bigint, x: number, y: number): boolean {
+  if (hWnd === 0n) return false;
+  const lParam = clientLParam(hWnd, x, y);
+  User32.PostMessageW(hWnd, WM_MOUSEMOVE, 0n, lParam);
+  User32.PostMessageW(hWnd, WM_LBUTTONDOWN, BigInt(MK_LBUTTON), lParam);
+  User32.PostMessageW(hWnd, WM_LBUTTONUP, 0n, lParam);
+  User32.PostMessageW(hWnd, WM_LBUTTONDBLCLK, BigInt(MK_LBUTTON), lParam);
+  User32.PostMessageW(hWnd, WM_LBUTTONUP, 0n, lParam);
+  User32.PostMessageW(hWnd, WM_LBUTTONDOWN, BigInt(MK_LBUTTON), lParam);
+  User32.PostMessageW(hWnd, WM_LBUTTONUP, 0n, lParam);
+  return true;
+}
+
+/** Cursor-free triple left-click at a screen point, posted to the TOPMOST window there (prefer the element/ref path
+ *  for occlusion-correctness). False if no window is under the point. */
+export function postTripleClickAt(x: number, y: number): boolean {
+  return postTripleClickToHwnd(User32.WindowFromPoint(packPoint(x, y)), x, y);
+}
+
 /** Post a cursor-free left-button DRAG (down → interpolated moves carrying MK_LBUTTON → up) from one screen point to
  *  another, to a SPECIFIC window — drag-selects text in a classic Edit/RichEdit or marquee-selects items in a ListView/
  *  ListBox with no real cursor (works background/occluded/locked). Both points convert to `hWnd` client coords. False

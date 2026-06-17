@@ -770,10 +770,10 @@ function act(element: Element, action: string, text: string | undefined, submit 
       : `(no readable value — control name is ${JSON.stringify(element.name)}; it may be empty or expose no Value/Text pattern — try inspect_element {ref} or read_table)`;
   }
   // Name the RESOLVED control in every result so an LLM gets target confirmation on an ambiguous selector match
-  // (the named-result contract computer.ts:77/88 + AI.md:181 already document). One name/role read per action.
+  // (the named-result contract computer.ts semanticClick + AI.md:181 already document). One name/role read per action.
   const target = `${element.controlTypeName} ${JSON.stringify(element.name)}`;
   if (action === 'invoke') return withPopupNote(() => patternAction('invoke', () => (element.invoke(), `invoked ${target}`)));
-  if (action === 'click') return clickElement(element, 'left', false, false), `clicked ${target}`;
+  if (action === 'click') return `${clickElement(element, 'left', false, false)} ${target}`;
   if (action === 'focus') return element.focus(), `focused ${target}`; // UIA SetFocus — cursor-free, no SendInput, so never gated
   if (action === 'type') {
     // Mirror the dedicated `type` tool: cursor-free WM_CHAR to an own-HWND control; SendInput only for a no-own-HWND
@@ -858,8 +858,10 @@ function clickPoint(element: Element): { x: number; y: number } | null {
 }
 
 /**
- * Click an element CURSOR-FREE first (UIA invoke → posted WM_* click — both work on a background, minimized,
- * occluded, or locked window with no real cursor), falling back to a real SendInput click only for a
+ * Click an element CURSOR-FREE first — for a left single-click: UIA invoke → the semantic activation the control
+ * supports (toggle a checkbox/switch, select a radio/list/tab item) → posted WM_* click — all work on a background,
+ * minimized, occluded, or locked window with no real cursor; the toggle/select steps fire VERIFIABLY where a posted
+ * coordinate click is silently dropped on a no-own-HWND WinUI control. Falls back to a real SendInput click only for a
  * left double / right / middle click or when the cursor-free paths fail (and BUN_UIA_CURSOR!=='never').
  */
 function clickElement(element: Element, button: 'left' | 'right' | 'middle', doubleClick: boolean, forceCursor: boolean): string {
@@ -886,7 +888,25 @@ function clickElement(element: Element, button: 'left' | 'right' | 'middle', dou
         element.invoke();
         return 'invoked (cursor-free)';
       } catch {
-        // no Invoke pattern — try a posted click
+        // no Invoke pattern — try the other semantic activations a left-click maps to
+      }
+      // A left-click on a toggle/checkbox IS a toggle; on a radio/list/tab item it IS a select. These fire cursor-free
+      // and VERIFIABLY (the control's state changes) on a no-own-HWND WinUI control — exactly where a posted COORDINATE
+      // click is silently dropped (PostMessage returns nonzero but nothing happens, a false success). Both throw when
+      // unsupported, so they only fire on a genuinely togglable/selectable control. (LegacyIAccessible.DoDefaultAction
+      // is deliberately NOT in this chain: it can silently no-op, which would just trade one false success for another
+      // and skip a coordinate post that would have worked on a legacy own-HWND control.)
+      try {
+        element.toggle();
+        return `toggled (cursor-free, state ${element.toggleState})`;
+      } catch {
+        // not a TogglePattern control
+      }
+      try {
+        element.select();
+        return 'selected (cursor-free)';
+      } catch {
+        // not a SelectionItemPattern control — fall back to the posted coordinate click
       }
     }
     const point = clickPoint(element);
@@ -1108,7 +1128,7 @@ const TOOLS: McpTool[] = [
     name: 'click',
     category: 'input',
     description:
-      "Click a control. CURSOR-FREE by default for EVERY button (left/right/middle) and doubleClick — UIA invoke for a left single/double, else a posted WM_*BUTTON to the control's own window — working on a background/minimized/occluded/locked window with no real cursor. Pass cursor:true to FORCE the real SendInput mouse (needs an unlocked, foregrounded desktop); the real mouse is also the automatic fallback when no cursor-free path applies.",
+      "Click a control. CURSOR-FREE by default for EVERY button (left/right/middle) and doubleClick — for a left single-click: UIA invoke, else the semantic activation the control actually supports (toggle a checkbox/switch, select a radio/list/tab item), else a posted WM_*BUTTON to the control's own window — so a click on a no-own-HWND WinUI ToggleSwitch/radio truly fires (not a silently-dropped coordinate click that falsely reports success). Reports what it did (invoked / toggled / selected / posted). A control that ONLY opens a dropdown/flyout (a WinUI/WPF combobox or expander — ExpandCollapse only, no Invoke) is NOT opened by click; use the dedicated expand/collapse verb cursor-free. Works on a background/minimized/occluded/locked window with no real cursor. Pass cursor:true to FORCE the real SendInput mouse (needs an unlocked, foregrounded desktop); the real mouse is also the automatic fallback when no cursor-free path applies.",
     inputSchema: {
       type: 'object',
       properties: {
@@ -2003,7 +2023,16 @@ const HANDLERS: Record<string, ToolHandler> = {
     if (element.toggleState >= 0) lines.push(`toggleState: ${element.toggleState} (0=off,1=on,2=indeterminate)`);
     if (element.expandCollapseState >= 0) lines.push(`expandCollapseState: ${element.expandCollapseState} (0=collapsed,1=expanded,2=partial,3=leaf)`);
     if (element.isSelected) lines.push('selected: true');
-    if (!Number.isNaN(element.rangeValue)) lines.push(`rangeValue: ${element.rangeValue}`);
+    let rangeReadOnly = false;
+    if (!Number.isNaN(element.rangeValue)) {
+      const rangeMin = element.getProperty(PropertyId.RangeValueMinimum);
+      const rangeMax = element.getProperty(PropertyId.RangeValueMaximum);
+      const small = element.getProperty(PropertyId.RangeValueSmallChange); // arrow-key step; large = page step — actionable for set_value / press_key nudging
+      const large = element.getProperty(PropertyId.RangeValueLargeChange);
+      rangeReadOnly = element.getProperty(PropertyId.RangeValueIsReadOnly) === true; // a ProgressBar / read-only slider — a set_value(numeric) would throw
+      const step = `${typeof small === 'number' && small > 0 ? `, small ${small}` : ''}${typeof large === 'number' && large > 0 ? `, large ${large}` : ''}${rangeReadOnly ? ', read-only' : ''}`;
+      lines.push(typeof rangeMin === 'number' && typeof rangeMax === 'number' ? `rangeValue: ${element.rangeValue} (min ${rangeMin}, max ${rangeMax}${step})` : `rangeValue: ${element.rangeValue}${rangeReadOnly ? ' (read-only)' : ''}`);
+    }
     const scroll = element.scrollInfo;
     if (scroll !== null) lines.push(`scroll: h=${scroll.horizontalPercent.toFixed(0)}% v=${scroll.verticalPercent.toFixed(0)}% scrollable=${scroll.horizontallyScrollable ? 'H' : ''}${scroll.verticallyScrollable ? 'V' : ''}`);
     const clickable = element.clickablePoint;
@@ -2022,13 +2051,14 @@ const HANDLERS: Record<string, ToolHandler> = {
     // invoke() can no-op silently), so report what it actually supports rather than letting the agent guess the verb.
     const can: string[] = [];
     const hasValuePattern = element.getProperty(PropertyId.IsValuePatternAvailable) === true;
+    const valueReadOnly = hasValuePattern && element.getProperty(PropertyId.ValueIsReadOnly) === true; // a read-only/disabled Edit — a set_value would throw (symmetric with the RangeValue read-only steer)
     const hasTextPattern = element.getProperty(PropertyId.IsTextPatternAvailable) === true;
     if (element.getProperty(PropertyId.IsInvokePatternAvailable) === true) can.push('invoke');
-    if (hasValuePattern) can.push('set_value');
+    if (hasValuePattern) can.push(valueReadOnly ? 'read value (read-only — set_value will fail)' : 'set_value');
     if (element.getProperty(PropertyId.IsTogglePatternAvailable) === true) can.push('toggle');
     if (element.getProperty(PropertyId.IsExpandCollapsePatternAvailable) === true) can.push('expand/collapse');
     if (element.getProperty(PropertyId.IsSelectionItemPatternAvailable) === true) can.push('select');
-    if (element.getProperty(PropertyId.IsRangeValuePatternAvailable) === true) can.push('set_value(numeric)');
+    if (element.getProperty(PropertyId.IsRangeValuePatternAvailable) === true) can.push(rangeReadOnly ? 'read rangeValue (read-only — set_value will fail)' : 'set_value(numeric)');
     if (element.getProperty(PropertyId.IsScrollPatternAvailable) === true) can.push('scroll');
     if (element.getProperty(PropertyId.IsScrollItemPatternAvailable) === true) can.push('scroll-into-view');
     if (hasTextPattern) can.push('read-text');
