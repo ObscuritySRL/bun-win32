@@ -5,6 +5,7 @@
 import { FFIType, JSCallback } from 'bun:ffi';
 
 import Advapi32 from '@bun-win32/advapi32';
+import Dwmapi from '@bun-win32/dwmapi';
 import Gdi32 from '@bun-win32/gdi32';
 import Kernel32 from '@bun-win32/kernel32';
 import Shell32 from '@bun-win32/shell32';
@@ -298,6 +299,15 @@ export function isSecureDesktopActive(): boolean {
 /** Whether a window is minimized (iconic) — readable for any top-level window without touching it. */
 export function isMinimized(hWnd: bigint): boolean {
   return User32.IsIconic(hWnd) !== 0;
+}
+
+/** The DWM CLOAK reason for a window, 0 if not cloaked. A cloaked window is DWM-hidden though NOT iconic (so isMinimized
+ *  misses it) and its UIA tree may read empty: 1 = the app cloaked itself (a suspended/background UWP or a helper
+ *  overlay), 2 = the shell cloaked it (it lives on ANOTHER virtual desktop, or is shell-hidden), 4 = inherited from an
+ *  owner. Detection only (a flat DwmGetWindowAttribute(DWMWA_CLOAKED) read — no COM vtable). */
+export function cloakReason(hWnd: bigint): number {
+  const buffer = Buffer.alloc(4);
+  return Dwmapi.DwmGetWindowAttribute(hWnd, 0x0000_000e, buffer.ptr!, 4) === 0 ? buffer.readUInt32LE(0) : 0; // DWMWA_CLOAKED = 14
 }
 
 /** Whether a window is maximized (zoomed). */

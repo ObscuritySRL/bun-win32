@@ -128,6 +128,7 @@ export { countNodes, estimateTokens, serialize, type SerializeOptions, type UiaN
 export { captureWindowLive, dispose as disposeWgc, wgcAvailable } from './wgc';
 export {
   captureWindowRGB,
+  cloakReason,
   closeWindow,
   findWindow,
   foregroundWindow,

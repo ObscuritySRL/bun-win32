@@ -20,18 +20,21 @@ function assert(condition: boolean, message: string): void {
   }
 }
 
-const at6 = coldTreeNote(0, false, false, 6);
+const at6 = coldTreeNote(0, false, false, 0, 6);
 assert(/maxDepth=6/.test(at6) && /e\.g\. 10/.test(at6), 'maxDepth=6 suggests raising to 10 (passed + 4)');
 assert(!/e\.g\. 4\)/.test(at6), 'no longer suggests the stale literal "(e.g. 4)" below the passed cap');
 
-const at2 = coldTreeNote(0, false, false, 2);
+const at2 = coldTreeNote(0, false, false, 0, 2);
 assert(/e\.g\. 6/.test(at2), 'maxDepth=2 suggests raising to 6');
 
-assert(coldTreeNote(5, false, false, 2) === '', 'a non-empty tree yields no note (markCount>0)');
+assert(coldTreeNote(5, false, false, 0, 2) === '', 'a non-empty tree yields no note (markCount>0)');
 
-// Priority: minimized / walled conditions override the maxDepth branch and carry no maxDepth suggestion.
-assert(/MINIMIZED/.test(coldTreeNote(0, true, false, 2)) && !/Raise maxDepth/.test(coldTreeNote(0, true, false, 2)), 'minimized takes priority over the maxDepth hint');
-assert(/UIPI|HIGHER integrity/.test(coldTreeNote(0, false, true, 2)), 'UIPI-walled takes priority over the maxDepth hint');
+// Priority: minimized / walled / cloaked conditions override the maxDepth branch and carry no maxDepth suggestion.
+assert(/MINIMIZED/.test(coldTreeNote(0, true, false, 0, 2)) && !/Raise maxDepth/.test(coldTreeNote(0, true, false, 0, 2)), 'minimized takes priority over the maxDepth hint');
+assert(/UIPI|HIGHER integrity/.test(coldTreeNote(0, false, true, 0, 2)), 'UIPI-walled takes priority over the maxDepth hint');
+// Cloaked (DWM-hidden) branches: reason 2 = shell/virtual-desktop, reason 1/4 = app/inherited; both override maxDepth and say NOT a cold tree.
+assert(/VIRTUAL DESKTOP/.test(coldTreeNote(0, false, false, 2)) && !/Raise maxDepth/.test(coldTreeNote(0, false, false, 2, 8)), 'cloaked=2 (shell) → virtual-desktop steer, overrides maxDepth');
+assert(/CLOAKED/.test(coldTreeNote(0, false, false, 1)) && /CLOAKED/.test(coldTreeNote(0, false, false, 4)), 'cloaked=1 (app) and =4 (inherited) → cloak steer (not cold-tree)');
 
 console.log(failures === 0 ? '\nPASS — the maxDepth recovery hint suggests a value ABOVE the passed cap, not the stale literal 4.' : `\nFAILED — ${failures} assertion(s)`);
 process.exit(failures === 0 ? 0 : 1);

@@ -370,16 +370,20 @@ export function capSnapshot(text: string, maxChars: number): string {
  *  their UIA/a11y tree on demand and tear it down when idle, so a just-attached or long-idle window can read
  *  empty on the first snapshot; a genuinely tree-less surface (game/canvas/custom-draw) also reads empty. The
  *  note tells the agent how to recover rather than give up. Empty string when there ARE controls. */
-export function coldTreeNote(markCount: number, minimized = false, walled = false, maxDepth?: number): string {
+export function coldTreeNote(markCount: number, minimized = false, walled = false, cloaked = 0, maxDepth?: number): string {
   if (markCount > 0) return '';
   // A small maxDepth caps the tree ABOVE the window's interactable controls — that is NOT a cold tree, so the generic
   // "re-snapshot to build it" steer would loop forever at the same depth. Steer to raising maxDepth instead. (UIPI /
-  // minimized are real conditions that take priority — they read empty at any depth.)
-  if (maxDepth !== undefined && !walled && !minimized)
+  // minimized / cloaked are real conditions that take priority — they read empty at any depth.)
+  if (maxDepth !== undefined && !walled && !minimized && cloaked === 0)
     return `\n\n(0 actionable controls — you passed maxDepth=${maxDepth}, which capped the tree ABOVE this window's interactable controls. Raise maxDepth (e.g. ${maxDepth + 4}) or omit it to read the full tree — re-snapshotting at the same depth will NOT help; this is not a cold tree.)`;
   if (walled)
     return '\n\n(0 actionable controls AND this window runs at a HIGHER integrity than this MCP host (a UAC-elevated / admin app) — the UIPI wall blocks UIA reads, capture, AND input alike, so the tree will ALWAYS read empty: re-snapshot / OCR / screen_capture cannot help. The only fix is to relaunch the MCP host ELEVATED (run it as administrator), then re-attach.)';
   if (minimized)
     return '\n\n(0 actionable controls AND this window is MINIMIZED — a UWP/WinUI window tears its UIA tree down while minimized, so re-snapshotting alone will NOT repopulate it. Restore it CURSOR-FREE with manage_window {action:"restore"} (SW_RESTORE — no focus theft, no foregrounding), then desktop_snapshot. If it is still empty after restoring, it may be a game / canvas / custom-draw surface — use ocr / screen_capture / inspect_point.)';
+  if (cloaked === 2)
+    return '\n\n(0 actionable controls AND this window is CLOAKED by the shell — it is on ANOTHER VIRTUAL DESKTOP (or shell-hidden), NOT a cold tree, so re-snapshotting will NOT build it. There is no cursor-free virtual-desktop switch here — a human must bring it to the current desktop, or try manage_window {action:"raise"}, then desktop_snapshot.)';
+  if (cloaked !== 0)
+    return '\n\n(0 actionable controls AND this window is CLOAKED (DWM-hidden though not minimized — a suspended/background window, or cloaked because its OWNER is hidden), NOT a cold tree, so re-snapshotting will NOT build it. Raise/restore it with manage_window {action:"raise"} — or surface its owner for an inherited cloak — then desktop_snapshot.)';
   return '\n\n(0 actionable controls — if this window has visible UI its UIA tree may be COLD: UWP/WinUI and Chromium build it on demand and tear it down when idle, so call desktop_snapshot again to build it (or briefly activate the window). If it is a game / canvas / custom-draw surface with no accessibility, use ocr / screen_capture / inspect_point for the pixels.)';
 }

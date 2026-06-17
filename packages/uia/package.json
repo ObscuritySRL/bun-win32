@@ -8,6 +8,7 @@
     "@bun-win32/combase": "workspace:*",
     "@bun-win32/core": "workspace:*",
     "@bun-win32/d3d11": "workspace:*",
+    "@bun-win32/dwmapi": "workspace:*",
     "@bun-win32/gdi32": "workspace:*",
     "@bun-win32/kernel32": "workspace:*",
     "@bun-win32/oleacc": "workspace:*",

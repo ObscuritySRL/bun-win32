@@ -21,6 +21,7 @@ import {
   captureWindowRGB,
   clickAt,
   clipboardSequence,
+  cloakReason,
   closeWindow,
   coldTreeNote,
   ControlType,
@@ -557,12 +558,12 @@ function snapshotText(maxDepth?: number, rootName?: string): string {
     // can narrow with {maxDepth}/{root}).
     if (root === undefined && body === lastSnapshotBody && !body.includes('more nodes — narrow with'))
       return stampRefs(
-        `${header}\n(no UI change since the last snapshot — refs unchanged)${coldTreeNote(current?.marks.length ?? 0, attached !== null && isMinimized(attached.hWnd), attached !== null && isUipiWalled(attached.hWnd), maxDepth)}${foregroundNudge()}`,
+        `${header}\n(no UI change since the last snapshot — refs unchanged)${coldTreeNote(current?.marks.length ?? 0, attached !== null && isMinimized(attached.hWnd), attached !== null && isUipiWalled(attached.hWnd), attached !== null ? cloakReason(attached.hWnd) : 0, maxDepth)}${foregroundNudge()}`,
       ); // coldTreeNote is '' for a warm tree; on a still-COLD re-snapshot it re-surfaces the restore/activate/elevate steer the bare line would have suppressed (or a maxDepth-cap steer)
     lastSnapshotBody = body;
     refGen += 1; // an explicit re-ground renumbers refs — invalidate any the model still holds
     return stampRefs(
-      `${header}\n${body}${root === undefined ? coldTreeNote(current?.marks.length ?? 0, attached !== null && isMinimized(attached.hWnd), attached !== null && isUipiWalled(attached.hWnd), maxDepth) + foregroundNudge() : ''}`,
+      `${header}\n${body}${root === undefined ? coldTreeNote(current?.marks.length ?? 0, attached !== null && isMinimized(attached.hWnd), attached !== null && isUipiWalled(attached.hWnd), attached !== null ? cloakReason(attached.hWnd) : 0, maxDepth) + foregroundNudge() : ''}`,
     );
   } finally {
     root?.release();
@@ -660,7 +661,7 @@ function withSnapshot(message: string): object {
   const bodyUnchanged = body === lastSnapshotBody;
   const noUiChange = (): object =>
     textResult(
-      `${message}\n\n${header}\n(no UI change since the last snapshot — refs unchanged)${coldTreeNote(current?.marks.length ?? 0, attached !== null && isMinimized(attached.hWnd), attached !== null && isUipiWalled(attached.hWnd))}${foregroundNudge()}`,
+      `${message}\n\n${header}\n(no UI change since the last snapshot — refs unchanged)${coldTreeNote(current?.marks.length ?? 0, attached !== null && isMinimized(attached.hWnd), attached !== null && isUipiWalled(attached.hWnd), attached !== null ? cloakReason(attached.hWnd) : 0)}${foregroundNudge()}`,
     ); // refs identical → generation held; coldTreeNote ('' when warm) re-surfaces recovery steer on a still-cold tree
   if (bodyUnchanged && !truncated) return noUiChange();
   if (prior !== null) {
@@ -679,7 +680,11 @@ function withSnapshot(message: string): object {
   }
   lastSnapshotBody = body;
   refGen += 1; // a full re-dump renumbers refs in traversal order — bump so the model's pre-re-render refs are rejected
-  return textResult(stampRefs(`${message}\n\n${header}\n${body}${coldTreeNote(current?.marks.length ?? 0, attached !== null && isMinimized(attached.hWnd), attached !== null && isUipiWalled(attached.hWnd))}${foregroundNudge()}`));
+  return textResult(
+    stampRefs(
+      `${message}\n\n${header}\n${body}${coldTreeNote(current?.marks.length ?? 0, attached !== null && isMinimized(attached.hWnd), attached !== null && isUipiWalled(attached.hWnd), attached !== null ? cloakReason(attached.hWnd) : 0)}${foregroundNudge()}`,
+    ),
+  );
 }
 
 /** Like withSnapshot, but for an expand whose dropdown items render IN-PROCESS (a WinUI/UWP combobox/menu surfaces its
@@ -1624,7 +1629,18 @@ const HANDLERS: Record<string, ToolHandler> = {
       const uac = window.className.startsWith('$$$Secure UAP Dummy Window Class')
         ? ' [UAC consent placeholder — the real prompt is on the secure desktop, undrivable from this session; a human must approve at the console, or relaunch the host elevated]'
         : '';
-      return `- ${JSON.stringify(window.title)} [class=${window.className}] [pid=${window.processId}${exe ? ` ${exe}` : ''}] [hWnd=0x${window.hWnd.toString(16)}]${state ? ` (${state})` : ''}${wall}${uac}`;
+      // DWM-cloaked windows are hidden though NOT minimized (so the 'min' state above misses them) and their UIA tree may
+      // read empty — flag them so the agent does not mistake an empty snapshot for a cold tree / waste an attach on an overlay.
+      const cloaked = cloakReason(window.hWnd);
+      const cloak =
+        cloaked === 2
+          ? ' [cloaked: shell-hidden / on another virtual desktop — its UIA tree may read empty here (NOT a cold tree); there is no cursor-free virtual-desktop switch, a human must bring it over (or try manage_window {action:"raise"})]'
+          : cloaked === 4
+            ? ' [cloaked: inherited — hidden because its OWNER window is hidden (likely on another virtual desktop); surface the OWNER window, not this child]'
+            : cloaked !== 0
+              ? ' [cloaked: app-hidden/suspended (a background UWP or a helper overlay) — likely not a live attach target; raise/restore it (manage_window {action:"raise"}) first if it is your target]'
+              : '';
+      return `- ${JSON.stringify(window.title)} [class=${window.className}] [pid=${window.processId}${exe ? ` ${exe}` : ''}] [hWnd=0x${window.hWnd.toString(16)}]${state ? ` (${state})` : ''}${wall}${uac}${cloak}`;
     });
     // A UAC consent / secure desktop is invisible and undrivable from this session (no UIA, no capture) — say so, so
     // the agent does not loop waiting on a prompt it cannot see; a human must respond at the console, or run elevated.
