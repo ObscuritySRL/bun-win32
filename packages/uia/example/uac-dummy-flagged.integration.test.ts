@@ -93,6 +93,15 @@ try {
     // genuine OS "$$$Secure UAP Dummy Window Class For Interim Dialog" window also being present on the desktop).
     const mislabeled = list.split('\n').filter((line) => /UAC consent placeholder/.test(line) && !/\[class=\$\$\$Secure UAP Dummy Window Class/.test(line));
     assert(mislabeled.length === 0, `the flag lands only on UAC-dummy-class windows, never a different class — mislabeled: ${JSON.stringify(mislabeled.slice(0, 2))}`);
+    // The UIPI-wall label is RELATIVE to this host's integrity, not the target's alone. This host runs at the same
+    // integrity as the dummy (same process), so a window it CAN drive must never carry the wall warning — the regression
+    // was list_windows printing "UIPI wall — drivable only if YOUR host runs elevated too" on a window the snapshot's
+    // coldTreeNote (which uses the relative isUipiWalled) reports as drivable.
+    assert(!/UIPI wall/.test(row), `a same-integrity (drivable) placeholder row carries NO UIPI-wall warning (got: ${JSON.stringify(row.slice(0, 110))})`);
+    // The wall warning, when it DOES appear, must only land on rows whose integrity tag outranks this medium host —
+    // i.e. high or system. Never on medium/low/untrusted (which this host can drive or is itself).
+    const wallMislabeled = list.split('\n').filter((line) => /UIPI wall/.test(line) && !/\[(high|system)-integrity — UIPI wall/.test(line));
+    assert(wallMislabeled.length === 0, `the UIPI-wall warning lands only on host-outranking (high/system) rows — mislabeled: ${JSON.stringify(wallMislabeled.slice(0, 2))}`);
   }
 } finally {
   proc.kill();
