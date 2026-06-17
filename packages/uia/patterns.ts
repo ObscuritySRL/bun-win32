@@ -519,11 +519,11 @@ const MAX_TABLE_COLUMNS = 4096; // safety bound for readTable's per-row column l
  * row count. The column count is clamped to MAX_TABLE_COLUMNS so a hostile/buggy provider cannot force an
  * unbounded allocation.
  *
- * Cell text precedence: a cell's Name is normally the datum (WinForms DataGridView), but File Explorer's Details
- * view (the canonical Windows grid) sets every cell's UIA Name to its COLUMN-HEADER label ("Name"/"Date
- * modified"/…) and puts the real datum in the ValuePattern value — so when the Name equals the column header (or
- * is empty) we take ValueValue instead, falling back to the Name only when there is no value. That keeps a
- * name-is-data grid correct while fixing the Explorer-Details inversion (was returning the header for every cell).
+ * Cell text precedence: the ValuePattern value is the real datum wherever it exists — File Explorer's Details view
+ * puts the datum there with the Name set to the COLUMN-HEADER label ("Name"/"Date modified"/…), and Excel/spreadsheet
+ * grids put it there with the Name set to the cell ADDRESS ("B2") — so ValueValue takes precedence over Name. Only a
+ * grid with no ValuePattern (WinForms DataGridView) falls back to the Name, and then only when the Name is not just
+ * the column-header label. That fixes both the Explorer-Details header inversion and the Excel address-not-value bug.
  */
 export function readTable(ptr: bigint, maxRows = 100): TableData | null {
   const grid = getPattern(ptr, PatternId.Grid);
@@ -548,11 +548,11 @@ export function readTable(ptr: bigint, maxRows = 100): TableData | null {
           comRelease(cell);
           continue;
         }
-        const name = getBstr(cell, SLOT.get_CurrentName);
-        if (name.length > 0 && name !== headers[column]) cells[column] = name; // a genuine datum in Name (WinForms DataGridView, where Name !== the column header)
+        const value = getPropertyValue(cell, PropertyId.ValueValue); // the ValuePattern value is the real datum wherever it exists — Explorer Details ("Adobe"), Excel/spreadsheet cells (Name is just the "B2" address) — so it takes precedence over Name
+        if (typeof value === 'string' && value.length > 0) cells[column] = value;
         else {
-          const value = getPropertyValue(cell, PropertyId.ValueValue); // Name is empty OR is just the column-header label (Explorer Details) → the datum is the ValuePattern value; '' when both are empty (a genuinely blank cell, e.g. a folder's Size — never echo the header label back)
-          cells[column] = typeof value === 'string' && value.length > 0 ? value : '';
+          const name = getBstr(cell, SLOT.get_CurrentName); // no ValuePattern → the datum is in Name (WinForms DataGridView), unless Name merely echoes the column header; '' when both are empty (a genuinely blank cell — never echo the header label back)
+          cells[column] = name.length > 0 && name !== headers[column] ? name : '';
         }
         comRelease(cell);
       }

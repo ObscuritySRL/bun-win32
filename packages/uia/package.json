@@ -120,6 +120,7 @@
     "example:expand-range": "bun ./example/expand-range.integration.test.ts",
     "example:explorer-in-the-dark": "bun ./example/explorer-in-the-dark.integration.test.ts",
     "example:filter-has-hastext": "bun ./example/filter-has-hastext.integration.test.ts",
+    "example:filter-not": "bun ./example/filter-not.integration.test.ts",
     "example:find-cached": "bun ./example/find-cached.integration.test.ts",
     "example:find-text": "bun ./example/find-text.integration.test.ts",
     "example:get-variant": "bun ./example/get-variant.integration.test.ts",
