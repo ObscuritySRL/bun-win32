@@ -11,7 +11,7 @@ import { comRelease, hresult, vcall } from './com';
 import { type CompiledCondition, compileCondition, type ElementProperties, formatNoMatch, matches, needsSubtreeFilter, type Selector, selectorToString } from './condition';
 import { ControlType, PropertyId, S_OK, SLOT, TreeScope } from './constants';
 import { ownerHwnd, postClickToHwnd } from './coords';
-import { clickAt, type as inputType } from './input';
+import { clickAt, dragTo as inputDragTo, type as inputType } from './input';
 import { type OcrText, ocrBitmap } from './ocr';
 import { type Bitmap, cropBitmap } from './screen';
 import { captureWindowLive } from './wgc';
@@ -970,6 +970,24 @@ export class Element {
     if (hWnd !== 0n && postClickToHwnd(hWnd, point.x, point.y)) return this; // cursor-free, no raise/flash
     if (hWnd !== 0n && User32.GetForegroundWindow() !== hWnd) User32.SetForegroundWindow(hWnd); // last resort: only when not already foreground
     clickAt(point.x, point.y);
+    return this;
+  }
+
+  /** Press-drag-release from this element's clickable point (bounding-rectangle center fallback, same as click()) to
+   *  `target`'s. Element→element drag (Playwright dragTo / FlaUI DragAndDrop): the centers are computed for you.
+   *  REAL-MOUSE path — an OLE/HTML5 drop needs the live cursor, so this moves it; not cursor-free. */
+  dragTo(target: Element): this {
+    let from = this.clickablePoint;
+    if (from === null) {
+      const rect = this.boundingRectangle;
+      from = { x: rect.x + Math.floor(rect.width / 2), y: rect.y + Math.floor(rect.height / 2) };
+    }
+    let to = target.clickablePoint;
+    if (to === null) {
+      const rect = target.boundingRectangle;
+      to = { x: rect.x + Math.floor(rect.width / 2), y: rect.y + Math.floor(rect.height / 2) };
+    }
+    inputDragTo(from.x, from.y, to.x, to.y);
     return this;
   }
 }
