@@ -9,8 +9,14 @@
 // background — invoke a button, toggle a check box, type into a field with no cursor and no foreground (verified: acting
 // on a backgrounded Swing window steals no foreground).
 //
-// Future act primitives (verified-feasible flat exports of this same DLL, deferred): AddAccessibleSelectionFromContext /
-// ClearAccessibleSelectionFromContext (select a JList/JComboBox/JTree item) and setCurrentAccessibleValue (slider/spinner).
+// Selection: javaInvoke ALREADY selects a JList item (the row's own accessible action selects it — verified). A
+// JComboBox/JTree item, though, can report invoke-success WITHOUT selecting (silent false success). A dedicated
+// java_select via addAccessibleSelectionFromContext is feasible but DEFERRED: the selection index is widget-specific
+// (JList = child index; JComboBox = item MODEL index, since items nest under a "popup menu"; JTree = visible-row index ≠
+// sibling index) and the selection container must be found via the AccessibleContextInfo accessibleSelection flag — too
+// silent-false-success-prone to ship without a careful per-widget verification pass. (A slider/spinner SET has NO flat
+// export: the bridge's AccessibleValue interface is read-only — only get{Current,Maximum,Minimum}AccessibleValueFromContext
+// exist — so a cursor-free value SET would need focus + posted keys, not a JAB primitive.)
 //
 // NOTE: bound via raw dlopen (the same in-package precedent as wgc.ts's d3d11 interop), not a @bun-win32 package — an
 // internal alternate engine; only ~9 read/act exports are used. WindowsAccessBridge-64.dll is ABSENT on machines

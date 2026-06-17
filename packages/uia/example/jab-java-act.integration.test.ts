@@ -1,14 +1,14 @@
 /**
  * jab-java-act — Java apps are not just READABLE but fully DRIVABLE cursor-free. A Java Swing window exposes nothing to
  * UIA or MSAA, yet jab.ts ACTS on it via the Java Access Bridge: javaInvoke (doAccessibleActions — the JVM's own click)
- * presses a button / toggles a check box, and javaSetText (setTextContents — no focus change) types into a field — all
- * with no cursor, no foreground, no focus theft.
+ * presses a button / toggles a check box / selects a JList item, and javaSetText (setTextContents — no focus change)
+ * types into a field — all with no cursor, no foreground, no focus theft.
  *
  * Proof: compile + launch a Swing app whose button sets the frame title to "ACT_CLICKED", whose text field mirrors its
  * contents into the title ("ACT_TEXT_<value>"), and a check box. Then drive it entirely through the bridge and verify
  * EXTERNALLY: javaSetText -> the title reflects the typed text; javaInvoke(check box) -> javaTree re-read shows the
- * "checked" state; javaInvoke(button) -> the title becomes "ACT_CLICKED". The Java process is killed + window closed in
- * finally. SKIPS cleanly if no JDK is present.
+ * "checked" state; javaInvoke(list item) -> the item transitions to the "selected" state; javaInvoke(button) -> the
+ * title becomes "ACT_CLICKED". The Java process is killed + window closed in finally. SKIPS cleanly if no JDK is present.
  *
  * bun test is broken repo-wide — runnable harness (compiles + spawns a Java Swing app):
  * Run: bun run example/jab-java-act.integration.test.ts
@@ -64,7 +64,7 @@ try {
   } else {
     await Bun.write(
       `${dir}/JabAct.java`,
-      `import javax.swing.*; import javax.swing.event.*; public class JabAct { public static void main(String[] a){ SwingUtilities.invokeLater(()->{ JFrame f=new JFrame("${TITLE}"); JButton b=new JButton("Click Me"); b.getAccessibleContext().setAccessibleName("actButton"); b.addActionListener(e->f.setTitle("ACT_CLICKED")); JCheckBox c=new JCheckBox("Toggle Me"); c.getAccessibleContext().setAccessibleName("actCheck"); JTextField t=new JTextField("",20); t.getAccessibleContext().setAccessibleName("actField"); t.getDocument().addDocumentListener(new DocumentListener(){ public void insertUpdate(DocumentEvent e){f.setTitle("ACT_TEXT_"+t.getText());} public void removeUpdate(DocumentEvent e){f.setTitle("ACT_TEXT_"+t.getText());} public void changedUpdate(DocumentEvent e){} }); JLabel lab=new JLabel("A Label"); lab.getAccessibleContext().setAccessibleName("actLabel"); JPanel p=new JPanel(); p.add(b); p.add(c); p.add(t); p.add(lab); f.add(p); f.setSize(460,170); f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); f.setVisible(true); }); } }`,
+      `import javax.swing.*; import javax.swing.event.*; public class JabAct { public static void main(String[] a){ SwingUtilities.invokeLater(()->{ JFrame f=new JFrame("${TITLE}"); JButton b=new JButton("Click Me"); b.getAccessibleContext().setAccessibleName("actButton"); b.addActionListener(e->f.setTitle("ACT_CLICKED")); JCheckBox c=new JCheckBox("Toggle Me"); c.getAccessibleContext().setAccessibleName("actCheck"); JTextField t=new JTextField("",20); t.getAccessibleContext().setAccessibleName("actField"); t.getDocument().addDocumentListener(new DocumentListener(){ public void insertUpdate(DocumentEvent e){f.setTitle("ACT_TEXT_"+t.getText());} public void removeUpdate(DocumentEvent e){f.setTitle("ACT_TEXT_"+t.getText());} public void changedUpdate(DocumentEvent e){} }); JLabel lab=new JLabel("A Label"); lab.getAccessibleContext().setAccessibleName("actLabel"); JList<String> list=new JList<>(new String[]{"ListOne","ListTwo"}); list.getAccessibleContext().setAccessibleName("actList"); JPanel p=new JPanel(); p.add(b); p.add(c); p.add(t); p.add(lab); p.add(new JScrollPane(list)); f.add(p); f.setSize(520,200); f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); f.setVisible(true); }); } }`,
     );
     const compile = Bun.spawnSync([`${bin}/javac.exe`, `${dir}/JabAct.java`], { stderr: 'pipe' });
     if (!compile.success) {
@@ -102,6 +102,18 @@ try {
         assert(clickOk, 'javaInvoke reported success on the push button');
         assert(windowTitle(hWnd) === 'ACT_CLICKED', `the button's action fired (title="${windowTitle(hWnd)}", expected "ACT_CLICKED")`);
 
+        // a JList item IS selected by javaInvoke (the list item's own accessible action selects it) — prove the state
+        // TRANSITION (not-selected → selected) via fresh tree reads (NOT just the boolean). Combo/tree do NOT select this way.
+        const beforeSelect = javaTree(hWnd);
+        const listItemBefore = beforeSelect === null ? undefined : flatten(beforeSelect).find((n) => n.name === 'ListTwo');
+        assert(listItemBefore !== undefined && !/selected/.test(listItemBefore.states), 'the JList item "ListTwo" is NOT selected before invoke (baseline)');
+        const listOk = javaInvoke(hWnd, { name: 'ListTwo' });
+        await Bun.sleep(350);
+        const afterSelect = javaTree(hWnd);
+        const listItem = afterSelect === null ? undefined : flatten(afterSelect).find((n) => n.name === 'ListTwo');
+        assert(listOk, 'javaInvoke reported success on the list item');
+        assert(listItem !== undefined && /selected/.test(listItem.states), `the JList item "ListTwo" is now selected (states="${listItem?.states ?? '(not found)'}")`);
+
         // negatives — all degrade cleanly to false (no throw, no segfault):
         assert(javaInvoke(hWnd, { name: 'noSuchControl' }) === false, 'javaInvoke on a missing control returns false');
         // a JLabel has no AccessibleAction → getAccessibleActions is empty → the 'click' fallback finds no action → false
@@ -120,5 +132,5 @@ try {
   uia.uninitialize();
 }
 
-console.log(failures === 0 ? '\nPASS — Java Swing app DRIVEN cursor-free via the Access Bridge (invoke + toggle + type).' : `\nFAILED — ${failures} assertion(s)`);
+console.log(failures === 0 ? '\nPASS — Java Swing app DRIVEN cursor-free via the Access Bridge (invoke + toggle + select + type).' : `\nFAILED — ${failures} assertion(s)`);
 process.exit(failures === 0 ? 0 : 1);
