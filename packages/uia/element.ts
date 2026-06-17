@@ -25,6 +25,7 @@ import {
   getSelectedText,
   getSelectionPointers,
   getValue,
+  gridItemPosition,
   invoke,
   isSelected,
   NoScroll,
@@ -656,6 +657,13 @@ export class Element {
   cell(row: number, column: number): Element | null {
     const pointer = getCell(this.ptr, row, column);
     return pointer === 0n ? null : new Element(pointer);
+  }
+
+  /** This cell's REVERSE position in its grid via GridItemPattern — 0-based row/column + row/column spans. The
+   *  complement of cell(): find a cell by Name, then learn where it sits to read the rest of that record. Null if
+   *  this element is not a grid cell (no GridItem pattern). */
+  gridPosition(): { row: number; column: number; rowSpan: number; columnSpan: number } | null {
+    return gridItemPosition(this.ptr);
   }
 
   /** Read any UIA property by id (PropertyId.*) via GetCurrentPropertyValue — HelpText, IsOffscreen,

@@ -154,6 +154,7 @@ export enum PropertyId {
   FrameworkId = 30024,
   ItemStatus = 30026,
   IsExpandCollapsePatternAvailable = 30028,
+  IsGridItemPatternAvailable = 30029,
   IsGridPatternAvailable = 30030,
   IsInvokePatternAvailable = 30031,
   IsMultipleViewPatternAvailable = 30032,
@@ -293,6 +294,12 @@ export const SLOT = {
   GetItem: 3,
   get_CurrentRowCount: 4,
   get_CurrentColumnCount: 5,
+  // IUIAutomationGridItemPattern (reverse: a cell -> its row/column/spans; verified vs UIAutomationClient.h IUIAutomationGridItemPatternVtbl — ContainingGrid 3, Row 4, Column 5, RowSpan 6, ColumnSpan 7)
+  get_CurrentContainingGrid: 3,
+  get_CurrentRow: 4,
+  get_CurrentColumn: 5,
+  get_CurrentRowSpan: 6,
+  get_CurrentColumnSpan: 7,
   // IUIAutomationTablePattern
   GetCurrentColumnHeaders: 4,
   // IUIAutomationMultipleViewPattern (view-mode switch — verified vs UIAutomationClient.h IUIAutomationMultipleViewPatternVtbl)

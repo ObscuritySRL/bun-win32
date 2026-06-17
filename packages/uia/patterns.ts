@@ -509,6 +509,25 @@ export function getCell(ptr: bigint, row: number, column: number): bigint {
   }
 }
 
+/** A grid cell's REVERSE position via GridItemPattern: its 0-based row/column and row/column spans within its
+ *  ContainingGrid. The complement of getCell — locate a cell by Name (find), then learn where it sits to read the
+ *  rest of that record ("find customer X's row, read its Status column"). null when the element has no GridItem
+ *  pattern (it is not a cell). Mirrors readTable/views: acquires the pattern, reads, releases. */
+export function gridItemPosition(ptr: bigint): { row: number; column: number; rowSpan: number; columnSpan: number } | null {
+  const pattern = getPattern(ptr, PatternId.GridItem);
+  if (pattern === 0n) return null;
+  try {
+    return {
+      row: getLong(pattern, SLOT.get_CurrentRow),
+      column: getLong(pattern, SLOT.get_CurrentColumn),
+      rowSpan: getLong(pattern, SLOT.get_CurrentRowSpan),
+      columnSpan: getLong(pattern, SLOT.get_CurrentColumnSpan),
+    };
+  } finally {
+    comRelease(pattern);
+  }
+}
+
 const IID_ELEMENT3 = guid(IID_IUIAutomationElement3);
 
 /** Open the element's context menu CURSOR-FREE via IUIAutomationElement3::ShowContextMenu — the UIA provider raises

@@ -2352,6 +2352,10 @@ const HANDLERS: Record<string, ToolHandler> = {
     if (hasTextPattern) can.push('read-text');
     if (element.getProperty(PropertyId.IsGridPatternAvailable) === true) can.push('read-table');
     if (element.getProperty(PropertyId.IsMultipleViewPatternAvailable) === true) can.push('set-view (list_views/set_view)');
+    if (element.getProperty(PropertyId.IsGridItemPatternAvailable) === true) {
+      const position = element.gridPosition(); // this element IS a cell — surface its (row,col) so the agent can read sibling columns of the same record via grid_cell on the container, no round-trip
+      if (position !== null) lines.push(`gridCell: (row ${position.row}, col ${position.column})${position.rowSpan > 1 || position.columnSpan > 1 ? ` span ${position.rowSpan}x${position.columnSpan}` : ''}`);
+    }
     // Own-HWND text control → the cursor-free posted-message text verbs work (WM_CHAR/WM_PASTE/WM_COPY/WM_CUT); the
     // documented can: list must name them or the agent (told to drive off this list) won't know it can type into a
     // classic Win32 Edit (Notepad/WordPad/Run dialog/address bars) without focus. handle + patterns already in hand.
