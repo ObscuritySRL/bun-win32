@@ -41,6 +41,8 @@ import {
   isSecureDesktopActive,
   isWindow,
   isWindowVisible,
+  javaInvoke,
+  javaSetText,
   javaTree,
   listMonitors,
   maximizeWindow,
@@ -602,6 +604,15 @@ function textResult(text: string): object {
 
 function errorResult(text: string): object {
   return { content: [{ type: 'text', text }], isError: true };
+}
+
+/** A Java window has no UIA tree, so the action tools cannot auto-append the usual smart observation — instead append a
+ *  fresh (size-capped) java_tree render so a java_invoke/java_set_text step yields its result in one call. */
+function javaObservation(hWnd: bigint): string {
+  const tree = javaTree(hWnd);
+  if (tree === null) return '';
+  const text = renderJavaTree(tree);
+  return `\n\n${text.length > 4000 ? `${text.slice(0, 4000)}\n…(tree truncated — call java_tree for the full view)` : text}`;
 }
 
 function imageResult(png: Uint8Array, note?: string): object {
@@ -1413,10 +1424,41 @@ const TOOLS: McpTool[] = [
     name: 'java_tree',
     category: 'read',
     description:
-      'The Java Access Bridge accessibility tree (role/name/states/bounds) of a Java Swing/AWT (and JavaFX where it bridges to JAB) window — a SunAwtFrame/SunAwtDialog exposes NOTHING to UIA or MSAA (only its bare top-level frame), but the JVM speaks the Access Bridge. Reads it cursor-free / background (no focus theft). Each node reports its screen bounds (@x,y WxH) — to ACT on a control, click_point at the center of its bounds. Returns null with a hint if the window is not a bridge-visible Java window (the JVM needs the Access Bridge enabled: `jabswitch -enable`, or launch with -Djavax.accessibility.assistive_technologies=com.sun.java.accessibility.AccessBridge).',
+      "The Java Access Bridge accessibility tree (role/name/states/bounds) of a Java Swing/AWT (and JavaFX where it bridges to JAB) window — a SunAwtFrame/SunAwtDialog exposes NOTHING to UIA or MSAA (only its bare top-level frame), but the JVM speaks the Access Bridge. Reads it cursor-free / background (no focus theft). To ACT on a control by its name, use java_invoke (buttons / check boxes / menu items) or java_set_text (text fields) — both cursor-free / background; click_point at a node's bounds center is the pixel fallback. Returns null with a hint if the window is not a bridge-visible Java window (the JVM needs the Access Bridge enabled: `jabswitch -enable`, or launch with -Djavax.accessibility.assistive_technologies=com.sun.java.accessibility.AccessBridge).",
     inputSchema: {
       type: 'object',
       properties: { hWnd: { type: ['string', 'number'], description: HWND_DESC }, maxDepth: { type: 'number', description: 'Default 24' }, maxNodes: { type: 'number', description: 'Default 2000 — total nodes before truncation' } },
+    },
+  },
+  {
+    name: 'java_invoke',
+    category: 'input',
+    description:
+      'Invoke a control in a Java Swing/AWT window by its name — push button, check box, radio button, menu item — cursor-free / background via the Java Access Bridge (doAccessibleActions, the JVM\'s own "click"; no cursor, no foreground, no focus theft). Call java_tree FIRST to get exact names. Targets the first AccessibleName match; optionally narrow by {role} (an en_US role substring, e.g. "check box") when two controls share a name — if two share name AND role, act via click_point at that node\'s java_tree bounds center instead. Returns whether the action succeeded (false if no match or not a bridge-visible Java window) and appends the resulting java tree.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        hWnd: { type: ['string', 'number'], description: HWND_DESC },
+        name: { type: 'string', description: 'AccessibleName of the control (exact, as shown by java_tree)' },
+        role: { type: 'string', description: 'Optional en_US role substring to disambiguate (e.g. "push button")' },
+      },
+      required: ['name'],
+    },
+  },
+  {
+    name: 'java_set_text',
+    category: 'input',
+    description:
+      'Set the contents of a Java Swing/AWT text control by its name — cursor-free / background via the Java Access Bridge (setTextContents; replaces the whole value, no cursor / foreground / focus change). Call java_tree FIRST to get exact names. Targets the first match; optionally narrow by {role}. Returns whether it succeeded and appends the resulting java tree (the supplied text is not echoed back).',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        hWnd: { type: ['string', 'number'], description: HWND_DESC },
+        name: { type: 'string', description: 'AccessibleName of the text control (exact, as shown by java_tree)' },
+        role: { type: 'string', description: 'Optional en_US role substring to disambiguate' },
+        text: { type: 'string', description: 'The new contents (replaces the field)' },
+      },
+      required: ['name', 'text'],
     },
   },
   {
@@ -1582,7 +1624,7 @@ const TOOLS: McpTool[] = [
 
 // Annotation policy: read tools are read-only; the rest mutate state (destructive); os tools reach beyond the
 // local desktop (open-world); setters/copies are idempotent. Hosts use these to drive their permission UI.
-const IDEMPOTENT = new Set(['copy', 'set_clipboard', 'set_value']);
+const IDEMPOTENT = new Set(['copy', 'java_set_text', 'set_clipboard', 'set_value']);
 for (const tool of TOOLS) {
   const readOnly = tool.category === 'read';
   tool.annotations = { openWorldHint: tool.category === 'os', ...(readOnly ? { readOnlyHint: true } : { destructiveHint: true }), ...(IDEMPOTENT.has(tool.name) ? { idempotentHint: true } : {}) };
@@ -2150,6 +2192,29 @@ const HANDLERS: Record<string, ToolHandler> = {
         ? '(not a bridge-visible Java window — if this is a Swing/AWT/JavaFX app, its JVM must have the Java Access Bridge enabled: run `jabswitch -enable` then restart the app, or launch it with -Djavax.accessibility.assistive_technologies=com.sun.java.accessibility.AccessBridge. Otherwise use ocr / screen_capture for its pixels.)'
         : renderJavaTree(tree),
     );
+  },
+  java_invoke: (args) => {
+    const hWnd = resolveHwnd(args);
+    const name = requireString(args, 'name');
+    const role = typeof args.role === 'string' ? args.role : undefined;
+    if (!javaInvoke(hWnd, { name, role }))
+      return errorResult(
+        `java_invoke: no Java control named ${JSON.stringify(name)}${role !== undefined ? ` with role ~${JSON.stringify(role)}` : ''} found (or not a bridge-visible Java window). Run java_tree to see the exact names/roles.`,
+      );
+    return textResult(`invoked ${JSON.stringify(name)} via the Java Access Bridge (cursor-free, no foreground).${javaObservation(hWnd)}`);
+  },
+  java_set_text: (args) => {
+    const hWnd = resolveHwnd(args);
+    const name = requireString(args, 'name');
+    const text = requireString(args, 'text');
+    const role = typeof args.role === 'string' ? args.role : undefined;
+    // Never echo the supplied text back (it may be a password) — the value is already in the agent's context; the
+    // appended tree shows the visible result. Matches the secret-echo floor of set_value / read / inspect_element.
+    if (!javaSetText(hWnd, { name, role }, text))
+      return errorResult(
+        `java_set_text: no Java text control named ${JSON.stringify(name)}${role !== undefined ? ` with role ~${JSON.stringify(role)}` : ''} found (or not a bridge-visible Java window). Run java_tree to see the exact names/roles.`,
+      );
+    return textResult(`set ${JSON.stringify(name)} via the Java Access Bridge (cursor-free, no foreground).${javaObservation(hWnd)}`);
   },
   list_monitors: () =>
     textResult(

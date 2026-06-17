@@ -122,6 +122,8 @@
     "example:inline-state": "bun ./example/inline-state.integration.test.ts",
     "example:inspector": "bun ./example/inspector.ts",
     "example:integrity-level": "bun ./example/integrity-level.integration.test.ts",
+    "example:jab-java-act": "bun ./example/jab-java-act.integration.test.ts",
+    "example:jab-java-tree": "bun ./example/jab-java-tree.integration.test.ts",
     "example:mcp-snapshot-economy": "bun ./example/mcp-snapshot-economy.integration.test.ts",
     "example:menu-drive": "bun ./example/menu-drive.integration.test.ts",
     "example:multi-select": "bun ./example/multi-select.integration.test.ts",

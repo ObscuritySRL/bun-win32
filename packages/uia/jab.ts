@@ -3,14 +3,20 @@
 // (a flat C-export system DLL, present wherever a JAB-enabled JDK/JRE is). The bridge registers running JVMs via a
 // window-message handshake, so after Windows_run() the client MUST pump its message queue once for the JVM to be
 // discovered; thereafter the read calls round-trip synchronously (SendMessage), no per-call pump needed. JOBJECT64 =
-// jlong (i64) on the 64-bit bridge; vmID = Windows long (i32); HWND = u64; BOOL/jint = i32. Detection-only/read-only.
+// jlong (i64) on the 64-bit bridge; vmID = Windows long (i32); HWND = u64; BOOL/jint = i32.
+//
+// READ (javaTree) and ACT (javaInvoke = doAccessibleActions, javaSetText = setTextContents) are BOTH cursor-free /
+// background — invoke a button, toggle a check box, type into a field with no cursor and no foreground (verified: acting
+// on a backgrounded Swing window steals no foreground).
+//
+// Future act primitives (verified-feasible flat exports of this same DLL, deferred): AddAccessibleSelectionFromContext /
+// ClearAccessibleSelectionFromContext (select a JList/JComboBox/JTree item) and setCurrentAccessibleValue (slider/spinner).
 //
 // NOTE: bound via raw dlopen (the same in-package precedent as wgc.ts's d3d11 interop), not a @bun-win32 package — an
-// internal alternate read-engine; only the ~6 read exports are used. WindowsAccessBridge-64.dll is ABSENT on machines
+// internal alternate engine; only ~9 read/act exports are used. WindowsAccessBridge-64.dll is ABSENT on machines
 // without a JAB-enabled JDK/JRE, so the dlopen is LAZY + fault-tolerant (see ensureStarted): a missing bridge degrades to
-// isJavaWindow()=false / javaTree()=null, never a throw at import (a top-level dlopen would brick the whole package on a
-// Java-less box). A native cursor-free ACT path (doAccessibleActions + getAccessibleActions — flat exports of this same
-// DLL) and a full @bun-win32/windowsaccessbridge package are verified-feasible future extractions.
+// isJavaWindow()=false / javaTree()=null / javaInvoke()=false, never a throw at import (a top-level dlopen would brick the
+// whole package on a Java-less box). A full @bun-win32/windowsaccessbridge package is a verified-feasible future extraction.
 
 import { dlopen, FFIType } from 'bun:ffi';
 
@@ -25,6 +31,9 @@ function openBridge() {
     getAccessibleContextFromHWND: { args: [FFIType.u64, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
     getAccessibleContextInfo: { args: [FFIType.i32, FFIType.i64, FFIType.ptr], returns: FFIType.i32 },
     getAccessibleChildFromContext: { args: [FFIType.i32, FFIType.i64, FFIType.i32], returns: FFIType.i64 },
+    getAccessibleActions: { args: [FFIType.i32, FFIType.i64, FFIType.ptr], returns: FFIType.i32 },
+    doAccessibleActions: { args: [FFIType.i32, FFIType.i64, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
+    setTextContents: { args: [FFIType.i32, FFIType.i64, FFIType.ptr], returns: FFIType.i32 },
     releaseJavaObject: { args: [FFIType.i32, FFIType.i64], returns: FFIType.void },
   }).symbols;
 }
@@ -43,10 +52,24 @@ export interface JavaNode {
   truncated?: boolean; // set on the root when maxDepth/maxNodes cut the traversal short
 }
 
+/** Selects a control to act on by its AccessibleName (as shown by java_tree), optionally narrowed by an en_US role
+ *  substring (e.g. 'push button', 'check box') to disambiguate same-named controls. */
+export interface JavaTarget {
+  name: string;
+  role?: string;
+}
+
 // AccessibleContextInfo field byte offsets (wchar_t=2B; MAX_STRING_SIZE=1024, SHORT_STRING_SIZE=256 — verified vs
 // AccessBridgePackages.h): name[1024]@0, description[1024]@2048, role[256]@4096, role_en_US@4608, states@5120,
 // states_en_US@5632, then jint indexInParent@6144, childrenCount@6148, x@6152, y@6156, width@6160, height@6164.
 const INFO_SIZE = 6400; // > 6188 actual; padded headroom
+
+// AccessibleActions (getAccessibleActions output): jint actionsCount@0, then AccessibleActionInfo actionInfo[256], each
+// a wchar_t name[256] (512B) — first action name at @4. AccessibleActionsToDo (doAccessibleActions input): jint
+// actionsCount@0, then AccessibleActionInfo actionInfo[32]; we set count=1 and write one action name at @4. Verified vs
+// AccessBridgePackages.h (MAX_ACTION_INFO=256, MAX_ACTIONS_TO_DO=32, SHORT_STRING_SIZE=256).
+const ACTIONS_SIZE = 4 + 256 * 512 + 16; // getAccessibleActions output buffer (DLL fills it)
+const ACTIONS_TODO_SIZE = 4 + 32 * 512 + 16; // doAccessibleActions input buffer
 
 const PM_REMOVE = 0x0001;
 const MSG = Buffer.allocUnsafe(48); // x64 MSG is 48 bytes; reused — its .ptr is read inline at each PeekMessage call
@@ -130,20 +153,28 @@ function walk(bridge: Bridge, vmID: number, context: bigint, depth: number, maxD
   return node;
 }
 
-/** Read a Java window's accessibility tree via the Access Bridge, or null if it is not a (bridge-visible) Java window.
- *  `maxDepth` bounds depth, `maxNodes` bounds total nodes (a deep Swing tree can be large). Read-only, cursor-free. */
-export function javaTree(hWnd: bigint, options: { maxDepth?: number; maxNodes?: number } = {}): JavaNode | null {
-  ensureStarted();
-  const bridge = jab;
-  if (bridge === null) return null;
-  pump(2);
+/** Resolve a Java window to its (vmID, root AccessibleContext), or null if it is not a bridge-visible Java window. The
+ *  caller MUST releaseJavaObject(vmID, root) when done — the bridge hands back a JVM-side ref. */
+function resolveRoot(bridge: Bridge, hWnd: bigint): { vmID: number; root: bigint } | null {
+  pump(2); // catch a JVM that launched after our handshake
   if (bridge.isJavaWindow(hWnd) === 0) return null;
   const vmidBuffer = Buffer.allocUnsafe(4);
   const contextBuffer = Buffer.allocUnsafe(8);
   if (bridge.getAccessibleContextFromHWND(hWnd, vmidBuffer.ptr!, contextBuffer.ptr!) === 0) return null;
   const vmID = vmidBuffer.readInt32LE(0);
   const root = contextBuffer.readBigUInt64LE(0);
-  if (root === 0n) return null;
+  return root === 0n ? null : { vmID, root };
+}
+
+/** Read a Java window's accessibility tree via the Access Bridge, or null if it is not a (bridge-visible) Java window.
+ *  `maxDepth` bounds depth, `maxNodes` bounds total nodes (a deep Swing tree can be large). Read-only, cursor-free. */
+export function javaTree(hWnd: bigint, options: { maxDepth?: number; maxNodes?: number } = {}): JavaNode | null {
+  ensureStarted();
+  const bridge = jab;
+  if (bridge === null) return null;
+  const resolved = resolveRoot(bridge, hWnd);
+  if (resolved === null) return null;
+  const { vmID, root } = resolved;
   const budget = { remaining: options.maxNodes ?? 2000, truncated: false };
   try {
     const tree = walk(bridge, vmID, root, 0, options.maxDepth ?? 24, budget);
@@ -152,6 +183,110 @@ export function javaTree(hWnd: bigint, options: { maxDepth?: number; maxNodes?: 
   } finally {
     bridge.releaseJavaObject(vmID, root);
   }
+}
+
+/** Walk to the FIRST context whose AccessibleName matches `target` (optionally narrowed by an en_US role substring) and
+ *  run `perform` on it while it is live, releasing every fetched context exactly once (as the read walk does). Returns
+ *  true once a match is handled, to stop the search. */
+function findAndAct(bridge: Bridge, vmID: number, context: bigint, target: JavaTarget, perform: (matched: bigint) => void, depth: number): boolean {
+  const info = Buffer.allocUnsafe(INFO_SIZE);
+  if (bridge.getAccessibleContextInfo(vmID, context, info.ptr!) === 0) return false;
+  const name = readWChar(info, 0, 1024);
+  const role = readWChar(info, 4608, 256) || readWChar(info, 4096, 256);
+  if (name === target.name && (target.role === undefined || role.includes(target.role))) {
+    perform(context); // context is live here; the parent loop releases it after we return
+    return true;
+  }
+  const childrenCount = info.readInt32LE(6148);
+  if (depth < 64) {
+    for (let index = 0; index < childrenCount; index += 1) {
+      const child = bridge.getAccessibleChildFromContext(vmID, context, index);
+      if (child === 0n) continue;
+      let handled = false;
+      try {
+        handled = findAndAct(bridge, vmID, child, target, perform, depth + 1);
+      } finally {
+        bridge.releaseJavaObject(vmID, child);
+      }
+      if (handled) return true;
+    }
+  }
+  return false;
+}
+
+/** Perform a control's first accessible action (its name from getAccessibleActions, e.g. 'click'; fall back to
+ *  'click') via doAccessibleActions. Returns whether the bridge reported success. */
+function invokeAction(bridge: Bridge, vmID: number, context: bigint): boolean {
+  const actions = Buffer.allocUnsafe(ACTIONS_SIZE);
+  // Read actionInfo[0].name (@4) ONLY when getAccessibleActions succeeded AND actionsCount(@0) > 0 — otherwise the
+  // allocUnsafe tail is uninitialized, so guard on the count to deterministically fall back to 'click'.
+  const actionName = bridge.getAccessibleActions(vmID, context, actions.ptr!) !== 0 && actions.readInt32LE(0) > 0 ? readWChar(actions, 4, 256) : '';
+  const chosen = actionName.length > 0 ? actionName : 'click';
+  const todo = Buffer.alloc(ACTIONS_TODO_SIZE); // zeroed: a clean actionsCount=1 + one NUL-terminated action name
+  todo.writeInt32LE(1, 0);
+  for (let index = 0; index < chosen.length && index < 255; index += 1) todo.writeUInt16LE(chosen.charCodeAt(index), 4 + index * 2);
+  const failure = Buffer.allocUnsafe(4);
+  return bridge.doAccessibleActions(vmID, context, todo.ptr!, failure.ptr!) !== 0;
+}
+
+/** Replace a text control's contents via setTextContents — it sets the document model directly, so no focus change is
+ *  needed (verified: it lands on a backgrounded field without requestFocus and steals no foreground). */
+function setTextAction(bridge: Bridge, vmID: number, context: bigint, text: string): boolean {
+  const buffer = Buffer.from(`${text}\0`, 'utf16le');
+  return bridge.setTextContents(vmID, context, buffer.ptr!) !== 0;
+}
+
+/** Invoke a Java control (push button / check box / menu item / …) by name, cursor-free / background, via the Access
+ *  Bridge — the native equivalent of a click but with no cursor and no foreground. Returns whether it succeeded. */
+export function javaInvoke(hWnd: bigint, target: JavaTarget): boolean {
+  ensureStarted();
+  const bridge = jab;
+  if (bridge === null) return false;
+  const resolved = resolveRoot(bridge, hWnd);
+  if (resolved === null) return false;
+  const { vmID, root } = resolved;
+  let ok = false;
+  try {
+    findAndAct(
+      bridge,
+      vmID,
+      root,
+      target,
+      (matched) => {
+        ok = invokeAction(bridge, vmID, matched);
+      },
+      0,
+    );
+  } finally {
+    bridge.releaseJavaObject(vmID, root);
+  }
+  return ok;
+}
+
+/** Set a Java text control's contents by name, cursor-free / background, via the Access Bridge. Returns success. */
+export function javaSetText(hWnd: bigint, target: JavaTarget, text: string): boolean {
+  ensureStarted();
+  const bridge = jab;
+  if (bridge === null) return false;
+  const resolved = resolveRoot(bridge, hWnd);
+  if (resolved === null) return false;
+  const { vmID, root } = resolved;
+  let ok = false;
+  try {
+    findAndAct(
+      bridge,
+      vmID,
+      root,
+      target,
+      (matched) => {
+        ok = setTextAction(bridge, vmID, matched, text);
+      },
+      0,
+    );
+  } finally {
+    bridge.releaseJavaObject(vmID, root);
+  }
+  return ok;
 }
 
 /** Render a JavaNode tree as indented text (Spy++/msaa_tree style) for an LLM. */
