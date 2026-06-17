@@ -54,6 +54,7 @@ Escalation rule: stay on the `uia` facade. Drop to a lower engine (`msaaTree`, t
 | resolve a pixel to an element | `uia.elementAt(x, y)` → `{ role, name, automationId, bounds }` |
 | click WITHOUT moving the cursor | `el.invoke()` (UIA) · `uia.postClick(x, y)` (posted `WM_*`) |
 | key / text WITHOUT focus (posted window messages) | `uia.setControlText(hWnd, text)` (`WM_SETTEXT`) · `uia.postKey(hWnd, 'Enter')` (`WM_KEYDOWN`/`UP`) · `uia.postText(hWnd, text)` (`WM_CHAR`) — to a control's `nativeWindowHandle`, background/occluded OK |
+| non-Latin / CJK / emoji text WITHOUT focus | `setControlText` (WM_SETTEXT) · `postText` (WM_CHAR per UTF-16 unit — an astral/emoji char posts as its two surrogate halves) · `Element.setValue` (ValuePattern) each round-trip Japanese/Korean/accented/astral-surrogate text cursor-free, backgrounded — proven in `example/non-latin-input.integration.test.ts`. The SendInput `type()` path needs a real foreground; use the posted path backgrounded. |
 | observe input without a global hook | `uia.isKeyDown('Shift')` (GetAsyncKeyState poll — crash-safe, no SetWindowsHookEx foreign-thread callback; poll it in a loop) |
 | computer-use action (Anthropic/CUA) | `await dispatch(app, { action: 'left_click', coordinate: [x, y] })` |
 | gated / auditable actions | `safeExecute(app, actions, { dryRun, allow, confirm, onAction })` |

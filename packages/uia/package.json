@@ -144,6 +144,7 @@
     "example:menu-drive": "bun ./example/menu-drive.integration.test.ts",
     "example:monitor-dpi": "bun ./example/monitor-dpi.integration.test.ts",
     "example:multi-select": "bun ./example/multi-select.integration.test.ts",
+    "example:non-latin-input": "bun ./example/non-latin-input.integration.test.ts",
     "example:ocr-text": "bun ./example/ocr-text.integration.test.ts",
     "example:ocr-window": "bun ./example/ocr-window.integration.test.ts",
     "example:pattern-no-raise": "bun ./example/pattern-no-raise.integration.test.ts",

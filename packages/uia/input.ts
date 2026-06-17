@@ -381,6 +381,7 @@ export function postText(hWnd: bigint, text: string): boolean {
   let ok = true;
   // Iterate UTF-16 code UNITS (charCodeAt), not code points — WM_CHAR carries one UTF-16 unit, so an astral char
   // must post as its two surrogate halves (for..of would yield one out-of-range code point and truncate it).
+  // Pinned by example/non-latin-input.integration.test.ts (emoji/CJK-extension-B round-trip) — do not switch to for..of.
   for (let index = 0; index < text.length; index += 1) {
     let code = text.charCodeAt(index);
     if (code === 0x0a) {
