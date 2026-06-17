@@ -18,7 +18,10 @@ const invokers = new Map<number, ReturnType<typeof CFunction>>();
  * leading u64 segfaults multi-pointer calls). `argTypes` must match the method's real signature.
  */
 export function vcall(thisPtr: bigint, slot: number, argTypes: readonly FFIType[], args: readonly unknown[]): number {
-  if (thisPtr === 0n) throw new Error(`vcall: null interface pointer (slot ${slot})`); // predicted-not-taken; turns a segfault into a catchable error
+  if (thisPtr === 0n) throw new Error(`vcall: null interface pointer (slot ${slot})`); // predicted-not-taken; catches ONLY the literal-null case (a non-null-but-unmapped thisPtr still segfaults at the deref below — see note)
+  // A non-null-but-unmapped thisPtr CANNOT be guarded here: Bun has no safe-read, so this deref segfaults the host
+  // uncatchably (e.g. read.ptr(0xdead, 0) panics). Callers MUST pass only refcounted COM proxies from a successful
+  // (pointer === 0n ? null : …) result — never a raw/garbage address. The guards below fire only once thisPtr is mapped.
   const vtable = read.ptr(Number(thisPtr) as Pointer, 0);
   if (!vtable) throw new Error(`vcall: null vtable at interface 0x${thisPtr.toString(16)} (slot ${slot}) — use-after-free or invalid interface pointer`); // a freed/zeroed object reads vtable 0; without this the next read segfaults uncatchably
   const method = read.ptr(Number(vtable) as Pointer, slot * 8);

@@ -479,8 +479,10 @@ describe('perf-regression: TrueCondition memoization (no window)', () => {
 // Window.dispose() routes through release(), so a `using app` + an explicit dispose, or a careless re-release in
 // a catch/finally, took the long-lived MCP server down. This pins release() idempotency: a second release is a
 // no-op (ptr stays 0n), and any post-release accessor hits the com.ts null-interface guard and throws CATCHABLY
-// instead of UAF-crashing. Uses only the in-process CUIAutomation client (root() → a real owned IUIAutomation-
-// Element*, NO window, NO app launch), so it runs under `bun test`.
+// instead of UAF-crashing. NOTE the guard's scope: it only catches a LITERAL-null (0n) thisPtr — a non-null-but-
+// unmapped thisPtr (a raw/garbage address) still segfaults the host uncatchably at com.ts's first deref (Bun has no
+// safe-read), which is why release() ZEROES the pointer rather than leaving a dangling non-null one. Uses only the
+// in-process CUIAutomation client (root() → a real owned IUIAutomationElement*, NO window, NO app launch), runs under `bun test`.
 describe('native-memory safety: Element.release() / Window.dispose() idempotency (no window)', () => {
   test('a double release() is a no-op (ptr→0n) and a post-release accessor throws catchably, not UAF-segfaults', () => {
     try {
@@ -510,5 +512,13 @@ describe('native-memory safety: Element.release() / Window.dispose() idempotency
     } finally {
       uninitialize();
     }
+  });
+
+  // Pins the EXACT scope of com.ts's first guard: a LITERAL-null (0n) thisPtr throws catchably. The complementary
+  // non-null-but-unmapped case (e.g. vcall(0xdeadn, …)) is deliberately NOT exercised — it segfaults the host
+  // uncatchably (Bun has no safe-read), so a passing assertion is impossible and the comment in com.ts documents it.
+  test('vcall on a literal-null (0n) thisPtr throws catchably — the guard covers ONLY the null case, not unmapped pointers', () => {
+    expect(() => vcall(0n, SLOT.GetRootElement, [FFIType.ptr], [Buffer.alloc(8).ptr!])).toThrow('null interface pointer');
+    expect(() => comRelease(0n)).not.toThrow(); // comRelease(0n) is a documented no-op (never reaches the deref)
   });
 });
