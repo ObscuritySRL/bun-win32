@@ -130,6 +130,7 @@
     "example:jab-java-act": "bun ./example/jab-java-act.integration.test.ts",
     "example:jab-java-tree": "bun ./example/jab-java-tree.integration.test.ts",
     "example:locate-all-images": "bun ./example/locate-all-images.integration.test.ts",
+    "example:mcp-pattern-no-raise": "bun ./example/mcp-pattern-no-raise.integration.test.ts",
     "example:mcp-snapshot-economy": "bun ./example/mcp-snapshot-economy.integration.test.ts",
     "example:menu-drive": "bun ./example/menu-drive.integration.test.ts",
     "example:multi-select": "bun ./example/multi-select.integration.test.ts",

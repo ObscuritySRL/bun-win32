@@ -248,6 +248,7 @@ export function isKeyDown(name: string): boolean {
 // and works on a background/occluded window. SendInput, by contrast,
 // goes to whatever owns the system focus. The HWND must be a real control window (Element.nativeWindowHandle != 0);
 // modern WinUI/WPF/Chromium sub-controls without their own HWND fall back to ValuePattern/SendInput.
+const BM_CLICK = 0x0000_00f5;
 const WM_SETTEXT = 0x0000_000c;
 const WM_KEYDOWN = 0x0000_0100;
 const WM_KEYUP = 0x0000_0101;
@@ -267,6 +268,16 @@ export function setControlText(hWnd: bigint, text: string): boolean {
   if (hWnd === 0n) return false;
   const buffer = Buffer.from(`${text}\0`, 'utf16le');
   return User32.SendMessageW(hWnd, WM_SETTEXT, 0n, BigInt(buffer.ptr!)) !== 0n;
+}
+
+/** Click a classic Win32 button/checkbox/radio (window class "Button") cursor-free via PostMessageW(BM_CLICK) — the
+ *  control fires its own WM_COMMAND/toggle as if clicked, with NO focus change and NO foreground steal, on a
+ *  minimized/background/locked window (proven live where the UIA Invoke/Toggle pattern STEALS foreground to the
+ *  control's HWND — see findings/32). Caller MUST verify the class is "Button" (BM_CLICK is a no-op on other classes).
+ *  Posted (async-queued), so the visible/UIA state settles a tick later. Returns false for a 0 handle. */
+export function postButtonClick(hWnd: bigint): boolean {
+  if (hWnd === 0n) return false;
+  return User32.PostMessageW(hWnd, BM_CLICK, 0n, 0n) !== 0;
 }
 
 /** Undo the last edit in a classic Edit / RichEdit cursor-free via SendMessageW(EM_UNDO) — no Ctrl+Z keystroke,

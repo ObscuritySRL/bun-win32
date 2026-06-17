@@ -57,6 +57,7 @@ import {
   ownedModalDialog,
   ownerHwnd,
   pasteToControl,
+  postButtonClick,
   postClickAt,
   postClickToHwnd,
   postDoubleClickAt,
@@ -119,7 +120,7 @@ const PROTOCOL_VERSION = '2025-11-25';
 const SUPPORTED_VERSIONS = new Set(['2025-11-25', '2025-06-18', '2025-03-26', '2024-11-05']);
 const SERVER_INFO = { name: 'bun-uia', version: '1.8.0' }; // keep in sync with package.json (scripts/published-deps.ts gates this)
 const INSTRUCTIONS =
-  'Drive Windows desktop apps via the UI Automation tree — and beyond it. Call list_windows, then attach (by hWnd or exact title — className is reliable only for single-window classes like Shell_TrayWnd, not the Chromium/Electron family) — attach ALREADY returns a ref-keyed tree, so act on those refs directly; call desktop_snapshot only to RE-ground after refs go stale (e.g. Button "Five" [ref=e49#1]); pass that ref VERBATIM (with its #generation tag) to click/invoke/type/toggle/set_value/inspect_element. Refs are valid ONLY for the most recent snapshot — every action returns a fresh one; re-ground from it. A ref from before a re-render is REJECTED (not silently mis-resolved), so always use the refs from the latest snapshot/delta. To stay cheap, an action that changes little returns just a "Δ" delta (the +/-/~ changes, with refs on appeared/renamed) instead of the full tree — your other refs stay valid; desktop_snapshot {maxDepth} bounds the tree size when a window is large. Prefer invoke/set_value/toggle/scroll (cursor-free — they need no focus and work on a minimized, background, occluded, or locked window — for a classic Win32/HWND app; a UWP/WinUI store app SUSPENDS its UI tree when minimized or fully backgrounded, so its tree reads empty and posted actions may not land until you restore/raise it) over click. To SEE beyond the attached window (a 2nd monitor, a game/browser, a composited surface, or anything with no window) use screen_capture; to see a SPECIFIC window even when occluded, in the background, or GPU-composited (where a plain screenshot is blank) use capture_window (Windows.Graphics.Capture); turn a pixel into a control with inspect_point. screenshot auto-falls-back PrintWindow → WGC → desktop-region. Read legacy/owner-draw windows with native_tree/msaa_tree. drag and real-cursor clicks move the actual mouse; SendInput-based input (sendKeys, press_key chord, hold_key, drag, and the type/paste fallback for a control with no own HWND) needs an unlocked, foregrounded desktop — the posted cursor-free paths do not: type (WM_CHAR) / paste (WM_PASTE) / press_key {ref} on an own-HWND control, plus set_value/invoke/toggle. launch/run/file tools and manage_window may be disabled by the server policy (BUN_UIA_PROFILE).';
+  'Drive Windows desktop apps via the UI Automation tree — and beyond it. Call list_windows, then attach (by hWnd or exact title — className is reliable only for single-window classes like Shell_TrayWnd, not the Chromium/Electron family) — attach ALREADY returns a ref-keyed tree, so act on those refs directly; call desktop_snapshot only to RE-ground after refs go stale (e.g. Button "Five" [ref=e49#1]); pass that ref VERBATIM (with its #generation tag) to click/invoke/type/toggle/set_value/inspect_element. Refs are valid ONLY for the most recent snapshot — every action returns a fresh one; re-ground from it. A ref from before a re-render is REJECTED (not silently mis-resolved), so always use the refs from the latest snapshot/delta. To stay cheap, an action that changes little returns just a "Δ" delta (the +/-/~ changes, with refs on appeared/renamed) instead of the full tree — your other refs stay valid; desktop_snapshot {maxDepth} bounds the tree size when a window is large. Prefer invoke/set_value/toggle/scroll (cursor-free — they need no focus and work on a minimized, background, occluded, or locked window — for a classic Win32/HWND app: set_value posts WM_SETTEXT, invoke/toggle on a "Button"-class control post BM_CLICK, all focus-clean — the raw UIA Value/Toggle/Invoke pattern would instead STEAL FOREGROUND to the control via the MSAA bridge, so these tools route around it; a UWP/WinUI store app SUSPENDS its UI tree when minimized or fully backgrounded, so its tree reads empty and posted actions may not land until you restore/raise it) over click. To SEE beyond the attached window (a 2nd monitor, a game/browser, a composited surface, or anything with no window) use screen_capture; to see a SPECIFIC window even when occluded, in the background, or GPU-composited (where a plain screenshot is blank) use capture_window (Windows.Graphics.Capture); turn a pixel into a control with inspect_point. screenshot auto-falls-back PrintWindow → WGC → desktop-region. Read legacy/owner-draw windows with native_tree/msaa_tree. drag and real-cursor clicks move the actual mouse; SendInput-based input (sendKeys, press_key chord, hold_key, drag, and the type/paste fallback for a control with no own HWND) needs an unlocked, foregrounded desktop — the posted cursor-free paths do not: type (WM_CHAR) / paste (WM_PASTE) / press_key {ref} on an own-HWND control, plus set_value/invoke/toggle. launch/run/file tools and manage_window may be disabled by the server policy (BUN_UIA_PROFILE).';
 // Shown instead of INSTRUCTIONS when the policy enables no 'input' category — so the system-prompt guidance never
 // describes action tools that tools/list does not expose (a readonly/restricted profile).
 const INSTRUCTIONS_READONLY =
@@ -913,9 +914,19 @@ function withLaunchSettledSnapshot(message: string): object {
   return withSnapshot(message);
 }
 
-/** ValuePattern set, falling back to RangeValuePattern for a numeric value on a slider/spinner (ValuePattern
- *  throws there) — so set_value drives both cursor-free. */
+/** Set a control's value FOCUS-CLEAN. For a classic Win32/HWND text field (own HWND + Value/Text pattern, NOT a
+ *  slider/spinner) prefer WM_SETTEXT: the UIA ValuePattern on an MSAA-bridged control routes through focus +
+ *  accDoDefaultAction and STEALS FOREGROUND to the control's own window (proven live on minimized Notepad
+ *  RichEditD2DPT / charmap RICHEDIT50W — see findings/32), whereas WM_SETTEXT lands the text with the foreground
+ *  UNCHANGED on a minimized/background/locked window. Falls back to ValuePattern when there is no own HWND (a WinUI/
+ *  WPF/Electron sub-control), then to RangeValuePattern for a numeric slider/spinner (those have no editable HWND
+ *  text), then to a last WM_SETTEXT for a no-ValuePattern classic Edit — so set_value drives them all cursor-free. */
 function setValueSmart(element: Element, value: string): string {
+  // A slider/spinner has no editable HWND text — keep its RangeValue branch (below) ahead of WM_SETTEXT; every OTHER
+  // own-HWND control that exposes Value or Text takes the focus-clean posted path FIRST so ValuePattern never raises it.
+  const isRange = element.getProperty(PropertyId.IsRangeValuePatternAvailable) === true;
+  const isText = element.getProperty(PropertyId.IsValuePatternAvailable) === true || element.getProperty(PropertyId.IsTextPatternAvailable) === true;
+  if (element.nativeWindowHandle !== 0n && isText && !isRange && setControlText(element.nativeWindowHandle, value)) return 'set text cursor-free (WM_SETTEXT — focus-clean; UIA ValuePattern would steal foreground on this HWND control)';
   try {
     element.setValue(value);
     return 'set value';
@@ -928,6 +939,40 @@ function setValueSmart(element: Element, value: string): string {
     if (setControlText(element.nativeWindowHandle, value)) return 'set text cursor-free (WM_SETTEXT)'; // a no-ValuePattern classic Edit with its own HWND
     throw error;
   }
+}
+
+/** A classic Win32 push button / checkbox / radio: own HWND + window class exactly "Button". For these, the UIA
+ *  Invoke/Toggle pattern is MSAA-bridged and STEALS FOREGROUND to the control's HWND (proven live on minimized charmap
+ *  RICHEDIT50W's "Advanced view" checkbox + "Select" button — see findings/32), so route through the focus-clean
+ *  PostMessageW(BM_CLICK) instead. A WinUI ToggleSwitch / WPF / Chromium control (no own HWND, or a non-"Button" class)
+ *  is NOT one of these — it falls through to the UIA pattern, which is the only path it has. */
+function isClassicButton(element: Element): boolean {
+  return element.nativeWindowHandle !== 0n && element.className === 'Button';
+}
+
+/** Invoke a control FOCUS-CLEAN: a classic Win32 "Button" takes PostMessageW(BM_CLICK) (no foreground steal, works
+ *  minimized/background — findings/32); everything else takes the UIA InvokePattern. */
+function invokeSmart(element: Element): string {
+  if (isClassicButton(element)) {
+    postButtonClick(element.nativeWindowHandle);
+    return 'invoked cursor-free (BM_CLICK — focus-clean; UIA InvokePattern would steal foreground)';
+  }
+  element.invoke();
+  return 'invoked';
+}
+
+/** Toggle a control FOCUS-CLEAN: a classic Win32 "Button" checkbox takes PostMessageW(BM_CLICK) (no foreground steal,
+ *  works minimized/background — findings/32); everything else takes the UIA TogglePattern. BM_CLICK is posted, so read
+ *  the settled state a tick later. */
+function toggleSmart(element: Element): string {
+  if (isClassicButton(element)) {
+    const before = element.toggleState;
+    postButtonClick(element.nativeWindowHandle);
+    Bun.sleepSync(120); // BM_CLICK is async-queued; let the toggle settle before reading state
+    return `toggled cursor-free (BM_CLICK — focus-clean; UIA TogglePattern would steal foreground) (state ${before} → ${element.toggleState})`;
+  }
+  element.toggle();
+  return `toggled (state ${element.toggleState})`;
 }
 
 /** Run an invoke/expand inside act() (find_and_act / reveal / grid_cell) and, if it opened a flyout/menu/dropdown in its
@@ -949,10 +994,11 @@ function act(element: Element, action: string, text: string | undefined, submit 
       ? `value: ${JSON.stringify(capText(content))}`
       : `(no readable value — control name is ${JSON.stringify(element.name)}; it may be empty or expose no Value/Text pattern — try inspect_element {ref} or read_table)`;
   }
+  if (ACTIONABILITY_GATED.has(action)) assertActionable(element, action); // Playwright-class enabled gate before the mutating verb actually fires
   // Name the RESOLVED control in every result so an LLM gets target confirmation on an ambiguous selector match
   // (the named-result contract computer.ts semanticClick + AI.md:181 already document). One name/role read per action.
   const target = `${element.controlTypeName} ${JSON.stringify(element.name)}`;
-  if (action === 'invoke') return withPopupNote(() => patternAction('invoke', () => (element.invoke(), `invoked ${target}`)));
+  if (action === 'invoke') return withPopupNote(() => patternAction('invoke', () => `${invokeSmart(element)} ${target}`));
   if (action === 'click') return `${clickElement(element, 'left', false, false)} ${target}`;
   if (action === 'focus') return element.focus(), `focused ${target}`; // UIA SetFocus — cursor-free, no SendInput, so never gated
   if (action === 'type') {
@@ -970,7 +1016,7 @@ function act(element: Element, action: string, text: string | undefined, submit 
     return `typed into ${target}${submit ? ' and pressed Enter' : ''}`;
   }
   if (action === 'set_value') return patternAction('set_value', () => `${setValueSmart(element, text ?? '')} ${target}`);
-  if (action === 'toggle') return patternAction('toggle', () => (element.toggle(), `toggled ${target} (state ${element.toggleState})`));
+  if (action === 'toggle') return patternAction('toggle', () => `${toggleSmart(element)} ${target}`);
   if (action === 'expand') return withPopupNote(() => patternAction('expand', () => (element.expand(), `expanded ${target}`)));
   if (action === 'collapse') return patternAction('collapse', () => (element.collapse(), `collapsed ${target}`));
   if (action === 'select') return patternAction('select', () => (element.select(), `selected ${target}`)); // cursor-free SelectionItem.Select — select a tab/radio/list-item/cell by name in one call (grid_cell{do:select} advertised this)
@@ -1356,7 +1402,8 @@ const TOOLS: McpTool[] = [
   {
     name: 'set_value',
     category: 'input',
-    description: 'Set a control value directly via the UIA Value pattern — no keystrokes, works on a background/locked window. A numeric value on a slider/spinner sets it via the RangeValue pattern.',
+    description:
+      'Set a control value in one call — no keystrokes, FOCUS-CLEAN on a background/minimized/locked window. For a classic Win32/HWND text field it posts WM_SETTEXT (the raw UIA Value pattern would STEAL FOREGROUND to the control via the MSAA bridge, so this tool posts instead); a WinUI/WPF/Electron sub-control with no own HWND uses the UIA Value pattern (which activates it). A numeric value on a slider/spinner sets it via the RangeValue pattern.',
     inputSchema: { type: 'object', properties: { element: { type: 'string', description: ELEMENT_DESC }, ref: { type: 'string', description: REF_DESC }, value: { type: 'string' } }, required: ['ref', 'value'] },
   },
   {
@@ -2007,16 +2054,17 @@ const HANDLERS: Record<string, ToolHandler> = {
   },
   invoke: (args) => {
     const element = resolveRef(requireString(args, 'ref'));
+    assertActionable(element, 'invoke'); // Playwright-class enabled gate — invoking a disabled control is a silent no-op
     const target = named(element);
     const before = popupSnapshot();
-    patternAction('invoke', () => element.invoke());
+    const outcome = patternAction('invoke', () => invokeSmart(element)); // a classic Win32 "Button" goes through focus-clean BM_CLICK (UIA InvokePattern steals foreground — findings/32)
     // Auto-return a flyout/menu that opened in its OWN window (so the agent need not hand-hunt it) — with NO dead poll
     // sleep: check once immediately (most providers create the popup synchronously) and once after the withSnapshot
     // rebuild, whose ~13ms cache build doubles as settle time for a slow provider.
     const note = (popup: { hWnd: bigint; className: string }): string =>
-      `invoked ${target} — it opened a flyout/menu in its OWN window: [hWnd=0x${popup.hWnd.toString(16)}] [class=${popup.className}] — attach it (attach {hWnd}) to drive its items.`;
+      `${outcome} ${target} — it opened a flyout/menu in its OWN window: [hWnd=0x${popup.hWnd.toString(16)}] [class=${popup.className}] — attach it (attach {hWnd}) to drive its items.`;
     const early = newPopup(before);
-    const result = withSnapshot(early !== undefined ? note(early) : `invoked ${target}`);
+    const result = withSnapshot(early !== undefined ? note(early) : `${outcome} ${target}`);
     const late = early === undefined ? newPopup(before) : undefined;
     return late !== undefined ? withSnapshot(note(late)) : result;
   },
@@ -2048,15 +2096,17 @@ const HANDLERS: Record<string, ToolHandler> = {
   set_value: (args) => {
     const element = resolveRef(requireString(args, 'ref'));
     const value = requireString(args, 'value'); // hoisted OUT of the patternAction closure so a missing-value SCHEMA error is not annotated with pattern-support advice
+    assertActionable(element, 'set_value'); // Playwright-class enabled gate — set_value on a disabled control writes nothing
     const target = named(element);
     const outcome = patternAction('set_value', () => setValueSmart(element, value)); // wrap the CALL SITE so RangeValue + WM_SETTEXT fallbacks still run and only the final exhausted throw gets the can: steer
     return withSnapshot(`${outcome} ${target} = ${element.isPassword ? '(password — withheld)' : JSON.stringify(args.value)}`); // never echo a secret-field value back (matches read / inspect_element / find_text)
   },
   toggle: (args) => {
     const element = resolveRef(requireString(args, 'ref'));
+    assertActionable(element, 'toggle'); // Playwright-class enabled gate — toggling a disabled control is a silent no-op
     const target = named(element);
-    patternAction('toggle', () => element.toggle());
-    return withSnapshot(`toggled ${target} (state ${element.toggleState})`);
+    const outcome = patternAction('toggle', () => toggleSmart(element)); // a classic Win32 "Button" checkbox goes through focus-clean BM_CLICK (UIA TogglePattern steals foreground — findings/32)
+    return withSnapshot(`${outcome} ${target}`);
   },
   expand: (args) => {
     const element = resolveRef(requireString(args, 'ref'));

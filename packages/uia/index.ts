@@ -120,6 +120,7 @@ export {
   packKeyboardInput,
   packMouseInput,
   pasteToControl,
+  postButtonClick,
   postHWheel,
   postHoldKey,
   postKey,

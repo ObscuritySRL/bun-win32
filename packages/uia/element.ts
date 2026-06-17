@@ -596,7 +596,10 @@ export class Element {
   }
 
   // control-pattern actions — each proven against a real control in Phase 5
-  /** Press via InvokePattern. Throws if unsupported (try `.click()`). */
+  /** Press via InvokePattern. Throws if unsupported (try `.click()`). NOTE: on a classic Win32/HWND (MSAA-bridged)
+   *  control the OS routes InvokePattern through focus + accDoDefaultAction, which ACTIVATES the control's window and
+   *  STEALS FOREGROUND to its HWND (proven live on minimized charmap — findings/32). For a focus-clean press on an
+   *  own-HWND "Button"-class control post BM_CLICK instead (the MCP invoke tool does this automatically). */
   invoke(): void {
     invoke(this.ptr);
   }
@@ -612,7 +615,11 @@ export class Element {
     return getValue(this.ptr);
   }
 
-  /** Set a ValuePattern value in one call — no keystrokes. Throws if unsupported (try `.type()`). */
+  /** Set a ValuePattern value in one call — no keystrokes. Throws if unsupported (try `.type()`). NOTE: on a classic
+   *  Win32/HWND (MSAA-bridged) control the OS routes ValuePattern.SetValue through focus, which ACTIVATES the control's
+   *  window and STEALS FOREGROUND to its HWND (proven live on minimized Notepad RichEditD2DPT — findings/32). For a
+   *  focus-clean write to an own-HWND text control post WM_SETTEXT (setControlText) — the MCP set_value tool does this
+   *  automatically; ValuePattern stays the path for a no-own-HWND WinUI/WPF/Electron sub-control. */
   setValue(text: string): void {
     setValue(this.ptr, text);
   }
@@ -681,7 +688,10 @@ export class Element {
     return getPropertyValue(this.ptr, propertyId);
   }
 
-  /** Toggle a checkbox via TogglePattern. Throws if unsupported. */
+  /** Toggle a checkbox via TogglePattern. Throws if unsupported. NOTE: on a classic Win32/HWND (MSAA-bridged) checkbox
+   *  the OS routes TogglePattern.Toggle through focus, which ACTIVATES the control's window and STEALS FOREGROUND to its
+   *  HWND (proven live on minimized charmap — findings/32). For a focus-clean toggle of an own-HWND "Button"-class
+   *  checkbox post BM_CLICK instead (the MCP toggle tool does this automatically). */
   toggle(): void {
     toggle(this.ptr);
   }
