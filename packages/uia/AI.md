@@ -4,12 +4,11 @@ Everything below is reachable from `@bun-win32/uia` (or its unscoped alias `bun-
 
 ## What it is
 
-Playwright for Windows desktop apps. Query the live UI Automation (accessibility) tree by name / control-type / automationId, invoke controls, type, read values, wait for elements to appear, and serialize a window's tree to JSON for an LLM agent. Four accessibility engines:
+Playwright for Windows desktop apps. Query the live UI Automation (accessibility) tree by name / control-type / automationId, invoke controls, type, read values, wait for elements to appear, and serialize a window's tree to JSON for an LLM agent. Three accessibility engines:
 
 1. **IUIAutomation COM client** (the spine) — driven through a cast-free vtable invoker. Query + invoke + patterns + cache.
-2. **Flat `uiautomationcore` C-API** — a VARIANT-free fast path (secondary; the COM path is the default).
-3. **`oleacc` MSAA fallback** — for legacy / owner-draw windows that expose no useful UIA tree.
-4. **Java Access Bridge** (`jab.ts` — top-level `javaTree` / `javaInvoke` / `javaSetText`) — reads and drives Java Swing/AWT (and bridged JavaFX) windows, which expose NOTHING to UIA or MSAA.
+2. **`oleacc` MSAA fallback** — for legacy / owner-draw windows that expose no useful UIA tree.
+3. **Java Access Bridge** (`jab.ts` — top-level `javaTree` / `javaInvoke` / `javaSetText`) — reads and drives Java Swing/AWT (and bridged JavaFX) windows, which expose NOTHING to UIA or MSAA.
 
 Escalation rule: stay on the `uia` facade. Drop to a lower engine (`msaaTree`, the raw `vcall`) only when you need something the facade lacks.
 
