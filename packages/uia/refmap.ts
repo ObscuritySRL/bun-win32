@@ -305,17 +305,37 @@ export function renderSnapshot(node: RefNode, depth = 0): string {
 // the two never drift. An interactive node is kept even when unnamed/ref-less (e.g. an icon-only Button).
 const INTERACTIVE_ROLES = new Set<string>([...INTERACTIVE].map((controlType) => ControlType[controlType]).filter((role): role is string => role !== undefined));
 
+// Details-view shell-column display cells that are ALWAYS READ-ONLY (system-set, never user-editable) — a CLOSED
+// positive allow-list, so pruning one can NEVER hide a WRITABLE shell field (System.ItemNameDisplay/Rating/Keywords/
+// Title/Author/Comment are editable in a metadata-rich Details view and are deliberately ABSENT here → always kept). A
+// folder with an exotic read-only column we didn't list just renders that column rather than dropping it (harmless).
+const READONLY_DISPLAY_COLUMNS = new Set(['System.DateAccessed', 'System.DateCreated', 'System.DateModified', 'System.FileExtension', 'System.ItemTypeText', 'System.Size']);
+
 /**
  * Prune ref-less structural noise from a snapshot tree before rendering — the single highest-leverage
  * token win, since the rendered tree is auto-appended after every MCP action. Bottom-up: drop a node
  * that has no ref, an empty name, no surviving children, and a non-interactive role; collapse an
- * unnamed ref-less single-child Pane/Group/Custom into that child. EVERY `[ref]` node and EVERY named
- * node is kept, so no actionable target is ever lost (the ref→Element map is untouched regardless).
- * Returns null when the whole node prunes away.
+ * unnamed ref-less single-child Pane/Group/Custom into that child. EVERY `[ref]` node and EVERY named node is kept in
+ * the rendered TEXT, so no actionable target is ever lost — the ONE exception is a Details-view ROW's READ-ONLY
+ * shell-column display cell (a leaf `Edit` under a ListItem/DataItem whose automationId is in the closed read-only
+ * column allow-list — Date/Type/Size/…, NEVER a writable shell field like System.ItemNameDisplay): it is dropped from the
+ * rendered TEXT only, yet KEEPS its ref (resolveRef still resolves it) and its Set-of-Marks entry (screenshot_marked
+ * still overlays it) — only the redundant text line is removed (see below). Returns null when the whole node prunes away.
  */
 export function pruneRefTree(node: RefNode): RefNode | null {
+  // A Details-view ROW (ListItem/DataItem) carries one leaf `Edit` per column whose automationId is a `System.*`
+  // property-system key. The READ-ONLY display columns (Date modified / Type / Size / …) are pure render noise: a busy
+  // File Open/Save dialog renders 3+ per row, bloating the snapshot past the size cap so its Open/Cancel buttons get
+  // TRUNCATED off the rendered tree (a dead-end on the "pick a file" task). Drop those from the RENDER — but ONLY under a
+  // grid row, and ONLY when the column is in the CLOSED read-only allow-list (READONLY_DISPLAY_COLUMNS). That positive
+  // allow-list is what makes this safe: a WRITABLE shell cell (System.ItemNameDisplay rename surface; System.Rating/
+  // Keywords/Title/Author metadata in a Music/Documents view) is never in the set, so it is NEVER hidden — and a
+  // property-pane metadata field (not under a row) is excluded by isRow anyway. Render-only: the ref→Element map keeps the
+  // dropped cells (resolveRef still resolves a held ref), the row keeps the filename, and the columns remain via read_table.
+  const isRow = node.role === 'ListItem' || node.role === 'DataItem';
   const children: RefNode[] = [];
   for (const child of node.children) {
+    if (isRow && child.children.length === 0 && child.role === 'Edit' && child.automationId !== undefined && READONLY_DISPLAY_COLUMNS.has(child.automationId)) continue;
     const kept = pruneRefTree(child);
     if (kept !== null) children.push(kept);
   }
