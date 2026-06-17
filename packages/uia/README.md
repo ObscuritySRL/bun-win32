@@ -1,6 +1,6 @@
 # @bun-win32/uia
 
-**Playwright for the Windows desktop — and an MCP server that hands Claude a whole Windows machine.** Find controls by **name, not pixels**, then click, type, wait, read, and assert across any native app — through the live UI Automation accessibility tree, from Bun, with **zero native dependencies**. No node-gyp, no prebuild matrix, no Appium server, no .NET.
+**Playwright for the Windows desktop — and an MCP server that hands Claude a whole Windows machine.** Target controls by **name and role, not brittle pixels**, then click, type, wait, read, and assert across any native app — through the live accessibility tree (UI Automation, with MSAA and the Java Access Bridge behind one facade), from Bun, with **zero native dependencies**. No node-gyp, no prebuild matrix, no Appium server, no .NET. And when an app exposes no tree, it reaches past it: synthetic input, window/process introspection, background capture, OCR, and image matching.
 
 **Two ways to use it:**
 

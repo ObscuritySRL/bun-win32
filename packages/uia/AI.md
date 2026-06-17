@@ -4,15 +4,16 @@ Everything below is reachable from `@bun-win32/uia` (or its unscoped alias `bun-
 
 ## What it is
 
-Playwright for Windows desktop apps. Query the live UI Automation (accessibility) tree by name / control-type / automationId, invoke controls, type, read values, wait for elements to appear, and serialize a window's tree to JSON for an LLM agent. Three engines behind one facade:
+Playwright for Windows desktop apps. Query the live UI Automation (accessibility) tree by name / control-type / automationId, invoke controls, type, read values, wait for elements to appear, and serialize a window's tree to JSON for an LLM agent. Four accessibility engines:
 
 1. **IUIAutomation COM client** (the spine) — driven through a cast-free vtable invoker. Query + invoke + patterns + cache.
 2. **Flat `uiautomationcore` C-API** — a VARIANT-free fast path (secondary; the COM path is the default).
 3. **`oleacc` MSAA fallback** — for legacy / owner-draw windows that expose no useful UIA tree.
+4. **Java Access Bridge** (`jab.ts` — top-level `javaTree` / `javaInvoke` / `javaSetText`) — reads and drives Java Swing/AWT (and bridged JavaFX) windows, which expose NOTHING to UIA or MSAA.
 
 Escalation rule: stay on the `uia` facade. Drop to a lower engine (`msaaTree`, the raw `vcall`) only when you need something the facade lacks.
 
-**More than accessibility.** The same facade drives synthetic input (`type`/`click`/`sendKeys` + raw mouse/keyboard helpers), cursor-free interaction (`invoke`/`setValue`/`postClick` — no real-cursor movement, works locked), full-screen + per-window capture, image **template matching** for surfaces with no a11y tree, native **HWND introspection** (Spy++/Winspector-style), an LLM **computer-use** adapter (Anthropic/OpenAI action sets), and a zero-dep **MCP server** — one package covering the a11y (FlaUI), pixel (nut.js/robotjs), and window-spy (Spy++) niches at once.
+**More than accessibility.** The same facade drives synthetic input (`type`/`click`/`sendKeys` + raw mouse/keyboard helpers), cursor-free interaction (`invoke`/`setValue`/`postClick` — no real-cursor movement, works locked), full-screen + per-window screenshots (with a background **Windows.Graphics.Capture** path), image **template matching** and **OCR** (Windows.Media.Ocr) for surfaces with no a11y tree, **clipboard** read/write (text / image / files), native **HWND introspection** (Spy++/Winspector-style), an LLM **computer-use** adapter (Anthropic/OpenAI action sets), and a zero-dep **MCP server** — one package covering the a11y (FlaUI), pixel (nut.js/robotjs), and window-spy (Spy++) niches at once.
 
 ## Mental model (read this first)
 

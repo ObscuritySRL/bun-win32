@@ -1,6 +1,6 @@
 # bun-uia
 
-**Playwright for Windows desktop apps.** Query the live UI Automation accessibility tree by name and role, invoke controls, type, wait for elements, and serialize a window to JSON for an LLM agent — from Bun, with **zero native dependencies**. No node-gyp, no prebuild matrix, no Appium server, no .NET.
+**Playwright for Windows desktop apps.** Drive native Windows from Bun — primarily through the accessibility tree (UI Automation, with MSAA and the Java Access Bridge behind it): find controls by name/role, invoke, type, wait for elements, and serialize a window to JSON for an LLM agent. And it reaches far past the tree — synthetic input, native window/process introspection, background screen capture, OCR, image matching, and clipboard. **Zero native dependencies** — no node-gyp, no prebuild matrix, no Appium server, no .NET.
 
 ```ts
 import { ControlType, uia } from 'bun-uia';
