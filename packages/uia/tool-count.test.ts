@@ -28,3 +28,8 @@ test('packages/bun-uia/README.md quotes the live tool counts', async () => {
   expect(readme).toContain(`**${total} policy-gated tools** (${safe} under the default \`safe\` profile; ${readonly} under \`readonly\`)`);
   expect(readme).toContain(`exposes the whole surface as ${total} policy-gated tools (${safe} under the default \`safe\` profile)`);
 });
+
+test('packages/uia/AI.md quotes the live tool counts', async () => {
+  const ai = await Bun.file(`${import.meta.dir}/AI.md`).text();
+  expect(ai).toContain(`**${total} tools** (${safe} visible under the default \`safe\` profile; ${readonly} under \`readonly\`; the ${osFs} os/fs tools need \`full\` or \`BUN_UIA_OS=1\`)`);
+});
