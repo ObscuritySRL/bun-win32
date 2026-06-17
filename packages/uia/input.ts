@@ -208,12 +208,17 @@ export function scrollWheel(x: number, y: number, clicks: number, horizontal = f
   User32.SendInput(1, buffer.ptr!, INPUT_SIZE);
 }
 
-/** Press-drag-release from one screen point to another via SendInput. Moves the real cursor. */
-export function dragTo(fromX: number, fromY: number, toX: number, toY: number): void {
+/** Interpolated real-cursor drag from one screen point to another via SendInput: SetCursorPos(from) → LEFTDOWN →
+ *  `steps` SetCursorPos moves → SetCursorPos(to) → LEFTUP. The intermediate moves each post a WM_MOUSEMOVE to the
+ *  window under the cursor, crossing the OS drag threshold (SM_CXDRAG/SM_CYDRAG, 4px) AFTER button-down and feeding
+ *  the dragstart/dragover stream — so threshold-gated drags (HTML5/Chromium drag-DROP, list reorder, slider thumb,
+ *  canvas) register, where a single from→to jump would not. */
+export function dragTo(fromX: number, fromY: number, toX: number, toY: number, steps = 16): void {
   User32.SetCursorPos(fromX, fromY);
   const down = Buffer.alloc(INPUT_SIZE);
   packMouseInput(down, 0, 0, 0, 0, MOUSEEVENTF_LEFTDOWN);
   User32.SendInput(1, down.ptr!, INPUT_SIZE);
+  for (let step = 1; step <= steps; step += 1) User32.SetCursorPos(Math.round(fromX + ((toX - fromX) * step) / steps), Math.round(fromY + ((toY - fromY) * step) / steps));
   User32.SetCursorPos(toX, toY);
   const up = Buffer.alloc(INPUT_SIZE);
   packMouseInput(up, 0, 0, 0, 0, MOUSEEVENTF_LEFTUP);
