@@ -2512,14 +2512,14 @@ const HANDLERS: Record<string, ToolHandler> = {
   },
   screenshot: async () => {
     const window = requireAttached();
+    // Gate BEFORE any capture, matching ocr/click_text: a minimized window has no live surface, yet PrintWindow returns a
+    // stale ICONIC bitmap that is non-near-uniform and would leak as a misleading image. Steer to the cursor-free restore.
+    if (isMinimized(window.hWnd)) return errorResult(minimizedCaptureSteer(window.hWnd, 'screenshot'));
     const capture = captureWindowRGB(window.hWnd);
     if (capture !== null && !isNearUniform(capture.rgb)) return imageResult(encodePNG(capture.rgb, capture.width, capture.height), `(${originNote(capture.originX, capture.originY, capture.width, capture.height)})`);
     const live = await captureWindowLiveWarm(window.hWnd);
     if (live !== null && !isNearUniform(live.rgb))
       return imageResult(encodePNG(live.rgb, live.width, live.height), `(PrintWindow was blank — Windows.Graphics.Capture live frame of the GPU/occluded surface; ${originNote(live.originX, live.originY, live.width, live.height)})`);
-    // A minimized window has no surface — both PrintWindow and WGC came back blank. Steer to the cursor-free restore
-    // BEFORE the desktop-region fallback, which would otherwise grab a useless taskbar-button sliver.
-    if (isMinimized(window.hWnd)) return errorResult(minimizedCaptureSteer(window.hWnd, 'screenshot'));
     const bounds = window.boundingRectangle;
     if (bounds.width > 0 && bounds.height > 0)
       return imageResult(
@@ -3281,11 +3281,17 @@ async function dispatch(request: JsonRpcRequest): Promise<void> {
       log(
         `audit: ${auditMode === 'off' ? 'DISABLED (BUN_UIA_AUDIT=off — explicit opt-out)' : auditMode === 'verbose' ? 'on (verbose — reads logged too)' : 'on (mutating-category calls → stderr)'}; clipboard redaction: ${redactDisabled ? 'DISABLED (BUN_UIA_REDACT=off)' : redactCustom !== undefined ? 'on (custom regex)' : 'on (built-in secret shapes)'}`,
       );
-      if (!enabledCategories.has('input') && (enabledCategories.has('os') || enabledCategories.has('fs')))
-        log('WARNING: a read-only profile has live os/fs reach (BUN_UIA_OS=1) — the agent can launch/run/read/write the filesystem while the banner reads "READ-ONLY"; withhold os/fs or raise the profile to match.');
-      const osLive = enabledCategories.has('os') || enabledCategories.has('fs');
-      const readonlyBanner = osLive ? INSTRUCTIONS_READONLY.replace('READ-ONLY under the current server policy', 'INSPECT-only for GUI but with LIVE os/fs reach (BUN_UIA_OS=1) under the current server policy') : INSTRUCTIONS_READONLY;
-      return reply({ protocolVersion, capabilities: { tools: {} }, serverInfo: SERVER_INFO, instructions: enabledCategories.has('input') ? INSTRUCTIONS : readonlyBanner });
+      // Compute reachability from the ACTUAL allowed surface — BUN_UIA_ALLOW grants a tool via toolAllowed WITHOUT ever
+      // adding to enabledCategories, so keying the honesty banner/warnings off enabledCategories would mis-tell the model it
+      // is read-only while an allow-listed click/type/read_file is live. Honesty must track what tools/list actually serves.
+      const allowedTools = TOOLS.filter(toolAllowed);
+      const actingLive = allowedTools.some((entry) => entry.category === 'input' || entry.category === 'window');
+      const osFsLive = allowedTools.some((entry) => entry.category === 'os' || entry.category === 'fs');
+      if (!actingLive && osFsLive) log('WARNING: a read-only profile has live os/fs reach — the agent can launch/run/read/write the filesystem while the banner reads "READ-ONLY"; withhold os/fs or raise the profile to match.');
+      if (actingLive && resolvedProfile === 'readonly')
+        log(`WARNING: a readonly profile exposes acting tools via BUN_UIA_ALLOW (${allowedTools.filter((entry) => entry.category === 'input' || entry.category === 'window').map((entry) => entry.name).join(',')}) while the banner reads READ-ONLY; the model is mis-told it cannot act — raise the profile or drop the allow entries.`);
+      const readonlyBanner = osFsLive ? INSTRUCTIONS_READONLY.replace('READ-ONLY under the current server policy', 'INSPECT-only for GUI but with LIVE os/fs reach under the current server policy') : INSTRUCTIONS_READONLY;
+      return reply({ protocolVersion, capabilities: { tools: {} }, serverInfo: SERVER_INFO, instructions: actingLive ? INSTRUCTIONS : readonlyBanner });
     }
     case 'notifications/initialized':
       return;
