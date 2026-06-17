@@ -7,6 +7,7 @@
 
 import { FFIType, JSCallback } from 'bun:ffi';
 
+import Shcore from '@bun-win32/shcore';
 import User32 from '@bun-win32/user32';
 
 import { Element, fromPoint } from './element';
@@ -61,8 +62,13 @@ export interface MonitorInfo {
   /** The work area (monitor minus the taskbar / app bars). */
   workArea: Rect;
   primary: boolean;
+  /** Effective DPI of this monitor (96 = 100%); needed to map element/click coordinates on a mixed-DPI rig. */
+  dpi: number;
+  /** Effective scale factor (dpi / 96): 1.0 at 96 DPI, 1.5 at 144 DPI, … */
+  scale: number;
 }
 
+const MDT_EFFECTIVE_DPI = 0x0000_0000;
 const MONITORINFOF_PRIMARY = 0x0000_0001;
 
 /** Pack a POINT (x low dword, y high dword) for the by-value WindowFromPoint argument. */
@@ -94,7 +100,10 @@ export function listMonitors(): MonitorInfo[] {
           const top = info.readInt32LE(offset + 4);
           return { x: left, y: top, width: info.readInt32LE(offset + 8) - left, height: info.readInt32LE(offset + 12) - top };
         };
-        monitors.push({ handle: hMonitor, bounds: rect(4), workArea: rect(20), primary: (info.readUInt32LE(36) & MONITORINFOF_PRIMARY) !== 0 });
+        const dpiX = Buffer.alloc(4);
+        const dpiY = Buffer.alloc(4);
+        const dpi = Shcore.GetDpiForMonitor(hMonitor, MDT_EFFECTIVE_DPI, dpiX.ptr!, dpiY.ptr!) === 0 ? dpiX.readUInt32LE(0) : 96;
+        monitors.push({ handle: hMonitor, bounds: rect(4), workArea: rect(20), primary: (info.readUInt32LE(36) & MONITORINFOF_PRIMARY) !== 0, dpi, scale: dpi / 96 });
       }
       return 1;
     },

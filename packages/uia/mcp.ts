@@ -2034,7 +2034,14 @@ const HANDLERS: Record<string, ToolHandler> = {
       const state = [isMinimized(window.hWnd) ? 'min' : '', isMaximized(window.hWnd) ? 'max' : '', window.hWnd === fg ? 'fg' : ''].filter(Boolean).join(',');
       const exe = processImagePath(window.processId).split('\\').pop() ?? '';
       const integrity = integrityLevel(window.processId);
-      const wall = integrity === 'high' || integrity === 'system' ? ` [${integrity}-integrity — UIPI wall: drivable only if YOUR host runs elevated too]` : integrity === 'low' || integrity === 'untrusted' ? ` [${integrity}-integrity]` : '';
+      // The UIPI wall is RELATIVE to THIS host: only warn of a wall isUipiWalled confirms for this host (matching the
+      // snapshot's coldTreeNote, which uses the same relative check) — an elevated host CAN drive a high-integrity target,
+      // so the static high/system warning was self-contradictory there. The integrity tag stays visible regardless.
+      const wall = isUipiWalled(window.hWnd)
+        ? ` [${integrity}-integrity — UIPI wall: outranks this host; drive it only by relaunching the host elevated]`
+        : integrity === 'high' || integrity === 'system' || integrity === 'low' || integrity === 'untrusted'
+          ? ` [${integrity}-integrity]`
+          : '';
       // The placeholder UAC leaves on the NORMAL desktop while a consent is pending — the real prompt is on the secure
       // desktop, so this window is undrivable; flag it so the agent does not attach + stall on it.
       // startsWith, not ===: the live placeholder is often the "… For Interim Dialog" variant of the class, not the bare name.
