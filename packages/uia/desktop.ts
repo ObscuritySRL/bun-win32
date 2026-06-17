@@ -8,6 +8,12 @@
 // foreign window across desktops here: switching/moving needs the UNDOCUMENTED, per-build-fragile
 // IVirtualDesktopManagerInternal (wrong vtable slot SEGFAULTS), or a human switching desktops. Detection is the
 // shippable capability; the move is the wall.
+//
+// OS WALL #2 (Windows 11 24H2/25H2, build >=26100, verified on 26200.8655): plain CoCreateInstance returns a manager
+// whose IsWindowOnCurrentVirtualDesktop/GetWindowDesktopId methods ALL yield REGDB_E_CLASSNOTREG (0x80040154) for every
+// window — parity-confirmed in .NET (PowerShell Add-Type calling the same CLSID/IID returns the identical hr). So even
+// DETECTION — not just the move — is environment-gated on recent builds; windowOnCurrentDesktop/windowDesktopId
+// correctly return null there. The slots/IID/apartment are correct; this is an OS regression, not a binding defect.
 
 import { FFIType } from 'bun:ffi';
 
