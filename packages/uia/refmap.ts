@@ -4,7 +4,7 @@
 // are valid until dispose(); re-snapshot after any action that changes the tree. Every Element
 // materialized by the walk is owned and released on dispose (the source window is NOT touched).
 
-import { AutomationElementMode, createCacheRequest, DEFAULT_CACHE_PROPERTIES } from './cache';
+import { AutomationElementMode, type CacheRequest, createCacheRequest, DEFAULT_CACHE_PROPERTIES } from './cache';
 import { ControlType, PropertyId, TreeScope } from './constants';
 import { Element } from './element';
 import { getCachedPropertyValue, getPropertyValue, type Rect, type VariantValue } from './reads';
@@ -140,11 +140,20 @@ export interface RefNode {
   enabled?: boolean;
   /** Inline dynamic-state suffix on a ref'd node, e.g. ` (on)` / ` (value="…")` / ` (42%)`. */
   state?: string;
+  /** Set when the maxNodes budget was exhausted while this node still had unwalked children — surfaced in the render
+   *  as `(… N children omitted — raise maxNodes)` so the agent knows the tree was cut, not that the children vanished. */
+  truncated?: boolean;
   children: RefNode[];
 }
 
-function walk(element: Element, depth: number, maxDepth: number, counter: { value: number }, byRef: Map<string, Element>, owned: Element[], marks: Mark[]): RefNode {
+/** A shared per-snapshot node budget threaded through both walks: `remaining` decrements on every materialized node,
+ *  `truncated` flips true the first time a parent's children are cut short. Mirrors jab.ts's walk() budget. */
+type Budget = { remaining: number; truncated: boolean };
+
+function walk(element: Element, depth: number, maxDepth: number, request: CacheRequest, budget: Budget, counter: { value: number }, byRef: Map<string, Element>, owned: Element[], marks: Mark[]): RefNode {
   // The caller owns `element` (snapshot pushed the root clone; a parent frame pushed each child before recursing).
+  // `element` arrives carrying request's Full cache — from the window's TreeScope_Element BuildUpdatedCache for the
+  // root, or from a prior firstChildCached/nextSiblingCached BuildCache navigation for every descendant.
   const controlType = element.cachedControlType;
   const name = element.cachedName;
   const bounds = element.cachedBoundingRectangle;
@@ -163,10 +172,23 @@ function walk(element: Element, depth: number, maxDepth: number, counter: { valu
     const state = cachedState(element.ptr, name);
     if (state.length > 0) node.state = state;
   }
+  // Per-PARENT, budget-aware enumeration via the cached control-view walker's BuildCache child/sibling navigation —
+  // each step marshals ONE node WITH its Full cache, and STOPS at maxNodes, so a dense 3000-sibling panel costs
+  // O(maxNodes) cross-process navigations instead of the whole-subtree BuildUpdatedCache(Subtree) that walls ~7s on a
+  // flat tree (the marshal cost is the sibling navigation, not depth — so the old maxDepth cap could not bound it).
   if (depth < maxDepth) {
-    const children = element.cachedChildren;
-    for (const child of children) owned.push(child); // own EVERY child up front so a fault mid-recursion cannot leak the not-yet-walked siblings
-    for (const child of children) node.children.push(walk(child, depth + 1, maxDepth, counter, byRef, owned, marks));
+    let child = element.firstChildCached(request);
+    while (child !== null) {
+      owned.push(child); // own each child the instant it is materialized so a fault mid-walk cannot leak it
+      if (budget.remaining <= 0) {
+        budget.truncated = true;
+        node.truncated = true; // this parent had at least one more child than the budget allowed
+        break;
+      }
+      budget.remaining -= 1;
+      node.children.push(walk(child, depth + 1, maxDepth, request, budget, counter, byRef, owned, marks));
+      child = child.nextSiblingCached(request);
+    }
   }
   return node;
 }
@@ -179,7 +201,7 @@ function walk(element: Element, depth: number, maxDepth: number, counter: { valu
  *  The CALLER owns `element` (the window / an extra root — not pushed to `owned`); every descendant this walk
  *  materializes is pushed to `owned` BEFORE recursing, so dispose() releases exactly what the snapshot created
  *  and a fault mid-recursion cannot orphan the not-yet-walked siblings. */
-function walkLive(element: Element, depth: number, maxDepth: number, counter: { value: number }, byRef: Map<string, Element>, owned: Element[], marks: Mark[]): RefNode {
+function walkLive(element: Element, depth: number, maxDepth: number, budget: Budget, counter: { value: number }, byRef: Map<string, Element>, owned: Element[], marks: Mark[]): RefNode {
   // The caller owns `element` (the window / extra root, or a child a parent frame pushed before recursing).
   const controlType = element.controlType;
   const name = element.name;
@@ -202,7 +224,15 @@ function walkLive(element: Element, depth: number, maxDepth: number, counter: { 
   if (depth < maxDepth) {
     const children = element.children;
     for (const child of children) owned.push(child); // own EVERY child up front so a fault mid-recursion cannot leak the not-yet-walked siblings
-    for (const child of children) node.children.push(walkLive(child, depth + 1, maxDepth, counter, byRef, owned, marks));
+    for (const child of children) {
+      if (budget.remaining <= 0) {
+        budget.truncated = true;
+        node.truncated = true; // remaining siblings were materialized+owned above but are not walked — they release on dispose
+        break;
+      }
+      budget.remaining -= 1;
+      node.children.push(walkLive(child, depth + 1, maxDepth, budget, counter, byRef, owned, marks));
+    }
   }
   return node;
 }
@@ -248,13 +278,16 @@ export class Snapshot {
  * the main tree (and any such extra root) is recovered via a LIVE walk instead of dropped, so the native browser
  * chrome stays visible and actionable; pass `live: true` to force that path for a known cache-hostile provider.
  * The caller disposes the Snapshot (and owns the `extraRoots` Elements it passed in). */
-export function snapshot(window: Element, options: { maxDepth?: number; extraRoots?: readonly Element[]; live?: boolean } = {}): Snapshot {
+export function snapshot(window: Element, options: { maxDepth?: number; maxNodes?: number; extraRoots?: readonly Element[]; live?: boolean } = {}): Snapshot {
   const maxDepth = options.maxDepth ?? 40;
-  const request = createCacheRequest([...DEFAULT_CACHE_PROPERTIES, ...STATE_PROPERTIES], TreeScope.TreeScope_Subtree, AutomationElementMode.Full);
-  // Heavy cross-process Chromium top-levels (e.g. Opera) deterministically FAIL BuildUpdatedCache(Subtree, Full)
-  // while still serving live reads + navigation. Default: try the one-shot cache; on failure fall back to the
-  // live walk so the native tree (browser chrome: tabs / address bar / URL) is recovered instead of dropped.
-  // `live: true` skips the cache attempt for a provider already known to be cache-hostile.
+  // The cache is ELEMENT-scoped (NOT Subtree): the budget-aware walk navigates child→sibling via the control-view
+  // walker's *BuildCache methods, each marshaling ONE node with its Full cache. The old TreeScope_Subtree forced the
+  // WHOLE subtree to marshal up front — ~7s on a 3000-sibling flat panel, and maxDepth could not bound it (the cost is
+  // sibling navigation, not depth). Per-parent BuildCache navigation makes a dense parent cost O(maxNodes), not O(N).
+  const request = createCacheRequest([...DEFAULT_CACHE_PROPERTIES, ...STATE_PROPERTIES], TreeScope.TreeScope_Element, AutomationElementMode.Full);
+  // Heavy cross-process Chromium top-levels (e.g. Opera) deterministically FAIL BuildUpdatedCache while still serving
+  // live reads + navigation. Default: try the one-shot cache; on failure fall back to the live walk so the native tree
+  // (browser chrome: tabs / address bar / URL) is recovered instead of dropped. `live: true` skips the cache attempt.
   const useLive = options.live === true;
   const cached = useLive ? window : window.buildUpdatedCache(request);
   const mainOk = !useLive && cached.ptr !== window.ptr;
@@ -262,19 +295,21 @@ export function snapshot(window: Element, options: { maxDepth?: number; extraRoo
   const owned: Element[] = [];
   const marks: Mark[] = [];
   const counter = { value: 1 };
+  const budget: Budget = { remaining: options.maxNodes ?? Number.POSITIVE_INFINITY, truncated: false };
   try {
     if (mainOk) owned.push(cached); // snapshot owns the cached clone; walkLive's root is the caller's window (not owned)
-    const tree = mainOk ? walk(cached, 0, maxDepth, counter, byRef, owned, marks) : walkLive(window, 0, maxDepth, counter, byRef, owned, marks);
+    const tree = mainOk ? walk(cached, 0, maxDepth, request, budget, counter, byRef, owned, marks) : walkLive(window, 0, maxDepth, budget, counter, byRef, owned, marks);
     for (const extra of options.extraRoots ?? []) {
       try {
         const cachedExtra = extra.buildUpdatedCache(request);
         if (cachedExtra.ptr !== extra.ptr) owned.push(cachedExtra); // snapshot owns the cached clone; the live path's root is the caller's extra (not owned)
-        const subtree = cachedExtra.ptr !== extra.ptr ? walk(cachedExtra, 1, maxDepth, counter, byRef, owned, marks) : walkLive(extra, 1, maxDepth, counter, byRef, owned, marks); // a render widget that refuses the cache still walks live
+        const subtree = cachedExtra.ptr !== extra.ptr ? walk(cachedExtra, 1, maxDepth, request, budget, counter, byRef, owned, marks) : walkLive(extra, 1, maxDepth, budget, counter, byRef, owned, marks); // a render widget that refuses the cache still walks live
         if (subtree.children.length > 0 || subtree.ref !== undefined) tree.children.push(subtree); // skip an empty render widget
       } catch {
         // a render widget can be mid-navigation — its absence must not fail the whole snapshot
       }
     }
+    if (budget.truncated) tree.truncated = true; // surface a global cut at the root so renderSnapshot's root trailer fires even if the deepest cut was nested
     return new Snapshot(tree, marks, byRef, owned);
   } catch (error) {
     for (const element of owned) element.release(); // owned = every node snapshot materialized (the cached clones it pushed + all children pushed before recursion); window / extraRoots stay caller-owned
@@ -298,6 +333,9 @@ export function renderSnapshot(node: RefNode, depth = 0): string {
   const offscreen = node.ref !== undefined && node.bounds === undefined ? ' (off-screen — no click point; use a pattern verb)' : '';
   let out = `${indent}- ${node.role}${label}${ref}${id}${node.state ?? ''}${disabled}${offscreen}`;
   for (const child of node.children) out += `\n${renderSnapshot(child, depth + 1)}`;
+  // A truncated parent had more children than the maxNodes budget allowed — tell the agent the tree was CUT (not that the
+  // children vanished), mirroring jab.ts's '(… tree truncated)' so the same recovery (raise maxNodes / scope with root) reads.
+  if (node.truncated) out += `\n${indent}  (… ${node.children.length}+ children shown — more omitted; raise maxNodes or scope with desktop_snapshot {root:"<a node name above>"})`;
   return out;
 }
 
@@ -348,6 +386,7 @@ export function pruneRefTree(node: RefNode): RefNode | null {
   if (node.bounds !== undefined) pruned.bounds = node.bounds;
   if (node.enabled !== undefined) pruned.enabled = node.enabled;
   if (node.state !== undefined) pruned.state = node.state;
+  if (node.truncated) pruned.truncated = true; // keep the budget-cut marker so the render trailer still fires after pruning
   return pruned;
 }
 

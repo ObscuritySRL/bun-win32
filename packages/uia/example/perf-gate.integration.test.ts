@@ -6,6 +6,10 @@
  * the measured-stable medians so they catch a regression, not machine jitter — plus that each TIGHT-LOOP hot
  * closure DFG-compiled (a deopt is itself a regression). Run it next to slot-gate before a release.
  *
+ * NOTE: this gate covers ONLY Calculator's small tree — it does NOT exercise a HIGH-DENSITY (flat) window with
+ * thousands of non-virtualized sibling controls, which used to wall the snapshot ~7s with no escape hatch. That
+ * hazard is now gated by dense-tree-budget.integration.test.ts (maxNodes budget + truncation); run both before a release.
+ *
  * Ceilings (generous headroom, JSC on this repo's pinned Bun; the live numbers print so drift is visible):
  *  - single cached property read (in-proc)  < 3 µs   (vcall dispatch into a prefetched object; ~0.5 µs here)
  *  - agent-grounding tree build             < 150 ms (a cross-process Subtree BuildCache walk; ~45–60 ms here)

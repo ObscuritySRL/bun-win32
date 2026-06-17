@@ -346,6 +346,29 @@ export class Element {
     return this.findAll({}, TreeScope.TreeScope_Children);
   }
 
+  /** The control-view FIRST child prefetched through `request` in ONE round-trip (GetFirstChildElementBuildCache on
+   *  the cached control-view walker), or null at a leaf. The returned Element arrives with the request's Full cache —
+   *  the budget-bounded snapshot walk navigates a dense parent O(maxNodes) siblings at a time instead of marshaling
+   *  the whole subtree up front. The caller owns the returned Element. */
+  firstChildCached(request: CacheRequest): Element | null {
+    const walker = controlViewWalker();
+    if (walker === 0n) return null;
+    if (vcall(walker, SLOT.GetFirstChildElementBuildCache, [FFIType.u64, FFIType.u64, FFIType.ptr], [this.ptr, request.ptr, scratch8.ptr!]) !== S_OK) return null;
+    const pointer = scratch8.readBigUInt64LE(0);
+    return pointer === 0n ? null : new Element(pointer);
+  }
+
+  /** The control-view NEXT sibling prefetched through `request` in ONE round-trip (GetNextSiblingElementBuildCache on
+   *  the cached control-view walker), or null at the last sibling. Pairs with firstChildCached for the budget-bounded
+   *  snapshot enumeration. The caller owns the returned Element. */
+  nextSiblingCached(request: CacheRequest): Element | null {
+    const walker = controlViewWalker();
+    if (walker === 0n) return null;
+    if (vcall(walker, SLOT.GetNextSiblingElementBuildCache, [FFIType.u64, FFIType.u64, FFIType.ptr], [this.ptr, request.ptr, scratch8.ptr!]) !== S_OK) return null;
+    const pointer = scratch8.readBigUInt64LE(0);
+    return pointer === 0n ? null : new Element(pointer);
+  }
+
   /** The control-view parent, or null at a root. The caller owns the returned Element. */
   get parent(): Element | null {
     const walker = controlViewWalker();

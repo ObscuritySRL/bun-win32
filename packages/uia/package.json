@@ -116,6 +116,7 @@
     "example:condition-perf": "bun ./example/condition-perf.integration.test.ts",
     "example:copy-secret-redacted-not-journaled": "bun ./example/copy-secret-redacted-not-journaled.integration.test.ts",
     "example:cursor-free-copy": "bun ./example/cursor-free-copy.integration.test.ts",
+    "example:dense-tree-budget": "bun ./example/dense-tree-budget.integration.test.ts",
     "example:desktop-mcp": "bun ./example/desktop-mcp.ts",
     "example:drive-in-the-dark": "bun ./example/drive-in-the-dark.ts",
     "example:element-capture-occlusion": "bun ./example/element-capture-occlusion.integration.test.ts",
