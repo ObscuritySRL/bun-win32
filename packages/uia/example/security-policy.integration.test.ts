@@ -134,6 +134,30 @@ try {
   const optErr = optOut.stderr();
   assert(!optErr.includes('[bun-uia-audit]'), 'BUN_UIA_AUDIT=off emits NO audit lines');
   assert(/audit: DISABLED \(BUN_UIA_AUDIT=off — explicit opt-out\)/.test(optErr), 'startup reports BUN_UIA_AUDIT=off as the EXPLICIT opt-out (never silent)');
+
+  // 4 — profile resolution is FAIL-CLOSED: a typo'd value drops to readonly (no acting tools) and warns loudly; a
+  //     whitespace-padded valid value trims to its real profile. An unrecognized profile must NEVER fall through to
+  //     the acting `safe` surface (that would hand click/type/set_value to a deployer who meant readonly).
+  const acting = new Set(['click', 'type', 'set_value']);
+  const typo = spawnServer({ BUN_UIA_PROFILE: 'raedonly' }); // a typo of `readonly`
+  const padded = spawnServer({ BUN_UIA_PROFILE: ' readonly ' }); // leading/trailing whitespace on a valid value
+  try {
+    await typo.call('initialize', init);
+    await padded.call('initialize', init);
+    const typoTools = ((await typo.call('tools/list', {})).result?.tools ?? []).map((tool) => tool.name);
+    const paddedTools = ((await padded.call('tools/list', {})).result?.tools ?? []).map((tool) => tool.name);
+    assert(!typoTools.some((name) => acting.has(name)), 'a typo profile (raedonly) EXPOSES no acting tools (fail-closed to readonly, not safe)');
+    assert(typoTools.length === roList.result?.tools?.length, 'a typo profile resolves to the SAME tool count as readonly');
+    const typoClick = await typo.call('tools/call', { name: 'click', arguments: { ref: 'e1' } });
+    assert(typoClick.result?.isError === true && /disabled by the server policy/.test(textOf(typoClick)), 'a typo profile REFUSES a click call (policy isError), not just hides it');
+    await Bun.sleep(150);
+    assert(/is not a recognized profile.*FAIL-CLOSED to readonly/s.test(typo.stderr()), 'a typo profile emits the loud unrecognized-profile WARNING at startup');
+    assert(/profile: readonly →/.test(typo.stderr()), 'the startup log reports the RESOLVED profile (readonly), never echoing the typo as valid');
+    assert(!paddedTools.some((name) => acting.has(name)) && paddedTools.length === roList.result?.tools?.length, 'a whitespace-padded valid profile (" readonly ") TRIMS to readonly, not safe');
+  } finally {
+    typo.kill();
+    padded.kill();
+  }
 } finally {
   safe.kill();
   readonly.kill();

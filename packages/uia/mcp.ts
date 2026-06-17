@@ -222,7 +222,14 @@ function isUipiWalled(hWnd: bigint): boolean {
   }
 }
 
-const enabledCategories = new Set<ToolCategory>(PROFILES[(Bun.env.BUN_UIA_PROFILE ?? 'safe').toLowerCase()] ?? PROFILES.safe);
+// Resolve the deployer profile FAIL-CLOSED: an unset value defaults to `safe`, but an UNRECOGNIZED one (a typo like
+// `raedonly`, stray whitespace) must NOT silently fall through to the acting `safe` surface — that hands a write-capable
+// agent (click/type/set_value) to a deployer who meant `readonly`. Trim + lowercase, then on a miss drop to the
+// most-restrictive `readonly` and warn loudly at startup so the misconfiguration is visible, never silent.
+const requestedProfile = (Bun.env.BUN_UIA_PROFILE ?? 'safe').trim().toLowerCase();
+const profileKnown = requestedProfile in PROFILES;
+const resolvedProfile = profileKnown ? requestedProfile : 'readonly';
+const enabledCategories = new Set<ToolCategory>(PROFILES[resolvedProfile]);
 if (Bun.env.BUN_UIA_OS === '1') {
   enabledCategories.add('os');
   enabledCategories.add('fs');
@@ -1095,8 +1102,10 @@ function act(element: Element, action: string, text: string | undefined, submit 
   if (action === 'read') {
     if (element.isPassword) return 'value: (password — withheld)';
     const content = element.value || element.text(); // NOT element.name — returning the label dressed as `value:` is a silent wrong read
+    // The control's body is on-screen content (an editable field where a human pastes API keys, or a doc planting
+    // "ignore previous instructions") — route it through the SAME redact+fence boundary read_clipboard/ocr enforce.
     return content.length > 0
-      ? `value: ${JSON.stringify(capText(content))}`
+      ? fenceUntrusted(`value: ${JSON.stringify(capText(redactSecrets(content)))}`, 'on-screen text')
       : `(no readable value — control name is ${JSON.stringify(element.name)}; it may be empty or expose no Value/Text pattern — try inspect_element {ref} or read_table)`;
   }
   if (ACTIONABILITY_GATED.has(action)) assertActionable(element, action); // Playwright-class enabled gate before the mutating verb actually fires
@@ -2546,7 +2555,9 @@ const HANDLERS: Record<string, ToolHandler> = {
     const isPassword = element.isPassword; // gate EVERY secret-bearing field (value + TextPattern body) — a leaked password can't be un-streamed
     const value = isPassword ? '' : element.value;
     if (isPassword) lines.push('value: (password — withheld)');
-    else if (value.length > 0) lines.push(`value: ${JSON.stringify(value)}`);
+    // The ValuePattern value is on-screen content (an editable field's body — a pasted API key, or a planted
+    // "ignore previous instructions") — give it the IDENTICAL redact+fence treatment the TextPattern body below gets.
+    else if (value.length > 0) lines.push(fenceUntrusted(`value: ${JSON.stringify(redactSecrets(value))}`, 'on-screen text'));
     if (element.toggleState >= 0) lines.push(`toggleState: ${element.toggleState} (0=off,1=on,2=indeterminate)`);
     if (element.expandCollapseState >= 0) lines.push(`expandCollapseState: ${element.expandCollapseState} (0=collapsed,1=expanded,2=partial,3=leaf)`);
     if (element.isSelected) lines.push('selected: true');
@@ -3207,8 +3218,10 @@ async function dispatch(request: JsonRpcRequest): Promise<void> {
       const requested = record(request.params).protocolVersion;
       const protocolVersion = typeof requested === 'string' && SUPPORTED_VERSIONS.has(requested) ? requested : PROTOCOL_VERSION;
       uia.initialize();
+      if (!profileKnown)
+        log(`WARNING: BUN_UIA_PROFILE=${JSON.stringify(Bun.env.BUN_UIA_PROFILE ?? '')} is not a recognized profile (readonly|safe|full) — falling back FAIL-CLOSED to readonly. Fix the value to grant acting tools.`);
       log(
-        `profile: ${(Bun.env.BUN_UIA_PROFILE ?? 'safe').toLowerCase()} → categories {${[...enabledCategories].join(',')}}; ${TOOLS.filter(toolAllowed).length}/${TOOLS.length} tools enabled${tracePath !== undefined ? `; trace → ${tracePath}${traceSnapshots ? ` (+snapshots/screenshots → ${traceArtifactDir})` : ''}` : ''}`,
+        `profile: ${resolvedProfile} → categories {${[...enabledCategories].join(',')}}; ${TOOLS.filter(toolAllowed).length}/${TOOLS.length} tools enabled${tracePath !== undefined ? `; trace → ${tracePath}${traceSnapshots ? ` (+snapshots/screenshots → ${traceArtifactDir})` : ''}` : ''}`,
       );
       // Report the security floor so a deployer's forensic-trace + redaction assumptions are auditable at startup: the
       // audit trail is default-on (BUN_UIA_AUDIT=off is the EXPLICIT opt-out, never silent), clipboard redaction is
