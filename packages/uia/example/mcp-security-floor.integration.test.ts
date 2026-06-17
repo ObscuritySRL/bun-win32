@@ -7,7 +7,8 @@
  *   2. CLIPBOARD LEAST-PRIVILEGE: read_clipboard is category 'input' (NOT 'read'), so the readonly profile does NOT
  *      expose it — a least-privilege agent cannot exfiltrate the global clipboard (passwords / 2FA / API keys).
  *   3. REDACTION: under an acting profile, read_clipboard masks a planted secret shape (an AKIA… key) instead of
- *      returning it verbatim, and fences the result as UNTRUSTED content (prompt-injection boundary).
+ *      returning it verbatim, and fences the result as UNTRUSTED content (prompt-injection boundary). copy/cut — which
+ *      extract an app's text the same way — fence their returned text identically (no UNFENCED captured-text return).
  *   4. OS/READONLY MISMATCH: readonly + BUN_UIA_OS=1 serves the ACTING instructions (not the READ-ONLY banner), so the
  *      model is never told it is read-only while run_program/write_file are live.
  *
@@ -110,6 +111,23 @@ try {
   assert(!err.includes(SECRET) && /<\d+ chars>/.test(err), 'the audit line MASKS the secret-bearing set_clipboard `text` arg (length only), never logging it verbatim');
 } finally {
   safe.kill();
+}
+
+// 3b — COPY/CUT FENCE PARITY: copy/cut extract an app's text the same as read_clipboard (often the ONLY way to pull a
+// page body from an app with no a11y tree), so their returned text MUST carry the same ⚠ UNTRUSTED data-boundary — a
+// copied document carrying "SYSTEM: ignore prior instructions" is content, not a command. Asserting the handler bodies
+// (not a live GUI) keeps this regression-proof: every copy/cut site that returns captured text routes it through the
+// fence, never bare textResult(capText(redactSecrets(x))). (The live byte-for-byte proof drives Notepad in .scratch.)
+{
+  const mcpSource = await Bun.file(`${import.meta.dir}/../mcp.ts`).text();
+  const copyBody = mcpSource.slice(mcpSource.indexOf('\n  copy: '), mcpSource.indexOf('\n  cut: '));
+  const cutBody = mcpSource.slice(mcpSource.indexOf('\n  cut: '), mcpSource.indexOf('\n  launch_app: '));
+  const fenceMarker = '⚠ UNTRUSTED';
+  const bareReturn = /return textResult\(capText\(redactSecrets\([^)]*\)\)\)/; // redacted but UNFENCED — the leak the fix closes
+  assert(!bareReturn.test(copyBody), 'copy never returns capText(redactSecrets(x)) UNFENCED — every captured-text return carries the untrusted boundary');
+  assert(!bareReturn.test(cutBody), 'cut never returns capText(redactSecrets(x)) UNFENCED — every captured-text return carries the untrusted boundary');
+  assert(copyBody.includes('fenceUntrusted'), 'copy fences its returned text via fenceUntrusted(), matching read_clipboard on byte-identical content');
+  assert(cutBody.includes(fenceMarker), 'cut fences its returned/echoed text (⚠ UNTRUSTED data boundary), matching read_clipboard');
 }
 
 // 2 — readonly profile must NOT expose read_clipboard (it is category 'input' now, not 'read').
@@ -216,5 +234,9 @@ try {
   osSecret.kill();
 }
 
-console.log(failures === 0 ? '\nPASS — audit trail on (calls AND policy-refusals), clipboard least-privilege + redacted + fenced, readonly+OS instructions consistent, thrown-error text un-prefixed, inline command-line credentials masked everywhere.' : `\nFAILED — ${failures} assertion(s)`);
+console.log(
+  failures === 0
+    ? '\nPASS — audit trail on (calls AND policy-refusals), clipboard least-privilege + redacted + fenced, readonly+OS instructions consistent, thrown-error text un-prefixed, inline command-line credentials masked everywhere.'
+    : `\nFAILED — ${failures} assertion(s)`,
+);
 process.exit(failures === 0 ? 0 : 1);
