@@ -1480,7 +1480,7 @@ const TOOLS: McpTool[] = [
     name: 'scroll',
     category: 'input',
     description:
-      'Scroll a control (cursor-free; works on a locked/background/minimized window). direction up/down/left/right scrolls the nearest ScrollPattern container by `amount` small steps (or a posted wheel on a ScrollPattern-less own-HWND control). direction top/bottom jumps to the start/end, page-up/page-down/page-left/page-right move one page (×`amount`) — these need a ScrollPattern. `to` (0-100) jumps to that percent (vertical unless direction is left/right). Without a direction or `to`, scrolls the ref into view via the ScrollItem pattern.',
+      "Scroll a control (cursor-free; works on a locked/background/minimized window). direction up/down/left/right scrolls the nearest usable ScrollPattern container by `amount` small steps; with NO usable ScrollPattern it posts a wheel cursor-free — to a classic ScrollPattern-less own-HWND control (ListView/Edit/TreeView), OR to a Chromium/Electron web page whose ScrollPattern FALSELY reports not-scrollable (the wheel goes to the page's browser host window — this is how you scroll a browser/VS Code/Discord page). direction top/bottom jumps to the start/end, page-up/page-down/page-left/page-right move one page (×`amount`) — these need a GENUINELY scrollable ScrollPattern (a Chromium page is refused here; use a directional scroll instead). `to` (0-100) jumps to that percent (vertical unless direction is left/right). Without a direction or `to`, scrolls the ref into view via the ScrollItem pattern.",
     inputSchema: {
       type: 'object',
       properties: {
@@ -2321,11 +2321,15 @@ const HANDLERS: Record<string, ToolHandler> = {
     // Scroll-to-position (cursor-free UIA ScrollPattern): jump to top/bottom, page by a LargeIncrement, or to an explicit
     // percent — the one-call "go to the top/bottom of this long list/log/doc" an incremental small-step loop can't give.
     if (typeof args.to === 'number' || direction === 'top' || direction === 'bottom' || direction === 'page-up' || direction === 'page-down' || direction === 'page-left' || direction === 'page-right') {
-      if (element.scrollInfo === null)
-        return withSnapshot(
-          `${target} has no ScrollPattern, so it cannot scroll-to-position — use a directional scroll {direction:up|down|left|right} (which also posts a wheel to a classic own-HWND control), or scroll {ref} alone to bring a ref into view`,
-        );
       const horizontal = direction === 'left' || direction === 'right' || direction === 'page-left' || direction === 'page-right';
+      const positionInfo = element.scrollInfo;
+      // Require a GENUINELY scrollable ScrollPattern in this axis — Chromium/Electron report a ScrollPattern that says
+      // not-scrollable, so a position jump would silently no-op + falsely report success. Steer to the directional wheel
+      // scroll (which DOES move a Chromium page) instead of pretending the jump worked.
+      if (positionInfo === null || (horizontal ? !positionInfo.horizontallyScrollable : !positionInfo.verticallyScrollable))
+        return withSnapshot(
+          `${target} has no usable ScrollPattern for a position jump in this axis (a Chromium/Electron page ALWAYS reports its ScrollPattern not-scrollable; a short native list reports it when content already fits) — a jump would silently no-op, so use a directional scroll {direction:up|down|left|right} instead (cursor-free: posts a wheel to a classic own-HWND control OR a Chromium page), or scroll {ref} alone to bring a ref into view`,
+        );
       if (typeof args.to === 'number') {
         const percent = Math.max(0, Math.min(100, args.to));
         element.setScrollPercent(horizontal ? percent : NoScroll, horizontal ? NoScroll : percent);
@@ -2342,9 +2346,12 @@ const HANDLERS: Record<string, ToolHandler> = {
     }
     if (direction === 'up' || direction === 'down' || direction === 'left' || direction === 'right') {
       const amount = typeof args.amount === 'number' ? args.amount : 3;
+      const horizontal = direction === 'left' || direction === 'right';
       const info = element.scrollInfo;
-      if (info !== null) {
-        const horizontal = direction === 'left' || direction === 'right';
+      // Use ScrollPattern ONLY when it reports actually scrollable in THIS axis. Chromium/Electron expose a ScrollPattern
+      // that falsely says verticallyScrollable:false on a tall page, so an unguarded element.scroll() silently no-ops and
+      // FALSELY reports "scrolled" — gate on the flag and fall through to a posted wheel instead.
+      if (info !== null && (horizontal ? info.horizontallyScrollable : info.verticallyScrollable)) {
         const step = direction === 'up' || direction === 'left' ? ScrollAmount.SmallDecrement : ScrollAmount.SmallIncrement;
         for (let count = 0; count < Math.max(1, amount); count += 1) element.scroll(horizontal ? step : ScrollAmount.NoAmount, horizontal ? ScrollAmount.NoAmount : step);
         return withSnapshot(`scrolled ${target} ${direction} ${amount}`);
@@ -2352,12 +2359,13 @@ const HANDLERS: Record<string, ToolHandler> = {
       const bounds = element.boundingRectangle;
       const centerX = bounds.x + Math.floor(bounds.width / 2);
       const centerY = bounds.y + Math.floor(bounds.height / 2);
-      // No ScrollPattern — for a classic control with its OWN HWND, a posted wheel scrolls it CURSOR-FREE (works
-      // minimized/background/locked), the path a ScrollPattern-less ListView/Edit/TreeView needs: WM_MOUSEWHEEL for
-      // up/down, WM_MOUSEHWHEEL for left/right. NOT the ownerHwnd ancestor — posting the wheel to the parent (e.g. the
-      // taskbar) would scroll the WRONG window while PostMessage still returns success (a false "scrolled" report). With
-      // no own HWND it falls to a UIA-ScrollPattern ANCESTOR via scrollAt, then the honest "no scrollable container".
-      const handle = element.nativeWindowHandle;
+      // No USABLE ScrollPattern — post a wheel CURSOR-FREE to the element's OWN HWND (a classic ScrollPattern-less
+      // ListView/Edit/TreeView, works minimized/background/locked), or for a Chromium/Electron web fragment (no own HWND)
+      // to its browser HOST window (chromiumHostHandle — verified: a posted WM_MOUSEWHEEL there scrolls the page,
+      // occlusion-correct, no cursor). NOT an arbitrary ownerHwnd ancestor — posting the wheel to the parent (e.g. the
+      // taskbar) would scroll the WRONG window while PostMessage still returns success. Else a UIA-ScrollPattern ANCESTOR
+      // via scrollAt, then the honest "no scrollable container".
+      const handle = element.nativeWindowHandle !== 0n ? element.nativeWindowHandle : element.chromiumHostHandle();
       const notches = direction === 'up' || direction === 'left' ? -Math.max(1, amount) : Math.max(1, amount); // wheel: +up/-down; hwheel: +right/-left
       if ((direction === 'up' || direction === 'down') && handle !== 0n && postWheel(handle, centerX, centerY, direction === 'up' ? Math.max(1, amount) : -Math.max(1, amount)))
         return withSnapshot(`scrolled ${target} ${direction} ${amount} (posted wheel, cursor-free)`);

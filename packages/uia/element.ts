@@ -207,6 +207,29 @@ export class Element {
     return getHandle(this.ptr, SLOT.get_CurrentNativeWindowHandle);
   }
 
+  /** The browser/host window handle of the Chromium/Electron render surface this element lives in, or 0n if it is not
+   *  Chromium web content. Walks self → ancestors to the first element that owns a window and returns it ONLY when that
+   *  window's class is a Chromium host (Chrome_RenderWidgetHostHWND / Chrome_WidgetWin_1). This is the cursor-free
+   *  wheel-scroll target for a web page, whose own UIA ScrollPattern falsely reports not-scrollable; for any other
+   *  control it returns 0n so callers fall back to their normal path. The caller does NOT own any returned handle. */
+  chromiumHostHandle(): bigint {
+    let node: Element | null = this;
+    for (let depth = 0; node !== null && depth < 32; depth += 1) {
+      const handle = node.nativeWindowHandle;
+      if (handle !== 0n) {
+        const buffer = Buffer.alloc(512);
+        const length = User32.GetClassNameW(handle, buffer.ptr!, 256);
+        const className = length > 0 ? buffer.subarray(0, length * 2).toString('utf16le') : '';
+        if (node !== this) node.release();
+        return className === 'Chrome_RenderWidgetHostHWND' || className === 'Chrome_WidgetWin_1' ? handle : 0n;
+      }
+      const parent: Element | null = node.parent;
+      if (node !== this) node.release();
+      node = parent;
+    }
+    return 0n;
+  }
+
   /** A guaranteed-hittable point inside the element (UIA GetClickablePoint), or null if it has none. */
   get clickablePoint(): { x: number; y: number } | null {
     const point = Buffer.alloc(8); // POINT { LONG x, LONG y }

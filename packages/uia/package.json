@@ -107,6 +107,7 @@
     "example:attach-by-class": "bun ./example/attach-by-class.integration.test.ts",
     "example:automate-calculator": "bun ./example/automate-calculator.ts",
     "example:benchmark": "bun ./example/benchmark.ts",
+    "example:chromium-scroll": "bun ./example/chromium-scroll.integration.test.ts",
     "example:cold-tree-note": "bun ./example/cold-tree-note.integration.test.ts",
     "example:computer-use": "bun ./example/computer-use.ts",
     "example:condition-perf": "bun ./example/condition-perf.integration.test.ts",
