@@ -79,3 +79,7 @@ packages/all/example/nul
 packages/all/example/.train.*
 packages/all/replay-2026-*/
 packages/all/.triage-logs/
+
+# Local-only dev docs — never publish
+CLAUDE-FABLE-5.md
+UIA_PROMPT_4.md
