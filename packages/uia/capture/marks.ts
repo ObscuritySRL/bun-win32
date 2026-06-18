@@ -5,10 +5,10 @@
 // (no terminal-engine dependency); marks are offset from virtual-screen bounds into window-local pixels.
 
 import { encodePNG } from './png';
-import type { Mark, Snapshot } from './refmap';
-import type { Rect } from './reads';
-import type { Window } from './element';
-import { captureWindowRGB } from './window';
+import type { Mark, Snapshot } from '../element/refmap';
+import type { Rect } from '../com/reads';
+import type { Window } from '../element/element';
+import { captureWindowRGB } from '../element/window';
 
 // Each digit is five rows of three columns; bit 2 = left, bit 1 = middle, bit 0 = right.
 const DIGITS: Record<string, readonly number[]> = {

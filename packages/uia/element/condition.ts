@@ -7,9 +7,9 @@ import { FFIType } from 'bun:ffi';
 
 import Oleaut32 from '@bun-win32/oleaut32';
 
-import { trueCondition } from './automation';
-import { comRelease, vcall } from './com';
-import { ControlType, PropertyId, S_OK, SLOT, VT_BSTR, VT_I4 } from './constants';
+import { trueCondition } from '../com/automation';
+import { comRelease, vcall } from '../com/com';
+import { ControlType, PropertyId, S_OK, SLOT, VT_BSTR, VT_I4 } from '../com/constants';
 
 export interface Selector {
   automationId?: string;

@@ -14,9 +14,9 @@
  */
 import Kernel32 from '@bun-win32/kernel32';
 import User32 from '@bun-win32/user32';
-import { ControlType } from '../constants';
-import { fromHandle } from '../element';
-import { postText, setControlText } from '../input';
+import { ControlType } from '../com/constants';
+import { fromHandle } from '../element/element';
+import { postText, setControlText } from '../input/input';
 
 const WS_OVERLAPPEDWINDOW = 0x00cf_0000;
 const WS_VISIBLE = 0x1000_0000;

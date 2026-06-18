@@ -1,7 +1,7 @@
 import { expect, test } from 'bun:test';
 
-import { formatNoMatch, selectorToString } from './condition';
-import { ControlType } from './constants';
+import { formatNoMatch, selectorToString } from '../element/condition';
+import { ControlType } from '../com/constants';
 
 test('selectorToString renders each field', () => {
   expect(selectorToString({ controlType: ControlType.Button, name: 'OK' })).toBe('{ controlType: Button, name: "OK" }');

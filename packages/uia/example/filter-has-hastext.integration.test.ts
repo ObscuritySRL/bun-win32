@@ -22,7 +22,7 @@
  */
 import { automation, comRelease, compileCondition, ControlType, matches, selectorToString, uia, windowProcessId } from '@bun-win32/uia';
 
-import { needsSubtreeFilter } from '../condition'; // not yet re-exported from index (coordinator: add to the condition export); imported locally so this harness runs now
+import { needsSubtreeFilter } from '../element/condition'; // not yet re-exported from index (coordinator: add to the condition export); imported locally so this harness runs now
 
 let failures = 0;
 function assert(condition: boolean, message: string): void {

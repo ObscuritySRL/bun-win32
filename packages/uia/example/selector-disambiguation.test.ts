@@ -15,8 +15,8 @@
  * bun test is broken repo-wide — runnable script:
  * Run: bun run example/selector-disambiguation.test.ts
  */
-import { ControlType } from '../constants';
-import { type ElementProperties, matches, pickIndexed, type Selector, selectorToString } from '../condition';
+import { ControlType } from '../com/constants';
+import { type ElementProperties, matches, pickIndexed, type Selector, selectorToString } from '../element/condition';
 
 let failures = 0;
 function assert(condition: boolean, message: string): void {

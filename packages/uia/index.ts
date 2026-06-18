@@ -1,22 +1,22 @@
-import { execute } from './agent';
-import { initialize, uninitialize } from './automation';
-import { copy, paste, readClipboard, readClipboardFiles, readClipboardImage, writeClipboard, writeClipboardFiles, writeClipboardImage } from './clipboard';
-import { dispatch } from './computer';
-import { elementAt, listMonitors, postClickAt, scrollAt } from './coords';
-import { diffTrees } from './diff';
-import { attach, focused, fromPoint, launch, root } from './element';
-import { listProcesses, waitForProcess, waitForWindow, waitForWindowGone, watchWindows } from './events';
-import { waitForIdle } from './idle';
-import { clickAt, isKeyDown, postKey, postText, sendKeys, setControlText, type } from './input';
-import { locateOnScreen } from './match';
-import { msaaTree } from './msaa';
-import { ocrBitmap, ocrScreen, ocrWindow } from './ocr';
-import { snapshot } from './refmap';
-import { captureScreen, pixelColor, screenshotScreen } from './screen';
-import { windowTree } from './spy';
-import { serialize } from './tree';
-import { captureWindowLive } from './wgc';
-import { listWindows } from './window';
+import { execute } from './agent/agent';
+import { initialize, uninitialize } from './com/automation';
+import { copy, paste, readClipboard, readClipboardFiles, readClipboardImage, writeClipboard, writeClipboardFiles, writeClipboardImage } from './agent/clipboard';
+import { dispatch } from './input/computer';
+import { elementAt, listMonitors, postClickAt, scrollAt } from './input/coords';
+import { diffTrees } from './element/diff';
+import { attach, focused, fromPoint, launch, root } from './element/element';
+import { listProcesses, waitForProcess, waitForWindow, waitForWindowGone, watchWindows } from './desktop/events';
+import { waitForIdle } from './desktop/idle';
+import { clickAt, isKeyDown, postKey, postText, sendKeys, setControlText, type } from './input/input';
+import { locateOnScreen } from './capture/match';
+import { msaaTree } from './element/msaa';
+import { ocrBitmap, ocrScreen, ocrWindow } from './capture/ocr';
+import { snapshot } from './element/refmap';
+import { captureScreen, pixelColor, screenshotScreen } from './capture/screen';
+import { windowTree } from './desktop/spy';
+import { serialize } from './element/tree';
+import { captureWindowLive } from './capture/wgc';
+import { listWindows } from './element/window';
 
 /** The Playwright-for-desktop facade: attach to a window, then find/waitFor/act/serialize. */
 export const uia = {
@@ -70,14 +70,14 @@ export const uia = {
   writeClipboardImage,
 };
 
-export { type AgentAction, type AgentActionResult, AGENT_TOOLS, execute, groundingTree, performAgentAction } from './agent';
-export { automation, initialize, trueCondition, uninitialize } from './automation';
-export { AutomationElementMode, CacheRequest, createCacheRequest, DEFAULT_CACHE_PROPERTIES } from './cache';
-export { clipboardSequence, copy, paste, readClipboard, readClipboardFiles, readClipboardImage, writeClipboard, writeClipboardFiles, writeClipboardImage } from './clipboard';
-export { comRelease, guid, hresult, vcall } from './com';
-export { type ComputerAction, type ComputerResult, dispatch, type DispatchOptions, fromCuaAction, normalizeKey } from './computer';
-export { type CompiledCondition, compileCondition, type ElementProperties, formatNoMatch, matches, needsSubtreeFilter, pickIndexed, selectorToString, type Selector } from './condition';
-export { ControlType, PatternId, PropertyConditionFlags, PropertyId, SLOT, TreeScope } from './constants';
+export { type AgentAction, type AgentActionResult, AGENT_TOOLS, execute, groundingTree, performAgentAction } from './agent/agent';
+export { automation, initialize, trueCondition, uninitialize } from './com/automation';
+export { AutomationElementMode, CacheRequest, createCacheRequest, DEFAULT_CACHE_PROPERTIES } from './com/cache';
+export { clipboardSequence, copy, paste, readClipboard, readClipboardFiles, readClipboardImage, writeClipboard, writeClipboardFiles, writeClipboardImage } from './agent/clipboard';
+export { comRelease, guid, hresult, vcall } from './com/com';
+export { type ComputerAction, type ComputerResult, dispatch, type DispatchOptions, fromCuaAction, normalizeKey } from './input/computer';
+export { type CompiledCondition, compileCondition, type ElementProperties, formatNoMatch, matches, needsSubtreeFilter, pickIndexed, selectorToString, type Selector } from './element/condition';
+export { ControlType, PatternId, PropertyConditionFlags, PropertyId, SLOT, TreeScope } from './com/constants';
 export {
   elementAt,
   listMonitors,
@@ -94,13 +94,13 @@ export {
   scrollAt,
   virtualScreen,
   windowAt,
-} from './coords';
-export { windowDesktopId, windowOnCurrentDesktop } from './desktop';
-export { type DiffNode, diffTrees, refsRenumbered, type RenameChange, renderDiff, type StateChange, type TreeChange, type TreeDiff } from './diff';
-export { attach, Element, focused, fromHandle, fromPoint, launch, root, type StateExpectation, Window } from './element';
-export { listProcesses, waitForProcess, waitForWindow, waitForWindowGone, watchWindows, type WindowEvent, type WindowEventType, type WindowMatch, type WindowWatcher } from './events';
-export { type IdleOptions, waitForIdle } from './idle';
-export { isJavaWindow, javaInvoke, type JavaNode, javaSetText, type JavaTarget, javaTree, renderJavaTree } from './jab';
+} from './input/coords';
+export { windowDesktopId, windowOnCurrentDesktop } from './desktop/desktop';
+export { type DiffNode, diffTrees, refsRenumbered, type RenameChange, renderDiff, type StateChange, type TreeChange, type TreeDiff } from './element/diff';
+export { attach, Element, focused, fromHandle, fromPoint, launch, root, type StateExpectation, Window } from './element/element';
+export { listProcesses, waitForProcess, waitForWindow, waitForWindowGone, watchWindows, type WindowEvent, type WindowEventType, type WindowMatch, type WindowWatcher } from './desktop/events';
+export { type IdleOptions, waitForIdle } from './desktop/idle';
+export { isJavaWindow, javaInvoke, type JavaNode, javaSetText, type JavaTarget, javaTree, renderJavaTree } from './element/jab';
 export {
   clickAt,
   copyFromControl,
@@ -134,20 +134,20 @@ export {
   type,
   undoControl,
   virtualKeyCode,
-} from './input';
-export { drawMarks, type MarkedScreenshot, type PlacedMark, screenshotWithMarks } from './marks';
-export { findAllImages, findImage, locateAllOnScreen, locateColor, locateOnScreen, type Match } from './match';
-export { accessibleFromWindow, type MsaaNode, msaaTree } from './msaa';
-export { disposeOcr, ocrAvailable, ocrBitmap, ocrScreen, type OcrLine, type OcrText, ocrWindow, type OcrWord } from './ocr';
-export { ExpandCollapseState, gridItemPosition, NoScroll, ScrollAmount, type ScrollInfo, type TableData, ToggleState, type ViewState, WindowVisualState } from './patterns';
-export { encodePNG } from './png';
-export { decodeBstr, getBstr, getCachedPropertyValue, getHandle, getLong, getPropertyValue, getRect, type Rect, type VariantValue } from './reads';
-export { capSnapshot, coldTreeNote, type Mark, pruneRefTree, type RefNode, renderSnapshot, snapshot, Snapshot } from './refmap';
-export { type AuditRecord, redactTree, safeExecute, type SafeOptions, toToolResult } from './safety';
-export { type Bitmap, captureScreen, cropBitmap, pixelColor, screenshotScreen } from './screen';
-export { type NativeWindow, renderWindowTree, windowStyles, windowTree } from './spy';
-export { countNodes, estimateTokens, serialize, type SerializeOptions, type UiaNode } from './tree';
-export { captureWindowLive, dispose as disposeWgc, wgcAvailable } from './wgc';
+} from './input/input';
+export { drawMarks, type MarkedScreenshot, type PlacedMark, screenshotWithMarks } from './capture/marks';
+export { findAllImages, findImage, locateAllOnScreen, locateColor, locateOnScreen, type Match } from './capture/match';
+export { accessibleFromWindow, type MsaaNode, msaaTree } from './element/msaa';
+export { disposeOcr, ocrAvailable, ocrBitmap, ocrScreen, type OcrLine, type OcrText, ocrWindow, type OcrWord } from './capture/ocr';
+export { ExpandCollapseState, gridItemPosition, NoScroll, ScrollAmount, type ScrollInfo, type TableData, ToggleState, type ViewState, WindowVisualState } from './element/patterns';
+export { encodePNG } from './capture/png';
+export { decodeBstr, getBstr, getCachedPropertyValue, getHandle, getLong, getPropertyValue, getRect, type Rect, type VariantValue } from './com/reads';
+export { capSnapshot, coldTreeNote, type Mark, pruneRefTree, type RefNode, renderSnapshot, snapshot, Snapshot } from './element/refmap';
+export { type AuditRecord, redactTree, safeExecute, type SafeOptions, toToolResult } from './agent/safety';
+export { type Bitmap, captureScreen, cropBitmap, pixelColor, screenshotScreen } from './capture/screen';
+export { type NativeWindow, renderWindowTree, windowStyles, windowTree } from './desktop/spy';
+export { countNodes, estimateTokens, serialize, type SerializeOptions, type UiaNode } from './element/tree';
+export { captureWindowLive, dispose as disposeWgc, wgcAvailable } from './capture/wgc';
 export {
   captureWindowRGB,
   cloakReason,
@@ -177,4 +177,4 @@ export {
   type WindowInfo,
   windowForProcess,
   windowProcessId,
-} from './window';
+} from './element/window';

@@ -4,7 +4,7 @@
 // then refine 1px around the best candidate. Returns the top-left match + a 0..1 confidence, or null
 // below the threshold. Best for small needles (a button, an icon); a full-screen scan is O(area).
 
-import type { Rect } from './reads';
+import type { Rect } from '../com/reads';
 import { type Bitmap, captureScreen } from './screen';
 
 export interface Match {

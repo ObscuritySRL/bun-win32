@@ -5,16 +5,16 @@ import { FFIType } from 'bun:ffi';
 
 import User32 from '@bun-win32/user32';
 
-import { automation, controlViewWalker } from './automation';
-import { AutomationElementMode, type CacheRequest, createCacheRequest } from './cache';
-import { comRelease, hresult, vcall } from './com';
+import { automation, controlViewWalker } from '../com/automation';
+import { AutomationElementMode, type CacheRequest, createCacheRequest } from '../com/cache';
+import { comRelease, hresult, vcall } from '../com/com';
 import { type CompiledCondition, compileCondition, type ElementProperties, formatNoMatch, matches, needsSubtreeFilter, type Selector, selectorToString } from './condition';
-import { ControlType, PropertyId, S_OK, SLOT, TreeScope } from './constants';
-import { ownerHwnd, postClickToHwnd } from './coords';
-import { clickAt, dragTo as inputDragTo, postText, type as inputType } from './input';
-import { type OcrText, ocrBitmap } from './ocr';
-import { type Bitmap, cropBitmap } from './screen';
-import { captureWindowLive } from './wgc';
+import { ControlType, PropertyId, S_OK, SLOT, TreeScope } from '../com/constants';
+import { ownerHwnd, postClickToHwnd } from '../input/coords';
+import { clickAt, dragTo as inputDragTo, postText, type as inputType } from '../input/input';
+import { type OcrText, ocrBitmap } from '../capture/ocr';
+import { type Bitmap, cropBitmap } from '../capture/screen';
+import { captureWindowLive } from '../capture/wgc';
 import { captureWindowRGB, listWindows, renderWidgetHandles, screenshot as windowScreenshot, windowForProcess } from './window';
 import {
   addToSelection,
@@ -65,7 +65,7 @@ import {
   type ViewState,
   type WindowVisualState,
 } from './patterns';
-import { getBstr, getHandle, getLong, getPropertyValue, getRect, type Rect, type VariantValue } from './reads';
+import { getBstr, getHandle, getLong, getPropertyValue, getRect, type Rect, type VariantValue } from '../com/reads';
 
 /** A control-STATE expectation for the retrying waitForState — the Playwright web-first-assertion analogue. Every
  *  field is optional; the wait succeeds when ALL provided fields hold simultaneously. `toggle`/`expanded`/`selected`/

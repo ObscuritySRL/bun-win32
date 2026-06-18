@@ -8,9 +8,9 @@ import { FFIType } from 'bun:ffi';
 
 import Oleacc, { IID_IAccessible, OBJID } from '@bun-win32/oleacc';
 
-import { comRelease, guid, vcall } from './com';
-import { S_OK, VT_DISPATCH, VT_I4 } from './constants';
-import { decodeBstr } from './reads';
+import { comRelease, guid, vcall } from '../com/com';
+import { S_OK, VT_DISPATCH, VT_I4 } from '../com/constants';
+import { decodeBstr } from '../com/reads';
 
 const IACC_QUERYINTERFACE = 0;
 const IACC_GET_ACCCHILDCOUNT = 8;

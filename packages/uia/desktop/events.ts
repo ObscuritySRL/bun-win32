@@ -17,7 +17,7 @@ import { FFIType, JSCallback } from 'bun:ffi';
 import Kernel32 from '@bun-win32/kernel32';
 import User32 from '@bun-win32/user32';
 
-import { listWindows, type WindowInfo } from './window';
+import { listWindows, type WindowInfo } from '../element/window';
 
 const EVENT_SYSTEM_FOREGROUND = 0x0000_0003;
 const EVENT_SYSTEM_MINIMIZESTART = 0x0000_0016;

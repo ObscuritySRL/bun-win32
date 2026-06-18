@@ -10,8 +10,8 @@
  * postWheel already does. bun test is broken repo-wide, so this is a runnable harness.
  * Run: bun run example/posted-click-dead-window-honest.integration.test.ts
  */
-import { postClickToHwnd, postDoubleClickToHwnd, postDragToHwnd, postTripleClickToHwnd } from '../coords';
-import { postWheel } from '../input';
+import { postClickToHwnd, postDoubleClickToHwnd, postDragToHwnd, postTripleClickToHwnd } from '../input/coords';
+import { postWheel } from '../input/input';
 
 let failures = 0;
 function assert(condition: boolean, message: string): void {

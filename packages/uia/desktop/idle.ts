@@ -4,8 +4,8 @@
 // cached round-trip per sample (~16 ms). The screenshot-free "wait until ready" that replaces a
 // blind wait(ms) and stops the model from acting on a half-rendered tree.
 
-import type { Element } from './element';
-import { serialize } from './tree';
+import type { Element } from '../element/element';
+import { serialize } from '../element/tree';
 
 export interface IdleOptions {
   /** Give up after this many ms (default 5000). */

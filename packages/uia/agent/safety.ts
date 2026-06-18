@@ -6,8 +6,8 @@
 // This is a client-side GATE, not a sandbox; it sits inside, not instead of, VM/container isolation.
 
 import { type AgentAction, type AgentActionResult, performAgentAction } from './agent';
-import type { Element } from './element';
-import type { UiaNode } from './tree';
+import type { Element } from '../element/element';
+import type { UiaNode } from '../element/tree';
 
 export interface AuditRecord {
   action: AgentAction;

@@ -7,7 +7,7 @@
 // that the computer-use literature attributes to screenshot-only grounding.
 
 import { ownerHwnd, postClickAt, postClickToHwnd, postDoubleClickAt, postDragToHwnd, postTripleClickAt, scrollAt } from './coords';
-import { focused, fromPoint, type Window } from './element';
+import { focused, fromPoint, type Window } from '../element/element';
 import { clickAt, cursorPosition, doubleClickAt, dragTo, holdKey, middleClickAt, mouseDown, mouseUp, moveTo, postHoldKey, postKey, postText, rightClickAt, scrollWheel, sendKeys, type as typeText } from './input';
 
 export interface ComputerAction {

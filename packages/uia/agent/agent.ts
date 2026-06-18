@@ -3,11 +3,11 @@
 // not pixels) and these tools; it grounds actions on roles and names instead of counting pixels — the
 // structured alternative the computer-use literature (UFO2, OSWorld) is converging on.
 
-import type { Selector } from './condition';
-import { ownerHwnd, postClickToHwnd } from './coords';
-import type { Element } from './element';
-import { postText } from './input';
-import { serialize, type UiaNode } from './tree';
+import type { Selector } from '../element/condition';
+import { ownerHwnd, postClickToHwnd } from '../input/coords';
+import type { Element } from '../element/element';
+import { postText } from '../input/input';
+import { serialize, type UiaNode } from '../element/tree';
 
 export interface AgentAction {
   find: Selector;

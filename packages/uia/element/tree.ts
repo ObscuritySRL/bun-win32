@@ -5,10 +5,10 @@
 // walled ~7s (the marshal cost is sibling navigation, not depth — maxDepth alone could not bound it). The
 // agent profile prunes to interactive + named controls (fewer tokens) the way Microsoft UFO2 grounds agents.
 
-import { AutomationElementMode, type CacheRequest, createCacheRequest } from './cache';
-import { ControlType, TreeScope } from './constants';
+import { AutomationElementMode, type CacheRequest, createCacheRequest } from '../com/cache';
+import { ControlType, TreeScope } from '../com/constants';
 import type { Element } from './element';
-import type { Rect } from './reads';
+import type { Rect } from '../com/reads';
 
 export interface UiaNode {
   role: string;

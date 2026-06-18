@@ -19,9 +19,9 @@ import { FFIType } from 'bun:ffi';
 
 import Combase from '@bun-win32/combase';
 
-import { setDesktopDisposer } from './automation';
-import { comRelease, guid, vcall } from './com';
-import { CLSCTX_INPROC_SERVER, COINIT_APARTMENTTHREADED, S_FALSE, S_OK } from './constants';
+import { setDesktopDisposer } from '../com/automation';
+import { comRelease, guid, vcall } from '../com/com';
+import { CLSCTX_INPROC_SERVER, COINIT_APARTMENTTHREADED, S_FALSE, S_OK } from '../com/constants';
 
 const CLSID_VirtualDesktopManager = '{AA509086-5CA9-4C25-8F95-589D3C07B48A}';
 const IID_IVirtualDesktopManager = '{A5CD92FF-29BE-454C-8D04-D82879FB3F1B}';

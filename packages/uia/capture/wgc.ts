@@ -15,7 +15,7 @@ import Combase from '@bun-win32/combase';
 import D3d11 from '@bun-win32/d3d11';
 import User32 from '@bun-win32/user32';
 
-import { initialize, setWgcBundleDisposer } from './automation';
+import { initialize, setWgcBundleDisposer } from '../com/automation';
 import type { Bitmap } from './screen';
 
 const S_OK = 0;

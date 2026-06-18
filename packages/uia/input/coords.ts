@@ -10,9 +10,9 @@ import { FFIType, JSCallback } from 'bun:ffi';
 import Shcore from '@bun-win32/shcore';
 import User32 from '@bun-win32/user32';
 
-import { Element, fromPoint } from './element';
-import { ScrollAmount } from './patterns';
-import type { Rect } from './reads';
+import { Element, fromPoint } from '../element/element';
+import { ScrollAmount } from '../element/patterns';
+import type { Rect } from '../com/reads';
 
 const MK_LBUTTON = 0x0001;
 const MK_RBUTTON = 0x0002;

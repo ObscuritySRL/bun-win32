@@ -7,12 +7,12 @@
     "source": "github",
     "subfolder": "packages/bun-uia"
   },
-  "version": "1.9.0",
+  "version": "1.9.1",
   "packages": [
     {
       "registryType": "npm",
       "identifier": "bun-uia",
-      "version": "1.9.0",
+      "version": "1.9.1",
       "runtimeHint": "bunx",
       "transport": {
         "type": "stdio"

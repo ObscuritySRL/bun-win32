@@ -10,9 +10,9 @@ import { describe, expect, test } from 'bun:test';
 import { FFIType } from 'bun:ffi';
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 
-import { automation, compileCondition, root, trueCondition, uninitialize, Window } from './index';
-import { comRelease, invokerCacheSize, vcall } from './com';
-import { SLOT } from './constants';
+import { automation, compileCondition, root, trueCondition, uninitialize, Window } from '../index';
+import { comRelease, invokerCacheSize, vcall } from '../com/com';
+import { SLOT } from '../com/constants';
 
 const SDK_INCLUDE = 'C:/Program Files (x86)/Windows Kits/10/Include';
 
@@ -365,7 +365,21 @@ describe('OCR SLOT coverage (ocr.ts)', () => {
 // against the authoritative per-file slot ledger below. It runs offline (pure source parsing, no SDK header,
 // no window), so it is always on under `bun test` and fails loudly the next time an engine adds/moves a vcall.
 describe('slot-gate coverage ↔ engine call sites (no drift)', () => {
-  const ENGINE = `${import.meta.dir}`;
+  const ENGINE = `${import.meta.dir}/..`;
+  // Engine modules live in concern subfolders (com/, element/, capture/, desktop/, …); resolve by basename.
+  const engineFile = (name: string): string => {
+    const stack = [ENGINE];
+    while (stack.length > 0) {
+      const dir = stack.pop()!;
+      for (const entry of readdirSync(dir, { withFileTypes: true })) {
+        if (entry.name === 'node_modules' || entry.name === '.git' || entry.name === 'example' || entry.name === 'test' || entry.name === 'findings' || entry.name === '.scratch') continue;
+        const full = `${dir}/${entry.name}`;
+        if (entry.isDirectory()) stack.push(full);
+        else if (entry.name === name) return full;
+      }
+    }
+    throw new Error(`engine file not found: ${name}`);
+  };
   // file → the set of distinct vtable slots the gate verifies for that engine's call sites. IUnknown 0/1/2
   // (QueryInterface/AddRef/Release) are universal across every COM interface and never transposed, so they are
   // exempt from the "every called slot is gated" rule; they are excluded here and from the parsed call sites.
@@ -398,7 +412,7 @@ describe('slot-gate coverage ↔ engine call sites (no drift)', () => {
 
   for (const [file, gated] of Object.entries(GATED_SLOTS_BY_FILE)) {
     test(`${file}: every vcall slot is gated, and every gated slot is actually called`, () => {
-      const source = readFileSync(`${ENGINE}/${file}`, 'utf8');
+      const source = readFileSync(engineFile(file), 'utf8');
       const called = calledSlots(source, constValues(source));
       expect(called.size).toBeGreaterThan(0); // sanity: the parser found real call sites
       const ungated = [...called].filter((slot) => !gated.has(slot)).sort((a, b) => a - b);
@@ -416,7 +430,7 @@ describe('slot-gate coverage ↔ engine call sites (no drift)', () => {
   // registers -> crash) passed the whole gate. This pins the literal to the gated value: it parses patterns.ts's
   // own `const TEXTRANGE_SELECT = <n>` and asserts n === the slot the VTBL block verifies against the header (16).
   test('patterns.ts TEXTRANGE_SELECT literal matches the header-verified IUIAutomationTextRange.Select slot (16)', () => {
-    const source = readFileSync(`${ENGINE}/patterns.ts`, 'utf8');
+    const source = readFileSync(engineFile('patterns.ts'), 'utf8');
     const textRangeSelect = constValues(source).get('TEXTRANGE_SELECT');
     expect(textRangeSelect).not.toBeUndefined(); // the const must exist and be parseable (a sanity check on the parser)
     expect(textRangeSelect).toBe(16); // 16 = the slot the VTBL block above verifies vs UIAutomationClient.h IUIAutomationTextRange.Select; a wrong literal fails loudly here

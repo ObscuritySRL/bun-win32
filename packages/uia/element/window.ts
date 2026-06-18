@@ -11,7 +11,7 @@ import Kernel32 from '@bun-win32/kernel32';
 import Shell32 from '@bun-win32/shell32';
 import User32 from '@bun-win32/user32';
 
-import { encodePNG } from './png';
+import { encodePNG } from '../capture/png';
 
 export interface WindowInfo {
   hWnd: bigint;

@@ -9,7 +9,7 @@
  * bun test is broken repo-wide — runnable harness:
  * Run: bun run example/monitor-dpi.integration.test.ts
  */
-import { listMonitors } from '../coords';
+import { listMonitors } from '../input/coords';
 
 function fail(message: string): never {
   console.error(`FAIL: ${message}`);

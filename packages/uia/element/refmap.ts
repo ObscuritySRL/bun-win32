@@ -4,10 +4,10 @@
 // are valid until dispose(); re-snapshot after any action that changes the tree. Every Element
 // materialized by the walk is owned and released on dispose (the source window is NOT touched).
 
-import { AutomationElementMode, type CacheRequest, createCacheRequest, DEFAULT_CACHE_PROPERTIES } from './cache';
-import { ControlType, PropertyId, TreeScope } from './constants';
+import { AutomationElementMode, type CacheRequest, createCacheRequest, DEFAULT_CACHE_PROPERTIES } from '../com/cache';
+import { ControlType, PropertyId, TreeScope } from '../com/constants';
 import { Element } from './element';
-import { getCachedPropertyValue, getPropertyValue, type Rect, type VariantValue } from './reads';
+import { getCachedPropertyValue, getPropertyValue, type Rect, type VariantValue } from '../com/reads';
 
 const INTERACTIVE = new Set<number>([
   ControlType.Button,

@@ -28,7 +28,7 @@ import { dlopen, FFIType } from 'bun:ffi';
 
 import User32 from '@bun-win32/user32';
 
-import type { Rect } from './reads';
+import type { Rect } from '../com/reads';
 
 function openBridge() {
   return dlopen('WindowsAccessBridge-64.dll', {

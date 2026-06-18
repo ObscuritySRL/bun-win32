@@ -11,9 +11,9 @@ import { FFIType, type Pointer, toArrayBuffer } from 'bun:ffi';
 
 import Combase from '@bun-win32/combase';
 
-import { initialize, setOcrDisposer } from './automation';
-import { comRelease, guid, vcall } from './com';
-import type { Rect } from './reads';
+import { initialize, setOcrDisposer } from '../com/automation';
+import { comRelease, guid, vcall } from '../com/com';
+import type { Rect } from '../com/reads';
 import { captureScreen, type Bitmap } from './screen';
 import { captureWindowLive } from './wgc';
 

@@ -8,8 +8,8 @@ import { toArrayBuffer } from 'bun:ffi';
 import Kernel32 from '@bun-win32/kernel32';
 import User32 from '@bun-win32/user32';
 
-import { sendKeys } from './input';
-import type { Bitmap } from './screen';
+import { sendKeys } from '../input/input';
+import type { Bitmap } from '../capture/screen';
 
 const CF_DIB = 8;
 const CF_HDROP = 15;

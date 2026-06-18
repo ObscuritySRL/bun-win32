@@ -7,9 +7,9 @@ import { FFIType, type Pointer } from 'bun:ffi';
 
 import Oleaut32 from '@bun-win32/oleaut32';
 
-import { comRelease, guid, hresult, vcall } from './com';
-import { IID_IUIAutomationElement3, PatternId, PropertyId, S_OK, SLOT } from './constants';
-import { decodeBstr, getBstr, getDouble, getLong, getPropertyValue } from './reads';
+import { comRelease, guid, hresult, vcall } from '../com/com';
+import { IID_IUIAutomationElement3, PatternId, PropertyId, S_OK, SLOT } from '../com/constants';
+import { decodeBstr, getBstr, getDouble, getLong, getPropertyValue } from '../com/reads';
 
 export interface ViewState {
   current: number;

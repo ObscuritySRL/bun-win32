@@ -1,6 +1,6 @@
 import { expect, test } from 'bun:test';
 
-import { INPUT_KEYBOARD, INPUT_MOUSE, INPUT_SIZE, KEYEVENTF_KEYUP, KEYEVENTF_UNICODE, MOUSEEVENTF_LEFTDOWN, packKeyboardInput, packMouseInput, virtualKeyCode } from './input';
+import { INPUT_KEYBOARD, INPUT_MOUSE, INPUT_SIZE, KEYEVENTF_KEYUP, KEYEVENTF_UNICODE, MOUSEEVENTF_LEFTDOWN, packKeyboardInput, packMouseInput, virtualKeyCode } from '../input/input';
 
 test('INPUT is 40 bytes on x64 (cbSize)', () => {
   expect(INPUT_SIZE).toBe(40);

@@ -1,6 +1,6 @@
 import { expect, test } from 'bun:test';
 
-import { ControlType, PatternId, PropertyId, SLOT, TreeScope } from './constants';
+import { ControlType, PatternId, PropertyId, SLOT, TreeScope } from '../com/constants';
 
 test('control-type ids match the SDK header', () => {
   expect(ControlType.Button).toBe(50000);

@@ -7,9 +7,9 @@
 import Gdi32 from '@bun-win32/gdi32';
 import User32 from '@bun-win32/user32';
 
-import { virtualScreen } from './coords';
+import { virtualScreen } from '../input/coords';
 import { encodePNG } from './png';
-import type { Rect } from './reads';
+import type { Rect } from '../com/reads';
 
 export interface Bitmap {
   rgb: Uint8Array;

@@ -6,7 +6,7 @@
 
 import User32 from '@bun-win32/user32';
 
-import type { Rect } from './reads';
+import type { Rect } from '../com/reads';
 
 const GWL_STYLE = -16;
 const GWL_EXSTYLE = -20;

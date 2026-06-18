@@ -1,7 +1,7 @@
 import { expect, test } from 'bun:test';
 
-import { matches, needsSubtreeFilter, selectorToString } from './condition';
-import { ControlType } from './constants';
+import { matches, needsSubtreeFilter, selectorToString } from '../element/condition';
+import { ControlType } from '../com/constants';
 
 const button = { name: 'Five', controlType: ControlType.Button, automationId: 'num5Button', className: 'Button' };
 
