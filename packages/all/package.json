@@ -103,6 +103,7 @@
     "@bun-win32/wer": "workspace:*",
     "@bun-win32/wevtapi": "workspace:*",
     "@bun-win32/wimgapi": "workspace:*",
+    "@bun-win32/windowsaccessbridge-64": "workspace:*",
     "@bun-win32/windowscodecs": "workspace:*",
     "@bun-win32/winhttp": "workspace:*",
     "@bun-win32/wininet": "workspace:*",

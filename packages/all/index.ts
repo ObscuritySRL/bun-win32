@@ -95,6 +95,7 @@ export { default as Webauthn } from '@bun-win32/webauthn';
 export { default as Wer } from '@bun-win32/wer';
 export { default as Wevtapi } from '@bun-win32/wevtapi';
 export { default as Wimgapi } from '@bun-win32/wimgapi';
+export { default as WindowsAccessBridge } from '@bun-win32/windowsaccessbridge-64';
 export { default as WindowsCodecs } from '@bun-win32/windowscodecs';
 export { default as Winhttp } from '@bun-win32/winhttp';
 export { default as Wininet } from '@bun-win32/wininet';

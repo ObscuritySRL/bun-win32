@@ -1,0 +1,61 @@
+{
+  "author": "Stev Peifer <stev.p@outlook.com>",
+  "bugs": {
+    "url": "https://github.com/ObscuritySRL/bun-win32/issues"
+  },
+  "dependencies": {
+    "@bun-win32/core": "workspace:*"
+  },
+  "description": "Zero-dependency, zero-overhead Java Access Bridge (WindowsAccessBridge-64.dll) bindings for Bun (FFI) on Windows.",
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "exports": {
+    ".": "./index.ts"
+  },
+  "license": "MIT",
+  "module": "index.ts",
+  "name": "@bun-win32/windowsaccessbridge-64",
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "private": false,
+  "homepage": "https://github.com/ObscuritySRL/bun-win32#readme",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/ObscuritySRL/bun-win32.git",
+    "directory": "packages/windowsaccessbridge-64"
+  },
+  "type": "module",
+  "version": "1.0.0",
+  "main": "./index.ts",
+  "keywords": [
+    "bun",
+    "ffi",
+    "win32",
+    "windows",
+    "windowsaccessbridge-64",
+    "java-access-bridge",
+    "accessibility",
+    "jab",
+    "bindings",
+    "typescript",
+    "dll"
+  ],
+  "files": [
+    "AI.md",
+    "README.md",
+    "index.ts",
+    "structs/*.ts",
+    "types/*.ts"
+  ],
+  "sideEffects": false,
+  "engines": {
+    "bun": ">=1.1.0"
+  },
+  "scripts": {
+    "example:inspector": "bun ./example/jab-inspector.ts",
+    "example:radar": "bun ./example/accessibility-radar.ts",
+    "test": "bun test ./example/windowsaccessbridge-64.integration.test.ts"
+  }
+}

@@ -177,6 +177,7 @@ Published packages are AI-friendly. Alongside the `README.md`, each package incl
 - [`wer`](./packages/wer) - Windows Error Reporting report authoring/stores (`WerReportCreate`, `WerReportSubmit`, `WerStoreOpen`, `WerStoreQueryReportMetadataV2`) plus the Wait Chain Traversal deadlock-detection API (`OpenThreadWaitChainSession`, `GetThreadWaitChain`) — live kernel thread-wait X-ray proven pure-FFI
 - [`wevtapi`](./packages/wevtapi) - Windows Event Log queries, rendering, subscriptions, channel configuration, publisher metadata
 - [`wimgapi`](./packages/wimgapi) - Windows Imaging (WIM): create/open `.wim` archives, capture/apply/enumerate images, mount/unmount/split/export, references, and live progress via a `WIMRegisterMessageCallback` JSCallback — the `DISM.exe`/`ImageX` engine in-process
+- [`windowsaccessbridge-64`](./packages/windowsaccessbridge-64) - Java Access Bridge: classify Java/Swing windows (`isJavaWindow`), walk the AccessibleContext tree (`getAccessibleContextFromHWND` / `getAccessibleContextInfo` / `getAccessibleChildFromContext`), read text/table/hypertext/value/selection info, drive actions, and register event callbacks — all 97 exports, proven against a live JDK Swing app
 - [`winusb`](./packages/winusb) - WinUSB device I/O, descriptors, pipes, policies, and isochronous transfers
 - [`wuapi`](./packages/wuapi) - Windows Update Agent COM server (`Dll*` entries): the Windows Update object model — `IUpdateSession` / `IUpdateSearcher` / update-history enumeration and result decoding over the COM vtable
 
