@@ -1,4 +1,4 @@
-import { type FFIFunction, FFIType } from 'bun:ffi';
+import { type FFIFunction, FFIType, type Pointer } from 'bun:ffi';
 
 import { Win32 } from '@bun-win32/core';
 
@@ -7,7 +7,6 @@ import type {
   BOOLEAN,
   BYTE,
   CODEPAGE_ENUMPROC,
-  COORD,
   DWORD,
   ENUMRESLANGPROCA,
   ENUMRESLANGPROCW,
@@ -281,8 +280,8 @@ class Kernel32 extends Win32 {
     CreateProcessA: { args: [FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.i32, FFIType.u32, FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
     CreateProcessW: { args: [FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.i32, FFIType.u32, FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
     CreatePseudoConsole: { args: [FFIType.u32, FFIType.u64, FFIType.u64, FFIType.u32, FFIType.ptr], returns: FFIType.u32 },
-    CreateRemoteThread: { args: [FFIType.u64, FFIType.ptr, FFIType.u64, FFIType.ptr, FFIType.u64, FFIType.u32, FFIType.ptr], returns: FFIType.u64 },
-    CreateRemoteThreadEx: { args: [FFIType.u64, FFIType.ptr, FFIType.u64, FFIType.ptr, FFIType.u64, FFIType.u32, FFIType.u32, FFIType.ptr], returns: FFIType.u64 },
+    CreateRemoteThread: { args: [FFIType.u64, FFIType.ptr, FFIType.u64, FFIType.u64, FFIType.u64, FFIType.u32, FFIType.ptr], returns: FFIType.u64 },
+    CreateRemoteThreadEx: { args: [FFIType.u64, FFIType.ptr, FFIType.u64, FFIType.u64, FFIType.u64, FFIType.u32, FFIType.u32, FFIType.ptr], returns: FFIType.u64 },
     CreateSemaphoreA: { args: [FFIType.ptr, FFIType.i32, FFIType.i32, FFIType.ptr], returns: FFIType.u64 },
     CreateSemaphoreExA: { args: [FFIType.ptr, FFIType.i32, FFIType.i32, FFIType.ptr, FFIType.u32, FFIType.u32], returns: FFIType.u64 },
     CreateSemaphoreExW: { args: [FFIType.ptr, FFIType.i32, FFIType.i32, FFIType.ptr, FFIType.u32, FFIType.u32], returns: FFIType.u64 },
@@ -2423,7 +2422,7 @@ class Kernel32 extends Win32 {
     hProcess: HANDLE,
     lpThreadAttributes: LPSECURITY_ATTRIBUTES | NULL,
     dwStackSize: SIZE_T,
-    lpStartAddress: LPTHREAD_START_ROUTINE,
+    lpStartAddress: LPTHREAD_START_ROUTINE<bigint>,
     lpParameter: bigint,
     dwCreationFlags: DWORD,
     lpThreadId: LPDWORD | NULL,
@@ -2436,7 +2435,7 @@ class Kernel32 extends Win32 {
     hProcess: HANDLE,
     lpThreadAttributes: LPSECURITY_ATTRIBUTES,
     dwStackSize: SIZE_T,
-    lpStartAddress: LPTHREAD_START_ROUTINE,
+    lpStartAddress: LPTHREAD_START_ROUTINE<bigint>,
     lpParameter: bigint,
     dwCreationFlags: DWORD,
     lpAttributeList: LPPROC_THREAD_ATTRIBUTE_LIST,
@@ -2491,7 +2490,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-createthread
-  public static CreateThread(lpThreadAttributes: LPSECURITY_ATTRIBUTES | NULL, dwStackSize: SIZE_T, lpStartAddress: LPTHREAD_START_ROUTINE, lpParameter: LPVOID | NULL, dwCreationFlags: DWORD, lpThreadId: LPDWORD | NULL): HANDLE {
+  public static CreateThread(lpThreadAttributes: LPSECURITY_ATTRIBUTES | NULL, dwStackSize: SIZE_T, lpStartAddress: LPTHREAD_START_ROUTINE<Pointer>, lpParameter: LPVOID | NULL, dwCreationFlags: DWORD, lpThreadId: LPDWORD | NULL): HANDLE {
     return Kernel32.Load('CreateThread')(lpThreadAttributes, dwStackSize, lpStartAddress, lpParameter, dwCreationFlags, lpThreadId);
   }
 
