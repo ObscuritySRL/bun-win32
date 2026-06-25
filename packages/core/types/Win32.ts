@@ -53,6 +53,7 @@ export type LPWSTR = Pointer;
 export type PBYTE = Pointer;
 export type PDWORD = Pointer;
 export type PHANDLE = Pointer;
+export type PSIZE_T = Pointer;
 export type PULONG = Pointer;
 export type PVOID<T extends Pointer | bigint = Pointer> = T;
 

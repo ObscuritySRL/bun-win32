@@ -68,6 +68,7 @@ import type {
   PHANDLE,
   PHANDLER_ROUTINE,
   PHPCON,
+  PSIZE_T,
   PULONG,
   PVOID,
   SIZE_T,
@@ -6800,7 +6801,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-readprocessmemory
-  public static ReadProcessMemory(hProcess: HANDLE, lpBaseAddress: LPCVOID<bigint>, lpBuffer: LPVOID, nSize: SIZE_T, lpNumberOfBytesRead: bigint): BOOL {
+  public static ReadProcessMemory(hProcess: HANDLE, lpBaseAddress: LPCVOID<bigint>, lpBuffer: LPVOID, nSize: SIZE_T, lpNumberOfBytesRead: PSIZE_T | NULL): BOOL {
     return Kernel32.Load('ReadProcessMemory')(hProcess, lpBaseAddress, lpBuffer, nSize, lpNumberOfBytesRead);
   }
 
@@ -8017,7 +8018,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-toolhelp32readprocessmemory
-  public static Toolhelp32ReadProcessMemory(th32ProcessID: DWORD, lpBaseAddress: LPCVOID<bigint>, lpBuffer: LPVOID, cbRead: SIZE_T, lpNumberOfBytesRead: bigint): BOOL {
+  public static Toolhelp32ReadProcessMemory(th32ProcessID: DWORD, lpBaseAddress: LPCVOID<bigint>, lpBuffer: LPVOID, cbRead: SIZE_T, lpNumberOfBytesRead: PSIZE_T | NULL): BOOL {
     return Kernel32.Load('Toolhelp32ReadProcessMemory')(th32ProcessID, lpBaseAddress, lpBuffer, cbRead, lpNumberOfBytesRead);
   }
 
@@ -8540,7 +8541,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-writeprocessmemory
-  public static WriteProcessMemory(hProcess: HANDLE, lpBaseAddress: LPVOID<bigint>, lpBuffer: LPVOID, nSize: SIZE_T, lpNumberOfBytesWritten: bigint): BOOL {
+  public static WriteProcessMemory(hProcess: HANDLE, lpBaseAddress: LPVOID<bigint>, lpBuffer: LPVOID, nSize: SIZE_T, lpNumberOfBytesWritten: PSIZE_T | NULL): BOOL {
     return Kernel32.Load('WriteProcessMemory')(hProcess, lpBaseAddress, lpBuffer, nSize, lpNumberOfBytesWritten);
   }
 

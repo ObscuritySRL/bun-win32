@@ -35,6 +35,7 @@ export type {
   PBYTE,
   PDWORD,
   PHANDLE,
+  PSIZE_T,
   PULONG,
   PVOID,
   SHORT,
