@@ -42,19 +42,19 @@ export type WPARAM = UINT_PTR;
 export type LPBOOL = Pointer;
 export type LPBYTE = Pointer;
 export type LPCSTR = Pointer;
-export type LPCVOID = Pointer;
+export type LPCVOID<T extends Pointer | bigint = Pointer> = T;
 export type LPCWSTR = Pointer;
 export type LPDWORD = Pointer;
 export type LPHANDLE = Pointer;
 export type LPSECURITY_ATTRIBUTES = Pointer;
 export type LPSTR = Pointer;
-export type LPVOID = Pointer;
+export type LPVOID<T extends Pointer | bigint = Pointer> = T;
 export type LPWSTR = Pointer;
 export type PBYTE = Pointer;
 export type PDWORD = Pointer;
 export type PHANDLE = Pointer;
 export type PULONG = Pointer;
-export type PVOID = Pointer;
+export type PVOID<T extends Pointer | bigint = Pointer> = T;
 
 // ── Special ─────────────────────────────────────────────────────────────────
 
