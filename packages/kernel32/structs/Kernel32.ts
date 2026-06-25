@@ -43,6 +43,7 @@ import type {
   LPCSTR,
   LPCURRENCYFMTA,
   LPCURRENCYFMTW,
+  LPCVOID,
   LPCWSTR,
   LPDWORD,
   LPHANDLE,
@@ -2424,7 +2425,7 @@ class Kernel32 extends Win32 {
     lpThreadAttributes: LPSECURITY_ATTRIBUTES | NULL,
     dwStackSize: SIZE_T,
     lpStartAddress: LPTHREAD_START_ROUTINE<bigint>,
-    lpParameter: bigint,
+    lpParameter: LPVOID<bigint>,
     dwCreationFlags: DWORD,
     lpThreadId: LPDWORD | NULL,
   ): HANDLE {
@@ -2437,7 +2438,7 @@ class Kernel32 extends Win32 {
     lpThreadAttributes: LPSECURITY_ATTRIBUTES,
     dwStackSize: SIZE_T,
     lpStartAddress: LPTHREAD_START_ROUTINE<bigint>,
-    lpParameter: bigint,
+    lpParameter: LPVOID<bigint>,
     dwCreationFlags: DWORD,
     lpAttributeList: LPPROC_THREAD_ATTRIBUTE_LIST,
     lpThreadId: LPDWORD,
@@ -2755,7 +2756,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-discardvirtualmemory
-  public static DiscardVirtualMemory(VirtualAddress: bigint, Size: SIZE_T): DWORD {
+  public static DiscardVirtualMemory(VirtualAddress: PVOID<bigint>, Size: SIZE_T): DWORD {
     return Kernel32.Load('DiscardVirtualMemory')(VirtualAddress, Size);
   }
 
@@ -6166,7 +6167,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-mapuserphysicalpages
-  public static MapUserPhysicalPages(VirtualAddress: bigint, NumberOfPages: ULONG_PTR, PageArray: LPVOID | NULL): BOOL {
+  public static MapUserPhysicalPages(VirtualAddress: PVOID<bigint>, NumberOfPages: ULONG_PTR, PageArray: LPVOID | NULL): BOOL {
     return Kernel32.Load('MapUserPhysicalPages')(VirtualAddress, NumberOfPages, PageArray);
   }
 
@@ -6176,22 +6177,22 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/memoryapi/nf-memoryapi-mapviewoffile
-  public static MapViewOfFile(hFileMappingObject: HANDLE, dwDesiredAccess: DWORD, dwFileOffsetHigh: DWORD, dwFileOffsetLow: DWORD, dwNumberOfBytesToMap: SIZE_T): bigint {
+  public static MapViewOfFile(hFileMappingObject: HANDLE, dwDesiredAccess: DWORD, dwFileOffsetHigh: DWORD, dwFileOffsetLow: DWORD, dwNumberOfBytesToMap: SIZE_T): LPVOID<bigint> {
     return Kernel32.Load('MapViewOfFile')(hFileMappingObject, dwDesiredAccess, dwFileOffsetHigh, dwFileOffsetLow, dwNumberOfBytesToMap);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/memoryapi/nf-memoryapi-mapviewoffileex
-  public static MapViewOfFileEx(hFileMappingObject: HANDLE, dwDesiredAccess: DWORD, dwFileOffsetHigh: DWORD, dwFileOffsetLow: DWORD, dwNumberOfBytesToMap: SIZE_T, lpBaseAddress: bigint): bigint {
+  public static MapViewOfFileEx(hFileMappingObject: HANDLE, dwDesiredAccess: DWORD, dwFileOffsetHigh: DWORD, dwFileOffsetLow: DWORD, dwNumberOfBytesToMap: SIZE_T, lpBaseAddress: LPVOID<bigint>): LPVOID<bigint> {
     return Kernel32.Load('MapViewOfFileEx')(hFileMappingObject, dwDesiredAccess, dwFileOffsetHigh, dwFileOffsetLow, dwNumberOfBytesToMap, lpBaseAddress);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/memoryapi/nf-memoryapi-mapviewoffileexnuma
-  public static MapViewOfFileExNuma(hFileMappingObject: HANDLE, dwDesiredAccess: DWORD, dwFileOffsetHigh: DWORD, dwFileOffsetLow: DWORD, dwNumberOfBytesToMap: SIZE_T, lpBaseAddress: bigint, nndPreferred: DWORD): bigint {
+  public static MapViewOfFileExNuma(hFileMappingObject: HANDLE, dwDesiredAccess: DWORD, dwFileOffsetHigh: DWORD, dwFileOffsetLow: DWORD, dwNumberOfBytesToMap: SIZE_T, lpBaseAddress: LPVOID<bigint>, nndPreferred: DWORD): LPVOID<bigint> {
     return Kernel32.Load('MapViewOfFileExNuma')(hFileMappingObject, dwDesiredAccess, dwFileOffsetHigh, dwFileOffsetLow, dwNumberOfBytesToMap, lpBaseAddress, nndPreferred);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/memoryapi/nf-memoryapi-mapviewoffilefromapp
-  public static MapViewOfFileFromApp(hFileMappingObject: HANDLE, DesiredAccess: DWORD, FileOffset: ULONGLONG, NumberOfBytesToMap: SIZE_T): bigint {
+  public static MapViewOfFileFromApp(hFileMappingObject: HANDLE, DesiredAccess: DWORD, FileOffset: ULONGLONG, NumberOfBytesToMap: SIZE_T): PVOID<bigint> {
     return Kernel32.Load('MapViewOfFileFromApp')(hFileMappingObject, DesiredAccess, FileOffset, NumberOfBytesToMap);
   }
 
@@ -6285,7 +6286,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-offervirtualmemory
-  public static OfferVirtualMemory(VirtualAddress: bigint, Size: SIZE_T, Priority: DWORD): DWORD {
+  public static OfferVirtualMemory(VirtualAddress: PVOID<bigint>, Size: SIZE_T, Priority: DWORD): DWORD {
     return Kernel32.Load('OfferVirtualMemory')(VirtualAddress, Size, Priority);
   }
 
@@ -6799,7 +6800,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-readprocessmemory
-  public static ReadProcessMemory(hProcess: HANDLE, lpBaseAddress: bigint, lpBuffer: LPVOID, nSize: SIZE_T, lpNumberOfBytesRead: bigint): BOOL {
+  public static ReadProcessMemory(hProcess: HANDLE, lpBaseAddress: LPCVOID<bigint>, lpBuffer: LPVOID, nSize: SIZE_T, lpNumberOfBytesRead: bigint): BOOL {
     return Kernel32.Load('ReadProcessMemory')(hProcess, lpBaseAddress, lpBuffer, nSize, lpNumberOfBytesRead);
   }
 
@@ -6809,7 +6810,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-reclaimvirtualmemory
-  public static ReclaimVirtualMemory(VirtualAddress: bigint, Size: SIZE_T): DWORD {
+  public static ReclaimVirtualMemory(VirtualAddress: PVOID<bigint>, Size: SIZE_T): DWORD {
     return Kernel32.Load('ReclaimVirtualMemory')(VirtualAddress, Size);
   }
 
@@ -8016,7 +8017,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-toolhelp32readprocessmemory
-  public static Toolhelp32ReadProcessMemory(th32ProcessID: DWORD, lpBaseAddress: bigint, lpBuffer: LPVOID, cbRead: SIZE_T, lpNumberOfBytesRead: bigint): BOOL {
+  public static Toolhelp32ReadProcessMemory(th32ProcessID: DWORD, lpBaseAddress: LPCVOID<bigint>, lpBuffer: LPVOID, cbRead: SIZE_T, lpNumberOfBytesRead: bigint): BOOL {
     return Kernel32.Load('Toolhelp32ReadProcessMemory')(th32ProcessID, lpBaseAddress, lpBuffer, cbRead, lpNumberOfBytesRead);
   }
 
@@ -8081,12 +8082,12 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/memoryapi/nf-memoryapi-unmapviewoffile
-  public static UnmapViewOfFile(lpBaseAddress: bigint): BOOL {
+  public static UnmapViewOfFile(lpBaseAddress: LPCVOID<bigint>): BOOL {
     return Kernel32.Load('UnmapViewOfFile')(lpBaseAddress);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/memoryapi/nf-memoryapi-unmapviewoffileex
-  public static UnmapViewOfFileEx(BaseAddress: bigint, UnmapFlags: DWORD): BOOL {
+  public static UnmapViewOfFileEx(BaseAddress: PVOID<bigint>, UnmapFlags: DWORD): BOOL {
     return Kernel32.Load('UnmapViewOfFileEx')(BaseAddress, UnmapFlags);
   }
 
@@ -8186,57 +8187,57 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/memoryapi/nf-memoryapi-virtualalloc
-  public static VirtualAlloc(lpAddress: bigint, dwSize: SIZE_T, flAllocationType: DWORD, flProtect: DWORD): bigint {
+  public static VirtualAlloc(lpAddress: LPVOID<bigint>, dwSize: SIZE_T, flAllocationType: DWORD, flProtect: DWORD): LPVOID<bigint> {
     return Kernel32.Load('VirtualAlloc')(lpAddress, dwSize, flAllocationType, flProtect);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/memoryapi/nf-memoryapi-virtualallocex
-  public static VirtualAllocEx(hProcess: HANDLE, lpAddress: bigint, dwSize: SIZE_T, flAllocationType: DWORD, flProtect: DWORD): bigint {
+  public static VirtualAllocEx(hProcess: HANDLE, lpAddress: LPVOID<bigint>, dwSize: SIZE_T, flAllocationType: DWORD, flProtect: DWORD): LPVOID<bigint> {
     return Kernel32.Load('VirtualAllocEx')(hProcess, lpAddress, dwSize, flAllocationType, flProtect);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/memoryapi/nf-memoryapi-virtualallocexnuma
-  public static VirtualAllocExNuma(hProcess: HANDLE, lpAddress: bigint, dwSize: SIZE_T, flAllocationType: DWORD, flProtect: DWORD, nndPreferred: DWORD): bigint {
+  public static VirtualAllocExNuma(hProcess: HANDLE, lpAddress: LPVOID<bigint>, dwSize: SIZE_T, flAllocationType: DWORD, flProtect: DWORD, nndPreferred: DWORD): LPVOID<bigint> {
     return Kernel32.Load('VirtualAllocExNuma')(hProcess, lpAddress, dwSize, flAllocationType, flProtect, nndPreferred);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/memoryapi/nf-memoryapi-virtualfree
-  public static VirtualFree(lpAddress: bigint, dwSize: SIZE_T, dwFreeType: DWORD): BOOL {
+  public static VirtualFree(lpAddress: LPVOID<bigint>, dwSize: SIZE_T, dwFreeType: DWORD): BOOL {
     return Kernel32.Load('VirtualFree')(lpAddress, dwSize, dwFreeType);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/memoryapi/nf-memoryapi-virtualfreeex
-  public static VirtualFreeEx(hProcess: HANDLE, lpAddress: bigint, dwSize: SIZE_T, dwFreeType: DWORD): BOOL {
+  public static VirtualFreeEx(hProcess: HANDLE, lpAddress: LPVOID<bigint>, dwSize: SIZE_T, dwFreeType: DWORD): BOOL {
     return Kernel32.Load('VirtualFreeEx')(hProcess, lpAddress, dwSize, dwFreeType);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/memoryapi/nf-memoryapi-virtuallock
-  public static VirtualLock(lpAddress: bigint, dwSize: SIZE_T): BOOL {
+  public static VirtualLock(lpAddress: LPVOID<bigint>, dwSize: SIZE_T): BOOL {
     return Kernel32.Load('VirtualLock')(lpAddress, dwSize);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/memoryapi/nf-memoryapi-virtualprotect
-  public static VirtualProtect(lpAddress: bigint, dwSize: SIZE_T, flNewProtect: DWORD, lpflOldProtect: LPVOID): BOOL {
+  public static VirtualProtect(lpAddress: LPVOID<bigint>, dwSize: SIZE_T, flNewProtect: DWORD, lpflOldProtect: LPVOID): BOOL {
     return Kernel32.Load('VirtualProtect')(lpAddress, dwSize, flNewProtect, lpflOldProtect);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/memoryapi/nf-memoryapi-virtualprotectex
-  public static VirtualProtectEx(hProcess: HANDLE, lpAddress: bigint, dwSize: SIZE_T, flNewProtect: DWORD, lpflOldProtect: LPVOID): BOOL {
+  public static VirtualProtectEx(hProcess: HANDLE, lpAddress: LPVOID<bigint>, dwSize: SIZE_T, flNewProtect: DWORD, lpflOldProtect: LPVOID): BOOL {
     return Kernel32.Load('VirtualProtectEx')(hProcess, lpAddress, dwSize, flNewProtect, lpflOldProtect);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/memoryapi/nf-memoryapi-virtualquery
-  public static VirtualQuery(lpAddress: bigint, lpBuffer: LPVOID, dwLength: SIZE_T): SIZE_T {
+  public static VirtualQuery(lpAddress: LPCVOID<bigint>, lpBuffer: LPVOID, dwLength: SIZE_T): SIZE_T {
     return Kernel32.Load('VirtualQuery')(lpAddress, lpBuffer, dwLength);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/memoryapi/nf-memoryapi-virtualqueryex
-  public static VirtualQueryEx(hProcess: HANDLE, lpAddress: bigint, lpBuffer: LPVOID, dwLength: SIZE_T): SIZE_T {
+  public static VirtualQueryEx(hProcess: HANDLE, lpAddress: LPCVOID<bigint>, lpBuffer: LPVOID, dwLength: SIZE_T): SIZE_T {
     return Kernel32.Load('VirtualQueryEx')(hProcess, lpAddress, lpBuffer, dwLength);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/memoryapi/nf-memoryapi-virtualunlock
-  public static VirtualUnlock(lpAddress: bigint, dwSize: SIZE_T): BOOL {
+  public static VirtualUnlock(lpAddress: LPVOID<bigint>, dwSize: SIZE_T): BOOL {
     return Kernel32.Load('VirtualUnlock')(lpAddress, dwSize);
   }
 
@@ -8539,7 +8540,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-writeprocessmemory
-  public static WriteProcessMemory(hProcess: HANDLE, lpBaseAddress: bigint, lpBuffer: LPVOID, nSize: SIZE_T, lpNumberOfBytesWritten: bigint): BOOL {
+  public static WriteProcessMemory(hProcess: HANDLE, lpBaseAddress: LPVOID<bigint>, lpBuffer: LPVOID, nSize: SIZE_T, lpNumberOfBytesWritten: bigint): BOOL {
     return Kernel32.Load('WriteProcessMemory')(hProcess, lpBaseAddress, lpBuffer, nSize, lpNumberOfBytesWritten);
   }
 
