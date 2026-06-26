@@ -29,8 +29,8 @@ import type {
   LPTSTR,
   LPVOID,
   LPWSTR,
-  NULLABLE,
-  OPTIONAL,
+  Nullable,
+  Optional,
   PAVIFILE,
   PAVISTREAM,
   PGETFRAME,
@@ -213,22 +213,22 @@ class Avifil32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/vfw/nf-vfw-avifileopen
-  public static AVIFileOpen(ppfile_out: Pointer, szFile: LPCTSTR, uMode: UINT, lpHandler: OPTIONAL<LPCLSID>): HRESULT {
+  public static AVIFileOpen(ppfile_out: Pointer, szFile: LPCTSTR, uMode: UINT, lpHandler: Optional<LPCLSID>): HRESULT {
     return Avifil32.Load('AVIFileOpen')(ppfile_out, szFile, uMode, lpHandler);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/vfw/nf-vfw-avifileopena
-  public static AVIFileOpenA(ppfile_out: Pointer, szFile: LPCSTR, uMode: UINT, lpHandler: OPTIONAL<LPCLSID>): HRESULT {
+  public static AVIFileOpenA(ppfile_out: Pointer, szFile: LPCSTR, uMode: UINT, lpHandler: Optional<LPCLSID>): HRESULT {
     return Avifil32.Load('AVIFileOpenA')(ppfile_out, szFile, uMode, lpHandler);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/vfw/nf-vfw-avifileopenw
-  public static AVIFileOpenW(ppfile_out: Pointer, szFile: LPCWSTR, uMode: UINT, lpHandler: OPTIONAL<LPCLSID>): HRESULT {
+  public static AVIFileOpenW(ppfile_out: Pointer, szFile: LPCWSTR, uMode: UINT, lpHandler: Optional<LPCLSID>): HRESULT {
     return Avifil32.Load('AVIFileOpenW')(ppfile_out, szFile, uMode, lpHandler);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/vfw/nf-vfw-avifilereaddata
-  public static AVIFileReadData(pfile: PAVIFILE, ckid: DWORD, lpData_out: NULLABLE<LPVOID>, lpcbData_in_out: LPLONG): HRESULT {
+  public static AVIFileReadData(pfile: PAVIFILE, ckid: DWORD, lpData_out: Nullable<LPVOID>, lpcbData_in_out: LPLONG): HRESULT {
     return Avifil32.Load('AVIFileReadData')(pfile, ckid, lpData_out, lpcbData_in_out);
   }
 
@@ -248,7 +248,7 @@ class Avifil32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/vfw/nf-vfw-avimakecompressedstream
-  public static AVIMakeCompressedStream(ppsCompressed_out: Pointer, ppsSource: PAVISTREAM, lpOptions: LPAVICOMPRESSOPTIONS, pclsidHandler: OPTIONAL<LPCLSID>): HRESULT {
+  public static AVIMakeCompressedStream(ppsCompressed_out: Pointer, ppsSource: PAVISTREAM, lpOptions: LPAVICOMPRESSOPTIONS, pclsidHandler: Optional<LPCLSID>): HRESULT {
     return Avifil32.Load('AVIMakeCompressedStream')(ppsCompressed_out, ppsSource, lpOptions, pclsidHandler);
   }
 
@@ -268,12 +268,12 @@ class Avifil32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/vfw/nf-vfw-avisave
-  public static AVISave(szFile: LPCTSTR, pclsidHandler: OPTIONAL<LPCLSID>, lpfnCallback: NULLABLE<AVISAVECALLBACK>, nStreams: INT, pfile: PAVISTREAM, lpOptions: NULLABLE<LPAVICOMPRESSOPTIONS>): HRESULT {
+  public static AVISave(szFile: LPCTSTR, pclsidHandler: Optional<LPCLSID>, lpfnCallback: Nullable<AVISAVECALLBACK>, nStreams: INT, pfile: PAVISTREAM, lpOptions: Nullable<LPAVICOMPRESSOPTIONS>): HRESULT {
     return Avifil32.Load('AVISave')(szFile, pclsidHandler, lpfnCallback, nStreams, pfile, lpOptions);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/vfw/nf-vfw-avisavea
-  public static AVISaveA(szFile: LPCSTR, pclsidHandler: OPTIONAL<LPCLSID>, lpfnCallback: NULLABLE<AVISAVECALLBACK>, nStreams: INT, pfile: PAVISTREAM, lpOptions: NULLABLE<LPAVICOMPRESSOPTIONS>): HRESULT {
+  public static AVISaveA(szFile: LPCSTR, pclsidHandler: Optional<LPCLSID>, lpfnCallback: Nullable<AVISAVECALLBACK>, nStreams: INT, pfile: PAVISTREAM, lpOptions: Nullable<LPAVICOMPRESSOPTIONS>): HRESULT {
     return Avifil32.Load('AVISaveA')(szFile, pclsidHandler, lpfnCallback, nStreams, pfile, lpOptions);
   }
 
@@ -288,22 +288,22 @@ class Avifil32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/vfw/nf-vfw-avisavev
-  public static AVISaveV(szFile: LPCTSTR, pclsidHandler: OPTIONAL<LPCLSID>, lpfnCallback: NULLABLE<AVISAVECALLBACK>, nStreams: INT, ppavi: Pointer, plpOptions: NULLABLE<Pointer>): HRESULT {
+  public static AVISaveV(szFile: LPCTSTR, pclsidHandler: Optional<LPCLSID>, lpfnCallback: Nullable<AVISAVECALLBACK>, nStreams: INT, ppavi: Pointer, plpOptions: Nullable<Pointer>): HRESULT {
     return Avifil32.Load('AVISaveV')(szFile, pclsidHandler, lpfnCallback, nStreams, ppavi, plpOptions);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/vfw/nf-vfw-avisaveva
-  public static AVISaveVA(szFile: LPCSTR, pclsidHandler: OPTIONAL<LPCLSID>, lpfnCallback: NULLABLE<AVISAVECALLBACK>, nStreams: INT, ppavi: Pointer, plpOptions: Pointer): HRESULT {
+  public static AVISaveVA(szFile: LPCSTR, pclsidHandler: Optional<LPCLSID>, lpfnCallback: Nullable<AVISAVECALLBACK>, nStreams: INT, ppavi: Pointer, plpOptions: Pointer): HRESULT {
     return Avifil32.Load('AVISaveVA')(szFile, pclsidHandler, lpfnCallback, nStreams, ppavi, plpOptions);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/vfw/nf-vfw-avisavevw
-  public static AVISaveVW(szFile: LPCWSTR, pclsidHandler: OPTIONAL<LPCLSID>, lpfnCallback: NULLABLE<AVISAVECALLBACK>, nStreams: INT, ppavi: Pointer, plpOptions: Pointer): HRESULT {
+  public static AVISaveVW(szFile: LPCWSTR, pclsidHandler: Optional<LPCLSID>, lpfnCallback: Nullable<AVISAVECALLBACK>, nStreams: INT, ppavi: Pointer, plpOptions: Pointer): HRESULT {
     return Avifil32.Load('AVISaveVW')(szFile, pclsidHandler, lpfnCallback, nStreams, ppavi, plpOptions);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/vfw/nf-vfw-avisavew
-  public static AVISaveW(szFile: LPCWSTR, pclsidHandler: OPTIONAL<LPCLSID>, lpfnCallback: NULLABLE<AVISAVECALLBACK>, nStreams: INT, pfile: PAVISTREAM, lpOptions: NULLABLE<LPAVICOMPRESSOPTIONS>): HRESULT {
+  public static AVISaveW(szFile: LPCWSTR, pclsidHandler: Optional<LPCLSID>, lpfnCallback: Nullable<AVISAVECALLBACK>, nStreams: INT, pfile: PAVISTREAM, lpOptions: Nullable<LPAVICOMPRESSOPTIONS>): HRESULT {
     return Avifil32.Load('AVISaveW')(szFile, pclsidHandler, lpfnCallback, nStreams, pfile, lpOptions);
   }
 
@@ -318,7 +318,7 @@ class Avifil32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/vfw/nf-vfw-avistreamcreate
-  public static AVIStreamCreate(ppavi_out: Pointer, lParam1: LONG, lParam2: LONG, pclsidHandler: OPTIONAL<LPCLSID>): HRESULT {
+  public static AVIStreamCreate(ppavi_out: Pointer, lParam1: LONG, lParam2: LONG, pclsidHandler: Optional<LPCLSID>): HRESULT {
     return Avifil32.Load('AVIStreamCreate')(ppavi_out, lParam1, lParam2, pclsidHandler);
   }
 
@@ -343,7 +343,7 @@ class Avifil32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/vfw/nf-vfw-avistreamgetframeopen
-  public static AVIStreamGetFrameOpen(pavi: PAVISTREAM, lpbiWanted: OPTIONAL<LPBITMAPINFOHEADER>): PGETFRAME {
+  public static AVIStreamGetFrameOpen(pavi: PAVISTREAM, lpbiWanted: Optional<LPBITMAPINFOHEADER>): PGETFRAME {
     return Avifil32.Load('AVIStreamGetFrameOpen')(pavi, lpbiWanted);
   }
 
@@ -368,32 +368,32 @@ class Avifil32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/vfw/nf-vfw-avistreamopenfromfile
-  public static AVIStreamOpenFromFile(ppavi_out: Pointer, szFile: LPCTSTR, fccType: DWORD, lParam: LONG, mode: UINT, pclsidHandler: OPTIONAL<LPCLSID>): HRESULT {
+  public static AVIStreamOpenFromFile(ppavi_out: Pointer, szFile: LPCTSTR, fccType: DWORD, lParam: LONG, mode: UINT, pclsidHandler: Optional<LPCLSID>): HRESULT {
     return Avifil32.Load('AVIStreamOpenFromFile')(ppavi_out, szFile, fccType, lParam, mode, pclsidHandler);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/vfw/nf-vfw-avistreamopenfromfilea
-  public static AVIStreamOpenFromFileA(ppavi_out: Pointer, szFile: LPCSTR, fccType: DWORD, lParam: LONG, mode: UINT, pclsidHandler: OPTIONAL<LPCLSID>): HRESULT {
+  public static AVIStreamOpenFromFileA(ppavi_out: Pointer, szFile: LPCSTR, fccType: DWORD, lParam: LONG, mode: UINT, pclsidHandler: Optional<LPCLSID>): HRESULT {
     return Avifil32.Load('AVIStreamOpenFromFileA')(ppavi_out, szFile, fccType, lParam, mode, pclsidHandler);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/vfw/nf-vfw-avistreamopenfromfilew
-  public static AVIStreamOpenFromFileW(ppavi_out: Pointer, szFile: LPCWSTR, fccType: DWORD, lParam: LONG, mode: UINT, pclsidHandler: OPTIONAL<LPCLSID>): HRESULT {
+  public static AVIStreamOpenFromFileW(ppavi_out: Pointer, szFile: LPCWSTR, fccType: DWORD, lParam: LONG, mode: UINT, pclsidHandler: Optional<LPCLSID>): HRESULT {
     return Avifil32.Load('AVIStreamOpenFromFileW')(ppavi_out, szFile, fccType, lParam, mode, pclsidHandler);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/vfw/nf-vfw-avistreamread
-  public static AVIStreamRead(pavi: PAVISTREAM, lStart: LONG, lSamples: LONG, lpBuffer_out: OPTIONAL<LPVOID>, cbBuffer: LONG, plBytes_out: OPTIONAL<LPLONG>, plSamples_out: OPTIONAL<LPLONG>): HRESULT {
+  public static AVIStreamRead(pavi: PAVISTREAM, lStart: LONG, lSamples: LONG, lpBuffer_out: Optional<LPVOID>, cbBuffer: LONG, plBytes_out: Optional<LPLONG>, plSamples_out: Optional<LPLONG>): HRESULT {
     return Avifil32.Load('AVIStreamRead')(pavi, lStart, lSamples, lpBuffer_out, cbBuffer, plBytes_out, plSamples_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/vfw/nf-vfw-avistreamreaddata
-  public static AVIStreamReadData(pavi: PAVISTREAM, fcc: DWORD, lp_out: OPTIONAL<LPVOID>, lpcb_in_out: LPLONG): HRESULT {
+  public static AVIStreamReadData(pavi: PAVISTREAM, fcc: DWORD, lp_out: Optional<LPVOID>, lpcb_in_out: LPLONG): HRESULT {
     return Avifil32.Load('AVIStreamReadData')(pavi, fcc, lp_out, lpcb_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/vfw/nf-vfw-avistreamreadformat
-  public static AVIStreamReadFormat(pavi: PAVISTREAM, lPos: LONG, lpFormat_out: OPTIONAL<LPVOID>, lpcbFormat_in_out: LPLONG): HRESULT {
+  public static AVIStreamReadFormat(pavi: PAVISTREAM, lPos: LONG, lpFormat_out: Optional<LPVOID>, lpcbFormat_in_out: LPLONG): HRESULT {
     return Avifil32.Load('AVIStreamReadFormat')(pavi, lPos, lpFormat_out, lpcbFormat_in_out);
   }
 
@@ -423,7 +423,7 @@ class Avifil32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/vfw/nf-vfw-avistreamwrite
-  public static AVIStreamWrite(pavi: PAVISTREAM, lStart: LONG, lSamples: LONG, lpBuffer: LPVOID, cbBuffer: LONG, dwFlags: DWORD, plSampWritten_out: OPTIONAL<LPLONG>, plBytesWritten_out: OPTIONAL<LPLONG>): HRESULT {
+  public static AVIStreamWrite(pavi: PAVISTREAM, lStart: LONG, lSamples: LONG, lpBuffer: LPVOID, cbBuffer: LONG, dwFlags: DWORD, plSampWritten_out: Optional<LPLONG>, plBytesWritten_out: Optional<LPLONG>): HRESULT {
     return Avifil32.Load('AVIStreamWrite')(pavi, lStart, lSamples, lpBuffer, cbBuffer, dwFlags, plSampWritten_out, plBytesWritten_out);
   }
 
@@ -433,7 +433,7 @@ class Avifil32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/vfw/nf-vfw-createeditablestream
-  public static CreateEditableStream(ppsEditable_out: Pointer, psSource: NULLABLE<PAVISTREAM>): HRESULT {
+  public static CreateEditableStream(ppsEditable_out: Pointer, psSource: Nullable<PAVISTREAM>): HRESULT {
     return Avifil32.Load('CreateEditableStream')(ppsEditable_out, psSource);
   }
 

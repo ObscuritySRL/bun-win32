@@ -12,8 +12,8 @@ import type {
   LPSECURITY_ATTRIBUTES,
   LPWSTR,
   NOTIFICATION_MASK,
-  NULLABLE,
-  OPTIONAL,
+  Nullable,
+  Optional,
   PDWORD,
   PLARGE_INTEGER,
   PTRANSACTION_NOTIFICATION,
@@ -92,12 +92,12 @@ class Ktmw32 extends Win32 {
   } as const satisfies Record<string, FFIFunction>;
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ktmw32/nf-ktmw32-commitcomplete
-  public static CommitComplete(EnlistmentHandle: HANDLE, TmVirtualClock: NULLABLE<PLARGE_INTEGER>): BOOL {
+  public static CommitComplete(EnlistmentHandle: HANDLE, TmVirtualClock: Nullable<PLARGE_INTEGER>): BOOL {
     return Ktmw32.Load('CommitComplete')(EnlistmentHandle, TmVirtualClock);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ktmw32/nf-ktmw32-commitenlistment
-  public static CommitEnlistment(EnlistmentHandle: HANDLE, TmVirtualClock: NULLABLE<PLARGE_INTEGER>): BOOL {
+  public static CommitEnlistment(EnlistmentHandle: HANDLE, TmVirtualClock: Nullable<PLARGE_INTEGER>): BOOL {
     return Ktmw32.Load('CommitEnlistment')(EnlistmentHandle, TmVirtualClock);
   }
 
@@ -113,28 +113,28 @@ class Ktmw32 extends Win32 {
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ktmw32/nf-ktmw32-createenlistment
   public static CreateEnlistment(
-    lpEnlistmentAttributes: OPTIONAL<LPSECURITY_ATTRIBUTES>,
+    lpEnlistmentAttributes: Optional<LPSECURITY_ATTRIBUTES>,
     ResourceManagerHandle: HANDLE,
     TransactionHandle: HANDLE,
     NotificationMask: NOTIFICATION_MASK,
     CreateOptions: DWORD,
-    EnlistmentKey: OPTIONAL<PVOID>,
+    EnlistmentKey: Optional<PVOID>,
   ): HANDLE {
     return Ktmw32.Load('CreateEnlistment')(lpEnlistmentAttributes, ResourceManagerHandle, TransactionHandle, NotificationMask, CreateOptions, EnlistmentKey);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ktmw32/nf-ktmw32-createresourcemanager
-  public static CreateResourceManager(lpResourceManagerAttributes: OPTIONAL<LPSECURITY_ATTRIBUTES>, ResourceManagerId: LPGUID, CreateOptions: DWORD, TmHandle: HANDLE, Description: OPTIONAL<LPWSTR>): HANDLE {
+  public static CreateResourceManager(lpResourceManagerAttributes: Optional<LPSECURITY_ATTRIBUTES>, ResourceManagerId: LPGUID, CreateOptions: DWORD, TmHandle: HANDLE, Description: Optional<LPWSTR>): HANDLE {
     return Ktmw32.Load('CreateResourceManager')(lpResourceManagerAttributes, ResourceManagerId, CreateOptions, TmHandle, Description);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ktmw32/nf-ktmw32-createtransaction
-  public static CreateTransaction(lpTransactionAttributes: OPTIONAL<LPSECURITY_ATTRIBUTES>, UOW: OPTIONAL<LPGUID>, CreateOptions: DWORD, IsolationLevel: DWORD, IsolationFlags: DWORD, Timeout: DWORD, Description: OPTIONAL<LPWSTR>): HANDLE {
+  public static CreateTransaction(lpTransactionAttributes: Optional<LPSECURITY_ATTRIBUTES>, UOW: Optional<LPGUID>, CreateOptions: DWORD, IsolationLevel: DWORD, IsolationFlags: DWORD, Timeout: DWORD, Description: Optional<LPWSTR>): HANDLE {
     return Ktmw32.Load('CreateTransaction')(lpTransactionAttributes, UOW, CreateOptions, IsolationLevel, IsolationFlags, Timeout, Description);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ktmw32/nf-ktmw32-createtransactionmanager
-  public static CreateTransactionManager(lpTransactionAttributes: OPTIONAL<LPSECURITY_ATTRIBUTES>, LogFileName: OPTIONAL<LPWSTR>, CreateOptions: ULONG, CommitStrength: ULONG): HANDLE {
+  public static CreateTransactionManager(lpTransactionAttributes: Optional<LPSECURITY_ATTRIBUTES>, LogFileName: Optional<LPWSTR>, CreateOptions: ULONG, CommitStrength: ULONG): HANDLE {
     return Ktmw32.Load('CreateTransactionManager')(lpTransactionAttributes, LogFileName, CreateOptions, CommitStrength);
   }
 
@@ -149,12 +149,12 @@ class Ktmw32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ktmw32/nf-ktmw32-getenlistmentrecoveryinformation
-  public static GetEnlistmentRecoveryInformation(EnlistmentHandle: HANDLE, BufferSize: ULONG, Buffer_out: PVOID, BufferUsed_out: OPTIONAL<PULONG>): BOOL {
+  public static GetEnlistmentRecoveryInformation(EnlistmentHandle: HANDLE, BufferSize: ULONG, Buffer_out: PVOID, BufferUsed_out: Optional<PULONG>): BOOL {
     return Ktmw32.Load('GetEnlistmentRecoveryInformation')(EnlistmentHandle, BufferSize, Buffer_out, BufferUsed_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ktmw32/nf-ktmw32-getnotificationresourcemanager
-  public static GetNotificationResourceManager(ResourceManagerHandle: HANDLE, TransactionNotification_out: PTRANSACTION_NOTIFICATION, NotificationLength: ULONG, dwMilliseconds: DWORD, ReturnLength_out: OPTIONAL<PULONG>): BOOL {
+  public static GetNotificationResourceManager(ResourceManagerHandle: HANDLE, TransactionNotification_out: PTRANSACTION_NOTIFICATION, NotificationLength: ULONG, dwMilliseconds: DWORD, ReturnLength_out: Optional<PULONG>): BOOL {
     return Ktmw32.Load('GetNotificationResourceManager')(ResourceManagerHandle, TransactionNotification_out, NotificationLength, dwMilliseconds, ReturnLength_out);
   }
 
@@ -171,12 +171,12 @@ class Ktmw32 extends Win32 {
   // https://learn.microsoft.com/en-us/windows/win32/api/ktmw32/nf-ktmw32-gettransactioninformation
   public static GetTransactionInformation(
     TransactionHandle: HANDLE,
-    Outcome_out: OPTIONAL<PDWORD>,
-    IsolationLevel_out: OPTIONAL<PDWORD>,
-    IsolationFlags_out: OPTIONAL<PDWORD>,
-    Timeout_out: OPTIONAL<PDWORD>,
+    Outcome_out: Optional<PDWORD>,
+    IsolationLevel_out: Optional<PDWORD>,
+    IsolationFlags_out: Optional<PDWORD>,
+    Timeout_out: Optional<PDWORD>,
     BufferLength: DWORD,
-    Description_out: OPTIONAL<LPWSTR>,
+    Description_out: Optional<LPWSTR>,
   ): BOOL {
     return Ktmw32.Load('GetTransactionInformation')(TransactionHandle, Outcome_out, IsolationLevel_out, IsolationFlags_out, Timeout_out, BufferLength, Description_out);
   }
@@ -212,7 +212,7 @@ class Ktmw32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ktmw32/nf-ktmw32-prepreparecomplete
-  public static PrePrepareComplete(EnlistmentHandle: HANDLE, TmVirtualClock: NULLABLE<PLARGE_INTEGER>): BOOL {
+  public static PrePrepareComplete(EnlistmentHandle: HANDLE, TmVirtualClock: Nullable<PLARGE_INTEGER>): BOOL {
     return Ktmw32.Load('PrePrepareComplete')(EnlistmentHandle, TmVirtualClock);
   }
 
@@ -222,7 +222,7 @@ class Ktmw32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ktmw32/nf-ktmw32-preparecomplete
-  public static PrepareComplete(EnlistmentHandle: HANDLE, TmVirtualClock: NULLABLE<PLARGE_INTEGER>): BOOL {
+  public static PrepareComplete(EnlistmentHandle: HANDLE, TmVirtualClock: Nullable<PLARGE_INTEGER>): BOOL {
     return Ktmw32.Load('PrepareComplete')(EnlistmentHandle, TmVirtualClock);
   }
 
@@ -232,12 +232,12 @@ class Ktmw32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ktmw32/nf-ktmw32-readonlyenlistment
-  public static ReadOnlyEnlistment(EnlistmentHandle: HANDLE, TmVirtualClock: NULLABLE<PLARGE_INTEGER>): BOOL {
+  public static ReadOnlyEnlistment(EnlistmentHandle: HANDLE, TmVirtualClock: Nullable<PLARGE_INTEGER>): BOOL {
     return Ktmw32.Load('ReadOnlyEnlistment')(EnlistmentHandle, TmVirtualClock);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ktmw32/nf-ktmw32-recoverenlistment
-  public static RecoverEnlistment(EnlistmentHandle: HANDLE, EnlistmentKey: OPTIONAL<PVOID>): BOOL {
+  public static RecoverEnlistment(EnlistmentHandle: HANDLE, EnlistmentKey: Optional<PVOID>): BOOL {
     return Ktmw32.Load('RecoverEnlistment')(EnlistmentHandle, EnlistmentKey);
   }
 
@@ -292,12 +292,12 @@ class Ktmw32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ktmw32/nf-ktmw32-settransactioninformation
-  public static SetTransactionInformation(TransactionHandle: HANDLE, IsolationLevel: DWORD, IsolationFlags: DWORD, Timeout: DWORD, Description: OPTIONAL<LPWSTR>): BOOL {
+  public static SetTransactionInformation(TransactionHandle: HANDLE, IsolationLevel: DWORD, IsolationFlags: DWORD, Timeout: DWORD, Description: Optional<LPWSTR>): BOOL {
     return Ktmw32.Load('SetTransactionInformation')(TransactionHandle, IsolationLevel, IsolationFlags, Timeout, Description);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ktmw32/nf-ktmw32-singlephasereject
-  public static SinglePhaseReject(EnlistmentHandle: HANDLE, TmVirtualClock: NULLABLE<PLARGE_INTEGER>): BOOL {
+  public static SinglePhaseReject(EnlistmentHandle: HANDLE, TmVirtualClock: Nullable<PLARGE_INTEGER>): BOOL {
     return Ktmw32.Load('SinglePhaseReject')(EnlistmentHandle, TmVirtualClock);
   }
 }

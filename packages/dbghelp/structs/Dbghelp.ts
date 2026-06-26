@@ -22,7 +22,7 @@ import type {
   LPSTACKFRAME64,
   LPSTACKFRAME_EX,
   MINIDUMP_TYPE,
-  OPTIONAL,
+  Optional,
   PDWORD,
   PDWORD64,
   PENUMDIRTREE_CALLBACK,
@@ -264,27 +264,27 @@ class Dbghelp extends Win32 {
   } as const satisfies Record<string, FFIFunction>;
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dbghelp/nf-dbghelp-enumdirtree
-  public static EnumDirTree(hProcess: OPTIONAL<HANDLE>, RootPath: LPCSTR, InputPathName: LPCSTR, OutputPathBuffer_out: OPTIONAL<LPSTR>, cb: OPTIONAL<PENUMDIRTREE_CALLBACK>, data: OPTIONAL<PVOID>): BOOL {
+  public static EnumDirTree(hProcess: Optional<HANDLE>, RootPath: LPCSTR, InputPathName: LPCSTR, OutputPathBuffer_out: Optional<LPSTR>, cb: Optional<PENUMDIRTREE_CALLBACK>, data: Optional<PVOID>): BOOL {
     return Dbghelp.Load('EnumDirTree')(hProcess, RootPath, InputPathName, OutputPathBuffer_out, cb, data);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dbghelp/nf-dbghelp-enumdirtreew
-  public static EnumDirTreeW(hProcess: OPTIONAL<HANDLE>, RootPath: LPCWSTR, InputPathName: LPCWSTR, OutputPathBuffer_out: OPTIONAL<LPWSTR>, cb: OPTIONAL<PENUMDIRTREE_CALLBACKW>, data: OPTIONAL<PVOID>): BOOL {
+  public static EnumDirTreeW(hProcess: Optional<HANDLE>, RootPath: LPCWSTR, InputPathName: LPCWSTR, OutputPathBuffer_out: Optional<LPWSTR>, cb: Optional<PENUMDIRTREE_CALLBACKW>, data: Optional<PVOID>): BOOL {
     return Dbghelp.Load('EnumDirTreeW')(hProcess, RootPath, InputPathName, OutputPathBuffer_out, cb, data);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dbghelp/nf-dbghelp-enumerateloadedmodulesex
-  public static EnumerateLoadedModulesEx(hProcess: HANDLE, EnumLoadedModulesCallback: PENUMLOADED_MODULES_CALLBACK64, UserContext: OPTIONAL<PVOID>): BOOL {
+  public static EnumerateLoadedModulesEx(hProcess: HANDLE, EnumLoadedModulesCallback: PENUMLOADED_MODULES_CALLBACK64, UserContext: Optional<PVOID>): BOOL {
     return Dbghelp.Load('EnumerateLoadedModulesEx')(hProcess, EnumLoadedModulesCallback, UserContext);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dbghelp/nf-dbghelp-enumerateloadedmodulesexw
-  public static EnumerateLoadedModulesExW(hProcess: HANDLE, EnumLoadedModulesCallback: PENUMLOADED_MODULES_CALLBACKW64, UserContext: OPTIONAL<PVOID>): BOOL {
+  public static EnumerateLoadedModulesExW(hProcess: HANDLE, EnumLoadedModulesCallback: PENUMLOADED_MODULES_CALLBACKW64, UserContext: Optional<PVOID>): BOOL {
     return Dbghelp.Load('EnumerateLoadedModulesExW')(hProcess, EnumLoadedModulesCallback, UserContext);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dbghelp/nf-dbghelp-enumerateloadedmodulesw64
-  public static EnumerateLoadedModulesW64(hProcess: HANDLE, EnumLoadedModulesCallback: PENUMLOADED_MODULES_CALLBACKW64, UserContext: OPTIONAL<PVOID>): BOOL {
+  public static EnumerateLoadedModulesW64(hProcess: HANDLE, EnumLoadedModulesCallback: PENUMLOADED_MODULES_CALLBACKW64, UserContext: Optional<PVOID>): BOOL {
     return Dbghelp.Load('EnumerateLoadedModulesW64')(hProcess, EnumLoadedModulesCallback, UserContext);
   }
 
@@ -294,12 +294,12 @@ class Dbghelp extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dbghelp/nf-dbghelp-finddebuginfofileex
-  public static FindDebugInfoFileEx(FileName: LPCSTR, SymbolPath: LPCSTR, DebugFilePath_out: LPSTR, Callback: OPTIONAL<PFIND_DEBUG_FILE_CALLBACK>, CallerData: OPTIONAL<PVOID>): HANDLE {
+  public static FindDebugInfoFileEx(FileName: LPCSTR, SymbolPath: LPCSTR, DebugFilePath_out: LPSTR, Callback: Optional<PFIND_DEBUG_FILE_CALLBACK>, CallerData: Optional<PVOID>): HANDLE {
     return Dbghelp.Load('FindDebugInfoFileEx')(FileName, SymbolPath, DebugFilePath_out, Callback, CallerData);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dbghelp/nf-dbghelp-finddebuginfofileexw
-  public static FindDebugInfoFileExW(FileName: LPCWSTR, SymbolPath: LPCWSTR, DebugFilePath_out: LPWSTR, Callback: OPTIONAL<PFIND_DEBUG_FILE_CALLBACKW>, CallerData: OPTIONAL<PVOID>): HANDLE {
+  public static FindDebugInfoFileExW(FileName: LPCWSTR, SymbolPath: LPCWSTR, DebugFilePath_out: LPWSTR, Callback: Optional<PFIND_DEBUG_FILE_CALLBACKW>, CallerData: Optional<PVOID>): HANDLE {
     return Dbghelp.Load('FindDebugInfoFileExW')(FileName, SymbolPath, DebugFilePath_out, Callback, CallerData);
   }
 
@@ -309,12 +309,12 @@ class Dbghelp extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dbghelp/nf-dbghelp-findexecutableimageex
-  public static FindExecutableImageEx(FileName: LPCSTR, SymbolPath: LPCSTR, ImageFilePath_out: LPSTR, Callback: OPTIONAL<PFIND_EXE_FILE_CALLBACK>, CallerData: OPTIONAL<PVOID>): HANDLE {
+  public static FindExecutableImageEx(FileName: LPCSTR, SymbolPath: LPCSTR, ImageFilePath_out: LPSTR, Callback: Optional<PFIND_EXE_FILE_CALLBACK>, CallerData: Optional<PVOID>): HANDLE {
     return Dbghelp.Load('FindExecutableImageEx')(FileName, SymbolPath, ImageFilePath_out, Callback, CallerData);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dbghelp/nf-dbghelp-findexecutableimageexw
-  public static FindExecutableImageExW(FileName: LPCWSTR, SymbolPath: LPCWSTR, ImageFilePath_out: LPWSTR, Callback: OPTIONAL<PFIND_EXE_FILE_CALLBACKW>, CallerData: PVOID): HANDLE {
+  public static FindExecutableImageExW(FileName: LPCWSTR, SymbolPath: LPCWSTR, ImageFilePath_out: LPWSTR, Callback: Optional<PFIND_EXE_FILE_CALLBACKW>, CallerData: PVOID): HANDLE {
     return Dbghelp.Load('FindExecutableImageExW')(FileName, SymbolPath, ImageFilePath_out, Callback, CallerData);
   }
 
@@ -339,7 +339,7 @@ class Dbghelp extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dbghelp/nf-dbghelp-imagedirectoryentrytodataex
-  public static ImageDirectoryEntryToDataEx(Base: PVOID, MappedAsImage: BOOLEAN, DirectoryEntry: USHORT, Size_out: PULONG, FoundHeader_out: OPTIONAL<PVOID>): PVOID {
+  public static ImageDirectoryEntryToDataEx(Base: PVOID, MappedAsImage: BOOLEAN, DirectoryEntry: USHORT, Size_out: PULONG, FoundHeader_out: Optional<PVOID>): PVOID {
     return Dbghelp.Load('ImageDirectoryEntryToDataEx')(Base, MappedAsImage, DirectoryEntry, Size_out, FoundHeader_out);
   }
 
@@ -354,7 +354,7 @@ class Dbghelp extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dbghelp/nf-dbghelp-imagervatova
-  public static ImageRvaToVa(NtHeaders: PIMAGE_NT_HEADERS, Base: PVOID, Rva: ULONG, LastRvaSection_in_out: OPTIONAL<PVOID>): PVOID {
+  public static ImageRvaToVa(NtHeaders: PIMAGE_NT_HEADERS, Base: PVOID, Rva: ULONG, LastRvaSection_in_out: Optional<PVOID>): PVOID {
     return Dbghelp.Load('ImageRvaToVa')(NtHeaders, Base, Rva, LastRvaSection_in_out);
   }
 
@@ -374,7 +374,7 @@ class Dbghelp extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/minidumpapiset/nf-minidumpapiset-minidumpreaddumpstream
-  public static MiniDumpReadDumpStream(BaseOfDump: PVOID, StreamNumber: ULONG, Dir_out: PVOID, StreamPointer_out: PVOID, StreamSize_out: OPTIONAL<PULONG>): BOOL {
+  public static MiniDumpReadDumpStream(BaseOfDump: PVOID, StreamNumber: ULONG, Dir_out: PVOID, StreamPointer_out: PVOID, StreamSize_out: Optional<PULONG>): BOOL {
     return Dbghelp.Load('MiniDumpReadDumpStream')(BaseOfDump, StreamNumber, Dir_out, StreamPointer_out, StreamSize_out);
   }
 
@@ -384,9 +384,9 @@ class Dbghelp extends Win32 {
     ProcessId: DWORD,
     hFile: HANDLE,
     DumpType: MINIDUMP_TYPE,
-    ExceptionParam: OPTIONAL<PMINIDUMP_EXCEPTION_INFORMATION>,
-    UserStreamParam: OPTIONAL<PMINIDUMP_USER_STREAM_INFORMATION>,
-    CallbackParam: OPTIONAL<PMINIDUMP_CALLBACK_INFORMATION>,
+    ExceptionParam: Optional<PMINIDUMP_EXCEPTION_INFORMATION>,
+    UserStreamParam: Optional<PMINIDUMP_USER_STREAM_INFORMATION>,
+    CallbackParam: Optional<PMINIDUMP_CALLBACK_INFORMATION>,
   ): BOOL {
     return Dbghelp.Load('MiniDumpWriteDump')(hProcess, ProcessId, hFile, DumpType, ExceptionParam, UserStreamParam, CallbackParam);
   }
@@ -408,10 +408,10 @@ class Dbghelp extends Win32 {
     hThread: HANDLE,
     StackFrame_in_out: LPSTACKFRAME64,
     ContextRecord_in_out: PVOID,
-    ReadMemoryRoutine: OPTIONAL<PREAD_PROCESS_MEMORY_ROUTINE64>,
-    FunctionTableAccessRoutine: OPTIONAL<PFUNCTION_TABLE_ACCESS_ROUTINE64>,
-    GetModuleBaseRoutine: OPTIONAL<PGET_MODULE_BASE_ROUTINE64>,
-    TranslateAddress: OPTIONAL<PTRANSLATE_ADDRESS_ROUTINE64>,
+    ReadMemoryRoutine: Optional<PREAD_PROCESS_MEMORY_ROUTINE64>,
+    FunctionTableAccessRoutine: Optional<PFUNCTION_TABLE_ACCESS_ROUTINE64>,
+    GetModuleBaseRoutine: Optional<PGET_MODULE_BASE_ROUTINE64>,
+    TranslateAddress: Optional<PTRANSLATE_ADDRESS_ROUTINE64>,
   ): BOOL {
     return Dbghelp.Load('StackWalk64')(MachineType, hProcess, hThread, StackFrame_in_out, ContextRecord_in_out, ReadMemoryRoutine, FunctionTableAccessRoutine, GetModuleBaseRoutine, TranslateAddress);
   }
@@ -423,10 +423,10 @@ class Dbghelp extends Win32 {
     hThread: HANDLE,
     StackFrame_in_out: LPSTACKFRAME_EX,
     ContextRecord_in_out: PVOID,
-    ReadMemoryRoutine: OPTIONAL<PREAD_PROCESS_MEMORY_ROUTINE64>,
-    FunctionTableAccessRoutine: OPTIONAL<PFUNCTION_TABLE_ACCESS_ROUTINE64>,
-    GetModuleBaseRoutine: OPTIONAL<PGET_MODULE_BASE_ROUTINE64>,
-    TranslateAddress: OPTIONAL<PTRANSLATE_ADDRESS_ROUTINE64>,
+    ReadMemoryRoutine: Optional<PREAD_PROCESS_MEMORY_ROUTINE64>,
+    FunctionTableAccessRoutine: Optional<PFUNCTION_TABLE_ACCESS_ROUTINE64>,
+    GetModuleBaseRoutine: Optional<PGET_MODULE_BASE_ROUTINE64>,
+    TranslateAddress: Optional<PTRANSLATE_ADDRESS_ROUTINE64>,
     Flags: DWORD,
   ): BOOL {
     return Dbghelp.Load('StackWalkEx')(MachineType, hProcess, hThread, StackFrame_in_out, ContextRecord_in_out, ReadMemoryRoutine, FunctionTableAccessRoutine, GetModuleBaseRoutine, TranslateAddress, Flags);
@@ -458,22 +458,22 @@ class Dbghelp extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dbghelp/nf-dbghelp-symdeletesymbol
-  public static SymDeleteSymbol(hProcess: HANDLE, BaseOfDll: ULONG64, Name: OPTIONAL<LPCSTR>, Address: DWORD64, Flags: DWORD): BOOL {
+  public static SymDeleteSymbol(hProcess: HANDLE, BaseOfDll: ULONG64, Name: Optional<LPCSTR>, Address: DWORD64, Flags: DWORD): BOOL {
     return Dbghelp.Load('SymDeleteSymbol')(hProcess, BaseOfDll, Name, Address, Flags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dbghelp/nf-dbghelp-symdeletesymbolw
-  public static SymDeleteSymbolW(hProcess: HANDLE, BaseOfDll: ULONG64, Name: OPTIONAL<LPCWSTR>, Address: DWORD64, Flags: DWORD): BOOL {
+  public static SymDeleteSymbolW(hProcess: HANDLE, BaseOfDll: ULONG64, Name: Optional<LPCWSTR>, Address: DWORD64, Flags: DWORD): BOOL {
     return Dbghelp.Load('SymDeleteSymbolW')(hProcess, BaseOfDll, Name, Address, Flags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dbghelp/nf-dbghelp-symenumlines
-  public static SymEnumLines(hProcess: HANDLE, Base: ULONG64, Obj: OPTIONAL<LPCSTR>, File: OPTIONAL<LPCSTR>, EnumLinesCallback: PSYM_ENUMLINES_CALLBACK, UserContext: OPTIONAL<PVOID>): BOOL {
+  public static SymEnumLines(hProcess: HANDLE, Base: ULONG64, Obj: Optional<LPCSTR>, File: Optional<LPCSTR>, EnumLinesCallback: PSYM_ENUMLINES_CALLBACK, UserContext: Optional<PVOID>): BOOL {
     return Dbghelp.Load('SymEnumLines')(hProcess, Base, Obj, File, EnumLinesCallback, UserContext);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dbghelp/nf-dbghelp-symenumlines
-  public static SymEnumLinesW(hProcess: HANDLE, Base: ULONG64, Obj: OPTIONAL<LPCWSTR>, File: OPTIONAL<LPCWSTR>, EnumLinesCallback: PSYM_ENUMLINES_CALLBACKW, UserContext: OPTIONAL<PVOID>): BOOL {
+  public static SymEnumLinesW(hProcess: HANDLE, Base: ULONG64, Obj: Optional<LPCWSTR>, File: Optional<LPCWSTR>, EnumLinesCallback: PSYM_ENUMLINES_CALLBACKW, UserContext: Optional<PVOID>): BOOL {
     return Dbghelp.Load('SymEnumLinesW')(hProcess, Base, Obj, File, EnumLinesCallback, UserContext);
   }
 
@@ -483,72 +483,72 @@ class Dbghelp extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dbghelp/nf-dbghelp-symenumsourcefiles
-  public static SymEnumSourceFiles(hProcess: HANDLE, ModBase: ULONG64, Mask: OPTIONAL<LPCSTR>, cbSrcFiles: PSYM_ENUMSOURCEFILES_CALLBACK, UserContext: OPTIONAL<PVOID>): BOOL {
+  public static SymEnumSourceFiles(hProcess: HANDLE, ModBase: ULONG64, Mask: Optional<LPCSTR>, cbSrcFiles: PSYM_ENUMSOURCEFILES_CALLBACK, UserContext: Optional<PVOID>): BOOL {
     return Dbghelp.Load('SymEnumSourceFiles')(hProcess, ModBase, Mask, cbSrcFiles, UserContext);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dbghelp/nf-dbghelp-symenumsourcefilesw
-  public static SymEnumSourceFilesW(hProcess: HANDLE, ModBase: ULONG64, Mask: OPTIONAL<LPCWSTR>, cbSrcFiles: PSYM_ENUMSOURCEFILES_CALLBACKW, UserContext: OPTIONAL<PVOID>): BOOL {
+  public static SymEnumSourceFilesW(hProcess: HANDLE, ModBase: ULONG64, Mask: Optional<LPCWSTR>, cbSrcFiles: PSYM_ENUMSOURCEFILES_CALLBACKW, UserContext: Optional<PVOID>): BOOL {
     return Dbghelp.Load('SymEnumSourceFilesW')(hProcess, ModBase, Mask, cbSrcFiles, UserContext);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dbghelp/nf-dbghelp-symenumsourcelines
-  public static SymEnumSourceLines(hProcess: HANDLE, Base: ULONG64, Obj: OPTIONAL<LPCSTR>, File: OPTIONAL<LPCSTR>, Line: DWORD, Flags: DWORD, EnumLinesCallback: PSYM_ENUMLINES_CALLBACK, UserContext: OPTIONAL<PVOID>): BOOL {
+  public static SymEnumSourceLines(hProcess: HANDLE, Base: ULONG64, Obj: Optional<LPCSTR>, File: Optional<LPCSTR>, Line: DWORD, Flags: DWORD, EnumLinesCallback: PSYM_ENUMLINES_CALLBACK, UserContext: Optional<PVOID>): BOOL {
     return Dbghelp.Load('SymEnumSourceLines')(hProcess, Base, Obj, File, Line, Flags, EnumLinesCallback, UserContext);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dbghelp/nf-dbghelp-symenumsourcelinesw
-  public static SymEnumSourceLinesW(hProcess: HANDLE, Base: ULONG64, Obj: OPTIONAL<LPCWSTR>, File: OPTIONAL<LPCWSTR>, Line: DWORD, Flags: DWORD, EnumLinesCallback: PSYM_ENUMLINES_CALLBACKW, UserContext: OPTIONAL<PVOID>): BOOL {
+  public static SymEnumSourceLinesW(hProcess: HANDLE, Base: ULONG64, Obj: Optional<LPCWSTR>, File: Optional<LPCWSTR>, Line: DWORD, Flags: DWORD, EnumLinesCallback: PSYM_ENUMLINES_CALLBACKW, UserContext: Optional<PVOID>): BOOL {
     return Dbghelp.Load('SymEnumSourceLinesW')(hProcess, Base, Obj, File, Line, Flags, EnumLinesCallback, UserContext);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dbghelp/nf-dbghelp-symenumsymbols
-  public static SymEnumSymbols(hProcess: HANDLE, BaseOfDll: ULONG64, Mask: OPTIONAL<LPCSTR>, EnumSymbolsCallback: PSYM_ENUMERATESYMBOLS_CALLBACK, UserContext: OPTIONAL<PVOID>): BOOL {
+  public static SymEnumSymbols(hProcess: HANDLE, BaseOfDll: ULONG64, Mask: Optional<LPCSTR>, EnumSymbolsCallback: PSYM_ENUMERATESYMBOLS_CALLBACK, UserContext: Optional<PVOID>): BOOL {
     return Dbghelp.Load('SymEnumSymbols')(hProcess, BaseOfDll, Mask, EnumSymbolsCallback, UserContext);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dbghelp/nf-dbghelp-symenumsymbolsex
-  public static SymEnumSymbolsEx(hProcess: HANDLE, BaseOfDll: ULONG64, Mask: OPTIONAL<LPCSTR>, EnumSymbolsCallback: PSYM_ENUMERATESYMBOLS_CALLBACK, UserContext: OPTIONAL<PVOID>, Options: DWORD): BOOL {
+  public static SymEnumSymbolsEx(hProcess: HANDLE, BaseOfDll: ULONG64, Mask: Optional<LPCSTR>, EnumSymbolsCallback: PSYM_ENUMERATESYMBOLS_CALLBACK, UserContext: Optional<PVOID>, Options: DWORD): BOOL {
     return Dbghelp.Load('SymEnumSymbolsEx')(hProcess, BaseOfDll, Mask, EnumSymbolsCallback, UserContext, Options);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dbghelp/nf-dbghelp-symenumsymbolsexw
-  public static SymEnumSymbolsExW(hProcess: HANDLE, BaseOfDll: ULONG64, Mask: OPTIONAL<LPCWSTR>, EnumSymbolsCallback: PSYM_ENUMERATESYMBOLS_CALLBACKW, UserContext: OPTIONAL<PVOID>, Options: DWORD): BOOL {
+  public static SymEnumSymbolsExW(hProcess: HANDLE, BaseOfDll: ULONG64, Mask: Optional<LPCWSTR>, EnumSymbolsCallback: PSYM_ENUMERATESYMBOLS_CALLBACKW, UserContext: Optional<PVOID>, Options: DWORD): BOOL {
     return Dbghelp.Load('SymEnumSymbolsExW')(hProcess, BaseOfDll, Mask, EnumSymbolsCallback, UserContext, Options);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dbghelp/nf-dbghelp-symenumsymbolsw
-  public static SymEnumSymbolsW(hProcess: HANDLE, BaseOfDll: ULONG64, Mask: OPTIONAL<LPCWSTR>, EnumSymbolsCallback: PSYM_ENUMERATESYMBOLS_CALLBACKW, UserContext: OPTIONAL<PVOID>): BOOL {
+  public static SymEnumSymbolsW(hProcess: HANDLE, BaseOfDll: ULONG64, Mask: Optional<LPCWSTR>, EnumSymbolsCallback: PSYM_ENUMERATESYMBOLS_CALLBACKW, UserContext: Optional<PVOID>): BOOL {
     return Dbghelp.Load('SymEnumSymbolsW')(hProcess, BaseOfDll, Mask, EnumSymbolsCallback, UserContext);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dbghelp/nf-dbghelp-symenumtypes
-  public static SymEnumTypes(hProcess: HANDLE, BaseOfDll: ULONG64, EnumSymbolsCallback: PSYM_ENUMERATESYMBOLS_CALLBACK, UserContext: OPTIONAL<PVOID>): BOOL {
+  public static SymEnumTypes(hProcess: HANDLE, BaseOfDll: ULONG64, EnumSymbolsCallback: PSYM_ENUMERATESYMBOLS_CALLBACK, UserContext: Optional<PVOID>): BOOL {
     return Dbghelp.Load('SymEnumTypes')(hProcess, BaseOfDll, EnumSymbolsCallback, UserContext);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dbghelp/nf-dbghelp-symenumtypesbyname
-  public static SymEnumTypesByName(hProcess: HANDLE, BaseOfDll: ULONG64, mask: OPTIONAL<LPCSTR>, EnumSymbolsCallback: PSYM_ENUMERATESYMBOLS_CALLBACK, UserContext: OPTIONAL<PVOID>): BOOL {
+  public static SymEnumTypesByName(hProcess: HANDLE, BaseOfDll: ULONG64, mask: Optional<LPCSTR>, EnumSymbolsCallback: PSYM_ENUMERATESYMBOLS_CALLBACK, UserContext: Optional<PVOID>): BOOL {
     return Dbghelp.Load('SymEnumTypesByName')(hProcess, BaseOfDll, mask, EnumSymbolsCallback, UserContext);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dbghelp/nf-dbghelp-symenumtypesbynamew
-  public static SymEnumTypesByNameW(hProcess: HANDLE, BaseOfDll: ULONG64, mask: OPTIONAL<LPCWSTR>, EnumSymbolsCallback: PSYM_ENUMERATESYMBOLS_CALLBACKW, UserContext: OPTIONAL<PVOID>): BOOL {
+  public static SymEnumTypesByNameW(hProcess: HANDLE, BaseOfDll: ULONG64, mask: Optional<LPCWSTR>, EnumSymbolsCallback: PSYM_ENUMERATESYMBOLS_CALLBACKW, UserContext: Optional<PVOID>): BOOL {
     return Dbghelp.Load('SymEnumTypesByNameW')(hProcess, BaseOfDll, mask, EnumSymbolsCallback, UserContext);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dbghelp/nf-dbghelp-symenumtypesw
-  public static SymEnumTypesW(hProcess: HANDLE, BaseOfDll: ULONG64, EnumSymbolsCallback: PSYM_ENUMERATESYMBOLS_CALLBACKW, UserContext: OPTIONAL<PVOID>): BOOL {
+  public static SymEnumTypesW(hProcess: HANDLE, BaseOfDll: ULONG64, EnumSymbolsCallback: PSYM_ENUMERATESYMBOLS_CALLBACKW, UserContext: Optional<PVOID>): BOOL {
     return Dbghelp.Load('SymEnumTypesW')(hProcess, BaseOfDll, EnumSymbolsCallback, UserContext);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dbghelp/nf-dbghelp-symfinddebuginfofile
-  public static SymFindDebugInfoFile(hProcess: HANDLE, FileName: LPCSTR, DebugFilePath_out: LPSTR, Callback: OPTIONAL<PFIND_DEBUG_FILE_CALLBACK>, CallerData: OPTIONAL<PVOID>): HANDLE {
+  public static SymFindDebugInfoFile(hProcess: HANDLE, FileName: LPCSTR, DebugFilePath_out: LPSTR, Callback: Optional<PFIND_DEBUG_FILE_CALLBACK>, CallerData: Optional<PVOID>): HANDLE {
     return Dbghelp.Load('SymFindDebugInfoFile')(hProcess, FileName, DebugFilePath_out, Callback, CallerData);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dbghelp/nf-dbghelp-symfinddebuginfofilew
-  public static SymFindDebugInfoFileW(hProcess: HANDLE, FileName: LPCWSTR, DebugFilePath_out: LPWSTR, Callback: OPTIONAL<PFIND_DEBUG_FILE_CALLBACKW>, CallerData: OPTIONAL<PVOID>): HANDLE {
+  public static SymFindDebugInfoFileW(hProcess: HANDLE, FileName: LPCWSTR, DebugFilePath_out: LPWSTR, Callback: Optional<PFIND_DEBUG_FILE_CALLBACKW>, CallerData: Optional<PVOID>): HANDLE {
     return Dbghelp.Load('SymFindDebugInfoFileW')(hProcess, FileName, DebugFilePath_out, Callback, CallerData);
   }
 
@@ -565,15 +565,15 @@ class Dbghelp extends Win32 {
   // https://learn.microsoft.com/en-us/windows/win32/api/dbghelp/nf-dbghelp-symfindfileinpath
   public static SymFindFileInPath(
     hprocess: HANDLE,
-    SearchPath: OPTIONAL<LPCSTR>,
+    SearchPath: Optional<LPCSTR>,
     FileName: LPCSTR,
-    id: OPTIONAL<PVOID>,
+    id: Optional<PVOID>,
     two: DWORD,
     three: DWORD,
     flags: DWORD,
     FoundFile_out: LPSTR,
-    callback: OPTIONAL<PFINDFILEINPATHCALLBACK>,
-    context: OPTIONAL<PVOID>,
+    callback: Optional<PFINDFILEINPATHCALLBACK>,
+    context: Optional<PVOID>,
   ): BOOL {
     return Dbghelp.Load('SymFindFileInPath')(hprocess, SearchPath, FileName, id, two, three, flags, FoundFile_out, callback, context);
   }
@@ -581,26 +581,26 @@ class Dbghelp extends Win32 {
   // https://learn.microsoft.com/en-us/windows/win32/api/dbghelp/nf-dbghelp-symfindfileinpathw
   public static SymFindFileInPathW(
     hprocess: HANDLE,
-    SearchPath: OPTIONAL<LPCWSTR>,
+    SearchPath: Optional<LPCWSTR>,
     FileName: LPCWSTR,
-    id: OPTIONAL<PVOID>,
+    id: Optional<PVOID>,
     two: DWORD,
     three: DWORD,
     flags: DWORD,
     FoundFile_out: LPWSTR,
-    callback: OPTIONAL<PFINDFILEINPATHCALLBACKW>,
-    context: OPTIONAL<PVOID>,
+    callback: Optional<PFINDFILEINPATHCALLBACKW>,
+    context: Optional<PVOID>,
   ): BOOL {
     return Dbghelp.Load('SymFindFileInPathW')(hprocess, SearchPath, FileName, id, two, three, flags, FoundFile_out, callback, context);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dbghelp/nf-dbghelp-symfromaddr
-  public static SymFromAddr(hProcess: HANDLE, Address: DWORD64, Displacement_out: OPTIONAL<PDWORD64>, Symbol_in_out: PSYMBOL_INFO): BOOL {
+  public static SymFromAddr(hProcess: HANDLE, Address: DWORD64, Displacement_out: Optional<PDWORD64>, Symbol_in_out: PSYMBOL_INFO): BOOL {
     return Dbghelp.Load('SymFromAddr')(hProcess, Address, Displacement_out, Symbol_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dbghelp/nf-dbghelp-symfromaddrw
-  public static SymFromAddrW(hProcess: HANDLE, Address: DWORD64, Displacement_out: OPTIONAL<PDWORD64>, Symbol_in_out: PSYMBOL_INFOW): BOOL {
+  public static SymFromAddrW(hProcess: HANDLE, Address: DWORD64, Displacement_out: Optional<PDWORD64>, Symbol_in_out: PSYMBOL_INFOW): BOOL {
     return Dbghelp.Load('SymFromAddrW')(hProcess, Address, Displacement_out, Symbol_in_out);
   }
 
@@ -615,12 +615,12 @@ class Dbghelp extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dbghelp/nf-dbghelp-symfrominlinecontext
-  public static SymFromInlineContext(hProcess: HANDLE, Address: DWORD64, InlineContext: ULONG, Displacement_out: OPTIONAL<PDWORD64>, Symbol_in_out: PSYMBOL_INFO): BOOL {
+  public static SymFromInlineContext(hProcess: HANDLE, Address: DWORD64, InlineContext: ULONG, Displacement_out: Optional<PDWORD64>, Symbol_in_out: PSYMBOL_INFO): BOOL {
     return Dbghelp.Load('SymFromInlineContext')(hProcess, Address, InlineContext, Displacement_out, Symbol_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dbghelp/nf-dbghelp-symfrominlinecontextw
-  public static SymFromInlineContextW(hProcess: HANDLE, Address: DWORD64, InlineContext: ULONG, Displacement_out: OPTIONAL<PDWORD64>, Symbol_in_out: PSYMBOL_INFOW): BOOL {
+  public static SymFromInlineContextW(hProcess: HANDLE, Address: DWORD64, InlineContext: ULONG, Displacement_out: Optional<PDWORD64>, Symbol_in_out: PSYMBOL_INFOW): BOOL {
     return Dbghelp.Load('SymFromInlineContextW')(hProcess, Address, InlineContext, Displacement_out, Symbol_in_out);
   }
 
@@ -675,22 +675,22 @@ class Dbghelp extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dbghelp/nf-dbghelp-symgetlinefrominlinecontext
-  public static SymGetLineFromInlineContext(hProcess: HANDLE, qwAddr: DWORD64, InlineContext: ULONG, qwModuleBaseAddress: OPTIONAL<DWORD64>, pdwDisplacement_out: PDWORD, Line64_out: PIMAGEHLP_LINE64): BOOL {
+  public static SymGetLineFromInlineContext(hProcess: HANDLE, qwAddr: DWORD64, InlineContext: ULONG, qwModuleBaseAddress: Optional<DWORD64>, pdwDisplacement_out: PDWORD, Line64_out: PIMAGEHLP_LINE64): BOOL {
     return Dbghelp.Load('SymGetLineFromInlineContext')(hProcess, qwAddr, InlineContext, qwModuleBaseAddress, pdwDisplacement_out, Line64_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dbghelp/nf-dbghelp-symgetlinefrominlinecontextw
-  public static SymGetLineFromInlineContextW(hProcess: HANDLE, dwAddr: DWORD64, InlineContext: ULONG, qwModuleBaseAddress: OPTIONAL<DWORD64>, pdwDisplacement_out: PDWORD, Line_out: PIMAGEHLP_LINEW64): BOOL {
+  public static SymGetLineFromInlineContextW(hProcess: HANDLE, dwAddr: DWORD64, InlineContext: ULONG, qwModuleBaseAddress: Optional<DWORD64>, pdwDisplacement_out: PDWORD, Line_out: PIMAGEHLP_LINEW64): BOOL {
     return Dbghelp.Load('SymGetLineFromInlineContextW')(hProcess, dwAddr, InlineContext, qwModuleBaseAddress, pdwDisplacement_out, Line_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dbghelp/nf-dbghelp-symgetlinefromname64
-  public static SymGetLineFromName64(hProcess: HANDLE, ModuleName: OPTIONAL<LPCSTR>, FileName: OPTIONAL<LPCSTR>, dwLineNumber: DWORD, plDisplacement_out: PLONG, Line_in_out: PIMAGEHLP_LINE64): BOOL {
+  public static SymGetLineFromName64(hProcess: HANDLE, ModuleName: Optional<LPCSTR>, FileName: Optional<LPCSTR>, dwLineNumber: DWORD, plDisplacement_out: PLONG, Line_in_out: PIMAGEHLP_LINE64): BOOL {
     return Dbghelp.Load('SymGetLineFromName64')(hProcess, ModuleName, FileName, dwLineNumber, plDisplacement_out, Line_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dbghelp/nf-dbghelp-symgetlinefromnamew64
-  public static SymGetLineFromNameW64(hProcess: HANDLE, ModuleName: OPTIONAL<LPCWSTR>, FileName: OPTIONAL<LPCWSTR>, dwLineNumber: DWORD, plDisplacement_out: PLONG, Line_in_out: PIMAGEHLP_LINEW64): BOOL {
+  public static SymGetLineFromNameW64(hProcess: HANDLE, ModuleName: Optional<LPCWSTR>, FileName: Optional<LPCWSTR>, dwLineNumber: DWORD, plDisplacement_out: PLONG, Line_in_out: PIMAGEHLP_LINEW64): BOOL {
     return Dbghelp.Load('SymGetLineFromNameW64')(hProcess, ModuleName, FileName, dwLineNumber, plDisplacement_out, Line_in_out);
   }
 
@@ -760,7 +760,7 @@ class Dbghelp extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dbghelp/nf-dbghelp-symgetsourcefile
-  public static SymGetSourceFile(hProcess: HANDLE, Base: ULONG64, Params: OPTIONAL<LPCSTR>, FileSpec: LPCSTR, FilePath_out: LPSTR, Size: DWORD): BOOL {
+  public static SymGetSourceFile(hProcess: HANDLE, Base: ULONG64, Params: Optional<LPCSTR>, FileSpec: LPCSTR, FilePath_out: LPSTR, Size: DWORD): BOOL {
     return Dbghelp.Load('SymGetSourceFile')(hProcess, Base, Params, FileSpec, FilePath_out, Size);
   }
 
@@ -775,12 +775,12 @@ class Dbghelp extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dbghelp/nf-dbghelp-symgetsourcefilefromtoken
-  public static SymGetSourceFileFromToken(hProcess: HANDLE, Token: PVOID, Params: OPTIONAL<LPCSTR>, FilePath_out: LPSTR, Size: DWORD): BOOL {
+  public static SymGetSourceFileFromToken(hProcess: HANDLE, Token: PVOID, Params: Optional<LPCSTR>, FilePath_out: LPSTR, Size: DWORD): BOOL {
     return Dbghelp.Load('SymGetSourceFileFromToken')(hProcess, Token, Params, FilePath_out, Size);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dbghelp/nf-dbghelp-symgetsourcefilefromtokenw
-  public static SymGetSourceFileFromTokenW(hProcess: HANDLE, Token: PVOID, Params: OPTIONAL<LPCWSTR>, FilePath_out: LPWSTR, Size: DWORD): BOOL {
+  public static SymGetSourceFileFromTokenW(hProcess: HANDLE, Token: PVOID, Params: Optional<LPCWSTR>, FilePath_out: LPWSTR, Size: DWORD): BOOL {
     return Dbghelp.Load('SymGetSourceFileFromTokenW')(hProcess, Token, Params, FilePath_out, Size);
   }
 
@@ -795,27 +795,27 @@ class Dbghelp extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dbghelp/nf-dbghelp-symgetsourcefilew
-  public static SymGetSourceFileW(hProcess: HANDLE, Base: ULONG64, Params: OPTIONAL<LPCWSTR>, FileSpec: LPCWSTR, FilePath_out: LPWSTR, Size: DWORD): BOOL {
+  public static SymGetSourceFileW(hProcess: HANDLE, Base: ULONG64, Params: Optional<LPCWSTR>, FileSpec: LPCWSTR, FilePath_out: LPWSTR, Size: DWORD): BOOL {
     return Dbghelp.Load('SymGetSourceFileW')(hProcess, Base, Params, FileSpec, FilePath_out, Size);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dbghelp/nf-dbghelp-symgetsourcevarfromtoken
-  public static SymGetSourceVarFromToken(hProcess: HANDLE, Token: PVOID, Params: OPTIONAL<LPCSTR>, VarName: LPCSTR, Value_out: LPSTR, Size: DWORD): BOOL {
+  public static SymGetSourceVarFromToken(hProcess: HANDLE, Token: PVOID, Params: Optional<LPCSTR>, VarName: LPCSTR, Value_out: LPSTR, Size: DWORD): BOOL {
     return Dbghelp.Load('SymGetSourceVarFromToken')(hProcess, Token, Params, VarName, Value_out, Size);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dbghelp/nf-dbghelp-symgetsourcevarfromtokenw
-  public static SymGetSourceVarFromTokenW(hProcess: HANDLE, Token: PVOID, Params: OPTIONAL<LPCWSTR>, VarName: LPCWSTR, Value_out: LPWSTR, Size: DWORD): BOOL {
+  public static SymGetSourceVarFromTokenW(hProcess: HANDLE, Token: PVOID, Params: Optional<LPCWSTR>, VarName: LPCWSTR, Value_out: LPWSTR, Size: DWORD): BOOL {
     return Dbghelp.Load('SymGetSourceVarFromTokenW')(hProcess, Token, Params, VarName, Value_out, Size);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dbghelp/nf-dbghelp-symgetsymbolfile
-  public static SymGetSymbolFile(hProcess: OPTIONAL<HANDLE>, SymPath: OPTIONAL<LPCSTR>, ImageFile: LPCSTR, Type: DWORD, SymbolFile_out: LPSTR, cSymbolFile: SIZE_T, DbgFile_out: LPSTR, cDbgFile: SIZE_T): BOOL {
+  public static SymGetSymbolFile(hProcess: Optional<HANDLE>, SymPath: Optional<LPCSTR>, ImageFile: LPCSTR, Type: DWORD, SymbolFile_out: LPSTR, cSymbolFile: SIZE_T, DbgFile_out: LPSTR, cDbgFile: SIZE_T): BOOL {
     return Dbghelp.Load('SymGetSymbolFile')(hProcess, SymPath, ImageFile, Type, SymbolFile_out, cSymbolFile, DbgFile_out, cDbgFile);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dbghelp/nf-dbghelp-symgetsymbolfilew
-  public static SymGetSymbolFileW(hProcess: OPTIONAL<HANDLE>, SymPath: OPTIONAL<LPCWSTR>, ImageFile: LPCWSTR, Type: DWORD, SymbolFile_out: LPWSTR, cSymbolFile: SIZE_T, DbgFile_out: LPWSTR, cDbgFile: SIZE_T): BOOL {
+  public static SymGetSymbolFileW(hProcess: Optional<HANDLE>, SymPath: Optional<LPCWSTR>, ImageFile: LPCWSTR, Type: DWORD, SymbolFile_out: LPWSTR, cSymbolFile: SIZE_T, DbgFile_out: LPWSTR, cDbgFile: SIZE_T): BOOL {
     return Dbghelp.Load('SymGetSymbolFileW')(hProcess, SymPath, ImageFile, Type, SymbolFile_out, cSymbolFile, DbgFile_out, cDbgFile);
   }
 
@@ -840,37 +840,37 @@ class Dbghelp extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dbghelp/nf-dbghelp-symgetunwindinfo
-  public static SymGetUnwindInfo(hProcess: HANDLE, Address: DWORD64, Buffer_out: OPTIONAL<PVOID>, Size_in_out: PULONG): BOOL {
+  public static SymGetUnwindInfo(hProcess: HANDLE, Address: DWORD64, Buffer_out: Optional<PVOID>, Size_in_out: PULONG): BOOL {
     return Dbghelp.Load('SymGetUnwindInfo')(hProcess, Address, Buffer_out, Size_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dbghelp/nf-dbghelp-syminitialize
-  public static SymInitialize(hProcess: HANDLE, UserSearchPath: OPTIONAL<LPCSTR>, fInvadeProcess: BOOL): BOOL {
+  public static SymInitialize(hProcess: HANDLE, UserSearchPath: Optional<LPCSTR>, fInvadeProcess: BOOL): BOOL {
     return Dbghelp.Load('SymInitialize')(hProcess, UserSearchPath, fInvadeProcess);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dbghelp/nf-dbghelp-syminitializew
-  public static SymInitializeW(hProcess: HANDLE, UserSearchPath: OPTIONAL<LPCWSTR>, fInvadeProcess: BOOL): BOOL {
+  public static SymInitializeW(hProcess: HANDLE, UserSearchPath: Optional<LPCWSTR>, fInvadeProcess: BOOL): BOOL {
     return Dbghelp.Load('SymInitializeW')(hProcess, UserSearchPath, fInvadeProcess);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dbghelp/nf-dbghelp-symloadmoduleex
-  public static SymLoadModuleEx(hProcess: HANDLE, hFile: OPTIONAL<HANDLE>, ImageName: OPTIONAL<LPCSTR>, ModuleName: OPTIONAL<LPCSTR>, BaseOfDll: DWORD64, DllSize: DWORD, Data: OPTIONAL<PMODLOAD_DATA>, Flags: DWORD): DWORD64 {
+  public static SymLoadModuleEx(hProcess: HANDLE, hFile: Optional<HANDLE>, ImageName: Optional<LPCSTR>, ModuleName: Optional<LPCSTR>, BaseOfDll: DWORD64, DllSize: DWORD, Data: Optional<PMODLOAD_DATA>, Flags: DWORD): DWORD64 {
     return Dbghelp.Load('SymLoadModuleEx')(hProcess, hFile, ImageName, ModuleName, BaseOfDll, DllSize, Data, Flags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dbghelp/nf-dbghelp-symloadmoduleexw
-  public static SymLoadModuleExW(hProcess: HANDLE, hFile: OPTIONAL<HANDLE>, ImageName: OPTIONAL<LPCWSTR>, ModuleName: OPTIONAL<LPCWSTR>, BaseOfDll: DWORD64, DllSize: DWORD, Data: OPTIONAL<PMODLOAD_DATA>, Flags: DWORD): DWORD64 {
+  public static SymLoadModuleExW(hProcess: HANDLE, hFile: Optional<HANDLE>, ImageName: Optional<LPCWSTR>, ModuleName: Optional<LPCWSTR>, BaseOfDll: DWORD64, DllSize: DWORD, Data: Optional<PMODLOAD_DATA>, Flags: DWORD): DWORD64 {
     return Dbghelp.Load('SymLoadModuleExW')(hProcess, hFile, ImageName, ModuleName, BaseOfDll, DllSize, Data, Flags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dbghelp/nf-dbghelp-symmatchfilename
-  public static SymMatchFileName(FileName: LPCSTR, Match: LPCSTR, FileNameStop_out: OPTIONAL<PVOID>, MatchStop_out: OPTIONAL<PVOID>): BOOL {
+  public static SymMatchFileName(FileName: LPCSTR, Match: LPCSTR, FileNameStop_out: Optional<PVOID>, MatchStop_out: Optional<PVOID>): BOOL {
     return Dbghelp.Load('SymMatchFileName')(FileName, Match, FileNameStop_out, MatchStop_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dbghelp/nf-dbghelp-symmatchfilenamew
-  public static SymMatchFileNameW(FileName: LPCWSTR, Match: LPCWSTR, FileNameStop_out: OPTIONAL<PVOID>, MatchStop_out: OPTIONAL<PVOID>): BOOL {
+  public static SymMatchFileNameW(FileName: LPCWSTR, Match: LPCWSTR, FileNameStop_out: Optional<PVOID>, MatchStop_out: Optional<PVOID>): BOOL {
     return Dbghelp.Load('SymMatchFileNameW')(FileName, Match, FileNameStop_out, MatchStop_out);
   }
 
@@ -940,10 +940,10 @@ class Dbghelp extends Win32 {
     BaseOfDll: ULONG64,
     Index: DWORD,
     SymTag: DWORD,
-    Mask: OPTIONAL<LPCSTR>,
-    Address: OPTIONAL<DWORD64>,
+    Mask: Optional<LPCSTR>,
+    Address: Optional<DWORD64>,
     EnumSymbolsCallback: PSYM_ENUMERATESYMBOLS_CALLBACK,
-    UserContext: OPTIONAL<PVOID>,
+    UserContext: Optional<PVOID>,
     Options: DWORD,
   ): BOOL {
     return Dbghelp.Load('SymSearch')(hProcess, BaseOfDll, Index, SymTag, Mask, Address, EnumSymbolsCallback, UserContext, Options);
@@ -955,17 +955,17 @@ class Dbghelp extends Win32 {
     BaseOfDll: ULONG64,
     Index: DWORD,
     SymTag: DWORD,
-    Mask: OPTIONAL<LPCWSTR>,
-    Address: OPTIONAL<DWORD64>,
+    Mask: Optional<LPCWSTR>,
+    Address: Optional<DWORD64>,
     EnumSymbolsCallback: PSYM_ENUMERATESYMBOLS_CALLBACKW,
-    UserContext: OPTIONAL<PVOID>,
+    UserContext: Optional<PVOID>,
     Options: DWORD,
   ): BOOL {
     return Dbghelp.Load('SymSearchW')(hProcess, BaseOfDll, Index, SymTag, Mask, Address, EnumSymbolsCallback, UserContext, Options);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dbghelp/nf-dbghelp-symsetcontext
-  public static SymSetContext(hProcess: HANDLE, StackFrame: PIMAGEHLP_STACK_FRAME, Context: OPTIONAL<PIMAGEHLP_CONTEXT>): BOOL {
+  public static SymSetContext(hProcess: HANDLE, StackFrame: PIMAGEHLP_STACK_FRAME, Context: Optional<PIMAGEHLP_CONTEXT>): BOOL {
     return Dbghelp.Load('SymSetContext')(hProcess, StackFrame, Context);
   }
 
@@ -975,12 +975,12 @@ class Dbghelp extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dbghelp/nf-dbghelp-symsethomedirectory
-  public static SymSetHomeDirectory(hProcess: OPTIONAL<HANDLE>, dir: OPTIONAL<LPCSTR>): LPSTR {
+  public static SymSetHomeDirectory(hProcess: Optional<HANDLE>, dir: Optional<LPCSTR>): LPSTR {
     return Dbghelp.Load('SymSetHomeDirectory')(hProcess, dir);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dbghelp/nf-dbghelp-symsethomedirectoryw
-  public static SymSetHomeDirectoryW(hProcess: OPTIONAL<HANDLE>, dir: OPTIONAL<LPCWSTR>): LPWSTR {
+  public static SymSetHomeDirectoryW(hProcess: Optional<HANDLE>, dir: Optional<LPCWSTR>): LPWSTR {
     return Dbghelp.Load('SymSetHomeDirectoryW')(hProcess, dir);
   }
 
@@ -1010,22 +1010,22 @@ class Dbghelp extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dbghelp/nf-dbghelp-symsetsearchpath
-  public static SymSetSearchPath(hProcess: HANDLE, SearchPath: OPTIONAL<LPCSTR>): BOOL {
+  public static SymSetSearchPath(hProcess: HANDLE, SearchPath: Optional<LPCSTR>): BOOL {
     return Dbghelp.Load('SymSetSearchPath')(hProcess, SearchPath);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dbghelp/nf-dbghelp-symsetsearchpathw
-  public static SymSetSearchPathW(hProcess: HANDLE, SearchPath: OPTIONAL<LPCWSTR>): BOOL {
+  public static SymSetSearchPathW(hProcess: HANDLE, SearchPath: Optional<LPCWSTR>): BOOL {
     return Dbghelp.Load('SymSetSearchPathW')(hProcess, SearchPath);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dbghelp/nf-dbghelp-symsrvdeltaname
-  public static SymSrvDeltaName(hProcess: HANDLE, SymPath: OPTIONAL<LPCSTR>, Type: LPCSTR, File1: LPCSTR, File2: LPCSTR): LPCSTR {
+  public static SymSrvDeltaName(hProcess: HANDLE, SymPath: Optional<LPCSTR>, Type: LPCSTR, File1: LPCSTR, File2: LPCSTR): LPCSTR {
     return Dbghelp.Load('SymSrvDeltaName')(hProcess, SymPath, Type, File1, File2);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dbghelp/nf-dbghelp-symsrvdeltanamew
-  public static SymSrvDeltaNameW(hProcess: HANDLE, SymPath: OPTIONAL<LPCWSTR>, Type: LPCWSTR, File1: LPCWSTR, File2: LPCWSTR): LPCWSTR {
+  public static SymSrvDeltaNameW(hProcess: HANDLE, SymPath: Optional<LPCWSTR>, Type: LPCWSTR, File1: LPCWSTR, File2: LPCWSTR): LPCWSTR {
     return Dbghelp.Load('SymSrvDeltaNameW')(hProcess, SymPath, Type, File1, File2);
   }
 
@@ -1040,62 +1040,62 @@ class Dbghelp extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dbghelp/nf-dbghelp-symsrvgetfileindexstring
-  public static SymSrvGetFileIndexString(hProcess: HANDLE, SrvPath: OPTIONAL<LPCSTR>, File: LPCSTR, Index_out: LPSTR, Size: SIZE_T, Flags: DWORD): BOOL {
+  public static SymSrvGetFileIndexString(hProcess: HANDLE, SrvPath: Optional<LPCSTR>, File: LPCSTR, Index_out: LPSTR, Size: SIZE_T, Flags: DWORD): BOOL {
     return Dbghelp.Load('SymSrvGetFileIndexString')(hProcess, SrvPath, File, Index_out, Size, Flags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dbghelp/nf-dbghelp-symsrvgetfileindexstringw
-  public static SymSrvGetFileIndexStringW(hProcess: HANDLE, SrvPath: OPTIONAL<LPCWSTR>, File: LPCWSTR, Index_out: LPWSTR, Size: SIZE_T, Flags: DWORD): BOOL {
+  public static SymSrvGetFileIndexStringW(hProcess: HANDLE, SrvPath: Optional<LPCWSTR>, File: LPCWSTR, Index_out: LPWSTR, Size: SIZE_T, Flags: DWORD): BOOL {
     return Dbghelp.Load('SymSrvGetFileIndexStringW')(hProcess, SrvPath, File, Index_out, Size, Flags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dbghelp/nf-dbghelp-symsrvgetfileindexes
-  public static SymSrvGetFileIndexes(File: LPCSTR, Id_out: PVOID, Val1_out: PDWORD, Val2_out: OPTIONAL<PDWORD>, Flags: DWORD): BOOL {
+  public static SymSrvGetFileIndexes(File: LPCSTR, Id_out: PVOID, Val1_out: PDWORD, Val2_out: Optional<PDWORD>, Flags: DWORD): BOOL {
     return Dbghelp.Load('SymSrvGetFileIndexes')(File, Id_out, Val1_out, Val2_out, Flags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dbghelp/nf-dbghelp-symsrvgetfileindexesw
-  public static SymSrvGetFileIndexesW(File: LPCWSTR, Id_out: PVOID, Val1_out: PDWORD, Val2_out: OPTIONAL<PDWORD>, Flags: DWORD): BOOL {
+  public static SymSrvGetFileIndexesW(File: LPCWSTR, Id_out: PVOID, Val1_out: PDWORD, Val2_out: Optional<PDWORD>, Flags: DWORD): BOOL {
     return Dbghelp.Load('SymSrvGetFileIndexesW')(File, Id_out, Val1_out, Val2_out, Flags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dbghelp/nf-dbghelp-symsrvgetsupplement
-  public static SymSrvGetSupplement(hProcess: HANDLE, SymPath: OPTIONAL<LPCSTR>, Node: LPCSTR, File: LPCSTR): LPCSTR {
+  public static SymSrvGetSupplement(hProcess: HANDLE, SymPath: Optional<LPCSTR>, Node: LPCSTR, File: LPCSTR): LPCSTR {
     return Dbghelp.Load('SymSrvGetSupplement')(hProcess, SymPath, Node, File);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dbghelp/nf-dbghelp-symsrvgetsupplementw
-  public static SymSrvGetSupplementW(hProcess: HANDLE, SymPath: OPTIONAL<LPCWSTR>, Node: LPCWSTR, File: LPCWSTR): LPCWSTR {
+  public static SymSrvGetSupplementW(hProcess: HANDLE, SymPath: Optional<LPCWSTR>, Node: LPCWSTR, File: LPCWSTR): LPCWSTR {
     return Dbghelp.Load('SymSrvGetSupplementW')(hProcess, SymPath, Node, File);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dbghelp/nf-dbghelp-symsrvisstore
-  public static SymSrvIsStore(hProcess: OPTIONAL<HANDLE>, path: LPCSTR): BOOL {
+  public static SymSrvIsStore(hProcess: Optional<HANDLE>, path: LPCSTR): BOOL {
     return Dbghelp.Load('SymSrvIsStore')(hProcess, path);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dbghelp/nf-dbghelp-symsrvisstoresw
-  public static SymSrvIsStoreW(hProcess: OPTIONAL<HANDLE>, path: LPCWSTR): BOOL {
+  public static SymSrvIsStoreW(hProcess: Optional<HANDLE>, path: LPCWSTR): BOOL {
     return Dbghelp.Load('SymSrvIsStoreW')(hProcess, path);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dbghelp/nf-dbghelp-symsrvstorefile
-  public static SymSrvStoreFile(hProcess: HANDLE, SrvPath: OPTIONAL<LPCSTR>, File: LPCSTR, Flags: DWORD): LPCSTR {
+  public static SymSrvStoreFile(hProcess: HANDLE, SrvPath: Optional<LPCSTR>, File: LPCSTR, Flags: DWORD): LPCSTR {
     return Dbghelp.Load('SymSrvStoreFile')(hProcess, SrvPath, File, Flags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dbghelp/nf-dbghelp-symsrvstorefilew
-  public static SymSrvStoreFileW(hProcess: HANDLE, SrvPath: OPTIONAL<LPCWSTR>, File: LPCWSTR, Flags: DWORD): LPCWSTR {
+  public static SymSrvStoreFileW(hProcess: HANDLE, SrvPath: Optional<LPCWSTR>, File: LPCWSTR, Flags: DWORD): LPCWSTR {
     return Dbghelp.Load('SymSrvStoreFileW')(hProcess, SrvPath, File, Flags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dbghelp/nf-dbghelp-symsrvstoresupplement
-  public static SymSrvStoreSupplement(hProcess: HANDLE, SrvPath: OPTIONAL<LPCSTR>, Node: LPCSTR, File: LPCSTR, Flags: DWORD): LPCSTR {
+  public static SymSrvStoreSupplement(hProcess: HANDLE, SrvPath: Optional<LPCSTR>, Node: LPCSTR, File: LPCSTR, Flags: DWORD): LPCSTR {
     return Dbghelp.Load('SymSrvStoreSupplement')(hProcess, SrvPath, Node, File, Flags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dbghelp/nf-dbghelp-symsrvstoresupplementw
-  public static SymSrvStoreSupplementW(hProcess: HANDLE, SymPath: OPTIONAL<LPCWSTR>, Node: LPCWSTR, File: LPCWSTR, Flags: DWORD): LPCWSTR {
+  public static SymSrvStoreSupplementW(hProcess: HANDLE, SymPath: Optional<LPCWSTR>, Node: LPCWSTR, File: LPCWSTR, Flags: DWORD): LPCWSTR {
     return Dbghelp.Load('SymSrvStoreSupplementW')(hProcess, SymPath, Node, File, Flags);
   }
 

@@ -12,8 +12,8 @@ import type {
   LPTHREAD_START_ROUTINE,
   NTSTATUS,
   NULL,
-  NULLABLE,
-  OPTIONAL,
+  Nullable,
+  Optional,
   PACCESS_MASK,
   PACL,
   PANSI_STRING,
@@ -464,7 +464,7 @@ class Ntdll extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntadjustgroupstoken
-  public static NtAdjustGroupsToken(TokenHandle: HANDLE, ResetToDefault: BOOLEAN, NewState: OPTIONAL<PTOKEN_GROUPS>, BufferLength: ULONG, PreviousState_out: OPTIONAL<PTOKEN_GROUPS>, ReturnLength_out: OPTIONAL<PULONG>): NTSTATUS {
+  public static NtAdjustGroupsToken(TokenHandle: HANDLE, ResetToDefault: BOOLEAN, NewState: Optional<PTOKEN_GROUPS>, BufferLength: ULONG, PreviousState_out: Optional<PTOKEN_GROUPS>, ReturnLength_out: Optional<PULONG>): NTSTATUS {
     return Ntdll.Load('NtAdjustGroupsToken')(TokenHandle, ResetToDefault, NewState, BufferLength, PreviousState_out, ReturnLength_out);
   }
 
@@ -472,16 +472,16 @@ class Ntdll extends Win32 {
   public static NtAdjustPrivilegesToken(
     TokenHandle: HANDLE,
     DisableAllPrivileges: BOOLEAN,
-    NewState: OPTIONAL<PTOKEN_PRIVILEGES>,
+    NewState: Optional<PTOKEN_PRIVILEGES>,
     BufferLength: ULONG,
-    PreviousState_out: OPTIONAL<PTOKEN_PRIVILEGES>,
-    ReturnLength_out: OPTIONAL<PULONG>,
+    PreviousState_out: Optional<PTOKEN_PRIVILEGES>,
+    ReturnLength_out: Optional<PULONG>,
   ): NTSTATUS {
     return Ntdll.Load('NtAdjustPrivilegesToken')(TokenHandle, DisableAllPrivileges, NewState, BufferLength, PreviousState_out, ReturnLength_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winternl/nf-winternl-ntalertresumethread
-  public static NtAlertResumeThread(ThreadHandle: HANDLE, PreviousSuspendCount_out: OPTIONAL<PULONG>): NTSTATUS {
+  public static NtAlertResumeThread(ThreadHandle: HANDLE, PreviousSuspendCount_out: Optional<PULONG>): NTSTATUS {
     return Ntdll.Load('NtAlertResumeThread')(ThreadHandle, PreviousSuspendCount_out);
   }
 
@@ -511,17 +511,17 @@ class Ntdll extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntcanceliofileex
-  public static NtCancelIoFileEx(FileHandle: HANDLE, IoRequestToCancel: OPTIONAL<PIO_STATUS_BLOCK>, IoStatusBlock_out: PIO_STATUS_BLOCK): NTSTATUS {
+  public static NtCancelIoFileEx(FileHandle: HANDLE, IoRequestToCancel: Optional<PIO_STATUS_BLOCK>, IoStatusBlock_out: PIO_STATUS_BLOCK): NTSTATUS {
     return Ntdll.Load('NtCancelIoFileEx')(FileHandle, IoRequestToCancel, IoStatusBlock_out);
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntcancelsynchronousiofile
-  public static NtCancelSynchronousIoFile(ThreadHandle: HANDLE, IoRequestToCancel: OPTIONAL<PIO_STATUS_BLOCK>, IoStatusBlock_out: PIO_STATUS_BLOCK): NTSTATUS {
+  public static NtCancelSynchronousIoFile(ThreadHandle: HANDLE, IoRequestToCancel: Optional<PIO_STATUS_BLOCK>, IoStatusBlock_out: PIO_STATUS_BLOCK): NTSTATUS {
     return Ntdll.Load('NtCancelSynchronousIoFile')(ThreadHandle, IoRequestToCancel, IoStatusBlock_out);
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-zwcanceltimer
-  public static NtCancelTimer(TimerHandle: HANDLE, CurrentState_out: OPTIONAL<PBOOLEAN>): NTSTATUS {
+  public static NtCancelTimer(TimerHandle: HANDLE, CurrentState_out: Optional<PBOOLEAN>): NTSTATUS {
     return Ntdll.Load('NtCancelTimer')(TimerHandle, CurrentState_out);
   }
 
@@ -551,7 +551,7 @@ class Ntdll extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntcreatedebugobject
-  public static NtCreateDebugObject(DebugObjectHandle_out: PHANDLE, DesiredAccess: ACCESS_MASK, ObjectAttributes: OPTIONAL<POBJECT_ATTRIBUTES>, Flags: ULONG): NTSTATUS {
+  public static NtCreateDebugObject(DebugObjectHandle_out: PHANDLE, DesiredAccess: ACCESS_MASK, ObjectAttributes: Optional<POBJECT_ATTRIBUTES>, Flags: ULONG): NTSTATUS {
     return Ntdll.Load('NtCreateDebugObject')(DebugObjectHandle_out, DesiredAccess, ObjectAttributes, Flags);
   }
 
@@ -561,7 +561,7 @@ class Ntdll extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-zwcreateevent
-  public static NtCreateEvent(EventHandle_out: PHANDLE, DesiredAccess: ACCESS_MASK, ObjectAttributes: OPTIONAL<POBJECT_ATTRIBUTES>, EventType: ULONG, InitialState: BOOLEAN): NTSTATUS {
+  public static NtCreateEvent(EventHandle_out: PHANDLE, DesiredAccess: ACCESS_MASK, ObjectAttributes: Optional<POBJECT_ATTRIBUTES>, EventType: ULONG, InitialState: BOOLEAN): NTSTATUS {
     return Ntdll.Load('NtCreateEvent')(EventHandle_out, DesiredAccess, ObjectAttributes, EventType, InitialState);
   }
 
@@ -571,29 +571,29 @@ class Ntdll extends Win32 {
     DesiredAccess: ACCESS_MASK,
     ObjectAttributes: POBJECT_ATTRIBUTES,
     IoStatusBlock_out: PIO_STATUS_BLOCK,
-    AllocationSize: OPTIONAL<PLARGE_INTEGER>,
+    AllocationSize: Optional<PLARGE_INTEGER>,
     FileAttributes: ULONG,
     ShareAccess: ULONG,
     CreateDisposition: ULONG,
     CreateOptions: ULONG,
-    EaBuffer: OPTIONAL<PVOID>,
+    EaBuffer: Optional<PVOID>,
     EaLength: ULONG,
   ): NTSTATUS {
     return Ntdll.Load('NtCreateFile')(FileHandle_out, DesiredAccess, ObjectAttributes, IoStatusBlock_out, AllocationSize, FileAttributes, ShareAccess, CreateDisposition, CreateOptions, EaBuffer, EaLength);
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-zwcreateiocompletion
-  public static NtCreateIoCompletion(IoCompletionHandle_out: PHANDLE, DesiredAccess: ACCESS_MASK, ObjectAttributes: OPTIONAL<POBJECT_ATTRIBUTES>, Count: ULONG): NTSTATUS {
+  public static NtCreateIoCompletion(IoCompletionHandle_out: PHANDLE, DesiredAccess: ACCESS_MASK, ObjectAttributes: Optional<POBJECT_ATTRIBUTES>, Count: ULONG): NTSTATUS {
     return Ntdll.Load('NtCreateIoCompletion')(IoCompletionHandle_out, DesiredAccess, ObjectAttributes, Count);
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-zwcreatejobobject
-  public static NtCreateJobObject(JobHandle_out: PHANDLE, DesiredAccess: ACCESS_MASK, ObjectAttributes: OPTIONAL<POBJECT_ATTRIBUTES>): NTSTATUS {
+  public static NtCreateJobObject(JobHandle_out: PHANDLE, DesiredAccess: ACCESS_MASK, ObjectAttributes: Optional<POBJECT_ATTRIBUTES>): NTSTATUS {
     return Ntdll.Load('NtCreateJobObject')(JobHandle_out, DesiredAccess, ObjectAttributes);
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-zwcreatekey
-  public static NtCreateKey(KeyHandle_out: PHANDLE, DesiredAccess: ACCESS_MASK, ObjectAttributes: POBJECT_ATTRIBUTES, TitleIndex: ULONG, Class: OPTIONAL<PUNICODE_STRING>, CreateOptions: ULONG, Disposition_out: OPTIONAL<PULONG>): NTSTATUS {
+  public static NtCreateKey(KeyHandle_out: PHANDLE, DesiredAccess: ACCESS_MASK, ObjectAttributes: POBJECT_ATTRIBUTES, TitleIndex: ULONG, Class: Optional<PUNICODE_STRING>, CreateOptions: ULONG, Disposition_out: Optional<PULONG>): NTSTATUS {
     return Ntdll.Load('NtCreateKey')(KeyHandle_out, DesiredAccess, ObjectAttributes, TitleIndex, Class, CreateOptions, Disposition_out);
   }
 
@@ -606,13 +606,13 @@ class Ntdll extends Win32 {
     CreateOptions: ULONG,
     MailslotQuota: ULONG,
     MaximumMessageSize: ULONG,
-    ReadTimeout: OPTIONAL<PLARGE_INTEGER>,
+    ReadTimeout: Optional<PLARGE_INTEGER>,
   ): NTSTATUS {
     return Ntdll.Load('NtCreateMailslotFile')(FileHandle_out, DesiredAccess, ObjectAttributes, IoStatusBlock_out, CreateOptions, MailslotQuota, MaximumMessageSize, ReadTimeout);
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-zwcreatemutant
-  public static NtCreateMutant(MutantHandle_out: PHANDLE, DesiredAccess: ACCESS_MASK, ObjectAttributes: OPTIONAL<POBJECT_ATTRIBUTES>, InitialOwner: BOOLEAN): NTSTATUS {
+  public static NtCreateMutant(MutantHandle_out: PHANDLE, DesiredAccess: ACCESS_MASK, ObjectAttributes: Optional<POBJECT_ATTRIBUTES>, InitialOwner: BOOLEAN): NTSTATUS {
     return Ntdll.Load('NtCreateMutant')(MutantHandle_out, DesiredAccess, ObjectAttributes, InitialOwner);
   }
 
@@ -631,7 +631,7 @@ class Ntdll extends Win32 {
     MaximumInstances: ULONG,
     InboundQuota: ULONG,
     OutboundQuota: ULONG,
-    DefaultTimeout: OPTIONAL<PLARGE_INTEGER>,
+    DefaultTimeout: Optional<PLARGE_INTEGER>,
   ): NTSTATUS {
     return Ntdll.Load('NtCreateNamedPipeFile')(
       FileHandle_out,
@@ -655,17 +655,17 @@ class Ntdll extends Win32 {
   public static NtCreateSection(
     SectionHandle_out: PHANDLE,
     DesiredAccess: ACCESS_MASK,
-    ObjectAttributes: OPTIONAL<POBJECT_ATTRIBUTES>,
-    MaximumSize: OPTIONAL<PLARGE_INTEGER>,
+    ObjectAttributes: Optional<POBJECT_ATTRIBUTES>,
+    MaximumSize: Optional<PLARGE_INTEGER>,
     SectionPageProtection: ULONG,
     AllocationAttributes: ULONG,
-    FileHandle: OPTIONAL<HANDLE>,
+    FileHandle: Optional<HANDLE>,
   ): NTSTATUS {
     return Ntdll.Load('NtCreateSection')(SectionHandle_out, DesiredAccess, ObjectAttributes, MaximumSize, SectionPageProtection, AllocationAttributes, FileHandle);
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-zwcreatesemaphore
-  public static NtCreateSemaphore(SemaphoreHandle_out: PHANDLE, DesiredAccess: ACCESS_MASK, ObjectAttributes: OPTIONAL<POBJECT_ATTRIBUTES>, InitialCount: LONG, MaximumCount: LONG): NTSTATUS {
+  public static NtCreateSemaphore(SemaphoreHandle_out: PHANDLE, DesiredAccess: ACCESS_MASK, ObjectAttributes: Optional<POBJECT_ATTRIBUTES>, InitialCount: LONG, MaximumCount: LONG): NTSTATUS {
     return Ntdll.Load('NtCreateSemaphore')(SemaphoreHandle_out, DesiredAccess, ObjectAttributes, InitialCount, MaximumCount);
   }
 
@@ -678,21 +678,21 @@ class Ntdll extends Win32 {
   public static NtCreateThreadEx(
     ThreadHandle_out: PHANDLE,
     DesiredAccess: ACCESS_MASK,
-    ObjectAttributes: OPTIONAL<POBJECT_ATTRIBUTES>,
+    ObjectAttributes: Optional<POBJECT_ATTRIBUTES>,
     ProcessHandle: HANDLE,
     StartRoutine: LPTHREAD_START_ROUTINE,
-    Argument: OPTIONAL<PVOID<bigint>>,
+    Argument: Optional<PVOID<bigint>>,
     CreateFlags: ULONG,
     ZeroBits: SIZE_T,
     StackSize: SIZE_T,
     MaximumStackSize: SIZE_T,
-    AttributeList: OPTIONAL<PPS_ATTRIBUTE_LIST>,
+    AttributeList: Optional<PPS_ATTRIBUTE_LIST>,
   ): NTSTATUS {
     return Ntdll.Load('NtCreateThreadEx')(ThreadHandle_out, DesiredAccess, ObjectAttributes, ProcessHandle, StartRoutine, Argument, CreateFlags, ZeroBits, StackSize, MaximumStackSize, AttributeList);
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-zwcreatetimer
-  public static NtCreateTimer(TimerHandle_out: PHANDLE, DesiredAccess: ACCESS_MASK, ObjectAttributes: OPTIONAL<POBJECT_ATTRIBUTES>, TimerType: ULONG): NTSTATUS {
+  public static NtCreateTimer(TimerHandle_out: PHANDLE, DesiredAccess: ACCESS_MASK, ObjectAttributes: Optional<POBJECT_ATTRIBUTES>, TimerType: ULONG): NTSTATUS {
     return Ntdll.Load('NtCreateTimer')(TimerHandle_out, DesiredAccess, ObjectAttributes, TimerType);
   }
 
@@ -729,14 +729,14 @@ class Ntdll extends Win32 {
   // https://learn.microsoft.com/en-us/windows/win32/api/winternl/nf-winternl-ntdeviceiocontrolfile
   public static NtDeviceIoControlFile(
     FileHandle: HANDLE,
-    Event: OPTIONAL<HANDLE>,
-    ApcRoutine: OPTIONAL<PIO_APC_ROUTINE>,
-    ApcContext: OPTIONAL<PVOID>,
+    Event: Optional<HANDLE>,
+    ApcRoutine: Optional<PIO_APC_ROUTINE>,
+    ApcContext: Optional<PVOID>,
     IoStatusBlock_out: PIO_STATUS_BLOCK,
     IoControlCode: ULONG,
-    InputBuffer: OPTIONAL<PVOID>,
+    InputBuffer: Optional<PVOID>,
     InputBufferLength: ULONG,
-    OutputBuffer_out: OPTIONAL<PVOID>,
+    OutputBuffer_out: Optional<PVOID>,
     OutputBufferLength: ULONG,
   ): NTSTATUS {
     return Ntdll.Load('NtDeviceIoControlFile')(FileHandle, Event, ApcRoutine, ApcContext, IoStatusBlock_out, IoControlCode, InputBuffer, InputBufferLength, OutputBuffer_out, OutputBufferLength);
@@ -746,8 +746,8 @@ class Ntdll extends Win32 {
   public static NtDuplicateObject(
     SourceProcessHandle: HANDLE,
     SourceHandle: HANDLE,
-    TargetProcessHandle: OPTIONAL<HANDLE>,
-    TargetHandle_out: OPTIONAL<PHANDLE>,
+    TargetProcessHandle: Optional<HANDLE>,
+    TargetHandle_out: Optional<PHANDLE>,
     DesiredAccess: ACCESS_MASK,
     HandleAttributes: ULONG,
     Options: ULONG,
@@ -756,7 +756,7 @@ class Ntdll extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntduplicatetoken
-  public static NtDuplicateToken(ExistingTokenHandle: HANDLE, DesiredAccess: ACCESS_MASK, ObjectAttributes: OPTIONAL<POBJECT_ATTRIBUTES>, EffectiveOnly: BOOLEAN, TokenType: ULONG, NewTokenHandle_out: PHANDLE): NTSTATUS {
+  public static NtDuplicateToken(ExistingTokenHandle: HANDLE, DesiredAccess: ACCESS_MASK, ObjectAttributes: Optional<POBJECT_ATTRIBUTES>, EffectiveOnly: BOOLEAN, TokenType: ULONG, NewTokenHandle_out: PHANDLE): NTSTATUS {
     return Ntdll.Load('NtDuplicateToken')(ExistingTokenHandle, DesiredAccess, ObjectAttributes, EffectiveOnly, TokenType, NewTokenHandle_out);
   }
 
@@ -779,9 +779,9 @@ class Ntdll extends Win32 {
   public static NtFilterToken(
     ExistingTokenHandle: HANDLE,
     Flags: ULONG,
-    SidsToDisable: OPTIONAL<PTOKEN_GROUPS>,
-    PrivilegesToDelete: OPTIONAL<PTOKEN_PRIVILEGES>,
-    RestrictedSids: OPTIONAL<PTOKEN_GROUPS>,
+    SidsToDisable: Optional<PTOKEN_GROUPS>,
+    PrivilegesToDelete: Optional<PTOKEN_PRIVILEGES>,
+    RestrictedSids: Optional<PTOKEN_GROUPS>,
     NewTokenHandle_out: PHANDLE,
   ): NTSTATUS {
     return Ntdll.Load('NtFilterToken')(ExistingTokenHandle, Flags, SidsToDisable, PrivilegesToDelete, RestrictedSids, NewTokenHandle_out);
@@ -798,7 +798,7 @@ class Ntdll extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntflushinstructioncache
-  public static NtFlushInstructionCache(ProcessHandle: HANDLE, BaseAddress: OPTIONAL<PVOID<bigint>>, Length: SIZE_T): NTSTATUS {
+  public static NtFlushInstructionCache(ProcessHandle: HANDLE, BaseAddress: Optional<PVOID<bigint>>, Length: SIZE_T): NTSTATUS {
     return Ntdll.Load('NtFlushInstructionCache')(ProcessHandle, BaseAddress, Length);
   }
 
@@ -820,14 +820,14 @@ class Ntdll extends Win32 {
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntfscontrolfile
   public static NtFsControlFile(
     FileHandle: HANDLE,
-    Event: OPTIONAL<HANDLE>,
-    ApcRoutine: OPTIONAL<PIO_APC_ROUTINE>,
-    ApcContext: OPTIONAL<PVOID>,
+    Event: Optional<HANDLE>,
+    ApcRoutine: Optional<PIO_APC_ROUTINE>,
+    ApcContext: Optional<PVOID>,
     IoStatusBlock_out: PIO_STATUS_BLOCK,
     FsControlCode: ULONG,
-    InputBuffer: OPTIONAL<PVOID>,
+    InputBuffer: Optional<PVOID>,
     InputBufferLength: ULONG,
-    OutputBuffer_out: OPTIONAL<PVOID>,
+    OutputBuffer_out: Optional<PVOID>,
     OutputBufferLength: ULONG,
   ): NTSTATUS {
     return Ntdll.Load('NtFsControlFile')(FileHandle, Event, ApcRoutine, ApcContext, IoStatusBlock_out, FsControlCode, InputBuffer, InputBufferLength, OutputBuffer_out, OutputBufferLength);
@@ -864,7 +864,7 @@ class Ntdll extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-zwisprocessinjob
-  public static NtIsProcessInJob(ProcessHandle: HANDLE, JobHandle: OPTIONAL<HANDLE>): NTSTATUS {
+  public static NtIsProcessInJob(ProcessHandle: HANDLE, JobHandle: Optional<HANDLE>): NTSTATUS {
     return Ntdll.Load('NtIsProcessInJob')(ProcessHandle, JobHandle);
   }
 
@@ -876,9 +876,9 @@ class Ntdll extends Win32 {
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntlockfile
   public static NtLockFile(
     FileHandle: HANDLE,
-    Event: OPTIONAL<HANDLE>,
-    ApcRoutine: OPTIONAL<PIO_APC_ROUTINE>,
-    ApcContext: OPTIONAL<PVOID>,
+    Event: Optional<HANDLE>,
+    ApcRoutine: Optional<PIO_APC_ROUTINE>,
+    ApcContext: Optional<PVOID>,
     IoStatusBlock_out: PIO_STATUS_BLOCK,
     ByteOffset: PLARGE_INTEGER,
     Length: PLARGE_INTEGER,
@@ -911,7 +911,7 @@ class Ntdll extends Win32 {
     BaseAddress_in_out: PVOID,
     ZeroBits: ULONG_PTR,
     CommitSize: SIZE_T,
-    SectionOffset_in_out: OPTIONAL<PLARGE_INTEGER>,
+    SectionOffset_in_out: Optional<PLARGE_INTEGER>,
     ViewSize_in_out: PSIZE_T,
     InheritDisposition: ULONG,
     AllocationType: ULONG,
@@ -923,9 +923,9 @@ class Ntdll extends Win32 {
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntnotifychangedirectoryfile
   public static NtNotifyChangeDirectoryFile(
     FileHandle: HANDLE,
-    Event: OPTIONAL<HANDLE>,
-    ApcRoutine: OPTIONAL<PIO_APC_ROUTINE>,
-    ApcContext: OPTIONAL<PVOID>,
+    Event: Optional<HANDLE>,
+    ApcRoutine: Optional<PIO_APC_ROUTINE>,
+    ApcContext: Optional<PVOID>,
     IoStatusBlock_out: PIO_STATUS_BLOCK,
     Buffer_out: PVOID,
     Length: ULONG,
@@ -938,13 +938,13 @@ class Ntdll extends Win32 {
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntnotifychangekey
   public static NtNotifyChangeKey(
     KeyHandle: HANDLE,
-    Event: OPTIONAL<HANDLE>,
-    ApcRoutine: OPTIONAL<PIO_APC_ROUTINE>,
-    ApcContext: OPTIONAL<PVOID>,
+    Event: Optional<HANDLE>,
+    ApcRoutine: Optional<PIO_APC_ROUTINE>,
+    ApcContext: Optional<PVOID>,
     IoStatusBlock_out: PIO_STATUS_BLOCK,
     CompletionFilter: ULONG,
     WatchTree: BOOLEAN,
-    Buffer_out: OPTIONAL<PVOID>,
+    Buffer_out: Optional<PVOID>,
     BufferSize: ULONG,
     Asynchronous: BOOLEAN,
   ): NTSTATUS {
@@ -955,14 +955,14 @@ class Ntdll extends Win32 {
   public static NtNotifyChangeMultipleKeys(
     MasterKeyHandle: HANDLE,
     Count: ULONG,
-    SubordinateObjects: OPTIONAL<POBJECT_ATTRIBUTES>,
-    Event: OPTIONAL<HANDLE>,
-    ApcRoutine: OPTIONAL<PIO_APC_ROUTINE>,
-    ApcContext: OPTIONAL<PVOID>,
+    SubordinateObjects: Optional<POBJECT_ATTRIBUTES>,
+    Event: Optional<HANDLE>,
+    ApcRoutine: Optional<PIO_APC_ROUTINE>,
+    ApcContext: Optional<PVOID>,
     IoStatusBlock_out: PIO_STATUS_BLOCK,
     CompletionFilter: ULONG,
     WatchTree: BOOLEAN,
-    Buffer_out: OPTIONAL<PVOID>,
+    Buffer_out: Optional<PVOID>,
     BufferSize: ULONG,
     Asynchronous: BOOLEAN,
   ): NTSTATUS {
@@ -1010,7 +1010,7 @@ class Ntdll extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntopenprocess
-  public static NtOpenProcess(ProcessHandle_out: PHANDLE, DesiredAccess: ACCESS_MASK, ObjectAttributes: POBJECT_ATTRIBUTES, ClientId: OPTIONAL<PCLIENT_ID>): NTSTATUS {
+  public static NtOpenProcess(ProcessHandle_out: PHANDLE, DesiredAccess: ACCESS_MASK, ObjectAttributes: POBJECT_ATTRIBUTES, ClientId: Optional<PCLIENT_ID>): NTSTATUS {
     return Ntdll.Load('NtOpenProcess')(ProcessHandle_out, DesiredAccess, ObjectAttributes, ClientId);
   }
 
@@ -1040,7 +1040,7 @@ class Ntdll extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntopenthread
-  public static NtOpenThread(ThreadHandle_out: PHANDLE, DesiredAccess: ACCESS_MASK, ObjectAttributes: POBJECT_ATTRIBUTES, ClientId: OPTIONAL<PCLIENT_ID>): NTSTATUS {
+  public static NtOpenThread(ThreadHandle_out: PHANDLE, DesiredAccess: ACCESS_MASK, ObjectAttributes: POBJECT_ATTRIBUTES, ClientId: Optional<PCLIENT_ID>): NTSTATUS {
     return Ntdll.Load('NtOpenThread')(ThreadHandle_out, DesiredAccess, ObjectAttributes, ClientId);
   }
 
@@ -1060,7 +1060,7 @@ class Ntdll extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-zwpowerinformation
-  public static NtPowerInformation(InformationLevel: ULONG, InputBuffer: OPTIONAL<PVOID>, InputBufferLength: ULONG, OutputBuffer_out: OPTIONAL<PVOID>, OutputBufferLength: ULONG): NTSTATUS {
+  public static NtPowerInformation(InformationLevel: ULONG, InputBuffer: Optional<PVOID>, InputBufferLength: ULONG, OutputBuffer_out: Optional<PVOID>, OutputBufferLength: ULONG): NTSTATUS {
     return Ntdll.Load('NtPowerInformation')(InformationLevel, InputBuffer, InputBufferLength, OutputBuffer_out, OutputBufferLength);
   }
 
@@ -1075,7 +1075,7 @@ class Ntdll extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntpulseevent
-  public static NtPulseEvent(EventHandle: HANDLE, PreviousState_out: OPTIONAL<PULONG>): NTSTATUS {
+  public static NtPulseEvent(EventHandle: HANDLE, PreviousState_out: Optional<PULONG>): NTSTATUS {
     return Ntdll.Load('NtPulseEvent')(EventHandle, PreviousState_out);
   }
 
@@ -1097,22 +1097,22 @@ class Ntdll extends Win32 {
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntquerydirectoryfile
   public static NtQueryDirectoryFile(
     FileHandle: HANDLE,
-    Event: OPTIONAL<HANDLE>,
-    ApcRoutine: OPTIONAL<PIO_APC_ROUTINE>,
-    ApcContext: OPTIONAL<PVOID>,
+    Event: Optional<HANDLE>,
+    ApcRoutine: Optional<PIO_APC_ROUTINE>,
+    ApcContext: Optional<PVOID>,
     IoStatusBlock_out: PIO_STATUS_BLOCK,
     FileInformation_out: PVOID,
     Length: ULONG,
     FileInformationClass: ULONG,
     ReturnSingleEntry: BOOLEAN,
-    FileName: OPTIONAL<PUNICODE_STRING>,
+    FileName: Optional<PUNICODE_STRING>,
     RestartScan: BOOLEAN,
   ): NTSTATUS {
     return Ntdll.Load('NtQueryDirectoryFile')(FileHandle, Event, ApcRoutine, ApcContext, IoStatusBlock_out, FileInformation_out, Length, FileInformationClass, ReturnSingleEntry, FileName, RestartScan);
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntquerydirectoryobject
-  public static NtQueryDirectoryObject(DirectoryHandle: HANDLE, Buffer_out: PVOID, Length: ULONG, ReturnSingleEntry: BOOLEAN, RestartScan: BOOLEAN, Context_in_out: PULONG, ReturnLength_out: OPTIONAL<PULONG>): NTSTATUS {
+  public static NtQueryDirectoryObject(DirectoryHandle: HANDLE, Buffer_out: PVOID, Length: ULONG, ReturnSingleEntry: BOOLEAN, RestartScan: BOOLEAN, Context_in_out: PULONG, ReturnLength_out: Optional<PULONG>): NTSTATUS {
     return Ntdll.Load('NtQueryDirectoryObject')(DirectoryHandle, Buffer_out, Length, ReturnSingleEntry, RestartScan, Context_in_out, ReturnLength_out);
   }
 
@@ -1123,16 +1123,16 @@ class Ntdll extends Win32 {
     Buffer_out: PVOID,
     Length: ULONG,
     ReturnSingleEntry: BOOLEAN,
-    EaList: OPTIONAL<PVOID>,
+    EaList: Optional<PVOID>,
     EaListLength: ULONG,
-    EaIndex: OPTIONAL<PULONG>,
+    EaIndex: Optional<PULONG>,
     RestartScan: BOOLEAN,
   ): NTSTATUS {
     return Ntdll.Load('NtQueryEaFile')(FileHandle, IoStatusBlock_out, Buffer_out, Length, ReturnSingleEntry, EaList, EaListLength, EaIndex, RestartScan);
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntqueryevent
-  public static NtQueryEvent(EventHandle: HANDLE, EventInformationClass: ULONG, EventInformation_out: PVOID, EventInformationLength: ULONG, ReturnLength_out: OPTIONAL<PULONG>): NTSTATUS {
+  public static NtQueryEvent(EventHandle: HANDLE, EventInformationClass: ULONG, EventInformation_out: PVOID, EventInformationLength: ULONG, ReturnLength_out: Optional<PULONG>): NTSTATUS {
     return Ntdll.Load('NtQueryEvent')(EventHandle, EventInformationClass, EventInformation_out, EventInformationLength, ReturnLength_out);
   }
 
@@ -1147,17 +1147,17 @@ class Ntdll extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-zwqueryinformationjobobject
-  public static NtQueryInformationJobObject(JobHandle: HANDLE, JobObjectInformationClass: ULONG, JobObjectInformation_out: PVOID, JobObjectInformationLength: ULONG, ReturnLength_out: OPTIONAL<PULONG>): NTSTATUS {
+  public static NtQueryInformationJobObject(JobHandle: HANDLE, JobObjectInformationClass: ULONG, JobObjectInformation_out: PVOID, JobObjectInformationLength: ULONG, ReturnLength_out: Optional<PULONG>): NTSTATUS {
     return Ntdll.Load('NtQueryInformationJobObject')(JobHandle, JobObjectInformationClass, JobObjectInformation_out, JobObjectInformationLength, ReturnLength_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winternl/nf-winternl-ntqueryinformationprocess
-  public static NtQueryInformationProcess(ProcessHandle: HANDLE, ProcessInformationClass: ULONG, ProcessInformation_out: PVOID, ProcessInformationLength: ULONG, ReturnLength_out: OPTIONAL<PULONG>): NTSTATUS {
+  public static NtQueryInformationProcess(ProcessHandle: HANDLE, ProcessInformationClass: ULONG, ProcessInformation_out: PVOID, ProcessInformationLength: ULONG, ReturnLength_out: Optional<PULONG>): NTSTATUS {
     return Ntdll.Load('NtQueryInformationProcess')(ProcessHandle, ProcessInformationClass, ProcessInformation_out, ProcessInformationLength, ReturnLength_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winternl/nf-winternl-ntqueryinformationthread
-  public static NtQueryInformationThread(ThreadHandle: HANDLE, ThreadInformationClass: ULONG, ThreadInformation_out: PVOID, ThreadInformationLength: ULONG, ReturnLength_out: OPTIONAL<PULONG>): NTSTATUS {
+  public static NtQueryInformationThread(ThreadHandle: HANDLE, ThreadInformationClass: ULONG, ThreadInformation_out: PVOID, ThreadInformationLength: ULONG, ReturnLength_out: Optional<PULONG>): NTSTATUS {
     return Ntdll.Load('NtQueryInformationThread')(ThreadHandle, ThreadInformationClass, ThreadInformation_out, ThreadInformationLength, ReturnLength_out);
   }
 
@@ -1172,7 +1172,7 @@ class Ntdll extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-zwqueryiocompletion
-  public static NtQueryIoCompletion(IoCompletionHandle: HANDLE, IoCompletionInformationClass: ULONG, IoCompletionInformation_out: PVOID, IoCompletionInformationLength: ULONG, ReturnLength_out: OPTIONAL<PULONG>): NTSTATUS {
+  public static NtQueryIoCompletion(IoCompletionHandle: HANDLE, IoCompletionInformationClass: ULONG, IoCompletionInformation_out: PVOID, IoCompletionInformationLength: ULONG, ReturnLength_out: Optional<PULONG>): NTSTATUS {
     return Ntdll.Load('NtQueryIoCompletion')(IoCompletionHandle, IoCompletionInformationClass, IoCompletionInformation_out, IoCompletionInformationLength, ReturnLength_out);
   }
 
@@ -1182,27 +1182,27 @@ class Ntdll extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-zwquerymultiplevaluekey
-  public static NtQueryMultipleValueKey(KeyHandle: HANDLE, ValueEntries_in_out: PKEY_VALUE_ENTRY, EntryCount: ULONG, ValueBuffer_out: PVOID, BufferLength_in_out: PULONG, RequiredBufferLength_out: OPTIONAL<PULONG>): NTSTATUS {
+  public static NtQueryMultipleValueKey(KeyHandle: HANDLE, ValueEntries_in_out: PKEY_VALUE_ENTRY, EntryCount: ULONG, ValueBuffer_out: PVOID, BufferLength_in_out: PULONG, RequiredBufferLength_out: Optional<PULONG>): NTSTATUS {
     return Ntdll.Load('NtQueryMultipleValueKey')(KeyHandle, ValueEntries_in_out, EntryCount, ValueBuffer_out, BufferLength_in_out, RequiredBufferLength_out);
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntquerymutant
-  public static NtQueryMutant(MutantHandle: HANDLE, MutantInformationClass: ULONG, MutantInformation_out: PVOID, MutantInformationLength: ULONG, ReturnLength_out: OPTIONAL<PULONG>): NTSTATUS {
+  public static NtQueryMutant(MutantHandle: HANDLE, MutantInformationClass: ULONG, MutantInformation_out: PVOID, MutantInformationLength: ULONG, ReturnLength_out: Optional<PULONG>): NTSTATUS {
     return Ntdll.Load('NtQueryMutant')(MutantHandle, MutantInformationClass, MutantInformation_out, MutantInformationLength, ReturnLength_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winternl/nf-winternl-ntqueryobject
-  public static NtQueryObject(Handle: OPTIONAL<HANDLE>, ObjectInformationClass: ULONG, ObjectInformation_out: OPTIONAL<PVOID>, ObjectInformationLength: ULONG, ReturnLength_out: OPTIONAL<PULONG>): NTSTATUS {
+  public static NtQueryObject(Handle: Optional<HANDLE>, ObjectInformationClass: ULONG, ObjectInformation_out: Optional<PVOID>, ObjectInformationLength: ULONG, ReturnLength_out: Optional<PULONG>): NTSTATUS {
     return Ntdll.Load('NtQueryObject')(Handle, ObjectInformationClass, ObjectInformation_out, ObjectInformationLength, ReturnLength_out);
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntqueryperformancecounter
-  public static NtQueryPerformanceCounter(PerformanceCounter_out: PLARGE_INTEGER, PerformanceFrequency_out: OPTIONAL<PLARGE_INTEGER>): NTSTATUS {
+  public static NtQueryPerformanceCounter(PerformanceCounter_out: PLARGE_INTEGER, PerformanceFrequency_out: Optional<PLARGE_INTEGER>): NTSTATUS {
     return Ntdll.Load('NtQueryPerformanceCounter')(PerformanceCounter_out, PerformanceFrequency_out);
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntquerysection
-  public static NtQuerySection(SectionHandle: HANDLE, SectionInformationClass: ULONG, SectionInformation_out: PVOID, SectionInformationLength: SIZE_T, ReturnLength_out: OPTIONAL<PSIZE_T>): NTSTATUS {
+  public static NtQuerySection(SectionHandle: HANDLE, SectionInformationClass: ULONG, SectionInformation_out: PVOID, SectionInformationLength: SIZE_T, ReturnLength_out: Optional<PSIZE_T>): NTSTATUS {
     return Ntdll.Load('NtQuerySection')(SectionHandle, SectionInformationClass, SectionInformation_out, SectionInformationLength, ReturnLength_out);
   }
 
@@ -1212,22 +1212,22 @@ class Ntdll extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntquerysemaphore
-  public static NtQuerySemaphore(SemaphoreHandle: HANDLE, SemaphoreInformationClass: ULONG, SemaphoreInformation_out: PVOID, SemaphoreInformationLength: ULONG, ReturnLength_out: OPTIONAL<PULONG>): NTSTATUS {
+  public static NtQuerySemaphore(SemaphoreHandle: HANDLE, SemaphoreInformationClass: ULONG, SemaphoreInformation_out: PVOID, SemaphoreInformationLength: ULONG, ReturnLength_out: Optional<PULONG>): NTSTATUS {
     return Ntdll.Load('NtQuerySemaphore')(SemaphoreHandle, SemaphoreInformationClass, SemaphoreInformation_out, SemaphoreInformationLength, ReturnLength_out);
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-zwquerysymboliclinkobject
-  public static NtQuerySymbolicLinkObject(LinkHandle: HANDLE, LinkTarget_in_out: PUNICODE_STRING, ReturnedLength_out: OPTIONAL<PULONG>): NTSTATUS {
+  public static NtQuerySymbolicLinkObject(LinkHandle: HANDLE, LinkTarget_in_out: PUNICODE_STRING, ReturnedLength_out: Optional<PULONG>): NTSTATUS {
     return Ntdll.Load('NtQuerySymbolicLinkObject')(LinkHandle, LinkTarget_in_out, ReturnedLength_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winternl/nf-winternl-ntquerysysteminformation
-  public static NtQuerySystemInformation(SystemInformationClass: ULONG, SystemInformation_out: PVOID, SystemInformationLength: ULONG, ReturnLength_out: OPTIONAL<PULONG>): NTSTATUS {
+  public static NtQuerySystemInformation(SystemInformationClass: ULONG, SystemInformation_out: PVOID, SystemInformationLength: ULONG, ReturnLength_out: Optional<PULONG>): NTSTATUS {
     return Ntdll.Load('NtQuerySystemInformation')(SystemInformationClass, SystemInformation_out, SystemInformationLength, ReturnLength_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winternl/nf-winternl-ntquerysysteminformationex
-  public static NtQuerySystemInformationEx(SystemInformationClass: ULONG, InputBuffer: PVOID, InputBufferLength: ULONG, SystemInformation_out: PVOID, SystemInformationLength: ULONG, ReturnLength_out: OPTIONAL<PULONG>): NTSTATUS {
+  public static NtQuerySystemInformationEx(SystemInformationClass: ULONG, InputBuffer: PVOID, InputBufferLength: ULONG, SystemInformation_out: PVOID, SystemInformationLength: ULONG, ReturnLength_out: Optional<PULONG>): NTSTATUS {
     return Ntdll.Load('NtQuerySystemInformationEx')(SystemInformationClass, InputBuffer, InputBufferLength, SystemInformation_out, SystemInformationLength, ReturnLength_out);
   }
 
@@ -1237,7 +1237,7 @@ class Ntdll extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-zwquerytimer
-  public static NtQueryTimer(TimerHandle: HANDLE, TimerInformationClass: ULONG, TimerInformation_out: PVOID, TimerInformationLength: ULONG, ReturnLength_out: OPTIONAL<PULONG>): NTSTATUS {
+  public static NtQueryTimer(TimerHandle: HANDLE, TimerInformationClass: ULONG, TimerInformation_out: PVOID, TimerInformationLength: ULONG, ReturnLength_out: Optional<PULONG>): NTSTATUS {
     return Ntdll.Load('NtQueryTimer')(TimerHandle, TimerInformationClass, TimerInformation_out, TimerInformationLength, ReturnLength_out);
   }
 
@@ -1252,7 +1252,7 @@ class Ntdll extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntqueryvirtualmemory
-  public static NtQueryVirtualMemory(ProcessHandle: HANDLE, BaseAddress: PVOID<bigint>, MemoryInformationClass: ULONG, MemoryInformation_out: PVOID, MemoryInformationLength: SIZE_T, ReturnLength_out: OPTIONAL<PSIZE_T>): NTSTATUS {
+  public static NtQueryVirtualMemory(ProcessHandle: HANDLE, BaseAddress: PVOID<bigint>, MemoryInformationClass: ULONG, MemoryInformation_out: PVOID, MemoryInformationLength: SIZE_T, ReturnLength_out: Optional<PSIZE_T>): NTSTATUS {
     return Ntdll.Load('NtQueryVirtualMemory')(ProcessHandle, BaseAddress, MemoryInformationClass, MemoryInformation_out, MemoryInformationLength, ReturnLength_out);
   }
 
@@ -1262,12 +1262,12 @@ class Ntdll extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntqueueapcthread
-  public static NtQueueApcThread(ThreadHandle: HANDLE, ApcRoutine: PPS_APC_ROUTINE, ApcArgument1: OPTIONAL<PVOID>, ApcArgument2: OPTIONAL<PVOID>, ApcArgument3: OPTIONAL<PVOID>): NTSTATUS {
+  public static NtQueueApcThread(ThreadHandle: HANDLE, ApcRoutine: PPS_APC_ROUTINE, ApcArgument1: Optional<PVOID>, ApcArgument2: Optional<PVOID>, ApcArgument3: Optional<PVOID>): NTSTATUS {
     return Ntdll.Load('NtQueueApcThread')(ThreadHandle, ApcRoutine, ApcArgument1, ApcArgument2, ApcArgument3);
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntqueueapcthreadex
-  public static NtQueueApcThreadEx(ThreadHandle: HANDLE, ReserveHandle: OPTIONAL<HANDLE>, ApcRoutine: PPS_APC_ROUTINE, ApcArgument1: OPTIONAL<PVOID>, ApcArgument2: OPTIONAL<PVOID>, ApcArgument3: OPTIONAL<PVOID>): NTSTATUS {
+  public static NtQueueApcThreadEx(ThreadHandle: HANDLE, ReserveHandle: Optional<HANDLE>, ApcRoutine: PPS_APC_ROUTINE, ApcArgument1: Optional<PVOID>, ApcArgument2: Optional<PVOID>, ApcArgument3: Optional<PVOID>): NTSTATUS {
     return Ntdll.Load('NtQueueApcThreadEx')(ThreadHandle, ReserveHandle, ApcRoutine, ApcArgument1, ApcArgument2, ApcArgument3);
   }
 
@@ -1279,14 +1279,14 @@ class Ntdll extends Win32 {
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntreadfile
   public static NtReadFile(
     FileHandle: HANDLE,
-    Event: OPTIONAL<HANDLE>,
-    ApcRoutine: OPTIONAL<PIO_APC_ROUTINE>,
-    ApcContext: OPTIONAL<PVOID>,
+    Event: Optional<HANDLE>,
+    ApcRoutine: Optional<PIO_APC_ROUTINE>,
+    ApcContext: Optional<PVOID>,
     IoStatusBlock_out: PIO_STATUS_BLOCK,
     Buffer_out: PVOID,
     Length: ULONG,
-    ByteOffset: OPTIONAL<PLARGE_INTEGER>,
-    Key: OPTIONAL<PULONG>,
+    ByteOffset: Optional<PLARGE_INTEGER>,
+    Key: Optional<PULONG>,
   ): NTSTATUS {
     return Ntdll.Load('NtReadFile')(FileHandle, Event, ApcRoutine, ApcContext, IoStatusBlock_out, Buffer_out, Length, ByteOffset, Key);
   }
@@ -1294,40 +1294,40 @@ class Ntdll extends Win32 {
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntreadfilescatter
   public static NtReadFileScatter(
     FileHandle: HANDLE,
-    Event: OPTIONAL<HANDLE>,
-    ApcRoutine: OPTIONAL<PIO_APC_ROUTINE>,
-    ApcContext: OPTIONAL<PVOID>,
+    Event: Optional<HANDLE>,
+    ApcRoutine: Optional<PIO_APC_ROUTINE>,
+    ApcContext: Optional<PVOID>,
     IoStatusBlock_out: PIO_STATUS_BLOCK,
     SegmentArray: PFILE_SEGMENT_ELEMENT,
     Length: ULONG,
-    ByteOffset: OPTIONAL<PLARGE_INTEGER>,
-    Key: OPTIONAL<PULONG>,
+    ByteOffset: Optional<PLARGE_INTEGER>,
+    Key: Optional<PULONG>,
   ): NTSTATUS {
     return Ntdll.Load('NtReadFileScatter')(FileHandle, Event, ApcRoutine, ApcContext, IoStatusBlock_out, SegmentArray, Length, ByteOffset, Key);
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntreadvirtualmemory
-  public static NtReadVirtualMemory(ProcessHandle: HANDLE, BaseAddress: PVOID<bigint>, Buffer_out: PVOID, BufferSize: SIZE_T, NumberOfBytesRead_out: OPTIONAL<PSIZE_T>): NTSTATUS {
+  public static NtReadVirtualMemory(ProcessHandle: HANDLE, BaseAddress: PVOID<bigint>, Buffer_out: PVOID, BufferSize: SIZE_T, NumberOfBytesRead_out: Optional<PSIZE_T>): NTSTATUS {
     return Ntdll.Load('NtReadVirtualMemory')(ProcessHandle, BaseAddress, Buffer_out, BufferSize, NumberOfBytesRead_out);
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-zwreleasemutant
-  public static NtReleaseMutant(MutantHandle: HANDLE, PreviousCount_out: OPTIONAL<PULONG>): NTSTATUS {
+  public static NtReleaseMutant(MutantHandle: HANDLE, PreviousCount_out: Optional<PULONG>): NTSTATUS {
     return Ntdll.Load('NtReleaseMutant')(MutantHandle, PreviousCount_out);
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-zwreleasesemaphore
-  public static NtReleaseSemaphore(SemaphoreHandle: HANDLE, ReleaseCount: LONG, PreviousCount_out: OPTIONAL<PULONG>): NTSTATUS {
+  public static NtReleaseSemaphore(SemaphoreHandle: HANDLE, ReleaseCount: LONG, PreviousCount_out: Optional<PULONG>): NTSTATUS {
     return Ntdll.Load('NtReleaseSemaphore')(SemaphoreHandle, ReleaseCount, PreviousCount_out);
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-zwremoveiocompletion
-  public static NtRemoveIoCompletion(IoCompletionHandle: HANDLE, KeyContext_out: PVOID, ApcContext_out: PVOID, IoStatusBlock_out: PIO_STATUS_BLOCK, Timeout: OPTIONAL<PLARGE_INTEGER>): NTSTATUS {
+  public static NtRemoveIoCompletion(IoCompletionHandle: HANDLE, KeyContext_out: PVOID, ApcContext_out: PVOID, IoStatusBlock_out: PIO_STATUS_BLOCK, Timeout: Optional<PLARGE_INTEGER>): NTSTATUS {
     return Ntdll.Load('NtRemoveIoCompletion')(IoCompletionHandle, KeyContext_out, ApcContext_out, IoStatusBlock_out, Timeout);
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-zwremoveiocompletionex
-  public static NtRemoveIoCompletionEx(IoCompletionHandle: HANDLE, IoCompletionInformation_out: PFILE_IO_COMPLETION_INFORMATION, Count: ULONG, NumEntriesRemoved_out: PULONG, Timeout: OPTIONAL<PLARGE_INTEGER>, Alertable: BOOLEAN): NTSTATUS {
+  public static NtRemoveIoCompletionEx(IoCompletionHandle: HANDLE, IoCompletionInformation_out: PFILE_IO_COMPLETION_INFORMATION, Count: ULONG, NumEntriesRemoved_out: PULONG, Timeout: Optional<PLARGE_INTEGER>, Alertable: BOOLEAN): NTSTATUS {
     return Ntdll.Load('NtRemoveIoCompletionEx')(IoCompletionHandle, IoCompletionInformation_out, Count, NumEntriesRemoved_out, Timeout, Alertable);
   }
 
@@ -1342,7 +1342,7 @@ class Ntdll extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntresetevent
-  public static NtResetEvent(EventHandle: HANDLE, PreviousState_out: OPTIONAL<PULONG>): NTSTATUS {
+  public static NtResetEvent(EventHandle: HANDLE, PreviousState_out: Optional<PULONG>): NTSTATUS {
     return Ntdll.Load('NtResetEvent')(EventHandle, PreviousState_out);
   }
 
@@ -1357,7 +1357,7 @@ class Ntdll extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntresumethread
-  public static NtResumeThread(ThreadHandle: HANDLE, PreviousSuspendCount_out: OPTIONAL<PULONG>): NTSTATUS {
+  public static NtResumeThread(ThreadHandle: HANDLE, PreviousSuspendCount_out: Optional<PULONG>): NTSTATUS {
     return Ntdll.Load('NtResumeThread')(ThreadHandle, PreviousSuspendCount_out);
   }
 
@@ -1392,7 +1392,7 @@ class Ntdll extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntsetevent
-  public static NtSetEvent(EventHandle: HANDLE, PreviousState_out: OPTIONAL<PULONG>): NTSTATUS {
+  public static NtSetEvent(EventHandle: HANDLE, PreviousState_out: Optional<PULONG>): NTSTATUS {
     return Ntdll.Load('NtSetEvent')(EventHandle, PreviousState_out);
   }
 
@@ -1442,12 +1442,12 @@ class Ntdll extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-zwsettimer
-  public static NtSetTimer(TimerHandle: HANDLE, DueTime: PLARGE_INTEGER, TimerApcRoutine: OPTIONAL<PTIMER_APC_ROUTINE>, TimerContext: OPTIONAL<PVOID>, ResumeTimer: BOOLEAN, Period: LONG, PreviousState_out: OPTIONAL<PBOOLEAN>): NTSTATUS {
+  public static NtSetTimer(TimerHandle: HANDLE, DueTime: PLARGE_INTEGER, TimerApcRoutine: Optional<PTIMER_APC_ROUTINE>, TimerContext: Optional<PVOID>, ResumeTimer: BOOLEAN, Period: LONG, PreviousState_out: Optional<PBOOLEAN>): NTSTATUS {
     return Ntdll.Load('NtSetTimer')(TimerHandle, DueTime, TimerApcRoutine, TimerContext, ResumeTimer, Period, PreviousState_out);
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntsettimerresolution
-  public static NtSetTimerResolution(DesiredTime: ULONG, SetResolution: BOOLEAN, ActualTime_out: OPTIONAL<PULONG>): NTSTATUS {
+  public static NtSetTimerResolution(DesiredTime: ULONG, SetResolution: BOOLEAN, ActualTime_out: Optional<PULONG>): NTSTATUS {
     return Ntdll.Load('NtSetTimerResolution')(DesiredTime, SetResolution, ActualTime_out);
   }
 
@@ -1467,7 +1467,7 @@ class Ntdll extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntsignalandwaitforsingleobject
-  public static NtSignalAndWaitForSingleObject(SignalHandle: HANDLE, WaitHandle: HANDLE, Alertable: BOOLEAN, Timeout: OPTIONAL<PLARGE_INTEGER>): NTSTATUS {
+  public static NtSignalAndWaitForSingleObject(SignalHandle: HANDLE, WaitHandle: HANDLE, Alertable: BOOLEAN, Timeout: Optional<PLARGE_INTEGER>): NTSTATUS {
     return Ntdll.Load('NtSignalAndWaitForSingleObject')(SignalHandle, WaitHandle, Alertable, Timeout);
   }
 
@@ -1477,7 +1477,7 @@ class Ntdll extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntsuspendthread
-  public static NtSuspendThread(ThreadHandle: HANDLE, PreviousSuspendCount_out: OPTIONAL<PULONG>): NTSTATUS {
+  public static NtSuspendThread(ThreadHandle: HANDLE, PreviousSuspendCount_out: Optional<PULONG>): NTSTATUS {
     return Ntdll.Load('NtSuspendThread')(ThreadHandle, PreviousSuspendCount_out);
   }
 
@@ -1487,12 +1487,12 @@ class Ntdll extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntterminateprocess
-  public static NtTerminateProcess(ProcessHandle: OPTIONAL<HANDLE>, ExitStatus: NTSTATUS): NTSTATUS {
+  public static NtTerminateProcess(ProcessHandle: Optional<HANDLE>, ExitStatus: NTSTATUS): NTSTATUS {
     return Ntdll.Load('NtTerminateProcess')(ProcessHandle, ExitStatus);
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntterminatethread
-  public static NtTerminateThread(ThreadHandle: OPTIONAL<HANDLE>, ExitStatus: NTSTATUS): NTSTATUS {
+  public static NtTerminateThread(ThreadHandle: Optional<HANDLE>, ExitStatus: NTSTATUS): NTSTATUS {
     return Ntdll.Load('NtTerminateThread')(ThreadHandle, ExitStatus);
   }
 
@@ -1527,31 +1527,31 @@ class Ntdll extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntwaitfordebugevent
-  public static NtWaitForDebugEvent(DebugObjectHandle: HANDLE, Alertable: BOOLEAN, Timeout: OPTIONAL<PLARGE_INTEGER>, WaitStateChange_out: PDBGUI_WAIT_STATE_CHANGE): NTSTATUS {
+  public static NtWaitForDebugEvent(DebugObjectHandle: HANDLE, Alertable: BOOLEAN, Timeout: Optional<PLARGE_INTEGER>, WaitStateChange_out: PDBGUI_WAIT_STATE_CHANGE): NTSTATUS {
     return Ntdll.Load('NtWaitForDebugEvent')(DebugObjectHandle, Alertable, Timeout, WaitStateChange_out);
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntwaitformultipleobjects
-  public static NtWaitForMultipleObjects(Count: ULONG, Handles: PHANDLE, WaitType: ULONG, Alertable: BOOLEAN, Timeout: OPTIONAL<PLARGE_INTEGER>): NTSTATUS {
+  public static NtWaitForMultipleObjects(Count: ULONG, Handles: PHANDLE, WaitType: ULONG, Alertable: BOOLEAN, Timeout: Optional<PLARGE_INTEGER>): NTSTATUS {
     return Ntdll.Load('NtWaitForMultipleObjects')(Count, Handles, WaitType, Alertable, Timeout);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winternl/nf-winternl-ntwaitforsingleobject
-  public static NtWaitForSingleObject(Handle: HANDLE, Alertable: BOOLEAN, Timeout: OPTIONAL<PLARGE_INTEGER>): NTSTATUS {
+  public static NtWaitForSingleObject(Handle: HANDLE, Alertable: BOOLEAN, Timeout: Optional<PLARGE_INTEGER>): NTSTATUS {
     return Ntdll.Load('NtWaitForSingleObject')(Handle, Alertable, Timeout);
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntwritefile
   public static NtWriteFile(
     FileHandle: HANDLE,
-    Event: OPTIONAL<HANDLE>,
-    ApcRoutine: OPTIONAL<PIO_APC_ROUTINE>,
-    ApcContext: OPTIONAL<PVOID>,
+    Event: Optional<HANDLE>,
+    ApcRoutine: Optional<PIO_APC_ROUTINE>,
+    ApcContext: Optional<PVOID>,
     IoStatusBlock_out: PIO_STATUS_BLOCK,
     Buffer: PVOID,
     Length: ULONG,
-    ByteOffset: OPTIONAL<PLARGE_INTEGER>,
-    Key: OPTIONAL<PULONG>,
+    ByteOffset: Optional<PLARGE_INTEGER>,
+    Key: Optional<PULONG>,
   ): NTSTATUS {
     return Ntdll.Load('NtWriteFile')(FileHandle, Event, ApcRoutine, ApcContext, IoStatusBlock_out, Buffer, Length, ByteOffset, Key);
   }
@@ -1559,20 +1559,20 @@ class Ntdll extends Win32 {
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntwritefilegather
   public static NtWriteFileGather(
     FileHandle: HANDLE,
-    Event: OPTIONAL<HANDLE>,
-    ApcRoutine: OPTIONAL<PIO_APC_ROUTINE>,
-    ApcContext: OPTIONAL<PVOID>,
+    Event: Optional<HANDLE>,
+    ApcRoutine: Optional<PIO_APC_ROUTINE>,
+    ApcContext: Optional<PVOID>,
     IoStatusBlock_out: PIO_STATUS_BLOCK,
     SegmentArray: PFILE_SEGMENT_ELEMENT,
     Length: ULONG,
-    ByteOffset: OPTIONAL<PLARGE_INTEGER>,
-    Key: OPTIONAL<PULONG>,
+    ByteOffset: Optional<PLARGE_INTEGER>,
+    Key: Optional<PULONG>,
   ): NTSTATUS {
     return Ntdll.Load('NtWriteFileGather')(FileHandle, Event, ApcRoutine, ApcContext, IoStatusBlock_out, SegmentArray, Length, ByteOffset, Key);
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntwritevirtualmemory
-  public static NtWriteVirtualMemory(ProcessHandle: HANDLE, BaseAddress: PVOID<bigint>, Buffer: PVOID, BufferSize: SIZE_T, NumberOfBytesWritten_out: OPTIONAL<PSIZE_T>): NTSTATUS {
+  public static NtWriteVirtualMemory(ProcessHandle: HANDLE, BaseAddress: PVOID<bigint>, Buffer: PVOID, BufferSize: SIZE_T, NumberOfBytesWritten_out: Optional<PSIZE_T>): NTSTATUS {
     return Ntdll.Load('NtWriteVirtualMemory')(ProcessHandle, BaseAddress, Buffer, BufferSize, NumberOfBytesWritten_out);
   }
 
@@ -1694,7 +1694,7 @@ class Ntdll extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winnt/nf-winnt-rtlcapturestackbacktrace
-  public static RtlCaptureStackBackTrace(FramesToSkip: ULONG, FramesToCapture: ULONG, BackTrace_out: PVOID, BackTraceHash_out: OPTIONAL<PULONG>): USHORT {
+  public static RtlCaptureStackBackTrace(FramesToSkip: ULONG, FramesToCapture: ULONG, BackTrace_out: PVOID, BackTraceHash_out: Optional<PULONG>): USHORT {
     return Ntdll.Load('RtlCaptureStackBackTrace')(FramesToSkip, FramesToCapture, BackTrace_out, BackTraceHash_out);
   }
 
@@ -1749,7 +1749,7 @@ class Ntdll extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-rtlcopyunicodestring
-  public static RtlCopyUnicodeString(DestinationString_in_out: PUNICODE_STRING, SourceString: OPTIONAL<PCUNICODE_STRING>): VOID {
+  public static RtlCopyUnicodeString(DestinationString_in_out: PUNICODE_STRING, SourceString: Optional<PCUNICODE_STRING>): VOID {
     return Ntdll.Load('RtlCopyUnicodeString')(DestinationString_in_out, SourceString);
   }
 
@@ -1764,7 +1764,7 @@ class Ntdll extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-rtlcreateheap
-  public static RtlCreateHeap(Flags: ULONG, HeapBase: OPTIONAL<PVOID>, ReserveSize: SIZE_T, CommitSize: SIZE_T, Lock: OPTIONAL<PVOID>, Parameters: OPTIONAL<PRTL_HEAP_PARAMETERS>): PVOID {
+  public static RtlCreateHeap(Flags: ULONG, HeapBase: Optional<PVOID>, ReserveSize: SIZE_T, CommitSize: SIZE_T, Lock: Optional<PVOID>, Parameters: Optional<PRTL_HEAP_PARAMETERS>): PVOID {
     return Ntdll.Load('RtlCreateHeap')(Flags, HeapBase, ReserveSize, CommitSize, Lock, Parameters);
   }
 
@@ -1772,14 +1772,14 @@ class Ntdll extends Win32 {
   public static RtlCreateProcessParametersEx(
     pProcessParameters_out: PVOID,
     ImagePathName: PUNICODE_STRING,
-    DllPath: OPTIONAL<PUNICODE_STRING>,
-    CurrentDirectory: OPTIONAL<PUNICODE_STRING>,
-    CommandLine: OPTIONAL<PUNICODE_STRING>,
-    Environment: OPTIONAL<PVOID>,
-    WindowTitle: OPTIONAL<PUNICODE_STRING>,
-    DesktopInfo: OPTIONAL<PUNICODE_STRING>,
-    ShellInfo: OPTIONAL<PUNICODE_STRING>,
-    RuntimeData: OPTIONAL<PUNICODE_STRING>,
+    DllPath: Optional<PUNICODE_STRING>,
+    CurrentDirectory: Optional<PUNICODE_STRING>,
+    CommandLine: Optional<PUNICODE_STRING>,
+    Environment: Optional<PVOID>,
+    WindowTitle: Optional<PUNICODE_STRING>,
+    DesktopInfo: Optional<PUNICODE_STRING>,
+    ShellInfo: Optional<PUNICODE_STRING>,
+    RuntimeData: Optional<PUNICODE_STRING>,
     Flags: ULONG,
   ): NTSTATUS {
     return Ntdll.Load('RtlCreateProcessParametersEx')(pProcessParameters_out, ImagePathName, DllPath, CurrentDirectory, CommandLine, Environment, WindowTitle, DesktopInfo, ShellInfo, RuntimeData, Flags);
@@ -1791,7 +1791,7 @@ class Ntdll extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/threadpoolapiset/nf-threadpoolapiset-createtimerqueuetimer
-  public static RtlCreateTimer(TimerQueueHandle: HANDLE, Handle_out: PHANDLE, Function: WAITORTIMERCALLBACKFUNC, Context: OPTIONAL<PVOID>, DueTime: ULONG, Period: ULONG, Flags: ULONG): NTSTATUS {
+  public static RtlCreateTimer(TimerQueueHandle: HANDLE, Handle_out: PHANDLE, Function: WAITORTIMERCALLBACKFUNC, Context: Optional<PVOID>, DueTime: ULONG, Period: ULONG, Flags: ULONG): NTSTATUS {
     return Ntdll.Load('RtlCreateTimer')(TimerQueueHandle, Handle_out, Function, Context, DueTime, Period, Flags);
   }
 
@@ -1816,7 +1816,7 @@ class Ntdll extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/threadpoolapiset/nf-threadpoolapiset-deletetimerqueuetimer
-  public static RtlDeleteTimer(TimerQueueHandle: HANDLE, TimerToCancel: HANDLE, CompletionEvent: OPTIONAL<HANDLE>): NTSTATUS {
+  public static RtlDeleteTimer(TimerQueueHandle: HANDLE, TimerToCancel: HANDLE, CompletionEvent: Optional<HANDLE>): NTSTATUS {
     return Ntdll.Load('RtlDeleteTimer')(TimerQueueHandle, TimerToCancel, CompletionEvent);
   }
 
@@ -1826,7 +1826,7 @@ class Ntdll extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/threadpoolapiset/nf-threadpoolapiset-deletetimerqueueex
-  public static RtlDeleteTimerQueueEx(TimerQueueHandle: HANDLE, CompletionEvent: OPTIONAL<HANDLE>): NTSTATUS {
+  public static RtlDeleteTimerQueueEx(TimerQueueHandle: HANDLE, CompletionEvent: Optional<HANDLE>): NTSTATUS {
     return Ntdll.Load('RtlDeleteTimerQueueEx')(TimerQueueHandle, CompletionEvent);
   }
 
@@ -1836,7 +1836,7 @@ class Ntdll extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/threadpoolapiset/nf-threadpoolapiset-unregisterwaitex
-  public static RtlDeregisterWaitEx(WaitHandle: HANDLE, CompletionEvent: OPTIONAL<HANDLE>): NTSTATUS {
+  public static RtlDeregisterWaitEx(WaitHandle: HANDLE, CompletionEvent: Optional<HANDLE>): NTSTATUS {
     return Ntdll.Load('RtlDeregisterWaitEx')(WaitHandle, CompletionEvent);
   }
 
@@ -1856,7 +1856,7 @@ class Ntdll extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-rtldospathnametontpathname_u_withstatus
-  public static RtlDosPathNameToNtPathName_U_WithStatus(DosFileName: PCWSTR, NtFileName_out: PUNICODE_STRING, FilePart_out: OPTIONAL<PVOID>, RelativeName_out: OPTIONAL<PRTL_RELATIVE_NAME_U>): NTSTATUS {
+  public static RtlDosPathNameToNtPathName_U_WithStatus(DosFileName: PCWSTR, NtFileName_out: PUNICODE_STRING, FilePart_out: Optional<PVOID>, RelativeName_out: Optional<PRTL_RELATIVE_NAME_U>): NTSTATUS {
     return Ntdll.Load('RtlDosPathNameToNtPathName_U_WithStatus')(DosFileName, NtFileName_out, FilePart_out, RelativeName_out);
   }
 
@@ -1886,7 +1886,7 @@ class Ntdll extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-rtlexpandenvironmentstrings_u
-  public static RtlExpandEnvironmentStrings_U(Environment: OPTIONAL<PVOID>, Source: PUNICODE_STRING, Destination_out: PUNICODE_STRING, ReturnedLength_out: OPTIONAL<PULONG>): NTSTATUS {
+  public static RtlExpandEnvironmentStrings_U(Environment: Optional<PVOID>, Source: PUNICODE_STRING, Destination_out: PUNICODE_STRING, ReturnedLength_out: Optional<PULONG>): NTSTATUS {
     return Ntdll.Load('RtlExpandEnvironmentStrings_U')(Environment, Source, Destination_out, ReturnedLength_out);
   }
 
@@ -1926,7 +1926,7 @@ class Ntdll extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-rtlfreeheap
-  public static RtlFreeHeap(HeapHandle: PVOID, Flags: ULONG, BaseAddress: OPTIONAL<PVOID>): BOOLEAN {
+  public static RtlFreeHeap(HeapHandle: PVOID, Flags: ULONG, BaseAddress: Optional<PVOID>): BOOLEAN {
     return Ntdll.Load('RtlFreeHeap')(HeapHandle, Flags, BaseAddress);
   }
 
@@ -1961,7 +1961,7 @@ class Ntdll extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-rtlgetfullpathname_u
-  public static RtlGetFullPathName_U(FileName: PCWSTR, BufferLength: ULONG, Buffer_out: PWSTR, FilePart_out: OPTIONAL<PVOID>): ULONG {
+  public static RtlGetFullPathName_U(FileName: PCWSTR, BufferLength: ULONG, Buffer_out: PWSTR, FilePart_out: Optional<PVOID>): ULONG {
     return Ntdll.Load('RtlGetFullPathName_U')(FileName, BufferLength, Buffer_out, FilePart_out);
   }
 
@@ -1986,17 +1986,17 @@ class Ntdll extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winternl/nf-winternl-rtlinitansistring
-  public static RtlInitAnsiString(DestinationString_out: PANSI_STRING, SourceString: OPTIONAL<PVOID>): VOID {
+  public static RtlInitAnsiString(DestinationString_out: PANSI_STRING, SourceString: Optional<PVOID>): VOID {
     return Ntdll.Load('RtlInitAnsiString')(DestinationString_out, SourceString);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winternl/nf-winternl-rtlinitstring
-  public static RtlInitString(DestinationString_out: PSTRING, SourceString: OPTIONAL<PVOID>): VOID {
+  public static RtlInitString(DestinationString_out: PSTRING, SourceString: Optional<PVOID>): VOID {
     return Ntdll.Load('RtlInitString')(DestinationString_out, SourceString);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winternl/nf-winternl-rtlinitunicodestring
-  public static RtlInitUnicodeString(DestinationString_out: PUNICODE_STRING, SourceString: OPTIONAL<PCWSTR>): VOID {
+  public static RtlInitUnicodeString(DestinationString_out: PUNICODE_STRING, SourceString: Optional<PCWSTR>): VOID {
     return Ntdll.Load('RtlInitUnicodeString')(DestinationString_out, SourceString);
   }
 
@@ -2036,7 +2036,7 @@ class Ntdll extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winnt/nf-winnt-rtlinstallfunctiontablecallback
-  public static RtlInstallFunctionTableCallback(TableIdentifier: ULONG_PTR, BaseAddress: ULONG_PTR, Length: DWORD, Callback: PGET_RUNTIME_FUNCTION_CALLBACK, Context: OPTIONAL<PVOID>, OutOfProcessCallbackDll: OPTIONAL<PCWSTR>): BOOLEAN {
+  public static RtlInstallFunctionTableCallback(TableIdentifier: ULONG_PTR, BaseAddress: ULONG_PTR, Length: DWORD, Callback: PGET_RUNTIME_FUNCTION_CALLBACK, Context: Optional<PVOID>, OutOfProcessCallbackDll: Optional<PCWSTR>): BOOLEAN {
     return Ntdll.Load('RtlInstallFunctionTableCallback')(TableIdentifier, BaseAddress, Length, Callback, Context, OutOfProcessCallbackDll);
   }
 
@@ -2086,7 +2086,7 @@ class Ntdll extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winnt/nf-winnt-rtllookupfunctionentry
-  public static RtlLookupFunctionEntry(ControlPc: ULONG_PTR, ImageBase_out: PULONG_PTR, HistoryTable_in_out: OPTIONAL<PUNWIND_HISTORY_TABLE>): PRUNTIME_FUNCTION {
+  public static RtlLookupFunctionEntry(ControlPc: ULONG_PTR, ImageBase_out: PULONG_PTR, HistoryTable_in_out: Optional<PUNWIND_HISTORY_TABLE>): PRUNTIME_FUNCTION {
     return Ntdll.Load('RtlLookupFunctionEntry')(ControlPc, ImageBase_out, HistoryTable_in_out);
   }
 
@@ -2116,12 +2116,12 @@ class Ntdll extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-rtlqueryenvironmentvariable_u
-  public static RtlQueryEnvironmentVariable_U(Environment: OPTIONAL<PVOID>, Name: PUNICODE_STRING, Value_out: PUNICODE_STRING): NTSTATUS {
+  public static RtlQueryEnvironmentVariable_U(Environment: Optional<PVOID>, Name: PUNICODE_STRING, Value_out: PUNICODE_STRING): NTSTATUS {
     return Ntdll.Load('RtlQueryEnvironmentVariable_U')(Environment, Name, Value_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/threadpoolapiset/nf-threadpoolapiset-queueuserworkitem
-  public static RtlQueueWorkItem(Function: WORKERCALLBACKFUNC, Context: NULLABLE<PVOID>, Flags: ULONG): NTSTATUS {
+  public static RtlQueueWorkItem(Function: WORKERCALLBACKFUNC, Context: Nullable<PVOID>, Flags: ULONG): NTSTATUS {
     return Ntdll.Load('RtlQueueWorkItem')(Function, Context, Flags);
   }
 
@@ -2151,7 +2151,7 @@ class Ntdll extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/threadpoolapiset/nf-threadpoolapiset-registerwaitforsingleobject
-  public static RtlRegisterWait(WaitHandle_out: PHANDLE, ObjectHandle: HANDLE, Callback: WAITORTIMERCALLBACKFUNC, Context: NULLABLE<PVOID>, Milliseconds: ULONG, Flags: ULONG): NTSTATUS {
+  public static RtlRegisterWait(WaitHandle_out: PHANDLE, ObjectHandle: HANDLE, Callback: WAITORTIMERCALLBACKFUNC, Context: Nullable<PVOID>, Milliseconds: ULONG, Flags: ULONG): NTSTATUS {
     return Ntdll.Load('RtlRegisterWait')(WaitHandle_out, ObjectHandle, Callback, Context, Milliseconds, Flags);
   }
 
@@ -2176,7 +2176,7 @@ class Ntdll extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winnt/nf-winnt-rtlrestorecontext
-  public static RtlRestoreContext(ContextRecord: PCONTEXT, ExceptionRecord: OPTIONAL<PEXCEPTION_RECORD>): VOID {
+  public static RtlRestoreContext(ContextRecord: PCONTEXT, ExceptionRecord: Optional<PEXCEPTION_RECORD>): VOID {
     return Ntdll.Load('RtlRestoreContext')(ContextRecord, ExceptionRecord);
   }
 
@@ -2201,12 +2201,12 @@ class Ntdll extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-rtlsetdaclsecuritydescriptor
-  public static RtlSetDaclSecurityDescriptor(SecurityDescriptor_in_out: PSECURITY_DESCRIPTOR, DaclPresent: BOOLEAN, Dacl: OPTIONAL<PACL>, DaclDefaulted: BOOLEAN): NTSTATUS {
+  public static RtlSetDaclSecurityDescriptor(SecurityDescriptor_in_out: PSECURITY_DESCRIPTOR, DaclPresent: BOOLEAN, Dacl: Optional<PACL>, DaclDefaulted: BOOLEAN): NTSTATUS {
     return Ntdll.Load('RtlSetDaclSecurityDescriptor')(SecurityDescriptor_in_out, DaclPresent, Dacl, DaclDefaulted);
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-rtlsetenvironmentvariable
-  public static RtlSetEnvironmentVariable(Environment_in_out: PVOID, Name: PUNICODE_STRING, Value: OPTIONAL<PUNICODE_STRING>): NTSTATUS {
+  public static RtlSetEnvironmentVariable(Environment_in_out: PVOID, Name: PUNICODE_STRING, Value: Optional<PUNICODE_STRING>): NTSTATUS {
     return Ntdll.Load('RtlSetEnvironmentVariable')(Environment_in_out, Name, Value);
   }
 
@@ -2221,12 +2221,12 @@ class Ntdll extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-rtlsleepconditionvariablecs
-  public static RtlSleepConditionVariableCS(ConditionVariable_in_out: PRTL_CONDITION_VARIABLE, CriticalSection_in_out: PRTL_CRITICAL_SECTION, Timeout: OPTIONAL<PLARGE_INTEGER>): NTSTATUS {
+  public static RtlSleepConditionVariableCS(ConditionVariable_in_out: PRTL_CONDITION_VARIABLE, CriticalSection_in_out: PRTL_CRITICAL_SECTION, Timeout: Optional<PLARGE_INTEGER>): NTSTATUS {
     return Ntdll.Load('RtlSleepConditionVariableCS')(ConditionVariable_in_out, CriticalSection_in_out, Timeout);
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-rtlsleepconditionvariablesrw
-  public static RtlSleepConditionVariableSRW(ConditionVariable_in_out: PRTL_CONDITION_VARIABLE, SRWLock_in_out: PRTL_SRWLOCK, Timeout: OPTIONAL<PLARGE_INTEGER>, Flags: ULONG): NTSTATUS {
+  public static RtlSleepConditionVariableSRW(ConditionVariable_in_out: PRTL_CONDITION_VARIABLE, SRWLock_in_out: PRTL_SRWLOCK, Timeout: Optional<PLARGE_INTEGER>, Flags: ULONG): NTSTATUS {
     return Ntdll.Load('RtlSleepConditionVariableSRW')(ConditionVariable_in_out, SRWLock_in_out, Timeout, Flags);
   }
 
@@ -2271,12 +2271,12 @@ class Ntdll extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winnt/nf-winnt-rtlunwind
-  public static RtlUnwind(TargetFrame: OPTIONAL<PVOID>, TargetIp: OPTIONAL<PVOID>, ExceptionRecord: OPTIONAL<PEXCEPTION_RECORD>, ReturnValue: PVOID): VOID {
+  public static RtlUnwind(TargetFrame: Optional<PVOID>, TargetIp: Optional<PVOID>, ExceptionRecord: Optional<PEXCEPTION_RECORD>, ReturnValue: PVOID): VOID {
     return Ntdll.Load('RtlUnwind')(TargetFrame, TargetIp, ExceptionRecord, ReturnValue);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winnt/nf-winnt-rtlunwindex
-  public static RtlUnwindEx(TargetFrame: OPTIONAL<PVOID>, TargetIp: OPTIONAL<PVOID>, ExceptionRecord: OPTIONAL<PEXCEPTION_RECORD>, ReturnValue: PVOID, ContextRecord: PCONTEXT, HistoryTable: OPTIONAL<PUNWIND_HISTORY_TABLE>): VOID {
+  public static RtlUnwindEx(TargetFrame: Optional<PVOID>, TargetIp: Optional<PVOID>, ExceptionRecord: Optional<PEXCEPTION_RECORD>, ReturnValue: PVOID, ContextRecord: PCONTEXT, HistoryTable: Optional<PUNWIND_HISTORY_TABLE>): VOID {
     return Ntdll.Load('RtlUnwindEx')(TargetFrame, TargetIp, ExceptionRecord, ReturnValue, ContextRecord, HistoryTable);
   }
 
@@ -2306,7 +2306,7 @@ class Ntdll extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-rtlvalidateheap
-  public static RtlValidateHeap(HeapHandle: PVOID, Flags: ULONG, BaseAddress: OPTIONAL<PVOID>): BOOLEAN {
+  public static RtlValidateHeap(HeapHandle: PVOID, Flags: ULONG, BaseAddress: Optional<PVOID>): BOOLEAN {
     return Ntdll.Load('RtlValidateHeap')(HeapHandle, Flags, BaseAddress);
   }
 
@@ -2324,7 +2324,7 @@ class Ntdll extends Win32 {
     ContextRecord_in_out: PCONTEXT,
     HandlerData_out: PVOID,
     EstablisherFrame_out: PULONG_PTR,
-    ContextPointers_in_out: OPTIONAL<PKNONVOLATILE_CONTEXT_POINTERS>,
+    ContextPointers_in_out: Optional<PKNONVOLATILE_CONTEXT_POINTERS>,
   ): PEXCEPTION_ROUTINE {
     return Ntdll.Load('RtlVirtualUnwind')(HandlerType, ImageBase, ControlPc, FunctionEntry, ContextRecord_in_out, HandlerData_out, EstablisherFrame_out, ContextPointers_in_out);
   }

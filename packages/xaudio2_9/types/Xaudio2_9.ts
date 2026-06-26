@@ -1,6 +1,6 @@
 import type { Pointer } from 'bun:ffi';
 
-export type { HRESULT, LPCVOID, NULL, OPTIONAL, VOID } from '@bun-win32/core';
+export type { HRESULT, LPCVOID, NULL, Optional, VOID } from '@bun-win32/core';
 
 export const CLSID_FXEcho = '5039d740-f736-449a-84d3-a56202557b87';
 export const CLSID_FXEQ = 'f5e01117-d6c4-485a-a3f5-695196f3dbfa';

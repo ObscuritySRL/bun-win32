@@ -24,8 +24,8 @@ import type {
   NET_IFINDEX,
   NET_IF_COMPARTMENT_ID,
   NULL,
-  NULLABLE,
-  OPTIONAL,
+  Nullable,
+  Optional,
   PBYTE,
   PDWORD,
   PFIXED_INFO,
@@ -422,7 +422,7 @@ class Iphlpapi extends Win32 {
 
   // https://learn.microsoft.com/en-us/windows/win32/api/netioapi/nf-netioapi-createsortedaddresspairs
   public static CreateSortedAddressPairs(
-    SourceAddressList: OPTIONAL<PSOCKADDR_IN6>,
+    SourceAddressList: Optional<PSOCKADDR_IN6>,
     SourceAddressCount: ULONG,
     DestinationAddressList: PSOCKADDR_IN6,
     DestinationAddressCount: ULONG,
@@ -489,7 +489,7 @@ class Iphlpapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/iphlpapi/nf-iphlpapi-disablemediasense
-  public static DisableMediaSense(pHandle_out: NULLABLE<PHANDLE>, pOverLapped: NULLABLE<LPOVERLAPPED>): DWORD {
+  public static DisableMediaSense(pHandle_out: Nullable<PHANDLE>, pOverLapped: Nullable<LPOVERLAPPED>): DWORD {
     return Iphlpapi.Load('DisableMediaSense')(pHandle_out, pOverLapped);
   }
 
@@ -524,12 +524,12 @@ class Iphlpapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/iphlpapi/nf-iphlpapi-getadaptersaddresses
-  public static GetAdaptersAddresses(Family: ULONG, Flags: ULONG, Reserved: OPTIONAL<PVOID>, AdapterAddresses_out: OPTIONAL<PIP_ADAPTER_ADDRESSES>, SizePointer_in_out: PULONG): ULONG {
+  public static GetAdaptersAddresses(Family: ULONG, Flags: ULONG, Reserved: Optional<PVOID>, AdapterAddresses_out: Optional<PIP_ADAPTER_ADDRESSES>, SizePointer_in_out: PULONG): ULONG {
     return Iphlpapi.Load('GetAdaptersAddresses')(Family, Flags, Reserved, AdapterAddresses_out, SizePointer_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/iphlpapi/nf-iphlpapi-getadaptersinfo
-  public static GetAdaptersInfo(AdapterInfo_out: OPTIONAL<PIP_ADAPTER_INFO>, SizePointer_in_out: PULONG): ULONG {
+  public static GetAdaptersInfo(AdapterInfo_out: Optional<PIP_ADAPTER_INFO>, SizePointer_in_out: PULONG): ULONG {
     return Iphlpapi.Load('GetAdaptersInfo')(AdapterInfo_out, SizePointer_in_out);
   }
 
@@ -560,9 +560,9 @@ class Iphlpapi extends Win32 {
 
   // https://learn.microsoft.com/en-us/windows/win32/api/netioapi/nf-netioapi-getbestroute2
   public static GetBestRoute2(
-    InterfaceLuid: OPTIONAL<PNET_LUID>,
+    InterfaceLuid: Optional<PNET_LUID>,
     InterfaceIndex: NET_IFINDEX,
-    SourceAddress: OPTIONAL<PSOCKADDR_INET>,
+    SourceAddress: Optional<PSOCKADDR_INET>,
     DestinationAddress: PSOCKADDR_INET,
     AddressSortOptions: ULONG,
     BestRoute_out: PMIB_IPFORWARD_ROW2,
@@ -577,12 +577,12 @@ class Iphlpapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/iphlpapi/nf-iphlpapi-getextendedtcptable
-  public static GetExtendedTcpTable(pTcpTable_out: OPTIONAL<PVOID>, pdwSize_in_out: PDWORD, bOrder: BOOL, ulAf: ULONG, TableClass: TCP_TABLE_CLASS, Reserved: ULONG): DWORD {
+  public static GetExtendedTcpTable(pTcpTable_out: Optional<PVOID>, pdwSize_in_out: PDWORD, bOrder: BOOL, ulAf: ULONG, TableClass: TCP_TABLE_CLASS, Reserved: ULONG): DWORD {
     return Iphlpapi.Load('GetExtendedTcpTable')(pTcpTable_out, pdwSize_in_out, bOrder, ulAf, TableClass, Reserved);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/iphlpapi/nf-iphlpapi-getextendedudptable
-  public static GetExtendedUdpTable(pUdpTable_out: OPTIONAL<PVOID>, pdwSize_in_out: PDWORD, bOrder: BOOL, ulAf: ULONG, TableClass: UDP_TABLE_CLASS, Reserved: ULONG): DWORD {
+  public static GetExtendedUdpTable(pUdpTable_out: Optional<PVOID>, pdwSize_in_out: PDWORD, bOrder: BOOL, ulAf: ULONG, TableClass: UDP_TABLE_CLASS, Reserved: ULONG): DWORD {
     return Iphlpapi.Load('GetExtendedUdpTable')(pUdpTable_out, pdwSize_in_out, bOrder, ulAf, TableClass, Reserved);
   }
 
@@ -622,7 +622,7 @@ class Iphlpapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/iphlpapi/nf-iphlpapi-getiftable
-  public static GetIfTable(pIfTable_out: OPTIONAL<PMIB_IFTABLE>, pdwSize_in_out: PULONG, bOrder: BOOL): DWORD {
+  public static GetIfTable(pIfTable_out: Optional<PMIB_IFTABLE>, pdwSize_in_out: PULONG, bOrder: BOOL): DWORD {
     return Iphlpapi.Load('GetIfTable')(pIfTable_out, pdwSize_in_out, bOrder);
   }
 
@@ -652,7 +652,7 @@ class Iphlpapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/iphlpapi/nf-iphlpapi-getinterfaceinfo
-  public static GetInterfaceInfo(pIfTable_out: OPTIONAL<PIP_INTERFACE_INFO>, dwOutBufLen_in_out: PULONG): DWORD {
+  public static GetInterfaceInfo(pIfTable_out: Optional<PIP_INTERFACE_INFO>, dwOutBufLen_in_out: PULONG): DWORD {
     return Iphlpapi.Load('GetInterfaceInfo')(pIfTable_out, dwOutBufLen_in_out);
   }
 
@@ -667,12 +667,12 @@ class Iphlpapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/iphlpapi/nf-iphlpapi-getipaddrtable
-  public static GetIpAddrTable(pIpAddrTable_out: OPTIONAL<PMIB_IPADDRTABLE>, pdwSize_in_out: PULONG, bOrder: BOOL): DWORD {
+  public static GetIpAddrTable(pIpAddrTable_out: Optional<PMIB_IPADDRTABLE>, pdwSize_in_out: PULONG, bOrder: BOOL): DWORD {
     return Iphlpapi.Load('GetIpAddrTable')(pIpAddrTable_out, pdwSize_in_out, bOrder);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/iphlpapi/nf-iphlpapi-getiperrorstring
-  public static GetIpErrorString(ErrorCode: IP_STATUS, Buffer_out: OPTIONAL<LPWSTR>, Size_in_out: PDWORD): DWORD {
+  public static GetIpErrorString(ErrorCode: IP_STATUS, Buffer_out: Optional<LPWSTR>, Size_in_out: PDWORD): DWORD {
     return Iphlpapi.Load('GetIpErrorString')(ErrorCode, Buffer_out, Size_in_out);
   }
 
@@ -682,7 +682,7 @@ class Iphlpapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/iphlpapi/nf-iphlpapi-getipforwardtable
-  public static GetIpForwardTable(pIpForwardTable_out: OPTIONAL<PMIB_IPFORWARDTABLE>, pdwSize_in_out: PULONG, bOrder: BOOL): DWORD {
+  public static GetIpForwardTable(pIpForwardTable_out: Optional<PMIB_IPFORWARDTABLE>, pdwSize_in_out: PULONG, bOrder: BOOL): DWORD {
     return Iphlpapi.Load('GetIpForwardTable')(pIpForwardTable_out, pdwSize_in_out, bOrder);
   }
 
@@ -707,7 +707,7 @@ class Iphlpapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/iphlpapi/nf-iphlpapi-getipnettable
-  public static GetIpNetTable(IpNetTable_out: OPTIONAL<PMIB_IPNETTABLE>, SizePointer_in_out: PULONG, Order: BOOL): ULONG {
+  public static GetIpNetTable(IpNetTable_out: Optional<PMIB_IPNETTABLE>, SizePointer_in_out: PULONG, Order: BOOL): ULONG {
     return Iphlpapi.Load('GetIpNetTable')(IpNetTable_out, SizePointer_in_out, Order);
   }
 
@@ -767,7 +767,7 @@ class Iphlpapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/iphlpapi/nf-iphlpapi-getnetworkparams
-  public static GetNetworkParams(pFixedInfo_out: OPTIONAL<PFIXED_INFO>, pOutBufLen_in_out: PULONG): DWORD {
+  public static GetNetworkParams(pFixedInfo_out: Optional<PFIXED_INFO>, pOutBufLen_in_out: PULONG): DWORD {
     return Iphlpapi.Load('GetNetworkParams')(pFixedInfo_out, pOutBufLen_in_out);
   }
 
@@ -797,7 +797,7 @@ class Iphlpapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/iphlpapi/nf-iphlpapi-getperadapterinfo
-  public static GetPerAdapterInfo(IfIndex: ULONG, pPerAdapterInfo_out: OPTIONAL<PIP_PER_ADAPTER_INFO>, pOutBufLen_in_out: PULONG): DWORD {
+  public static GetPerAdapterInfo(IfIndex: ULONG, pPerAdapterInfo_out: Optional<PIP_PER_ADAPTER_INFO>, pOutBufLen_in_out: PULONG): DWORD {
     return Iphlpapi.Load('GetPerAdapterInfo')(IfIndex, pPerAdapterInfo_out, pOutBufLen_in_out);
   }
 
@@ -805,13 +805,13 @@ class Iphlpapi extends Win32 {
   public static GetPerTcp6ConnectionEStats(
     Row: PMIB_TCP6ROW,
     EstatsType: TCP_ESTATS_TYPE,
-    Rw_out: OPTIONAL<PUCHAR>,
+    Rw_out: Optional<PUCHAR>,
     RwVersion: ULONG,
     RwSize: ULONG,
-    Ros_out: OPTIONAL<PUCHAR>,
+    Ros_out: Optional<PUCHAR>,
     RosVersion: ULONG,
     RosSize: ULONG,
-    Rod_out: OPTIONAL<PUCHAR>,
+    Rod_out: Optional<PUCHAR>,
     RodVersion: ULONG,
     RodSize: ULONG,
   ): ULONG {
@@ -822,13 +822,13 @@ class Iphlpapi extends Win32 {
   public static GetPerTcpConnectionEStats(
     Row: PMIB_TCPROW,
     EstatsType: TCP_ESTATS_TYPE,
-    Rw_out: OPTIONAL<PUCHAR>,
+    Rw_out: Optional<PUCHAR>,
     RwVersion: ULONG,
     RwSize: ULONG,
-    Ros_out: OPTIONAL<PUCHAR>,
+    Ros_out: Optional<PUCHAR>,
     RosVersion: ULONG,
     RosSize: ULONG,
-    Rod_out: OPTIONAL<PUCHAR>,
+    Rod_out: Optional<PUCHAR>,
     RodVersion: ULONG,
     RodSize: ULONG,
   ): ULONG {
@@ -871,12 +871,12 @@ class Iphlpapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/iphlpapi/nf-iphlpapi-gettcptable
-  public static GetTcpTable(TcpTable_out: OPTIONAL<PMIB_TCPTABLE>, SizePointer_in_out: PULONG, Order: BOOL): ULONG {
+  public static GetTcpTable(TcpTable_out: Optional<PMIB_TCPTABLE>, SizePointer_in_out: PULONG, Order: BOOL): ULONG {
     return Iphlpapi.Load('GetTcpTable')(TcpTable_out, SizePointer_in_out, Order);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/iphlpapi/nf-iphlpapi-gettcptable2
-  public static GetTcpTable2(TcpTable_out: OPTIONAL<PMIB_TCPTABLE2>, SizePointer_in_out: PULONG, Order: BOOL): ULONG {
+  public static GetTcpTable2(TcpTable_out: Optional<PMIB_TCPTABLE2>, SizePointer_in_out: PULONG, Order: BOOL): ULONG {
     return Iphlpapi.Load('GetTcpTable2')(TcpTable_out, SizePointer_in_out, Order);
   }
 
@@ -886,7 +886,7 @@ class Iphlpapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/iphlpapi/nf-iphlpapi-getudp6table
-  public static GetUdp6Table(Udp6Table_out: OPTIONAL<PMIB_UDP6TABLE>, SizePointer_in_out: PULONG, Order: BOOL): ULONG {
+  public static GetUdp6Table(Udp6Table_out: Optional<PMIB_UDP6TABLE>, SizePointer_in_out: PULONG, Order: BOOL): ULONG {
     return Iphlpapi.Load('GetUdp6Table')(Udp6Table_out, SizePointer_in_out, Order);
   }
 
@@ -906,12 +906,12 @@ class Iphlpapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/iphlpapi/nf-iphlpapi-getudptable
-  public static GetUdpTable(UdpTable_out: OPTIONAL<PMIB_UDPTABLE>, SizePointer_in_out: PULONG, Order: BOOL): ULONG {
+  public static GetUdpTable(UdpTable_out: Optional<PMIB_UDPTABLE>, SizePointer_in_out: PULONG, Order: BOOL): ULONG {
     return Iphlpapi.Load('GetUdpTable')(UdpTable_out, SizePointer_in_out, Order);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/iphlpapi/nf-iphlpapi-getunidirectionaladapterinfo
-  public static GetUniDirectionalAdapterInfo(pIPIfInfo_out: OPTIONAL<PIP_UNIDIRECTIONAL_ADAPTER_ADDRESS>, dwOutBufLen_in_out: PULONG): DWORD {
+  public static GetUniDirectionalAdapterInfo(pIPIfInfo_out: Optional<PIP_UNIDIRECTIONAL_ADAPTER_ADDRESS>, dwOutBufLen_in_out: PULONG): DWORD {
     return Iphlpapi.Load('GetUniDirectionalAdapterInfo')(pIPIfInfo_out, dwOutBufLen_in_out);
   }
 
@@ -938,14 +938,14 @@ class Iphlpapi extends Win32 {
   // https://learn.microsoft.com/en-us/windows/win32/api/icmpapi/nf-icmpapi-icmp6sendecho2
   public static Icmp6SendEcho2(
     IcmpHandle: HANDLE,
-    Event: OPTIONAL<HANDLE>,
-    ApcRoutine: OPTIONAL<PIO_APC_ROUTINE>,
-    ApcContext: OPTIONAL<PVOID>,
+    Event: Optional<HANDLE>,
+    ApcRoutine: Optional<PIO_APC_ROUTINE>,
+    ApcContext: Optional<PVOID>,
     SourceAddress: PSOCKADDR_IN6,
     DestinationAddress: PSOCKADDR_IN6,
     RequestData: LPVOID,
     RequestSize: WORD,
-    RequestOptions: OPTIONAL<PIP_OPTION_INFORMATION>,
+    RequestOptions: Optional<PIP_OPTION_INFORMATION>,
     ReplyBuffer_out: LPVOID,
     ReplySize: DWORD,
     Timeout: DWORD,
@@ -969,20 +969,20 @@ class Iphlpapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/icmpapi/nf-icmpapi-icmpsendecho
-  public static IcmpSendEcho(IcmpHandle: HANDLE, DestinationAddress: IPAddr, RequestData: LPVOID, RequestSize: WORD, RequestOptions: OPTIONAL<PIP_OPTION_INFORMATION>, ReplyBuffer_out: LPVOID, ReplySize: DWORD, Timeout: DWORD): DWORD {
+  public static IcmpSendEcho(IcmpHandle: HANDLE, DestinationAddress: IPAddr, RequestData: LPVOID, RequestSize: WORD, RequestOptions: Optional<PIP_OPTION_INFORMATION>, ReplyBuffer_out: LPVOID, ReplySize: DWORD, Timeout: DWORD): DWORD {
     return Iphlpapi.Load('IcmpSendEcho')(IcmpHandle, DestinationAddress, RequestData, RequestSize, RequestOptions, ReplyBuffer_out, ReplySize, Timeout);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/icmpapi/nf-icmpapi-icmpsendecho2
   public static IcmpSendEcho2(
     IcmpHandle: HANDLE,
-    Event: OPTIONAL<HANDLE>,
-    ApcRoutine: OPTIONAL<PIO_APC_ROUTINE>,
-    ApcContext: OPTIONAL<PVOID>,
+    Event: Optional<HANDLE>,
+    ApcRoutine: Optional<PIO_APC_ROUTINE>,
+    ApcContext: Optional<PVOID>,
     DestinationAddress: IPAddr,
     RequestData: LPVOID,
     RequestSize: WORD,
-    RequestOptions: OPTIONAL<PIP_OPTION_INFORMATION>,
+    RequestOptions: Optional<PIP_OPTION_INFORMATION>,
     ReplyBuffer_out: LPVOID,
     ReplySize: DWORD,
     Timeout: DWORD,
@@ -993,14 +993,14 @@ class Iphlpapi extends Win32 {
   // https://learn.microsoft.com/en-us/windows/win32/api/icmpapi/nf-icmpapi-icmpsendecho2ex
   public static IcmpSendEcho2Ex(
     IcmpHandle: HANDLE,
-    Event: OPTIONAL<HANDLE>,
-    ApcRoutine: OPTIONAL<PIO_APC_ROUTINE>,
-    ApcContext: OPTIONAL<PVOID>,
+    Event: Optional<HANDLE>,
+    ApcRoutine: Optional<PIO_APC_ROUTINE>,
+    ApcContext: Optional<PVOID>,
     SourceAddress: IPAddr,
     DestinationAddress: IPAddr,
     RequestData: LPVOID,
     RequestSize: WORD,
-    RequestOptions: OPTIONAL<PIP_OPTION_INFORMATION>,
+    RequestOptions: Optional<PIP_OPTION_INFORMATION>,
     ReplyBuffer_out: LPVOID,
     ReplySize: DWORD,
     Timeout: DWORD,
@@ -1044,62 +1044,62 @@ class Iphlpapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/iphlpapi/nf-iphlpapi-notifyaddrchange
-  public static NotifyAddrChange(Handle_out: NULLABLE<PHANDLE>, overlapped: NULLABLE<LPOVERLAPPED>): DWORD {
+  public static NotifyAddrChange(Handle_out: Nullable<PHANDLE>, overlapped: Nullable<LPOVERLAPPED>): DWORD {
     return Iphlpapi.Load('NotifyAddrChange')(Handle_out, overlapped);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/netioapi/nf-netioapi-notifyipinterfacechange
-  public static NotifyIpInterfaceChange(Family: ADDRESS_FAMILY, Callback: PIPINTERFACE_CHANGE_CALLBACK, CallerContext: OPTIONAL<PVOID>, InitialNotification: BOOLEAN, NotificationHandle_in_out: PHANDLE): DWORD {
+  public static NotifyIpInterfaceChange(Family: ADDRESS_FAMILY, Callback: PIPINTERFACE_CHANGE_CALLBACK, CallerContext: Optional<PVOID>, InitialNotification: BOOLEAN, NotificationHandle_in_out: PHANDLE): DWORD {
     return Iphlpapi.Load('NotifyIpInterfaceChange')(Family, Callback, CallerContext, InitialNotification, NotificationHandle_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/netioapi/nf-netioapi-notifynetworkconnectivityhintchange
-  public static NotifyNetworkConnectivityHintChange(Callback: PNETWORK_CONNECTIVITY_HINT_CHANGE_CALLBACK, CallerContext: OPTIONAL<PVOID>, InitialNotification: BOOLEAN, NotificationHandle_out: PHANDLE): DWORD {
+  public static NotifyNetworkConnectivityHintChange(Callback: PNETWORK_CONNECTIVITY_HINT_CHANGE_CALLBACK, CallerContext: Optional<PVOID>, InitialNotification: BOOLEAN, NotificationHandle_out: PHANDLE): DWORD {
     return Iphlpapi.Load('NotifyNetworkConnectivityHintChange')(Callback, CallerContext, InitialNotification, NotificationHandle_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/iphlpapi/nf-iphlpapi-notifyroutechange
-  public static NotifyRouteChange(Handle_out: NULLABLE<PHANDLE>, overlapped: NULLABLE<LPOVERLAPPED>): DWORD {
+  public static NotifyRouteChange(Handle_out: Nullable<PHANDLE>, overlapped: Nullable<LPOVERLAPPED>): DWORD {
     return Iphlpapi.Load('NotifyRouteChange')(Handle_out, overlapped);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/netioapi/nf-netioapi-notifyroutechange2
-  public static NotifyRouteChange2(AddressFamily: ADDRESS_FAMILY, Callback: PIPFORWARD_CHANGE_CALLBACK, CallerContext: NULLABLE<PVOID>, InitialNotification: BOOLEAN, NotificationHandle_in_out: PHANDLE): DWORD {
+  public static NotifyRouteChange2(AddressFamily: ADDRESS_FAMILY, Callback: PIPFORWARD_CHANGE_CALLBACK, CallerContext: Nullable<PVOID>, InitialNotification: BOOLEAN, NotificationHandle_in_out: PHANDLE): DWORD {
     return Iphlpapi.Load('NotifyRouteChange2')(AddressFamily, Callback, CallerContext, InitialNotification, NotificationHandle_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/netioapi/nf-netioapi-notifystableunicastipaddresstable
-  public static NotifyStableUnicastIpAddressTable(Family: ADDRESS_FAMILY, Table_out: PVOID, CallerCallback: PSTABLE_UNICAST_IPADDRESS_TABLE_CALLBACK, CallerContext: NULLABLE<PVOID>, NotificationHandle_in_out: PHANDLE): DWORD {
+  public static NotifyStableUnicastIpAddressTable(Family: ADDRESS_FAMILY, Table_out: PVOID, CallerCallback: PSTABLE_UNICAST_IPADDRESS_TABLE_CALLBACK, CallerContext: Nullable<PVOID>, NotificationHandle_in_out: PHANDLE): DWORD {
     return Iphlpapi.Load('NotifyStableUnicastIpAddressTable')(Family, Table_out, CallerCallback, CallerContext, NotificationHandle_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/netioapi/nf-netioapi-notifyteredoportchange
-  public static NotifyTeredoPortChange(Callback: PTEREDO_PORT_CHANGE_CALLBACK, CallerContext: NULLABLE<PVOID>, InitialNotification: BOOLEAN, NotificationHandle_in_out: PHANDLE): DWORD {
+  public static NotifyTeredoPortChange(Callback: PTEREDO_PORT_CHANGE_CALLBACK, CallerContext: Nullable<PVOID>, InitialNotification: BOOLEAN, NotificationHandle_in_out: PHANDLE): DWORD {
     return Iphlpapi.Load('NotifyTeredoPortChange')(Callback, CallerContext, InitialNotification, NotificationHandle_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/netioapi/nf-netioapi-notifyunicastipaddresschange
-  public static NotifyUnicastIpAddressChange(Family: ADDRESS_FAMILY, Callback: PUNICAST_IPADDRESS_CHANGE_CALLBACK, CallerContext: OPTIONAL<PVOID>, InitialNotification: BOOLEAN, NotificationHandle_in_out: PHANDLE): DWORD {
+  public static NotifyUnicastIpAddressChange(Family: ADDRESS_FAMILY, Callback: PUNICAST_IPADDRESS_CHANGE_CALLBACK, CallerContext: Optional<PVOID>, InitialNotification: BOOLEAN, NotificationHandle_in_out: PHANDLE): DWORD {
     return Iphlpapi.Load('NotifyUnicastIpAddressChange')(Family, Callback, CallerContext, InitialNotification, NotificationHandle_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/iphlpapi/nf-iphlpapi-parsenetworkstring
-  public static ParseNetworkString(NetworkString: LPCWSTR, Types: DWORD, AddressInfo_out: OPTIONAL<PNET_ADDRESS_INFO>, PortNumber_out: OPTIONAL<PUSHORT>, PrefixLength_out: OPTIONAL<PBYTE>): DWORD {
+  public static ParseNetworkString(NetworkString: LPCWSTR, Types: DWORD, AddressInfo_out: Optional<PNET_ADDRESS_INFO>, PortNumber_out: Optional<PUSHORT>, PrefixLength_out: Optional<PBYTE>): DWORD {
     return Iphlpapi.Load('ParseNetworkString')(NetworkString, Types, AddressInfo_out, PortNumber_out, PrefixLength_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/iphlpapi/nf-iphlpapi-registerinterfacetimestampconfigchange
-  public static RegisterInterfaceTimestampConfigChange(Callback: PINTERFACE_TIMESTAMP_CONFIG_CHANGE_CALLBACK, CallerContext: OPTIONAL<PVOID>, NotificationHandle_out: PVOID): DWORD {
+  public static RegisterInterfaceTimestampConfigChange(Callback: PINTERFACE_TIMESTAMP_CONFIG_CHANGE_CALLBACK, CallerContext: Optional<PVOID>, NotificationHandle_out: PVOID): DWORD {
     return Iphlpapi.Load('RegisterInterfaceTimestampConfigChange')(Callback, CallerContext, NotificationHandle_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/netioapi/nf-netioapi-resolveipnetentry2
-  public static ResolveIpNetEntry2(Row_in_out: PMIB_IPNET_ROW2, SourceAddress: OPTIONAL<PSOCKADDR_INET>): DWORD {
+  public static ResolveIpNetEntry2(Row_in_out: PMIB_IPNET_ROW2, SourceAddress: Optional<PSOCKADDR_INET>): DWORD {
     return Iphlpapi.Load('ResolveIpNetEntry2')(Row_in_out, SourceAddress);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/iphlpapi/nf-iphlpapi-restoremediasense
-  public static RestoreMediaSense(pOverlapped: NULLABLE<LPOVERLAPPED>, lpdwEnableCount_out: OPTIONAL<LPDWORD>): DWORD {
+  public static RestoreMediaSense(pOverlapped: Nullable<LPOVERLAPPED>, lpdwEnableCount_out: Optional<LPDWORD>): DWORD {
     return Iphlpapi.Load('RestoreMediaSense')(pOverlapped, lpdwEnableCount_out);
   }
 
@@ -1189,7 +1189,7 @@ class Iphlpapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/iphlpapi/nf-iphlpapi-unenablerouter
-  public static UnenableRouter(pOverlapped: LPOVERLAPPED, lpdwEnableCount_out: OPTIONAL<LPDWORD>): DWORD {
+  public static UnenableRouter(pOverlapped: LPOVERLAPPED, lpdwEnableCount_out: Optional<LPDWORD>): DWORD {
     return Iphlpapi.Load('UnenableRouter')(pOverlapped, lpdwEnableCount_out);
   }
 

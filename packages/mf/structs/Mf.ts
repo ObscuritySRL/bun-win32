@@ -17,8 +17,8 @@ import type {
   IUnknown,
   LPCWSTR,
   LPLPVOID,
-  NULLABLE,
-  OPTIONAL,
+  Nullable,
+  Optional,
   PBYTE,
   PIMFASFContentInfo,
   PIMFASFIndexer,
@@ -121,7 +121,7 @@ class Mf extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mfidl/nf-mfidl-mfcreate3gpmediasink
-  public static MFCreate3GPMediaSink(pIByteStream: IMFByteStream, pVideoMediaType: OPTIONAL<IMFMediaType>, pAudioMediaType: OPTIONAL<IMFMediaType>, ppIMediaSink_out: PIMFMediaSink): HRESULT {
+  public static MFCreate3GPMediaSink(pIByteStream: IMFByteStream, pVideoMediaType: Optional<IMFMediaType>, pAudioMediaType: Optional<IMFMediaType>, ppIMediaSink_out: PIMFMediaSink): HRESULT {
     return Mf.Load('MFCreate3GPMediaSink')(pIByteStream, pVideoMediaType, pAudioMediaType, ppIMediaSink_out);
   }
 
@@ -201,7 +201,7 @@ class Mf extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mfidl/nf-mfidl-mfcreatefmpeg4mediasink
-  public static MFCreateFMPEG4MediaSink(pIByteStream: IMFByteStream, pVideoMediaType: OPTIONAL<IMFMediaType>, pAudioMediaType: OPTIONAL<IMFMediaType>, ppIMediaSink_out: PIMFMediaSink): HRESULT {
+  public static MFCreateFMPEG4MediaSink(pIByteStream: IMFByteStream, pVideoMediaType: Optional<IMFMediaType>, pAudioMediaType: Optional<IMFMediaType>, ppIMediaSink_out: PIMFMediaSink): HRESULT {
     return Mf.Load('MFCreateFMPEG4MediaSink')(pIByteStream, pVideoMediaType, pAudioMediaType, ppIMediaSink_out);
   }
 
@@ -211,12 +211,12 @@ class Mf extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mfidl/nf-mfidl-mfcreatempeg4mediasink
-  public static MFCreateMPEG4MediaSink(pIByteStream: IMFByteStream, pVideoMediaType: OPTIONAL<IMFMediaType>, pAudioMediaType: OPTIONAL<IMFMediaType>, ppIMediaSink_out: PIMFMediaSink): HRESULT {
+  public static MFCreateMPEG4MediaSink(pIByteStream: IMFByteStream, pVideoMediaType: Optional<IMFMediaType>, pAudioMediaType: Optional<IMFMediaType>, ppIMediaSink_out: PIMFMediaSink): HRESULT {
     return Mf.Load('MFCreateMPEG4MediaSink')(pIByteStream, pVideoMediaType, pAudioMediaType, ppIMediaSink_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mfidl/nf-mfidl-mfcreatemuxsink
-  public static MFCreateMuxSink(guidOutputSubType: GUID, pOutputAttributes: OPTIONAL<IMFAttributes>, pOutputByteStream: OPTIONAL<IMFByteStream>, ppMuxSink_out: PIMFMediaSink): HRESULT {
+  public static MFCreateMuxSink(guidOutputSubType: GUID, pOutputAttributes: Optional<IMFAttributes>, pOutputByteStream: Optional<IMFByteStream>, ppMuxSink_out: PIMFMediaSink): HRESULT {
     return Mf.Load('MFCreateMuxSink')(guidOutputSubType, pOutputAttributes, pOutputByteStream, ppMuxSink_out);
   }
 
@@ -251,7 +251,7 @@ class Mf extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mfidl/nf-mfidl-mfcreatevideorendereractivate
-  public static MFCreateVideoRendererActivate(hwndVideo: NULLABLE<HWND>, ppActivate_out: PIMFActivate): HRESULT {
+  public static MFCreateVideoRendererActivate(hwndVideo: Nullable<HWND>, ppActivate_out: PIMFActivate): HRESULT {
     return Mf.Load('MFCreateVideoRendererActivate')(hwndVideo, ppActivate_out);
   }
 

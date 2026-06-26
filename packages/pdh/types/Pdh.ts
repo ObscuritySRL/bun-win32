@@ -1,6 +1,6 @@
 import type { Pointer } from 'bun:ffi';
 
-export type { BOOL, BOOLEAN, DWORD, DWORD_PTR, HANDLE, HWND, LPCSTR, LPCWSTR, LPDWORD, LPSTR, LPWSTR, LONG, NULL, NULLABLE, OPTIONAL } from '@bun-win32/core';
+export type { BOOL, BOOLEAN, DWORD, DWORD_PTR, HANDLE, HWND, LPCSTR, LPCWSTR, LPDWORD, LPSTR, LPWSTR, LONG, NULL, Nullable, Optional } from '@bun-win32/core';
 
 export enum PdhCounterFormat {
   PDH_FMT_1000 = 0x0000_2000,

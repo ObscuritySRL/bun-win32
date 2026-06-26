@@ -1,6 +1,6 @@
 import type { Pointer } from 'bun:ffi';
 
-export type { HRESULT, LPCWSTR, OPTIONAL, PVOID, ULONG, VOID } from '@bun-win32/core';
+export type { HRESULT, LPCWSTR, Optional, PVOID, ULONG, VOID } from '@bun-win32/core';
 
 export enum AMSI_RESULT {
   AMSI_RESULT_BLOCKED_BY_ADMIN_END = 0x4fff,

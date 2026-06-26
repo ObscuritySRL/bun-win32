@@ -737,7 +737,7 @@ void main(uint3 id : SV_DispatchThreadID) {
     }
   }
 
-  // OPTIONAL acceleration clamp (off when maxAcc<=0). Every force above is softened, so accel is
+  // Optional acceleration clamp (off when maxAcc<=0). Every force above is softened, so accel is
   // already bounded; the conservative default leaves this off so the force is exactly -∇(potential).
   float amag = length(acc);
   float maxAcc = gPhys.y;
@@ -762,7 +762,7 @@ void main(uint3 id : SV_DispatchThreadID) {
   // Tiny velocity damping so momentum persists but energy doesn't accumulate forever.
   vel *= (1.0 - gPhys.x * dt);
 
-  // OPTIONAL speed clamp (off when maxSpeed<=0). Conservative default leaves it off so a star keeps
+  // Optional speed clamp (off when maxSpeed<=0). Conservative default leaves it off so a star keeps
   // EXACTLY the velocity gravity (and clicks) give it — no energy is quietly removed at the top end.
   float smag = length(vel);
   float maxSpeed = gPhys.z;

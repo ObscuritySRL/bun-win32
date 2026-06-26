@@ -1,6 +1,6 @@
 import type { Pointer } from 'bun:ffi';
 
-export type { BOOLEAN, DWORD, HANDLE, HRESULT, LPCVOID, LPCWSTR, OPTIONAL, PDWORD, PHANDLE, PVOID, VOID } from '@bun-win32/core';
+export type { BOOLEAN, DWORD, HANDLE, HRESULT, LPCVOID, LPCWSTR, Optional, PDWORD, PHANDLE, PVOID, VOID } from '@bun-win32/core';
 
 export const CF_EOF = -1n;
 export const CF_MAX_PRIORITY_HINT = 15;

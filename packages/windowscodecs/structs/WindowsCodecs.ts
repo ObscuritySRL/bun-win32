@@ -58,7 +58,7 @@ import type {
   LPWICPixelFormatGUID,
   LPWICRect,
   LPWSTR,
-  OPTIONAL,
+  Optional,
   PCWSTR,
   REFCLSID,
   REFGUID,
@@ -234,7 +234,7 @@ class WindowsCodecs extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/objidl/nf-objidl-ienumstring-next
-  public static IEnumString_Next_WIC_Proxy(This: IEnumString, celt: ULONG, rgelt_out: LPLPOLESTR, pceltFetched_out: OPTIONAL<LPULONG>): HRESULT {
+  public static IEnumString_Next_WIC_Proxy(This: IEnumString, celt: ULONG, rgelt_out: LPLPOLESTR, pceltFetched_out: Optional<LPULONG>): HRESULT {
     return WindowsCodecs.Load('IEnumString_Next_WIC_Proxy')(This, celt, rgelt_out, pceltFetched_out);
   }
 
@@ -249,7 +249,7 @@ class WindowsCodecs extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincodec/nf-wincodec-iwicbitmapclipper-initialize
-  public static IWICBitmapClipper_Initialize_Proxy(This: IWICBitmapClipper, pISource: OPTIONAL<IWICBitmapSource>, prc: LPWICRect): HRESULT {
+  public static IWICBitmapClipper_Initialize_Proxy(This: IWICBitmapClipper, pISource: Optional<IWICBitmapSource>, prc: LPWICRect): HRESULT {
     return WindowsCodecs.Load('IWICBitmapClipper_Initialize_Proxy')(This, pISource, prc);
   }
 
@@ -274,32 +274,32 @@ class WindowsCodecs extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincodec/nf-wincodec-iwicbitmapcodecinfo-getdevicemanufacturer
-  public static IWICBitmapCodecInfo_GetDeviceManufacturer_Proxy(This: IWICBitmapCodecInfo, cchDeviceManufacturer: UINT, wzDeviceManufacturer_in_out: OPTIONAL<LPWSTR>, pcchActual_out: LPUINT): HRESULT {
+  public static IWICBitmapCodecInfo_GetDeviceManufacturer_Proxy(This: IWICBitmapCodecInfo, cchDeviceManufacturer: UINT, wzDeviceManufacturer_in_out: Optional<LPWSTR>, pcchActual_out: LPUINT): HRESULT {
     return WindowsCodecs.Load('IWICBitmapCodecInfo_GetDeviceManufacturer_Proxy')(This, cchDeviceManufacturer, wzDeviceManufacturer_in_out, pcchActual_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincodec/nf-wincodec-iwicbitmapcodecinfo-getdevicemodels
-  public static IWICBitmapCodecInfo_GetDeviceModels_Proxy(This: IWICBitmapCodecInfo, cchDeviceModels: UINT, wzDeviceModels_in_out: OPTIONAL<LPWSTR>, pcchActual_out: LPUINT): HRESULT {
+  public static IWICBitmapCodecInfo_GetDeviceModels_Proxy(This: IWICBitmapCodecInfo, cchDeviceModels: UINT, wzDeviceModels_in_out: Optional<LPWSTR>, pcchActual_out: LPUINT): HRESULT {
     return WindowsCodecs.Load('IWICBitmapCodecInfo_GetDeviceModels_Proxy')(This, cchDeviceModels, wzDeviceModels_in_out, pcchActual_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincodec/nf-wincodec-iwicbitmapcodecinfo-getfileextensions
-  public static IWICBitmapCodecInfo_GetFileExtensions_Proxy(This: IWICBitmapCodecInfo, cchFileExtensions: UINT, wzFileExtensions_in_out: OPTIONAL<LPWSTR>, pcchActual_out: LPUINT): HRESULT {
+  public static IWICBitmapCodecInfo_GetFileExtensions_Proxy(This: IWICBitmapCodecInfo, cchFileExtensions: UINT, wzFileExtensions_in_out: Optional<LPWSTR>, pcchActual_out: LPUINT): HRESULT {
     return WindowsCodecs.Load('IWICBitmapCodecInfo_GetFileExtensions_Proxy')(This, cchFileExtensions, wzFileExtensions_in_out, pcchActual_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincodec/nf-wincodec-iwicbitmapcodecinfo-getmimetypes
-  public static IWICBitmapCodecInfo_GetMimeTypes_Proxy(This: IWICBitmapCodecInfo, cchMimeTypes: UINT, wzMimeTypes_in_out: OPTIONAL<LPWSTR>, pcchActual_out: LPUINT): HRESULT {
+  public static IWICBitmapCodecInfo_GetMimeTypes_Proxy(This: IWICBitmapCodecInfo, cchMimeTypes: UINT, wzMimeTypes_in_out: Optional<LPWSTR>, pcchActual_out: LPUINT): HRESULT {
     return WindowsCodecs.Load('IWICBitmapCodecInfo_GetMimeTypes_Proxy')(This, cchMimeTypes, wzMimeTypes_in_out, pcchActual_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincodec/nf-wincodec-iwicbitmapdecoder-copypalette
-  public static IWICBitmapDecoder_CopyPalette_Proxy(This: IWICBitmapDecoder, pIPalette: OPTIONAL<IWICPalette>): HRESULT {
+  public static IWICBitmapDecoder_CopyPalette_Proxy(This: IWICBitmapDecoder, pIPalette: Optional<IWICPalette>): HRESULT {
     return WindowsCodecs.Load('IWICBitmapDecoder_CopyPalette_Proxy')(This, pIPalette);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincodec/nf-wincodec-iwicbitmapdecoder-getcolorcontexts
-  public static IWICBitmapDecoder_GetColorContexts_Proxy(This: IWICBitmapDecoder, cCount: UINT, ppIColorContexts_in_out: OPTIONAL<Pointer>, pcActualCount_out: LPUINT): HRESULT {
+  public static IWICBitmapDecoder_GetColorContexts_Proxy(This: IWICBitmapDecoder, cCount: UINT, ppIColorContexts_in_out: Optional<Pointer>, pcActualCount_out: LPUINT): HRESULT {
     return WindowsCodecs.Load('IWICBitmapDecoder_GetColorContexts_Proxy')(This, cCount, ppIColorContexts_in_out, pcActualCount_out);
   }
 
@@ -339,7 +339,7 @@ class WindowsCodecs extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincodec/nf-wincodec-iwicbitmapencoder-createnewframe
-  public static IWICBitmapEncoder_CreateNewFrame_Proxy(This: IWICBitmapEncoder, ppIFrameEncode_out: Pointer, ppIEncoderOptions_in_out: OPTIONAL<Pointer>): HRESULT {
+  public static IWICBitmapEncoder_CreateNewFrame_Proxy(This: IWICBitmapEncoder, ppIFrameEncode_out: Pointer, ppIEncoderOptions_in_out: Optional<Pointer>): HRESULT {
     return WindowsCodecs.Load('IWICBitmapEncoder_CreateNewFrame_Proxy')(This, ppIFrameEncode_out, ppIEncoderOptions_in_out);
   }
 
@@ -354,27 +354,27 @@ class WindowsCodecs extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincodec/nf-wincodec-iwicbitmapencoder-initialize
-  public static IWICBitmapEncoder_Initialize_Proxy(This: IWICBitmapEncoder, pIStream: OPTIONAL<IStream>, cacheOption: WICBitmapEncoderCacheOption): HRESULT {
+  public static IWICBitmapEncoder_Initialize_Proxy(This: IWICBitmapEncoder, pIStream: Optional<IStream>, cacheOption: WICBitmapEncoderCacheOption): HRESULT {
     return WindowsCodecs.Load('IWICBitmapEncoder_Initialize_Proxy')(This, pIStream, cacheOption);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincodec/nf-wincodec-iwicbitmapencoder-setpalette
-  public static IWICBitmapEncoder_SetPalette_Proxy(This: IWICBitmapEncoder, pIPalette: OPTIONAL<IWICPalette>): HRESULT {
+  public static IWICBitmapEncoder_SetPalette_Proxy(This: IWICBitmapEncoder, pIPalette: Optional<IWICPalette>): HRESULT {
     return WindowsCodecs.Load('IWICBitmapEncoder_SetPalette_Proxy')(This, pIPalette);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincodec/nf-wincodec-iwicbitmapencoder-setthumbnail
-  public static IWICBitmapEncoder_SetThumbnail_Proxy(This: IWICBitmapEncoder, pIThumbnail: OPTIONAL<IWICBitmapSource>): HRESULT {
+  public static IWICBitmapEncoder_SetThumbnail_Proxy(This: IWICBitmapEncoder, pIThumbnail: Optional<IWICBitmapSource>): HRESULT {
     return WindowsCodecs.Load('IWICBitmapEncoder_SetThumbnail_Proxy')(This, pIThumbnail);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincodec/nf-wincodec-iwicbitmapfliprotator-initialize
-  public static IWICBitmapFlipRotator_Initialize_Proxy(This: IWICBitmapFlipRotator, pISource: OPTIONAL<IWICBitmapSource>, options: WICBitmapTransformOptions): HRESULT {
+  public static IWICBitmapFlipRotator_Initialize_Proxy(This: IWICBitmapFlipRotator, pISource: Optional<IWICBitmapSource>, options: WICBitmapTransformOptions): HRESULT {
     return WindowsCodecs.Load('IWICBitmapFlipRotator_Initialize_Proxy')(This, pISource, options);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincodec/nf-wincodec-iwicbitmapframedecode-getcolorcontexts
-  public static IWICBitmapFrameDecode_GetColorContexts_Proxy(This: IWICBitmapFrameDecode, cCount: UINT, ppIColorContexts_in_out: OPTIONAL<Pointer>, pcActualCount_out: LPUINT): HRESULT {
+  public static IWICBitmapFrameDecode_GetColorContexts_Proxy(This: IWICBitmapFrameDecode, cCount: UINT, ppIColorContexts_in_out: Optional<Pointer>, pcActualCount_out: LPUINT): HRESULT {
     return WindowsCodecs.Load('IWICBitmapFrameDecode_GetColorContexts_Proxy')(This, cCount, ppIColorContexts_in_out, pcActualCount_out);
   }
 
@@ -399,7 +399,7 @@ class WindowsCodecs extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincodec/nf-wincodec-iwicbitmapframeencode-initialize
-  public static IWICBitmapFrameEncode_Initialize_Proxy(This: IWICBitmapFrameEncode, pIEncoderOptions: OPTIONAL<IPropertyBag2>): HRESULT {
+  public static IWICBitmapFrameEncode_Initialize_Proxy(This: IWICBitmapFrameEncode, pIEncoderOptions: Optional<IPropertyBag2>): HRESULT {
     return WindowsCodecs.Load('IWICBitmapFrameEncode_Initialize_Proxy')(This, pIEncoderOptions);
   }
 
@@ -419,17 +419,17 @@ class WindowsCodecs extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincodec/nf-wincodec-iwicbitmapframeencode-setthumbnail
-  public static IWICBitmapFrameEncode_SetThumbnail_Proxy(This: IWICBitmapFrameEncode, pIThumbnail: OPTIONAL<IWICBitmapSource>): HRESULT {
+  public static IWICBitmapFrameEncode_SetThumbnail_Proxy(This: IWICBitmapFrameEncode, pIThumbnail: Optional<IWICBitmapSource>): HRESULT {
     return WindowsCodecs.Load('IWICBitmapFrameEncode_SetThumbnail_Proxy')(This, pIThumbnail);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincodec/nf-wincodec-iwicbitmapframeencode-writesource
-  public static IWICBitmapFrameEncode_WriteSource_Proxy(This: IWICBitmapFrameEncode, pIBitmapSource: OPTIONAL<IWICBitmapSource>, prc: OPTIONAL<LPWICRect>): HRESULT {
+  public static IWICBitmapFrameEncode_WriteSource_Proxy(This: IWICBitmapFrameEncode, pIBitmapSource: Optional<IWICBitmapSource>, prc: Optional<LPWICRect>): HRESULT {
     return WindowsCodecs.Load('IWICBitmapFrameEncode_WriteSource_Proxy')(This, pIBitmapSource, prc);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincodec/nf-wincodec-iwicbitmaplock-getdatapointer
-  public static IWICBitmapLock_GetDataPointer_STA_Proxy(This: IWICBitmapLock, pcbBufferSize_out: LPUINT, ppbData_out: OPTIONAL<LPWICInProcPointer>): HRESULT {
+  public static IWICBitmapLock_GetDataPointer_STA_Proxy(This: IWICBitmapLock, pcbBufferSize_out: LPUINT, ppbData_out: Optional<LPWICInProcPointer>): HRESULT {
     return WindowsCodecs.Load('IWICBitmapLock_GetDataPointer_STA_Proxy')(This, pcbBufferSize_out, ppbData_out);
   }
 
@@ -439,17 +439,17 @@ class WindowsCodecs extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincodec/nf-wincodec-iwicbitmapscaler-initialize
-  public static IWICBitmapScaler_Initialize_Proxy(This: IWICBitmapScaler, pISource: OPTIONAL<IWICBitmapSource>, uiWidth: UINT, uiHeight: UINT, mode: WICBitmapInterpolationMode): HRESULT {
+  public static IWICBitmapScaler_Initialize_Proxy(This: IWICBitmapScaler, pISource: Optional<IWICBitmapSource>, uiWidth: UINT, uiHeight: UINT, mode: WICBitmapInterpolationMode): HRESULT {
     return WindowsCodecs.Load('IWICBitmapScaler_Initialize_Proxy')(This, pISource, uiWidth, uiHeight, mode);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincodec/nf-wincodec-iwicbitmapsource-copypalette
-  public static IWICBitmapSource_CopyPalette_Proxy(This: IWICBitmapSource, pIPalette: OPTIONAL<IWICPalette>): HRESULT {
+  public static IWICBitmapSource_CopyPalette_Proxy(This: IWICBitmapSource, pIPalette: Optional<IWICPalette>): HRESULT {
     return WindowsCodecs.Load('IWICBitmapSource_CopyPalette_Proxy')(This, pIPalette);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincodec/nf-wincodec-iwicbitmapsource-copypixels
-  public static IWICBitmapSource_CopyPixels_Proxy(This: IWICBitmapSource, prc: OPTIONAL<LPWICRect>, cbStride: UINT, cbBufferSize: UINT, pbBuffer_out: LPBYTE): HRESULT {
+  public static IWICBitmapSource_CopyPixels_Proxy(This: IWICBitmapSource, prc: Optional<LPWICRect>, cbStride: UINT, cbBufferSize: UINT, pbBuffer_out: LPBYTE): HRESULT {
     return WindowsCodecs.Load('IWICBitmapSource_CopyPixels_Proxy')(This, prc, cbStride, cbBufferSize, pbBuffer_out);
   }
 
@@ -469,12 +469,12 @@ class WindowsCodecs extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincodec/nf-wincodec-iwicbitmap-lock
-  public static IWICBitmap_Lock_Proxy(This: IWICBitmap, prcLock: OPTIONAL<LPWICRect>, flags: DWORD, ppILock_out: Pointer): HRESULT {
+  public static IWICBitmap_Lock_Proxy(This: IWICBitmap, prcLock: Optional<LPWICRect>, flags: DWORD, ppILock_out: Pointer): HRESULT {
     return WindowsCodecs.Load('IWICBitmap_Lock_Proxy')(This, prcLock, flags, ppILock_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincodec/nf-wincodec-iwicbitmap-setpalette
-  public static IWICBitmap_SetPalette_Proxy(This: IWICBitmap, pIPalette: OPTIONAL<IWICPalette>): HRESULT {
+  public static IWICBitmap_SetPalette_Proxy(This: IWICBitmap, pIPalette: Optional<IWICPalette>): HRESULT {
     return WindowsCodecs.Load('IWICBitmap_SetPalette_Proxy')(This, pIPalette);
   }
 
@@ -489,17 +489,17 @@ class WindowsCodecs extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincodecsdk/nf-wincodecsdk-iwiccomponentfactory-createmetadatawriterfromreader
-  public static IWICComponentFactory_CreateMetadataWriterFromReader_Proxy(This: IWICComponentFactory, pIReader: OPTIONAL<IWICMetadataReader>, pguidVendor: OPTIONAL<LPGUID>, ppIWriter_out: Pointer): HRESULT {
+  public static IWICComponentFactory_CreateMetadataWriterFromReader_Proxy(This: IWICComponentFactory, pIReader: Optional<IWICMetadataReader>, pguidVendor: Optional<LPGUID>, ppIWriter_out: Pointer): HRESULT {
     return WindowsCodecs.Load('IWICComponentFactory_CreateMetadataWriterFromReader_Proxy')(This, pIReader, pguidVendor, ppIWriter_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincodecsdk/nf-wincodecsdk-iwiccomponentfactory-createquerywriterfromblockwriter
-  public static IWICComponentFactory_CreateQueryWriterFromBlockWriter_Proxy(This: IWICComponentFactory, pIBlockWriter: OPTIONAL<IWICMetadataBlockWriter>, ppIQueryWriter_out: Pointer): HRESULT {
+  public static IWICComponentFactory_CreateQueryWriterFromBlockWriter_Proxy(This: IWICComponentFactory, pIBlockWriter: Optional<IWICMetadataBlockWriter>, ppIQueryWriter_out: Pointer): HRESULT {
     return WindowsCodecs.Load('IWICComponentFactory_CreateQueryWriterFromBlockWriter_Proxy')(This, pIBlockWriter, ppIQueryWriter_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincodec/nf-wincodec-iwiccomponentinfo-getauthor
-  public static IWICComponentInfo_GetAuthor_Proxy(This: IWICComponentInfo, cchAuthor: UINT, wzAuthor_in_out: OPTIONAL<LPWSTR>, pcchActual_out: LPUINT): HRESULT {
+  public static IWICComponentInfo_GetAuthor_Proxy(This: IWICComponentInfo, cchAuthor: UINT, wzAuthor_in_out: Optional<LPWSTR>, pcchActual_out: LPUINT): HRESULT {
     return WindowsCodecs.Load('IWICComponentInfo_GetAuthor_Proxy')(This, cchAuthor, wzAuthor_in_out, pcchActual_out);
   }
 
@@ -509,17 +509,17 @@ class WindowsCodecs extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincodec/nf-wincodec-iwiccomponentinfo-getfriendlyname
-  public static IWICComponentInfo_GetFriendlyName_Proxy(This: IWICComponentInfo, cchFriendlyName: UINT, wzFriendlyName_in_out: OPTIONAL<LPWSTR>, pcchActual_out: LPUINT): HRESULT {
+  public static IWICComponentInfo_GetFriendlyName_Proxy(This: IWICComponentInfo, cchFriendlyName: UINT, wzFriendlyName_in_out: Optional<LPWSTR>, pcchActual_out: LPUINT): HRESULT {
     return WindowsCodecs.Load('IWICComponentInfo_GetFriendlyName_Proxy')(This, cchFriendlyName, wzFriendlyName_in_out, pcchActual_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincodec/nf-wincodec-iwiccomponentinfo-getspecversion
-  public static IWICComponentInfo_GetSpecVersion_Proxy(This: IWICComponentInfo, cchSpecVersion: UINT, wzSpecVersion_in_out: OPTIONAL<LPWSTR>, pcchActual_out: LPUINT): HRESULT {
+  public static IWICComponentInfo_GetSpecVersion_Proxy(This: IWICComponentInfo, cchSpecVersion: UINT, wzSpecVersion_in_out: Optional<LPWSTR>, pcchActual_out: LPUINT): HRESULT {
     return WindowsCodecs.Load('IWICComponentInfo_GetSpecVersion_Proxy')(This, cchSpecVersion, wzSpecVersion_in_out, pcchActual_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincodec/nf-wincodec-iwiccomponentinfo-getversion
-  public static IWICComponentInfo_GetVersion_Proxy(This: IWICComponentInfo, cchVersion: UINT, wzVersion_in_out: OPTIONAL<LPWSTR>, pcchActual_out: LPUINT): HRESULT {
+  public static IWICComponentInfo_GetVersion_Proxy(This: IWICComponentInfo, cchVersion: UINT, wzVersion_in_out: Optional<LPWSTR>, pcchActual_out: LPUINT): HRESULT {
     return WindowsCodecs.Load('IWICComponentInfo_GetVersion_Proxy')(This, cchVersion, wzVersion_in_out, pcchActual_out);
   }
 
@@ -536,10 +536,10 @@ class WindowsCodecs extends Win32 {
   // https://learn.microsoft.com/en-us/windows/win32/api/wincodec/nf-wincodec-iwicformatconverter-initialize
   public static IWICFormatConverter_Initialize_Proxy(
     This: IWICFormatConverter,
-    pISource: OPTIONAL<IWICBitmapSource>,
+    pISource: Optional<IWICBitmapSource>,
     dstFormat: REFWICPixelFormatGUID,
     dither: WICBitmapDitherType,
-    pIPalette: OPTIONAL<IWICPalette>,
+    pIPalette: Optional<IWICPalette>,
     alphaThresholdPercent: DOUBLE,
     paletteTranslate: WICBitmapPaletteType,
   ): HRESULT {
@@ -557,7 +557,7 @@ class WindowsCodecs extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincodec/nf-wincodec-iwicimagingfactory-createbitmapfromhbitmap
-  public static IWICImagingFactory_CreateBitmapFromHBITMAP_Proxy(This: IWICImagingFactory, hBitmap: HBITMAP, hPalette: OPTIONAL<HPALETTE>, options: WICBitmapAlphaChannelOption, ppIBitmap_out: Pointer): HRESULT {
+  public static IWICImagingFactory_CreateBitmapFromHBITMAP_Proxy(This: IWICImagingFactory, hBitmap: HBITMAP, hPalette: Optional<HPALETTE>, options: WICBitmapAlphaChannelOption, ppIBitmap_out: Pointer): HRESULT {
     return WindowsCodecs.Load('IWICImagingFactory_CreateBitmapFromHBITMAP_Proxy')(This, hBitmap, hPalette, options, ppIBitmap_out);
   }
 
@@ -581,7 +581,7 @@ class WindowsCodecs extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincodec/nf-wincodec-iwicimagingfactory-createbitmapfromsource
-  public static IWICImagingFactory_CreateBitmapFromSource_Proxy(This: IWICImagingFactory, pIBitmapSource: OPTIONAL<IWICBitmapSource>, option: WICBitmapCreateCacheOption, ppIBitmap_out: Pointer): HRESULT {
+  public static IWICImagingFactory_CreateBitmapFromSource_Proxy(This: IWICImagingFactory, pIBitmapSource: Optional<IWICBitmapSource>, option: WICBitmapCreateCacheOption, ppIBitmap_out: Pointer): HRESULT {
     return WindowsCodecs.Load('IWICImagingFactory_CreateBitmapFromSource_Proxy')(This, pIBitmapSource, option, ppIBitmap_out);
   }
 
@@ -601,32 +601,32 @@ class WindowsCodecs extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincodec/nf-wincodec-iwicimagingfactory-createdecoderfromfilehandle
-  public static IWICImagingFactory_CreateDecoderFromFileHandle_Proxy(This: IWICImagingFactory, hFile: ULONG_PTR, pguidVendor: OPTIONAL<LPGUID>, metadataOptions: WICDecodeOptions, ppIDecoder_out: Pointer): HRESULT {
+  public static IWICImagingFactory_CreateDecoderFromFileHandle_Proxy(This: IWICImagingFactory, hFile: ULONG_PTR, pguidVendor: Optional<LPGUID>, metadataOptions: WICDecodeOptions, ppIDecoder_out: Pointer): HRESULT {
     return WindowsCodecs.Load('IWICImagingFactory_CreateDecoderFromFileHandle_Proxy')(This, hFile, pguidVendor, metadataOptions, ppIDecoder_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincodec/nf-wincodec-iwicimagingfactory-createdecoderfromfilename
-  public static IWICImagingFactory_CreateDecoderFromFilename_Proxy(This: IWICImagingFactory, wzFilename: LPCWSTR, pguidVendor: OPTIONAL<LPGUID>, dwDesiredAccess: DWORD, metadataOptions: WICDecodeOptions, ppIDecoder_out: Pointer): HRESULT {
+  public static IWICImagingFactory_CreateDecoderFromFilename_Proxy(This: IWICImagingFactory, wzFilename: LPCWSTR, pguidVendor: Optional<LPGUID>, dwDesiredAccess: DWORD, metadataOptions: WICDecodeOptions, ppIDecoder_out: Pointer): HRESULT {
     return WindowsCodecs.Load('IWICImagingFactory_CreateDecoderFromFilename_Proxy')(This, wzFilename, pguidVendor, dwDesiredAccess, metadataOptions, ppIDecoder_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincodec/nf-wincodec-iwicimagingfactory-createdecoderfromstream
-  public static IWICImagingFactory_CreateDecoderFromStream_Proxy(This: IWICImagingFactory, pIStream: OPTIONAL<IStream>, pguidVendor: OPTIONAL<LPGUID>, metadataOptions: WICDecodeOptions, ppIDecoder_out: Pointer): HRESULT {
+  public static IWICImagingFactory_CreateDecoderFromStream_Proxy(This: IWICImagingFactory, pIStream: Optional<IStream>, pguidVendor: Optional<LPGUID>, metadataOptions: WICDecodeOptions, ppIDecoder_out: Pointer): HRESULT {
     return WindowsCodecs.Load('IWICImagingFactory_CreateDecoderFromStream_Proxy')(This, pIStream, pguidVendor, metadataOptions, ppIDecoder_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincodec/nf-wincodec-iwicimagingfactory-createencoder
-  public static IWICImagingFactory_CreateEncoder_Proxy(This: IWICImagingFactory, guidContainerFormat: REFGUID, pguidVendor: OPTIONAL<LPGUID>, ppIEncoder_out: Pointer): HRESULT {
+  public static IWICImagingFactory_CreateEncoder_Proxy(This: IWICImagingFactory, guidContainerFormat: REFGUID, pguidVendor: Optional<LPGUID>, ppIEncoder_out: Pointer): HRESULT {
     return WindowsCodecs.Load('IWICImagingFactory_CreateEncoder_Proxy')(This, guidContainerFormat, pguidVendor, ppIEncoder_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincodec/nf-wincodec-iwicimagingfactory-createfastmetadataencoderfromdecoder
-  public static IWICImagingFactory_CreateFastMetadataEncoderFromDecoder_Proxy(This: IWICImagingFactory, pIDecoder: OPTIONAL<IWICBitmapDecoder>, ppIFastEncoder_out: Pointer): HRESULT {
+  public static IWICImagingFactory_CreateFastMetadataEncoderFromDecoder_Proxy(This: IWICImagingFactory, pIDecoder: Optional<IWICBitmapDecoder>, ppIFastEncoder_out: Pointer): HRESULT {
     return WindowsCodecs.Load('IWICImagingFactory_CreateFastMetadataEncoderFromDecoder_Proxy')(This, pIDecoder, ppIFastEncoder_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincodec/nf-wincodec-iwicimagingfactory-createfastmetadataencoderfromframedecode
-  public static IWICImagingFactory_CreateFastMetadataEncoderFromFrameDecode_Proxy(This: IWICImagingFactory, pIFrameDecoder: OPTIONAL<IWICBitmapFrameDecode>, ppIFastEncoder_out: Pointer): HRESULT {
+  public static IWICImagingFactory_CreateFastMetadataEncoderFromFrameDecode_Proxy(This: IWICImagingFactory, pIFrameDecoder: Optional<IWICBitmapFrameDecode>, ppIFastEncoder_out: Pointer): HRESULT {
     return WindowsCodecs.Load('IWICImagingFactory_CreateFastMetadataEncoderFromFrameDecode_Proxy')(This, pIFrameDecoder, ppIFastEncoder_out);
   }
 
@@ -641,12 +641,12 @@ class WindowsCodecs extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincodec/nf-wincodec-iwicimagingfactory-createquerywriterfromreader
-  public static IWICImagingFactory_CreateQueryWriterFromReader_Proxy(This: IWICImagingFactory, pIQueryReader: OPTIONAL<IWICMetadataQueryReader>, pguidVendor: OPTIONAL<LPGUID>, ppIQueryWriter_out: Pointer): HRESULT {
+  public static IWICImagingFactory_CreateQueryWriterFromReader_Proxy(This: IWICImagingFactory, pIQueryReader: Optional<IWICMetadataQueryReader>, pguidVendor: Optional<LPGUID>, ppIQueryWriter_out: Pointer): HRESULT {
     return WindowsCodecs.Load('IWICImagingFactory_CreateQueryWriterFromReader_Proxy')(This, pIQueryReader, pguidVendor, ppIQueryWriter_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincodec/nf-wincodec-iwicimagingfactory-createquerywriter
-  public static IWICImagingFactory_CreateQueryWriter_Proxy(This: IWICImagingFactory, guidMetadataFormat: REFGUID, pguidVendor: OPTIONAL<LPGUID>, ppIQueryWriter_out: Pointer): HRESULT {
+  public static IWICImagingFactory_CreateQueryWriter_Proxy(This: IWICImagingFactory, guidMetadataFormat: REFGUID, pguidVendor: Optional<LPGUID>, ppIQueryWriter_out: Pointer): HRESULT {
     return WindowsCodecs.Load('IWICImagingFactory_CreateQueryWriter_Proxy')(This, guidMetadataFormat, pguidVendor, ppIQueryWriter_out);
   }
 
@@ -676,12 +676,12 @@ class WindowsCodecs extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincodec/nf-wincodec-iwicmetadataqueryreader-getlocation
-  public static IWICMetadataQueryReader_GetLocation_Proxy(This: IWICMetadataQueryReader, cchMaxLength: UINT, wzNamespace_in_out: OPTIONAL<LPWSTR>, pcchActualLength_out: LPUINT): HRESULT {
+  public static IWICMetadataQueryReader_GetLocation_Proxy(This: IWICMetadataQueryReader, cchMaxLength: UINT, wzNamespace_in_out: Optional<LPWSTR>, pcchActualLength_out: LPUINT): HRESULT {
     return WindowsCodecs.Load('IWICMetadataQueryReader_GetLocation_Proxy')(This, cchMaxLength, wzNamespace_in_out, pcchActualLength_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincodec/nf-wincodec-iwicmetadataqueryreader-getmetadatabyname
-  public static IWICMetadataQueryReader_GetMetadataByName_Proxy(This: IWICMetadataQueryReader, wzName: LPCWSTR, pvarValue_in_out: OPTIONAL<LPPROPVARIANT>): HRESULT {
+  public static IWICMetadataQueryReader_GetMetadataByName_Proxy(This: IWICMetadataQueryReader, wzName: LPCWSTR, pvarValue_in_out: Optional<LPPROPVARIANT>): HRESULT {
     return WindowsCodecs.Load('IWICMetadataQueryReader_GetMetadataByName_Proxy')(This, wzName, pvarValue_in_out);
   }
 
@@ -721,12 +721,12 @@ class WindowsCodecs extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincodec/nf-wincodec-iwicpalette-initializefrombitmap
-  public static IWICPalette_InitializeFromBitmap_Proxy(This: IWICPalette, pISurface: OPTIONAL<IWICBitmapSource>, cCount: UINT, fAddTransparentColor: BOOL): HRESULT {
+  public static IWICPalette_InitializeFromBitmap_Proxy(This: IWICPalette, pISurface: Optional<IWICBitmapSource>, cCount: UINT, fAddTransparentColor: BOOL): HRESULT {
     return WindowsCodecs.Load('IWICPalette_InitializeFromBitmap_Proxy')(This, pISurface, cCount, fAddTransparentColor);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincodec/nf-wincodec-iwicpalette-initializefrompalette
-  public static IWICPalette_InitializeFromPalette_Proxy(This: IWICPalette, pIPalette: OPTIONAL<IWICPalette>): HRESULT {
+  public static IWICPalette_InitializeFromPalette_Proxy(This: IWICPalette, pIPalette: Optional<IWICPalette>): HRESULT {
     return WindowsCodecs.Load('IWICPalette_InitializeFromPalette_Proxy')(This, pIPalette);
   }
 
@@ -746,12 +746,12 @@ class WindowsCodecs extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincodec/nf-wincodec-iwicpixelformatinfo-getchannelmask
-  public static IWICPixelFormatInfo_GetChannelMask_Proxy(This: IWICPixelFormatInfo, uiChannelIndex: UINT, cbMaskBuffer: UINT, pbMaskBuffer_in_out: OPTIONAL<LPBYTE>, pcbActual_out: LPUINT): HRESULT {
+  public static IWICPixelFormatInfo_GetChannelMask_Proxy(This: IWICPixelFormatInfo, uiChannelIndex: UINT, cbMaskBuffer: UINT, pbMaskBuffer_in_out: Optional<LPBYTE>, pcbActual_out: LPUINT): HRESULT {
     return WindowsCodecs.Load('IWICPixelFormatInfo_GetChannelMask_Proxy')(This, uiChannelIndex, cbMaskBuffer, pbMaskBuffer_in_out, pcbActual_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincodec/nf-wincodec-iwicstream-initializefromistream
-  public static IWICStream_InitializeFromIStream_Proxy(This: IWICStream, pIStream: OPTIONAL<IStream>): HRESULT {
+  public static IWICStream_InitializeFromIStream_Proxy(This: IWICStream, pIStream: Optional<IStream>): HRESULT {
     return WindowsCodecs.Load('IWICStream_InitializeFromIStream_Proxy')(This, pIStream);
   }
 
@@ -791,12 +791,12 @@ class WindowsCodecs extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincodec/nf-wincodec-wicmapguidtoshortname
-  public static WICMapGuidToShortName(guid: REFGUID, cchName: UINT, wzName_in_out: OPTIONAL<LPWSTR>, pcchActual_out: LPUINT): HRESULT {
+  public static WICMapGuidToShortName(guid: REFGUID, cchName: UINT, wzName_in_out: Optional<LPWSTR>, pcchActual_out: LPUINT): HRESULT {
     return WindowsCodecs.Load('WICMapGuidToShortName')(guid, cchName, wzName_in_out, pcchActual_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincodec/nf-wincodec-wicmapschematoname
-  public static WICMapSchemaToName(guidMetadataFormat: REFGUID, pwzSchema: LPWSTR, cchName: UINT, wzName_in_out: OPTIONAL<LPWSTR>, pcchActual_out: LPUINT): HRESULT {
+  public static WICMapSchemaToName(guidMetadataFormat: REFGUID, pwzSchema: LPWSTR, cchName: UINT, wzName_in_out: Optional<LPWSTR>, pcchActual_out: LPUINT): HRESULT {
     return WindowsCodecs.Load('WICMapSchemaToName')(guidMetadataFormat, pwzSchema, cchName, wzName_in_out, pcchActual_out);
   }
 
@@ -806,7 +806,7 @@ class WindowsCodecs extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincodecsdk/nf-wincodecsdk-wicmatchmetadatacontent
-  public static WICMatchMetadataContent(guidContainerFormat: REFGUID, pguidVendor: OPTIONAL<LPGUID>, pIStream: IStream, pguidMetadataFormat_out: LPGUID): HRESULT {
+  public static WICMatchMetadataContent(guidContainerFormat: REFGUID, pguidVendor: Optional<LPGUID>, pIStream: IStream, pguidMetadataFormat_out: LPGUID): HRESULT {
     return WindowsCodecs.Load('WICMatchMetadataContent')(guidContainerFormat, pguidVendor, pIStream, pguidMetadataFormat_out);
   }
 

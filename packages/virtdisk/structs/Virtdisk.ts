@@ -9,8 +9,8 @@ import type {
   LPCWSTR,
   LPOVERLAPPED,
   LPWSTR,
-  NULLABLE,
-  OPTIONAL,
+  Nullable,
+  Optional,
   PAPPLY_SNAPSHOT_VHDSET_PARAMETERS,
   PATTACH_VIRTUAL_DISK_PARAMETERS,
   PCOMPACT_VIRTUAL_DISK_PARAMETERS,
@@ -113,11 +113,11 @@ class Virtdisk extends Win32 {
   // https://learn.microsoft.com/en-us/windows/win32/api/virtdisk/nf-virtdisk-attachvirtualdisk
   public static AttachVirtualDisk(
     VirtualDiskHandle: HANDLE,
-    SecurityDescriptor: OPTIONAL<PSECURITY_DESCRIPTOR>,
+    SecurityDescriptor: Optional<PSECURITY_DESCRIPTOR>,
     Flags: DWORD,
     ProviderSpecificFlags: ULONG,
-    Parameters: OPTIONAL<PATTACH_VIRTUAL_DISK_PARAMETERS>,
-    Overlapped: OPTIONAL<LPOVERLAPPED>,
+    Parameters: Optional<PATTACH_VIRTUAL_DISK_PARAMETERS>,
+    Overlapped: Optional<LPOVERLAPPED>,
   ): DWORD {
     return Virtdisk.Load('AttachVirtualDisk')(VirtualDiskHandle, SecurityDescriptor, Flags, ProviderSpecificFlags, Parameters, Overlapped);
   }
@@ -128,7 +128,7 @@ class Virtdisk extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/virtdisk/nf-virtdisk-compactvirtualdisk
-  public static CompactVirtualDisk(VirtualDiskHandle: HANDLE, Flags: DWORD, Parameters: OPTIONAL<PCOMPACT_VIRTUAL_DISK_PARAMETERS>, Overlapped: OPTIONAL<LPOVERLAPPED>): DWORD {
+  public static CompactVirtualDisk(VirtualDiskHandle: HANDLE, Flags: DWORD, Parameters: Optional<PCOMPACT_VIRTUAL_DISK_PARAMETERS>, Overlapped: Optional<LPOVERLAPPED>): DWORD {
     return Virtdisk.Load('CompactVirtualDisk')(VirtualDiskHandle, Flags, Parameters, Overlapped);
   }
 
@@ -142,11 +142,11 @@ class Virtdisk extends Win32 {
     VirtualStorageType: PVIRTUAL_STORAGE_TYPE,
     Path: LPCWSTR,
     VirtualDiskAccessMask: DWORD,
-    SecurityDescriptor: OPTIONAL<PSECURITY_DESCRIPTOR>,
+    SecurityDescriptor: Optional<PSECURITY_DESCRIPTOR>,
     Flags: DWORD,
     ProviderSpecificFlags: ULONG,
     Parameters: PCREATE_VIRTUAL_DISK_PARAMETERS,
-    Overlapped: OPTIONAL<LPOVERLAPPED>,
+    Overlapped: Optional<LPOVERLAPPED>,
     Handle_out: PHANDLE,
   ): DWORD {
     return Virtdisk.Load('CreateVirtualDisk')(VirtualStorageType, Path, VirtualDiskAccessMask, SecurityDescriptor, Flags, ProviderSpecificFlags, Parameters, Overlapped, Handle_out);
@@ -173,7 +173,7 @@ class Virtdisk extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/virtdisk/nf-virtdisk-expandvirtualdisk
-  public static ExpandVirtualDisk(VirtualDiskHandle: HANDLE, Flags: DWORD, Parameters: PEXPAND_VIRTUAL_DISK_PARAMETERS, Overlapped: OPTIONAL<LPOVERLAPPED>): DWORD {
+  public static ExpandVirtualDisk(VirtualDiskHandle: HANDLE, Flags: DWORD, Parameters: PEXPAND_VIRTUAL_DISK_PARAMETERS, Overlapped: Optional<LPOVERLAPPED>): DWORD {
     return Virtdisk.Load('ExpandVirtualDisk')(VirtualDiskHandle, Flags, Parameters, Overlapped);
   }
 
@@ -183,17 +183,17 @@ class Virtdisk extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/virtdisk/nf-virtdisk-getallattachedvirtualdiskphysicalpaths
-  public static GetAllAttachedVirtualDiskPhysicalPaths(PathsBufferSizeInBytes_in_out: PULONG, PathsBuffer_out: NULLABLE<LPWSTR>): DWORD {
+  public static GetAllAttachedVirtualDiskPhysicalPaths(PathsBufferSizeInBytes_in_out: PULONG, PathsBuffer_out: Nullable<LPWSTR>): DWORD {
     return Virtdisk.Load('GetAllAttachedVirtualDiskPhysicalPaths')(PathsBufferSizeInBytes_in_out, PathsBuffer_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/virtdisk/nf-virtdisk-getstoragedependencyinformation
-  public static GetStorageDependencyInformation(ObjectHandle: HANDLE, Flags: DWORD, StorageDependencyInfoSize: ULONG, StorageDependencyInfo_in_out: PSTORAGE_DEPENDENCY_INFO, SizeUsed_out: OPTIONAL<PULONG>): DWORD {
+  public static GetStorageDependencyInformation(ObjectHandle: HANDLE, Flags: DWORD, StorageDependencyInfoSize: ULONG, StorageDependencyInfo_in_out: PSTORAGE_DEPENDENCY_INFO, SizeUsed_out: Optional<PULONG>): DWORD {
     return Virtdisk.Load('GetStorageDependencyInformation')(ObjectHandle, Flags, StorageDependencyInfoSize, StorageDependencyInfo_in_out, SizeUsed_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/virtdisk/nf-virtdisk-getvirtualdiskinformation
-  public static GetVirtualDiskInformation(VirtualDiskHandle: HANDLE, VirtualDiskInfoSize_in_out: PULONG, VirtualDiskInfo_in_out: PGET_VIRTUAL_DISK_INFO, SizeUsed_out: OPTIONAL<PULONG>): DWORD {
+  public static GetVirtualDiskInformation(VirtualDiskHandle: HANDLE, VirtualDiskInfoSize_in_out: PULONG, VirtualDiskInfo_in_out: PGET_VIRTUAL_DISK_INFO, SizeUsed_out: Optional<PULONG>): DWORD {
     return Virtdisk.Load('GetVirtualDiskInformation')(VirtualDiskHandle, VirtualDiskInfoSize_in_out, VirtualDiskInfo_in_out, SizeUsed_out);
   }
 
@@ -213,7 +213,7 @@ class Virtdisk extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/virtdisk/nf-virtdisk-mergevirtualdisk
-  public static MergeVirtualDisk(VirtualDiskHandle: HANDLE, Flags: DWORD, Parameters: PMERGE_VIRTUAL_DISK_PARAMETERS, Overlapped: OPTIONAL<LPOVERLAPPED>): DWORD {
+  public static MergeVirtualDisk(VirtualDiskHandle: HANDLE, Flags: DWORD, Parameters: PMERGE_VIRTUAL_DISK_PARAMETERS, Overlapped: Optional<LPOVERLAPPED>): DWORD {
     return Virtdisk.Load('MergeVirtualDisk')(VirtualDiskHandle, Flags, Parameters, Overlapped);
   }
 
@@ -228,7 +228,7 @@ class Virtdisk extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/virtdisk/nf-virtdisk-openvirtualdisk
-  public static OpenVirtualDisk(VirtualStorageType: PVIRTUAL_STORAGE_TYPE, Path: LPCWSTR, VirtualDiskAccessMask: DWORD, Flags: DWORD, Parameters: OPTIONAL<POPEN_VIRTUAL_DISK_PARAMETERS>, Handle_out: PHANDLE): DWORD {
+  public static OpenVirtualDisk(VirtualStorageType: PVIRTUAL_STORAGE_TYPE, Path: LPCWSTR, VirtualDiskAccessMask: DWORD, Flags: DWORD, Parameters: Optional<POPEN_VIRTUAL_DISK_PARAMETERS>, Handle_out: PHANDLE): DWORD {
     return Virtdisk.Load('OpenVirtualDisk')(VirtualStorageType, Path, VirtualDiskAccessMask, Flags, Parameters, Handle_out);
   }
 
@@ -252,7 +252,7 @@ class Virtdisk extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/virtdisk/nf-virtdisk-resizevirtualdisk
-  public static ResizeVirtualDisk(VirtualDiskHandle: HANDLE, Flags: DWORD, Parameters: PRESIZE_VIRTUAL_DISK_PARAMETERS, Overlapped: OPTIONAL<LPOVERLAPPED>): DWORD {
+  public static ResizeVirtualDisk(VirtualDiskHandle: HANDLE, Flags: DWORD, Parameters: PRESIZE_VIRTUAL_DISK_PARAMETERS, Overlapped: Optional<LPOVERLAPPED>): DWORD {
     return Virtdisk.Load('ResizeVirtualDisk')(VirtualDiskHandle, Flags, Parameters, Overlapped);
   }
 

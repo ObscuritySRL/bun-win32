@@ -20,7 +20,7 @@ import type {
   LPPHYSICAL_MONITOR,
   LPSTR,
   LPUINT,
-  OPTIONAL,
+  Optional,
   PDXVAHD_CONTENT_DESC,
   PDXVAHDSW_Plugin,
   PIDirect3DDeviceManager9,
@@ -132,7 +132,7 @@ class Dxva2 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dxvahd/nf-dxvahd-dxvahd_createdevice
-  public static DXVAHD_CreateDevice(pD3DDevice: IDirect3DDevice9Ex, pContentDesc: PDXVAHD_CONTENT_DESC, Usage: DXVAHD_DEVICE_USAGE, pPlugin: OPTIONAL<PDXVAHDSW_Plugin>, ppDevice_out: PIDXVAHD_Device): HRESULT {
+  public static DXVAHD_CreateDevice(pD3DDevice: IDirect3DDevice9Ex, pContentDesc: PDXVAHD_CONTENT_DESC, Usage: DXVAHD_DEVICE_USAGE, pPlugin: Optional<PDXVAHDSW_Plugin>, ppDevice_out: PIDXVAHD_Device): HRESULT {
     return Dxva2.Load('DXVAHD_CreateDevice')(pD3DDevice, pContentDesc, Usage, pPlugin, ppDevice_out);
   }
 
@@ -212,7 +212,7 @@ class Dxva2 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/lowlevelmonitorconfigurationapi/nf-lowlevelmonitorconfigurationapi-getvcpfeatureandvcpfeaturereply
-  public static GetVCPFeatureAndVCPFeatureReply(hMonitor: HANDLE, bVCPCode: BYTE, pvct_out: OPTIONAL<LPMC_VCP_CODE_TYPE>, pdwCurrentValue_out: LPDWORD, pdwMaximumValue_out: OPTIONAL<LPDWORD>): BOOL {
+  public static GetVCPFeatureAndVCPFeatureReply(hMonitor: HANDLE, bVCPCode: BYTE, pvct_out: Optional<LPMC_VCP_CODE_TYPE>, pdwCurrentValue_out: LPDWORD, pdwMaximumValue_out: Optional<LPDWORD>): BOOL {
     return Dxva2.Load('GetVCPFeatureAndVCPFeatureReply')(hMonitor, bVCPCode, pvct_out, pdwCurrentValue_out, pdwMaximumValue_out);
   }
 

@@ -1,7 +1,7 @@
 import type { Pointer } from 'bun:ffi';
 import type { HANDLE } from '@bun-win32/core';
 
-export type { ACCESS_MASK, BOOLEAN, DWORD, HANDLE, LONG, NULL, NULLABLE, OPTIONAL, PHANDLE, PULONG, PVOID, SIZE_T, ULONG, ULONG_PTR, USHORT, VOID } from '@bun-win32/core';
+export type { ACCESS_MASK, BOOLEAN, DWORD, HANDLE, LONG, NULL, Nullable, Optional, PHANDLE, PULONG, PVOID, SIZE_T, ULONG, ULONG_PTR, USHORT, VOID } from '@bun-win32/core';
 
 export type NTSTATUS = number;
 

@@ -1,6 +1,6 @@
 import type { Pointer } from 'bun:ffi';
 
-export type { BOOL, BYTE, DWORD, HANDLE, HRESULT, HWND, LONG, LPCSTR, LPCWSTR, LPSTR, LPVOID, LPWSTR, NULL, NULLABLE, OPTIONAL, PBYTE, PDWORD, PVOID } from '@bun-win32/core';
+export type { BOOL, BYTE, DWORD, HANDLE, HRESULT, HWND, LONG, LPCSTR, LPCWSTR, LPSTR, LPVOID, LPWSTR, NULL, Nullable, Optional, PBYTE, PDWORD, PVOID } from '@bun-win32/core';
 
 export const CRYPTCAT_ADDCATALOG_HARDLINK = 0x0000_0001;
 

@@ -23,8 +23,8 @@ import type {
   LPSECURITY_ATTRIBUTES,
   LPVOID,
   NULL,
-  NULLABLE,
-  OPTIONAL,
+  Nullable,
+  Optional,
   PCWSTR,
   PHANDLE,
   PHTTP_BYTE_RANGE,
@@ -116,7 +116,7 @@ class Httpapi extends Win32 {
   } as const satisfies Record<string, FFIFunction>;
 
   // https://learn.microsoft.com/en-us/windows/win32/api/http/nf-http-httpaddfragmenttocache
-  public static HttpAddFragmentToCache(RequestQueueHandle: HANDLE, UrlPrefix: PCWSTR, DataChunk: PHTTP_DATA_CHUNK, CachePolicy: PHTTP_CACHE_POLICY, Overlapped: OPTIONAL<LPOVERLAPPED>): ULONG {
+  public static HttpAddFragmentToCache(RequestQueueHandle: HANDLE, UrlPrefix: PCWSTR, DataChunk: PHTTP_DATA_CHUNK, CachePolicy: PHTTP_CACHE_POLICY, Overlapped: Optional<LPOVERLAPPED>): ULONG {
     return Httpapi.Load('HttpAddFragmentToCache')(RequestQueueHandle, UrlPrefix, DataChunk, CachePolicy, Overlapped);
   }
 
@@ -126,12 +126,12 @@ class Httpapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/http/nf-http-httpaddurltourlgroup
-  public static HttpAddUrlToUrlGroup(UrlGroupId: HTTP_URL_GROUP_ID, pFullyQualifiedUrl: PCWSTR, UrlContext: OPTIONAL<HTTP_URL_CONTEXT>, Reserved: ULONG): ULONG {
+  public static HttpAddUrlToUrlGroup(UrlGroupId: HTTP_URL_GROUP_ID, pFullyQualifiedUrl: PCWSTR, UrlContext: Optional<HTTP_URL_CONTEXT>, Reserved: ULONG): ULONG {
     return Httpapi.Load('HttpAddUrlToUrlGroup')(UrlGroupId, pFullyQualifiedUrl, UrlContext, Reserved);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/http/nf-http-httpcancelhttprequest
-  public static HttpCancelHttpRequest(RequestQueueHandle: HANDLE, RequestId: HTTP_REQUEST_ID, Overlapped: OPTIONAL<LPOVERLAPPED>): ULONG {
+  public static HttpCancelHttpRequest(RequestQueueHandle: HANDLE, RequestId: HTTP_REQUEST_ID, Overlapped: Optional<LPOVERLAPPED>): ULONG {
     return Httpapi.Load('HttpCancelHttpRequest')(RequestQueueHandle, RequestId, Overlapped);
   }
 
@@ -156,7 +156,7 @@ class Httpapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/http/nf-http-httpcreaterequestqueue
-  public static HttpCreateRequestQueue(Version: HTTPAPI_VERSION, Name: OPTIONAL<PCWSTR>, SecurityAttributes: OPTIONAL<LPSECURITY_ATTRIBUTES>, Flags: ULONG, RequestQueueHandle_out: PHANDLE): ULONG {
+  public static HttpCreateRequestQueue(Version: HTTPAPI_VERSION, Name: Optional<PCWSTR>, SecurityAttributes: Optional<LPSECURITY_ATTRIBUTES>, Flags: ULONG, RequestQueueHandle_out: PHANDLE): ULONG {
     return Httpapi.Load('HttpCreateRequestQueue')(Version, Name, SecurityAttributes, Flags, RequestQueueHandle_out);
   }
 
@@ -171,7 +171,7 @@ class Httpapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/http/nf-http-httpdeclarepush
-  public static HttpDeclarePush(RequestQueueHandle: HANDLE, RequestId: HTTP_REQUEST_ID, Verb: HTTP_VERB, Path: PCWSTR, Query: OPTIONAL<LPCSTR>, Headers: OPTIONAL<PHTTP_REQUEST_HEADERS>): ULONG {
+  public static HttpDeclarePush(RequestQueueHandle: HANDLE, RequestId: HTTP_REQUEST_ID, Verb: HTTP_VERB, Path: PCWSTR, Query: Optional<LPCSTR>, Headers: Optional<PHTTP_REQUEST_HEADERS>): ULONG {
     return Httpapi.Load('HttpDeclarePush')(RequestQueueHandle, RequestId, Verb, Path, Query, Headers);
   }
 
@@ -198,7 +198,7 @@ class Httpapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/http/nf-http-httpflushresponsecache
-  public static HttpFlushResponseCache(RequestQueueHandle: HANDLE, UrlPrefix: PCWSTR, Flags: ULONG, Overlapped: OPTIONAL<LPOVERLAPPED>): ULONG {
+  public static HttpFlushResponseCache(RequestQueueHandle: HANDLE, UrlPrefix: PCWSTR, Flags: ULONG, Overlapped: Optional<LPOVERLAPPED>): ULONG {
     return Httpapi.Load('HttpFlushResponseCache')(RequestQueueHandle, UrlPrefix, Flags, Overlapped);
   }
 
@@ -221,17 +221,17 @@ class Httpapi extends Win32 {
   public static HttpQueryRequestQueueProperty(
     RequestQueueHandle: HANDLE,
     Property: HTTP_SERVER_PROPERTY,
-    PropertyInformation_out: OPTIONAL<PVOID>,
+    PropertyInformation_out: Optional<PVOID>,
     PropertyInformationLength: ULONG,
     Reserved1: ULONG,
-    ReturnLength_out: OPTIONAL<PULONG>,
+    ReturnLength_out: Optional<PULONG>,
     Reserved2: NULL,
   ): ULONG {
     return Httpapi.Load('HttpQueryRequestQueueProperty')(RequestQueueHandle, Property, PropertyInformation_out, PropertyInformationLength, Reserved1, ReturnLength_out, Reserved2);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/http/nf-http-httpqueryserversessionproperty
-  public static HttpQueryServerSessionProperty(ServerSessionId: HTTP_SERVER_SESSION_ID, Property: HTTP_SERVER_PROPERTY, PropertyInformation_out: OPTIONAL<PVOID>, PropertyInformationLength: ULONG, ReturnLength_out: OPTIONAL<PULONG>): ULONG {
+  public static HttpQueryServerSessionProperty(ServerSessionId: HTTP_SERVER_SESSION_ID, Property: HTTP_SERVER_PROPERTY, PropertyInformation_out: Optional<PVOID>, PropertyInformationLength: ULONG, ReturnLength_out: Optional<PULONG>): ULONG {
     return Httpapi.Load('HttpQueryServerSessionProperty')(ServerSessionId, Property, PropertyInformation_out, PropertyInformationLength, ReturnLength_out);
   }
 
@@ -239,18 +239,18 @@ class Httpapi extends Win32 {
   public static HttpQueryServiceConfiguration(
     ServiceHandle: 0n,
     ConfigId: HTTP_SERVICE_CONFIG_ID,
-    pInput: OPTIONAL<PVOID>,
+    pInput: Optional<PVOID>,
     InputLength: ULONG,
-    pOutput_out: OPTIONAL<PVOID>,
+    pOutput_out: Optional<PVOID>,
     OutputLength: ULONG,
-    pReturnLength_out: OPTIONAL<PULONG>,
+    pReturnLength_out: Optional<PULONG>,
     pOverlapped: NULL,
   ): ULONG {
     return Httpapi.Load('HttpQueryServiceConfiguration')(ServiceHandle, ConfigId, pInput, InputLength, pOutput_out, OutputLength, pReturnLength_out, pOverlapped);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/http/nf-http-httpqueryurlgroupproperty
-  public static HttpQueryUrlGroupProperty(UrlGroupId: HTTP_URL_GROUP_ID, Property: HTTP_SERVER_PROPERTY, PropertyInformation_out: OPTIONAL<PVOID>, PropertyInformationLength: ULONG, ReturnLength_out: OPTIONAL<PULONG>): ULONG {
+  public static HttpQueryUrlGroupProperty(UrlGroupId: HTTP_URL_GROUP_ID, Property: HTTP_SERVER_PROPERTY, PropertyInformation_out: Optional<PVOID>, PropertyInformationLength: ULONG, ReturnLength_out: Optional<PULONG>): ULONG {
     return Httpapi.Load('HttpQueryUrlGroupProperty')(UrlGroupId, Property, PropertyInformation_out, PropertyInformationLength, ReturnLength_out);
   }
 
@@ -258,11 +258,11 @@ class Httpapi extends Win32 {
   public static HttpReadFragmentFromCache(
     RequestQueueHandle: HANDLE,
     UrlPrefix: PCWSTR,
-    ByteRange: OPTIONAL<PHTTP_BYTE_RANGE>,
+    ByteRange: Optional<PHTTP_BYTE_RANGE>,
     Buffer_out: PVOID,
     BufferLength: ULONG,
-    BytesRead_out: OPTIONAL<PULONG>,
-    Overlapped: OPTIONAL<LPOVERLAPPED>,
+    BytesRead_out: Optional<PULONG>,
+    Overlapped: Optional<LPOVERLAPPED>,
   ): ULONG {
     return Httpapi.Load('HttpReadFragmentFromCache')(RequestQueueHandle, UrlPrefix, ByteRange, Buffer_out, BufferLength, BytesRead_out, Overlapped);
   }
@@ -274,8 +274,8 @@ class Httpapi extends Win32 {
     Flags: ULONG,
     SslClientCertInfo_out: PHTTP_SSL_CLIENT_CERT_INFO,
     SslClientCertInfoSize: ULONG,
-    BytesReceived_out: OPTIONAL<PULONG>,
-    Overlapped: OPTIONAL<LPOVERLAPPED>,
+    BytesReceived_out: Optional<PULONG>,
+    Overlapped: Optional<LPOVERLAPPED>,
   ): ULONG {
     return Httpapi.Load('HttpReceiveClientCertificate')(RequestQueueHandle, ConnectionId, Flags, SslClientCertInfo_out, SslClientCertInfoSize, BytesReceived_out, Overlapped);
   }
@@ -287,8 +287,8 @@ class Httpapi extends Win32 {
     Flags: ULONG,
     RequestBuffer_out: PHTTP_REQUEST,
     RequestBufferLength: ULONG,
-    BytesReturned_out: OPTIONAL<PULONG>,
-    Overlapped: OPTIONAL<LPOVERLAPPED>,
+    BytesReturned_out: Optional<PULONG>,
+    Overlapped: Optional<LPOVERLAPPED>,
   ): ULONG {
     return Httpapi.Load('HttpReceiveHttpRequest')(RequestQueueHandle, RequestId, Flags, RequestBuffer_out, RequestBufferLength, BytesReturned_out, Overlapped);
   }
@@ -300,8 +300,8 @@ class Httpapi extends Win32 {
     Flags: ULONG,
     EntityBuffer_out: PVOID,
     EntityBufferLength: ULONG,
-    BytesReturned_out: OPTIONAL<PULONG>,
-    Overlapped: OPTIONAL<LPOVERLAPPED>,
+    BytesReturned_out: Optional<PULONG>,
+    Overlapped: Optional<LPOVERLAPPED>,
   ): ULONG {
     return Httpapi.Load('HttpReceiveRequestEntityBody')(RequestQueueHandle, RequestId, Flags, EntityBuffer_out, EntityBufferLength, BytesReturned_out, Overlapped);
   }
@@ -312,7 +312,7 @@ class Httpapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/http/nf-http-httpremoveurlfromurlgroup
-  public static HttpRemoveUrlFromUrlGroup(UrlGroupId: HTTP_URL_GROUP_ID, pFullyQualifiedUrl: NULLABLE<PCWSTR>, Flags: ULONG): ULONG {
+  public static HttpRemoveUrlFromUrlGroup(UrlGroupId: HTTP_URL_GROUP_ID, pFullyQualifiedUrl: Nullable<PCWSTR>, Flags: ULONG): ULONG {
     return Httpapi.Load('HttpRemoveUrlFromUrlGroup')(UrlGroupId, pFullyQualifiedUrl, Flags);
   }
 
@@ -322,12 +322,12 @@ class Httpapi extends Win32 {
     RequestId: HTTP_REQUEST_ID,
     Flags: ULONG,
     HttpResponse: PHTTP_RESPONSE,
-    CachePolicy: OPTIONAL<PHTTP_CACHE_POLICY>,
-    BytesSent_out: OPTIONAL<PULONG>,
+    CachePolicy: Optional<PHTTP_CACHE_POLICY>,
+    BytesSent_out: Optional<PULONG>,
     Reserved1: NULL,
     Reserved2: ULONG,
-    Overlapped: OPTIONAL<LPOVERLAPPED>,
-    LogData: OPTIONAL<PHTTP_LOG_DATA>,
+    Overlapped: Optional<LPOVERLAPPED>,
+    LogData: Optional<PHTTP_LOG_DATA>,
   ): ULONG {
     return Httpapi.Load('HttpSendHttpResponse')(RequestQueueHandle, RequestId, Flags, HttpResponse, CachePolicy, BytesSent_out, Reserved1, Reserved2, Overlapped, LogData);
   }
@@ -338,18 +338,18 @@ class Httpapi extends Win32 {
     RequestId: HTTP_REQUEST_ID,
     Flags: ULONG,
     EntityChunkCount: USHORT,
-    EntityChunks: OPTIONAL<PHTTP_DATA_CHUNK>,
-    BytesSent_out: OPTIONAL<PULONG>,
+    EntityChunks: Optional<PHTTP_DATA_CHUNK>,
+    BytesSent_out: Optional<PULONG>,
     Reserved1: NULL,
     Reserved2: ULONG,
-    Overlapped: OPTIONAL<LPOVERLAPPED>,
-    LogData: OPTIONAL<PHTTP_LOG_DATA>,
+    Overlapped: Optional<LPOVERLAPPED>,
+    LogData: Optional<PHTTP_LOG_DATA>,
   ): ULONG {
     return Httpapi.Load('HttpSendResponseEntityBody')(RequestQueueHandle, RequestId, Flags, EntityChunkCount, EntityChunks, BytesSent_out, Reserved1, Reserved2, Overlapped, LogData);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/http/nf-http-httpsetrequestproperty
-  public static HttpSetRequestProperty(RequestQueueHandle: HANDLE, Id: HTTP_OPAQUE_ID, PropertyId: HTTP_REQUEST_PROPERTY, Input: OPTIONAL<PVOID>, InputPropertySize: ULONG, Overlapped: LPOVERLAPPED): ULONG {
+  public static HttpSetRequestProperty(RequestQueueHandle: HANDLE, Id: HTTP_OPAQUE_ID, PropertyId: HTTP_REQUEST_PROPERTY, Input: Optional<PVOID>, InputPropertySize: ULONG, Overlapped: LPOVERLAPPED): ULONG {
     return Httpapi.Load('HttpSetRequestProperty')(RequestQueueHandle, Id, PropertyId, Input, InputPropertySize, Overlapped);
   }
 
@@ -389,17 +389,17 @@ class Httpapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/http/nf-http-httpwaitfordemandstart
-  public static HttpWaitForDemandStart(RequestQueueHandle: HANDLE, Overlapped: OPTIONAL<LPOVERLAPPED>): ULONG {
+  public static HttpWaitForDemandStart(RequestQueueHandle: HANDLE, Overlapped: Optional<LPOVERLAPPED>): ULONG {
     return Httpapi.Load('HttpWaitForDemandStart')(RequestQueueHandle, Overlapped);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/http/nf-http-httpwaitfordisconnect
-  public static HttpWaitForDisconnect(RequestQueueHandle: HANDLE, ConnectionId: HTTP_CONNECTION_ID, Overlapped: OPTIONAL<LPOVERLAPPED>): ULONG {
+  public static HttpWaitForDisconnect(RequestQueueHandle: HANDLE, ConnectionId: HTTP_CONNECTION_ID, Overlapped: Optional<LPOVERLAPPED>): ULONG {
     return Httpapi.Load('HttpWaitForDisconnect')(RequestQueueHandle, ConnectionId, Overlapped);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/http/nf-http-httpwaitfordisconnectex
-  public static HttpWaitForDisconnectEx(RequestQueueHandle: HANDLE, ConnectionId: HTTP_CONNECTION_ID, Reserved: ULONG, Overlapped: OPTIONAL<LPOVERLAPPED>): ULONG {
+  public static HttpWaitForDisconnectEx(RequestQueueHandle: HANDLE, ConnectionId: HTTP_CONNECTION_ID, Reserved: ULONG, Overlapped: Optional<LPOVERLAPPED>): ULONG {
     return Httpapi.Load('HttpWaitForDisconnectEx')(RequestQueueHandle, ConnectionId, Reserved, Overlapped);
   }
 }

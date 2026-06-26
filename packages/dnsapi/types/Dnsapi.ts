@@ -1,6 +1,6 @@
 import type { Pointer } from 'bun:ffi';
 
-export type { BOOL, DWORD, HANDLE, LPCWSTR, LPVOID, LPWSTR, NULL, NULLABLE, OPTIONAL, PDWORD, PHANDLE, PVOID, WORD } from '@bun-win32/core';
+export type { BOOL, DWORD, HANDLE, LPCWSTR, LPVOID, LPWSTR, NULL, Nullable, Optional, PDWORD, PHANDLE, PVOID, WORD } from '@bun-win32/core';
 
 export enum DnsCharSet {
   DnsCharSetAnsi = 3,

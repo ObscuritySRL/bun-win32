@@ -1,6 +1,6 @@
 import type { Pointer } from 'bun:ffi';
 
-export type { BOOL, DWORD, DWORD_PTR, HANDLE, HRESULT, LPBOOL, LPDWORD, OPTIONAL } from '@bun-win32/core';
+export type { BOOL, DWORD, DWORD_PTR, HANDLE, HRESULT, LPBOOL, LPDWORD, Optional } from '@bun-win32/core';
 
 export const WCT_ASYNC_OPEN_FLAG = 0x0000_0001;
 export const WCT_MAX_NODE_COUNT = 16;

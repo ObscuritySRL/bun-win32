@@ -2,7 +2,7 @@ import { type FFIFunction, FFIType } from 'bun:ffi';
 
 import { Win32 } from '@bun-win32/core';
 
-import type { BOOL, BYTE, DWORD, LPWSTR, OPTIONAL, PUINT, PXINPUT_BATTERY_INFORMATION, PXINPUT_CAPABILITIES, PXINPUT_KEYSTROKE, PXINPUT_STATE, PXINPUT_VIBRATION, VOID } from '../types/Xinput1_4';
+import type { BOOL, BYTE, DWORD, LPWSTR, Optional, PUINT, PXINPUT_BATTERY_INFORMATION, PXINPUT_CAPABILITIES, PXINPUT_KEYSTROKE, PXINPUT_STATE, PXINPUT_VIBRATION, VOID } from '../types/Xinput1_4';
 
 /**
  * Thin, lazy-loaded FFI bindings for `xinput1_4.dll`.
@@ -46,7 +46,7 @@ class Xinput1_4 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/xinput/nf-xinput-xinputgetaudiodeviceids
-  public static XInputGetAudioDeviceIds(dwUserIndex: DWORD, pRenderDeviceId_out: OPTIONAL<LPWSTR>, pRenderCount_in_out: OPTIONAL<PUINT>, pCaptureDeviceId_out: OPTIONAL<LPWSTR>, pCaptureCount_in_out: OPTIONAL<PUINT>): DWORD {
+  public static XInputGetAudioDeviceIds(dwUserIndex: DWORD, pRenderDeviceId_out: Optional<LPWSTR>, pRenderCount_in_out: Optional<PUINT>, pCaptureDeviceId_out: Optional<LPWSTR>, pCaptureCount_in_out: Optional<PUINT>): DWORD {
     return Xinput1_4.Load('XInputGetAudioDeviceIds')(dwUserIndex, pRenderDeviceId_out, pRenderCount_in_out, pCaptureDeviceId_out, pCaptureCount_in_out);
   }
 

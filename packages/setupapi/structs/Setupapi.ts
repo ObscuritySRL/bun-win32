@@ -27,7 +27,7 @@ import type {
   LPPROPSHEETHEADERA,
   LPPROPSHEETHEADERW,
   LogSeverity,
-  OPTIONAL,
+  Optional,
   PBOOL,
   PBYTE,
   PCSTR,
@@ -439,32 +439,32 @@ class Setupapi extends Win32 {
   } as const satisfies Record<string, FFIFunction>;
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupaddinstallsectiontodiskspacelista
-  public static SetupAddInstallSectionToDiskSpaceListA(DiskSpace: HDSKSPC, InfHandle: HINF, LayoutInfHandle: OPTIONAL<HINF>, SectionName: PCSTR, Reserved1: OPTIONAL<PVOID>, Reserved2: UINT): BOOL {
+  public static SetupAddInstallSectionToDiskSpaceListA(DiskSpace: HDSKSPC, InfHandle: HINF, LayoutInfHandle: Optional<HINF>, SectionName: PCSTR, Reserved1: Optional<PVOID>, Reserved2: UINT): BOOL {
     return Setupapi.Load('SetupAddInstallSectionToDiskSpaceListA')(DiskSpace, InfHandle, LayoutInfHandle, SectionName, Reserved1, Reserved2);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupaddinstallsectiontodiskspacelistw
-  public static SetupAddInstallSectionToDiskSpaceListW(DiskSpace: HDSKSPC, InfHandle: HINF, LayoutInfHandle: OPTIONAL<HINF>, SectionName: PCWSTR, Reserved1: OPTIONAL<PVOID>, Reserved2: UINT): BOOL {
+  public static SetupAddInstallSectionToDiskSpaceListW(DiskSpace: HDSKSPC, InfHandle: HINF, LayoutInfHandle: Optional<HINF>, SectionName: PCWSTR, Reserved1: Optional<PVOID>, Reserved2: UINT): BOOL {
     return Setupapi.Load('SetupAddInstallSectionToDiskSpaceListW')(DiskSpace, InfHandle, LayoutInfHandle, SectionName, Reserved1, Reserved2);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupaddsectiontodiskspacelista
-  public static SetupAddSectionToDiskSpaceListA(DiskSpace: HDSKSPC, InfHandle: HINF, ListInfHandle: OPTIONAL<HINF>, SectionName: PCSTR, Operation: UINT, Reserved1: OPTIONAL<PVOID>, Reserved2: UINT): BOOL {
+  public static SetupAddSectionToDiskSpaceListA(DiskSpace: HDSKSPC, InfHandle: HINF, ListInfHandle: Optional<HINF>, SectionName: PCSTR, Operation: UINT, Reserved1: Optional<PVOID>, Reserved2: UINT): BOOL {
     return Setupapi.Load('SetupAddSectionToDiskSpaceListA')(DiskSpace, InfHandle, ListInfHandle, SectionName, Operation, Reserved1, Reserved2);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupaddsectiontodiskspacelistw
-  public static SetupAddSectionToDiskSpaceListW(DiskSpace: HDSKSPC, InfHandle: HINF, ListInfHandle: OPTIONAL<HINF>, SectionName: PCWSTR, Operation: UINT, Reserved1: OPTIONAL<PVOID>, Reserved2: UINT): BOOL {
+  public static SetupAddSectionToDiskSpaceListW(DiskSpace: HDSKSPC, InfHandle: HINF, ListInfHandle: Optional<HINF>, SectionName: PCWSTR, Operation: UINT, Reserved1: Optional<PVOID>, Reserved2: UINT): BOOL {
     return Setupapi.Load('SetupAddSectionToDiskSpaceListW')(DiskSpace, InfHandle, ListInfHandle, SectionName, Operation, Reserved1, Reserved2);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupaddtodiskspacelista
-  public static SetupAddToDiskSpaceListA(DiskSpace: HDSKSPC, TargetFilespec: PCSTR, FileSize: LONGLONG, Operation: UINT, Reserved1: OPTIONAL<PVOID>, Reserved2: UINT): BOOL {
+  public static SetupAddToDiskSpaceListA(DiskSpace: HDSKSPC, TargetFilespec: PCSTR, FileSize: LONGLONG, Operation: UINT, Reserved1: Optional<PVOID>, Reserved2: UINT): BOOL {
     return Setupapi.Load('SetupAddToDiskSpaceListA')(DiskSpace, TargetFilespec, FileSize, Operation, Reserved1, Reserved2);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupaddtodiskspacelistw
-  public static SetupAddToDiskSpaceListW(DiskSpace: HDSKSPC, TargetFilespec: PCWSTR, FileSize: LONGLONG, Operation: UINT, Reserved1: OPTIONAL<PVOID>, Reserved2: UINT): BOOL {
+  public static SetupAddToDiskSpaceListW(DiskSpace: HDSKSPC, TargetFilespec: PCWSTR, FileSize: LONGLONG, Operation: UINT, Reserved1: Optional<PVOID>, Reserved2: UINT): BOOL {
     return Setupapi.Load('SetupAddToDiskSpaceListW')(DiskSpace, TargetFilespec, FileSize, Operation, Reserved1, Reserved2);
   }
 
@@ -479,22 +479,22 @@ class Setupapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupadjustdiskspacelista
-  public static SetupAdjustDiskSpaceListA(DiskSpace: HDSKSPC, DriveRoot: LPCSTR, Amount: LONGLONG, Reserved1: OPTIONAL<PVOID>, Reserved2: UINT): BOOL {
+  public static SetupAdjustDiskSpaceListA(DiskSpace: HDSKSPC, DriveRoot: LPCSTR, Amount: LONGLONG, Reserved1: Optional<PVOID>, Reserved2: UINT): BOOL {
     return Setupapi.Load('SetupAdjustDiskSpaceListA')(DiskSpace, DriveRoot, Amount, Reserved1, Reserved2);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupadjustdiskspacelistw
-  public static SetupAdjustDiskSpaceListW(DiskSpace: HDSKSPC, DriveRoot: LPCWSTR, Amount: LONGLONG, Reserved1: OPTIONAL<PVOID>, Reserved2: UINT): BOOL {
+  public static SetupAdjustDiskSpaceListW(DiskSpace: HDSKSPC, DriveRoot: LPCWSTR, Amount: LONGLONG, Reserved1: Optional<PVOID>, Reserved2: UINT): BOOL {
     return Setupapi.Load('SetupAdjustDiskSpaceListW')(DiskSpace, DriveRoot, Amount, Reserved1, Reserved2);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupbackuperrora
-  public static SetupBackupErrorA(hwndParent: HWND, DialogTitle: OPTIONAL<PCSTR>, SourceFile: PCSTR, TargetFile: OPTIONAL<PCSTR>, Win32ErrorCode: UINT, Style: DWORD): UINT {
+  public static SetupBackupErrorA(hwndParent: HWND, DialogTitle: Optional<PCSTR>, SourceFile: PCSTR, TargetFile: Optional<PCSTR>, Win32ErrorCode: UINT, Style: DWORD): UINT {
     return Setupapi.Load('SetupBackupErrorA')(hwndParent, DialogTitle, SourceFile, TargetFile, Win32ErrorCode, Style);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupbackuperrorw
-  public static SetupBackupErrorW(hwndParent: HWND, DialogTitle: OPTIONAL<PCWSTR>, SourceFile: PCWSTR, TargetFile: OPTIONAL<PCWSTR>, Win32ErrorCode: UINT, Style: DWORD): UINT {
+  public static SetupBackupErrorW(hwndParent: HWND, DialogTitle: Optional<PCWSTR>, SourceFile: PCWSTR, TargetFile: Optional<PCWSTR>, Win32ErrorCode: UINT, Style: DWORD): UINT {
     return Setupapi.Load('SetupBackupErrorW')(hwndParent, DialogTitle, SourceFile, TargetFile, Win32ErrorCode, Style);
   }
 
@@ -519,12 +519,12 @@ class Setupapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupcommitfilequeuea
-  public static SetupCommitFileQueueA(Owner: OPTIONAL<HWND>, QueueHandle: HSPFILEQ, MsgHandler: PSP_FILE_CALLBACK_A, Context: PVOID): BOOL {
+  public static SetupCommitFileQueueA(Owner: Optional<HWND>, QueueHandle: HSPFILEQ, MsgHandler: PSP_FILE_CALLBACK_A, Context: PVOID): BOOL {
     return Setupapi.Load('SetupCommitFileQueueA')(Owner, QueueHandle, MsgHandler, Context);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupcommitfilequeuew
-  public static SetupCommitFileQueueW(Owner: OPTIONAL<HWND>, QueueHandle: HSPFILEQ, MsgHandler: PSP_FILE_CALLBACK_W, Context: PVOID): BOOL {
+  public static SetupCommitFileQueueW(Owner: Optional<HWND>, QueueHandle: HSPFILEQ, MsgHandler: PSP_FILE_CALLBACK_W, Context: PVOID): BOOL {
     return Setupapi.Load('SetupCommitFileQueueW')(Owner, QueueHandle, MsgHandler, Context);
   }
 
@@ -541,16 +541,16 @@ class Setupapi extends Win32 {
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupcopyerrora
   public static SetupCopyErrorA(
     hwndParent: HWND,
-    DialogTitle: OPTIONAL<PCSTR>,
-    DiskName: OPTIONAL<PCSTR>,
+    DialogTitle: Optional<PCSTR>,
+    DiskName: Optional<PCSTR>,
     PathToSource: PCSTR,
     SourceFile: PCSTR,
-    TargetPathFile: OPTIONAL<PCSTR>,
+    TargetPathFile: Optional<PCSTR>,
     Win32ErrorCode: UINT,
     Style: DWORD,
-    PathBuffer_out: OPTIONAL<PSTR>,
+    PathBuffer_out: Optional<PSTR>,
     PathBufferSize: DWORD,
-    PathRequiredSize_out: OPTIONAL<PDWORD>,
+    PathRequiredSize_out: Optional<PDWORD>,
   ): UINT {
     return Setupapi.Load('SetupCopyErrorA')(hwndParent, DialogTitle, DiskName, PathToSource, SourceFile, TargetPathFile, Win32ErrorCode, Style, PathBuffer_out, PathBufferSize, PathRequiredSize_out);
   }
@@ -558,16 +558,16 @@ class Setupapi extends Win32 {
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupcopyerrorw
   public static SetupCopyErrorW(
     hwndParent: HWND,
-    DialogTitle: OPTIONAL<PCWSTR>,
-    DiskName: OPTIONAL<PCWSTR>,
+    DialogTitle: Optional<PCWSTR>,
+    DiskName: Optional<PCWSTR>,
     PathToSource: PCWSTR,
     SourceFile: PCWSTR,
-    TargetPathFile: OPTIONAL<PCWSTR>,
+    TargetPathFile: Optional<PCWSTR>,
     Win32ErrorCode: UINT,
     Style: DWORD,
-    PathBuffer_out: OPTIONAL<PWSTR>,
+    PathBuffer_out: Optional<PWSTR>,
     PathBufferSize: DWORD,
-    PathRequiredSize_out: OPTIONAL<PDWORD>,
+    PathRequiredSize_out: Optional<PDWORD>,
   ): UINT {
     return Setupapi.Load('SetupCopyErrorW')(hwndParent, DialogTitle, DiskName, PathToSource, SourceFile, TargetPathFile, Win32ErrorCode, Style, PathBuffer_out, PathBufferSize, PathRequiredSize_out);
   }
@@ -575,13 +575,13 @@ class Setupapi extends Win32 {
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupcopyoeminfa
   public static SetupCopyOEMInfA(
     SourceInfFileName: PCSTR,
-    OEMSourceMediaLocation: OPTIONAL<PCSTR>,
+    OEMSourceMediaLocation: Optional<PCSTR>,
     OEMSourceMediaType: DWORD,
     CopyStyle: DWORD,
-    DestinationInfFileName_out: OPTIONAL<PSTR>,
+    DestinationInfFileName_out: Optional<PSTR>,
     DestinationInfFileNameSize: DWORD,
-    RequiredSize_out: OPTIONAL<PDWORD>,
-    DestinationInfFileNameComponent_out: OPTIONAL<PPSTR>,
+    RequiredSize_out: Optional<PDWORD>,
+    DestinationInfFileNameComponent_out: Optional<PPSTR>,
   ): BOOL {
     return Setupapi.Load('SetupCopyOEMInfA')(SourceInfFileName, OEMSourceMediaLocation, OEMSourceMediaType, CopyStyle, DestinationInfFileName_out, DestinationInfFileNameSize, RequiredSize_out, DestinationInfFileNameComponent_out);
   }
@@ -589,34 +589,34 @@ class Setupapi extends Win32 {
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupcopyoeminfw
   public static SetupCopyOEMInfW(
     SourceInfFileName: PCWSTR,
-    OEMSourceMediaLocation: OPTIONAL<PCWSTR>,
+    OEMSourceMediaLocation: Optional<PCWSTR>,
     OEMSourceMediaType: DWORD,
     CopyStyle: DWORD,
-    DestinationInfFileName_out: OPTIONAL<PWSTR>,
+    DestinationInfFileName_out: Optional<PWSTR>,
     DestinationInfFileNameSize: DWORD,
-    RequiredSize_out: OPTIONAL<PDWORD>,
-    DestinationInfFileNameComponent_out: OPTIONAL<PPWSTR>,
+    RequiredSize_out: Optional<PDWORD>,
+    DestinationInfFileNameComponent_out: Optional<PPWSTR>,
   ): BOOL {
     return Setupapi.Load('SetupCopyOEMInfW')(SourceInfFileName, OEMSourceMediaLocation, OEMSourceMediaType, CopyStyle, DestinationInfFileName_out, DestinationInfFileNameSize, RequiredSize_out, DestinationInfFileNameComponent_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupcreatediskspacelista
-  public static SetupCreateDiskSpaceListA(Reserved1: OPTIONAL<PVOID>, Reserved2: DWORD, Flags: UINT): HDSKSPC {
+  public static SetupCreateDiskSpaceListA(Reserved1: Optional<PVOID>, Reserved2: DWORD, Flags: UINT): HDSKSPC {
     return Setupapi.Load('SetupCreateDiskSpaceListA')(Reserved1, Reserved2, Flags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupcreatediskspacelistw
-  public static SetupCreateDiskSpaceListW(Reserved1: OPTIONAL<PVOID>, Reserved2: DWORD, Flags: UINT): HDSKSPC {
+  public static SetupCreateDiskSpaceListW(Reserved1: Optional<PVOID>, Reserved2: DWORD, Flags: UINT): HDSKSPC {
     return Setupapi.Load('SetupCreateDiskSpaceListW')(Reserved1, Reserved2, Flags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdecompressorcopyfilea
-  public static SetupDecompressOrCopyFileA(SourceFileName: PCSTR, TargetFileName: PCSTR, CompressionType: OPTIONAL<PUINT>): DWORD {
+  public static SetupDecompressOrCopyFileA(SourceFileName: PCSTR, TargetFileName: PCSTR, CompressionType: Optional<PUINT>): DWORD {
     return Setupapi.Load('SetupDecompressOrCopyFileA')(SourceFileName, TargetFileName, CompressionType);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdecompressorcopyfilew
-  public static SetupDecompressOrCopyFileW(SourceFileName: PCWSTR, TargetFileName: PCWSTR, CompressionType: OPTIONAL<PUINT>): DWORD {
+  public static SetupDecompressOrCopyFileW(SourceFileName: PCWSTR, TargetFileName: PCWSTR, CompressionType: Optional<PUINT>): DWORD {
     return Setupapi.Load('SetupDecompressOrCopyFileW')(SourceFileName, TargetFileName, CompressionType);
   }
 
@@ -631,12 +631,12 @@ class Setupapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdeleteerrora
-  public static SetupDeleteErrorA(hwndParent: HWND, DialogTitle: OPTIONAL<PCSTR>, File: PCSTR, Win32ErrorCode: UINT, Style: DWORD): UINT {
+  public static SetupDeleteErrorA(hwndParent: HWND, DialogTitle: Optional<PCSTR>, File: PCSTR, Win32ErrorCode: UINT, Style: DWORD): UINT {
     return Setupapi.Load('SetupDeleteErrorA')(hwndParent, DialogTitle, File, Win32ErrorCode, Style);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdeleteerrorw
-  public static SetupDeleteErrorW(hwndParent: HWND, DialogTitle: OPTIONAL<PCWSTR>, File: PCWSTR, Win32ErrorCode: UINT, Style: DWORD): UINT {
+  public static SetupDeleteErrorW(hwndParent: HWND, DialogTitle: Optional<PCWSTR>, File: PCWSTR, Win32ErrorCode: UINT, Style: DWORD): UINT {
     return Setupapi.Load('SetupDeleteErrorW')(hwndParent, DialogTitle, File, Win32ErrorCode, Style);
   }
 
@@ -646,32 +646,32 @@ class Setupapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdiaskforoemdisk
-  public static SetupDiAskForOEMDisk(DeviceInfoSet: HDEVINFO, DeviceInfoData: OPTIONAL<PSP_DEVINFO_DATA>): BOOL {
+  public static SetupDiAskForOEMDisk(DeviceInfoSet: HDEVINFO, DeviceInfoData: Optional<PSP_DEVINFO_DATA>): BOOL {
     return Setupapi.Load('SetupDiAskForOEMDisk')(DeviceInfoSet, DeviceInfoData);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdibuildclassinfolist
-  public static SetupDiBuildClassInfoList(Flags: DWORD, ClassGuidList_out: OPTIONAL<LPGUID>, ClassGuidListSize: DWORD, RequiredSize_out: PDWORD): BOOL {
+  public static SetupDiBuildClassInfoList(Flags: DWORD, ClassGuidList_out: Optional<LPGUID>, ClassGuidListSize: DWORD, RequiredSize_out: PDWORD): BOOL {
     return Setupapi.Load('SetupDiBuildClassInfoList')(Flags, ClassGuidList_out, ClassGuidListSize, RequiredSize_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdibuildclassinfolistexa
-  public static SetupDiBuildClassInfoListExA(Flags: DWORD, ClassGuidList_out: OPTIONAL<LPGUID>, ClassGuidListSize: DWORD, RequiredSize_out: PDWORD, MachineName: OPTIONAL<PCSTR>, Reserved: OPTIONAL<PVOID>): BOOL {
+  public static SetupDiBuildClassInfoListExA(Flags: DWORD, ClassGuidList_out: Optional<LPGUID>, ClassGuidListSize: DWORD, RequiredSize_out: PDWORD, MachineName: Optional<PCSTR>, Reserved: Optional<PVOID>): BOOL {
     return Setupapi.Load('SetupDiBuildClassInfoListExA')(Flags, ClassGuidList_out, ClassGuidListSize, RequiredSize_out, MachineName, Reserved);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdibuildclassinfolistexw
-  public static SetupDiBuildClassInfoListExW(Flags: DWORD, ClassGuidList_out: OPTIONAL<LPGUID>, ClassGuidListSize: DWORD, RequiredSize_out: PDWORD, MachineName: OPTIONAL<PCWSTR>, Reserved: OPTIONAL<PVOID>): BOOL {
+  public static SetupDiBuildClassInfoListExW(Flags: DWORD, ClassGuidList_out: Optional<LPGUID>, ClassGuidListSize: DWORD, RequiredSize_out: PDWORD, MachineName: Optional<PCWSTR>, Reserved: Optional<PVOID>): BOOL {
     return Setupapi.Load('SetupDiBuildClassInfoListExW')(Flags, ClassGuidList_out, ClassGuidListSize, RequiredSize_out, MachineName, Reserved);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdibuilddriverinfolist
-  public static SetupDiBuildDriverInfoList(DeviceInfoSet: HDEVINFO, DeviceInfoData_in_out: OPTIONAL<PSP_DEVINFO_DATA>, DriverType: DWORD): BOOL {
+  public static SetupDiBuildDriverInfoList(DeviceInfoSet: HDEVINFO, DeviceInfoData_in_out: Optional<PSP_DEVINFO_DATA>, DriverType: DWORD): BOOL {
     return Setupapi.Load('SetupDiBuildDriverInfoList')(DeviceInfoSet, DeviceInfoData_in_out, DriverType);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdicallclassinstaller
-  public static SetupDiCallClassInstaller(InstallFunction: DI_FUNCTION, DeviceInfoSet: HDEVINFO, DeviceInfoData: OPTIONAL<PSP_DEVINFO_DATA>): BOOL {
+  public static SetupDiCallClassInstaller(InstallFunction: DI_FUNCTION, DeviceInfoSet: HDEVINFO, DeviceInfoData: Optional<PSP_DEVINFO_DATA>): BOOL {
     return Setupapi.Load('SetupDiCallClassInstaller')(InstallFunction, DeviceInfoSet, DeviceInfoData);
   }
 
@@ -691,12 +691,12 @@ class Setupapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdiclassguidsfromnameexa
-  public static SetupDiClassGuidsFromNameExA(ClassName: PCSTR, ClassGuidList_out: LPGUID, ClassGuidListSize: DWORD, RequiredSize_out: PDWORD, MachineName: OPTIONAL<PCSTR>, Reserved: OPTIONAL<PVOID>): BOOL {
+  public static SetupDiClassGuidsFromNameExA(ClassName: PCSTR, ClassGuidList_out: LPGUID, ClassGuidListSize: DWORD, RequiredSize_out: PDWORD, MachineName: Optional<PCSTR>, Reserved: Optional<PVOID>): BOOL {
     return Setupapi.Load('SetupDiClassGuidsFromNameExA')(ClassName, ClassGuidList_out, ClassGuidListSize, RequiredSize_out, MachineName, Reserved);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdiclassguidsfromnameexw
-  public static SetupDiClassGuidsFromNameExW(ClassName: PCWSTR, ClassGuidList_out: LPGUID, ClassGuidListSize: DWORD, RequiredSize_out: PDWORD, MachineName: OPTIONAL<PCWSTR>, Reserved: OPTIONAL<PVOID>): BOOL {
+  public static SetupDiClassGuidsFromNameExW(ClassName: PCWSTR, ClassGuidList_out: LPGUID, ClassGuidListSize: DWORD, RequiredSize_out: PDWORD, MachineName: Optional<PCWSTR>, Reserved: Optional<PVOID>): BOOL {
     return Setupapi.Load('SetupDiClassGuidsFromNameExW')(ClassName, ClassGuidList_out, ClassGuidListSize, RequiredSize_out, MachineName, Reserved);
   }
 
@@ -706,32 +706,32 @@ class Setupapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdiclassnamefromguida
-  public static SetupDiClassNameFromGuidA(ClassGuid: LPGUID, ClassName_out: PSTR, ClassNameSize: DWORD, RequiredSize_out: OPTIONAL<PDWORD>): BOOL {
+  public static SetupDiClassNameFromGuidA(ClassGuid: LPGUID, ClassName_out: PSTR, ClassNameSize: DWORD, RequiredSize_out: Optional<PDWORD>): BOOL {
     return Setupapi.Load('SetupDiClassNameFromGuidA')(ClassGuid, ClassName_out, ClassNameSize, RequiredSize_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdiclassnamefromguidexa
-  public static SetupDiClassNameFromGuidExA(ClassGuid: LPGUID, ClassName_out: PSTR, ClassNameSize: DWORD, RequiredSize_out: OPTIONAL<PDWORD>, MachineName: OPTIONAL<PCSTR>, Reserved: OPTIONAL<PVOID>): BOOL {
+  public static SetupDiClassNameFromGuidExA(ClassGuid: LPGUID, ClassName_out: PSTR, ClassNameSize: DWORD, RequiredSize_out: Optional<PDWORD>, MachineName: Optional<PCSTR>, Reserved: Optional<PVOID>): BOOL {
     return Setupapi.Load('SetupDiClassNameFromGuidExA')(ClassGuid, ClassName_out, ClassNameSize, RequiredSize_out, MachineName, Reserved);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdiclassnamefromguidexw
-  public static SetupDiClassNameFromGuidExW(ClassGuid: LPGUID, ClassName_out: PWSTR, ClassNameSize: DWORD, RequiredSize_out: OPTIONAL<PDWORD>, MachineName: OPTIONAL<PCWSTR>, Reserved: OPTIONAL<PVOID>): BOOL {
+  public static SetupDiClassNameFromGuidExW(ClassGuid: LPGUID, ClassName_out: PWSTR, ClassNameSize: DWORD, RequiredSize_out: Optional<PDWORD>, MachineName: Optional<PCWSTR>, Reserved: Optional<PVOID>): BOOL {
     return Setupapi.Load('SetupDiClassNameFromGuidExW')(ClassGuid, ClassName_out, ClassNameSize, RequiredSize_out, MachineName, Reserved);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdiclassnamefromguidw
-  public static SetupDiClassNameFromGuidW(ClassGuid: LPGUID, ClassName_out: PWSTR, ClassNameSize: DWORD, RequiredSize_out: OPTIONAL<PDWORD>): BOOL {
+  public static SetupDiClassNameFromGuidW(ClassGuid: LPGUID, ClassName_out: PWSTR, ClassNameSize: DWORD, RequiredSize_out: Optional<PDWORD>): BOOL {
     return Setupapi.Load('SetupDiClassNameFromGuidW')(ClassGuid, ClassName_out, ClassNameSize, RequiredSize_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdicreatedevregkeya
-  public static SetupDiCreateDevRegKeyA(DeviceInfoSet: HDEVINFO, DeviceInfoData: PSP_DEVINFO_DATA, Scope: DWORD, HwProfile: DWORD, KeyType: DWORD, InfHandle: OPTIONAL<HINF>, InfSectionName: OPTIONAL<PCSTR>): HKEY {
+  public static SetupDiCreateDevRegKeyA(DeviceInfoSet: HDEVINFO, DeviceInfoData: PSP_DEVINFO_DATA, Scope: DWORD, HwProfile: DWORD, KeyType: DWORD, InfHandle: Optional<HINF>, InfSectionName: Optional<PCSTR>): HKEY {
     return Setupapi.Load('SetupDiCreateDevRegKeyA')(DeviceInfoSet, DeviceInfoData, Scope, HwProfile, KeyType, InfHandle, InfSectionName);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdicreatedevregkeyw
-  public static SetupDiCreateDevRegKeyW(DeviceInfoSet: HDEVINFO, DeviceInfoData: PSP_DEVINFO_DATA, Scope: DWORD, HwProfile: DWORD, KeyType: DWORD, InfHandle: OPTIONAL<HINF>, InfSectionName: OPTIONAL<PCWSTR>): HKEY {
+  public static SetupDiCreateDevRegKeyW(DeviceInfoSet: HDEVINFO, DeviceInfoData: PSP_DEVINFO_DATA, Scope: DWORD, HwProfile: DWORD, KeyType: DWORD, InfHandle: Optional<HINF>, InfSectionName: Optional<PCWSTR>): HKEY {
     return Setupapi.Load('SetupDiCreateDevRegKeyW')(DeviceInfoSet, DeviceInfoData, Scope, HwProfile, KeyType, InfHandle, InfSectionName);
   }
 
@@ -740,26 +740,26 @@ class Setupapi extends Win32 {
     DeviceInfoSet: HDEVINFO,
     DeviceName: PCSTR,
     ClassGuid: LPGUID,
-    DeviceDescription: OPTIONAL<PCSTR>,
-    hwndParent: OPTIONAL<HWND>,
+    DeviceDescription: Optional<PCSTR>,
+    hwndParent: Optional<HWND>,
     CreationFlags: DWORD,
-    DeviceInfoData_out: OPTIONAL<PSP_DEVINFO_DATA>,
+    DeviceInfoData_out: Optional<PSP_DEVINFO_DATA>,
   ): BOOL {
     return Setupapi.Load('SetupDiCreateDeviceInfoA')(DeviceInfoSet, DeviceName, ClassGuid, DeviceDescription, hwndParent, CreationFlags, DeviceInfoData_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdicreatedeviceinfolist
-  public static SetupDiCreateDeviceInfoList(ClassGuid: OPTIONAL<LPGUID>, hwndParent: OPTIONAL<HWND>): HDEVINFO {
+  public static SetupDiCreateDeviceInfoList(ClassGuid: Optional<LPGUID>, hwndParent: Optional<HWND>): HDEVINFO {
     return Setupapi.Load('SetupDiCreateDeviceInfoList')(ClassGuid, hwndParent);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdicreatedeviceinfolistexa
-  public static SetupDiCreateDeviceInfoListExA(ClassGuid: OPTIONAL<LPGUID>, hwndParent: OPTIONAL<HWND>, MachineName: OPTIONAL<PCSTR>, Reserved: OPTIONAL<PVOID>): HDEVINFO {
+  public static SetupDiCreateDeviceInfoListExA(ClassGuid: Optional<LPGUID>, hwndParent: Optional<HWND>, MachineName: Optional<PCSTR>, Reserved: Optional<PVOID>): HDEVINFO {
     return Setupapi.Load('SetupDiCreateDeviceInfoListExA')(ClassGuid, hwndParent, MachineName, Reserved);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdicreatedeviceinfolistexw
-  public static SetupDiCreateDeviceInfoListExW(ClassGuid: OPTIONAL<LPGUID>, hwndParent: OPTIONAL<HWND>, MachineName: OPTIONAL<PCWSTR>, Reserved: OPTIONAL<PVOID>): HDEVINFO {
+  public static SetupDiCreateDeviceInfoListExW(ClassGuid: Optional<LPGUID>, hwndParent: Optional<HWND>, MachineName: Optional<PCWSTR>, Reserved: Optional<PVOID>): HDEVINFO {
     return Setupapi.Load('SetupDiCreateDeviceInfoListExW')(ClassGuid, hwndParent, MachineName, Reserved);
   }
 
@@ -768,10 +768,10 @@ class Setupapi extends Win32 {
     DeviceInfoSet: HDEVINFO,
     DeviceName: PCWSTR,
     ClassGuid: LPGUID,
-    DeviceDescription: OPTIONAL<PCWSTR>,
-    hwndParent: OPTIONAL<HWND>,
+    DeviceDescription: Optional<PCWSTR>,
+    hwndParent: Optional<HWND>,
     CreationFlags: DWORD,
-    DeviceInfoData_out: OPTIONAL<PSP_DEVINFO_DATA>,
+    DeviceInfoData_out: Optional<PSP_DEVINFO_DATA>,
   ): BOOL {
     return Setupapi.Load('SetupDiCreateDeviceInfoW')(DeviceInfoSet, DeviceName, ClassGuid, DeviceDescription, hwndParent, CreationFlags, DeviceInfoData_out);
   }
@@ -781,20 +781,20 @@ class Setupapi extends Win32 {
     DeviceInfoSet: HDEVINFO,
     DeviceInfoData: PSP_DEVINFO_DATA,
     InterfaceClassGuid: LPGUID,
-    ReferenceString: OPTIONAL<PCSTR>,
+    ReferenceString: Optional<PCSTR>,
     CreationFlags: DWORD,
-    DeviceInterfaceData_out: OPTIONAL<PSP_DEVICE_INTERFACE_DATA>,
+    DeviceInterfaceData_out: Optional<PSP_DEVICE_INTERFACE_DATA>,
   ): BOOL {
     return Setupapi.Load('SetupDiCreateDeviceInterfaceA')(DeviceInfoSet, DeviceInfoData, InterfaceClassGuid, ReferenceString, CreationFlags, DeviceInterfaceData_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdicreatedeviceinterfaceregkeya
-  public static SetupDiCreateDeviceInterfaceRegKeyA(DeviceInfoSet: HDEVINFO, DeviceInterfaceData: PSP_DEVICE_INTERFACE_DATA, Reserved: DWORD, samDesired: REGSAM, InfHandle: OPTIONAL<HINF>, InfSectionName: OPTIONAL<PCSTR>): HKEY {
+  public static SetupDiCreateDeviceInterfaceRegKeyA(DeviceInfoSet: HDEVINFO, DeviceInterfaceData: PSP_DEVICE_INTERFACE_DATA, Reserved: DWORD, samDesired: REGSAM, InfHandle: Optional<HINF>, InfSectionName: Optional<PCSTR>): HKEY {
     return Setupapi.Load('SetupDiCreateDeviceInterfaceRegKeyA')(DeviceInfoSet, DeviceInterfaceData, Reserved, samDesired, InfHandle, InfSectionName);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdicreatedeviceinterfaceregkeyw
-  public static SetupDiCreateDeviceInterfaceRegKeyW(DeviceInfoSet: HDEVINFO, DeviceInterfaceData: PSP_DEVICE_INTERFACE_DATA, Reserved: DWORD, samDesired: REGSAM, InfHandle: OPTIONAL<HINF>, InfSectionName: OPTIONAL<PCWSTR>): HKEY {
+  public static SetupDiCreateDeviceInterfaceRegKeyW(DeviceInfoSet: HDEVINFO, DeviceInterfaceData: PSP_DEVICE_INTERFACE_DATA, Reserved: DWORD, samDesired: REGSAM, InfHandle: Optional<HINF>, InfSectionName: Optional<PCWSTR>): HKEY {
     return Setupapi.Load('SetupDiCreateDeviceInterfaceRegKeyW')(DeviceInfoSet, DeviceInterfaceData, Reserved, samDesired, InfHandle, InfSectionName);
   }
 
@@ -803,9 +803,9 @@ class Setupapi extends Win32 {
     DeviceInfoSet: HDEVINFO,
     DeviceInfoData: PSP_DEVINFO_DATA,
     InterfaceClassGuid: LPGUID,
-    ReferenceString: OPTIONAL<PCWSTR>,
+    ReferenceString: Optional<PCWSTR>,
     CreationFlags: DWORD,
-    DeviceInterfaceData_out: OPTIONAL<PSP_DEVICE_INTERFACE_DATA>,
+    DeviceInterfaceData_out: Optional<PSP_DEVICE_INTERFACE_DATA>,
   ): BOOL {
     return Setupapi.Load('SetupDiCreateDeviceInterfaceW')(DeviceInfoSet, DeviceInfoData, InterfaceClassGuid, ReferenceString, CreationFlags, DeviceInterfaceData_out);
   }
@@ -841,7 +841,7 @@ class Setupapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdidestroydriverinfolist
-  public static SetupDiDestroyDriverInfoList(DeviceInfoSet: HDEVINFO, DeviceInfoData: OPTIONAL<PSP_DEVINFO_DATA>, DriverType: DWORD): BOOL {
+  public static SetupDiDestroyDriverInfoList(DeviceInfoSet: HDEVINFO, DeviceInfoData: Optional<PSP_DEVINFO_DATA>, DriverType: DWORD): BOOL {
     return Setupapi.Load('SetupDiDestroyDriverInfoList')(DeviceInfoSet, DeviceInfoData, DriverType);
   }
 
@@ -856,28 +856,28 @@ class Setupapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdienumdeviceinterfaces
-  public static SetupDiEnumDeviceInterfaces(DeviceInfoSet: HDEVINFO, DeviceInfoData: OPTIONAL<PSP_DEVINFO_DATA>, InterfaceClassGuid: LPGUID, MemberIndex: DWORD, DeviceInterfaceData_out: PSP_DEVICE_INTERFACE_DATA): BOOL {
+  public static SetupDiEnumDeviceInterfaces(DeviceInfoSet: HDEVINFO, DeviceInfoData: Optional<PSP_DEVINFO_DATA>, InterfaceClassGuid: LPGUID, MemberIndex: DWORD, DeviceInterfaceData_out: PSP_DEVICE_INTERFACE_DATA): BOOL {
     return Setupapi.Load('SetupDiEnumDeviceInterfaces')(DeviceInfoSet, DeviceInfoData, InterfaceClassGuid, MemberIndex, DeviceInterfaceData_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdienumdriverinfoa
-  public static SetupDiEnumDriverInfoA(DeviceInfoSet: HDEVINFO, DeviceInfoData: OPTIONAL<PSP_DEVINFO_DATA>, DriverType: DWORD, MemberIndex: DWORD, DriverInfoData_out: PSP_DRVINFO_DATA_A): BOOL {
+  public static SetupDiEnumDriverInfoA(DeviceInfoSet: HDEVINFO, DeviceInfoData: Optional<PSP_DEVINFO_DATA>, DriverType: DWORD, MemberIndex: DWORD, DriverInfoData_out: PSP_DRVINFO_DATA_A): BOOL {
     return Setupapi.Load('SetupDiEnumDriverInfoA')(DeviceInfoSet, DeviceInfoData, DriverType, MemberIndex, DriverInfoData_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdienumdriverinfow
-  public static SetupDiEnumDriverInfoW(DeviceInfoSet: HDEVINFO, DeviceInfoData: OPTIONAL<PSP_DEVINFO_DATA>, DriverType: DWORD, MemberIndex: DWORD, DriverInfoData_out: PSP_DRVINFO_DATA_W): BOOL {
+  public static SetupDiEnumDriverInfoW(DeviceInfoSet: HDEVINFO, DeviceInfoData: Optional<PSP_DEVINFO_DATA>, DriverType: DWORD, MemberIndex: DWORD, DriverInfoData_out: PSP_DRVINFO_DATA_W): BOOL {
     return Setupapi.Load('SetupDiEnumDriverInfoW')(DeviceInfoSet, DeviceInfoData, DriverType, MemberIndex, DriverInfoData_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdigetactualmodelssectiona
   public static SetupDiGetActualModelsSectionA(
     Context: PINFCONTEXT,
-    AlternatePlatformInfo: OPTIONAL<PSP_ALTPLATFORM_INFO>,
-    InfSectionWithExt_out: OPTIONAL<PSTR>,
+    AlternatePlatformInfo: Optional<PSP_ALTPLATFORM_INFO>,
+    InfSectionWithExt_out: Optional<PSTR>,
     InfSectionWithExtSize: DWORD,
-    RequiredSize_out: OPTIONAL<PDWORD>,
-    Reserved: OPTIONAL<PVOID>,
+    RequiredSize_out: Optional<PDWORD>,
+    Reserved: Optional<PVOID>,
   ): BOOL {
     return Setupapi.Load('SetupDiGetActualModelsSectionA')(Context, AlternatePlatformInfo, InfSectionWithExt_out, InfSectionWithExtSize, RequiredSize_out, Reserved);
   }
@@ -885,17 +885,17 @@ class Setupapi extends Win32 {
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdigetactualmodelssectionw
   public static SetupDiGetActualModelsSectionW(
     Context: PINFCONTEXT,
-    AlternatePlatformInfo: OPTIONAL<PSP_ALTPLATFORM_INFO>,
-    InfSectionWithExt_out: OPTIONAL<PWSTR>,
+    AlternatePlatformInfo: Optional<PSP_ALTPLATFORM_INFO>,
+    InfSectionWithExt_out: Optional<PWSTR>,
     InfSectionWithExtSize: DWORD,
-    RequiredSize_out: OPTIONAL<PDWORD>,
-    Reserved: OPTIONAL<PVOID>,
+    RequiredSize_out: Optional<PDWORD>,
+    Reserved: Optional<PVOID>,
   ): BOOL {
     return Setupapi.Load('SetupDiGetActualModelsSectionW')(Context, AlternatePlatformInfo, InfSectionWithExt_out, InfSectionWithExtSize, RequiredSize_out, Reserved);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdigetactualsectiontoinstalla
-  public static SetupDiGetActualSectionToInstallA(InfHandle: HINF, InfSectionName: PCSTR, InfSectionWithExt_out: OPTIONAL<PSTR>, InfSectionWithExtSize: DWORD, RequiredSize_out: OPTIONAL<PDWORD>, Extension_out: OPTIONAL<PPSTR>): BOOL {
+  public static SetupDiGetActualSectionToInstallA(InfHandle: HINF, InfSectionName: PCSTR, InfSectionWithExt_out: Optional<PSTR>, InfSectionWithExtSize: DWORD, RequiredSize_out: Optional<PDWORD>, Extension_out: Optional<PPSTR>): BOOL {
     return Setupapi.Load('SetupDiGetActualSectionToInstallA')(InfHandle, InfSectionName, InfSectionWithExt_out, InfSectionWithExtSize, RequiredSize_out, Extension_out);
   }
 
@@ -903,12 +903,12 @@ class Setupapi extends Win32 {
   public static SetupDiGetActualSectionToInstallExA(
     InfHandle: HINF,
     InfSectionName: PCSTR,
-    AlternatePlatformInfo: OPTIONAL<PSP_ALTPLATFORM_INFO>,
-    InfSectionWithExt_out: OPTIONAL<PSTR>,
+    AlternatePlatformInfo: Optional<PSP_ALTPLATFORM_INFO>,
+    InfSectionWithExt_out: Optional<PSTR>,
     InfSectionWithExtSize: DWORD,
-    RequiredSize_out: OPTIONAL<PDWORD>,
-    Extension_out: OPTIONAL<PPSTR>,
-    Reserved: OPTIONAL<PVOID>,
+    RequiredSize_out: Optional<PDWORD>,
+    Extension_out: Optional<PPSTR>,
+    Reserved: Optional<PVOID>,
   ): BOOL {
     return Setupapi.Load('SetupDiGetActualSectionToInstallExA')(InfHandle, InfSectionName, AlternatePlatformInfo, InfSectionWithExt_out, InfSectionWithExtSize, RequiredSize_out, Extension_out, Reserved);
   }
@@ -917,53 +917,53 @@ class Setupapi extends Win32 {
   public static SetupDiGetActualSectionToInstallExW(
     InfHandle: HINF,
     InfSectionName: PCWSTR,
-    AlternatePlatformInfo: OPTIONAL<PSP_ALTPLATFORM_INFO>,
-    InfSectionWithExt_out: OPTIONAL<PWSTR>,
+    AlternatePlatformInfo: Optional<PSP_ALTPLATFORM_INFO>,
+    InfSectionWithExt_out: Optional<PWSTR>,
     InfSectionWithExtSize: DWORD,
-    RequiredSize_out: OPTIONAL<PDWORD>,
-    Extension_out: OPTIONAL<PPWSTR>,
-    Reserved: OPTIONAL<PVOID>,
+    RequiredSize_out: Optional<PDWORD>,
+    Extension_out: Optional<PPWSTR>,
+    Reserved: Optional<PVOID>,
   ): BOOL {
     return Setupapi.Load('SetupDiGetActualSectionToInstallExW')(InfHandle, InfSectionName, AlternatePlatformInfo, InfSectionWithExt_out, InfSectionWithExtSize, RequiredSize_out, Extension_out, Reserved);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdigetactualsectiontoinstallw
-  public static SetupDiGetActualSectionToInstallW(InfHandle: HINF, InfSectionName: PCWSTR, InfSectionWithExt_out: OPTIONAL<PWSTR>, InfSectionWithExtSize: DWORD, RequiredSize_out: OPTIONAL<PDWORD>, Extension_out: OPTIONAL<PPWSTR>): BOOL {
+  public static SetupDiGetActualSectionToInstallW(InfHandle: HINF, InfSectionName: PCWSTR, InfSectionWithExt_out: Optional<PWSTR>, InfSectionWithExtSize: DWORD, RequiredSize_out: Optional<PDWORD>, Extension_out: Optional<PPWSTR>): BOOL {
     return Setupapi.Load('SetupDiGetActualSectionToInstallW')(InfHandle, InfSectionName, InfSectionWithExt_out, InfSectionWithExtSize, RequiredSize_out, Extension_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdigetclassbitmapindex
-  public static SetupDiGetClassBitmapIndex(ClassGuid: OPTIONAL<LPGUID>, MiniIconIndex_out: PINT): BOOL {
+  public static SetupDiGetClassBitmapIndex(ClassGuid: Optional<LPGUID>, MiniIconIndex_out: PINT): BOOL {
     return Setupapi.Load('SetupDiGetClassBitmapIndex')(ClassGuid, MiniIconIndex_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdigetclassdescriptiona
-  public static SetupDiGetClassDescriptionA(ClassGuid: LPGUID, ClassDescription_out: PSTR, ClassDescriptionSize: DWORD, RequiredSize_out: OPTIONAL<PDWORD>): BOOL {
+  public static SetupDiGetClassDescriptionA(ClassGuid: LPGUID, ClassDescription_out: PSTR, ClassDescriptionSize: DWORD, RequiredSize_out: Optional<PDWORD>): BOOL {
     return Setupapi.Load('SetupDiGetClassDescriptionA')(ClassGuid, ClassDescription_out, ClassDescriptionSize, RequiredSize_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdigetclassdescriptionexa
-  public static SetupDiGetClassDescriptionExA(ClassGuid: LPGUID, ClassDescription_out: PSTR, ClassDescriptionSize: DWORD, RequiredSize_out: OPTIONAL<PDWORD>, MachineName: OPTIONAL<PCSTR>, Reserved: OPTIONAL<PVOID>): BOOL {
+  public static SetupDiGetClassDescriptionExA(ClassGuid: LPGUID, ClassDescription_out: PSTR, ClassDescriptionSize: DWORD, RequiredSize_out: Optional<PDWORD>, MachineName: Optional<PCSTR>, Reserved: Optional<PVOID>): BOOL {
     return Setupapi.Load('SetupDiGetClassDescriptionExA')(ClassGuid, ClassDescription_out, ClassDescriptionSize, RequiredSize_out, MachineName, Reserved);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdigetclassdescriptionexw
-  public static SetupDiGetClassDescriptionExW(ClassGuid: LPGUID, ClassDescription_out: PWSTR, ClassDescriptionSize: DWORD, RequiredSize_out: OPTIONAL<PDWORD>, MachineName: OPTIONAL<PCWSTR>, Reserved: OPTIONAL<PVOID>): BOOL {
+  public static SetupDiGetClassDescriptionExW(ClassGuid: LPGUID, ClassDescription_out: PWSTR, ClassDescriptionSize: DWORD, RequiredSize_out: Optional<PDWORD>, MachineName: Optional<PCWSTR>, Reserved: Optional<PVOID>): BOOL {
     return Setupapi.Load('SetupDiGetClassDescriptionExW')(ClassGuid, ClassDescription_out, ClassDescriptionSize, RequiredSize_out, MachineName, Reserved);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdigetclassdescriptionw
-  public static SetupDiGetClassDescriptionW(ClassGuid: LPGUID, ClassDescription_out: PWSTR, ClassDescriptionSize: DWORD, RequiredSize_out: OPTIONAL<PDWORD>): BOOL {
+  public static SetupDiGetClassDescriptionW(ClassGuid: LPGUID, ClassDescription_out: PWSTR, ClassDescriptionSize: DWORD, RequiredSize_out: Optional<PDWORD>): BOOL {
     return Setupapi.Load('SetupDiGetClassDescriptionW')(ClassGuid, ClassDescription_out, ClassDescriptionSize, RequiredSize_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdigetclassdevpropertysheetsa
   public static SetupDiGetClassDevPropertySheetsA(
     DeviceInfoSet: HDEVINFO,
-    DeviceInfoData: OPTIONAL<PSP_DEVINFO_DATA>,
+    DeviceInfoData: Optional<PSP_DEVINFO_DATA>,
     PropertySheetHeader: LPPROPSHEETHEADERA,
     PropertySheetHeaderPageListSize: DWORD,
-    RequiredSize_out: OPTIONAL<PDWORD>,
+    RequiredSize_out: Optional<PDWORD>,
     PropertySheetType: DWORD,
   ): BOOL {
     return Setupapi.Load('SetupDiGetClassDevPropertySheetsA')(DeviceInfoSet, DeviceInfoData, PropertySheetHeader, PropertySheetHeaderPageListSize, RequiredSize_out, PropertySheetType);
@@ -972,48 +972,48 @@ class Setupapi extends Win32 {
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdigetclassdevpropertysheetsw
   public static SetupDiGetClassDevPropertySheetsW(
     DeviceInfoSet: HDEVINFO,
-    DeviceInfoData: OPTIONAL<PSP_DEVINFO_DATA>,
+    DeviceInfoData: Optional<PSP_DEVINFO_DATA>,
     PropertySheetHeader: LPPROPSHEETHEADERW,
     PropertySheetHeaderPageListSize: DWORD,
-    RequiredSize_out: OPTIONAL<PDWORD>,
+    RequiredSize_out: Optional<PDWORD>,
     PropertySheetType: DWORD,
   ): BOOL {
     return Setupapi.Load('SetupDiGetClassDevPropertySheetsW')(DeviceInfoSet, DeviceInfoData, PropertySheetHeader, PropertySheetHeaderPageListSize, RequiredSize_out, PropertySheetType);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdigetclassdevsa
-  public static SetupDiGetClassDevsA(ClassGuid: OPTIONAL<LPGUID>, Enumerator: OPTIONAL<PCSTR>, hwndParent: OPTIONAL<HWND>, Flags: DWORD): HDEVINFO {
+  public static SetupDiGetClassDevsA(ClassGuid: Optional<LPGUID>, Enumerator: Optional<PCSTR>, hwndParent: Optional<HWND>, Flags: DWORD): HDEVINFO {
     return Setupapi.Load('SetupDiGetClassDevsA')(ClassGuid, Enumerator, hwndParent, Flags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdigetclassdevsexa
   public static SetupDiGetClassDevsExA(
-    ClassGuid: OPTIONAL<LPGUID>,
-    Enumerator: OPTIONAL<PCSTR>,
-    hwndParent: OPTIONAL<HWND>,
+    ClassGuid: Optional<LPGUID>,
+    Enumerator: Optional<PCSTR>,
+    hwndParent: Optional<HWND>,
     Flags: DWORD,
-    DeviceInfoSet: OPTIONAL<HDEVINFO>,
-    MachineName: OPTIONAL<PCSTR>,
-    Reserved: OPTIONAL<PVOID>,
+    DeviceInfoSet: Optional<HDEVINFO>,
+    MachineName: Optional<PCSTR>,
+    Reserved: Optional<PVOID>,
   ): HDEVINFO {
     return Setupapi.Load('SetupDiGetClassDevsExA')(ClassGuid, Enumerator, hwndParent, Flags, DeviceInfoSet, MachineName, Reserved);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdigetclassdevsexw
   public static SetupDiGetClassDevsExW(
-    ClassGuid: OPTIONAL<LPGUID>,
-    Enumerator: OPTIONAL<PCWSTR>,
-    hwndParent: OPTIONAL<HWND>,
+    ClassGuid: Optional<LPGUID>,
+    Enumerator: Optional<PCWSTR>,
+    hwndParent: Optional<HWND>,
     Flags: DWORD,
-    DeviceInfoSet: OPTIONAL<HDEVINFO>,
-    MachineName: OPTIONAL<PCWSTR>,
-    Reserved: OPTIONAL<PVOID>,
+    DeviceInfoSet: Optional<HDEVINFO>,
+    MachineName: Optional<PCWSTR>,
+    Reserved: Optional<PVOID>,
   ): HDEVINFO {
     return Setupapi.Load('SetupDiGetClassDevsExW')(ClassGuid, Enumerator, hwndParent, Flags, DeviceInfoSet, MachineName, Reserved);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdigetclassdevsw
-  public static SetupDiGetClassDevsW(ClassGuid: OPTIONAL<LPGUID>, Enumerator: OPTIONAL<PCWSTR>, hwndParent: OPTIONAL<HWND>, Flags: DWORD): HDEVINFO {
+  public static SetupDiGetClassDevsW(ClassGuid: Optional<LPGUID>, Enumerator: Optional<PCWSTR>, hwndParent: Optional<HWND>, Flags: DWORD): HDEVINFO {
     return Setupapi.Load('SetupDiGetClassDevsW')(ClassGuid, Enumerator, hwndParent, Flags);
   }
 
@@ -1028,22 +1028,22 @@ class Setupapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdigetclassimagelistexa
-  public static SetupDiGetClassImageListExA(ClassImageListData_out: PSP_CLASSIMAGELIST_DATA, MachineName: OPTIONAL<PCSTR>, Reserved: OPTIONAL<PVOID>): BOOL {
+  public static SetupDiGetClassImageListExA(ClassImageListData_out: PSP_CLASSIMAGELIST_DATA, MachineName: Optional<PCSTR>, Reserved: Optional<PVOID>): BOOL {
     return Setupapi.Load('SetupDiGetClassImageListExA')(ClassImageListData_out, MachineName, Reserved);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdigetclassimagelistexw
-  public static SetupDiGetClassImageListExW(ClassImageListData_out: PSP_CLASSIMAGELIST_DATA, MachineName: OPTIONAL<PCWSTR>, Reserved: OPTIONAL<PVOID>): BOOL {
+  public static SetupDiGetClassImageListExW(ClassImageListData_out: PSP_CLASSIMAGELIST_DATA, MachineName: Optional<PCWSTR>, Reserved: Optional<PVOID>): BOOL {
     return Setupapi.Load('SetupDiGetClassImageListExW')(ClassImageListData_out, MachineName, Reserved);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdigetclassinstallparamsa
   public static SetupDiGetClassInstallParamsA(
     DeviceInfoSet: HDEVINFO,
-    DeviceInfoData: OPTIONAL<PSP_DEVINFO_DATA>,
-    ClassInstallParams_out: OPTIONAL<PSP_CLASSINSTALL_HEADER>,
+    DeviceInfoData: Optional<PSP_DEVINFO_DATA>,
+    ClassInstallParams_out: Optional<PSP_CLASSINSTALL_HEADER>,
     ClassInstallParamsSize: DWORD,
-    RequiredSize_out: OPTIONAL<PDWORD>,
+    RequiredSize_out: Optional<PDWORD>,
   ): BOOL {
     return Setupapi.Load('SetupDiGetClassInstallParamsA')(DeviceInfoSet, DeviceInfoData, ClassInstallParams_out, ClassInstallParamsSize, RequiredSize_out);
   }
@@ -1051,10 +1051,10 @@ class Setupapi extends Win32 {
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdigetclassinstallparamsw
   public static SetupDiGetClassInstallParamsW(
     DeviceInfoSet: HDEVINFO,
-    DeviceInfoData: OPTIONAL<PSP_DEVINFO_DATA>,
-    ClassInstallParams_out: OPTIONAL<PSP_CLASSINSTALL_HEADER>,
+    DeviceInfoData: Optional<PSP_DEVINFO_DATA>,
+    ClassInstallParams_out: Optional<PSP_CLASSINSTALL_HEADER>,
     ClassInstallParamsSize: DWORD,
-    RequiredSize_out: OPTIONAL<PDWORD>,
+    RequiredSize_out: Optional<PDWORD>,
   ): BOOL {
     return Setupapi.Load('SetupDiGetClassInstallParamsW')(DeviceInfoSet, DeviceInfoData, ClassInstallParams_out, ClassInstallParamsSize, RequiredSize_out);
   }
@@ -1064,36 +1064,36 @@ class Setupapi extends Win32 {
     ClassGuid: LPGUID,
     PropertyKey: PDEVPROPKEY,
     PropertyType_out: PDEVPROPTYPE,
-    PropertyBuffer_out: OPTIONAL<PBYTE>,
+    PropertyBuffer_out: Optional<PBYTE>,
     PropertyBufferSize: DWORD,
-    RequiredSize_out: OPTIONAL<PDWORD>,
+    RequiredSize_out: Optional<PDWORD>,
     Flags: DWORD,
-    MachineName: OPTIONAL<PCWSTR>,
-    Reserved: OPTIONAL<PVOID>,
+    MachineName: Optional<PCWSTR>,
+    Reserved: Optional<PVOID>,
   ): BOOL {
     return Setupapi.Load('SetupDiGetClassPropertyExW')(ClassGuid, PropertyKey, PropertyType_out, PropertyBuffer_out, PropertyBufferSize, RequiredSize_out, Flags, MachineName, Reserved);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdigetclasspropertykeys
-  public static SetupDiGetClassPropertyKeys(ClassGuid: LPGUID, PropertyKeyArray_out: OPTIONAL<PDEVPROPKEY>, PropertyKeyCount: DWORD, RequiredPropertyKeyCount_out: OPTIONAL<PDWORD>, Flags: DWORD): BOOL {
+  public static SetupDiGetClassPropertyKeys(ClassGuid: LPGUID, PropertyKeyArray_out: Optional<PDEVPROPKEY>, PropertyKeyCount: DWORD, RequiredPropertyKeyCount_out: Optional<PDWORD>, Flags: DWORD): BOOL {
     return Setupapi.Load('SetupDiGetClassPropertyKeys')(ClassGuid, PropertyKeyArray_out, PropertyKeyCount, RequiredPropertyKeyCount_out, Flags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdigetclasspropertykeysexw
   public static SetupDiGetClassPropertyKeysExW(
     ClassGuid: LPGUID,
-    PropertyKeyArray_out: OPTIONAL<PDEVPROPKEY>,
+    PropertyKeyArray_out: Optional<PDEVPROPKEY>,
     PropertyKeyCount: DWORD,
-    RequiredPropertyKeyCount_out: OPTIONAL<PDWORD>,
+    RequiredPropertyKeyCount_out: Optional<PDWORD>,
     Flags: DWORD,
-    MachineName: OPTIONAL<PCWSTR>,
-    Reserved: OPTIONAL<PVOID>,
+    MachineName: Optional<PCWSTR>,
+    Reserved: Optional<PVOID>,
   ): BOOL {
     return Setupapi.Load('SetupDiGetClassPropertyKeysExW')(ClassGuid, PropertyKeyArray_out, PropertyKeyCount, RequiredPropertyKeyCount_out, Flags, MachineName, Reserved);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdigetclasspropertyw
-  public static SetupDiGetClassPropertyW(ClassGuid: LPGUID, PropertyKey: PDEVPROPKEY, PropertyType_out: PDEVPROPTYPE, PropertyBuffer_out: OPTIONAL<PBYTE>, PropertyBufferSize: DWORD, RequiredSize_out: OPTIONAL<PDWORD>, Flags: DWORD): BOOL {
+  public static SetupDiGetClassPropertyW(ClassGuid: LPGUID, PropertyKey: PDEVPROPKEY, PropertyType_out: PDEVPROPTYPE, PropertyBuffer_out: Optional<PBYTE>, PropertyBufferSize: DWORD, RequiredSize_out: Optional<PDWORD>, Flags: DWORD): BOOL {
     return Setupapi.Load('SetupDiGetClassPropertyW')(ClassGuid, PropertyKey, PropertyType_out, PropertyBuffer_out, PropertyBufferSize, RequiredSize_out, Flags);
   }
 
@@ -1101,12 +1101,12 @@ class Setupapi extends Win32 {
   public static SetupDiGetClassRegistryPropertyA(
     ClassGuid: LPGUID,
     Property: DWORD,
-    PropertyRegDataType_out: OPTIONAL<PDWORD>,
+    PropertyRegDataType_out: Optional<PDWORD>,
     PropertyBuffer_out: PBYTE,
     PropertyBufferSize: DWORD,
-    RequiredSize_out: OPTIONAL<PDWORD>,
-    MachineName: OPTIONAL<PCSTR>,
-    Reserved: OPTIONAL<PVOID>,
+    RequiredSize_out: Optional<PDWORD>,
+    MachineName: Optional<PCSTR>,
+    Reserved: Optional<PVOID>,
   ): BOOL {
     return Setupapi.Load('SetupDiGetClassRegistryPropertyA')(ClassGuid, Property, PropertyRegDataType_out, PropertyBuffer_out, PropertyBufferSize, RequiredSize_out, MachineName, Reserved);
   }
@@ -1115,12 +1115,12 @@ class Setupapi extends Win32 {
   public static SetupDiGetClassRegistryPropertyW(
     ClassGuid: LPGUID,
     Property: DWORD,
-    PropertyRegDataType_out: OPTIONAL<PDWORD>,
+    PropertyRegDataType_out: Optional<PDWORD>,
     PropertyBuffer_out: PBYTE,
     PropertyBufferSize: DWORD,
-    RequiredSize_out: OPTIONAL<PDWORD>,
-    MachineName: OPTIONAL<PCWSTR>,
-    Reserved: OPTIONAL<PVOID>,
+    RequiredSize_out: Optional<PDWORD>,
+    MachineName: Optional<PCWSTR>,
+    Reserved: Optional<PVOID>,
   ): BOOL {
     return Setupapi.Load('SetupDiGetClassRegistryPropertyW')(ClassGuid, Property, PropertyRegDataType_out, PropertyBuffer_out, PropertyBufferSize, RequiredSize_out, MachineName, Reserved);
   }
@@ -1131,10 +1131,10 @@ class Setupapi extends Win32 {
     DeviceInfoData: PSP_DEVINFO_DATA,
     CustomPropertyName: PCSTR,
     Flags: DWORD,
-    PropertyRegDataType_out: OPTIONAL<PDWORD>,
+    PropertyRegDataType_out: Optional<PDWORD>,
     PropertyBuffer_out: PBYTE,
     PropertyBufferSize: DWORD,
-    RequiredSize_out: OPTIONAL<PDWORD>,
+    RequiredSize_out: Optional<PDWORD>,
   ): BOOL {
     return Setupapi.Load('SetupDiGetCustomDevicePropertyA')(DeviceInfoSet, DeviceInfoData, CustomPropertyName, Flags, PropertyRegDataType_out, PropertyBuffer_out, PropertyBufferSize, RequiredSize_out);
   }
@@ -1145,10 +1145,10 @@ class Setupapi extends Win32 {
     DeviceInfoData: PSP_DEVINFO_DATA,
     CustomPropertyName: PCWSTR,
     Flags: DWORD,
-    PropertyRegDataType_out: OPTIONAL<PDWORD>,
+    PropertyRegDataType_out: Optional<PDWORD>,
     PropertyBuffer_out: PBYTE,
     PropertyBufferSize: DWORD,
-    RequiredSize_out: OPTIONAL<PDWORD>,
+    RequiredSize_out: Optional<PDWORD>,
   ): BOOL {
     return Setupapi.Load('SetupDiGetCustomDevicePropertyW')(DeviceInfoSet, DeviceInfoData, CustomPropertyName, Flags, PropertyRegDataType_out, PropertyBuffer_out, PropertyBufferSize, RequiredSize_out);
   }
@@ -1169,22 +1169,22 @@ class Setupapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdigetdeviceinstallparamsa
-  public static SetupDiGetDeviceInstallParamsA(DeviceInfoSet: HDEVINFO, DeviceInfoData: OPTIONAL<PSP_DEVINFO_DATA>, DeviceInstallParams_out: PSP_DEVINSTALL_PARAMS_A): BOOL {
+  public static SetupDiGetDeviceInstallParamsA(DeviceInfoSet: HDEVINFO, DeviceInfoData: Optional<PSP_DEVINFO_DATA>, DeviceInstallParams_out: PSP_DEVINSTALL_PARAMS_A): BOOL {
     return Setupapi.Load('SetupDiGetDeviceInstallParamsA')(DeviceInfoSet, DeviceInfoData, DeviceInstallParams_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdigetdeviceinstallparamsw
-  public static SetupDiGetDeviceInstallParamsW(DeviceInfoSet: HDEVINFO, DeviceInfoData: OPTIONAL<PSP_DEVINFO_DATA>, DeviceInstallParams_out: PSP_DEVINSTALL_PARAMS_W): BOOL {
+  public static SetupDiGetDeviceInstallParamsW(DeviceInfoSet: HDEVINFO, DeviceInfoData: Optional<PSP_DEVINFO_DATA>, DeviceInstallParams_out: PSP_DEVINSTALL_PARAMS_W): BOOL {
     return Setupapi.Load('SetupDiGetDeviceInstallParamsW')(DeviceInfoSet, DeviceInfoData, DeviceInstallParams_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdigetdeviceinstanceida
-  public static SetupDiGetDeviceInstanceIdA(DeviceInfoSet: HDEVINFO, DeviceInfoData: PSP_DEVINFO_DATA, DeviceInstanceId_out: OPTIONAL<PSTR>, DeviceInstanceIdSize: DWORD, RequiredSize_out: OPTIONAL<PDWORD>): BOOL {
+  public static SetupDiGetDeviceInstanceIdA(DeviceInfoSet: HDEVINFO, DeviceInfoData: PSP_DEVINFO_DATA, DeviceInstanceId_out: Optional<PSTR>, DeviceInstanceIdSize: DWORD, RequiredSize_out: Optional<PDWORD>): BOOL {
     return Setupapi.Load('SetupDiGetDeviceInstanceIdA')(DeviceInfoSet, DeviceInfoData, DeviceInstanceId_out, DeviceInstanceIdSize, RequiredSize_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdigetdeviceinstanceidw
-  public static SetupDiGetDeviceInstanceIdW(DeviceInfoSet: HDEVINFO, DeviceInfoData: PSP_DEVINFO_DATA, DeviceInstanceId_out: OPTIONAL<PWSTR>, DeviceInstanceIdSize: DWORD, RequiredSize_out: OPTIONAL<PDWORD>): BOOL {
+  public static SetupDiGetDeviceInstanceIdW(DeviceInfoSet: HDEVINFO, DeviceInfoData: PSP_DEVINFO_DATA, DeviceInstanceId_out: Optional<PWSTR>, DeviceInstanceIdSize: DWORD, RequiredSize_out: Optional<PDWORD>): BOOL {
     return Setupapi.Load('SetupDiGetDeviceInstanceIdW')(DeviceInfoSet, DeviceInfoData, DeviceInstanceId_out, DeviceInstanceIdSize, RequiredSize_out);
   }
 
@@ -1197,10 +1197,10 @@ class Setupapi extends Win32 {
   public static SetupDiGetDeviceInterfaceDetailA(
     DeviceInfoSet: HDEVINFO,
     DeviceInterfaceData: PSP_DEVICE_INTERFACE_DATA,
-    DeviceInterfaceDetailData_in_out: OPTIONAL<PSP_DEVICE_INTERFACE_DETAIL_DATA_A>,
+    DeviceInterfaceDetailData_in_out: Optional<PSP_DEVICE_INTERFACE_DETAIL_DATA_A>,
     DeviceInterfaceDetailDataSize: DWORD,
-    RequiredSize_out: OPTIONAL<PDWORD>,
-    DeviceInfoData_out: OPTIONAL<PSP_DEVINFO_DATA>,
+    RequiredSize_out: Optional<PDWORD>,
+    DeviceInfoData_out: Optional<PSP_DEVINFO_DATA>,
   ): BOOL {
     return Setupapi.Load('SetupDiGetDeviceInterfaceDetailA')(DeviceInfoSet, DeviceInterfaceData, DeviceInterfaceDetailData_in_out, DeviceInterfaceDetailDataSize, RequiredSize_out, DeviceInfoData_out);
   }
@@ -1209,10 +1209,10 @@ class Setupapi extends Win32 {
   public static SetupDiGetDeviceInterfaceDetailW(
     DeviceInfoSet: HDEVINFO,
     DeviceInterfaceData: PSP_DEVICE_INTERFACE_DATA,
-    DeviceInterfaceDetailData_out: OPTIONAL<PSP_DEVICE_INTERFACE_DETAIL_DATA_W>,
+    DeviceInterfaceDetailData_out: Optional<PSP_DEVICE_INTERFACE_DETAIL_DATA_W>,
     DeviceInterfaceDetailDataSize: DWORD,
-    RequiredSize_out: OPTIONAL<PDWORD>,
-    DeviceInfoData_out: OPTIONAL<PSP_DEVINFO_DATA>,
+    RequiredSize_out: Optional<PDWORD>,
+    DeviceInfoData_out: Optional<PSP_DEVINFO_DATA>,
   ): BOOL {
     return Setupapi.Load('SetupDiGetDeviceInterfaceDetailW')(DeviceInfoSet, DeviceInterfaceData, DeviceInterfaceDetailData_out, DeviceInterfaceDetailDataSize, RequiredSize_out, DeviceInfoData_out);
   }
@@ -1221,9 +1221,9 @@ class Setupapi extends Win32 {
   public static SetupDiGetDeviceInterfacePropertyKeys(
     DeviceInfoSet: HDEVINFO,
     DeviceInterfaceData: PSP_DEVICE_INTERFACE_DATA,
-    PropertyKeyArray_out: OPTIONAL<PDEVPROPKEY>,
+    PropertyKeyArray_out: Optional<PDEVPROPKEY>,
     PropertyKeyCount: DWORD,
-    RequiredPropertyKeyCount_out: OPTIONAL<PDWORD>,
+    RequiredPropertyKeyCount_out: Optional<PDWORD>,
     Flags: DWORD,
   ): BOOL {
     return Setupapi.Load('SetupDiGetDeviceInterfacePropertyKeys')(DeviceInfoSet, DeviceInterfaceData, PropertyKeyArray_out, PropertyKeyCount, RequiredPropertyKeyCount_out, Flags);
@@ -1235,9 +1235,9 @@ class Setupapi extends Win32 {
     DeviceInterfaceData: PSP_DEVICE_INTERFACE_DATA,
     PropertyKey: PDEVPROPKEY,
     PropertyType_out: PDEVPROPTYPE,
-    PropertyBuffer_out: OPTIONAL<PBYTE>,
+    PropertyBuffer_out: Optional<PBYTE>,
     PropertyBufferSize: DWORD,
-    RequiredSize_out: OPTIONAL<PDWORD>,
+    RequiredSize_out: Optional<PDWORD>,
     Flags: DWORD,
   ): BOOL {
     return Setupapi.Load('SetupDiGetDeviceInterfacePropertyW')(DeviceInfoSet, DeviceInterfaceData, PropertyKey, PropertyType_out, PropertyBuffer_out, PropertyBufferSize, RequiredSize_out, Flags);
@@ -1247,9 +1247,9 @@ class Setupapi extends Win32 {
   public static SetupDiGetDevicePropertyKeys(
     DeviceInfoSet: HDEVINFO,
     DeviceInfoData: PSP_DEVINFO_DATA,
-    PropertyKeyArray_out: OPTIONAL<PDEVPROPKEY>,
+    PropertyKeyArray_out: Optional<PDEVPROPKEY>,
     PropertyKeyCount: DWORD,
-    RequiredPropertyKeyCount_out: OPTIONAL<PDWORD>,
+    RequiredPropertyKeyCount_out: Optional<PDWORD>,
     Flags: DWORD,
   ): BOOL {
     return Setupapi.Load('SetupDiGetDevicePropertyKeys')(DeviceInfoSet, DeviceInfoData, PropertyKeyArray_out, PropertyKeyCount, RequiredPropertyKeyCount_out, Flags);
@@ -1261,9 +1261,9 @@ class Setupapi extends Win32 {
     DeviceInfoData: PSP_DEVINFO_DATA,
     PropertyKey: PDEVPROPKEY,
     PropertyType_out: PDEVPROPTYPE,
-    PropertyBuffer_out: OPTIONAL<PBYTE>,
+    PropertyBuffer_out: Optional<PBYTE>,
     PropertyBufferSize: DWORD,
-    RequiredSize_out: OPTIONAL<PDWORD>,
+    RequiredSize_out: Optional<PDWORD>,
     Flags: DWORD,
   ): BOOL {
     return Setupapi.Load('SetupDiGetDevicePropertyW')(DeviceInfoSet, DeviceInfoData, PropertyKey, PropertyType_out, PropertyBuffer_out, PropertyBufferSize, RequiredSize_out, Flags);
@@ -1274,10 +1274,10 @@ class Setupapi extends Win32 {
     DeviceInfoSet: HDEVINFO,
     DeviceInfoData: PSP_DEVINFO_DATA,
     Property: DWORD,
-    PropertyRegDataType_out: OPTIONAL<PDWORD>,
-    PropertyBuffer_out: OPTIONAL<PBYTE>,
+    PropertyRegDataType_out: Optional<PDWORD>,
+    PropertyBuffer_out: Optional<PBYTE>,
     PropertyBufferSize: DWORD,
-    RequiredSize_out: OPTIONAL<PDWORD>,
+    RequiredSize_out: Optional<PDWORD>,
   ): BOOL {
     return Setupapi.Load('SetupDiGetDeviceRegistryPropertyA')(DeviceInfoSet, DeviceInfoData, Property, PropertyRegDataType_out, PropertyBuffer_out, PropertyBufferSize, RequiredSize_out);
   }
@@ -1287,10 +1287,10 @@ class Setupapi extends Win32 {
     DeviceInfoSet: HDEVINFO,
     DeviceInfoData: PSP_DEVINFO_DATA,
     Property: DWORD,
-    PropertyRegDataType_out: OPTIONAL<PDWORD>,
-    PropertyBuffer_out: OPTIONAL<PBYTE>,
+    PropertyRegDataType_out: Optional<PDWORD>,
+    PropertyBuffer_out: Optional<PBYTE>,
     PropertyBufferSize: DWORD,
-    RequiredSize_out: OPTIONAL<PDWORD>,
+    RequiredSize_out: Optional<PDWORD>,
   ): BOOL {
     return Setupapi.Load('SetupDiGetDeviceRegistryPropertyW')(DeviceInfoSet, DeviceInfoData, Property, PropertyRegDataType_out, PropertyBuffer_out, PropertyBufferSize, RequiredSize_out);
   }
@@ -1298,11 +1298,11 @@ class Setupapi extends Win32 {
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdigetdriverinfodetaila
   public static SetupDiGetDriverInfoDetailA(
     DeviceInfoSet: HDEVINFO,
-    DeviceInfoData: OPTIONAL<PSP_DEVINFO_DATA>,
+    DeviceInfoData: Optional<PSP_DEVINFO_DATA>,
     DriverInfoData: PSP_DRVINFO_DATA_A,
-    DriverInfoDetailData_in_out: OPTIONAL<PSP_DRVINFO_DETAIL_DATA_A>,
+    DriverInfoDetailData_in_out: Optional<PSP_DRVINFO_DETAIL_DATA_A>,
     DriverInfoDetailDataSize: DWORD,
-    RequiredSize_out: OPTIONAL<PDWORD>,
+    RequiredSize_out: Optional<PDWORD>,
   ): BOOL {
     return Setupapi.Load('SetupDiGetDriverInfoDetailA')(DeviceInfoSet, DeviceInfoData, DriverInfoData, DriverInfoDetailData_in_out, DriverInfoDetailDataSize, RequiredSize_out);
   }
@@ -1310,67 +1310,67 @@ class Setupapi extends Win32 {
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdigetdriverinfodetailw
   public static SetupDiGetDriverInfoDetailW(
     DeviceInfoSet: HDEVINFO,
-    DeviceInfoData: OPTIONAL<PSP_DEVINFO_DATA>,
+    DeviceInfoData: Optional<PSP_DEVINFO_DATA>,
     DriverInfoData: PSP_DRVINFO_DATA_W,
-    DriverInfoDetailData_in_out: OPTIONAL<PSP_DRVINFO_DETAIL_DATA_W>,
+    DriverInfoDetailData_in_out: Optional<PSP_DRVINFO_DETAIL_DATA_W>,
     DriverInfoDetailDataSize: DWORD,
-    RequiredSize_out: OPTIONAL<PDWORD>,
+    RequiredSize_out: Optional<PDWORD>,
   ): BOOL {
     return Setupapi.Load('SetupDiGetDriverInfoDetailW')(DeviceInfoSet, DeviceInfoData, DriverInfoData, DriverInfoDetailData_in_out, DriverInfoDetailDataSize, RequiredSize_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdigetdriverinstallparamsa
-  public static SetupDiGetDriverInstallParamsA(DeviceInfoSet: HDEVINFO, DeviceInfoData: OPTIONAL<PSP_DEVINFO_DATA>, DriverInfoData: PSP_DRVINFO_DATA_A, DriverInstallParams_out: PSP_DRVINSTALL_PARAMS): BOOL {
+  public static SetupDiGetDriverInstallParamsA(DeviceInfoSet: HDEVINFO, DeviceInfoData: Optional<PSP_DEVINFO_DATA>, DriverInfoData: PSP_DRVINFO_DATA_A, DriverInstallParams_out: PSP_DRVINSTALL_PARAMS): BOOL {
     return Setupapi.Load('SetupDiGetDriverInstallParamsA')(DeviceInfoSet, DeviceInfoData, DriverInfoData, DriverInstallParams_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdigetdriverinstallparamsw
-  public static SetupDiGetDriverInstallParamsW(DeviceInfoSet: HDEVINFO, DeviceInfoData: OPTIONAL<PSP_DEVINFO_DATA>, DriverInfoData: PSP_DRVINFO_DATA_W, DriverInstallParams_out: PSP_DRVINSTALL_PARAMS): BOOL {
+  public static SetupDiGetDriverInstallParamsW(DeviceInfoSet: HDEVINFO, DeviceInfoData: Optional<PSP_DEVINFO_DATA>, DriverInfoData: PSP_DRVINFO_DATA_W, DriverInstallParams_out: PSP_DRVINSTALL_PARAMS): BOOL {
     return Setupapi.Load('SetupDiGetDriverInstallParamsW')(DeviceInfoSet, DeviceInfoData, DriverInfoData, DriverInstallParams_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdigethwprofilefriendlynamea
-  public static SetupDiGetHwProfileFriendlyNameA(HwProfile: DWORD, FriendlyName_out: PSTR, FriendlyNameSize: DWORD, RequiredSize_out: OPTIONAL<PDWORD>): BOOL {
+  public static SetupDiGetHwProfileFriendlyNameA(HwProfile: DWORD, FriendlyName_out: PSTR, FriendlyNameSize: DWORD, RequiredSize_out: Optional<PDWORD>): BOOL {
     return Setupapi.Load('SetupDiGetHwProfileFriendlyNameA')(HwProfile, FriendlyName_out, FriendlyNameSize, RequiredSize_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdigethwprofilefriendlynameexa
-  public static SetupDiGetHwProfileFriendlyNameExA(HwProfile: DWORD, FriendlyName_out: PSTR, FriendlyNameSize: DWORD, RequiredSize_out: OPTIONAL<PDWORD>, MachineName: OPTIONAL<PCSTR>, Reserved: OPTIONAL<PVOID>): BOOL {
+  public static SetupDiGetHwProfileFriendlyNameExA(HwProfile: DWORD, FriendlyName_out: PSTR, FriendlyNameSize: DWORD, RequiredSize_out: Optional<PDWORD>, MachineName: Optional<PCSTR>, Reserved: Optional<PVOID>): BOOL {
     return Setupapi.Load('SetupDiGetHwProfileFriendlyNameExA')(HwProfile, FriendlyName_out, FriendlyNameSize, RequiredSize_out, MachineName, Reserved);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdigethwprofilefriendlynameexw
-  public static SetupDiGetHwProfileFriendlyNameExW(HwProfile: DWORD, FriendlyName_out: PWSTR, FriendlyNameSize: DWORD, RequiredSize_out: OPTIONAL<PDWORD>, MachineName: OPTIONAL<PCWSTR>, Reserved: OPTIONAL<PVOID>): BOOL {
+  public static SetupDiGetHwProfileFriendlyNameExW(HwProfile: DWORD, FriendlyName_out: PWSTR, FriendlyNameSize: DWORD, RequiredSize_out: Optional<PDWORD>, MachineName: Optional<PCWSTR>, Reserved: Optional<PVOID>): BOOL {
     return Setupapi.Load('SetupDiGetHwProfileFriendlyNameExW')(HwProfile, FriendlyName_out, FriendlyNameSize, RequiredSize_out, MachineName, Reserved);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdigethwprofilefriendlynamew
-  public static SetupDiGetHwProfileFriendlyNameW(HwProfile: DWORD, FriendlyName_out: PWSTR, FriendlyNameSize: DWORD, RequiredSize_out: OPTIONAL<PDWORD>): BOOL {
+  public static SetupDiGetHwProfileFriendlyNameW(HwProfile: DWORD, FriendlyName_out: PWSTR, FriendlyNameSize: DWORD, RequiredSize_out: Optional<PDWORD>): BOOL {
     return Setupapi.Load('SetupDiGetHwProfileFriendlyNameW')(HwProfile, FriendlyName_out, FriendlyNameSize, RequiredSize_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdigethwprofilelist
-  public static SetupDiGetHwProfileList(HwProfileList_out: PDWORD, HwProfileListSize: DWORD, RequiredSize_out: PDWORD, CurrentlyActiveIndex_out: OPTIONAL<PDWORD>): BOOL {
+  public static SetupDiGetHwProfileList(HwProfileList_out: PDWORD, HwProfileListSize: DWORD, RequiredSize_out: PDWORD, CurrentlyActiveIndex_out: Optional<PDWORD>): BOOL {
     return Setupapi.Load('SetupDiGetHwProfileList')(HwProfileList_out, HwProfileListSize, RequiredSize_out, CurrentlyActiveIndex_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdigethwprofilelistexa
-  public static SetupDiGetHwProfileListExA(HwProfileList_out: PDWORD, HwProfileListSize: DWORD, RequiredSize_out: PDWORD, CurrentlyActiveIndex_out: OPTIONAL<PDWORD>, MachineName: OPTIONAL<PCSTR>, Reserved: OPTIONAL<PVOID>): BOOL {
+  public static SetupDiGetHwProfileListExA(HwProfileList_out: PDWORD, HwProfileListSize: DWORD, RequiredSize_out: PDWORD, CurrentlyActiveIndex_out: Optional<PDWORD>, MachineName: Optional<PCSTR>, Reserved: Optional<PVOID>): BOOL {
     return Setupapi.Load('SetupDiGetHwProfileListExA')(HwProfileList_out, HwProfileListSize, RequiredSize_out, CurrentlyActiveIndex_out, MachineName, Reserved);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdigethwprofilelistexw
-  public static SetupDiGetHwProfileListExW(HwProfileList_out: PDWORD, HwProfileListSize: DWORD, RequiredSize_out: PDWORD, CurrentlyActiveIndex_out: OPTIONAL<PDWORD>, MachineName: OPTIONAL<PCWSTR>, Reserved: OPTIONAL<PVOID>): BOOL {
+  public static SetupDiGetHwProfileListExW(HwProfileList_out: PDWORD, HwProfileListSize: DWORD, RequiredSize_out: PDWORD, CurrentlyActiveIndex_out: Optional<PDWORD>, MachineName: Optional<PCWSTR>, Reserved: Optional<PVOID>): BOOL {
     return Setupapi.Load('SetupDiGetHwProfileListExW')(HwProfileList_out, HwProfileListSize, RequiredSize_out, CurrentlyActiveIndex_out, MachineName, Reserved);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdigetinfclassa
-  public static SetupDiGetINFClassA(InfName: PCSTR, ClassGuid_out: LPGUID, ClassName_out: PSTR, ClassNameSize: DWORD, RequiredSize_out: OPTIONAL<PDWORD>): BOOL {
+  public static SetupDiGetINFClassA(InfName: PCSTR, ClassGuid_out: LPGUID, ClassName_out: PSTR, ClassNameSize: DWORD, RequiredSize_out: Optional<PDWORD>): BOOL {
     return Setupapi.Load('SetupDiGetINFClassA')(InfName, ClassGuid_out, ClassName_out, ClassNameSize, RequiredSize_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdigetinfclassw
-  public static SetupDiGetINFClassW(InfName: PCWSTR, ClassGuid_out: LPGUID, ClassName_out: PWSTR, ClassNameSize: DWORD, RequiredSize_out: OPTIONAL<PDWORD>): BOOL {
+  public static SetupDiGetINFClassW(InfName: PCWSTR, ClassGuid_out: LPGUID, ClassName_out: PWSTR, ClassNameSize: DWORD, RequiredSize_out: Optional<PDWORD>): BOOL {
     return Setupapi.Load('SetupDiGetINFClassW')(InfName, ClassGuid_out, ClassName_out, ClassNameSize, RequiredSize_out);
   }
 
@@ -1380,53 +1380,53 @@ class Setupapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdigetselecteddrivera
-  public static SetupDiGetSelectedDriverA(DeviceInfoSet: HDEVINFO, DeviceInfoData: OPTIONAL<PSP_DEVINFO_DATA>, DriverInfoData_out: PSP_DRVINFO_DATA_A): BOOL {
+  public static SetupDiGetSelectedDriverA(DeviceInfoSet: HDEVINFO, DeviceInfoData: Optional<PSP_DEVINFO_DATA>, DriverInfoData_out: PSP_DRVINFO_DATA_A): BOOL {
     return Setupapi.Load('SetupDiGetSelectedDriverA')(DeviceInfoSet, DeviceInfoData, DriverInfoData_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdigetselecteddriverw
-  public static SetupDiGetSelectedDriverW(DeviceInfoSet: HDEVINFO, DeviceInfoData: OPTIONAL<PSP_DEVINFO_DATA>, DriverInfoData_out: PSP_DRVINFO_DATA_W): BOOL {
+  public static SetupDiGetSelectedDriverW(DeviceInfoSet: HDEVINFO, DeviceInfoData: Optional<PSP_DEVINFO_DATA>, DriverInfoData_out: PSP_DRVINFO_DATA_W): BOOL {
     return Setupapi.Load('SetupDiGetSelectedDriverW')(DeviceInfoSet, DeviceInfoData, DriverInfoData_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdigetwizardpage
-  public static SetupDiGetWizardPage(DeviceInfoSet: HDEVINFO, DeviceInfoData: OPTIONAL<PSP_DEVINFO_DATA>, InstallWizardData: PSP_INSTALLWIZARD_DATA, PageType: DWORD, Flags: DWORD): HPROPSHEETPAGE {
+  public static SetupDiGetWizardPage(DeviceInfoSet: HDEVINFO, DeviceInfoData: Optional<PSP_DEVINFO_DATA>, InstallWizardData: PSP_INSTALLWIZARD_DATA, PageType: DWORD, Flags: DWORD): HPROPSHEETPAGE {
     return Setupapi.Load('SetupDiGetWizardPage')(DeviceInfoSet, DeviceInfoData, InstallWizardData, PageType, Flags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdiinstallclassa
-  public static SetupDiInstallClassA(hwndParent: OPTIONAL<HWND>, InfFileName: PCSTR, Flags: DWORD, FileQueue: OPTIONAL<HSPFILEQ>): BOOL {
+  public static SetupDiInstallClassA(hwndParent: Optional<HWND>, InfFileName: PCSTR, Flags: DWORD, FileQueue: Optional<HSPFILEQ>): BOOL {
     return Setupapi.Load('SetupDiInstallClassA')(hwndParent, InfFileName, Flags, FileQueue);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdiinstallclassexa
   public static SetupDiInstallClassExA(
-    hwndParent: OPTIONAL<HWND>,
-    InfFileName: OPTIONAL<PCSTR>,
+    hwndParent: Optional<HWND>,
+    InfFileName: Optional<PCSTR>,
     Flags: DWORD,
-    FileQueue: OPTIONAL<HSPFILEQ>,
-    InterfaceClassGuid: OPTIONAL<LPGUID>,
-    Reserved1: OPTIONAL<PVOID>,
-    Reserved2: OPTIONAL<PVOID>,
+    FileQueue: Optional<HSPFILEQ>,
+    InterfaceClassGuid: Optional<LPGUID>,
+    Reserved1: Optional<PVOID>,
+    Reserved2: Optional<PVOID>,
   ): BOOL {
     return Setupapi.Load('SetupDiInstallClassExA')(hwndParent, InfFileName, Flags, FileQueue, InterfaceClassGuid, Reserved1, Reserved2);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdiinstallclassexw
   public static SetupDiInstallClassExW(
-    hwndParent: OPTIONAL<HWND>,
-    InfFileName: OPTIONAL<PCWSTR>,
+    hwndParent: Optional<HWND>,
+    InfFileName: Optional<PCWSTR>,
     Flags: DWORD,
-    FileQueue: OPTIONAL<HSPFILEQ>,
-    InterfaceClassGuid: OPTIONAL<LPGUID>,
-    Reserved1: OPTIONAL<PVOID>,
-    Reserved2: OPTIONAL<PVOID>,
+    FileQueue: Optional<HSPFILEQ>,
+    InterfaceClassGuid: Optional<LPGUID>,
+    Reserved1: Optional<PVOID>,
+    Reserved2: Optional<PVOID>,
   ): BOOL {
     return Setupapi.Load('SetupDiInstallClassExW')(hwndParent, InfFileName, Flags, FileQueue, InterfaceClassGuid, Reserved1, Reserved2);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdiinstallclassw
-  public static SetupDiInstallClassW(hwndParent: OPTIONAL<HWND>, InfFileName: PCWSTR, Flags: DWORD, FileQueue: OPTIONAL<HSPFILEQ>): BOOL {
+  public static SetupDiInstallClassW(hwndParent: Optional<HWND>, InfFileName: PCWSTR, Flags: DWORD, FileQueue: Optional<HSPFILEQ>): BOOL {
     return Setupapi.Load('SetupDiInstallClassW')(hwndParent, InfFileName, Flags, FileQueue);
   }
 
@@ -1446,7 +1446,7 @@ class Setupapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdiloadclassicon
-  public static SetupDiLoadClassIcon(ClassGuid: LPGUID, LargeIcon_out: OPTIONAL<PHICON>, MiniIconIndex_out: OPTIONAL<PINT>): BOOL {
+  public static SetupDiLoadClassIcon(ClassGuid: LPGUID, LargeIcon_out: Optional<PHICON>, MiniIconIndex_out: Optional<PINT>): BOOL {
     return Setupapi.Load('SetupDiLoadClassIcon')(ClassGuid, LargeIcon_out, MiniIconIndex_out);
   }
 
@@ -1456,17 +1456,17 @@ class Setupapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdiopenclassregkey
-  public static SetupDiOpenClassRegKey(ClassGuid: OPTIONAL<LPGUID>, samDesired: REGSAM): HKEY {
+  public static SetupDiOpenClassRegKey(ClassGuid: Optional<LPGUID>, samDesired: REGSAM): HKEY {
     return Setupapi.Load('SetupDiOpenClassRegKey')(ClassGuid, samDesired);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdiopenclassregkeyexa
-  public static SetupDiOpenClassRegKeyExA(ClassGuid: OPTIONAL<LPGUID>, samDesired: REGSAM, Flags: DWORD, MachineName: OPTIONAL<PCSTR>, Reserved: OPTIONAL<PVOID>): HKEY {
+  public static SetupDiOpenClassRegKeyExA(ClassGuid: Optional<LPGUID>, samDesired: REGSAM, Flags: DWORD, MachineName: Optional<PCSTR>, Reserved: Optional<PVOID>): HKEY {
     return Setupapi.Load('SetupDiOpenClassRegKeyExA')(ClassGuid, samDesired, Flags, MachineName, Reserved);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdiopenclassregkeyexw
-  public static SetupDiOpenClassRegKeyExW(ClassGuid: OPTIONAL<LPGUID>, samDesired: REGSAM, Flags: DWORD, MachineName: OPTIONAL<PCWSTR>, Reserved: OPTIONAL<PVOID>): HKEY {
+  public static SetupDiOpenClassRegKeyExW(ClassGuid: Optional<LPGUID>, samDesired: REGSAM, Flags: DWORD, MachineName: Optional<PCWSTR>, Reserved: Optional<PVOID>): HKEY {
     return Setupapi.Load('SetupDiOpenClassRegKeyExW')(ClassGuid, samDesired, Flags, MachineName, Reserved);
   }
 
@@ -1476,17 +1476,17 @@ class Setupapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdiopendeviceinfoa
-  public static SetupDiOpenDeviceInfoA(DeviceInfoSet: HDEVINFO, DeviceInstanceId: PCSTR, hwndParent: OPTIONAL<HWND>, OpenFlags: DWORD, DeviceInfoData_out: OPTIONAL<PSP_DEVINFO_DATA>): BOOL {
+  public static SetupDiOpenDeviceInfoA(DeviceInfoSet: HDEVINFO, DeviceInstanceId: PCSTR, hwndParent: Optional<HWND>, OpenFlags: DWORD, DeviceInfoData_out: Optional<PSP_DEVINFO_DATA>): BOOL {
     return Setupapi.Load('SetupDiOpenDeviceInfoA')(DeviceInfoSet, DeviceInstanceId, hwndParent, OpenFlags, DeviceInfoData_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdiopendeviceinfow
-  public static SetupDiOpenDeviceInfoW(DeviceInfoSet: HDEVINFO, DeviceInstanceId: PCWSTR, hwndParent: OPTIONAL<HWND>, OpenFlags: DWORD, DeviceInfoData_out: OPTIONAL<PSP_DEVINFO_DATA>): BOOL {
+  public static SetupDiOpenDeviceInfoW(DeviceInfoSet: HDEVINFO, DeviceInstanceId: PCWSTR, hwndParent: Optional<HWND>, OpenFlags: DWORD, DeviceInfoData_out: Optional<PSP_DEVINFO_DATA>): BOOL {
     return Setupapi.Load('SetupDiOpenDeviceInfoW')(DeviceInfoSet, DeviceInstanceId, hwndParent, OpenFlags, DeviceInfoData_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdiopendeviceinterfacea
-  public static SetupDiOpenDeviceInterfaceA(DeviceInfoSet: HDEVINFO, DevicePath: PCSTR, OpenFlags: DWORD, DeviceInterfaceData_out: OPTIONAL<PSP_DEVICE_INTERFACE_DATA>): BOOL {
+  public static SetupDiOpenDeviceInterfaceA(DeviceInfoSet: HDEVINFO, DevicePath: PCSTR, OpenFlags: DWORD, DeviceInterfaceData_out: Optional<PSP_DEVICE_INTERFACE_DATA>): BOOL {
     return Setupapi.Load('SetupDiOpenDeviceInterfaceA')(DeviceInfoSet, DevicePath, OpenFlags, DeviceInterfaceData_out);
   }
 
@@ -1496,7 +1496,7 @@ class Setupapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdiopendeviceinterfacew
-  public static SetupDiOpenDeviceInterfaceW(DeviceInfoSet: HDEVINFO, DevicePath: PCWSTR, OpenFlags: DWORD, DeviceInterfaceData_out: OPTIONAL<PSP_DEVICE_INTERFACE_DATA>): BOOL {
+  public static SetupDiOpenDeviceInterfaceW(DeviceInfoSet: HDEVINFO, DevicePath: PCWSTR, OpenFlags: DWORD, DeviceInterfaceData_out: Optional<PSP_DEVICE_INTERFACE_DATA>): BOOL {
     return Setupapi.Load('SetupDiOpenDeviceInterfaceW')(DeviceInfoSet, DevicePath, OpenFlags, DeviceInterfaceData_out);
   }
 
@@ -1510,9 +1510,9 @@ class Setupapi extends Win32 {
     DeviceInfoSet: HDEVINFO,
     DeviceInfoData_in_out: PSP_DEVINFO_DATA,
     Flags: DWORD,
-    CompareProc: OPTIONAL<PSP_DETSIG_CMPPROC>,
-    CompareContext: OPTIONAL<PVOID>,
-    DupDeviceInfoData_out: OPTIONAL<PSP_DEVINFO_DATA>,
+    CompareProc: Optional<PSP_DETSIG_CMPPROC>,
+    CompareContext: Optional<PVOID>,
+    DupDeviceInfoData_out: Optional<PSP_DEVINFO_DATA>,
   ): BOOL {
     return Setupapi.Load('SetupDiRegisterDeviceInfo')(DeviceInfoSet, DeviceInfoData_in_out, Flags, CompareProc, CompareContext, DupDeviceInfoData_out);
   }
@@ -1533,27 +1533,27 @@ class Setupapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdiselectbestcompatdrv
-  public static SetupDiSelectBestCompatDrv(DeviceInfoSet: HDEVINFO, DeviceInfoData_in_out: OPTIONAL<PSP_DEVINFO_DATA>): BOOL {
+  public static SetupDiSelectBestCompatDrv(DeviceInfoSet: HDEVINFO, DeviceInfoData_in_out: Optional<PSP_DEVINFO_DATA>): BOOL {
     return Setupapi.Load('SetupDiSelectBestCompatDrv')(DeviceInfoSet, DeviceInfoData_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdiselectdevice
-  public static SetupDiSelectDevice(DeviceInfoSet: HDEVINFO, DeviceInfoData_in_out: OPTIONAL<PSP_DEVINFO_DATA>): BOOL {
+  public static SetupDiSelectDevice(DeviceInfoSet: HDEVINFO, DeviceInfoData_in_out: Optional<PSP_DEVINFO_DATA>): BOOL {
     return Setupapi.Load('SetupDiSelectDevice')(DeviceInfoSet, DeviceInfoData_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdiselectoemdrv
-  public static SetupDiSelectOEMDrv(hwndParent: OPTIONAL<HWND>, DeviceInfoSet: HDEVINFO, DeviceInfoData_in_out: OPTIONAL<PSP_DEVINFO_DATA>): BOOL {
+  public static SetupDiSelectOEMDrv(hwndParent: Optional<HWND>, DeviceInfoSet: HDEVINFO, DeviceInfoData_in_out: Optional<PSP_DEVINFO_DATA>): BOOL {
     return Setupapi.Load('SetupDiSelectOEMDrv')(hwndParent, DeviceInfoSet, DeviceInfoData_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdisetclassinstallparamsa
-  public static SetupDiSetClassInstallParamsA(DeviceInfoSet: HDEVINFO, DeviceInfoData: OPTIONAL<PSP_DEVINFO_DATA>, ClassInstallParams: OPTIONAL<PSP_CLASSINSTALL_HEADER>, ClassInstallParamsSize: DWORD): BOOL {
+  public static SetupDiSetClassInstallParamsA(DeviceInfoSet: HDEVINFO, DeviceInfoData: Optional<PSP_DEVINFO_DATA>, ClassInstallParams: Optional<PSP_CLASSINSTALL_HEADER>, ClassInstallParamsSize: DWORD): BOOL {
     return Setupapi.Load('SetupDiSetClassInstallParamsA')(DeviceInfoSet, DeviceInfoData, ClassInstallParams, ClassInstallParamsSize);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdisetclassinstallparamsw
-  public static SetupDiSetClassInstallParamsW(DeviceInfoSet: HDEVINFO, DeviceInfoData: OPTIONAL<PSP_DEVINFO_DATA>, ClassInstallParams: OPTIONAL<PSP_CLASSINSTALL_HEADER>, ClassInstallParamsSize: DWORD): BOOL {
+  public static SetupDiSetClassInstallParamsW(DeviceInfoSet: HDEVINFO, DeviceInfoData: Optional<PSP_DEVINFO_DATA>, ClassInstallParams: Optional<PSP_CLASSINSTALL_HEADER>, ClassInstallParamsSize: DWORD): BOOL {
     return Setupapi.Load('SetupDiSetClassInstallParamsW')(DeviceInfoSet, DeviceInfoData, ClassInstallParams, ClassInstallParamsSize);
   }
 
@@ -1562,42 +1562,42 @@ class Setupapi extends Win32 {
     ClassGuid: LPGUID,
     PropertyKey: PDEVPROPKEY,
     PropertyType: DEVPROPTYPE,
-    PropertyBuffer: OPTIONAL<PBYTE>,
+    PropertyBuffer: Optional<PBYTE>,
     PropertyBufferSize: DWORD,
     Flags: DWORD,
-    MachineName: OPTIONAL<PCWSTR>,
-    Reserved: OPTIONAL<PVOID>,
+    MachineName: Optional<PCWSTR>,
+    Reserved: Optional<PVOID>,
   ): BOOL {
     return Setupapi.Load('SetupDiSetClassPropertyExW')(ClassGuid, PropertyKey, PropertyType, PropertyBuffer, PropertyBufferSize, Flags, MachineName, Reserved);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdisetclasspropertyw
-  public static SetupDiSetClassPropertyW(ClassGuid: LPGUID, PropertyKey: PDEVPROPKEY, PropertyType: DEVPROPTYPE, PropertyBuffer: OPTIONAL<PBYTE>, PropertyBufferSize: DWORD, Flags: DWORD): BOOL {
+  public static SetupDiSetClassPropertyW(ClassGuid: LPGUID, PropertyKey: PDEVPROPKEY, PropertyType: DEVPROPTYPE, PropertyBuffer: Optional<PBYTE>, PropertyBufferSize: DWORD, Flags: DWORD): BOOL {
     return Setupapi.Load('SetupDiSetClassPropertyW')(ClassGuid, PropertyKey, PropertyType, PropertyBuffer, PropertyBufferSize, Flags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdisetclassregistrypropertya
-  public static SetupDiSetClassRegistryPropertyA(ClassGuid: LPGUID, Property: DWORD, PropertyBuffer: OPTIONAL<PBYTE>, PropertyBufferSize: DWORD, MachineName: OPTIONAL<PCSTR>, Reserved: OPTIONAL<PVOID>): BOOL {
+  public static SetupDiSetClassRegistryPropertyA(ClassGuid: LPGUID, Property: DWORD, PropertyBuffer: Optional<PBYTE>, PropertyBufferSize: DWORD, MachineName: Optional<PCSTR>, Reserved: Optional<PVOID>): BOOL {
     return Setupapi.Load('SetupDiSetClassRegistryPropertyA')(ClassGuid, Property, PropertyBuffer, PropertyBufferSize, MachineName, Reserved);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdisetclassregistrypropertyw
-  public static SetupDiSetClassRegistryPropertyW(ClassGuid: LPGUID, Property: DWORD, PropertyBuffer: OPTIONAL<PBYTE>, PropertyBufferSize: DWORD, MachineName: OPTIONAL<PCWSTR>, Reserved: OPTIONAL<PVOID>): BOOL {
+  public static SetupDiSetClassRegistryPropertyW(ClassGuid: LPGUID, Property: DWORD, PropertyBuffer: Optional<PBYTE>, PropertyBufferSize: DWORD, MachineName: Optional<PCWSTR>, Reserved: Optional<PVOID>): BOOL {
     return Setupapi.Load('SetupDiSetClassRegistryPropertyW')(ClassGuid, Property, PropertyBuffer, PropertyBufferSize, MachineName, Reserved);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdisetdeviceinstallparamsa
-  public static SetupDiSetDeviceInstallParamsA(DeviceInfoSet: HDEVINFO, DeviceInfoData: OPTIONAL<PSP_DEVINFO_DATA>, DeviceInstallParams: PSP_DEVINSTALL_PARAMS_A): BOOL {
+  public static SetupDiSetDeviceInstallParamsA(DeviceInfoSet: HDEVINFO, DeviceInfoData: Optional<PSP_DEVINFO_DATA>, DeviceInstallParams: PSP_DEVINSTALL_PARAMS_A): BOOL {
     return Setupapi.Load('SetupDiSetDeviceInstallParamsA')(DeviceInfoSet, DeviceInfoData, DeviceInstallParams);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdisetdeviceinstallparamsw
-  public static SetupDiSetDeviceInstallParamsW(DeviceInfoSet: HDEVINFO, DeviceInfoData: OPTIONAL<PSP_DEVINFO_DATA>, DeviceInstallParams: PSP_DEVINSTALL_PARAMS_W): BOOL {
+  public static SetupDiSetDeviceInstallParamsW(DeviceInfoSet: HDEVINFO, DeviceInfoData: Optional<PSP_DEVINFO_DATA>, DeviceInstallParams: PSP_DEVINSTALL_PARAMS_W): BOOL {
     return Setupapi.Load('SetupDiSetDeviceInstallParamsW')(DeviceInfoSet, DeviceInfoData, DeviceInstallParams);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdisetdeviceinterfacedefault
-  public static SetupDiSetDeviceInterfaceDefault(DeviceInfoSet: HDEVINFO, DeviceInterfaceData_in_out: PSP_DEVICE_INTERFACE_DATA, Flags: DWORD, Reserved: OPTIONAL<PVOID>): BOOL {
+  public static SetupDiSetDeviceInterfaceDefault(DeviceInfoSet: HDEVINFO, DeviceInterfaceData_in_out: PSP_DEVICE_INTERFACE_DATA, Flags: DWORD, Reserved: Optional<PVOID>): BOOL {
     return Setupapi.Load('SetupDiSetDeviceInterfaceDefault')(DeviceInfoSet, DeviceInterfaceData_in_out, Flags, Reserved);
   }
 
@@ -1607,7 +1607,7 @@ class Setupapi extends Win32 {
     DeviceInterfaceData: PSP_DEVICE_INTERFACE_DATA,
     PropertyKey: PDEVPROPKEY,
     PropertyType: DEVPROPTYPE,
-    PropertyBuffer: OPTIONAL<PBYTE>,
+    PropertyBuffer: Optional<PBYTE>,
     PropertyBufferSize: DWORD,
     Flags: DWORD,
   ): BOOL {
@@ -1615,27 +1615,27 @@ class Setupapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdisetdevicepropertyw
-  public static SetupDiSetDevicePropertyW(DeviceInfoSet: HDEVINFO, DeviceInfoData: PSP_DEVINFO_DATA, PropertyKey: PDEVPROPKEY, PropertyType: DEVPROPTYPE, PropertyBuffer: OPTIONAL<PBYTE>, PropertyBufferSize: DWORD, Flags: DWORD): BOOL {
+  public static SetupDiSetDevicePropertyW(DeviceInfoSet: HDEVINFO, DeviceInfoData: PSP_DEVINFO_DATA, PropertyKey: PDEVPROPKEY, PropertyType: DEVPROPTYPE, PropertyBuffer: Optional<PBYTE>, PropertyBufferSize: DWORD, Flags: DWORD): BOOL {
     return Setupapi.Load('SetupDiSetDevicePropertyW')(DeviceInfoSet, DeviceInfoData, PropertyKey, PropertyType, PropertyBuffer, PropertyBufferSize, Flags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdisetdeviceregistrypropertya
-  public static SetupDiSetDeviceRegistryPropertyA(DeviceInfoSet: HDEVINFO, DeviceInfoData_in_out: PSP_DEVINFO_DATA, Property: DWORD, PropertyBuffer: OPTIONAL<PBYTE>, PropertyBufferSize: DWORD): BOOL {
+  public static SetupDiSetDeviceRegistryPropertyA(DeviceInfoSet: HDEVINFO, DeviceInfoData_in_out: PSP_DEVINFO_DATA, Property: DWORD, PropertyBuffer: Optional<PBYTE>, PropertyBufferSize: DWORD): BOOL {
     return Setupapi.Load('SetupDiSetDeviceRegistryPropertyA')(DeviceInfoSet, DeviceInfoData_in_out, Property, PropertyBuffer, PropertyBufferSize);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdisetdeviceregistrypropertyw
-  public static SetupDiSetDeviceRegistryPropertyW(DeviceInfoSet: HDEVINFO, DeviceInfoData_in_out: PSP_DEVINFO_DATA, Property: DWORD, PropertyBuffer: OPTIONAL<PBYTE>, PropertyBufferSize: DWORD): BOOL {
+  public static SetupDiSetDeviceRegistryPropertyW(DeviceInfoSet: HDEVINFO, DeviceInfoData_in_out: PSP_DEVINFO_DATA, Property: DWORD, PropertyBuffer: Optional<PBYTE>, PropertyBufferSize: DWORD): BOOL {
     return Setupapi.Load('SetupDiSetDeviceRegistryPropertyW')(DeviceInfoSet, DeviceInfoData_in_out, Property, PropertyBuffer, PropertyBufferSize);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdisetdriverinstallparamsa
-  public static SetupDiSetDriverInstallParamsA(DeviceInfoSet: HDEVINFO, DeviceInfoData: OPTIONAL<PSP_DEVINFO_DATA>, DriverInfoData: PSP_DRVINFO_DATA_A, DriverInstallParams: PSP_DRVINSTALL_PARAMS): BOOL {
+  public static SetupDiSetDriverInstallParamsA(DeviceInfoSet: HDEVINFO, DeviceInfoData: Optional<PSP_DEVINFO_DATA>, DriverInfoData: PSP_DRVINFO_DATA_A, DriverInstallParams: PSP_DRVINSTALL_PARAMS): BOOL {
     return Setupapi.Load('SetupDiSetDriverInstallParamsA')(DeviceInfoSet, DeviceInfoData, DriverInfoData, DriverInstallParams);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdisetdriverinstallparamsw
-  public static SetupDiSetDriverInstallParamsW(DeviceInfoSet: HDEVINFO, DeviceInfoData: OPTIONAL<PSP_DEVINFO_DATA>, DriverInfoData: PSP_DRVINFO_DATA_W, DriverInstallParams: PSP_DRVINSTALL_PARAMS): BOOL {
+  public static SetupDiSetDriverInstallParamsW(DeviceInfoSet: HDEVINFO, DeviceInfoData: Optional<PSP_DEVINFO_DATA>, DriverInfoData: PSP_DRVINFO_DATA_W, DriverInstallParams: PSP_DRVINSTALL_PARAMS): BOOL {
     return Setupapi.Load('SetupDiSetDriverInstallParamsW')(DeviceInfoSet, DeviceInfoData, DriverInfoData, DriverInstallParams);
   }
 
@@ -1645,12 +1645,12 @@ class Setupapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdisetselecteddrivera
-  public static SetupDiSetSelectedDriverA(DeviceInfoSet: HDEVINFO, DeviceInfoData_in_out: OPTIONAL<PSP_DEVINFO_DATA>, DriverInfoData_in_out: OPTIONAL<PSP_DRVINFO_DATA_A>): BOOL {
+  public static SetupDiSetSelectedDriverA(DeviceInfoSet: HDEVINFO, DeviceInfoData_in_out: Optional<PSP_DEVINFO_DATA>, DriverInfoData_in_out: Optional<PSP_DRVINFO_DATA_A>): BOOL {
     return Setupapi.Load('SetupDiSetSelectedDriverA')(DeviceInfoSet, DeviceInfoData_in_out, DriverInfoData_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdisetselecteddriverw
-  public static SetupDiSetSelectedDriverW(DeviceInfoSet: HDEVINFO, DeviceInfoData_in_out: OPTIONAL<PSP_DEVINFO_DATA>, DriverInfoData_in_out: OPTIONAL<PSP_DRVINFO_DATA_W>): BOOL {
+  public static SetupDiSetSelectedDriverW(DeviceInfoSet: HDEVINFO, DeviceInfoData_in_out: Optional<PSP_DEVINFO_DATA>, DriverInfoData_in_out: Optional<PSP_DRVINFO_DATA_W>): BOOL {
     return Setupapi.Load('SetupDiSetSelectedDriverW')(DeviceInfoSet, DeviceInfoData_in_out, DriverInfoData_in_out);
   }
 
@@ -1660,32 +1660,32 @@ class Setupapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupduplicatediskspacelista
-  public static SetupDuplicateDiskSpaceListA(DiskSpace: HDSKSPC, Reserved1: OPTIONAL<PVOID>, Reserved2: DWORD, Flags: UINT): HDSKSPC {
+  public static SetupDuplicateDiskSpaceListA(DiskSpace: HDSKSPC, Reserved1: Optional<PVOID>, Reserved2: DWORD, Flags: UINT): HDSKSPC {
     return Setupapi.Load('SetupDuplicateDiskSpaceListA')(DiskSpace, Reserved1, Reserved2, Flags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupduplicatediskspacelistw
-  public static SetupDuplicateDiskSpaceListW(DiskSpace: HDSKSPC, Reserved1: OPTIONAL<PVOID>, Reserved2: DWORD, Flags: UINT): HDSKSPC {
+  public static SetupDuplicateDiskSpaceListW(DiskSpace: HDSKSPC, Reserved1: Optional<PVOID>, Reserved2: DWORD, Flags: UINT): HDSKSPC {
     return Setupapi.Load('SetupDuplicateDiskSpaceListW')(DiskSpace, Reserved1, Reserved2, Flags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupenuminfsectionsa
-  public static SetupEnumInfSectionsA(InfHandle: HINF, Index: UINT, Buffer_out: OPTIONAL<PSTR>, Size: UINT, SizeNeeded_out: OPTIONAL<PUINT>): BOOL {
+  public static SetupEnumInfSectionsA(InfHandle: HINF, Index: UINT, Buffer_out: Optional<PSTR>, Size: UINT, SizeNeeded_out: Optional<PUINT>): BOOL {
     return Setupapi.Load('SetupEnumInfSectionsA')(InfHandle, Index, Buffer_out, Size, SizeNeeded_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupenuminfsectionsw
-  public static SetupEnumInfSectionsW(InfHandle: HINF, Index: UINT, Buffer_out: OPTIONAL<PWSTR>, Size: UINT, SizeNeeded_out: OPTIONAL<PUINT>): BOOL {
+  public static SetupEnumInfSectionsW(InfHandle: HINF, Index: UINT, Buffer_out: Optional<PWSTR>, Size: UINT, SizeNeeded_out: Optional<PUINT>): BOOL {
     return Setupapi.Load('SetupEnumInfSectionsW')(InfHandle, Index, Buffer_out, Size, SizeNeeded_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupfindfirstlinea
-  public static SetupFindFirstLineA(InfHandle: HINF, Section: PCSTR, Key: OPTIONAL<PCSTR>, Context_out: PINFCONTEXT): BOOL {
+  public static SetupFindFirstLineA(InfHandle: HINF, Section: PCSTR, Key: Optional<PCSTR>, Context_out: PINFCONTEXT): BOOL {
     return Setupapi.Load('SetupFindFirstLineA')(InfHandle, Section, Key, Context_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupfindfirstlinew
-  public static SetupFindFirstLineW(InfHandle: HINF, Section: PCWSTR, Key: OPTIONAL<PCWSTR>, Context_out: PINFCONTEXT): BOOL {
+  public static SetupFindFirstLineW(InfHandle: HINF, Section: PCWSTR, Key: Optional<PCWSTR>, Context_out: PINFCONTEXT): BOOL {
     return Setupapi.Load('SetupFindFirstLineW')(InfHandle, Section, Key, Context_out);
   }
 
@@ -1695,12 +1695,12 @@ class Setupapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupfindnextmatchlinea
-  public static SetupFindNextMatchLineA(ContextIn: PINFCONTEXT, Key: OPTIONAL<PCSTR>, ContextOut_out: PINFCONTEXT): BOOL {
+  public static SetupFindNextMatchLineA(ContextIn: PINFCONTEXT, Key: Optional<PCSTR>, ContextOut_out: PINFCONTEXT): BOOL {
     return Setupapi.Load('SetupFindNextMatchLineA')(ContextIn, Key, ContextOut_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupfindnextmatchlinew
-  public static SetupFindNextMatchLineW(ContextIn: PINFCONTEXT, Key: OPTIONAL<PCWSTR>, ContextOut_out: PINFCONTEXT): BOOL {
+  public static SetupFindNextMatchLineW(ContextIn: PINFCONTEXT, Key: Optional<PCWSTR>, ContextOut_out: PINFCONTEXT): BOOL {
     return Setupapi.Load('SetupFindNextMatchLineW')(ContextIn, Key, ContextOut_out);
   }
 
@@ -1725,7 +1725,7 @@ class Setupapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupgetbinaryfield
-  public static SetupGetBinaryField(Context: PINFCONTEXT, FieldIndex: DWORD, ReturnBuffer_out: OPTIONAL<PBYTE>, ReturnBufferSize: DWORD, RequiredSize_out: OPTIONAL<LPDWORD>): BOOL {
+  public static SetupGetBinaryField(Context: PINFCONTEXT, FieldIndex: DWORD, ReturnBuffer_out: Optional<PBYTE>, ReturnBufferSize: DWORD, RequiredSize_out: Optional<LPDWORD>): BOOL {
     return Setupapi.Load('SetupGetBinaryField')(Context, FieldIndex, ReturnBuffer_out, ReturnBufferSize, RequiredSize_out);
   }
 
@@ -1742,9 +1742,9 @@ class Setupapi extends Win32 {
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupgetfilecompressioninfoexa
   public static SetupGetFileCompressionInfoExA(
     SourceFileName: PCSTR,
-    ActualSourceFileNameBuffer: OPTIONAL<PSTR>,
+    ActualSourceFileNameBuffer: Optional<PSTR>,
     ActualSourceFileNameBufferLen: DWORD,
-    RequiredBufferLen_out: OPTIONAL<PDWORD>,
+    RequiredBufferLen_out: Optional<PDWORD>,
     SourceFileSize_out: PDWORD,
     TargetFileSize_out: PDWORD,
     CompressionType_out: PUINT,
@@ -1755,9 +1755,9 @@ class Setupapi extends Win32 {
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupgetfilecompressioninfoexw
   public static SetupGetFileCompressionInfoExW(
     SourceFileName: PCWSTR,
-    ActualSourceFileNameBuffer: OPTIONAL<PWSTR>,
+    ActualSourceFileNameBuffer: Optional<PWSTR>,
     ActualSourceFileNameBufferLen: DWORD,
-    RequiredBufferLen_out: OPTIONAL<PDWORD>,
+    RequiredBufferLen_out: Optional<PDWORD>,
     SourceFileSize_out: PDWORD,
     TargetFileSize_out: PDWORD,
     CompressionType_out: PUINT,
@@ -1783,11 +1783,11 @@ class Setupapi extends Win32 {
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupgetinfdriverstorelocationa
   public static SetupGetInfDriverStoreLocationA(
     FileName: PCSTR,
-    AlternatePlatformInfo: OPTIONAL<PSP_ALTPLATFORM_INFO>,
-    LocaleName: OPTIONAL<PCSTR>,
+    AlternatePlatformInfo: Optional<PSP_ALTPLATFORM_INFO>,
+    LocaleName: Optional<PCSTR>,
     ReturnBuffer_out: PSTR,
     ReturnBufferSize: DWORD,
-    RequiredSize_out: OPTIONAL<PDWORD>,
+    RequiredSize_out: Optional<PDWORD>,
   ): BOOL {
     return Setupapi.Load('SetupGetInfDriverStoreLocationA')(FileName, AlternatePlatformInfo, LocaleName, ReturnBuffer_out, ReturnBufferSize, RequiredSize_out);
   }
@@ -1795,42 +1795,42 @@ class Setupapi extends Win32 {
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupgetinfdriverstorelocationw
   public static SetupGetInfDriverStoreLocationW(
     FileName: PCWSTR,
-    AlternatePlatformInfo: OPTIONAL<PSP_ALTPLATFORM_INFO>,
-    LocaleName: OPTIONAL<PCWSTR>,
+    AlternatePlatformInfo: Optional<PSP_ALTPLATFORM_INFO>,
+    LocaleName: Optional<PCWSTR>,
     ReturnBuffer_out: PWSTR,
     ReturnBufferSize: DWORD,
-    RequiredSize_out: OPTIONAL<PDWORD>,
+    RequiredSize_out: Optional<PDWORD>,
   ): BOOL {
     return Setupapi.Load('SetupGetInfDriverStoreLocationW')(FileName, AlternatePlatformInfo, LocaleName, ReturnBuffer_out, ReturnBufferSize, RequiredSize_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupgetinffilelista
-  public static SetupGetInfFileListA(DirectoryPath: OPTIONAL<PCSTR>, InfStyle: DWORD, ReturnBuffer_out: OPTIONAL<PSTR>, ReturnBufferSize: DWORD, RequiredSize_out: OPTIONAL<PDWORD>): BOOL {
+  public static SetupGetInfFileListA(DirectoryPath: Optional<PCSTR>, InfStyle: DWORD, ReturnBuffer_out: Optional<PSTR>, ReturnBufferSize: DWORD, RequiredSize_out: Optional<PDWORD>): BOOL {
     return Setupapi.Load('SetupGetInfFileListA')(DirectoryPath, InfStyle, ReturnBuffer_out, ReturnBufferSize, RequiredSize_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupgetinffilelistw
-  public static SetupGetInfFileListW(DirectoryPath: OPTIONAL<PCWSTR>, InfStyle: DWORD, ReturnBuffer_out: PWSTR, ReturnBufferSize: DWORD, RequiredSize_out: OPTIONAL<PDWORD>): BOOL {
+  public static SetupGetInfFileListW(DirectoryPath: Optional<PCWSTR>, InfStyle: DWORD, ReturnBuffer_out: PWSTR, ReturnBufferSize: DWORD, RequiredSize_out: Optional<PDWORD>): BOOL {
     return Setupapi.Load('SetupGetInfFileListW')(DirectoryPath, InfStyle, ReturnBuffer_out, ReturnBufferSize, RequiredSize_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupgetinfinformationa
-  public static SetupGetInfInformationA(InfSpec: LPCVOID, SearchControl: DWORD, ReturnBuffer_out: OPTIONAL<PSP_INF_INFORMATION>, ReturnBufferSize: DWORD, RequiredSize_out: OPTIONAL<PDWORD>): BOOL {
+  public static SetupGetInfInformationA(InfSpec: LPCVOID, SearchControl: DWORD, ReturnBuffer_out: Optional<PSP_INF_INFORMATION>, ReturnBufferSize: DWORD, RequiredSize_out: Optional<PDWORD>): BOOL {
     return Setupapi.Load('SetupGetInfInformationA')(InfSpec, SearchControl, ReturnBuffer_out, ReturnBufferSize, RequiredSize_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupgetinfinformationw
-  public static SetupGetInfInformationW(InfSpec: LPCVOID, SearchControl: DWORD, ReturnBuffer_out: OPTIONAL<PSP_INF_INFORMATION>, ReturnBufferSize: DWORD, RequiredSize_out: OPTIONAL<PDWORD>): BOOL {
+  public static SetupGetInfInformationW(InfSpec: LPCVOID, SearchControl: DWORD, ReturnBuffer_out: Optional<PSP_INF_INFORMATION>, ReturnBufferSize: DWORD, RequiredSize_out: Optional<PDWORD>): BOOL {
     return Setupapi.Load('SetupGetInfInformationW')(InfSpec, SearchControl, ReturnBuffer_out, ReturnBufferSize, RequiredSize_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupgetinfpublishednamea
-  public static SetupGetInfPublishedNameA(DriverStoreLocation: PCSTR, ReturnBuffer_out: PSTR, ReturnBufferSize: DWORD, RequiredSize_out: OPTIONAL<PDWORD>): BOOL {
+  public static SetupGetInfPublishedNameA(DriverStoreLocation: PCSTR, ReturnBuffer_out: PSTR, ReturnBufferSize: DWORD, RequiredSize_out: Optional<PDWORD>): BOOL {
     return Setupapi.Load('SetupGetInfPublishedNameA')(DriverStoreLocation, ReturnBuffer_out, ReturnBufferSize, RequiredSize_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupgetinfpublishednamew
-  public static SetupGetInfPublishedNameW(DriverStoreLocation: PCWSTR, ReturnBuffer_out: PWSTR, ReturnBufferSize: DWORD, RequiredSize_out: OPTIONAL<PDWORD>): BOOL {
+  public static SetupGetInfPublishedNameW(DriverStoreLocation: PCWSTR, ReturnBuffer_out: PWSTR, ReturnBufferSize: DWORD, RequiredSize_out: Optional<PDWORD>): BOOL {
     return Setupapi.Load('SetupGetInfPublishedNameW')(DriverStoreLocation, ReturnBuffer_out, ReturnBufferSize, RequiredSize_out);
   }
 
@@ -1861,37 +1861,37 @@ class Setupapi extends Win32 {
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupgetlinetexta
   public static SetupGetLineTextA(
-    Context: OPTIONAL<PINFCONTEXT>,
-    InfHandle: OPTIONAL<HINF>,
-    Section: OPTIONAL<PCSTR>,
-    Key: OPTIONAL<PCSTR>,
-    ReturnBuffer_out: OPTIONAL<PSTR>,
+    Context: Optional<PINFCONTEXT>,
+    InfHandle: Optional<HINF>,
+    Section: Optional<PCSTR>,
+    Key: Optional<PCSTR>,
+    ReturnBuffer_out: Optional<PSTR>,
     ReturnBufferSize: DWORD,
-    RequiredSize_out: OPTIONAL<PDWORD>,
+    RequiredSize_out: Optional<PDWORD>,
   ): BOOL {
     return Setupapi.Load('SetupGetLineTextA')(Context, InfHandle, Section, Key, ReturnBuffer_out, ReturnBufferSize, RequiredSize_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupgetlinetextw
   public static SetupGetLineTextW(
-    Context: OPTIONAL<PINFCONTEXT>,
-    InfHandle: OPTIONAL<HINF>,
-    Section: OPTIONAL<PCWSTR>,
-    Key: OPTIONAL<PCWSTR>,
-    ReturnBuffer_out: OPTIONAL<PWSTR>,
+    Context: Optional<PINFCONTEXT>,
+    InfHandle: Optional<HINF>,
+    Section: Optional<PCWSTR>,
+    Key: Optional<PCWSTR>,
+    ReturnBuffer_out: Optional<PWSTR>,
     ReturnBufferSize: DWORD,
-    RequiredSize_out: OPTIONAL<PDWORD>,
+    RequiredSize_out: Optional<PDWORD>,
   ): BOOL {
     return Setupapi.Load('SetupGetLineTextW')(Context, InfHandle, Section, Key, ReturnBuffer_out, ReturnBufferSize, RequiredSize_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupgetmultiszfielda
-  public static SetupGetMultiSzFieldA(Context: PINFCONTEXT, FieldIndex: DWORD, ReturnBuffer_out: OPTIONAL<PSTR>, ReturnBufferSize: DWORD, RequiredSize_out: OPTIONAL<LPDWORD>): BOOL {
+  public static SetupGetMultiSzFieldA(Context: PINFCONTEXT, FieldIndex: DWORD, ReturnBuffer_out: Optional<PSTR>, ReturnBufferSize: DWORD, RequiredSize_out: Optional<LPDWORD>): BOOL {
     return Setupapi.Load('SetupGetMultiSzFieldA')(Context, FieldIndex, ReturnBuffer_out, ReturnBufferSize, RequiredSize_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupgetmultiszfieldw
-  public static SetupGetMultiSzFieldW(Context: PINFCONTEXT, FieldIndex: DWORD, ReturnBuffer_out: OPTIONAL<PWSTR>, ReturnBufferSize: DWORD, RequiredSize_out: OPTIONAL<LPDWORD>): BOOL {
+  public static SetupGetMultiSzFieldW(Context: PINFCONTEXT, FieldIndex: DWORD, ReturnBuffer_out: Optional<PWSTR>, ReturnBufferSize: DWORD, RequiredSize_out: Optional<LPDWORD>): BOOL {
     return Setupapi.Load('SetupGetMultiSzFieldW')(Context, FieldIndex, ReturnBuffer_out, ReturnBufferSize, RequiredSize_out);
   }
 
@@ -1903,12 +1903,12 @@ class Setupapi extends Win32 {
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupgetsourcefilelocationa
   public static SetupGetSourceFileLocationA(
     InfHandle: HINF,
-    InfContext: OPTIONAL<PINFCONTEXT>,
-    FileName: OPTIONAL<PCSTR>,
+    InfContext: Optional<PINFCONTEXT>,
+    FileName: Optional<PCSTR>,
     SourceId_out: PUINT,
-    ReturnBuffer_out: OPTIONAL<PSTR>,
+    ReturnBuffer_out: Optional<PSTR>,
     ReturnBufferSize: DWORD,
-    RequiredSize_out: OPTIONAL<PDWORD>,
+    RequiredSize_out: Optional<PDWORD>,
   ): BOOL {
     return Setupapi.Load('SetupGetSourceFileLocationA')(InfHandle, InfContext, FileName, SourceId_out, ReturnBuffer_out, ReturnBufferSize, RequiredSize_out);
   }
@@ -1916,100 +1916,100 @@ class Setupapi extends Win32 {
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupgetsourcefilelocationw
   public static SetupGetSourceFileLocationW(
     InfHandle: HINF,
-    InfContext: OPTIONAL<PINFCONTEXT>,
-    FileName: OPTIONAL<PCWSTR>,
+    InfContext: Optional<PINFCONTEXT>,
+    FileName: Optional<PCWSTR>,
     SourceId_out: PUINT,
-    ReturnBuffer_out: OPTIONAL<PWSTR>,
+    ReturnBuffer_out: Optional<PWSTR>,
     ReturnBufferSize: DWORD,
-    RequiredSize_out: OPTIONAL<PDWORD>,
+    RequiredSize_out: Optional<PDWORD>,
   ): BOOL {
     return Setupapi.Load('SetupGetSourceFileLocationW')(InfHandle, InfContext, FileName, SourceId_out, ReturnBuffer_out, ReturnBufferSize, RequiredSize_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupgetsourcefilesizea
-  public static SetupGetSourceFileSizeA(InfHandle: HINF, InfContext: OPTIONAL<PINFCONTEXT>, FileName: OPTIONAL<PCSTR>, Section: OPTIONAL<PCSTR>, FileSize_out: PDWORD, RoundingFactor: UINT): BOOL {
+  public static SetupGetSourceFileSizeA(InfHandle: HINF, InfContext: Optional<PINFCONTEXT>, FileName: Optional<PCSTR>, Section: Optional<PCSTR>, FileSize_out: PDWORD, RoundingFactor: UINT): BOOL {
     return Setupapi.Load('SetupGetSourceFileSizeA')(InfHandle, InfContext, FileName, Section, FileSize_out, RoundingFactor);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupgetsourcefilesizew
-  public static SetupGetSourceFileSizeW(InfHandle: HINF, InfContext: OPTIONAL<PINFCONTEXT>, FileName: OPTIONAL<PCWSTR>, Section: OPTIONAL<PCWSTR>, FileSize_out: PDWORD, RoundingFactor: UINT): BOOL {
+  public static SetupGetSourceFileSizeW(InfHandle: HINF, InfContext: Optional<PINFCONTEXT>, FileName: Optional<PCWSTR>, Section: Optional<PCWSTR>, FileSize_out: PDWORD, RoundingFactor: UINT): BOOL {
     return Setupapi.Load('SetupGetSourceFileSizeW')(InfHandle, InfContext, FileName, Section, FileSize_out, RoundingFactor);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupgetsourceinfoa
-  public static SetupGetSourceInfoA(InfHandle: HINF, SourceId: UINT, InfoDesired: UINT, ReturnBuffer_out: OPTIONAL<PSTR>, ReturnBufferSize: DWORD, RequiredSize_out: OPTIONAL<PDWORD>): BOOL {
+  public static SetupGetSourceInfoA(InfHandle: HINF, SourceId: UINT, InfoDesired: UINT, ReturnBuffer_out: Optional<PSTR>, ReturnBufferSize: DWORD, RequiredSize_out: Optional<PDWORD>): BOOL {
     return Setupapi.Load('SetupGetSourceInfoA')(InfHandle, SourceId, InfoDesired, ReturnBuffer_out, ReturnBufferSize, RequiredSize_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupgetsourceinfow
-  public static SetupGetSourceInfoW(InfHandle: HINF, SourceId: UINT, InfoDesired: UINT, ReturnBuffer_out: OPTIONAL<PWSTR>, ReturnBufferSize: DWORD, RequiredSize_out: OPTIONAL<PDWORD>): BOOL {
+  public static SetupGetSourceInfoW(InfHandle: HINF, SourceId: UINT, InfoDesired: UINT, ReturnBuffer_out: Optional<PWSTR>, ReturnBufferSize: DWORD, RequiredSize_out: Optional<PDWORD>): BOOL {
     return Setupapi.Load('SetupGetSourceInfoW')(InfHandle, SourceId, InfoDesired, ReturnBuffer_out, ReturnBufferSize, RequiredSize_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupgetstringfielda
-  public static SetupGetStringFieldA(Context: PINFCONTEXT, FieldIndex: DWORD, ReturnBuffer_out: OPTIONAL<PSTR>, ReturnBufferSize: DWORD, RequiredSize_out: OPTIONAL<PDWORD>): BOOL {
+  public static SetupGetStringFieldA(Context: PINFCONTEXT, FieldIndex: DWORD, ReturnBuffer_out: Optional<PSTR>, ReturnBufferSize: DWORD, RequiredSize_out: Optional<PDWORD>): BOOL {
     return Setupapi.Load('SetupGetStringFieldA')(Context, FieldIndex, ReturnBuffer_out, ReturnBufferSize, RequiredSize_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupgetstringfieldw
-  public static SetupGetStringFieldW(Context: PINFCONTEXT, FieldIndex: DWORD, ReturnBuffer_out: OPTIONAL<PWSTR>, ReturnBufferSize: DWORD, RequiredSize_out: OPTIONAL<PDWORD>): BOOL {
+  public static SetupGetStringFieldW(Context: PINFCONTEXT, FieldIndex: DWORD, ReturnBuffer_out: Optional<PWSTR>, ReturnBufferSize: DWORD, RequiredSize_out: Optional<PDWORD>): BOOL {
     return Setupapi.Load('SetupGetStringFieldW')(Context, FieldIndex, ReturnBuffer_out, ReturnBufferSize, RequiredSize_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupgettargetpatha
-  public static SetupGetTargetPathA(InfHandle: HINF, InfContext: OPTIONAL<PINFCONTEXT>, Section: OPTIONAL<PCSTR>, ReturnBuffer_out: OPTIONAL<PSTR>, ReturnBufferSize: DWORD, RequiredSize_out: OPTIONAL<PDWORD>): BOOL {
+  public static SetupGetTargetPathA(InfHandle: HINF, InfContext: Optional<PINFCONTEXT>, Section: Optional<PCSTR>, ReturnBuffer_out: Optional<PSTR>, ReturnBufferSize: DWORD, RequiredSize_out: Optional<PDWORD>): BOOL {
     return Setupapi.Load('SetupGetTargetPathA')(InfHandle, InfContext, Section, ReturnBuffer_out, ReturnBufferSize, RequiredSize_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupgettargetpathw
-  public static SetupGetTargetPathW(InfHandle: HINF, InfContext: OPTIONAL<PINFCONTEXT>, Section: OPTIONAL<PCWSTR>, ReturnBuffer_out: OPTIONAL<PWSTR>, ReturnBufferSize: DWORD, RequiredSize_out: OPTIONAL<PDWORD>): BOOL {
+  public static SetupGetTargetPathW(InfHandle: HINF, InfContext: Optional<PINFCONTEXT>, Section: Optional<PCWSTR>, ReturnBuffer_out: Optional<PWSTR>, ReturnBufferSize: DWORD, RequiredSize_out: Optional<PDWORD>): BOOL {
     return Setupapi.Load('SetupGetTargetPathW')(InfHandle, InfContext, Section, ReturnBuffer_out, ReturnBufferSize, RequiredSize_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupinitdefaultqueuecallback
-  public static SetupInitDefaultQueueCallback(OwnerWindow: OPTIONAL<HWND>): PVOID {
+  public static SetupInitDefaultQueueCallback(OwnerWindow: Optional<HWND>): PVOID {
     return Setupapi.Load('SetupInitDefaultQueueCallback')(OwnerWindow);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupinitdefaultqueuecallbackex
-  public static SetupInitDefaultQueueCallbackEx(OwnerWindow: OPTIONAL<HWND>, AlternateProgressWindow: OPTIONAL<HWND>, ProgressMessage: UINT, Reserved1: DWORD, Reserved2: OPTIONAL<PVOID>): PVOID {
+  public static SetupInitDefaultQueueCallbackEx(OwnerWindow: Optional<HWND>, AlternateProgressWindow: Optional<HWND>, ProgressMessage: UINT, Reserved1: DWORD, Reserved2: Optional<PVOID>): PVOID {
     return Setupapi.Load('SetupInitDefaultQueueCallbackEx')(OwnerWindow, AlternateProgressWindow, ProgressMessage, Reserved1, Reserved2);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupinitializefileloga
-  public static SetupInitializeFileLogA(LogFileName: OPTIONAL<PCSTR>, Flags: DWORD): HSPFILELOG {
+  public static SetupInitializeFileLogA(LogFileName: Optional<PCSTR>, Flags: DWORD): HSPFILELOG {
     return Setupapi.Load('SetupInitializeFileLogA')(LogFileName, Flags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupinitializefilelogw
-  public static SetupInitializeFileLogW(LogFileName: OPTIONAL<PCWSTR>, Flags: DWORD): HSPFILELOG {
+  public static SetupInitializeFileLogW(LogFileName: Optional<PCWSTR>, Flags: DWORD): HSPFILELOG {
     return Setupapi.Load('SetupInitializeFileLogW')(LogFileName, Flags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupinstallfilea
   public static SetupInstallFileA(
-    InfHandle: OPTIONAL<HINF>,
-    InfContext: OPTIONAL<PINFCONTEXT>,
-    SourceFile: OPTIONAL<PCSTR>,
-    SourcePathRoot: OPTIONAL<PCSTR>,
-    DestinationName: OPTIONAL<PCSTR>,
+    InfHandle: Optional<HINF>,
+    InfContext: Optional<PINFCONTEXT>,
+    SourceFile: Optional<PCSTR>,
+    SourcePathRoot: Optional<PCSTR>,
+    DestinationName: Optional<PCSTR>,
     CopyStyle: DWORD,
-    CopyMsgHandler: OPTIONAL<PSP_FILE_CALLBACK_A>,
-    Context: OPTIONAL<PVOID>,
+    CopyMsgHandler: Optional<PSP_FILE_CALLBACK_A>,
+    Context: Optional<PVOID>,
   ): BOOL {
     return Setupapi.Load('SetupInstallFileA')(InfHandle, InfContext, SourceFile, SourcePathRoot, DestinationName, CopyStyle, CopyMsgHandler, Context);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupinstallfileexa
   public static SetupInstallFileExA(
-    InfHandle: OPTIONAL<HINF>,
-    InfContext: OPTIONAL<PINFCONTEXT>,
-    SourceFile: OPTIONAL<PCSTR>,
-    SourcePathRoot: OPTIONAL<PCSTR>,
-    DestinationName: OPTIONAL<PCSTR>,
+    InfHandle: Optional<HINF>,
+    InfContext: Optional<PINFCONTEXT>,
+    SourceFile: Optional<PCSTR>,
+    SourcePathRoot: Optional<PCSTR>,
+    DestinationName: Optional<PCSTR>,
     CopyStyle: DWORD,
-    CopyMsgHandler: OPTIONAL<PSP_FILE_CALLBACK_A>,
-    Context: OPTIONAL<PVOID>,
+    CopyMsgHandler: Optional<PSP_FILE_CALLBACK_A>,
+    Context: Optional<PVOID>,
     FileWasInUse_out: PBOOL,
   ): BOOL {
     return Setupapi.Load('SetupInstallFileExA')(InfHandle, InfContext, SourceFile, SourcePathRoot, DestinationName, CopyStyle, CopyMsgHandler, Context, FileWasInUse_out);
@@ -2017,14 +2017,14 @@ class Setupapi extends Win32 {
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupinstallfileexw
   public static SetupInstallFileExW(
-    InfHandle: OPTIONAL<HINF>,
-    InfContext: OPTIONAL<PINFCONTEXT>,
-    SourceFile: OPTIONAL<PCWSTR>,
-    SourcePathRoot: OPTIONAL<PCWSTR>,
-    DestinationName: OPTIONAL<PCWSTR>,
+    InfHandle: Optional<HINF>,
+    InfContext: Optional<PINFCONTEXT>,
+    SourceFile: Optional<PCWSTR>,
+    SourcePathRoot: Optional<PCWSTR>,
+    DestinationName: Optional<PCWSTR>,
     CopyStyle: DWORD,
-    CopyMsgHandler: OPTIONAL<PSP_FILE_CALLBACK_W>,
-    Context: OPTIONAL<PVOID>,
+    CopyMsgHandler: Optional<PSP_FILE_CALLBACK_W>,
+    Context: Optional<PVOID>,
     FileWasInUse_out: PBOOL,
   ): BOOL {
     return Setupapi.Load('SetupInstallFileExW')(InfHandle, InfContext, SourceFile, SourcePathRoot, DestinationName, CopyStyle, CopyMsgHandler, Context, FileWasInUse_out);
@@ -2032,58 +2032,58 @@ class Setupapi extends Win32 {
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupinstallfilew
   public static SetupInstallFileW(
-    InfHandle: OPTIONAL<HINF>,
-    InfContext: OPTIONAL<PINFCONTEXT>,
-    SourceFile: OPTIONAL<PCWSTR>,
-    SourcePathRoot: OPTIONAL<PCWSTR>,
-    DestinationName: OPTIONAL<PCWSTR>,
+    InfHandle: Optional<HINF>,
+    InfContext: Optional<PINFCONTEXT>,
+    SourceFile: Optional<PCWSTR>,
+    SourcePathRoot: Optional<PCWSTR>,
+    DestinationName: Optional<PCWSTR>,
     CopyStyle: DWORD,
-    CopyMsgHandler: OPTIONAL<PSP_FILE_CALLBACK_W>,
-    Context: OPTIONAL<PVOID>,
+    CopyMsgHandler: Optional<PSP_FILE_CALLBACK_W>,
+    Context: Optional<PVOID>,
   ): BOOL {
     return Setupapi.Load('SetupInstallFileW')(InfHandle, InfContext, SourceFile, SourcePathRoot, DestinationName, CopyStyle, CopyMsgHandler, Context);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupinstallfilesfrominfsectiona
-  public static SetupInstallFilesFromInfSectionA(InfHandle: HINF, LayoutInfHandle: OPTIONAL<HINF>, FileQueue: HSPFILEQ, SectionName: PCSTR, SourceRootPath: OPTIONAL<PCSTR>, CopyFlags: UINT): BOOL {
+  public static SetupInstallFilesFromInfSectionA(InfHandle: HINF, LayoutInfHandle: Optional<HINF>, FileQueue: HSPFILEQ, SectionName: PCSTR, SourceRootPath: Optional<PCSTR>, CopyFlags: UINT): BOOL {
     return Setupapi.Load('SetupInstallFilesFromInfSectionA')(InfHandle, LayoutInfHandle, FileQueue, SectionName, SourceRootPath, CopyFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupinstallfilesfrominfsectionw
-  public static SetupInstallFilesFromInfSectionW(InfHandle: HINF, LayoutInfHandle: OPTIONAL<HINF>, FileQueue: HSPFILEQ, SectionName: PCWSTR, SourceRootPath: OPTIONAL<PCWSTR>, CopyFlags: UINT): BOOL {
+  public static SetupInstallFilesFromInfSectionW(InfHandle: HINF, LayoutInfHandle: Optional<HINF>, FileQueue: HSPFILEQ, SectionName: PCWSTR, SourceRootPath: Optional<PCWSTR>, CopyFlags: UINT): BOOL {
     return Setupapi.Load('SetupInstallFilesFromInfSectionW')(InfHandle, LayoutInfHandle, FileQueue, SectionName, SourceRootPath, CopyFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupinstallfrominfsectiona
   public static SetupInstallFromInfSectionA(
-    Owner: OPTIONAL<HWND>,
+    Owner: Optional<HWND>,
     InfHandle: HINF,
     SectionName: PCSTR,
     Flags: UINT,
-    RelativeKeyRoot: OPTIONAL<HKEY>,
-    SourceRootPath: OPTIONAL<PCSTR>,
+    RelativeKeyRoot: Optional<HKEY>,
+    SourceRootPath: Optional<PCSTR>,
     CopyFlags: UINT,
-    MsgHandler: OPTIONAL<PSP_FILE_CALLBACK_A>,
-    Context: OPTIONAL<PVOID>,
-    DeviceInfoSet: OPTIONAL<HDEVINFO>,
-    DeviceInfoData: OPTIONAL<PSP_DEVINFO_DATA>,
+    MsgHandler: Optional<PSP_FILE_CALLBACK_A>,
+    Context: Optional<PVOID>,
+    DeviceInfoSet: Optional<HDEVINFO>,
+    DeviceInfoData: Optional<PSP_DEVINFO_DATA>,
   ): BOOL {
     return Setupapi.Load('SetupInstallFromInfSectionA')(Owner, InfHandle, SectionName, Flags, RelativeKeyRoot, SourceRootPath, CopyFlags, MsgHandler, Context, DeviceInfoSet, DeviceInfoData);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupinstallfrominfsectionw
   public static SetupInstallFromInfSectionW(
-    Owner: OPTIONAL<HWND>,
+    Owner: Optional<HWND>,
     InfHandle: HINF,
     SectionName: PCWSTR,
     Flags: UINT,
-    RelativeKeyRoot: OPTIONAL<HKEY>,
-    SourceRootPath: OPTIONAL<PCWSTR>,
+    RelativeKeyRoot: Optional<HKEY>,
+    SourceRootPath: Optional<PCWSTR>,
     CopyFlags: UINT,
-    MsgHandler: OPTIONAL<PSP_FILE_CALLBACK_W>,
-    Context: OPTIONAL<PVOID>,
-    DeviceInfoSet: OPTIONAL<HDEVINFO>,
-    DeviceInfoData: OPTIONAL<PSP_DEVINFO_DATA>,
+    MsgHandler: Optional<PSP_FILE_CALLBACK_W>,
+    Context: Optional<PVOID>,
+    DeviceInfoSet: Optional<HDEVINFO>,
+    DeviceInfoData: Optional<PSP_DEVINFO_DATA>,
   ): BOOL {
     return Setupapi.Load('SetupInstallFromInfSectionW')(Owner, InfHandle, SectionName, Flags, RelativeKeyRoot, SourceRootPath, CopyFlags, MsgHandler, Context, DeviceInfoSet, DeviceInfoData);
   }
@@ -2098,10 +2098,10 @@ class Setupapi extends Win32 {
     InfHandle: HINF,
     SectionName: PCSTR,
     Flags: DWORD,
-    DeviceInfoSet: OPTIONAL<HDEVINFO>,
-    DeviceInfoData: OPTIONAL<PSP_DEVINFO_DATA>,
-    Reserved1: OPTIONAL<PVOID>,
-    Reserved2: OPTIONAL<PVOID>,
+    DeviceInfoSet: Optional<HDEVINFO>,
+    DeviceInfoData: Optional<PSP_DEVINFO_DATA>,
+    Reserved1: Optional<PVOID>,
+    Reserved2: Optional<PVOID>,
   ): BOOL {
     return Setupapi.Load('SetupInstallServicesFromInfSectionExA')(InfHandle, SectionName, Flags, DeviceInfoSet, DeviceInfoData, Reserved1, Reserved2);
   }
@@ -2111,10 +2111,10 @@ class Setupapi extends Win32 {
     InfHandle: HINF,
     SectionName: PCWSTR,
     Flags: DWORD,
-    DeviceInfoSet: OPTIONAL<HDEVINFO>,
-    DeviceInfoData: OPTIONAL<PSP_DEVINFO_DATA>,
-    Reserved1: OPTIONAL<PVOID>,
-    Reserved2: OPTIONAL<PVOID>,
+    DeviceInfoSet: Optional<HDEVINFO>,
+    DeviceInfoData: Optional<PSP_DEVINFO_DATA>,
+    Reserved1: Optional<PVOID>,
+    Reserved2: Optional<PVOID>,
   ): BOOL {
     return Setupapi.Load('SetupInstallServicesFromInfSectionExW')(InfHandle, SectionName, Flags, DeviceInfoSet, DeviceInfoData, Reserved1, Reserved2);
   }
@@ -2147,13 +2147,13 @@ class Setupapi extends Win32 {
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setuplogfilea
   public static SetupLogFileA(
     FileLogHandle: HSPFILELOG,
-    LogSectionName: OPTIONAL<PCSTR>,
+    LogSectionName: Optional<PCSTR>,
     SourceFilename: PCSTR,
     TargetFilename: PCSTR,
     Checksum: DWORD,
-    DiskTagfile: OPTIONAL<PCSTR>,
-    DiskDescription: OPTIONAL<PCSTR>,
-    OtherInfo: OPTIONAL<PCSTR>,
+    DiskTagfile: Optional<PCSTR>,
+    DiskDescription: Optional<PCSTR>,
+    OtherInfo: Optional<PCSTR>,
     Flags: DWORD,
   ): BOOL {
     return Setupapi.Load('SetupLogFileA')(FileLogHandle, LogSectionName, SourceFilename, TargetFilename, Checksum, DiskTagfile, DiskDescription, OtherInfo, Flags);
@@ -2162,25 +2162,25 @@ class Setupapi extends Win32 {
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setuplogfilew
   public static SetupLogFileW(
     FileLogHandle: HSPFILELOG,
-    LogSectionName: OPTIONAL<PCWSTR>,
+    LogSectionName: Optional<PCWSTR>,
     SourceFilename: PCWSTR,
     TargetFilename: PCWSTR,
     Checksum: DWORD,
-    DiskTagfile: OPTIONAL<PCWSTR>,
-    DiskDescription: OPTIONAL<PCWSTR>,
-    OtherInfo: OPTIONAL<PCWSTR>,
+    DiskTagfile: Optional<PCWSTR>,
+    DiskDescription: Optional<PCWSTR>,
+    OtherInfo: Optional<PCWSTR>,
     Flags: DWORD,
   ): BOOL {
     return Setupapi.Load('SetupLogFileW')(FileLogHandle, LogSectionName, SourceFilename, TargetFilename, Checksum, DiskTagfile, DiskDescription, OtherInfo, Flags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupopenappendinffilea
-  public static SetupOpenAppendInfFileA(FileName: OPTIONAL<PCSTR>, InfHandle: HINF, ErrorLine_out: OPTIONAL<PUINT>): BOOL {
+  public static SetupOpenAppendInfFileA(FileName: Optional<PCSTR>, InfHandle: HINF, ErrorLine_out: Optional<PUINT>): BOOL {
     return Setupapi.Load('SetupOpenAppendInfFileA')(FileName, InfHandle, ErrorLine_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupopenappendinffilew
-  public static SetupOpenAppendInfFileW(FileName: OPTIONAL<PCWSTR>, InfHandle: HINF, ErrorLine_out: OPTIONAL<PUINT>): BOOL {
+  public static SetupOpenAppendInfFileW(FileName: Optional<PCWSTR>, InfHandle: HINF, ErrorLine_out: Optional<PUINT>): BOOL {
     return Setupapi.Load('SetupOpenAppendInfFileW')(FileName, InfHandle, ErrorLine_out);
   }
 
@@ -2190,12 +2190,12 @@ class Setupapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupopeninffilea
-  public static SetupOpenInfFileA(FileName: PCSTR, InfClass: OPTIONAL<PCSTR>, InfStyle: DWORD, ErrorLine_out: OPTIONAL<PUINT>): HINF {
+  public static SetupOpenInfFileA(FileName: PCSTR, InfClass: Optional<PCSTR>, InfStyle: DWORD, ErrorLine_out: Optional<PUINT>): HINF {
     return Setupapi.Load('SetupOpenInfFileA')(FileName, InfClass, InfStyle, ErrorLine_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupopeninffilew
-  public static SetupOpenInfFileW(FileName: PCWSTR, InfClass: OPTIONAL<PCWSTR>, InfStyle: DWORD, ErrorLine_out: OPTIONAL<PUINT>): HINF {
+  public static SetupOpenInfFileW(FileName: PCWSTR, InfClass: Optional<PCWSTR>, InfStyle: DWORD, ErrorLine_out: Optional<PUINT>): HINF {
     return Setupapi.Load('SetupOpenInfFileW')(FileName, InfClass, InfStyle, ErrorLine_out);
   }
 
@@ -2222,15 +2222,15 @@ class Setupapi extends Win32 {
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setuppromptfordiska
   public static SetupPromptForDiskA(
     hwndParent: HWND,
-    DialogTitle: OPTIONAL<PCSTR>,
-    DiskName: OPTIONAL<PCSTR>,
-    PathToSource: OPTIONAL<PCSTR>,
+    DialogTitle: Optional<PCSTR>,
+    DiskName: Optional<PCSTR>,
+    PathToSource: Optional<PCSTR>,
     FileSought: PCSTR,
-    TagFile: OPTIONAL<PCSTR>,
+    TagFile: Optional<PCSTR>,
     DiskPromptStyle: DWORD,
-    PathBuffer_out: OPTIONAL<PSTR>,
+    PathBuffer_out: Optional<PSTR>,
     PathBufferSize: DWORD,
-    PathRequiredSize_out: OPTIONAL<PDWORD>,
+    PathRequiredSize_out: Optional<PDWORD>,
   ): UINT {
     return Setupapi.Load('SetupPromptForDiskA')(hwndParent, DialogTitle, DiskName, PathToSource, FileSought, TagFile, DiskPromptStyle, PathBuffer_out, PathBufferSize, PathRequiredSize_out);
   }
@@ -2238,43 +2238,43 @@ class Setupapi extends Win32 {
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setuppromptfordiskw
   public static SetupPromptForDiskW(
     hwndParent: HWND,
-    DialogTitle: OPTIONAL<PCWSTR>,
-    DiskName: OPTIONAL<PCWSTR>,
-    PathToSource: OPTIONAL<PCWSTR>,
+    DialogTitle: Optional<PCWSTR>,
+    DiskName: Optional<PCWSTR>,
+    PathToSource: Optional<PCWSTR>,
     FileSought: PCWSTR,
-    TagFile: OPTIONAL<PCWSTR>,
+    TagFile: Optional<PCWSTR>,
     DiskPromptStyle: DWORD,
-    PathBuffer_out: OPTIONAL<PWSTR>,
+    PathBuffer_out: Optional<PWSTR>,
     PathBufferSize: DWORD,
-    PathRequiredSize_out: OPTIONAL<PDWORD>,
+    PathRequiredSize_out: Optional<PDWORD>,
   ): UINT {
     return Setupapi.Load('SetupPromptForDiskW')(hwndParent, DialogTitle, DiskName, PathToSource, FileSought, TagFile, DiskPromptStyle, PathBuffer_out, PathBufferSize, PathRequiredSize_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setuppromptreboot
-  public static SetupPromptReboot(FileQueue: OPTIONAL<HSPFILEQ>, Owner: OPTIONAL<HWND>, ScanOnly: BOOL): INT {
+  public static SetupPromptReboot(FileQueue: Optional<HSPFILEQ>, Owner: Optional<HWND>, ScanOnly: BOOL): INT {
     return Setupapi.Load('SetupPromptReboot')(FileQueue, Owner, ScanOnly);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupquerydrivesindiskspacelista
-  public static SetupQueryDrivesInDiskSpaceListA(DiskSpace: HDSKSPC, ReturnBuffer_out: OPTIONAL<PSTR>, ReturnBufferSize: DWORD, RequiredSize_out: OPTIONAL<PDWORD>): BOOL {
+  public static SetupQueryDrivesInDiskSpaceListA(DiskSpace: HDSKSPC, ReturnBuffer_out: Optional<PSTR>, ReturnBufferSize: DWORD, RequiredSize_out: Optional<PDWORD>): BOOL {
     return Setupapi.Load('SetupQueryDrivesInDiskSpaceListA')(DiskSpace, ReturnBuffer_out, ReturnBufferSize, RequiredSize_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupquerydrivesindiskspacelistw
-  public static SetupQueryDrivesInDiskSpaceListW(DiskSpace: HDSKSPC, ReturnBuffer_out: OPTIONAL<PWSTR>, ReturnBufferSize: DWORD, RequiredSize_out: OPTIONAL<PDWORD>): BOOL {
+  public static SetupQueryDrivesInDiskSpaceListW(DiskSpace: HDSKSPC, ReturnBuffer_out: Optional<PWSTR>, ReturnBufferSize: DWORD, RequiredSize_out: Optional<PDWORD>): BOOL {
     return Setupapi.Load('SetupQueryDrivesInDiskSpaceListW')(DiskSpace, ReturnBuffer_out, ReturnBufferSize, RequiredSize_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupqueryfileloga
   public static SetupQueryFileLogA(
     FileLogHandle: HSPFILELOG,
-    LogSectionName: OPTIONAL<PCSTR>,
+    LogSectionName: Optional<PCSTR>,
     TargetFilename: PCSTR,
     DesiredInfo: SetupFileLogInfo,
-    DataOut_out: OPTIONAL<PSTR>,
+    DataOut_out: Optional<PSTR>,
     ReturnBufferSize: DWORD,
-    RequiredSize_out: OPTIONAL<PDWORD>,
+    RequiredSize_out: Optional<PDWORD>,
   ): BOOL {
     return Setupapi.Load('SetupQueryFileLogA')(FileLogHandle, LogSectionName, TargetFilename, DesiredInfo, DataOut_out, ReturnBufferSize, RequiredSize_out);
   }
@@ -2282,43 +2282,43 @@ class Setupapi extends Win32 {
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupqueryfilelogw
   public static SetupQueryFileLogW(
     FileLogHandle: HSPFILELOG,
-    LogSectionName: OPTIONAL<PCWSTR>,
+    LogSectionName: Optional<PCWSTR>,
     TargetFilename: PCWSTR,
     DesiredInfo: SetupFileLogInfo,
-    DataOut_out: OPTIONAL<PWSTR>,
+    DataOut_out: Optional<PWSTR>,
     ReturnBufferSize: DWORD,
-    RequiredSize_out: OPTIONAL<PDWORD>,
+    RequiredSize_out: Optional<PDWORD>,
   ): BOOL {
     return Setupapi.Load('SetupQueryFileLogW')(FileLogHandle, LogSectionName, TargetFilename, DesiredInfo, DataOut_out, ReturnBufferSize, RequiredSize_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupqueryinffileinformationa
-  public static SetupQueryInfFileInformationA(InfInformation: PSP_INF_INFORMATION, InfIndex: UINT, ReturnBuffer_out: OPTIONAL<PSTR>, ReturnBufferSize: DWORD, RequiredSize_out: OPTIONAL<PDWORD>): BOOL {
+  public static SetupQueryInfFileInformationA(InfInformation: PSP_INF_INFORMATION, InfIndex: UINT, ReturnBuffer_out: Optional<PSTR>, ReturnBufferSize: DWORD, RequiredSize_out: Optional<PDWORD>): BOOL {
     return Setupapi.Load('SetupQueryInfFileInformationA')(InfInformation, InfIndex, ReturnBuffer_out, ReturnBufferSize, RequiredSize_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupqueryinffileinformationw
-  public static SetupQueryInfFileInformationW(InfInformation: PSP_INF_INFORMATION, InfIndex: UINT, ReturnBuffer_out: OPTIONAL<PWSTR>, ReturnBufferSize: DWORD, RequiredSize_out: OPTIONAL<PDWORD>): BOOL {
+  public static SetupQueryInfFileInformationW(InfInformation: PSP_INF_INFORMATION, InfIndex: UINT, ReturnBuffer_out: Optional<PWSTR>, ReturnBufferSize: DWORD, RequiredSize_out: Optional<PDWORD>): BOOL {
     return Setupapi.Load('SetupQueryInfFileInformationW')(InfInformation, InfIndex, ReturnBuffer_out, ReturnBufferSize, RequiredSize_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupqueryinforiginalfileinformationa
-  public static SetupQueryInfOriginalFileInformationA(InfInformation: PSP_INF_INFORMATION, InfIndex: UINT, AlternatePlatformInfo: OPTIONAL<PSP_ALTPLATFORM_INFO>, OriginalFileInfo_out: PSP_ORIGINAL_FILE_INFO_A): BOOL {
+  public static SetupQueryInfOriginalFileInformationA(InfInformation: PSP_INF_INFORMATION, InfIndex: UINT, AlternatePlatformInfo: Optional<PSP_ALTPLATFORM_INFO>, OriginalFileInfo_out: PSP_ORIGINAL_FILE_INFO_A): BOOL {
     return Setupapi.Load('SetupQueryInfOriginalFileInformationA')(InfInformation, InfIndex, AlternatePlatformInfo, OriginalFileInfo_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupqueryinforiginalfileinformationw
-  public static SetupQueryInfOriginalFileInformationW(InfInformation: PSP_INF_INFORMATION, InfIndex: UINT, AlternatePlatformInfo: OPTIONAL<PSP_ALTPLATFORM_INFO>, OriginalFileInfo_out: PSP_ORIGINAL_FILE_INFO_W): BOOL {
+  public static SetupQueryInfOriginalFileInformationW(InfInformation: PSP_INF_INFORMATION, InfIndex: UINT, AlternatePlatformInfo: Optional<PSP_ALTPLATFORM_INFO>, OriginalFileInfo_out: PSP_ORIGINAL_FILE_INFO_W): BOOL {
     return Setupapi.Load('SetupQueryInfOriginalFileInformationW')(InfInformation, InfIndex, AlternatePlatformInfo, OriginalFileInfo_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupqueryinfversioninformationa
-  public static SetupQueryInfVersionInformationA(InfInformation: PSP_INF_INFORMATION, InfIndex: UINT, Key: OPTIONAL<PCSTR>, ReturnBuffer_out: OPTIONAL<PSTR>, ReturnBufferSize: DWORD, RequiredSize_out: OPTIONAL<PDWORD>): BOOL {
+  public static SetupQueryInfVersionInformationA(InfInformation: PSP_INF_INFORMATION, InfIndex: UINT, Key: Optional<PCSTR>, ReturnBuffer_out: Optional<PSTR>, ReturnBufferSize: DWORD, RequiredSize_out: Optional<PDWORD>): BOOL {
     return Setupapi.Load('SetupQueryInfVersionInformationA')(InfInformation, InfIndex, Key, ReturnBuffer_out, ReturnBufferSize, RequiredSize_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupqueryinfversioninformationw
-  public static SetupQueryInfVersionInformationW(InfInformation: PSP_INF_INFORMATION, InfIndex: UINT, Key: OPTIONAL<PCWSTR>, ReturnBuffer_out: OPTIONAL<PWSTR>, ReturnBufferSize: DWORD, RequiredSize_out: OPTIONAL<PDWORD>): BOOL {
+  public static SetupQueryInfVersionInformationW(InfInformation: PSP_INF_INFORMATION, InfIndex: UINT, Key: Optional<PCWSTR>, ReturnBuffer_out: Optional<PWSTR>, ReturnBufferSize: DWORD, RequiredSize_out: Optional<PDWORD>): BOOL {
     return Setupapi.Load('SetupQueryInfVersionInformationW')(InfInformation, InfIndex, Key, ReturnBuffer_out, ReturnBufferSize, RequiredSize_out);
   }
 
@@ -2333,25 +2333,25 @@ class Setupapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupqueryspacerequiredondrivea
-  public static SetupQuerySpaceRequiredOnDriveA(DiskSpace: HDSKSPC, DriveSpec: PCSTR, SpaceRequired_out: PLONGLONG, Reserved1: OPTIONAL<PVOID>, Reserved2: UINT): BOOL {
+  public static SetupQuerySpaceRequiredOnDriveA(DiskSpace: HDSKSPC, DriveSpec: PCSTR, SpaceRequired_out: PLONGLONG, Reserved1: Optional<PVOID>, Reserved2: UINT): BOOL {
     return Setupapi.Load('SetupQuerySpaceRequiredOnDriveA')(DiskSpace, DriveSpec, SpaceRequired_out, Reserved1, Reserved2);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupqueryspacerequiredondrivew
-  public static SetupQuerySpaceRequiredOnDriveW(DiskSpace: HDSKSPC, DriveSpec: PCWSTR, SpaceRequired_out: PLONGLONG, Reserved1: OPTIONAL<PVOID>, Reserved2: UINT): BOOL {
+  public static SetupQuerySpaceRequiredOnDriveW(DiskSpace: HDSKSPC, DriveSpec: PCWSTR, SpaceRequired_out: PLONGLONG, Reserved1: Optional<PVOID>, Reserved2: UINT): BOOL {
     return Setupapi.Load('SetupQuerySpaceRequiredOnDriveW')(DiskSpace, DriveSpec, SpaceRequired_out, Reserved1, Reserved2);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupqueuecopya
   public static SetupQueueCopyA(
     QueueHandle: HSPFILEQ,
-    SourceRootPath: OPTIONAL<PCSTR>,
-    SourcePath: OPTIONAL<PCSTR>,
+    SourceRootPath: Optional<PCSTR>,
+    SourcePath: Optional<PCSTR>,
     SourceFilename: PCSTR,
-    SourceDescription: OPTIONAL<PCSTR>,
-    SourceTagfile: OPTIONAL<PCSTR>,
+    SourceDescription: Optional<PCSTR>,
+    SourceTagfile: Optional<PCSTR>,
     TargetDirectory: PCSTR,
-    TargetFilename: OPTIONAL<PCSTR>,
+    TargetFilename: Optional<PCSTR>,
     CopyStyle: DWORD,
   ): BOOL {
     return Setupapi.Load('SetupQueueCopyA')(QueueHandle, SourceRootPath, SourcePath, SourceFilename, SourceDescription, SourceTagfile, TargetDirectory, TargetFilename, CopyStyle);
@@ -2368,97 +2368,97 @@ class Setupapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupqueuecopysectiona
-  public static SetupQueueCopySectionA(QueueHandle: HSPFILEQ, SourceRootPath: OPTIONAL<PCSTR>, InfHandle: HINF, ListInfHandle: OPTIONAL<HINF>, Section: PCSTR, CopyStyle: DWORD): BOOL {
+  public static SetupQueueCopySectionA(QueueHandle: HSPFILEQ, SourceRootPath: Optional<PCSTR>, InfHandle: HINF, ListInfHandle: Optional<HINF>, Section: PCSTR, CopyStyle: DWORD): BOOL {
     return Setupapi.Load('SetupQueueCopySectionA')(QueueHandle, SourceRootPath, InfHandle, ListInfHandle, Section, CopyStyle);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupqueuecopysectionw
-  public static SetupQueueCopySectionW(QueueHandle: HSPFILEQ, SourceRootPath: OPTIONAL<PCWSTR>, InfHandle: HINF, ListInfHandle: OPTIONAL<HINF>, Section: PCWSTR, CopyStyle: DWORD): BOOL {
+  public static SetupQueueCopySectionW(QueueHandle: HSPFILEQ, SourceRootPath: Optional<PCWSTR>, InfHandle: HINF, ListInfHandle: Optional<HINF>, Section: PCWSTR, CopyStyle: DWORD): BOOL {
     return Setupapi.Load('SetupQueueCopySectionW')(QueueHandle, SourceRootPath, InfHandle, ListInfHandle, Section, CopyStyle);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupqueuecopyw
   public static SetupQueueCopyW(
     QueueHandle: HSPFILEQ,
-    SourceRootPath: OPTIONAL<PCWSTR>,
-    SourcePath: OPTIONAL<PCWSTR>,
+    SourceRootPath: Optional<PCWSTR>,
+    SourcePath: Optional<PCWSTR>,
     SourceFilename: PCWSTR,
-    SourceDescription: OPTIONAL<PCWSTR>,
-    SourceTagfile: OPTIONAL<PCWSTR>,
+    SourceDescription: Optional<PCWSTR>,
+    SourceTagfile: Optional<PCWSTR>,
     TargetDirectory: PCWSTR,
-    TargetFilename: OPTIONAL<PCWSTR>,
+    TargetFilename: Optional<PCWSTR>,
     CopyStyle: DWORD,
   ): BOOL {
     return Setupapi.Load('SetupQueueCopyW')(QueueHandle, SourceRootPath, SourcePath, SourceFilename, SourceDescription, SourceTagfile, TargetDirectory, TargetFilename, CopyStyle);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupqueuedefaultcopya
-  public static SetupQueueDefaultCopyA(QueueHandle: HSPFILEQ, InfHandle: HINF, SourceRootPath: OPTIONAL<PCSTR>, SourceFilename: PCSTR, TargetFilename: OPTIONAL<PCSTR>, CopyStyle: DWORD): BOOL {
+  public static SetupQueueDefaultCopyA(QueueHandle: HSPFILEQ, InfHandle: HINF, SourceRootPath: Optional<PCSTR>, SourceFilename: PCSTR, TargetFilename: Optional<PCSTR>, CopyStyle: DWORD): BOOL {
     return Setupapi.Load('SetupQueueDefaultCopyA')(QueueHandle, InfHandle, SourceRootPath, SourceFilename, TargetFilename, CopyStyle);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupqueuedefaultcopyw
-  public static SetupQueueDefaultCopyW(QueueHandle: HSPFILEQ, InfHandle: HINF, SourceRootPath: OPTIONAL<PCWSTR>, SourceFilename: PCWSTR, TargetFilename: OPTIONAL<PCWSTR>, CopyStyle: DWORD): BOOL {
+  public static SetupQueueDefaultCopyW(QueueHandle: HSPFILEQ, InfHandle: HINF, SourceRootPath: Optional<PCWSTR>, SourceFilename: PCWSTR, TargetFilename: Optional<PCWSTR>, CopyStyle: DWORD): BOOL {
     return Setupapi.Load('SetupQueueDefaultCopyW')(QueueHandle, InfHandle, SourceRootPath, SourceFilename, TargetFilename, CopyStyle);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupqueuedeletea
-  public static SetupQueueDeleteA(QueueHandle: HSPFILEQ, PathPart1: PCSTR, PathPart2: OPTIONAL<PCSTR>): BOOL {
+  public static SetupQueueDeleteA(QueueHandle: HSPFILEQ, PathPart1: PCSTR, PathPart2: Optional<PCSTR>): BOOL {
     return Setupapi.Load('SetupQueueDeleteA')(QueueHandle, PathPart1, PathPart2);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupqueuedeletesectiona
-  public static SetupQueueDeleteSectionA(QueueHandle: HSPFILEQ, InfHandle: HINF, ListInfHandle: OPTIONAL<HINF>, Section: PCSTR): BOOL {
+  public static SetupQueueDeleteSectionA(QueueHandle: HSPFILEQ, InfHandle: HINF, ListInfHandle: Optional<HINF>, Section: PCSTR): BOOL {
     return Setupapi.Load('SetupQueueDeleteSectionA')(QueueHandle, InfHandle, ListInfHandle, Section);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupqueuedeletesectionw
-  public static SetupQueueDeleteSectionW(QueueHandle: HSPFILEQ, InfHandle: HINF, ListInfHandle: OPTIONAL<HINF>, Section: PCWSTR): BOOL {
+  public static SetupQueueDeleteSectionW(QueueHandle: HSPFILEQ, InfHandle: HINF, ListInfHandle: Optional<HINF>, Section: PCWSTR): BOOL {
     return Setupapi.Load('SetupQueueDeleteSectionW')(QueueHandle, InfHandle, ListInfHandle, Section);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupqueuedeletew
-  public static SetupQueueDeleteW(QueueHandle: HSPFILEQ, PathPart1: PCWSTR, PathPart2: OPTIONAL<PCWSTR>): BOOL {
+  public static SetupQueueDeleteW(QueueHandle: HSPFILEQ, PathPart1: PCWSTR, PathPart2: Optional<PCWSTR>): BOOL {
     return Setupapi.Load('SetupQueueDeleteW')(QueueHandle, PathPart1, PathPart2);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupqueuerenamea
-  public static SetupQueueRenameA(QueueHandle: HSPFILEQ, SourcePath: PCSTR, SourceFilename: OPTIONAL<PCSTR>, TargetPath: OPTIONAL<PCSTR>, TargetFilename: PCSTR): BOOL {
+  public static SetupQueueRenameA(QueueHandle: HSPFILEQ, SourcePath: PCSTR, SourceFilename: Optional<PCSTR>, TargetPath: Optional<PCSTR>, TargetFilename: PCSTR): BOOL {
     return Setupapi.Load('SetupQueueRenameA')(QueueHandle, SourcePath, SourceFilename, TargetPath, TargetFilename);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupqueuerenamesectiona
-  public static SetupQueueRenameSectionA(QueueHandle: HSPFILEQ, InfHandle: HINF, ListInfHandle: OPTIONAL<HINF>, Section: PCSTR): BOOL {
+  public static SetupQueueRenameSectionA(QueueHandle: HSPFILEQ, InfHandle: HINF, ListInfHandle: Optional<HINF>, Section: PCSTR): BOOL {
     return Setupapi.Load('SetupQueueRenameSectionA')(QueueHandle, InfHandle, ListInfHandle, Section);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupqueuerenamesectionw
-  public static SetupQueueRenameSectionW(QueueHandle: HSPFILEQ, InfHandle: HINF, ListInfHandle: OPTIONAL<HINF>, Section: PCWSTR): BOOL {
+  public static SetupQueueRenameSectionW(QueueHandle: HSPFILEQ, InfHandle: HINF, ListInfHandle: Optional<HINF>, Section: PCWSTR): BOOL {
     return Setupapi.Load('SetupQueueRenameSectionW')(QueueHandle, InfHandle, ListInfHandle, Section);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupqueuerenamew
-  public static SetupQueueRenameW(QueueHandle: HSPFILEQ, SourcePath: PCWSTR, SourceFilename: OPTIONAL<PCWSTR>, TargetPath: OPTIONAL<PCWSTR>, TargetFilename: PCWSTR): BOOL {
+  public static SetupQueueRenameW(QueueHandle: HSPFILEQ, SourcePath: PCWSTR, SourceFilename: Optional<PCWSTR>, TargetPath: Optional<PCWSTR>, TargetFilename: PCWSTR): BOOL {
     return Setupapi.Load('SetupQueueRenameW')(QueueHandle, SourcePath, SourceFilename, TargetPath, TargetFilename);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupremovefilelogentrya
-  public static SetupRemoveFileLogEntryA(FileLogHandle: HSPFILELOG, LogSectionName: OPTIONAL<PCSTR>, TargetFilename: OPTIONAL<PCSTR>): BOOL {
+  public static SetupRemoveFileLogEntryA(FileLogHandle: HSPFILELOG, LogSectionName: Optional<PCSTR>, TargetFilename: Optional<PCSTR>): BOOL {
     return Setupapi.Load('SetupRemoveFileLogEntryA')(FileLogHandle, LogSectionName, TargetFilename);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupremovefilelogentryw
-  public static SetupRemoveFileLogEntryW(FileLogHandle: HSPFILELOG, LogSectionName: OPTIONAL<PCWSTR>, TargetFilename: OPTIONAL<PCWSTR>): BOOL {
+  public static SetupRemoveFileLogEntryW(FileLogHandle: HSPFILELOG, LogSectionName: Optional<PCWSTR>, TargetFilename: Optional<PCWSTR>): BOOL {
     return Setupapi.Load('SetupRemoveFileLogEntryW')(FileLogHandle, LogSectionName, TargetFilename);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupremovefromdiskspacelista
-  public static SetupRemoveFromDiskSpaceListA(DiskSpace: HDSKSPC, TargetFilespec: PCSTR, Operation: UINT, Reserved1: OPTIONAL<PVOID>, Reserved2: UINT): BOOL {
+  public static SetupRemoveFromDiskSpaceListA(DiskSpace: HDSKSPC, TargetFilespec: PCSTR, Operation: UINT, Reserved1: Optional<PVOID>, Reserved2: UINT): BOOL {
     return Setupapi.Load('SetupRemoveFromDiskSpaceListA')(DiskSpace, TargetFilespec, Operation, Reserved1, Reserved2);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupremovefromdiskspacelistw
-  public static SetupRemoveFromDiskSpaceListW(DiskSpace: HDSKSPC, TargetFilespec: PCWSTR, Operation: UINT, Reserved1: OPTIONAL<PVOID>, Reserved2: UINT): BOOL {
+  public static SetupRemoveFromDiskSpaceListW(DiskSpace: HDSKSPC, TargetFilespec: PCWSTR, Operation: UINT, Reserved1: Optional<PVOID>, Reserved2: UINT): BOOL {
     return Setupapi.Load('SetupRemoveFromDiskSpaceListW')(DiskSpace, TargetFilespec, Operation, Reserved1, Reserved2);
   }
 
@@ -2473,72 +2473,72 @@ class Setupapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupremoveinstallsectionfromdiskspacelista
-  public static SetupRemoveInstallSectionFromDiskSpaceListA(DiskSpace: HDSKSPC, InfHandle: HINF, LayoutInfHandle: OPTIONAL<HINF>, SectionName: PCSTR, Reserved1: OPTIONAL<PVOID>, Reserved2: UINT): BOOL {
+  public static SetupRemoveInstallSectionFromDiskSpaceListA(DiskSpace: HDSKSPC, InfHandle: HINF, LayoutInfHandle: Optional<HINF>, SectionName: PCSTR, Reserved1: Optional<PVOID>, Reserved2: UINT): BOOL {
     return Setupapi.Load('SetupRemoveInstallSectionFromDiskSpaceListA')(DiskSpace, InfHandle, LayoutInfHandle, SectionName, Reserved1, Reserved2);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupremoveinstallsectionfromdiskspacelistw
-  public static SetupRemoveInstallSectionFromDiskSpaceListW(DiskSpace: HDSKSPC, InfHandle: HINF, LayoutInfHandle: OPTIONAL<HINF>, SectionName: PCWSTR, Reserved1: OPTIONAL<PVOID>, Reserved2: UINT): BOOL {
+  public static SetupRemoveInstallSectionFromDiskSpaceListW(DiskSpace: HDSKSPC, InfHandle: HINF, LayoutInfHandle: Optional<HINF>, SectionName: PCWSTR, Reserved1: Optional<PVOID>, Reserved2: UINT): BOOL {
     return Setupapi.Load('SetupRemoveInstallSectionFromDiskSpaceListW')(DiskSpace, InfHandle, LayoutInfHandle, SectionName, Reserved1, Reserved2);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupremovesectionfromdiskspacelista
-  public static SetupRemoveSectionFromDiskSpaceListA(DiskSpace: HDSKSPC, InfHandle: HINF, ListInfHandle: OPTIONAL<HINF>, SectionName: PCSTR, Operation: UINT, Reserved1: OPTIONAL<PVOID>, Reserved2: UINT): BOOL {
+  public static SetupRemoveSectionFromDiskSpaceListA(DiskSpace: HDSKSPC, InfHandle: HINF, ListInfHandle: Optional<HINF>, SectionName: PCSTR, Operation: UINT, Reserved1: Optional<PVOID>, Reserved2: UINT): BOOL {
     return Setupapi.Load('SetupRemoveSectionFromDiskSpaceListA')(DiskSpace, InfHandle, ListInfHandle, SectionName, Operation, Reserved1, Reserved2);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupremovesectionfromdiskspacelistw
-  public static SetupRemoveSectionFromDiskSpaceListW(DiskSpace: HDSKSPC, InfHandle: HINF, ListInfHandle: OPTIONAL<HINF>, SectionName: PCWSTR, Operation: UINT, Reserved1: OPTIONAL<PVOID>, Reserved2: UINT): BOOL {
+  public static SetupRemoveSectionFromDiskSpaceListW(DiskSpace: HDSKSPC, InfHandle: HINF, ListInfHandle: Optional<HINF>, SectionName: PCWSTR, Operation: UINT, Reserved1: Optional<PVOID>, Reserved2: UINT): BOOL {
     return Setupapi.Load('SetupRemoveSectionFromDiskSpaceListW')(DiskSpace, InfHandle, ListInfHandle, SectionName, Operation, Reserved1, Reserved2);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setuprenameerrora
-  public static SetupRenameErrorA(hwndParent: HWND, DialogTitle: OPTIONAL<PCSTR>, SourceFile: PCSTR, TargetFile: PCSTR, Win32ErrorCode: UINT, Style: DWORD): UINT {
+  public static SetupRenameErrorA(hwndParent: HWND, DialogTitle: Optional<PCSTR>, SourceFile: PCSTR, TargetFile: PCSTR, Win32ErrorCode: UINT, Style: DWORD): UINT {
     return Setupapi.Load('SetupRenameErrorA')(hwndParent, DialogTitle, SourceFile, TargetFile, Win32ErrorCode, Style);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setuprenameerrorw
-  public static SetupRenameErrorW(hwndParent: HWND, DialogTitle: OPTIONAL<PCWSTR>, SourceFile: PCWSTR, TargetFile: PCWSTR, Win32ErrorCode: UINT, Style: DWORD): UINT {
+  public static SetupRenameErrorW(hwndParent: HWND, DialogTitle: Optional<PCWSTR>, SourceFile: PCWSTR, TargetFile: PCWSTR, Win32ErrorCode: UINT, Style: DWORD): UINT {
     return Setupapi.Load('SetupRenameErrorW')(hwndParent, DialogTitle, SourceFile, TargetFile, Win32ErrorCode, Style);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupscanfilequeuea
-  public static SetupScanFileQueueA(FileQueue: HSPFILEQ, Flags: DWORD, Window: OPTIONAL<HWND>, CallbackRoutine: OPTIONAL<PSP_FILE_CALLBACK_A>, CallbackContext: OPTIONAL<PVOID>, Result_out: PDWORD): BOOL {
+  public static SetupScanFileQueueA(FileQueue: HSPFILEQ, Flags: DWORD, Window: Optional<HWND>, CallbackRoutine: Optional<PSP_FILE_CALLBACK_A>, CallbackContext: Optional<PVOID>, Result_out: PDWORD): BOOL {
     return Setupapi.Load('SetupScanFileQueueA')(FileQueue, Flags, Window, CallbackRoutine, CallbackContext, Result_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupscanfilequeuew
-  public static SetupScanFileQueueW(FileQueue: HSPFILEQ, Flags: DWORD, Window: OPTIONAL<HWND>, CallbackRoutine: OPTIONAL<PSP_FILE_CALLBACK_W>, CallbackContext: OPTIONAL<PVOID>, Result_out: PDWORD): BOOL {
+  public static SetupScanFileQueueW(FileQueue: HSPFILEQ, Flags: DWORD, Window: Optional<HWND>, CallbackRoutine: Optional<PSP_FILE_CALLBACK_W>, CallbackContext: Optional<PVOID>, Result_out: PDWORD): BOOL {
     return Setupapi.Load('SetupScanFileQueueW')(FileQueue, Flags, Window, CallbackRoutine, CallbackContext, Result_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupsetdirectoryida
-  public static SetupSetDirectoryIdA(InfHandle: HINF, Id: DWORD, Directory: OPTIONAL<PCSTR>): BOOL {
+  public static SetupSetDirectoryIdA(InfHandle: HINF, Id: DWORD, Directory: Optional<PCSTR>): BOOL {
     return Setupapi.Load('SetupSetDirectoryIdA')(InfHandle, Id, Directory);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupsetdirectoryidexa
-  public static SetupSetDirectoryIdExA(InfHandle: HINF, Id: DWORD, Directory: OPTIONAL<PCSTR>, Flags: DWORD, Reserved1: DWORD, Reserved2: OPTIONAL<PVOID>): BOOL {
+  public static SetupSetDirectoryIdExA(InfHandle: HINF, Id: DWORD, Directory: Optional<PCSTR>, Flags: DWORD, Reserved1: DWORD, Reserved2: Optional<PVOID>): BOOL {
     return Setupapi.Load('SetupSetDirectoryIdExA')(InfHandle, Id, Directory, Flags, Reserved1, Reserved2);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupsetdirectoryidexw
-  public static SetupSetDirectoryIdExW(InfHandle: HINF, Id: DWORD, Directory: OPTIONAL<PCWSTR>, Flags: DWORD, Reserved1: DWORD, Reserved2: OPTIONAL<PVOID>): BOOL {
+  public static SetupSetDirectoryIdExW(InfHandle: HINF, Id: DWORD, Directory: Optional<PCWSTR>, Flags: DWORD, Reserved1: DWORD, Reserved2: Optional<PVOID>): BOOL {
     return Setupapi.Load('SetupSetDirectoryIdExW')(InfHandle, Id, Directory, Flags, Reserved1, Reserved2);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupsetdirectoryidw
-  public static SetupSetDirectoryIdW(InfHandle: HINF, Id: DWORD, Directory: OPTIONAL<PCWSTR>): BOOL {
+  public static SetupSetDirectoryIdW(InfHandle: HINF, Id: DWORD, Directory: Optional<PCWSTR>): BOOL {
     return Setupapi.Load('SetupSetDirectoryIdW')(InfHandle, Id, Directory);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupsetfilequeuealternateplatforma
-  public static SetupSetFileQueueAlternatePlatformA(QueueHandle: HSPFILEQ, AlternatePlatformInfo: OPTIONAL<PSP_ALTPLATFORM_INFO>, AlternateDefaultCatalogFile: OPTIONAL<PCSTR>): BOOL {
+  public static SetupSetFileQueueAlternatePlatformA(QueueHandle: HSPFILEQ, AlternatePlatformInfo: Optional<PSP_ALTPLATFORM_INFO>, AlternateDefaultCatalogFile: Optional<PCSTR>): BOOL {
     return Setupapi.Load('SetupSetFileQueueAlternatePlatformA')(QueueHandle, AlternatePlatformInfo, AlternateDefaultCatalogFile);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupsetfilequeuealternateplatformw
-  public static SetupSetFileQueueAlternatePlatformW(QueueHandle: HSPFILEQ, AlternatePlatformInfo: OPTIONAL<PSP_ALTPLATFORM_INFO>, AlternateDefaultCatalogFile: OPTIONAL<PCWSTR>): BOOL {
+  public static SetupSetFileQueueAlternatePlatformW(QueueHandle: HSPFILEQ, AlternatePlatformInfo: Optional<PSP_ALTPLATFORM_INFO>, AlternateDefaultCatalogFile: Optional<PCWSTR>): BOOL {
     return Setupapi.Load('SetupSetFileQueueAlternatePlatformW')(QueueHandle, AlternatePlatformInfo, AlternateDefaultCatalogFile);
   }
 
@@ -2553,12 +2553,12 @@ class Setupapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupsetplatformpathoverridea
-  public static SetupSetPlatformPathOverrideA(Override: OPTIONAL<PCSTR>): BOOL {
+  public static SetupSetPlatformPathOverrideA(Override: Optional<PCSTR>): BOOL {
     return Setupapi.Load('SetupSetPlatformPathOverrideA')(Override);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupsetplatformpathoverridew
-  public static SetupSetPlatformPathOverrideW(Override: OPTIONAL<PCWSTR>): BOOL {
+  public static SetupSetPlatformPathOverrideW(Override: Optional<PCWSTR>): BOOL {
     return Setupapi.Load('SetupSetPlatformPathOverrideW')(Override);
   }
 
@@ -2583,27 +2583,27 @@ class Setupapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupuninstallnewlycopiedinfs
-  public static SetupUninstallNewlyCopiedInfs(FileQueue: HSPFILEQ, Flags: DWORD, Reserved: OPTIONAL<PVOID>): BOOL {
+  public static SetupUninstallNewlyCopiedInfs(FileQueue: HSPFILEQ, Flags: DWORD, Reserved: Optional<PVOID>): BOOL {
     return Setupapi.Load('SetupUninstallNewlyCopiedInfs')(FileQueue, Flags, Reserved);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupuninstalloeminfa
-  public static SetupUninstallOEMInfA(InfFileName: PCSTR, Flags: DWORD, Reserved: OPTIONAL<PVOID>): BOOL {
+  public static SetupUninstallOEMInfA(InfFileName: PCSTR, Flags: DWORD, Reserved: Optional<PVOID>): BOOL {
     return Setupapi.Load('SetupUninstallOEMInfA')(InfFileName, Flags, Reserved);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupuninstalloeminfw
-  public static SetupUninstallOEMInfW(InfFileName: PCWSTR, Flags: DWORD, Reserved: OPTIONAL<PVOID>): BOOL {
+  public static SetupUninstallOEMInfW(InfFileName: PCWSTR, Flags: DWORD, Reserved: Optional<PVOID>): BOOL {
     return Setupapi.Load('SetupUninstallOEMInfW')(InfFileName, Flags, Reserved);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupverifyinffilea
-  public static SetupVerifyInfFileA(InfName: PCSTR, AltPlatformInfo: OPTIONAL<PSP_ALTPLATFORM_INFO>, InfSignerInfo_in_out: PSP_INF_SIGNER_INFO_A): BOOL {
+  public static SetupVerifyInfFileA(InfName: PCSTR, AltPlatformInfo: Optional<PSP_ALTPLATFORM_INFO>, InfSignerInfo_in_out: PSP_INF_SIGNER_INFO_A): BOOL {
     return Setupapi.Load('SetupVerifyInfFileA')(InfName, AltPlatformInfo, InfSignerInfo_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupverifyinffilew
-  public static SetupVerifyInfFileW(InfName: PCWSTR, AltPlatformInfo: OPTIONAL<PSP_ALTPLATFORM_INFO>, InfSignerInfo_in_out: PSP_INF_SIGNER_INFO_W): BOOL {
+  public static SetupVerifyInfFileW(InfName: PCWSTR, AltPlatformInfo: Optional<PSP_ALTPLATFORM_INFO>, InfSignerInfo_in_out: PSP_INF_SIGNER_INFO_W): BOOL {
     return Setupapi.Load('SetupVerifyInfFileW')(InfName, AltPlatformInfo, InfSignerInfo_in_out);
   }
 

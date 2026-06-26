@@ -25,7 +25,7 @@ import type {
   LPPRINTDLGW,
   LPSTR,
   LPWSTR,
-  NULLABLE,
+  Nullable,
   SHORT,
   WORD,
 } from '../types/Comdlg32';
@@ -116,12 +116,12 @@ class Comdlg32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/commdlg/nf-commdlg-getfiletitlea
-  public static GetFileTitleA(lpszFile: LPCSTR, Buf_out: NULLABLE<LPSTR>, cchSize: WORD): SHORT {
+  public static GetFileTitleA(lpszFile: LPCSTR, Buf_out: Nullable<LPSTR>, cchSize: WORD): SHORT {
     return Comdlg32.Load('GetFileTitleA')(lpszFile, Buf_out, cchSize);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/commdlg/nf-commdlg-getfiletitlew
-  public static GetFileTitleW(lpszFile: LPCWSTR, Buf_out: NULLABLE<LPWSTR>, cchSize: WORD): SHORT {
+  public static GetFileTitleW(lpszFile: LPCWSTR, Buf_out: Nullable<LPWSTR>, cchSize: WORD): SHORT {
     return Comdlg32.Load('GetFileTitleW')(lpszFile, Buf_out, cchSize);
   }
 

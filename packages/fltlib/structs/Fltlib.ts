@@ -19,7 +19,7 @@ import type {
   LPSECURITY_ATTRIBUTES,
   LPVOID,
   LPWSTR,
-  OPTIONAL,
+  Optional,
   PFILTER_MESSAGE_HEADER,
   PFILTER_REPLY_HEADER,
   PHANDLE,
@@ -90,12 +90,12 @@ class Fltlib extends Win32 {
   } as const satisfies Record<string, FFIFunction>;
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fltuser/nf-fltuser-filterattach
-  public static FilterAttach(lpFilterName: LPCWSTR, lpVolumeName: LPCWSTR, lpInstanceName: OPTIONAL<LPCWSTR>, dwCreatedInstanceNameLength: DWORD, lpCreatedInstanceName_out: OPTIONAL<LPWSTR>): HRESULT {
+  public static FilterAttach(lpFilterName: LPCWSTR, lpVolumeName: LPCWSTR, lpInstanceName: Optional<LPCWSTR>, dwCreatedInstanceNameLength: DWORD, lpCreatedInstanceName_out: Optional<LPWSTR>): HRESULT {
     return Fltlib.Load('FilterAttach')(lpFilterName, lpVolumeName, lpInstanceName, dwCreatedInstanceNameLength, lpCreatedInstanceName_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fltuser/nf-fltuser-filterattachataltitude
-  public static FilterAttachAtAltitude(lpFilterName: LPCWSTR, lpVolumeName: LPCWSTR, lpAltitude: LPCWSTR, lpInstanceName: OPTIONAL<LPCWSTR>, dwCreatedInstanceNameLength: DWORD, lpCreatedInstanceName_out: OPTIONAL<LPWSTR>): HRESULT {
+  public static FilterAttachAtAltitude(lpFilterName: LPCWSTR, lpVolumeName: LPCWSTR, lpAltitude: LPCWSTR, lpInstanceName: Optional<LPCWSTR>, dwCreatedInstanceNameLength: DWORD, lpCreatedInstanceName_out: Optional<LPWSTR>): HRESULT {
     return Fltlib.Load('FilterAttachAtAltitude')(lpFilterName, lpVolumeName, lpAltitude, lpInstanceName, dwCreatedInstanceNameLength, lpCreatedInstanceName_out);
   }
 
@@ -105,7 +105,7 @@ class Fltlib extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fltuser/nf-fltuser-filterconnectcommunicationport
-  public static FilterConnectCommunicationPort(lpPortName: LPCWSTR, dwOptions: DWORD, lpContext: OPTIONAL<LPCVOID>, wSizeOfContext: WORD, lpSecurityAttributes: OPTIONAL<LPSECURITY_ATTRIBUTES>, hPort_out: PHANDLE): HRESULT {
+  public static FilterConnectCommunicationPort(lpPortName: LPCWSTR, dwOptions: DWORD, lpContext: Optional<LPCVOID>, wSizeOfContext: WORD, lpSecurityAttributes: Optional<LPSECURITY_ATTRIBUTES>, hPort_out: PHANDLE): HRESULT {
     return Fltlib.Load('FilterConnectCommunicationPort')(lpPortName, dwOptions, lpContext, wSizeOfContext, lpSecurityAttributes, hPort_out);
   }
 
@@ -115,7 +115,7 @@ class Fltlib extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fltuser/nf-fltuser-filterdetach
-  public static FilterDetach(lpFilterName: LPCWSTR, lpVolumeName: LPCWSTR, lpInstanceName: OPTIONAL<LPCWSTR>): HRESULT {
+  public static FilterDetach(lpFilterName: LPCWSTR, lpVolumeName: LPCWSTR, lpInstanceName: Optional<LPCWSTR>): HRESULT {
     return Fltlib.Load('FilterDetach')(lpFilterName, lpVolumeName, lpInstanceName);
   }
 
@@ -145,7 +145,7 @@ class Fltlib extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fltuser/nf-fltuser-filtergetmessage
-  public static FilterGetMessage(hPort: HANDLE, lpMessageBuffer_out: PFILTER_MESSAGE_HEADER, dwMessageBufferSize: DWORD, lpOverlapped_in_out: OPTIONAL<LPOVERLAPPED>): HRESULT {
+  public static FilterGetMessage(hPort: HANDLE, lpMessageBuffer_out: PFILTER_MESSAGE_HEADER, dwMessageBufferSize: DWORD, lpOverlapped_in_out: Optional<LPOVERLAPPED>): HRESULT {
     return Fltlib.Load('FilterGetMessage')(hPort, lpMessageBuffer_out, dwMessageBufferSize, lpOverlapped_in_out);
   }
 
@@ -155,7 +155,7 @@ class Fltlib extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fltuser/nf-fltuser-filterinstancecreate
-  public static FilterInstanceCreate(lpFilterName: LPCWSTR, lpVolumeName: LPCWSTR, lpInstanceName: OPTIONAL<LPCWSTR>, hInstance_out: PHFILTER_INSTANCE): HRESULT {
+  public static FilterInstanceCreate(lpFilterName: LPCWSTR, lpVolumeName: LPCWSTR, lpInstanceName: Optional<LPCWSTR>, hInstance_out: PHFILTER_INSTANCE): HRESULT {
     return Fltlib.Load('FilterInstanceCreate')(lpFilterName, lpVolumeName, lpInstanceName, hInstance_out);
   }
 
@@ -190,7 +190,7 @@ class Fltlib extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fltuser/nf-fltuser-filtersendmessage
-  public static FilterSendMessage(hPort: HANDLE, lpInBuffer: LPVOID, dwInBufferSize: DWORD, lpOutBuffer_out: OPTIONAL<LPVOID>, dwOutBufferSize: DWORD, lpBytesReturned_out: LPDWORD): HRESULT {
+  public static FilterSendMessage(hPort: HANDLE, lpInBuffer: LPVOID, dwInBufferSize: DWORD, lpOutBuffer_out: Optional<LPVOID>, dwOutBufferSize: DWORD, lpBytesReturned_out: LPDWORD): HRESULT {
     return Fltlib.Load('FilterSendMessage')(hPort, lpInBuffer, dwInBufferSize, lpOutBuffer_out, dwOutBufferSize, lpBytesReturned_out);
   }
 

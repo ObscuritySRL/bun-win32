@@ -2,7 +2,7 @@ import { type FFIFunction, FFIType } from 'bun:ffi';
 
 import { Win32 } from '@bun-win32/core';
 
-import type { HRESULT, IUnknown, LPCVOID, LPLPVOID, LPVOID, OPTIONAL, PD3D12_ROOT_SIGNATURE_DESC, PD3D12_VERSIONED_ROOT_SIGNATURE_DESC, PID3DBlob, PUINT, REFCLSID, REFIID, SIZE_T, UINT } from '../types/D3d12';
+import type { HRESULT, IUnknown, LPCVOID, LPLPVOID, LPVOID, Optional, PD3D12_ROOT_SIGNATURE_DESC, PD3D12_VERSIONED_ROOT_SIGNATURE_DESC, PID3DBlob, PUINT, REFCLSID, REFIID, SIZE_T, UINT } from '../types/D3d12';
 import type { D3D_FEATURE_LEVEL, D3D_ROOT_SIGNATURE_VERSION } from '../types/D3d12';
 
 /**
@@ -45,7 +45,7 @@ class D3d12 extends Win32 {
   } as const satisfies Record<string, FFIFunction>;
 
   // https://learn.microsoft.com/en-us/windows/win32/api/d3d12/nf-d3d12-d3d12createdevice
-  public static D3D12CreateDevice(pAdapter: OPTIONAL<IUnknown>, MinimumFeatureLevel: D3D_FEATURE_LEVEL, riid: REFIID, ppDevice_out: OPTIONAL<LPLPVOID>): HRESULT {
+  public static D3D12CreateDevice(pAdapter: Optional<IUnknown>, MinimumFeatureLevel: D3D_FEATURE_LEVEL, riid: REFIID, ppDevice_out: Optional<LPLPVOID>): HRESULT {
     return D3d12.Load('D3D12CreateDevice')(pAdapter, MinimumFeatureLevel, riid, ppDevice_out);
   }
 
@@ -60,27 +60,27 @@ class D3d12 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/d3d12/nf-d3d12-d3d12enableexperimentalfeatures
-  public static D3D12EnableExperimentalFeatures(NumFeatures: UINT, pIIDs: REFIID, pConfigurationStructs: OPTIONAL<LPVOID>, pConfigurationStructSizes: OPTIONAL<PUINT>): HRESULT {
+  public static D3D12EnableExperimentalFeatures(NumFeatures: UINT, pIIDs: REFIID, pConfigurationStructs: Optional<LPVOID>, pConfigurationStructSizes: Optional<PUINT>): HRESULT {
     return D3d12.Load('D3D12EnableExperimentalFeatures')(NumFeatures, pIIDs, pConfigurationStructs, pConfigurationStructSizes);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/d3d12/nf-d3d12-d3d12getdebuginterface
-  public static D3D12GetDebugInterface(riid: REFIID, ppvDebug_out: OPTIONAL<LPLPVOID>): HRESULT {
+  public static D3D12GetDebugInterface(riid: REFIID, ppvDebug_out: Optional<LPLPVOID>): HRESULT {
     return D3d12.Load('D3D12GetDebugInterface')(riid, ppvDebug_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/d3d12/nf-d3d12-d3d12getinterface
-  public static D3D12GetInterface(rclsid: REFCLSID, riid: REFIID, ppvDebug_out: OPTIONAL<LPLPVOID>): HRESULT {
+  public static D3D12GetInterface(rclsid: REFCLSID, riid: REFIID, ppvDebug_out: Optional<LPLPVOID>): HRESULT {
     return D3d12.Load('D3D12GetInterface')(rclsid, riid, ppvDebug_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/d3d12/nf-d3d12-d3d12serializerootsignature
-  public static D3D12SerializeRootSignature(pRootSignature: PD3D12_ROOT_SIGNATURE_DESC, Version: D3D_ROOT_SIGNATURE_VERSION, ppBlob_out: PID3DBlob, ppErrorBlob_out: OPTIONAL<PID3DBlob>): HRESULT {
+  public static D3D12SerializeRootSignature(pRootSignature: PD3D12_ROOT_SIGNATURE_DESC, Version: D3D_ROOT_SIGNATURE_VERSION, ppBlob_out: PID3DBlob, ppErrorBlob_out: Optional<PID3DBlob>): HRESULT {
     return D3d12.Load('D3D12SerializeRootSignature')(pRootSignature, Version, ppBlob_out, ppErrorBlob_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/d3d12/nf-d3d12-d3d12serializeversionedrootsignature
-  public static D3D12SerializeVersionedRootSignature(pRootSignature: PD3D12_VERSIONED_ROOT_SIGNATURE_DESC, ppBlob_out: PID3DBlob, ppErrorBlob_out: OPTIONAL<PID3DBlob>): HRESULT {
+  public static D3D12SerializeVersionedRootSignature(pRootSignature: PD3D12_VERSIONED_ROOT_SIGNATURE_DESC, ppBlob_out: PID3DBlob, ppErrorBlob_out: Optional<PID3DBlob>): HRESULT {
     return D3d12.Load('D3D12SerializeVersionedRootSignature')(pRootSignature, ppBlob_out, ppErrorBlob_out);
   }
 }

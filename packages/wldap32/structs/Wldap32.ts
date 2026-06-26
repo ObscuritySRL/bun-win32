@@ -12,8 +12,8 @@ import type {
   LPSTR,
   LPVOID,
   LPWSTR,
-  NULLABLE,
-  OPTIONAL,
+  Nullable,
+  Optional,
   PBERVAL,
   PBerElement,
   PCHAR,
@@ -411,17 +411,17 @@ class Wldap32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-cldap_open
-  public static cldap_open(HostName: NULLABLE<PSTR>, PortNumber: ULONG): PLDAP {
+  public static cldap_open(HostName: Nullable<PSTR>, PortNumber: ULONG): PLDAP {
     return Wldap32.Load('cldap_open')(HostName, PortNumber);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-cldap_opena
-  public static cldap_openA(HostName: NULLABLE<PSTR>, PortNumber: ULONG): PLDAP {
+  public static cldap_openA(HostName: Nullable<PSTR>, PortNumber: ULONG): PLDAP {
     return Wldap32.Load('cldap_openA')(HostName, PortNumber);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-cldap_openw
-  public static cldap_openW(HostName: NULLABLE<PWSTR>, PortNumber: ULONG): PLDAP {
+  public static cldap_openW(HostName: Nullable<PWSTR>, PortNumber: ULONG): PLDAP {
     return Wldap32.Load('cldap_openW')(HostName, PortNumber);
   }
 
@@ -446,32 +446,32 @@ class Wldap32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_add_ext
-  public static ldap_add_ext(ld: PLDAP, dn: PSTR, attrs: PPLDAPModA, ServerControls: NULLABLE<PPLDAPControlA>, ClientControls: NULLABLE<PPLDAPControlA>, MessageNumber_out: PULONG): ULONG {
+  public static ldap_add_ext(ld: PLDAP, dn: PSTR, attrs: PPLDAPModA, ServerControls: Nullable<PPLDAPControlA>, ClientControls: Nullable<PPLDAPControlA>, MessageNumber_out: PULONG): ULONG {
     return Wldap32.Load('ldap_add_ext')(ld, dn, attrs, ServerControls, ClientControls, MessageNumber_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_add_exta
-  public static ldap_add_extA(ld: PLDAP, dn: PSTR, attrs: PPLDAPModA, ServerControls: NULLABLE<PPLDAPControlA>, ClientControls: NULLABLE<PPLDAPControlA>, MessageNumber_out: PULONG): ULONG {
+  public static ldap_add_extA(ld: PLDAP, dn: PSTR, attrs: PPLDAPModA, ServerControls: Nullable<PPLDAPControlA>, ClientControls: Nullable<PPLDAPControlA>, MessageNumber_out: PULONG): ULONG {
     return Wldap32.Load('ldap_add_extA')(ld, dn, attrs, ServerControls, ClientControls, MessageNumber_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_add_extw
-  public static ldap_add_extW(ld: PLDAP, dn: PWSTR, attrs: PPLDAPModW, ServerControls: NULLABLE<PPLDAPControlW>, ClientControls: NULLABLE<PPLDAPControlW>, MessageNumber_out: PULONG): ULONG {
+  public static ldap_add_extW(ld: PLDAP, dn: PWSTR, attrs: PPLDAPModW, ServerControls: Nullable<PPLDAPControlW>, ClientControls: Nullable<PPLDAPControlW>, MessageNumber_out: PULONG): ULONG {
     return Wldap32.Load('ldap_add_extW')(ld, dn, attrs, ServerControls, ClientControls, MessageNumber_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_add_ext_s
-  public static ldap_add_ext_s(ld: PLDAP, dn: PSTR, attrs: PPLDAPModA, ServerControls: NULLABLE<PPLDAPControlA>, ClientControls: NULLABLE<PPLDAPControlA>): ULONG {
+  public static ldap_add_ext_s(ld: PLDAP, dn: PSTR, attrs: PPLDAPModA, ServerControls: Nullable<PPLDAPControlA>, ClientControls: Nullable<PPLDAPControlA>): ULONG {
     return Wldap32.Load('ldap_add_ext_s')(ld, dn, attrs, ServerControls, ClientControls);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_add_ext_sa
-  public static ldap_add_ext_sA(ld: PLDAP, dn: PSTR, attrs: PPLDAPModA, ServerControls: NULLABLE<PPLDAPControlA>, ClientControls: NULLABLE<PPLDAPControlA>): ULONG {
+  public static ldap_add_ext_sA(ld: PLDAP, dn: PSTR, attrs: PPLDAPModA, ServerControls: Nullable<PPLDAPControlA>, ClientControls: Nullable<PPLDAPControlA>): ULONG {
     return Wldap32.Load('ldap_add_ext_sA')(ld, dn, attrs, ServerControls, ClientControls);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_add_ext_sw
-  public static ldap_add_ext_sW(ld: PLDAP, dn: PWSTR, attrs: PPLDAPModW, ServerControls: NULLABLE<PPLDAPControlW>, ClientControls: NULLABLE<PPLDAPControlW>): ULONG {
+  public static ldap_add_ext_sW(ld: PLDAP, dn: PWSTR, attrs: PPLDAPModW, ServerControls: Nullable<PPLDAPControlW>, ClientControls: Nullable<PPLDAPControlW>): ULONG {
     return Wldap32.Load('ldap_add_ext_sW')(ld, dn, attrs, ServerControls, ClientControls);
   }
 
@@ -491,32 +491,32 @@ class Wldap32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_bind
-  public static ldap_bind(ld: PLDAP, dn: OPTIONAL<PSTR>, cred: OPTIONAL<PCHAR>, method: ULONG): ULONG {
+  public static ldap_bind(ld: PLDAP, dn: Optional<PSTR>, cred: Optional<PCHAR>, method: ULONG): ULONG {
     return Wldap32.Load('ldap_bind')(ld, dn, cred, method);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_binda
-  public static ldap_bindA(ld: PLDAP, dn: OPTIONAL<PSTR>, cred: OPTIONAL<PCHAR>, method: ULONG): ULONG {
+  public static ldap_bindA(ld: PLDAP, dn: Optional<PSTR>, cred: Optional<PCHAR>, method: ULONG): ULONG {
     return Wldap32.Load('ldap_bindA')(ld, dn, cred, method);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_bindw
-  public static ldap_bindW(ld: PLDAP, dn: OPTIONAL<PWSTR>, cred: OPTIONAL<PWCHAR>, method: ULONG): ULONG {
+  public static ldap_bindW(ld: PLDAP, dn: Optional<PWSTR>, cred: Optional<PWCHAR>, method: ULONG): ULONG {
     return Wldap32.Load('ldap_bindW')(ld, dn, cred, method);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_bind_s
-  public static ldap_bind_s(ld: PLDAP, dn: OPTIONAL<PSTR>, cred: OPTIONAL<PCHAR>, method: ULONG): ULONG {
+  public static ldap_bind_s(ld: PLDAP, dn: Optional<PSTR>, cred: Optional<PCHAR>, method: ULONG): ULONG {
     return Wldap32.Load('ldap_bind_s')(ld, dn, cred, method);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_bind_sa
-  public static ldap_bind_sA(ld: PLDAP, dn: OPTIONAL<PSTR>, cred: OPTIONAL<PCHAR>, method: ULONG): ULONG {
+  public static ldap_bind_sA(ld: PLDAP, dn: Optional<PSTR>, cred: Optional<PCHAR>, method: ULONG): ULONG {
     return Wldap32.Load('ldap_bind_sA')(ld, dn, cred, method);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_bind_sw
-  public static ldap_bind_sW(ld: PLDAP, dn: OPTIONAL<PWSTR>, cred: OPTIONAL<PWCHAR>, method: ULONG): ULONG {
+  public static ldap_bind_sW(ld: PLDAP, dn: Optional<PWSTR>, cred: Optional<PWCHAR>, method: ULONG): ULONG {
     return Wldap32.Load('ldap_bind_sW')(ld, dn, cred, method);
   }
 
@@ -556,32 +556,32 @@ class Wldap32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_compare_ext
-  public static ldap_compare_ext(ld: PLDAP, dn: PSTR, Attr: PSTR, Value: NULLABLE<PSTR>, Data: NULLABLE<PBERVAL>, ServerControls: NULLABLE<PPLDAPControlA>, ClientControls: NULLABLE<PPLDAPControlA>, MessageNumber_out: PULONG): ULONG {
+  public static ldap_compare_ext(ld: PLDAP, dn: PSTR, Attr: PSTR, Value: Nullable<PSTR>, Data: Nullable<PBERVAL>, ServerControls: Nullable<PPLDAPControlA>, ClientControls: Nullable<PPLDAPControlA>, MessageNumber_out: PULONG): ULONG {
     return Wldap32.Load('ldap_compare_ext')(ld, dn, Attr, Value, Data, ServerControls, ClientControls, MessageNumber_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_compare_exta
-  public static ldap_compare_extA(ld: PLDAP, dn: PSTR, Attr: PSTR, Value: OPTIONAL<PSTR>, Data: OPTIONAL<PBERVAL>, ServerControls: NULLABLE<PPLDAPControlA>, ClientControls: NULLABLE<PPLDAPControlA>, MessageNumber_out: PULONG): ULONG {
+  public static ldap_compare_extA(ld: PLDAP, dn: PSTR, Attr: PSTR, Value: Optional<PSTR>, Data: Optional<PBERVAL>, ServerControls: Nullable<PPLDAPControlA>, ClientControls: Nullable<PPLDAPControlA>, MessageNumber_out: PULONG): ULONG {
     return Wldap32.Load('ldap_compare_extA')(ld, dn, Attr, Value, Data, ServerControls, ClientControls, MessageNumber_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_compare_extw
-  public static ldap_compare_extW(ld: PLDAP, dn: PWSTR, Attr: PWSTR, Value: OPTIONAL<PWSTR>, Data: OPTIONAL<PBERVAL>, ServerControls: NULLABLE<PPLDAPControlW>, ClientControls: NULLABLE<PPLDAPControlW>, MessageNumber_out: PULONG): ULONG {
+  public static ldap_compare_extW(ld: PLDAP, dn: PWSTR, Attr: PWSTR, Value: Optional<PWSTR>, Data: Optional<PBERVAL>, ServerControls: Nullable<PPLDAPControlW>, ClientControls: Nullable<PPLDAPControlW>, MessageNumber_out: PULONG): ULONG {
     return Wldap32.Load('ldap_compare_extW')(ld, dn, Attr, Value, Data, ServerControls, ClientControls, MessageNumber_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_compare_ext_s
-  public static ldap_compare_ext_s(ld: PLDAP, dn: PSTR, Attr: PSTR, Value: NULLABLE<PSTR>, Data: NULLABLE<PBERVAL>, ServerControls: NULLABLE<PPLDAPControlA>, ClientControls: NULLABLE<PPLDAPControlA>): ULONG {
+  public static ldap_compare_ext_s(ld: PLDAP, dn: PSTR, Attr: PSTR, Value: Nullable<PSTR>, Data: Nullable<PBERVAL>, ServerControls: Nullable<PPLDAPControlA>, ClientControls: Nullable<PPLDAPControlA>): ULONG {
     return Wldap32.Load('ldap_compare_ext_s')(ld, dn, Attr, Value, Data, ServerControls, ClientControls);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_compare_ext_sa
-  public static ldap_compare_ext_sA(ld: PLDAP, dn: PSTR, Attr: PSTR, Value: OPTIONAL<PSTR>, Data: OPTIONAL<PBERVAL>, ServerControls: NULLABLE<PPLDAPControlA>, ClientControls: NULLABLE<PPLDAPControlA>): ULONG {
+  public static ldap_compare_ext_sA(ld: PLDAP, dn: PSTR, Attr: PSTR, Value: Optional<PSTR>, Data: Optional<PBERVAL>, ServerControls: Nullable<PPLDAPControlA>, ClientControls: Nullable<PPLDAPControlA>): ULONG {
     return Wldap32.Load('ldap_compare_ext_sA')(ld, dn, Attr, Value, Data, ServerControls, ClientControls);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_compare_ext_sw
-  public static ldap_compare_ext_sW(ld: PLDAP, dn: PWSTR, Attr: PWSTR, Value: OPTIONAL<PWSTR>, Data: OPTIONAL<PBERVAL>, ServerControls: NULLABLE<PPLDAPControlW>, ClientControls: NULLABLE<PPLDAPControlW>): ULONG {
+  public static ldap_compare_ext_sW(ld: PLDAP, dn: PWSTR, Attr: PWSTR, Value: Optional<PWSTR>, Data: Optional<PBERVAL>, ServerControls: Nullable<PPLDAPControlW>, ClientControls: Nullable<PPLDAPControlW>): ULONG {
     return Wldap32.Load('ldap_compare_ext_sW')(ld, dn, Attr, Value, Data, ServerControls, ClientControls);
   }
 
@@ -606,7 +606,7 @@ class Wldap32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_connect
-  public static ldap_connect(ld: PLDAP, timeout: NULLABLE<PLDAP_TIMEVAL>): ULONG {
+  public static ldap_connect(ld: PLDAP, timeout: Nullable<PLDAP_TIMEVAL>): ULONG {
     return Wldap32.Load('ldap_connect')(ld, timeout);
   }
 
@@ -651,17 +651,17 @@ class Wldap32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_count_values
-  public static ldap_count_values(vals: OPTIONAL<PZPSTR>): ULONG {
+  public static ldap_count_values(vals: Optional<PZPSTR>): ULONG {
     return Wldap32.Load('ldap_count_values')(vals);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_count_valuesa
-  public static ldap_count_valuesA(vals: OPTIONAL<PZPSTR>): ULONG {
+  public static ldap_count_valuesA(vals: Optional<PZPSTR>): ULONG {
     return Wldap32.Load('ldap_count_valuesA')(vals);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_count_valuesw
-  public static ldap_count_valuesW(vals: OPTIONAL<PZPWSTR>): ULONG {
+  public static ldap_count_valuesW(vals: Optional<PZPWSTR>): ULONG {
     return Wldap32.Load('ldap_count_valuesW')(vals);
   }
 
@@ -671,17 +671,17 @@ class Wldap32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_create_page_control
-  public static ldap_create_page_control(ExternalHandle: PLDAP, PageSize: ULONG, Cookie: NULLABLE<PBERVAL>, IsCritical: UCHAR, Control_out: PPLDAPControlA): ULONG {
+  public static ldap_create_page_control(ExternalHandle: PLDAP, PageSize: ULONG, Cookie: Nullable<PBERVAL>, IsCritical: UCHAR, Control_out: PPLDAPControlA): ULONG {
     return Wldap32.Load('ldap_create_page_control')(ExternalHandle, PageSize, Cookie, IsCritical, Control_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_create_page_controla
-  public static ldap_create_page_controlA(ExternalHandle: PLDAP, PageSize: ULONG, Cookie: NULLABLE<PBERVAL>, IsCritical: UCHAR, Control_out: PPLDAPControlA): ULONG {
+  public static ldap_create_page_controlA(ExternalHandle: PLDAP, PageSize: ULONG, Cookie: Nullable<PBERVAL>, IsCritical: UCHAR, Control_out: PPLDAPControlA): ULONG {
     return Wldap32.Load('ldap_create_page_controlA')(ExternalHandle, PageSize, Cookie, IsCritical, Control_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_create_page_controlw
-  public static ldap_create_page_controlW(ExternalHandle: PLDAP, PageSize: ULONG, Cookie: NULLABLE<PBERVAL>, IsCritical: UCHAR, Control_out: PPLDAPControlW): ULONG {
+  public static ldap_create_page_controlW(ExternalHandle: PLDAP, PageSize: ULONG, Cookie: Nullable<PBERVAL>, IsCritical: UCHAR, Control_out: PPLDAPControlW): ULONG {
     return Wldap32.Load('ldap_create_page_controlW')(ExternalHandle, PageSize, Cookie, IsCritical, Control_out);
   }
 
@@ -726,32 +726,32 @@ class Wldap32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_delete_ext
-  public static ldap_delete_ext(ld: PLDAP, dn: PSTR, ServerControls: NULLABLE<PPLDAPControlA>, ClientControls: NULLABLE<PPLDAPControlA>, MessageNumber_out: PULONG): ULONG {
+  public static ldap_delete_ext(ld: PLDAP, dn: PSTR, ServerControls: Nullable<PPLDAPControlA>, ClientControls: Nullable<PPLDAPControlA>, MessageNumber_out: PULONG): ULONG {
     return Wldap32.Load('ldap_delete_ext')(ld, dn, ServerControls, ClientControls, MessageNumber_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_delete_exta
-  public static ldap_delete_extA(ld: PLDAP, dn: PSTR, ServerControls: NULLABLE<PPLDAPControlA>, ClientControls: NULLABLE<PPLDAPControlA>, MessageNumber_out: PULONG): ULONG {
+  public static ldap_delete_extA(ld: PLDAP, dn: PSTR, ServerControls: Nullable<PPLDAPControlA>, ClientControls: Nullable<PPLDAPControlA>, MessageNumber_out: PULONG): ULONG {
     return Wldap32.Load('ldap_delete_extA')(ld, dn, ServerControls, ClientControls, MessageNumber_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_delete_extw
-  public static ldap_delete_extW(ld: PLDAP, dn: PWSTR, ServerControls: NULLABLE<PPLDAPControlW>, ClientControls: NULLABLE<PPLDAPControlW>, MessageNumber_out: PULONG): ULONG {
+  public static ldap_delete_extW(ld: PLDAP, dn: PWSTR, ServerControls: Nullable<PPLDAPControlW>, ClientControls: Nullable<PPLDAPControlW>, MessageNumber_out: PULONG): ULONG {
     return Wldap32.Load('ldap_delete_extW')(ld, dn, ServerControls, ClientControls, MessageNumber_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_delete_ext_s
-  public static ldap_delete_ext_s(ld: PLDAP, dn: PSTR, ServerControls: NULLABLE<PPLDAPControlA>, ClientControls: NULLABLE<PPLDAPControlA>): ULONG {
+  public static ldap_delete_ext_s(ld: PLDAP, dn: PSTR, ServerControls: Nullable<PPLDAPControlA>, ClientControls: Nullable<PPLDAPControlA>): ULONG {
     return Wldap32.Load('ldap_delete_ext_s')(ld, dn, ServerControls, ClientControls);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_delete_ext_sa
-  public static ldap_delete_ext_sA(ld: PLDAP, dn: PSTR, ServerControls: NULLABLE<PPLDAPControlA>, ClientControls: NULLABLE<PPLDAPControlA>): ULONG {
+  public static ldap_delete_ext_sA(ld: PLDAP, dn: PSTR, ServerControls: Nullable<PPLDAPControlA>, ClientControls: Nullable<PPLDAPControlA>): ULONG {
     return Wldap32.Load('ldap_delete_ext_sA')(ld, dn, ServerControls, ClientControls);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_delete_ext_sw
-  public static ldap_delete_ext_sW(ld: PLDAP, dn: PWSTR, ServerControls: NULLABLE<PPLDAPControlW>, ClientControls: NULLABLE<PPLDAPControlW>): ULONG {
+  public static ldap_delete_ext_sW(ld: PLDAP, dn: PWSTR, ServerControls: Nullable<PPLDAPControlW>, ClientControls: Nullable<PPLDAPControlW>): ULONG {
     return Wldap32.Load('ldap_delete_ext_sW')(ld, dn, ServerControls, ClientControls);
   }
 
@@ -811,17 +811,17 @@ class Wldap32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_escape_filter_element
-  public static ldap_escape_filter_element(sourceFilterElement: PCHAR, sourceLength: ULONG, destFilterElement_out: OPTIONAL<PCHAR>, destLength: ULONG): ULONG {
+  public static ldap_escape_filter_element(sourceFilterElement: PCHAR, sourceLength: ULONG, destFilterElement_out: Optional<PCHAR>, destLength: ULONG): ULONG {
     return Wldap32.Load('ldap_escape_filter_element')(sourceFilterElement, sourceLength, destFilterElement_out, destLength);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_escape_filter_elementa
-  public static ldap_escape_filter_elementA(sourceFilterElement: PCHAR, sourceLength: ULONG, destFilterElement_out: OPTIONAL<PCHAR>, destLength: ULONG): ULONG {
+  public static ldap_escape_filter_elementA(sourceFilterElement: PCHAR, sourceLength: ULONG, destFilterElement_out: Optional<PCHAR>, destLength: ULONG): ULONG {
     return Wldap32.Load('ldap_escape_filter_elementA')(sourceFilterElement, sourceLength, destFilterElement_out, destLength);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_escape_filter_elementw
-  public static ldap_escape_filter_elementW(sourceFilterElement: PCHAR, sourceLength: ULONG, destFilterElement_out: OPTIONAL<PWCHAR>, destLength: ULONG): ULONG {
+  public static ldap_escape_filter_elementW(sourceFilterElement: PCHAR, sourceLength: ULONG, destFilterElement_out: Optional<PWCHAR>, destLength: ULONG): ULONG {
     return Wldap32.Load('ldap_escape_filter_elementW')(sourceFilterElement, sourceLength, destFilterElement_out, destLength);
   }
 
@@ -841,17 +841,17 @@ class Wldap32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_extended_operation
-  public static ldap_extended_operation(ld: PLDAP, Oid: PSTR, Data: NULLABLE<PBERVAL>, ServerControls: NULLABLE<PPLDAPControlA>, ClientControls: NULLABLE<PPLDAPControlA>, MessageNumber_out: PULONG): ULONG {
+  public static ldap_extended_operation(ld: PLDAP, Oid: PSTR, Data: Nullable<PBERVAL>, ServerControls: Nullable<PPLDAPControlA>, ClientControls: Nullable<PPLDAPControlA>, MessageNumber_out: PULONG): ULONG {
     return Wldap32.Load('ldap_extended_operation')(ld, Oid, Data, ServerControls, ClientControls, MessageNumber_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_extended_operationa
-  public static ldap_extended_operationA(ld: PLDAP, Oid: PSTR, Data: NULLABLE<PBERVAL>, ServerControls: NULLABLE<PPLDAPControlA>, ClientControls: NULLABLE<PPLDAPControlA>, MessageNumber_out: PULONG): ULONG {
+  public static ldap_extended_operationA(ld: PLDAP, Oid: PSTR, Data: Nullable<PBERVAL>, ServerControls: Nullable<PPLDAPControlA>, ClientControls: Nullable<PPLDAPControlA>, MessageNumber_out: PULONG): ULONG {
     return Wldap32.Load('ldap_extended_operationA')(ld, Oid, Data, ServerControls, ClientControls, MessageNumber_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_extended_operationw
-  public static ldap_extended_operationW(ld: PLDAP, Oid: PWSTR, Data: NULLABLE<PBERVAL>, ServerControls: NULLABLE<PPLDAPControlW>, ClientControls: NULLABLE<PPLDAPControlW>, MessageNumber_out: PULONG): ULONG {
+  public static ldap_extended_operationW(ld: PLDAP, Oid: PWSTR, Data: Nullable<PBERVAL>, ServerControls: Nullable<PPLDAPControlW>, ClientControls: Nullable<PPLDAPControlW>, MessageNumber_out: PULONG): ULONG {
     return Wldap32.Load('ldap_extended_operationW')(ld, Oid, Data, ServerControls, ClientControls, MessageNumber_out);
   }
 
@@ -859,9 +859,9 @@ class Wldap32 extends Win32 {
   public static ldap_extended_operation_sA(
     ExternalHandle: PLDAP,
     Oid: PSTR,
-    Data: NULLABLE<PBERVAL>,
-    ServerControls: NULLABLE<PPLDAPControlA>,
-    ClientControls: NULLABLE<PPLDAPControlA>,
+    Data: Nullable<PBERVAL>,
+    ServerControls: Nullable<PPLDAPControlA>,
+    ClientControls: Nullable<PPLDAPControlA>,
     ReturnedOid_out: PZPSTR,
     ReturnedData_out: PPBERVAL,
   ): ULONG {
@@ -872,9 +872,9 @@ class Wldap32 extends Win32 {
   public static ldap_extended_operation_sW(
     ExternalHandle: PLDAP,
     Oid: PWSTR,
-    Data: NULLABLE<PBERVAL>,
-    ServerControls: NULLABLE<PPLDAPControlW>,
-    ClientControls: NULLABLE<PPLDAPControlW>,
+    Data: Nullable<PBERVAL>,
+    ServerControls: Nullable<PPLDAPControlW>,
+    ClientControls: Nullable<PPLDAPControlW>,
     ReturnedOid_out: PZPWSTR,
     ReturnedData_out: PPBERVAL,
   ): ULONG {
@@ -942,7 +942,7 @@ class Wldap32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_get_next_page_s
-  public static ldap_get_next_page_s(ExternalHandle: PLDAP, SearchHandle: PLDAPSearch, timeout: NULLABLE<PLDAP_TIMEVAL>, PageSize: ULONG, TotalCount_out: PULONG, Results_out: PPLDAPMessage): ULONG {
+  public static ldap_get_next_page_s(ExternalHandle: PLDAP, SearchHandle: PLDAPSearch, timeout: Nullable<PLDAP_TIMEVAL>, PageSize: ULONG, TotalCount_out: PULONG, Results_out: PPLDAPMessage): ULONG {
     return Wldap32.Load('ldap_get_next_page_s')(ExternalHandle, SearchHandle, timeout, PageSize, TotalCount_out, Results_out);
   }
 
@@ -997,17 +997,17 @@ class Wldap32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_init
-  public static ldap_init(HostName: NULLABLE<PSTR>, PortNumber: ULONG): PLDAP {
+  public static ldap_init(HostName: Nullable<PSTR>, PortNumber: ULONG): PLDAP {
     return Wldap32.Load('ldap_init')(HostName, PortNumber);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_inita
-  public static ldap_initA(HostName: NULLABLE<PSTR>, PortNumber: ULONG): PLDAP {
+  public static ldap_initA(HostName: Nullable<PSTR>, PortNumber: ULONG): PLDAP {
     return Wldap32.Load('ldap_initA')(HostName, PortNumber);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_initw
-  public static ldap_initW(HostName: NULLABLE<PWSTR>, PortNumber: ULONG): PLDAP {
+  public static ldap_initW(HostName: Nullable<PWSTR>, PortNumber: ULONG): PLDAP {
     return Wldap32.Load('ldap_initW')(HostName, PortNumber);
   }
 
@@ -1042,32 +1042,32 @@ class Wldap32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_modify_ext
-  public static ldap_modify_ext(ld: PLDAP, dn: PSTR, mods: PPLDAPModA, ServerControls: NULLABLE<PPLDAPControlA>, ClientControls: NULLABLE<PPLDAPControlA>, MessageNumber_out: PULONG): ULONG {
+  public static ldap_modify_ext(ld: PLDAP, dn: PSTR, mods: PPLDAPModA, ServerControls: Nullable<PPLDAPControlA>, ClientControls: Nullable<PPLDAPControlA>, MessageNumber_out: PULONG): ULONG {
     return Wldap32.Load('ldap_modify_ext')(ld, dn, mods, ServerControls, ClientControls, MessageNumber_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_modify_exta
-  public static ldap_modify_extA(ld: PLDAP, dn: PSTR, mods: PPLDAPModA, ServerControls: NULLABLE<PPLDAPControlA>, ClientControls: NULLABLE<PPLDAPControlA>, MessageNumber_out: PULONG): ULONG {
+  public static ldap_modify_extA(ld: PLDAP, dn: PSTR, mods: PPLDAPModA, ServerControls: Nullable<PPLDAPControlA>, ClientControls: Nullable<PPLDAPControlA>, MessageNumber_out: PULONG): ULONG {
     return Wldap32.Load('ldap_modify_extA')(ld, dn, mods, ServerControls, ClientControls, MessageNumber_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_modify_extw
-  public static ldap_modify_extW(ld: PLDAP, dn: PWSTR, mods: PPLDAPModW, ServerControls: NULLABLE<PPLDAPControlW>, ClientControls: NULLABLE<PPLDAPControlW>, MessageNumber_out: PULONG): ULONG {
+  public static ldap_modify_extW(ld: PLDAP, dn: PWSTR, mods: PPLDAPModW, ServerControls: Nullable<PPLDAPControlW>, ClientControls: Nullable<PPLDAPControlW>, MessageNumber_out: PULONG): ULONG {
     return Wldap32.Load('ldap_modify_extW')(ld, dn, mods, ServerControls, ClientControls, MessageNumber_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_modify_ext_s
-  public static ldap_modify_ext_s(ld: PLDAP, dn: PSTR, mods: PPLDAPModA, ServerControls: NULLABLE<PPLDAPControlA>, ClientControls: NULLABLE<PPLDAPControlA>): ULONG {
+  public static ldap_modify_ext_s(ld: PLDAP, dn: PSTR, mods: PPLDAPModA, ServerControls: Nullable<PPLDAPControlA>, ClientControls: Nullable<PPLDAPControlA>): ULONG {
     return Wldap32.Load('ldap_modify_ext_s')(ld, dn, mods, ServerControls, ClientControls);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_modify_ext_sa
-  public static ldap_modify_ext_sA(ld: PLDAP, dn: PSTR, mods: PPLDAPModA, ServerControls: NULLABLE<PPLDAPControlA>, ClientControls: NULLABLE<PPLDAPControlA>): ULONG {
+  public static ldap_modify_ext_sA(ld: PLDAP, dn: PSTR, mods: PPLDAPModA, ServerControls: Nullable<PPLDAPControlA>, ClientControls: Nullable<PPLDAPControlA>): ULONG {
     return Wldap32.Load('ldap_modify_ext_sA')(ld, dn, mods, ServerControls, ClientControls);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_modify_ext_sw
-  public static ldap_modify_ext_sW(ld: PLDAP, dn: PWSTR, mods: PPLDAPModW, ServerControls: NULLABLE<PPLDAPControlW>, ClientControls: NULLABLE<PPLDAPControlW>): ULONG {
+  public static ldap_modify_ext_sW(ld: PLDAP, dn: PWSTR, mods: PPLDAPModW, ServerControls: Nullable<PPLDAPControlW>, ClientControls: Nullable<PPLDAPControlW>): ULONG {
     return Wldap32.Load('ldap_modify_ext_sW')(ld, dn, mods, ServerControls, ClientControls);
   }
 
@@ -1177,27 +1177,27 @@ class Wldap32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_open
-  public static ldap_open(HostName: NULLABLE<PSTR>, PortNumber: ULONG): PLDAP {
+  public static ldap_open(HostName: Nullable<PSTR>, PortNumber: ULONG): PLDAP {
     return Wldap32.Load('ldap_open')(HostName, PortNumber);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_opena
-  public static ldap_openA(HostName: NULLABLE<PSTR>, PortNumber: ULONG): PLDAP {
+  public static ldap_openA(HostName: Nullable<PSTR>, PortNumber: ULONG): PLDAP {
     return Wldap32.Load('ldap_openA')(HostName, PortNumber);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_openw
-  public static ldap_openW(HostName: NULLABLE<PWSTR>, PortNumber: ULONG): PLDAP {
+  public static ldap_openW(HostName: Nullable<PWSTR>, PortNumber: ULONG): PLDAP {
     return Wldap32.Load('ldap_openW')(HostName, PortNumber);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_parse_extended_resulta
-  public static ldap_parse_extended_resultA(Connection: PLDAP, ResultMessage: PLDAPMessage, ResultOID_out: OPTIONAL<PZPSTR>, ResultData_out: PPBERVAL, Freeit: BOOLEAN): ULONG {
+  public static ldap_parse_extended_resultA(Connection: PLDAP, ResultMessage: PLDAPMessage, ResultOID_out: Optional<PZPSTR>, ResultData_out: PPBERVAL, Freeit: BOOLEAN): ULONG {
     return Wldap32.Load('ldap_parse_extended_resultA')(Connection, ResultMessage, ResultOID_out, ResultData_out, Freeit);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_parse_extended_resultw
-  public static ldap_parse_extended_resultW(Connection: PLDAP, ResultMessage: PLDAPMessage, ResultOID_out: OPTIONAL<PZPWSTR>, ResultData_out: PPBERVAL, Freeit: BOOLEAN): ULONG {
+  public static ldap_parse_extended_resultW(Connection: PLDAP, ResultMessage: PLDAPMessage, ResultOID_out: Optional<PZPWSTR>, ResultData_out: PPBERVAL, Freeit: BOOLEAN): ULONG {
     return Wldap32.Load('ldap_parse_extended_resultW')(Connection, ResultMessage, ResultOID_out, ResultData_out, Freeit);
   }
 
@@ -1235,11 +1235,11 @@ class Wldap32 extends Win32 {
   public static ldap_parse_result(
     Connection: PLDAP,
     ResultMessage: PLDAPMessage,
-    ReturnCode_out: OPTIONAL<PULONG>,
-    MatchedDNs_out: OPTIONAL<PZPSTR>,
-    ErrorMessage_out: OPTIONAL<PZPSTR>,
-    Referrals_out: OPTIONAL<PPZPSTR>,
-    ServerControls_out: OPTIONAL<PPPLDAPControlA>,
+    ReturnCode_out: Optional<PULONG>,
+    MatchedDNs_out: Optional<PZPSTR>,
+    ErrorMessage_out: Optional<PZPSTR>,
+    Referrals_out: Optional<PPZPSTR>,
+    ServerControls_out: Optional<PPPLDAPControlA>,
     Freeit: BOOLEAN,
   ): ULONG {
     return Wldap32.Load('ldap_parse_result')(Connection, ResultMessage, ReturnCode_out, MatchedDNs_out, ErrorMessage_out, Referrals_out, ServerControls_out, Freeit);
@@ -1249,11 +1249,11 @@ class Wldap32 extends Win32 {
   public static ldap_parse_resultA(
     Connection: PLDAP,
     ResultMessage: PLDAPMessage,
-    ReturnCode_out: OPTIONAL<PULONG>,
-    MatchedDNs_out: OPTIONAL<PZPSTR>,
-    ErrorMessage_out: OPTIONAL<PZPSTR>,
-    Referrals_out: OPTIONAL<PPZPSTR>,
-    ServerControls_out: OPTIONAL<PPPLDAPControlA>,
+    ReturnCode_out: Optional<PULONG>,
+    MatchedDNs_out: Optional<PZPSTR>,
+    ErrorMessage_out: Optional<PZPSTR>,
+    Referrals_out: Optional<PPZPSTR>,
+    ServerControls_out: Optional<PPPLDAPControlA>,
     Freeit: BOOLEAN,
   ): ULONG {
     return Wldap32.Load('ldap_parse_resultA')(Connection, ResultMessage, ReturnCode_out, MatchedDNs_out, ErrorMessage_out, Referrals_out, ServerControls_out, Freeit);
@@ -1263,28 +1263,28 @@ class Wldap32 extends Win32 {
   public static ldap_parse_resultW(
     Connection: PLDAP,
     ResultMessage: PLDAPMessage,
-    ReturnCode_out: OPTIONAL<PULONG>,
-    MatchedDNs_out: OPTIONAL<PZPWSTR>,
-    ErrorMessage_out: OPTIONAL<PZPWSTR>,
-    Referrals_out: OPTIONAL<PPZPWSTR>,
-    ServerControls_out: OPTIONAL<PPPLDAPControlW>,
+    ReturnCode_out: Optional<PULONG>,
+    MatchedDNs_out: Optional<PZPWSTR>,
+    ErrorMessage_out: Optional<PZPWSTR>,
+    Referrals_out: Optional<PPZPWSTR>,
+    ServerControls_out: Optional<PPPLDAPControlW>,
     Freeit: BOOLEAN,
   ): ULONG {
     return Wldap32.Load('ldap_parse_resultW')(Connection, ResultMessage, ReturnCode_out, MatchedDNs_out, ErrorMessage_out, Referrals_out, ServerControls_out, Freeit);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_parse_sort_control
-  public static ldap_parse_sort_control(ExternalHandle: PLDAP, Control: PPLDAPControlA, Result_out: PULONG, Attribute_out: OPTIONAL<PZPSTR>): ULONG {
+  public static ldap_parse_sort_control(ExternalHandle: PLDAP, Control: PPLDAPControlA, Result_out: PULONG, Attribute_out: Optional<PZPSTR>): ULONG {
     return Wldap32.Load('ldap_parse_sort_control')(ExternalHandle, Control, Result_out, Attribute_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_parse_sort_controla
-  public static ldap_parse_sort_controlA(ExternalHandle: PLDAP, Control: PPLDAPControlA, Result_out: PULONG, Attribute_out: OPTIONAL<PZPSTR>): ULONG {
+  public static ldap_parse_sort_controlA(ExternalHandle: PLDAP, Control: PPLDAPControlA, Result_out: PULONG, Attribute_out: Optional<PZPSTR>): ULONG {
     return Wldap32.Load('ldap_parse_sort_controlA')(ExternalHandle, Control, Result_out, Attribute_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_parse_sort_controlw
-  public static ldap_parse_sort_controlW(ExternalHandle: PLDAP, Control: PPLDAPControlW, Result_out: PULONG, Attribute_out: OPTIONAL<PZPWSTR>): ULONG {
+  public static ldap_parse_sort_controlW(ExternalHandle: PLDAP, Control: PPLDAPControlW, Result_out: PULONG, Attribute_out: Optional<PZPWSTR>): ULONG {
     return Wldap32.Load('ldap_parse_sort_controlW')(ExternalHandle, Control, Result_out, Attribute_out);
   }
 
@@ -1304,37 +1304,37 @@ class Wldap32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_rename_ext
-  public static ldap_rename_ext(ld: PLDAP, dn: PSTR, NewRDN: PSTR, NewParent: PSTR, DeleteOldRdn: INT, ServerControls: NULLABLE<PPLDAPControlA>, ClientControls: NULLABLE<PPLDAPControlA>, MessageNumber_out: PULONG): ULONG {
+  public static ldap_rename_ext(ld: PLDAP, dn: PSTR, NewRDN: PSTR, NewParent: PSTR, DeleteOldRdn: INT, ServerControls: Nullable<PPLDAPControlA>, ClientControls: Nullable<PPLDAPControlA>, MessageNumber_out: PULONG): ULONG {
     return Wldap32.Load('ldap_rename_ext')(ld, dn, NewRDN, NewParent, DeleteOldRdn, ServerControls, ClientControls, MessageNumber_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_rename_exta
-  public static ldap_rename_extA(ld: PLDAP, dn: PSTR, NewRDN: PSTR, NewParent: OPTIONAL<PSTR>, DeleteOldRdn: INT, ServerControls: NULLABLE<PPLDAPControlA>, ClientControls: NULLABLE<PPLDAPControlA>, MessageNumber_out: PULONG): ULONG {
+  public static ldap_rename_extA(ld: PLDAP, dn: PSTR, NewRDN: PSTR, NewParent: Optional<PSTR>, DeleteOldRdn: INT, ServerControls: Nullable<PPLDAPControlA>, ClientControls: Nullable<PPLDAPControlA>, MessageNumber_out: PULONG): ULONG {
     return Wldap32.Load('ldap_rename_extA')(ld, dn, NewRDN, NewParent, DeleteOldRdn, ServerControls, ClientControls, MessageNumber_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_rename_extw
-  public static ldap_rename_extW(ld: PLDAP, dn: PWSTR, NewRDN: PWSTR, NewParent: OPTIONAL<PWSTR>, DeleteOldRdn: INT, ServerControls: NULLABLE<PPLDAPControlW>, ClientControls: NULLABLE<PPLDAPControlW>, MessageNumber_out: PULONG): ULONG {
+  public static ldap_rename_extW(ld: PLDAP, dn: PWSTR, NewRDN: PWSTR, NewParent: Optional<PWSTR>, DeleteOldRdn: INT, ServerControls: Nullable<PPLDAPControlW>, ClientControls: Nullable<PPLDAPControlW>, MessageNumber_out: PULONG): ULONG {
     return Wldap32.Load('ldap_rename_extW')(ld, dn, NewRDN, NewParent, DeleteOldRdn, ServerControls, ClientControls, MessageNumber_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_rename_ext_s
-  public static ldap_rename_ext_s(ld: PLDAP, dn: PSTR, NewRDN: PSTR, NewParent: PSTR, DeleteOldRdn: INT, ServerControls: NULLABLE<PPLDAPControlA>, ClientControls: NULLABLE<PPLDAPControlA>): ULONG {
+  public static ldap_rename_ext_s(ld: PLDAP, dn: PSTR, NewRDN: PSTR, NewParent: PSTR, DeleteOldRdn: INT, ServerControls: Nullable<PPLDAPControlA>, ClientControls: Nullable<PPLDAPControlA>): ULONG {
     return Wldap32.Load('ldap_rename_ext_s')(ld, dn, NewRDN, NewParent, DeleteOldRdn, ServerControls, ClientControls);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_rename_ext_sa
-  public static ldap_rename_ext_sA(ld: PLDAP, dn: PSTR, NewRDN: PSTR, NewParent: OPTIONAL<PSTR>, DeleteOldRdn: INT, ServerControls: NULLABLE<PPLDAPControlA>, ClientControls: NULLABLE<PPLDAPControlA>): ULONG {
+  public static ldap_rename_ext_sA(ld: PLDAP, dn: PSTR, NewRDN: PSTR, NewParent: Optional<PSTR>, DeleteOldRdn: INT, ServerControls: Nullable<PPLDAPControlA>, ClientControls: Nullable<PPLDAPControlA>): ULONG {
     return Wldap32.Load('ldap_rename_ext_sA')(ld, dn, NewRDN, NewParent, DeleteOldRdn, ServerControls, ClientControls);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_rename_ext_sw
-  public static ldap_rename_ext_sW(ld: PLDAP, dn: PWSTR, NewRDN: PWSTR, NewParent: OPTIONAL<PWSTR>, DeleteOldRdn: INT, ServerControls: NULLABLE<PPLDAPControlW>, ClientControls: NULLABLE<PPLDAPControlW>): ULONG {
+  public static ldap_rename_ext_sW(ld: PLDAP, dn: PWSTR, NewRDN: PWSTR, NewParent: Optional<PWSTR>, DeleteOldRdn: INT, ServerControls: Nullable<PPLDAPControlW>, ClientControls: Nullable<PPLDAPControlW>): ULONG {
     return Wldap32.Load('ldap_rename_ext_sW')(ld, dn, NewRDN, NewParent, DeleteOldRdn, ServerControls, ClientControls);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_result
-  public static ldap_result(ld: PLDAP, msgid: ULONG, all: ULONG, timeout: OPTIONAL<PLDAP_TIMEVAL>, res_out: PPLDAPMessage): ULONG {
+  public static ldap_result(ld: PLDAP, msgid: ULONG, all: ULONG, timeout: Optional<PLDAP_TIMEVAL>, res_out: PPLDAPMessage): ULONG {
     return Wldap32.Load('ldap_result')(ld, msgid, all, timeout, res_out);
   }
 
@@ -1344,37 +1344,37 @@ class Wldap32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_sasl_binda
-  public static ldap_sasl_bindA(ExternalHandle: PLDAP, DistName: PSTR, AuthMechanism: PSTR, cred: PBERVAL, ServerCtrls: NULLABLE<PPLDAPControlA>, ClientCtrls: NULLABLE<PPLDAPControlA>, MessageNumber_out: PINT): INT {
+  public static ldap_sasl_bindA(ExternalHandle: PLDAP, DistName: PSTR, AuthMechanism: PSTR, cred: PBERVAL, ServerCtrls: Nullable<PPLDAPControlA>, ClientCtrls: Nullable<PPLDAPControlA>, MessageNumber_out: PINT): INT {
     return Wldap32.Load('ldap_sasl_bindA')(ExternalHandle, DistName, AuthMechanism, cred, ServerCtrls, ClientCtrls, MessageNumber_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_sasl_bindw
-  public static ldap_sasl_bindW(ExternalHandle: PLDAP, DistName: PWSTR, AuthMechanism: PWSTR, cred: PBERVAL, ServerCtrls: NULLABLE<PPLDAPControlW>, ClientCtrls: NULLABLE<PPLDAPControlW>, MessageNumber_out: PINT): INT {
+  public static ldap_sasl_bindW(ExternalHandle: PLDAP, DistName: PWSTR, AuthMechanism: PWSTR, cred: PBERVAL, ServerCtrls: Nullable<PPLDAPControlW>, ClientCtrls: Nullable<PPLDAPControlW>, MessageNumber_out: PINT): INT {
     return Wldap32.Load('ldap_sasl_bindW')(ExternalHandle, DistName, AuthMechanism, cred, ServerCtrls, ClientCtrls, MessageNumber_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_sasl_bind_sa
-  public static ldap_sasl_bind_sA(ExternalHandle: PLDAP, DistName: PSTR, AuthMechanism: PSTR, cred: PBERVAL, ServerCtrls: NULLABLE<PPLDAPControlA>, ClientCtrls: NULLABLE<PPLDAPControlA>, ServerData_out: PPBERVAL): INT {
+  public static ldap_sasl_bind_sA(ExternalHandle: PLDAP, DistName: PSTR, AuthMechanism: PSTR, cred: PBERVAL, ServerCtrls: Nullable<PPLDAPControlA>, ClientCtrls: Nullable<PPLDAPControlA>, ServerData_out: PPBERVAL): INT {
     return Wldap32.Load('ldap_sasl_bind_sA')(ExternalHandle, DistName, AuthMechanism, cred, ServerCtrls, ClientCtrls, ServerData_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_sasl_bind_sw
-  public static ldap_sasl_bind_sW(ExternalHandle: PLDAP, DistName: PWSTR, AuthMechanism: PWSTR, cred: PBERVAL, ServerCtrls: NULLABLE<PPLDAPControlW>, ClientCtrls: NULLABLE<PPLDAPControlW>, ServerData_out: PPBERVAL): INT {
+  public static ldap_sasl_bind_sW(ExternalHandle: PLDAP, DistName: PWSTR, AuthMechanism: PWSTR, cred: PBERVAL, ServerCtrls: Nullable<PPLDAPControlW>, ClientCtrls: Nullable<PPLDAPControlW>, ServerData_out: PPBERVAL): INT {
     return Wldap32.Load('ldap_sasl_bind_sW')(ExternalHandle, DistName, AuthMechanism, cred, ServerCtrls, ClientCtrls, ServerData_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_search
-  public static ldap_search(ld: PLDAP, base: OPTIONAL<PSTR>, scope: ULONG, filter: PSTR, attrs: NULLABLE<PZPSTR>, attrsonly: ULONG): ULONG {
+  public static ldap_search(ld: PLDAP, base: Optional<PSTR>, scope: ULONG, filter: PSTR, attrs: Nullable<PZPSTR>, attrsonly: ULONG): ULONG {
     return Wldap32.Load('ldap_search')(ld, base, scope, filter, attrs, attrsonly);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_searcha
-  public static ldap_searchA(ld: PLDAP, base: OPTIONAL<PSTR>, scope: ULONG, filter: PSTR, attrs: NULLABLE<PZPSTR>, attrsonly: ULONG): ULONG {
+  public static ldap_searchA(ld: PLDAP, base: Optional<PSTR>, scope: ULONG, filter: PSTR, attrs: Nullable<PZPSTR>, attrsonly: ULONG): ULONG {
     return Wldap32.Load('ldap_searchA')(ld, base, scope, filter, attrs, attrsonly);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_searchw
-  public static ldap_searchW(ld: PLDAP, base: OPTIONAL<PWSTR>, scope: ULONG, filter: PWSTR, attrs: NULLABLE<PZPWSTR>, attrsonly: ULONG): ULONG {
+  public static ldap_searchW(ld: PLDAP, base: Optional<PWSTR>, scope: ULONG, filter: PWSTR, attrs: Nullable<PZPWSTR>, attrsonly: ULONG): ULONG {
     return Wldap32.Load('ldap_searchW')(ld, base, scope, filter, attrs, attrsonly);
   }
 
@@ -1386,13 +1386,13 @@ class Wldap32 extends Win32 {
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_search_ext
   public static ldap_search_ext(
     ld: PLDAP,
-    base: OPTIONAL<PSTR>,
+    base: Optional<PSTR>,
     scope: ULONG,
     filter: PSTR,
-    attrs: NULLABLE<PZPSTR>,
+    attrs: Nullable<PZPSTR>,
     attrsonly: ULONG,
-    ServerControls: OPTIONAL<PPLDAPControlA>,
-    ClientControls: OPTIONAL<PPLDAPControlA>,
+    ServerControls: Optional<PPLDAPControlA>,
+    ClientControls: Optional<PPLDAPControlA>,
     TimeLimit: ULONG,
     SizeLimit: ULONG,
     MessageNumber_out: PULONG,
@@ -1403,13 +1403,13 @@ class Wldap32 extends Win32 {
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_search_exta
   public static ldap_search_extA(
     ld: PLDAP,
-    base: OPTIONAL<PSTR>,
+    base: Optional<PSTR>,
     scope: ULONG,
     filter: PSTR,
-    attrs: NULLABLE<PZPSTR>,
+    attrs: Nullable<PZPSTR>,
     attrsonly: ULONG,
-    ServerControls: OPTIONAL<PPLDAPControlA>,
-    ClientControls: OPTIONAL<PPLDAPControlA>,
+    ServerControls: Optional<PPLDAPControlA>,
+    ClientControls: Optional<PPLDAPControlA>,
     TimeLimit: ULONG,
     SizeLimit: ULONG,
     MessageNumber_out: PULONG,
@@ -1420,13 +1420,13 @@ class Wldap32 extends Win32 {
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_search_extw
   public static ldap_search_extW(
     ld: PLDAP,
-    base: OPTIONAL<PWSTR>,
+    base: Optional<PWSTR>,
     scope: ULONG,
     filter: PWSTR,
-    attrs: NULLABLE<PZPWSTR>,
+    attrs: Nullable<PZPWSTR>,
     attrsonly: ULONG,
-    ServerControls: OPTIONAL<PPLDAPControlW>,
-    ClientControls: OPTIONAL<PPLDAPControlW>,
+    ServerControls: Optional<PPLDAPControlW>,
+    ClientControls: Optional<PPLDAPControlW>,
     TimeLimit: ULONG,
     SizeLimit: ULONG,
     MessageNumber_out: PULONG,
@@ -1437,14 +1437,14 @@ class Wldap32 extends Win32 {
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_search_ext_s
   public static ldap_search_ext_s(
     ld: PLDAP,
-    base: OPTIONAL<PSTR>,
+    base: Optional<PSTR>,
     scope: ULONG,
     filter: PSTR,
-    attrs: NULLABLE<PZPSTR>,
+    attrs: Nullable<PZPSTR>,
     attrsonly: ULONG,
-    ServerControls: OPTIONAL<PPLDAPControlA>,
-    ClientControls: OPTIONAL<PPLDAPControlA>,
-    timeout: NULLABLE<PLDAP_TIMEVAL>,
+    ServerControls: Optional<PPLDAPControlA>,
+    ClientControls: Optional<PPLDAPControlA>,
+    timeout: Nullable<PLDAP_TIMEVAL>,
     SizeLimit: ULONG,
     res_out: PPLDAPMessage,
   ): ULONG {
@@ -1454,14 +1454,14 @@ class Wldap32 extends Win32 {
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_search_ext_sa
   public static ldap_search_ext_sA(
     ld: PLDAP,
-    base: OPTIONAL<PSTR>,
+    base: Optional<PSTR>,
     scope: ULONG,
     filter: PSTR,
-    attrs: NULLABLE<PZPSTR>,
+    attrs: Nullable<PZPSTR>,
     attrsonly: ULONG,
-    ServerControls: OPTIONAL<PPLDAPControlA>,
-    ClientControls: OPTIONAL<PPLDAPControlA>,
-    timeout: NULLABLE<PLDAP_TIMEVAL>,
+    ServerControls: Optional<PPLDAPControlA>,
+    ClientControls: Optional<PPLDAPControlA>,
+    timeout: Nullable<PLDAP_TIMEVAL>,
     SizeLimit: ULONG,
     res_out: PPLDAPMessage,
   ): ULONG {
@@ -1471,14 +1471,14 @@ class Wldap32 extends Win32 {
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_search_ext_sw
   public static ldap_search_ext_sW(
     ld: PLDAP,
-    base: OPTIONAL<PWSTR>,
+    base: Optional<PWSTR>,
     scope: ULONG,
     filter: PWSTR,
-    attrs: NULLABLE<PZPWSTR>,
+    attrs: Nullable<PZPWSTR>,
     attrsonly: ULONG,
-    ServerControls: OPTIONAL<PPLDAPControlW>,
-    ClientControls: OPTIONAL<PPLDAPControlW>,
-    timeout: NULLABLE<PLDAP_TIMEVAL>,
+    ServerControls: Optional<PPLDAPControlW>,
+    ClientControls: Optional<PPLDAPControlW>,
+    timeout: Nullable<PLDAP_TIMEVAL>,
     SizeLimit: ULONG,
     res_out: PPLDAPMessage,
   ): ULONG {
@@ -1491,13 +1491,13 @@ class Wldap32 extends Win32 {
     DistinguishedName: PSTR,
     ScopeOfSearch: ULONG,
     SearchFilter: PSTR,
-    AttributeList: NULLABLE<PZPSTR>,
+    AttributeList: Nullable<PZPSTR>,
     AttributesOnly: ULONG,
-    ServerControls: NULLABLE<PPLDAPControlA>,
-    ClientControls: NULLABLE<PPLDAPControlA>,
+    ServerControls: Nullable<PPLDAPControlA>,
+    ClientControls: Nullable<PPLDAPControlA>,
     PageTimeLimit: ULONG,
     TotalSizeLimit: ULONG,
-    SortKeys: NULLABLE<PPLDAPSortKeyA>,
+    SortKeys: Nullable<PPLDAPSortKeyA>,
   ): PLDAPSearch {
     return Wldap32.Load('ldap_search_init_page')(ExternalHandle, DistinguishedName, ScopeOfSearch, SearchFilter, AttributeList, AttributesOnly, ServerControls, ClientControls, PageTimeLimit, TotalSizeLimit, SortKeys);
   }
@@ -1508,13 +1508,13 @@ class Wldap32 extends Win32 {
     DistinguishedName: PSTR,
     ScopeOfSearch: ULONG,
     SearchFilter: PSTR,
-    AttributeList: NULLABLE<PZPSTR>,
+    AttributeList: Nullable<PZPSTR>,
     AttributesOnly: ULONG,
-    ServerControls: NULLABLE<PPLDAPControlA>,
-    ClientControls: NULLABLE<PPLDAPControlA>,
+    ServerControls: Nullable<PPLDAPControlA>,
+    ClientControls: Nullable<PPLDAPControlA>,
     PageTimeLimit: ULONG,
     TotalSizeLimit: ULONG,
-    SortKeys: NULLABLE<PPLDAPSortKeyA>,
+    SortKeys: Nullable<PPLDAPSortKeyA>,
   ): PLDAPSearch {
     return Wldap32.Load('ldap_search_init_pageA')(ExternalHandle, DistinguishedName, ScopeOfSearch, SearchFilter, AttributeList, AttributesOnly, ServerControls, ClientControls, PageTimeLimit, TotalSizeLimit, SortKeys);
   }
@@ -1525,44 +1525,44 @@ class Wldap32 extends Win32 {
     DistinguishedName: PWSTR,
     ScopeOfSearch: ULONG,
     SearchFilter: PWSTR,
-    AttributeList: NULLABLE<PZPWSTR>,
+    AttributeList: Nullable<PZPWSTR>,
     AttributesOnly: ULONG,
-    ServerControls: NULLABLE<PPLDAPControlW>,
-    ClientControls: NULLABLE<PPLDAPControlW>,
+    ServerControls: Nullable<PPLDAPControlW>,
+    ClientControls: Nullable<PPLDAPControlW>,
     PageTimeLimit: ULONG,
     TotalSizeLimit: ULONG,
-    SortKeys: NULLABLE<PPLDAPSortKeyW>,
+    SortKeys: Nullable<PPLDAPSortKeyW>,
   ): PLDAPSearch {
     return Wldap32.Load('ldap_search_init_pageW')(ExternalHandle, DistinguishedName, ScopeOfSearch, SearchFilter, AttributeList, AttributesOnly, ServerControls, ClientControls, PageTimeLimit, TotalSizeLimit, SortKeys);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_search_s
-  public static ldap_search_s(ld: PLDAP, base: OPTIONAL<PSTR>, scope: ULONG, filter: PSTR, attrs: NULLABLE<PZPSTR>, attrsonly: ULONG, res_out: PPLDAPMessage): ULONG {
+  public static ldap_search_s(ld: PLDAP, base: Optional<PSTR>, scope: ULONG, filter: PSTR, attrs: Nullable<PZPSTR>, attrsonly: ULONG, res_out: PPLDAPMessage): ULONG {
     return Wldap32.Load('ldap_search_s')(ld, base, scope, filter, attrs, attrsonly, res_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_search_sa
-  public static ldap_search_sA(ld: PLDAP, base: OPTIONAL<PSTR>, scope: ULONG, filter: PSTR, attrs: NULLABLE<PZPSTR>, attrsonly: ULONG, res_out: PPLDAPMessage): ULONG {
+  public static ldap_search_sA(ld: PLDAP, base: Optional<PSTR>, scope: ULONG, filter: PSTR, attrs: Nullable<PZPSTR>, attrsonly: ULONG, res_out: PPLDAPMessage): ULONG {
     return Wldap32.Load('ldap_search_sA')(ld, base, scope, filter, attrs, attrsonly, res_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_search_sw
-  public static ldap_search_sW(ld: PLDAP, base: OPTIONAL<PWSTR>, scope: ULONG, filter: PWSTR, attrs: NULLABLE<PZPWSTR>, attrsonly: ULONG, res_out: PPLDAPMessage): ULONG {
+  public static ldap_search_sW(ld: PLDAP, base: Optional<PWSTR>, scope: ULONG, filter: PWSTR, attrs: Nullable<PZPWSTR>, attrsonly: ULONG, res_out: PPLDAPMessage): ULONG {
     return Wldap32.Load('ldap_search_sW')(ld, base, scope, filter, attrs, attrsonly, res_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_search_st
-  public static ldap_search_st(ld: PLDAP, base: OPTIONAL<PSTR>, scope: ULONG, filter: PSTR, attrs: NULLABLE<PZPSTR>, attrsonly: ULONG, timeout: NULLABLE<PLDAP_TIMEVAL>, res_out: PPLDAPMessage): ULONG {
+  public static ldap_search_st(ld: PLDAP, base: Optional<PSTR>, scope: ULONG, filter: PSTR, attrs: Nullable<PZPSTR>, attrsonly: ULONG, timeout: Nullable<PLDAP_TIMEVAL>, res_out: PPLDAPMessage): ULONG {
     return Wldap32.Load('ldap_search_st')(ld, base, scope, filter, attrs, attrsonly, timeout, res_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_search_sta
-  public static ldap_search_stA(ld: PLDAP, base: OPTIONAL<PSTR>, scope: ULONG, filter: PSTR, attrs: NULLABLE<PZPSTR>, attrsonly: ULONG, timeout: NULLABLE<PLDAP_TIMEVAL>, res_out: PPLDAPMessage): ULONG {
+  public static ldap_search_stA(ld: PLDAP, base: Optional<PSTR>, scope: ULONG, filter: PSTR, attrs: Nullable<PZPSTR>, attrsonly: ULONG, timeout: Nullable<PLDAP_TIMEVAL>, res_out: PPLDAPMessage): ULONG {
     return Wldap32.Load('ldap_search_stA')(ld, base, scope, filter, attrs, attrsonly, timeout, res_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_search_stw
-  public static ldap_search_stW(ld: PLDAP, base: OPTIONAL<PWSTR>, scope: ULONG, filter: PWSTR, attrs: NULLABLE<PZPWSTR>, attrsonly: ULONG, timeout: NULLABLE<PLDAP_TIMEVAL>, res_out: PPLDAPMessage): ULONG {
+  public static ldap_search_stW(ld: PLDAP, base: Optional<PWSTR>, scope: ULONG, filter: PWSTR, attrs: Nullable<PZPWSTR>, attrsonly: ULONG, timeout: Nullable<PLDAP_TIMEVAL>, res_out: PPLDAPMessage): ULONG {
     return Wldap32.Load('ldap_search_stW')(ld, base, scope, filter, attrs, attrsonly, timeout, res_out);
   }
 
@@ -1592,57 +1592,57 @@ class Wldap32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_simple_bind
-  public static ldap_simple_bind(ld: PLDAP, dn: OPTIONAL<PSTR>, passwd: OPTIONAL<PSTR>): ULONG {
+  public static ldap_simple_bind(ld: PLDAP, dn: Optional<PSTR>, passwd: Optional<PSTR>): ULONG {
     return Wldap32.Load('ldap_simple_bind')(ld, dn, passwd);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_simple_binda
-  public static ldap_simple_bindA(ld: PLDAP, dn: OPTIONAL<PSTR>, passwd: OPTIONAL<PSTR>): ULONG {
+  public static ldap_simple_bindA(ld: PLDAP, dn: Optional<PSTR>, passwd: Optional<PSTR>): ULONG {
     return Wldap32.Load('ldap_simple_bindA')(ld, dn, passwd);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_simple_bindw
-  public static ldap_simple_bindW(ld: PLDAP, dn: OPTIONAL<PWSTR>, passwd: OPTIONAL<PWSTR>): ULONG {
+  public static ldap_simple_bindW(ld: PLDAP, dn: Optional<PWSTR>, passwd: Optional<PWSTR>): ULONG {
     return Wldap32.Load('ldap_simple_bindW')(ld, dn, passwd);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_simple_bind_s
-  public static ldap_simple_bind_s(ld: PLDAP, dn: OPTIONAL<PSTR>, passwd: OPTIONAL<PSTR>): ULONG {
+  public static ldap_simple_bind_s(ld: PLDAP, dn: Optional<PSTR>, passwd: Optional<PSTR>): ULONG {
     return Wldap32.Load('ldap_simple_bind_s')(ld, dn, passwd);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_simple_bind_sa
-  public static ldap_simple_bind_sA(ld: PLDAP, dn: OPTIONAL<PSTR>, passwd: OPTIONAL<PSTR>): ULONG {
+  public static ldap_simple_bind_sA(ld: PLDAP, dn: Optional<PSTR>, passwd: Optional<PSTR>): ULONG {
     return Wldap32.Load('ldap_simple_bind_sA')(ld, dn, passwd);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_simple_bind_sw
-  public static ldap_simple_bind_sW(ld: PLDAP, dn: OPTIONAL<PWSTR>, passwd: OPTIONAL<PWSTR>): ULONG {
+  public static ldap_simple_bind_sW(ld: PLDAP, dn: Optional<PWSTR>, passwd: Optional<PWSTR>): ULONG {
     return Wldap32.Load('ldap_simple_bind_sW')(ld, dn, passwd);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_sslinit
-  public static ldap_sslinit(HostName: NULLABLE<PSTR>, PortNumber: ULONG, secure: INT): PLDAP {
+  public static ldap_sslinit(HostName: Nullable<PSTR>, PortNumber: ULONG, secure: INT): PLDAP {
     return Wldap32.Load('ldap_sslinit')(HostName, PortNumber, secure);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_sslinita
-  public static ldap_sslinitA(HostName: NULLABLE<PSTR>, PortNumber: ULONG, secure: INT): PLDAP {
+  public static ldap_sslinitA(HostName: Nullable<PSTR>, PortNumber: ULONG, secure: INT): PLDAP {
     return Wldap32.Load('ldap_sslinitA')(HostName, PortNumber, secure);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_sslinitw
-  public static ldap_sslinitW(HostName: NULLABLE<PWSTR>, PortNumber: ULONG, secure: INT): PLDAP {
+  public static ldap_sslinitW(HostName: Nullable<PWSTR>, PortNumber: ULONG, secure: INT): PLDAP {
     return Wldap32.Load('ldap_sslinitW')(HostName, PortNumber, secure);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_start_tls_sa
-  public static ldap_start_tls_sA(ExternalHandle: PLDAP, ServerReturnValue_out: PULONG, result_out: PPLDAPMessage, ServerControls: NULLABLE<PPLDAPControlA>, ClientControls: NULLABLE<PPLDAPControlA>): ULONG {
+  public static ldap_start_tls_sA(ExternalHandle: PLDAP, ServerReturnValue_out: PULONG, result_out: PPLDAPMessage, ServerControls: Nullable<PPLDAPControlA>, ClientControls: Nullable<PPLDAPControlA>): ULONG {
     return Wldap32.Load('ldap_start_tls_sA')(ExternalHandle, ServerReturnValue_out, result_out, ServerControls, ClientControls);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_start_tls_sw
-  public static ldap_start_tls_sW(ExternalHandle: PLDAP, ServerReturnValue_out: PULONG, result_out: PPLDAPMessage, ServerControls: NULLABLE<PPLDAPControlW>, ClientControls: NULLABLE<PPLDAPControlW>): ULONG {
+  public static ldap_start_tls_sW(ExternalHandle: PLDAP, ServerReturnValue_out: PULONG, result_out: PPLDAPMessage, ServerControls: Nullable<PPLDAPControlW>, ClientControls: Nullable<PPLDAPControlW>): ULONG {
     return Wldap32.Load('ldap_start_tls_sW')(ExternalHandle, ServerReturnValue_out, result_out, ServerControls, ClientControls);
   }
 
@@ -1682,17 +1682,17 @@ class Wldap32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_value_free
-  public static ldap_value_free(vals: OPTIONAL<PZPSTR>): ULONG {
+  public static ldap_value_free(vals: Optional<PZPSTR>): ULONG {
     return Wldap32.Load('ldap_value_free')(vals);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_value_freea
-  public static ldap_value_freeA(vals: OPTIONAL<PZPSTR>): ULONG {
+  public static ldap_value_freeA(vals: Optional<PZPSTR>): ULONG {
     return Wldap32.Load('ldap_value_freeA')(vals);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_value_freew
-  public static ldap_value_freeW(vals: OPTIONAL<PZPWSTR>): ULONG {
+  public static ldap_value_freeW(vals: Optional<PZPWSTR>): ULONG {
     return Wldap32.Load('ldap_value_freeW')(vals);
   }
 

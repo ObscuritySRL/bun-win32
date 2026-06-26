@@ -1,6 +1,6 @@
 import type { Pointer } from 'bun:ffi';
 
-export type { BOOL, DWORD, HRESULT, HWND, LONG, LPARAM, LPCWSTR, LRESULT, NULL, NULLABLE, OPTIONAL, WPARAM } from '@bun-win32/core';
+export type { BOOL, DWORD, HRESULT, HWND, LONG, LPARAM, LPCWSTR, LRESULT, NULL, Nullable, Optional, WPARAM } from '@bun-win32/core';
 
 export const UIA_E_ELEMENTNOTAVAILABLE = 0x8004_0201;
 export const UIA_E_ELEMENTNOTENABLED = 0x8004_0200;

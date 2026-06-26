@@ -1,6 +1,6 @@
 import type { Pointer } from 'bun:ffi';
 
-export type { BOOL, DWORD, HANDLE, NULL, NULLABLE, OPTIONAL, PDWORD, PHANDLE, PVOID } from '@bun-win32/core';
+export type { BOOL, DWORD, HANDLE, NULL, Nullable, Optional, PDWORD, PHANDLE, PVOID } from '@bun-win32/core';
 
 export enum MOUNTED_IMAGE_INFO_LEVELS {
   MountedImageInfoLevel0 = 0,

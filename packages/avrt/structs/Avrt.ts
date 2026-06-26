@@ -2,7 +2,7 @@ import { type FFIFunction, FFIType } from 'bun:ffi';
 
 import { Win32 } from '@bun-win32/core';
 
-import type { AVRT_PRIORITY, BOOL, HANDLE, LPCSTR, LPCWSTR, LPDWORD, LPGUID, OPTIONAL, PHANDLE, PLARGE_INTEGER, PULONG } from '../types/Avrt';
+import type { AVRT_PRIORITY, BOOL, HANDLE, LPCSTR, LPCWSTR, LPDWORD, LPGUID, Optional, PHANDLE, PLARGE_INTEGER, PULONG } from '../types/Avrt';
 
 /**
  * Thin, lazy-loaded FFI bindings for `avrt.dll`.
@@ -59,17 +59,17 @@ class Avrt extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/avrt/nf-avrt-avrtcreatethreadorderinggroup
-  public static AvRtCreateThreadOrderingGroup(Context_out: PHANDLE, Period: PLARGE_INTEGER, ThreadOrderingGuid_in_out: LPGUID, Timeout: OPTIONAL<PLARGE_INTEGER>): BOOL {
+  public static AvRtCreateThreadOrderingGroup(Context_out: PHANDLE, Period: PLARGE_INTEGER, ThreadOrderingGuid_in_out: LPGUID, Timeout: Optional<PLARGE_INTEGER>): BOOL {
     return Avrt.Load('AvRtCreateThreadOrderingGroup')(Context_out, Period, ThreadOrderingGuid_in_out, Timeout);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/avrt/nf-avrt-avrtcreatethreadorderinggroupexa
-  public static AvRtCreateThreadOrderingGroupExA(Context_out: PHANDLE, Period: PLARGE_INTEGER, ThreadOrderingGuid_in_out: LPGUID, Timeout: OPTIONAL<PLARGE_INTEGER>, TaskName: LPCSTR): BOOL {
+  public static AvRtCreateThreadOrderingGroupExA(Context_out: PHANDLE, Period: PLARGE_INTEGER, ThreadOrderingGuid_in_out: LPGUID, Timeout: Optional<PLARGE_INTEGER>, TaskName: LPCSTR): BOOL {
     return Avrt.Load('AvRtCreateThreadOrderingGroupExA')(Context_out, Period, ThreadOrderingGuid_in_out, Timeout, TaskName);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/avrt/nf-avrt-avrtcreatethreadorderinggroupexw
-  public static AvRtCreateThreadOrderingGroupExW(Context_out: PHANDLE, Period: PLARGE_INTEGER, ThreadOrderingGuid_in_out: LPGUID, Timeout: OPTIONAL<PLARGE_INTEGER>, TaskName: LPCWSTR): BOOL {
+  public static AvRtCreateThreadOrderingGroupExW(Context_out: PHANDLE, Period: PLARGE_INTEGER, ThreadOrderingGuid_in_out: LPGUID, Timeout: Optional<PLARGE_INTEGER>, TaskName: LPCWSTR): BOOL {
     return Avrt.Load('AvRtCreateThreadOrderingGroupExW')(Context_out, Period, ThreadOrderingGuid_in_out, Timeout, TaskName);
   }
 

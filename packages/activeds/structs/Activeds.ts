@@ -10,7 +10,7 @@ import type {
   LPCWSTR,
   LPDWORD,
   LPLPWSTR,
-  NULLABLE,
+  Nullable,
   PDWORD,
   PIEnumVARIANT,
   PPSECURITY_DESCRIPTOR,
@@ -94,12 +94,12 @@ class Activeds extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/adshlp/nf-adshlp-adsopenobject
-  public static ADsOpenObject(lpszPathName: LPCWSTR, lpszUserName: NULLABLE<LPCWSTR>, lpszPassword: NULLABLE<LPCWSTR>, dwReserved: DWORD, riid: REFIID, ppObject_out: PPVOID): HRESULT {
+  public static ADsOpenObject(lpszPathName: LPCWSTR, lpszUserName: Nullable<LPCWSTR>, lpszPassword: Nullable<LPCWSTR>, dwReserved: DWORD, riid: REFIID, ppObject_out: PPVOID): HRESULT {
     return Activeds.Load('ADsOpenObject')(lpszPathName, lpszUserName, lpszPassword, dwReserved, riid, ppObject_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/adshlp/nf-adshlp-binarysdtosecuritydescriptor
-  public static BinarySDToSecurityDescriptor(pSecurityDescriptor: PSECURITY_DESCRIPTOR, pVarsec_out: PVARIANT, pszServerName: NULLABLE<LPCWSTR>, userName: NULLABLE<LPCWSTR>, passWord: NULLABLE<LPCWSTR>, dwFlags: DWORD): HRESULT {
+  public static BinarySDToSecurityDescriptor(pSecurityDescriptor: PSECURITY_DESCRIPTOR, pVarsec_out: PVARIANT, pszServerName: Nullable<LPCWSTR>, userName: Nullable<LPCWSTR>, passWord: Nullable<LPCWSTR>, dwFlags: DWORD): HRESULT {
     return Activeds.Load('BinarySDToSecurityDescriptor')(pSecurityDescriptor, pVarsec_out, pszServerName, userName, passWord, dwFlags);
   }
 
@@ -118,9 +118,9 @@ class Activeds extends Win32 {
     vVarSecDes: VARIANT,
     ppSecurityDescriptor_out: PPSECURITY_DESCRIPTOR,
     pdwSDLength_out: PDWORD,
-    pszServerName: NULLABLE<LPCWSTR>,
-    userName: NULLABLE<LPCWSTR>,
-    passWord: NULLABLE<LPCWSTR>,
+    pszServerName: Nullable<LPCWSTR>,
+    userName: Nullable<LPCWSTR>,
+    passWord: Nullable<LPCWSTR>,
     dwFlags: DWORD,
   ): HRESULT {
     return Activeds.Load('SecurityDescriptorToBinarySD')(vVarSecDes, ppSecurityDescriptor_out, pdwSDLength_out, pszServerName, userName, passWord, dwFlags);

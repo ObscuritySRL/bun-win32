@@ -1,6 +1,6 @@
 import type { Pointer } from 'bun:ffi';
 
-export type { BOOL, DWORD, HANDLE, HRESULT, NULL, OPTIONAL, PDWORD, PVOID, UINT } from '@bun-win32/core';
+export type { BOOL, DWORD, HANDLE, HRESULT, NULL, Optional, PDWORD, PVOID, UINT } from '@bun-win32/core';
 
 export const DISM_ONLINE_IMAGE = 'DISM_{53BFAE52-B167-4E2F-A258-0A37B57FF845}';
 

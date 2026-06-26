@@ -1,6 +1,6 @@
 import type { Pointer } from 'bun:ffi';
 
-export type { DWORD, HINSTANCE, HRESULT, NULLABLE, OPTIONAL } from '@bun-win32/core';
+export type { DWORD, HINSTANCE, HRESULT, Nullable, Optional } from '@bun-win32/core';
 
 export const CLSID_DirectInput8 = '25e609e4-b259-11cf-bfc7-444553540000';
 

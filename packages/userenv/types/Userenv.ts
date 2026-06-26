@@ -1,6 +1,6 @@
 import type { Pointer } from 'bun:ffi';
 
-export type { BOOL, DWORD, HANDLE, HRESULT, LPBOOL, LPCSTR, LPCWSTR, LPDWORD, LPSTR, LPVOID, LPWSTR, NULL, OPTIONAL } from '@bun-win32/core';
+export type { BOOL, DWORD, HANDLE, HRESULT, LPBOOL, LPCSTR, LPCWSTR, LPDWORD, LPSTR, LPVOID, LPWSTR, NULL, Optional } from '@bun-win32/core';
 
 export type ASYNCCOMPLETIONHANDLE = bigint;
 export type LPLPVOID = Pointer;

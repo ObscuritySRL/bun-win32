@@ -2,7 +2,7 @@ import { type FFIFunction, FFIType } from 'bun:ffi';
 
 import { Win32 } from '@bun-win32/core';
 
-import type { BOOL, DWORD, FARPROC, HANDLE, LPPROGRESS_ROUTINE, MOUNTED_IMAGE_INFO_LEVELS, NULLABLE, OPTIONAL, PBOOL, PCWSTR, PDWORD, PHANDLE, PLARGE_INTEGER, PPVOID, PVOID, PWIM_INFO, PWIM_MOUNT_LIST } from '../types/Wimgapi';
+import type { BOOL, DWORD, FARPROC, HANDLE, LPPROGRESS_ROUTINE, MOUNTED_IMAGE_INFO_LEVELS, Nullable, Optional, PBOOL, PCWSTR, PDWORD, PHANDLE, PLARGE_INTEGER, PPVOID, PVOID, PWIM_INFO, PWIM_MOUNT_LIST } from '../types/Wimgapi';
 
 /**
  * Thin, lazy-loaded FFI bindings for `wimgapi.dll`.
@@ -67,7 +67,7 @@ class Wimgapi extends Win32 {
   } as const satisfies Record<string, FFIFunction>;
 
   // https://learn.microsoft.com/en-us/windows-hardware/manufacture/desktop/wim/dd834965(v=msdn.10)
-  public static WIMApplyImage(hImage: HANDLE, pszPath: NULLABLE<PCWSTR>, dwApplyFlags: DWORD): BOOL {
+  public static WIMApplyImage(hImage: HANDLE, pszPath: Nullable<PCWSTR>, dwApplyFlags: DWORD): BOOL {
     return Wimgapi.Load('WIMApplyImage')(hImage, pszPath, dwApplyFlags);
   }
 
@@ -82,17 +82,17 @@ class Wimgapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/manufacture/desktop/wim/dd851949(v=msdn.10)
-  public static WIMCommitImageHandle(hImage: HANDLE, dwCommitFlags: DWORD, phNewImageHandle_out: OPTIONAL<PHANDLE>): BOOL {
+  public static WIMCommitImageHandle(hImage: HANDLE, dwCommitFlags: DWORD, phNewImageHandle_out: Optional<PHANDLE>): BOOL {
     return Wimgapi.Load('WIMCommitImageHandle')(hImage, dwCommitFlags, phNewImageHandle_out);
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/manufacture/desktop/wim/dd851916(v=msdn.10)
-  public static WIMCopyFile(pszExistingFileName: PCWSTR, pszNewFileName: PCWSTR, pProgressRoutine: OPTIONAL<LPPROGRESS_ROUTINE>, pvData: OPTIONAL<PVOID>, pbCancel: OPTIONAL<PBOOL>, dwCopyFlags: DWORD): BOOL {
+  public static WIMCopyFile(pszExistingFileName: PCWSTR, pszNewFileName: PCWSTR, pProgressRoutine: Optional<LPPROGRESS_ROUTINE>, pvData: Optional<PVOID>, pbCancel: Optional<PBOOL>, dwCopyFlags: DWORD): BOOL {
     return Wimgapi.Load('WIMCopyFile')(pszExistingFileName, pszNewFileName, pProgressRoutine, pvData, pbCancel, dwCopyFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/manufacture/desktop/wim/dd851934(v=msdn.10)
-  public static WIMCreateFile(pszWimPath: PCWSTR, dwDesiredAccess: DWORD, dwCreationDisposition: DWORD, dwFlagsAndAttributes: DWORD, dwCompressionType: DWORD, pdwCreationResult_out: OPTIONAL<PDWORD>): HANDLE {
+  public static WIMCreateFile(pszWimPath: PCWSTR, dwDesiredAccess: DWORD, dwCreationDisposition: DWORD, dwFlagsAndAttributes: DWORD, dwCompressionType: DWORD, pdwCreationResult_out: Optional<PDWORD>): HANDLE {
     return Wimgapi.Load('WIMCreateFile')(pszWimPath, dwDesiredAccess, dwCreationDisposition, dwFlagsAndAttributes, dwCompressionType, pdwCreationResult_out);
   }
 
@@ -132,7 +132,7 @@ class Wimgapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/manufacture/desktop/wim/dd851943(v=msdn.10)
-  public static WIMGetMessageCallbackCount(hWim: OPTIONAL<HANDLE>): DWORD {
+  public static WIMGetMessageCallbackCount(hWim: Optional<HANDLE>): DWORD {
     return Wimgapi.Load('WIMGetMessageCallbackCount')(hWim);
   }
 
@@ -142,17 +142,17 @@ class Wimgapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/manufacture/desktop/wim/dd851928(v=msdn.10)
-  public static WIMGetMountedImageInfo(fInfoLevelId: MOUNTED_IMAGE_INFO_LEVELS, pdwImageCount_out: PDWORD, pMountInfo_out: NULLABLE<PVOID>, cbMountInfoLength: DWORD, pcbReturnLength_out: PDWORD): BOOL {
+  public static WIMGetMountedImageInfo(fInfoLevelId: MOUNTED_IMAGE_INFO_LEVELS, pdwImageCount_out: PDWORD, pMountInfo_out: Nullable<PVOID>, cbMountInfoLength: DWORD, pcbReturnLength_out: PDWORD): BOOL {
     return Wimgapi.Load('WIMGetMountedImageInfo')(fInfoLevelId, pdwImageCount_out, pMountInfo_out, cbMountInfoLength, pcbReturnLength_out);
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/manufacture/desktop/wim/dd834940(v=msdn.10)
-  public static WIMGetMountedImageInfoFromHandle(hImage: HANDLE, fInfoLevelId: MOUNTED_IMAGE_INFO_LEVELS, pMountInfo_out: NULLABLE<PVOID>, cbMountInfoLength: DWORD, pcbReturnLength_out: PDWORD): BOOL {
+  public static WIMGetMountedImageInfoFromHandle(hImage: HANDLE, fInfoLevelId: MOUNTED_IMAGE_INFO_LEVELS, pMountInfo_out: Nullable<PVOID>, cbMountInfoLength: DWORD, pcbReturnLength_out: PDWORD): BOOL {
     return Wimgapi.Load('WIMGetMountedImageInfoFromHandle')(hImage, fInfoLevelId, pMountInfo_out, cbMountInfoLength, pcbReturnLength_out);
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/manufacture/desktop/wim/dd851936(v=msdn.10)
-  public static WIMGetMountedImages(pMountList_out: NULLABLE<PWIM_MOUNT_LIST>, pcbMountListLength_in_out: PDWORD): BOOL {
+  public static WIMGetMountedImages(pMountList_out: Nullable<PWIM_MOUNT_LIST>, pcbMountListLength_in_out: PDWORD): BOOL {
     return Wimgapi.Load('WIMGetMountedImages')(pMountList_out, pcbMountListLength_in_out);
   }
 
@@ -162,7 +162,7 @@ class Wimgapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/manufacture/desktop/wim/dd851922(v=msdn.10)
-  public static WIMMountImage(pszMountPath: PCWSTR, pszWimFileName: PCWSTR, dwImageIndex: DWORD, pszTempPath: OPTIONAL<PCWSTR>): BOOL {
+  public static WIMMountImage(pszMountPath: PCWSTR, pszWimFileName: PCWSTR, dwImageIndex: DWORD, pszTempPath: Optional<PCWSTR>): BOOL {
     return Wimgapi.Load('WIMMountImage')(pszMountPath, pszWimFileName, dwImageIndex, pszTempPath);
   }
 
@@ -177,7 +177,7 @@ class Wimgapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/manufacture/desktop/wim/dd851932(v=msdn.10)
-  public static WIMRegisterMessageCallback(hWim: OPTIONAL<HANDLE>, fpMessageProc: FARPROC, pvUserData: OPTIONAL<PVOID>): DWORD {
+  public static WIMRegisterMessageCallback(hWim: Optional<HANDLE>, fpMessageProc: FARPROC, pvUserData: Optional<PVOID>): DWORD {
     return Wimgapi.Load('WIMRegisterMessageCallback')(hWim, fpMessageProc, pvUserData);
   }
 
@@ -197,7 +197,7 @@ class Wimgapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/manufacture/desktop/wim/dd851956(v=msdn.10)
-  public static WIMSetReferenceFile(hWim: HANDLE, pszPath: NULLABLE<PCWSTR>, dwFlags: DWORD): BOOL {
+  public static WIMSetReferenceFile(hWim: HANDLE, pszPath: Nullable<PCWSTR>, dwFlags: DWORD): BOOL {
     return Wimgapi.Load('WIMSetReferenceFile')(hWim, pszPath, dwFlags);
   }
 
@@ -212,7 +212,7 @@ class Wimgapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/manufacture/desktop/wim/dd834967(v=msdn.10)
-  public static WIMUnmountImage(pszMountPath: PCWSTR, pszWimFileName: OPTIONAL<PCWSTR>, dwImageIndex: DWORD, bCommitChanges: BOOL): BOOL {
+  public static WIMUnmountImage(pszMountPath: PCWSTR, pszWimFileName: Optional<PCWSTR>, dwImageIndex: DWORD, bCommitChanges: BOOL): BOOL {
     return Wimgapi.Load('WIMUnmountImage')(pszMountPath, pszWimFileName, dwImageIndex, bCommitChanges);
   }
 
@@ -227,7 +227,7 @@ class Wimgapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/manufacture/desktop/wim/dd851930(v=msdn.10)
-  public static WIMUnregisterMessageCallback(hWim: OPTIONAL<HANDLE>, fpMessageProc: OPTIONAL<FARPROC>): BOOL {
+  public static WIMUnregisterMessageCallback(hWim: Optional<HANDLE>, fpMessageProc: Optional<FARPROC>): BOOL {
     return Wimgapi.Load('WIMUnregisterMessageCallback')(hWim, fpMessageProc);
   }
 }

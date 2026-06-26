@@ -13,7 +13,7 @@ import type {
   HWCT,
   LPBOOL,
   LPDWORD,
-  OPTIONAL,
+  Optional,
   PCOGETACTIVATIONSTATE,
   PCOGETCALLSTATE,
   PCWSTR,
@@ -100,12 +100,12 @@ class Wer extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wct/nf-wct-getthreadwaitchain
-  public static GetThreadWaitChain(WctHandle: HWCT, Context: OPTIONAL<DWORD_PTR>, Flags: DWORD, ThreadId: DWORD, NodeCount_in_out: LPDWORD, NodeInfoArray_out: PWAITCHAIN_NODE_INFO, IsCycle_out: LPBOOL): BOOL {
+  public static GetThreadWaitChain(WctHandle: HWCT, Context: Optional<DWORD_PTR>, Flags: DWORD, ThreadId: DWORD, NodeCount_in_out: LPDWORD, NodeInfoArray_out: PWAITCHAIN_NODE_INFO, IsCycle_out: LPBOOL): BOOL {
     return Wer.Load('GetThreadWaitChain')(WctHandle, Context, Flags, ThreadId, NodeCount_in_out, NodeInfoArray_out, IsCycle_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wct/nf-wct-openthreadwaitchainsession
-  public static OpenThreadWaitChainSession(Flags: DWORD, callback: OPTIONAL<PWAITCHAINCALLBACK>): HWCT {
+  public static OpenThreadWaitChainSession(Flags: DWORD, callback: Optional<PWAITCHAINCALLBACK>): HWCT {
     return Wer.Load('OpenThreadWaitChainSession')(Flags, callback);
   }
 
@@ -133,10 +133,10 @@ class Wer extends Win32 {
   public static WerReportAddDump(
     hReportHandle: HREPORT,
     hProcess: HANDLE,
-    hThread: OPTIONAL<HANDLE>,
+    hThread: Optional<HANDLE>,
     dumpType: WER_DUMP_TYPE,
-    pExceptionParam: OPTIONAL<PWER_EXCEPTION_INFORMATION>,
-    pDumpCustomOptions: OPTIONAL<PWER_DUMP_CUSTOM_OPTIONS>,
+    pExceptionParam: Optional<PWER_EXCEPTION_INFORMATION>,
+    pDumpCustomOptions: Optional<PWER_DUMP_CUSTOM_OPTIONS>,
     dwFlags: DWORD,
   ): HRESULT {
     return Wer.Load('WerReportAddDump')(hReportHandle, hProcess, hThread, dumpType, pExceptionParam, pDumpCustomOptions, dwFlags);
@@ -153,12 +153,12 @@ class Wer extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/werapi/nf-werapi-werreportcreate
-  public static WerReportCreate(pwzEventType: PCWSTR, repType: WER_REPORT_TYPE, pReportInformation: OPTIONAL<PWER_REPORT_INFORMATION>, phReportHandle_out: PHREPORT): HRESULT {
+  public static WerReportCreate(pwzEventType: PCWSTR, repType: WER_REPORT_TYPE, pReportInformation: Optional<PWER_REPORT_INFORMATION>, phReportHandle_out: PHREPORT): HRESULT {
     return Wer.Load('WerReportCreate')(pwzEventType, repType, pReportInformation, phReportHandle_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/werapi/nf-werapi-werreportsetparameter
-  public static WerReportSetParameter(hReportHandle: HREPORT, dwparamID: DWORD, pwzName: OPTIONAL<PCWSTR>, pwzValue: PCWSTR): HRESULT {
+  public static WerReportSetParameter(hReportHandle: HREPORT, dwparamID: DWORD, pwzName: Optional<PCWSTR>, pwzValue: PCWSTR): HRESULT {
     return Wer.Load('WerReportSetParameter')(hReportHandle, dwparamID, pwzName, pwzValue);
   }
 
@@ -168,12 +168,12 @@ class Wer extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/werapi/nf-werapi-werreportsubmit
-  public static WerReportSubmit(hReportHandle: HREPORT, consent: WER_CONSENT, dwFlags: DWORD, pSubmitResult_out: OPTIONAL<PWER_SUBMIT_RESULT>): HRESULT {
+  public static WerReportSubmit(hReportHandle: HREPORT, consent: WER_CONSENT, dwFlags: DWORD, pSubmitResult_out: Optional<PWER_SUBMIT_RESULT>): HRESULT {
     return Wer.Load('WerReportSubmit')(hReportHandle, consent, dwFlags, pSubmitResult_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/werapi/nf-werapi-werstoreclose
-  public static WerStoreClose(hReportStore: OPTIONAL<HREPORTSTORE>): void {
+  public static WerStoreClose(hReportStore: Optional<HREPORTSTORE>): void {
     return Wer.Load('WerStoreClose')(hReportStore);
   }
 
@@ -218,7 +218,7 @@ class Wer extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/werapi/nf-werapi-werstoreuploadreport
-  public static WerStoreUploadReport(hReportStore: HREPORTSTORE, pszReportKey: PCWSTR, dwFlags: DWORD, pSubmitResult_out: OPTIONAL<PWER_SUBMIT_RESULT>): HRESULT {
+  public static WerStoreUploadReport(hReportStore: HREPORTSTORE, pszReportKey: PCWSTR, dwFlags: DWORD, pSubmitResult_out: Optional<PWER_SUBMIT_RESULT>): HRESULT {
     return Wer.Load('WerStoreUploadReport')(hReportStore, pszReportKey, dwFlags, pSubmitResult_out);
   }
 }

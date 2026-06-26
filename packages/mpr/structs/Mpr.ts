@@ -2,7 +2,7 @@ import { type FFIFunction, FFIType } from 'bun:ffi';
 
 import { Win32 } from '@bun-win32/core';
 
-import type { BOOL, DWORD, HANDLE, HWND, LPCONNECTDLGSTRUCTW, LPCWSTR, LPDISCDLGSTRUCTW, LPDWORD, LPHANDLE, LPLPWSTR, LPNETCONNECTINFOSTRUCT, LPNETINFOSTRUCT, LPNETRESOURCEW, LPVOID, LPWSTR, OPTIONAL, PBYTE, PVOID } from '../types/Mpr';
+import type { BOOL, DWORD, HANDLE, HWND, LPCONNECTDLGSTRUCTW, LPCWSTR, LPDISCDLGSTRUCTW, LPDWORD, LPHANDLE, LPLPWSTR, LPNETCONNECTINFOSTRUCT, LPNETINFOSTRUCT, LPNETRESOURCEW, LPVOID, LPWSTR, Optional, PBYTE, PVOID } from '../types/Mpr';
 
 class Mpr extends Win32 {
   protected static override name = 'mpr.dll';
@@ -42,22 +42,22 @@ class Mpr extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winnetwk/nf-winnetwk-wnetaddconnection2w
-  public static WNetAddConnection2W(lpNetResource: LPNETRESOURCEW, lpPassword: OPTIONAL<LPCWSTR>, lpUserName: OPTIONAL<LPCWSTR>, dwFlags: DWORD): DWORD {
+  public static WNetAddConnection2W(lpNetResource: LPNETRESOURCEW, lpPassword: Optional<LPCWSTR>, lpUserName: Optional<LPCWSTR>, dwFlags: DWORD): DWORD {
     return Mpr.Load('WNetAddConnection2W')(lpNetResource, lpPassword, lpUserName, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winnetwk/nf-winnetwk-wnetaddconnection3w
-  public static WNetAddConnection3W(hwndOwner: OPTIONAL<HWND>, lpNetResource: LPNETRESOURCEW, lpPassword: OPTIONAL<LPCWSTR>, lpUserName: OPTIONAL<LPCWSTR>, dwFlags: DWORD): DWORD {
+  public static WNetAddConnection3W(hwndOwner: Optional<HWND>, lpNetResource: LPNETRESOURCEW, lpPassword: Optional<LPCWSTR>, lpUserName: Optional<LPCWSTR>, dwFlags: DWORD): DWORD {
     return Mpr.Load('WNetAddConnection3W')(hwndOwner, lpNetResource, lpPassword, lpUserName, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winnetwk/nf-winnetwk-wnetaddconnection4w
-  public static WNetAddConnection4W(hwndOwner: OPTIONAL<HWND>, lpNetResource: LPNETRESOURCEW, pAuthBuffer: PVOID, cbAuthBuffer: DWORD, dwFlags: DWORD, lpUseOptions: PBYTE, cbUseOptions: DWORD): DWORD {
+  public static WNetAddConnection4W(hwndOwner: Optional<HWND>, lpNetResource: LPNETRESOURCEW, pAuthBuffer: PVOID, cbAuthBuffer: DWORD, dwFlags: DWORD, lpUseOptions: PBYTE, cbUseOptions: DWORD): DWORD {
     return Mpr.Load('WNetAddConnection4W')(hwndOwner, lpNetResource, pAuthBuffer, cbAuthBuffer, dwFlags, lpUseOptions, cbUseOptions);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winnetwk/nf-winnetwk-wnetaddconnectionw
-  public static WNetAddConnectionW(lpRemoteName: LPCWSTR, lpPassword: OPTIONAL<LPCWSTR>, lpLocalName: OPTIONAL<LPCWSTR>): DWORD {
+  public static WNetAddConnectionW(lpRemoteName: LPCWSTR, lpPassword: Optional<LPCWSTR>, lpLocalName: Optional<LPCWSTR>): DWORD {
     return Mpr.Load('WNetAddConnectionW')(lpRemoteName, lpPassword, lpLocalName);
   }
 
@@ -87,7 +87,7 @@ class Mpr extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winnetwk/nf-winnetwk-wnetdisconnectdialog
-  public static WNetDisconnectDialog(hwnd: OPTIONAL<HWND>, dwType: DWORD): DWORD {
+  public static WNetDisconnectDialog(hwnd: Optional<HWND>, dwType: DWORD): DWORD {
     return Mpr.Load('WNetDisconnectDialog')(hwnd, dwType);
   }
 
@@ -102,7 +102,7 @@ class Mpr extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winnetwk/nf-winnetwk-wnetgetconnectionw
-  public static WNetGetConnectionW(lpLocalName: LPCWSTR, lpRemoteName_out: OPTIONAL<LPWSTR>, lpnLength_in_out: LPDWORD): DWORD {
+  public static WNetGetConnectionW(lpLocalName: LPCWSTR, lpRemoteName_out: Optional<LPWSTR>, lpnLength_in_out: LPDWORD): DWORD {
     return Mpr.Load('WNetGetConnectionW')(lpLocalName, lpRemoteName_out, lpnLength_in_out);
   }
 
@@ -137,46 +137,46 @@ class Mpr extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winnetwk/nf-winnetwk-wnetgetuserw
-  public static WNetGetUserW(lpName: OPTIONAL<LPCWSTR>, lpUserName_out: LPWSTR, lpnLength_in_out: LPDWORD): DWORD {
+  public static WNetGetUserW(lpName: Optional<LPCWSTR>, lpUserName_out: LPWSTR, lpnLength_in_out: LPDWORD): DWORD {
     return Mpr.Load('WNetGetUserW')(lpName, lpUserName_out, lpnLength_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winnetwk/nf-winnetwk-wnetopenenumw
-  public static WNetOpenEnumW(dwScope: DWORD, dwType: DWORD, dwUsage: DWORD, lpNetResource: OPTIONAL<LPNETRESOURCEW>, lphEnum_out: LPHANDLE): DWORD {
+  public static WNetOpenEnumW(dwScope: DWORD, dwType: DWORD, dwUsage: DWORD, lpNetResource: Optional<LPNETRESOURCEW>, lphEnum_out: LPHANDLE): DWORD {
     return Mpr.Load('WNetOpenEnumW')(dwScope, dwType, dwUsage, lpNetResource, lphEnum_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winnetwk/nf-winnetwk-wnetrestoresingleconnectionw
-  public static WNetRestoreSingleConnectionW(hwndParent: OPTIONAL<HWND>, lpDevice: LPCWSTR, fUseUI: BOOL): DWORD {
+  public static WNetRestoreSingleConnectionW(hwndParent: Optional<HWND>, lpDevice: LPCWSTR, fUseUI: BOOL): DWORD {
     return Mpr.Load('WNetRestoreSingleConnectionW')(hwndParent, lpDevice, fUseUI);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winnetwk/nf-winnetwk-wnetuseconnection4w
   public static WNetUseConnection4W(
-    hwndOwner: OPTIONAL<HWND>,
+    hwndOwner: Optional<HWND>,
     lpNetResource: LPNETRESOURCEW,
-    pAuthBuffer: OPTIONAL<PVOID>,
+    pAuthBuffer: Optional<PVOID>,
     cbAuthBuffer: DWORD,
     dwFlags: DWORD,
-    lpUseOptions: OPTIONAL<PBYTE>,
+    lpUseOptions: Optional<PBYTE>,
     cbUseOptions: DWORD,
-    lpAccessName_out: OPTIONAL<LPWSTR>,
-    lpBufferSize_in_out: OPTIONAL<LPDWORD>,
-    lpResult_out: OPTIONAL<LPDWORD>,
+    lpAccessName_out: Optional<LPWSTR>,
+    lpBufferSize_in_out: Optional<LPDWORD>,
+    lpResult_out: Optional<LPDWORD>,
   ): DWORD {
     return Mpr.Load('WNetUseConnection4W')(hwndOwner, lpNetResource, pAuthBuffer, cbAuthBuffer, dwFlags, lpUseOptions, cbUseOptions, lpAccessName_out, lpBufferSize_in_out, lpResult_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winnetwk/nf-winnetwk-wnetuseconnectionw
   public static WNetUseConnectionW(
-    hwndOwner: OPTIONAL<HWND>,
+    hwndOwner: Optional<HWND>,
     lpNetResource: LPNETRESOURCEW,
-    lpPassword: OPTIONAL<LPCWSTR>,
-    lpUserId: OPTIONAL<LPCWSTR>,
+    lpPassword: Optional<LPCWSTR>,
+    lpUserId: Optional<LPCWSTR>,
     dwFlags: DWORD,
-    lpAccessName_out: OPTIONAL<LPWSTR>,
-    lpBufferSize_in_out: OPTIONAL<LPDWORD>,
-    lpResult_out: OPTIONAL<LPDWORD>,
+    lpAccessName_out: Optional<LPWSTR>,
+    lpBufferSize_in_out: Optional<LPDWORD>,
+    lpResult_out: Optional<LPDWORD>,
   ): DWORD {
     return Mpr.Load('WNetUseConnectionW')(hwndOwner, lpNetResource, lpPassword, lpUserId, dwFlags, lpAccessName_out, lpBufferSize_in_out, lpResult_out);
   }

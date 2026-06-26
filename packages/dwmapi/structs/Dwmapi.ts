@@ -17,8 +17,8 @@ import type {
   LPBOOL,
   LPDWORD,
   LPARAM,
-  NULLABLE,
-  OPTIONAL,
+  Nullable,
+  Optional,
   PACKED_POINT,
   PDWM_BLURBEHIND,
   PDWM_PRESENT_PARAMETERS,
@@ -127,7 +127,7 @@ class Dwmapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dwmapi/nf-dwmapi-dwmgetcompositiontiminginfo
-  public static DwmGetCompositionTimingInfo(hwnd: NULLABLE<HWND>, pTimingInfo_out: PDWM_TIMING_INFO): HRESULT {
+  public static DwmGetCompositionTimingInfo(hwnd: Nullable<HWND>, pTimingInfo_out: PDWM_TIMING_INFO): HRESULT {
     return Dwmapi.Load('DwmGetCompositionTimingInfo')(hwnd, pTimingInfo_out);
   }
 
@@ -137,7 +137,7 @@ class Dwmapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dwmapi/nf-dwmapi-dwmgetunmettabrequirements
-  public static DwmGetUnmetTabRequirements(appWindow: OPTIONAL<HWND>, value_out: PDWM_TAB_WINDOW_REQUIREMENTS): HRESULT {
+  public static DwmGetUnmetTabRequirements(appWindow: Optional<HWND>, value_out: PDWM_TAB_WINDOW_REQUIREMENTS): HRESULT {
     return Dwmapi.Load('DwmGetUnmetTabRequirements')(appWindow, value_out);
   }
 
@@ -182,7 +182,7 @@ class Dwmapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dwmapi/nf-dwmapi-dwmseticoniclivepreviewbitmap
-  public static DwmSetIconicLivePreviewBitmap(hwnd: HWND, hbmp: HBITMAP, pptClient: OPTIONAL<PPOINT>, dwSITFlags: DWORD): HRESULT {
+  public static DwmSetIconicLivePreviewBitmap(hwnd: HWND, hbmp: HBITMAP, pptClient: Optional<PPOINT>, dwSITFlags: DWORD): HRESULT {
     return Dwmapi.Load('DwmSetIconicLivePreviewBitmap')(hwnd, hbmp, pptClient, dwSITFlags);
   }
 

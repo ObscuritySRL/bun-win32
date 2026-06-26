@@ -1,7 +1,7 @@
 import type { Pointer } from 'bun:ffi';
 
 import type { DWORD } from '@bun-win32/core';
-export type { BOOL, BYTE, DWORD, HANDLE, LPCWSTR, LPDWORD, LPHANDLE, LPWSTR, NULL, OPTIONAL, PBYTE, PDWORD, PHANDLE, PULONG, PVOID, ULONG, VOID } from '@bun-win32/core';
+export type { BOOL, BYTE, DWORD, HANDLE, LPCWSTR, LPDWORD, LPHANDLE, LPWSTR, NULL, Optional, PBYTE, PDWORD, PHANDLE, PULONG, PVOID, ULONG, VOID } from '@bun-win32/core';
 
 export const WLAN_API_VERSION = 0x0000_0002;
 export const WLAN_API_VERSION_1_0 = 0x0000_0001;

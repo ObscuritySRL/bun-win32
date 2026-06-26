@@ -1,6 +1,6 @@
 import type { Pointer } from 'bun:ffi';
 
-export type { BOOL, DWORD, DWORD_PTR, HANDLE, HMODULE, HWND, INT, LONG, LPARAM, LPBYTE, LPCSTR, LPCWSTR, LPDWORD, LPHANDLE, LPSTR, LPWSTR, LRESULT, NULL, NULLABLE, OPTIONAL, UINT, UINT_PTR } from '@bun-win32/core';
+export type { BOOL, DWORD, DWORD_PTR, HANDLE, HMODULE, HWND, INT, LONG, LPARAM, LPBYTE, LPCSTR, LPCWSTR, LPDWORD, LPHANDLE, LPSTR, LPWSTR, LRESULT, NULL, Nullable, Optional, UINT, UINT_PTR } from '@bun-win32/core';
 
 export const MCI_ALL_DEVICE_ID = 0xffff_ffff;
 export const MIDI_MAPPER = 0xffff_ffff;

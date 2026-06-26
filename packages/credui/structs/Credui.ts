@@ -13,7 +13,7 @@ import type {
   LPVOID,
   LPWSTR,
   NULL,
-  OPTIONAL,
+  Optional,
   PCREDUI_INFOA,
   PCREDUI_INFOW,
   PCSTR,
@@ -91,25 +91,25 @@ class Credui extends Win32 {
   } as const satisfies Record<string, FFIFunction>;
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincred/nf-wincred-credpackauthenticationbuffera
-  public static CredPackAuthenticationBufferA(dwFlags: DWORD, pszUserName: LPSTR, pszPassword: LPSTR, pPackedCredentials_out: OPTIONAL<PBYTE>, pcbPackedCredentials_in_out: LPDWORD): BOOL {
+  public static CredPackAuthenticationBufferA(dwFlags: DWORD, pszUserName: LPSTR, pszPassword: LPSTR, pPackedCredentials_out: Optional<PBYTE>, pcbPackedCredentials_in_out: LPDWORD): BOOL {
     return Credui.Load('CredPackAuthenticationBufferA')(dwFlags, pszUserName, pszPassword, pPackedCredentials_out, pcbPackedCredentials_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincred/nf-wincred-credpackauthenticationbufferw
-  public static CredPackAuthenticationBufferW(dwFlags: DWORD, pszUserName: LPWSTR, pszPassword: LPWSTR, pPackedCredentials_out: OPTIONAL<PBYTE>, pcbPackedCredentials_in_out: LPDWORD): BOOL {
+  public static CredPackAuthenticationBufferW(dwFlags: DWORD, pszUserName: LPWSTR, pszPassword: LPWSTR, pPackedCredentials_out: Optional<PBYTE>, pcbPackedCredentials_in_out: LPDWORD): BOOL {
     return Credui.Load('CredPackAuthenticationBufferW')(dwFlags, pszUserName, pszPassword, pPackedCredentials_out, pcbPackedCredentials_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincred/nf-wincred-creduicmdlinepromptforcredentialsa
   public static CredUICmdLinePromptForCredentialsA(
-    pszTargetName: OPTIONAL<PCSTR>,
+    pszTargetName: Optional<PCSTR>,
     pContext: NULL,
     dwAuthError: DWORD,
     UserName_in_out: PSTR,
     ulUserBufferSize: ULONG,
     pszPassword_in_out: PSTR,
     ulPasswordBufferSize: ULONG,
-    pfSave_in_out: OPTIONAL<PBOOL>,
+    pfSave_in_out: Optional<PBOOL>,
     dwFlags: DWORD,
   ): DWORD {
     return Credui.Load('CredUICmdLinePromptForCredentialsA')(pszTargetName, pContext, dwAuthError, UserName_in_out, ulUserBufferSize, pszPassword_in_out, ulPasswordBufferSize, pfSave_in_out, dwFlags);
@@ -117,14 +117,14 @@ class Credui extends Win32 {
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincred/nf-wincred-creduicmdlinepromptforcredentialsw
   public static CredUICmdLinePromptForCredentialsW(
-    pszTargetName: OPTIONAL<PCWSTR>,
+    pszTargetName: Optional<PCWSTR>,
     pContext: NULL,
     dwAuthError: DWORD,
     UserName_in_out: PWSTR,
     ulUserBufferSize: ULONG,
     pszPassword_in_out: PWSTR,
     ulPasswordBufferSize: ULONG,
-    pfSave_in_out: OPTIONAL<PBOOL>,
+    pfSave_in_out: Optional<PBOOL>,
     dwFlags: DWORD,
   ): DWORD {
     return Credui.Load('CredUICmdLinePromptForCredentialsW')(pszTargetName, pContext, dwAuthError, UserName_in_out, ulUserBufferSize, pszPassword_in_out, ulPasswordBufferSize, pfSave_in_out, dwFlags);
@@ -152,15 +152,15 @@ class Credui extends Win32 {
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincred/nf-wincred-creduipromptforcredentialsa
   public static CredUIPromptForCredentialsA(
-    pUiInfo: OPTIONAL<PCREDUI_INFOA>,
-    pszTargetName: OPTIONAL<PCSTR>,
+    pUiInfo: Optional<PCREDUI_INFOA>,
+    pszTargetName: Optional<PCSTR>,
     pContext: NULL,
     dwAuthError: DWORD,
     pszUserName_in_out: PSTR,
     ulUserNameBufferSize: ULONG,
     pszPassword_in_out: PSTR,
     ulPasswordBufferSize: ULONG,
-    save_in_out: OPTIONAL<PBOOL>,
+    save_in_out: Optional<PBOOL>,
     dwFlags: DWORD,
   ): DWORD {
     return Credui.Load('CredUIPromptForCredentialsA')(pUiInfo, pszTargetName, pContext, dwAuthError, pszUserName_in_out, ulUserNameBufferSize, pszPassword_in_out, ulPasswordBufferSize, save_in_out, dwFlags);
@@ -168,15 +168,15 @@ class Credui extends Win32 {
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincred/nf-wincred-creduipromptforcredentialsw
   public static CredUIPromptForCredentialsW(
-    pUiInfo: OPTIONAL<PCREDUI_INFOW>,
-    pszTargetName: OPTIONAL<PCWSTR>,
+    pUiInfo: Optional<PCREDUI_INFOW>,
+    pszTargetName: Optional<PCWSTR>,
     pContext: NULL,
     dwAuthError: DWORD,
     pszUserName_in_out: PWSTR,
     ulUserNameBufferSize: ULONG,
     pszPassword_in_out: PWSTR,
     ulPasswordBufferSize: ULONG,
-    save_in_out: OPTIONAL<PBOOL>,
+    save_in_out: Optional<PBOOL>,
     dwFlags: DWORD,
   ): DWORD {
     return Credui.Load('CredUIPromptForCredentialsW')(pUiInfo, pszTargetName, pContext, dwAuthError, pszUserName_in_out, ulUserNameBufferSize, pszPassword_in_out, ulPasswordBufferSize, save_in_out, dwFlags);
@@ -184,14 +184,14 @@ class Credui extends Win32 {
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincred/nf-wincred-creduipromptforwindowscredentialsa
   public static CredUIPromptForWindowsCredentialsA(
-    pUiInfo: OPTIONAL<PCREDUI_INFOA>,
+    pUiInfo: Optional<PCREDUI_INFOA>,
     dwAuthError: DWORD,
     pulAuthPackage_in_out: PULONG,
-    pvInAuthBuffer: OPTIONAL<LPCVOID>,
+    pvInAuthBuffer: Optional<LPCVOID>,
     ulInAuthBufferSize: ULONG,
     ppvOutAuthBuffer_out: PPVOID,
     pulOutAuthBufferSize_out: PULONG,
-    pfSave_in_out: OPTIONAL<PBOOL>,
+    pfSave_in_out: Optional<PBOOL>,
     dwFlags: DWORD,
   ): DWORD {
     return Credui.Load('CredUIPromptForWindowsCredentialsA')(pUiInfo, dwAuthError, pulAuthPackage_in_out, pvInAuthBuffer, ulInAuthBufferSize, ppvOutAuthBuffer_out, pulOutAuthBufferSize_out, pfSave_in_out, dwFlags);
@@ -199,26 +199,26 @@ class Credui extends Win32 {
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincred/nf-wincred-creduipromptforwindowscredentialsw
   public static CredUIPromptForWindowsCredentialsW(
-    pUiInfo: OPTIONAL<PCREDUI_INFOW>,
+    pUiInfo: Optional<PCREDUI_INFOW>,
     dwAuthError: DWORD,
     pulAuthPackage_in_out: PULONG,
-    pvInAuthBuffer: OPTIONAL<LPCVOID>,
+    pvInAuthBuffer: Optional<LPCVOID>,
     ulInAuthBufferSize: ULONG,
     ppvOutAuthBuffer_out: PPVOID,
     pulOutAuthBufferSize_out: PULONG,
-    pfSave_in_out: OPTIONAL<PBOOL>,
+    pfSave_in_out: Optional<PBOOL>,
     dwFlags: DWORD,
   ): DWORD {
     return Credui.Load('CredUIPromptForWindowsCredentialsW')(pUiInfo, dwAuthError, pulAuthPackage_in_out, pvInAuthBuffer, ulInAuthBufferSize, ppvOutAuthBuffer_out, pulOutAuthBufferSize_out, pfSave_in_out, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincred/nf-wincred-creduireadssocredw
-  public static CredUIReadSSOCredW(pszRealm: OPTIONAL<PCWSTR>, ppszUsername_out: PPWSTR): DWORD {
+  public static CredUIReadSSOCredW(pszRealm: Optional<PCWSTR>, ppszUsername_out: PPWSTR): DWORD {
     return Credui.Load('CredUIReadSSOCredW')(pszRealm, ppszUsername_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincred/nf-wincred-creduistoressocredw
-  public static CredUIStoreSSOCredW(pszRealm: OPTIONAL<PCWSTR>, pszUsername: PCWSTR, pszPassword: PCWSTR, bPersist: BOOL): DWORD {
+  public static CredUIStoreSSOCredW(pszRealm: Optional<PCWSTR>, pszUsername: PCWSTR, pszPassword: PCWSTR, bPersist: BOOL): DWORD {
     return Credui.Load('CredUIStoreSSOCredW')(pszRealm, pszUsername, pszPassword, bPersist);
   }
 
@@ -227,11 +227,11 @@ class Credui extends Win32 {
     dwFlags: DWORD,
     pAuthBuffer: LPVOID,
     cbAuthBuffer: DWORD,
-    pszUserName_out: OPTIONAL<LPSTR>,
+    pszUserName_out: Optional<LPSTR>,
     pcchlMaxUserName_in_out: LPDWORD,
-    pszDomainName_out: OPTIONAL<LPSTR>,
-    pcchMaxDomainName_in_out: OPTIONAL<LPDWORD>,
-    pszPassword_out: OPTIONAL<LPSTR>,
+    pszDomainName_out: Optional<LPSTR>,
+    pcchMaxDomainName_in_out: Optional<LPDWORD>,
+    pszPassword_out: Optional<LPSTR>,
     pcchMaxPassword_in_out: LPDWORD,
   ): BOOL {
     return Credui.Load('CredUnPackAuthenticationBufferA')(dwFlags, pAuthBuffer, cbAuthBuffer, pszUserName_out, pcchlMaxUserName_in_out, pszDomainName_out, pcchMaxDomainName_in_out, pszPassword_out, pcchMaxPassword_in_out);
@@ -242,18 +242,18 @@ class Credui extends Win32 {
     dwFlags: DWORD,
     pAuthBuffer: LPVOID,
     cbAuthBuffer: DWORD,
-    pszUserName_out: OPTIONAL<LPWSTR>,
+    pszUserName_out: Optional<LPWSTR>,
     pcchMaxUserName_in_out: LPDWORD,
-    pszDomainName_out: OPTIONAL<LPWSTR>,
-    pcchMaxDomainName_in_out: OPTIONAL<LPDWORD>,
-    pszPassword_out: OPTIONAL<LPWSTR>,
+    pszDomainName_out: Optional<LPWSTR>,
+    pcchMaxDomainName_in_out: Optional<LPDWORD>,
+    pszPassword_out: Optional<LPWSTR>,
     pcchMaxPassword_in_out: LPDWORD,
   ): BOOL {
     return Credui.Load('CredUnPackAuthenticationBufferW')(dwFlags, pAuthBuffer, cbAuthBuffer, pszUserName_out, pcchMaxUserName_in_out, pszDomainName_out, pcchMaxDomainName_in_out, pszPassword_out, pcchMaxPassword_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/sspi/nf-sspi-sspigetcreduicontext
-  public static SspiGetCredUIContext(ContextHandle: HANDLE, CredType: PGUID, LogonId: OPTIONAL<PLUID>, CredUIContexts_out: PPSEC_WINNT_CREDUI_CONTEXT_VECTOR, TokenHandle_out: OPTIONAL<PHANDLE>): SECURITY_STATUS {
+  public static SspiGetCredUIContext(ContextHandle: HANDLE, CredType: PGUID, LogonId: Optional<PLUID>, CredUIContexts_out: PPSEC_WINNT_CREDUI_CONTEXT_VECTOR, TokenHandle_out: Optional<PHANDLE>): SECURITY_STATUS {
     return Credui.Load('SspiGetCredUIContext')(ContextHandle, CredType, LogonId, CredUIContexts_out, TokenHandle_out);
   }
 
@@ -265,12 +265,12 @@ class Credui extends Win32 {
   // https://learn.microsoft.com/en-us/windows/win32/api/sspi/nf-sspi-sspipromptforcredentialsa
   public static SspiPromptForCredentialsA(
     pszTargetName: PCSTR,
-    pUiInfo: OPTIONAL<PCREDUI_INFOA>,
+    pUiInfo: Optional<PCREDUI_INFOA>,
     dwAuthError: ULONG,
     pszPackage: PCSTR,
-    pInputAuthIdentity: OPTIONAL<PSEC_WINNT_AUTH_IDENTITY_OPAQUE>,
+    pInputAuthIdentity: Optional<PSEC_WINNT_AUTH_IDENTITY_OPAQUE>,
     ppAuthIdentity_out: PPSEC_WINNT_AUTH_IDENTITY_OPAQUE,
-    pfSave_in_out: OPTIONAL<PINT>,
+    pfSave_in_out: Optional<PINT>,
     dwFlags: ULONG,
   ): SECURITY_STATUS {
     return Credui.Load('SspiPromptForCredentialsA')(pszTargetName, pUiInfo, dwAuthError, pszPackage, pInputAuthIdentity, ppAuthIdentity_out, pfSave_in_out, dwFlags);
@@ -279,12 +279,12 @@ class Credui extends Win32 {
   // https://learn.microsoft.com/en-us/windows/win32/api/sspi/nf-sspi-sspipromptforcredentialsw
   public static SspiPromptForCredentialsW(
     pszTargetName: PCWSTR,
-    pUiInfo: OPTIONAL<PCREDUI_INFOW>,
+    pUiInfo: Optional<PCREDUI_INFOW>,
     dwAuthError: ULONG,
     pszPackage: PCWSTR,
-    pInputAuthIdentity: OPTIONAL<PSEC_WINNT_AUTH_IDENTITY_OPAQUE>,
+    pInputAuthIdentity: Optional<PSEC_WINNT_AUTH_IDENTITY_OPAQUE>,
     ppAuthIdentity_out: PPSEC_WINNT_AUTH_IDENTITY_OPAQUE,
-    pfSave_in_out: OPTIONAL<PINT>,
+    pfSave_in_out: Optional<PINT>,
     dwFlags: ULONG,
   ): SECURITY_STATUS {
     return Credui.Load('SspiPromptForCredentialsW')(pszTargetName, pUiInfo, dwAuthError, pszPackage, pInputAuthIdentity, ppAuthIdentity_out, pfSave_in_out, dwFlags);

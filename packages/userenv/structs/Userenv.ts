@@ -19,7 +19,7 @@ import type {
   LPSTR,
   LPVOID,
   LPWSTR,
-  OPTIONAL,
+  Optional,
   PGENERIC_MAPPING,
   PGROUP_POLICY_OBJECTA,
   PGROUP_POLICY_OBJECTW,
@@ -110,12 +110,12 @@ class Userenv extends Win32 {
   } as const satisfies Record<string, FFIFunction>;
 
   // https://learn.microsoft.com/en-us/windows/win32/api/userenv/nf-userenv-createappcontainerprofile
-  public static CreateAppContainerProfile(pszAppContainerName: LPCWSTR, pszDisplayName: LPCWSTR, pszDescription: LPCWSTR, pCapabilities: OPTIONAL<PSID_AND_ATTRIBUTES>, dwCapabilityCount: DWORD, ppSidAppContainerSid_out: LPLPVOID): HRESULT {
+  public static CreateAppContainerProfile(pszAppContainerName: LPCWSTR, pszDisplayName: LPCWSTR, pszDescription: LPCWSTR, pCapabilities: Optional<PSID_AND_ATTRIBUTES>, dwCapabilityCount: DWORD, ppSidAppContainerSid_out: LPLPVOID): HRESULT {
     return Userenv.Load('CreateAppContainerProfile')(pszAppContainerName, pszDisplayName, pszDescription, pCapabilities, dwCapabilityCount, ppSidAppContainerSid_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/userenv/nf-userenv-createenvironmentblock
-  public static CreateEnvironmentBlock(lpEnvironment_out: LPLPVOID, hToken: OPTIONAL<HANDLE>, bInherit: BOOL): BOOL {
+  public static CreateEnvironmentBlock(lpEnvironment_out: LPLPVOID, hToken: Optional<HANDLE>, bInherit: BOOL): BOOL {
     return Userenv.Load('CreateEnvironmentBlock')(lpEnvironment_out, hToken, bInherit);
   }
 
@@ -130,12 +130,12 @@ class Userenv extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/userenv/nf-userenv-deleteprofilea
-  public static DeleteProfileA(lpSidString: LPCSTR, lpProfilePath: OPTIONAL<LPCSTR>, lpComputerName: OPTIONAL<LPCSTR>): BOOL {
+  public static DeleteProfileA(lpSidString: LPCSTR, lpProfilePath: Optional<LPCSTR>, lpComputerName: Optional<LPCSTR>): BOOL {
     return Userenv.Load('DeleteProfileA')(lpSidString, lpProfilePath, lpComputerName);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/userenv/nf-userenv-deleteprofilew
-  public static DeleteProfileW(lpSidString: LPCWSTR, lpProfilePath: OPTIONAL<LPCWSTR>, lpComputerName: OPTIONAL<LPCWSTR>): BOOL {
+  public static DeleteProfileW(lpSidString: LPCWSTR, lpProfilePath: Optional<LPCWSTR>, lpComputerName: Optional<LPCWSTR>): BOOL {
     return Userenv.Load('DeleteProfileW')(lpSidString, lpProfilePath, lpComputerName);
   }
 
@@ -160,12 +160,12 @@ class Userenv extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/userenv/nf-userenv-expandenvironmentstringsforusera
-  public static ExpandEnvironmentStringsForUserA(hToken: OPTIONAL<HANDLE>, lpSrc: LPCSTR, lpDest_out: LPSTR, dwSize: DWORD): BOOL {
+  public static ExpandEnvironmentStringsForUserA(hToken: Optional<HANDLE>, lpSrc: LPCSTR, lpDest_out: LPSTR, dwSize: DWORD): BOOL {
     return Userenv.Load('ExpandEnvironmentStringsForUserA')(hToken, lpSrc, lpDest_out, dwSize);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/userenv/nf-userenv-expandenvironmentstringsforuserw
-  public static ExpandEnvironmentStringsForUserW(hToken: OPTIONAL<HANDLE>, lpSrc: LPCWSTR, lpDest_out: LPWSTR, dwSize: DWORD): BOOL {
+  public static ExpandEnvironmentStringsForUserW(hToken: Optional<HANDLE>, lpSrc: LPCWSTR, lpDest_out: LPWSTR, dwSize: DWORD): BOOL {
     return Userenv.Load('ExpandEnvironmentStringsForUserW')(hToken, lpSrc, lpDest_out, dwSize);
   }
 
@@ -185,12 +185,12 @@ class Userenv extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/userenv/nf-userenv-getallusersprofiledirectorya
-  public static GetAllUsersProfileDirectoryA(lpProfileDir_out: OPTIONAL<LPSTR>, lpcchSize_in_out: LPDWORD): BOOL {
+  public static GetAllUsersProfileDirectoryA(lpProfileDir_out: Optional<LPSTR>, lpcchSize_in_out: LPDWORD): BOOL {
     return Userenv.Load('GetAllUsersProfileDirectoryA')(lpProfileDir_out, lpcchSize_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/userenv/nf-userenv-getallusersprofiledirectoryw
-  public static GetAllUsersProfileDirectoryW(lpProfileDir_out: OPTIONAL<LPWSTR>, lpcchSize_in_out: LPDWORD): BOOL {
+  public static GetAllUsersProfileDirectoryW(lpProfileDir_out: Optional<LPWSTR>, lpcchSize_in_out: LPDWORD): BOOL {
     return Userenv.Load('GetAllUsersProfileDirectoryW')(lpProfileDir_out, lpcchSize_in_out);
   }
 
@@ -205,32 +205,32 @@ class Userenv extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/userenv/nf-userenv-getappliedgpolista
-  public static GetAppliedGPOListA(dwFlags: DWORD, pMachineName: OPTIONAL<LPCSTR>, pSidUser: OPTIONAL<PSID>, pGuidExtension: LPVOID, ppGPOList_out: LPLPVOID): DWORD {
+  public static GetAppliedGPOListA(dwFlags: DWORD, pMachineName: Optional<LPCSTR>, pSidUser: Optional<PSID>, pGuidExtension: LPVOID, ppGPOList_out: LPLPVOID): DWORD {
     return Userenv.Load('GetAppliedGPOListA')(dwFlags, pMachineName, pSidUser, pGuidExtension, ppGPOList_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/userenv/nf-userenv-getappliedgpolistw
-  public static GetAppliedGPOListW(dwFlags: DWORD, pMachineName: OPTIONAL<LPCWSTR>, pSidUser: OPTIONAL<PSID>, pGuidExtension: LPVOID, ppGPOList_out: LPLPVOID): DWORD {
+  public static GetAppliedGPOListW(dwFlags: DWORD, pMachineName: Optional<LPCWSTR>, pSidUser: Optional<PSID>, pGuidExtension: LPVOID, ppGPOList_out: LPLPVOID): DWORD {
     return Userenv.Load('GetAppliedGPOListW')(dwFlags, pMachineName, pSidUser, pGuidExtension, ppGPOList_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/userenv/nf-userenv-getdefaultuserprofiledirectorya
-  public static GetDefaultUserProfileDirectoryA(lpProfileDir_out: OPTIONAL<LPSTR>, lpcchSize_in_out: LPDWORD): BOOL {
+  public static GetDefaultUserProfileDirectoryA(lpProfileDir_out: Optional<LPSTR>, lpcchSize_in_out: LPDWORD): BOOL {
     return Userenv.Load('GetDefaultUserProfileDirectoryA')(lpProfileDir_out, lpcchSize_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/userenv/nf-userenv-getdefaultuserprofiledirectoryw
-  public static GetDefaultUserProfileDirectoryW(lpProfileDir_out: OPTIONAL<LPWSTR>, lpcchSize_in_out: LPDWORD): BOOL {
+  public static GetDefaultUserProfileDirectoryW(lpProfileDir_out: Optional<LPWSTR>, lpcchSize_in_out: LPDWORD): BOOL {
     return Userenv.Load('GetDefaultUserProfileDirectoryW')(lpProfileDir_out, lpcchSize_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/userenv/nf-userenv-getgpolista
-  public static GetGPOListA(hToken: OPTIONAL<HANDLE>, lpName: OPTIONAL<LPCSTR>, lpHostName: OPTIONAL<LPCSTR>, lpComputerName: OPTIONAL<LPCSTR>, dwFlags: DWORD, pGPOList_out: LPLPVOID): BOOL {
+  public static GetGPOListA(hToken: Optional<HANDLE>, lpName: Optional<LPCSTR>, lpHostName: Optional<LPCSTR>, lpComputerName: Optional<LPCSTR>, dwFlags: DWORD, pGPOList_out: LPLPVOID): BOOL {
     return Userenv.Load('GetGPOListA')(hToken, lpName, lpHostName, lpComputerName, dwFlags, pGPOList_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/userenv/nf-userenv-getgpolistw
-  public static GetGPOListW(hToken: OPTIONAL<HANDLE>, lpName: OPTIONAL<LPCWSTR>, lpHostName: OPTIONAL<LPCWSTR>, lpComputerName: OPTIONAL<LPCWSTR>, dwFlags: DWORD, pGPOList_out: LPLPVOID): BOOL {
+  public static GetGPOListW(hToken: Optional<HANDLE>, lpName: Optional<LPCWSTR>, lpHostName: Optional<LPCWSTR>, lpComputerName: Optional<LPCWSTR>, dwFlags: DWORD, pGPOList_out: LPLPVOID): BOOL {
     return Userenv.Load('GetGPOListW')(hToken, lpName, lpHostName, lpComputerName, dwFlags, pGPOList_out);
   }
 
@@ -240,22 +240,22 @@ class Userenv extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/userenv/nf-userenv-getprofilesdirectorya
-  public static GetProfilesDirectoryA(lpProfileDir_out: OPTIONAL<LPSTR>, lpcchSize_in_out: LPDWORD): BOOL {
+  public static GetProfilesDirectoryA(lpProfileDir_out: Optional<LPSTR>, lpcchSize_in_out: LPDWORD): BOOL {
     return Userenv.Load('GetProfilesDirectoryA')(lpProfileDir_out, lpcchSize_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/userenv/nf-userenv-getprofilesdirectoryw
-  public static GetProfilesDirectoryW(lpProfileDir_out: OPTIONAL<LPWSTR>, lpcchSize_in_out: LPDWORD): BOOL {
+  public static GetProfilesDirectoryW(lpProfileDir_out: Optional<LPWSTR>, lpcchSize_in_out: LPDWORD): BOOL {
     return Userenv.Load('GetProfilesDirectoryW')(lpProfileDir_out, lpcchSize_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/userenv/nf-userenv-getuserprofiledirectorya
-  public static GetUserProfileDirectoryA(hToken: HANDLE, lpProfileDir_out: OPTIONAL<LPSTR>, lpcchSize_in_out: LPDWORD): BOOL {
+  public static GetUserProfileDirectoryA(hToken: HANDLE, lpProfileDir_out: Optional<LPSTR>, lpcchSize_in_out: LPDWORD): BOOL {
     return Userenv.Load('GetUserProfileDirectoryA')(hToken, lpProfileDir_out, lpcchSize_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/userenv/nf-userenv-getuserprofiledirectoryw
-  public static GetUserProfileDirectoryW(hToken: HANDLE, lpProfileDir_out: OPTIONAL<LPWSTR>, lpcchSize_in_out: LPDWORD): BOOL {
+  public static GetUserProfileDirectoryW(hToken: HANDLE, lpProfileDir_out: Optional<LPWSTR>, lpcchSize_in_out: LPDWORD): BOOL {
     return Userenv.Load('GetUserProfileDirectoryW')(hToken, lpProfileDir_out, lpcchSize_in_out);
   }
 
@@ -302,14 +302,14 @@ class Userenv extends Win32 {
   // https://learn.microsoft.com/en-us/windows/win32/api/userenv/nf-userenv-rsopaccesscheckbytype
   public static RsopAccessCheckByType(
     pSecurityDescriptor: PSECURITY_DESCRIPTOR,
-    pPrincipalSelfSid: OPTIONAL<PSID>,
+    pPrincipalSelfSid: Optional<PSID>,
     pRsopToken: PRSOPTOKEN,
     dwDesiredAccessMask: DWORD,
-    pObjectTypeList: OPTIONAL<POBJECT_TYPE_LIST>,
+    pObjectTypeList: Optional<POBJECT_TYPE_LIST>,
     ObjectTypeListLength: DWORD,
     pGenericMapping: PGENERIC_MAPPING,
-    pPrivilegeSet: OPTIONAL<PPRIVILEGE_SET>,
-    pdwPrivilegeSetLength: OPTIONAL<LPDWORD>,
+    pPrivilegeSet: Optional<PPRIVILEGE_SET>,
+    pdwPrivilegeSetLength: Optional<LPDWORD>,
     pdwGrantedAccessMask_out: LPDWORD,
     pbAccessStatus_out: LPBOOL,
   ): HRESULT {

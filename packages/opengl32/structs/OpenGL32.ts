@@ -44,7 +44,7 @@ import type {
   LPLAYERPLANEDESCRIPTOR,
   LPGLYPHMETRICSFLOAT,
   LPWGLSWAP,
-  NULLABLE,
+  Nullable,
 } from '../types/OpenGL32';
 
 /**
@@ -986,7 +986,7 @@ class OpenGL32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/opengl/gldrawelements
-  public static glDrawElements(mode: GLenum, count: GLsizei, type: GLenum, indices: NULLABLE<GLvoid_>): void {
+  public static glDrawElements(mode: GLenum, count: GLsizei, type: GLenum, indices: Nullable<GLvoid_>): void {
     return OpenGL32.Load('glDrawElements')(mode, count, type, indices);
   }
 
@@ -1591,7 +1591,7 @@ class OpenGL32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/opengl/glnormalpointer
-  public static glNormalPointer(type: GLenum, stride: GLsizei, pointer: NULLABLE<GLvoid_>): void {
+  public static glNormalPointer(type: GLenum, stride: GLsizei, pointer: Nullable<GLvoid_>): void {
     return OpenGL32.Load('glNormalPointer')(type, stride, pointer);
   }
 
@@ -2151,12 +2151,12 @@ class OpenGL32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/opengl/glteximage1d
-  public static glTexImage1D(target: GLenum, level: GLint, internalformat: GLint, width: GLsizei, border: GLint, format: GLint, type: GLenum, pixels: NULLABLE<GLvoid_>): void {
+  public static glTexImage1D(target: GLenum, level: GLint, internalformat: GLint, width: GLsizei, border: GLint, format: GLint, type: GLenum, pixels: Nullable<GLvoid_>): void {
     return OpenGL32.Load('glTexImage1D')(target, level, internalformat, width, border, format, type, pixels);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/opengl/glteximage2d
-  public static glTexImage2D(target: GLenum, level: GLint, internalformat: GLint, width: GLsizei, height: GLsizei, border: GLint, format: GLint, type: GLenum, pixels: NULLABLE<GLvoid_>): void {
+  public static glTexImage2D(target: GLenum, level: GLint, internalformat: GLint, width: GLsizei, height: GLsizei, border: GLint, format: GLint, type: GLenum, pixels: Nullable<GLvoid_>): void {
     return OpenGL32.Load('glTexImage2D')(target, level, internalformat, width, height, border, format, type, pixels);
   }
 
@@ -2361,7 +2361,7 @@ class OpenGL32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-wgldescribepixelformat
-  public static wglDescribePixelFormat(hdc: HDC, iPixelFormat: INT, nBytes: UINT, ppfd: NULLABLE<LPPIXELFORMATDESCRIPTOR>): INT {
+  public static wglDescribePixelFormat(hdc: HDC, iPixelFormat: INT, nBytes: UINT, ppfd: Nullable<LPPIXELFORMATDESCRIPTOR>): INT {
     return OpenGL32.Load('wglDescribePixelFormat')(hdc, iPixelFormat, nBytes, ppfd);
   }
 
@@ -2386,7 +2386,7 @@ class OpenGL32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-wglmakecurrent
-  public static wglMakeCurrent(hdc: HDC, hglrc: NULLABLE<HGLRC>): BOOL {
+  public static wglMakeCurrent(hdc: HDC, hglrc: Nullable<HGLRC>): BOOL {
     return OpenGL32.Load('wglMakeCurrent')(hdc, hglrc);
   }
 
@@ -2431,12 +2431,12 @@ class OpenGL32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-wglusefontoutlinesa
-  public static wglUseFontOutlinesA(hdc: HDC, first: DWORD, count: DWORD, listBase: DWORD, deviation: GLfloat, extrusion: GLfloat, format: INT, lpgmf: NULLABLE<LPGLYPHMETRICSFLOAT>): BOOL {
+  public static wglUseFontOutlinesA(hdc: HDC, first: DWORD, count: DWORD, listBase: DWORD, deviation: GLfloat, extrusion: GLfloat, format: INT, lpgmf: Nullable<LPGLYPHMETRICSFLOAT>): BOOL {
     return OpenGL32.Load('wglUseFontOutlinesA')(hdc, first, count, listBase, deviation, extrusion, format, lpgmf);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-wglusefontoutlinesw
-  public static wglUseFontOutlinesW(hdc: HDC, first: DWORD, count: DWORD, listBase: DWORD, deviation: GLfloat, extrusion: GLfloat, format: INT, lpgmf: NULLABLE<LPGLYPHMETRICSFLOAT>): BOOL {
+  public static wglUseFontOutlinesW(hdc: HDC, first: DWORD, count: DWORD, listBase: DWORD, deviation: GLfloat, extrusion: GLfloat, format: INT, lpgmf: Nullable<LPGLYPHMETRICSFLOAT>): BOOL {
     return OpenGL32.Load('wglUseFontOutlinesW')(hdc, first, count, listBase, deviation, extrusion, format, lpgmf);
   }
 
@@ -2454,10 +2454,10 @@ class OpenGL32 extends Win32 {
   // WGL Extensions (lazy-loaded via wglGetProcAddress)
   // ---------------------------------------------------------------------------
 
-  public static wglChoosePixelFormatARB(hdc: HDC, piAttribIList: NULLABLE<GLint_>, pfAttribFList: NULLABLE<GLfloat_>, nMaxFormats: UINT, piFormats: GLint_, nNumFormats: GLuint_): BOOL {
+  public static wglChoosePixelFormatARB(hdc: HDC, piAttribIList: Nullable<GLint_>, pfAttribFList: Nullable<GLfloat_>, nMaxFormats: UINT, piFormats: GLint_, nNumFormats: GLuint_): BOOL {
     return OpenGL32.LoadExtension('wglChoosePixelFormatARB')(hdc, piAttribIList, pfAttribFList, nMaxFormats, piFormats, nNumFormats);
   }
-  public static wglCreateContextAttribsARB(hdc: HDC, hShareContext: NULLABLE<HGLRC>, attribList: GLint_): HGLRC {
+  public static wglCreateContextAttribsARB(hdc: HDC, hShareContext: Nullable<HGLRC>, attribList: GLint_): HGLRC {
     return OpenGL32.LoadExtension('wglCreateContextAttribsARB')(hdc, hShareContext, attribList);
   }
   public static wglGetExtensionsStringARB(hdc: HDC): GLchar_ {
@@ -2486,7 +2486,7 @@ class OpenGL32 extends Win32 {
   public static glBindBuffer(target: GLenum, buffer: GLuint): void {
     return OpenGL32.LoadExtension('glBindBuffer')(target, buffer);
   }
-  public static glBufferData(target: GLenum, size: GLsizeiptr, data: NULLABLE<GLvoid_>, usage: GLenum): void {
+  public static glBufferData(target: GLenum, size: GLsizeiptr, data: Nullable<GLvoid_>, usage: GLenum): void {
     return OpenGL32.LoadExtension('glBufferData')(target, size, data, usage);
   }
   public static glBufferSubData(target: GLenum, offset: GLintptr, size: GLsizeiptr, data: GLvoid_): void {
@@ -2542,19 +2542,19 @@ class OpenGL32 extends Win32 {
   public static glDetachShader(program: GLuint, shader: GLuint): void {
     return OpenGL32.LoadExtension('glDetachShader')(program, shader);
   }
-  public static glGetProgramInfoLog(program: GLuint, bufSize: GLsizei, length: NULLABLE<GLsizei_>, infoLog: GLchar_): void {
+  public static glGetProgramInfoLog(program: GLuint, bufSize: GLsizei, length: Nullable<GLsizei_>, infoLog: GLchar_): void {
     return OpenGL32.LoadExtension('glGetProgramInfoLog')(program, bufSize, length, infoLog);
   }
   public static glGetProgramiv(program: GLuint, pname: GLenum, params: GLint_): void {
     return OpenGL32.LoadExtension('glGetProgramiv')(program, pname, params);
   }
-  public static glGetShaderInfoLog(shader: GLuint, bufSize: GLsizei, length: NULLABLE<GLsizei_>, infoLog: GLchar_): void {
+  public static glGetShaderInfoLog(shader: GLuint, bufSize: GLsizei, length: Nullable<GLsizei_>, infoLog: GLchar_): void {
     return OpenGL32.LoadExtension('glGetShaderInfoLog')(shader, bufSize, length, infoLog);
   }
   public static glGetShaderiv(shader: GLuint, pname: GLenum, params: GLint_): void {
     return OpenGL32.LoadExtension('glGetShaderiv')(shader, pname, params);
   }
-  public static glGetShaderSource(shader: GLuint, bufSize: GLsizei, length: NULLABLE<GLsizei_>, source: GLchar_): void {
+  public static glGetShaderSource(shader: GLuint, bufSize: GLsizei, length: Nullable<GLsizei_>, source: GLchar_): void {
     return OpenGL32.LoadExtension('glGetShaderSource')(shader, bufSize, length, source);
   }
   public static glGetUniformLocation(program: GLuint, name: GLchar_): GLint {
@@ -2569,7 +2569,7 @@ class OpenGL32 extends Win32 {
   public static glLinkProgram(program: GLuint): void {
     return OpenGL32.LoadExtension('glLinkProgram')(program);
   }
-  public static glShaderSource(shader: GLuint, count: GLsizei, string: GLchar_, length: NULLABLE<GLint_>): void {
+  public static glShaderSource(shader: GLuint, count: GLsizei, string: GLchar_, length: Nullable<GLint_>): void {
     return OpenGL32.LoadExtension('glShaderSource')(shader, count, string, length);
   }
   public static glUseProgram(program: GLuint): void {
@@ -2651,10 +2651,10 @@ class OpenGL32 extends Win32 {
   public static glEnableVertexAttribArray(index: GLuint): void {
     return OpenGL32.LoadExtension('glEnableVertexAttribArray')(index);
   }
-  public static glGetActiveAttrib(program: GLuint, index: GLuint, bufSize: GLsizei, length: NULLABLE<GLsizei_>, size: GLint_, type: GLenum_, name: GLchar_): void {
+  public static glGetActiveAttrib(program: GLuint, index: GLuint, bufSize: GLsizei, length: Nullable<GLsizei_>, size: GLint_, type: GLenum_, name: GLchar_): void {
     return OpenGL32.LoadExtension('glGetActiveAttrib')(program, index, bufSize, length, size, type, name);
   }
-  public static glGetActiveUniform(program: GLuint, index: GLuint, bufSize: GLsizei, length: NULLABLE<GLsizei_>, size: GLint_, type: GLenum_, name: GLchar_): void {
+  public static glGetActiveUniform(program: GLuint, index: GLuint, bufSize: GLsizei, length: Nullable<GLsizei_>, size: GLint_, type: GLenum_, name: GLchar_): void {
     return OpenGL32.LoadExtension('glGetActiveUniform')(program, index, bufSize, length, size, type, name);
   }
   public static glGetAttribLocation(program: GLuint, name: GLchar_): GLint {

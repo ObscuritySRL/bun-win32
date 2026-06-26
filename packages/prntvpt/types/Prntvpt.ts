@@ -1,6 +1,6 @@
 import type { Pointer } from 'bun:ffi';
 
-export type { DWORD, HRESULT, LPCWSTR, NULLABLE, OPTIONAL, PDWORD, PULONG, PVOID, ULONG } from '@bun-win32/core';
+export type { DWORD, HRESULT, LPCWSTR, Nullable, Optional, PDWORD, PULONG, PVOID, ULONG } from '@bun-win32/core';
 
 export const E_DELTA_PRINTTICKET_FORMAT = 0x8004_0005;
 export const E_PRINTCAPABILITIES_FORMAT = 0x8004_0004;

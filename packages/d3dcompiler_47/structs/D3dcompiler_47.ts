@@ -12,7 +12,7 @@ import type {
   LPCSTR,
   LPCVOID,
   LPCWSTR,
-  OPTIONAL,
+  Optional,
   PD3D_SHADER_DATA,
   PD3D_SHADER_MACRO,
   PID3D11FunctionLinkingGraph,
@@ -88,15 +88,15 @@ class D3dcompiler_47 extends Win32 {
   public static D3DCompile(
     pSrcData: LPCVOID,
     SrcDataSize: SIZE_T,
-    pSourceName: OPTIONAL<LPCSTR>,
-    pDefines: OPTIONAL<PD3D_SHADER_MACRO>,
-    pInclude: OPTIONAL<ID3DInclude>,
-    pEntrypoint: OPTIONAL<LPCSTR>,
+    pSourceName: Optional<LPCSTR>,
+    pDefines: Optional<PD3D_SHADER_MACRO>,
+    pInclude: Optional<ID3DInclude>,
+    pEntrypoint: Optional<LPCSTR>,
     pTarget: LPCSTR,
     Flags1: UINT,
     Flags2: UINT,
     ppCode_out: PID3DBlob,
-    ppErrorMsgs_out: OPTIONAL<PID3DBlob>,
+    ppErrorMsgs_out: Optional<PID3DBlob>,
   ): HRESULT {
     return D3dcompiler_47.Load('D3DCompile')(pSrcData, SrcDataSize, pSourceName, pDefines, pInclude, pEntrypoint, pTarget, Flags1, Flags2, ppCode_out, ppErrorMsgs_out);
   }
@@ -105,18 +105,18 @@ class D3dcompiler_47 extends Win32 {
   public static D3DCompile2(
     pSrcData: LPCVOID,
     SrcDataSize: SIZE_T,
-    pSourceName: OPTIONAL<LPCSTR>,
-    pDefines: OPTIONAL<PD3D_SHADER_MACRO>,
-    pInclude: OPTIONAL<ID3DInclude>,
+    pSourceName: Optional<LPCSTR>,
+    pDefines: Optional<PD3D_SHADER_MACRO>,
+    pInclude: Optional<ID3DInclude>,
     pEntrypoint: LPCSTR,
     pTarget: LPCSTR,
     Flags1: UINT,
     Flags2: UINT,
     SecondaryDataFlags: UINT,
-    pSecondaryData: OPTIONAL<LPCVOID>,
+    pSecondaryData: Optional<LPCVOID>,
     SecondaryDataSize: SIZE_T,
     ppCode_out: PID3DBlob,
-    ppErrorMsgs_out: OPTIONAL<PID3DBlob>,
+    ppErrorMsgs_out: Optional<PID3DBlob>,
   ): HRESULT {
     return D3dcompiler_47.Load('D3DCompile2')(pSrcData, SrcDataSize, pSourceName, pDefines, pInclude, pEntrypoint, pTarget, Flags1, Flags2, SecondaryDataFlags, pSecondaryData, SecondaryDataSize, ppCode_out, ppErrorMsgs_out);
   }
@@ -124,14 +124,14 @@ class D3dcompiler_47 extends Win32 {
   // https://learn.microsoft.com/en-us/windows/win32/api/d3dcompiler/nf-d3dcompiler-d3dcompilefromfile
   public static D3DCompileFromFile(
     pFileName: LPCWSTR,
-    pDefines: OPTIONAL<PD3D_SHADER_MACRO>,
-    pInclude: OPTIONAL<ID3DInclude>,
+    pDefines: Optional<PD3D_SHADER_MACRO>,
+    pInclude: Optional<ID3DInclude>,
     pEntrypoint: LPCSTR,
     pTarget: LPCSTR,
     Flags1: UINT,
     Flags2: UINT,
     ppCode_out: PID3DBlob,
-    ppErrorMsgs_out: OPTIONAL<PID3DBlob>,
+    ppErrorMsgs_out: Optional<PID3DBlob>,
   ): HRESULT {
     return D3dcompiler_47.Load('D3DCompileFromFile')(pFileName, pDefines, pInclude, pEntrypoint, pTarget, Flags1, Flags2, ppCode_out, ppErrorMsgs_out);
   }
@@ -157,12 +157,12 @@ class D3dcompiler_47 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/d3dcompiler/nf-d3dcompiler-d3ddecompressshaders
-  public static D3DDecompressShaders(pSrcData: LPCVOID, SrcDataSize: SIZE_T, uNumShaders: UINT, uStartIndex: UINT, pIndices: OPTIONAL<PUINT>, uFlags: UINT, ppShaders_out: PID3DBlob, pTotalShaders_out: OPTIONAL<PUINT>): HRESULT {
+  public static D3DDecompressShaders(pSrcData: LPCVOID, SrcDataSize: SIZE_T, uNumShaders: UINT, uStartIndex: UINT, pIndices: Optional<PUINT>, uFlags: UINT, ppShaders_out: PID3DBlob, pTotalShaders_out: Optional<PUINT>): HRESULT {
     return D3dcompiler_47.Load('D3DDecompressShaders')(pSrcData, SrcDataSize, uNumShaders, uStartIndex, pIndices, uFlags, ppShaders_out, pTotalShaders_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/d3dcompiler/nf-d3dcompiler-d3ddisassemble
-  public static D3DDisassemble(pSrcData: LPCVOID, SrcDataSize: SIZE_T, Flags: UINT, szComments: OPTIONAL<LPCSTR>, ppDisassembly_out: PID3DBlob): HRESULT {
+  public static D3DDisassemble(pSrcData: LPCVOID, SrcDataSize: SIZE_T, Flags: UINT, szComments: Optional<LPCSTR>, ppDisassembly_out: PID3DBlob): HRESULT {
     return D3dcompiler_47.Load('D3DDisassemble')(pSrcData, SrcDataSize, Flags, szComments, ppDisassembly_out);
   }
 
@@ -176,10 +176,10 @@ class D3dcompiler_47 extends Win32 {
     pSrcData: LPCVOID,
     SrcDataSize: SIZE_T,
     Flags: UINT,
-    szComments: OPTIONAL<LPCSTR>,
+    szComments: Optional<LPCSTR>,
     StartByteOffset: SIZE_T,
     NumInsts: SIZE_T,
-    pFinishByteOffset_out: OPTIONAL<PSIZE_T>,
+    pFinishByteOffset_out: Optional<PSIZE_T>,
     ppDisassembly_out: PID3DBlob,
   ): HRESULT {
     return D3dcompiler_47.Load('D3DDisassembleRegion')(pSrcData, SrcDataSize, Flags, szComments, StartByteOffset, NumInsts, pFinishByteOffset_out, ppDisassembly_out);
@@ -211,7 +211,7 @@ class D3dcompiler_47 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/d3dcompiler/nf-d3dcompiler-d3dgettraceinstructionoffsets
-  public static D3DGetTraceInstructionOffsets(pSrcData: LPCVOID, SrcDataSize: SIZE_T, Flags: UINT, StartInstIndex: SIZE_T, NumInsts: SIZE_T, pOffsets_out: OPTIONAL<PSIZE_T>, pTotalInsts_out: OPTIONAL<PSIZE_T>): HRESULT {
+  public static D3DGetTraceInstructionOffsets(pSrcData: LPCVOID, SrcDataSize: SIZE_T, Flags: UINT, StartInstIndex: SIZE_T, NumInsts: SIZE_T, pOffsets_out: Optional<PSIZE_T>, pTotalInsts_out: Optional<PSIZE_T>): HRESULT {
     return D3dcompiler_47.Load('D3DGetTraceInstructionOffsets')(pSrcData, SrcDataSize, Flags, StartInstIndex, NumInsts, pOffsets_out, pTotalInsts_out);
   }
 
@@ -224,11 +224,11 @@ class D3dcompiler_47 extends Win32 {
   public static D3DPreprocess(
     pSrcData: LPCVOID,
     SrcDataSize: SIZE_T,
-    pSourceName: OPTIONAL<LPCSTR>,
-    pDefines: OPTIONAL<PD3D_SHADER_MACRO>,
-    pInclude: OPTIONAL<ID3DInclude>,
+    pSourceName: Optional<LPCSTR>,
+    pDefines: Optional<PD3D_SHADER_MACRO>,
+    pInclude: Optional<ID3DInclude>,
     ppCodeText_out: PID3DBlob,
-    ppErrorMsgs_out: OPTIONAL<PID3DBlob>,
+    ppErrorMsgs_out: Optional<PID3DBlob>,
   ): HRESULT {
     return D3dcompiler_47.Load('D3DPreprocess')(pSrcData, SrcDataSize, pSourceName, pDefines, pInclude, ppCodeText_out, ppErrorMsgs_out);
   }

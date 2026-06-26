@@ -1,6 +1,6 @@
 import type { Pointer } from 'bun:ffi';
 
-export type { BOOLEAN, CHAR, HANDLE, INT, LPCSTR, LPCWSTR, LPSTR, LPVOID, LPWSTR, NULL, NULLABLE, OPTIONAL, PHANDLE, PVOID, ULONG, USHORT } from '@bun-win32/core';
+export type { BOOLEAN, CHAR, HANDLE, INT, LPCSTR, LPCWSTR, LPSTR, LPVOID, LPWSTR, NULL, Nullable, Optional, PHANDLE, PVOID, ULONG, USHORT } from '@bun-win32/core';
 
 export const LBER_DEFAULT = 0xffff_ffff;
 export const LBER_ERROR = 0xffff_ffff;

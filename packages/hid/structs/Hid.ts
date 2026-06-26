@@ -9,7 +9,7 @@ import type {
   LONG,
   LPGUID,
   NTSTATUS,
-  OPTIONAL,
+  Optional,
   PCHAR,
   PHIDD_ATTRIBUTES,
   PHIDD_CONFIGURATION,
@@ -396,7 +396,7 @@ class Hid extends Win32 {
     KeyAction: HIDP_KEYBOARD_DIRECTION,
     ModifierState_in_out: PHIDP_KEYBOARD_MODIFIER_STATE,
     InsertCodesProcedure: PHIDP_INSERT_SCANCODES,
-    InsertCodesContext: OPTIONAL<PVOID>,
+    InsertCodesContext: Optional<PVOID>,
   ): NTSTATUS {
     return Hid.Load('HidP_TranslateUsagesToI8042ScanCodes')(ChangedUsageList, UsageListLength, KeyAction, ModifierState_in_out, InsertCodesProcedure, InsertCodesContext);
   }

@@ -2,7 +2,7 @@ import { type FFIFunction, FFIType } from 'bun:ffi';
 
 import { Win32 } from '@bun-win32/core';
 
-import type { HRESULT, ID3D12Device, LPLPVOID, OPTIONAL, REFIID } from '../types/DirectML';
+import type { HRESULT, ID3D12Device, LPLPVOID, Optional, REFIID } from '../types/DirectML';
 import type { DML_CREATE_DEVICE_FLAGS, DML_FEATURE_LEVEL } from '../types/DirectML';
 
 /**
@@ -38,12 +38,12 @@ class DirectML extends Win32 {
   } as const satisfies Record<string, FFIFunction>;
 
   // https://learn.microsoft.com/en-us/windows/win32/api/directml/nf-directml-dmlcreatedevice
-  public static DMLCreateDevice(d3d12Device: ID3D12Device, flags: DML_CREATE_DEVICE_FLAGS, riid: REFIID, ppv_out: OPTIONAL<LPLPVOID>): HRESULT {
+  public static DMLCreateDevice(d3d12Device: ID3D12Device, flags: DML_CREATE_DEVICE_FLAGS, riid: REFIID, ppv_out: Optional<LPLPVOID>): HRESULT {
     return DirectML.Load('DMLCreateDevice')(d3d12Device, flags, riid, ppv_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/directml/nf-directml-dmlcreatedevice1
-  public static DMLCreateDevice1(d3d12Device: ID3D12Device, flags: DML_CREATE_DEVICE_FLAGS, minimumFeatureLevel: DML_FEATURE_LEVEL, riid: REFIID, ppv_out: OPTIONAL<LPLPVOID>): HRESULT {
+  public static DMLCreateDevice1(d3d12Device: ID3D12Device, flags: DML_CREATE_DEVICE_FLAGS, minimumFeatureLevel: DML_FEATURE_LEVEL, riid: REFIID, ppv_out: Optional<LPLPVOID>): HRESULT {
     return DirectML.Load('DMLCreateDevice1')(d3d12Device, flags, minimumFeatureLevel, riid, ppv_out);
   }
 }

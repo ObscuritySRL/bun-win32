@@ -5,7 +5,7 @@ import { Win32 } from '@bun-win32/core';
 import type {
   HRESULT,
   LPBOOL,
-  OPTIONAL,
+  Optional,
   PBYTE,
   PCBYTE,
   PCTBS_CONTEXT_PARAMS,
@@ -68,12 +68,12 @@ class Tbs extends Win32 {
   } as const satisfies Record<string, FFIFunction>;
 
   // https://learn.microsoft.com/en-us/windows/win32/api/tbs/nf-tbs-getdeviceid
-  public static GetDeviceID(pbWindowsAIK_out: OPTIONAL<PBYTE>, cbWindowsAIK: UINT32, pcbResult_out: PUINT32, pfProtectedByTPM_out: OPTIONAL<LPBOOL>): HRESULT {
+  public static GetDeviceID(pbWindowsAIK_out: Optional<PBYTE>, cbWindowsAIK: UINT32, pcbResult_out: PUINT32, pfProtectedByTPM_out: Optional<LPBOOL>): HRESULT {
     return Tbs.Load('GetDeviceID')(pbWindowsAIK_out, cbWindowsAIK, pcbResult_out, pfProtectedByTPM_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/tbs/nf-tbs-getdeviceidstring
-  public static GetDeviceIDString(pszWindowsAIK_out: OPTIONAL<PWSTR>, cchWindowsAIK: UINT32, pcchResult_out: PUINT32, pfProtectedByTPM_out: OPTIONAL<LPBOOL>): HRESULT {
+  public static GetDeviceIDString(pszWindowsAIK_out: Optional<PWSTR>, cchWindowsAIK: UINT32, pcchResult_out: PUINT32, pfProtectedByTPM_out: Optional<LPBOOL>): HRESULT {
     return Tbs.Load('GetDeviceIDString')(pszWindowsAIK_out, cchWindowsAIK, pcchResult_out, pfProtectedByTPM_out);
   }
 
@@ -93,17 +93,17 @@ class Tbs extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/tbs/nf-tbs-tbsi_get_ownerauth
-  public static Tbsi_Get_OwnerAuth(hContext: TBS_HCONTEXT, ownerauthType: TBS_OWNERAUTH_TYPE, pOutputBuf_out: OPTIONAL<PBYTE>, pOutputBufLen_in_out: PUINT32): TBS_RESULT {
+  public static Tbsi_Get_OwnerAuth(hContext: TBS_HCONTEXT, ownerauthType: TBS_OWNERAUTH_TYPE, pOutputBuf_out: Optional<PBYTE>, pOutputBufLen_in_out: PUINT32): TBS_RESULT {
     return Tbs.Load('Tbsi_Get_OwnerAuth')(hContext, ownerauthType, pOutputBuf_out, pOutputBufLen_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/tbs/nf-tbs-tbsi_get_tcg_log
-  public static Tbsi_Get_TCG_Log(hContext: TBS_HCONTEXT, pOutputBuf_out: OPTIONAL<PBYTE>, pOutputBufLen_in_out: PUINT32): TBS_RESULT {
+  public static Tbsi_Get_TCG_Log(hContext: TBS_HCONTEXT, pOutputBuf_out: Optional<PBYTE>, pOutputBufLen_in_out: PUINT32): TBS_RESULT {
     return Tbs.Load('Tbsi_Get_TCG_Log')(hContext, pOutputBuf_out, pOutputBufLen_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/tbs/nf-tbs-tbsi_get_tcg_log_ex
-  public static Tbsi_Get_TCG_Log_Ex(logType: UINT32, pbOutput_out: OPTIONAL<PBYTE>, pcbOutput_in_out: PUINT32): TBS_RESULT {
+  public static Tbsi_Get_TCG_Log_Ex(logType: UINT32, pbOutput_out: Optional<PBYTE>, pcbOutput_in_out: PUINT32): TBS_RESULT {
     return Tbs.Load('Tbsi_Get_TCG_Log_Ex')(logType, pbOutput_out, pcbOutput_in_out);
   }
 

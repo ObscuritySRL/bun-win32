@@ -1,6 +1,6 @@
 import type { Pointer } from 'bun:ffi';
 
-export type { BOOL, DWORD, HRESULT, INT, LPCSTR, LPCWSTR, LPDWORD, LPHANDLE, LPSTR, LPVOID, LPWSTR, NULL, NULLABLE, OPTIONAL, PBYTE, UINT, WORD } from '@bun-win32/core';
+export type { BOOL, DWORD, HRESULT, INT, LPCSTR, LPCWSTR, LPDWORD, LPHANDLE, LPSTR, LPVOID, LPWSTR, NULL, Nullable, Optional, PBYTE, UINT, WORD } from '@bun-win32/core';
 
 export const MSIDBOPEN_CREATE = 3;
 export const MSIDBOPEN_CREATEDIRECT = 4;

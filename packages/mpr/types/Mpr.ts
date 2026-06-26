@@ -1,6 +1,6 @@
 import type { Pointer } from 'bun:ffi';
 
-export type { BOOL, DWORD, HANDLE, HWND, LPCWSTR, LPDWORD, LPHANDLE, LPVOID, LPWSTR, OPTIONAL, PBYTE, PVOID } from '@bun-win32/core';
+export type { BOOL, DWORD, HANDLE, HWND, LPCWSTR, LPDWORD, LPHANDLE, LPVOID, LPWSTR, Optional, PBYTE, PVOID } from '@bun-win32/core';
 
 export type LPCONNECTDLGSTRUCTW = Pointer;
 export type LPDISCDLGSTRUCTW = Pointer;

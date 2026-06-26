@@ -13,7 +13,7 @@ import type {
   LPPWEBAUTHN_ASSERTION,
   LPPWEBAUTHN_CREDENTIAL_ATTESTATION,
   LPPWEBAUTHN_CREDENTIAL_DETAILS_LIST,
-  OPTIONAL,
+  Optional,
   PCBYTE,
   PCWEBAUTHN_AUTHENTICATOR_GET_ASSERTION_OPTIONS,
   PCWEBAUTHN_AUTHENTICATOR_MAKE_CREDENTIAL_OPTIONS,
@@ -75,7 +75,7 @@ class Webauthn extends Win32 {
     hWnd: HWND,
     pwszRpId: LPCWSTR,
     pWebAuthNClientData: PCWEBAUTHN_CLIENT_DATA,
-    pWebAuthNGetAssertionOptions: OPTIONAL<PCWEBAUTHN_AUTHENTICATOR_GET_ASSERTION_OPTIONS>,
+    pWebAuthNGetAssertionOptions: Optional<PCWEBAUTHN_AUTHENTICATOR_GET_ASSERTION_OPTIONS>,
     ppWebAuthNAssertion_out: LPPWEBAUTHN_ASSERTION,
   ): HRESULT {
     return Webauthn.Load('WebAuthNAuthenticatorGetAssertion')(hWnd, pwszRpId, pWebAuthNClientData, pWebAuthNGetAssertionOptions, ppWebAuthNAssertion_out);
@@ -88,7 +88,7 @@ class Webauthn extends Win32 {
     pUserInformation: PCWEBAUTHN_USER_ENTITY_INFORMATION,
     pPubKeyCredParams: PCWEBAUTHN_COSE_CREDENTIAL_PARAMETERS,
     pWebAuthNClientData: PCWEBAUTHN_CLIENT_DATA,
-    pWebAuthNMakeCredentialOptions: OPTIONAL<PCWEBAUTHN_AUTHENTICATOR_MAKE_CREDENTIAL_OPTIONS>,
+    pWebAuthNMakeCredentialOptions: Optional<PCWEBAUTHN_AUTHENTICATOR_MAKE_CREDENTIAL_OPTIONS>,
     ppWebAuthNCredentialAttestation_out: LPPWEBAUTHN_CREDENTIAL_ATTESTATION,
   ): HRESULT {
     return Webauthn.Load('WebAuthNAuthenticatorMakeCredential')(hWnd, pRpInformation, pUserInformation, pPubKeyCredParams, pWebAuthNClientData, pWebAuthNMakeCredentialOptions, ppWebAuthNCredentialAttestation_out);
@@ -110,7 +110,7 @@ class Webauthn extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/webauthn/nf-webauthn-webauthnfreecredentialattestation
-  public static WebAuthNFreeCredentialAttestation(pWebAuthNCredentialAttestation: OPTIONAL<PWEBAUTHN_CREDENTIAL_ATTESTATION>): void {
+  public static WebAuthNFreeCredentialAttestation(pWebAuthNCredentialAttestation: Optional<PWEBAUTHN_CREDENTIAL_ATTESTATION>): void {
     return Webauthn.Load('WebAuthNFreeCredentialAttestation')(pWebAuthNCredentialAttestation);
   }
 

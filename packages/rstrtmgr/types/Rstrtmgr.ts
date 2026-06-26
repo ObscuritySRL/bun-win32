@@ -1,6 +1,6 @@
 import type { Pointer } from 'bun:ffi';
 
-export type { DWORD, LPCWSTR, LPDWORD, LPWSTR, NULL, OPTIONAL, PBYTE, UINT, ULONG } from '@bun-win32/core';
+export type { DWORD, LPCWSTR, LPDWORD, LPWSTR, NULL, Optional, PBYTE, UINT, ULONG } from '@bun-win32/core';
 
 export const CCH_RM_MAX_APP_NAME = 255;
 export const CCH_RM_MAX_SVC_NAME = 63;

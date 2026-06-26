@@ -77,8 +77,8 @@ import type {
   LinearGradientMode,
   MatrixOrder,
   MetafileFrameUnit,
-  NULLABLE,
-  OPTIONAL,
+  Nullable,
+  Optional,
   PROPID,
   PaletteType,
   PenAlignment,
@@ -982,7 +982,7 @@ class Gdiplus extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipbitmaplockbits
-  public static GdipBitmapLockBits(bitmap: GpBitmap, rect: NULLABLE<Pointer>, flags: UINT, format: PixelFormat, lockedBitmapData_in_out: Pointer): Status {
+  public static GdipBitmapLockBits(bitmap: GpBitmap, rect: Nullable<Pointer>, flags: UINT, format: PixelFormat, lockedBitmapData_in_out: Pointer): Status {
     return Gdiplus.Load('GdipBitmapLockBits')(bitmap, rect, flags, format, lockedBitmapData_in_out);
   }
 
@@ -1167,7 +1167,7 @@ class Gdiplus extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipcreatebitmapfromscan0
-  public static GdipCreateBitmapFromScan0(width: INT, height: INT, stride: INT, format: PixelFormat, scan0: OPTIONAL<LPVOID>, bitmap_out: Pointer): Status {
+  public static GdipCreateBitmapFromScan0(width: INT, height: INT, stride: INT, format: PixelFormat, scan0: Optional<LPVOID>, bitmap_out: Pointer): Status {
     return Gdiplus.Load('GdipCreateBitmapFromScan0')(width, height, stride, format, scan0, bitmap_out);
   }
 
@@ -1828,7 +1828,7 @@ class Gdiplus extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipemftowmfbits
-  public static GdipEmfToWmfBits(hemf: HENHMETAFILE, cbData16: UINT, pData16_out: OPTIONAL<LPBYTE>, iMapMode: INT, eFlags: INT): UINT {
+  public static GdipEmfToWmfBits(hemf: HENHMETAFILE, cbData16: UINT, pData16_out: Optional<LPBYTE>, iMapMode: INT, eFlags: INT): UINT {
     return Gdiplus.Load('GdipEmfToWmfBits')(hemf, cbData16, pData16_out, iMapMode, eFlags);
   }
 
@@ -2738,7 +2738,7 @@ class Gdiplus extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetregiondata
-  public static GdipGetRegionData(region: GpRegion, buffer_out: LPBYTE, bufferSize: UINT, sizeFilled_out: OPTIONAL<LPUINT>): Status {
+  public static GdipGetRegionData(region: GpRegion, buffer_out: LPBYTE, bufferSize: UINT, sizeFilled_out: Optional<LPUINT>): Status {
     return Gdiplus.Load('GdipGetRegionData')(region, buffer_out, bufferSize, sizeFilled_out);
   }
 
@@ -2913,7 +2913,7 @@ class Gdiplus extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipinitializepalette
-  public static GdipInitializePalette(palette_out: Pointer, palettetype: PaletteType, optimalColors: INT, useTransparentColor: BOOL, bitmap: NULLABLE<GpBitmap>): Status {
+  public static GdipInitializePalette(palette_out: Pointer, palettetype: PaletteType, optimalColors: INT, useTransparentColor: BOOL, bitmap: Nullable<GpBitmap>): Status {
     return Gdiplus.Load('GdipInitializePalette')(palette_out, palettetype, optimalColors, useTransparentColor, bitmap);
   }
 
@@ -3318,12 +3318,12 @@ class Gdiplus extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsaveimagetofile
-  public static GdipSaveImageToFile(image: GpImage, filename: LPWSTR, clsidEncoder: Pointer, encoderParams: NULLABLE<Pointer>): Status {
+  public static GdipSaveImageToFile(image: GpImage, filename: LPWSTR, clsidEncoder: Pointer, encoderParams: Nullable<Pointer>): Status {
     return Gdiplus.Load('GdipSaveImageToFile')(image, filename, clsidEncoder, encoderParams);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsaveimagetostream
-  public static GdipSaveImageToStream(image: GpImage, stream: IStream, clsidEncoder: Pointer, encoderParams: NULLABLE<Pointer>): Status {
+  public static GdipSaveImageToStream(image: GpImage, stream: IStream, clsidEncoder: Pointer, encoderParams: Nullable<Pointer>): Status {
     return Gdiplus.Load('GdipSaveImageToStream')(image, stream, clsidEncoder, encoderParams);
   }
 
@@ -3978,7 +3978,7 @@ class Gdiplus extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdiplusstartup
-  public static GdiplusStartup(token_out: LPULONG_PTR, input: Pointer, output_out: NULLABLE<Pointer>): Status {
+  public static GdiplusStartup(token_out: LPULONG_PTR, input: Pointer, output_out: Nullable<Pointer>): Status {
     return Gdiplus.Load('GdiplusStartup')(token_out, input, output_out);
   }
 }

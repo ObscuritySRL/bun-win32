@@ -1,6 +1,6 @@
 import type { Pointer } from 'bun:ffi';
 
-export type { BOOL, DWORD, HANDLE, HRESULT, LONG, LPCVOID, LPCWSTR, LPDWORD, LPVOID, LPWSTR, NULL, NULLABLE, OPTIONAL, UINT, ULONG } from '@bun-win32/core';
+export type { BOOL, DWORD, HANDLE, HRESULT, LONG, LPCVOID, LPCWSTR, LPDWORD, LPVOID, LPWSTR, NULL, Nullable, Optional, UINT, ULONG } from '@bun-win32/core';
 
 // ── MF-specific scalar aliases ──────────────────────────────────────────────
 

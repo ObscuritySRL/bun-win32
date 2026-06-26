@@ -1,6 +1,6 @@
 import type { Pointer } from 'bun:ffi';
 
-export type { BOOL, DWORD, DWORD_PTR, HANDLE, HWND, INT, LPCSTR, LPCWSTR, LPDWORD, LPHANDLE, LPSTR, LPVOID, LPWSTR, NULL, NULLABLE, OPTIONAL, PBYTE, PVOID, UINT, ULONG, WORD } from '@bun-win32/core';
+export type { BOOL, DWORD, DWORD_PTR, HANDLE, HWND, INT, LPCSTR, LPCWSTR, LPDWORD, LPHANDLE, LPSTR, LPVOID, LPWSTR, NULL, Nullable, Optional, PBYTE, PVOID, UINT, ULONG, WORD } from '@bun-win32/core';
 
 export const INVALID_SOCKET = -1n as SOCKET;
 export const SOCKET_ERROR = -1;

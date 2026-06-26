@@ -1,6 +1,6 @@
 import type { Pointer } from 'bun:ffi';
 
-export type { BOOL, DWORD, HANDLE, HRESULT, LPCWSTR, NULL, OPTIONAL, PDWORD } from '@bun-win32/core';
+export type { BOOL, DWORD, HANDLE, HRESULT, LPCWSTR, NULL, Optional, PDWORD } from '@bun-win32/core';
 
 export enum INET_FIREWALL_AC_CHANGE_TYPE {
   INET_FIREWALL_AC_CHANGE_CREATE = 1,

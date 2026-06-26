@@ -1,6 +1,6 @@
 import type { Pointer } from 'bun:ffi';
 
-export type { BOOL, DWORD, HANDLE, HRESULT, LPARAM, LPBOOL, LPBYTE, LPCSTR, LPCWSTR, LPDWORD, LPSTR, LPVOID, LPWSTR, NULL, NULLABLE, OPTIONAL, PBYTE, PDWORD, PVOID, UINT } from '@bun-win32/core';
+export type { BOOL, DWORD, HANDLE, HRESULT, LPARAM, LPBOOL, LPBYTE, LPCSTR, LPCWSTR, LPDWORD, LPSTR, LPVOID, LPWSTR, NULL, Nullable, Optional, PBYTE, PDWORD, PVOID, UINT } from '@bun-win32/core';
 
 export enum BMFORMAT {
   BM_10b_G3CH = 0x0404,

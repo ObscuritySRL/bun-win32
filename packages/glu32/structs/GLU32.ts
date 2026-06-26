@@ -19,7 +19,7 @@ import type {
   GLubyte_,
   GLvoid_,
   GLWChar_,
-  NULLABLE,
+  Nullable,
 } from '../types/GLU32';
 
 /**
@@ -231,7 +231,7 @@ class GLU32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/opengl/glunurbscallback
-  public static gluNurbsCallback(nobj: GLUnurbs, which: GLenum, fn: NULLABLE<GLUnurbsErrorProc>): void {
+  public static gluNurbsCallback(nobj: GLUnurbs, which: GLenum, fn: Nullable<GLUnurbsErrorProc>): void {
     return GLU32.Load('gluNurbsCallback')(nobj, which, fn);
   }
 
@@ -281,7 +281,7 @@ class GLU32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/opengl/gluquadriccallback
-  public static gluQuadricCallback(qobj: GLUquadric, which: GLenum, fn: NULLABLE<GLUquadricErrorProc>): void {
+  public static gluQuadricCallback(qobj: GLUquadric, which: GLenum, fn: Nullable<GLUquadricErrorProc>): void {
     return GLU32.Load('gluQuadricCallback')(qobj, which, fn);
   }
 
@@ -321,12 +321,12 @@ class GLU32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/opengl/glutessbeginpolygon
-  public static gluTessBeginPolygon(tess: GLUtesselator, polygon_data: NULLABLE<GLvoid_>): void {
+  public static gluTessBeginPolygon(tess: GLUtesselator, polygon_data: Nullable<GLvoid_>): void {
     return GLU32.Load('gluTessBeginPolygon')(tess, polygon_data);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/opengl/glutesscallback
-  public static gluTessCallback(tess: GLUtesselator, which: GLenum, fn: NULLABLE<GLUtessCallbackProc>): void {
+  public static gluTessCallback(tess: GLUtesselator, which: GLenum, fn: Nullable<GLUtessCallbackProc>): void {
     return GLU32.Load('gluTessCallback')(tess, which, fn);
   }
 
@@ -351,7 +351,7 @@ class GLU32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/opengl/glutessvertex
-  public static gluTessVertex(tess: GLUtesselator, coords: GLdouble_, data: NULLABLE<GLvoid_>): void {
+  public static gluTessVertex(tess: GLUtesselator, coords: GLdouble_, data: Nullable<GLvoid_>): void {
     return GLU32.Load('gluTessVertex')(tess, coords, data);
   }
 

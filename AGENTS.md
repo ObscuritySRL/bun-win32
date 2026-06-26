@@ -124,9 +124,9 @@ The full treatment is `PROMPT.md` §5–§9. The non-negotiables:
 - **By-value small structs** (e.g. 8-byte `POINT`) are packed into a `bigint` and passed as `u64` (see `packPOINT` in `user32`).
 - **NULL-return representation follows the FFI type:** `u64 → 0n`, `ptr → null`, `u32 → 0`. A function that "returns NULL on success" with an `HLOCAL` return type returns `0n`, not `null`; the caller checks `=== 0n`.
 - **SAL is encoded by what kind of fact it is: nullability in the TYPE, direction in the NAME.** This is SAL-header-first and changes **only the TS signature — never the FFI `Symbols` map or the base Microsoft type.** Cross-check the docs page (C prototype, Parameters, Remarks). Run `nullcheck.ts` to audit. Full rules in **SAL semantics** below; in brief:
-  - **Nullability → the type**, via two representation-aware markers from `@bun-win32/core` (the null sentinel is derived from `T`: `0n` for bigint-based types — `HANDLE`, by-value addresses, `*_PTR`; `null` for `Pointer`-based `LP*`/`P*` buffers): `OPTIONAL<T>` for a formally optional param (SAL `_*opt_` / `[*, optional]`), `NULLABLE<T>` for a plain `[in]`/`[out]` param the docs say "can be NULL" / "Specify NULL to …". Required params are bare; a `_Reserved_` param documented "must be NULL/zero" is typed `NULL` (only the rare reserved-but-takes-a-value is `OPTIONAL`).
+  - **Nullability → the type**, via two representation-aware markers from `@bun-win32/core` (the null sentinel is derived from `T`: `0n` for bigint-based types — `HANDLE`, by-value addresses, `*_PTR`; `null` for `Pointer`-based `LP*`/`P*` buffers): `Optional<T>` for a formally optional param (SAL `_*opt_` / `[*, optional]`), `Nullable<T>` for a plain `[in]`/`[out]` param the docs say "can be NULL" / "Specify NULL to …". Required params are bare; a `_Reserved_` param documented "must be NULL/zero" is typed `NULL` (only the rare reserved-but-takes-a-value is `Optional`).
   - **Direction → the name**, by suffixing the exact Win32 parameter name: `_Out_`/`[out]` → `name_out`, `_Inout_`/`[in, out]` → `name_in_out`, `_In_` → bare. (Direction is usage metadata, not a value-contract fact, so it does not belong in the type.)
-  - Compose them independently: an optional out-param is `lpcbNeeded_out: OPTIONAL<LPDWORD>`.
+  - Compose them independently: an optional out-param is `lpcbNeeded_out: Optional<LPDWORD>`.
 - **No type casts. Ever.** No `as any`, no `as unknown as T`, no forced casts — in structs, types, examples, or tests. If the types disagree, the FFI mapping or the alias is wrong; fix the root cause. The only allowed narrowing is `!` (non-null assertion), `BigInt()` (number → handle), and explicit annotations to break circular inference. Prefer `satisfies` over `as`; `as const` only for literal narrowing.
 
 ### SAL semantics — nullability in the type, direction in the name
@@ -136,17 +136,17 @@ Bindings faithfully mirror each function's Microsoft SAL contract, encoded by **
 **Nullability is a value-contract fact (it changes which values are valid) → it lives in the TYPE.** Two markers in `@bun-win32/core`, both representation-aware (the null sentinel is resolved from `T`, so you never write it and can never mismatch it):
 
 ```ts
-export type OPTIONAL<T> = [T] extends [bigint] ? T | 0n : T | null;
-export type NULLABLE<T> = [T] extends [bigint] ? T | 0n : T | null;
+export type Optional<T> = [T] extends [bigint] ? T | 0n : T | null;
+export type Nullable<T> = [T] extends [bigint] ? T | 0n : T | null;
 ```
 
 `[T] extends [bigint]` (non-distributive) yields `T | 0n` for bigint-based types (`HANDLE`, `HMODULE`, by-value addresses, `LPVOID<bigint>`, `*_PTR`) and `T | null` for `Pointer`-based buffers (`LP*` / `P*`). Choose between the two by the SAL/prose, and they resolve identically — the **name carries the Microsoft intent**:
 
-- **`OPTIONAL<T>`** — the parameter is formally optional: SAL `_In_opt_` / `_Out_opt_` / `[in, optional]` / `[out, optional]`. "You may omit it." (A `_Reserved_` param documented "must be NULL/zero" is **not** this — it is typed `NULL`; see below.)
-- **`NULLABLE<T>`** — SAL is plain `[in]` / `[out]` but the docs say the value may be NULL: "This parameter can be NULL", "may be NULL", "Specify NULL to …" (defaults, system-chosen addresses, sizing calls).
+- **`Optional<T>`** — the parameter is formally optional: SAL `_In_opt_` / `_Out_opt_` / `[in, optional]` / `[out, optional]`. "You may omit it." (A `_Reserved_` param documented "must be NULL/zero" is **not** this — it is typed `NULL`; see below.)
+- **`Nullable<T>`** — SAL is plain `[in]` / `[out]` but the docs say the value may be NULL: "This parameter can be NULL", "may be NULL", "Specify NULL to …" (defaults, system-chosen addresses, sizing calls).
 - A **required** param is bare (`HANDLE`, `LPDWORD`). A **must-be-null reserved** param stays `NULL` (it is only ever null — not "T or null").
-- `OPTIONAL` / `NULLABLE` apply **only to types that have a null sentinel** — pointers (`LP*` / `P*` → `null`) and handles / by-value addresses (→ `0n`). A **by-value scalar** (`DWORD`, `ULONG`, `UINT`, `BOOL`, `INT`) marked `_*opt_` stays **bare**: its "optional" means *pass 0 / a default value*, not null — there is no null to represent, and `T | null` on a `u32`/`i32` arg is wrong.
-- When the SAL annotation and the prose disagree, the **SAL annotation governs** the optional-vs-required decision; "can be NULL" prose on a non-`_opt_` param is what makes it `NULLABLE` rather than `OPTIONAL`.
+- `Optional` / `Nullable` apply **only to types that have a null sentinel** — pointers (`LP*` / `P*` → `null`) and handles / by-value addresses (→ `0n`). A **by-value scalar** (`DWORD`, `ULONG`, `UINT`, `BOOL`, `INT`) marked `_*opt_` stays **bare**: its "optional" means *pass 0 / a default value*, not null — there is no null to represent, and `T | null` on a `u32`/`i32` arg is wrong.
+- When the SAL annotation and the prose disagree, the **SAL annotation governs** the optional-vs-required decision; "can be NULL" prose on a non-`_opt_` param is what makes it `Nullable` rather than `Optional`.
 
 **Direction is usage metadata (it does not change the type) → it lives in the NAME.** Suffix the exact Win32 parameter name so the MSDN lookup survives (`lpcbNeeded` stays recognizable inside `lpcbNeeded_out`):
 
@@ -160,10 +160,10 @@ export type NULLABLE<T> = [T] extends [bigint] ? T | 0n : T | null;
 // EnumProcessModules: _In_ HANDLE, _Out_ HMODULE*, _In_ DWORD, _Out_ LPDWORD
 public static EnumProcessModules(hProcess: HANDLE, lphModule_out: LPHMODULE, cb: DWORD, lpcbNeeded_out: LPDWORD): BOOL
 // GetModuleBaseNameW: _In_opt_ hModule, _Out_ buffer
-public static GetModuleBaseNameW(hProcess: HANDLE, hModule: OPTIONAL<HMODULE>, lpBaseName_out: LPWSTR, nSize: DWORD): DWORD
+public static GetModuleBaseNameW(hProcess: HANDLE, hModule: Optional<HMODULE>, lpBaseName_out: LPWSTR, nSize: DWORD): DWORD
 // QueryWorkingSetEx: _Inout_ pv ;  EnumPageFilesW: _In_ pContext "can be NULL"
 public static QueryWorkingSetEx(hProcess: HANDLE, pv_in_out: PVOID, cb: DWORD): BOOL
-public static EnumPageFilesW(pCallBackRoutine: PENUM_PAGE_FILE_CALLBACKW, pContext: NULLABLE<LPVOID>): BOOL
+public static EnumPageFilesW(pCallBackRoutine: PENUM_PAGE_FILE_CALLBACKW, pContext: Nullable<LPVOID>): BOOL
 ```
 
 Reference implementation: `packages/psapi/structs/Psapi.ts`.

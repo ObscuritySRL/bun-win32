@@ -1,6 +1,6 @@
 import type { Pointer } from 'bun:ffi';
 
-export type { BOOL, DWORD, INT, LPCSTR, NULL, NULLABLE, UINT } from '@bun-win32/core';
+export type { BOOL, DWORD, INT, LPCSTR, NULL, Nullable, UINT } from '@bun-win32/core';
 
 export enum GLenum {
   /* AlphaFunction */

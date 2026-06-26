@@ -2,7 +2,7 @@ import { type FFIFunction, FFIType } from 'bun:ffi';
 
 import { Win32 } from '@bun-win32/core';
 
-import type { HRESULT, IMFAttributes, IMFByteStream, IMFMediaSink, IMFMediaSource, LPCWSTR, LPLPVOID, OPTIONAL, PIMFSinkWriter, PIMFSourceReader, REFCLSID, REFIID } from '../types/Mfreadwrite';
+import type { HRESULT, IMFAttributes, IMFByteStream, IMFMediaSink, IMFMediaSource, LPCWSTR, LPLPVOID, Optional, PIMFSinkWriter, PIMFSourceReader, REFCLSID, REFIID } from '../types/Mfreadwrite';
 
 /**
  * Thin, lazy-loaded FFI bindings for `mfreadwrite.dll`.
@@ -53,27 +53,27 @@ class Mfreadwrite extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mfreadwrite/nf-mfreadwrite-mfcreatesinkwriterfrommediasink
-  public static MFCreateSinkWriterFromMediaSink(pMediaSink: IMFMediaSink, pAttributes: OPTIONAL<IMFAttributes>, ppSinkWriter_out: PIMFSinkWriter): HRESULT {
+  public static MFCreateSinkWriterFromMediaSink(pMediaSink: IMFMediaSink, pAttributes: Optional<IMFAttributes>, ppSinkWriter_out: PIMFSinkWriter): HRESULT {
     return Mfreadwrite.Load('MFCreateSinkWriterFromMediaSink')(pMediaSink, pAttributes, ppSinkWriter_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mfreadwrite/nf-mfreadwrite-mfcreatesinkwriterfromurl
-  public static MFCreateSinkWriterFromURL(pwszOutputURL: OPTIONAL<LPCWSTR>, pByteStream: OPTIONAL<IMFByteStream>, pAttributes: OPTIONAL<IMFAttributes>, ppSinkWriter_out: PIMFSinkWriter): HRESULT {
+  public static MFCreateSinkWriterFromURL(pwszOutputURL: Optional<LPCWSTR>, pByteStream: Optional<IMFByteStream>, pAttributes: Optional<IMFAttributes>, ppSinkWriter_out: PIMFSinkWriter): HRESULT {
     return Mfreadwrite.Load('MFCreateSinkWriterFromURL')(pwszOutputURL, pByteStream, pAttributes, ppSinkWriter_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mfreadwrite/nf-mfreadwrite-mfcreatesourcereaderfrombytestream
-  public static MFCreateSourceReaderFromByteStream(pByteStream: IMFByteStream, pAttributes: OPTIONAL<IMFAttributes>, ppSourceReader_out: PIMFSourceReader): HRESULT {
+  public static MFCreateSourceReaderFromByteStream(pByteStream: IMFByteStream, pAttributes: Optional<IMFAttributes>, ppSourceReader_out: PIMFSourceReader): HRESULT {
     return Mfreadwrite.Load('MFCreateSourceReaderFromByteStream')(pByteStream, pAttributes, ppSourceReader_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mfreadwrite/nf-mfreadwrite-mfcreatesourcereaderfrommediasource
-  public static MFCreateSourceReaderFromMediaSource(pMediaSource: IMFMediaSource, pAttributes: OPTIONAL<IMFAttributes>, ppSourceReader_out: PIMFSourceReader): HRESULT {
+  public static MFCreateSourceReaderFromMediaSource(pMediaSource: IMFMediaSource, pAttributes: Optional<IMFAttributes>, ppSourceReader_out: PIMFSourceReader): HRESULT {
     return Mfreadwrite.Load('MFCreateSourceReaderFromMediaSource')(pMediaSource, pAttributes, ppSourceReader_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mfreadwrite/nf-mfreadwrite-mfcreatesourcereaderfromurl
-  public static MFCreateSourceReaderFromURL(pwszURL: LPCWSTR, pAttributes: OPTIONAL<IMFAttributes>, ppSourceReader_out: PIMFSourceReader): HRESULT {
+  public static MFCreateSourceReaderFromURL(pwszURL: LPCWSTR, pAttributes: Optional<IMFAttributes>, ppSourceReader_out: PIMFSourceReader): HRESULT {
     return Mfreadwrite.Load('MFCreateSourceReaderFromURL')(pwszURL, pAttributes, ppSourceReader_out);
   }
 }

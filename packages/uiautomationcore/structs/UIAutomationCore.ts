@@ -24,12 +24,12 @@ import type {
   LPARAM,
   LPCWSTR,
   LRESULT,
-  NULLABLE,
+  Nullable,
   NavigateDirection,
   NormalizeState,
   NotificationKind,
   NotificationProcessing,
-  OPTIONAL,
+  Optional,
   PATTERNID,
   PBOOL,
   PBSTR,
@@ -244,7 +244,7 @@ class UIAutomationCore extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uiautomationcoreapi/nf-uiautomationcoreapi-itemcontainerpattern_finditembyproperty
-  public static ItemContainerPattern_FindItemByProperty(hobj: HUIAPATTERNOBJECT, hnodeStartAfter: NULLABLE<HUIANODE>, propertyId: PROPERTYID, value: VARIANT, pFound_out: PHUIANODE): HRESULT {
+  public static ItemContainerPattern_FindItemByProperty(hobj: HUIAPATTERNOBJECT, hnodeStartAfter: Nullable<HUIANODE>, propertyId: PROPERTYID, value: VARIANT, pFound_out: PHUIANODE): HRESULT {
     return UIAutomationCore.Load('ItemContainerPattern_FindItemByProperty')(hobj, hnodeStartAfter, propertyId, value, pFound_out);
   }
 
@@ -464,7 +464,7 @@ class UIAutomationCore extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uiautomationcoreapi/nf-uiautomationcoreapi-uiaaddevent
-  public static UiaAddEvent(hnode: HUIANODE, eventId: EVENTID, pCallback: UiaEventCallback, scope: TreeScope, pProperties: NULLABLE<PPROPERTYID>, cProperties: int, pRequest: UiaCacheRequest, phEvent_out: PHUIAEVENT): HRESULT {
+  public static UiaAddEvent(hnode: HUIANODE, eventId: EVENTID, pCallback: UiaEventCallback, scope: TreeScope, pProperties: Nullable<PPROPERTYID>, cProperties: int, pRequest: UiaCacheRequest, phEvent_out: PHUIAEVENT): HRESULT {
     return UIAutomationCore.Load('UiaAddEvent')(hnode, eventId, pCallback, scope, pProperties, cProperties, pRequest, phEvent_out);
   }
 
@@ -619,7 +619,7 @@ class UIAutomationCore extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uiautomationcoreapi/nf-uiautomationcoreapi-uiaraiseactivetextpositionchangedevent
-  public static UiaRaiseActiveTextPositionChangedEvent(provider: IRawElementProviderSimple, textRange: OPTIONAL<ITextRangeProvider>): HRESULT {
+  public static UiaRaiseActiveTextPositionChangedEvent(provider: IRawElementProviderSimple, textRange: Optional<ITextRangeProvider>): HRESULT {
     return UIAutomationCore.Load('UiaRaiseActiveTextPositionChangedEvent')(provider, textRange);
   }
 
@@ -644,12 +644,12 @@ class UIAutomationCore extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uiautomationcoreapi/nf-uiautomationcoreapi-uiaraisenotificationevent
-  public static UiaRaiseNotificationEvent(provider: IRawElementProviderSimple, notificationKind: NotificationKind, notificationProcessing: NotificationProcessing, displayString: OPTIONAL<BSTR>, activityId: BSTR): HRESULT {
+  public static UiaRaiseNotificationEvent(provider: IRawElementProviderSimple, notificationKind: NotificationKind, notificationProcessing: NotificationProcessing, displayString: Optional<BSTR>, activityId: BSTR): HRESULT {
     return UIAutomationCore.Load('UiaRaiseNotificationEvent')(provider, notificationKind, notificationProcessing, displayString, activityId);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uiautomationcoreapi/nf-uiautomationcoreapi-uiaraisestructurechangedevent
-  public static UiaRaiseStructureChangedEvent(pProvider: IRawElementProviderSimple, structureChangeType: StructureChangeType, pRuntimeId: NULLABLE<PINT>, cRuntimeIdLen: int): HRESULT {
+  public static UiaRaiseStructureChangedEvent(pProvider: IRawElementProviderSimple, structureChangeType: StructureChangeType, pRuntimeId: Nullable<PINT>, cRuntimeIdLen: int): HRESULT {
     return UIAutomationCore.Load('UiaRaiseStructureChangedEvent')(pProvider, structureChangeType, pRuntimeId, cRuntimeIdLen);
   }
 
@@ -659,7 +659,7 @@ class UIAutomationCore extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uiautomationcoreapi/nf-uiautomationcoreapi-uiaregisterprovidercallback
-  public static UiaRegisterProviderCallback(pCallback: NULLABLE<UiaProviderCallback>): void {
+  public static UiaRegisterProviderCallback(pCallback: Nullable<UiaProviderCallback>): void {
     return UIAutomationCore.Load('UiaRegisterProviderCallback')(pCallback);
   }
 
@@ -669,7 +669,7 @@ class UIAutomationCore extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uiautomationcoreapi/nf-uiautomationcoreapi-uiareturnrawelementprovider
-  public static UiaReturnRawElementProvider(hwnd: HWND, wParam: WPARAM, lParam: LPARAM, el: NULLABLE<IRawElementProviderSimple>): LRESULT {
+  public static UiaReturnRawElementProvider(hwnd: HWND, wParam: WPARAM, lParam: LPARAM, el: Nullable<IRawElementProviderSimple>): LRESULT {
     return UIAutomationCore.Load('UiaReturnRawElementProvider')(hwnd, wParam, lParam, el);
   }
 

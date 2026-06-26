@@ -2,7 +2,7 @@ import { type FFIFunction, FFIType } from 'bun:ffi';
 
 import { Win32 } from '@bun-win32/core';
 
-import type { BOOL, DWORD, HANDLE, LPDWORD, LPLPVOID, LPCSTR, LPCVOID, LPCWSTR, LPSTR, LPVOID, LPWSTR, OPTIONAL, PDWORD, PUINT } from '../types/Version';
+import type { BOOL, DWORD, HANDLE, LPDWORD, LPLPVOID, LPCSTR, LPCVOID, LPCWSTR, LPSTR, LPVOID, LPWSTR, Optional, PDWORD, PUINT } from '../types/Version';
 
 /**
  * Thin, lazy-loaded FFI bindings for `version.dll`.
@@ -69,7 +69,7 @@ class Version extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winver/nf-winver-getfileversioninfosizea
-  public static GetFileVersionInfoSizeA(lptstrFilename: LPCSTR, lpdwHandle_out: OPTIONAL<LPDWORD>): DWORD {
+  public static GetFileVersionInfoSizeA(lptstrFilename: LPCSTR, lpdwHandle_out: Optional<LPDWORD>): DWORD {
     return Version.Load('GetFileVersionInfoSizeA')(lptstrFilename, lpdwHandle_out);
   }
 
@@ -84,7 +84,7 @@ class Version extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winver/nf-winver-getfileversioninfosizew
-  public static GetFileVersionInfoSizeW(lptstrFilename: LPCWSTR, lpdwHandle_out: OPTIONAL<LPDWORD>): DWORD {
+  public static GetFileVersionInfoSizeW(lptstrFilename: LPCWSTR, lpdwHandle_out: Optional<LPDWORD>): DWORD {
     return Version.Load('GetFileVersionInfoSizeW')(lptstrFilename, lpdwHandle_out);
   }
 
@@ -94,12 +94,12 @@ class Version extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winver/nf-winver-verfindfilea
-  public static VerFindFileA(uFlags: DWORD, szFileName: LPCSTR, szWinDir: OPTIONAL<LPCSTR>, szAppDir: LPCSTR, szCurDir_out: LPSTR, puCurDirLen_in_out: PUINT, szDestDir_out: LPSTR, puDestDirLen_in_out: PUINT): DWORD {
+  public static VerFindFileA(uFlags: DWORD, szFileName: LPCSTR, szWinDir: Optional<LPCSTR>, szAppDir: LPCSTR, szCurDir_out: LPSTR, puCurDirLen_in_out: PUINT, szDestDir_out: LPSTR, puDestDirLen_in_out: PUINT): DWORD {
     return Version.Load('VerFindFileA')(uFlags, szFileName, szWinDir, szAppDir, szCurDir_out, puCurDirLen_in_out, szDestDir_out, puDestDirLen_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winver/nf-winver-verfindfilew
-  public static VerFindFileW(uFlags: DWORD, szFileName: LPCWSTR, szWinDir: OPTIONAL<LPCWSTR>, szAppDir: LPCWSTR, szCurDir_out: LPWSTR, puCurDirLen_in_out: PUINT, szDestDir_out: LPWSTR, puDestDirLen_in_out: PUINT): DWORD {
+  public static VerFindFileW(uFlags: DWORD, szFileName: LPCWSTR, szWinDir: Optional<LPCWSTR>, szAppDir: LPCWSTR, szCurDir_out: LPWSTR, puCurDirLen_in_out: PUINT, szDestDir_out: LPWSTR, puDestDirLen_in_out: PUINT): DWORD {
     return Version.Load('VerFindFileW')(uFlags, szFileName, szWinDir, szAppDir, szCurDir_out, puCurDirLen_in_out, szDestDir_out, puDestDirLen_in_out);
   }
 

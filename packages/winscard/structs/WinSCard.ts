@@ -25,8 +25,8 @@ import type {
   LPSCARD_READERSTATEA,
   LPSCARD_READERSTATEW,
   NULL,
-  NULLABLE,
-  OPTIONAL,
+  Nullable,
+  Optional,
   PBYTE,
   PUUID,
   SCARD_ATTRIBUTE,
@@ -238,7 +238,7 @@ class WinSCard extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winscard/nf-winscard-scardgetattrib
-  public static SCardGetAttrib(hCard: SCARDHANDLE, dwAttrId: SCARD_ATTRIBUTE, pbAttr_out: OPTIONAL<LPBYTE>, pcbAttrLen_in_out: LPDWORD): LONG {
+  public static SCardGetAttrib(hCard: SCARDHANDLE, dwAttrId: SCARD_ATTRIBUTE, pbAttr_out: Optional<LPBYTE>, pcbAttrLen_in_out: LPDWORD): LONG {
     return WinSCard.Load('SCardGetAttrib')(hCard, dwAttrId, pbAttr_out, pcbAttrLen_in_out);
   }
 
@@ -273,22 +273,22 @@ class WinSCard extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winscard/nf-winscard-scardgetreaderdeviceinstanceida
-  public static SCardGetReaderDeviceInstanceIdA(hContext: SCARDCONTEXT, szReaderName: LPCSTR, szDeviceInstanceId_out: OPTIONAL<LPSTR>, pcchDeviceInstanceId_in_out: LPDWORD): LONG {
+  public static SCardGetReaderDeviceInstanceIdA(hContext: SCARDCONTEXT, szReaderName: LPCSTR, szDeviceInstanceId_out: Optional<LPSTR>, pcchDeviceInstanceId_in_out: LPDWORD): LONG {
     return WinSCard.Load('SCardGetReaderDeviceInstanceIdA')(hContext, szReaderName, szDeviceInstanceId_out, pcchDeviceInstanceId_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winscard/nf-winscard-scardgetreaderdeviceinstanceidw
-  public static SCardGetReaderDeviceInstanceIdW(hContext: SCARDCONTEXT, szReaderName: LPCWSTR, szDeviceInstanceId_out: OPTIONAL<LPWSTR>, pcchDeviceInstanceId_in_out: LPDWORD): LONG {
+  public static SCardGetReaderDeviceInstanceIdW(hContext: SCARDCONTEXT, szReaderName: LPCWSTR, szDeviceInstanceId_out: Optional<LPWSTR>, pcchDeviceInstanceId_in_out: LPDWORD): LONG {
     return WinSCard.Load('SCardGetReaderDeviceInstanceIdW')(hContext, szReaderName, szDeviceInstanceId_out, pcchDeviceInstanceId_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winscard/nf-winscard-scardgetreadericona
-  public static SCardGetReaderIconA(hContext: SCARDCONTEXT, szReaderName: LPCSTR, pbIcon_out: NULLABLE<LPBYTE>, pcbIcon_in_out: LPDWORD): LONG {
+  public static SCardGetReaderIconA(hContext: SCARDCONTEXT, szReaderName: LPCSTR, pbIcon_out: Nullable<LPBYTE>, pcbIcon_in_out: LPDWORD): LONG {
     return WinSCard.Load('SCardGetReaderIconA')(hContext, szReaderName, pbIcon_out, pcbIcon_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winscard/nf-winscard-scardgetreadericonw
-  public static SCardGetReaderIconW(hContext: SCARDCONTEXT, szReaderName: LPCWSTR, pbIcon_out: NULLABLE<LPBYTE>, pcbIcon_in_out: LPDWORD): LONG {
+  public static SCardGetReaderIconW(hContext: SCARDCONTEXT, szReaderName: LPCWSTR, pbIcon_out: Nullable<LPBYTE>, pcbIcon_in_out: LPDWORD): LONG {
     return WinSCard.Load('SCardGetReaderIconW')(hContext, szReaderName, pbIcon_out, pcbIcon_in_out);
   }
 
@@ -311,8 +311,8 @@ class WinSCard extends Win32 {
   public static SCardIntroduceCardTypeA(
     hContext: SCARDCONTEXT,
     szCardName: LPCSTR,
-    pguidPrimaryProvider: OPTIONAL<LPCGUID>,
-    rgguidInterfaces: OPTIONAL<LPCGUID>,
+    pguidPrimaryProvider: Optional<LPCGUID>,
+    rgguidInterfaces: Optional<LPCGUID>,
     dwInterfaceCount: DWORD,
     pbAtr: LPCBYTE,
     pbAtrMask: LPCBYTE,
@@ -325,8 +325,8 @@ class WinSCard extends Win32 {
   public static SCardIntroduceCardTypeW(
     hContext: SCARDCONTEXT,
     szCardName: LPCWSTR,
-    pguidPrimaryProvider: OPTIONAL<LPCGUID>,
-    rgguidInterfaces: OPTIONAL<LPCGUID>,
+    pguidPrimaryProvider: Optional<LPCGUID>,
+    rgguidInterfaces: Optional<LPCGUID>,
     dwInterfaceCount: DWORD,
     pbAtr: LPCBYTE,
     pbAtrMask: LPCBYTE,
@@ -361,12 +361,12 @@ class WinSCard extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winscard/nf-winscard-scardlistcardsa
-  public static SCardListCardsA(hContext: SCARDCONTEXT, pbAtr: OPTIONAL<LPCBYTE>, rgquidInterfaces: OPTIONAL<LPCGUID>, cguidInterfaceCount: DWORD, mszCards_out: OPTIONAL<LPSTR>, pcchCards_in_out: LPDWORD): LONG {
+  public static SCardListCardsA(hContext: SCARDCONTEXT, pbAtr: Optional<LPCBYTE>, rgquidInterfaces: Optional<LPCGUID>, cguidInterfaceCount: DWORD, mszCards_out: Optional<LPSTR>, pcchCards_in_out: LPDWORD): LONG {
     return WinSCard.Load('SCardListCardsA')(hContext, pbAtr, rgquidInterfaces, cguidInterfaceCount, mszCards_out, pcchCards_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winscard/nf-winscard-scardlistcardsw
-  public static SCardListCardsW(hContext: SCARDCONTEXT, pbAtr: OPTIONAL<LPCBYTE>, rgquidInterfaces: OPTIONAL<LPCGUID>, cguidInterfaceCount: DWORD, mszCards_out: OPTIONAL<LPWSTR>, pcchCards_in_out: LPDWORD): LONG {
+  public static SCardListCardsW(hContext: SCARDCONTEXT, pbAtr: Optional<LPCBYTE>, rgquidInterfaces: Optional<LPCGUID>, cguidInterfaceCount: DWORD, mszCards_out: Optional<LPWSTR>, pcchCards_in_out: LPDWORD): LONG {
     return WinSCard.Load('SCardListCardsW')(hContext, pbAtr, rgquidInterfaces, cguidInterfaceCount, mszCards_out, pcchCards_in_out);
   }
 
@@ -381,32 +381,32 @@ class WinSCard extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winscard/nf-winscard-scardlistreadergroupsa
-  public static SCardListReaderGroupsA(hContext: SCARDCONTEXT, mszGroups_out: OPTIONAL<LPSTR>, pcchGroups_in_out: LPDWORD): LONG {
+  public static SCardListReaderGroupsA(hContext: SCARDCONTEXT, mszGroups_out: Optional<LPSTR>, pcchGroups_in_out: LPDWORD): LONG {
     return WinSCard.Load('SCardListReaderGroupsA')(hContext, mszGroups_out, pcchGroups_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winscard/nf-winscard-scardlistreadergroupsw
-  public static SCardListReaderGroupsW(hContext: SCARDCONTEXT, mszGroups_out: OPTIONAL<LPWSTR>, pcchGroups_in_out: LPDWORD): LONG {
+  public static SCardListReaderGroupsW(hContext: SCARDCONTEXT, mszGroups_out: Optional<LPWSTR>, pcchGroups_in_out: LPDWORD): LONG {
     return WinSCard.Load('SCardListReaderGroupsW')(hContext, mszGroups_out, pcchGroups_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winscard/nf-winscard-scardlistreadersa
-  public static SCardListReadersA(hContext: SCARDCONTEXT, mszGroups: OPTIONAL<LPCSTR>, mszReaders_out: OPTIONAL<LPSTR>, pcchReaders_in_out: LPDWORD): LONG {
+  public static SCardListReadersA(hContext: SCARDCONTEXT, mszGroups: Optional<LPCSTR>, mszReaders_out: Optional<LPSTR>, pcchReaders_in_out: LPDWORD): LONG {
     return WinSCard.Load('SCardListReadersA')(hContext, mszGroups, mszReaders_out, pcchReaders_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winscard/nf-winscard-scardlistreadersw
-  public static SCardListReadersW(hContext: SCARDCONTEXT, mszGroups: OPTIONAL<LPCWSTR>, mszReaders_out: OPTIONAL<LPWSTR>, pcchReaders_in_out: LPDWORD): LONG {
+  public static SCardListReadersW(hContext: SCARDCONTEXT, mszGroups: Optional<LPCWSTR>, mszReaders_out: Optional<LPWSTR>, pcchReaders_in_out: LPDWORD): LONG {
     return WinSCard.Load('SCardListReadersW')(hContext, mszGroups, mszReaders_out, pcchReaders_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winscard/nf-winscard-scardlistreaderswithdeviceinstanceida
-  public static SCardListReadersWithDeviceInstanceIdA(hContext: SCARDCONTEXT, szDeviceInstanceId: LPCSTR, mszReaders_out: OPTIONAL<LPSTR>, pcchReaders_in_out: LPDWORD): LONG {
+  public static SCardListReadersWithDeviceInstanceIdA(hContext: SCARDCONTEXT, szDeviceInstanceId: LPCSTR, mszReaders_out: Optional<LPSTR>, pcchReaders_in_out: LPDWORD): LONG {
     return WinSCard.Load('SCardListReadersWithDeviceInstanceIdA')(hContext, szDeviceInstanceId, mszReaders_out, pcchReaders_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winscard/nf-winscard-scardlistreaderswithdeviceinstanceidw
-  public static SCardListReadersWithDeviceInstanceIdW(hContext: SCARDCONTEXT, szDeviceInstanceId: LPCWSTR, mszReaders_out: OPTIONAL<LPWSTR>, pcchReaders_in_out: LPDWORD): LONG {
+  public static SCardListReadersWithDeviceInstanceIdW(hContext: SCARDCONTEXT, szDeviceInstanceId: LPCWSTR, mszReaders_out: Optional<LPWSTR>, pcchReaders_in_out: LPDWORD): LONG {
     return WinSCard.Load('SCardListReadersWithDeviceInstanceIdW')(hContext, szDeviceInstanceId, mszReaders_out, pcchReaders_in_out);
   }
 
@@ -441,7 +441,7 @@ class WinSCard extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winscard/nf-winscard-scardreconnect
-  public static SCardReconnect(hCard: SCARDHANDLE, dwShareMode: SCARD_SHARE_MODE, dwPreferredProtocols: SCARD_PROTOCOL, dwInitialization: SCARD_DISPOSITION, pdwActiveProtocol_out: OPTIONAL<LPDWORD>): LONG {
+  public static SCardReconnect(hCard: SCARDHANDLE, dwShareMode: SCARD_SHARE_MODE, dwPreferredProtocols: SCARD_PROTOCOL, dwInitialization: SCARD_DISPOSITION, pdwActiveProtocol_out: Optional<LPDWORD>): LONG {
     return WinSCard.Load('SCardReconnect')(hCard, dwShareMode, dwPreferredProtocols, dwInitialization, pdwActiveProtocol_out);
   }
 
@@ -488,12 +488,12 @@ class WinSCard extends Win32 {
   // https://learn.microsoft.com/en-us/windows/win32/api/winscard/nf-winscard-scardstatusa
   public static SCardStatusA(
     hCard: SCARDHANDLE,
-    mszReaderNames_out: OPTIONAL<LPSTR>,
-    pcchReaderLen_in_out: OPTIONAL<LPDWORD>,
-    pdwState_out: OPTIONAL<LPDWORD>,
-    pdwProtocol_out: OPTIONAL<LPDWORD>,
-    pbAtr_out: OPTIONAL<LPBYTE>,
-    pcbAtrLen_in_out: OPTIONAL<LPDWORD>,
+    mszReaderNames_out: Optional<LPSTR>,
+    pcchReaderLen_in_out: Optional<LPDWORD>,
+    pdwState_out: Optional<LPDWORD>,
+    pdwProtocol_out: Optional<LPDWORD>,
+    pbAtr_out: Optional<LPBYTE>,
+    pcbAtrLen_in_out: Optional<LPDWORD>,
   ): LONG {
     return WinSCard.Load('SCardStatusA')(hCard, mszReaderNames_out, pcchReaderLen_in_out, pdwState_out, pdwProtocol_out, pbAtr_out, pcbAtrLen_in_out);
   }
@@ -501,18 +501,18 @@ class WinSCard extends Win32 {
   // https://learn.microsoft.com/en-us/windows/win32/api/winscard/nf-winscard-scardstatusw
   public static SCardStatusW(
     hCard: SCARDHANDLE,
-    mszReaderNames_out: OPTIONAL<LPWSTR>,
-    pcchReaderLen_in_out: OPTIONAL<LPDWORD>,
-    pdwState_out: OPTIONAL<LPDWORD>,
-    pdwProtocol_out: OPTIONAL<LPDWORD>,
-    pbAtr_out: OPTIONAL<LPBYTE>,
-    pcbAtrLen_in_out: OPTIONAL<LPDWORD>,
+    mszReaderNames_out: Optional<LPWSTR>,
+    pcchReaderLen_in_out: Optional<LPDWORD>,
+    pdwState_out: Optional<LPDWORD>,
+    pdwProtocol_out: Optional<LPDWORD>,
+    pbAtr_out: Optional<LPBYTE>,
+    pcbAtrLen_in_out: Optional<LPDWORD>,
   ): LONG {
     return WinSCard.Load('SCardStatusW')(hCard, mszReaderNames_out, pcchReaderLen_in_out, pdwState_out, pdwProtocol_out, pbAtr_out, pcbAtrLen_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winscard/nf-winscard-scardtransmit
-  public static SCardTransmit(hCard: SCARDHANDLE, pioSendPci: LPCSCARD_IO_REQUEST, pbSendBuffer: LPCBYTE, cbSendLength: DWORD, pioRecvPci_in_out: OPTIONAL<LPSCARD_IO_REQUEST>, pbRecvBuffer_out: LPBYTE, pcbRecvLength_in_out: LPDWORD): LONG {
+  public static SCardTransmit(hCard: SCARDHANDLE, pioSendPci: LPCSCARD_IO_REQUEST, pbSendBuffer: LPCBYTE, cbSendLength: DWORD, pioRecvPci_in_out: Optional<LPSCARD_IO_REQUEST>, pbRecvBuffer_out: LPBYTE, pcbRecvLength_in_out: LPDWORD): LONG {
     return WinSCard.Load('SCardTransmit')(hCard, pioSendPci, pbSendBuffer, cbSendLength, pioRecvPci_in_out, pbRecvBuffer_out, pcbRecvLength_in_out);
   }
 

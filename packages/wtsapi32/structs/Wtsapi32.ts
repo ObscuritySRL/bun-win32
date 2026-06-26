@@ -13,7 +13,7 @@ import type {
   LPSTR,
   LPWSTR,
   NULL,
-  OPTIONAL,
+  Optional,
   PBOOL,
   PBYTE,
   PCHAR,
@@ -164,12 +164,12 @@ class Wtsapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wtsapi32/nf-wtsapi32-wtsenumeratelistenersa
-  public static WTSEnumerateListenersA(hServer: HANDLE, pReserved: NULL, Reserved: DWORD, pListeners_out: OPTIONAL<PWTSLISTENERNAMEA>, pCount_in_out: LPDWORD): BOOL {
+  public static WTSEnumerateListenersA(hServer: HANDLE, pReserved: NULL, Reserved: DWORD, pListeners_out: Optional<PWTSLISTENERNAMEA>, pCount_in_out: LPDWORD): BOOL {
     return Wtsapi32.Load('WTSEnumerateListenersA')(hServer, pReserved, Reserved, pListeners_out, pCount_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wtsapi32/nf-wtsapi32-wtsenumeratelistenersw
-  public static WTSEnumerateListenersW(hServer: HANDLE, pReserved: NULL, Reserved: DWORD, pListeners_out: OPTIONAL<PWTSLISTENERNAMEW>, pCount_in_out: LPDWORD): BOOL {
+  public static WTSEnumerateListenersW(hServer: HANDLE, pReserved: NULL, Reserved: DWORD, pListeners_out: Optional<PWTSLISTENERNAMEW>, pCount_in_out: LPDWORD): BOOL {
     return Wtsapi32.Load('WTSEnumerateListenersW')(hServer, pReserved, Reserved, pListeners_out, pCount_in_out);
   }
 
@@ -250,7 +250,7 @@ class Wtsapi32 extends Win32 {
     Reserved: DWORD,
     pListenerName: LPSTR,
     SecurityInformation: SECURITY_INFORMATION,
-    pSecurityDescriptor_out: OPTIONAL<PSECURITY_DESCRIPTOR>,
+    pSecurityDescriptor_out: Optional<PSECURITY_DESCRIPTOR>,
     nLength: DWORD,
     lpnLengthNeeded_out: LPDWORD,
   ): BOOL {
@@ -264,7 +264,7 @@ class Wtsapi32 extends Win32 {
     Reserved: DWORD,
     pListenerName: LPWSTR,
     SecurityInformation: SECURITY_INFORMATION,
-    pSecurityDescriptor_out: OPTIONAL<PSECURITY_DESCRIPTOR>,
+    pSecurityDescriptor_out: Optional<PSECURITY_DESCRIPTOR>,
     nLength: DWORD,
     lpnLengthNeeded_out: LPDWORD,
   ): BOOL {
@@ -367,7 +367,7 @@ class Wtsapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wtshintapi/nf-wtshintapi-wtssetrenderhint
-  public static WTSSetRenderHint(pRenderHintID_in_out: PVOID, hwndOwner: HWND, renderHintType: DWORD, cbHintDataLength: DWORD, pHintData: OPTIONAL<PBYTE>): HRESULT {
+  public static WTSSetRenderHint(pRenderHintID_in_out: PVOID, hwndOwner: HWND, renderHintType: DWORD, cbHintDataLength: DWORD, pHintData: Optional<PBYTE>): HRESULT {
     return Wtsapi32.Load('WTSSetRenderHint')(pRenderHintID_in_out, hwndOwner, renderHintType, cbHintDataLength, pHintData);
   }
 

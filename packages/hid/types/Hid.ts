@@ -1,6 +1,6 @@
 import type { Pointer } from 'bun:ffi';
 
-export type { BOOLEAN, HANDLE, LONG, OPTIONAL, PULONG, PVOID, ULONG, USHORT, VOID } from '@bun-win32/core';
+export type { BOOLEAN, HANDLE, LONG, Optional, PULONG, PVOID, ULONG, USHORT, VOID } from '@bun-win32/core';
 
 export const HIDP_STATUS_BAD_LOG_PHY_VALUES = 0xc011_0006 | 0;
 export const HIDP_STATUS_BUFFER_TOO_SMALL = 0xc011_0007 | 0;

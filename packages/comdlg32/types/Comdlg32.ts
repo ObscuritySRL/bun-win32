@@ -1,6 +1,6 @@
 import type { Pointer } from 'bun:ffi';
 
-export type { BOOL, DWORD, HRESULT, HWND, LPCSTR, LPCWSTR, LPSTR, LPWSTR, NULL, NULLABLE, SHORT, WORD } from '@bun-win32/core';
+export type { BOOL, DWORD, HRESULT, HWND, LPCSTR, LPCWSTR, LPSTR, LPWSTR, NULL, Nullable, SHORT, WORD } from '@bun-win32/core';
 
 export const CD_LBSELADD = 2;
 export const CD_LBSELCHANGE = 0;

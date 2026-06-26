@@ -1,7 +1,7 @@
 import type { Pointer } from 'bun:ffi';
 
 import type { DWORD, LONG, ULONG_PTR } from '@bun-win32/core';
-export type { BYTE, DWORD, HANDLE, LONG, LPBYTE, LPCSTR, LPCVOID, LPCWSTR, LPDWORD, LPSTR, LPVOID, LPWSTR, NULL, NULLABLE, OPTIONAL, PBYTE, PVOID, ULONG, ULONG_PTR, VOID } from '@bun-win32/core';
+export type { BYTE, DWORD, HANDLE, LONG, LPBYTE, LPCSTR, LPCVOID, LPCWSTR, LPDWORD, LPSTR, LPVOID, LPWSTR, NULL, Nullable, Optional, PBYTE, PVOID, ULONG, ULONG_PTR, VOID } from '@bun-win32/core';
 
 export const SCARD_ATR_LENGTH: DWORD = 33;
 export const SCARD_AUTOALLOCATE: DWORD = 0xffff_ffff;

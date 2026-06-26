@@ -1,6 +1,6 @@
 import type { Pointer } from 'bun:ffi';
 
-export type { BOOL, BYTE, DWORD, LPWSTR, NULL, OPTIONAL, VOID, WCHAR, WORD } from '@bun-win32/core';
+export type { BOOL, BYTE, DWORD, LPWSTR, NULL, Optional, VOID, WCHAR, WORD } from '@bun-win32/core';
 
 export const XUSER_MAX_COUNT = 4;
 export const XUSER_INDEX_ANY = 0x0000_00ff;

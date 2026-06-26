@@ -1,6 +1,6 @@
 import type { Pointer } from 'bun:ffi';
 
-export type { BOOL, DWORD, HANDLE, LONG, LPSTR, LPVOID, LPWSTR, NULL, NULLABLE, OPTIONAL, PVOID, SIZE_T, ULONG, ULONG_PTR, USHORT, VOID, WORD } from '@bun-win32/core';
+export type { BOOL, DWORD, HANDLE, LONG, LPSTR, LPVOID, LPWSTR, NULL, Nullable, Optional, PVOID, SIZE_T, ULONG, ULONG_PTR, USHORT, VOID, WORD } from '@bun-win32/core';
 
 export const RPC_C_AUTHN_DEFAULT = 0xffff_ffff;
 export const RPC_C_AUTHZ_DEFAULT = 0xffff_ffff;

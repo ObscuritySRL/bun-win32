@@ -1,6 +1,6 @@
 import type { Pointer } from 'bun:ffi';
 
-export type { BOOL, BOOLEAN, DWORD, HANDLE, HWND, LPCVOID, LPCWSTR, LPVOID, LPWSTR, NULL, OPTIONAL, PBYTE, PDWORD, PHANDLE, PULONG, PVOID, SIZE_T, ULONG } from '@bun-win32/core';
+export type { BOOL, BOOLEAN, DWORD, HANDLE, HWND, LPCVOID, LPCWSTR, LPVOID, LPWSTR, NULL, Optional, PBYTE, PDWORD, PHANDLE, PULONG, PVOID, SIZE_T, ULONG } from '@bun-win32/core';
 
 export type HCRYPTKEY = bigint;
 export type HCRYPTPROV = bigint;

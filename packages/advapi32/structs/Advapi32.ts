@@ -29,7 +29,7 @@ import type {
   LSA_HANDLE,
   LSTATUS,
   NTSTATUS,
-  OPTIONAL,
+  Optional,
   PACL,
   PBOOL,
   PBYTE,
@@ -999,12 +999,12 @@ class Advapi32 extends Win32 {
   } as const satisfies Record<string, FFIFunction>;
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-abortsystemshutdowna
-  public static AbortSystemShutdownA(lpMachineName: OPTIONAL<LPCSTR>): BOOL {
+  public static AbortSystemShutdownA(lpMachineName: Optional<LPCSTR>): BOOL {
     return Advapi32.Load('AbortSystemShutdownA')(lpMachineName);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-abortsystemshutdownw
-  public static AbortSystemShutdownW(lpMachineName: OPTIONAL<LPCWSTR>): BOOL {
+  public static AbortSystemShutdownW(lpMachineName: Optional<LPCWSTR>): BOOL {
     return Advapi32.Load('AbortSystemShutdownW')(lpMachineName);
   }
 
@@ -1014,7 +1014,7 @@ class Advapi32 extends Win32 {
     ClientToken: HANDLE,
     DesiredAccess: DWORD,
     GenericMapping: PGENERIC_MAPPING,
-    PrivilegeSet_out: OPTIONAL<PPRIVILEGE_SET>,
+    PrivilegeSet_out: Optional<PPRIVILEGE_SET>,
     PrivilegeSetLength_in_out: LPDWORD,
     GrantedAccess_out: LPDWORD,
     AccessStatus_out: LPBOOL,
@@ -1025,9 +1025,9 @@ class Advapi32 extends Win32 {
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-accesscheckandauditalarma
   public static AccessCheckAndAuditAlarmA(
     SubsystemName: LPCSTR,
-    HandleId: OPTIONAL<LPVOID>,
+    HandleId: Optional<LPVOID>,
     ObjectTypeName: LPSTR,
-    ObjectName: OPTIONAL<LPSTR>,
+    ObjectName: Optional<LPSTR>,
     SecurityDescriptor: PSECURITY_DESCRIPTOR,
     DesiredAccess: DWORD,
     GenericMapping: PGENERIC_MAPPING,
@@ -1042,9 +1042,9 @@ class Advapi32 extends Win32 {
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-accesscheckandauditalarmw
   public static AccessCheckAndAuditAlarmW(
     SubsystemName: LPCWSTR,
-    HandleId: OPTIONAL<LPVOID>,
+    HandleId: Optional<LPVOID>,
     ObjectTypeName: LPWSTR,
-    ObjectName: OPTIONAL<LPWSTR>,
+    ObjectName: Optional<LPWSTR>,
     SecurityDescriptor: PSECURITY_DESCRIPTOR,
     DesiredAccess: DWORD,
     GenericMapping: PGENERIC_MAPPING,
@@ -1059,13 +1059,13 @@ class Advapi32 extends Win32 {
   // https://learn.microsoft.com/en-us/windows/win32/api/securitybaseapi/nf-securitybaseapi-accesscheckbytype
   public static AccessCheckByType(
     pSecurityDescriptor: PSECURITY_DESCRIPTOR,
-    PrincipalSelfSid: OPTIONAL<PSID>,
+    PrincipalSelfSid: Optional<PSID>,
     ClientToken: HANDLE,
     DesiredAccess: DWORD,
-    ObjectTypeList_in_out: OPTIONAL<POBJECT_TYPE_LIST>,
+    ObjectTypeList_in_out: Optional<POBJECT_TYPE_LIST>,
     ObjectTypeListLength: DWORD,
     GenericMapping: PGENERIC_MAPPING,
-    PrivilegeSet_out: OPTIONAL<PPRIVILEGE_SET>,
+    PrivilegeSet_out: Optional<PPRIVILEGE_SET>,
     PrivilegeSetLength_in_out: LPDWORD,
     GrantedAccess_out: LPDWORD,
     AccessStatus_out: LPBOOL,
@@ -1090,13 +1090,13 @@ class Advapi32 extends Win32 {
     SubsystemName: LPCSTR,
     HandleId: LPVOID,
     ObjectTypeName: LPCSTR,
-    ObjectName: OPTIONAL<LPCSTR>,
+    ObjectName: Optional<LPCSTR>,
     SecurityDescriptor: PSECURITY_DESCRIPTOR,
-    PrincipalSelfSid: OPTIONAL<PSID>,
+    PrincipalSelfSid: Optional<PSID>,
     ClientToken: HANDLE,
     DesiredAccess: DWORD,
     AuditType: AUDIT_EVENT_TYPE,
-    ObjectTypeList_in_out: OPTIONAL<POBJECT_TYPE_LIST>,
+    ObjectTypeList_in_out: Optional<POBJECT_TYPE_LIST>,
     ObjectTypeListLength: DWORD,
     GenericMapping: PGENERIC_MAPPING,
     PrivilegeSet: PPRIVILEGE_SET,
@@ -1133,13 +1133,13 @@ class Advapi32 extends Win32 {
     SubsystemName: LPCWSTR,
     HandleId: LPVOID,
     ObjectTypeName: LPCWSTR,
-    ObjectName: OPTIONAL<LPCWSTR>,
+    ObjectName: Optional<LPCWSTR>,
     SecurityDescriptor: PSECURITY_DESCRIPTOR,
-    PrincipalSelfSid: OPTIONAL<PSID>,
+    PrincipalSelfSid: Optional<PSID>,
     ClientToken: HANDLE,
     DesiredAccess: DWORD,
     AuditType: AUDIT_EVENT_TYPE,
-    ObjectTypeList_in_out: OPTIONAL<POBJECT_TYPE_LIST>,
+    ObjectTypeList_in_out: Optional<POBJECT_TYPE_LIST>,
     ObjectTypeListLength: DWORD,
     GenericMapping: PGENERIC_MAPPING,
     PrivilegeSet: PPRIVILEGE_SET,
@@ -1174,13 +1174,13 @@ class Advapi32 extends Win32 {
   // https://learn.microsoft.com/en-us/windows/win32/api/securitybaseapi/nf-securitybaseapi-accesscheckbytyperesultlist
   public static AccessCheckByTypeResultList(
     pSecurityDescriptor: PSECURITY_DESCRIPTOR,
-    PrincipalSelfSid: OPTIONAL<PSID>,
+    PrincipalSelfSid: Optional<PSID>,
     ClientToken: HANDLE,
     DesiredAccess: DWORD,
-    ObjectTypeList_in_out: OPTIONAL<POBJECT_TYPE_LIST>,
+    ObjectTypeList_in_out: Optional<POBJECT_TYPE_LIST>,
     ObjectTypeListLength: DWORD,
     GenericMapping: PGENERIC_MAPPING,
-    PrivilegeSet_out: OPTIONAL<PPRIVILEGE_SET>,
+    PrivilegeSet_out: Optional<PPRIVILEGE_SET>,
     PrivilegeSetLength_in_out: LPDWORD,
     GrantedAccessList_out: LPDWORD,
     AccessStatusList_out: LPDWORD,
@@ -1205,13 +1205,13 @@ class Advapi32 extends Win32 {
     SubsystemName: LPCSTR,
     HandleId: LPVOID,
     ObjectTypeName: LPCSTR,
-    ObjectName: OPTIONAL<LPCSTR>,
+    ObjectName: Optional<LPCSTR>,
     SecurityDescriptor: PSECURITY_DESCRIPTOR,
-    PrincipalSelfSid: OPTIONAL<PSID>,
+    PrincipalSelfSid: Optional<PSID>,
     ClientToken: HANDLE,
     DesiredAccess: DWORD,
     AuditType: AUDIT_EVENT_TYPE,
-    ObjectTypeList_in_out: OPTIONAL<POBJECT_TYPE_LIST>,
+    ObjectTypeList_in_out: Optional<POBJECT_TYPE_LIST>,
     ObjectTypeListLength: DWORD,
     GenericMapping: PGENERIC_MAPPING,
     PrivilegeSet: PPRIVILEGE_SET,
@@ -1249,13 +1249,13 @@ class Advapi32 extends Win32 {
     HandleId: LPVOID,
     ClientToken: HANDLE,
     ObjectTypeName: LPCSTR,
-    ObjectName: OPTIONAL<LPCSTR>,
+    ObjectName: Optional<LPCSTR>,
     SecurityDescriptor: PSECURITY_DESCRIPTOR,
-    PrincipalSelfSid: OPTIONAL<PSID>,
+    PrincipalSelfSid: Optional<PSID>,
     ClientToken2: HANDLE,
     DesiredAccess: DWORD,
     AuditType: AUDIT_EVENT_TYPE,
-    ObjectTypeList_in_out: OPTIONAL<POBJECT_TYPE_LIST>,
+    ObjectTypeList_in_out: Optional<POBJECT_TYPE_LIST>,
     ObjectTypeListLength: DWORD,
     GenericMapping: PGENERIC_MAPPING,
     PrivilegeSet: PPRIVILEGE_SET,
@@ -1294,13 +1294,13 @@ class Advapi32 extends Win32 {
     HandleId: LPVOID,
     ClientToken: HANDLE,
     ObjectTypeName: LPCWSTR,
-    ObjectName: OPTIONAL<LPCWSTR>,
+    ObjectName: Optional<LPCWSTR>,
     SecurityDescriptor: PSECURITY_DESCRIPTOR,
-    PrincipalSelfSid: OPTIONAL<PSID>,
+    PrincipalSelfSid: Optional<PSID>,
     ClientToken2: HANDLE,
     DesiredAccess: DWORD,
     AuditType: AUDIT_EVENT_TYPE,
-    ObjectTypeList_in_out: OPTIONAL<POBJECT_TYPE_LIST>,
+    ObjectTypeList_in_out: Optional<POBJECT_TYPE_LIST>,
     ObjectTypeListLength: DWORD,
     GenericMapping: PGENERIC_MAPPING,
     PrivilegeSet: PPRIVILEGE_SET,
@@ -1338,13 +1338,13 @@ class Advapi32 extends Win32 {
     SubsystemName: LPCWSTR,
     HandleId: LPVOID,
     ObjectTypeName: LPCWSTR,
-    ObjectName: OPTIONAL<LPCWSTR>,
+    ObjectName: Optional<LPCWSTR>,
     SecurityDescriptor: PSECURITY_DESCRIPTOR,
-    PrincipalSelfSid: OPTIONAL<PSID>,
+    PrincipalSelfSid: Optional<PSID>,
     ClientToken: HANDLE,
     DesiredAccess: DWORD,
     AuditType: AUDIT_EVENT_TYPE,
-    ObjectTypeList_in_out: OPTIONAL<POBJECT_TYPE_LIST>,
+    ObjectTypeList_in_out: Optional<POBJECT_TYPE_LIST>,
     ObjectTypeListLength: DWORD,
     GenericMapping: PGENERIC_MAPPING,
     PrivilegeSet: PPRIVILEGE_SET,
@@ -1387,7 +1387,7 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/securitybaseapi/nf-securitybaseapi-addaccessallowedobjectace
-  public static AddAccessAllowedObjectAce(pAcl_in_out: PACL, dwAceRevision: DWORD, AceFlags: DWORD, AccessMask: DWORD, ObjectTypeGuid: OPTIONAL<PVOID>, InheritedObjectTypeGuid: OPTIONAL<PVOID>, pSid: PSID): BOOL {
+  public static AddAccessAllowedObjectAce(pAcl_in_out: PACL, dwAceRevision: DWORD, AceFlags: DWORD, AccessMask: DWORD, ObjectTypeGuid: Optional<PVOID>, InheritedObjectTypeGuid: Optional<PVOID>, pSid: PSID): BOOL {
     return Advapi32.Load('AddAccessAllowedObjectAce')(pAcl_in_out, dwAceRevision, AceFlags, AccessMask, ObjectTypeGuid, InheritedObjectTypeGuid, pSid);
   }
 
@@ -1402,7 +1402,7 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/securitybaseapi/nf-securitybaseapi-addaccessdeniedobjectace
-  public static AddAccessDeniedObjectAce(pAcl_in_out: PACL, dwAceRevision: DWORD, AceFlags: DWORD, AccessMask: DWORD, ObjectTypeGuid: OPTIONAL<PVOID>, InheritedObjectTypeGuid: OPTIONAL<PVOID>, pSid: PSID): BOOL {
+  public static AddAccessDeniedObjectAce(pAcl_in_out: PACL, dwAceRevision: DWORD, AceFlags: DWORD, AccessMask: DWORD, ObjectTypeGuid: Optional<PVOID>, InheritedObjectTypeGuid: Optional<PVOID>, pSid: PSID): BOOL {
     return Advapi32.Load('AddAccessDeniedObjectAce')(pAcl_in_out, dwAceRevision, AceFlags, AccessMask, ObjectTypeGuid, InheritedObjectTypeGuid, pSid);
   }
 
@@ -1427,8 +1427,8 @@ class Advapi32 extends Win32 {
     dwAceRevision: DWORD,
     AceFlags: DWORD,
     AccessMask: DWORD,
-    ObjectTypeGuid: OPTIONAL<PVOID>,
-    InheritedObjectTypeGuid: OPTIONAL<PVOID>,
+    ObjectTypeGuid: Optional<PVOID>,
+    InheritedObjectTypeGuid: Optional<PVOID>,
     pSid: PSID,
     bAuditSuccess: BOOL,
     bAuditFailure: BOOL,
@@ -1452,12 +1452,12 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/securitybaseapi/nf-securitybaseapi-adjusttokengroups
-  public static AdjustTokenGroups(TokenHandle: HANDLE, ResetToDefault: BOOL, NewState: OPTIONAL<PTOKEN_GROUPS>, BufferLength: DWORD, PreviousState_out: OPTIONAL<PTOKEN_GROUPS>, ReturnLength_out: OPTIONAL<LPDWORD>): BOOL {
+  public static AdjustTokenGroups(TokenHandle: HANDLE, ResetToDefault: BOOL, NewState: Optional<PTOKEN_GROUPS>, BufferLength: DWORD, PreviousState_out: Optional<PTOKEN_GROUPS>, ReturnLength_out: Optional<LPDWORD>): BOOL {
     return Advapi32.Load('AdjustTokenGroups')(TokenHandle, ResetToDefault, NewState, BufferLength, PreviousState_out, ReturnLength_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/securitybaseapi/nf-securitybaseapi-adjusttokenprivileges
-  public static AdjustTokenPrivileges(TokenHandle: HANDLE, DisableAllPrivileges: BOOL, NewState: OPTIONAL<PTOKEN_PRIVILEGES>, BufferLength: DWORD, PreviousState_out: OPTIONAL<PTOKEN_PRIVILEGES>, ReturnLength_out: OPTIONAL<LPDWORD>): BOOL {
+  public static AdjustTokenPrivileges(TokenHandle: HANDLE, DisableAllPrivileges: BOOL, NewState: Optional<PTOKEN_PRIVILEGES>, BufferLength: DWORD, PreviousState_out: Optional<PTOKEN_PRIVILEGES>, ReturnLength_out: Optional<LPDWORD>): BOOL {
     return Advapi32.Load('AdjustTokenPrivileges')(TokenHandle, DisableAllPrivileges, NewState, BufferLength, PreviousState_out, ReturnLength_out);
   }
 
@@ -1514,7 +1514,7 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntsecapi/nf-ntsecapi-auditenumeratesubcategories
-  public static AuditEnumerateSubCategories(pAuditCategoryGuid: OPTIONAL<PVOID>, bRetrieveAllSubCategories: BOOL, ppAuditSubCategoriesArray_out: PVOID, pdwCountReturned_out: PDWORD): BOOL {
+  public static AuditEnumerateSubCategories(pAuditCategoryGuid: Optional<PVOID>, bRetrieveAllSubCategories: BOOL, ppAuditSubCategoriesArray_out: PVOID, pdwCountReturned_out: PDWORD): BOOL {
     return Advapi32.Load('AuditEnumerateSubCategories')(pAuditCategoryGuid, bRetrieveAllSubCategories, ppAuditSubCategoriesArray_out, pdwCountReturned_out);
   }
 
@@ -1579,12 +1579,12 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntsecapi/nf-ntsecapi-auditsetglobalsacla
-  public static AuditSetGlobalSaclA(ObjectTypeName: LPCSTR, Acl: OPTIONAL<PACL>): BOOL {
+  public static AuditSetGlobalSaclA(ObjectTypeName: LPCSTR, Acl: Optional<PACL>): BOOL {
     return Advapi32.Load('AuditSetGlobalSaclA')(ObjectTypeName, Acl);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntsecapi/nf-ntsecapi-auditsetglobalsaclw
-  public static AuditSetGlobalSaclW(ObjectTypeName: LPCWSTR, Acl: OPTIONAL<PACL>): BOOL {
+  public static AuditSetGlobalSaclW(ObjectTypeName: LPCWSTR, Acl: Optional<PACL>): BOOL {
     return Advapi32.Load('AuditSetGlobalSaclW')(ObjectTypeName, Acl);
   }
 
@@ -1690,44 +1690,44 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/aclapi/nf-aclapi-buildexplicitaccesswithnamea
-  public static BuildExplicitAccessWithNameA(pExplicitAccess_in_out: PEXPLICIT_ACCESSA, pTrusteeName: OPTIONAL<LPSTR>, AccessPermissions: DWORD, AccessMode: DWORD, Inheritance: DWORD): VOID {
+  public static BuildExplicitAccessWithNameA(pExplicitAccess_in_out: PEXPLICIT_ACCESSA, pTrusteeName: Optional<LPSTR>, AccessPermissions: DWORD, AccessMode: DWORD, Inheritance: DWORD): VOID {
     return Advapi32.Load('BuildExplicitAccessWithNameA')(pExplicitAccess_in_out, pTrusteeName, AccessPermissions, AccessMode, Inheritance);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/aclapi/nf-aclapi-buildexplicitaccesswithnamew
-  public static BuildExplicitAccessWithNameW(pExplicitAccess_in_out: PEXPLICIT_ACCESSW, pTrusteeName: OPTIONAL<LPWSTR>, AccessPermissions: DWORD, AccessMode: DWORD, Inheritance: DWORD): VOID {
+  public static BuildExplicitAccessWithNameW(pExplicitAccess_in_out: PEXPLICIT_ACCESSW, pTrusteeName: Optional<LPWSTR>, AccessPermissions: DWORD, AccessMode: DWORD, Inheritance: DWORD): VOID {
     return Advapi32.Load('BuildExplicitAccessWithNameW')(pExplicitAccess_in_out, pTrusteeName, AccessPermissions, AccessMode, Inheritance);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/aclapi/nf-aclapi-buildimpersonateexplicitaccesswithnamea
-  public static BuildImpersonateExplicitAccessWithNameA(pExplicitAccess_in_out: PEXPLICIT_ACCESSA, pTrusteeName: OPTIONAL<LPSTR>, pTrustee: OPTIONAL<PTRUSTEE>, AccessPermissions: DWORD, AccessMode: DWORD, Inheritance: DWORD): VOID {
+  public static BuildImpersonateExplicitAccessWithNameA(pExplicitAccess_in_out: PEXPLICIT_ACCESSA, pTrusteeName: Optional<LPSTR>, pTrustee: Optional<PTRUSTEE>, AccessPermissions: DWORD, AccessMode: DWORD, Inheritance: DWORD): VOID {
     return Advapi32.Load('BuildImpersonateExplicitAccessWithNameA')(pExplicitAccess_in_out, pTrusteeName, pTrustee, AccessPermissions, AccessMode, Inheritance);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/aclapi/nf-aclapi-buildimpersonateexplicitaccesswithnamew
-  public static BuildImpersonateExplicitAccessWithNameW(pExplicitAccess_in_out: PEXPLICIT_ACCESSW, pTrusteeName: OPTIONAL<LPWSTR>, pTrustee: OPTIONAL<PTRUSTEE>, AccessPermissions: DWORD, AccessMode: DWORD, Inheritance: DWORD): VOID {
+  public static BuildImpersonateExplicitAccessWithNameW(pExplicitAccess_in_out: PEXPLICIT_ACCESSW, pTrusteeName: Optional<LPWSTR>, pTrustee: Optional<PTRUSTEE>, AccessPermissions: DWORD, AccessMode: DWORD, Inheritance: DWORD): VOID {
     return Advapi32.Load('BuildImpersonateExplicitAccessWithNameW')(pExplicitAccess_in_out, pTrusteeName, pTrustee, AccessPermissions, AccessMode, Inheritance);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/aclapi/nf-aclapi-buildimpersonatetrusteea
-  public static BuildImpersonateTrusteeA(pTrustee_in_out: PTRUSTEE, pImpersonateTrustee: OPTIONAL<PTRUSTEE>): VOID {
+  public static BuildImpersonateTrusteeA(pTrustee_in_out: PTRUSTEE, pImpersonateTrustee: Optional<PTRUSTEE>): VOID {
     return Advapi32.Load('BuildImpersonateTrusteeA')(pTrustee_in_out, pImpersonateTrustee);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/aclapi/nf-aclapi-buildimpersonatetrusteew
-  public static BuildImpersonateTrusteeW(pTrustee_in_out: PTRUSTEE, pImpersonateTrustee: OPTIONAL<PTRUSTEE>): VOID {
+  public static BuildImpersonateTrusteeW(pTrustee_in_out: PTRUSTEE, pImpersonateTrustee: Optional<PTRUSTEE>): VOID {
     return Advapi32.Load('BuildImpersonateTrusteeW')(pTrustee_in_out, pImpersonateTrustee);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/aclapi/nf-aclapi-buildsecuritydescriptora
   public static BuildSecurityDescriptorA(
-    pOwner: OPTIONAL<PTRUSTEE>,
-    pGroup: OPTIONAL<PTRUSTEE>,
+    pOwner: Optional<PTRUSTEE>,
+    pGroup: Optional<PTRUSTEE>,
     cCountOfAccessEntries: ULONG,
-    pListOfAccessEntries: OPTIONAL<PEXPLICIT_ACCESSA>,
+    pListOfAccessEntries: Optional<PEXPLICIT_ACCESSA>,
     cCountOfAuditEntries: ULONG,
-    pListOfAuditEntries: OPTIONAL<PEXPLICIT_ACCESSA>,
-    pOldSD: OPTIONAL<PSECURITY_DESCRIPTOR>,
+    pListOfAuditEntries: Optional<PEXPLICIT_ACCESSA>,
+    pOldSD: Optional<PSECURITY_DESCRIPTOR>,
     pSizeNewSD_out: PULONG,
     ppNewSD_out: PVOID,
   ): DWORD {
@@ -1736,13 +1736,13 @@ class Advapi32 extends Win32 {
 
   // https://learn.microsoft.com/en-us/windows/win32/api/aclapi/nf-aclapi-buildsecuritydescriptorw
   public static BuildSecurityDescriptorW(
-    pOwner: OPTIONAL<PTRUSTEE>,
-    pGroup: OPTIONAL<PTRUSTEE>,
+    pOwner: Optional<PTRUSTEE>,
+    pGroup: Optional<PTRUSTEE>,
     cCountOfAccessEntries: ULONG,
-    pListOfAccessEntries: OPTIONAL<PEXPLICIT_ACCESSW>,
+    pListOfAccessEntries: Optional<PEXPLICIT_ACCESSW>,
     cCountOfAuditEntries: ULONG,
-    pListOfAuditEntries: OPTIONAL<PEXPLICIT_ACCESSW>,
-    pOldSD: OPTIONAL<PSECURITY_DESCRIPTOR>,
+    pListOfAuditEntries: Optional<PEXPLICIT_ACCESSW>,
+    pOldSD: Optional<PSECURITY_DESCRIPTOR>,
     pSizeNewSD_out: PULONG,
     ppNewSD_out: PVOID,
   ): DWORD {
@@ -1750,42 +1750,42 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/aclapi/nf-aclapi-buildtrusteewithnamea
-  public static BuildTrusteeWithNameA(pTrustee_in_out: PTRUSTEE, pName: OPTIONAL<LPSTR>): VOID {
+  public static BuildTrusteeWithNameA(pTrustee_in_out: PTRUSTEE, pName: Optional<LPSTR>): VOID {
     return Advapi32.Load('BuildTrusteeWithNameA')(pTrustee_in_out, pName);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/aclapi/nf-aclapi-buildtrusteewithnamew
-  public static BuildTrusteeWithNameW(pTrustee_in_out: PTRUSTEE, pName: OPTIONAL<LPWSTR>): VOID {
+  public static BuildTrusteeWithNameW(pTrustee_in_out: PTRUSTEE, pName: Optional<LPWSTR>): VOID {
     return Advapi32.Load('BuildTrusteeWithNameW')(pTrustee_in_out, pName);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/aclapi/nf-aclapi-buildtrusteewithobjectsandnamea
-  public static BuildTrusteeWithObjectsAndNameA(pTrustee_in_out: PTRUSTEE, pObjName: OPTIONAL<PVOID>, ObjectType: DWORD, ObjectTypeName: OPTIONAL<LPSTR>, InheritedObjectTypeName: OPTIONAL<LPSTR>, Name: OPTIONAL<LPSTR>): VOID {
+  public static BuildTrusteeWithObjectsAndNameA(pTrustee_in_out: PTRUSTEE, pObjName: Optional<PVOID>, ObjectType: DWORD, ObjectTypeName: Optional<LPSTR>, InheritedObjectTypeName: Optional<LPSTR>, Name: Optional<LPSTR>): VOID {
     return Advapi32.Load('BuildTrusteeWithObjectsAndNameA')(pTrustee_in_out, pObjName, ObjectType, ObjectTypeName, InheritedObjectTypeName, Name);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/aclapi/nf-aclapi-buildtrusteewithobjectsandnamew
-  public static BuildTrusteeWithObjectsAndNameW(pTrustee_in_out: PTRUSTEE, pObjName: OPTIONAL<PVOID>, ObjectType: DWORD, ObjectTypeName: OPTIONAL<LPWSTR>, InheritedObjectTypeName: OPTIONAL<LPWSTR>, Name: OPTIONAL<LPWSTR>): VOID {
+  public static BuildTrusteeWithObjectsAndNameW(pTrustee_in_out: PTRUSTEE, pObjName: Optional<PVOID>, ObjectType: DWORD, ObjectTypeName: Optional<LPWSTR>, InheritedObjectTypeName: Optional<LPWSTR>, Name: Optional<LPWSTR>): VOID {
     return Advapi32.Load('BuildTrusteeWithObjectsAndNameW')(pTrustee_in_out, pObjName, ObjectType, ObjectTypeName, InheritedObjectTypeName, Name);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/aclapi/nf-aclapi-buildtrusteewithobjectsandsida
-  public static BuildTrusteeWithObjectsAndSidA(pTrustee_in_out: PTRUSTEE, pObjSid: OPTIONAL<PVOID>, pObjectGuid: OPTIONAL<PVOID>, pInheritedObjectGuid: OPTIONAL<PVOID>, pSid: OPTIONAL<PSID>): VOID {
+  public static BuildTrusteeWithObjectsAndSidA(pTrustee_in_out: PTRUSTEE, pObjSid: Optional<PVOID>, pObjectGuid: Optional<PVOID>, pInheritedObjectGuid: Optional<PVOID>, pSid: Optional<PSID>): VOID {
     return Advapi32.Load('BuildTrusteeWithObjectsAndSidA')(pTrustee_in_out, pObjSid, pObjectGuid, pInheritedObjectGuid, pSid);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/aclapi/nf-aclapi-buildtrusteewithobjectsandsidw
-  public static BuildTrusteeWithObjectsAndSidW(pTrustee_in_out: PTRUSTEE, pObjSid: OPTIONAL<PVOID>, pObjectGuid: OPTIONAL<PVOID>, pInheritedObjectGuid: OPTIONAL<PVOID>, pSid: OPTIONAL<PSID>): VOID {
+  public static BuildTrusteeWithObjectsAndSidW(pTrustee_in_out: PTRUSTEE, pObjSid: Optional<PVOID>, pObjectGuid: Optional<PVOID>, pInheritedObjectGuid: Optional<PVOID>, pSid: Optional<PSID>): VOID {
     return Advapi32.Load('BuildTrusteeWithObjectsAndSidW')(pTrustee_in_out, pObjSid, pObjectGuid, pInheritedObjectGuid, pSid);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/aclapi/nf-aclapi-buildtrusteewithsida
-  public static BuildTrusteeWithSidA(pTrustee_in_out: PTRUSTEE, pSid: OPTIONAL<PSID>): VOID {
+  public static BuildTrusteeWithSidA(pTrustee_in_out: PTRUSTEE, pSid: Optional<PSID>): VOID {
     return Advapi32.Load('BuildTrusteeWithSidA')(pTrustee_in_out, pSid);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/aclapi/nf-aclapi-buildtrusteewithsidw
-  public static BuildTrusteeWithSidW(pTrustee_in_out: PTRUSTEE, pSid: OPTIONAL<PSID>): VOID {
+  public static BuildTrusteeWithSidW(pTrustee_in_out: PTRUSTEE, pSid: Optional<PSID>): VOID {
     return Advapi32.Load('BuildTrusteeWithSidW')(pTrustee_in_out, pSid);
   }
 
@@ -1795,12 +1795,12 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsvc/nf-winsvc-changeserviceconfig2a
-  public static ChangeServiceConfig2A(hService: SC_HANDLE, dwInfoLevel: DWORD, lpInfo: OPTIONAL<LPVOID>): BOOL {
+  public static ChangeServiceConfig2A(hService: SC_HANDLE, dwInfoLevel: DWORD, lpInfo: Optional<LPVOID>): BOOL {
     return Advapi32.Load('ChangeServiceConfig2A')(hService, dwInfoLevel, lpInfo);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsvc/nf-winsvc-changeserviceconfig2w
-  public static ChangeServiceConfig2W(hService: SC_HANDLE, dwInfoLevel: DWORD, lpInfo: OPTIONAL<LPVOID>): BOOL {
+  public static ChangeServiceConfig2W(hService: SC_HANDLE, dwInfoLevel: DWORD, lpInfo: Optional<LPVOID>): BOOL {
     return Advapi32.Load('ChangeServiceConfig2W')(hService, dwInfoLevel, lpInfo);
   }
 
@@ -1810,13 +1810,13 @@ class Advapi32 extends Win32 {
     dwServiceType: DWORD,
     dwStartType: DWORD,
     dwErrorControl: DWORD,
-    lpBinaryPathName: OPTIONAL<LPCSTR>,
-    lpLoadOrderGroup: OPTIONAL<LPCSTR>,
-    lpdwTagId_out: OPTIONAL<LPDWORD>,
-    lpDependencies: OPTIONAL<LPCSTR>,
-    lpServiceStartName: OPTIONAL<LPCSTR>,
-    lpPassword: OPTIONAL<LPCSTR>,
-    lpDisplayName: OPTIONAL<LPCSTR>,
+    lpBinaryPathName: Optional<LPCSTR>,
+    lpLoadOrderGroup: Optional<LPCSTR>,
+    lpdwTagId_out: Optional<LPDWORD>,
+    lpDependencies: Optional<LPCSTR>,
+    lpServiceStartName: Optional<LPCSTR>,
+    lpPassword: Optional<LPCSTR>,
+    lpDisplayName: Optional<LPCSTR>,
   ): BOOL {
     return Advapi32.Load('ChangeServiceConfigA')(hService, dwServiceType, dwStartType, dwErrorControl, lpBinaryPathName, lpLoadOrderGroup, lpdwTagId_out, lpDependencies, lpServiceStartName, lpPassword, lpDisplayName);
   }
@@ -1827,13 +1827,13 @@ class Advapi32 extends Win32 {
     dwServiceType: DWORD,
     dwStartType: DWORD,
     dwErrorControl: DWORD,
-    lpBinaryPathName: OPTIONAL<LPCWSTR>,
-    lpLoadOrderGroup: OPTIONAL<LPCWSTR>,
-    lpdwTagId_out: OPTIONAL<LPDWORD>,
-    lpDependencies: OPTIONAL<LPCWSTR>,
-    lpServiceStartName: OPTIONAL<LPCWSTR>,
-    lpPassword: OPTIONAL<LPCWSTR>,
-    lpDisplayName: OPTIONAL<LPCWSTR>,
+    lpBinaryPathName: Optional<LPCWSTR>,
+    lpLoadOrderGroup: Optional<LPCWSTR>,
+    lpdwTagId_out: Optional<LPDWORD>,
+    lpDependencies: Optional<LPCWSTR>,
+    lpServiceStartName: Optional<LPCWSTR>,
+    lpPassword: Optional<LPCWSTR>,
+    lpDisplayName: Optional<LPCWSTR>,
   ): BOOL {
     return Advapi32.Load('ChangeServiceConfigW')(hService, dwServiceType, dwStartType, dwErrorControl, lpBinaryPathName, lpLoadOrderGroup, lpdwTagId_out, lpDependencies, lpServiceStartName, lpPassword, lpDisplayName);
   }
@@ -1844,17 +1844,17 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/securitybaseapi/nf-securitybaseapi-checktokenmembership
-  public static CheckTokenMembership(TokenHandle: OPTIONAL<HANDLE>, SidToCheck: PSID, IsMember_out: PBOOL): BOOL {
+  public static CheckTokenMembership(TokenHandle: Optional<HANDLE>, SidToCheck: PSID, IsMember_out: PBOOL): BOOL {
     return Advapi32.Load('CheckTokenMembership')(TokenHandle, SidToCheck, IsMember_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-cleareventloga
-  public static ClearEventLogA(hEventLog: HANDLE, lpBackupFileName: OPTIONAL<LPCSTR>): BOOL {
+  public static ClearEventLogA(hEventLog: HANDLE, lpBackupFileName: Optional<LPCSTR>): BOOL {
     return Advapi32.Load('ClearEventLogA')(hEventLog, lpBackupFileName);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-cleareventlogw
-  public static ClearEventLogW(hEventLog: HANDLE, lpBackupFileName: OPTIONAL<LPCWSTR>): BOOL {
+  public static ClearEventLogW(hEventLog: HANDLE, lpBackupFileName: Optional<LPCWSTR>): BOOL {
     return Advapi32.Load('ClearEventLogW')(hEventLog, lpBackupFileName);
   }
 
@@ -1914,12 +1914,12 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/evntrace/nf-evntrace-controltracea
-  public static ControlTraceA(TraceHandle: TRACEHANDLE, InstanceName: OPTIONAL<LPCSTR>, Properties_in_out: PVOID, ControlCode: ULONG): ULONG {
+  public static ControlTraceA(TraceHandle: TRACEHANDLE, InstanceName: Optional<LPCSTR>, Properties_in_out: PVOID, ControlCode: ULONG): ULONG {
     return Advapi32.Load('ControlTraceA')(TraceHandle, InstanceName, Properties_in_out, ControlCode);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/evntrace/nf-evntrace-controltracew
-  public static ControlTraceW(TraceHandle: TRACEHANDLE, InstanceName: OPTIONAL<LPCWSTR>, Properties_in_out: PVOID, ControlCode: ULONG): ULONG {
+  public static ControlTraceW(TraceHandle: TRACEHANDLE, InstanceName: Optional<LPCWSTR>, Properties_in_out: PVOID, ControlCode: ULONG): ULONG {
     return Advapi32.Load('ControlTraceW')(TraceHandle, InstanceName, Properties_in_out, ControlCode);
   }
 
@@ -1995,7 +1995,7 @@ class Advapi32 extends Win32 {
     RequestedStringSDRevision: DWORD,
     SecurityInformation: SECURITY_INFORMATION,
     StringSecurityDescriptor_out: PVOID,
-    StringSecurityDescriptorLen_out: OPTIONAL<PULONG>,
+    StringSecurityDescriptorLen_out: Optional<PULONG>,
   ): BOOL {
     return Advapi32.Load('ConvertSecurityDescriptorToStringSecurityDescriptorA')(SecurityDescriptor, RequestedStringSDRevision, SecurityInformation, StringSecurityDescriptor_out, StringSecurityDescriptorLen_out);
   }
@@ -2006,7 +2006,7 @@ class Advapi32 extends Win32 {
     RequestedStringSDRevision: DWORD,
     SecurityInformation: SECURITY_INFORMATION,
     StringSecurityDescriptor_out: PVOID,
-    StringSecurityDescriptorLen_out: OPTIONAL<PULONG>,
+    StringSecurityDescriptorLen_out: Optional<PULONG>,
   ): BOOL {
     return Advapi32.Load('ConvertSecurityDescriptorToStringSecurityDescriptorW')(SecurityDescriptor, RequestedStringSDRevision, SecurityInformation, StringSecurityDescriptor_out, StringSecurityDescriptorLen_out);
   }
@@ -2042,12 +2042,12 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/sddl/nf-sddl-convertstringsecuritydescriptortosecuritydescriptora
-  public static ConvertStringSecurityDescriptorToSecurityDescriptorA(StringSecurityDescriptor: LPCSTR, StringSDRevision: DWORD, SecurityDescriptor_out: PVOID, SecurityDescriptorSize_out: OPTIONAL<PULONG>): BOOL {
+  public static ConvertStringSecurityDescriptorToSecurityDescriptorA(StringSecurityDescriptor: LPCSTR, StringSDRevision: DWORD, SecurityDescriptor_out: PVOID, SecurityDescriptorSize_out: Optional<PULONG>): BOOL {
     return Advapi32.Load('ConvertStringSecurityDescriptorToSecurityDescriptorA')(StringSecurityDescriptor, StringSDRevision, SecurityDescriptor_out, SecurityDescriptorSize_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/sddl/nf-sddl-convertstringsecuritydescriptortosecuritydescriptorw
-  public static ConvertStringSecurityDescriptorToSecurityDescriptorW(StringSecurityDescriptor: LPCWSTR, StringSDRevision: DWORD, SecurityDescriptor_out: PVOID, SecurityDescriptorSize_out: OPTIONAL<PULONG>): BOOL {
+  public static ConvertStringSecurityDescriptorToSecurityDescriptorW(StringSecurityDescriptor: LPCWSTR, StringSDRevision: DWORD, SecurityDescriptor_out: PVOID, SecurityDescriptorSize_out: Optional<PULONG>): BOOL {
     return Advapi32.Load('ConvertStringSecurityDescriptorToSecurityDescriptorW')(StringSecurityDescriptor, StringSDRevision, SecurityDescriptor_out, SecurityDescriptorSize_out);
   }
 
@@ -2063,10 +2063,10 @@ class Advapi32 extends Win32 {
 
   // https://learn.microsoft.com/en-us/windows/win32/api/securitybaseapi/nf-securitybaseapi-converttoautoinheritprivateobjectsecurity
   public static ConvertToAutoInheritPrivateObjectSecurity(
-    ParentDescriptor: OPTIONAL<PSECURITY_DESCRIPTOR>,
+    ParentDescriptor: Optional<PSECURITY_DESCRIPTOR>,
     CurrentSecurityDescriptor: PSECURITY_DESCRIPTOR,
     NewSecurityDescriptor_out: PVOID,
-    ObjectType: OPTIONAL<PVOID>,
+    ObjectType: Optional<PVOID>,
     IsDirectoryObject: BOOL,
     GenericMapping: PGENERIC_MAPPING,
   ): BOOL {
@@ -2085,11 +2085,11 @@ class Advapi32 extends Win32 {
 
   // https://learn.microsoft.com/en-us/windows/win32/api/securitybaseapi/nf-securitybaseapi-createprivateobjectsecurity
   public static CreatePrivateObjectSecurity(
-    ParentDescriptor: OPTIONAL<PSECURITY_DESCRIPTOR>,
-    CreatorDescriptor: OPTIONAL<PSECURITY_DESCRIPTOR>,
+    ParentDescriptor: Optional<PSECURITY_DESCRIPTOR>,
+    CreatorDescriptor: Optional<PSECURITY_DESCRIPTOR>,
     NewDescriptor_out: PVOID,
     IsDirectoryObject: BOOL,
-    Token: OPTIONAL<HANDLE>,
+    Token: Optional<HANDLE>,
     GenericMapping: PGENERIC_MAPPING,
   ): BOOL {
     return Advapi32.Load('CreatePrivateObjectSecurity')(ParentDescriptor, CreatorDescriptor, NewDescriptor_out, IsDirectoryObject, Token, GenericMapping);
@@ -2097,13 +2097,13 @@ class Advapi32 extends Win32 {
 
   // https://learn.microsoft.com/en-us/windows/win32/api/securitybaseapi/nf-securitybaseapi-createprivateobjectsecurityex
   public static CreatePrivateObjectSecurityEx(
-    ParentDescriptor: OPTIONAL<PSECURITY_DESCRIPTOR>,
-    CreatorDescriptor: OPTIONAL<PSECURITY_DESCRIPTOR>,
+    ParentDescriptor: Optional<PSECURITY_DESCRIPTOR>,
+    CreatorDescriptor: Optional<PSECURITY_DESCRIPTOR>,
     NewDescriptor_out: PVOID,
-    ObjectType: OPTIONAL<PVOID>,
+    ObjectType: Optional<PVOID>,
     IsContainerObject: BOOL,
     AutoInheritFlags: ULONG,
-    Token: OPTIONAL<HANDLE>,
+    Token: Optional<HANDLE>,
     GenericMapping: PGENERIC_MAPPING,
   ): BOOL {
     return Advapi32.Load('CreatePrivateObjectSecurityEx')(ParentDescriptor, CreatorDescriptor, NewDescriptor_out, ObjectType, IsContainerObject, AutoInheritFlags, Token, GenericMapping);
@@ -2111,14 +2111,14 @@ class Advapi32 extends Win32 {
 
   // https://learn.microsoft.com/en-us/windows/win32/api/securitybaseapi/nf-securitybaseapi-createprivateobjectsecuritywithmultipleinheritance
   public static CreatePrivateObjectSecurityWithMultipleInheritance(
-    ParentDescriptor: OPTIONAL<PSECURITY_DESCRIPTOR>,
-    CreatorDescriptor: OPTIONAL<PSECURITY_DESCRIPTOR>,
+    ParentDescriptor: Optional<PSECURITY_DESCRIPTOR>,
+    CreatorDescriptor: Optional<PSECURITY_DESCRIPTOR>,
     NewDescriptor_out: PVOID,
-    ObjectTypes: OPTIONAL<PVOID>,
+    ObjectTypes: Optional<PVOID>,
     GuidCount: ULONG,
     IsContainerObject: BOOL,
     AutoInheritFlags: ULONG,
-    Token: OPTIONAL<HANDLE>,
+    Token: Optional<HANDLE>,
     GenericMapping: PGENERIC_MAPPING,
   ): BOOL {
     return Advapi32.Load('CreatePrivateObjectSecurityWithMultipleInheritance')(ParentDescriptor, CreatorDescriptor, NewDescriptor_out, ObjectTypes, GuidCount, IsContainerObject, AutoInheritFlags, Token, GenericMapping);
@@ -2126,15 +2126,15 @@ class Advapi32 extends Win32 {
 
   // https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-createprocessasusera
   public static CreateProcessAsUserA(
-    hToken: OPTIONAL<HANDLE>,
-    lpApplicationName: OPTIONAL<LPCSTR>,
-    lpCommandLine_in_out: OPTIONAL<LPSTR>,
-    lpProcessAttributes: OPTIONAL<PVOID>,
-    lpThreadAttributes: OPTIONAL<PVOID>,
+    hToken: Optional<HANDLE>,
+    lpApplicationName: Optional<LPCSTR>,
+    lpCommandLine_in_out: Optional<LPSTR>,
+    lpProcessAttributes: Optional<PVOID>,
+    lpThreadAttributes: Optional<PVOID>,
     bInheritHandles: BOOL,
     dwCreationFlags: DWORD,
-    lpEnvironment: OPTIONAL<LPVOID>,
-    lpCurrentDirectory: OPTIONAL<LPCSTR>,
+    lpEnvironment: Optional<LPVOID>,
+    lpCurrentDirectory: Optional<LPCSTR>,
     lpStartupInfo: PVOID,
     lpProcessInformation_out: PVOID,
   ): BOOL {
@@ -2155,15 +2155,15 @@ class Advapi32 extends Win32 {
 
   // https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-createprocessasuserw
   public static CreateProcessAsUserW(
-    hToken: OPTIONAL<HANDLE>,
-    lpApplicationName: OPTIONAL<LPCWSTR>,
-    lpCommandLine_in_out: OPTIONAL<LPWSTR>,
-    lpProcessAttributes: OPTIONAL<PVOID>,
-    lpThreadAttributes: OPTIONAL<PVOID>,
+    hToken: Optional<HANDLE>,
+    lpApplicationName: Optional<LPCWSTR>,
+    lpCommandLine_in_out: Optional<LPWSTR>,
+    lpProcessAttributes: Optional<PVOID>,
+    lpThreadAttributes: Optional<PVOID>,
     bInheritHandles: BOOL,
     dwCreationFlags: DWORD,
-    lpEnvironment: OPTIONAL<LPVOID>,
-    lpCurrentDirectory: OPTIONAL<LPCWSTR>,
+    lpEnvironment: Optional<LPVOID>,
+    lpCurrentDirectory: Optional<LPCWSTR>,
     lpStartupInfo: PVOID,
     lpProcessInformation_out: PVOID,
   ): BOOL {
@@ -2185,14 +2185,14 @@ class Advapi32 extends Win32 {
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-createprocesswithlogonw
   public static CreateProcessWithLogonW(
     lpUsername: LPCWSTR,
-    lpDomain: OPTIONAL<LPCWSTR>,
+    lpDomain: Optional<LPCWSTR>,
     lpPassword: LPCWSTR,
     dwLogonFlags: DWORD,
-    lpApplicationName: OPTIONAL<LPCWSTR>,
-    lpCommandLine_in_out: OPTIONAL<LPWSTR>,
+    lpApplicationName: Optional<LPCWSTR>,
+    lpCommandLine_in_out: Optional<LPWSTR>,
     dwCreationFlags: DWORD,
-    lpEnvironment: OPTIONAL<LPVOID>,
-    lpCurrentDirectory: OPTIONAL<LPCWSTR>,
+    lpEnvironment: Optional<LPVOID>,
+    lpCurrentDirectory: Optional<LPCWSTR>,
     lpStartupInfo: PVOID,
     lpProcessInformation_out: PVOID,
   ): BOOL {
@@ -2203,11 +2203,11 @@ class Advapi32 extends Win32 {
   public static CreateProcessWithTokenW(
     hToken: HANDLE,
     dwLogonFlags: DWORD,
-    lpApplicationName: OPTIONAL<LPCWSTR>,
-    lpCommandLine_in_out: OPTIONAL<LPWSTR>,
+    lpApplicationName: Optional<LPCWSTR>,
+    lpCommandLine_in_out: Optional<LPWSTR>,
     dwCreationFlags: DWORD,
-    lpEnvironment: OPTIONAL<LPVOID>,
-    lpCurrentDirectory: OPTIONAL<LPCWSTR>,
+    lpEnvironment: Optional<LPVOID>,
+    lpCurrentDirectory: Optional<LPCWSTR>,
     lpStartupInfo: PVOID,
     lpProcessInformation_out: PVOID,
   ): BOOL {
@@ -2219,11 +2219,11 @@ class Advapi32 extends Win32 {
     ExistingTokenHandle: HANDLE,
     Flags: DWORD,
     DisableSidCount: DWORD,
-    SidsToDisable: OPTIONAL<PVOID>,
+    SidsToDisable: Optional<PVOID>,
     DeletePrivilegeCount: DWORD,
-    PrivilegesToDelete: OPTIONAL<PVOID>,
+    PrivilegesToDelete: Optional<PVOID>,
     RestrictedSidCount: DWORD,
-    SidsToRestrict: OPTIONAL<PVOID>,
+    SidsToRestrict: Optional<PVOID>,
     NewTokenHandle_out: PHANDLE,
   ): BOOL {
     return Advapi32.Load('CreateRestrictedToken')(ExistingTokenHandle, Flags, DisableSidCount, SidsToDisable, DeletePrivilegeCount, PrivilegesToDelete, RestrictedSidCount, SidsToRestrict, NewTokenHandle_out);
@@ -2233,17 +2233,17 @@ class Advapi32 extends Win32 {
   public static CreateServiceA(
     hSCManager: SC_HANDLE,
     lpServiceName: LPCSTR,
-    lpDisplayName: OPTIONAL<LPCSTR>,
+    lpDisplayName: Optional<LPCSTR>,
     dwDesiredAccess: DWORD,
     dwServiceType: DWORD,
     dwStartType: DWORD,
     dwErrorControl: DWORD,
-    lpBinaryPathName: OPTIONAL<LPCSTR>,
-    lpLoadOrderGroup: OPTIONAL<LPCSTR>,
-    lpdwTagId_out: OPTIONAL<LPDWORD>,
-    lpDependencies: OPTIONAL<LPCSTR>,
-    lpServiceStartName: OPTIONAL<LPCSTR>,
-    lpPassword: OPTIONAL<LPCSTR>,
+    lpBinaryPathName: Optional<LPCSTR>,
+    lpLoadOrderGroup: Optional<LPCSTR>,
+    lpdwTagId_out: Optional<LPDWORD>,
+    lpDependencies: Optional<LPCSTR>,
+    lpServiceStartName: Optional<LPCSTR>,
+    lpPassword: Optional<LPCSTR>,
   ): SC_HANDLE {
     return Advapi32.Load('CreateServiceA')(
       hSCManager,
@@ -2301,17 +2301,17 @@ class Advapi32 extends Win32 {
   public static CreateServiceW(
     hSCManager: SC_HANDLE,
     lpServiceName: LPCWSTR,
-    lpDisplayName: OPTIONAL<LPCWSTR>,
+    lpDisplayName: Optional<LPCWSTR>,
     dwDesiredAccess: DWORD,
     dwServiceType: DWORD,
     dwStartType: DWORD,
     dwErrorControl: DWORD,
-    lpBinaryPathName: OPTIONAL<LPCWSTR>,
-    lpLoadOrderGroup: OPTIONAL<LPCWSTR>,
-    lpdwTagId_out: OPTIONAL<LPDWORD>,
-    lpDependencies: OPTIONAL<LPCWSTR>,
-    lpServiceStartName: OPTIONAL<LPCWSTR>,
-    lpPassword: OPTIONAL<LPCWSTR>,
+    lpBinaryPathName: Optional<LPCWSTR>,
+    lpLoadOrderGroup: Optional<LPCWSTR>,
+    lpdwTagId_out: Optional<LPDWORD>,
+    lpDependencies: Optional<LPCWSTR>,
+    lpServiceStartName: Optional<LPCWSTR>,
+    lpPassword: Optional<LPCWSTR>,
   ): SC_HANDLE {
     return Advapi32.Load('CreateServiceW')(
       hSCManager,
@@ -2331,7 +2331,7 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/securitybaseapi/nf-securitybaseapi-createwellknownsid
-  public static CreateWellKnownSid(WellKnownSidType: DWORD, DomainSid: OPTIONAL<PSID>, pSid_out: OPTIONAL<PSID>, cbSid_in_out: LPDWORD): BOOL {
+  public static CreateWellKnownSid(WellKnownSidType: DWORD, DomainSid: Optional<PSID>, pSid_out: Optional<PSID>, cbSid_in_out: LPDWORD): BOOL {
     return Advapi32.Load('CreateWellKnownSid')(WellKnownSidType, DomainSid, pSid_out, cbSid_in_out);
   }
 
@@ -2356,12 +2356,12 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincred/nf-wincred-credenumeratea
-  public static CredEnumerateA(Filter: OPTIONAL<LPCSTR>, Flags: DWORD, Count_out: LPDWORD, Credential_out: PVOID): BOOL {
+  public static CredEnumerateA(Filter: Optional<LPCSTR>, Flags: DWORD, Count_out: LPDWORD, Credential_out: PVOID): BOOL {
     return Advapi32.Load('CredEnumerateA')(Filter, Flags, Count_out, Credential_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincred/nf-wincred-credenumeratew
-  public static CredEnumerateW(Filter: OPTIONAL<LPCWSTR>, Flags: DWORD, Count_out: LPDWORD, Credential_out: PVOID): BOOL {
+  public static CredEnumerateW(Filter: Optional<LPCWSTR>, Flags: DWORD, Count_out: LPDWORD, Credential_out: PVOID): BOOL {
     return Advapi32.Load('CredEnumerateW')(Filter, Flags, Count_out, Credential_out);
   }
 
@@ -2441,12 +2441,12 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincred/nf-wincred-credprotecta
-  public static CredProtectA(fAsSelf: BOOL, pszCredentials: LPSTR, cchCredentials: DWORD, pszProtectedCredentials_out: LPSTR, pcchMaxChars_in_out: LPDWORD, ProtectionType_out: OPTIONAL<PVOID>): BOOL {
+  public static CredProtectA(fAsSelf: BOOL, pszCredentials: LPSTR, cchCredentials: DWORD, pszProtectedCredentials_out: LPSTR, pcchMaxChars_in_out: LPDWORD, ProtectionType_out: Optional<PVOID>): BOOL {
     return Advapi32.Load('CredProtectA')(fAsSelf, pszCredentials, cchCredentials, pszProtectedCredentials_out, pcchMaxChars_in_out, ProtectionType_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincred/nf-wincred-credprotectw
-  public static CredProtectW(fAsSelf: BOOL, pszCredentials: LPWSTR, cchCredentials: DWORD, pszProtectedCredentials_out: LPWSTR, pcchMaxChars_in_out: LPDWORD, ProtectionType_out: OPTIONAL<PVOID>): BOOL {
+  public static CredProtectW(fAsSelf: BOOL, pszCredentials: LPWSTR, cchCredentials: DWORD, pszProtectedCredentials_out: LPWSTR, pcchMaxChars_in_out: LPDWORD, ProtectionType_out: Optional<PVOID>): BOOL {
     return Advapi32.Load('CredProtectW')(fAsSelf, pszCredentials, cchCredentials, pszProtectedCredentials_out, pcchMaxChars_in_out, ProtectionType_out);
   }
 
@@ -2501,12 +2501,12 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincred/nf-wincred-credunprotecta
-  public static CredUnprotectA(fAsSelf: BOOL, pszProtectedCredentials: LPSTR, cchProtectedCredentials: DWORD, pszCredentials_out: OPTIONAL<LPSTR>, pcchMaxChars_in_out: LPDWORD): BOOL {
+  public static CredUnprotectA(fAsSelf: BOOL, pszProtectedCredentials: LPSTR, cchProtectedCredentials: DWORD, pszCredentials_out: Optional<LPSTR>, pcchMaxChars_in_out: LPDWORD): BOOL {
     return Advapi32.Load('CredUnprotectA')(fAsSelf, pszProtectedCredentials, cchProtectedCredentials, pszCredentials_out, pcchMaxChars_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincred/nf-wincred-credunprotectw
-  public static CredUnprotectW(fAsSelf: BOOL, pszProtectedCredentials: LPWSTR, cchProtectedCredentials: DWORD, pszCredentials_out: OPTIONAL<LPWSTR>, pcchMaxChars_in_out: LPDWORD): BOOL {
+  public static CredUnprotectW(fAsSelf: BOOL, pszProtectedCredentials: LPWSTR, cchProtectedCredentials: DWORD, pszCredentials_out: Optional<LPWSTR>, pcchMaxChars_in_out: LPDWORD): BOOL {
     return Advapi32.Load('CredUnprotectW')(fAsSelf, pszProtectedCredentials, cchProtectedCredentials, pszCredentials_out, pcchMaxChars_in_out);
   }
 
@@ -2561,12 +2561,12 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincrypt/nf-wincrypt-cryptacquirecontexta
-  public static CryptAcquireContextA(phProv_out: PVOID, szContainer: OPTIONAL<LPCSTR>, szProvider: OPTIONAL<LPCSTR>, dwProvType: DWORD, dwFlags: DWORD): BOOL {
+  public static CryptAcquireContextA(phProv_out: PVOID, szContainer: Optional<LPCSTR>, szProvider: Optional<LPCSTR>, dwProvType: DWORD, dwFlags: DWORD): BOOL {
     return Advapi32.Load('CryptAcquireContextA')(phProv_out, szContainer, szProvider, dwProvType, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincrypt/nf-wincrypt-cryptacquirecontextw
-  public static CryptAcquireContextW(phProv_out: PVOID, szContainer: OPTIONAL<LPCWSTR>, szProvider: OPTIONAL<LPCWSTR>, dwProvType: DWORD, dwFlags: DWORD): BOOL {
+  public static CryptAcquireContextW(phProv_out: PVOID, szContainer: Optional<LPCWSTR>, szProvider: Optional<LPCWSTR>, dwProvType: DWORD, dwFlags: DWORD): BOOL {
     return Advapi32.Load('CryptAcquireContextW')(phProv_out, szContainer, szProvider, dwProvType, dwFlags);
   }
 
@@ -2611,32 +2611,32 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincrypt/nf-wincrypt-cryptencrypt
-  public static CryptEncrypt(hKey: HCRYPTKEY, hHash: HCRYPTHASH, Final: BOOL, dwFlags: DWORD, pbData_in_out: OPTIONAL<PBYTE>, pdwDataLen_in_out: LPDWORD, dwBufLen: DWORD): BOOL {
+  public static CryptEncrypt(hKey: HCRYPTKEY, hHash: HCRYPTHASH, Final: BOOL, dwFlags: DWORD, pbData_in_out: Optional<PBYTE>, pdwDataLen_in_out: LPDWORD, dwBufLen: DWORD): BOOL {
     return Advapi32.Load('CryptEncrypt')(hKey, hHash, Final, dwFlags, pbData_in_out, pdwDataLen_in_out, dwBufLen);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincrypt/nf-wincrypt-cryptenumprovidertypesa
-  public static CryptEnumProviderTypesA(dwIndex: DWORD, pdwReserved: NULL, dwFlags: DWORD, pdwProvType_out: LPDWORD, szTypeName_out: OPTIONAL<LPSTR>, pcbTypeName_in_out: LPDWORD): BOOL {
+  public static CryptEnumProviderTypesA(dwIndex: DWORD, pdwReserved: NULL, dwFlags: DWORD, pdwProvType_out: LPDWORD, szTypeName_out: Optional<LPSTR>, pcbTypeName_in_out: LPDWORD): BOOL {
     return Advapi32.Load('CryptEnumProviderTypesA')(dwIndex, pdwReserved, dwFlags, pdwProvType_out, szTypeName_out, pcbTypeName_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincrypt/nf-wincrypt-cryptenumprovidertypesw
-  public static CryptEnumProviderTypesW(dwIndex: DWORD, pdwReserved: NULL, dwFlags: DWORD, pdwProvType_out: LPDWORD, szTypeName_out: OPTIONAL<LPWSTR>, pcbTypeName_in_out: LPDWORD): BOOL {
+  public static CryptEnumProviderTypesW(dwIndex: DWORD, pdwReserved: NULL, dwFlags: DWORD, pdwProvType_out: LPDWORD, szTypeName_out: Optional<LPWSTR>, pcbTypeName_in_out: LPDWORD): BOOL {
     return Advapi32.Load('CryptEnumProviderTypesW')(dwIndex, pdwReserved, dwFlags, pdwProvType_out, szTypeName_out, pcbTypeName_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincrypt/nf-wincrypt-cryptenumprovidersa
-  public static CryptEnumProvidersA(dwIndex: DWORD, pdwReserved: NULL, dwFlags: DWORD, pdwProvType_out: LPDWORD, szProvName_out: OPTIONAL<LPSTR>, pcbProvName_in_out: LPDWORD): BOOL {
+  public static CryptEnumProvidersA(dwIndex: DWORD, pdwReserved: NULL, dwFlags: DWORD, pdwProvType_out: LPDWORD, szProvName_out: Optional<LPSTR>, pcbProvName_in_out: LPDWORD): BOOL {
     return Advapi32.Load('CryptEnumProvidersA')(dwIndex, pdwReserved, dwFlags, pdwProvType_out, szProvName_out, pcbProvName_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincrypt/nf-wincrypt-cryptenumprovidersw
-  public static CryptEnumProvidersW(dwIndex: DWORD, pdwReserved: NULL, dwFlags: DWORD, pdwProvType_out: LPDWORD, szProvName_out: OPTIONAL<LPWSTR>, pcbProvName_in_out: LPDWORD): BOOL {
+  public static CryptEnumProvidersW(dwIndex: DWORD, pdwReserved: NULL, dwFlags: DWORD, pdwProvType_out: LPDWORD, szProvName_out: Optional<LPWSTR>, pcbProvName_in_out: LPDWORD): BOOL {
     return Advapi32.Load('CryptEnumProvidersW')(dwIndex, pdwReserved, dwFlags, pdwProvType_out, szProvName_out, pcbProvName_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincrypt/nf-wincrypt-cryptexportkey
-  public static CryptExportKey(hKey: HCRYPTKEY, hExpKey: HCRYPTKEY, dwBlobType: DWORD, dwFlags: DWORD, pbData_out: OPTIONAL<PBYTE>, pdwDataLen_in_out: LPDWORD): BOOL {
+  public static CryptExportKey(hKey: HCRYPTKEY, hExpKey: HCRYPTKEY, dwBlobType: DWORD, dwFlags: DWORD, pbData_out: Optional<PBYTE>, pdwDataLen_in_out: LPDWORD): BOOL {
     return Advapi32.Load('CryptExportKey')(hKey, hExpKey, dwBlobType, dwFlags, pbData_out, pdwDataLen_in_out);
   }
 
@@ -2651,27 +2651,27 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincrypt/nf-wincrypt-cryptgetdefaultprovidera
-  public static CryptGetDefaultProviderA(dwProvType: DWORD, pdwReserved: NULL, dwFlags: DWORD, pszProvName_out: OPTIONAL<LPSTR>, pcbProvName_in_out: LPDWORD): BOOL {
+  public static CryptGetDefaultProviderA(dwProvType: DWORD, pdwReserved: NULL, dwFlags: DWORD, pszProvName_out: Optional<LPSTR>, pcbProvName_in_out: LPDWORD): BOOL {
     return Advapi32.Load('CryptGetDefaultProviderA')(dwProvType, pdwReserved, dwFlags, pszProvName_out, pcbProvName_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincrypt/nf-wincrypt-cryptgetdefaultproviderw
-  public static CryptGetDefaultProviderW(dwProvType: DWORD, pdwReserved: NULL, dwFlags: DWORD, pszProvName_out: OPTIONAL<LPWSTR>, pcbProvName_in_out: LPDWORD): BOOL {
+  public static CryptGetDefaultProviderW(dwProvType: DWORD, pdwReserved: NULL, dwFlags: DWORD, pszProvName_out: Optional<LPWSTR>, pcbProvName_in_out: LPDWORD): BOOL {
     return Advapi32.Load('CryptGetDefaultProviderW')(dwProvType, pdwReserved, dwFlags, pszProvName_out, pcbProvName_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincrypt/nf-wincrypt-cryptgethashparam
-  public static CryptGetHashParam(hHash: HCRYPTHASH, dwParam: DWORD, pbData_out: OPTIONAL<PBYTE>, pdwDataLen_in_out: LPDWORD, dwFlags: DWORD): BOOL {
+  public static CryptGetHashParam(hHash: HCRYPTHASH, dwParam: DWORD, pbData_out: Optional<PBYTE>, pdwDataLen_in_out: LPDWORD, dwFlags: DWORD): BOOL {
     return Advapi32.Load('CryptGetHashParam')(hHash, dwParam, pbData_out, pdwDataLen_in_out, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincrypt/nf-wincrypt-cryptgetkeyparam
-  public static CryptGetKeyParam(hKey: HCRYPTKEY, dwParam: DWORD, pbData_out: OPTIONAL<PBYTE>, pdwDataLen_in_out: LPDWORD, dwFlags: DWORD): BOOL {
+  public static CryptGetKeyParam(hKey: HCRYPTKEY, dwParam: DWORD, pbData_out: Optional<PBYTE>, pdwDataLen_in_out: LPDWORD, dwFlags: DWORD): BOOL {
     return Advapi32.Load('CryptGetKeyParam')(hKey, dwParam, pbData_out, pdwDataLen_in_out, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincrypt/nf-wincrypt-cryptgetprovparam
-  public static CryptGetProvParam(hProv: HCRYPTPROV, dwParam: DWORD, pbData_out: OPTIONAL<PBYTE>, pdwDataLen_in_out: LPDWORD, dwFlags: DWORD): BOOL {
+  public static CryptGetProvParam(hProv: HCRYPTPROV, dwParam: DWORD, pbData_out: Optional<PBYTE>, pdwDataLen_in_out: LPDWORD, dwFlags: DWORD): BOOL {
     return Advapi32.Load('CryptGetProvParam')(hProv, dwParam, pbData_out, pdwDataLen_in_out, dwFlags);
   }
 
@@ -2736,22 +2736,22 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincrypt/nf-wincrypt-cryptsignhasha
-  public static CryptSignHashA(hHash: HCRYPTHASH, dwKeySpec: DWORD, sDescription: OPTIONAL<LPCSTR>, dwFlags: DWORD, pbSignature_out: OPTIONAL<PBYTE>, pdwSigLen_in_out: LPDWORD): BOOL {
+  public static CryptSignHashA(hHash: HCRYPTHASH, dwKeySpec: DWORD, sDescription: Optional<LPCSTR>, dwFlags: DWORD, pbSignature_out: Optional<PBYTE>, pdwSigLen_in_out: LPDWORD): BOOL {
     return Advapi32.Load('CryptSignHashA')(hHash, dwKeySpec, sDescription, dwFlags, pbSignature_out, pdwSigLen_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincrypt/nf-wincrypt-cryptsignhashw
-  public static CryptSignHashW(hHash: HCRYPTHASH, dwKeySpec: DWORD, sDescription: OPTIONAL<LPCWSTR>, dwFlags: DWORD, pbSignature_out: OPTIONAL<PBYTE>, pdwSigLen_in_out: LPDWORD): BOOL {
+  public static CryptSignHashW(hHash: HCRYPTHASH, dwKeySpec: DWORD, sDescription: Optional<LPCWSTR>, dwFlags: DWORD, pbSignature_out: Optional<PBYTE>, pdwSigLen_in_out: LPDWORD): BOOL {
     return Advapi32.Load('CryptSignHashW')(hHash, dwKeySpec, sDescription, dwFlags, pbSignature_out, pdwSigLen_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincrypt/nf-wincrypt-cryptverifysignaturea
-  public static CryptVerifySignatureA(hHash: HCRYPTHASH, pbSignature: PBYTE, dwSigLen: DWORD, hPubKey: HCRYPTKEY, sDescription: OPTIONAL<LPCSTR>, dwFlags: DWORD): BOOL {
+  public static CryptVerifySignatureA(hHash: HCRYPTHASH, pbSignature: PBYTE, dwSigLen: DWORD, hPubKey: HCRYPTKEY, sDescription: Optional<LPCSTR>, dwFlags: DWORD): BOOL {
     return Advapi32.Load('CryptVerifySignatureA')(hHash, pbSignature, dwSigLen, hPubKey, sDescription, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincrypt/nf-wincrypt-cryptverifysignaturew
-  public static CryptVerifySignatureW(hHash: HCRYPTHASH, pbSignature: PBYTE, dwSigLen: DWORD, hPubKey: HCRYPTKEY, sDescription: OPTIONAL<LPCWSTR>, dwFlags: DWORD): BOOL {
+  public static CryptVerifySignatureW(hHash: HCRYPTHASH, pbSignature: PBYTE, dwSigLen: DWORD, hPubKey: HCRYPTKEY, sDescription: Optional<LPCWSTR>, dwFlags: DWORD): BOOL {
     return Advapi32.Load('CryptVerifySignatureW')(hHash, pbSignature, dwSigLen, hPubKey, sDescription, dwFlags);
   }
 
@@ -2786,7 +2786,7 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winefs/nf-winefs-duplicateencryptioninfofile
-  public static DuplicateEncryptionInfoFile(SrcFileName: LPCWSTR, DstFileName: LPCWSTR, dwCreationDistribution: DWORD, dwAttributes: DWORD, lpSecurityAttributes: OPTIONAL<PVOID>): DWORD {
+  public static DuplicateEncryptionInfoFile(SrcFileName: LPCWSTR, DstFileName: LPCWSTR, dwCreationDistribution: DWORD, dwAttributes: DWORD, lpSecurityAttributes: Optional<PVOID>): DWORD {
     return Advapi32.Load('DuplicateEncryptionInfoFile')(SrcFileName, DstFileName, dwCreationDistribution, dwAttributes, lpSecurityAttributes);
   }
 
@@ -2796,7 +2796,7 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/securitybaseapi/nf-securitybaseapi-duplicatetokenex
-  public static DuplicateTokenEx(hExistingToken: HANDLE, dwDesiredAccess: DWORD, lpTokenAttributes: OPTIONAL<PVOID>, ImpersonationLevel: SECURITY_IMPERSONATION_LEVEL, TokenType: TOKEN_TYPE, phNewToken_out: PHANDLE): BOOL {
+  public static DuplicateTokenEx(hExistingToken: HANDLE, dwDesiredAccess: DWORD, lpTokenAttributes: Optional<PVOID>, ImpersonationLevel: SECURITY_IMPERSONATION_LEVEL, TokenType: TOKEN_TYPE, phNewToken_out: PHANDLE): BOOL {
     return Advapi32.Load('DuplicateTokenEx')(hExistingToken, dwDesiredAccess, lpTokenAttributes, ImpersonationLevel, TokenType, phNewToken_out);
   }
 
@@ -2808,20 +2808,20 @@ class Advapi32 extends Win32 {
   // https://learn.microsoft.com/en-us/windows/win32/api/evntrace/nf-evntrace-enabletraceex
   public static EnableTraceEx(
     ProviderId: PVOID,
-    SourceId: OPTIONAL<PVOID>,
+    SourceId: Optional<PVOID>,
     TraceHandle: TRACEHANDLE,
     IsEnabled: ULONG,
     Level: BYTE,
     MatchAnyKeyword: ULONG_PTR,
     MatchAllKeyword: ULONG_PTR,
     EnableProperty: ULONG,
-    EnableFilterDesc: OPTIONAL<PVOID>,
+    EnableFilterDesc: Optional<PVOID>,
   ): ULONG {
     return Advapi32.Load('EnableTraceEx')(ProviderId, SourceId, TraceHandle, IsEnabled, Level, MatchAnyKeyword, MatchAllKeyword, EnableProperty, EnableFilterDesc);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/evntrace/nf-evntrace-enabletraceex2
-  public static EnableTraceEx2(TraceHandle: TRACEHANDLE, ProviderId: PVOID, ControlCode: ULONG, Level: BYTE, MatchAnyKeyword: ULONG_PTR, MatchAllKeyword: ULONG_PTR, Timeout: ULONG, EnableParameters: OPTIONAL<PVOID>): ULONG {
+  public static EnableTraceEx2(TraceHandle: TRACEHANDLE, ProviderId: PVOID, ControlCode: ULONG, Level: BYTE, MatchAnyKeyword: ULONG_PTR, MatchAllKeyword: ULONG_PTR, Timeout: ULONG, EnableParameters: Optional<PVOID>): ULONG {
     return Advapi32.Load('EnableTraceEx2')(TraceHandle, ProviderId, ControlCode, Level, MatchAnyKeyword, MatchAllKeyword, Timeout, EnableParameters);
   }
 
@@ -2846,12 +2846,12 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsvc/nf-winsvc-enumdependentservicesa
-  public static EnumDependentServicesA(hService: SC_HANDLE, dwServiceState: DWORD, lpServices_out: OPTIONAL<LPBYTE>, cbBufSize: DWORD, pcbBytesNeeded_out: LPDWORD, lpServicesReturned_out: LPDWORD): BOOL {
+  public static EnumDependentServicesA(hService: SC_HANDLE, dwServiceState: DWORD, lpServices_out: Optional<LPBYTE>, cbBufSize: DWORD, pcbBytesNeeded_out: LPDWORD, lpServicesReturned_out: LPDWORD): BOOL {
     return Advapi32.Load('EnumDependentServicesA')(hService, dwServiceState, lpServices_out, cbBufSize, pcbBytesNeeded_out, lpServicesReturned_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsvc/nf-winsvc-enumdependentservicesw
-  public static EnumDependentServicesW(hService: SC_HANDLE, dwServiceState: DWORD, lpServices_out: OPTIONAL<LPBYTE>, cbBufSize: DWORD, pcbBytesNeeded_out: LPDWORD, lpServicesReturned_out: LPDWORD): BOOL {
+  public static EnumDependentServicesW(hService: SC_HANDLE, dwServiceState: DWORD, lpServices_out: Optional<LPBYTE>, cbBufSize: DWORD, pcbBytesNeeded_out: LPDWORD, lpServicesReturned_out: LPDWORD): BOOL {
     return Advapi32.Load('EnumDependentServicesW')(hService, dwServiceState, lpServices_out, cbBufSize, pcbBytesNeeded_out, lpServicesReturned_out);
   }
 
@@ -2880,11 +2880,11 @@ class Advapi32 extends Win32 {
     hSCManager: SC_HANDLE,
     dwServiceType: DWORD,
     dwServiceState: DWORD,
-    lpServices_out: OPTIONAL<LPBYTE>,
+    lpServices_out: Optional<LPBYTE>,
     cbBufSize: DWORD,
     pcbBytesNeeded_out: LPDWORD,
     lpServicesReturned_out: LPDWORD,
-    lpResumeHandle_in_out: OPTIONAL<LPDWORD>,
+    lpResumeHandle_in_out: Optional<LPDWORD>,
   ): BOOL {
     return Advapi32.Load('EnumServicesStatusA')(hSCManager, dwServiceType, dwServiceState, lpServices_out, cbBufSize, pcbBytesNeeded_out, lpServicesReturned_out, lpResumeHandle_in_out);
   }
@@ -2895,12 +2895,12 @@ class Advapi32 extends Win32 {
     InfoLevel: DWORD,
     dwServiceType: DWORD,
     dwServiceState: DWORD,
-    lpServices_out: OPTIONAL<LPBYTE>,
+    lpServices_out: Optional<LPBYTE>,
     cbBufSize: DWORD,
     pcbBytesNeeded_out: LPDWORD,
     lpServicesReturned_out: LPDWORD,
-    lpResumeHandle_in_out: OPTIONAL<LPDWORD>,
-    pszGroupName: OPTIONAL<LPCSTR>,
+    lpResumeHandle_in_out: Optional<LPDWORD>,
+    pszGroupName: Optional<LPCSTR>,
   ): BOOL {
     return Advapi32.Load('EnumServicesStatusExA')(hSCManager, InfoLevel, dwServiceType, dwServiceState, lpServices_out, cbBufSize, pcbBytesNeeded_out, lpServicesReturned_out, lpResumeHandle_in_out, pszGroupName);
   }
@@ -2911,12 +2911,12 @@ class Advapi32 extends Win32 {
     InfoLevel: DWORD,
     dwServiceType: DWORD,
     dwServiceState: DWORD,
-    lpServices_out: OPTIONAL<LPBYTE>,
+    lpServices_out: Optional<LPBYTE>,
     cbBufSize: DWORD,
     pcbBytesNeeded_out: LPDWORD,
     lpServicesReturned_out: LPDWORD,
-    lpResumeHandle_in_out: OPTIONAL<LPDWORD>,
-    pszGroupName: OPTIONAL<LPCWSTR>,
+    lpResumeHandle_in_out: Optional<LPDWORD>,
+    pszGroupName: Optional<LPCWSTR>,
   ): BOOL {
     return Advapi32.Load('EnumServicesStatusExW')(hSCManager, InfoLevel, dwServiceType, dwServiceState, lpServices_out, cbBufSize, pcbBytesNeeded_out, lpServicesReturned_out, lpResumeHandle_in_out, pszGroupName);
   }
@@ -2926,11 +2926,11 @@ class Advapi32 extends Win32 {
     hSCManager: SC_HANDLE,
     dwServiceType: DWORD,
     dwServiceState: DWORD,
-    lpServices_out: OPTIONAL<LPBYTE>,
+    lpServices_out: Optional<LPBYTE>,
     cbBufSize: DWORD,
     pcbBytesNeeded_out: LPDWORD,
     lpServicesReturned_out: LPDWORD,
-    lpResumeHandle_in_out: OPTIONAL<LPDWORD>,
+    lpResumeHandle_in_out: Optional<LPDWORD>,
   ): BOOL {
     return Advapi32.Load('EnumServicesStatusW')(hSCManager, dwServiceType, dwServiceState, lpServices_out, cbBufSize, pcbBytesNeeded_out, lpServicesReturned_out, lpResumeHandle_in_out);
   }
@@ -2941,7 +2941,7 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/evntrace/nf-evntrace-enumeratetraceguidsex
-  public static EnumerateTraceGuidsEx(TraceQueryInfoClass: DWORD, InBuffer: OPTIONAL<PVOID>, InBufferSize: ULONG, OutBuffer_out: OPTIONAL<PVOID>, OutBufferSize: ULONG, ReturnLength_out: PULONG): ULONG {
+  public static EnumerateTraceGuidsEx(TraceQueryInfoClass: DWORD, InBuffer: Optional<PVOID>, InBufferSize: ULONG, OutBuffer_out: Optional<PVOID>, OutBufferSize: ULONG, ReturnLength_out: PULONG): ULONG {
     return Advapi32.Load('EnumerateTraceGuidsEx')(TraceQueryInfoClass, InBuffer, InBufferSize, OutBuffer_out, OutBufferSize, ReturnLength_out);
   }
 
@@ -2966,7 +2966,7 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/evntcons/nf-evntcons-eventaccessquery
-  public static EventAccessQuery(Guid: PVOID, Buffer_out: OPTIONAL<PSECURITY_DESCRIPTOR>, BufferSize_in_out: PULONG): ULONG {
+  public static EventAccessQuery(Guid: PVOID, Buffer_out: Optional<PSECURITY_DESCRIPTOR>, BufferSize_in_out: PULONG): ULONG {
     return Advapi32.Load('EventAccessQuery')(Guid, Buffer_out, BufferSize_in_out);
   }
 
@@ -2996,12 +2996,12 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/evntrace/nf-evntrace-flushtracea
-  public static FlushTraceA(TraceHandle: TRACEHANDLE, InstanceName: OPTIONAL<LPCSTR>, Properties_in_out: PVOID): ULONG {
+  public static FlushTraceA(TraceHandle: TRACEHANDLE, InstanceName: Optional<LPCSTR>, Properties_in_out: PVOID): ULONG {
     return Advapi32.Load('FlushTraceA')(TraceHandle, InstanceName, Properties_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/evntrace/nf-evntrace-flushtracew
-  public static FlushTraceW(TraceHandle: TRACEHANDLE, InstanceName: OPTIONAL<LPCWSTR>, Properties_in_out: PVOID): ULONG {
+  public static FlushTraceW(TraceHandle: TRACEHANDLE, InstanceName: Optional<LPCWSTR>, Properties_in_out: PVOID): ULONG {
     return Advapi32.Load('FlushTraceW')(TraceHandle, InstanceName, Properties_in_out);
   }
 
@@ -3021,7 +3021,7 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/aclapi/nf-aclapi-freeinheritedfromarray
-  public static FreeInheritedFromArray(pInheritArray: PVOID, AceCnt: USHORT, pfnArray: OPTIONAL<PVOID>): DWORD {
+  public static FreeInheritedFromArray(pInheritArray: PVOID, AceCnt: USHORT, pfnArray: Optional<PVOID>): DWORD {
     return Advapi32.Load('FreeInheritedFromArray')(pInheritArray, AceCnt, pfnArray);
   }
 
@@ -3126,12 +3126,12 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/securitybaseapi/nf-securitybaseapi-getfilesecuritya
-  public static GetFileSecurityA(lpFileName: LPCSTR, RequestedInformation: SECURITY_INFORMATION, pSecurityDescriptor_out: OPTIONAL<PSECURITY_DESCRIPTOR>, nLength: DWORD, lpnLengthNeeded_out: LPDWORD): BOOL {
+  public static GetFileSecurityA(lpFileName: LPCSTR, RequestedInformation: SECURITY_INFORMATION, pSecurityDescriptor_out: Optional<PSECURITY_DESCRIPTOR>, nLength: DWORD, lpnLengthNeeded_out: LPDWORD): BOOL {
     return Advapi32.Load('GetFileSecurityA')(lpFileName, RequestedInformation, pSecurityDescriptor_out, nLength, lpnLengthNeeded_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/securitybaseapi/nf-securitybaseapi-getfilesecurityw
-  public static GetFileSecurityW(lpFileName: LPCWSTR, RequestedInformation: SECURITY_INFORMATION, pSecurityDescriptor_out: OPTIONAL<PSECURITY_DESCRIPTOR>, nLength: DWORD, lpnLengthNeeded_out: LPDWORD): BOOL {
+  public static GetFileSecurityW(lpFileName: LPCWSTR, RequestedInformation: SECURITY_INFORMATION, pSecurityDescriptor_out: Optional<PSECURITY_DESCRIPTOR>, nLength: DWORD, lpnLengthNeeded_out: LPDWORD): BOOL {
     return Advapi32.Load('GetFileSecurityW')(lpFileName, RequestedInformation, pSecurityDescriptor_out, nLength, lpnLengthNeeded_out);
   }
 
@@ -3151,10 +3151,10 @@ class Advapi32 extends Win32 {
     ObjectType: DWORD,
     SecurityInfo: SECURITY_INFORMATION,
     Container: BOOL,
-    pObjectClassGuids: OPTIONAL<PVOID>,
+    pObjectClassGuids: Optional<PVOID>,
     GuidCount: DWORD,
     pAcl: PACL,
-    pfnArray: OPTIONAL<PVOID>,
+    pfnArray: Optional<PVOID>,
     pGenericMapping: PGENERIC_MAPPING,
     pInheritArray_out: PVOID,
   ): DWORD {
@@ -3167,10 +3167,10 @@ class Advapi32 extends Win32 {
     ObjectType: DWORD,
     SecurityInfo: SECURITY_INFORMATION,
     Container: BOOL,
-    pObjectClassGuids: OPTIONAL<PVOID>,
+    pObjectClassGuids: Optional<PVOID>,
     GuidCount: DWORD,
     pAcl: PACL,
-    pfnArray: OPTIONAL<PVOID>,
+    pfnArray: Optional<PVOID>,
     pGenericMapping: PGENERIC_MAPPING,
     pInheritArray_out: PVOID,
   ): DWORD {
@@ -3178,7 +3178,7 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/securitybaseapi/nf-securitybaseapi-getkernelobjectsecurity
-  public static GetKernelObjectSecurity(Handle: HANDLE, RequestedInformation: SECURITY_INFORMATION, pSecurityDescriptor_out: OPTIONAL<PSECURITY_DESCRIPTOR>, nLength: DWORD, lpnLengthNeeded_out: LPDWORD): BOOL {
+  public static GetKernelObjectSecurity(Handle: HANDLE, RequestedInformation: SECURITY_INFORMATION, pSecurityDescriptor_out: Optional<PSECURITY_DESCRIPTOR>, nLength: DWORD, lpnLengthNeeded_out: LPDWORD): BOOL {
     return Advapi32.Load('GetKernelObjectSecurity')(Handle, RequestedInformation, pSecurityDescriptor_out, nLength, lpnLengthNeeded_out);
   }
 
@@ -3208,22 +3208,22 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/aclapi/nf-aclapi-getmultipletrusteea
-  public static GetMultipleTrusteeA(pTrustee: OPTIONAL<PTRUSTEE>): PVOID {
+  public static GetMultipleTrusteeA(pTrustee: Optional<PTRUSTEE>): PVOID {
     return Advapi32.Load('GetMultipleTrusteeA')(pTrustee);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/aclapi/nf-aclapi-getmultipletrusteeoperationa
-  public static GetMultipleTrusteeOperationA(pTrustee: OPTIONAL<PTRUSTEE>): DWORD {
+  public static GetMultipleTrusteeOperationA(pTrustee: Optional<PTRUSTEE>): DWORD {
     return Advapi32.Load('GetMultipleTrusteeOperationA')(pTrustee);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/aclapi/nf-aclapi-getmultipletrusteeoperationw
-  public static GetMultipleTrusteeOperationW(pTrustee: OPTIONAL<PTRUSTEE>): DWORD {
+  public static GetMultipleTrusteeOperationW(pTrustee: Optional<PTRUSTEE>): DWORD {
     return Advapi32.Load('GetMultipleTrusteeOperationW')(pTrustee);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/aclapi/nf-aclapi-getmultipletrusteew
-  public static GetMultipleTrusteeW(pTrustee: OPTIONAL<PTRUSTEE>): LPVOID {
+  public static GetMultipleTrusteeW(pTrustee: Optional<PTRUSTEE>): LPVOID {
     return Advapi32.Load('GetMultipleTrusteeW')(pTrustee);
   }
 
@@ -3232,10 +3232,10 @@ class Advapi32 extends Win32 {
     pObjectName: LPCSTR,
     ObjectType: DWORD,
     SecurityInfo: SECURITY_INFORMATION,
-    ppsidOwner_out: OPTIONAL<PVOID>,
-    ppsidGroup_out: OPTIONAL<PVOID>,
-    ppDacl_out: OPTIONAL<PVOID>,
-    ppSacl_out: OPTIONAL<PVOID>,
+    ppsidOwner_out: Optional<PVOID>,
+    ppsidGroup_out: Optional<PVOID>,
+    ppDacl_out: Optional<PVOID>,
+    ppSacl_out: Optional<PVOID>,
     ppSecurityDescriptor_out: PVOID,
   ): DWORD {
     return Advapi32.Load('GetNamedSecurityInfoA')(pObjectName, ObjectType, SecurityInfo, ppsidOwner_out, ppsidGroup_out, ppDacl_out, ppSacl_out, ppSecurityDescriptor_out);
@@ -3256,10 +3256,10 @@ class Advapi32 extends Win32 {
     pObjectName: LPCWSTR,
     ObjectType: DWORD,
     SecurityInfo: SECURITY_INFORMATION,
-    ppsidOwner_out: OPTIONAL<PVOID>,
-    ppsidGroup_out: OPTIONAL<PVOID>,
-    ppDacl_out: OPTIONAL<PVOID>,
-    ppSacl_out: OPTIONAL<PVOID>,
+    ppsidOwner_out: Optional<PVOID>,
+    ppsidGroup_out: Optional<PVOID>,
+    ppDacl_out: Optional<PVOID>,
+    ppSacl_out: Optional<PVOID>,
     ppSecurityDescriptor_out: PVOID,
   ): DWORD {
     return Advapi32.Load('GetNamedSecurityInfoW')(pObjectName, ObjectType, SecurityInfo, ppsidOwner_out, ppsidGroup_out, ppDacl_out, ppSacl_out, ppSecurityDescriptor_out);
@@ -3281,7 +3281,7 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/securitybaseapi/nf-securitybaseapi-getprivateobjectsecurity
-  public static GetPrivateObjectSecurity(ObjectDescriptor: PSECURITY_DESCRIPTOR, SecurityInformation: SECURITY_INFORMATION, ResultantDescriptor_out: OPTIONAL<PSECURITY_DESCRIPTOR>, DescriptorLength: DWORD, ReturnLength_out: LPDWORD): BOOL {
+  public static GetPrivateObjectSecurity(ObjectDescriptor: PSECURITY_DESCRIPTOR, SecurityInformation: SECURITY_INFORMATION, ResultantDescriptor_out: Optional<PSECURITY_DESCRIPTOR>, DescriptorLength: DWORD, ReturnLength_out: LPDWORD): BOOL {
     return Advapi32.Load('GetPrivateObjectSecurity')(ObjectDescriptor, SecurityInformation, ResultantDescriptor_out, DescriptorLength, ReturnLength_out);
   }
 
@@ -3325,11 +3325,11 @@ class Advapi32 extends Win32 {
     handle: HANDLE,
     ObjectType: DWORD,
     SecurityInfo: SECURITY_INFORMATION,
-    ppsidOwner_out: OPTIONAL<PVOID>,
-    ppsidGroup_out: OPTIONAL<PVOID>,
-    ppDacl_out: OPTIONAL<PVOID>,
-    ppSacl_out: OPTIONAL<PVOID>,
-    ppSecurityDescriptor_out: OPTIONAL<PVOID>,
+    ppsidOwner_out: Optional<PVOID>,
+    ppsidGroup_out: Optional<PVOID>,
+    ppDacl_out: Optional<PVOID>,
+    ppSacl_out: Optional<PVOID>,
+    ppSecurityDescriptor_out: Optional<PVOID>,
   ): DWORD {
     return Advapi32.Load('GetSecurityInfo')(handle, ObjectType, SecurityInfo, ppsidOwner_out, ppsidGroup_out, ppDacl_out, ppSacl_out, ppSecurityDescriptor_out);
   }
@@ -3345,22 +3345,22 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsvc/nf-winsvc-getservicedisplaynamea
-  public static GetServiceDisplayNameA(hSCManager: SC_HANDLE, lpServiceName: LPCSTR, lpDisplayName_out: OPTIONAL<LPSTR>, lpcchBuffer_in_out: LPDWORD): BOOL {
+  public static GetServiceDisplayNameA(hSCManager: SC_HANDLE, lpServiceName: LPCSTR, lpDisplayName_out: Optional<LPSTR>, lpcchBuffer_in_out: LPDWORD): BOOL {
     return Advapi32.Load('GetServiceDisplayNameA')(hSCManager, lpServiceName, lpDisplayName_out, lpcchBuffer_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsvc/nf-winsvc-getservicedisplaynamew
-  public static GetServiceDisplayNameW(hSCManager: SC_HANDLE, lpServiceName: LPCWSTR, lpDisplayName_out: OPTIONAL<LPWSTR>, lpcchBuffer_in_out: LPDWORD): BOOL {
+  public static GetServiceDisplayNameW(hSCManager: SC_HANDLE, lpServiceName: LPCWSTR, lpDisplayName_out: Optional<LPWSTR>, lpcchBuffer_in_out: LPDWORD): BOOL {
     return Advapi32.Load('GetServiceDisplayNameW')(hSCManager, lpServiceName, lpDisplayName_out, lpcchBuffer_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsvc/nf-winsvc-getservicekeynamea
-  public static GetServiceKeyNameA(hSCManager: SC_HANDLE, lpDisplayName: LPCSTR, lpServiceName_out: OPTIONAL<LPSTR>, lpcchBuffer_in_out: LPDWORD): BOOL {
+  public static GetServiceKeyNameA(hSCManager: SC_HANDLE, lpDisplayName: LPCSTR, lpServiceName_out: Optional<LPSTR>, lpcchBuffer_in_out: LPDWORD): BOOL {
     return Advapi32.Load('GetServiceKeyNameA')(hSCManager, lpDisplayName, lpServiceName_out, lpcchBuffer_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsvc/nf-winsvc-getservicekeynamew
-  public static GetServiceKeyNameW(hSCManager: SC_HANDLE, lpDisplayName: LPCWSTR, lpServiceName_out: OPTIONAL<LPWSTR>, lpcchBuffer_in_out: LPDWORD): BOOL {
+  public static GetServiceKeyNameW(hSCManager: SC_HANDLE, lpDisplayName: LPCWSTR, lpServiceName_out: Optional<LPWSTR>, lpcchBuffer_in_out: LPDWORD): BOOL {
     return Advapi32.Load('GetServiceKeyNameW')(hSCManager, lpDisplayName, lpServiceName_out, lpcchBuffer_in_out);
   }
 
@@ -3390,12 +3390,12 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wct/nf-wct-getthreadwaitchain
-  public static GetThreadWaitChain(WctHandle: HWCT, Context: OPTIONAL<PVOID>, Flags: ULONG, ThreadId: DWORD, NodeCount_in_out: LPDWORD, NodeInfoArray_out: PVOID, IsCycle_out: LPBOOL): BOOL {
+  public static GetThreadWaitChain(WctHandle: HWCT, Context: Optional<PVOID>, Flags: ULONG, ThreadId: DWORD, NodeCount_in_out: LPDWORD, NodeInfoArray_out: PVOID, IsCycle_out: LPBOOL): BOOL {
     return Advapi32.Load('GetThreadWaitChain')(WctHandle, Context, Flags, ThreadId, NodeCount_in_out, NodeInfoArray_out, IsCycle_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/securitybaseapi/nf-securitybaseapi-gettokeninformation
-  public static GetTokenInformation(TokenHandle: HANDLE, TokenInformationClass: TOKEN_INFORMATION_CLASS, TokenInformation_out: OPTIONAL<LPVOID>, TokenInformationLength: DWORD, ReturnLength_out: LPDWORD): BOOL {
+  public static GetTokenInformation(TokenHandle: HANDLE, TokenInformationClass: TOKEN_INFORMATION_CLASS, TokenInformation_out: Optional<LPVOID>, TokenInformationLength: DWORD, ReturnLength_out: LPDWORD): BOOL {
     return Advapi32.Load('GetTokenInformation')(TokenHandle, TokenInformationClass, TokenInformation_out, TokenInformationLength, ReturnLength_out);
   }
 
@@ -3420,27 +3420,27 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/aclapi/nf-aclapi-gettrusteetypea
-  public static GetTrusteeTypeA(pTrustee: OPTIONAL<PTRUSTEE>): DWORD {
+  public static GetTrusteeTypeA(pTrustee: Optional<PTRUSTEE>): DWORD {
     return Advapi32.Load('GetTrusteeTypeA')(pTrustee);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/aclapi/nf-aclapi-gettrusteetypew
-  public static GetTrusteeTypeW(pTrustee: OPTIONAL<PTRUSTEE>): DWORD {
+  public static GetTrusteeTypeW(pTrustee: Optional<PTRUSTEE>): DWORD {
     return Advapi32.Load('GetTrusteeTypeW')(pTrustee);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-getusernamea
-  public static GetUserNameA(lpBuffer_out: OPTIONAL<LPSTR>, pcbBuffer_in_out: LPDWORD): BOOL {
+  public static GetUserNameA(lpBuffer_out: Optional<LPSTR>, pcbBuffer_in_out: LPDWORD): BOOL {
     return Advapi32.Load('GetUserNameA')(lpBuffer_out, pcbBuffer_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-getusernamew
-  public static GetUserNameW(lpBuffer_out: OPTIONAL<LPWSTR>, pcbBuffer_in_out: LPDWORD): BOOL {
+  public static GetUserNameW(lpBuffer_out: Optional<LPWSTR>, pcbBuffer_in_out: LPDWORD): BOOL {
     return Advapi32.Load('GetUserNameW')(lpBuffer_out, pcbBuffer_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/securitybaseapi/nf-securitybaseapi-getwindowsaccountdomainsid
-  public static GetWindowsAccountDomainSid(pSid: PSID, pDomainSid_out: OPTIONAL<PSID>, cbDomainSid_in_out: LPDWORD): BOOL {
+  public static GetWindowsAccountDomainSid(pSid: PSID, pDomainSid_out: Optional<PSID>, cbDomainSid_in_out: LPDWORD): BOOL {
     return Advapi32.Load('GetWindowsAccountDomainSid')(pSid, pDomainSid_out, cbDomainSid_in_out);
   }
 
@@ -3505,32 +3505,32 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-initiateshutdowna
-  public static InitiateShutdownA(lpMachineName: OPTIONAL<LPSTR>, lpMessage: OPTIONAL<LPSTR>, dwGracePeriod: DWORD, dwShutdownFlags: DWORD, dwReason: DWORD): DWORD {
+  public static InitiateShutdownA(lpMachineName: Optional<LPSTR>, lpMessage: Optional<LPSTR>, dwGracePeriod: DWORD, dwShutdownFlags: DWORD, dwReason: DWORD): DWORD {
     return Advapi32.Load('InitiateShutdownA')(lpMachineName, lpMessage, dwGracePeriod, dwShutdownFlags, dwReason);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-initiateshutdownw
-  public static InitiateShutdownW(lpMachineName: OPTIONAL<LPWSTR>, lpMessage: OPTIONAL<LPWSTR>, dwGracePeriod: DWORD, dwShutdownFlags: DWORD, dwReason: DWORD): DWORD {
+  public static InitiateShutdownW(lpMachineName: Optional<LPWSTR>, lpMessage: Optional<LPWSTR>, dwGracePeriod: DWORD, dwShutdownFlags: DWORD, dwReason: DWORD): DWORD {
     return Advapi32.Load('InitiateShutdownW')(lpMachineName, lpMessage, dwGracePeriod, dwShutdownFlags, dwReason);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-initiatesystemshutdowna
-  public static InitiateSystemShutdownA(lpMachineName: OPTIONAL<LPSTR>, lpMessage: OPTIONAL<LPSTR>, dwTimeout: DWORD, bForceAppsClosed: BOOL, bRebootAfterShutdown: BOOL): BOOL {
+  public static InitiateSystemShutdownA(lpMachineName: Optional<LPSTR>, lpMessage: Optional<LPSTR>, dwTimeout: DWORD, bForceAppsClosed: BOOL, bRebootAfterShutdown: BOOL): BOOL {
     return Advapi32.Load('InitiateSystemShutdownA')(lpMachineName, lpMessage, dwTimeout, bForceAppsClosed, bRebootAfterShutdown);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-initiatesystemshutdownexa
-  public static InitiateSystemShutdownExA(lpMachineName: OPTIONAL<LPSTR>, lpMessage: OPTIONAL<LPSTR>, dwTimeout: DWORD, bForceAppsClosed: BOOL, bRebootAfterShutdown: BOOL, dwReason: DWORD): BOOL {
+  public static InitiateSystemShutdownExA(lpMachineName: Optional<LPSTR>, lpMessage: Optional<LPSTR>, dwTimeout: DWORD, bForceAppsClosed: BOOL, bRebootAfterShutdown: BOOL, dwReason: DWORD): BOOL {
     return Advapi32.Load('InitiateSystemShutdownExA')(lpMachineName, lpMessage, dwTimeout, bForceAppsClosed, bRebootAfterShutdown, dwReason);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-initiatesystemshutdownexw
-  public static InitiateSystemShutdownExW(lpMachineName: OPTIONAL<LPWSTR>, lpMessage: OPTIONAL<LPWSTR>, dwTimeout: DWORD, bForceAppsClosed: BOOL, bRebootAfterShutdown: BOOL, dwReason: DWORD): BOOL {
+  public static InitiateSystemShutdownExW(lpMachineName: Optional<LPWSTR>, lpMessage: Optional<LPWSTR>, dwTimeout: DWORD, bForceAppsClosed: BOOL, bRebootAfterShutdown: BOOL, dwReason: DWORD): BOOL {
     return Advapi32.Load('InitiateSystemShutdownExW')(lpMachineName, lpMessage, dwTimeout, bForceAppsClosed, bRebootAfterShutdown, dwReason);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-initiatesystemshutdownw
-  public static InitiateSystemShutdownW(lpMachineName: OPTIONAL<LPWSTR>, lpMessage: OPTIONAL<LPWSTR>, dwTimeout: DWORD, bForceAppsClosed: BOOL, bRebootAfterShutdown: BOOL): BOOL {
+  public static InitiateSystemShutdownW(lpMachineName: Optional<LPWSTR>, lpMessage: Optional<LPWSTR>, dwTimeout: DWORD, bForceAppsClosed: BOOL, bRebootAfterShutdown: BOOL): BOOL {
     return Advapi32.Load('InitiateSystemShutdownW')(lpMachineName, lpMessage, dwTimeout, bForceAppsClosed, bRebootAfterShutdown);
   }
 
@@ -3540,7 +3540,7 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-istextunicode
-  public static IsTextUnicode(lpv: LPCVOID, iSize: INT, lpiResult_in_out: OPTIONAL<LPVOID>): BOOL {
+  public static IsTextUnicode(lpv: LPCVOID, iSize: INT, lpiResult_in_out: Optional<LPVOID>): BOOL {
     return Advapi32.Load('IsTextUnicode')(lpv, iSize, lpiResult_in_out);
   }
 
@@ -3585,22 +3585,22 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-logonusera
-  public static LogonUserA(lpszUsername: LPCSTR, lpszDomain: OPTIONAL<LPCSTR>, lpszPassword: OPTIONAL<LPCSTR>, dwLogonType: DWORD, dwLogonProvider: DWORD, phToken_out: PHANDLE): BOOL {
+  public static LogonUserA(lpszUsername: LPCSTR, lpszDomain: Optional<LPCSTR>, lpszPassword: Optional<LPCSTR>, dwLogonType: DWORD, dwLogonProvider: DWORD, phToken_out: PHANDLE): BOOL {
     return Advapi32.Load('LogonUserA')(lpszUsername, lpszDomain, lpszPassword, dwLogonType, dwLogonProvider, phToken_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-logonuserexa
   public static LogonUserExA(
     lpszUsername: LPCSTR,
-    lpszDomain: OPTIONAL<LPCSTR>,
-    lpszPassword: OPTIONAL<LPCSTR>,
+    lpszDomain: Optional<LPCSTR>,
+    lpszPassword: Optional<LPCSTR>,
     dwLogonType: DWORD,
     dwLogonProvider: DWORD,
-    phToken_out: OPTIONAL<PHANDLE>,
-    ppLogonSid_out: OPTIONAL<PVOID>,
-    ppProfileBuffer_out: OPTIONAL<PVOID>,
-    pdwProfileLength_out: OPTIONAL<LPDWORD>,
-    pQuotaLimits_out: OPTIONAL<PVOID>,
+    phToken_out: Optional<PHANDLE>,
+    ppLogonSid_out: Optional<PVOID>,
+    ppProfileBuffer_out: Optional<PVOID>,
+    pdwProfileLength_out: Optional<LPDWORD>,
+    pQuotaLimits_out: Optional<PVOID>,
   ): BOOL {
     return Advapi32.Load('LogonUserExA')(lpszUsername, lpszDomain, lpszPassword, dwLogonType, dwLogonProvider, phToken_out, ppLogonSid_out, ppProfileBuffer_out, pdwProfileLength_out, pQuotaLimits_out);
   }
@@ -3625,31 +3625,31 @@ class Advapi32 extends Win32 {
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-logonuserexw
   public static LogonUserExW(
     lpszUsername: LPCWSTR,
-    lpszDomain: OPTIONAL<LPCWSTR>,
-    lpszPassword: OPTIONAL<LPCWSTR>,
+    lpszDomain: Optional<LPCWSTR>,
+    lpszPassword: Optional<LPCWSTR>,
     dwLogonType: DWORD,
     dwLogonProvider: DWORD,
-    phToken_out: OPTIONAL<PHANDLE>,
-    ppLogonSid_out: OPTIONAL<PVOID>,
-    ppProfileBuffer_out: OPTIONAL<PVOID>,
-    pdwProfileLength_out: OPTIONAL<LPDWORD>,
-    pQuotaLimits_out: OPTIONAL<PVOID>,
+    phToken_out: Optional<PHANDLE>,
+    ppLogonSid_out: Optional<PVOID>,
+    ppProfileBuffer_out: Optional<PVOID>,
+    pdwProfileLength_out: Optional<LPDWORD>,
+    pQuotaLimits_out: Optional<PVOID>,
   ): BOOL {
     return Advapi32.Load('LogonUserExW')(lpszUsername, lpszDomain, lpszPassword, dwLogonType, dwLogonProvider, phToken_out, ppLogonSid_out, ppProfileBuffer_out, pdwProfileLength_out, pQuotaLimits_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-logonuserw
-  public static LogonUserW(lpszUsername: LPCWSTR, lpszDomain: OPTIONAL<LPCWSTR>, lpszPassword: OPTIONAL<LPCWSTR>, dwLogonType: DWORD, dwLogonProvider: DWORD, phToken_out: PHANDLE): BOOL {
+  public static LogonUserW(lpszUsername: LPCWSTR, lpszDomain: Optional<LPCWSTR>, lpszPassword: Optional<LPCWSTR>, dwLogonType: DWORD, dwLogonProvider: DWORD, phToken_out: PHANDLE): BOOL {
     return Advapi32.Load('LogonUserW')(lpszUsername, lpszDomain, lpszPassword, dwLogonType, dwLogonProvider, phToken_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-lookupaccountnamea
   public static LookupAccountNameA(
-    lpSystemName: OPTIONAL<LPCSTR>,
+    lpSystemName: Optional<LPCSTR>,
     lpAccountName: LPCSTR,
-    Sid_out: OPTIONAL<PSID>,
+    Sid_out: Optional<PSID>,
     cbSid_in_out: LPDWORD,
-    ReferencedDomainName_out: OPTIONAL<LPSTR>,
+    ReferencedDomainName_out: Optional<LPSTR>,
     cchReferencedDomainName_in_out: LPDWORD,
     peUse_out: PSID_NAME_USE,
   ): BOOL {
@@ -3658,11 +3658,11 @@ class Advapi32 extends Win32 {
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-lookupaccountnamew
   public static LookupAccountNameW(
-    lpSystemName: OPTIONAL<LPCWSTR>,
+    lpSystemName: Optional<LPCWSTR>,
     lpAccountName: LPCWSTR,
-    Sid_out: OPTIONAL<PSID>,
+    Sid_out: Optional<PSID>,
     cbSid_in_out: LPDWORD,
-    ReferencedDomainName_out: OPTIONAL<LPWSTR>,
+    ReferencedDomainName_out: Optional<LPWSTR>,
     cchReferencedDomainName_in_out: LPDWORD,
     peUse_out: PSID_NAME_USE,
   ): BOOL {
@@ -3671,11 +3671,11 @@ class Advapi32 extends Win32 {
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-lookupaccountsida
   public static LookupAccountSidA(
-    lpSystemName: OPTIONAL<LPCSTR>,
+    lpSystemName: Optional<LPCSTR>,
     Sid: PSID,
-    Name_out: OPTIONAL<LPSTR>,
+    Name_out: Optional<LPSTR>,
     cchName_in_out: LPDWORD,
-    ReferencedDomainName_out: OPTIONAL<LPSTR>,
+    ReferencedDomainName_out: Optional<LPSTR>,
     cchReferencedDomainName_in_out: LPDWORD,
     peUse_out: PSID_NAME_USE,
   ): BOOL {
@@ -3684,11 +3684,11 @@ class Advapi32 extends Win32 {
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-lookupaccountsidw
   public static LookupAccountSidW(
-    lpSystemName: OPTIONAL<LPCWSTR>,
+    lpSystemName: Optional<LPCWSTR>,
     Sid: PSID,
-    Name_out: OPTIONAL<LPWSTR>,
+    Name_out: Optional<LPWSTR>,
     cchName_in_out: LPDWORD,
-    ReferencedDomainName_out: OPTIONAL<LPWSTR>,
+    ReferencedDomainName_out: Optional<LPWSTR>,
     cchReferencedDomainName_in_out: LPDWORD,
     peUse_out: PSID_NAME_USE,
   ): BOOL {
@@ -3696,42 +3696,42 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-lookupprivilegedisplaynamea
-  public static LookupPrivilegeDisplayNameA(lpSystemName: OPTIONAL<LPCSTR>, lpName: LPCSTR, lpDisplayName_out: OPTIONAL<LPSTR>, cchDisplayName_in_out: LPDWORD, lpLanguageId_out: LPDWORD): BOOL {
+  public static LookupPrivilegeDisplayNameA(lpSystemName: Optional<LPCSTR>, lpName: LPCSTR, lpDisplayName_out: Optional<LPSTR>, cchDisplayName_in_out: LPDWORD, lpLanguageId_out: LPDWORD): BOOL {
     return Advapi32.Load('LookupPrivilegeDisplayNameA')(lpSystemName, lpName, lpDisplayName_out, cchDisplayName_in_out, lpLanguageId_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-lookupprivilegedisplaynamew
-  public static LookupPrivilegeDisplayNameW(lpSystemName: OPTIONAL<LPCWSTR>, lpName: LPCWSTR, lpDisplayName_out: OPTIONAL<LPWSTR>, cchDisplayName_in_out: LPDWORD, lpLanguageId_out: LPDWORD): BOOL {
+  public static LookupPrivilegeDisplayNameW(lpSystemName: Optional<LPCWSTR>, lpName: LPCWSTR, lpDisplayName_out: Optional<LPWSTR>, cchDisplayName_in_out: LPDWORD, lpLanguageId_out: LPDWORD): BOOL {
     return Advapi32.Load('LookupPrivilegeDisplayNameW')(lpSystemName, lpName, lpDisplayName_out, cchDisplayName_in_out, lpLanguageId_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-lookupprivilegenamea
-  public static LookupPrivilegeNameA(lpSystemName: OPTIONAL<LPCSTR>, lpLuid: PVOID, lpName_out: OPTIONAL<LPSTR>, cchName_in_out: LPDWORD): BOOL {
+  public static LookupPrivilegeNameA(lpSystemName: Optional<LPCSTR>, lpLuid: PVOID, lpName_out: Optional<LPSTR>, cchName_in_out: LPDWORD): BOOL {
     return Advapi32.Load('LookupPrivilegeNameA')(lpSystemName, lpLuid, lpName_out, cchName_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-lookupprivilegenamew
-  public static LookupPrivilegeNameW(lpSystemName: OPTIONAL<LPCWSTR>, lpLuid: PVOID, lpName_out: OPTIONAL<LPWSTR>, cchName_in_out: LPDWORD): BOOL {
+  public static LookupPrivilegeNameW(lpSystemName: Optional<LPCWSTR>, lpLuid: PVOID, lpName_out: Optional<LPWSTR>, cchName_in_out: LPDWORD): BOOL {
     return Advapi32.Load('LookupPrivilegeNameW')(lpSystemName, lpLuid, lpName_out, cchName_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-lookupprivilegevaluea
-  public static LookupPrivilegeValueA(lpSystemName: OPTIONAL<LPCSTR>, lpName: LPCSTR, lpLuid_out: PVOID): BOOL {
+  public static LookupPrivilegeValueA(lpSystemName: Optional<LPCSTR>, lpName: LPCSTR, lpLuid_out: PVOID): BOOL {
     return Advapi32.Load('LookupPrivilegeValueA')(lpSystemName, lpName, lpLuid_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-lookupprivilegevaluew
-  public static LookupPrivilegeValueW(lpSystemName: OPTIONAL<LPCWSTR>, lpName: LPCWSTR, lpLuid_out: PVOID): BOOL {
+  public static LookupPrivilegeValueW(lpSystemName: Optional<LPCWSTR>, lpName: LPCWSTR, lpLuid_out: PVOID): BOOL {
     return Advapi32.Load('LookupPrivilegeValueW')(lpSystemName, lpName, lpLuid_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/aclapi/nf-aclapi-lookupsecuritydescriptorpartsa
   public static LookupSecurityDescriptorPartsA(
-    pOwner_out: OPTIONAL<PVOID>,
-    pGroup_out: OPTIONAL<PVOID>,
-    cCountOfAccessEntries_out: OPTIONAL<PULONG>,
+    pOwner_out: Optional<PVOID>,
+    pGroup_out: Optional<PVOID>,
+    cCountOfAccessEntries_out: Optional<PULONG>,
     pListOfAccessEntries_out: PVOID,
-    cCountOfAuditEntries_out: OPTIONAL<PULONG>,
+    cCountOfAuditEntries_out: Optional<PULONG>,
     pListOfAuditEntries_out: PVOID,
     pSD: PSECURITY_DESCRIPTOR,
   ): DWORD {
@@ -3740,11 +3740,11 @@ class Advapi32 extends Win32 {
 
   // https://learn.microsoft.com/en-us/windows/win32/api/aclapi/nf-aclapi-lookupsecuritydescriptorpartsw
   public static LookupSecurityDescriptorPartsW(
-    pOwner_out: OPTIONAL<PVOID>,
-    pGroup_out: OPTIONAL<PVOID>,
-    cCountOfAccessEntries_out: OPTIONAL<PULONG>,
+    pOwner_out: Optional<PVOID>,
+    pGroup_out: Optional<PVOID>,
+    cCountOfAccessEntries_out: Optional<PULONG>,
     pListOfAccessEntries_out: PVOID,
-    cCountOfAuditEntries_out: OPTIONAL<PULONG>,
+    cCountOfAuditEntries_out: Optional<PULONG>,
     pListOfAuditEntries_out: PVOID,
     pSD: PSECURITY_DESCRIPTOR,
   ): DWORD {
@@ -3827,7 +3827,7 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntsecapi/nf-ntsecapi-lsaenumerateaccountswithuserright
-  public static LsaEnumerateAccountsWithUserRight(PolicyHandle: LSA_HANDLE, UserRight: OPTIONAL<PLSA_UNICODE_STRING>, Buffer_out: PVOID, CountReturned_out: PULONG): NTSTATUS {
+  public static LsaEnumerateAccountsWithUserRight(PolicyHandle: LSA_HANDLE, UserRight: Optional<PLSA_UNICODE_STRING>, Buffer_out: PVOID, CountReturned_out: PULONG): NTSTATUS {
     return Advapi32.Load('LsaEnumerateAccountsWithUserRight')(PolicyHandle, UserRight, Buffer_out, CountReturned_out);
   }
 
@@ -3852,12 +3852,12 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntsecapi/nf-ntsecapi-lsafreememory
-  public static LsaFreeMemory(Buffer: OPTIONAL<PVOID>): NTSTATUS {
+  public static LsaFreeMemory(Buffer: Optional<PVOID>): NTSTATUS {
     return Advapi32.Load('LsaFreeMemory')(Buffer);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntsecapi/nf-ntsecapi-lsagetappliedcapids
-  public static LsaGetAppliedCAPIDs(SystemName: OPTIONAL<PLSA_UNICODE_STRING>, CAPIDs_out: PVOID, CAPIDCount_out: PULONG): NTSTATUS {
+  public static LsaGetAppliedCAPIDs(SystemName: Optional<PLSA_UNICODE_STRING>, CAPIDs_out: PVOID, CAPIDCount_out: PULONG): NTSTATUS {
     return Advapi32.Load('LsaGetAppliedCAPIDs')(SystemName, CAPIDs_out, CAPIDCount_out);
   }
 
@@ -3872,7 +3872,7 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntsecapi/nf-ntsecapi-lsagetremoteusername
-  public static LsaGetRemoteUserName(SystemName: OPTIONAL<PLSA_UNICODE_STRING>, UserName_out: PVOID, DomainName_out: OPTIONAL<PVOID>): NTSTATUS {
+  public static LsaGetRemoteUserName(SystemName: Optional<PLSA_UNICODE_STRING>, UserName_out: PVOID, DomainName_out: Optional<PVOID>): NTSTATUS {
     return Advapi32.Load('LsaGetRemoteUserName')(SystemName, UserName_out, DomainName_out);
   }
 
@@ -3882,7 +3882,7 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntsecapi/nf-ntsecapi-lsagetusername
-  public static LsaGetUserName(UserName_out: PVOID, DomainName_out: OPTIONAL<PVOID>): NTSTATUS {
+  public static LsaGetUserName(UserName_out: PVOID, DomainName_out: Optional<PVOID>): NTSTATUS {
     return Advapi32.Load('LsaGetUserName')(UserName_out, DomainName_out);
   }
 
@@ -3972,12 +3972,12 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntsecapi/nf-ntsecapi-lsaopenpolicy
-  public static LsaOpenPolicy(SystemName: OPTIONAL<PLSA_UNICODE_STRING>, ObjectAttributes: PLSA_OBJECT_ATTRIBUTES, DesiredAccess: ACCESS_MASK, PolicyHandle_out: PLSA_HANDLE): NTSTATUS {
+  public static LsaOpenPolicy(SystemName: Optional<PLSA_UNICODE_STRING>, ObjectAttributes: PLSA_OBJECT_ATTRIBUTES, DesiredAccess: ACCESS_MASK, PolicyHandle_out: PLSA_HANDLE): NTSTATUS {
     return Advapi32.Load('LsaOpenPolicy')(SystemName, ObjectAttributes, DesiredAccess, PolicyHandle_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntsecapi/nf-ntsecapi-lsaopenpolicysce
-  public static LsaOpenPolicySce(SystemName: OPTIONAL<PLSA_UNICODE_STRING>, ObjectAttributes: PLSA_OBJECT_ATTRIBUTES, DesiredAccess: ACCESS_MASK, PolicyHandle_out: PLSA_HANDLE): NTSTATUS {
+  public static LsaOpenPolicySce(SystemName: Optional<PLSA_UNICODE_STRING>, ObjectAttributes: PLSA_OBJECT_ATTRIBUTES, DesiredAccess: ACCESS_MASK, PolicyHandle_out: PLSA_HANDLE): NTSTATUS {
     return Advapi32.Load('LsaOpenPolicySce')(SystemName, ObjectAttributes, DesiredAccess, PolicyHandle_out);
   }
 
@@ -4007,7 +4007,7 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntsecapi/nf-ntsecapi-lsaquerycaps
-  public static LsaQueryCAPs(CAPIDs: OPTIONAL<PVOID>, CAPIDCount: ULONG, CAPs_out: PVOID, CAPCount_out: PULONG): NTSTATUS {
+  public static LsaQueryCAPs(CAPIDs: Optional<PVOID>, CAPIDCount: ULONG, CAPs_out: PVOID, CAPCount_out: PULONG): NTSTATUS {
     return Advapi32.Load('LsaQueryCAPs')(CAPIDs, CAPIDCount, CAPs_out, CAPCount_out);
   }
 
@@ -4047,7 +4047,7 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntlsa/nf-ntlsa-lsaquerysecret
-  public static LsaQuerySecret(SecretHandle: LSA_HANDLE, CurrentValue_out: OPTIONAL<PVOID>, CurrentValueSetTime_out: OPTIONAL<PVOID>, OldValue_out: OPTIONAL<PVOID>, OldValueSetTime_out: OPTIONAL<PVOID>): NTSTATUS {
+  public static LsaQuerySecret(SecretHandle: LSA_HANDLE, CurrentValue_out: Optional<PVOID>, CurrentValueSetTime_out: Optional<PVOID>, OldValue_out: Optional<PVOID>, OldValueSetTime_out: Optional<PVOID>): NTSTATUS {
     return Advapi32.Load('LsaQuerySecret')(SecretHandle, CurrentValue_out, CurrentValueSetTime_out, OldValue_out, OldValueSetTime_out);
   }
 
@@ -4067,12 +4067,12 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntsecapi/nf-ntsecapi-lsaremoveaccountrights
-  public static LsaRemoveAccountRights(PolicyHandle: LSA_HANDLE, AccountSid: PSID, AllRights: BOOL, UserRights: OPTIONAL<PLSA_UNICODE_STRING>, CountOfRights: ULONG): NTSTATUS {
+  public static LsaRemoveAccountRights(PolicyHandle: LSA_HANDLE, AccountSid: PSID, AllRights: BOOL, UserRights: Optional<PLSA_UNICODE_STRING>, CountOfRights: ULONG): NTSTATUS {
     return Advapi32.Load('LsaRemoveAccountRights')(PolicyHandle, AccountSid, AllRights, UserRights, CountOfRights);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntlsa/nf-ntlsa-lsaremoveprivilegesfromaccount
-  public static LsaRemovePrivilegesFromAccount(AccountHandle: LSA_HANDLE, AllPrivileges: BOOL, Privileges: OPTIONAL<PVOID>): NTSTATUS {
+  public static LsaRemovePrivilegesFromAccount(AccountHandle: LSA_HANDLE, AllPrivileges: BOOL, Privileges: Optional<PVOID>): NTSTATUS {
     return Advapi32.Load('LsaRemovePrivilegesFromAccount')(AccountHandle, AllPrivileges, Privileges);
   }
 
@@ -4082,12 +4082,12 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntsecapi/nf-ntsecapi-lsasetcaps
-  public static LsaSetCAPs(CAPIDs: OPTIONAL<PVOID>, CAPIDCount: ULONG, Flags: DWORD): NTSTATUS {
+  public static LsaSetCAPs(CAPIDs: Optional<PVOID>, CAPIDCount: ULONG, Flags: DWORD): NTSTATUS {
     return Advapi32.Load('LsaSetCAPs')(CAPIDs, CAPIDCount, Flags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntsecapi/nf-ntsecapi-lsasetdomaininformationpolicy
-  public static LsaSetDomainInformationPolicy(PolicyHandle: LSA_HANDLE, InformationClass: DWORD, Buffer: OPTIONAL<PVOID>): NTSTATUS {
+  public static LsaSetDomainInformationPolicy(PolicyHandle: LSA_HANDLE, InformationClass: DWORD, Buffer: Optional<PVOID>): NTSTATUS {
     return Advapi32.Load('LsaSetDomainInformationPolicy')(PolicyHandle, InformationClass, Buffer);
   }
 
@@ -4122,7 +4122,7 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntlsa/nf-ntlsa-lsasetsecret
-  public static LsaSetSecret(SecretHandle: LSA_HANDLE, CurrentValue: OPTIONAL<PLSA_UNICODE_STRING>, OldValue: OPTIONAL<PLSA_UNICODE_STRING>): NTSTATUS {
+  public static LsaSetSecret(SecretHandle: LSA_HANDLE, CurrentValue: Optional<PLSA_UNICODE_STRING>, OldValue: Optional<PLSA_UNICODE_STRING>): NTSTATUS {
     return Advapi32.Load('LsaSetSecret')(SecretHandle, CurrentValue, OldValue);
   }
 
@@ -4147,7 +4147,7 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntsecapi/nf-ntsecapi-lsastoreprivatedata
-  public static LsaStorePrivateData(PolicyHandle: LSA_HANDLE, KeyName: PLSA_UNICODE_STRING, PrivateData: OPTIONAL<PLSA_UNICODE_STRING>): NTSTATUS {
+  public static LsaStorePrivateData(PolicyHandle: LSA_HANDLE, KeyName: PLSA_UNICODE_STRING, PrivateData: Optional<PLSA_UNICODE_STRING>): NTSTATUS {
     return Advapi32.Load('LsaStorePrivateData')(PolicyHandle, KeyName, PrivateData);
   }
 
@@ -4182,15 +4182,15 @@ class Advapi32 extends Win32 {
   // https://learn.microsoft.com/en-us/windows/win32/api/securitybaseapi/nf-securitybaseapi-makeabsolutesd
   public static MakeAbsoluteSD(
     pSelfRelativeSD: PSECURITY_DESCRIPTOR,
-    pAbsoluteSD_out: OPTIONAL<PSECURITY_DESCRIPTOR>,
+    pAbsoluteSD_out: Optional<PSECURITY_DESCRIPTOR>,
     lpdwAbsoluteSDSize_in_out: LPDWORD,
-    pDacl_out: OPTIONAL<PACL>,
+    pDacl_out: Optional<PACL>,
     lpdwDaclSize_in_out: LPDWORD,
-    pSacl_out: OPTIONAL<PACL>,
+    pSacl_out: Optional<PACL>,
     lpdwSaclSize_in_out: LPDWORD,
-    pOwner_out: OPTIONAL<PSID>,
+    pOwner_out: Optional<PSID>,
     lpdwOwnerSize_in_out: LPDWORD,
-    pPrimaryGroup_out: OPTIONAL<PSID>,
+    pPrimaryGroup_out: Optional<PSID>,
     lpdwPrimaryGroupSize_in_out: LPDWORD,
   ): BOOL {
     return Advapi32.Load('MakeAbsoluteSD')(
@@ -4214,7 +4214,7 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/securitybaseapi/nf-securitybaseapi-makeselfrelativesd
-  public static MakeSelfRelativeSD(pAbsoluteSD: PSECURITY_DESCRIPTOR, pSelfRelativeSD_out: OPTIONAL<PSECURITY_DESCRIPTOR>, lpdwBufferLength_in_out: LPDWORD): BOOL {
+  public static MakeSelfRelativeSD(pAbsoluteSD: PSECURITY_DESCRIPTOR, pSelfRelativeSD_out: Optional<PSECURITY_DESCRIPTOR>, lpdwBufferLength_in_out: LPDWORD): BOOL {
     return Advapi32.Load('MakeSelfRelativeSD')(pAbsoluteSD, pSelfRelativeSD_out, lpdwBufferLength_in_out);
   }
 
@@ -4278,12 +4278,12 @@ class Advapi32 extends Win32 {
     SubsystemName: LPCSTR,
     HandleId: LPVOID,
     ObjectTypeName: LPSTR,
-    ObjectName: OPTIONAL<LPSTR>,
+    ObjectName: Optional<LPSTR>,
     pSecurityDescriptor: PSECURITY_DESCRIPTOR,
     ClientToken: HANDLE,
     DesiredAccess: DWORD,
     GrantedAccess: DWORD,
-    Privileges: OPTIONAL<PPRIVILEGE_SET>,
+    Privileges: Optional<PPRIVILEGE_SET>,
     ObjectCreation: BOOL,
     AccessGranted: BOOL,
     GenerateOnClose_out: LPBOOL,
@@ -4296,12 +4296,12 @@ class Advapi32 extends Win32 {
     SubsystemName: LPCWSTR,
     HandleId: LPVOID,
     ObjectTypeName: LPWSTR,
-    ObjectName: OPTIONAL<LPWSTR>,
+    ObjectName: Optional<LPWSTR>,
     pSecurityDescriptor: PSECURITY_DESCRIPTOR,
     ClientToken: HANDLE,
     DesiredAccess: DWORD,
     GrantedAccess: DWORD,
-    Privileges: OPTIONAL<PPRIVILEGE_SET>,
+    Privileges: Optional<PPRIVILEGE_SET>,
     ObjectCreation: BOOL,
     AccessGranted: BOOL,
     GenerateOnClose_out: LPBOOL,
@@ -4320,12 +4320,12 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-openbackupeventloga
-  public static OpenBackupEventLogA(lpUNCServerName: OPTIONAL<LPCSTR>, lpFileName: LPCSTR): HANDLE {
+  public static OpenBackupEventLogA(lpUNCServerName: Optional<LPCSTR>, lpFileName: LPCSTR): HANDLE {
     return Advapi32.Load('OpenBackupEventLogA')(lpUNCServerName, lpFileName);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-openbackupeventlogw
-  public static OpenBackupEventLogW(lpUNCServerName: OPTIONAL<LPCWSTR>, lpFileName: LPCWSTR): HANDLE {
+  public static OpenBackupEventLogW(lpUNCServerName: Optional<LPCWSTR>, lpFileName: LPCWSTR): HANDLE {
     return Advapi32.Load('OpenBackupEventLogW')(lpUNCServerName, lpFileName);
   }
 
@@ -4340,12 +4340,12 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-openeventloga
-  public static OpenEventLogA(lpUNCServerName: OPTIONAL<LPCSTR>, lpSourceName: LPCSTR): HANDLE {
+  public static OpenEventLogA(lpUNCServerName: Optional<LPCSTR>, lpSourceName: LPCSTR): HANDLE {
     return Advapi32.Load('OpenEventLogA')(lpUNCServerName, lpSourceName);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-openeventlogw
-  public static OpenEventLogW(lpUNCServerName: OPTIONAL<LPCWSTR>, lpSourceName: LPCWSTR): HANDLE {
+  public static OpenEventLogW(lpUNCServerName: Optional<LPCWSTR>, lpSourceName: LPCWSTR): HANDLE {
     return Advapi32.Load('OpenEventLogW')(lpUNCServerName, lpSourceName);
   }
 
@@ -4355,12 +4355,12 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsvc/nf-winsvc-openscmanagera
-  public static OpenSCManagerA(lpMachineName: OPTIONAL<LPCSTR>, lpDatabaseName: OPTIONAL<LPCSTR>, dwDesiredAccess: DWORD): SC_HANDLE {
+  public static OpenSCManagerA(lpMachineName: Optional<LPCSTR>, lpDatabaseName: Optional<LPCSTR>, dwDesiredAccess: DWORD): SC_HANDLE {
     return Advapi32.Load('OpenSCManagerA')(lpMachineName, lpDatabaseName, dwDesiredAccess);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsvc/nf-winsvc-openscmanagerw
-  public static OpenSCManagerW(lpMachineName: OPTIONAL<LPCWSTR>, lpDatabaseName: OPTIONAL<LPCWSTR>, dwDesiredAccess: DWORD): SC_HANDLE {
+  public static OpenSCManagerW(lpMachineName: Optional<LPCWSTR>, lpDatabaseName: Optional<LPCWSTR>, dwDesiredAccess: DWORD): SC_HANDLE {
     return Advapi32.Load('OpenSCManagerW')(lpMachineName, lpDatabaseName, dwDesiredAccess);
   }
 
@@ -4380,7 +4380,7 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wct/nf-wct-openthreadwaitchainsession
-  public static OpenThreadWaitChainSession(Flags: ULONG, callback: OPTIONAL<PVOID>): HWCT {
+  public static OpenThreadWaitChainSession(Flags: ULONG, callback: Optional<PVOID>): HWCT {
     return Advapi32.Load('OpenThreadWaitChainSession')(Flags, callback);
   }
 
@@ -4420,32 +4420,32 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/perflib/nf-perflib-perfenumeratecounterset
-  public static PerfEnumerateCounterSet(szMachine: OPTIONAL<LPCWSTR>, pCounterSetIds_out: OPTIONAL<PVOID>, cCounterSetIds: DWORD, pcCounterSetIdsActual_out: LPDWORD): ULONG {
+  public static PerfEnumerateCounterSet(szMachine: Optional<LPCWSTR>, pCounterSetIds_out: Optional<PVOID>, cCounterSetIds: DWORD, pcCounterSetIdsActual_out: LPDWORD): ULONG {
     return Advapi32.Load('PerfEnumerateCounterSet')(szMachine, pCounterSetIds_out, cCounterSetIds, pcCounterSetIdsActual_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/perflib/nf-perflib-perfenumeratecountersetinstances
-  public static PerfEnumerateCounterSetInstances(szMachine: OPTIONAL<LPCWSTR>, pCounterSetId: PVOID, pInstances_out: OPTIONAL<PVOID>, cbInstances: DWORD, pcbInstancesActual_out: LPDWORD): ULONG {
+  public static PerfEnumerateCounterSetInstances(szMachine: Optional<LPCWSTR>, pCounterSetId: PVOID, pInstances_out: Optional<PVOID>, cbInstances: DWORD, pcbInstancesActual_out: LPDWORD): ULONG {
     return Advapi32.Load('PerfEnumerateCounterSetInstances')(szMachine, pCounterSetId, pInstances_out, cbInstances, pcbInstancesActual_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/perflib/nf-perflib-perfopenqueryhandle
-  public static PerfOpenQueryHandle(szMachine: OPTIONAL<LPCWSTR>, phQuery_out: PHANDLE): ULONG {
+  public static PerfOpenQueryHandle(szMachine: Optional<LPCWSTR>, phQuery_out: PHANDLE): ULONG {
     return Advapi32.Load('PerfOpenQueryHandle')(szMachine, phQuery_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/perflib/nf-perflib-perfquerycounterdata
-  public static PerfQueryCounterData(hQuery: HANDLE, pCounterBlock_out: OPTIONAL<PVOID>, cbCounterBlock: DWORD, pcbCounterBlockActual_out: LPDWORD): ULONG {
+  public static PerfQueryCounterData(hQuery: HANDLE, pCounterBlock_out: Optional<PVOID>, cbCounterBlock: DWORD, pcbCounterBlockActual_out: LPDWORD): ULONG {
     return Advapi32.Load('PerfQueryCounterData')(hQuery, pCounterBlock_out, cbCounterBlock, pcbCounterBlockActual_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/perflib/nf-perflib-perfquerycounterinfo
-  public static PerfQueryCounterInfo(hQuery: HANDLE, pCounters_out: OPTIONAL<PVOID>, cbCounters: DWORD, pcbCountersActual_out: LPDWORD): ULONG {
+  public static PerfQueryCounterInfo(hQuery: HANDLE, pCounters_out: Optional<PVOID>, cbCounters: DWORD, pcbCountersActual_out: LPDWORD): ULONG {
     return Advapi32.Load('PerfQueryCounterInfo')(hQuery, pCounters_out, cbCounters, pcbCountersActual_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/perflib/nf-perflib-perfquerycountersetregistrationinfo
-  public static PerfQueryCounterSetRegistrationInfo(szMachine: OPTIONAL<LPCWSTR>, pCounterSetId: PVOID, requestCode: DWORD, requestLangId: DWORD, pbRegInfo_out: OPTIONAL<PVOID>, cbRegInfo: DWORD, pcbRegInfoActual_out: LPDWORD): ULONG {
+  public static PerfQueryCounterSetRegistrationInfo(szMachine: Optional<LPCWSTR>, pCounterSetId: PVOID, requestCode: DWORD, requestLangId: DWORD, pbRegInfo_out: Optional<PVOID>, cbRegInfo: DWORD, pcbRegInfoActual_out: LPDWORD): ULONG {
     return Advapi32.Load('PerfQueryCounterSetRegistrationInfo')(szMachine, pCounterSetId, requestCode, requestLangId, pbRegInfo_out, cbRegInfo, pcbRegInfoActual_out);
   }
 
@@ -4518,7 +4518,7 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/evntrace/nf-evntrace-processtrace
-  public static ProcessTrace(HandleArray: PVOID, HandleCount: ULONG, StartTime: OPTIONAL<PVOID>, EndTime: OPTIONAL<PVOID>): ULONG {
+  public static ProcessTrace(HandleArray: PVOID, HandleCount: ULONG, StartTime: Optional<PVOID>, EndTime: Optional<PVOID>): ULONG {
     return Advapi32.Load('ProcessTrace')(HandleArray, HandleCount, StartTime, EndTime);
   }
 
@@ -4548,22 +4548,22 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsvc/nf-winsvc-queryserviceconfig2a
-  public static QueryServiceConfig2A(hService: SC_HANDLE, dwInfoLevel: DWORD, lpBuffer_out: OPTIONAL<LPBYTE>, cbBufSize: DWORD, pcbBytesNeeded_out: LPDWORD): BOOL {
+  public static QueryServiceConfig2A(hService: SC_HANDLE, dwInfoLevel: DWORD, lpBuffer_out: Optional<LPBYTE>, cbBufSize: DWORD, pcbBytesNeeded_out: LPDWORD): BOOL {
     return Advapi32.Load('QueryServiceConfig2A')(hService, dwInfoLevel, lpBuffer_out, cbBufSize, pcbBytesNeeded_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsvc/nf-winsvc-queryserviceconfig2w
-  public static QueryServiceConfig2W(hService: SC_HANDLE, dwInfoLevel: DWORD, lpBuffer_out: OPTIONAL<LPBYTE>, cbBufSize: DWORD, pcbBytesNeeded_out: LPDWORD): BOOL {
+  public static QueryServiceConfig2W(hService: SC_HANDLE, dwInfoLevel: DWORD, lpBuffer_out: Optional<LPBYTE>, cbBufSize: DWORD, pcbBytesNeeded_out: LPDWORD): BOOL {
     return Advapi32.Load('QueryServiceConfig2W')(hService, dwInfoLevel, lpBuffer_out, cbBufSize, pcbBytesNeeded_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsvc/nf-winsvc-queryserviceconfiga
-  public static QueryServiceConfigA(hService: SC_HANDLE, lpServiceConfig_out: OPTIONAL<PVOID>, cbBufSize: DWORD, pcbBytesNeeded_out: LPDWORD): BOOL {
+  public static QueryServiceConfigA(hService: SC_HANDLE, lpServiceConfig_out: Optional<PVOID>, cbBufSize: DWORD, pcbBytesNeeded_out: LPDWORD): BOOL {
     return Advapi32.Load('QueryServiceConfigA')(hService, lpServiceConfig_out, cbBufSize, pcbBytesNeeded_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsvc/nf-winsvc-queryserviceconfigw
-  public static QueryServiceConfigW(hService: SC_HANDLE, lpServiceConfig_out: OPTIONAL<PVOID>, cbBufSize: DWORD, pcbBytesNeeded_out: LPDWORD): BOOL {
+  public static QueryServiceConfigW(hService: SC_HANDLE, lpServiceConfig_out: Optional<PVOID>, cbBufSize: DWORD, pcbBytesNeeded_out: LPDWORD): BOOL {
     return Advapi32.Load('QueryServiceConfigW')(hService, lpServiceConfig_out, cbBufSize, pcbBytesNeeded_out);
   }
 
@@ -4573,17 +4573,17 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsvc/nf-winsvc-queryservicelockstatusa
-  public static QueryServiceLockStatusA(hSCManager: SC_HANDLE, lpLockStatus_out: OPTIONAL<PVOID>, cbBufSize: DWORD, pcbBytesNeeded_out: LPDWORD): BOOL {
+  public static QueryServiceLockStatusA(hSCManager: SC_HANDLE, lpLockStatus_out: Optional<PVOID>, cbBufSize: DWORD, pcbBytesNeeded_out: LPDWORD): BOOL {
     return Advapi32.Load('QueryServiceLockStatusA')(hSCManager, lpLockStatus_out, cbBufSize, pcbBytesNeeded_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsvc/nf-winsvc-queryservicelockstatusw
-  public static QueryServiceLockStatusW(hSCManager: SC_HANDLE, lpLockStatus_out: OPTIONAL<PVOID>, cbBufSize: DWORD, pcbBytesNeeded_out: LPDWORD): BOOL {
+  public static QueryServiceLockStatusW(hSCManager: SC_HANDLE, lpLockStatus_out: Optional<PVOID>, cbBufSize: DWORD, pcbBytesNeeded_out: LPDWORD): BOOL {
     return Advapi32.Load('QueryServiceLockStatusW')(hSCManager, lpLockStatus_out, cbBufSize, pcbBytesNeeded_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsvc/nf-winsvc-queryserviceobjectsecurity
-  public static QueryServiceObjectSecurity(hService: SC_HANDLE, dwSecurityInformation: SECURITY_INFORMATION, lpSecurityDescriptor_out: OPTIONAL<PSECURITY_DESCRIPTOR>, cbBufSize: DWORD, pcbBytesNeeded_out: LPDWORD): BOOL {
+  public static QueryServiceObjectSecurity(hService: SC_HANDLE, dwSecurityInformation: SECURITY_INFORMATION, lpSecurityDescriptor_out: Optional<PSECURITY_DESCRIPTOR>, cbBufSize: DWORD, pcbBytesNeeded_out: LPDWORD): BOOL {
     return Advapi32.Load('QueryServiceObjectSecurity')(hService, dwSecurityInformation, lpSecurityDescriptor_out, cbBufSize, pcbBytesNeeded_out);
   }
 
@@ -4593,22 +4593,22 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsvc/nf-winsvc-queryservicestatusex
-  public static QueryServiceStatusEx(hService: SC_HANDLE, InfoLevel: DWORD, lpBuffer_out: OPTIONAL<LPBYTE>, cbBufSize: DWORD, pcbBytesNeeded_out: LPDWORD): BOOL {
+  public static QueryServiceStatusEx(hService: SC_HANDLE, InfoLevel: DWORD, lpBuffer_out: Optional<LPBYTE>, cbBufSize: DWORD, pcbBytesNeeded_out: LPDWORD): BOOL {
     return Advapi32.Load('QueryServiceStatusEx')(hService, InfoLevel, lpBuffer_out, cbBufSize, pcbBytesNeeded_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/evntrace/nf-evntrace-querytracea
-  public static QueryTraceA(TraceHandle: TRACEHANDLE, InstanceName: OPTIONAL<LPCSTR>, Properties_in_out: PVOID): ULONG {
+  public static QueryTraceA(TraceHandle: TRACEHANDLE, InstanceName: Optional<LPCSTR>, Properties_in_out: PVOID): ULONG {
     return Advapi32.Load('QueryTraceA')(TraceHandle, InstanceName, Properties_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/evntrace/nf-evntrace-querytraceprocessinghandle
-  public static QueryTraceProcessingHandle(ProcessingHandle: TRACEHANDLE, InformationClass: DWORD, InBuffer: OPTIONAL<PVOID>, InBufferSize: ULONG, OutBuffer_out: OPTIONAL<PVOID>, OutBufferSize: ULONG, ReturnLength_in_out: PULONG): ULONG {
+  public static QueryTraceProcessingHandle(ProcessingHandle: TRACEHANDLE, InformationClass: DWORD, InBuffer: Optional<PVOID>, InBufferSize: ULONG, OutBuffer_out: Optional<PVOID>, OutBufferSize: ULONG, ReturnLength_in_out: PULONG): ULONG {
     return Advapi32.Load('QueryTraceProcessingHandle')(ProcessingHandle, InformationClass, InBuffer, InBufferSize, OutBuffer_out, OutBufferSize, ReturnLength_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/evntrace/nf-evntrace-querytracew
-  public static QueryTraceW(TraceHandle: TRACEHANDLE, InstanceName: OPTIONAL<LPCWSTR>, Properties_in_out: PVOID): ULONG {
+  public static QueryTraceW(TraceHandle: TRACEHANDLE, InstanceName: Optional<LPCWSTR>, Properties_in_out: PVOID): ULONG {
     return Advapi32.Load('QueryTraceW')(TraceHandle, InstanceName, Properties_in_out);
   }
 
@@ -4628,7 +4628,7 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-readencryptedfileraw
-  public static ReadEncryptedFileRaw(pfExportCallback: PVOID, pvCallbackContext: OPTIONAL<PVOID>, pvContext: PVOID): DWORD {
+  public static ReadEncryptedFileRaw(pfExportCallback: PVOID, pvCallbackContext: Optional<PVOID>, pvContext: PVOID): DWORD {
     return Advapi32.Load('ReadEncryptedFileRaw')(pfExportCallback, pvCallbackContext, pvContext);
   }
 
@@ -4648,37 +4648,37 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regconnectregistrya
-  public static RegConnectRegistryA(lpMachineName: OPTIONAL<LPCSTR>, hKey: HKEY, phkResult_out: PHKEY): LSTATUS {
+  public static RegConnectRegistryA(lpMachineName: Optional<LPCSTR>, hKey: HKEY, phkResult_out: PHKEY): LSTATUS {
     return Advapi32.Load('RegConnectRegistryA')(lpMachineName, hKey, phkResult_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regconnectregistryexa
-  public static RegConnectRegistryExA(lpMachineName: OPTIONAL<LPCSTR>, hKey: HKEY, Flags: ULONG, phkResult_out: PHKEY): LSTATUS {
+  public static RegConnectRegistryExA(lpMachineName: Optional<LPCSTR>, hKey: HKEY, Flags: ULONG, phkResult_out: PHKEY): LSTATUS {
     return Advapi32.Load('RegConnectRegistryExA')(lpMachineName, hKey, Flags, phkResult_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regconnectregistryexw
-  public static RegConnectRegistryExW(lpMachineName: OPTIONAL<LPCWSTR>, hKey: HKEY, Flags: ULONG, phkResult_out: PHKEY): LSTATUS {
+  public static RegConnectRegistryExW(lpMachineName: Optional<LPCWSTR>, hKey: HKEY, Flags: ULONG, phkResult_out: PHKEY): LSTATUS {
     return Advapi32.Load('RegConnectRegistryExW')(lpMachineName, hKey, Flags, phkResult_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regconnectregistryw
-  public static RegConnectRegistryW(lpMachineName: OPTIONAL<LPCWSTR>, hKey: HKEY, phkResult_out: PHKEY): LSTATUS {
+  public static RegConnectRegistryW(lpMachineName: Optional<LPCWSTR>, hKey: HKEY, phkResult_out: PHKEY): LSTATUS {
     return Advapi32.Load('RegConnectRegistryW')(lpMachineName, hKey, phkResult_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regcopytreea
-  public static RegCopyTreeA(hKeySrc: HKEY, lpSubKey: OPTIONAL<LPCSTR>, hKeyDest: HKEY): LSTATUS {
+  public static RegCopyTreeA(hKeySrc: HKEY, lpSubKey: Optional<LPCSTR>, hKeyDest: HKEY): LSTATUS {
     return Advapi32.Load('RegCopyTreeA')(hKeySrc, lpSubKey, hKeyDest);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regcopytreew
-  public static RegCopyTreeW(hKeySrc: HKEY, lpSubKey: OPTIONAL<LPCWSTR>, hKeyDest: HKEY): LSTATUS {
+  public static RegCopyTreeW(hKeySrc: HKEY, lpSubKey: Optional<LPCWSTR>, hKeyDest: HKEY): LSTATUS {
     return Advapi32.Load('RegCopyTreeW')(hKeySrc, lpSubKey, hKeyDest);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regcreatekeya
-  public static RegCreateKeyA(hKey: HKEY, lpSubKey: OPTIONAL<LPCSTR>, phkResult_out: PHKEY): LSTATUS {
+  public static RegCreateKeyA(hKey: HKEY, lpSubKey: Optional<LPCSTR>, phkResult_out: PHKEY): LSTATUS {
     return Advapi32.Load('RegCreateKeyA')(hKey, lpSubKey, phkResult_out);
   }
 
@@ -4687,12 +4687,12 @@ class Advapi32 extends Win32 {
     hKey: HKEY,
     lpSubKey: LPCSTR,
     Reserved: DWORD,
-    lpClass: OPTIONAL<LPSTR>,
+    lpClass: Optional<LPSTR>,
     dwOptions: DWORD,
     samDesired: REGSAM,
-    lpSecurityAttributes: OPTIONAL<PVOID>,
+    lpSecurityAttributes: Optional<PVOID>,
     phkResult_out: PHKEY,
-    lpdwDisposition_out: OPTIONAL<LPDWORD>,
+    lpdwDisposition_out: Optional<LPDWORD>,
   ): LSTATUS {
     return Advapi32.Load('RegCreateKeyExA')(hKey, lpSubKey, Reserved, lpClass, dwOptions, samDesired, lpSecurityAttributes, phkResult_out, lpdwDisposition_out);
   }
@@ -4702,12 +4702,12 @@ class Advapi32 extends Win32 {
     hKey: HKEY,
     lpSubKey: LPCWSTR,
     Reserved: DWORD,
-    lpClass: OPTIONAL<LPWSTR>,
+    lpClass: Optional<LPWSTR>,
     dwOptions: DWORD,
     samDesired: REGSAM,
-    lpSecurityAttributes: OPTIONAL<PVOID>,
+    lpSecurityAttributes: Optional<PVOID>,
     phkResult_out: PHKEY,
-    lpdwDisposition_out: OPTIONAL<LPDWORD>,
+    lpdwDisposition_out: Optional<LPDWORD>,
   ): LSTATUS {
     return Advapi32.Load('RegCreateKeyExW')(hKey, lpSubKey, Reserved, lpClass, dwOptions, samDesired, lpSecurityAttributes, phkResult_out, lpdwDisposition_out);
   }
@@ -4717,14 +4717,14 @@ class Advapi32 extends Win32 {
     hKey: HKEY,
     lpSubKey: LPCSTR,
     Reserved: DWORD,
-    lpClass: OPTIONAL<LPSTR>,
+    lpClass: Optional<LPSTR>,
     dwOptions: DWORD,
     samDesired: REGSAM,
-    lpSecurityAttributes: OPTIONAL<PVOID>,
+    lpSecurityAttributes: Optional<PVOID>,
     phkResult_out: PHKEY,
-    lpdwDisposition_out: OPTIONAL<LPDWORD>,
+    lpdwDisposition_out: Optional<LPDWORD>,
     hTransaction: HANDLE,
-    pExtendedParemeter: OPTIONAL<PVOID>,
+    pExtendedParemeter: Optional<PVOID>,
   ): LSTATUS {
     return Advapi32.Load('RegCreateKeyTransactedA')(hKey, lpSubKey, Reserved, lpClass, dwOptions, samDesired, lpSecurityAttributes, phkResult_out, lpdwDisposition_out, hTransaction, pExtendedParemeter);
   }
@@ -4734,20 +4734,20 @@ class Advapi32 extends Win32 {
     hKey: HKEY,
     lpSubKey: LPCWSTR,
     Reserved: DWORD,
-    lpClass: OPTIONAL<LPWSTR>,
+    lpClass: Optional<LPWSTR>,
     dwOptions: DWORD,
     samDesired: REGSAM,
-    lpSecurityAttributes: OPTIONAL<PVOID>,
+    lpSecurityAttributes: Optional<PVOID>,
     phkResult_out: PHKEY,
-    lpdwDisposition_out: OPTIONAL<LPDWORD>,
+    lpdwDisposition_out: Optional<LPDWORD>,
     hTransaction: HANDLE,
-    pExtendedParemeter: OPTIONAL<PVOID>,
+    pExtendedParemeter: Optional<PVOID>,
   ): LSTATUS {
     return Advapi32.Load('RegCreateKeyTransactedW')(hKey, lpSubKey, Reserved, lpClass, dwOptions, samDesired, lpSecurityAttributes, phkResult_out, lpdwDisposition_out, hTransaction, pExtendedParemeter);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regcreatekeyw
-  public static RegCreateKeyW(hKey: HKEY, lpSubKey: OPTIONAL<LPCWSTR>, phkResult_out: PHKEY): LSTATUS {
+  public static RegCreateKeyW(hKey: HKEY, lpSubKey: Optional<LPCWSTR>, phkResult_out: PHKEY): LSTATUS {
     return Advapi32.Load('RegCreateKeyW')(hKey, lpSubKey, phkResult_out);
   }
 
@@ -4767,22 +4767,22 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regdeletekeytransacteda
-  public static RegDeleteKeyTransactedA(hKey: HKEY, lpSubKey: LPCSTR, samDesired: REGSAM, Reserved: DWORD, hTransaction: HANDLE, pExtendedParameter: OPTIONAL<PVOID>): LSTATUS {
+  public static RegDeleteKeyTransactedA(hKey: HKEY, lpSubKey: LPCSTR, samDesired: REGSAM, Reserved: DWORD, hTransaction: HANDLE, pExtendedParameter: Optional<PVOID>): LSTATUS {
     return Advapi32.Load('RegDeleteKeyTransactedA')(hKey, lpSubKey, samDesired, Reserved, hTransaction, pExtendedParameter);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regdeletekeytransactedw
-  public static RegDeleteKeyTransactedW(hKey: HKEY, lpSubKey: LPCWSTR, samDesired: REGSAM, Reserved: DWORD, hTransaction: HANDLE, pExtendedParameter: OPTIONAL<PVOID>): LSTATUS {
+  public static RegDeleteKeyTransactedW(hKey: HKEY, lpSubKey: LPCWSTR, samDesired: REGSAM, Reserved: DWORD, hTransaction: HANDLE, pExtendedParameter: Optional<PVOID>): LSTATUS {
     return Advapi32.Load('RegDeleteKeyTransactedW')(hKey, lpSubKey, samDesired, Reserved, hTransaction, pExtendedParameter);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regdeletekeyvaluea
-  public static RegDeleteKeyValueA(hKey: HKEY, lpSubKey: OPTIONAL<LPCSTR>, lpValueName: OPTIONAL<LPCSTR>): LSTATUS {
+  public static RegDeleteKeyValueA(hKey: HKEY, lpSubKey: Optional<LPCSTR>, lpValueName: Optional<LPCSTR>): LSTATUS {
     return Advapi32.Load('RegDeleteKeyValueA')(hKey, lpSubKey, lpValueName);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regdeletekeyvaluew
-  public static RegDeleteKeyValueW(hKey: HKEY, lpSubKey: OPTIONAL<LPCWSTR>, lpValueName: OPTIONAL<LPCWSTR>): LSTATUS {
+  public static RegDeleteKeyValueW(hKey: HKEY, lpSubKey: Optional<LPCWSTR>, lpValueName: Optional<LPCWSTR>): LSTATUS {
     return Advapi32.Load('RegDeleteKeyValueW')(hKey, lpSubKey, lpValueName);
   }
 
@@ -4792,22 +4792,22 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regdeletetreea
-  public static RegDeleteTreeA(hKey: HKEY, lpSubKey: OPTIONAL<LPCSTR>): LSTATUS {
+  public static RegDeleteTreeA(hKey: HKEY, lpSubKey: Optional<LPCSTR>): LSTATUS {
     return Advapi32.Load('RegDeleteTreeA')(hKey, lpSubKey);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regdeletetreew
-  public static RegDeleteTreeW(hKey: HKEY, lpSubKey: OPTIONAL<LPCWSTR>): LSTATUS {
+  public static RegDeleteTreeW(hKey: HKEY, lpSubKey: Optional<LPCWSTR>): LSTATUS {
     return Advapi32.Load('RegDeleteTreeW')(hKey, lpSubKey);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regdeletevaluea
-  public static RegDeleteValueA(hKey: HKEY, lpValueName: OPTIONAL<LPCSTR>): LSTATUS {
+  public static RegDeleteValueA(hKey: HKEY, lpValueName: Optional<LPCSTR>): LSTATUS {
     return Advapi32.Load('RegDeleteValueA')(hKey, lpValueName);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regdeletevaluew
-  public static RegDeleteValueW(hKey: HKEY, lpValueName: OPTIONAL<LPCWSTR>): LSTATUS {
+  public static RegDeleteValueW(hKey: HKEY, lpValueName: Optional<LPCWSTR>): LSTATUS {
     return Advapi32.Load('RegDeleteValueW')(hKey, lpValueName);
   }
 
@@ -4832,7 +4832,7 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regenumkeya
-  public static RegEnumKeyA(hKey: HKEY, dwIndex: DWORD, lpName_out: OPTIONAL<LPSTR>, cchName: DWORD): LSTATUS {
+  public static RegEnumKeyA(hKey: HKEY, dwIndex: DWORD, lpName_out: Optional<LPSTR>, cchName: DWORD): LSTATUS {
     return Advapi32.Load('RegEnumKeyA')(hKey, dwIndex, lpName_out, cchName);
   }
 
@@ -4840,12 +4840,12 @@ class Advapi32 extends Win32 {
   public static RegEnumKeyExA(
     hKey: HKEY,
     dwIndex: DWORD,
-    lpName_out: OPTIONAL<LPSTR>,
+    lpName_out: Optional<LPSTR>,
     lpcchName_in_out: LPDWORD,
     lpReserved: NULL,
-    lpClass_out: OPTIONAL<LPSTR>,
-    lpcchClass_in_out: OPTIONAL<LPDWORD>,
-    lpftLastWriteTime_out: OPTIONAL<PVOID>,
+    lpClass_out: Optional<LPSTR>,
+    lpcchClass_in_out: Optional<LPDWORD>,
+    lpftLastWriteTime_out: Optional<PVOID>,
   ): LSTATUS {
     return Advapi32.Load('RegEnumKeyExA')(hKey, dwIndex, lpName_out, lpcchName_in_out, lpReserved, lpClass_out, lpcchClass_in_out, lpftLastWriteTime_out);
   }
@@ -4854,18 +4854,18 @@ class Advapi32 extends Win32 {
   public static RegEnumKeyExW(
     hKey: HKEY,
     dwIndex: DWORD,
-    lpName_out: OPTIONAL<LPWSTR>,
+    lpName_out: Optional<LPWSTR>,
     lpcchName_in_out: LPDWORD,
     lpReserved: NULL,
-    lpClass_out: OPTIONAL<LPWSTR>,
-    lpcchClass_in_out: OPTIONAL<LPDWORD>,
-    lpftLastWriteTime_out: OPTIONAL<PVOID>,
+    lpClass_out: Optional<LPWSTR>,
+    lpcchClass_in_out: Optional<LPDWORD>,
+    lpftLastWriteTime_out: Optional<PVOID>,
   ): LSTATUS {
     return Advapi32.Load('RegEnumKeyExW')(hKey, dwIndex, lpName_out, lpcchName_in_out, lpReserved, lpClass_out, lpcchClass_in_out, lpftLastWriteTime_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regenumkeyw
-  public static RegEnumKeyW(hKey: HKEY, dwIndex: DWORD, lpName_out: OPTIONAL<LPWSTR>, cchName: DWORD): LSTATUS {
+  public static RegEnumKeyW(hKey: HKEY, dwIndex: DWORD, lpName_out: Optional<LPWSTR>, cchName: DWORD): LSTATUS {
     return Advapi32.Load('RegEnumKeyW')(hKey, dwIndex, lpName_out, cchName);
   }
 
@@ -4873,12 +4873,12 @@ class Advapi32 extends Win32 {
   public static RegEnumValueA(
     hKey: HKEY,
     dwIndex: DWORD,
-    lpValueName_out: OPTIONAL<LPSTR>,
+    lpValueName_out: Optional<LPSTR>,
     lpcchValueName_in_out: LPDWORD,
     lpReserved: NULL,
-    lpType_out: OPTIONAL<LPDWORD>,
-    lpData_out: OPTIONAL<LPBYTE>,
-    lpcbData_in_out: OPTIONAL<LPDWORD>,
+    lpType_out: Optional<LPDWORD>,
+    lpData_out: Optional<LPBYTE>,
+    lpcbData_in_out: Optional<LPDWORD>,
   ): LSTATUS {
     return Advapi32.Load('RegEnumValueA')(hKey, dwIndex, lpValueName_out, lpcchValueName_in_out, lpReserved, lpType_out, lpData_out, lpcbData_in_out);
   }
@@ -4887,12 +4887,12 @@ class Advapi32 extends Win32 {
   public static RegEnumValueW(
     hKey: HKEY,
     dwIndex: DWORD,
-    lpValueName_out: OPTIONAL<LPWSTR>,
+    lpValueName_out: Optional<LPWSTR>,
     lpcchValueName_in_out: LPDWORD,
     lpReserved: NULL,
-    lpType_out: OPTIONAL<LPDWORD>,
-    lpData_out: OPTIONAL<LPBYTE>,
-    lpcbData_in_out: OPTIONAL<LPDWORD>,
+    lpType_out: Optional<LPDWORD>,
+    lpData_out: Optional<LPBYTE>,
+    lpcbData_in_out: Optional<LPDWORD>,
   ): LSTATUS {
     return Advapi32.Load('RegEnumValueW')(hKey, dwIndex, lpValueName_out, lpcchValueName_in_out, lpReserved, lpType_out, lpData_out, lpcbData_in_out);
   }
@@ -4903,17 +4903,17 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-reggetkeysecurity
-  public static RegGetKeySecurity(hKey: HKEY, SecurityInformation: SECURITY_INFORMATION, pSecurityDescriptor_out: OPTIONAL<PSECURITY_DESCRIPTOR>, lpcbSecurityDescriptor_in_out: LPDWORD): LSTATUS {
+  public static RegGetKeySecurity(hKey: HKEY, SecurityInformation: SECURITY_INFORMATION, pSecurityDescriptor_out: Optional<PSECURITY_DESCRIPTOR>, lpcbSecurityDescriptor_in_out: LPDWORD): LSTATUS {
     return Advapi32.Load('RegGetKeySecurity')(hKey, SecurityInformation, pSecurityDescriptor_out, lpcbSecurityDescriptor_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-reggetvaluea
-  public static RegGetValueA(hkey: HKEY, lpSubKey: OPTIONAL<LPCSTR>, lpValue: OPTIONAL<LPCSTR>, dwFlags: DWORD, pdwType_out: OPTIONAL<LPDWORD>, pvData_out: OPTIONAL<PVOID>, pcbData_in_out: OPTIONAL<LPDWORD>): LSTATUS {
+  public static RegGetValueA(hkey: HKEY, lpSubKey: Optional<LPCSTR>, lpValue: Optional<LPCSTR>, dwFlags: DWORD, pdwType_out: Optional<LPDWORD>, pvData_out: Optional<PVOID>, pcbData_in_out: Optional<LPDWORD>): LSTATUS {
     return Advapi32.Load('RegGetValueA')(hkey, lpSubKey, lpValue, dwFlags, pdwType_out, pvData_out, pcbData_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-reggetvaluew
-  public static RegGetValueW(hkey: HKEY, lpSubKey: OPTIONAL<LPCWSTR>, lpValue: OPTIONAL<LPCWSTR>, dwFlags: DWORD, pdwType_out: OPTIONAL<LPDWORD>, pvData_out: OPTIONAL<PVOID>, pcbData_in_out: OPTIONAL<LPDWORD>): LSTATUS {
+  public static RegGetValueW(hkey: HKEY, lpSubKey: Optional<LPCWSTR>, lpValue: Optional<LPCWSTR>, dwFlags: DWORD, pdwType_out: Optional<LPDWORD>, pvData_out: Optional<PVOID>, pcbData_in_out: Optional<LPDWORD>): LSTATUS {
     return Advapi32.Load('RegGetValueW')(hkey, lpSubKey, lpValue, dwFlags, pdwType_out, pvData_out, pcbData_in_out);
   }
 
@@ -4928,27 +4928,27 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regloadkeya
-  public static RegLoadKeyA(hKey: HKEY, lpSubKey: OPTIONAL<LPCSTR>, lpFile: LPCSTR): LSTATUS {
+  public static RegLoadKeyA(hKey: HKEY, lpSubKey: Optional<LPCSTR>, lpFile: LPCSTR): LSTATUS {
     return Advapi32.Load('RegLoadKeyA')(hKey, lpSubKey, lpFile);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regloadkeyw
-  public static RegLoadKeyW(hKey: HKEY, lpSubKey: OPTIONAL<LPCWSTR>, lpFile: LPCWSTR): LSTATUS {
+  public static RegLoadKeyW(hKey: HKEY, lpSubKey: Optional<LPCWSTR>, lpFile: LPCWSTR): LSTATUS {
     return Advapi32.Load('RegLoadKeyW')(hKey, lpSubKey, lpFile);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regloadmuistringa
-  public static RegLoadMUIStringA(hKey: HKEY, pszValue: OPTIONAL<LPCSTR>, pszOutBuf_out: OPTIONAL<LPSTR>, cbOutBuf: DWORD, pcbData_out: OPTIONAL<LPDWORD>, Flags: DWORD, pszDirectory: OPTIONAL<LPCSTR>): LSTATUS {
+  public static RegLoadMUIStringA(hKey: HKEY, pszValue: Optional<LPCSTR>, pszOutBuf_out: Optional<LPSTR>, cbOutBuf: DWORD, pcbData_out: Optional<LPDWORD>, Flags: DWORD, pszDirectory: Optional<LPCSTR>): LSTATUS {
     return Advapi32.Load('RegLoadMUIStringA')(hKey, pszValue, pszOutBuf_out, cbOutBuf, pcbData_out, Flags, pszDirectory);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regloadmuistringw
-  public static RegLoadMUIStringW(hKey: HKEY, pszValue: OPTIONAL<LPCWSTR>, pszOutBuf_out: OPTIONAL<LPWSTR>, cbOutBuf: DWORD, pcbData_out: OPTIONAL<LPDWORD>, Flags: DWORD, pszDirectory: OPTIONAL<LPCWSTR>): LSTATUS {
+  public static RegLoadMUIStringW(hKey: HKEY, pszValue: Optional<LPCWSTR>, pszOutBuf_out: Optional<LPWSTR>, cbOutBuf: DWORD, pcbData_out: Optional<LPDWORD>, Flags: DWORD, pszDirectory: Optional<LPCWSTR>): LSTATUS {
     return Advapi32.Load('RegLoadMUIStringW')(hKey, pszValue, pszOutBuf_out, cbOutBuf, pcbData_out, Flags, pszDirectory);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regnotifychangekeyvalue
-  public static RegNotifyChangeKeyValue(hKey: HKEY, bWatchSubtree: BOOL, dwNotifyFilter: DWORD, hEvent: OPTIONAL<HANDLE>, fAsynchronous: BOOL): LSTATUS {
+  public static RegNotifyChangeKeyValue(hKey: HKEY, bWatchSubtree: BOOL, dwNotifyFilter: DWORD, hEvent: Optional<HANDLE>, fAsynchronous: BOOL): LSTATUS {
     return Advapi32.Load('RegNotifyChangeKeyValue')(hKey, bWatchSubtree, dwNotifyFilter, hEvent, fAsynchronous);
   }
 
@@ -4958,32 +4958,32 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regopenkeya
-  public static RegOpenKeyA(hKey: HKEY, lpSubKey: OPTIONAL<LPCSTR>, phkResult_out: PHKEY): LSTATUS {
+  public static RegOpenKeyA(hKey: HKEY, lpSubKey: Optional<LPCSTR>, phkResult_out: PHKEY): LSTATUS {
     return Advapi32.Load('RegOpenKeyA')(hKey, lpSubKey, phkResult_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regopenkeyexa
-  public static RegOpenKeyExA(hKey: HKEY, lpSubKey: OPTIONAL<LPCSTR>, ulOptions: DWORD, samDesired: REGSAM, phkResult_out: PHKEY): LSTATUS {
+  public static RegOpenKeyExA(hKey: HKEY, lpSubKey: Optional<LPCSTR>, ulOptions: DWORD, samDesired: REGSAM, phkResult_out: PHKEY): LSTATUS {
     return Advapi32.Load('RegOpenKeyExA')(hKey, lpSubKey, ulOptions, samDesired, phkResult_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regopenkeyexw
-  public static RegOpenKeyExW(hKey: HKEY, lpSubKey: OPTIONAL<LPCWSTR>, ulOptions: DWORD, samDesired: REGSAM, phkResult_out: PHKEY): LSTATUS {
+  public static RegOpenKeyExW(hKey: HKEY, lpSubKey: Optional<LPCWSTR>, ulOptions: DWORD, samDesired: REGSAM, phkResult_out: PHKEY): LSTATUS {
     return Advapi32.Load('RegOpenKeyExW')(hKey, lpSubKey, ulOptions, samDesired, phkResult_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regopenkeytransacteda
-  public static RegOpenKeyTransactedA(hKey: HKEY, lpSubKey: OPTIONAL<LPCSTR>, ulOptions: DWORD, samDesired: REGSAM, phkResult_out: PHKEY, hTransaction: HANDLE, pExtendedParemeter: OPTIONAL<PVOID>): LSTATUS {
+  public static RegOpenKeyTransactedA(hKey: HKEY, lpSubKey: Optional<LPCSTR>, ulOptions: DWORD, samDesired: REGSAM, phkResult_out: PHKEY, hTransaction: HANDLE, pExtendedParemeter: Optional<PVOID>): LSTATUS {
     return Advapi32.Load('RegOpenKeyTransactedA')(hKey, lpSubKey, ulOptions, samDesired, phkResult_out, hTransaction, pExtendedParemeter);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regopenkeytransactedw
-  public static RegOpenKeyTransactedW(hKey: HKEY, lpSubKey: OPTIONAL<LPCWSTR>, ulOptions: DWORD, samDesired: REGSAM, phkResult_out: PHKEY, hTransaction: HANDLE, pExtendedParemeter: OPTIONAL<PVOID>): LSTATUS {
+  public static RegOpenKeyTransactedW(hKey: HKEY, lpSubKey: Optional<LPCWSTR>, ulOptions: DWORD, samDesired: REGSAM, phkResult_out: PHKEY, hTransaction: HANDLE, pExtendedParemeter: Optional<PVOID>): LSTATUS {
     return Advapi32.Load('RegOpenKeyTransactedW')(hKey, lpSubKey, ulOptions, samDesired, phkResult_out, hTransaction, pExtendedParemeter);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regopenkeyw
-  public static RegOpenKeyW(hKey: HKEY, lpSubKey: OPTIONAL<LPCWSTR>, phkResult_out: PHKEY): LSTATUS {
+  public static RegOpenKeyW(hKey: HKEY, lpSubKey: Optional<LPCWSTR>, phkResult_out: PHKEY): LSTATUS {
     return Advapi32.Load('RegOpenKeyW')(hKey, lpSubKey, phkResult_out);
   }
 
@@ -4993,24 +4993,24 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regoverridepredefkey
-  public static RegOverridePredefKey(hKey: HKEY, hNewHKey: OPTIONAL<HKEY>): LSTATUS {
+  public static RegOverridePredefKey(hKey: HKEY, hNewHKey: Optional<HKEY>): LSTATUS {
     return Advapi32.Load('RegOverridePredefKey')(hKey, hNewHKey);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regqueryinfokeya
   public static RegQueryInfoKeyA(
     hKey: HKEY,
-    lpClass_out: OPTIONAL<LPSTR>,
-    lpcchClass_in_out: OPTIONAL<LPDWORD>,
+    lpClass_out: Optional<LPSTR>,
+    lpcchClass_in_out: Optional<LPDWORD>,
     lpReserved: NULL,
-    lpcSubKeys_out: OPTIONAL<LPDWORD>,
-    lpcbMaxSubKeyLen_out: OPTIONAL<LPDWORD>,
-    lpcbMaxClassLen_out: OPTIONAL<LPDWORD>,
-    lpcValues_out: OPTIONAL<LPDWORD>,
-    lpcbMaxValueNameLen_out: OPTIONAL<LPDWORD>,
-    lpcbMaxValueLen_out: OPTIONAL<LPDWORD>,
-    lpcbSecurityDescriptor_out: OPTIONAL<LPDWORD>,
-    lpftLastWriteTime_out: OPTIONAL<PVOID>,
+    lpcSubKeys_out: Optional<LPDWORD>,
+    lpcbMaxSubKeyLen_out: Optional<LPDWORD>,
+    lpcbMaxClassLen_out: Optional<LPDWORD>,
+    lpcValues_out: Optional<LPDWORD>,
+    lpcbMaxValueNameLen_out: Optional<LPDWORD>,
+    lpcbMaxValueLen_out: Optional<LPDWORD>,
+    lpcbSecurityDescriptor_out: Optional<LPDWORD>,
+    lpftLastWriteTime_out: Optional<PVOID>,
   ): LSTATUS {
     return Advapi32.Load('RegQueryInfoKeyA')(
       hKey,
@@ -5031,17 +5031,17 @@ class Advapi32 extends Win32 {
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regqueryinfokeyw
   public static RegQueryInfoKeyW(
     hKey: HKEY,
-    lpClass_out: OPTIONAL<LPWSTR>,
-    lpcchClass_in_out: OPTIONAL<LPDWORD>,
+    lpClass_out: Optional<LPWSTR>,
+    lpcchClass_in_out: Optional<LPDWORD>,
     lpReserved: NULL,
-    lpcSubKeys_out: OPTIONAL<LPDWORD>,
-    lpcbMaxSubKeyLen_out: OPTIONAL<LPDWORD>,
-    lpcbMaxClassLen_out: OPTIONAL<LPDWORD>,
-    lpcValues_out: OPTIONAL<LPDWORD>,
-    lpcbMaxValueNameLen_out: OPTIONAL<LPDWORD>,
-    lpcbMaxValueLen_out: OPTIONAL<LPDWORD>,
-    lpcbSecurityDescriptor_out: OPTIONAL<LPDWORD>,
-    lpftLastWriteTime_out: OPTIONAL<PVOID>,
+    lpcSubKeys_out: Optional<LPDWORD>,
+    lpcbMaxSubKeyLen_out: Optional<LPDWORD>,
+    lpcbMaxClassLen_out: Optional<LPDWORD>,
+    lpcValues_out: Optional<LPDWORD>,
+    lpcbMaxValueNameLen_out: Optional<LPDWORD>,
+    lpcbMaxValueLen_out: Optional<LPDWORD>,
+    lpcbSecurityDescriptor_out: Optional<LPDWORD>,
+    lpftLastWriteTime_out: Optional<PVOID>,
   ): LSTATUS {
     return Advapi32.Load('RegQueryInfoKeyW')(
       hKey,
@@ -5060,12 +5060,12 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regquerymultiplevaluesa
-  public static RegQueryMultipleValuesA(hKey: HKEY, val_list_out: PVALENTA, num_vals: DWORD, lpValueBuf_out: OPTIONAL<LPSTR>, ldwTotsize_in_out: OPTIONAL<LPDWORD>): LSTATUS {
+  public static RegQueryMultipleValuesA(hKey: HKEY, val_list_out: PVALENTA, num_vals: DWORD, lpValueBuf_out: Optional<LPSTR>, ldwTotsize_in_out: Optional<LPDWORD>): LSTATUS {
     return Advapi32.Load('RegQueryMultipleValuesA')(hKey, val_list_out, num_vals, lpValueBuf_out, ldwTotsize_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regquerymultiplevaluesw
-  public static RegQueryMultipleValuesW(hKey: HKEY, val_list_out: PVALENTW, num_vals: DWORD, lpValueBuf_out: OPTIONAL<LPWSTR>, ldwTotsize_in_out: OPTIONAL<LPDWORD>): LSTATUS {
+  public static RegQueryMultipleValuesW(hKey: HKEY, val_list_out: PVALENTW, num_vals: DWORD, lpValueBuf_out: Optional<LPWSTR>, ldwTotsize_in_out: Optional<LPDWORD>): LSTATUS {
     return Advapi32.Load('RegQueryMultipleValuesW')(hKey, val_list_out, num_vals, lpValueBuf_out, ldwTotsize_in_out);
   }
 
@@ -5075,37 +5075,37 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regqueryvaluea
-  public static RegQueryValueA(hKey: HKEY, lpSubKey: OPTIONAL<LPCSTR>, lpData_out: OPTIONAL<LPSTR>, lpcbData_in_out: OPTIONAL<PLONG>): LSTATUS {
+  public static RegQueryValueA(hKey: HKEY, lpSubKey: Optional<LPCSTR>, lpData_out: Optional<LPSTR>, lpcbData_in_out: Optional<PLONG>): LSTATUS {
     return Advapi32.Load('RegQueryValueA')(hKey, lpSubKey, lpData_out, lpcbData_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regqueryvalueexa
-  public static RegQueryValueExA(hKey: HKEY, lpValueName: OPTIONAL<LPCSTR>, lpReserved: NULL, lpType_out: OPTIONAL<LPDWORD>, lpData_out: OPTIONAL<LPBYTE>, lpcbData_in_out: OPTIONAL<LPDWORD>): LSTATUS {
+  public static RegQueryValueExA(hKey: HKEY, lpValueName: Optional<LPCSTR>, lpReserved: NULL, lpType_out: Optional<LPDWORD>, lpData_out: Optional<LPBYTE>, lpcbData_in_out: Optional<LPDWORD>): LSTATUS {
     return Advapi32.Load('RegQueryValueExA')(hKey, lpValueName, lpReserved, lpType_out, lpData_out, lpcbData_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regqueryvalueexw
-  public static RegQueryValueExW(hKey: HKEY, lpValueName: OPTIONAL<LPCWSTR>, lpReserved: NULL, lpType_out: OPTIONAL<LPDWORD>, lpData_out: OPTIONAL<LPBYTE>, lpcbData_in_out: OPTIONAL<LPDWORD>): LSTATUS {
+  public static RegQueryValueExW(hKey: HKEY, lpValueName: Optional<LPCWSTR>, lpReserved: NULL, lpType_out: Optional<LPDWORD>, lpData_out: Optional<LPBYTE>, lpcbData_in_out: Optional<LPDWORD>): LSTATUS {
     return Advapi32.Load('RegQueryValueExW')(hKey, lpValueName, lpReserved, lpType_out, lpData_out, lpcbData_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regqueryvaluew
-  public static RegQueryValueW(hKey: HKEY, lpSubKey: OPTIONAL<LPCWSTR>, lpData_out: OPTIONAL<LPWSTR>, lpcbData_in_out: OPTIONAL<PLONG>): LSTATUS {
+  public static RegQueryValueW(hKey: HKEY, lpSubKey: Optional<LPCWSTR>, lpData_out: Optional<LPWSTR>, lpcbData_in_out: Optional<PLONG>): LSTATUS {
     return Advapi32.Load('RegQueryValueW')(hKey, lpSubKey, lpData_out, lpcbData_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regrenamekey
-  public static RegRenameKey(hKey: HKEY, lpSubKeyName: OPTIONAL<LPCWSTR>, lpNewKeyName: LPCWSTR): LSTATUS {
+  public static RegRenameKey(hKey: HKEY, lpSubKeyName: Optional<LPCWSTR>, lpNewKeyName: LPCWSTR): LSTATUS {
     return Advapi32.Load('RegRenameKey')(hKey, lpSubKeyName, lpNewKeyName);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regreplacekeya
-  public static RegReplaceKeyA(hKey: HKEY, lpSubKey: OPTIONAL<LPCSTR>, lpNewFile: LPCSTR, lpOldFile: LPCSTR): LSTATUS {
+  public static RegReplaceKeyA(hKey: HKEY, lpSubKey: Optional<LPCSTR>, lpNewFile: LPCSTR, lpOldFile: LPCSTR): LSTATUS {
     return Advapi32.Load('RegReplaceKeyA')(hKey, lpSubKey, lpNewFile, lpOldFile);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regreplacekeyw
-  public static RegReplaceKeyW(hKey: HKEY, lpSubKey: OPTIONAL<LPCWSTR>, lpNewFile: LPCWSTR, lpOldFile: LPCWSTR): LSTATUS {
+  public static RegReplaceKeyW(hKey: HKEY, lpSubKey: Optional<LPCWSTR>, lpNewFile: LPCWSTR, lpOldFile: LPCWSTR): LSTATUS {
     return Advapi32.Load('RegReplaceKeyW')(hKey, lpSubKey, lpNewFile, lpOldFile);
   }
 
@@ -5120,22 +5120,22 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regsavekeya
-  public static RegSaveKeyA(hKey: HKEY, lpFile: LPCSTR, lpSecurityAttributes: OPTIONAL<PVOID>): LSTATUS {
+  public static RegSaveKeyA(hKey: HKEY, lpFile: LPCSTR, lpSecurityAttributes: Optional<PVOID>): LSTATUS {
     return Advapi32.Load('RegSaveKeyA')(hKey, lpFile, lpSecurityAttributes);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regsavekeyexa
-  public static RegSaveKeyExA(hKey: HKEY, lpFile: LPCSTR, lpSecurityAttributes: OPTIONAL<PVOID>, Flags: DWORD): LSTATUS {
+  public static RegSaveKeyExA(hKey: HKEY, lpFile: LPCSTR, lpSecurityAttributes: Optional<PVOID>, Flags: DWORD): LSTATUS {
     return Advapi32.Load('RegSaveKeyExA')(hKey, lpFile, lpSecurityAttributes, Flags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regsavekeyexw
-  public static RegSaveKeyExW(hKey: HKEY, lpFile: LPCWSTR, lpSecurityAttributes: OPTIONAL<PVOID>, Flags: DWORD): LSTATUS {
+  public static RegSaveKeyExW(hKey: HKEY, lpFile: LPCWSTR, lpSecurityAttributes: Optional<PVOID>, Flags: DWORD): LSTATUS {
     return Advapi32.Load('RegSaveKeyExW')(hKey, lpFile, lpSecurityAttributes, Flags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regsavekeyw
-  public static RegSaveKeyW(hKey: HKEY, lpFile: LPCWSTR, lpSecurityAttributes: OPTIONAL<PVOID>): LSTATUS {
+  public static RegSaveKeyW(hKey: HKEY, lpFile: LPCWSTR, lpSecurityAttributes: Optional<PVOID>): LSTATUS {
     return Advapi32.Load('RegSaveKeyW')(hKey, lpFile, lpSecurityAttributes);
   }
 
@@ -5145,52 +5145,52 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regsetkeyvaluea
-  public static RegSetKeyValueA(hKey: HKEY, lpSubKey: OPTIONAL<LPCSTR>, lpValueName: OPTIONAL<LPCSTR>, dwType: DWORD, lpData: OPTIONAL<LPCVOID>, cbData: DWORD): LSTATUS {
+  public static RegSetKeyValueA(hKey: HKEY, lpSubKey: Optional<LPCSTR>, lpValueName: Optional<LPCSTR>, dwType: DWORD, lpData: Optional<LPCVOID>, cbData: DWORD): LSTATUS {
     return Advapi32.Load('RegSetKeyValueA')(hKey, lpSubKey, lpValueName, dwType, lpData, cbData);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regsetkeyvaluew
-  public static RegSetKeyValueW(hKey: HKEY, lpSubKey: OPTIONAL<LPCWSTR>, lpValueName: OPTIONAL<LPCWSTR>, dwType: DWORD, lpData: OPTIONAL<LPCVOID>, cbData: DWORD): LSTATUS {
+  public static RegSetKeyValueW(hKey: HKEY, lpSubKey: Optional<LPCWSTR>, lpValueName: Optional<LPCWSTR>, dwType: DWORD, lpData: Optional<LPCVOID>, cbData: DWORD): LSTATUS {
     return Advapi32.Load('RegSetKeyValueW')(hKey, lpSubKey, lpValueName, dwType, lpData, cbData);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regsetvaluea
-  public static RegSetValueA(hKey: HKEY, lpSubKey: OPTIONAL<LPCSTR>, dwType: DWORD, lpData: OPTIONAL<LPCSTR>, cbData: DWORD): LSTATUS {
+  public static RegSetValueA(hKey: HKEY, lpSubKey: Optional<LPCSTR>, dwType: DWORD, lpData: Optional<LPCSTR>, cbData: DWORD): LSTATUS {
     return Advapi32.Load('RegSetValueA')(hKey, lpSubKey, dwType, lpData, cbData);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regsetvalueexa
-  public static RegSetValueExA(hKey: HKEY, lpValueName: OPTIONAL<LPCSTR>, Reserved: DWORD, dwType: DWORD, lpData: OPTIONAL<LPBYTE>, cbData: DWORD): LSTATUS {
+  public static RegSetValueExA(hKey: HKEY, lpValueName: Optional<LPCSTR>, Reserved: DWORD, dwType: DWORD, lpData: Optional<LPBYTE>, cbData: DWORD): LSTATUS {
     return Advapi32.Load('RegSetValueExA')(hKey, lpValueName, Reserved, dwType, lpData, cbData);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regsetvalueexw
-  public static RegSetValueExW(hKey: HKEY, lpValueName: OPTIONAL<LPCWSTR>, Reserved: DWORD, dwType: DWORD, lpData: OPTIONAL<LPBYTE>, cbData: DWORD): LSTATUS {
+  public static RegSetValueExW(hKey: HKEY, lpValueName: Optional<LPCWSTR>, Reserved: DWORD, dwType: DWORD, lpData: Optional<LPBYTE>, cbData: DWORD): LSTATUS {
     return Advapi32.Load('RegSetValueExW')(hKey, lpValueName, Reserved, dwType, lpData, cbData);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regsetvaluew
-  public static RegSetValueW(hKey: HKEY, lpSubKey: OPTIONAL<LPCWSTR>, dwType: DWORD, lpData: OPTIONAL<LPCWSTR>, cbData: DWORD): LSTATUS {
+  public static RegSetValueW(hKey: HKEY, lpSubKey: Optional<LPCWSTR>, dwType: DWORD, lpData: Optional<LPCWSTR>, cbData: DWORD): LSTATUS {
     return Advapi32.Load('RegSetValueW')(hKey, lpSubKey, dwType, lpData, cbData);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regunloadkeya
-  public static RegUnLoadKeyA(hKey: HKEY, lpSubKey: OPTIONAL<LPCSTR>): LSTATUS {
+  public static RegUnLoadKeyA(hKey: HKEY, lpSubKey: Optional<LPCSTR>): LSTATUS {
     return Advapi32.Load('RegUnLoadKeyA')(hKey, lpSubKey);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regunloadkeyw
-  public static RegUnLoadKeyW(hKey: HKEY, lpSubKey: OPTIONAL<LPCWSTR>): LSTATUS {
+  public static RegUnLoadKeyW(hKey: HKEY, lpSubKey: Optional<LPCWSTR>): LSTATUS {
     return Advapi32.Load('RegUnLoadKeyW')(hKey, lpSubKey);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-registereventsourcea
-  public static RegisterEventSourceA(lpUNCServerName: OPTIONAL<LPCSTR>, lpSourceName: LPCSTR): HANDLE {
+  public static RegisterEventSourceA(lpUNCServerName: Optional<LPCSTR>, lpSourceName: LPCSTR): HANDLE {
     return Advapi32.Load('RegisterEventSourceA')(lpUNCServerName, lpSourceName);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-registereventsourcew
-  public static RegisterEventSourceW(lpUNCServerName: OPTIONAL<LPCWSTR>, lpSourceName: LPCWSTR): HANDLE {
+  public static RegisterEventSourceW(lpUNCServerName: Optional<LPCWSTR>, lpSourceName: LPCWSTR): HANDLE {
     return Advapi32.Load('RegisterEventSourceW')(lpUNCServerName, lpSourceName);
   }
 
@@ -5205,12 +5205,12 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsvc/nf-winsvc-registerservicectrlhandlerexa
-  public static RegisterServiceCtrlHandlerExA(lpServiceName: LPCSTR, lpHandlerProc: PVOID, lpContext: OPTIONAL<LPVOID>): SERVICE_STATUS_HANDLE {
+  public static RegisterServiceCtrlHandlerExA(lpServiceName: LPCSTR, lpHandlerProc: PVOID, lpContext: Optional<LPVOID>): SERVICE_STATUS_HANDLE {
     return Advapi32.Load('RegisterServiceCtrlHandlerExA')(lpServiceName, lpHandlerProc, lpContext);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsvc/nf-winsvc-registerservicectrlhandlerexw
-  public static RegisterServiceCtrlHandlerExW(lpServiceName: LPCWSTR, lpHandlerProc: PVOID, lpContext: OPTIONAL<LPVOID>): SERVICE_STATUS_HANDLE {
+  public static RegisterServiceCtrlHandlerExW(lpServiceName: LPCWSTR, lpHandlerProc: PVOID, lpContext: Optional<LPVOID>): SERVICE_STATUS_HANDLE {
     return Advapi32.Load('RegisterServiceCtrlHandlerExW')(lpServiceName, lpHandlerProc, lpContext);
   }
 
@@ -5273,12 +5273,12 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-reporteventa
-  public static ReportEventA(hEventLog: HANDLE, wType: WORD, wCategory: WORD, dwEventID: DWORD, lpUserSid: OPTIONAL<PSID>, wNumStrings: WORD, dwDataSize: DWORD, lpStrings: OPTIONAL<PVOID>, lpRawData: OPTIONAL<LPVOID>): BOOL {
+  public static ReportEventA(hEventLog: HANDLE, wType: WORD, wCategory: WORD, dwEventID: DWORD, lpUserSid: Optional<PSID>, wNumStrings: WORD, dwDataSize: DWORD, lpStrings: Optional<PVOID>, lpRawData: Optional<LPVOID>): BOOL {
     return Advapi32.Load('ReportEventA')(hEventLog, wType, wCategory, dwEventID, lpUserSid, wNumStrings, dwDataSize, lpStrings, lpRawData);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-reporteventw
-  public static ReportEventW(hEventLog: HANDLE, wType: WORD, wCategory: WORD, dwEventID: DWORD, lpUserSid: OPTIONAL<PSID>, wNumStrings: WORD, dwDataSize: DWORD, lpStrings: OPTIONAL<PVOID>, lpRawData: OPTIONAL<LPVOID>): BOOL {
+  public static ReportEventW(hEventLog: HANDLE, wType: WORD, wCategory: WORD, dwEventID: DWORD, lpUserSid: Optional<PSID>, wNumStrings: WORD, dwDataSize: DWORD, lpStrings: Optional<PVOID>, lpRawData: Optional<LPVOID>): BOOL {
     return Advapi32.Load('ReportEventW')(hEventLog, wType, wCategory, dwEventID, lpUserSid, wNumStrings, dwDataSize, lpStrings, lpRawData);
   }
 
@@ -5298,7 +5298,7 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsafer/nf-winsafer-safercomputetokenfromlevel
-  public static SaferComputeTokenFromLevel(LevelHandle: HANDLE, InAccessToken: OPTIONAL<HANDLE>, OutAccessToken_out: PHANDLE, dwFlags: DWORD, lpReserved_in_out: OPTIONAL<PVOID>): BOOL {
+  public static SaferComputeTokenFromLevel(LevelHandle: HANDLE, InAccessToken: Optional<HANDLE>, OutAccessToken_out: PHANDLE, dwFlags: DWORD, lpReserved_in_out: Optional<PVOID>): BOOL {
     return Advapi32.Load('SaferComputeTokenFromLevel')(LevelHandle, InAccessToken, OutAccessToken_out, dwFlags, lpReserved_in_out);
   }
 
@@ -5308,7 +5308,7 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsafer/nf-winsafer-safergetlevelinformation
-  public static SaferGetLevelInformation(LevelHandle: HANDLE, dwInfoType: DWORD, lpQueryBuffer_out: OPTIONAL<PVOID>, dwInBufferSize: DWORD, lpdwOutBufferSize_out: LPDWORD): BOOL {
+  public static SaferGetLevelInformation(LevelHandle: HANDLE, dwInfoType: DWORD, lpQueryBuffer_out: Optional<PVOID>, dwInBufferSize: DWORD, lpdwOutBufferSize_out: LPDWORD): BOOL {
     return Advapi32.Load('SaferGetLevelInformation')(LevelHandle, dwInfoType, lpQueryBuffer_out, dwInBufferSize, lpdwOutBufferSize_out);
   }
 
@@ -5318,7 +5318,7 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsafer/nf-winsafer-saferidentifylevel
-  public static SaferIdentifyLevel(dwNumProperties: DWORD, pCodeProperties: OPTIONAL<PVOID>, pLevelHandle_out: PVOID, lpReserved: OPTIONAL<PVOID>): BOOL {
+  public static SaferIdentifyLevel(dwNumProperties: DWORD, pCodeProperties: Optional<PVOID>, pLevelHandle_out: PVOID, lpReserved: Optional<PVOID>): BOOL {
     return Advapi32.Load('SaferIdentifyLevel')(dwNumProperties, pCodeProperties, pLevelHandle_out, lpReserved);
   }
 
@@ -5378,7 +5378,7 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winefs/nf-winefs-setencryptedfilemetadata
-  public static SetEncryptedFileMetadata(lpFileName: LPCWSTR, pbOldMetadata: OPTIONAL<PVOID>, pbNewMetadata: PVOID, pOwnerHash: PVOID, dwOperation: DWORD, pCertificatesAdded: OPTIONAL<PVOID>): DWORD {
+  public static SetEncryptedFileMetadata(lpFileName: LPCWSTR, pbOldMetadata: Optional<PVOID>, pbNewMetadata: PVOID, pOwnerHash: PVOID, dwOperation: DWORD, pCertificatesAdded: Optional<PVOID>): DWORD {
     return Advapi32.Load('SetEncryptedFileMetadata')(lpFileName, pbOldMetadata, pbNewMetadata, pOwnerHash, dwOperation, pCertificatesAdded);
   }
 
@@ -5393,12 +5393,12 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/aclapi/nf-aclapi-setentriesinacla
-  public static SetEntriesInAclA(cCountOfExplicitEntries: ULONG, pListOfExplicitEntries: OPTIONAL<PEXPLICIT_ACCESSA>, OldAcl: OPTIONAL<PACL>, NewAcl_out: PVOID): DWORD {
+  public static SetEntriesInAclA(cCountOfExplicitEntries: ULONG, pListOfExplicitEntries: Optional<PEXPLICIT_ACCESSA>, OldAcl: Optional<PACL>, NewAcl_out: PVOID): DWORD {
     return Advapi32.Load('SetEntriesInAclA')(cCountOfExplicitEntries, pListOfExplicitEntries, OldAcl, NewAcl_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/aclapi/nf-aclapi-setentriesinaclw
-  public static SetEntriesInAclW(cCountOfExplicitEntries: ULONG, pListOfExplicitEntries: OPTIONAL<PEXPLICIT_ACCESSW>, OldAcl: OPTIONAL<PACL>, NewAcl_out: PVOID): DWORD {
+  public static SetEntriesInAclW(cCountOfExplicitEntries: ULONG, pListOfExplicitEntries: Optional<PEXPLICIT_ACCESSW>, OldAcl: Optional<PACL>, NewAcl_out: PVOID): DWORD {
     return Advapi32.Load('SetEntriesInAclW')(cCountOfExplicitEntries, pListOfExplicitEntries, OldAcl, NewAcl_out);
   }
 
@@ -5438,7 +5438,7 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/aclapi/nf-aclapi-setnamedsecurityinfoa
-  public static SetNamedSecurityInfoA(pObjectName: LPSTR, ObjectType: DWORD, SecurityInfo: SECURITY_INFORMATION, psidOwner: OPTIONAL<PSID>, psidGroup: OPTIONAL<PSID>, pDacl: OPTIONAL<PACL>, pSacl: OPTIONAL<PACL>): DWORD {
+  public static SetNamedSecurityInfoA(pObjectName: LPSTR, ObjectType: DWORD, SecurityInfo: SECURITY_INFORMATION, psidOwner: Optional<PSID>, psidGroup: Optional<PSID>, pDacl: Optional<PACL>, pSacl: Optional<PACL>): DWORD {
     return Advapi32.Load('SetNamedSecurityInfoA')(pObjectName, ObjectType, SecurityInfo, psidOwner, psidGroup, pDacl, pSacl);
   }
 
@@ -5453,12 +5453,12 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/aclapi/nf-aclapi-setnamedsecurityinfow
-  public static SetNamedSecurityInfoW(pObjectName: LPWSTR, ObjectType: DWORD, SecurityInfo: SECURITY_INFORMATION, psidOwner: OPTIONAL<PSID>, psidGroup: OPTIONAL<PSID>, pDacl: OPTIONAL<PACL>, pSacl: OPTIONAL<PACL>): DWORD {
+  public static SetNamedSecurityInfoW(pObjectName: LPWSTR, ObjectType: DWORD, SecurityInfo: SECURITY_INFORMATION, psidOwner: Optional<PSID>, psidGroup: Optional<PSID>, pDacl: Optional<PACL>, pSacl: Optional<PACL>): DWORD {
     return Advapi32.Load('SetNamedSecurityInfoW')(pObjectName, ObjectType, SecurityInfo, psidOwner, psidGroup, pDacl, pSacl);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/securitybaseapi/nf-securitybaseapi-setprivateobjectsecurity
-  public static SetPrivateObjectSecurity(SecurityInformation: SECURITY_INFORMATION, ModificationDescriptor: PSECURITY_DESCRIPTOR, ObjectsSecurityDescriptor_in_out: PVOID, GenericMapping: PGENERIC_MAPPING, Token: OPTIONAL<HANDLE>): BOOL {
+  public static SetPrivateObjectSecurity(SecurityInformation: SECURITY_INFORMATION, ModificationDescriptor: PSECURITY_DESCRIPTOR, ObjectsSecurityDescriptor_in_out: PVOID, GenericMapping: PGENERIC_MAPPING, Token: Optional<HANDLE>): BOOL {
     return Advapi32.Load('SetPrivateObjectSecurity')(SecurityInformation, ModificationDescriptor, ObjectsSecurityDescriptor_in_out, GenericMapping, Token);
   }
 
@@ -5469,7 +5469,7 @@ class Advapi32 extends Win32 {
     ObjectsSecurityDescriptor_in_out: PVOID,
     AutoInheritFlags: ULONG,
     GenericMapping: PGENERIC_MAPPING,
-    Token: OPTIONAL<HANDLE>,
+    Token: Optional<HANDLE>,
   ): BOOL {
     return Advapi32.Load('SetPrivateObjectSecurityEx')(SecurityInformation, ModificationDescriptor, ObjectsSecurityDescriptor_in_out, AutoInheritFlags, GenericMapping, Token);
   }
@@ -5485,32 +5485,32 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/securitybaseapi/nf-securitybaseapi-setsecuritydescriptordacl
-  public static SetSecurityDescriptorDacl(pSecurityDescriptor_in_out: PSECURITY_DESCRIPTOR, bDaclPresent: BOOL, pDacl: OPTIONAL<PACL>, bDaclDefaulted: BOOL): BOOL {
+  public static SetSecurityDescriptorDacl(pSecurityDescriptor_in_out: PSECURITY_DESCRIPTOR, bDaclPresent: BOOL, pDacl: Optional<PACL>, bDaclDefaulted: BOOL): BOOL {
     return Advapi32.Load('SetSecurityDescriptorDacl')(pSecurityDescriptor_in_out, bDaclPresent, pDacl, bDaclDefaulted);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/securitybaseapi/nf-securitybaseapi-setsecuritydescriptorgroup
-  public static SetSecurityDescriptorGroup(pSecurityDescriptor_in_out: PSECURITY_DESCRIPTOR, pGroup: OPTIONAL<PSID>, bGroupDefaulted: BOOL): BOOL {
+  public static SetSecurityDescriptorGroup(pSecurityDescriptor_in_out: PSECURITY_DESCRIPTOR, pGroup: Optional<PSID>, bGroupDefaulted: BOOL): BOOL {
     return Advapi32.Load('SetSecurityDescriptorGroup')(pSecurityDescriptor_in_out, pGroup, bGroupDefaulted);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/securitybaseapi/nf-securitybaseapi-setsecuritydescriptorowner
-  public static SetSecurityDescriptorOwner(pSecurityDescriptor_in_out: PSECURITY_DESCRIPTOR, pOwner: OPTIONAL<PSID>, bOwnerDefaulted: BOOL): BOOL {
+  public static SetSecurityDescriptorOwner(pSecurityDescriptor_in_out: PSECURITY_DESCRIPTOR, pOwner: Optional<PSID>, bOwnerDefaulted: BOOL): BOOL {
     return Advapi32.Load('SetSecurityDescriptorOwner')(pSecurityDescriptor_in_out, pOwner, bOwnerDefaulted);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/securitybaseapi/nf-securitybaseapi-setsecuritydescriptorrmcontrol
-  public static SetSecurityDescriptorRMControl(SecurityDescriptor_in_out: PSECURITY_DESCRIPTOR, RMControl: OPTIONAL<PUCHAR>): DWORD {
+  public static SetSecurityDescriptorRMControl(SecurityDescriptor_in_out: PSECURITY_DESCRIPTOR, RMControl: Optional<PUCHAR>): DWORD {
     return Advapi32.Load('SetSecurityDescriptorRMControl')(SecurityDescriptor_in_out, RMControl);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/securitybaseapi/nf-securitybaseapi-setsecuritydescriptorsacl
-  public static SetSecurityDescriptorSacl(pSecurityDescriptor_in_out: PSECURITY_DESCRIPTOR, bSaclPresent: BOOL, pSacl: OPTIONAL<PACL>, bSaclDefaulted: BOOL): BOOL {
+  public static SetSecurityDescriptorSacl(pSecurityDescriptor_in_out: PSECURITY_DESCRIPTOR, bSaclPresent: BOOL, pSacl: Optional<PACL>, bSaclDefaulted: BOOL): BOOL {
     return Advapi32.Load('SetSecurityDescriptorSacl')(pSecurityDescriptor_in_out, bSaclPresent, pSacl, bSaclDefaulted);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/aclapi/nf-aclapi-setsecurityinfo
-  public static SetSecurityInfo(handle: HANDLE, ObjectType: DWORD, SecurityInfo: SECURITY_INFORMATION, psidOwner: OPTIONAL<PSID>, psidGroup: OPTIONAL<PSID>, pDacl: OPTIONAL<PACL>, pSacl: OPTIONAL<PACL>): DWORD {
+  public static SetSecurityInfo(handle: HANDLE, ObjectType: DWORD, SecurityInfo: SECURITY_INFORMATION, psidOwner: Optional<PSID>, psidGroup: Optional<PSID>, pDacl: Optional<PACL>, pSacl: Optional<PACL>): DWORD {
     return Advapi32.Load('SetSecurityInfo')(handle, ObjectType, SecurityInfo, psidOwner, psidGroup, pDacl, pSacl);
   }
 
@@ -5540,7 +5540,7 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-setthreadtoken
-  public static SetThreadToken(Thread: OPTIONAL<PHANDLE>, Token: OPTIONAL<HANDLE>): BOOL {
+  public static SetThreadToken(Thread: Optional<PHANDLE>, Token: Optional<HANDLE>): BOOL {
     return Advapi32.Load('SetThreadToken')(Thread, Token);
   }
 
@@ -5550,17 +5550,17 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winefs/nf-winefs-setuserfileencryptionkey
-  public static SetUserFileEncryptionKey(pEncryptionCertificate: OPTIONAL<PVOID>): DWORD {
+  public static SetUserFileEncryptionKey(pEncryptionCertificate: Optional<PVOID>): DWORD {
     return Advapi32.Load('SetUserFileEncryptionKey')(pEncryptionCertificate);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winefs/nf-winefs-setuserfileencryptionkeyex
-  public static SetUserFileEncryptionKeyEx(pEncryptionCertificate: OPTIONAL<PVOID>, dwCapabilities: DWORD, dwFlags: DWORD, pvReserved: NULL): DWORD {
+  public static SetUserFileEncryptionKeyEx(pEncryptionCertificate: Optional<PVOID>, dwCapabilities: DWORD, dwFlags: DWORD, pvReserved: NULL): DWORD {
     return Advapi32.Load('SetUserFileEncryptionKeyEx')(pEncryptionCertificate, dwCapabilities, dwFlags, pvReserved);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsvc/nf-winsvc-startservicea
-  public static StartServiceA(hService: SC_HANDLE, dwNumServiceArgs: DWORD, lpServiceArgVectors: OPTIONAL<PVOID>): BOOL {
+  public static StartServiceA(hService: SC_HANDLE, dwNumServiceArgs: DWORD, lpServiceArgVectors: Optional<PVOID>): BOOL {
     return Advapi32.Load('StartServiceA')(hService, dwNumServiceArgs, lpServiceArgVectors);
   }
 
@@ -5575,7 +5575,7 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsvc/nf-winsvc-startservicew
-  public static StartServiceW(hService: SC_HANDLE, dwNumServiceArgs: DWORD, lpServiceArgVectors: OPTIONAL<PVOID>): BOOL {
+  public static StartServiceW(hService: SC_HANDLE, dwNumServiceArgs: DWORD, lpServiceArgVectors: Optional<PVOID>): BOOL {
     return Advapi32.Load('StartServiceW')(hService, dwNumServiceArgs, lpServiceArgVectors);
   }
 
@@ -5590,12 +5590,12 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/evntrace/nf-evntrace-stoptracea
-  public static StopTraceA(TraceHandle: TRACEHANDLE, InstanceName: OPTIONAL<LPCSTR>, Properties_in_out: PVOID): ULONG {
+  public static StopTraceA(TraceHandle: TRACEHANDLE, InstanceName: Optional<LPCSTR>, Properties_in_out: PVOID): ULONG {
     return Advapi32.Load('StopTraceA')(TraceHandle, InstanceName, Properties_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/evntrace/nf-evntrace-stoptracew
-  public static StopTraceW(TraceHandle: TRACEHANDLE, InstanceName: OPTIONAL<LPCWSTR>, Properties_in_out: PVOID): ULONG {
+  public static StopTraceW(TraceHandle: TRACEHANDLE, InstanceName: Optional<LPCWSTR>, Properties_in_out: PVOID): ULONG {
     return Advapi32.Load('StopTraceW')(TraceHandle, InstanceName, Properties_in_out);
   }
 
@@ -5619,14 +5619,14 @@ class Advapi32 extends Win32 {
     pObjectName: LPSTR,
     ObjectType: DWORD,
     SecurityInfo: SECURITY_INFORMATION,
-    pOwner: OPTIONAL<PSID>,
-    pGroup: OPTIONAL<PSID>,
-    pDacl: OPTIONAL<PACL>,
-    pSacl: OPTIONAL<PACL>,
+    pOwner: Optional<PSID>,
+    pGroup: Optional<PSID>,
+    pDacl: Optional<PACL>,
+    pSacl: Optional<PACL>,
     KeepExplicit: BOOL,
-    fnProgress: OPTIONAL<PVOID>,
+    fnProgress: Optional<PVOID>,
     ProgressInvokeSetting: DWORD,
-    Args: OPTIONAL<PVOID>,
+    Args: Optional<PVOID>,
   ): DWORD {
     return Advapi32.Load('TreeResetNamedSecurityInfoA')(pObjectName, ObjectType, SecurityInfo, pOwner, pGroup, pDacl, pSacl, KeepExplicit, fnProgress, ProgressInvokeSetting, Args);
   }
@@ -5636,14 +5636,14 @@ class Advapi32 extends Win32 {
     pObjectName: LPWSTR,
     ObjectType: DWORD,
     SecurityInfo: SECURITY_INFORMATION,
-    pOwner: OPTIONAL<PSID>,
-    pGroup: OPTIONAL<PSID>,
-    pDacl: OPTIONAL<PACL>,
-    pSacl: OPTIONAL<PACL>,
+    pOwner: Optional<PSID>,
+    pGroup: Optional<PSID>,
+    pDacl: Optional<PACL>,
+    pSacl: Optional<PACL>,
     KeepExplicit: BOOL,
-    fnProgress: OPTIONAL<PVOID>,
+    fnProgress: Optional<PVOID>,
     ProgressInvokeSetting: DWORD,
-    Args: OPTIONAL<PVOID>,
+    Args: Optional<PVOID>,
   ): DWORD {
     return Advapi32.Load('TreeResetNamedSecurityInfoW')(pObjectName, ObjectType, SecurityInfo, pOwner, pGroup, pDacl, pSacl, KeepExplicit, fnProgress, ProgressInvokeSetting, Args);
   }
@@ -5653,14 +5653,14 @@ class Advapi32 extends Win32 {
     pObjectName: LPSTR,
     ObjectType: DWORD,
     SecurityInfo: SECURITY_INFORMATION,
-    pOwner: OPTIONAL<PSID>,
-    pGroup: OPTIONAL<PSID>,
-    pDacl: OPTIONAL<PACL>,
-    pSacl: OPTIONAL<PACL>,
+    pOwner: Optional<PSID>,
+    pGroup: Optional<PSID>,
+    pDacl: Optional<PACL>,
+    pSacl: Optional<PACL>,
     dwAction: DWORD,
-    fnProgress: OPTIONAL<PVOID>,
+    fnProgress: Optional<PVOID>,
     ProgressInvokeSetting: DWORD,
-    Args: OPTIONAL<PVOID>,
+    Args: Optional<PVOID>,
   ): DWORD {
     return Advapi32.Load('TreeSetNamedSecurityInfoA')(pObjectName, ObjectType, SecurityInfo, pOwner, pGroup, pDacl, pSacl, dwAction, fnProgress, ProgressInvokeSetting, Args);
   }
@@ -5670,14 +5670,14 @@ class Advapi32 extends Win32 {
     pObjectName: LPWSTR,
     ObjectType: DWORD,
     SecurityInfo: SECURITY_INFORMATION,
-    pOwner: OPTIONAL<PSID>,
-    pGroup: OPTIONAL<PSID>,
-    pDacl: OPTIONAL<PACL>,
-    pSacl: OPTIONAL<PACL>,
+    pOwner: Optional<PSID>,
+    pGroup: Optional<PSID>,
+    pDacl: Optional<PACL>,
+    pSacl: Optional<PACL>,
     dwAction: DWORD,
-    fnProgress: OPTIONAL<PVOID>,
+    fnProgress: Optional<PVOID>,
     ProgressInvokeSetting: DWORD,
-    Args: OPTIONAL<PVOID>,
+    Args: Optional<PVOID>,
   ): DWORD {
     return Advapi32.Load('TreeSetNamedSecurityInfoW')(pObjectName, ObjectType, SecurityInfo, pOwner, pGroup, pDacl, pSacl, dwAction, fnProgress, ProgressInvokeSetting, Args);
   }
@@ -5708,12 +5708,12 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/evntrace/nf-evntrace-updatetracea
-  public static UpdateTraceA(TraceHandle: TRACEHANDLE, InstanceName: OPTIONAL<LPCSTR>, Properties_in_out: PVOID): ULONG {
+  public static UpdateTraceA(TraceHandle: TRACEHANDLE, InstanceName: Optional<LPCSTR>, Properties_in_out: PVOID): ULONG {
     return Advapi32.Load('UpdateTraceA')(TraceHandle, InstanceName, Properties_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/evntrace/nf-evntrace-updatetracew
-  public static UpdateTraceW(TraceHandle: TRACEHANDLE, InstanceName: OPTIONAL<LPCWSTR>, Properties_in_out: PVOID): ULONG {
+  public static UpdateTraceW(TraceHandle: TRACEHANDLE, InstanceName: Optional<LPCWSTR>, Properties_in_out: PVOID): ULONG {
     return Advapi32.Load('UpdateTraceW')(TraceHandle, InstanceName, Properties_in_out);
   }
 
@@ -5728,7 +5728,7 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsvc/nf-winsvc-waitservicestate
-  public static WaitServiceState(hService: SC_HANDLE, dwNotify: DWORD, dwTimeout: DWORD, hCancelEvent: OPTIONAL<HANDLE>): DWORD {
+  public static WaitServiceState(hService: SC_HANDLE, dwNotify: DWORD, dwTimeout: DWORD, hCancelEvent: Optional<HANDLE>): DWORD {
     return Advapi32.Load('WaitServiceState')(hService, dwNotify, dwTimeout, hCancelEvent);
   }
 
@@ -5878,7 +5878,7 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-writeencryptedfileraw
-  public static WriteEncryptedFileRaw(pfImportCallback: PVOID, pvCallbackContext: OPTIONAL<PVOID>, pvContext: PVOID): DWORD {
+  public static WriteEncryptedFileRaw(pfImportCallback: PVOID, pvCallbackContext: Optional<PVOID>, pvContext: PVOID): DWORD {
     return Advapi32.Load('WriteEncryptedFileRaw')(pfImportCallback, pvCallbackContext, pvContext);
   }
 }

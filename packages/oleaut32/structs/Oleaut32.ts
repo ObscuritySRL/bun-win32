@@ -53,8 +53,8 @@ import type {
   LPVARIANT,
   LPVARIANTARG,
   NULL,
-  NULLABLE,
-  OPTIONAL,
+  Nullable,
+  Optional,
   PCOLORREF,
   POCPFIPARAMS,
   PULONG,
@@ -596,7 +596,7 @@ class Oleaut32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-dispcallfunc
-  public static DispCallFunc(pvInstance: OPTIONAL<PVOID>, oVft: ULONG_PTR, cc: CallConv, vtReturn: VARTYPE, cActuals: UINT, prgvt: PVARTYPE, prgpvarg: Pointer, pvargResult_out: LPVARIANT): HRESULT {
+  public static DispCallFunc(pvInstance: Optional<PVOID>, oVft: ULONG_PTR, cc: CallConv, vtReturn: VARTYPE, cActuals: UINT, prgvt: PVARTYPE, prgpvarg: Pointer, pvargResult_out: LPVARIANT): HRESULT {
     return Oleaut32.Load('DispCallFunc')(pvInstance, oVft, cc, vtReturn, cActuals, prgvt, prgpvarg, pvargResult_out);
   }
 
@@ -606,12 +606,12 @@ class Oleaut32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-dispgetparam
-  public static DispGetParam(pdispparams: LPDISPPARAMS, position: UINT, vtTarg: VARTYPE, pvarResult_out: LPVARIANTARG, puArgErr_out: OPTIONAL<Pointer>): HRESULT {
+  public static DispGetParam(pdispparams: LPDISPPARAMS, position: UINT, vtTarg: VARTYPE, pvarResult_out: LPVARIANTARG, puArgErr_out: Optional<Pointer>): HRESULT {
     return Oleaut32.Load('DispGetParam')(pdispparams, position, vtTarg, pvarResult_out, puArgErr_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-dispinvoke
-  public static DispInvoke(_this: PVOID, ptinfo: ITypeInfo, dispidMember: DISPID, wFlags: WORD, pparams: LPDISPPARAMS, pvarResult_out: NULLABLE<LPVARIANT>, pexcepinfo_out: NULLABLE<LPEXCEPINFO>, puArgErr_out: NULLABLE<Pointer>): HRESULT {
+  public static DispInvoke(_this: PVOID, ptinfo: ITypeInfo, dispidMember: DISPID, wFlags: WORD, pparams: LPDISPPARAMS, pvarResult_out: Nullable<LPVARIANT>, pexcepinfo_out: Nullable<LPEXCEPINFO>, puArgErr_out: Nullable<Pointer>): HRESULT {
     return Oleaut32.Load('DispInvoke')(_this, ptinfo, dispidMember, wFlags, pparams, pvarResult_out, pexcepinfo_out, puArgErr_out);
   }
 
@@ -776,7 +776,7 @@ class Oleaut32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/olectl/nf-olectl-olecreatepictureindirect
-  public static OleCreatePictureIndirect(lpPictDesc: NULLABLE<LPPICTDESC>, riid: REFIID, fOwn: BOOL, lplpvObj_out: LPLPVOID): HRESULT {
+  public static OleCreatePictureIndirect(lpPictDesc: Nullable<LPPICTDESC>, riid: REFIID, fOwn: BOOL, lplpvObj_out: LPLPVOID): HRESULT {
     return Oleaut32.Load('OleCreatePictureIndirect')(lpPictDesc, riid, fOwn, lplpvObj_out);
   }
 
@@ -816,7 +816,7 @@ class Oleaut32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/olectl/nf-olectl-oleloadpicturepath
-  public static OleLoadPicturePath(szURLorPath: LPOLESTR, punkCaller: NULLABLE<IUnknown>, dwReserved: DWORD, clrReserved: DWORD, riid: REFIID, ppvRet_out: LPLPVOID): HRESULT {
+  public static OleLoadPicturePath(szURLorPath: LPOLESTR, punkCaller: Nullable<IUnknown>, dwReserved: DWORD, clrReserved: DWORD, riid: REFIID, ppvRet_out: LPLPVOID): HRESULT {
     return Oleaut32.Load('OleLoadPicturePath')(szURLorPath, punkCaller, dwReserved, clrReserved, riid, ppvRet_out);
   }
 
@@ -826,7 +826,7 @@ class Oleaut32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/olectl/nf-olectl-oletranslatecolor
-  public static OleTranslateColor(clr: DWORD, hpal: NULLABLE<HANDLE>, pcolorref_out: NULLABLE<PCOLORREF>): HRESULT {
+  public static OleTranslateColor(clr: DWORD, hpal: Nullable<HANDLE>, pcolorref_out: Nullable<PCOLORREF>): HRESULT {
     return Oleaut32.Load('OleTranslateColor')(clr, hpal, pcolorref_out);
   }
 
@@ -841,12 +841,12 @@ class Oleaut32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-registertypelib
-  public static RegisterTypeLib(ptlib: ITypeLib, szFullPath: LPCOLESTR, szHelpDir: OPTIONAL<LPCOLESTR>): HRESULT {
+  public static RegisterTypeLib(ptlib: ITypeLib, szFullPath: LPCOLESTR, szHelpDir: Optional<LPCOLESTR>): HRESULT {
     return Oleaut32.Load('RegisterTypeLib')(ptlib, szFullPath, szHelpDir);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-registertypelibforuser
-  public static RegisterTypeLibForUser(ptlib: ITypeLib, szFullPath: LPCOLESTR, szHelpDir: OPTIONAL<LPCOLESTR>): HRESULT {
+  public static RegisterTypeLibForUser(ptlib: ITypeLib, szFullPath: LPCOLESTR, szHelpDir: Optional<LPCOLESTR>): HRESULT {
     return Oleaut32.Load('RegisterTypeLibForUser')(ptlib, szFullPath, szHelpDir);
   }
 
@@ -896,7 +896,7 @@ class Oleaut32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-safearraycreateex
-  public static SafeArrayCreateEx(vt: VARTYPE, cDims: UINT, rgsabound: LPSAFEARRAYBOUND, pvExtra: NULLABLE<PVOID>): LPSAFEARRAY {
+  public static SafeArrayCreateEx(vt: VARTYPE, cDims: UINT, rgsabound: LPSAFEARRAYBOUND, pvExtra: Nullable<PVOID>): LPSAFEARRAY {
     return Oleaut32.Load('SafeArrayCreateEx')(vt, cDims, rgsabound, pvExtra);
   }
 
@@ -906,7 +906,7 @@ class Oleaut32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-safearraycreatevectorex
-  public static SafeArrayCreateVectorEx(vt: VARTYPE, lLbound: LONG, cElements: ULONG, pvExtra: NULLABLE<PVOID>): LPSAFEARRAY {
+  public static SafeArrayCreateVectorEx(vt: VARTYPE, lLbound: LONG, cElements: ULONG, pvExtra: Nullable<PVOID>): LPSAFEARRAY {
     return Oleaut32.Load('SafeArrayCreateVectorEx')(vt, lLbound, cElements, pvExtra);
   }
 
@@ -1016,7 +1016,7 @@ class Oleaut32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-seterrorinfo
-  public static SetErrorInfo(dwReserved: ULONG, perrinfo: OPTIONAL<IErrorInfo>): HRESULT {
+  public static SetErrorInfo(dwReserved: ULONG, perrinfo: Optional<IErrorInfo>): HRESULT {
     return Oleaut32.Load('SetErrorInfo')(dwReserved, perrinfo);
   }
 
@@ -1036,32 +1036,32 @@ class Oleaut32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-sysallocstring
-  public static SysAllocString(psz: OPTIONAL<LPCOLESTR>): BSTR {
+  public static SysAllocString(psz: Optional<LPCOLESTR>): BSTR {
     return Oleaut32.Load('SysAllocString')(psz);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-sysallocstringbytelen
-  public static SysAllocStringByteLen(psz: OPTIONAL<LPCSTR>, len: UINT): BSTR {
+  public static SysAllocStringByteLen(psz: Optional<LPCSTR>, len: UINT): BSTR {
     return Oleaut32.Load('SysAllocStringByteLen')(psz, len);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-sysallocstringlen
-  public static SysAllocStringLen(strIn: OPTIONAL<LPCOLESTR>, ui: UINT): BSTR {
+  public static SysAllocStringLen(strIn: Optional<LPCOLESTR>, ui: UINT): BSTR {
     return Oleaut32.Load('SysAllocStringLen')(strIn, ui);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-sysfreestring
-  public static SysFreeString(bstrString: OPTIONAL<BSTR>): void {
+  public static SysFreeString(bstrString: Optional<BSTR>): void {
     return Oleaut32.Load('SysFreeString')(bstrString);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-sysreallocstring
-  public static SysReAllocString(pbstr_in_out: LPBSTR, psz: OPTIONAL<LPCOLESTR>): INT {
+  public static SysReAllocString(pbstr_in_out: LPBSTR, psz: Optional<LPCOLESTR>): INT {
     return Oleaut32.Load('SysReAllocString')(pbstr_in_out, psz);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-sysreallocstringlen
-  public static SysReAllocStringLen(pbstr_in_out: LPBSTR, psz: OPTIONAL<LPCOLESTR>, len: UINT): INT {
+  public static SysReAllocStringLen(pbstr_in_out: LPBSTR, psz: Optional<LPCOLESTR>, len: UINT): INT {
     return Oleaut32.Load('SysReAllocStringLen')(pbstr_in_out, psz, len);
   }
 
@@ -1071,12 +1071,12 @@ class Oleaut32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-sysstringbytelen
-  public static SysStringByteLen(bstr: OPTIONAL<BSTR>): UINT {
+  public static SysStringByteLen(bstr: Optional<BSTR>): UINT {
     return Oleaut32.Load('SysStringByteLen')(bstr);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-sysstringlen
-  public static SysStringLen(pbstr: OPTIONAL<BSTR>): UINT {
+  public static SysStringLen(pbstr: Optional<BSTR>): UINT {
     return Oleaut32.Load('SysStringLen')(pbstr);
   }
 
@@ -1646,7 +1646,7 @@ class Oleaut32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-varformat
-  public static VarFormat(pvarIn: LPVARIANTARG, pstrFormat: OPTIONAL<LPOLESTR>, iFirstDay: INT, iFirstWeek: INT, dwFlags: ULONG, pbstrOut_out: LPBSTR): HRESULT {
+  public static VarFormat(pvarIn: LPVARIANTARG, pstrFormat: Optional<LPOLESTR>, iFirstDay: INT, iFirstWeek: INT, dwFlags: ULONG, pbstrOut_out: LPBSTR): HRESULT {
     return Oleaut32.Load('VarFormat')(pvarIn, pstrFormat, iFirstDay, iFirstWeek, dwFlags, pbstrOut_out);
   }
 
@@ -1661,7 +1661,7 @@ class Oleaut32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-varformatfromtokens
-  public static VarFormatFromTokens(pvarIn: LPVARIANTARG, pstrFormat: OPTIONAL<LPOLESTR>, pbTokCur: Pointer, dwFlags: ULONG, pbstrOut_out: LPBSTR, lcid: LCID): HRESULT {
+  public static VarFormatFromTokens(pvarIn: LPVARIANTARG, pstrFormat: Optional<LPOLESTR>, pbTokCur: Pointer, dwFlags: ULONG, pbstrOut_out: LPBSTR, lcid: LCID): HRESULT {
     return Oleaut32.Load('VarFormatFromTokens')(pvarIn, pstrFormat, pbTokCur, dwFlags, pbstrOut_out, lcid);
   }
 
@@ -2286,7 +2286,7 @@ class Oleaut32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-vartokenizeformatstring
-  public static VarTokenizeFormatString(pstrFormat: OPTIONAL<LPOLESTR>, rgbTok_in_out: Pointer, cbTok: INT, iFirstDay: INT, iFirstWeek: INT, lcid: LCID, pcbActual_out: OPTIONAL<Pointer>): HRESULT {
+  public static VarTokenizeFormatString(pstrFormat: Optional<LPOLESTR>, rgbTok_in_out: Pointer, cbTok: INT, iFirstDay: INT, iFirstWeek: INT, lcid: LCID, pcbActual_out: Optional<Pointer>): HRESULT {
     return Oleaut32.Load('VarTokenizeFormatString')(pstrFormat, rgbTok_in_out, cbTok, iFirstDay, iFirstWeek, lcid, pcbActual_out);
   }
 

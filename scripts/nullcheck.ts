@@ -11,7 +11,7 @@
  *
  * For each pointer-like (resolves to bun:ffi Pointer) or handle-like (resolves to
  * a bigint handle) parameter it reports:
- *   - MISSING       header SAL is optional (_opt_ / _Reserved_ / OPTIONAL) but the
+ *   - MISSING       header SAL is optional (_opt_ / _Reserved_ / Optional) but the
  *                   TS signature lacks the union -> pointer needs `| NULL`, handle
  *                   needs `| 0n`. These are real bugs; `--fix` adds them.
  *   - TYPE_MISMATCH the TS type disagrees with the header on pointer-vs-handle
@@ -229,10 +229,10 @@ function parseMethods(source: string): MethodEntry[] {
         // Strip the SAL direction suffix (_out / _in_out) so the param name matches the SDK-header param name.
         const name = paramMatch[1].replace(/_(in_out|out)$/, '');
         const tsType = paramMatch[2].trim().replace(/\s+/g, ' ');
-        // Nullability marker, SAL vocabulary: OPTIONAL<…> / NULLABLE<…> / bare NULL (or legacy | NULL / | 0n).
-        const optWrap = tsType.match(/^(OPTIONAL|NULLABLE)<([\s\S]+)>$/);
+        // Nullability marker, SAL vocabulary: Optional<…> / Nullable<…> / bare NULL (or legacy | NULL / | 0n).
+        const optWrap = tsType.match(/^(Optional|Nullable)<([\s\S]+)>$/);
         const legacy = /\|\s*NULL\b/.test(tsType) || /\|\s*0n\b/.test(tsType);
-        const markerKind: MethodParam['markerKind'] = optWrap ? (optWrap[1] === 'OPTIONAL' ? 'optional' : 'nullable') : tsType === 'NULL' ? 'null' : legacy ? 'legacy' : 'none';
+        const markerKind: MethodParam['markerKind'] = optWrap ? (optWrap[1] === 'Optional' ? 'optional' : 'nullable') : tsType === 'NULL' ? 'null' : legacy ? 'legacy' : 'none';
         const isNullable = markerKind !== 'none';
         const baseType = (optWrap ? optWrap[2] : tsType)
           .replace(/\s*\|\s*NULL\b/g, '')
@@ -591,10 +591,10 @@ function parseSdkParams(inner: string): SdkParam[] {
     const optional = /_opt_/i.test(part) || /\b_Reserved_\b/.test(part) || /\bOPTIONAL\b/.test(part);
     const array = /\[/.test(part); // `Type Name[]` / `Type Name[N]` decays to a pointer
     // Strip SAL: leading-underscore annotations (optionally with (...) args),
-    // old-style IN/OUT/INOUT/OPTIONAL macros, const, and trailing array [].
+    // old-style IN/OUT/INOUT/Optional macros, const, and trailing array [].
     const cleaned = part
       .replace(/_(?=[A-Za-z]*[a-z])[A-Za-z0-9_]+(?:\([^)]*\))?/g, '')
-      .replace(/\b(IN|OUT|INOUT|OPTIONAL)\b/g, '')
+      .replace(/\b(IN|OUT|INOUT|Optional)\b/g, '')
       .replace(/\bGDIPCONST\b/g, '')
       .replace(/\bCONST\b/gi, '')
       .replace(/\[[^\]]*\]/g, '')
@@ -713,7 +713,7 @@ function auditPackage(pkg: string): { findings: Finding[]; className: string } {
       if (headerParam.optional && !hasMarker) {
         findings.push({ kind: 'MISSING', method: method.name, symbol: method.symbolName, param: param.name, paramBase: param.baseType, marker, ctype: headerParam.ctype, line: method.line, header: proto.header });
       } else if (!headerParam.optional && (param.markerKind === 'optional' || param.markerKind === 'legacy')) {
-        // Only OPTIONAL (formally-optional) is header-verifiable. NULLABLE is prose-based ("can be NULL" with no _opt_ SAL) and NULL is must-be-null reserved — neither is a spurious-marker error here.
+        // Only Optional (formally-optional) is header-verifiable. Nullable is prose-based ("can be NULL" with no _opt_ SAL) and NULL is must-be-null reserved — neither is a spurious-marker error here.
         findings.push({ kind: 'SPURIOUS', method: method.name, symbol: method.symbolName, param: param.name, paramBase: param.baseType, marker, ctype: headerParam.ctype, line: method.line, header: proto.header });
       }
     }

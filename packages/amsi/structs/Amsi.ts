@@ -2,7 +2,7 @@ import { type FFIFunction, FFIType } from 'bun:ffi';
 
 import { Win32 } from '@bun-win32/core';
 
-import type { HAMSICONTEXT, HAMSISESSION, HRESULT, LPCWSTR, OPTIONAL, PAMSI_RESULT, PHAMSICONTEXT, PHAMSISESSION, PPVOID, PVOID, REFCLSID, REFIID, ULONG, VOID } from '../types/Amsi';
+import type { HAMSICONTEXT, HAMSISESSION, HRESULT, LPCWSTR, Optional, PAMSI_RESULT, PHAMSICONTEXT, PHAMSISESSION, PPVOID, PVOID, REFCLSID, REFIID, ULONG, VOID } from '../types/Amsi';
 
 /**
  * Thin, lazy-loaded FFI bindings for `amsi.dll`.
@@ -56,7 +56,7 @@ class Amsi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/amsi/nf-amsi-amsinotifyoperation
-  public static AmsiNotifyOperation(amsiContext: HAMSICONTEXT, buffer: PVOID, length: ULONG, contentName: OPTIONAL<LPCWSTR>, result_out: PAMSI_RESULT): HRESULT {
+  public static AmsiNotifyOperation(amsiContext: HAMSICONTEXT, buffer: PVOID, length: ULONG, contentName: Optional<LPCWSTR>, result_out: PAMSI_RESULT): HRESULT {
     return Amsi.Load('AmsiNotifyOperation')(amsiContext, buffer, length, contentName, result_out);
   }
 
@@ -66,12 +66,12 @@ class Amsi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/amsi/nf-amsi-amsiscanbuffer
-  public static AmsiScanBuffer(amsiContext: HAMSICONTEXT, buffer: PVOID, length: ULONG, contentName: OPTIONAL<LPCWSTR>, amsiSession: OPTIONAL<HAMSISESSION>, result_out: PAMSI_RESULT): HRESULT {
+  public static AmsiScanBuffer(amsiContext: HAMSICONTEXT, buffer: PVOID, length: ULONG, contentName: Optional<LPCWSTR>, amsiSession: Optional<HAMSISESSION>, result_out: PAMSI_RESULT): HRESULT {
     return Amsi.Load('AmsiScanBuffer')(amsiContext, buffer, length, contentName, amsiSession, result_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/amsi/nf-amsi-amsiscanstring
-  public static AmsiScanString(amsiContext: HAMSICONTEXT, string: LPCWSTR, contentName: OPTIONAL<LPCWSTR>, amsiSession: OPTIONAL<HAMSISESSION>, result_out: PAMSI_RESULT): HRESULT {
+  public static AmsiScanString(amsiContext: HAMSICONTEXT, string: LPCWSTR, contentName: Optional<LPCWSTR>, amsiSession: Optional<HAMSISESSION>, result_out: PAMSI_RESULT): HRESULT {
     return Amsi.Load('AmsiScanString')(amsiContext, string, contentName, amsiSession, result_out);
   }
 

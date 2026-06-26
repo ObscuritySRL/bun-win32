@@ -15,8 +15,8 @@ import type {
   LPCVOID,
   LPSTR,
   LPVOID,
-  NULLABLE,
-  OPTIONAL,
+  Nullable,
+  Optional,
   PCABINETDLLVERSIONINFO,
   PCCAB,
   PCOMPRESS_ALLOCATION_ROUTINES,
@@ -118,28 +118,28 @@ class Cabinet extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/compressapi/nf-compressapi-compress
-  public static Compress(CompressorHandle: COMPRESSOR_HANDLE, UncompressedData: OPTIONAL<LPCVOID>, UncompressedDataSize: SIZE_T, CompressedBuffer_out: OPTIONAL<PVOID>, CompressedBufferSize: SIZE_T, CompressedDataSize_out: PSIZE_T): BOOL {
+  public static Compress(CompressorHandle: COMPRESSOR_HANDLE, UncompressedData: Optional<LPCVOID>, UncompressedDataSize: SIZE_T, CompressedBuffer_out: Optional<PVOID>, CompressedBufferSize: SIZE_T, CompressedDataSize_out: PSIZE_T): BOOL {
     return Cabinet.Load('Compress')(CompressorHandle, UncompressedData, UncompressedDataSize, CompressedBuffer_out, CompressedBufferSize, CompressedDataSize_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/compressapi/nf-compressapi-createcompressor
-  public static CreateCompressor(Algorithm: DWORD, AllocationRoutines: OPTIONAL<PCOMPRESS_ALLOCATION_ROUTINES>, CompressorHandle_out: PCOMPRESSOR_HANDLE): BOOL {
+  public static CreateCompressor(Algorithm: DWORD, AllocationRoutines: Optional<PCOMPRESS_ALLOCATION_ROUTINES>, CompressorHandle_out: PCOMPRESSOR_HANDLE): BOOL {
     return Cabinet.Load('CreateCompressor')(Algorithm, AllocationRoutines, CompressorHandle_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/compressapi/nf-compressapi-createdecompressor
-  public static CreateDecompressor(Algorithm: DWORD, AllocationRoutines: OPTIONAL<PCOMPRESS_ALLOCATION_ROUTINES>, DecompressorHandle_out: PDECOMPRESSOR_HANDLE): BOOL {
+  public static CreateDecompressor(Algorithm: DWORD, AllocationRoutines: Optional<PCOMPRESS_ALLOCATION_ROUTINES>, DecompressorHandle_out: PDECOMPRESSOR_HANDLE): BOOL {
     return Cabinet.Load('CreateDecompressor')(Algorithm, AllocationRoutines, DecompressorHandle_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/compressapi/nf-compressapi-decompress
   public static Decompress(
     DecompressorHandle: DECOMPRESSOR_HANDLE,
-    CompressedData: OPTIONAL<LPCVOID>,
+    CompressedData: Optional<LPCVOID>,
     CompressedDataSize: SIZE_T,
-    UncompressedBuffer_out: OPTIONAL<PVOID>,
+    UncompressedBuffer_out: Optional<PVOID>,
     UncompressedBufferSize: SIZE_T,
-    UncompressedDataSize_out: OPTIONAL<PSIZE_T>,
+    UncompressedDataSize_out: Optional<PSIZE_T>,
   ): BOOL {
     return Cabinet.Load('Decompress')(DecompressorHandle, CompressedData, CompressedDataSize, UncompressedBuffer_out, UncompressedBufferSize, UncompressedDataSize_out);
   }
@@ -168,7 +168,7 @@ class Cabinet extends Win32 {
     pfndelete: PFNFCIDELETE,
     pfnfcigtf: PFNFCIGETTEMPFILE,
     pccab: PCCAB,
-    pv: OPTIONAL<LPVOID>,
+    pv: Optional<LPVOID>,
   ): HFCI {
     return Cabinet.Load('FCICreate')(perf, pfnfcifp, pfna, pfnf, pfnopen, pfnread, pfnwrite, pfnclose, pfnseek, pfndelete, pfnfcigtf, pccab, pv);
   }
@@ -189,7 +189,7 @@ class Cabinet extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fdi/nf-fdi-fdicopy
-  public static FDICopy(hfdi: HFDI, pszCabinet: LPSTR, pszCabPath: LPSTR, flags: INT, pfnfdin: PFNFDINOTIFY, pfnfdid: NULLABLE<PFNFDIDECRYPT>, pvUser: OPTIONAL<LPVOID>): BOOL {
+  public static FDICopy(hfdi: HFDI, pszCabinet: LPSTR, pszCabPath: LPSTR, flags: INT, pfnfdin: PFNFDINOTIFY, pfnfdid: Nullable<PFNFDIDECRYPT>, pvUser: Optional<LPVOID>): BOOL {
     return Cabinet.Load('FDICopy')(hfdi, pszCabinet, pszCabPath, flags, pfnfdin, pfnfdid, pvUser);
   }
 
@@ -204,7 +204,7 @@ class Cabinet extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fdi/nf-fdi-fdiiscabinet
-  public static FDIIsCabinet(hfdi: HFDI, hf: INT_PTR, pfdici_out: OPTIONAL<PFDICABINETINFO>): BOOL {
+  public static FDIIsCabinet(hfdi: HFDI, hf: INT_PTR, pfdici_out: Optional<PFDICABINETINFO>): BOOL {
     return Cabinet.Load('FDIIsCabinet')(hfdi, hf, pfdici_out);
   }
 

@@ -1,6 +1,6 @@
 import type { Pointer } from 'bun:ffi';
 
-export type { BOOL, DWORD, HANDLE, HRESULT, HWND, INT, LONG, LPBYTE, LPCSTR, LPCWSTR, LPDWORD, LPHANDLE, LPSTR, LPVOID, LPWSTR, NULL, NULLABLE, OPTIONAL, PBYTE, PDWORD, PVOID, SIZE_T, ULONG, WORD } from '@bun-win32/core';
+export type { BOOL, DWORD, HANDLE, HRESULT, HWND, INT, LONG, LPBYTE, LPCSTR, LPCWSTR, LPDWORD, LPHANDLE, LPSTR, LPVOID, LPWSTR, NULL, Nullable, Optional, PBYTE, PDWORD, PVOID, SIZE_T, ULONG, WORD } from '@bun-win32/core';
 
 export enum DeviceCapability {
   DC_BINNAMES = 12,

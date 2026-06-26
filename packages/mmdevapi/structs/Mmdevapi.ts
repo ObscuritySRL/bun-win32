@@ -2,7 +2,7 @@ import { type FFIFunction, FFIType } from 'bun:ffi';
 
 import { Win32 } from '@bun-win32/core';
 
-import type { HRESULT, IActivateAudioInterfaceCompletionHandler, LPCWSTR, OPTIONAL, PIActivateAudioInterfaceAsyncOperation, PPROPVARIANT, PPVOID, REFCLSID, REFIID } from '../types/Mmdevapi';
+import type { HRESULT, IActivateAudioInterfaceCompletionHandler, LPCWSTR, Optional, PIActivateAudioInterfaceAsyncOperation, PPROPVARIANT, PPVOID, REFCLSID, REFIID } from '../types/Mmdevapi';
 
 /**
  * Thin, lazy-loaded FFI bindings for `mmdevapi.dll`.
@@ -43,7 +43,7 @@ class Mmdevapi extends Win32 {
   public static ActivateAudioInterfaceAsync(
     deviceInterfacePath: LPCWSTR,
     riid: REFIID,
-    activationParams: OPTIONAL<PPROPVARIANT>,
+    activationParams: Optional<PPROPVARIANT>,
     completionHandler: IActivateAudioInterfaceCompletionHandler,
     activationOperation_out: PIActivateAudioInterfaceAsyncOperation,
   ): HRESULT {

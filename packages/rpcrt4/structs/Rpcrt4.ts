@@ -2,7 +2,7 @@ import { type FFIFunction, FFIType } from 'bun:ffi';
 
 import { Win32 } from '@bun-win32/core';
 
-import type { BOOL, DWORD, LONG, LPSTR, LPVOID, LPWSTR, LUID, NULL, NULLABLE, OPTIONAL, PVOID, SIZE_T, ULONG, ULONG_PTR, USHORT, VOID } from '../types/Rpcrt4';
+import type { BOOL, DWORD, LONG, LPSTR, LPVOID, LPWSTR, LUID, NULL, Nullable, Optional, PVOID, SIZE_T, ULONG, ULONG_PTR, USHORT, VOID } from '../types/Rpcrt4';
 import type {
   MIDL_ES_HANDLE,
   PCCERT_CONTEXT,
@@ -291,7 +291,7 @@ class Rpcrt4 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/rpcndr/nf-rpcndr-mesbufferhandlereset
-  public static MesBufferHandleReset(Handle: MIDL_ES_HANDLE, HandleStyle: ULONG, Operation: ULONG, Buffer: OPTIONAL<PVOID>, BufferSize: ULONG, EncodedSize_out: OPTIONAL<PVOID>): RPC_STATUS {
+  public static MesBufferHandleReset(Handle: MIDL_ES_HANDLE, HandleStyle: ULONG, Operation: ULONG, Buffer: Optional<PVOID>, BufferSize: ULONG, EncodedSize_out: Optional<PVOID>): RPC_STATUS {
     return Rpcrt4.Load('MesBufferHandleReset')(Handle, HandleStyle, Operation, Buffer, BufferSize, EncodedSize_out);
   }
 
@@ -326,7 +326,7 @@ class Rpcrt4 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/rpcndr/nf-rpcndr-mesincrementalhandlereset
-  public static MesIncrementalHandleReset(Handle: MIDL_ES_HANDLE, UserState: NULLABLE<PVOID>, AllocFn: NULLABLE<PVOID>, WriteFn: NULLABLE<PVOID>, ReadFn: NULLABLE<PVOID>, Operation: ULONG): RPC_STATUS {
+  public static MesIncrementalHandleReset(Handle: MIDL_ES_HANDLE, UserState: Nullable<PVOID>, AllocFn: Nullable<PVOID>, WriteFn: Nullable<PVOID>, ReadFn: Nullable<PVOID>, Operation: ULONG): RPC_STATUS {
     return Rpcrt4.Load('MesIncrementalHandleReset')(Handle, UserState, AllocFn, WriteFn, ReadFn, Operation);
   }
 
@@ -346,7 +346,7 @@ class Rpcrt4 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/rpcasync/nf-rpcasync-rpcasynccompletecall
-  public static RpcAsyncCompleteCall(pAsync_in_out: PRPC_ASYNC_STATE, Reply_out: OPTIONAL<PVOID>): RPC_STATUS {
+  public static RpcAsyncCompleteCall(pAsync_in_out: PRPC_ASYNC_STATE, Reply_out: Optional<PVOID>): RPC_STATUS {
     return Rpcrt4.Load('RpcAsyncCompleteCall')(pAsync_in_out, Reply_out);
   }
 
@@ -366,7 +366,7 @@ class Rpcrt4 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/rpcdce/nf-rpcdce-rpcbindingbind
-  public static RpcBindingBind(pAsync: OPTIONAL<PRPC_ASYNC_STATE>, Binding: RPC_BINDING_HANDLE, IfSpec: RPC_IF_HANDLE): RPC_STATUS {
+  public static RpcBindingBind(pAsync: Optional<PRPC_ASYNC_STATE>, Binding: RPC_BINDING_HANDLE, IfSpec: RPC_IF_HANDLE): RPC_STATUS {
     return Rpcrt4.Load('RpcBindingBind')(pAsync, Binding, IfSpec);
   }
 
@@ -376,12 +376,12 @@ class Rpcrt4 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/rpcdce/nf-rpcdce-rpcbindingcreatea
-  public static RpcBindingCreateA(Template: PRPC_BINDING_HANDLE_TEMPLATE_V1_A, Security: OPTIONAL<PRPC_BINDING_HANDLE_SECURITY_V1_A>, Options: OPTIONAL<PRPC_BINDING_HANDLE_OPTIONS_V1>, Binding_out: PRPC_BINDING_HANDLE): RPC_STATUS {
+  public static RpcBindingCreateA(Template: PRPC_BINDING_HANDLE_TEMPLATE_V1_A, Security: Optional<PRPC_BINDING_HANDLE_SECURITY_V1_A>, Options: Optional<PRPC_BINDING_HANDLE_OPTIONS_V1>, Binding_out: PRPC_BINDING_HANDLE): RPC_STATUS {
     return Rpcrt4.Load('RpcBindingCreateA')(Template, Security, Options, Binding_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/rpcdce/nf-rpcdce-rpcbindingcreatew
-  public static RpcBindingCreateW(Template: PRPC_BINDING_HANDLE_TEMPLATE_V1_W, Security: OPTIONAL<PRPC_BINDING_HANDLE_SECURITY_V1_W>, Options: OPTIONAL<PRPC_BINDING_HANDLE_OPTIONS_V1>, Binding_out: PRPC_BINDING_HANDLE): RPC_STATUS {
+  public static RpcBindingCreateW(Template: PRPC_BINDING_HANDLE_TEMPLATE_V1_W, Security: Optional<PRPC_BINDING_HANDLE_SECURITY_V1_W>, Options: Optional<PRPC_BINDING_HANDLE_OPTIONS_V1>, Binding_out: PRPC_BINDING_HANDLE): RPC_STATUS {
     return Rpcrt4.Load('RpcBindingCreateW')(Template, Security, Options, Binding_out);
   }
 
@@ -402,24 +402,24 @@ class Rpcrt4 extends Win32 {
 
   // https://learn.microsoft.com/en-us/windows/win32/api/rpcdce/nf-rpcdce-rpcbindinginqauthclienta
   public static RpcBindingInqAuthClientA(
-    ClientBinding: OPTIONAL<RPC_BINDING_HANDLE>,
+    ClientBinding: Optional<RPC_BINDING_HANDLE>,
     Privs_out: PRPC_AUTHZ_HANDLE,
-    ServerPrincName_out: OPTIONAL<PRPC_CSTR>,
-    AuthnLevel_out: OPTIONAL<PVOID>,
-    AuthnSvc_out: OPTIONAL<PVOID>,
-    AuthzSvc_out: OPTIONAL<PVOID>,
+    ServerPrincName_out: Optional<PRPC_CSTR>,
+    AuthnLevel_out: Optional<PVOID>,
+    AuthnSvc_out: Optional<PVOID>,
+    AuthzSvc_out: Optional<PVOID>,
   ): RPC_STATUS {
     return Rpcrt4.Load('RpcBindingInqAuthClientA')(ClientBinding, Privs_out, ServerPrincName_out, AuthnLevel_out, AuthnSvc_out, AuthzSvc_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/rpcdce/nf-rpcdce-rpcbindinginqauthclientexa
   public static RpcBindingInqAuthClientExA(
-    ClientBinding: OPTIONAL<RPC_BINDING_HANDLE>,
+    ClientBinding: Optional<RPC_BINDING_HANDLE>,
     Privs_out: PRPC_AUTHZ_HANDLE,
-    ServerPrincName_out: OPTIONAL<PRPC_CSTR>,
-    AuthnLevel_out: OPTIONAL<PVOID>,
-    AuthnSvc_out: OPTIONAL<PVOID>,
-    AuthzSvc_out: OPTIONAL<PVOID>,
+    ServerPrincName_out: Optional<PRPC_CSTR>,
+    AuthnLevel_out: Optional<PVOID>,
+    AuthnSvc_out: Optional<PVOID>,
+    AuthzSvc_out: Optional<PVOID>,
     Flags: ULONG,
   ): RPC_STATUS {
     return Rpcrt4.Load('RpcBindingInqAuthClientExA')(ClientBinding, Privs_out, ServerPrincName_out, AuthnLevel_out, AuthnSvc_out, AuthzSvc_out, Flags);
@@ -427,12 +427,12 @@ class Rpcrt4 extends Win32 {
 
   // https://learn.microsoft.com/en-us/windows/win32/api/rpcdce/nf-rpcdce-rpcbindinginqauthclientexw
   public static RpcBindingInqAuthClientExW(
-    ClientBinding: OPTIONAL<RPC_BINDING_HANDLE>,
+    ClientBinding: Optional<RPC_BINDING_HANDLE>,
     Privs_out: PRPC_AUTHZ_HANDLE,
-    ServerPrincName_out: OPTIONAL<PRPC_WSTR>,
-    AuthnLevel_out: OPTIONAL<PVOID>,
-    AuthnSvc_out: OPTIONAL<PVOID>,
-    AuthzSvc_out: OPTIONAL<PVOID>,
+    ServerPrincName_out: Optional<PRPC_WSTR>,
+    AuthnLevel_out: Optional<PVOID>,
+    AuthnSvc_out: Optional<PVOID>,
+    AuthzSvc_out: Optional<PVOID>,
     Flags: ULONG,
   ): RPC_STATUS {
     return Rpcrt4.Load('RpcBindingInqAuthClientExW')(ClientBinding, Privs_out, ServerPrincName_out, AuthnLevel_out, AuthnSvc_out, AuthzSvc_out, Flags);
@@ -440,12 +440,12 @@ class Rpcrt4 extends Win32 {
 
   // https://learn.microsoft.com/en-us/windows/win32/api/rpcdce/nf-rpcdce-rpcbindinginqauthclientw
   public static RpcBindingInqAuthClientW(
-    ClientBinding: OPTIONAL<RPC_BINDING_HANDLE>,
+    ClientBinding: Optional<RPC_BINDING_HANDLE>,
     Privs_out: PRPC_AUTHZ_HANDLE,
-    ServerPrincName_out: OPTIONAL<PRPC_WSTR>,
-    AuthnLevel_out: OPTIONAL<PVOID>,
-    AuthnSvc_out: OPTIONAL<PVOID>,
-    AuthzSvc_out: OPTIONAL<PVOID>,
+    ServerPrincName_out: Optional<PRPC_WSTR>,
+    AuthnLevel_out: Optional<PVOID>,
+    AuthnSvc_out: Optional<PVOID>,
+    AuthzSvc_out: Optional<PVOID>,
   ): RPC_STATUS {
     return Rpcrt4.Load('RpcBindingInqAuthClientW')(ClientBinding, Privs_out, ServerPrincName_out, AuthnLevel_out, AuthnSvc_out, AuthzSvc_out);
   }
@@ -453,11 +453,11 @@ class Rpcrt4 extends Win32 {
   // https://learn.microsoft.com/en-us/windows/win32/api/rpcdce/nf-rpcdce-rpcbindinginqauthinfoa
   public static RpcBindingInqAuthInfoA(
     Binding: RPC_BINDING_HANDLE,
-    ServerPrincName_out: OPTIONAL<PRPC_CSTR>,
-    AuthnLevel_out: OPTIONAL<PVOID>,
-    AuthnSvc_out: OPTIONAL<PVOID>,
-    AuthIdentity_out: OPTIONAL<PRPC_AUTH_IDENTITY_HANDLE>,
-    AuthzSvc_out: OPTIONAL<PVOID>,
+    ServerPrincName_out: Optional<PRPC_CSTR>,
+    AuthnLevel_out: Optional<PVOID>,
+    AuthnSvc_out: Optional<PVOID>,
+    AuthIdentity_out: Optional<PRPC_AUTH_IDENTITY_HANDLE>,
+    AuthzSvc_out: Optional<PVOID>,
   ): RPC_STATUS {
     return Rpcrt4.Load('RpcBindingInqAuthInfoA')(Binding, ServerPrincName_out, AuthnLevel_out, AuthnSvc_out, AuthIdentity_out, AuthzSvc_out);
   }
@@ -465,13 +465,13 @@ class Rpcrt4 extends Win32 {
   // https://learn.microsoft.com/en-us/windows/win32/api/rpcdce/nf-rpcdce-rpcbindinginqauthinfoexa
   public static RpcBindingInqAuthInfoExA(
     Binding: RPC_BINDING_HANDLE,
-    ServerPrincName_out: OPTIONAL<PRPC_CSTR>,
-    AuthnLevel_out: OPTIONAL<PVOID>,
-    AuthnSvc_out: OPTIONAL<PVOID>,
-    AuthIdentity_out: OPTIONAL<PRPC_AUTH_IDENTITY_HANDLE>,
-    AuthzSvc_out: OPTIONAL<PVOID>,
+    ServerPrincName_out: Optional<PRPC_CSTR>,
+    AuthnLevel_out: Optional<PVOID>,
+    AuthnSvc_out: Optional<PVOID>,
+    AuthIdentity_out: Optional<PRPC_AUTH_IDENTITY_HANDLE>,
+    AuthzSvc_out: Optional<PVOID>,
     RpcQosVersion: ULONG,
-    SecurityQOS_out: OPTIONAL<PRPC_SECURITY_QOS>,
+    SecurityQOS_out: Optional<PRPC_SECURITY_QOS>,
   ): RPC_STATUS {
     return Rpcrt4.Load('RpcBindingInqAuthInfoExA')(Binding, ServerPrincName_out, AuthnLevel_out, AuthnSvc_out, AuthIdentity_out, AuthzSvc_out, RpcQosVersion, SecurityQOS_out);
   }
@@ -479,13 +479,13 @@ class Rpcrt4 extends Win32 {
   // https://learn.microsoft.com/en-us/windows/win32/api/rpcdce/nf-rpcdce-rpcbindinginqauthinfoexw
   public static RpcBindingInqAuthInfoExW(
     Binding: RPC_BINDING_HANDLE,
-    ServerPrincName_out: OPTIONAL<PRPC_WSTR>,
-    AuthnLevel_out: OPTIONAL<PVOID>,
-    AuthnSvc_out: OPTIONAL<PVOID>,
-    AuthIdentity_out: OPTIONAL<PRPC_AUTH_IDENTITY_HANDLE>,
-    AuthzSvc_out: OPTIONAL<PVOID>,
+    ServerPrincName_out: Optional<PRPC_WSTR>,
+    AuthnLevel_out: Optional<PVOID>,
+    AuthnSvc_out: Optional<PVOID>,
+    AuthIdentity_out: Optional<PRPC_AUTH_IDENTITY_HANDLE>,
+    AuthzSvc_out: Optional<PVOID>,
     RpcQosVersion: ULONG,
-    SecurityQOS_out: OPTIONAL<PRPC_SECURITY_QOS>,
+    SecurityQOS_out: Optional<PRPC_SECURITY_QOS>,
   ): RPC_STATUS {
     return Rpcrt4.Load('RpcBindingInqAuthInfoExW')(Binding, ServerPrincName_out, AuthnLevel_out, AuthnSvc_out, AuthIdentity_out, AuthzSvc_out, RpcQosVersion, SecurityQOS_out);
   }
@@ -493,11 +493,11 @@ class Rpcrt4 extends Win32 {
   // https://learn.microsoft.com/en-us/windows/win32/api/rpcdce/nf-rpcdce-rpcbindinginqauthinfow
   public static RpcBindingInqAuthInfoW(
     Binding: RPC_BINDING_HANDLE,
-    ServerPrincName_out: OPTIONAL<PRPC_WSTR>,
-    AuthnLevel_out: OPTIONAL<PVOID>,
-    AuthnSvc_out: OPTIONAL<PVOID>,
-    AuthIdentity_out: OPTIONAL<PRPC_AUTH_IDENTITY_HANDLE>,
-    AuthzSvc_out: OPTIONAL<PVOID>,
+    ServerPrincName_out: Optional<PRPC_WSTR>,
+    AuthnLevel_out: Optional<PVOID>,
+    AuthnSvc_out: Optional<PVOID>,
+    AuthIdentity_out: Optional<PRPC_AUTH_IDENTITY_HANDLE>,
+    AuthzSvc_out: Optional<PVOID>,
   ): RPC_STATUS {
     return Rpcrt4.Load('RpcBindingInqAuthInfoW')(Binding, ServerPrincName_out, AuthnLevel_out, AuthnSvc_out, AuthIdentity_out, AuthzSvc_out);
   }
@@ -523,24 +523,24 @@ class Rpcrt4 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/rpcdce/nf-rpcdce-rpcbindingserverfromclient
-  public static RpcBindingServerFromClient(ClientBinding: OPTIONAL<RPC_BINDING_HANDLE>, ServerBinding_out: PRPC_BINDING_HANDLE): RPC_STATUS {
+  public static RpcBindingServerFromClient(ClientBinding: Optional<RPC_BINDING_HANDLE>, ServerBinding_out: PRPC_BINDING_HANDLE): RPC_STATUS {
     return Rpcrt4.Load('RpcBindingServerFromClient')(ClientBinding, ServerBinding_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/rpcdce/nf-rpcdce-rpcbindingsetauthinfoa
-  public static RpcBindingSetAuthInfoA(Binding: RPC_BINDING_HANDLE, ServerPrincName: OPTIONAL<RPC_CSTR>, AuthnLevel: ULONG, AuthnSvc: ULONG, AuthIdentity: OPTIONAL<RPC_AUTH_IDENTITY_HANDLE>, AuthzSvc: ULONG): RPC_STATUS {
+  public static RpcBindingSetAuthInfoA(Binding: RPC_BINDING_HANDLE, ServerPrincName: Optional<RPC_CSTR>, AuthnLevel: ULONG, AuthnSvc: ULONG, AuthIdentity: Optional<RPC_AUTH_IDENTITY_HANDLE>, AuthzSvc: ULONG): RPC_STATUS {
     return Rpcrt4.Load('RpcBindingSetAuthInfoA')(Binding, ServerPrincName, AuthnLevel, AuthnSvc, AuthIdentity, AuthzSvc);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/rpcdce/nf-rpcdce-rpcbindingsetauthinfoexa
   public static RpcBindingSetAuthInfoExA(
     Binding: RPC_BINDING_HANDLE,
-    ServerPrincName: OPTIONAL<RPC_CSTR>,
+    ServerPrincName: Optional<RPC_CSTR>,
     AuthnLevel: ULONG,
     AuthnSvc: ULONG,
-    AuthIdentity: OPTIONAL<RPC_AUTH_IDENTITY_HANDLE>,
+    AuthIdentity: Optional<RPC_AUTH_IDENTITY_HANDLE>,
     AuthzSvc: ULONG,
-    SecurityQos: OPTIONAL<PRPC_SECURITY_QOS>,
+    SecurityQos: Optional<PRPC_SECURITY_QOS>,
   ): RPC_STATUS {
     return Rpcrt4.Load('RpcBindingSetAuthInfoExA')(Binding, ServerPrincName, AuthnLevel, AuthnSvc, AuthIdentity, AuthzSvc, SecurityQos);
   }
@@ -548,23 +548,23 @@ class Rpcrt4 extends Win32 {
   // https://learn.microsoft.com/en-us/windows/win32/api/rpcdce/nf-rpcdce-rpcbindingsetauthinfoexw
   public static RpcBindingSetAuthInfoExW(
     Binding: RPC_BINDING_HANDLE,
-    ServerPrincName: OPTIONAL<RPC_WSTR>,
+    ServerPrincName: Optional<RPC_WSTR>,
     AuthnLevel: ULONG,
     AuthnSvc: ULONG,
-    AuthIdentity: OPTIONAL<RPC_AUTH_IDENTITY_HANDLE>,
+    AuthIdentity: Optional<RPC_AUTH_IDENTITY_HANDLE>,
     AuthzSvc: ULONG,
-    SecurityQos: OPTIONAL<PRPC_SECURITY_QOS>,
+    SecurityQos: Optional<PRPC_SECURITY_QOS>,
   ): RPC_STATUS {
     return Rpcrt4.Load('RpcBindingSetAuthInfoExW')(Binding, ServerPrincName, AuthnLevel, AuthnSvc, AuthIdentity, AuthzSvc, SecurityQos);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/rpcdce/nf-rpcdce-rpcbindingsetauthinfow
-  public static RpcBindingSetAuthInfoW(Binding: RPC_BINDING_HANDLE, ServerPrincName: OPTIONAL<RPC_WSTR>, AuthnLevel: ULONG, AuthnSvc: ULONG, AuthIdentity: OPTIONAL<RPC_AUTH_IDENTITY_HANDLE>, AuthzSvc: ULONG): RPC_STATUS {
+  public static RpcBindingSetAuthInfoW(Binding: RPC_BINDING_HANDLE, ServerPrincName: Optional<RPC_WSTR>, AuthnLevel: ULONG, AuthnSvc: ULONG, AuthIdentity: Optional<RPC_AUTH_IDENTITY_HANDLE>, AuthzSvc: ULONG): RPC_STATUS {
     return Rpcrt4.Load('RpcBindingSetAuthInfoW')(Binding, ServerPrincName, AuthnLevel, AuthnSvc, AuthIdentity, AuthzSvc);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/rpcdce/nf-rpcdce-rpcbindingsetobject
-  public static RpcBindingSetObject(Binding: RPC_BINDING_HANDLE, ObjectUuid: NULLABLE<PUUID>): RPC_STATUS {
+  public static RpcBindingSetObject(Binding: RPC_BINDING_HANDLE, ObjectUuid: Nullable<PUUID>): RPC_STATUS {
     return Rpcrt4.Load('RpcBindingSetObject')(Binding, ObjectUuid);
   }
 
@@ -619,22 +619,22 @@ class Rpcrt4 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/rpcdce/nf-rpcdce-rpcepregistera
-  public static RpcEpRegisterA(IfSpec: RPC_IF_HANDLE, BindingVector: PRPC_BINDING_VECTOR, UuidVector: OPTIONAL<PUUID_VECTOR>, Annotation: OPTIONAL<RPC_CSTR>): RPC_STATUS {
+  public static RpcEpRegisterA(IfSpec: RPC_IF_HANDLE, BindingVector: PRPC_BINDING_VECTOR, UuidVector: Optional<PUUID_VECTOR>, Annotation: Optional<RPC_CSTR>): RPC_STATUS {
     return Rpcrt4.Load('RpcEpRegisterA')(IfSpec, BindingVector, UuidVector, Annotation);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/rpcdce/nf-rpcdce-rpcepregisternoreplacea
-  public static RpcEpRegisterNoReplaceA(IfSpec: RPC_IF_HANDLE, BindingVector: PRPC_BINDING_VECTOR, UuidVector: OPTIONAL<PUUID_VECTOR>, Annotation: OPTIONAL<RPC_CSTR>): RPC_STATUS {
+  public static RpcEpRegisterNoReplaceA(IfSpec: RPC_IF_HANDLE, BindingVector: PRPC_BINDING_VECTOR, UuidVector: Optional<PUUID_VECTOR>, Annotation: Optional<RPC_CSTR>): RPC_STATUS {
     return Rpcrt4.Load('RpcEpRegisterNoReplaceA')(IfSpec, BindingVector, UuidVector, Annotation);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/rpcdce/nf-rpcdce-rpcepregisternoreplacew
-  public static RpcEpRegisterNoReplaceW(IfSpec: RPC_IF_HANDLE, BindingVector: PRPC_BINDING_VECTOR, UuidVector: OPTIONAL<PUUID_VECTOR>, Annotation: OPTIONAL<RPC_WSTR>): RPC_STATUS {
+  public static RpcEpRegisterNoReplaceW(IfSpec: RPC_IF_HANDLE, BindingVector: PRPC_BINDING_VECTOR, UuidVector: Optional<PUUID_VECTOR>, Annotation: Optional<RPC_WSTR>): RPC_STATUS {
     return Rpcrt4.Load('RpcEpRegisterNoReplaceW')(IfSpec, BindingVector, UuidVector, Annotation);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/rpcdce/nf-rpcdce-rpcepregisterw
-  public static RpcEpRegisterW(IfSpec: RPC_IF_HANDLE, BindingVector: PRPC_BINDING_VECTOR, UuidVector: OPTIONAL<PUUID_VECTOR>, Annotation: OPTIONAL<RPC_WSTR>): RPC_STATUS {
+  public static RpcEpRegisterW(IfSpec: RPC_IF_HANDLE, BindingVector: PRPC_BINDING_VECTOR, UuidVector: Optional<PUUID_VECTOR>, Annotation: Optional<RPC_WSTR>): RPC_STATUS {
     return Rpcrt4.Load('RpcEpRegisterW')(IfSpec, BindingVector, UuidVector, Annotation);
   }
 
@@ -644,7 +644,7 @@ class Rpcrt4 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/rpcdce/nf-rpcdce-rpcepunregister
-  public static RpcEpUnregister(IfSpec: RPC_IF_HANDLE, BindingVector: PRPC_BINDING_VECTOR, UuidVector: OPTIONAL<PUUID_VECTOR>): RPC_STATUS {
+  public static RpcEpUnregister(IfSpec: RPC_IF_HANDLE, BindingVector: PRPC_BINDING_VECTOR, UuidVector: Optional<PUUID_VECTOR>): RPC_STATUS {
     return Rpcrt4.Load('RpcEpUnregister')(IfSpec, BindingVector, UuidVector);
   }
 
@@ -705,13 +705,13 @@ class Rpcrt4 extends Win32 {
 
   // https://learn.microsoft.com/en-us/windows/win32/api/rpcdce/nf-rpcdce-rpcgetauthorizationcontextforclient
   public static RpcGetAuthorizationContextForClient(
-    ClientBinding: OPTIONAL<RPC_BINDING_HANDLE>,
+    ClientBinding: Optional<RPC_BINDING_HANDLE>,
     ImpersonateOnReturn: BOOL,
-    Reserved1: OPTIONAL<PVOID>,
-    pExpirationTime: OPTIONAL<PVOID>,
+    Reserved1: Optional<PVOID>,
+    pExpirationTime: Optional<PVOID>,
     Reserved2: LUID,
     Reserved3: DWORD,
-    Reserved4: OPTIONAL<PVOID>,
+    Reserved4: Optional<PVOID>,
     pAuthzClientContext_out: PRPC_AUTHZ_HANDLE,
   ): RPC_STATUS {
     return Rpcrt4.Load('RpcGetAuthorizationContextForClient')(ClientBinding, ImpersonateOnReturn, Reserved1, pExpirationTime, Reserved2, Reserved3, Reserved4, pAuthzClientContext_out);
@@ -728,17 +728,17 @@ class Rpcrt4 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/rpcdce/nf-rpcdce-rpcimpersonateclient
-  public static RpcImpersonateClient(BindingHandle: OPTIONAL<RPC_BINDING_HANDLE>): RPC_STATUS {
+  public static RpcImpersonateClient(BindingHandle: Optional<RPC_BINDING_HANDLE>): RPC_STATUS {
     return Rpcrt4.Load('RpcImpersonateClient')(BindingHandle);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/rpcdce/nf-rpcdce-rpcimpersonateclient2
-  public static RpcImpersonateClient2(BindingHandle: OPTIONAL<RPC_BINDING_HANDLE>, Flags: ULONG): RPC_STATUS {
+  public static RpcImpersonateClient2(BindingHandle: Optional<RPC_BINDING_HANDLE>, Flags: ULONG): RPC_STATUS {
     return Rpcrt4.Load('RpcImpersonateClient2')(BindingHandle, Flags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/rpcdce/nf-rpcdce-rpcimpersonateclientcontainer
-  public static RpcImpersonateClientContainer(BindingHandle: OPTIONAL<RPC_BINDING_HANDLE>): RPC_STATUS {
+  public static RpcImpersonateClientContainer(BindingHandle: Optional<RPC_BINDING_HANDLE>): RPC_STATUS {
     return Rpcrt4.Load('RpcImpersonateClientContainer')(BindingHandle);
   }
 
@@ -748,7 +748,7 @@ class Rpcrt4 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/rpcdce/nf-rpcdce-rpcmgmtepeltinqbegin
-  public static RpcMgmtEpEltInqBegin(EpBinding: OPTIONAL<RPC_BINDING_HANDLE>, InquiryType: ULONG, IfId: OPTIONAL<PRPC_IF_ID>, VersOption: ULONG, ObjectUuid: OPTIONAL<PUUID>, InquiryContext_out: PVOID): RPC_STATUS {
+  public static RpcMgmtEpEltInqBegin(EpBinding: Optional<RPC_BINDING_HANDLE>, InquiryType: ULONG, IfId: Optional<PRPC_IF_ID>, VersOption: ULONG, ObjectUuid: Optional<PUUID>, InquiryContext_out: PVOID): RPC_STATUS {
     return Rpcrt4.Load('RpcMgmtEpEltInqBegin')(EpBinding, InquiryType, IfId, VersOption, ObjectUuid, InquiryContext_out);
   }
 
@@ -758,17 +758,17 @@ class Rpcrt4 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/rpcdce/nf-rpcdce-rpcmgmtepeltinqnexta
-  public static RpcMgmtEpEltInqNextA(InquiryContext: RPC_BINDING_HANDLE, IfId_out: PRPC_IF_ID, Binding_out: OPTIONAL<PRPC_BINDING_HANDLE>, ObjectUuid_out: OPTIONAL<PUUID>, Annotation_out: OPTIONAL<PRPC_CSTR>): RPC_STATUS {
+  public static RpcMgmtEpEltInqNextA(InquiryContext: RPC_BINDING_HANDLE, IfId_out: PRPC_IF_ID, Binding_out: Optional<PRPC_BINDING_HANDLE>, ObjectUuid_out: Optional<PUUID>, Annotation_out: Optional<PRPC_CSTR>): RPC_STATUS {
     return Rpcrt4.Load('RpcMgmtEpEltInqNextA')(InquiryContext, IfId_out, Binding_out, ObjectUuid_out, Annotation_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/rpcdce/nf-rpcdce-rpcmgmtepeltinqnextw
-  public static RpcMgmtEpEltInqNextW(InquiryContext: RPC_BINDING_HANDLE, IfId_out: PRPC_IF_ID, Binding_out: OPTIONAL<PRPC_BINDING_HANDLE>, ObjectUuid_out: OPTIONAL<PUUID>, Annotation_out: OPTIONAL<PRPC_WSTR>): RPC_STATUS {
+  public static RpcMgmtEpEltInqNextW(InquiryContext: RPC_BINDING_HANDLE, IfId_out: PRPC_IF_ID, Binding_out: Optional<PRPC_BINDING_HANDLE>, ObjectUuid_out: Optional<PUUID>, Annotation_out: Optional<PRPC_WSTR>): RPC_STATUS {
     return Rpcrt4.Load('RpcMgmtEpEltInqNextW')(InquiryContext, IfId_out, Binding_out, ObjectUuid_out, Annotation_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/rpcdce/nf-rpcdce-rpcmgmtepunregister
-  public static RpcMgmtEpUnregister(EpBinding: OPTIONAL<RPC_BINDING_HANDLE>, IfId: PRPC_IF_ID, Binding: RPC_BINDING_HANDLE, ObjectUuid: OPTIONAL<PUUID>): RPC_STATUS {
+  public static RpcMgmtEpUnregister(EpBinding: Optional<RPC_BINDING_HANDLE>, IfId: PRPC_IF_ID, Binding: RPC_BINDING_HANDLE, ObjectUuid: Optional<PUUID>): RPC_STATUS {
     return Rpcrt4.Load('RpcMgmtEpUnregister')(EpBinding, IfId, Binding, ObjectUuid);
   }
 
@@ -783,32 +783,32 @@ class Rpcrt4 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/rpcdce/nf-rpcdce-rpcmgmtinqifids
-  public static RpcMgmtInqIfIds(Binding: OPTIONAL<RPC_BINDING_HANDLE>, IfIdVector_out: PVOID): RPC_STATUS {
+  public static RpcMgmtInqIfIds(Binding: Optional<RPC_BINDING_HANDLE>, IfIdVector_out: PVOID): RPC_STATUS {
     return Rpcrt4.Load('RpcMgmtInqIfIds')(Binding, IfIdVector_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/rpcdce/nf-rpcdce-rpcmgmtinqserverprincnamea
-  public static RpcMgmtInqServerPrincNameA(Binding: OPTIONAL<RPC_BINDING_HANDLE>, AuthnSvc: ULONG, ServerPrincName_out: PRPC_CSTR): RPC_STATUS {
+  public static RpcMgmtInqServerPrincNameA(Binding: Optional<RPC_BINDING_HANDLE>, AuthnSvc: ULONG, ServerPrincName_out: PRPC_CSTR): RPC_STATUS {
     return Rpcrt4.Load('RpcMgmtInqServerPrincNameA')(Binding, AuthnSvc, ServerPrincName_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/rpcdce/nf-rpcdce-rpcmgmtinqserverprincnamew
-  public static RpcMgmtInqServerPrincNameW(Binding: OPTIONAL<RPC_BINDING_HANDLE>, AuthnSvc: ULONG, ServerPrincName_out: PRPC_WSTR): RPC_STATUS {
+  public static RpcMgmtInqServerPrincNameW(Binding: Optional<RPC_BINDING_HANDLE>, AuthnSvc: ULONG, ServerPrincName_out: PRPC_WSTR): RPC_STATUS {
     return Rpcrt4.Load('RpcMgmtInqServerPrincNameW')(Binding, AuthnSvc, ServerPrincName_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/rpcdce/nf-rpcdce-rpcmgmtinqstats
-  public static RpcMgmtInqStats(Binding: OPTIONAL<RPC_BINDING_HANDLE>, Statistics_out: PRPC_STATS_VECTOR): RPC_STATUS {
+  public static RpcMgmtInqStats(Binding: Optional<RPC_BINDING_HANDLE>, Statistics_out: PRPC_STATS_VECTOR): RPC_STATUS {
     return Rpcrt4.Load('RpcMgmtInqStats')(Binding, Statistics_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/rpcdce/nf-rpcdce-rpcmgmtisserverlistening
-  public static RpcMgmtIsServerListening(Binding: OPTIONAL<RPC_BINDING_HANDLE>): RPC_STATUS {
+  public static RpcMgmtIsServerListening(Binding: Optional<RPC_BINDING_HANDLE>): RPC_STATUS {
     return Rpcrt4.Load('RpcMgmtIsServerListening')(Binding);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/rpcdce/nf-rpcdce-rpcmgmtsetauthorizationfn
-  public static RpcMgmtSetAuthorizationFn(AuthorizationFn: NULLABLE<RPC_MGMT_AUTHORIZATION_FN>): RPC_STATUS {
+  public static RpcMgmtSetAuthorizationFn(AuthorizationFn: Nullable<RPC_MGMT_AUTHORIZATION_FN>): RPC_STATUS {
     return Rpcrt4.Load('RpcMgmtSetAuthorizationFn')(AuthorizationFn);
   }
 
@@ -833,7 +833,7 @@ class Rpcrt4 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/rpcdce/nf-rpcdce-rpcmgmtstopserverlistening
-  public static RpcMgmtStopServerListening(Binding: OPTIONAL<RPC_BINDING_HANDLE>): RPC_STATUS {
+  public static RpcMgmtStopServerListening(Binding: Optional<RPC_BINDING_HANDLE>): RPC_STATUS {
     return Rpcrt4.Load('RpcMgmtStopServerListening')(Binding);
   }
 
@@ -873,17 +873,17 @@ class Rpcrt4 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/rpcdce/nf-rpcdce-rpcobjectinqtype
-  public static RpcObjectInqType(ObjectUuid: PUUID, TypeUuid_out: OPTIONAL<PUUID>): RPC_STATUS {
+  public static RpcObjectInqType(ObjectUuid: PUUID, TypeUuid_out: Optional<PUUID>): RPC_STATUS {
     return Rpcrt4.Load('RpcObjectInqType')(ObjectUuid, TypeUuid_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/rpcdce/nf-rpcdce-rpcobjectsetinqfn
-  public static RpcObjectSetInqFn(InquiryFn: NULLABLE<RPC_OBJECT_INQ_FN>): RPC_STATUS {
+  public static RpcObjectSetInqFn(InquiryFn: Nullable<RPC_OBJECT_INQ_FN>): RPC_STATUS {
     return Rpcrt4.Load('RpcObjectSetInqFn')(InquiryFn);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/rpcdce/nf-rpcdce-rpcobjectsettype
-  public static RpcObjectSetType(ObjectUuid: PUUID, TypeUuid: OPTIONAL<PUUID>): RPC_STATUS {
+  public static RpcObjectSetType(ObjectUuid: PUUID, TypeUuid: Optional<PUUID>): RPC_STATUS {
     return Rpcrt4.Load('RpcObjectSetType')(ObjectUuid, TypeUuid);
   }
 
@@ -913,7 +913,7 @@ class Rpcrt4 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/rpcdce/nf-rpcdce-rpcreverttoselfex
-  public static RpcRevertToSelfEx(BindingHandle: OPTIONAL<RPC_BINDING_HANDLE>): RPC_STATUS {
+  public static RpcRevertToSelfEx(BindingHandle: Optional<RPC_BINDING_HANDLE>): RPC_STATUS {
     return Rpcrt4.Load('RpcRevertToSelfEx')(BindingHandle);
   }
 
@@ -933,17 +933,17 @@ class Rpcrt4 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/rpcdce/nf-rpcdce-rpcserverinqbindingsex
-  public static RpcServerInqBindingsEx(SecurityDescriptor: OPTIONAL<PVOID>, BindingVector_out: PVOID): RPC_STATUS {
+  public static RpcServerInqBindingsEx(SecurityDescriptor: Optional<PVOID>, BindingVector_out: PVOID): RPC_STATUS {
     return Rpcrt4.Load('RpcServerInqBindingsEx')(SecurityDescriptor, BindingVector_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/rpcdce/nf-rpcdce-rpcserverinqcallattributesa
-  public static RpcServerInqCallAttributesA(ClientBinding: OPTIONAL<RPC_BINDING_HANDLE>, RpcCallAttributes_in_out: PRPC_CALL_ATTRIBUTES_V2_A): RPC_STATUS {
+  public static RpcServerInqCallAttributesA(ClientBinding: Optional<RPC_BINDING_HANDLE>, RpcCallAttributes_in_out: PRPC_CALL_ATTRIBUTES_V2_A): RPC_STATUS {
     return Rpcrt4.Load('RpcServerInqCallAttributesA')(ClientBinding, RpcCallAttributes_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/rpcdce/nf-rpcdce-rpcserverinqcallattributesw
-  public static RpcServerInqCallAttributesW(ClientBinding: OPTIONAL<RPC_BINDING_HANDLE>, RpcCallAttributes_in_out: PRPC_CALL_ATTRIBUTES_V2_W): RPC_STATUS {
+  public static RpcServerInqCallAttributesW(ClientBinding: Optional<RPC_BINDING_HANDLE>, RpcCallAttributes_in_out: PRPC_CALL_ATTRIBUTES_V2_W): RPC_STATUS {
     return Rpcrt4.Load('RpcServerInqCallAttributesW')(ClientBinding, RpcCallAttributes_in_out);
   }
 
@@ -958,7 +958,7 @@ class Rpcrt4 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/rpcdce/nf-rpcdce-rpcserverinqif
-  public static RpcServerInqIf(IfSpec: RPC_IF_HANDLE, MgrTypeUuid: OPTIONAL<PUUID>, MgrEpv_out: PRPC_MGR_EPV): RPC_STATUS {
+  public static RpcServerInqIf(IfSpec: RPC_IF_HANDLE, MgrTypeUuid: Optional<PUUID>, MgrEpv_out: PRPC_MGR_EPV): RPC_STATUS {
     return Rpcrt4.Load('RpcServerInqIf')(IfSpec, MgrTypeUuid, MgrEpv_out);
   }
 
@@ -979,7 +979,7 @@ class Rpcrt4 extends Win32 {
     Endpoints: PRPC_ENDPOINT_TEMPLATEA,
     NumEndpoints: ULONG,
     IdleSecondsTimeout: ULONG,
-    IdleCallbackFn: NULLABLE<PVOID>,
+    IdleCallbackFn: Nullable<PVOID>,
     IdleCallbackContext: PVOID,
     InterfaceGroup_out: PVOID,
   ): RPC_STATUS {
@@ -993,7 +993,7 @@ class Rpcrt4 extends Win32 {
     Endpoints: PRPC_ENDPOINT_TEMPLATEW,
     NumEndpoints: ULONG,
     IdleSecondsTimeout: ULONG,
-    IdleCallbackFn: NULLABLE<PVOID>,
+    IdleCallbackFn: Nullable<PVOID>,
     IdleCallbackContext: PVOID,
     InterfaceGroup_out: PVOID,
   ): RPC_STATUS {
@@ -1016,146 +1016,146 @@ class Rpcrt4 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/rpcdce/nf-rpcdce-rpcserverregisterauthinfoa
-  public static RpcServerRegisterAuthInfoA(ServerPrincName: OPTIONAL<RPC_CSTR>, AuthnSvc: ULONG, GetKeyFn: OPTIONAL<RPC_AUTH_KEY_RETRIEVAL_FN>, Arg: OPTIONAL<PVOID>): RPC_STATUS {
+  public static RpcServerRegisterAuthInfoA(ServerPrincName: Optional<RPC_CSTR>, AuthnSvc: ULONG, GetKeyFn: Optional<RPC_AUTH_KEY_RETRIEVAL_FN>, Arg: Optional<PVOID>): RPC_STATUS {
     return Rpcrt4.Load('RpcServerRegisterAuthInfoA')(ServerPrincName, AuthnSvc, GetKeyFn, Arg);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/rpcdce/nf-rpcdce-rpcserverregisterauthinfow
-  public static RpcServerRegisterAuthInfoW(ServerPrincName: OPTIONAL<RPC_WSTR>, AuthnSvc: ULONG, GetKeyFn: OPTIONAL<RPC_AUTH_KEY_RETRIEVAL_FN>, Arg: OPTIONAL<PVOID>): RPC_STATUS {
+  public static RpcServerRegisterAuthInfoW(ServerPrincName: Optional<RPC_WSTR>, AuthnSvc: ULONG, GetKeyFn: Optional<RPC_AUTH_KEY_RETRIEVAL_FN>, Arg: Optional<PVOID>): RPC_STATUS {
     return Rpcrt4.Load('RpcServerRegisterAuthInfoW')(ServerPrincName, AuthnSvc, GetKeyFn, Arg);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/rpcdce/nf-rpcdce-rpcserverregisterif
-  public static RpcServerRegisterIf(IfSpec: RPC_IF_HANDLE, MgrTypeUuid: OPTIONAL<PUUID>, MgrEpv: OPTIONAL<PRPC_MGR_EPV>): RPC_STATUS {
+  public static RpcServerRegisterIf(IfSpec: RPC_IF_HANDLE, MgrTypeUuid: Optional<PUUID>, MgrEpv: Optional<PRPC_MGR_EPV>): RPC_STATUS {
     return Rpcrt4.Load('RpcServerRegisterIf')(IfSpec, MgrTypeUuid, MgrEpv);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/rpcdce/nf-rpcdce-rpcserverregisterif2
-  public static RpcServerRegisterIf2(IfSpec: RPC_IF_HANDLE, MgrTypeUuid: OPTIONAL<PUUID>, MgrEpv: OPTIONAL<PRPC_MGR_EPV>, Flags: ULONG, MaxCalls: ULONG, MaxRpcSize: ULONG, IfCallback: OPTIONAL<RPC_IF_CALLBACK_FN>): RPC_STATUS {
+  public static RpcServerRegisterIf2(IfSpec: RPC_IF_HANDLE, MgrTypeUuid: Optional<PUUID>, MgrEpv: Optional<PRPC_MGR_EPV>, Flags: ULONG, MaxCalls: ULONG, MaxRpcSize: ULONG, IfCallback: Optional<RPC_IF_CALLBACK_FN>): RPC_STATUS {
     return Rpcrt4.Load('RpcServerRegisterIf2')(IfSpec, MgrTypeUuid, MgrEpv, Flags, MaxCalls, MaxRpcSize, IfCallback);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/rpcdce/nf-rpcdce-rpcserverregisterif3
   public static RpcServerRegisterIf3(
     IfSpec: RPC_IF_HANDLE,
-    MgrTypeUuid: OPTIONAL<PUUID>,
-    MgrEpv: OPTIONAL<PRPC_MGR_EPV>,
+    MgrTypeUuid: Optional<PUUID>,
+    MgrEpv: Optional<PRPC_MGR_EPV>,
     Flags: ULONG,
     MaxCalls: ULONG,
     MaxRpcSize: ULONG,
-    IfCallbackFn: OPTIONAL<RPC_IF_CALLBACK_FN>,
-    SecurityDescriptor: OPTIONAL<PVOID>,
+    IfCallbackFn: Optional<RPC_IF_CALLBACK_FN>,
+    SecurityDescriptor: Optional<PVOID>,
   ): RPC_STATUS {
     return Rpcrt4.Load('RpcServerRegisterIf3')(IfSpec, MgrTypeUuid, MgrEpv, Flags, MaxCalls, MaxRpcSize, IfCallbackFn, SecurityDescriptor);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/rpcdce/nf-rpcdce-rpcserverregisterifex
-  public static RpcServerRegisterIfEx(IfSpec: RPC_IF_HANDLE, MgrTypeUuid: OPTIONAL<PUUID>, MgrEpv: OPTIONAL<PRPC_MGR_EPV>, Flags: ULONG, MaxCalls: ULONG, IfCallback: OPTIONAL<RPC_IF_CALLBACK_FN>): RPC_STATUS {
+  public static RpcServerRegisterIfEx(IfSpec: RPC_IF_HANDLE, MgrTypeUuid: Optional<PUUID>, MgrEpv: Optional<PRPC_MGR_EPV>, Flags: ULONG, MaxCalls: ULONG, IfCallback: Optional<RPC_IF_CALLBACK_FN>): RPC_STATUS {
     return Rpcrt4.Load('RpcServerRegisterIfEx')(IfSpec, MgrTypeUuid, MgrEpv, Flags, MaxCalls, IfCallback);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/rpcdce/nf-rpcdce-rpcserversubscribefornotification
-  public static RpcServerSubscribeForNotification(Binding: OPTIONAL<RPC_BINDING_HANDLE>, Notification: number, NotificationType: number, NotificationCallBack: RPC_NOTIFICATION_CALLBACK): RPC_STATUS {
+  public static RpcServerSubscribeForNotification(Binding: Optional<RPC_BINDING_HANDLE>, Notification: number, NotificationType: number, NotificationCallBack: RPC_NOTIFICATION_CALLBACK): RPC_STATUS {
     return Rpcrt4.Load('RpcServerSubscribeForNotification')(Binding, Notification, NotificationType, NotificationCallBack);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/rpcdce/nf-rpcdce-rpcservertestcancel
-  public static RpcServerTestCancel(BindingHandle: OPTIONAL<RPC_BINDING_HANDLE>): RPC_STATUS {
+  public static RpcServerTestCancel(BindingHandle: Optional<RPC_BINDING_HANDLE>): RPC_STATUS {
     return Rpcrt4.Load('RpcServerTestCancel')(BindingHandle);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/rpcdce/nf-rpcdce-rpcserverunregisterif
-  public static RpcServerUnregisterIf(IfSpec: OPTIONAL<RPC_IF_HANDLE>, MgrTypeUuid: OPTIONAL<PUUID>, WaitForCallsToComplete: ULONG): RPC_STATUS {
+  public static RpcServerUnregisterIf(IfSpec: Optional<RPC_IF_HANDLE>, MgrTypeUuid: Optional<PUUID>, WaitForCallsToComplete: ULONG): RPC_STATUS {
     return Rpcrt4.Load('RpcServerUnregisterIf')(IfSpec, MgrTypeUuid, WaitForCallsToComplete);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/rpcdce/nf-rpcdce-rpcserverunregisterifex
-  public static RpcServerUnregisterIfEx(IfSpec: OPTIONAL<RPC_IF_HANDLE>, MgrTypeUuid: OPTIONAL<PUUID>, RundownContextHandles: number): RPC_STATUS {
+  public static RpcServerUnregisterIfEx(IfSpec: Optional<RPC_IF_HANDLE>, MgrTypeUuid: Optional<PUUID>, RundownContextHandles: number): RPC_STATUS {
     return Rpcrt4.Load('RpcServerUnregisterIfEx')(IfSpec, MgrTypeUuid, RundownContextHandles);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/rpcdce/nf-rpcdce-rpcserverunsubscribefornotification
-  public static RpcServerUnsubscribeForNotification(Binding: OPTIONAL<RPC_BINDING_HANDLE>, NotificationType: number, NotificationsQueued_out: PVOID): RPC_STATUS {
+  public static RpcServerUnsubscribeForNotification(Binding: Optional<RPC_BINDING_HANDLE>, NotificationType: number, NotificationsQueued_out: PVOID): RPC_STATUS {
     return Rpcrt4.Load('RpcServerUnsubscribeForNotification')(Binding, NotificationType, NotificationsQueued_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/rpcdce/nf-rpcdce-rpcserveruseallprotseqs
-  public static RpcServerUseAllProtseqs(MaxCalls: ULONG, SecurityDescriptor: OPTIONAL<PVOID>): RPC_STATUS {
+  public static RpcServerUseAllProtseqs(MaxCalls: ULONG, SecurityDescriptor: Optional<PVOID>): RPC_STATUS {
     return Rpcrt4.Load('RpcServerUseAllProtseqs')(MaxCalls, SecurityDescriptor);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/rpcdce/nf-rpcdce-rpcserveruseallprotseqsex
-  public static RpcServerUseAllProtseqsEx(MaxCalls: ULONG, SecurityDescriptor: OPTIONAL<PVOID>, Policy: PRPC_POLICY): RPC_STATUS {
+  public static RpcServerUseAllProtseqsEx(MaxCalls: ULONG, SecurityDescriptor: Optional<PVOID>, Policy: PRPC_POLICY): RPC_STATUS {
     return Rpcrt4.Load('RpcServerUseAllProtseqsEx')(MaxCalls, SecurityDescriptor, Policy);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/rpcdce/nf-rpcdce-rpcserveruseallprotseqsif
-  public static RpcServerUseAllProtseqsIf(MaxCalls: ULONG, IfSpec: RPC_IF_HANDLE, SecurityDescriptor: OPTIONAL<PVOID>): RPC_STATUS {
+  public static RpcServerUseAllProtseqsIf(MaxCalls: ULONG, IfSpec: RPC_IF_HANDLE, SecurityDescriptor: Optional<PVOID>): RPC_STATUS {
     return Rpcrt4.Load('RpcServerUseAllProtseqsIf')(MaxCalls, IfSpec, SecurityDescriptor);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/rpcdce/nf-rpcdce-rpcserveruseallprotseqsifex
-  public static RpcServerUseAllProtseqsIfEx(MaxCalls: ULONG, IfSpec: RPC_IF_HANDLE, SecurityDescriptor: OPTIONAL<PVOID>, Policy: PRPC_POLICY): RPC_STATUS {
+  public static RpcServerUseAllProtseqsIfEx(MaxCalls: ULONG, IfSpec: RPC_IF_HANDLE, SecurityDescriptor: Optional<PVOID>, Policy: PRPC_POLICY): RPC_STATUS {
     return Rpcrt4.Load('RpcServerUseAllProtseqsIfEx')(MaxCalls, IfSpec, SecurityDescriptor, Policy);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/rpcdce/nf-rpcdce-rpcserveruseprotseqa
-  public static RpcServerUseProtseqA(Protseq: RPC_CSTR, MaxCalls: ULONG, SecurityDescriptor: OPTIONAL<PVOID>): RPC_STATUS {
+  public static RpcServerUseProtseqA(Protseq: RPC_CSTR, MaxCalls: ULONG, SecurityDescriptor: Optional<PVOID>): RPC_STATUS {
     return Rpcrt4.Load('RpcServerUseProtseqA')(Protseq, MaxCalls, SecurityDescriptor);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/rpcdce/nf-rpcdce-rpcserveruseprotseqepa
-  public static RpcServerUseProtseqEpA(Protseq: RPC_CSTR, MaxCalls: ULONG, Endpoint: RPC_CSTR, SecurityDescriptor: OPTIONAL<PVOID>): RPC_STATUS {
+  public static RpcServerUseProtseqEpA(Protseq: RPC_CSTR, MaxCalls: ULONG, Endpoint: RPC_CSTR, SecurityDescriptor: Optional<PVOID>): RPC_STATUS {
     return Rpcrt4.Load('RpcServerUseProtseqEpA')(Protseq, MaxCalls, Endpoint, SecurityDescriptor);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/rpcdce/nf-rpcdce-rpcserveruseprotseqepexa
-  public static RpcServerUseProtseqEpExA(Protseq: RPC_CSTR, MaxCalls: ULONG, Endpoint: RPC_CSTR, SecurityDescriptor: OPTIONAL<PVOID>, Policy: PRPC_POLICY): RPC_STATUS {
+  public static RpcServerUseProtseqEpExA(Protseq: RPC_CSTR, MaxCalls: ULONG, Endpoint: RPC_CSTR, SecurityDescriptor: Optional<PVOID>, Policy: PRPC_POLICY): RPC_STATUS {
     return Rpcrt4.Load('RpcServerUseProtseqEpExA')(Protseq, MaxCalls, Endpoint, SecurityDescriptor, Policy);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/rpcdce/nf-rpcdce-rpcserveruseprotseqepexw
-  public static RpcServerUseProtseqEpExW(Protseq: RPC_WSTR, MaxCalls: ULONG, Endpoint: RPC_WSTR, SecurityDescriptor: OPTIONAL<PVOID>, Policy: PRPC_POLICY): RPC_STATUS {
+  public static RpcServerUseProtseqEpExW(Protseq: RPC_WSTR, MaxCalls: ULONG, Endpoint: RPC_WSTR, SecurityDescriptor: Optional<PVOID>, Policy: PRPC_POLICY): RPC_STATUS {
     return Rpcrt4.Load('RpcServerUseProtseqEpExW')(Protseq, MaxCalls, Endpoint, SecurityDescriptor, Policy);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/rpcdce/nf-rpcdce-rpcserveruseprotseqepw
-  public static RpcServerUseProtseqEpW(Protseq: RPC_WSTR, MaxCalls: ULONG, Endpoint: RPC_WSTR, SecurityDescriptor: OPTIONAL<PVOID>): RPC_STATUS {
+  public static RpcServerUseProtseqEpW(Protseq: RPC_WSTR, MaxCalls: ULONG, Endpoint: RPC_WSTR, SecurityDescriptor: Optional<PVOID>): RPC_STATUS {
     return Rpcrt4.Load('RpcServerUseProtseqEpW')(Protseq, MaxCalls, Endpoint, SecurityDescriptor);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/rpcdce/nf-rpcdce-rpcserveruseprotseqexa
-  public static RpcServerUseProtseqExA(Protseq: RPC_CSTR, MaxCalls: ULONG, SecurityDescriptor: OPTIONAL<PVOID>, Policy: PRPC_POLICY): RPC_STATUS {
+  public static RpcServerUseProtseqExA(Protseq: RPC_CSTR, MaxCalls: ULONG, SecurityDescriptor: Optional<PVOID>, Policy: PRPC_POLICY): RPC_STATUS {
     return Rpcrt4.Load('RpcServerUseProtseqExA')(Protseq, MaxCalls, SecurityDescriptor, Policy);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/rpcdce/nf-rpcdce-rpcserveruseprotseqexw
-  public static RpcServerUseProtseqExW(Protseq: RPC_WSTR, MaxCalls: ULONG, SecurityDescriptor: OPTIONAL<PVOID>, Policy: PRPC_POLICY): RPC_STATUS {
+  public static RpcServerUseProtseqExW(Protseq: RPC_WSTR, MaxCalls: ULONG, SecurityDescriptor: Optional<PVOID>, Policy: PRPC_POLICY): RPC_STATUS {
     return Rpcrt4.Load('RpcServerUseProtseqExW')(Protseq, MaxCalls, SecurityDescriptor, Policy);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/rpcdce/nf-rpcdce-rpcserveruseprotseqifa
-  public static RpcServerUseProtseqIfA(Protseq: RPC_CSTR, MaxCalls: ULONG, IfSpec: RPC_IF_HANDLE, SecurityDescriptor: OPTIONAL<PVOID>): RPC_STATUS {
+  public static RpcServerUseProtseqIfA(Protseq: RPC_CSTR, MaxCalls: ULONG, IfSpec: RPC_IF_HANDLE, SecurityDescriptor: Optional<PVOID>): RPC_STATUS {
     return Rpcrt4.Load('RpcServerUseProtseqIfA')(Protseq, MaxCalls, IfSpec, SecurityDescriptor);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/rpcdce/nf-rpcdce-rpcserveruseprotseqifexa
-  public static RpcServerUseProtseqIfExA(Protseq: RPC_CSTR, MaxCalls: ULONG, IfSpec: RPC_IF_HANDLE, SecurityDescriptor: OPTIONAL<PVOID>, Policy: PRPC_POLICY): RPC_STATUS {
+  public static RpcServerUseProtseqIfExA(Protseq: RPC_CSTR, MaxCalls: ULONG, IfSpec: RPC_IF_HANDLE, SecurityDescriptor: Optional<PVOID>, Policy: PRPC_POLICY): RPC_STATUS {
     return Rpcrt4.Load('RpcServerUseProtseqIfExA')(Protseq, MaxCalls, IfSpec, SecurityDescriptor, Policy);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/rpcdce/nf-rpcdce-rpcserveruseprotseqifexw
-  public static RpcServerUseProtseqIfExW(Protseq: RPC_WSTR, MaxCalls: ULONG, IfSpec: RPC_IF_HANDLE, SecurityDescriptor: OPTIONAL<PVOID>, Policy: PRPC_POLICY): RPC_STATUS {
+  public static RpcServerUseProtseqIfExW(Protseq: RPC_WSTR, MaxCalls: ULONG, IfSpec: RPC_IF_HANDLE, SecurityDescriptor: Optional<PVOID>, Policy: PRPC_POLICY): RPC_STATUS {
     return Rpcrt4.Load('RpcServerUseProtseqIfExW')(Protseq, MaxCalls, IfSpec, SecurityDescriptor, Policy);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/rpcdce/nf-rpcdce-rpcserveruseprotseqifw
-  public static RpcServerUseProtseqIfW(Protseq: RPC_WSTR, MaxCalls: ULONG, IfSpec: RPC_IF_HANDLE, SecurityDescriptor: OPTIONAL<PVOID>): RPC_STATUS {
+  public static RpcServerUseProtseqIfW(Protseq: RPC_WSTR, MaxCalls: ULONG, IfSpec: RPC_IF_HANDLE, SecurityDescriptor: Optional<PVOID>): RPC_STATUS {
     return Rpcrt4.Load('RpcServerUseProtseqIfW')(Protseq, MaxCalls, IfSpec, SecurityDescriptor);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/rpcdce/nf-rpcdce-rpcserveruseprotseqw
-  public static RpcServerUseProtseqW(Protseq: RPC_WSTR, MaxCalls: ULONG, SecurityDescriptor: OPTIONAL<PVOID>): RPC_STATUS {
+  public static RpcServerUseProtseqW(Protseq: RPC_WSTR, MaxCalls: ULONG, SecurityDescriptor: Optional<PVOID>): RPC_STATUS {
     return Rpcrt4.Load('RpcServerUseProtseqW')(Protseq, MaxCalls, SecurityDescriptor);
   }
 
@@ -1220,7 +1220,7 @@ class Rpcrt4 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/rpcdce/nf-rpcdce-rpcsscontextlockexclusive
-  public static RpcSsContextLockExclusive(ServerBindingHandle: OPTIONAL<RPC_BINDING_HANDLE>, UserContext: PVOID): VOID {
+  public static RpcSsContextLockExclusive(ServerBindingHandle: Optional<RPC_BINDING_HANDLE>, UserContext: PVOID): VOID {
     return Rpcrt4.Load('RpcSsContextLockExclusive')(ServerBindingHandle, UserContext);
   }
 
@@ -1276,24 +1276,24 @@ class Rpcrt4 extends Win32 {
 
   // https://learn.microsoft.com/en-us/windows/win32/api/rpcdce/nf-rpcdce-rpcstringbindingcomposea
   public static RpcStringBindingComposeA(
-    ObjUuid: OPTIONAL<RPC_CSTR>,
-    Protseq: OPTIONAL<RPC_CSTR>,
-    NetworkAddr: OPTIONAL<RPC_CSTR>,
-    Endpoint: OPTIONAL<RPC_CSTR>,
-    Options: OPTIONAL<RPC_CSTR>,
-    StringBinding_out: OPTIONAL<PRPC_CSTR>,
+    ObjUuid: Optional<RPC_CSTR>,
+    Protseq: Optional<RPC_CSTR>,
+    NetworkAddr: Optional<RPC_CSTR>,
+    Endpoint: Optional<RPC_CSTR>,
+    Options: Optional<RPC_CSTR>,
+    StringBinding_out: Optional<PRPC_CSTR>,
   ): RPC_STATUS {
     return Rpcrt4.Load('RpcStringBindingComposeA')(ObjUuid, Protseq, NetworkAddr, Endpoint, Options, StringBinding_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/rpcdce/nf-rpcdce-rpcstringbindingcomposew
   public static RpcStringBindingComposeW(
-    ObjUuid: OPTIONAL<RPC_WSTR>,
-    Protseq: OPTIONAL<RPC_WSTR>,
-    NetworkAddr: OPTIONAL<RPC_WSTR>,
-    Endpoint: OPTIONAL<RPC_WSTR>,
-    Options: OPTIONAL<RPC_WSTR>,
-    StringBinding_out: OPTIONAL<PRPC_WSTR>,
+    ObjUuid: Optional<RPC_WSTR>,
+    Protseq: Optional<RPC_WSTR>,
+    NetworkAddr: Optional<RPC_WSTR>,
+    Endpoint: Optional<RPC_WSTR>,
+    Options: Optional<RPC_WSTR>,
+    StringBinding_out: Optional<PRPC_WSTR>,
   ): RPC_STATUS {
     return Rpcrt4.Load('RpcStringBindingComposeW')(ObjUuid, Protseq, NetworkAddr, Endpoint, Options, StringBinding_out);
   }
@@ -1301,11 +1301,11 @@ class Rpcrt4 extends Win32 {
   // https://learn.microsoft.com/en-us/windows/win32/api/rpcdce/nf-rpcdce-rpcstringbindingparsea
   public static RpcStringBindingParseA(
     StringBinding: RPC_CSTR,
-    ObjUuid_out: OPTIONAL<PRPC_CSTR>,
-    Protseq_out: OPTIONAL<PRPC_CSTR>,
-    NetworkAddr_out: OPTIONAL<PRPC_CSTR>,
-    Endpoint_out: OPTIONAL<PRPC_CSTR>,
-    NetworkOptions_out: OPTIONAL<PRPC_CSTR>,
+    ObjUuid_out: Optional<PRPC_CSTR>,
+    Protseq_out: Optional<PRPC_CSTR>,
+    NetworkAddr_out: Optional<PRPC_CSTR>,
+    Endpoint_out: Optional<PRPC_CSTR>,
+    NetworkOptions_out: Optional<PRPC_CSTR>,
   ): RPC_STATUS {
     return Rpcrt4.Load('RpcStringBindingParseA')(StringBinding, ObjUuid_out, Protseq_out, NetworkAddr_out, Endpoint_out, NetworkOptions_out);
   }
@@ -1313,11 +1313,11 @@ class Rpcrt4 extends Win32 {
   // https://learn.microsoft.com/en-us/windows/win32/api/rpcdce/nf-rpcdce-rpcstringbindingparsew
   public static RpcStringBindingParseW(
     StringBinding: RPC_WSTR,
-    ObjUuid_out: OPTIONAL<PRPC_WSTR>,
-    Protseq_out: OPTIONAL<PRPC_WSTR>,
-    NetworkAddr_out: OPTIONAL<PRPC_WSTR>,
-    Endpoint_out: OPTIONAL<PRPC_WSTR>,
-    NetworkOptions_out: OPTIONAL<PRPC_WSTR>,
+    ObjUuid_out: Optional<PRPC_WSTR>,
+    Protseq_out: Optional<PRPC_WSTR>,
+    NetworkAddr_out: Optional<PRPC_WSTR>,
+    Endpoint_out: Optional<PRPC_WSTR>,
+    NetworkOptions_out: Optional<PRPC_WSTR>,
   ): RPC_STATUS {
     return Rpcrt4.Load('RpcStringBindingParseW')(StringBinding, ObjUuid_out, Protseq_out, NetworkAddr_out, Endpoint_out, NetworkOptions_out);
   }
@@ -1348,7 +1348,7 @@ class Rpcrt4 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/rpcdce/nf-rpcdce-towerexplode
-  public static TowerExplode(Tower: PVOID, ObjectUuid_out: OPTIONAL<PUUID>, SyntaxUuid_out: OPTIONAL<PUUID>, Protseq_out: OPTIONAL<PRPC_CSTR>, Endpoint_out: OPTIONAL<PRPC_CSTR>, Address_out: OPTIONAL<PRPC_CSTR>): RPC_STATUS {
+  public static TowerExplode(Tower: PVOID, ObjectUuid_out: Optional<PUUID>, SyntaxUuid_out: Optional<PUUID>, Protseq_out: Optional<PRPC_CSTR>, Endpoint_out: Optional<PRPC_CSTR>, Address_out: Optional<PRPC_CSTR>): RPC_STATUS {
     return Rpcrt4.Load('TowerExplode')(Tower, ObjectUuid_out, SyntaxUuid_out, Protseq_out, Endpoint_out, Address_out);
   }
 
@@ -1378,12 +1378,12 @@ class Rpcrt4 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/rpcdce/nf-rpcdce-uuidfromstringa
-  public static UuidFromStringA(StringUuid: OPTIONAL<RPC_CSTR>, Uuid_out: PUUID): RPC_STATUS {
+  public static UuidFromStringA(StringUuid: Optional<RPC_CSTR>, Uuid_out: PUUID): RPC_STATUS {
     return Rpcrt4.Load('UuidFromStringA')(StringUuid, Uuid_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/rpcdce/nf-rpcdce-uuidfromstringw
-  public static UuidFromStringW(StringUuid: OPTIONAL<RPC_WSTR>, Uuid_out: PUUID): RPC_STATUS {
+  public static UuidFromStringW(StringUuid: Optional<RPC_WSTR>, Uuid_out: PUUID): RPC_STATUS {
     return Rpcrt4.Load('UuidFromStringW')(StringUuid, Uuid_out);
   }
 

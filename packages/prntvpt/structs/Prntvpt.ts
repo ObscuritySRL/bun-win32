@@ -10,8 +10,8 @@ import type {
   HRESULT,
   IStream,
   LPCWSTR,
-  NULLABLE,
-  OPTIONAL,
+  Nullable,
+  Optional,
   PBSTR,
   PCWSTR,
   PDEVMODE,
@@ -108,28 +108,28 @@ class Prntvpt extends Win32 {
     scope: EPrintTicketScope,
     pcbDevmode_out: PULONG,
     ppDevmode_out: PPDEVMODE,
-    pbstrErrorMessage_out: OPTIONAL<PBSTR>,
+    pbstrErrorMessage_out: Optional<PBSTR>,
   ): HRESULT {
     return Prntvpt.Load('PTConvertPrintTicketToDevMode')(hProvider, pPrintTicket, baseDevmodeType, scope, pcbDevmode_out, ppDevmode_out, pbstrErrorMessage_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/prntvpt/nf-prntvpt-ptgetprintcapabilities
-  public static PTGetPrintCapabilities(hProvider: HPTPROVIDER, pPrintTicket: OPTIONAL<IStream>, pCapabilities_in_out: IStream, pbstrErrorMessage_out: OPTIONAL<PBSTR>): HRESULT {
+  public static PTGetPrintCapabilities(hProvider: HPTPROVIDER, pPrintTicket: Optional<IStream>, pCapabilities_in_out: IStream, pbstrErrorMessage_out: Optional<PBSTR>): HRESULT {
     return Prntvpt.Load('PTGetPrintCapabilities')(hProvider, pPrintTicket, pCapabilities_in_out, pbstrErrorMessage_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/prntvpt/nf-prntvpt-ptgetprintdevicecapabilities
-  public static PTGetPrintDeviceCapabilities(hProvider: HPTPROVIDER, pPrintTicket: OPTIONAL<IStream>, pDeviceCapabilities_in_out: IStream, pbstrErrorMessage_out: OPTIONAL<PBSTR>): HRESULT {
+  public static PTGetPrintDeviceCapabilities(hProvider: HPTPROVIDER, pPrintTicket: Optional<IStream>, pDeviceCapabilities_in_out: IStream, pbstrErrorMessage_out: Optional<PBSTR>): HRESULT {
     return Prntvpt.Load('PTGetPrintDeviceCapabilities')(hProvider, pPrintTicket, pDeviceCapabilities_in_out, pbstrErrorMessage_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/prntvpt/nf-prntvpt-ptgetprintdeviceresources
-  public static PTGetPrintDeviceResources(hProvider: HPTPROVIDER, pszLocaleName: NULLABLE<LPCWSTR>, pPrintTicket: OPTIONAL<IStream>, pDeviceResources_in_out: IStream, pbstrErrorMessage_out: OPTIONAL<PBSTR>): HRESULT {
+  public static PTGetPrintDeviceResources(hProvider: HPTPROVIDER, pszLocaleName: Nullable<LPCWSTR>, pPrintTicket: Optional<IStream>, pDeviceResources_in_out: IStream, pbstrErrorMessage_out: Optional<PBSTR>): HRESULT {
     return Prntvpt.Load('PTGetPrintDeviceResources')(hProvider, pszLocaleName, pPrintTicket, pDeviceResources_in_out, pbstrErrorMessage_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/prntvpt/nf-prntvpt-ptmergeandvalidateprintticket
-  public static PTMergeAndValidatePrintTicket(hProvider: HPTPROVIDER, pBaseTicket: IStream, pDeltaTicket: OPTIONAL<IStream>, scope: EPrintTicketScope, pResultTicket_in_out: IStream, pbstrErrorMessage_out: OPTIONAL<PBSTR>): HRESULT {
+  public static PTMergeAndValidatePrintTicket(hProvider: HPTPROVIDER, pBaseTicket: IStream, pDeltaTicket: Optional<IStream>, scope: EPrintTicketScope, pResultTicket_in_out: IStream, pbstrErrorMessage_out: Optional<PBSTR>): HRESULT {
     return Prntvpt.Load('PTMergeAndValidatePrintTicket')(hProvider, pBaseTicket, pDeltaTicket, scope, pResultTicket_in_out, pbstrErrorMessage_out);
   }
 

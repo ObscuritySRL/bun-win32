@@ -28,8 +28,8 @@ import type {
   LONGLONG,
   LPCWSTR,
   LPWSTR,
-  NULLABLE,
-  OPTIONAL,
+  Nullable,
+  Optional,
   PDWORD,
   PEVT_HANDLE,
   PEVT_RPC_LOGIN,
@@ -101,17 +101,17 @@ class Wevtapi extends Win32 {
   } as const satisfies Record<string, FFIFunction>;
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winevt/nf-winevt-evtarchiveexportedlog
-  public static EvtArchiveExportedLog(Session: OPTIONAL<EVT_HANDLE>, LogFilePath: LPCWSTR, Locale: LCID, Flags: DWORD): BOOL {
+  public static EvtArchiveExportedLog(Session: Optional<EVT_HANDLE>, LogFilePath: LPCWSTR, Locale: LCID, Flags: DWORD): BOOL {
     return Wevtapi.Load('EvtArchiveExportedLog')(Session, LogFilePath, Locale, Flags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winevt/nf-winevt-evtcancel
-  public static EvtCancel(Object: OPTIONAL<EVT_HANDLE>): BOOL {
+  public static EvtCancel(Object: Optional<EVT_HANDLE>): BOOL {
     return Wevtapi.Load('EvtCancel')(Object);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winevt/nf-winevt-evtclearlog
-  public static EvtClearLog(Session: OPTIONAL<EVT_HANDLE>, ChannelPath: LPCWSTR, TargetFilePath: OPTIONAL<LPCWSTR>, Flags: DWORD): BOOL {
+  public static EvtClearLog(Session: Optional<EVT_HANDLE>, ChannelPath: LPCWSTR, TargetFilePath: Optional<LPCWSTR>, Flags: DWORD): BOOL {
     return Wevtapi.Load('EvtClearLog')(Session, ChannelPath, TargetFilePath, Flags);
   }
 
@@ -121,30 +121,30 @@ class Wevtapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winevt/nf-winevt-evtcreatebookmark
-  public static EvtCreateBookmark(BookmarkXml: OPTIONAL<LPCWSTR>): EVT_HANDLE {
+  public static EvtCreateBookmark(BookmarkXml: Optional<LPCWSTR>): EVT_HANDLE {
     return Wevtapi.Load('EvtCreateBookmark')(BookmarkXml);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winevt/nf-winevt-evtcreaterendercontext
-  public static EvtCreateRenderContext(ValuePathsCount: DWORD, ValuePaths: OPTIONAL<PLPCWSTR>, Flags: EvtRenderContextFlags): EVT_HANDLE {
+  public static EvtCreateRenderContext(ValuePathsCount: DWORD, ValuePaths: Optional<PLPCWSTR>, Flags: EvtRenderContextFlags): EVT_HANDLE {
     return Wevtapi.Load('EvtCreateRenderContext')(ValuePathsCount, ValuePaths, Flags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winevt/nf-winevt-evtexportlog
-  public static EvtExportLog(Session: OPTIONAL<EVT_HANDLE>, Path: OPTIONAL<LPCWSTR>, Query: OPTIONAL<LPCWSTR>, TargetFilePath: LPCWSTR, Flags: EvtExportLogFlags): BOOL {
+  public static EvtExportLog(Session: Optional<EVT_HANDLE>, Path: Optional<LPCWSTR>, Query: Optional<LPCWSTR>, TargetFilePath: LPCWSTR, Flags: EvtExportLogFlags): BOOL {
     return Wevtapi.Load('EvtExportLog')(Session, Path, Query, TargetFilePath, Flags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winevt/nf-winevt-evtformatmessage
   public static EvtFormatMessage(
-    PublisherMetadata: OPTIONAL<EVT_HANDLE>,
-    Event: OPTIONAL<EVT_HANDLE>,
+    PublisherMetadata: Optional<EVT_HANDLE>,
+    Event: Optional<EVT_HANDLE>,
     MessageId: DWORD,
     ValueCount: DWORD,
-    Values: OPTIONAL<PEVT_VARIANT>,
+    Values: Optional<PEVT_VARIANT>,
     Flags: EvtFormatMessageFlags,
     BufferSize: DWORD,
-    Buffer_out: OPTIONAL<LPWSTR>,
+    Buffer_out: Optional<LPWSTR>,
     BufferUsed_out: PDWORD,
   ): BOOL {
     return Wevtapi.Load('EvtFormatMessage')(PublisherMetadata, Event, MessageId, ValueCount, Values, Flags, BufferSize, Buffer_out, BufferUsed_out);
@@ -156,14 +156,14 @@ class Wevtapi extends Win32 {
     PropertyId: EvtChannelConfigPropertyId,
     Flags: DWORD,
     PropertyValueBufferSize: DWORD,
-    PropertyValueBuffer_out: OPTIONAL<PEVT_VARIANT>,
+    PropertyValueBuffer_out: Optional<PEVT_VARIANT>,
     PropertyValueBufferUsed_out: PDWORD,
   ): BOOL {
     return Wevtapi.Load('EvtGetChannelConfigProperty')(ChannelConfig, PropertyId, Flags, PropertyValueBufferSize, PropertyValueBuffer_out, PropertyValueBufferUsed_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winevt/nf-winevt-evtgeteventinfo
-  public static EvtGetEventInfo(Event: EVT_HANDLE, PropertyId: EvtEventPropertyId, PropertyValueBufferSize: DWORD, PropertyValueBuffer_out: OPTIONAL<PEVT_VARIANT>, PropertyValueBufferUsed_out: PDWORD): BOOL {
+  public static EvtGetEventInfo(Event: EVT_HANDLE, PropertyId: EvtEventPropertyId, PropertyValueBufferSize: DWORD, PropertyValueBuffer_out: Optional<PEVT_VARIANT>, PropertyValueBufferUsed_out: PDWORD): BOOL {
     return Wevtapi.Load('EvtGetEventInfo')(Event, PropertyId, PropertyValueBufferSize, PropertyValueBuffer_out, PropertyValueBufferUsed_out);
   }
 
@@ -173,19 +173,19 @@ class Wevtapi extends Win32 {
     PropertyId: EvtEventMetadataPropertyId,
     Flags: DWORD,
     EventMetadataPropertyBufferSize: DWORD,
-    EventMetadataPropertyBuffer_out: OPTIONAL<PEVT_VARIANT>,
+    EventMetadataPropertyBuffer_out: Optional<PEVT_VARIANT>,
     EventMetadataPropertyBufferUsed_out: PDWORD,
   ): BOOL {
     return Wevtapi.Load('EvtGetEventMetadataProperty')(EventMetadata, PropertyId, Flags, EventMetadataPropertyBufferSize, EventMetadataPropertyBuffer_out, EventMetadataPropertyBufferUsed_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winevt/nf-winevt-evtgetextendedstatus
-  public static EvtGetExtendedStatus(BufferSize: DWORD, Buffer_out: OPTIONAL<LPWSTR>, BufferUsed_out: PDWORD): DWORD {
+  public static EvtGetExtendedStatus(BufferSize: DWORD, Buffer_out: Optional<LPWSTR>, BufferUsed_out: PDWORD): DWORD {
     return Wevtapi.Load('EvtGetExtendedStatus')(BufferSize, Buffer_out, BufferUsed_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winevt/nf-winevt-evtgetloginfo
-  public static EvtGetLogInfo(Log: EVT_HANDLE, PropertyId: EvtLogPropertyId, PropertyValueBufferSize: DWORD, PropertyValueBuffer_out: OPTIONAL<PEVT_VARIANT>, PropertyValueBufferUsed_out: PDWORD): BOOL {
+  public static EvtGetLogInfo(Log: EVT_HANDLE, PropertyId: EvtLogPropertyId, PropertyValueBufferSize: DWORD, PropertyValueBuffer_out: Optional<PEVT_VARIANT>, PropertyValueBufferUsed_out: PDWORD): BOOL {
     return Wevtapi.Load('EvtGetLogInfo')(Log, PropertyId, PropertyValueBufferSize, PropertyValueBuffer_out, PropertyValueBufferUsed_out);
   }
 
@@ -196,7 +196,7 @@ class Wevtapi extends Win32 {
     ArrayIndex: DWORD,
     Flags: DWORD,
     PropertyValueBufferSize: DWORD,
-    PropertyValueBuffer_out: OPTIONAL<PEVT_VARIANT>,
+    PropertyValueBuffer_out: Optional<PEVT_VARIANT>,
     PropertyValueBufferUsed_out: PDWORD,
   ): BOOL {
     return Wevtapi.Load('EvtGetObjectArrayProperty')(ObjectArray, PropertyId, ArrayIndex, Flags, PropertyValueBufferSize, PropertyValueBuffer_out, PropertyValueBufferUsed_out);
@@ -213,14 +213,14 @@ class Wevtapi extends Win32 {
     PropertyId: EvtPublisherMetadataPropertyId,
     Flags: DWORD,
     PublisherMetadataPropertyBufferSize: DWORD,
-    PublisherMetadataPropertyBuffer_out: OPTIONAL<PEVT_VARIANT>,
+    PublisherMetadataPropertyBuffer_out: Optional<PEVT_VARIANT>,
     PublisherMetadataPropertyBufferUsed_out: PDWORD,
   ): BOOL {
     return Wevtapi.Load('EvtGetPublisherMetadataProperty')(PublisherMetadata, PropertyId, Flags, PublisherMetadataPropertyBufferSize, PublisherMetadataPropertyBuffer_out, PublisherMetadataPropertyBufferUsed_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winevt/nf-winevt-evtgetqueryinfo
-  public static EvtGetQueryInfo(QueryOrSubscription: EVT_HANDLE, PropertyId: EvtQueryPropertyId, PropertyValueBufferSize: DWORD, PropertyValueBuffer_out: OPTIONAL<PEVT_VARIANT>, PropertyValueBufferUsed_out: PDWORD): BOOL {
+  public static EvtGetQueryInfo(QueryOrSubscription: EVT_HANDLE, PropertyId: EvtQueryPropertyId, PropertyValueBufferSize: DWORD, PropertyValueBuffer_out: Optional<PEVT_VARIANT>, PropertyValueBufferUsed_out: PDWORD): BOOL {
     return Wevtapi.Load('EvtGetQueryInfo')(QueryOrSubscription, PropertyId, PropertyValueBufferSize, PropertyValueBuffer_out, PropertyValueBufferUsed_out);
   }
 
@@ -230,7 +230,7 @@ class Wevtapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winevt/nf-winevt-evtnextchannelpath
-  public static EvtNextChannelPath(ChannelEnum: EVT_HANDLE, ChannelPathBufferSize: DWORD, ChannelPathBuffer_out: OPTIONAL<LPWSTR>, ChannelPathBufferUsed_out: PDWORD): BOOL {
+  public static EvtNextChannelPath(ChannelEnum: EVT_HANDLE, ChannelPathBufferSize: DWORD, ChannelPathBuffer_out: Optional<LPWSTR>, ChannelPathBufferUsed_out: PDWORD): BOOL {
     return Wevtapi.Load('EvtNextChannelPath')(ChannelEnum, ChannelPathBufferSize, ChannelPathBuffer_out, ChannelPathBufferUsed_out);
   }
 
@@ -240,17 +240,17 @@ class Wevtapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winevt/nf-winevt-evtnextpublisherid
-  public static EvtNextPublisherId(PublisherEnum: EVT_HANDLE, PublisherIdBufferSize: DWORD, PublisherIdBuffer_out: OPTIONAL<LPWSTR>, PublisherIdBufferUsed_out: PDWORD): BOOL {
+  public static EvtNextPublisherId(PublisherEnum: EVT_HANDLE, PublisherIdBufferSize: DWORD, PublisherIdBuffer_out: Optional<LPWSTR>, PublisherIdBufferUsed_out: PDWORD): BOOL {
     return Wevtapi.Load('EvtNextPublisherId')(PublisherEnum, PublisherIdBufferSize, PublisherIdBuffer_out, PublisherIdBufferUsed_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winevt/nf-winevt-evtopenchannelconfig
-  public static EvtOpenChannelConfig(Session: OPTIONAL<EVT_HANDLE>, ChannelPath: LPCWSTR, Flags: DWORD): EVT_HANDLE {
+  public static EvtOpenChannelConfig(Session: Optional<EVT_HANDLE>, ChannelPath: LPCWSTR, Flags: DWORD): EVT_HANDLE {
     return Wevtapi.Load('EvtOpenChannelConfig')(Session, ChannelPath, Flags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winevt/nf-winevt-evtopenchannelenum
-  public static EvtOpenChannelEnum(Session: OPTIONAL<EVT_HANDLE>, Flags: DWORD): EVT_HANDLE {
+  public static EvtOpenChannelEnum(Session: Optional<EVT_HANDLE>, Flags: DWORD): EVT_HANDLE {
     return Wevtapi.Load('EvtOpenChannelEnum')(Session, Flags);
   }
 
@@ -260,17 +260,17 @@ class Wevtapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winevt/nf-winevt-evtopenlog
-  public static EvtOpenLog(Session: OPTIONAL<EVT_HANDLE>, Path: LPCWSTR, Flags: EvtOpenLogFlags): EVT_HANDLE {
+  public static EvtOpenLog(Session: Optional<EVT_HANDLE>, Path: LPCWSTR, Flags: EvtOpenLogFlags): EVT_HANDLE {
     return Wevtapi.Load('EvtOpenLog')(Session, Path, Flags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winevt/nf-winevt-evtopenpublisherenum
-  public static EvtOpenPublisherEnum(Session: OPTIONAL<EVT_HANDLE>, Flags: DWORD): EVT_HANDLE {
+  public static EvtOpenPublisherEnum(Session: Optional<EVT_HANDLE>, Flags: DWORD): EVT_HANDLE {
     return Wevtapi.Load('EvtOpenPublisherEnum')(Session, Flags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winevt/nf-winevt-evtopenpublishermetadata
-  public static EvtOpenPublisherMetadata(Session: OPTIONAL<EVT_HANDLE>, PublisherId: LPCWSTR, LogFilePath: OPTIONAL<LPCWSTR>, Locale: LCID, Flags: DWORD): EVT_HANDLE {
+  public static EvtOpenPublisherMetadata(Session: Optional<EVT_HANDLE>, PublisherId: LPCWSTR, LogFilePath: Optional<LPCWSTR>, Locale: LCID, Flags: DWORD): EVT_HANDLE {
     return Wevtapi.Load('EvtOpenPublisherMetadata')(Session, PublisherId, LogFilePath, Locale, Flags);
   }
 
@@ -280,12 +280,12 @@ class Wevtapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winevt/nf-winevt-evtquery
-  public static EvtQuery(Session: OPTIONAL<EVT_HANDLE>, Path: OPTIONAL<LPCWSTR>, Query: OPTIONAL<LPCWSTR>, Flags: EvtQueryFlags): EVT_HANDLE {
+  public static EvtQuery(Session: Optional<EVT_HANDLE>, Path: Optional<LPCWSTR>, Query: Optional<LPCWSTR>, Flags: EvtQueryFlags): EVT_HANDLE {
     return Wevtapi.Load('EvtQuery')(Session, Path, Query, Flags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winevt/nf-winevt-evtrender
-  public static EvtRender(Context: OPTIONAL<EVT_HANDLE>, Fragment: EVT_HANDLE, Flags: EvtRenderFlags, BufferSize: DWORD, Buffer_out: OPTIONAL<PVOID>, BufferUsed_out: PDWORD, PropertyCount_out: PDWORD): BOOL {
+  public static EvtRender(Context: Optional<EVT_HANDLE>, Fragment: EVT_HANDLE, Flags: EvtRenderFlags, BufferSize: DWORD, Buffer_out: Optional<PVOID>, BufferUsed_out: PDWORD, PropertyCount_out: PDWORD): BOOL {
     return Wevtapi.Load('EvtRender')(Context, Fragment, Flags, BufferSize, Buffer_out, BufferUsed_out, PropertyCount_out);
   }
 
@@ -295,7 +295,7 @@ class Wevtapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winevt/nf-winevt-evtseek
-  public static EvtSeek(ResultSet: EVT_HANDLE, Position: LONGLONG, Bookmark: OPTIONAL<EVT_HANDLE>, Timeout: DWORD, Flags: EvtSeekFlags): BOOL {
+  public static EvtSeek(ResultSet: EVT_HANDLE, Position: LONGLONG, Bookmark: Optional<EVT_HANDLE>, Timeout: DWORD, Flags: EvtSeekFlags): BOOL {
     return Wevtapi.Load('EvtSeek')(ResultSet, Position, Bookmark, Timeout, Flags);
   }
 
@@ -306,13 +306,13 @@ class Wevtapi extends Win32 {
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winevt/nf-winevt-evtsubscribe
   public static EvtSubscribe(
-    Session: OPTIONAL<EVT_HANDLE>,
-    SignalEvent: OPTIONAL<HANDLE>,
-    ChannelPath: OPTIONAL<LPCWSTR>,
-    Query: OPTIONAL<LPCWSTR>,
-    Bookmark: OPTIONAL<EVT_HANDLE>,
-    Context: NULLABLE<PVOID>,
-    Callback: NULLABLE<EVT_SUBSCRIBE_CALLBACK>,
+    Session: Optional<EVT_HANDLE>,
+    SignalEvent: Optional<HANDLE>,
+    ChannelPath: Optional<LPCWSTR>,
+    Query: Optional<LPCWSTR>,
+    Bookmark: Optional<EVT_HANDLE>,
+    Context: Nullable<PVOID>,
+    Callback: Nullable<EVT_SUBSCRIBE_CALLBACK>,
     Flags: EvtSubscribeFlags,
   ): EVT_HANDLE {
     return Wevtapi.Load('EvtSubscribe')(Session, SignalEvent, ChannelPath, Query, Bookmark, Context, Callback, Flags);

@@ -2,7 +2,7 @@ import { type FFIFunction, FFIType } from 'bun:ffi';
 
 import { Win32 } from '@bun-win32/core';
 
-import type { FLOAT32, HRESULT, LPCVOID, LPCX3DAUDIO_EMITTER, LPCX3DAUDIO_LISTENER, LPLPVOID, LPX3DAUDIO_DSP_SETTINGS, OPTIONAL, REFCLSID, UINT32, VOID, X3DAUDIO_HANDLE, XAUDIO2_PROCESSOR } from '../types/Xaudio2_9';
+import type { FLOAT32, HRESULT, LPCVOID, LPCX3DAUDIO_EMITTER, LPCX3DAUDIO_LISTENER, LPLPVOID, LPX3DAUDIO_DSP_SETTINGS, Optional, REFCLSID, UINT32, VOID, X3DAUDIO_HANDLE, XAUDIO2_PROCESSOR } from '../types/Xaudio2_9';
 
 /**
  * Thin, lazy-loaded FFI bindings for `xaudio2_9.dll`.
@@ -51,7 +51,7 @@ class Xaudio2_9 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/xapofx/nf-xapofx-createfx
-  public static CreateFX(clsid: REFCLSID, pEffect_out: LPLPVOID, pInitData: OPTIONAL<LPCVOID>, InitDataByteSize: UINT32): HRESULT {
+  public static CreateFX(clsid: REFCLSID, pEffect_out: LPLPVOID, pInitData: Optional<LPCVOID>, InitDataByteSize: UINT32): HRESULT {
     return Xaudio2_9.Load('CreateFX')(clsid, pEffect_out, pInitData, InitDataByteSize);
   }
 

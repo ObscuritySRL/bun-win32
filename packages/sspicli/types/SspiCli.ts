@@ -1,6 +1,6 @@
 import type { Pointer } from 'bun:ffi';
 
-export type { BOOLEAN, HANDLE, LPSTR, LPWSTR, NULL, NULLABLE, OPTIONAL, PHANDLE, PULONG, PVOID, ULONG, VOID } from '@bun-win32/core';
+export type { BOOLEAN, HANDLE, LPSTR, LPWSTR, NULL, Nullable, Optional, PHANDLE, PULONG, PVOID, ULONG, VOID } from '@bun-win32/core';
 
 export enum CredentialUse {
   SECPKG_CRED_BOTH = 0x0000_0003,

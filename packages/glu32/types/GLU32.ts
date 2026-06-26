@@ -1,6 +1,6 @@
 import type { Pointer } from 'bun:ffi';
 
-export type { NULL, NULLABLE } from '@bun-win32/core';
+export type { NULL, Nullable } from '@bun-win32/core';
 
 export enum GLenum {
   /* Boolean */

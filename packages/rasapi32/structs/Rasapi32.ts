@@ -43,7 +43,7 @@ import type {
   LPSTR,
   LPVOID,
   LPWSTR,
-  OPTIONAL,
+  Optional,
   PLPRASEAPUSERIDENTITYA,
   PLPRASEAPUSERIDENTITYW,
   PLPSTR,
@@ -188,92 +188,92 @@ class Rasapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ras/nf-ras-rascreatephonebookentrya
-  public static RasCreatePhonebookEntryA(hwnd: HWND, lpszPhonebook: OPTIONAL<LPCSTR>): DWORD {
+  public static RasCreatePhonebookEntryA(hwnd: HWND, lpszPhonebook: Optional<LPCSTR>): DWORD {
     return Rasapi32.Load('RasCreatePhonebookEntryA')(hwnd, lpszPhonebook);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ras/nf-ras-rascreatephonebookentryw
-  public static RasCreatePhonebookEntryW(hwnd: HWND, lpszPhonebook: OPTIONAL<LPCWSTR>): DWORD {
+  public static RasCreatePhonebookEntryW(hwnd: HWND, lpszPhonebook: Optional<LPCWSTR>): DWORD {
     return Rasapi32.Load('RasCreatePhonebookEntryW')(hwnd, lpszPhonebook);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ras/nf-ras-rasdeleteentrya
-  public static RasDeleteEntryA(lpszPhonebook: OPTIONAL<LPCSTR>, lpszEntry: LPCSTR): DWORD {
+  public static RasDeleteEntryA(lpszPhonebook: Optional<LPCSTR>, lpszEntry: LPCSTR): DWORD {
     return Rasapi32.Load('RasDeleteEntryA')(lpszPhonebook, lpszEntry);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ras/nf-ras-rasdeleteentryw
-  public static RasDeleteEntryW(lpszPhonebook: OPTIONAL<LPCWSTR>, lpszEntry: LPCWSTR): DWORD {
+  public static RasDeleteEntryW(lpszPhonebook: Optional<LPCWSTR>, lpszEntry: LPCWSTR): DWORD {
     return Rasapi32.Load('RasDeleteEntryW')(lpszPhonebook, lpszEntry);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ras/nf-ras-rasdeletesubentrya
-  public static RasDeleteSubEntryA(pszPhonebook: OPTIONAL<LPCSTR>, pszEntry: LPCSTR, dwSubentryId: DWORD): DWORD {
+  public static RasDeleteSubEntryA(pszPhonebook: Optional<LPCSTR>, pszEntry: LPCSTR, dwSubentryId: DWORD): DWORD {
     return Rasapi32.Load('RasDeleteSubEntryA')(pszPhonebook, pszEntry, dwSubentryId);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ras/nf-ras-rasdeletesubentryw
-  public static RasDeleteSubEntryW(pszPhonebook: OPTIONAL<LPCWSTR>, pszEntry: LPCWSTR, dwSubEntryId: DWORD): DWORD {
+  public static RasDeleteSubEntryW(pszPhonebook: Optional<LPCWSTR>, pszEntry: LPCWSTR, dwSubEntryId: DWORD): DWORD {
     return Rasapi32.Load('RasDeleteSubEntryW')(pszPhonebook, pszEntry, dwSubEntryId);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ras/nf-ras-rasdiala
-  public static RasDialA(lpRasDialExtensions: OPTIONAL<LPRASDIALEXTENSIONS>, lpszPhonebook: OPTIONAL<LPCSTR>, lpRasDialParams: LPRASDIALPARAMSA, dwNotifierType: DWORD, lpvNotifier: OPTIONAL<LPVOID>, lphRasConn_out: LPHRASCONN): DWORD {
+  public static RasDialA(lpRasDialExtensions: Optional<LPRASDIALEXTENSIONS>, lpszPhonebook: Optional<LPCSTR>, lpRasDialParams: LPRASDIALPARAMSA, dwNotifierType: DWORD, lpvNotifier: Optional<LPVOID>, lphRasConn_out: LPHRASCONN): DWORD {
     return Rasapi32.Load('RasDialA')(lpRasDialExtensions, lpszPhonebook, lpRasDialParams, dwNotifierType, lpvNotifier, lphRasConn_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ras/nf-ras-rasdialw
-  public static RasDialW(lpRasDialExtensions: OPTIONAL<LPRASDIALEXTENSIONS>, lpszPhonebook: OPTIONAL<LPCWSTR>, lpRasDialParams: LPRASDIALPARAMSW, dwNotifierType: DWORD, lpvNotifier: OPTIONAL<LPVOID>, lphRasConn_out: LPHRASCONN): DWORD {
+  public static RasDialW(lpRasDialExtensions: Optional<LPRASDIALEXTENSIONS>, lpszPhonebook: Optional<LPCWSTR>, lpRasDialParams: LPRASDIALPARAMSW, dwNotifierType: DWORD, lpvNotifier: Optional<LPVOID>, lphRasConn_out: LPHRASCONN): DWORD {
     return Rasapi32.Load('RasDialW')(lpRasDialExtensions, lpszPhonebook, lpRasDialParams, dwNotifierType, lpvNotifier, lphRasConn_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ras/nf-ras-raseditphonebookentrya
-  public static RasEditPhonebookEntryA(hwnd: HWND, lpszPhonebook: OPTIONAL<LPCSTR>, lpszEntry: LPCSTR): DWORD {
+  public static RasEditPhonebookEntryA(hwnd: HWND, lpszPhonebook: Optional<LPCSTR>, lpszEntry: LPCSTR): DWORD {
     return Rasapi32.Load('RasEditPhonebookEntryA')(hwnd, lpszPhonebook, lpszEntry);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ras/nf-ras-raseditphonebookentryw
-  public static RasEditPhonebookEntryW(hwnd: HWND, lpszPhonebook: OPTIONAL<LPCWSTR>, lpszEntry: LPCWSTR): DWORD {
+  public static RasEditPhonebookEntryW(hwnd: HWND, lpszPhonebook: Optional<LPCWSTR>, lpszEntry: LPCWSTR): DWORD {
     return Rasapi32.Load('RasEditPhonebookEntryW')(hwnd, lpszPhonebook, lpszEntry);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ras/nf-ras-rasenumautodialaddressesa
-  public static RasEnumAutodialAddressesA(lppRasAutodialAddresses_in_out: OPTIONAL<PLPSTR>, lpdwcbRasAutodialAddresses_in_out: LPDWORD, lpdwcRasAutodialAddresses_out: LPDWORD): DWORD {
+  public static RasEnumAutodialAddressesA(lppRasAutodialAddresses_in_out: Optional<PLPSTR>, lpdwcbRasAutodialAddresses_in_out: LPDWORD, lpdwcRasAutodialAddresses_out: LPDWORD): DWORD {
     return Rasapi32.Load('RasEnumAutodialAddressesA')(lppRasAutodialAddresses_in_out, lpdwcbRasAutodialAddresses_in_out, lpdwcRasAutodialAddresses_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ras/nf-ras-rasenumautodialaddressesw
-  public static RasEnumAutodialAddressesW(lppRasAutodialAddresses_in_out: OPTIONAL<PLPWSTR>, lpdwcbRasAutodialAddresses_in_out: LPDWORD, lpdwcRasAutodialAddresses_out: LPDWORD): DWORD {
+  public static RasEnumAutodialAddressesW(lppRasAutodialAddresses_in_out: Optional<PLPWSTR>, lpdwcbRasAutodialAddresses_in_out: LPDWORD, lpdwcRasAutodialAddresses_out: LPDWORD): DWORD {
     return Rasapi32.Load('RasEnumAutodialAddressesW')(lppRasAutodialAddresses_in_out, lpdwcbRasAutodialAddresses_in_out, lpdwcRasAutodialAddresses_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ras/nf-ras-rasenumconnectionsa
-  public static RasEnumConnectionsA(lprasconn_in_out: OPTIONAL<LPRASCONNA>, lpcb_in_out: LPDWORD, lpcConnections_out: LPDWORD): DWORD {
+  public static RasEnumConnectionsA(lprasconn_in_out: Optional<LPRASCONNA>, lpcb_in_out: LPDWORD, lpcConnections_out: LPDWORD): DWORD {
     return Rasapi32.Load('RasEnumConnectionsA')(lprasconn_in_out, lpcb_in_out, lpcConnections_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ras/nf-ras-rasenumconnectionsw
-  public static RasEnumConnectionsW(lprasconn_in_out: OPTIONAL<LPRASCONNW>, lpcb_in_out: LPDWORD, lpcConnections_out: LPDWORD): DWORD {
+  public static RasEnumConnectionsW(lprasconn_in_out: Optional<LPRASCONNW>, lpcb_in_out: LPDWORD, lpcConnections_out: LPDWORD): DWORD {
     return Rasapi32.Load('RasEnumConnectionsW')(lprasconn_in_out, lpcb_in_out, lpcConnections_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ras/nf-ras-rasenumdevicesa
-  public static RasEnumDevicesA(lpRasDevInfo_in_out: OPTIONAL<LPRASDEVINFOA>, lpcb_in_out: LPDWORD, lpcDevices_out: LPDWORD): DWORD {
+  public static RasEnumDevicesA(lpRasDevInfo_in_out: Optional<LPRASDEVINFOA>, lpcb_in_out: LPDWORD, lpcDevices_out: LPDWORD): DWORD {
     return Rasapi32.Load('RasEnumDevicesA')(lpRasDevInfo_in_out, lpcb_in_out, lpcDevices_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ras/nf-ras-rasenumdevicesw
-  public static RasEnumDevicesW(lpRasDevInfo_in_out: OPTIONAL<LPRASDEVINFOW>, lpcb_in_out: LPDWORD, lpcDevices_out: LPDWORD): DWORD {
+  public static RasEnumDevicesW(lpRasDevInfo_in_out: Optional<LPRASDEVINFOW>, lpcb_in_out: LPDWORD, lpcDevices_out: LPDWORD): DWORD {
     return Rasapi32.Load('RasEnumDevicesW')(lpRasDevInfo_in_out, lpcb_in_out, lpcDevices_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ras/nf-ras-rasenumentriesa
-  public static RasEnumEntriesA(reserved: OPTIONAL<LPCSTR>, lpszPhonebook: OPTIONAL<LPCSTR>, lprasentryname_in_out: OPTIONAL<LPRASENTRYNAMEA>, lpcb_in_out: LPDWORD, lpcEntries_out: LPDWORD): DWORD {
+  public static RasEnumEntriesA(reserved: Optional<LPCSTR>, lpszPhonebook: Optional<LPCSTR>, lprasentryname_in_out: Optional<LPRASENTRYNAMEA>, lpcb_in_out: LPDWORD, lpcEntries_out: LPDWORD): DWORD {
     return Rasapi32.Load('RasEnumEntriesA')(reserved, lpszPhonebook, lprasentryname_in_out, lpcb_in_out, lpcEntries_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ras/nf-ras-rasenumentriesw
-  public static RasEnumEntriesW(reserved: OPTIONAL<LPCWSTR>, lpszPhonebook: OPTIONAL<LPCWSTR>, lprasentryname_in_out: OPTIONAL<LPRASENTRYNAMEW>, lpcb_in_out: LPDWORD, lpcEntries_out: LPDWORD): DWORD {
+  public static RasEnumEntriesW(reserved: Optional<LPCWSTR>, lpszPhonebook: Optional<LPCWSTR>, lprasentryname_in_out: Optional<LPRASENTRYNAMEW>, lpcb_in_out: LPDWORD, lpcEntries_out: LPDWORD): DWORD {
     return Rasapi32.Load('RasEnumEntriesW')(reserved, lpszPhonebook, lprasentryname_in_out, lpcb_in_out, lpcEntries_out);
   }
 
@@ -289,9 +289,9 @@ class Rasapi32 extends Win32 {
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ras/nf-ras-rasgetautodialaddressa
   public static RasGetAutodialAddressA(
-    lpszAddress: OPTIONAL<LPCSTR>,
-    lpdwReserved: OPTIONAL<LPDWORD>,
-    lpAutoDialEntries_in_out: OPTIONAL<LPRASAUTODIALENTRYA>,
+    lpszAddress: Optional<LPCSTR>,
+    lpdwReserved: Optional<LPDWORD>,
+    lpAutoDialEntries_in_out: Optional<LPRASAUTODIALENTRYA>,
     lpdwcbAutoDialEntries_in_out: LPDWORD,
     lpdwcAutoDialEntries_out: LPDWORD,
   ): DWORD {
@@ -300,9 +300,9 @@ class Rasapi32 extends Win32 {
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ras/nf-ras-rasgetautodialaddressw
   public static RasGetAutodialAddressW(
-    lpszAddress: OPTIONAL<LPCWSTR>,
-    lpdwReserved: OPTIONAL<LPDWORD>,
-    lpAutoDialEntries_in_out: OPTIONAL<LPRASAUTODIALENTRYW>,
+    lpszAddress: Optional<LPCWSTR>,
+    lpdwReserved: Optional<LPDWORD>,
+    lpAutoDialEntries_in_out: Optional<LPRASAUTODIALENTRYW>,
     lpdwcbAutoDialEntries_in_out: LPDWORD,
     lpdwcAutoDialEntries_out: LPDWORD,
   ): DWORD {
@@ -345,85 +345,85 @@ class Rasapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ras/nf-ras-rasgetcountryinfoa
-  public static RasGetCountryInfoA(lpRasCtryInfo_in_out: OPTIONAL<LPRASCTRYINFOA>, lpdwSize_in_out: LPDWORD): DWORD {
+  public static RasGetCountryInfoA(lpRasCtryInfo_in_out: Optional<LPRASCTRYINFOA>, lpdwSize_in_out: LPDWORD): DWORD {
     return Rasapi32.Load('RasGetCountryInfoA')(lpRasCtryInfo_in_out, lpdwSize_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ras/nf-ras-rasgetcountryinfow
-  public static RasGetCountryInfoW(lpRasCtryInfo_in_out: OPTIONAL<LPRASCTRYINFOW>, lpdwSize_in_out: LPDWORD): DWORD {
+  public static RasGetCountryInfoW(lpRasCtryInfo_in_out: Optional<LPRASCTRYINFOW>, lpdwSize_in_out: LPDWORD): DWORD {
     return Rasapi32.Load('RasGetCountryInfoW')(lpRasCtryInfo_in_out, lpdwSize_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ras/nf-ras-rasgetcredentialsa
-  public static RasGetCredentialsA(lpszPhonebook: OPTIONAL<LPCSTR>, lpszEntry: LPCSTR, lpCredentials_in_out: LPRASCREDENTIALSA): DWORD {
+  public static RasGetCredentialsA(lpszPhonebook: Optional<LPCSTR>, lpszEntry: LPCSTR, lpCredentials_in_out: LPRASCREDENTIALSA): DWORD {
     return Rasapi32.Load('RasGetCredentialsA')(lpszPhonebook, lpszEntry, lpCredentials_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ras/nf-ras-rasgetcredentialsw
-  public static RasGetCredentialsW(lpszPhonebook: OPTIONAL<LPCWSTR>, lpszEntry: LPCWSTR, lpCredentials_in_out: LPRASCREDENTIALSW): DWORD {
+  public static RasGetCredentialsW(lpszPhonebook: Optional<LPCWSTR>, lpszEntry: LPCWSTR, lpCredentials_in_out: LPRASCREDENTIALSW): DWORD {
     return Rasapi32.Load('RasGetCredentialsW')(lpszPhonebook, lpszEntry, lpCredentials_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ras/nf-ras-rasgetcustomauthdataa
-  public static RasGetCustomAuthDataA(pszPhonebook: OPTIONAL<LPCSTR>, pszEntry: LPCSTR, pbCustomAuthData_out: OPTIONAL<LPBYTE>, pdwSizeofCustomAuthData_in_out: LPDWORD): DWORD {
+  public static RasGetCustomAuthDataA(pszPhonebook: Optional<LPCSTR>, pszEntry: LPCSTR, pbCustomAuthData_out: Optional<LPBYTE>, pdwSizeofCustomAuthData_in_out: LPDWORD): DWORD {
     return Rasapi32.Load('RasGetCustomAuthDataA')(pszPhonebook, pszEntry, pbCustomAuthData_out, pdwSizeofCustomAuthData_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ras/nf-ras-rasgetcustomauthdataw
-  public static RasGetCustomAuthDataW(pszPhonebook: OPTIONAL<LPCWSTR>, pszEntry: LPCWSTR, pbCustomAuthData_out: OPTIONAL<LPBYTE>, pdwSizeofCustomAuthData_in_out: LPDWORD): DWORD {
+  public static RasGetCustomAuthDataW(pszPhonebook: Optional<LPCWSTR>, pszEntry: LPCWSTR, pbCustomAuthData_out: Optional<LPBYTE>, pdwSizeofCustomAuthData_in_out: LPDWORD): DWORD {
     return Rasapi32.Load('RasGetCustomAuthDataW')(pszPhonebook, pszEntry, pbCustomAuthData_out, pdwSizeofCustomAuthData_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ras/nf-ras-rasgeteapuserdataa
-  public static RasGetEapUserDataA(hToken: OPTIONAL<HANDLE>, pszPhonebook: OPTIONAL<LPCSTR>, pszEntry: LPCSTR, pbEapData_out: OPTIONAL<LPBYTE>, pdwSizeofEapData_in_out: LPDWORD): DWORD {
+  public static RasGetEapUserDataA(hToken: Optional<HANDLE>, pszPhonebook: Optional<LPCSTR>, pszEntry: LPCSTR, pbEapData_out: Optional<LPBYTE>, pdwSizeofEapData_in_out: LPDWORD): DWORD {
     return Rasapi32.Load('RasGetEapUserDataA')(hToken, pszPhonebook, pszEntry, pbEapData_out, pdwSizeofEapData_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ras/nf-ras-rasgeteapuserdataw
-  public static RasGetEapUserDataW(hToken: OPTIONAL<HANDLE>, pszPhonebook: OPTIONAL<LPCWSTR>, pszEntry: LPCWSTR, pbEapData_out: OPTIONAL<LPBYTE>, pdwSizeofEapData_in_out: LPDWORD): DWORD {
+  public static RasGetEapUserDataW(hToken: Optional<HANDLE>, pszPhonebook: Optional<LPCWSTR>, pszEntry: LPCWSTR, pbEapData_out: Optional<LPBYTE>, pdwSizeofEapData_in_out: LPDWORD): DWORD {
     return Rasapi32.Load('RasGetEapUserDataW')(hToken, pszPhonebook, pszEntry, pbEapData_out, pdwSizeofEapData_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ras/nf-ras-rasgeteapuseridentitya
-  public static RasGetEapUserIdentityA(pszPhonebook: OPTIONAL<LPCSTR>, pszEntry: LPCSTR, dwFlags: DWORD, hwnd: HWND, ppRasEapUserIdentity_out: PLPRASEAPUSERIDENTITYA): DWORD {
+  public static RasGetEapUserIdentityA(pszPhonebook: Optional<LPCSTR>, pszEntry: LPCSTR, dwFlags: DWORD, hwnd: HWND, ppRasEapUserIdentity_out: PLPRASEAPUSERIDENTITYA): DWORD {
     return Rasapi32.Load('RasGetEapUserIdentityA')(pszPhonebook, pszEntry, dwFlags, hwnd, ppRasEapUserIdentity_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ras/nf-ras-rasgeteapuseridentityw
-  public static RasGetEapUserIdentityW(pszPhonebook: OPTIONAL<LPCWSTR>, pszEntry: LPCWSTR, dwFlags: DWORD, hwnd: HWND, ppRasEapUserIdentity_out: PLPRASEAPUSERIDENTITYW): DWORD {
+  public static RasGetEapUserIdentityW(pszPhonebook: Optional<LPCWSTR>, pszEntry: LPCWSTR, dwFlags: DWORD, hwnd: HWND, ppRasEapUserIdentity_out: PLPRASEAPUSERIDENTITYW): DWORD {
     return Rasapi32.Load('RasGetEapUserIdentityW')(pszPhonebook, pszEntry, dwFlags, hwnd, ppRasEapUserIdentity_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ras/nf-ras-rasgetentrydialparamsa
-  public static RasGetEntryDialParamsA(lpszPhonebook: OPTIONAL<LPCSTR>, lpRasDialParams_in_out: LPRASDIALPARAMSA, lpfPassword_out: LPBOOL): DWORD {
+  public static RasGetEntryDialParamsA(lpszPhonebook: Optional<LPCSTR>, lpRasDialParams_in_out: LPRASDIALPARAMSA, lpfPassword_out: LPBOOL): DWORD {
     return Rasapi32.Load('RasGetEntryDialParamsA')(lpszPhonebook, lpRasDialParams_in_out, lpfPassword_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ras/nf-ras-rasgetentrydialparamsw
-  public static RasGetEntryDialParamsW(lpszPhonebook: OPTIONAL<LPCWSTR>, lpRasDialParams_in_out: LPRASDIALPARAMSW, lpfPassword_out: LPBOOL): DWORD {
+  public static RasGetEntryDialParamsW(lpszPhonebook: Optional<LPCWSTR>, lpRasDialParams_in_out: LPRASDIALPARAMSW, lpfPassword_out: LPBOOL): DWORD {
     return Rasapi32.Load('RasGetEntryDialParamsW')(lpszPhonebook, lpRasDialParams_in_out, lpfPassword_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ras/nf-ras-rasgetentrypropertiesa
   public static RasGetEntryPropertiesA(
-    lpszPhonebook: OPTIONAL<LPCSTR>,
+    lpszPhonebook: Optional<LPCSTR>,
     lpszEntry: LPCSTR,
-    lpRasEntry_in_out: OPTIONAL<LPRASENTRYA>,
+    lpRasEntry_in_out: Optional<LPRASENTRYA>,
     lpdwEntryInfoSize_in_out: LPDWORD,
-    lpbDeviceInfo_out: OPTIONAL<LPBYTE>,
-    lpdwDeviceInfoSize_in_out: OPTIONAL<LPDWORD>,
+    lpbDeviceInfo_out: Optional<LPBYTE>,
+    lpdwDeviceInfoSize_in_out: Optional<LPDWORD>,
   ): DWORD {
     return Rasapi32.Load('RasGetEntryPropertiesA')(lpszPhonebook, lpszEntry, lpRasEntry_in_out, lpdwEntryInfoSize_in_out, lpbDeviceInfo_out, lpdwDeviceInfoSize_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ras/nf-ras-rasgetentrypropertiesw
   public static RasGetEntryPropertiesW(
-    lpszPhonebook: OPTIONAL<LPCWSTR>,
+    lpszPhonebook: Optional<LPCWSTR>,
     lpszEntry: LPCWSTR,
-    lpRasEntry_in_out: OPTIONAL<LPRASENTRYW>,
+    lpRasEntry_in_out: Optional<LPRASENTRYW>,
     lpdwEntryInfoSize_in_out: LPDWORD,
-    lpbDeviceInfo_out: OPTIONAL<LPBYTE>,
-    lpdwDeviceInfoSize_in_out: OPTIONAL<LPDWORD>,
+    lpbDeviceInfo_out: Optional<LPBYTE>,
+    lpdwDeviceInfoSize_in_out: Optional<LPDWORD>,
   ): DWORD {
     return Rasapi32.Load('RasGetEntryPropertiesW')(lpszPhonebook, lpszEntry, lpRasEntry_in_out, lpdwEntryInfoSize_in_out, lpbDeviceInfo_out, lpdwDeviceInfoSize_in_out);
   }
@@ -454,7 +454,7 @@ class Rasapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ras/nf-ras-rasgetprojectioninfoex
-  public static RasGetProjectionInfoEx(hrasconn: HRASCONN, pRasProjection_in_out: OPTIONAL<PRAS_PROJECTION_INFO>, lpdwSize_in_out: LPDWORD): DWORD {
+  public static RasGetProjectionInfoEx(hrasconn: HRASCONN, pRasProjection_in_out: Optional<PRAS_PROJECTION_INFO>, lpdwSize_in_out: LPDWORD): DWORD {
     return Rasapi32.Load('RasGetProjectionInfoEx')(hrasconn, pRasProjection_in_out, lpdwSize_in_out);
   }
 
@@ -475,26 +475,26 @@ class Rasapi32 extends Win32 {
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ras/nf-ras-rasgetsubentrypropertiesa
   public static RasGetSubEntryPropertiesA(
-    lpszPhonebook: OPTIONAL<LPCSTR>,
+    lpszPhonebook: Optional<LPCSTR>,
     lpszEntry: LPCSTR,
     dwSubEntry: DWORD,
-    lpRasSubEntry_in_out: OPTIONAL<LPRASSUBENTRYA>,
-    lpdwcb_in_out: OPTIONAL<LPDWORD>,
-    lpbDeviceConfig_out: OPTIONAL<LPBYTE>,
-    lpdwcbDeviceConfig_in_out: OPTIONAL<LPDWORD>,
+    lpRasSubEntry_in_out: Optional<LPRASSUBENTRYA>,
+    lpdwcb_in_out: Optional<LPDWORD>,
+    lpbDeviceConfig_out: Optional<LPBYTE>,
+    lpdwcbDeviceConfig_in_out: Optional<LPDWORD>,
   ): DWORD {
     return Rasapi32.Load('RasGetSubEntryPropertiesA')(lpszPhonebook, lpszEntry, dwSubEntry, lpRasSubEntry_in_out, lpdwcb_in_out, lpbDeviceConfig_out, lpdwcbDeviceConfig_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ras/nf-ras-rasgetsubentrypropertiesw
   public static RasGetSubEntryPropertiesW(
-    lpszPhonebook: OPTIONAL<LPCWSTR>,
+    lpszPhonebook: Optional<LPCWSTR>,
     lpszEntry: LPCWSTR,
     dwSubEntry: DWORD,
-    lpRasSubEntry_in_out: OPTIONAL<LPRASSUBENTRYW>,
-    lpdwcb_in_out: OPTIONAL<LPDWORD>,
-    lpbDeviceConfig_out: OPTIONAL<LPBYTE>,
-    lpdwcbDeviceConfig_in_out: OPTIONAL<LPDWORD>,
+    lpRasSubEntry_in_out: Optional<LPRASSUBENTRYW>,
+    lpdwcb_in_out: Optional<LPDWORD>,
+    lpbDeviceConfig_out: Optional<LPBYTE>,
+    lpdwcbDeviceConfig_in_out: Optional<LPDWORD>,
   ): DWORD {
     return Rasapi32.Load('RasGetSubEntryPropertiesW')(lpszPhonebook, lpszEntry, dwSubEntry, lpRasSubEntry_in_out, lpdwcb_in_out, lpbDeviceConfig_out, lpdwcbDeviceConfig_in_out);
   }
@@ -515,22 +515,22 @@ class Rasapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ras/nf-ras-rasrenameentrya
-  public static RasRenameEntryA(lpszPhonebook: OPTIONAL<LPCSTR>, lpszOldEntry: LPCSTR, lpszNewEntry: LPCSTR): DWORD {
+  public static RasRenameEntryA(lpszPhonebook: Optional<LPCSTR>, lpszOldEntry: LPCSTR, lpszNewEntry: LPCSTR): DWORD {
     return Rasapi32.Load('RasRenameEntryA')(lpszPhonebook, lpszOldEntry, lpszNewEntry);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ras/nf-ras-rasrenameentryw
-  public static RasRenameEntryW(lpszPhonebook: OPTIONAL<LPCWSTR>, lpszOldEntry: LPCWSTR, lpszNewEntry: LPCWSTR): DWORD {
+  public static RasRenameEntryW(lpszPhonebook: Optional<LPCWSTR>, lpszOldEntry: LPCWSTR, lpszNewEntry: LPCWSTR): DWORD {
     return Rasapi32.Load('RasRenameEntryW')(lpszPhonebook, lpszOldEntry, lpszNewEntry);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ras/nf-ras-rassetautodialaddressa
-  public static RasSetAutodialAddressA(lpszAddress: OPTIONAL<LPCSTR>, dwReserved: DWORD, lpAutoDialEntries: OPTIONAL<LPRASAUTODIALENTRYA>, dwcbAutoDialEntries: DWORD, dwcAutoDialEntries: DWORD): DWORD {
+  public static RasSetAutodialAddressA(lpszAddress: Optional<LPCSTR>, dwReserved: DWORD, lpAutoDialEntries: Optional<LPRASAUTODIALENTRYA>, dwcbAutoDialEntries: DWORD, dwcAutoDialEntries: DWORD): DWORD {
     return Rasapi32.Load('RasSetAutodialAddressA')(lpszAddress, dwReserved, lpAutoDialEntries, dwcbAutoDialEntries, dwcAutoDialEntries);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ras/nf-ras-rassetautodialaddressw
-  public static RasSetAutodialAddressW(lpszAddress: OPTIONAL<LPCWSTR>, dwReserved: DWORD, lpAutoDialEntries: OPTIONAL<LPRASAUTODIALENTRYW>, dwcbAutoDialEntries: DWORD, dwcAutoDialEntries: DWORD): DWORD {
+  public static RasSetAutodialAddressW(lpszAddress: Optional<LPCWSTR>, dwReserved: DWORD, lpAutoDialEntries: Optional<LPRASAUTODIALENTRYW>, dwcbAutoDialEntries: DWORD, dwcAutoDialEntries: DWORD): DWORD {
     return Rasapi32.Load('RasSetAutodialAddressW')(lpszAddress, dwReserved, lpAutoDialEntries, dwcbAutoDialEntries, dwcAutoDialEntries);
   }
 
@@ -555,62 +555,62 @@ class Rasapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ras/nf-ras-rassetcredentialsa
-  public static RasSetCredentialsA(lpszPhonebook: OPTIONAL<LPCSTR>, lpszEntry: LPCSTR, lpCredentials: LPRASCREDENTIALSA, fClearCredentials: BOOL): DWORD {
+  public static RasSetCredentialsA(lpszPhonebook: Optional<LPCSTR>, lpszEntry: LPCSTR, lpCredentials: LPRASCREDENTIALSA, fClearCredentials: BOOL): DWORD {
     return Rasapi32.Load('RasSetCredentialsA')(lpszPhonebook, lpszEntry, lpCredentials, fClearCredentials);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ras/nf-ras-rassetcredentialsw
-  public static RasSetCredentialsW(lpszPhonebook: OPTIONAL<LPCWSTR>, lpszEntry: LPCWSTR, lpCredentials: LPRASCREDENTIALSW, fClearCredentials: BOOL): DWORD {
+  public static RasSetCredentialsW(lpszPhonebook: Optional<LPCWSTR>, lpszEntry: LPCWSTR, lpCredentials: LPRASCREDENTIALSW, fClearCredentials: BOOL): DWORD {
     return Rasapi32.Load('RasSetCredentialsW')(lpszPhonebook, lpszEntry, lpCredentials, fClearCredentials);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ras/nf-ras-rassetcustomauthdataa
-  public static RasSetCustomAuthDataA(pszPhonebook: OPTIONAL<LPCSTR>, pszEntry: LPCSTR, pbCustomAuthData: LPBYTE, dwSizeofCustomAuthData: DWORD): DWORD {
+  public static RasSetCustomAuthDataA(pszPhonebook: Optional<LPCSTR>, pszEntry: LPCSTR, pbCustomAuthData: LPBYTE, dwSizeofCustomAuthData: DWORD): DWORD {
     return Rasapi32.Load('RasSetCustomAuthDataA')(pszPhonebook, pszEntry, pbCustomAuthData, dwSizeofCustomAuthData);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ras/nf-ras-rassetcustomauthdataw
-  public static RasSetCustomAuthDataW(pszPhonebook: OPTIONAL<LPCWSTR>, pszEntry: LPCWSTR, pbCustomAuthData: LPBYTE, dwSizeofCustomAuthData: DWORD): DWORD {
+  public static RasSetCustomAuthDataW(pszPhonebook: Optional<LPCWSTR>, pszEntry: LPCWSTR, pbCustomAuthData: LPBYTE, dwSizeofCustomAuthData: DWORD): DWORD {
     return Rasapi32.Load('RasSetCustomAuthDataW')(pszPhonebook, pszEntry, pbCustomAuthData, dwSizeofCustomAuthData);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ras/nf-ras-rasseteapuserdataa
-  public static RasSetEapUserDataA(hToken: OPTIONAL<HANDLE>, pszPhonebook: OPTIONAL<LPCSTR>, pszEntry: LPCSTR, pbEapData: LPBYTE, dwSizeofEapData: DWORD): DWORD {
+  public static RasSetEapUserDataA(hToken: Optional<HANDLE>, pszPhonebook: Optional<LPCSTR>, pszEntry: LPCSTR, pbEapData: LPBYTE, dwSizeofEapData: DWORD): DWORD {
     return Rasapi32.Load('RasSetEapUserDataA')(hToken, pszPhonebook, pszEntry, pbEapData, dwSizeofEapData);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ras/nf-ras-rasseteapuserdataw
-  public static RasSetEapUserDataW(hToken: OPTIONAL<HANDLE>, pszPhonebook: OPTIONAL<LPCWSTR>, pszEntry: LPCWSTR, pbEapData: LPBYTE, dwSizeofEapData: DWORD): DWORD {
+  public static RasSetEapUserDataW(hToken: Optional<HANDLE>, pszPhonebook: Optional<LPCWSTR>, pszEntry: LPCWSTR, pbEapData: LPBYTE, dwSizeofEapData: DWORD): DWORD {
     return Rasapi32.Load('RasSetEapUserDataW')(hToken, pszPhonebook, pszEntry, pbEapData, dwSizeofEapData);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ras/nf-ras-rassetentrydialparamsa
-  public static RasSetEntryDialParamsA(lpszPhonebook: OPTIONAL<LPCSTR>, lpRasDialParams: LPRASDIALPARAMSA, fRemovePassword: BOOL): DWORD {
+  public static RasSetEntryDialParamsA(lpszPhonebook: Optional<LPCSTR>, lpRasDialParams: LPRASDIALPARAMSA, fRemovePassword: BOOL): DWORD {
     return Rasapi32.Load('RasSetEntryDialParamsA')(lpszPhonebook, lpRasDialParams, fRemovePassword);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ras/nf-ras-rassetentrydialparamsw
-  public static RasSetEntryDialParamsW(lpszPhonebook: OPTIONAL<LPCWSTR>, lpRasDialParams: LPRASDIALPARAMSW, fRemovePassword: BOOL): DWORD {
+  public static RasSetEntryDialParamsW(lpszPhonebook: Optional<LPCWSTR>, lpRasDialParams: LPRASDIALPARAMSW, fRemovePassword: BOOL): DWORD {
     return Rasapi32.Load('RasSetEntryDialParamsW')(lpszPhonebook, lpRasDialParams, fRemovePassword);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ras/nf-ras-rassetentrypropertiesa
-  public static RasSetEntryPropertiesA(lpszPhonebook: OPTIONAL<LPCSTR>, lpszEntry: LPCSTR, lpRasEntry: LPRASENTRYA, dwEntryInfoSize: DWORD, lpbDeviceInfo: OPTIONAL<LPBYTE>, dwDeviceInfoSize: DWORD): DWORD {
+  public static RasSetEntryPropertiesA(lpszPhonebook: Optional<LPCSTR>, lpszEntry: LPCSTR, lpRasEntry: LPRASENTRYA, dwEntryInfoSize: DWORD, lpbDeviceInfo: Optional<LPBYTE>, dwDeviceInfoSize: DWORD): DWORD {
     return Rasapi32.Load('RasSetEntryPropertiesA')(lpszPhonebook, lpszEntry, lpRasEntry, dwEntryInfoSize, lpbDeviceInfo, dwDeviceInfoSize);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ras/nf-ras-rassetentrypropertiesw
-  public static RasSetEntryPropertiesW(lpszPhonebook: OPTIONAL<LPCWSTR>, lpszEntry: LPCWSTR, lpRasEntry: LPRASENTRYW, dwEntryInfoSize: DWORD, lpbDeviceInfo: OPTIONAL<LPBYTE>, dwDeviceInfoSize: DWORD): DWORD {
+  public static RasSetEntryPropertiesW(lpszPhonebook: Optional<LPCWSTR>, lpszEntry: LPCWSTR, lpRasEntry: LPRASENTRYW, dwEntryInfoSize: DWORD, lpbDeviceInfo: Optional<LPBYTE>, dwDeviceInfoSize: DWORD): DWORD {
     return Rasapi32.Load('RasSetEntryPropertiesW')(lpszPhonebook, lpszEntry, lpRasEntry, dwEntryInfoSize, lpbDeviceInfo, dwDeviceInfoSize);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ras/nf-ras-rassetsubentrypropertiesa
-  public static RasSetSubEntryPropertiesA(lpszPhonebook: OPTIONAL<LPCSTR>, lpszEntry: LPCSTR, dwSubEntry: DWORD, lpRasSubEntry: LPRASSUBENTRYA, dwcbRasSubEntry: DWORD, lpbDeviceConfig: OPTIONAL<LPBYTE>, dwcbDeviceConfig: DWORD): DWORD {
+  public static RasSetSubEntryPropertiesA(lpszPhonebook: Optional<LPCSTR>, lpszEntry: LPCSTR, dwSubEntry: DWORD, lpRasSubEntry: LPRASSUBENTRYA, dwcbRasSubEntry: DWORD, lpbDeviceConfig: Optional<LPBYTE>, dwcbDeviceConfig: DWORD): DWORD {
     return Rasapi32.Load('RasSetSubEntryPropertiesA')(lpszPhonebook, lpszEntry, dwSubEntry, lpRasSubEntry, dwcbRasSubEntry, lpbDeviceConfig, dwcbDeviceConfig);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ras/nf-ras-rassetsubentrypropertiesw
-  public static RasSetSubEntryPropertiesW(lpszPhonebook: OPTIONAL<LPCWSTR>, lpszEntry: LPCWSTR, dwSubEntry: DWORD, lpRasSubEntry: LPRASSUBENTRYW, dwcbRasSubEntry: DWORD, lpbDeviceConfig: OPTIONAL<LPBYTE>, dwcbDeviceConfig: DWORD): DWORD {
+  public static RasSetSubEntryPropertiesW(lpszPhonebook: Optional<LPCWSTR>, lpszEntry: LPCWSTR, dwSubEntry: DWORD, lpRasSubEntry: LPRASSUBENTRYW, dwcbRasSubEntry: DWORD, lpbDeviceConfig: Optional<LPBYTE>, dwcbDeviceConfig: DWORD): DWORD {
     return Rasapi32.Load('RasSetSubEntryPropertiesW')(lpszPhonebook, lpszEntry, dwSubEntry, lpRasSubEntry, dwcbRasSubEntry, lpbDeviceConfig, dwcbDeviceConfig);
   }
 
@@ -620,12 +620,12 @@ class Rasapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ras/nf-ras-rasvalidateentrynamea
-  public static RasValidateEntryNameA(lpszPhonebook: OPTIONAL<LPCSTR>, lpszEntry: LPCSTR): DWORD {
+  public static RasValidateEntryNameA(lpszPhonebook: Optional<LPCSTR>, lpszEntry: LPCSTR): DWORD {
     return Rasapi32.Load('RasValidateEntryNameA')(lpszPhonebook, lpszEntry);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ras/nf-ras-rasvalidateentrynamew
-  public static RasValidateEntryNameW(lpszPhonebook: OPTIONAL<LPCWSTR>, lpszEntry: LPCWSTR): DWORD {
+  public static RasValidateEntryNameW(lpszPhonebook: Optional<LPCWSTR>, lpszEntry: LPCWSTR): DWORD {
     return Rasapi32.Load('RasValidateEntryNameW')(lpszPhonebook, lpszEntry);
   }
 }

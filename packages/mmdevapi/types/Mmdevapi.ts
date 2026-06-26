@@ -1,6 +1,6 @@
 import type { Pointer } from 'bun:ffi';
 
-export type { HRESULT, LPCWSTR, NULL, OPTIONAL } from '@bun-win32/core';
+export type { HRESULT, LPCWSTR, NULL, Optional } from '@bun-win32/core';
 
 export type IActivateAudioInterfaceCompletionHandler = Pointer;
 export type LPLPVOID = Pointer;

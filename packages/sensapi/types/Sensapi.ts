@@ -1,6 +1,6 @@
 import type { Pointer } from 'bun:ffi';
 
-export type { BOOL, DWORD, LPCSTR, LPCWSTR, LPDWORD, NULL, NULLABLE } from '@bun-win32/core';
+export type { BOOL, DWORD, LPCSTR, LPCWSTR, LPDWORD, NULL, Nullable } from '@bun-win32/core';
 
 export enum NetworkAliveFlags {
   NETWORK_ALIVE_AOL = 0x0000_0004,

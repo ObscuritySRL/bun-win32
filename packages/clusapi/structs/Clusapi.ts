@@ -51,7 +51,7 @@ import type {
   LPSECURITY_ATTRIBUTES,
   LPVOID,
   LPWSTR,
-  OPTIONAL,
+  Optional,
   PBOOL,
   PBYTE,
   PCLUSTER_BATCH_COMMAND,
@@ -335,7 +335,7 @@ class Clusapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/clusapi/nf-clusapi-addclusternode
-  public static AddClusterNode(hCluster: HCLUSTER, lpszNodeName: LPCWSTR, pfnProgressCallback: OPTIONAL<PCLUSTER_SETUP_PROGRESS_CALLBACK>, pvCallbackArg: OPTIONAL<PVOID>): HNODE {
+  public static AddClusterNode(hCluster: HCLUSTER, lpszNodeName: LPCWSTR, pfnProgressCallback: Optional<PCLUSTER_SETUP_PROGRESS_CALLBACK>, pvCallbackArg: Optional<PVOID>): HNODE {
     return Clusapi.Load('AddClusterNode')(hCluster, lpszNodeName, pfnProgressCallback, pvCallbackArg);
   }
 
@@ -432,13 +432,13 @@ class Clusapi extends Win32 {
   // https://learn.microsoft.com/en-us/windows/win32/api/clusapi/nf-clusapi-clustercontrol
   public static ClusterControl(
     hCluster: HCLUSTER,
-    hHostNode: OPTIONAL<HNODE>,
+    hHostNode: Optional<HNODE>,
     dwControlCode: DWORD,
-    lpInBuffer: OPTIONAL<LPVOID>,
+    lpInBuffer: Optional<LPVOID>,
     nInBufferSize: DWORD,
-    lpOutBuffer_out: OPTIONAL<LPVOID>,
+    lpOutBuffer_out: Optional<LPVOID>,
     nOutBufferSize: DWORD,
-    lpBytesReturned_out: OPTIONAL<LPDWORD>,
+    lpBytesReturned_out: Optional<LPDWORD>,
   ): DWORD {
     return Clusapi.Load('ClusterControl')(hCluster, hHostNode, dwControlCode, lpInBuffer, nInBufferSize, lpOutBuffer_out, nOutBufferSize, lpBytesReturned_out);
   }
@@ -476,13 +476,13 @@ class Clusapi extends Win32 {
   // https://learn.microsoft.com/en-us/windows/win32/api/clusapi/nf-clusapi-clustergroupcontrol
   public static ClusterGroupControl(
     hGroup: HGROUP,
-    hHostNode: OPTIONAL<HNODE>,
+    hHostNode: Optional<HNODE>,
     dwControlCode: DWORD,
-    lpInBuffer: OPTIONAL<LPVOID>,
+    lpInBuffer: Optional<LPVOID>,
     nInBufferSize: DWORD,
-    lpOutBuffer_out: OPTIONAL<LPVOID>,
+    lpOutBuffer_out: Optional<LPVOID>,
     nOutBufferSize: DWORD,
-    lpBytesReturned_out: OPTIONAL<LPDWORD>,
+    lpBytesReturned_out: Optional<LPDWORD>,
   ): DWORD {
     return Clusapi.Load('ClusterGroupControl')(hGroup, hHostNode, dwControlCode, lpInBuffer, nInBufferSize, lpOutBuffer_out, nOutBufferSize, lpBytesReturned_out);
   }
@@ -513,7 +513,7 @@ class Clusapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/clusapi/nf-clusapi-clustergroupopenenumex
-  public static ClusterGroupOpenEnumEx(hCluster: HCLUSTER, lpszProperties: OPTIONAL<LPCWSTR>, cbProperties: DWORD, lpszRoProperties: OPTIONAL<LPCWSTR>, cbRoProperties: DWORD, dwFlags: DWORD): HGROUPENUMEX {
+  public static ClusterGroupOpenEnumEx(hCluster: HCLUSTER, lpszProperties: Optional<LPCWSTR>, cbProperties: DWORD, lpszRoProperties: Optional<LPCWSTR>, cbRoProperties: DWORD, dwFlags: DWORD): HGROUPENUMEX {
     return Clusapi.Load('ClusterGroupOpenEnumEx')(hCluster, lpszProperties, cbProperties, lpszRoProperties, cbRoProperties, dwFlags);
   }
 
@@ -525,13 +525,13 @@ class Clusapi extends Win32 {
   // https://learn.microsoft.com/en-us/windows/win32/api/clusapi/nf-clusapi-clustergroupsetcontrol
   public static ClusterGroupSetControl(
     hGroupSet: HGROUPSET,
-    hHostNode: OPTIONAL<HNODE>,
+    hHostNode: Optional<HNODE>,
     dwControlCode: DWORD,
-    lpInBuffer: OPTIONAL<LPVOID>,
+    lpInBuffer: Optional<LPVOID>,
     cbInBufferSize: DWORD,
-    lpOutBuffer_out: OPTIONAL<LPVOID>,
+    lpOutBuffer_out: Optional<LPVOID>,
     cbOutBufferSize: DWORD,
-    lpBytesReturned_out: OPTIONAL<LPDWORD>,
+    lpBytesReturned_out: Optional<LPDWORD>,
   ): DWORD {
     return Clusapi.Load('ClusterGroupSetControl')(hGroupSet, hHostNode, dwControlCode, lpInBuffer, cbInBufferSize, lpOutBuffer_out, cbOutBufferSize, lpBytesReturned_out);
   }
@@ -559,13 +559,13 @@ class Clusapi extends Win32 {
   // https://learn.microsoft.com/en-us/windows/win32/api/clusapi/nf-clusapi-clusternetinterfacecontrol
   public static ClusterNetInterfaceControl(
     hNetInterface: HNETINTERFACE,
-    hHostNode: OPTIONAL<HNODE>,
+    hHostNode: Optional<HNODE>,
     dwControlCode: DWORD,
-    lpInBuffer: OPTIONAL<LPVOID>,
+    lpInBuffer: Optional<LPVOID>,
     nInBufferSize: DWORD,
-    lpOutBuffer_out: OPTIONAL<LPVOID>,
+    lpOutBuffer_out: Optional<LPVOID>,
     nOutBufferSize: DWORD,
-    lpBytesReturned_out: OPTIONAL<LPDWORD>,
+    lpBytesReturned_out: Optional<LPDWORD>,
   ): DWORD {
     return Clusapi.Load('ClusterNetInterfaceControl')(hNetInterface, hHostNode, dwControlCode, lpInBuffer, nInBufferSize, lpOutBuffer_out, nOutBufferSize, lpBytesReturned_out);
   }
@@ -576,7 +576,7 @@ class Clusapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/clusapi/nf-clusapi-clusternetinterfaceopenenum
-  public static ClusterNetInterfaceOpenEnum(hCluster: HCLUSTER, lpszNodeName: OPTIONAL<LPCWSTR>, lpszNetworkName: OPTIONAL<LPCWSTR>): HNETINTERFACEENUM {
+  public static ClusterNetInterfaceOpenEnum(hCluster: HCLUSTER, lpszNodeName: Optional<LPCWSTR>, lpszNetworkName: Optional<LPCWSTR>): HNETINTERFACEENUM {
     return Clusapi.Load('ClusterNetInterfaceOpenEnum')(hCluster, lpszNodeName, lpszNetworkName);
   }
 
@@ -588,13 +588,13 @@ class Clusapi extends Win32 {
   // https://learn.microsoft.com/en-us/windows/win32/api/clusapi/nf-clusapi-clusternetworkcontrol
   public static ClusterNetworkControl(
     hNetwork: HNETWORK,
-    hHostNode: OPTIONAL<HNODE>,
+    hHostNode: Optional<HNODE>,
     dwControlCode: DWORD,
-    lpInBuffer: OPTIONAL<LPVOID>,
+    lpInBuffer: Optional<LPVOID>,
     nInBufferSize: DWORD,
-    lpOutBuffer_out: OPTIONAL<LPVOID>,
+    lpOutBuffer_out: Optional<LPVOID>,
     nOutBufferSize: DWORD,
-    lpBytesReturned_out: OPTIONAL<LPDWORD>,
+    lpBytesReturned_out: Optional<LPDWORD>,
   ): DWORD {
     return Clusapi.Load('ClusterNetworkControl')(hNetwork, hHostNode, dwControlCode, lpInBuffer, nInBufferSize, lpOutBuffer_out, nOutBufferSize, lpBytesReturned_out);
   }
@@ -627,13 +627,13 @@ class Clusapi extends Win32 {
   // https://learn.microsoft.com/en-us/windows/win32/api/clusapi/nf-clusapi-clusternodecontrol
   public static ClusterNodeControl(
     hNode: HNODE,
-    hHostNode: OPTIONAL<HNODE>,
+    hHostNode: Optional<HNODE>,
     dwControlCode: DWORD,
-    lpInBuffer: OPTIONAL<LPVOID>,
+    lpInBuffer: Optional<LPVOID>,
     nInBufferSize: DWORD,
-    lpOutBuffer_out: OPTIONAL<LPVOID>,
+    lpOutBuffer_out: Optional<LPVOID>,
     nOutBufferSize: DWORD,
-    lpBytesReturned_out: OPTIONAL<LPDWORD>,
+    lpBytesReturned_out: Optional<LPDWORD>,
   ): DWORD {
     return Clusapi.Load('ClusterNodeControl')(hNode, hHostNode, dwControlCode, lpInBuffer, nInBufferSize, lpOutBuffer_out, nOutBufferSize, lpBytesReturned_out);
   }
@@ -664,7 +664,7 @@ class Clusapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/clusapi/nf-clusapi-clusternodeopenenumex
-  public static ClusterNodeOpenEnumEx(hNode: HNODE, dwType: DWORD, pOptions: OPTIONAL<PVOID>): HNODEENUMEX {
+  public static ClusterNodeOpenEnumEx(hNode: HNODE, dwType: DWORD, pOptions: Optional<PVOID>): HNODEENUMEX {
     return Clusapi.Load('ClusterNodeOpenEnumEx')(hNode, dwType, pOptions);
   }
 
@@ -674,12 +674,12 @@ class Clusapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/clusapi/nf-clusapi-clusteropenenumex
-  public static ClusterOpenEnumEx(hCluster: HCLUSTER, dwType: DWORD, pOptions: OPTIONAL<PVOID>): HCLUSENUMEX {
+  public static ClusterOpenEnumEx(hCluster: HCLUSTER, dwType: DWORD, pOptions: Optional<PVOID>): HCLUSENUMEX {
     return Clusapi.Load('ClusterOpenEnumEx')(hCluster, dwType, pOptions);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/clusapi/nf-clusapi-clusterregbatchaddcommand
-  public static ClusterRegBatchAddCommand(hRegBatch: HREGBATCH, dwCommand: CLUSTER_REG_COMMAND, wzName: OPTIONAL<LPCWSTR>, dwOptions: DWORD, lpData: OPTIONAL<LPVOID>, cbData: DWORD): LONG {
+  public static ClusterRegBatchAddCommand(hRegBatch: HREGBATCH, dwCommand: CLUSTER_REG_COMMAND, wzName: Optional<LPCWSTR>, dwOptions: DWORD, lpData: Optional<LPVOID>, cbData: DWORD): LONG {
     return Clusapi.Load('ClusterRegBatchAddCommand')(hRegBatch, dwCommand, wzName, dwOptions, lpData, cbData);
   }
 
@@ -694,12 +694,12 @@ class Clusapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/clusapi/nf-clusapi-clusterregclosebatch
-  public static ClusterRegCloseBatch(hRegBatch: HREGBATCH, bCommit: BOOL, failedCommandNumber_out: OPTIONAL<PINT>): LONG {
+  public static ClusterRegCloseBatch(hRegBatch: HREGBATCH, bCommit: BOOL, failedCommandNumber_out: Optional<PINT>): LONG {
     return Clusapi.Load('ClusterRegCloseBatch')(hRegBatch, bCommit, failedCommandNumber_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/clusapi/nf-clusapi-clusterregclosebatchex
-  public static ClusterRegCloseBatchEx(hRegBatch: HREGBATCH, flags: DWORD, failedCommandNumber_out: OPTIONAL<PINT>): LONG {
+  public static ClusterRegCloseBatchEx(hRegBatch: HREGBATCH, flags: DWORD, failedCommandNumber_out: Optional<PINT>): LONG {
     return Clusapi.Load('ClusterRegCloseBatchEx')(hRegBatch, flags, failedCommandNumber_out);
   }
 
@@ -729,7 +729,7 @@ class Clusapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/clusapi/nf-clusapi-clusterregcreatebatch
-  public static ClusterRegCreateBatch(hKey: OPTIONAL<HKEY>, pHREGBATCH_out: PHREGBATCH): LONG {
+  public static ClusterRegCreateBatch(hKey: Optional<HKEY>, pHREGBATCH_out: PHREGBATCH): LONG {
     return Clusapi.Load('ClusterRegCreateBatch')(hKey, pHREGBATCH_out);
   }
 
@@ -739,7 +739,7 @@ class Clusapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/clusapi/nf-clusapi-clusterregcreatekey
-  public static ClusterRegCreateKey(hKey: HKEY, lpszSubKey: LPCWSTR, dwOptions: DWORD, samDesired: REGSAM, lpSecurityAttributes: OPTIONAL<LPSECURITY_ATTRIBUTES>, phkResult_out: PHKEY, lpdwDisposition_out: OPTIONAL<LPDWORD>): LONG {
+  public static ClusterRegCreateKey(hKey: HKEY, lpszSubKey: LPCWSTR, dwOptions: DWORD, samDesired: REGSAM, lpSecurityAttributes: Optional<LPSECURITY_ATTRIBUTES>, phkResult_out: PHKEY, lpdwDisposition_out: Optional<LPDWORD>): LONG {
     return Clusapi.Load('ClusterRegCreateKey')(hKey, lpszSubKey, dwOptions, samDesired, lpSecurityAttributes, phkResult_out, lpdwDisposition_out);
   }
 
@@ -759,12 +759,12 @@ class Clusapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/clusapi/nf-clusapi-clusterregenumkey
-  public static ClusterRegEnumKey(hKey: HKEY, dwIndex: DWORD, lpszName_out: LPWSTR, lpcchName_in_out: LPDWORD, lpftLastWriteTime_out: OPTIONAL<PFILETIME>): LONG {
+  public static ClusterRegEnumKey(hKey: HKEY, dwIndex: DWORD, lpszName_out: LPWSTR, lpcchName_in_out: LPDWORD, lpftLastWriteTime_out: Optional<PFILETIME>): LONG {
     return Clusapi.Load('ClusterRegEnumKey')(hKey, dwIndex, lpszName_out, lpcchName_in_out, lpftLastWriteTime_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/clusapi/nf-clusapi-clusterregenumvalue
-  public static ClusterRegEnumValue(hKey: HKEY, dwIndex: DWORD, lpszValueName_out: LPWSTR, lpcchValueName_in_out: LPDWORD, lpdwType_out: OPTIONAL<LPDWORD>, lpData_out: OPTIONAL<LPBYTE>, lpcbData_in_out: OPTIONAL<LPDWORD>): DWORD {
+  public static ClusterRegEnumValue(hKey: HKEY, dwIndex: DWORD, lpszValueName_out: LPWSTR, lpcchValueName_in_out: LPDWORD, lpdwType_out: Optional<LPDWORD>, lpData_out: Optional<LPBYTE>, lpcbData_in_out: Optional<LPDWORD>): DWORD {
     return Clusapi.Load('ClusterRegEnumValue')(hKey, dwIndex, lpszValueName_out, lpcchValueName_in_out, lpdwType_out, lpData_out, lpcbData_in_out);
   }
 
@@ -798,7 +798,7 @@ class Clusapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/clusapi/nf-clusapi-clusterregqueryvalue
-  public static ClusterRegQueryValue(hKey: HKEY, lpszValueName: LPCWSTR, lpdwValueType_out: OPTIONAL<LPDWORD>, lpData_out: OPTIONAL<LPBYTE>, lpcbData_in_out: OPTIONAL<LPDWORD>): LONG {
+  public static ClusterRegQueryValue(hKey: HKEY, lpszValueName: LPCWSTR, lpdwValueType_out: Optional<LPDWORD>, lpData_out: Optional<LPBYTE>, lpcbData_in_out: Optional<LPDWORD>): LONG {
     return Clusapi.Load('ClusterRegQueryValue')(hKey, lpszValueName, lpdwValueType_out, lpData_out, lpcbData_in_out);
   }
 
@@ -845,13 +845,13 @@ class Clusapi extends Win32 {
   // https://learn.microsoft.com/en-us/windows/win32/api/clusapi/nf-clusapi-clusterresourcecontrol
   public static ClusterResourceControl(
     hResource: HRESOURCE,
-    hHostNode: OPTIONAL<HNODE>,
+    hHostNode: Optional<HNODE>,
     dwControlCode: DWORD,
-    lpInBuffer: OPTIONAL<LPVOID>,
+    lpInBuffer: Optional<LPVOID>,
     cbInBufferSize: DWORD,
-    lpOutBuffer_out: OPTIONAL<LPVOID>,
+    lpOutBuffer_out: Optional<LPVOID>,
     cbOutBufferSize: DWORD,
-    lpBytesReturned_out: OPTIONAL<LPDWORD>,
+    lpBytesReturned_out: Optional<LPDWORD>,
   ): DWORD {
     return Clusapi.Load('ClusterResourceControl')(hResource, hHostNode, dwControlCode, lpInBuffer, cbInBufferSize, lpOutBuffer_out, cbOutBufferSize, lpBytesReturned_out);
   }
@@ -859,13 +859,13 @@ class Clusapi extends Win32 {
   // https://learn.microsoft.com/en-us/windows/win32/api/clusapi/nf-clusapi-clusterresourcecontrolasuser
   public static ClusterResourceControlAsUser(
     hResource: HRESOURCE,
-    hHostNode: OPTIONAL<HNODE>,
+    hHostNode: Optional<HNODE>,
     dwControlCode: DWORD,
-    lpInBuffer: OPTIONAL<LPVOID>,
+    lpInBuffer: Optional<LPVOID>,
     cbInBufferSize: DWORD,
-    lpOutBuffer_out: OPTIONAL<LPVOID>,
+    lpOutBuffer_out: Optional<LPVOID>,
     cbOutBufferSize: DWORD,
-    lpBytesReturned_out: OPTIONAL<LPDWORD>,
+    lpBytesReturned_out: Optional<LPDWORD>,
   ): DWORD {
     return Clusapi.Load('ClusterResourceControlAsUser')(hResource, hHostNode, dwControlCode, lpInBuffer, cbInBufferSize, lpOutBuffer_out, cbOutBufferSize, lpBytesReturned_out);
   }
@@ -896,7 +896,7 @@ class Clusapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/clusapi/nf-clusapi-clusterresourceopenenumex
-  public static ClusterResourceOpenEnumEx(hCluster: HCLUSTER, lpszProperties: OPTIONAL<LPCWSTR>, cbProperties: DWORD, lpszRoProperties: OPTIONAL<LPCWSTR>, cbRoProperties: DWORD, dwFlags: DWORD): HRESENUMEX {
+  public static ClusterResourceOpenEnumEx(hCluster: HCLUSTER, lpszProperties: Optional<LPCWSTR>, cbProperties: DWORD, lpszRoProperties: Optional<LPCWSTR>, cbRoProperties: DWORD, dwFlags: DWORD): HRESENUMEX {
     return Clusapi.Load('ClusterResourceOpenEnumEx')(hCluster, lpszProperties, cbProperties, lpszRoProperties, cbRoProperties, dwFlags);
   }
 
@@ -909,13 +909,13 @@ class Clusapi extends Win32 {
   public static ClusterResourceTypeControl(
     hCluster: HCLUSTER,
     lpszResourceTypeName: LPCWSTR,
-    hHostNode: OPTIONAL<HNODE>,
+    hHostNode: Optional<HNODE>,
     dwControlCode: DWORD,
-    lpInBuffer: OPTIONAL<LPVOID>,
+    lpInBuffer: Optional<LPVOID>,
     nInBufferSize: DWORD,
-    lpOutBuffer_out: OPTIONAL<LPVOID>,
+    lpOutBuffer_out: Optional<LPVOID>,
     nOutBufferSize: DWORD,
-    lpBytesReturned_out: OPTIONAL<LPDWORD>,
+    lpBytesReturned_out: Optional<LPDWORD>,
   ): DWORD {
     return Clusapi.Load('ClusterResourceTypeControl')(hCluster, lpszResourceTypeName, hHostNode, dwControlCode, lpInBuffer, nInBufferSize, lpOutBuffer_out, nOutBufferSize, lpBytesReturned_out);
   }
@@ -924,13 +924,13 @@ class Clusapi extends Win32 {
   public static ClusterResourceTypeControlAsUser(
     hCluster: HCLUSTER,
     lpszResourceTypeName: LPCWSTR,
-    hHostNode: OPTIONAL<HNODE>,
+    hHostNode: Optional<HNODE>,
     dwControlCode: DWORD,
-    lpInBuffer: OPTIONAL<LPVOID>,
+    lpInBuffer: Optional<LPVOID>,
     nInBufferSize: DWORD,
-    lpOutBuffer_out: OPTIONAL<LPVOID>,
+    lpOutBuffer_out: Optional<LPVOID>,
     nOutBufferSize: DWORD,
-    lpBytesReturned_out: OPTIONAL<LPDWORD>,
+    lpBytesReturned_out: Optional<LPDWORD>,
   ): DWORD {
     return Clusapi.Load('ClusterResourceTypeControlAsUser')(hCluster, lpszResourceTypeName, hHostNode, dwControlCode, lpInBuffer, nInBufferSize, lpOutBuffer_out, nOutBufferSize, lpBytesReturned_out);
   }
@@ -961,12 +961,12 @@ class Clusapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/clusapi/nf-clusapi-clusterupgradefunctionallevel
-  public static ClusterUpgradeFunctionalLevel(hCluster: HCLUSTER, perform: BOOL, pfnProgressCallback: OPTIONAL<PCLUSTER_UPGRADE_PROGRESS_CALLBACK>, pvCallbackArg: OPTIONAL<PVOID>): DWORD {
+  public static ClusterUpgradeFunctionalLevel(hCluster: HCLUSTER, perform: BOOL, pfnProgressCallback: Optional<PCLUSTER_UPGRADE_PROGRESS_CALLBACK>, pvCallbackArg: Optional<PVOID>): DWORD {
     return Clusapi.Load('ClusterUpgradeFunctionalLevel')(hCluster, perform, pfnProgressCallback, pvCallbackArg);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/clusapi/nf-clusapi-createcluster
-  public static CreateCluster(pConfig: PCREATE_CLUSTER_CONFIG, pfnProgressCallback: OPTIONAL<PCLUSTER_SETUP_PROGRESS_CALLBACK>, pvCallbackArg: OPTIONAL<PVOID>): HCLUSTER {
+  public static CreateCluster(pConfig: PCREATE_CLUSTER_CONFIG, pfnProgressCallback: Optional<PCLUSTER_SETUP_PROGRESS_CALLBACK>, pvCallbackArg: Optional<PVOID>): HCLUSTER {
     return Clusapi.Load('CreateCluster')(pConfig, pfnProgressCallback, pvCallbackArg);
   }
 
@@ -976,7 +976,7 @@ class Clusapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/clusapi/nf-clusapi-createclustergroupex
-  public static CreateClusterGroupEx(hCluster: HCLUSTER, lpszGroupName: LPCWSTR, pGroupInfo: OPTIONAL<PCLUSTER_CREATE_GROUP_INFO>): HGROUP {
+  public static CreateClusterGroupEx(hCluster: HCLUSTER, lpszGroupName: LPCWSTR, pGroupInfo: Optional<PCLUSTER_CREATE_GROUP_INFO>): HGROUP {
     return Clusapi.Load('CreateClusterGroupEx')(hCluster, lpszGroupName, pGroupInfo);
   }
 
@@ -986,7 +986,7 @@ class Clusapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/clusapi/nf-clusapi-createclusternameaccount
-  public static CreateClusterNameAccount(hCluster: HCLUSTER, pConfig: PCREATE_CLUSTER_NAME_ACCOUNT, pfnProgressCallback: OPTIONAL<PCLUSTER_SETUP_PROGRESS_CALLBACK>, pvCallbackArg: OPTIONAL<PVOID>): DWORD {
+  public static CreateClusterNameAccount(hCluster: HCLUSTER, pConfig: PCREATE_CLUSTER_NAME_ACCOUNT, pfnProgressCallback: Optional<PCLUSTER_SETUP_PROGRESS_CALLBACK>, pvCallbackArg: Optional<PVOID>): DWORD {
     return Clusapi.Load('CreateClusterNameAccount')(hCluster, pConfig, pfnProgressCallback, pvCallbackArg);
   }
 
@@ -1031,7 +1031,7 @@ class Clusapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/clusapi/nf-clusapi-destroycluster
-  public static DestroyCluster(hCluster: HCLUSTER, pfnProgressCallback: OPTIONAL<PCLUSTER_SETUP_PROGRESS_CALLBACK>, pvCallbackArg: OPTIONAL<PVOID>, fdeleteVirtualComputerObjects: BOOL): DWORD {
+  public static DestroyCluster(hCluster: HCLUSTER, pfnProgressCallback: Optional<PCLUSTER_SETUP_PROGRESS_CALLBACK>, pvCallbackArg: Optional<PVOID>, fdeleteVirtualComputerObjects: BOOL): DWORD {
     return Clusapi.Load('DestroyCluster')(hCluster, pfnProgressCallback, pvCallbackArg, fdeleteVirtualComputerObjects);
   }
 
@@ -1086,12 +1086,12 @@ class Clusapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/clusapi/nf-clusapi-getclustergroupstate
-  public static GetClusterGroupState(hGroup: HGROUP, lpszNodeName_out: OPTIONAL<LPWSTR>, lpcchNodeName_in_out: OPTIONAL<LPDWORD>): CLUSTER_GROUP_STATE {
+  public static GetClusterGroupState(hGroup: HGROUP, lpszNodeName_out: Optional<LPWSTR>, lpcchNodeName_in_out: Optional<LPDWORD>): CLUSTER_GROUP_STATE {
     return Clusapi.Load('GetClusterGroupState')(hGroup, lpszNodeName_out, lpcchNodeName_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/clusapi/nf-clusapi-getclusterinformation
-  public static GetClusterInformation(hCluster: HCLUSTER, lpszClusterName_out: LPWSTR, lpcchClusterName_in_out: LPDWORD, lpClusterInfo_out: OPTIONAL<LPCLUSTERVERSIONINFO>): DWORD {
+  public static GetClusterInformation(hCluster: HCLUSTER, lpszClusterName_out: LPWSTR, lpcchClusterName_in_out: LPDWORD, lpClusterInfo_out: Optional<LPCLUSTERVERSIONINFO>): DWORD {
     return Clusapi.Load('GetClusterInformation')(hCluster, lpszClusterName_out, lpcchClusterName_in_out, lpClusterInfo_out);
   }
 
@@ -1131,7 +1131,7 @@ class Clusapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/clusapi/nf-clusapi-getclusternodeid
-  public static GetClusterNodeId(hNode: OPTIONAL<HNODE>, lpszNodeId_out: LPWSTR, lpcchName_in_out: LPDWORD): DWORD {
+  public static GetClusterNodeId(hNode: Optional<HNODE>, lpszNodeId_out: LPWSTR, lpcchName_in_out: LPDWORD): DWORD {
     return Clusapi.Load('GetClusterNodeId')(hNode, lpszNodeId_out, lpcchName_in_out);
   }
 
@@ -1154,17 +1154,17 @@ class Clusapi extends Win32 {
   public static GetClusterNotifyV2(
     hChange: HCHANGE,
     lpdwNotifyKey_out: PDWORD_PTR,
-    pFilterAndType_in_out: OPTIONAL<PNOTIFY_FILTER_AND_TYPE>,
-    buffer_in_out: OPTIONAL<LPBYTE>,
-    lpbBufferSize_in_out: OPTIONAL<LPDWORD>,
-    lpszObjectId_in_out: OPTIONAL<LPWSTR>,
-    lpcchObjectId_in_out: OPTIONAL<LPDWORD>,
-    lpszParentId_in_out: OPTIONAL<LPWSTR>,
-    lpcchParentId_in_out: OPTIONAL<LPDWORD>,
-    lpszName_in_out: OPTIONAL<LPWSTR>,
-    lpcchName_in_out: OPTIONAL<LPDWORD>,
-    lpszType_in_out: OPTIONAL<LPWSTR>,
-    lpcchType_in_out: OPTIONAL<LPDWORD>,
+    pFilterAndType_in_out: Optional<PNOTIFY_FILTER_AND_TYPE>,
+    buffer_in_out: Optional<LPBYTE>,
+    lpbBufferSize_in_out: Optional<LPDWORD>,
+    lpszObjectId_in_out: Optional<LPWSTR>,
+    lpcchObjectId_in_out: Optional<LPDWORD>,
+    lpszParentId_in_out: Optional<LPWSTR>,
+    lpcchParentId_in_out: Optional<LPDWORD>,
+    lpszName_in_out: Optional<LPWSTR>,
+    lpcchName_in_out: Optional<LPDWORD>,
+    lpszType_in_out: Optional<LPWSTR>,
+    lpcchType_in_out: Optional<LPDWORD>,
     dwMilliseconds: DWORD,
   ): DWORD {
     return Clusapi.Load('GetClusterNotifyV2')(
@@ -1191,7 +1191,7 @@ class Clusapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/clusapi/nf-clusapi-getclusterresourcedependencyexpression
-  public static GetClusterResourceDependencyExpression(hResource: HRESOURCE, lpszDependencyExpression_out: OPTIONAL<LPWSTR>, lpcchDependencyExpression_in_out: LPDWORD): DWORD {
+  public static GetClusterResourceDependencyExpression(hResource: HRESOURCE, lpszDependencyExpression_out: Optional<LPWSTR>, lpcchDependencyExpression_in_out: LPDWORD): DWORD {
     return Clusapi.Load('GetClusterResourceDependencyExpression')(hResource, lpszDependencyExpression_out, lpcchDependencyExpression_in_out);
   }
 
@@ -1208,10 +1208,10 @@ class Clusapi extends Win32 {
   // https://learn.microsoft.com/en-us/windows/win32/api/clusapi/nf-clusapi-getclusterresourcestate
   public static GetClusterResourceState(
     hResource: HRESOURCE,
-    lpszNodeName_out: OPTIONAL<LPWSTR>,
-    lpcchNodeName_in_out: OPTIONAL<LPDWORD>,
-    lpszGroupName_out: OPTIONAL<LPWSTR>,
-    lpcchGroupName_in_out: OPTIONAL<LPDWORD>,
+    lpszNodeName_out: Optional<LPWSTR>,
+    lpcchNodeName_in_out: Optional<LPDWORD>,
+    lpszGroupName_out: Optional<LPWSTR>,
+    lpcchGroupName_in_out: Optional<LPDWORD>,
   ): CLUSTER_RESOURCE_STATE {
     return Clusapi.Load('GetClusterResourceState')(hResource, lpszNodeName_out, lpcchNodeName_in_out, lpszGroupName_out, lpcchGroupName_in_out);
   }
@@ -1222,7 +1222,7 @@ class Clusapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/clusapi/nf-clusapi-getnodeclusterstate
-  public static GetNodeClusterState(lpszNodeName: OPTIONAL<LPCWSTR>, pdwClusterState_out: LPDWORD): DWORD {
+  public static GetNodeClusterState(lpszNodeName: Optional<LPCWSTR>, pdwClusterState_out: LPDWORD): DWORD {
     return Clusapi.Load('GetNodeClusterState')(lpszNodeName, pdwClusterState_out);
   }
 
@@ -1237,12 +1237,12 @@ class Clusapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/clusapi/nf-clusapi-moveclustergroup
-  public static MoveClusterGroup(hGroup: HGROUP, hDestinationNode: OPTIONAL<HNODE>): DWORD {
+  public static MoveClusterGroup(hGroup: HGROUP, hDestinationNode: Optional<HNODE>): DWORD {
     return Clusapi.Load('MoveClusterGroup')(hGroup, hDestinationNode);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/clusapi/nf-clusapi-moveclustergroupex
-  public static MoveClusterGroupEx(hGroup: HGROUP, hDestinationNode: OPTIONAL<HNODE>, dwMoveFlags: DWORD, lpInBuffer: OPTIONAL<PBYTE>, cbInBufferSize: DWORD): DWORD {
+  public static MoveClusterGroupEx(hGroup: HGROUP, hDestinationNode: Optional<HNODE>, dwMoveFlags: DWORD, lpInBuffer: Optional<PBYTE>, cbInBufferSize: DWORD): DWORD {
     return Clusapi.Load('MoveClusterGroupEx')(hGroup, hDestinationNode, dwMoveFlags, lpInBuffer, cbInBufferSize);
   }
 
@@ -1252,7 +1252,7 @@ class Clusapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/clusapi/nf-clusapi-offlineclustergroupex
-  public static OfflineClusterGroupEx(hGroup: HGROUP, dwOfflineFlags: DWORD, lpInBuffer: OPTIONAL<PBYTE>, cbInBufferSize: DWORD): DWORD {
+  public static OfflineClusterGroupEx(hGroup: HGROUP, dwOfflineFlags: DWORD, lpInBuffer: Optional<PBYTE>, cbInBufferSize: DWORD): DWORD {
     return Clusapi.Load('OfflineClusterGroupEx')(hGroup, dwOfflineFlags, lpInBuffer, cbInBufferSize);
   }
 
@@ -1262,17 +1262,17 @@ class Clusapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/clusapi/nf-clusapi-offlineclusterresourceex
-  public static OfflineClusterResourceEx(hResource: HRESOURCE, dwOfflineFlags: DWORD, lpInBuffer: OPTIONAL<PBYTE>, cbInBufferSize: DWORD): DWORD {
+  public static OfflineClusterResourceEx(hResource: HRESOURCE, dwOfflineFlags: DWORD, lpInBuffer: Optional<PBYTE>, cbInBufferSize: DWORD): DWORD {
     return Clusapi.Load('OfflineClusterResourceEx')(hResource, dwOfflineFlags, lpInBuffer, cbInBufferSize);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/clusapi/nf-clusapi-onlineclustergroup
-  public static OnlineClusterGroup(hGroup: HGROUP, hDestinationNode: OPTIONAL<HNODE>): DWORD {
+  public static OnlineClusterGroup(hGroup: HGROUP, hDestinationNode: Optional<HNODE>): DWORD {
     return Clusapi.Load('OnlineClusterGroup')(hGroup, hDestinationNode);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/clusapi/nf-clusapi-onlineclustergroupex
-  public static OnlineClusterGroupEx(hGroup: HGROUP, hDestinationNode: OPTIONAL<HNODE>, dwOnlineFlags: DWORD, lpInBuffer: OPTIONAL<PBYTE>, cbInBufferSize: DWORD): DWORD {
+  public static OnlineClusterGroupEx(hGroup: HGROUP, hDestinationNode: Optional<HNODE>, dwOnlineFlags: DWORD, lpInBuffer: Optional<PBYTE>, cbInBufferSize: DWORD): DWORD {
     return Clusapi.Load('OnlineClusterGroupEx')(hGroup, hDestinationNode, dwOnlineFlags, lpInBuffer, cbInBufferSize);
   }
 
@@ -1282,17 +1282,17 @@ class Clusapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/clusapi/nf-clusapi-onlineclusterresourceex
-  public static OnlineClusterResourceEx(hResource: HRESOURCE, dwOnlineFlags: DWORD, lpInBuffer: OPTIONAL<PBYTE>, cbInBufferSize: DWORD): DWORD {
+  public static OnlineClusterResourceEx(hResource: HRESOURCE, dwOnlineFlags: DWORD, lpInBuffer: Optional<PBYTE>, cbInBufferSize: DWORD): DWORD {
     return Clusapi.Load('OnlineClusterResourceEx')(hResource, dwOnlineFlags, lpInBuffer, cbInBufferSize);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/clusapi/nf-clusapi-opencluster
-  public static OpenCluster(lpszClusterName: OPTIONAL<LPCWSTR>): HCLUSTER {
+  public static OpenCluster(lpszClusterName: Optional<LPCWSTR>): HCLUSTER {
     return Clusapi.Load('OpenCluster')(lpszClusterName);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/clusapi/nf-clusapi-openclusterex
-  public static OpenClusterEx(lpszClusterName: OPTIONAL<LPCWSTR>, DesiredAccess: DWORD, GrantedAccess_out: OPTIONAL<LPDWORD>): HCLUSTER {
+  public static OpenClusterEx(lpszClusterName: Optional<LPCWSTR>, DesiredAccess: DWORD, GrantedAccess_out: Optional<LPDWORD>): HCLUSTER {
     return Clusapi.Load('OpenClusterEx')(lpszClusterName, DesiredAccess, GrantedAccess_out);
   }
 
@@ -1302,7 +1302,7 @@ class Clusapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/clusapi/nf-clusapi-openclustergroupex
-  public static OpenClusterGroupEx(hCluster: HCLUSTER, lpszGroupName: OPTIONAL<LPCWSTR>, dwDesiredAccess: DWORD, lpdwGrantedAccess_out: OPTIONAL<LPDWORD>): HGROUP {
+  public static OpenClusterGroupEx(hCluster: HCLUSTER, lpszGroupName: Optional<LPCWSTR>, dwDesiredAccess: DWORD, lpdwGrantedAccess_out: Optional<LPDWORD>): HGROUP {
     return Clusapi.Load('OpenClusterGroupEx')(hCluster, lpszGroupName, dwDesiredAccess, lpdwGrantedAccess_out);
   }
 
@@ -1317,7 +1317,7 @@ class Clusapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/clusapi/nf-clusapi-openclusternetinterfaceex
-  public static OpenClusterNetInterfaceEx(hCluster: HCLUSTER, lpszInterfaceName: OPTIONAL<LPCWSTR>, dwDesiredAccess: DWORD, lpdwGrantedAccess_out: OPTIONAL<LPDWORD>): HNETINTERFACE {
+  public static OpenClusterNetInterfaceEx(hCluster: HCLUSTER, lpszInterfaceName: Optional<LPCWSTR>, dwDesiredAccess: DWORD, lpdwGrantedAccess_out: Optional<LPDWORD>): HNETINTERFACE {
     return Clusapi.Load('OpenClusterNetInterfaceEx')(hCluster, lpszInterfaceName, dwDesiredAccess, lpdwGrantedAccess_out);
   }
 
@@ -1327,7 +1327,7 @@ class Clusapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/clusapi/nf-clusapi-openclusternetworkex
-  public static OpenClusterNetworkEx(hCluster: HCLUSTER, lpszNetworkName: OPTIONAL<LPCWSTR>, dwDesiredAccess: DWORD, lpdwGrantedAccess_out: OPTIONAL<LPDWORD>): HNETWORK {
+  public static OpenClusterNetworkEx(hCluster: HCLUSTER, lpszNetworkName: Optional<LPCWSTR>, dwDesiredAccess: DWORD, lpdwGrantedAccess_out: Optional<LPDWORD>): HNETWORK {
     return Clusapi.Load('OpenClusterNetworkEx')(hCluster, lpszNetworkName, dwDesiredAccess, lpdwGrantedAccess_out);
   }
 
@@ -1337,7 +1337,7 @@ class Clusapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/clusapi/nf-clusapi-openclusternodeex
-  public static OpenClusterNodeEx(hCluster: HCLUSTER, lpszNodeName: OPTIONAL<LPCWSTR>, dwDesiredAccess: DWORD, lpdwGrantedAccess_out: OPTIONAL<LPDWORD>): HNODE {
+  public static OpenClusterNodeEx(hCluster: HCLUSTER, lpszNodeName: Optional<LPCWSTR>, dwDesiredAccess: DWORD, lpdwGrantedAccess_out: Optional<LPDWORD>): HNODE {
     return Clusapi.Load('OpenClusterNodeEx')(hCluster, lpszNodeName, dwDesiredAccess, lpdwGrantedAccess_out);
   }
 
@@ -1347,7 +1347,7 @@ class Clusapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/clusapi/nf-clusapi-openclusterresourceex
-  public static OpenClusterResourceEx(hCluster: HCLUSTER, lpszResourceName: OPTIONAL<LPCWSTR>, dwDesiredAccess: DWORD, lpdwGrantedAccess_out: OPTIONAL<LPDWORD>): HRESOURCE {
+  public static OpenClusterResourceEx(hCluster: HCLUSTER, lpszResourceName: Optional<LPCWSTR>, dwDesiredAccess: DWORD, lpdwGrantedAccess_out: Optional<LPDWORD>): HRESOURCE {
     return Clusapi.Load('OpenClusterResourceEx')(hCluster, lpszResourceName, dwDesiredAccess, lpdwGrantedAccess_out);
   }
 
@@ -1357,7 +1357,7 @@ class Clusapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/clusapi/nf-clusapi-pauseclusternodeex
-  public static PauseClusterNodeEx(hNode: HNODE, bDrainNode: BOOL, dwPauseFlags: DWORD, hNodeDrainTarget: OPTIONAL<HNODE>): DWORD {
+  public static PauseClusterNodeEx(hNode: HNODE, bDrainNode: BOOL, dwPauseFlags: DWORD, hNodeDrainTarget: Optional<HNODE>): DWORD {
     return Clusapi.Load('PauseClusterNodeEx')(hNode, bDrainNode, dwPauseFlags, hNodeDrainTarget);
   }
 
@@ -1412,7 +1412,7 @@ class Clusapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/clusapi/nf-clusapi-restoreclusterdatabase
-  public static RestoreClusterDatabase(lpszPathName: LPCWSTR, bForce: BOOL, lpszQuorumDriveLetter: OPTIONAL<LPCWSTR>): DWORD {
+  public static RestoreClusterDatabase(lpszPathName: LPCWSTR, bForce: BOOL, lpszQuorumDriveLetter: Optional<LPCWSTR>): DWORD {
     return Clusapi.Load('RestoreClusterDatabase')(lpszPathName, bForce, lpszQuorumDriveLetter);
   }
 
@@ -1432,7 +1432,7 @@ class Clusapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/clusapi/nf-clusapi-setclustergroupnodelist
-  public static SetClusterGroupNodeList(hGroup: HGROUP, NodeCount: DWORD, NodeList: OPTIONAL<PHNODE>): DWORD {
+  public static SetClusterGroupNodeList(hGroup: HGROUP, NodeCount: DWORD, NodeList: Optional<PHNODE>): DWORD {
     return Clusapi.Load('SetClusterGroupNodeList')(hGroup, NodeCount, NodeList);
   }
 
@@ -1457,7 +1457,7 @@ class Clusapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/clusapi/nf-clusapi-setclusterquorumresource
-  public static SetClusterQuorumResource(hResource: HRESOURCE, lpszDeviceName: OPTIONAL<LPCWSTR>, dwMaxQuoLogSize: DWORD): DWORD {
+  public static SetClusterQuorumResource(hResource: HRESOURCE, lpszDeviceName: Optional<LPCWSTR>, dwMaxQuoLogSize: DWORD): DWORD {
     return Clusapi.Load('SetClusterQuorumResource')(hResource, lpszDeviceName, dwMaxQuoLogSize);
   }
 
@@ -1472,7 +1472,7 @@ class Clusapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/clusapi/nf-clusapi-setclusterserviceaccountpassword
-  public static SetClusterServiceAccountPassword(lpszClusterName: LPCWSTR, lpszNewPassword: LPCWSTR, dwFlags: DWORD, lpReturnStatusBuffer_out: OPTIONAL<PCLUSTER_SET_PASSWORD_STATUS>, lpcbReturnStatusBufferSize_in_out: LPDWORD): DWORD {
+  public static SetClusterServiceAccountPassword(lpszClusterName: LPCWSTR, lpszNewPassword: LPCWSTR, dwFlags: DWORD, lpReturnStatusBuffer_out: Optional<PCLUSTER_SET_PASSWORD_STATUS>, lpcbReturnStatusBufferSize_in_out: LPDWORD): DWORD {
     return Clusapi.Load('SetClusterServiceAccountPassword')(lpszClusterName, lpszNewPassword, dwFlags, lpReturnStatusBuffer_out, lpcbReturnStatusBufferSize_in_out);
   }
 

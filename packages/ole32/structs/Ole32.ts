@@ -64,8 +64,8 @@ import type {
   LPWORD,
   LPWSTR,
   NULL,
-  NULLABLE,
-  OPTIONAL,
+  Nullable,
+  Optional,
   PHGLOBAL,
   PMemoryAllocator,
   PPBC,
@@ -260,7 +260,7 @@ class Ole32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/objbase/nf-objbase-coallowsetforegroundwindow
-  public static CoAllowSetForegroundWindow(pUnk: LPUNKNOWN, lpvReserved: OPTIONAL<LPVOID>): HRESULT {
+  public static CoAllowSetForegroundWindow(pUnk: LPUNKNOWN, lpvReserved: Optional<LPVOID>): HRESULT {
     return Ole32.Load('CoAllowSetForegroundWindow')(pUnk, lpvReserved);
   }
 
@@ -295,12 +295,12 @@ class Ole32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/objbase/nf-objbase-cogetobject
-  public static CoGetObject(pszName: LPCWSTR, pBindOptions: OPTIONAL<BIND_OPTS>, riid: REFIID, ppv_out: LPLPVOID): HRESULT {
+  public static CoGetObject(pszName: LPCWSTR, pBindOptions: Optional<BIND_OPTS>, riid: REFIID, ppv_out: LPLPVOID): HRESULT {
     return Ole32.Load('CoGetObject')(pszName, pBindOptions, riid, ppv_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/objbase/nf-objbase-coinitialize
-  public static CoInitialize(pvReserved: OPTIONAL<LPVOID>): HRESULT {
+  public static CoInitialize(pvReserved: Optional<LPVOID>): HRESULT {
     return Ole32.Load('CoInitialize')(pvReserved);
   }
 
@@ -315,12 +315,12 @@ class Ole32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/objbase/nf-objbase-coregistermessagefilter
-  public static CoRegisterMessageFilter(lpMessageFilter: OPTIONAL<LPMESSAGEFILTER>, lplpMessageFilter_out: OPTIONAL<PPMESSAGEFILTER>): HRESULT {
+  public static CoRegisterMessageFilter(lpMessageFilter: Optional<LPMESSAGEFILTER>, lplpMessageFilter_out: Optional<PPMESSAGEFILTER>): HRESULT {
     return Ole32.Load('CoRegisterMessageFilter')(lpMessageFilter, lplpMessageFilter_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/combaseapi/nf-combaseapi-cotaskmemfree
-  public static CoTaskMemFree(pv: OPTIONAL<LPVOID>): void {
+  public static CoTaskMemFree(pv: Optional<LPVOID>): void {
     return Ole32.Load('CoTaskMemFree')(pv);
   }
 
@@ -345,7 +345,7 @@ class Ole32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/objbase/nf-objbase-createdatacache
-  public static CreateDataCache(pUnkOuter: OPTIONAL<LPUNKNOWN>, rclsid: REFCLSID, iid: REFIID, ppv_out: LPLPVOID): HRESULT {
+  public static CreateDataCache(pUnkOuter: Optional<LPUNKNOWN>, rclsid: REFCLSID, iid: REFIID, ppv_out: LPLPVOID): HRESULT {
     return Ole32.Load('CreateDataCache')(pUnkOuter, rclsid, iid, ppv_out);
   }
 
@@ -355,12 +355,12 @@ class Ole32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/objbase/nf-objbase-creategenericcomposite
-  public static CreateGenericComposite(pmkFirst: OPTIONAL<LPMONIKER>, pmkRest: OPTIONAL<LPMONIKER>, ppmkComposite_out: PPMONIKER): HRESULT {
+  public static CreateGenericComposite(pmkFirst: Optional<LPMONIKER>, pmkRest: Optional<LPMONIKER>, ppmkComposite_out: PPMONIKER): HRESULT {
     return Ole32.Load('CreateGenericComposite')(pmkFirst, pmkRest, ppmkComposite_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/coml2api/nf-coml2api-createilockbytesonhglobal
-  public static CreateILockBytesOnHGlobal(hGlobal: OPTIONAL<HGLOBAL>, fDeleteOnRelease: BOOL, pplkbyt_out: PPLOCKBYTES): HRESULT {
+  public static CreateILockBytesOnHGlobal(hGlobal: Optional<HGLOBAL>, fDeleteOnRelease: BOOL, pplkbyt_out: PPLOCKBYTES): HRESULT {
     return Ole32.Load('CreateILockBytesOnHGlobal')(hGlobal, fDeleteOnRelease, pplkbyt_out);
   }
 
@@ -370,7 +370,7 @@ class Ole32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/objbase/nf-objbase-createobjrefmoniker
-  public static CreateObjrefMoniker(punk: OPTIONAL<LPUNKNOWN>, ppmk_out: PPMONIKER): HRESULT {
+  public static CreateObjrefMoniker(punk: Optional<LPUNKNOWN>, ppmk_out: PPMONIKER): HRESULT {
     return Ole32.Load('CreateObjrefMoniker')(punk, ppmk_out);
   }
 
@@ -380,7 +380,7 @@ class Ole32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/objbase/nf-objbase-createpointermoniker
-  public static CreatePointerMoniker(punk: OPTIONAL<LPUNKNOWN>, ppmk_out: PPMONIKER): HRESULT {
+  public static CreatePointerMoniker(punk: Optional<LPUNKNOWN>, ppmk_out: PPMONIKER): HRESULT {
     return Ole32.Load('CreatePointerMoniker')(punk, ppmk_out);
   }
 
@@ -465,7 +465,7 @@ class Ole32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ole2/nf-ole2-oleconvertolestreamtoistorage
-  public static OleConvertOLESTREAMToIStorage(lpolestream: LPOLESTREAM, pstg_out: LPSTORAGE, ptd: NULLABLE<DVTARGETDEVICE>): HRESULT {
+  public static OleConvertOLESTREAMToIStorage(lpolestream: LPOLESTREAM, pstg_out: LPSTORAGE, ptd: Nullable<DVTARGETDEVICE>): HRESULT {
     return Ole32.Load('OleConvertOLESTREAMToIStorage')(lpolestream, pstg_out, ptd);
   }
 
@@ -475,17 +475,17 @@ class Ole32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ole2/nf-ole2-olecreate
-  public static OleCreate(rclsid: REFCLSID, riid: REFIID, renderopt: DWORD, pFormatEtc: NULLABLE<LPFORMATETC>, pClientSite: NULLABLE<LPOLECLIENTSITE>, pStg: LPSTORAGE, ppvObj_out: LPLPVOID): HRESULT {
+  public static OleCreate(rclsid: REFCLSID, riid: REFIID, renderopt: DWORD, pFormatEtc: Nullable<LPFORMATETC>, pClientSite: Nullable<LPOLECLIENTSITE>, pStg: LPSTORAGE, ppvObj_out: LPLPVOID): HRESULT {
     return Ole32.Load('OleCreate')(rclsid, riid, renderopt, pFormatEtc, pClientSite, pStg, ppvObj_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ole2/nf-ole2-olecreatedefaulthandler
-  public static OleCreateDefaultHandler(clsid: REFCLSID, pUnkOuter: NULLABLE<LPUNKNOWN>, riid: REFIID, lplpObj_out: LPLPVOID): HRESULT {
+  public static OleCreateDefaultHandler(clsid: REFCLSID, pUnkOuter: Nullable<LPUNKNOWN>, riid: REFIID, lplpObj_out: LPLPVOID): HRESULT {
     return Ole32.Load('OleCreateDefaultHandler')(clsid, pUnkOuter, riid, lplpObj_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ole2/nf-ole2-olecreateembeddinghelper
-  public static OleCreateEmbeddingHelper(clsid: REFCLSID, pUnkOuter: NULLABLE<LPUNKNOWN>, flags: DWORD, pCF: LPCLASSFACTORY, riid: REFIID, lplpObj_out: LPLPVOID): HRESULT {
+  public static OleCreateEmbeddingHelper(clsid: REFCLSID, pUnkOuter: Nullable<LPUNKNOWN>, flags: DWORD, pCF: LPCLASSFACTORY, riid: REFIID, lplpObj_out: LPLPVOID): HRESULT {
     return Ole32.Load('OleCreateEmbeddingHelper')(clsid, pUnkOuter, flags, pCF, riid, lplpObj_out);
   }
 
@@ -500,7 +500,7 @@ class Ole32 extends Win32 {
     rgFormatEtc: LPFORMATETC,
     lpAdviseSink: IAdviseSink,
     rgdwConnection_out: LPDWORD,
-    pClientSite: NULLABLE<LPOLECLIENTSITE>,
+    pClientSite: Nullable<LPOLECLIENTSITE>,
     pStg: LPSTORAGE,
     ppvObj_out: LPLPVOID,
   ): HRESULT {
@@ -508,7 +508,7 @@ class Ole32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ole2/nf-ole2-olecreatefromdata
-  public static OleCreateFromData(pSrcDataObj: LPDATAOBJECT, riid: REFIID, renderopt: DWORD, pFormatEtc: LPFORMATETC, pClientSite: NULLABLE<LPOLECLIENTSITE>, pStg: LPSTORAGE, ppvObj_out: LPLPVOID): HRESULT {
+  public static OleCreateFromData(pSrcDataObj: LPDATAOBJECT, riid: REFIID, renderopt: DWORD, pFormatEtc: LPFORMATETC, pClientSite: Nullable<LPOLECLIENTSITE>, pStg: LPSTORAGE, ppvObj_out: LPLPVOID): HRESULT {
     return Ole32.Load('OleCreateFromData')(pSrcDataObj, riid, renderopt, pFormatEtc, pClientSite, pStg, ppvObj_out);
   }
 
@@ -523,7 +523,7 @@ class Ole32 extends Win32 {
     rgFormatEtc: LPFORMATETC,
     lpAdviseSink: IAdviseSink,
     rgdwConnection_out: LPDWORD,
-    pClientSite: NULLABLE<LPOLECLIENTSITE>,
+    pClientSite: Nullable<LPOLECLIENTSITE>,
     pStg: LPSTORAGE,
     ppvObj_out: LPLPVOID,
   ): HRESULT {
@@ -531,7 +531,7 @@ class Ole32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ole2/nf-ole2-olecreatefromfile
-  public static OleCreateFromFile(rclsid: REFCLSID, lpszFileName: LPCOLESTR, riid: REFIID, renderopt: DWORD, lpFormatEtc: NULLABLE<LPFORMATETC>, pClientSite: NULLABLE<LPOLECLIENTSITE>, pStg: LPSTORAGE, ppvObj_out: LPLPVOID): HRESULT {
+  public static OleCreateFromFile(rclsid: REFCLSID, lpszFileName: LPCOLESTR, riid: REFIID, renderopt: DWORD, lpFormatEtc: Nullable<LPFORMATETC>, pClientSite: Nullable<LPOLECLIENTSITE>, pStg: LPSTORAGE, ppvObj_out: LPLPVOID): HRESULT {
     return Ole32.Load('OleCreateFromFile')(rclsid, lpszFileName, riid, renderopt, lpFormatEtc, pClientSite, pStg, ppvObj_out);
   }
 
@@ -547,7 +547,7 @@ class Ole32 extends Win32 {
     rgFormatEtc: LPFORMATETC,
     lpAdviseSink: IAdviseSink,
     rgdwConnection_out: LPDWORD,
-    pClientSite: NULLABLE<LPOLECLIENTSITE>,
+    pClientSite: Nullable<LPOLECLIENTSITE>,
     pStg: LPSTORAGE,
     ppvObj_out: LPLPVOID,
   ): HRESULT {
@@ -570,7 +570,7 @@ class Ole32 extends Win32 {
     rgFormatEtc: LPFORMATETC,
     lpAdviseSink: IAdviseSink,
     rgdwConnection_out: LPDWORD,
-    pClientSite: NULLABLE<LPOLECLIENTSITE>,
+    pClientSite: Nullable<LPOLECLIENTSITE>,
     pStg: LPSTORAGE,
     ppvObj_out: LPLPVOID,
   ): HRESULT {
@@ -578,7 +578,7 @@ class Ole32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ole2/nf-ole2-olecreatelinkfromdata
-  public static OleCreateLinkFromData(pSrcDataObj: LPDATAOBJECT, riid: REFIID, renderopt: DWORD, pFormatEtc: LPFORMATETC, pClientSite: NULLABLE<LPOLECLIENTSITE>, pStg: LPSTORAGE, ppvObj_out: LPLPVOID): HRESULT {
+  public static OleCreateLinkFromData(pSrcDataObj: LPDATAOBJECT, riid: REFIID, renderopt: DWORD, pFormatEtc: LPFORMATETC, pClientSite: Nullable<LPOLECLIENTSITE>, pStg: LPSTORAGE, ppvObj_out: LPLPVOID): HRESULT {
     return Ole32.Load('OleCreateLinkFromData')(pSrcDataObj, riid, renderopt, pFormatEtc, pClientSite, pStg, ppvObj_out);
   }
 
@@ -593,7 +593,7 @@ class Ole32 extends Win32 {
     rgFormatEtc: LPFORMATETC,
     lpAdviseSink: IAdviseSink,
     rgdwConnection_out: LPDWORD,
-    pClientSite: NULLABLE<LPOLECLIENTSITE>,
+    pClientSite: Nullable<LPOLECLIENTSITE>,
     pStg: LPSTORAGE,
     ppvObj_out: LPLPVOID,
   ): HRESULT {
@@ -601,7 +601,7 @@ class Ole32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ole2/nf-ole2-olecreatelinktofile
-  public static OleCreateLinkToFile(lpszFileName: LPCOLESTR, riid: REFIID, renderopt: DWORD, lpFormatEtc: LPFORMATETC, pClientSite: NULLABLE<LPOLECLIENTSITE>, pStg: LPSTORAGE, ppvObj_out: LPLPVOID): HRESULT {
+  public static OleCreateLinkToFile(lpszFileName: LPCOLESTR, riid: REFIID, renderopt: DWORD, lpFormatEtc: LPFORMATETC, pClientSite: Nullable<LPOLECLIENTSITE>, pStg: LPSTORAGE, ppvObj_out: LPLPVOID): HRESULT {
     return Ole32.Load('OleCreateLinkToFile')(lpszFileName, riid, renderopt, lpFormatEtc, pClientSite, pStg, ppvObj_out);
   }
 
@@ -616,7 +616,7 @@ class Ole32 extends Win32 {
     rgFormatEtc: LPFORMATETC,
     lpAdviseSink: IAdviseSink,
     rgdwConnection_out: LPDWORD,
-    pClientSite: NULLABLE<LPOLECLIENTSITE>,
+    pClientSite: Nullable<LPOLECLIENTSITE>,
     pStg: LPSTORAGE,
     ppvObj_out: LPLPVOID,
   ): HRESULT {
@@ -629,7 +629,7 @@ class Ole32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ole2/nf-ole2-olecreatestaticfromdata
-  public static OleCreateStaticFromData(pSrcDataObj: LPDATAOBJECT, iid: REFIID, renderopt: DWORD, pFormatEtc: LPFORMATETC, pClientSite: NULLABLE<LPOLECLIENTSITE>, pStg: LPSTORAGE, ppvObj_out: LPLPVOID): HRESULT {
+  public static OleCreateStaticFromData(pSrcDataObj: LPDATAOBJECT, iid: REFIID, renderopt: DWORD, pFormatEtc: LPFORMATETC, pClientSite: Nullable<LPOLECLIENTSITE>, pStg: LPSTORAGE, ppvObj_out: LPLPVOID): HRESULT {
     return Ole32.Load('OleCreateStaticFromData')(pSrcDataObj, iid, renderopt, pFormatEtc, pClientSite, pStg, ppvObj_out);
   }
 
@@ -644,7 +644,7 @@ class Ole32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ole2/nf-ole2-oledraw
-  public static OleDraw(pUnknown: LPUNKNOWN, dwAspect: DWORD, hdcDraw: HDC, lprcBounds: NULLABLE<LPCRECT>): HRESULT {
+  public static OleDraw(pUnknown: LPUNKNOWN, dwAspect: DWORD, hdcDraw: HDC, lprcBounds: Nullable<LPCRECT>): HRESULT {
     return Ole32.Load('OleDraw')(pUnknown, dwAspect, hdcDraw, lprcBounds);
   }
 
@@ -674,7 +674,7 @@ class Ole32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ole2/nf-ole2-olegeticonofclass
-  public static OleGetIconOfClass(rclsid: REFCLSID, lpszLabel: OPTIONAL<LPOLESTR>, fUseTypeAsLabel: BOOL): HGLOBAL {
+  public static OleGetIconOfClass(rclsid: REFCLSID, lpszLabel: Optional<LPOLESTR>, fUseTypeAsLabel: BOOL): HGLOBAL {
     return Ole32.Load('OleGetIconOfClass')(rclsid, lpszLabel, fUseTypeAsLabel);
   }
 
@@ -819,7 +819,7 @@ class Ole32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ole2/nf-ole2-readfmtusertypestg
-  public static ReadFmtUserTypeStg(pstg: LPSTORAGE, pcf_out: LPWORD, lplpszUserType_out: OPTIONAL<PPOLESTR>): HRESULT {
+  public static ReadFmtUserTypeStg(pstg: LPSTORAGE, pcf_out: LPWORD, lplpszUserType_out: Optional<PPOLESTR>): HRESULT {
     return Ole32.Load('ReadFmtUserTypeStg')(pstg, pcf_out, lplpszUserType_out);
   }
 
@@ -852,17 +852,17 @@ class Ole32 extends Win32 {
   public static StgConvertVariantToProperty(
     pvar: PROPVARIANT,
     CodePage: USHORT,
-    pprop_out: OPTIONAL<SERIALIZEDPROPERTYVALUE>,
+    pprop_out: Optional<SERIALIZEDPROPERTYVALUE>,
     pcb_in_out: PULONG,
     pid: PROPID,
     fReserved: BOOLEAN,
-    pcIndirect_in_out: OPTIONAL<PULONG>,
+    pcIndirect_in_out: Optional<PULONG>,
   ): SERIALIZEDPROPERTYVALUE {
     return Ole32.Load('StgConvertVariantToProperty')(pvar, CodePage, pprop_out, pcb_in_out, pid, fReserved, pcIndirect_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/coml2api/nf-coml2api-stgcreatedocfile
-  public static StgCreateDocfile(pwcsName: OPTIONAL<LPCWSTR>, grfMode: DWORD, reserved: DWORD, ppstgOpen_out: PPIStorage): HRESULT {
+  public static StgCreateDocfile(pwcsName: Optional<LPCWSTR>, grfMode: DWORD, reserved: DWORD, ppstgOpen_out: PPIStorage): HRESULT {
     return Ole32.Load('StgCreateDocfile')(pwcsName, grfMode, reserved, ppstgOpen_out);
   }
 
@@ -883,12 +883,12 @@ class Ole32 extends Win32 {
 
   // https://learn.microsoft.com/en-us/windows/win32/api/coml2api/nf-coml2api-stgcreatestorageex
   public static StgCreateStorageEx(
-    pwcsName: OPTIONAL<LPCWSTR>,
+    pwcsName: Optional<LPCWSTR>,
     grfMode: DWORD,
     stgfmt: DWORD,
     grfAttrs: DWORD,
-    pStgOptions_in_out: OPTIONAL<STGOPTIONS>,
-    pSecurityDescriptor: OPTIONAL<PSECURITY_DESCRIPTOR>,
+    pStgOptions_in_out: Optional<STGOPTIONS>,
+    pSecurityDescriptor: Optional<PSECURITY_DESCRIPTOR>,
     riid: REFIID,
     ppObjectOpen_out: PPVOID,
   ): HRESULT {
@@ -926,7 +926,7 @@ class Ole32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/coml2api/nf-coml2api-stgopenstorage
-  public static StgOpenStorage(pwcsName: OPTIONAL<LPCWSTR>, pstgPriority: OPTIONAL<IStorage>, grfMode: DWORD, snbExclude: OPTIONAL<SNB>, reserved: DWORD, ppstgOpen_out: PPIStorage): HRESULT {
+  public static StgOpenStorage(pwcsName: Optional<LPCWSTR>, pstgPriority: Optional<IStorage>, grfMode: DWORD, snbExclude: Optional<SNB>, reserved: DWORD, ppstgOpen_out: PPIStorage): HRESULT {
     return Ole32.Load('StgOpenStorage')(pwcsName, pstgPriority, grfMode, snbExclude, reserved, ppstgOpen_out);
   }
 
@@ -936,8 +936,8 @@ class Ole32 extends Win32 {
     grfMode: DWORD,
     stgfmt: DWORD,
     grfAttrs: DWORD,
-    pStgOptions_in_out: OPTIONAL<STGOPTIONS>,
-    pSecurityDescriptor: OPTIONAL<PSECURITY_DESCRIPTOR>,
+    pStgOptions_in_out: Optional<STGOPTIONS>,
+    pSecurityDescriptor: Optional<PSECURITY_DESCRIPTOR>,
     riid: REFIID,
     ppObjectOpen_out: PPVOID,
   ): HRESULT {
@@ -945,7 +945,7 @@ class Ole32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/coml2api/nf-coml2api-stgopenstorageonilockbytes
-  public static StgOpenStorageOnILockBytes(plkbyt: ILockBytes, pstgPriority: OPTIONAL<IStorage>, grfMode: DWORD, snbExclude: OPTIONAL<SNB>, reserved: DWORD, ppstgOpen_out: PPIStorage): HRESULT {
+  public static StgOpenStorageOnILockBytes(plkbyt: ILockBytes, pstgPriority: Optional<IStorage>, grfMode: DWORD, snbExclude: Optional<SNB>, reserved: DWORD, ppstgOpen_out: PPIStorage): HRESULT {
     return Ole32.Load('StgOpenStorageOnILockBytes')(plkbyt, pstgPriority, grfMode, snbExclude, reserved, ppstgOpen_out);
   }
 
@@ -955,7 +955,7 @@ class Ole32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/coml2api/nf-coml2api-stgsettimes
-  public static StgSetTimes(lpszName: LPCWSTR, pctime: OPTIONAL<FILETIME>, patime: OPTIONAL<FILETIME>, pmtime: OPTIONAL<FILETIME>): HRESULT {
+  public static StgSetTimes(lpszName: LPCWSTR, pctime: Optional<FILETIME>, patime: Optional<FILETIME>, pmtime: Optional<FILETIME>): HRESULT {
     return Ole32.Load('StgSetTimes')(lpszName, pctime, patime, pmtime);
   }
 

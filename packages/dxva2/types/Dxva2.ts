@@ -1,6 +1,6 @@
 import type { Pointer } from 'bun:ffi';
 
-export type { BOOL, BYTE, DWORD, HANDLE, HRESULT, LPDWORD, LPSTR, LPVOID, NULL, OPTIONAL, UINT, ULONG } from '@bun-win32/core';
+export type { BOOL, BYTE, DWORD, HANDLE, HRESULT, LPDWORD, LPSTR, LPVOID, NULL, Optional, UINT, ULONG } from '@bun-win32/core';
 
 // ── DXVA2 / Monitor-specific scalar aliases ─────────────────────────────────
 

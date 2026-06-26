@@ -1,6 +1,6 @@
 import type { Pointer } from 'bun:ffi';
 
-export type { HMODULE, HRESULT, NULL, NULLABLE, OPTIONAL, UINT } from '@bun-win32/core';
+export type { HMODULE, HRESULT, NULL, Nullable, Optional, UINT } from '@bun-win32/core';
 
 export const D3D11_SDK_VERSION = 7;
 

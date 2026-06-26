@@ -2,7 +2,7 @@ import { type FFIFunction, FFIType } from 'bun:ffi';
 
 import { Win32 } from '@bun-win32/core';
 
-import type { BOOL, LPCSTR, LPCWSTR, LPDWORD, LPQOCINFO, NULLABLE } from '../types/Sensapi';
+import type { BOOL, LPCSTR, LPCWSTR, LPDWORD, LPQOCINFO, Nullable } from '../types/Sensapi';
 
 /**
  * Thin, lazy-loaded FFI bindings for `sensapi.dll`.
@@ -38,12 +38,12 @@ class Sensapi extends Win32 {
   } as const satisfies Record<string, FFIFunction>;
 
   // https://learn.microsoft.com/en-us/windows/win32/api/sensapi/nf-sensapi-isdestinationreachablea
-  public static IsDestinationReachableA(lpszDestination: LPCSTR, lpQOCInfo_in_out: NULLABLE<LPQOCINFO>): BOOL {
+  public static IsDestinationReachableA(lpszDestination: LPCSTR, lpQOCInfo_in_out: Nullable<LPQOCINFO>): BOOL {
     return Sensapi.Load('IsDestinationReachableA')(lpszDestination, lpQOCInfo_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/sensapi/nf-sensapi-isdestinationreachablew
-  public static IsDestinationReachableW(lpszDestination: LPCWSTR, lpQOCInfo_in_out: NULLABLE<LPQOCINFO>): BOOL {
+  public static IsDestinationReachableW(lpszDestination: LPCWSTR, lpQOCInfo_in_out: Nullable<LPQOCINFO>): BOOL {
     return Sensapi.Load('IsDestinationReachableW')(lpszDestination, lpQOCInfo_in_out);
   }
 

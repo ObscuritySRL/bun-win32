@@ -1,6 +1,6 @@
 import type { Pointer } from 'bun:ffi';
 
-export type { BOOL, DWORD, DWORD_PTR, HANDLE, LONG, LPBYTE, LPCWSTR, LPDWORD, LPHANDLE, LPSECURITY_ATTRIBUTES, LPVOID, LPWSTR, NULL, OPTIONAL, PBYTE, PVOID } from '@bun-win32/core';
+export type { BOOL, DWORD, DWORD_PTR, HANDLE, LONG, LPBYTE, LPCWSTR, LPDWORD, LPHANDLE, LPSECURITY_ATTRIBUTES, LPVOID, LPWSTR, NULL, Optional, PBYTE, PVOID } from '@bun-win32/core';
 
 export enum CLUSTER_GROUP_STATE {
   ClusterGroupFailed = 2,

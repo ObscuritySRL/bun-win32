@@ -1,6 +1,6 @@
 import type { Pointer } from 'bun:ffi';
 
-export type { BOOL, HRESULT, NULL, OPTIONAL } from '@bun-win32/core';
+export type { BOOL, HRESULT, NULL, Optional } from '@bun-win32/core';
 
 export enum D2D1_COLOR_SPACE {
   D2D1_COLOR_SPACE_CUSTOM = 0,

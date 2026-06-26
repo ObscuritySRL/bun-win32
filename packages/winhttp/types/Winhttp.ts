@@ -1,6 +1,6 @@
 import type { Pointer } from 'bun:ffi';
 
-export type { BOOL, BYTE, DWORD, DWORD_PTR, INT, LPBOOL, LPCVOID, LPCWSTR, LPDWORD, LPVOID, LPWSTR, NULL, NULLABLE, OPTIONAL, PBYTE, PDWORD, PVOID, UINT, USHORT, WORD } from '@bun-win32/core';
+export type { BOOL, BYTE, DWORD, DWORD_PTR, INT, LPBOOL, LPCVOID, LPCWSTR, LPDWORD, LPVOID, LPWSTR, NULL, Nullable, Optional, PBYTE, PDWORD, PVOID, UINT, USHORT, WORD } from '@bun-win32/core';
 
 export const WINHTTP_INVALID_STATUS_CALLBACK: bigint = 0xffff_ffff_ffff_ffffn;
 export const WINHTTP_NO_CLIENT_CERT_CONTEXT = null;

@@ -1,6 +1,6 @@
 import type { Pointer } from 'bun:ffi';
 
-export type { DWORD, LPCWSTR, NULL, OPTIONAL } from '@bun-win32/core';
+export type { DWORD, LPCWSTR, NULL, Optional } from '@bun-win32/core';
 
 export enum MI_Result {
   MI_RESULT_ACCESS_DENIED = 2,

@@ -2,7 +2,7 @@ import { type FFIFunction, FFIType } from 'bun:ffi';
 
 import { Win32 } from '@bun-win32/core';
 
-import type { BOOL, DWORD, FLOAT, HWND, INT, LPDWORD, LPRECT, MagImageScalingCallback, NULL, NULLABLE, PBOOL, PFLOAT, PHWND, PINT, PMAGCOLOREFFECT, PMAGTRANSFORM, PRECT, RECT } from '../types/Magnification';
+import type { BOOL, DWORD, FLOAT, HWND, INT, LPDWORD, LPRECT, MagImageScalingCallback, NULL, Nullable, PBOOL, PFLOAT, PHWND, PINT, PMAGCOLOREFFECT, PMAGTRANSFORM, PRECT, RECT } from '../types/Magnification';
 
 /**
  * Thin, lazy-loaded FFI bindings for `magnification.dll`.
@@ -98,7 +98,7 @@ class Magnification extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/magnification/nf-magnification-magsetcoloreffect
-  public static MagSetColorEffect(hwnd: HWND, pEffect: NULLABLE<PMAGCOLOREFFECT>): BOOL {
+  public static MagSetColorEffect(hwnd: HWND, pEffect: Nullable<PMAGCOLOREFFECT>): BOOL {
     return Magnification.Load('MagSetColorEffect')(hwnd, pEffect);
   }
 
@@ -113,7 +113,7 @@ class Magnification extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/magnification/nf-magnification-magsetimagescalingcallback
-  public static MagSetImageScalingCallback(hwnd: HWND, callback: NULLABLE<MagImageScalingCallback>): BOOL {
+  public static MagSetImageScalingCallback(hwnd: HWND, callback: Nullable<MagImageScalingCallback>): BOOL {
     return Magnification.Load('MagSetImageScalingCallback')(hwnd, callback);
   }
 

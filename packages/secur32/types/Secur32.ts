@@ -1,6 +1,6 @@
 import type { Pointer } from 'bun:ffi';
 
-export type { HANDLE, LPCSTR, LPCWSTR, LPSTR, LPVOID, LPWSTR, NULL, NULLABLE, OPTIONAL, PHANDLE, PULONG, PVOID, ULONG, VOID } from '@bun-win32/core';
+export type { HANDLE, LPCSTR, LPCWSTR, LPSTR, LPVOID, LPWSTR, NULL, Nullable, Optional, PHANDLE, PULONG, PVOID, ULONG, VOID } from '@bun-win32/core';
 
 export enum ExtendedNameFormat {
   NameCanonical = 0x0000_0007,

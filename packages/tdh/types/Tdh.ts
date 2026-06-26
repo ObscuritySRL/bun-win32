@@ -1,7 +1,7 @@
 import type { Pointer } from 'bun:ffi';
 
 import type { HANDLE, ULONG } from '@bun-win32/core';
-export type { BOOLEAN, LPCVOID, OPTIONAL, PBYTE, PULONG, ULONG, USHORT } from '@bun-win32/core';
+export type { BOOLEAN, LPCVOID, Optional, PBYTE, PULONG, ULONG, USHORT } from '@bun-win32/core';
 
 export enum DECODING_SOURCE {
   DecodingSourceMax = 4,

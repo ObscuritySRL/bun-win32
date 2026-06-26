@@ -9,7 +9,7 @@ import type {
   IDXGIDevice,
   IDXGISurface,
   LPLPVOID,
-  OPTIONAL,
+  Optional,
   PACKED_D2D1_POINT_2F,
   PD2D1_COLOR_F,
   PD2D1_CREATION_PROPERTIES,
@@ -86,17 +86,17 @@ class D2D1 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/d2d1_1/nf-d2d1_1-d2d1createdevice
-  public static D2D1CreateDevice(dxgiDevice: IDXGIDevice, creationProperties: OPTIONAL<PD2D1_CREATION_PROPERTIES>, d2dDevice_out: PID2D1Device): HRESULT {
+  public static D2D1CreateDevice(dxgiDevice: IDXGIDevice, creationProperties: Optional<PD2D1_CREATION_PROPERTIES>, d2dDevice_out: PID2D1Device): HRESULT {
     return D2D1.Load('D2D1CreateDevice')(dxgiDevice, creationProperties, d2dDevice_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/d2d1_1/nf-d2d1_1-d2d1createdevicecontext
-  public static D2D1CreateDeviceContext(dxgiSurface: IDXGISurface, creationProperties: OPTIONAL<PD2D1_CREATION_PROPERTIES>, d2dDeviceContext_out: PID2D1DeviceContext): HRESULT {
+  public static D2D1CreateDeviceContext(dxgiSurface: IDXGISurface, creationProperties: Optional<PD2D1_CREATION_PROPERTIES>, d2dDeviceContext_out: PID2D1DeviceContext): HRESULT {
     return D2D1.Load('D2D1CreateDeviceContext')(dxgiSurface, creationProperties, d2dDeviceContext_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/d2d1/nf-d2d1-d2d1createfactory
-  public static D2D1CreateFactory(factoryType: D2D1_FACTORY_TYPE, riid: REFIID, pFactoryOptions: OPTIONAL<PD2D1_FACTORY_OPTIONS>, ppIFactory_out: LPLPVOID): HRESULT {
+  public static D2D1CreateFactory(factoryType: D2D1_FACTORY_TYPE, riid: REFIID, pFactoryOptions: Optional<PD2D1_FACTORY_OPTIONS>, ppIFactory_out: LPLPVOID): HRESULT {
     return D2D1.Load('D2D1CreateFactory')(factoryType, riid, pFactoryOptions, ppIFactory_out);
   }
 

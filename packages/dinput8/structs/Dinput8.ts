@@ -2,7 +2,7 @@ import { type FFIFunction, FFIType } from 'bun:ffi';
 
 import { Win32 } from '@bun-win32/core';
 
-import type { DWORD, HINSTANCE, HRESULT, LPCDIDATAFORMAT, LPLPVOID, LPUNKNOWN, NULLABLE, OPTIONAL, PPVOID, REFCLSID, REFIID } from '../types/Dinput8';
+import type { DWORD, HINSTANCE, HRESULT, LPCDIDATAFORMAT, LPLPVOID, LPUNKNOWN, Nullable, Optional, PPVOID, REFCLSID, REFIID } from '../types/Dinput8';
 
 /**
  * Thin, lazy-loaded FFI bindings for `dinput8.dll`.
@@ -42,7 +42,7 @@ class Dinput8 extends Win32 {
   } as const satisfies Record<string, FFIFunction>;
 
   // https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee416756(v=vs.85)
-  public static DirectInput8Create(hinst: HINSTANCE, dwVersion: DWORD, riidltf: REFIID, ppvOut_out: LPLPVOID, punkOuter: NULLABLE<LPUNKNOWN>): HRESULT {
+  public static DirectInput8Create(hinst: HINSTANCE, dwVersion: DWORD, riidltf: REFIID, ppvOut_out: LPLPVOID, punkOuter: Nullable<LPUNKNOWN>): HRESULT {
     return Dinput8.Load('DirectInput8Create')(hinst, dwVersion, riidltf, ppvOut_out, punkOuter);
   }
 

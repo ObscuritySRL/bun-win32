@@ -1,6 +1,6 @@
 import type { Pointer } from 'bun:ffi';
 
-export type { BOOL, DWORD, HANDLE, LPCSTR, LPCVOID, LPCWSTR, LPDWORD, LPSTR, LPVOID, LPWSTR, OPTIONAL, PDWORD, PVOID, UINT } from '@bun-win32/core';
+export type { BOOL, DWORD, HANDLE, LPCSTR, LPCVOID, LPCWSTR, LPDWORD, LPSTR, LPVOID, LPWSTR, Optional, PDWORD, PVOID, UINT } from '@bun-win32/core';
 
 export const VS_FFI_FILEFLAGSMASK = 0x0000_003f;
 export const VS_FFI_SIGNATURE = 0xfeef_04bd;

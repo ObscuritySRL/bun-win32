@@ -1,6 +1,6 @@
 import type { Pointer } from 'bun:ffi';
 
-export type { BOOL, DWORD, HRESULT, LPBOOL, LPVOID, NULL, OPTIONAL, PULONG, PVOID, UINT, UINT_PTR, ULONG, USHORT } from '@bun-win32/core';
+export type { BOOL, DWORD, HRESULT, LPBOOL, LPVOID, NULL, Optional, PULONG, PVOID, UINT, UINT_PTR, ULONG, USHORT } from '@bun-win32/core';
 
 export enum AgileReferenceOptions {
   AGILEREFERENCE_DEFAULT = 0x0000_0000,

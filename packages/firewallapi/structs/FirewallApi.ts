@@ -8,7 +8,7 @@ import type {
   HANDLE,
   HRESULT,
   LPCWSTR,
-  OPTIONAL,
+  Optional,
   PAC_CHANGES_CALLBACK_FN,
   PDWORD,
   PHANDLE,
@@ -113,7 +113,7 @@ class FirewallApi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/networkisolation/nf-networkisolation-networkisolationregisterforappcontainerchanges
-  public static NetworkIsolationRegisterForAppContainerChanges(flags: DWORD, callback: PAC_CHANGES_CALLBACK_FN, context: OPTIONAL<PVOID>, registrationObject_out: PHANDLE): DWORD {
+  public static NetworkIsolationRegisterForAppContainerChanges(flags: DWORD, callback: PAC_CHANGES_CALLBACK_FN, context: Optional<PVOID>, registrationObject_out: PHANDLE): DWORD {
     return FirewallApi.Load('NetworkIsolationRegisterForAppContainerChanges')(flags, callback, context, registrationObject_out);
   }
 

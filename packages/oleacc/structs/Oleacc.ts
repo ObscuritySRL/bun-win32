@@ -2,7 +2,7 @@ import { type FFIFunction, FFIType } from 'bun:ffi';
 
 import { Win32 } from '@bun-win32/core';
 
-import type { DWORD, HRESULT, HWND, IAccessible, LONG, LPCSTR, LPCWSTR, LPSTR, LPUNKNOWN, LPWSTR, LRESULT, OPTIONAL, PACKED_POINT, PDWORD, PHWND, PLONG, PPVOID, PVARIANT, REFCLSID, REFIID, UINT, VOID, WPARAM } from '../types/Oleacc';
+import type { DWORD, HRESULT, HWND, IAccessible, LONG, LPCSTR, LPCWSTR, LPSTR, LPUNKNOWN, LPWSTR, LRESULT, Optional, PACKED_POINT, PDWORD, PHWND, PLONG, PPVOID, PVARIANT, REFCLSID, REFIID, UINT, VOID, WPARAM } from '../types/Oleacc';
 
 /**
  * Thin, lazy-loaded FFI bindings for `oleacc.dll`.
@@ -126,22 +126,22 @@ class Oleacc extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/oleacc/nf-oleacc-getroletexta
-  public static GetRoleTextA(lRole: DWORD, lpszRole_out: OPTIONAL<LPSTR>, cchRoleMax: UINT): UINT {
+  public static GetRoleTextA(lRole: DWORD, lpszRole_out: Optional<LPSTR>, cchRoleMax: UINT): UINT {
     return Oleacc.Load('GetRoleTextA')(lRole, lpszRole_out, cchRoleMax);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/oleacc/nf-oleacc-getroletextw
-  public static GetRoleTextW(lRole: DWORD, lpszRole_out: OPTIONAL<LPWSTR>, cchRoleMax: UINT): UINT {
+  public static GetRoleTextW(lRole: DWORD, lpszRole_out: Optional<LPWSTR>, cchRoleMax: UINT): UINT {
     return Oleacc.Load('GetRoleTextW')(lRole, lpszRole_out, cchRoleMax);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/oleacc/nf-oleacc-getstatetexta
-  public static GetStateTextA(lStateBit: DWORD, lpszState_out: OPTIONAL<LPSTR>, cchState: UINT): UINT {
+  public static GetStateTextA(lStateBit: DWORD, lpszState_out: Optional<LPSTR>, cchState: UINT): UINT {
     return Oleacc.Load('GetStateTextA')(lStateBit, lpszState_out, cchState);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/oleacc/nf-oleacc-getstatetextw
-  public static GetStateTextW(lStateBit: DWORD, lpszState_out: OPTIONAL<LPWSTR>, cchState: UINT): UINT {
+  public static GetStateTextW(lStateBit: DWORD, lpszState_out: Optional<LPWSTR>, cchState: UINT): UINT {
     return Oleacc.Load('GetStateTextW')(lStateBit, lpszState_out, cchState);
   }
 
@@ -156,7 +156,7 @@ class Oleacc extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/oleacc/nf-oleacc-windowfromaccessibleobject
-  public static WindowFromAccessibleObject(unnamedParam1: IAccessible, phwnd_out: OPTIONAL<PHWND>): HRESULT {
+  public static WindowFromAccessibleObject(unnamedParam1: IAccessible, phwnd_out: Optional<PHWND>): HRESULT {
     return Oleacc.Load('WindowFromAccessibleObject')(unnamedParam1, phwnd_out);
   }
 }

@@ -31,7 +31,7 @@ export type {
   LPWSTR,
   LRESULT,
   NULL,
-  OPTIONAL,
+  Optional,
   PBYTE,
   PDWORD,
   PHANDLE,

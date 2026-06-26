@@ -1,7 +1,7 @@
 import type { Pointer } from 'bun:ffi';
 
 import type { DWORD, HANDLE } from '@bun-win32/core';
-export type { BOOL, BYTE, DWORD, HANDLE, HRESULT, HWND, LPDWORD, LPSTR, LPWSTR, NULL, OPTIONAL, PBYTE, PHANDLE, PULONG, PVOID, ULONG, USHORT } from '@bun-win32/core';
+export type { BOOL, BYTE, DWORD, HANDLE, HRESULT, HWND, LPDWORD, LPSTR, LPWSTR, NULL, Optional, PBYTE, PHANDLE, PULONG, PVOID, ULONG, USHORT } from '@bun-win32/core';
 
 export const WTS_ANY_SESSION: DWORD = 0xffff_fffe;
 export const WTS_CHANNEL_OPTION_DYNAMIC: DWORD = 0x0000_0001;

@@ -1,6 +1,6 @@
 import type { Pointer } from 'bun:ffi';
 
-export type { BOOL, HANDLE, LPDWORD, LONG, NULL, OPTIONAL, PULONG, PVOID, ULONG, USHORT } from '@bun-win32/core';
+export type { BOOL, HANDLE, LPDWORD, LONG, NULL, Optional, PULONG, PVOID, ULONG, USHORT } from '@bun-win32/core';
 
 export enum DeviceInformationType {
   DEVICE_SPEED = 0x0000_0001,

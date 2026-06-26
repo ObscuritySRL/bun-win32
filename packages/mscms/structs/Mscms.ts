@@ -22,8 +22,8 @@ import type {
   LPVOID,
   LPWSTR,
   LUID,
-  NULLABLE,
-  OPTIONAL,
+  Nullable,
+  Optional,
   PBMCALLBACKFN,
   PBOOL,
   PBYTE,
@@ -156,17 +156,17 @@ class Mscms extends Win32 {
   } as const satisfies Record<string, FFIFunction>;
 
   // https://learn.microsoft.com/en-us/windows/win32/api/icm/nf-icm-associatecolorprofilewithdevicea
-  public static AssociateColorProfileWithDeviceA(pMachineName: OPTIONAL<PCSTR>, pProfileName: PCSTR, pDeviceName: PCSTR): BOOL {
+  public static AssociateColorProfileWithDeviceA(pMachineName: Optional<PCSTR>, pProfileName: PCSTR, pDeviceName: PCSTR): BOOL {
     return Mscms.Load('AssociateColorProfileWithDeviceA')(pMachineName, pProfileName, pDeviceName);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/icm/nf-icm-associatecolorprofilewithdevicew
-  public static AssociateColorProfileWithDeviceW(pMachineName: OPTIONAL<PCWSTR>, pProfileName: PCWSTR, pDeviceName: PCWSTR): BOOL {
+  public static AssociateColorProfileWithDeviceW(pMachineName: Optional<PCWSTR>, pProfileName: PCWSTR, pDeviceName: PCWSTR): BOOL {
     return Mscms.Load('AssociateColorProfileWithDeviceW')(pMachineName, pProfileName, pDeviceName);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/icm/nf-icm-checkbitmapbits
-  public static CheckBitmapBits(hColorTransform: HTRANSFORM, pSrcBits: PVOID, bmInput: BMFORMAT, dwWidth: DWORD, dwHeight: DWORD, dwStride: DWORD, paResult_out: PBYTE, pfnCallback: OPTIONAL<PBMCALLBACKFN>, lpCallbackData: LPARAM): BOOL {
+  public static CheckBitmapBits(hColorTransform: HTRANSFORM, pSrcBits: PVOID, bmInput: BMFORMAT, dwWidth: DWORD, dwHeight: DWORD, dwStride: DWORD, paResult_out: PBYTE, pfnCallback: Optional<PBMCALLBACKFN>, lpCallbackData: LPARAM): BOOL {
     return Mscms.Load('CheckBitmapBits')(hColorTransform, pSrcBits, bmInput, dwWidth, dwHeight, dwStride, paResult_out, pfnCallback, lpCallbackData);
   }
 
@@ -176,7 +176,7 @@ class Mscms extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/icm/nf-icm-closecolorprofile
-  public static CloseColorProfile(hProfile: OPTIONAL<HPROFILE>): BOOL {
+  public static CloseColorProfile(hProfile: Optional<HPROFILE>): BOOL {
     return Mscms.Load('CloseColorProfile')(hProfile);
   }
 
@@ -226,12 +226,12 @@ class Mscms extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/icm/nf-icm-createcolortransforma
-  public static CreateColorTransformA(pLogColorSpace: LPLOGCOLORSPACEA, hDestProfile: HPROFILE, hTargetProfile: NULLABLE<HPROFILE>, dwFlags: DWORD): HTRANSFORM {
+  public static CreateColorTransformA(pLogColorSpace: LPLOGCOLORSPACEA, hDestProfile: HPROFILE, hTargetProfile: Nullable<HPROFILE>, dwFlags: DWORD): HTRANSFORM {
     return Mscms.Load('CreateColorTransformA')(pLogColorSpace, hDestProfile, hTargetProfile, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/icm/nf-icm-createcolortransformw
-  public static CreateColorTransformW(pLogColorSpace: LPLOGCOLORSPACEW, hDestProfile: HPROFILE, hTargetProfile: NULLABLE<HPROFILE>, dwFlags: DWORD): HTRANSFORM {
+  public static CreateColorTransformW(pLogColorSpace: LPLOGCOLORSPACEW, hDestProfile: HPROFILE, hTargetProfile: Nullable<HPROFILE>, dwFlags: DWORD): HTRANSFORM {
     return Mscms.Load('CreateColorTransformW')(pLogColorSpace, hDestProfile, hTargetProfile, dwFlags);
   }
 
@@ -261,22 +261,22 @@ class Mscms extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/icm/nf-icm-disassociatecolorprofilefromdevicea
-  public static DisassociateColorProfileFromDeviceA(pMachineName: OPTIONAL<PCSTR>, pProfileName: PCSTR, pDeviceName: PCSTR): BOOL {
+  public static DisassociateColorProfileFromDeviceA(pMachineName: Optional<PCSTR>, pProfileName: PCSTR, pDeviceName: PCSTR): BOOL {
     return Mscms.Load('DisassociateColorProfileFromDeviceA')(pMachineName, pProfileName, pDeviceName);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/icm/nf-icm-disassociatecolorprofilefromdevicew
-  public static DisassociateColorProfileFromDeviceW(pMachineName: OPTIONAL<PCWSTR>, pProfileName: PCWSTR, pDeviceName: PCWSTR): BOOL {
+  public static DisassociateColorProfileFromDeviceW(pMachineName: Optional<PCWSTR>, pProfileName: PCWSTR, pDeviceName: PCWSTR): BOOL {
     return Mscms.Load('DisassociateColorProfileFromDeviceW')(pMachineName, pProfileName, pDeviceName);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/icm/nf-icm-enumcolorprofilesa
-  public static EnumColorProfilesA(pMachineName: OPTIONAL<PCSTR>, pEnumRecord: PENUMTYPEA, pEnumerationBuffer_out: OPTIONAL<PBYTE>, pdwSizeOfEnumerationBuffer_in_out: PDWORD, pnProfiles_out: OPTIONAL<PDWORD>): BOOL {
+  public static EnumColorProfilesA(pMachineName: Optional<PCSTR>, pEnumRecord: PENUMTYPEA, pEnumerationBuffer_out: Optional<PBYTE>, pdwSizeOfEnumerationBuffer_in_out: PDWORD, pnProfiles_out: Optional<PDWORD>): BOOL {
     return Mscms.Load('EnumColorProfilesA')(pMachineName, pEnumRecord, pEnumerationBuffer_out, pdwSizeOfEnumerationBuffer_in_out, pnProfiles_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/icm/nf-icm-enumcolorprofilesw
-  public static EnumColorProfilesW(pMachineName: OPTIONAL<PCWSTR>, pEnumRecord: PENUMTYPEW, pEnumerationBuffer_out: OPTIONAL<PBYTE>, pdwSizeOfEnumerationBuffer_in_out: PDWORD, pnProfiles_out: OPTIONAL<PDWORD>): BOOL {
+  public static EnumColorProfilesW(pMachineName: Optional<PCWSTR>, pEnumRecord: PENUMTYPEW, pEnumerationBuffer_out: Optional<PBYTE>, pdwSizeOfEnumerationBuffer_in_out: PDWORD, pnProfiles_out: Optional<PDWORD>): BOOL {
     return Mscms.Load('EnumColorProfilesW')(pMachineName, pEnumRecord, pEnumerationBuffer_out, pdwSizeOfEnumerationBuffer_in_out, pnProfiles_out);
   }
 
@@ -286,17 +286,17 @@ class Mscms extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/icm/nf-icm-getcolordirectorya
-  public static GetColorDirectoryA(pMachineName: OPTIONAL<PCSTR>, pBuffer_out: OPTIONAL<PSTR>, pdwSize_in_out: PDWORD): BOOL {
+  public static GetColorDirectoryA(pMachineName: Optional<PCSTR>, pBuffer_out: Optional<PSTR>, pdwSize_in_out: PDWORD): BOOL {
     return Mscms.Load('GetColorDirectoryA')(pMachineName, pBuffer_out, pdwSize_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/icm/nf-icm-getcolordirectoryw
-  public static GetColorDirectoryW(pMachineName: OPTIONAL<PCWSTR>, pBuffer_out: OPTIONAL<PWSTR>, pdwSize_in_out: PDWORD): BOOL {
+  public static GetColorDirectoryW(pMachineName: Optional<PCWSTR>, pBuffer_out: Optional<PWSTR>, pdwSize_in_out: PDWORD): BOOL {
     return Mscms.Load('GetColorDirectoryW')(pMachineName, pBuffer_out, pdwSize_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/icm/nf-icm-getcolorprofileelement
-  public static GetColorProfileElement(hProfile: HPROFILE, tag: TAGTYPE, dwOffset: DWORD, pcbElement_in_out: PDWORD, pElement_out: OPTIONAL<PVOID>, pbReference_out: PBOOL): BOOL {
+  public static GetColorProfileElement(hProfile: HPROFILE, tag: TAGTYPE, dwOffset: DWORD, pcbElement_in_out: PDWORD, pElement_out: Optional<PVOID>, pbReference_out: PBOOL): BOOL {
     return Mscms.Load('GetColorProfileElement')(hProfile, tag, dwOffset, pcbElement_in_out, pElement_out, pbReference_out);
   }
 
@@ -306,7 +306,7 @@ class Mscms extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/icm/nf-icm-getcolorprofilefromhandle
-  public static GetColorProfileFromHandle(hProfile: HPROFILE, pProfile_out: OPTIONAL<PBYTE>, pcbProfile_in_out: PDWORD): BOOL {
+  public static GetColorProfileFromHandle(hProfile: HPROFILE, pProfile_out: Optional<PBYTE>, pcbProfile_in_out: PDWORD): BOOL {
     return Mscms.Load('GetColorProfileFromHandle')(hProfile, pProfile_out, pcbProfile_in_out);
   }
 
@@ -326,37 +326,37 @@ class Mscms extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/icm/nf-icm-getps2colorrenderingdictionary
-  public static GetPS2ColorRenderingDictionary(hProfile: HPROFILE, dwIntent: DWORD, pPS2ColorRenderingDictionary_out: OPTIONAL<PBYTE>, pcbPS2ColorRenderingDictionary_in_out: PDWORD, pbBinary_in_out: PBOOL): BOOL {
+  public static GetPS2ColorRenderingDictionary(hProfile: HPROFILE, dwIntent: DWORD, pPS2ColorRenderingDictionary_out: Optional<PBYTE>, pcbPS2ColorRenderingDictionary_in_out: PDWORD, pbBinary_in_out: PBOOL): BOOL {
     return Mscms.Load('GetPS2ColorRenderingDictionary')(hProfile, dwIntent, pPS2ColorRenderingDictionary_out, pcbPS2ColorRenderingDictionary_in_out, pbBinary_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/icm/nf-icm-getps2colorrenderingintent
-  public static GetPS2ColorRenderingIntent(hProfile: HPROFILE, dwIntent: DWORD, pBuffer_out: OPTIONAL<PBYTE>, pcbPS2ColorRenderingIntent_in_out: PDWORD): BOOL {
+  public static GetPS2ColorRenderingIntent(hProfile: HPROFILE, dwIntent: DWORD, pBuffer_out: Optional<PBYTE>, pcbPS2ColorRenderingIntent_in_out: PDWORD): BOOL {
     return Mscms.Load('GetPS2ColorRenderingIntent')(hProfile, dwIntent, pBuffer_out, pcbPS2ColorRenderingIntent_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/icm/nf-icm-getps2colorspacearray
-  public static GetPS2ColorSpaceArray(hProfile: HPROFILE, dwIntent: DWORD, dwCSAType: DWORD, pPS2ColorSpaceArray_out: OPTIONAL<PBYTE>, pcbPS2ColorSpaceArray_in_out: PDWORD, pbBinary_out: PBOOL): BOOL {
+  public static GetPS2ColorSpaceArray(hProfile: HPROFILE, dwIntent: DWORD, dwCSAType: DWORD, pPS2ColorSpaceArray_out: Optional<PBYTE>, pcbPS2ColorSpaceArray_in_out: PDWORD, pbBinary_out: PBOOL): BOOL {
     return Mscms.Load('GetPS2ColorSpaceArray')(hProfile, dwIntent, dwCSAType, pPS2ColorSpaceArray_out, pcbPS2ColorSpaceArray_in_out, pbBinary_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/icm/nf-icm-getstandardcolorspaceprofilea
-  public static GetStandardColorSpaceProfileA(pMachineName: OPTIONAL<PCSTR>, dwSCS: DWORD, pBuffer_out: OPTIONAL<PSTR>, pcbSize_in_out: PDWORD): BOOL {
+  public static GetStandardColorSpaceProfileA(pMachineName: Optional<PCSTR>, dwSCS: DWORD, pBuffer_out: Optional<PSTR>, pcbSize_in_out: PDWORD): BOOL {
     return Mscms.Load('GetStandardColorSpaceProfileA')(pMachineName, dwSCS, pBuffer_out, pcbSize_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/icm/nf-icm-getstandardcolorspaceprofilew
-  public static GetStandardColorSpaceProfileW(pMachineName: OPTIONAL<PCWSTR>, dwSCS: DWORD, pBuffer_out: OPTIONAL<PWSTR>, pcbSize_in_out: PDWORD): BOOL {
+  public static GetStandardColorSpaceProfileW(pMachineName: Optional<PCWSTR>, dwSCS: DWORD, pBuffer_out: Optional<PWSTR>, pcbSize_in_out: PDWORD): BOOL {
     return Mscms.Load('GetStandardColorSpaceProfileW')(pMachineName, dwSCS, pBuffer_out, pcbSize_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/icm/nf-icm-installcolorprofilea
-  public static InstallColorProfileA(pMachineName: OPTIONAL<PCSTR>, pProfileName: PCSTR): BOOL {
+  public static InstallColorProfileA(pMachineName: Optional<PCSTR>, pProfileName: PCSTR): BOOL {
     return Mscms.Load('InstallColorProfileA')(pMachineName, pProfileName);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/icm/nf-icm-installcolorprofilew
-  public static InstallColorProfileW(pMachineName: OPTIONAL<PCWSTR>, pProfileName: PCWSTR): BOOL {
+  public static InstallColorProfileW(pMachineName: Optional<PCWSTR>, pProfileName: PCWSTR): BOOL {
     return Mscms.Load('InstallColorProfileW')(pMachineName, pProfileName);
   }
 
@@ -381,12 +381,12 @@ class Mscms extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/icm/nf-icm-registercmma
-  public static RegisterCMMA(pMachineName: OPTIONAL<PCSTR>, cmmID: DWORD, pCMMdll: PCSTR): BOOL {
+  public static RegisterCMMA(pMachineName: Optional<PCSTR>, cmmID: DWORD, pCMMdll: PCSTR): BOOL {
     return Mscms.Load('RegisterCMMA')(pMachineName, cmmID, pCMMdll);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/icm/nf-icm-registercmmw
-  public static RegisterCMMW(pMachineName: OPTIONAL<PCWSTR>, cmmID: DWORD, pCMMdll: PCWSTR): BOOL {
+  public static RegisterCMMW(pMachineName: Optional<PCWSTR>, cmmID: DWORD, pCMMdll: PCWSTR): BOOL {
     return Mscms.Load('RegisterCMMW')(pMachineName, cmmID, pCMMdll);
   }
 
@@ -416,12 +416,12 @@ class Mscms extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/icm/nf-icm-setstandardcolorspaceprofilea
-  public static SetStandardColorSpaceProfileA(pMachineName: OPTIONAL<PCSTR>, dwProfileID: DWORD, pProfilename: PCSTR): BOOL {
+  public static SetStandardColorSpaceProfileA(pMachineName: Optional<PCSTR>, dwProfileID: DWORD, pProfilename: PCSTR): BOOL {
     return Mscms.Load('SetStandardColorSpaceProfileA')(pMachineName, dwProfileID, pProfilename);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/icm/nf-icm-setstandardcolorspaceprofilew
-  public static SetStandardColorSpaceProfileW(pMachineName: OPTIONAL<PCWSTR>, dwProfileID: DWORD, pProfileName: PCWSTR): BOOL {
+  public static SetStandardColorSpaceProfileW(pMachineName: Optional<PCWSTR>, dwProfileID: DWORD, pProfileName: PCWSTR): BOOL {
     return Mscms.Load('SetStandardColorSpaceProfileW')(pMachineName, dwProfileID, pProfileName);
   }
 
@@ -436,7 +436,7 @@ class Mscms extends Win32 {
     pDestBits_out: PVOID,
     bmOutput: BMFORMAT,
     dwOutputStride: DWORD,
-    pfnCallBack: OPTIONAL<PBMCALLBACKFN>,
+    pfnCallBack: Optional<PBMCALLBACKFN>,
     ulCallbackData: LPARAM,
   ): BOOL {
     return Mscms.Load('TranslateBitmapBits')(hColorTransform, pSrcBits, bmInput, dwWidth, dwHeight, dwInputStride, pDestBits_out, bmOutput, dwOutputStride, pfnCallBack, ulCallbackData);
@@ -448,22 +448,22 @@ class Mscms extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/icm/nf-icm-uninstallcolorprofilea
-  public static UninstallColorProfileA(pMachineName: OPTIONAL<PCSTR>, pProfileName: PCSTR, bDelete: BOOL): BOOL {
+  public static UninstallColorProfileA(pMachineName: Optional<PCSTR>, pProfileName: PCSTR, bDelete: BOOL): BOOL {
     return Mscms.Load('UninstallColorProfileA')(pMachineName, pProfileName, bDelete);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/icm/nf-icm-uninstallcolorprofilew
-  public static UninstallColorProfileW(pMachineName: OPTIONAL<PCWSTR>, pProfileName: PCWSTR, bDelete: BOOL): BOOL {
+  public static UninstallColorProfileW(pMachineName: Optional<PCWSTR>, pProfileName: PCWSTR, bDelete: BOOL): BOOL {
     return Mscms.Load('UninstallColorProfileW')(pMachineName, pProfileName, bDelete);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/icm/nf-icm-unregistercmma
-  public static UnregisterCMMA(pMachineName: OPTIONAL<PCSTR>, cmmID: DWORD): BOOL {
+  public static UnregisterCMMA(pMachineName: Optional<PCSTR>, cmmID: DWORD): BOOL {
     return Mscms.Load('UnregisterCMMA')(pMachineName, cmmID);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/icm/nf-icm-unregistercmmw
-  public static UnregisterCMMW(pMachineName: OPTIONAL<PCWSTR>, cmmID: DWORD): BOOL {
+  public static UnregisterCMMW(pMachineName: Optional<PCWSTR>, cmmID: DWORD): BOOL {
     return Mscms.Load('UnregisterCMMW')(pMachineName, cmmID);
   }
 
@@ -488,7 +488,7 @@ class Mscms extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/icm/nf-icm-wcsenumcolorprofiles
-  public static WcsEnumColorProfiles(scope: WCS_PROFILE_MANAGEMENT_SCOPE, pEnumRecord: PENUMTYPEW, pBuffer_out: PBYTE, dwSize: DWORD, pnProfiles_out: OPTIONAL<PDWORD>): BOOL {
+  public static WcsEnumColorProfiles(scope: WCS_PROFILE_MANAGEMENT_SCOPE, pEnumRecord: PENUMTYPEW, pBuffer_out: PBYTE, dwSize: DWORD, pnProfiles_out: Optional<PDWORD>): BOOL {
     return Mscms.Load('WcsEnumColorProfiles')(scope, pEnumRecord, pBuffer_out, dwSize, pnProfiles_out);
   }
 
@@ -505,7 +505,7 @@ class Mscms extends Win32 {
   // https://learn.microsoft.com/en-us/windows/win32/api/icm/nf-icm-wcsgetdefaultcolorprofile
   public static WcsGetDefaultColorProfile(
     scope: WCS_PROFILE_MANAGEMENT_SCOPE,
-    pDeviceName: OPTIONAL<PCWSTR>,
+    pDeviceName: Optional<PCWSTR>,
     cptColorProfileType: COLORPROFILETYPE,
     cpstColorProfileSubType: COLORPROFILESUBTYPE,
     dwProfileID: DWORD,
@@ -518,7 +518,7 @@ class Mscms extends Win32 {
   // https://learn.microsoft.com/en-us/windows/win32/api/icm/nf-icm-wcsgetdefaultcolorprofilesize
   public static WcsGetDefaultColorProfileSize(
     scope: WCS_PROFILE_MANAGEMENT_SCOPE,
-    pDeviceName: OPTIONAL<PCWSTR>,
+    pDeviceName: Optional<PCWSTR>,
     cptColorProfileType: COLORPROFILETYPE,
     cpstColorProfileSubType: COLORPROFILESUBTYPE,
     dwProfileID: DWORD,
@@ -538,12 +538,12 @@ class Mscms extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/icm/nf-icm-wcsopencolorprofilea
-  public static WcsOpenColorProfileA(pCDMPProfile: PPROFILE, pCAMPProfile: OPTIONAL<PPROFILE>, pGMMPProfile: OPTIONAL<PPROFILE>, dwDesireAccess: DWORD, dwShareMode: DWORD, dwCreationMode: DWORD, dwFlags: DWORD): HPROFILE {
+  public static WcsOpenColorProfileA(pCDMPProfile: PPROFILE, pCAMPProfile: Optional<PPROFILE>, pGMMPProfile: Optional<PPROFILE>, dwDesireAccess: DWORD, dwShareMode: DWORD, dwCreationMode: DWORD, dwFlags: DWORD): HPROFILE {
     return Mscms.Load('WcsOpenColorProfileA')(pCDMPProfile, pCAMPProfile, pGMMPProfile, dwDesireAccess, dwShareMode, dwCreationMode, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/icm/nf-icm-wcsopencolorprofilew
-  public static WcsOpenColorProfileW(pCDMPProfile: PPROFILE, pCAMPProfile: OPTIONAL<PPROFILE>, pGMMPProfile: OPTIONAL<PPROFILE>, dwDesireAccess: DWORD, dwShareMode: DWORD, dwCreationMode: DWORD, dwFlags: DWORD): HPROFILE {
+  public static WcsOpenColorProfileW(pCDMPProfile: PPROFILE, pCAMPProfile: Optional<PPROFILE>, pGMMPProfile: Optional<PPROFILE>, dwDesireAccess: DWORD, dwShareMode: DWORD, dwCreationMode: DWORD, dwFlags: DWORD): HPROFILE {
     return Mscms.Load('WcsOpenColorProfileW')(pCDMPProfile, pCAMPProfile, pGMMPProfile, dwDesireAccess, dwShareMode, dwCreationMode, dwFlags);
   }
 
@@ -555,11 +555,11 @@ class Mscms extends Win32 {
   // https://learn.microsoft.com/en-us/windows/win32/api/icm/nf-icm-wcssetdefaultcolorprofile
   public static WcsSetDefaultColorProfile(
     scope: WCS_PROFILE_MANAGEMENT_SCOPE,
-    pDeviceName: OPTIONAL<PCWSTR>,
+    pDeviceName: Optional<PCWSTR>,
     cptColorProfileType: COLORPROFILETYPE,
     cpstColorProfileSubType: COLORPROFILESUBTYPE,
     dwProfileID: DWORD,
-    pProfileName: OPTIONAL<PCWSTR>,
+    pProfileName: Optional<PCWSTR>,
   ): BOOL {
     return Mscms.Load('WcsSetDefaultColorProfile')(scope, pDeviceName, cptColorProfileType, cpstColorProfileSubType, dwProfileID, pProfileName);
   }
