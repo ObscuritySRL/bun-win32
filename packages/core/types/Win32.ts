@@ -60,4 +60,8 @@ export type PVOID<T extends Pointer | bigint = Pointer> = T;
 // ── Special ─────────────────────────────────────────────────────────────────
 
 export type NULL = null;
+// SAL nullability (representation-aware: bigint-based T -> T | 0n, Pointer-based T -> T | null).
+// OPTIONAL: SAL _*opt_ / _Reserved_.  NULLABLE: plain [in]/[out] the docs say "can be NULL". See AGENTS.md.
+export type NULLABLE<T> = [T] extends [bigint] ? T | 0n : T | null;
+export type OPTIONAL<T> = [T] extends [bigint] ? T | 0n : T | null;
 export type VOID = void;

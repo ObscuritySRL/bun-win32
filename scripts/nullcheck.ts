@@ -204,6 +204,7 @@ interface MethodParam {
   baseType: string;
   hasNull: boolean;
   has0n: boolean;
+  markerKind: 'optional' | 'nullable' | 'null' | 'legacy' | 'none';
 }
 interface MethodEntry {
   name: string;
@@ -225,14 +226,19 @@ function parseMethods(source: string): MethodEntry[] {
       for (const part of splitTopLevel(paramsText)) {
         const paramMatch = part.trim().match(/^(\w+)\s*:\s*([\s\S]+)$/);
         if (!paramMatch) continue;
+        // Strip the SAL direction suffix (_out / _in_out) so the param name matches the SDK-header param name.
+        const name = paramMatch[1].replace(/_(in_out|out)$/, '');
         const tsType = paramMatch[2].trim().replace(/\s+/g, ' ');
-        const hasNull = /\|\s*NULL\b/.test(tsType);
-        const has0n = /\|\s*0n\b/.test(tsType);
-        const baseType = tsType
+        // Nullability marker, SAL vocabulary: OPTIONAL<…> / NULLABLE<…> / bare NULL (or legacy | NULL / | 0n).
+        const optWrap = tsType.match(/^(OPTIONAL|NULLABLE)<([\s\S]+)>$/);
+        const legacy = /\|\s*NULL\b/.test(tsType) || /\|\s*0n\b/.test(tsType);
+        const markerKind: MethodParam['markerKind'] = optWrap ? (optWrap[1] === 'OPTIONAL' ? 'optional' : 'nullable') : tsType === 'NULL' ? 'null' : legacy ? 'legacy' : 'none';
+        const isNullable = markerKind !== 'none';
+        const baseType = (optWrap ? optWrap[2] : tsType)
           .replace(/\s*\|\s*NULL\b/g, '')
           .replace(/\s*\|\s*0n\b/g, '')
           .trim();
-        params.push({ name: paramMatch[1], tsType, baseType, hasNull, has0n });
+        params.push({ name, tsType, baseType, hasNull: isNullable, has0n: isNullable, markerKind });
       }
     }
     methods.push({ name: match[1], symbolName: loadMatch ? loadMatch[1] : match[1], params, line: i + 1 });
@@ -706,7 +712,8 @@ function auditPackage(pkg: string): { findings: Finding[]; className: string } {
       }
       if (headerParam.optional && !hasMarker) {
         findings.push({ kind: 'MISSING', method: method.name, symbol: method.symbolName, param: param.name, paramBase: param.baseType, marker, ctype: headerParam.ctype, line: method.line, header: proto.header });
-      } else if (!headerParam.optional && hasMarker) {
+      } else if (!headerParam.optional && (param.markerKind === 'optional' || param.markerKind === 'legacy')) {
+        // Only OPTIONAL (formally-optional) is header-verifiable. NULLABLE is prose-based ("can be NULL" with no _opt_ SAL) and NULL is must-be-null reserved — neither is a spurious-marker error here.
         findings.push({ kind: 'SPURIOUS', method: method.name, symbol: method.symbolName, param: param.name, paramBase: param.baseType, marker, ctype: headerParam.ctype, line: method.line, header: proto.header });
       }
     }
