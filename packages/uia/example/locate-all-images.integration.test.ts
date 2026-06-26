@@ -61,7 +61,11 @@ for (const spot of planted) stamp(haystack, needle, spot.x, spot.y);
 
 const all = findAllImages(haystack, needle, { threshold: 0.99 });
 assert(all.length === 3, `findAllImages enumerates EVERY occurrence — got ${all.length}, want 3`);
-for (const spot of planted) assert(all.some((match) => match.x === spot.x && match.y === spot.y && match.score >= 0.99), `match at (${spot.x},${spot.y}) is reported`);
+for (const spot of planted)
+  assert(
+    all.some((match) => match.x === spot.x && match.y === spot.y && match.score >= 0.99),
+    `match at (${spot.x},${spot.y}) is reported`,
+  );
 const seen = new Set(all.map((match) => `${match.x},${match.y}`));
 assert(seen.size === all.length, 'non-max suppression yields de-duplicated, non-overlapping hits');
 

@@ -68,7 +68,10 @@ try {
     else {
       const fragment = exactTitle.slice(1, exactTitle.length - 1); // drop first + last char → a strict substring, no exact match
       const bySubstring = await call('tools/call', { name: 'attach', arguments: { title: fragment } });
-      assert(bySubstring.result?.isError !== true && titleOf(textOf(bySubstring)) === exactTitle, `attach by a substring (${JSON.stringify(fragment)}) resolves to ${JSON.stringify(exactTitle)} (got: ${JSON.stringify(titleOf(textOf(bySubstring)))})`);
+      assert(
+        bySubstring.result?.isError !== true && titleOf(textOf(bySubstring)) === exactTitle,
+        `attach by a substring (${JSON.stringify(fragment)}) resolves to ${JSON.stringify(exactTitle)} (got: ${JSON.stringify(titleOf(textOf(bySubstring)))})`,
+      );
 
       const byExact = await call('tools/call', { name: 'attach', arguments: { title: exactTitle } });
       assert(byExact.result?.isError !== true && titleOf(textOf(byExact)) === exactTitle, 'an exact-title attach still works');

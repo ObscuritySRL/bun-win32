@@ -83,7 +83,12 @@ const reground = await call('tools/call', { name: 'desktop_snapshot', arguments:
 const fiveRef2 = textOf(reground).match(/"Five" \[ref=(e\d+(?:#\d+)?)\]/)?.[1];
 const press = await call('tools/call', { name: 'invoke', arguments: { element: 'Five', ref: fiveRef2 } });
 const pressText = textOf(press);
-console.log(`  pure-rename invoke → ${pressText.split('\n').length} lines:\n${pressText.split('\n').map((line) => `    ${line}`).join('\n')}`);
+console.log(
+  `  pure-rename invoke → ${pressText.split('\n').length} lines:\n${pressText
+    .split('\n')
+    .map((line) => `    ${line}`)
+    .join('\n')}`,
+);
 assert(pressText.includes('— Δ'), 'the pure-rename action returns a compact Δ delta, not a full re-dump');
 assert(/Display is/.test(pressText), 'the Δ delta names the changed display text');
 assert(pressText.length * 3 < fullBody.length, `the Δ reply is far smaller than a full re-ground (${pressText.length} vs ${fullBody.length} chars)`);

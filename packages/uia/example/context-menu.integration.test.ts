@@ -44,7 +44,10 @@ try {
 } finally {
   const notepadPid = windowProcessId(window.hWnd);
   if (notepadPid) Bun.spawnSync(['taskkill', '/F', '/PID', String(notepadPid)]);
-  uia.windows({ includeUntitled: true }).filter((w) => w.className === '#32768').forEach((w) => User32.PostMessageW(w.hWnd, 0x0010, 0n, 0n)); // WM_CLOSE any stray menu
+  uia
+    .windows({ includeUntitled: true })
+    .filter((w) => w.className === '#32768')
+    .forEach((w) => User32.PostMessageW(w.hWnd, 0x0010, 0n, 0n)); // WM_CLOSE any stray menu
   window.dispose();
   await Bun.sleep(100);
   closeWindow(window.hWnd);

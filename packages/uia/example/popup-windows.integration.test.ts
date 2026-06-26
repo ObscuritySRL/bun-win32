@@ -28,7 +28,10 @@ try {
   const all = uia.windows({ includeUntitled: true });
   const titledSet = new Set(titled.map((w) => w.hWnd));
   assert(all.length >= titled.length, `includeUntitled is a superset (${titled.length} titled → ${all.length} with untitled)`);
-  assert(titled.every((w) => all.some((a) => a.hWnd === w.hWnd)), 'every titled window is still present with includeUntitled');
+  assert(
+    titled.every((w) => all.some((a) => a.hWnd === w.hWnd)),
+    'every titled window is still present with includeUntitled',
+  );
   if (all.some((w) => !titledSet.has(w.hWnd))) assert(true, 'includeUntitled surfaces untitled top-level windows the default list hides');
   else console.log('  skip: no untitled top-level window currently open to exercise the superset delta');
 

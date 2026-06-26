@@ -85,7 +85,7 @@ const process_ = Kernel32.GetCurrentProcess();
 
 function readBytes(address: bigint, size: number): Buffer {
   const buffer = Buffer.alloc(size);
-  Kernel32.ReadProcessMemory(process_, address, buffer.ptr!, BigInt(size), 0n);
+  Kernel32.ReadProcessMemory(process_, address, buffer.ptr!, BigInt(size), null);
   return buffer;
 }
 

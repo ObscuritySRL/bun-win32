@@ -61,7 +61,7 @@ const proc = Kernel32.GetCurrentProcess();
 /** Copy `size` bytes from any in-process address into a local Buffer (cast-free). */
 function readMem(address: bigint, size: number): Buffer {
   const buffer = Buffer.alloc(size);
-  if (address !== 0n && size > 0) Kernel32.ReadProcessMemory(proc, address, buffer.ptr!, BigInt(size), 0n);
+  if (address !== 0n && size > 0) Kernel32.ReadProcessMemory(proc, address, buffer.ptr!, BigInt(size), null);
   return buffer;
 }
 

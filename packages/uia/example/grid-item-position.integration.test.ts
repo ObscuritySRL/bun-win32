@@ -25,7 +25,12 @@ function assert(condition: boolean, message: string): void {
 
 uia.initialize();
 let explorer = 0n;
-const prior = new Set(uia.windows().filter((w) => w.className === 'CabinetWClass').map((w) => w.hWnd));
+const prior = new Set(
+  uia
+    .windows()
+    .filter((w) => w.className === 'CabinetWClass')
+    .map((w) => w.hWnd),
+);
 Bun.spawn(['explorer.exe', 'C:\\Windows\\System32'], { stdout: 'ignore', stderr: 'ignore' });
 for (let attempt = 0; attempt < 50 && explorer === 0n; attempt += 1) {
   await Bun.sleep(200);
@@ -51,7 +56,12 @@ try {
       // A non-cell (the grid container itself) has no GridItem pattern → gridPosition() is null.
       assert(grid.gridPosition() === null, 'the Grid container itself reports no gridPosition (not a cell)');
       // Round-trip cell(r,c).gridPosition() === {r,c} across a few coordinates.
-      for (const [row, column] of [[0, 0], [0, 1], [1, 0], [2, 1]] as const) {
+      for (const [row, column] of [
+        [0, 0],
+        [0, 1],
+        [1, 0],
+        [2, 1],
+      ] as const) {
         const cell = grid.cell(row, column);
         if (cell === null) {
           assert(false, `cell(${row},${column}) exists`);

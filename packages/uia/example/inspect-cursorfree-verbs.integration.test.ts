@@ -69,7 +69,10 @@ try {
     if (editRef === undefined) console.log('  skip: no Edit ref in the Character Map snapshot');
     else {
       const edit = textOf(await call('tools/call', { name: 'inspect_element', arguments: { ref: editRef } }));
-      assert(/nativeWindowHandle: 0x/.test(edit) && /can:[^\n]*type\/paste\/copy\/cut \(cursor-free/.test(edit), `inspect_element on an own-HWND Edit lists the cursor-free text verbs (got: ${JSON.stringify(/can:[^\n]*/.exec(edit)?.[0]?.slice(0, 90) ?? '')})`);
+      assert(
+        /nativeWindowHandle: 0x/.test(edit) && /can:[^\n]*type\/paste\/copy\/cut \(cursor-free/.test(edit),
+        `inspect_element on an own-HWND Edit lists the cursor-free text verbs (got: ${JSON.stringify(/can:[^\n]*/.exec(edit)?.[0]?.slice(0, 90) ?? '')})`,
+      );
       if (buttonRef !== undefined) {
         const button = textOf(await call('tools/call', { name: 'inspect_element', arguments: { ref: buttonRef } }));
         assert(!/type\/paste\/copy\/cut/.test(button), 'a no-text Button does NOT list the cursor-free text verbs (no false affordance)');

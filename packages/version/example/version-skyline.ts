@@ -76,7 +76,7 @@ function formatVersion(msValue: number, lsValue: number): string {
 
 function readMemory(pointerAddress: number, byteCount: number): Buffer {
   const outputBuffer = Buffer.alloc(byteCount);
-  const readResult = Kernel32.ReadProcessMemory(CURRENT_PROCESS_HANDLE, BigInt(pointerAddress), outputBuffer.ptr, BigInt(byteCount), 0n);
+  const readResult = Kernel32.ReadProcessMemory(CURRENT_PROCESS_HANDLE, BigInt(pointerAddress), outputBuffer.ptr, BigInt(byteCount), null);
 
   if (readResult === 0) {
     throw new Error(`ReadProcessMemory failed with ${Kernel32.GetLastError()}`);

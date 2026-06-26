@@ -23,7 +23,12 @@ function assert(condition: boolean, message: string): void {
 
 uia.initialize();
 let notepad = 0n;
-const prior = new Set(uia.windows().filter((w) => /Notepad/i.test(w.className)).map((w) => w.hWnd));
+const prior = new Set(
+  uia
+    .windows()
+    .filter((w) => /Notepad/i.test(w.className))
+    .map((w) => w.hWnd),
+);
 Bun.spawn(['notepad.exe'], { stdout: 'ignore', stderr: 'ignore' });
 for (let attempt = 0; attempt < 40 && notepad === 0n; attempt += 1) {
   await Bun.sleep(150);
@@ -75,5 +80,9 @@ try {
   uia.uninitialize();
 }
 
-console.log(failures === 0 ? '\nPASS — editor TextPattern content reads cursor-free; inspect_element surfaces it (terminal read is opportunistic — see terminal-scrollback.integration.test.ts for the deterministic terminal proof).' : `\nFAILED — ${failures} assertion(s)`);
+console.log(
+  failures === 0
+    ? '\nPASS — editor TextPattern content reads cursor-free; inspect_element surfaces it (terminal read is opportunistic — see terminal-scrollback.integration.test.ts for the deterministic terminal proof).'
+    : `\nFAILED — ${failures} assertion(s)`,
+);
 process.exit(failures === 0 ? 0 : 1);

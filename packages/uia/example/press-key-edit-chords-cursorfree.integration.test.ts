@@ -81,7 +81,10 @@ try {
       const selectAll = await call('tools/call', { name: 'press_key', arguments: { ref: editRef, key: 'Control+A' } });
       assert(selectAll.result?.isError !== true && /selected all.*cursor-free/i.test(textOf(selectAll)), `Control+A on an own-HWND Edit is cursor-free (EM_SETSEL) (got: ${JSON.stringify(textOf(selectAll).slice(0, 70))})`);
       const copy = await call('tools/call', { name: 'press_key', arguments: { ref: editRef, key: 'Control+C' } });
-      assert(copy.result?.isError !== true && /copied.*cursor-free/i.test(textOf(copy)) && /chord cursor free/.test(textOf(copy)), `Control+C is cursor-free (WM_COPY) and carries the text (got: ${JSON.stringify(textOf(copy).slice(0, 80))})`);
+      assert(
+        copy.result?.isError !== true && /copied.*cursor-free/i.test(textOf(copy)) && /chord cursor free/.test(textOf(copy)),
+        `Control+C is cursor-free (WM_COPY) and carries the text (got: ${JSON.stringify(textOf(copy).slice(0, 80))})`,
+      );
       const after = cursor();
       assert(Math.abs(after.x - before.x) <= 2 && Math.abs(after.y - before.y) <= 2, `the real cursor never moved across the chords (before ${before.x},${before.y} → after ${after.x},${after.y})`);
     }

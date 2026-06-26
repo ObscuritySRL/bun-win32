@@ -70,9 +70,14 @@ server.stdin.end();
 await Bun.sleep(400);
 server.kill();
 
-const raw = await Bun.file(tracePath).text().catch(() => '');
+const raw = await Bun.file(tracePath)
+  .text()
+  .catch(() => '');
 if (raw.length === 0) await fail('BUN_UIA_TRACE produced no journal file — the trace gate is not wired');
-const lines = raw.split('\n').filter((line) => line.length > 0).map((line) => JSON.parse(line));
+const lines = raw
+  .split('\n')
+  .filter((line) => line.length > 0)
+  .map((line) => JSON.parse(line));
 if (lines.length !== 2) await fail(`expected one journal line per tool call (2), got ${lines.length}`);
 ok(`journal has ${lines.length} lines — one per tools/call`);
 

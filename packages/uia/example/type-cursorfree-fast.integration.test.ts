@@ -64,7 +64,10 @@ try {
 
     console.log(`  Element.type() took ${elapsedMs.toFixed(2)}ms`);
     assert((editor.value || editor.text()).includes(probe), `Element.type() text landed cursor-free into the minimized own-HWND edit (read back contains ${JSON.stringify(probe)})`);
-    assert(Math.abs(afterCursor.x - beforeCursor.x) <= 2 && Math.abs(afterCursor.y - beforeCursor.y) <= 2, `the real mouse never moved (before ${beforeCursor.x},${beforeCursor.y} → after ${afterCursor.x},${afterCursor.y}) — the posted path, not SendInput`);
+    assert(
+      Math.abs(afterCursor.x - beforeCursor.x) <= 2 && Math.abs(afterCursor.y - beforeCursor.y) <= 2,
+      `the real mouse never moved (before ${beforeCursor.x},${beforeCursor.y} → after ${afterCursor.x},${afterCursor.y}) — the posted path, not SendInput`,
+    );
     assert(afterForeground === beforeForeground, `foreground UNCHANGED (before 0x${beforeForeground.toString(16)} → after 0x${afterForeground.toString(16)}) — no UIA SetFocus raise`);
     assert(elapsedMs < 500, `Element.type() completed under 500ms (got ${elapsedMs.toFixed(2)}ms) — the FlaUI/Playwright/nut.js typing-latency parity bound, off the slow UIA SetFocus path`);
   }

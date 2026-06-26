@@ -28,7 +28,11 @@ function assert(condition: boolean, message: string): void {
 }
 
 uia.initialize();
-const before = new Set(listWindows().filter((window) => window.className === 'Notepad').map((window) => window.hWnd));
+const before = new Set(
+  listWindows()
+    .filter((window) => window.className === 'Notepad')
+    .map((window) => window.hWnd),
+);
 Bun.spawn(['notepad.exe']);
 let target = 0n;
 for (let attempt = 0; attempt < 30 && target === 0n; attempt += 1) {

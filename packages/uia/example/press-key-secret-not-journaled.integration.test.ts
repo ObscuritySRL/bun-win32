@@ -77,7 +77,9 @@ try {
   await call('tools/call', { name: 'press_key', arguments: { key: CHORD } });
   await Bun.sleep(250); // let the trace appendFile + audit flush
 
-  const trace = await Bun.file(tracePath).text().catch(() => '');
+  const trace = await Bun.file(tracePath)
+    .text()
+    .catch(() => '');
   const auditLines = auditText.split('\n').filter((line) => line.includes('[bun-uia-audit]'));
   const audit = auditLines.join('\n');
 

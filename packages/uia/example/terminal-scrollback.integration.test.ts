@@ -28,7 +28,12 @@ const isConsole = (className: string): boolean => /CASCADIA_HOSTING_WINDOW_CLASS
 
 uia.initialize();
 const lineCount = 600;
-const prior = new Set(uia.windows().filter((w) => isConsole(w.className)).map((w) => w.hWnd));
+const prior = new Set(
+  uia
+    .windows()
+    .filter((w) => isConsole(w.className))
+    .map((w) => w.hWnd),
+);
 // `start` opens the console in its own top-level window (the host the machine is configured for); the for-loop
 // emits hundreds of scrollback lines so the off-screen buffer dwarfs the visible region.
 const fill = `for /L %i in (1,1,${lineCount}) do @echo scrollback line %i of the bun-uia terminal-scrollback probe`;

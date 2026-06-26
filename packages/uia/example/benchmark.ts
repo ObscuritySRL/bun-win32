@@ -75,7 +75,10 @@ console.log('| --- | --- |');
 console.log(`| single property read (cross-process) | ${(readNs / 1000).toFixed(2)} µs |`);
 console.log(`| naive subtree walk (${nodes} nodes, 4 props) | ${naiveMs.toFixed(2)} ms |`);
 const cacheRatio = naiveMs / cachedMs;
-const cacheLabel = cacheRatio >= 1 ? `${cacheRatio.toFixed(2)}× faster than naive` : `${(1 / cacheRatio).toFixed(2)}× SLOWER on this small ${nodes}-node tree — the cached walk trades a fixed BuildCache round-trip for N lazy reads, so it pays off only as the tree grows (large cross-process trees are where it wins)`;
+const cacheLabel =
+  cacheRatio >= 1
+    ? `${cacheRatio.toFixed(2)}× faster than naive`
+    : `${(1 / cacheRatio).toFixed(2)}× SLOWER on this small ${nodes}-node tree — the cached walk trades a fixed BuildCache round-trip for N lazy reads, so it pays off only as the tree grows (large cross-process trees are where it wins)`;
 console.log(`| **cached subtree walk** (1 round-trip) | **${cachedMs.toFixed(2)} ms** (${cacheLabel}) |`);
 console.log(`| agent-grounding tree build | ${treeMs.toFixed(2)} ms, ~${treeTokens} tokens |`);
 console.log(`| vs OSWorld a11y-tree build (3–26 s) | **${(3000 / treeMs).toFixed(0)}–${(26000 / treeMs).toFixed(0)}× faster** |`);

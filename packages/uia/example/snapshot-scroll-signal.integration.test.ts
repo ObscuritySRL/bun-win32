@@ -76,7 +76,17 @@ try {
     await Bun.sleep(1500);
     const snap = textOf(await call('tools/call', { name: 'attach', arguments: { hWnd: `0x${explorer.toString(16)}` } }));
     if (!/scrollable=.*V|List "/.test(snap)) console.log('  skip: no scrollable list in the Explorer snapshot (view/layout)');
-    else assert(/\(.*scroll \d+% — more below.*\)|\(.*scroll 100% \(end\).*\)/.test(snap), `a scrollable List container carries the scroll signal (got list line: ${JSON.stringify(snap.split('\n').find((l) => /scroll \d+%|scroll 100%/.test(l))?.trim().slice(0, 70) ?? '(none)')})`);
+    else
+      assert(
+        /\(.*scroll \d+% — more below.*\)|\(.*scroll 100% \(end\).*\)/.test(snap),
+        `a scrollable List container carries the scroll signal (got list line: ${JSON.stringify(
+          snap
+            .split('\n')
+            .find((l) => /scroll \d+%|scroll 100%/.test(l))
+            ?.trim()
+            .slice(0, 70) ?? '(none)',
+        )})`,
+      );
   }
 } finally {
   proc.kill();

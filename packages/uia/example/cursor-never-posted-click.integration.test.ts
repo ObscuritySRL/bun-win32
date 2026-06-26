@@ -63,7 +63,10 @@ try {
 
   // The DEFAULT posted click is NOT the cursor:true refusal — it posts cursor-free (or reports no window).
   const posted = await call('tools/call', { name: 'click_point', arguments: { x: 5, y: 5 } });
-  assert(!/click_point \{cursor:true\} moves the real cursor/.test(textOf(posted)) && /posted .*cursor-free|reached no window/.test(textOf(posted)), `the DEFAULT click_point is allowed under never (got: ${JSON.stringify(textOf(posted).slice(0, 80))})`);
+  assert(
+    !/click_point \{cursor:true\} moves the real cursor/.test(textOf(posted)) && /posted .*cursor-free|reached no window/.test(textOf(posted)),
+    `the DEFAULT click_point is allowed under never (got: ${JSON.stringify(textOf(posted).slice(0, 80))})`,
+  );
 
   // DOC: AI.md no longer lists click_point/click_text among the tools never refuses.
   const aimd = await Bun.file(`${import.meta.dir}/../AI.md`).text();

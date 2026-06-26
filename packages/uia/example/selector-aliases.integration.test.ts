@@ -58,7 +58,12 @@ function assert(condition: boolean, message: string): void {
 }
 
 uia.initialize();
-const priorCalc = new Set(uia.windows({ includeUntitled: true }).filter((window) => /Calcul/i.test(window.title)).map((window) => window.hWnd));
+const priorCalc = new Set(
+  uia
+    .windows({ includeUntitled: true })
+    .filter((window) => /Calcul/i.test(window.title))
+    .map((window) => window.hWnd),
+);
 const calc = await uia.launch(['cmd', '/c', 'start', 'calc'], { title: 'Calculator' });
 try {
   await call('initialize', { protocolVersion: '2025-11-25', capabilities: {}, clientInfo: { name: 'selector-aliases', version: '1' } });
@@ -69,11 +74,18 @@ try {
   // 1) role + name aliases resolve to a real control (cursor-free focus, non-mutating).
   const five = await act({ role: 'Button', name: 'Five' });
   if (/no element matched/.test(textOf(five))) console.log('  skip: no "Five" button (Calculator locale/layout)');
-  else assert(five.result?.isError !== true && /Five/.test(textOf(five)) && !/unknown selector key/.test(textOf(five)), `{role:"Button", name:"Five"} folds role→controlType and finds the button (got: ${JSON.stringify(textOf(five).slice(0, 70))})`);
+  else
+    assert(
+      five.result?.isError !== true && /Five/.test(textOf(five)) && !/unknown selector key/.test(textOf(five)),
+      `{role:"Button", name:"Five"} folds role→controlType and finds the button (got: ${JSON.stringify(textOf(five).slice(0, 70))})`,
+    );
 
   // 2) A bogus id is FOLDED to automationId and searched — not rejected as an unknown key.
   const byId = await act({ id: 'zzz_no_such_automation_id' });
-  assert(byId.result?.isError === true && /no element matched/.test(textOf(byId)) && /automationId/.test(textOf(byId)) && !/unknown selector key/.test(textOf(byId)), `{id:"…"} folds to automationId and is searched (got: ${JSON.stringify(textOf(byId).slice(0, 90))})`);
+  assert(
+    byId.result?.isError === true && /no element matched/.test(textOf(byId)) && /automationId/.test(textOf(byId)) && !/unknown selector key/.test(textOf(byId)),
+    `{id:"…"} folds to automationId and is searched (got: ${JSON.stringify(textOf(byId).slice(0, 90))})`,
+  );
 
   // 3) An alias that conflicts with its canonical key is a hard error.
   const conflict = await act({ role: 'Button', controlType: 'Edit' });

@@ -21,7 +21,11 @@ function assert(condition: boolean, message: string): void {
 }
 
 uia.initialize();
-const prior = new Set(listWindows({ includeUntitled: true }).filter((w) => /CabinetWClass/i.test(w.className)).map((w) => w.hWnd));
+const prior = new Set(
+  listWindows({ includeUntitled: true })
+    .filter((w) => /CabinetWClass/i.test(w.className))
+    .map((w) => w.hWnd),
+);
 Bun.spawn(['explorer.exe', 'C:\\Windows'], { stdout: 'ignore', stderr: 'ignore' });
 let hWnd = 0n;
 for (let i = 0; i < 50 && hWnd === 0n; i += 1) {

@@ -27,7 +27,12 @@ function countRole(node: RefNode, role: string): number {
 
 uia.initialize();
 let frame = 0n;
-const priorPids = new Set(uia.windows().filter((w) => w.className === 'ApplicationFrameWindow' && /settings/i.test(w.title)).map((w) => w.hWnd));
+const priorPids = new Set(
+  uia
+    .windows()
+    .filter((w) => w.className === 'ApplicationFrameWindow' && /settings/i.test(w.title))
+    .map((w) => w.hWnd),
+);
 Bun.spawn(['cmd', '/c', 'start', 'ms-settings:'], { stdout: 'ignore', stderr: 'ignore' });
 for (let attempt = 0; attempt < 40 && frame === 0n; attempt += 1) {
   await Bun.sleep(200);

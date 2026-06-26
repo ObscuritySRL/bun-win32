@@ -39,7 +39,10 @@ try {
     }
   }
   assert(!threw, `integrityLevel never throws across all ${processes.length} processes`);
-  assert([...levels].every((level) => ['', 'untrusted', 'low', 'medium', 'high', 'system'].includes(level)), `every result is a valid level (saw: ${[...levels].sort().join(', ')})`);
+  assert(
+    [...levels].every((level) => ['', 'untrusted', 'low', 'medium', 'high', 'system'].includes(level)),
+    `every result is a valid level (saw: ${[...levels].sort().join(', ')})`,
+  );
 
   // a known System process: winlogon / csrss. Expect 'system' or '' (token inaccessible from Medium) — never 'medium'.
   const systemProcess = processes.find((process) => /^(winlogon|csrss|services|wininit)\.exe$/i.test(process.name));

@@ -31,7 +31,12 @@ uia.initialize();
 
 // (A)+(B) deterministic: spawn Notepad (a real tree), compare cached vs forced-live snapshots.
 let notepad = 0n;
-const priorNotepad = new Set(uia.windows().filter((w) => w.className === 'Notepad' || /Notepad$/.test(w.className)).map((w) => w.hWnd));
+const priorNotepad = new Set(
+  uia
+    .windows()
+    .filter((w) => w.className === 'Notepad' || /Notepad$/.test(w.className))
+    .map((w) => w.hWnd),
+);
 Bun.spawn(['notepad.exe'], { stdout: 'ignore', stderr: 'ignore' });
 for (let attempt = 0; attempt < 40 && notepad === 0n; attempt += 1) {
   await Bun.sleep(150);

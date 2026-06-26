@@ -66,7 +66,15 @@ try {
     assert(invoked.result?.isError !== true, 'invoking the "Show Hidden Icons" chevron succeeds (cursor-free)');
     await Bun.sleep(500); // the flyout animates open
     const list = textOf(await call('tools/call', { name: 'list_windows', arguments: {} }));
-    assert(/TopLevelWindowForOverflowXamlIsland.*overflow flyout/.test(list), `list_windows surfaces the open tray overflow flyout (EnumWindows misses it) — got tray line: ${JSON.stringify(list.split('\n').find((l) => /Overflow/i.test(l))?.slice(0, 90) ?? '(none)')}`);
+    assert(
+      /TopLevelWindowForOverflowXamlIsland.*overflow flyout/.test(list),
+      `list_windows surfaces the open tray overflow flyout (EnumWindows misses it) — got tray line: ${JSON.stringify(
+        list
+          .split('\n')
+          .find((l) => /Overflow/i.test(l))
+          ?.slice(0, 90) ?? '(none)',
+      )}`,
+    );
     const popupHwnd = /\[hWnd=0x([0-9a-f]+)\] *$/m.exec(list.split('\n').find((l) => /TopLevelWindowForOverflowXamlIsland/.test(l)) ?? '')?.[1];
     if (popupHwnd !== undefined) {
       postKey(BigInt(`0x${popupHwnd}`), 'Escape'); // dismiss the flyout cursor-free

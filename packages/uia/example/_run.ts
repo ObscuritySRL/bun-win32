@@ -30,7 +30,8 @@ const packageDir = `${dir}/..`;
  * — no window, no subprocess, no shared-OS-state mutation — so the fast tier is genuinely safe to run in parallel.
  * The detector is intentionally biased toward SLOW: over-serializing only costs time; a false FAST flakes.
  */
-const isSlow = (source: string): boolean => /Bun\.spawn(Sync)?\(|spawnServer\(|spawnSync\(|uia\.launch\(|CreateWindowEx[AW]|CreateProcess|ShellExecute|AllocConsole|SendInput|SetForegroundWindow|SetCursorPos|keybd_event|mouse_event|writeClipboard|clipboardSequence/.test(source);
+const isSlow = (source: string): boolean =>
+  /Bun\.spawn(Sync)?\(|spawnServer\(|spawnSync\(|uia\.launch\(|CreateWindowEx[AW]|CreateProcess|ShellExecute|AllocConsole|SendInput|SetForegroundWindow|SetCursorPos|keybd_event|mouse_event|writeClipboard|clipboardSequence/.test(source);
 
 type Test = { name: string; path: string; slow: boolean };
 const tests: Test[] = [];
@@ -94,5 +95,7 @@ if (runSlow && slow.length > 0) {
 const passed = outcomes.filter((outcome) => statusOf(outcome) === 'PASS');
 const skipped = outcomes.filter((outcome) => statusOf(outcome) === 'SKIP');
 const failed = outcomes.filter((outcome) => statusOf(outcome) === 'FAIL' || statusOf(outcome) === 'TIMEOUT');
-console.log(`\n${failed.length === 0 ? 'PASS' : 'FAIL'} — ${passed.length} passed, ${skipped.length} inconclusive, ${failed.length} failed of ${outcomes.length}${failed.length > 0 ? `; failed: ${failed.map((outcome) => outcome.name).join(', ')}` : ''}`);
+console.log(
+  `\n${failed.length === 0 ? 'PASS' : 'FAIL'} — ${passed.length} passed, ${skipped.length} inconclusive, ${failed.length} failed of ${outcomes.length}${failed.length > 0 ? `; failed: ${failed.map((outcome) => outcome.name).join(', ')}` : ''}`,
+);
 process.exit(failed.length === 0 ? 0 : 1);

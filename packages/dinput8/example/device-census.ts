@@ -78,14 +78,14 @@ const currentProcess = Kernel32.GetCurrentProcess();
 
 function readPointerAt(address: bigint): bigint {
   const buffer = Buffer.alloc(POINTER_SIZE);
-  const ok = Kernel32.ReadProcessMemory(currentProcess, address, buffer.ptr!, BigInt(POINTER_SIZE), 0n);
+  const ok = Kernel32.ReadProcessMemory(currentProcess, address, buffer.ptr!, BigInt(POINTER_SIZE), null);
   if (ok === 0) throw new Error(`ReadProcessMemory failed at 0x${address.toString(16)}`);
   return buffer.readBigUInt64LE(0);
 }
 
 function readBytesAt(address: bigint, size: number): Buffer {
   const buffer = Buffer.alloc(size);
-  const ok = Kernel32.ReadProcessMemory(currentProcess, address, buffer.ptr!, BigInt(size), 0n);
+  const ok = Kernel32.ReadProcessMemory(currentProcess, address, buffer.ptr!, BigInt(size), null);
   if (ok === 0) throw new Error(`ReadProcessMemory failed at 0x${address.toString(16)}`);
   return buffer;
 }

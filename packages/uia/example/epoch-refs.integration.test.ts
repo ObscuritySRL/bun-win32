@@ -19,7 +19,12 @@
 import { closeWindow, uia } from '@bun-win32/uia';
 
 uia.initialize();
-const priorCalc = new Set(uia.windows({ includeUntitled: true }).filter((window) => /Calcul/i.test(window.title)).map((window) => window.hWnd));
+const priorCalc = new Set(
+  uia
+    .windows({ includeUntitled: true })
+    .filter((window) => /Calcul/i.test(window.title))
+    .map((window) => window.hWnd),
+);
 const calc = await uia.launch(['cmd', '/c', 'start', 'calc'], { title: 'Calculator' }); // returns the CalculatorApp window (NOT the cmd shim) so teardown can actually close it
 
 const server = Bun.spawn(['bun', `${import.meta.dir}/../mcp.ts`], { stdin: 'pipe', stdout: 'pipe', stderr: 'ignore', env: { ...Bun.env, BUN_UIA_PROFILE: 'safe' } });

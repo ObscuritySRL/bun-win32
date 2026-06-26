@@ -80,7 +80,7 @@ function printDetailRows(rows: readonly [string, string][]): void {
 
 function readPointerValue(address: bigint): bigint {
   const valueBuffer = Buffer.alloc(POINTER_SIZE);
-  const readResult = Kernel32.ReadProcessMemory(currentProcessHandle, address, valueBuffer.ptr, BigInt(valueBuffer.length), 0n);
+  const readResult = Kernel32.ReadProcessMemory(currentProcessHandle, address, valueBuffer.ptr, BigInt(valueBuffer.length), null);
 
   if (readResult === 0) {
     throw new Error(`ReadProcessMemory failed with ${Kernel32.GetLastError()}`);

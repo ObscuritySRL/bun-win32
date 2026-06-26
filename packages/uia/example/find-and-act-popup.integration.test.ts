@@ -66,7 +66,10 @@ try {
     await call('tools/call', { name: 'attach', arguments: { hWnd: `0x${charmap.hWnd.toString(16)}` } });
     const r = await call('tools/call', { name: 'find_and_act', arguments: { selector: { controlType: 'ComboBox' }, do: 'expand' } });
     const text = textOf(r);
-    assert(r.result?.isError !== true && /opened a flyout\/menu in its OWN window/.test(text) && /\[hWnd=0x[0-9a-f]+\]/.test(text), `find_and_act {do:expand} auto-returns the dropdown's own-window popup (got: ${JSON.stringify(text.slice(0, 110))})`);
+    assert(
+      r.result?.isError !== true && /opened a flyout\/menu in its OWN window/.test(text) && /\[hWnd=0x[0-9a-f]+\]/.test(text),
+      `find_and_act {do:expand} auto-returns the dropdown's own-window popup (got: ${JSON.stringify(text.slice(0, 110))})`,
+    );
     const popupHwnd = /\[hWnd=0x([0-9a-f]+)\]/.exec(text)?.[1];
     if (popupHwnd !== undefined) {
       postKey(BigInt(`0x${popupHwnd}`), 'Escape');

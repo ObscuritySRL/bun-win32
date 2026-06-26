@@ -100,7 +100,7 @@ if (isoHr === 0) {
 }
 
 const wdagFlag = Buffer.alloc(4);
-const wdagHr = Shcore.IsProcessInWDAGContainer(0n as unknown as Pointer, wdagFlag.ptr);
+const wdagHr = Shcore.IsProcessInWDAGContainer(null, wdagFlag.ptr);
 if (wdagHr === 0) {
   console.log(`  WDAGContainer:     ${wdagFlag.readInt32LE(0) !== 0 ? 'YES' : 'no'}`);
 } else {

@@ -58,7 +58,10 @@ const tasklistRows = tasklist
 const tasklistPids = new Set(tasklistRows.map((match) => Number(match[2])).filter((pid) => pid > 4)); // same domain as the snapshot filter — tasklist also lists Idle (0) and System (4)
 const snapshotPids = new Set(snapshotRows.filter((row) => row.pid > 4).map((row) => row.pid));
 const intersection = [...snapshotPids].filter((pid) => tasklistPids.has(pid)).length;
-check(Math.abs(snapshotPids.size - tasklistPids.size) <= 12, `processes: count ${snapshotPids.size} within ±12 of tasklist ${tasklistPids.size} (the two captures are ~100 ms apart — browsers spawning workers routinely move the count by several)`);
+check(
+  Math.abs(snapshotPids.size - tasklistPids.size) <= 12,
+  `processes: count ${snapshotPids.size} within ±12 of tasklist ${tasklistPids.size} (the two captures are ~100 ms apart — browsers spawning workers routinely move the count by several)`,
+);
 check(intersection / Math.max(snapshotPids.size, 1) > 0.95, `processes: ${((intersection / snapshotPids.size) * 100).toFixed(1)}% of snapshot pids confirmed by tasklist`);
 const namesAgree = tasklistRows.filter((match) => {
   const row = snapshotRows.find((candidate) => candidate.pid === Number(match[2]));

@@ -421,7 +421,7 @@ function hexDump(h: bigint, regions: Region[], wantBytes: number): void {
   // Assemble + call immediately; base + buffer ptr live here with no awaits.
   // lpNumberOfBytesRead is optional; pass NULL (0n) per the repo's FFI convention
   // (Bun marshals 0n as a null pointer; a non-zero bigint is rejected by the ptr arg).
-  const ok = Kernel32.ReadProcessMemory(h, target.base, buf.ptr, BigInt(n), 0n);
+  const ok = Kernel32.ReadProcessMemory(h, target.base, buf.ptr, BigInt(n), null);
   const got = ok ? n : 0;
 
   console.log(`  ${DIM}region ${hex64(target.base)}  ${protectName(target.protect)}  ` + `${typeName(target.type)}  size ${formatBytes(Number(target.size))}${RESET}`);

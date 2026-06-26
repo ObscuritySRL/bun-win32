@@ -36,7 +36,12 @@ for (const window of uia.windows()) {
   if (window.className === 'CabinetWClass') closeWindow(window.hWnd);
 }
 await Bun.sleep(800);
-const priorExplorers = new Set(uia.windows().filter((w) => w.className === 'CabinetWClass').map((w) => w.hWnd));
+const priorExplorers = new Set(
+  uia
+    .windows()
+    .filter((w) => w.className === 'CabinetWClass')
+    .map((w) => w.hWnd),
+);
 Bun.spawn(['explorer.exe', 'shell:MyComputerFolder'], { stdout: 'ignore', stderr: 'ignore' });
 // Wait for the NEW Explorer whose title is the "This PC" view (not just any CabinetWClass).
 let hWnd = 0n;

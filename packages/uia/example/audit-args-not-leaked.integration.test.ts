@@ -78,7 +78,9 @@ try {
   await call('tools/call', { name: 'copy_files', arguments: { paths: [PATH_SECRET] } });
   await Bun.sleep(300); // let the trace appendFile + audit flush
 
-  const trace = await Bun.file(tracePath).text().catch(() => '');
+  const trace = await Bun.file(tracePath)
+    .text()
+    .catch(() => '');
   const auditLines = auditText.split('\n').filter((line) => line.includes('[bun-uia-audit]'));
   const audit = auditLines.join('\n');
 

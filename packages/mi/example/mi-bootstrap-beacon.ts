@@ -268,7 +268,7 @@ function getPressureColor(ratio: number): string {
 
 function readMemory(address: bigint, byteCount: number): Buffer {
   const outputBuffer = Buffer.alloc(byteCount);
-  const readResult = Kernel32.ReadProcessMemory(currentProcessHandle, address, outputBuffer.ptr, BigInt(byteCount), 0n);
+  const readResult = Kernel32.ReadProcessMemory(currentProcessHandle, address, outputBuffer.ptr, BigInt(byteCount), null);
 
   if (readResult === 0) {
     throw new Error(`ReadProcessMemory failed with ${Kernel32.GetLastError()}`);

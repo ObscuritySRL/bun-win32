@@ -48,7 +48,12 @@ await Bun.write(path, html);
 const fileUrl = `file:///${path.replace(/\\/g, '/')}`;
 
 uia.initialize();
-const priorEdge = new Set(uia.windows().filter((w) => w.className === 'Chrome_WidgetWin_1').map((w) => w.hWnd));
+const priorEdge = new Set(
+  uia
+    .windows()
+    .filter((w) => w.className === 'Chrome_WidgetWin_1')
+    .map((w) => w.hWnd),
+);
 Bun.spawn(['cmd', '/c', 'start', 'msedge', '--inprivate', '--new-window', fileUrl], { stdout: 'ignore', stderr: 'ignore' });
 let hWnd = 0n;
 for (let attempt = 0; attempt < 40 && hWnd === 0n; attempt += 1) {
@@ -76,7 +81,7 @@ try {
     }
     const edit = web.find({ controlType: ControlType.Edit });
     assert(button !== null, `found the page's button in the web DOM (name ${JSON.stringify(button?.name ?? '')})`);
-    assert(edit !== null, 'found the page\'s text input in the web DOM');
+    assert(edit !== null, "found the page's text input in the web DOM");
 
     if (edit !== null) {
       assert(edit.value === 'initial', `read the input's value from the live DOM ("${edit.value}")`);
@@ -113,5 +118,5 @@ try {
     .catch(() => {});
 }
 
-console.log(failures === 0 ? '\nPASS — saw and drove a Chromium browser\'s web DOM (read, set, invoke) entirely cursor-free.' : `\nFAILED — ${failures} assertion(s)`);
+console.log(failures === 0 ? "\nPASS — saw and drove a Chromium browser's web DOM (read, set, invoke) entirely cursor-free." : `\nFAILED — ${failures} assertion(s)`);
 process.exit(failures === 0 ? 0 : 1);

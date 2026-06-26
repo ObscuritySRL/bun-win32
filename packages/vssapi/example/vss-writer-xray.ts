@@ -112,7 +112,7 @@ const SELF = Kernel32.GetCurrentProcess();
 /** Reads a 64-bit pointer-sized value out of native memory (cast-free). */
 function peek64(addr: bigint): bigint {
   const buf = Buffer.alloc(8);
-  Kernel32.ReadProcessMemory(SELF, addr, buf.ptr!, 8n, 0n);
+  Kernel32.ReadProcessMemory(SELF, addr, buf.ptr!, 8n, null);
   return buf.readBigUInt64LE(0);
 }
 
@@ -137,7 +137,7 @@ function vcall(thisPtr: bigint, slot: number, argTypes: readonly FFIType[], args
 function readWide(addr: bigint): string {
   if (addr === 0n) return '';
   const buf = Buffer.alloc(2048);
-  Kernel32.ReadProcessMemory(SELF, addr, buf.ptr!, BigInt(buf.length), 0n);
+  Kernel32.ReadProcessMemory(SELF, addr, buf.ptr!, BigInt(buf.length), null);
   let end = 0;
   while (end + 1 < buf.length && buf.readUInt16LE(end) !== 0) end += 2;
   return buf.toString('utf16le', 0, end);

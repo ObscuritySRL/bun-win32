@@ -62,7 +62,7 @@ function enableVirtualTerminal(): void {
 /** Reads `size` bytes from this process's address space at `address`. */
 function readMemory(address: bigint, size: number): Buffer {
   const out = Buffer.alloc(size);
-  Kernel32.ReadProcessMemory(Kernel32.GetCurrentProcess(), address, out.ptr!, BigInt(size), 0n);
+  Kernel32.ReadProcessMemory(Kernel32.GetCurrentProcess(), address, out.ptr!, BigInt(size), null);
   return out;
 }
 

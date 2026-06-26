@@ -60,7 +60,7 @@ interface NetResource {
 
 function readMemory(addr: number, size: number): Buffer {
   const out = Buffer.alloc(size);
-  Kernel32.ReadProcessMemory(CURRENT_PROCESS, BigInt(addr), out.ptr, BigInt(size), 0n);
+  Kernel32.ReadProcessMemory(CURRENT_PROCESS, BigInt(addr), out.ptr, BigInt(size), null);
   return out;
 }
 

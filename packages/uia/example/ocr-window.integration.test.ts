@@ -125,7 +125,10 @@ try {
     // null result (caught above) or a blank/garbage frame (no phrase words at all), so this fails hard on regress.
     const tokens = ['QUICK', 'BROWN', 'FOX', '2026'];
     const matched = tokens.filter((token) => recognized.includes(token));
-    assert(recognized.includes('BROWN FOX'), `recognized adjacent phrase words "BROWN FOX" through WGC (${matched.length}/${tokens.length} tokens overall: ${matched.join(', ')}) — proves captureWindowLive → ocrBitmap carried the painted pixels`);
+    assert(
+      recognized.includes('BROWN FOX'),
+      `recognized adjacent phrase words "BROWN FOX" through WGC (${matched.length}/${tokens.length} tokens overall: ${matched.join(', ')}) — proves captureWindowLive → ocrBitmap carried the painted pixels`,
+    );
     const words = result.lines.flatMap((line) => line.words);
     assert(words.length > 0 && words.every((word) => word.bounds.width > 0 && word.bounds.height > 0), `every word has a non-empty SCREEN-pixel bounding box (${words.length} words) — postClickable`);
   }

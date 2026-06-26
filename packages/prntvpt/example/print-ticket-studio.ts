@@ -279,7 +279,7 @@ async function main(): Promise<void> {
       const cb = pcb.readUInt32LE(0);
       const addr = ppDevmode.readBigUInt64LE(0); // driver-allocated DEVMODE (PTBUFFER token)
       const out = Buffer.alloc(cb);
-      Kernel32.ReadProcessMemory(Kernel32.GetCurrentProcess(), addr, out.ptr!, BigInt(cb), 0n);
+      Kernel32.ReadProcessMemory(Kernel32.GetCurrentProcess(), addr, out.ptr!, BigInt(cb), null);
 
       const before = devmode.readInt16LE(DM_ORIENTATION);
       const after = out.readInt16LE(DM_ORIENTATION);

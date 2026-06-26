@@ -29,7 +29,12 @@ function cursorPos(): { x: number; y: number } {
 
 uia.initialize();
 let notepad = 0n;
-const prior = new Set(uia.windows().filter((w) => /Notepad/i.test(w.className)).map((w) => w.hWnd));
+const prior = new Set(
+  uia
+    .windows()
+    .filter((w) => /Notepad/i.test(w.className))
+    .map((w) => w.hWnd),
+);
 Bun.spawn(['notepad.exe'], { stdout: 'ignore', stderr: 'ignore' });
 for (let attempt = 0; attempt < 40 && notepad === 0n; attempt += 1) {
   await Bun.sleep(150);

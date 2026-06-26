@@ -29,7 +29,10 @@ const pane = (children: DiffNode[]): DiffNode => ({ role: 'Window', name: 'w', c
 const before = pane([row('Alpha', 'e1'), row('Beta', 'e2'), row('Gamma', 'e3')]);
 const after = pane([row('Alpha', 'e1'), row('CHANGED', 'e2'), row('Gamma', 'e3')]); // middle Beta → CHANGED
 const diff = diffTrees(before, after);
-assert(diff.renamed.some((change) => change.before === 'Beta' && change.after === 'CHANGED'), `a middle duplicate-aid row's rename is reported (renamed: ${JSON.stringify(diff.renamed.map((c) => `${c.before}→${c.after}`))})`);
+assert(
+  diff.renamed.some((change) => change.before === 'Beta' && change.after === 'CHANGED'),
+  `a middle duplicate-aid row's rename is reported (renamed: ${JSON.stringify(diff.renamed.map((c) => `${c.before}→${c.after}`))})`,
+);
 assert(diff.appeared.length === 0 && diff.disappeared.length === 0, 'the rename is NOT mis-read as appear+disappear');
 
 // 2) Unique-aid sibling-insert economy preserved: a status Text appearing before unique-aid buttons must NOT renumber them.

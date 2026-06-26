@@ -31,7 +31,12 @@ function cellText(cell: Element, header = ''): string {
 
 uia.initialize();
 let explorer = 0n;
-const prior = new Set(uia.windows().filter((w) => w.className === 'CabinetWClass').map((w) => w.hWnd));
+const prior = new Set(
+  uia
+    .windows()
+    .filter((w) => w.className === 'CabinetWClass')
+    .map((w) => w.hWnd),
+);
 Bun.spawn(['explorer.exe', 'C:\\Windows\\System32'], { stdout: 'ignore', stderr: 'ignore' });
 for (let attempt = 0; attempt < 50 && explorer === 0n; attempt += 1) {
   await Bun.sleep(200);

@@ -70,7 +70,7 @@ function formatCount(value: bigint): string {
 
 function readWidePointer(pointerAddress: number, byteCount: number): string {
   const readBuffer = Buffer.alloc(byteCount);
-  const status = Kernel32.ReadProcessMemory(CURRENT_PROCESS_HANDLE, BigInt(pointerAddress), readBuffer.ptr, BigInt(byteCount), 0n);
+  const status = Kernel32.ReadProcessMemory(CURRENT_PROCESS_HANDLE, BigInt(pointerAddress), readBuffer.ptr, BigInt(byteCount), null);
 
   if (status === FALSE) {
     return '';

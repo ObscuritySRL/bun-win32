@@ -34,7 +34,12 @@ for (const window of uia.windows()) {
   if (window.className === 'CabinetWClass') closeWindow(window.hWnd);
 }
 await Bun.sleep(800);
-const priorExplorers = new Set(uia.windows().filter((w) => w.className === 'CabinetWClass').map((w) => w.hWnd));
+const priorExplorers = new Set(
+  uia
+    .windows()
+    .filter((w) => w.className === 'CabinetWClass')
+    .map((w) => w.hWnd),
+);
 Bun.spawn(['explorer.exe', 'shell:MyComputerFolder'], { stdout: 'ignore', stderr: 'ignore' });
 let hWnd = 0n;
 for (let attempt = 0; attempt < 24 && hWnd === 0n; attempt += 1) {
