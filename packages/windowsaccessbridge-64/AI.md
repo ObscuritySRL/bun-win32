@@ -53,13 +53,21 @@ const text = buf.toString('utf16le').replace(/\0.*$/s, '');
 
 - **Pointer** params (struct/buffer out-params, `wchar_t *`, callback FPs): pass `buffer.ptr` from a caller-allocated `Buffer`.
 - **Handle/object** params (`HWND`, `AccessibleContext`, `JOBJECT64`, …): pass a `bigint` value.
-- **Out-parameters**: allocate a `Buffer`, pass `.ptr`, read the result after the call.
+- **Out-parameters** carry a direction suffix on the parameter **name** — `_out` for an `_Out_` param (the function writes through it), `_in_out` for `_Inout_` (you seed it, the function updates it); an `_In_` param is bare. Allocate a `Buffer`, pass `.ptr`, read the result after the call.
 
 ```ts
 const out = Buffer.alloc(8);
 WindowsAccessBridge.getAccessibleContextFromHWND(hWnd, vmID.ptr, out.ptr);
 const accessibleContext = out.readBigUInt64LE(0);
 ```
+
+### Nullability
+
+Nullability is encoded in the **type** via two representation-aware markers — the null sentinel is derived from `T` (`null` for pointer types `LP*`/`P*`, `0n` for handles and by-value addresses):
+
+- `OPTIONAL<T>` — the parameter is formally optional (SAL `_*opt_` / `[*, optional]` / `_Reserved_` that still takes a value). Pass a value, or the null sentinel to omit.
+- `NULLABLE<T>` — a plain `[in]`/`[out]` param whose docs say it can be NULL ("This parameter can be NULL" / "Specify NULL to …", including sizing-call buffers).
+- A **required** param is bare; a **must-be-null reserved** param is typed `NULL`. A by-value **scalar** (`DWORD`/`ULONG`/`UINT`/`BOOL`) is never wrapped — its "optional" means pass `0`/a default.
 
 ## Errors and Cleanup
 

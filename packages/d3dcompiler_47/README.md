@@ -94,3 +94,4 @@ bun run example:shader-doctor
 - Windows only. Bun runtime required.
 - `D3DCompile` and friends return new `ID3DBlob` instances. Their lifetime is yours: call the vtable's `Release` slot (offset `16` from the vtable pointer) when you are done, or you will leak native memory.
 - Sentinel pointer `D3D_COMPILE_STANDARD_FILE_INCLUDE = (ID3DInclude*)1` can be passed for `pInclude` if you want the compiler's built-in include handler. From TypeScript, construct it as `Number(1) as Pointer` since the API takes `FFIType.ptr`.
+- **SAL types & naming:** nullability is in the **type** — `OPTIONAL<T>` (formally optional, SAL `_*opt_`) and `NULLABLE<T>` (plain `[in]`/`[out]` the docs say can be NULL), the null sentinel derived from `T` (`null` for pointers `LP*`/`P*`, `0n` for handles/by-value addresses); direction is in the **parameter name** — `_out` (`_Out_`), `_in_out` (`_Inout_`), `_In_` bare. See `AI.md` and the repo `AGENTS.md`.

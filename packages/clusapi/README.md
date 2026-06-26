@@ -75,3 +75,4 @@ bun test  example/clusapi.integration.test.ts  # real FFI integration test
 - Cluster handles are opaque `bigint` tokens — never dereference them; pass them back to other `Clusapi` methods and release with the matching `Close*` call.
 - Many functions follow the two-call sizing pattern: call with a NULL/short buffer, observe `ERROR_MORE_DATA` (234), then re-call with the required size.
 - Windows only. Bun runtime required.
+- **SAL types & naming:** nullability is in the **type** — `OPTIONAL<T>` (formally optional, SAL `_*opt_`) and `NULLABLE<T>` (plain `[in]`/`[out]` the docs say can be NULL), the null sentinel derived from `T` (`null` for pointers `LP*`/`P*`, `0n` for handles/by-value addresses); direction is in the **parameter name** — `_out` (`_Out_`), `_in_out` (`_Inout_`), `_In_` bare. See `AI.md` and the repo `AGENTS.md`.

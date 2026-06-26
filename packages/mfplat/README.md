@@ -71,3 +71,4 @@ bun run example:mfplat-platform-probe
 - `MFTEnumEx` returns a `CoTaskMemAlloc`'d array of `IMFActivate*`. Release each activate via its vtable, then free the outer array with `ole32!CoTaskMemFree`.
 - 25 exports from `mfplat.dll` are forwarders into `RTWorkQ.dll` (MFAllocateWorkQueue, MFScheduleWorkItem, etc.). Bun's loader resolves them transparently — no special handling required.
 - Windows only. Bun runtime required.
+- **SAL types & naming:** nullability is in the **type** — `OPTIONAL<T>` (formally optional, SAL `_*opt_`) and `NULLABLE<T>` (plain `[in]`/`[out]` the docs say can be NULL), the null sentinel derived from `T` (`null` for pointers `LP*`/`P*`, `0n` for handles/by-value addresses); direction is in the **parameter name** — `_out` (`_Out_`), `_in_out` (`_Inout_`), `_In_` bare. See `AI.md` and the repo `AGENTS.md`.

@@ -72,3 +72,4 @@ bun run example/authenticator-diagnostic.ts
 - Result codes are `HRESULT` (`0` = `S_OK`); decode failures with `WebAuthNGetErrorName` (W3C error name) and `WebAuthNGetW3CExceptionDOMError` (canonical DOM error).
 - `WebAuthNGetApiVersionNumber` gates which structure versions are valid — check it before populating versioned option structs.
 - Windows only. Bun runtime required.
+- **SAL types & naming:** nullability is in the **type** — `OPTIONAL<T>` (formally optional, SAL `_*opt_`) and `NULLABLE<T>` (plain `[in]`/`[out]` the docs say can be NULL), the null sentinel derived from `T` (`null` for pointers `LP*`/`P*`, `0n` for handles/by-value addresses); direction is in the **parameter name** — `_out` (`_Out_`), `_in_out` (`_Inout_`), `_In_` bare. See `AI.md` and the repo `AGENTS.md`.

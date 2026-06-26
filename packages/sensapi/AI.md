@@ -47,7 +47,7 @@ Sensapi.IsDestinationReachableW(wide.ptr, null);
 ### Pointers, handles, out-parameters
 
 - **Pointer** params (`LP*`): pass `buffer.ptr` from a caller-allocated `Buffer`.
-- **Out-parameters**: allocate a `Buffer`, pass `.ptr`, read the result after the call.
+- **Out-parameters** carry a direction suffix on the parameter **name** — `_out` for an `_Out_` param (the function writes through it), `_in_out` for `_Inout_` (you seed it, the function updates it); an `_In_` param is bare. Allocate a `Buffer`, pass `.ptr`, read the result after the call.
 
 ```ts
 const flags = Buffer.alloc(4);
@@ -57,10 +57,11 @@ const value = flags.readUInt32LE(0);
 
 ### Nullability
 
-- `| NULL` in a signature → pass `null` (optional pointer).
+Nullability is encoded in the **type** via two representation-aware markers — the null sentinel is derived from `T` (`null` for pointer types `LP*`/`P*`, `0n` for handles and by-value addresses):
 
-`IsDestinationReachable[AW]`'s `lpQOCInfo` is optional — pass `null` to skip QoC collection.
-
+- `OPTIONAL<T>` — the parameter is formally optional (SAL `_*opt_` / `[*, optional]` / `_Reserved_` that still takes a value). Pass a value, or the null sentinel to omit.
+- `NULLABLE<T>` — a plain `[in]`/`[out]` param whose docs say it can be NULL ("This parameter can be NULL" / "Specify NULL to …", including sizing-call buffers).
+- A **required** param is bare; a **must-be-null reserved** param is typed `NULL`. A by-value **scalar** (`DWORD`/`ULONG`/`UINT`/`BOOL`) is never wrapped — its "optional" means pass `0`/a default.
 ## Errors and Cleanup
 
 Return values are raw. Read `GetLastError()` from `@bun-win32/kernel32` for extended error info. The caller owns `QOCINFO` buffer memory; free it when done.

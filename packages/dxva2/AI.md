@@ -53,7 +53,7 @@ const text = new TextDecoder('utf-16').decode(buf).replace(/\0.*$/, '');
 
 - **Pointer** params (`LP*`, `P*`, `Pointer`): pass `buffer.ptr` from a caller-allocated `Buffer`.
 - **Handle** params (`HANDLE`, `HWND`, etc.): pass a `bigint` value.
-- **Out-parameters**: allocate a `Buffer`, pass `.ptr`, read the result after the call.
+- **Out-parameters** carry a direction suffix on the parameter **name** — `_out` for an `_Out_` param (the function writes through it), `_in_out` for `_Inout_` (you seed it, the function updates it); an `_In_` param is bare. Allocate a `Buffer`, pass `.ptr`, read the result after the call.
 
 ```ts
 const out = Buffer.alloc(4);
@@ -63,8 +63,11 @@ const value = out.readUInt32LE(0);
 
 ### Nullability
 
-- `| NULL` in a signature → pass `null` (optional pointer).
-- `| 0n` in a signature → pass `0n` (optional handle).
+Nullability is encoded in the **type** via two representation-aware markers — the null sentinel is derived from `T` (`null` for pointer types `LP*`/`P*`, `0n` for handles and by-value addresses):
+
+- `OPTIONAL<T>` — the parameter is formally optional (SAL `_*opt_` / `[*, optional]` / `_Reserved_` that still takes a value). Pass a value, or the null sentinel to omit.
+- `NULLABLE<T>` — a plain `[in]`/`[out]` param whose docs say it can be NULL ("This parameter can be NULL" / "Specify NULL to …", including sizing-call buffers).
+- A **required** param is bare; a **must-be-null reserved** param is typed `NULL`. A by-value **scalar** (`DWORD`/`ULONG`/`UINT`/`BOOL`) is never wrapped — its "optional" means pass `0`/a default.
 
 ## Errors and Cleanup
 

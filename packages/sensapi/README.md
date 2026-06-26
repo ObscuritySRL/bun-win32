@@ -70,3 +70,4 @@ bun run example:link-sentinel
 - Either rely on lazy binding or call `Sensapi.Preload()`.
 - Windows only. Bun runtime required.
 - `IsDestinationReachable[AW]` is documented as unsupported on Windows Vista and later — Microsoft's guidance is to use the Network List Manager for new code. The binding is still exposed because the export exists and the call is still well-defined (`GetLastError` returns `ERROR_CALL_NOT_IMPLEMENTED`).
+- **SAL types & naming:** nullability is in the **type** — `OPTIONAL<T>` (formally optional, SAL `_*opt_`) and `NULLABLE<T>` (plain `[in]`/`[out]` the docs say can be NULL), the null sentinel derived from `T` (`null` for pointers `LP*`/`P*`, `0n` for handles/by-value addresses); direction is in the **parameter name** — `_out` (`_Out_`), `_in_out` (`_Inout_`), `_In_` bare. See `AI.md` and the repo `AGENTS.md`.

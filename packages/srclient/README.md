@@ -76,3 +76,4 @@ bun run example:restore-diagnostic          # Full System Restore configuration 
 - `RESTOREPOINTINFOA/W` and `STATEMGRSTATUS` are `#pragma pack(1)` — pack fields with no
   alignment padding.
 - Windows only. Bun runtime required.
+- **SAL types & naming:** nullability is in the **type** — `OPTIONAL<T>` (formally optional, SAL `_*opt_`) and `NULLABLE<T>` (plain `[in]`/`[out]` the docs say can be NULL), the null sentinel derived from `T` (`null` for pointers `LP*`/`P*`, `0n` for handles/by-value addresses); direction is in the **parameter name** — `_out` (`_Out_`), `_in_out` (`_Inout_`), `_In_` bare. See `AI.md` and the repo `AGENTS.md`.

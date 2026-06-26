@@ -59,8 +59,11 @@ const writtenLength = Normaliz.NormalizeString(NormalizationForm.NormalizationC,
 
 ### Nullability
 
-- `| NULL` means pass `null` for an optional pointer parameter.
+Nullability is encoded in the **type** via two representation-aware markers — the null sentinel is derived from `T` (`null` for pointer types `LP*`/`P*`, `0n` for handles and by-value addresses):
 
+- `OPTIONAL<T>` — the parameter is formally optional (SAL `_*opt_` / `[*, optional]` / `_Reserved_` that still takes a value). Pass a value, or the null sentinel to omit.
+- `NULLABLE<T>` — a plain `[in]`/`[out]` param whose docs say it can be NULL ("This parameter can be NULL" / "Specify NULL to …", including sizing-call buffers).
+- A **required** param is bare; a **must-be-null reserved** param is typed `NULL`. A by-value **scalar** (`DWORD`/`ULONG`/`UINT`/`BOOL`) is never wrapped — its "optional" means pass `0`/a default.
 ## Errors and Cleanup
 
 Return values are raw. If a call returns `0` or a negative length, read `GetLastError()` through another package such as `@bun-win32/kernel32`.

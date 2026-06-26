@@ -82,3 +82,4 @@ bun run example:http-inspector
 - `InternetSetStatusCallback` requires a `JSCallback` whose pointer remains live for the lifetime of the handle. Free it only after `InternetCloseHandle` returns.
 - The URL cache APIs operate on the Windows-wide WinINet/IE legacy cache (`%LOCALAPPDATA%\Microsoft\Windows\INetCache`). Modern Chromium-based Edge does not write to it.
 - `CommitUrlCacheEntry*` takes `FILETIME` by value; use the `packFILETIME(low, high)` helper from `types/Wininet.ts`.
+- **SAL types & naming:** nullability is in the **type** — `OPTIONAL<T>` (formally optional, SAL `_*opt_`) and `NULLABLE<T>` (plain `[in]`/`[out]` the docs say can be NULL), the null sentinel derived from `T` (`null` for pointers `LP*`/`P*`, `0n` for handles/by-value addresses); direction is in the **parameter name** — `_out` (`_Out_`), `_in_out` (`_Inout_`), `_In_` bare. See `AI.md` and the repo `AGENTS.md`.

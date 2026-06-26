@@ -82,3 +82,4 @@ bun run example:dns-forensics microsoft.com github.com   # custom targets
 - Either rely on lazy binding or call `Dnsapi.Preload()`.
 - DNS records returned by `DnsQuery_W`/`DnsQuery_A`/`DnsQuery_UTF8` are a linked list rooted at the pointer written into the `ppQueryResults` out-buffer; release the whole list with `DnsRecordListFree(head, DnsFreeType.DnsFreeRecordList)`.
 - Windows only. Bun runtime required.
+- **SAL types & naming:** nullability is in the **type** — `OPTIONAL<T>` (formally optional, SAL `_*opt_`) and `NULLABLE<T>` (plain `[in]`/`[out]` the docs say can be NULL), the null sentinel derived from `T` (`null` for pointers `LP*`/`P*`, `0n` for handles/by-value addresses); direction is in the **parameter name** — `_out` (`_Out_`), `_in_out` (`_Inout_`), `_In_` bare. See `AI.md` and the repo `AGENTS.md`.
