@@ -28,7 +28,7 @@
     "directory": "packages/ntdll"
   },
   "type": "module",
-  "version": "1.0.8",
+  "version": "2.0.0",
   "main": "./index.ts",
   "keywords": [
     "bun",

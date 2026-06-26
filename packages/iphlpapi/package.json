@@ -27,7 +27,7 @@
     "directory": "packages/iphlpapi"
   },
   "type": "module",
-  "version": "1.0.5",
+  "version": "2.0.0",
   "main": "./index.ts",
   "keywords": [
     "bun",
