@@ -65,7 +65,7 @@ import type {
   LPVOID,
   LPWORD,
   LPWSTR,
-  NULL,
+  OPTIONAL,
   PCUITEMID_CHILD,
   PCUSERIALIZEDPROPSTORAGE,
   PCWSTR,
@@ -334,318 +334,318 @@ class Propsys extends Win32 {
   } as const satisfies Record<string, FFIFunction>;
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-clearpropvariantarray
-  public static ClearPropVariantArray(rgPropVar: LPPROPVARIANT, cVars: UINT): void {
-    return Propsys.Load('ClearPropVariantArray')(rgPropVar, cVars);
+  public static ClearPropVariantArray(rgPropVar_in_out: LPPROPVARIANT, cVars: UINT): void {
+    return Propsys.Load('ClearPropVariantArray')(rgPropVar_in_out, cVars);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-clearvariantarray
-  public static ClearVariantArray(pvars: LPVARIANT, cvars: UINT): void {
-    return Propsys.Load('ClearVariantArray')(pvars, cvars);
+  public static ClearVariantArray(pvars_in_out: LPVARIANT, cvars: UINT): void {
+    return Propsys.Load('ClearVariantArray')(pvars_in_out, cvars);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-initpropvariantfrombooleanvector
-  public static InitPropVariantFromBooleanVector(prgf: LPBOOL | NULL, cElems: ULONG, ppropvar: LPPROPVARIANT): HRESULT {
-    return Propsys.Load('InitPropVariantFromBooleanVector')(prgf, cElems, ppropvar);
+  public static InitPropVariantFromBooleanVector(prgf: OPTIONAL<LPBOOL>, cElems: ULONG, ppropvar_out: LPPROPVARIANT): HRESULT {
+    return Propsys.Load('InitPropVariantFromBooleanVector')(prgf, cElems, ppropvar_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-initpropvariantfrombuffer
-  public static InitPropVariantFromBuffer(pv: LPVOID, cb: UINT, ppropvar: LPPROPVARIANT): HRESULT {
-    return Propsys.Load('InitPropVariantFromBuffer')(pv, cb, ppropvar);
+  public static InitPropVariantFromBuffer(pv: LPVOID, cb: UINT, ppropvar_out: LPPROPVARIANT): HRESULT {
+    return Propsys.Load('InitPropVariantFromBuffer')(pv, cb, ppropvar_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-initpropvariantfromclsid
-  public static InitPropVariantFromCLSID(clsid: REFCLSID, ppropvar: LPPROPVARIANT): HRESULT {
-    return Propsys.Load('InitPropVariantFromCLSID')(clsid, ppropvar);
+  public static InitPropVariantFromCLSID(clsid: REFCLSID, ppropvar_out: LPPROPVARIANT): HRESULT {
+    return Propsys.Load('InitPropVariantFromCLSID')(clsid, ppropvar_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-initpropvariantfromdoublevector
-  public static InitPropVariantFromDoubleVector(prgn: LPDOUBLE | NULL, cElems: ULONG, ppropvar: LPPROPVARIANT): HRESULT {
-    return Propsys.Load('InitPropVariantFromDoubleVector')(prgn, cElems, ppropvar);
+  public static InitPropVariantFromDoubleVector(prgn: OPTIONAL<LPDOUBLE>, cElems: ULONG, ppropvar_out: LPPROPVARIANT): HRESULT {
+    return Propsys.Load('InitPropVariantFromDoubleVector')(prgn, cElems, ppropvar_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-initpropvariantfromfiletime
-  public static InitPropVariantFromFileTime(pftIn: LPFILETIME, ppropvar: LPPROPVARIANT): HRESULT {
-    return Propsys.Load('InitPropVariantFromFileTime')(pftIn, ppropvar);
+  public static InitPropVariantFromFileTime(pftIn: LPFILETIME, ppropvar_out: LPPROPVARIANT): HRESULT {
+    return Propsys.Load('InitPropVariantFromFileTime')(pftIn, ppropvar_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-initpropvariantfromfiletimevector
-  public static InitPropVariantFromFileTimeVector(prgft: LPFILETIME | NULL, cElems: ULONG, ppropvar: LPPROPVARIANT): HRESULT {
-    return Propsys.Load('InitPropVariantFromFileTimeVector')(prgft, cElems, ppropvar);
+  public static InitPropVariantFromFileTimeVector(prgft: OPTIONAL<LPFILETIME>, cElems: ULONG, ppropvar_out: LPPROPVARIANT): HRESULT {
+    return Propsys.Load('InitPropVariantFromFileTimeVector')(prgft, cElems, ppropvar_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-initpropvariantfromguidasstring
-  public static InitPropVariantFromGUIDAsString(guid: REFGUID, ppropvar: LPPROPVARIANT): HRESULT {
-    return Propsys.Load('InitPropVariantFromGUIDAsString')(guid, ppropvar);
+  public static InitPropVariantFromGUIDAsString(guid: REFGUID, ppropvar_out: LPPROPVARIANT): HRESULT {
+    return Propsys.Load('InitPropVariantFromGUIDAsString')(guid, ppropvar_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-initpropvariantfromint16vector
-  public static InitPropVariantFromInt16Vector(prgn: LPSHORT | NULL, cElems: ULONG, ppropvar: LPPROPVARIANT): HRESULT {
-    return Propsys.Load('InitPropVariantFromInt16Vector')(prgn, cElems, ppropvar);
+  public static InitPropVariantFromInt16Vector(prgn: OPTIONAL<LPSHORT>, cElems: ULONG, ppropvar_out: LPPROPVARIANT): HRESULT {
+    return Propsys.Load('InitPropVariantFromInt16Vector')(prgn, cElems, ppropvar_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-initpropvariantfromint32vector
-  public static InitPropVariantFromInt32Vector(prgn: LPLONG | NULL, cElems: ULONG, ppropvar: LPPROPVARIANT): HRESULT {
-    return Propsys.Load('InitPropVariantFromInt32Vector')(prgn, cElems, ppropvar);
+  public static InitPropVariantFromInt32Vector(prgn: OPTIONAL<LPLONG>, cElems: ULONG, ppropvar_out: LPPROPVARIANT): HRESULT {
+    return Propsys.Load('InitPropVariantFromInt32Vector')(prgn, cElems, ppropvar_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-initpropvariantfromint64vector
-  public static InitPropVariantFromInt64Vector(prgn: LPLONGLONG | NULL, cElems: ULONG, ppropvar: LPPROPVARIANT): HRESULT {
-    return Propsys.Load('InitPropVariantFromInt64Vector')(prgn, cElems, ppropvar);
+  public static InitPropVariantFromInt64Vector(prgn: OPTIONAL<LPLONGLONG>, cElems: ULONG, ppropvar_out: LPPROPVARIANT): HRESULT {
+    return Propsys.Load('InitPropVariantFromInt64Vector')(prgn, cElems, ppropvar_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-initpropvariantfrompropvariantvectorelem
-  public static InitPropVariantFromPropVariantVectorElem(propvarIn: REFPROPVARIANT, iElem: ULONG, ppropvar: LPPROPVARIANT): HRESULT {
-    return Propsys.Load('InitPropVariantFromPropVariantVectorElem')(propvarIn, iElem, ppropvar);
+  public static InitPropVariantFromPropVariantVectorElem(propvarIn: REFPROPVARIANT, iElem: ULONG, ppropvar_out: LPPROPVARIANT): HRESULT {
+    return Propsys.Load('InitPropVariantFromPropVariantVectorElem')(propvarIn, iElem, ppropvar_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-initpropvariantfromresource
-  public static InitPropVariantFromResource(hinst: HINSTANCE, id: UINT, ppropvar: LPPROPVARIANT): HRESULT {
-    return Propsys.Load('InitPropVariantFromResource')(hinst, id, ppropvar);
+  public static InitPropVariantFromResource(hinst: HINSTANCE, id: UINT, ppropvar_out: LPPROPVARIANT): HRESULT {
+    return Propsys.Load('InitPropVariantFromResource')(hinst, id, ppropvar_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-initpropvariantfromstrret
-  public static InitPropVariantFromStrRet(pstrret: LPSTRRET, pidl: PCUITEMID_CHILD | NULL, ppropvar: LPPROPVARIANT): HRESULT {
-    return Propsys.Load('InitPropVariantFromStrRet')(pstrret, pidl, ppropvar);
+  public static InitPropVariantFromStrRet(pstrret_in_out: LPSTRRET, pidl: OPTIONAL<PCUITEMID_CHILD>, ppropvar_out: LPPROPVARIANT): HRESULT {
+    return Propsys.Load('InitPropVariantFromStrRet')(pstrret_in_out, pidl, ppropvar_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-initpropvariantfromstringasvector
-  public static InitPropVariantFromStringAsVector(psz: PCWSTR | NULL, ppropvar: LPPROPVARIANT): HRESULT {
-    return Propsys.Load('InitPropVariantFromStringAsVector')(psz, ppropvar);
+  public static InitPropVariantFromStringAsVector(psz: OPTIONAL<PCWSTR>, ppropvar_out: LPPROPVARIANT): HRESULT {
+    return Propsys.Load('InitPropVariantFromStringAsVector')(psz, ppropvar_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-initpropvariantfromstringvector
-  public static InitPropVariantFromStringVector(prgsz: LPPCWSTR | NULL, cElems: ULONG, ppropvar: LPPROPVARIANT): HRESULT {
-    return Propsys.Load('InitPropVariantFromStringVector')(prgsz, cElems, ppropvar);
+  public static InitPropVariantFromStringVector(prgsz: OPTIONAL<LPPCWSTR>, cElems: ULONG, ppropvar_out: LPPROPVARIANT): HRESULT {
+    return Propsys.Load('InitPropVariantFromStringVector')(prgsz, cElems, ppropvar_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-initpropvariantfromuint16vector
-  public static InitPropVariantFromUInt16Vector(prgn: LPUSHORT | NULL, cElems: ULONG, ppropvar: LPPROPVARIANT): HRESULT {
-    return Propsys.Load('InitPropVariantFromUInt16Vector')(prgn, cElems, ppropvar);
+  public static InitPropVariantFromUInt16Vector(prgn: OPTIONAL<LPUSHORT>, cElems: ULONG, ppropvar_out: LPPROPVARIANT): HRESULT {
+    return Propsys.Load('InitPropVariantFromUInt16Vector')(prgn, cElems, ppropvar_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-initpropvariantfromuint32vector
-  public static InitPropVariantFromUInt32Vector(prgn: LPULONG | NULL, cElems: ULONG, ppropvar: LPPROPVARIANT): HRESULT {
-    return Propsys.Load('InitPropVariantFromUInt32Vector')(prgn, cElems, ppropvar);
+  public static InitPropVariantFromUInt32Vector(prgn: OPTIONAL<LPULONG>, cElems: ULONG, ppropvar_out: LPPROPVARIANT): HRESULT {
+    return Propsys.Load('InitPropVariantFromUInt32Vector')(prgn, cElems, ppropvar_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-initpropvariantfromuint64vector
-  public static InitPropVariantFromUInt64Vector(prgn: LPULONGLONG | NULL, cElems: ULONG, ppropvar: LPPROPVARIANT): HRESULT {
-    return Propsys.Load('InitPropVariantFromUInt64Vector')(prgn, cElems, ppropvar);
+  public static InitPropVariantFromUInt64Vector(prgn: OPTIONAL<LPULONGLONG>, cElems: ULONG, ppropvar_out: LPPROPVARIANT): HRESULT {
+    return Propsys.Load('InitPropVariantFromUInt64Vector')(prgn, cElems, ppropvar_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-initpropvariantvectorfrompropvariant
-  public static InitPropVariantVectorFromPropVariant(propvarSingle: REFPROPVARIANT, ppropvarVector: LPPROPVARIANT): HRESULT {
-    return Propsys.Load('InitPropVariantVectorFromPropVariant')(propvarSingle, ppropvarVector);
+  public static InitPropVariantVectorFromPropVariant(propvarSingle: REFPROPVARIANT, ppropvarVector_out: LPPROPVARIANT): HRESULT {
+    return Propsys.Load('InitPropVariantVectorFromPropVariant')(propvarSingle, ppropvarVector_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-initvariantfrombooleanarray
-  public static InitVariantFromBooleanArray(prgf: LPBOOL, cElems: ULONG, pvar: LPVARIANT): HRESULT {
-    return Propsys.Load('InitVariantFromBooleanArray')(prgf, cElems, pvar);
+  public static InitVariantFromBooleanArray(prgf: LPBOOL, cElems: ULONG, pvar_out: LPVARIANT): HRESULT {
+    return Propsys.Load('InitVariantFromBooleanArray')(prgf, cElems, pvar_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-initvariantfrombuffer
-  public static InitVariantFromBuffer(pv: LPVOID, cb: UINT, pvar: LPVARIANT): HRESULT {
-    return Propsys.Load('InitVariantFromBuffer')(pv, cb, pvar);
+  public static InitVariantFromBuffer(pv: LPVOID, cb: UINT, pvar_out: LPVARIANT): HRESULT {
+    return Propsys.Load('InitVariantFromBuffer')(pv, cb, pvar_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-initvariantfromdoublearray
-  public static InitVariantFromDoubleArray(prgn: LPDOUBLE, cElems: ULONG, pvar: LPVARIANT): HRESULT {
-    return Propsys.Load('InitVariantFromDoubleArray')(prgn, cElems, pvar);
+  public static InitVariantFromDoubleArray(prgn: LPDOUBLE, cElems: ULONG, pvar_out: LPVARIANT): HRESULT {
+    return Propsys.Load('InitVariantFromDoubleArray')(prgn, cElems, pvar_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-initvariantfromfiletime
-  public static InitVariantFromFileTime(pft: LPFILETIME, pvar: LPVARIANT): HRESULT {
-    return Propsys.Load('InitVariantFromFileTime')(pft, pvar);
+  public static InitVariantFromFileTime(pft: LPFILETIME, pvar_out: LPVARIANT): HRESULT {
+    return Propsys.Load('InitVariantFromFileTime')(pft, pvar_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-initvariantfromfiletimearray
-  public static InitVariantFromFileTimeArray(prgft: LPFILETIME | NULL, cElems: ULONG, pvar: LPVARIANT): HRESULT {
-    return Propsys.Load('InitVariantFromFileTimeArray')(prgft, cElems, pvar);
+  public static InitVariantFromFileTimeArray(prgft: OPTIONAL<LPFILETIME>, cElems: ULONG, pvar_out: LPVARIANT): HRESULT {
+    return Propsys.Load('InitVariantFromFileTimeArray')(prgft, cElems, pvar_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-initvariantfromguidasstring
-  public static InitVariantFromGUIDAsString(guid: REFGUID, pvar: LPVARIANT): HRESULT {
-    return Propsys.Load('InitVariantFromGUIDAsString')(guid, pvar);
+  public static InitVariantFromGUIDAsString(guid: REFGUID, pvar_out: LPVARIANT): HRESULT {
+    return Propsys.Load('InitVariantFromGUIDAsString')(guid, pvar_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-initvariantfromint16array
-  public static InitVariantFromInt16Array(prgn: LPSHORT, cElems: ULONG, pvar: LPVARIANT): HRESULT {
-    return Propsys.Load('InitVariantFromInt16Array')(prgn, cElems, pvar);
+  public static InitVariantFromInt16Array(prgn: LPSHORT, cElems: ULONG, pvar_out: LPVARIANT): HRESULT {
+    return Propsys.Load('InitVariantFromInt16Array')(prgn, cElems, pvar_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-initvariantfromint32array
-  public static InitVariantFromInt32Array(prgn: LPLONG, cElems: ULONG, pvar: LPVARIANT): HRESULT {
-    return Propsys.Load('InitVariantFromInt32Array')(prgn, cElems, pvar);
+  public static InitVariantFromInt32Array(prgn: LPLONG, cElems: ULONG, pvar_out: LPVARIANT): HRESULT {
+    return Propsys.Load('InitVariantFromInt32Array')(prgn, cElems, pvar_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-initvariantfromint64array
-  public static InitVariantFromInt64Array(prgn: LPLONGLONG, cElems: ULONG, pvar: LPVARIANT): HRESULT {
-    return Propsys.Load('InitVariantFromInt64Array')(prgn, cElems, pvar);
+  public static InitVariantFromInt64Array(prgn: LPLONGLONG, cElems: ULONG, pvar_out: LPVARIANT): HRESULT {
+    return Propsys.Load('InitVariantFromInt64Array')(prgn, cElems, pvar_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-initvariantfromresource
-  public static InitVariantFromResource(hinst: HINSTANCE, id: UINT, pvar: LPVARIANT): HRESULT {
-    return Propsys.Load('InitVariantFromResource')(hinst, id, pvar);
+  public static InitVariantFromResource(hinst: HINSTANCE, id: UINT, pvar_out: LPVARIANT): HRESULT {
+    return Propsys.Load('InitVariantFromResource')(hinst, id, pvar_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-initvariantfromstrret
-  public static InitVariantFromStrRet(pstrret: LPSTRRET, pidl: PCUITEMID_CHILD, pvar: LPVARIANT): HRESULT {
-    return Propsys.Load('InitVariantFromStrRet')(pstrret, pidl, pvar);
+  public static InitVariantFromStrRet(pstrret: LPSTRRET, pidl: PCUITEMID_CHILD, pvar_out: LPVARIANT): HRESULT {
+    return Propsys.Load('InitVariantFromStrRet')(pstrret, pidl, pvar_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-initvariantfromstringarray
-  public static InitVariantFromStringArray(prgsz: LPPCWSTR, cElems: ULONG, pvar: LPVARIANT): HRESULT {
-    return Propsys.Load('InitVariantFromStringArray')(prgsz, cElems, pvar);
+  public static InitVariantFromStringArray(prgsz: LPPCWSTR, cElems: ULONG, pvar_out: LPVARIANT): HRESULT {
+    return Propsys.Load('InitVariantFromStringArray')(prgsz, cElems, pvar_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-initvariantfromuint16array
-  public static InitVariantFromUInt16Array(prgn: LPUSHORT, cElems: ULONG, pvar: LPVARIANT): HRESULT {
-    return Propsys.Load('InitVariantFromUInt16Array')(prgn, cElems, pvar);
+  public static InitVariantFromUInt16Array(prgn: LPUSHORT, cElems: ULONG, pvar_out: LPVARIANT): HRESULT {
+    return Propsys.Load('InitVariantFromUInt16Array')(prgn, cElems, pvar_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-initvariantfromuint32array
-  public static InitVariantFromUInt32Array(prgn: LPULONG, cElems: ULONG, pvar: LPVARIANT): HRESULT {
-    return Propsys.Load('InitVariantFromUInt32Array')(prgn, cElems, pvar);
+  public static InitVariantFromUInt32Array(prgn: LPULONG, cElems: ULONG, pvar_out: LPVARIANT): HRESULT {
+    return Propsys.Load('InitVariantFromUInt32Array')(prgn, cElems, pvar_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-initvariantfromuint64array
-  public static InitVariantFromUInt64Array(prgn: LPULONGLONG, cElems: ULONG, pvar: LPVARIANT): HRESULT {
-    return Propsys.Load('InitVariantFromUInt64Array')(prgn, cElems, pvar);
+  public static InitVariantFromUInt64Array(prgn: LPULONGLONG, cElems: ULONG, pvar_out: LPVARIANT): HRESULT {
+    return Propsys.Load('InitVariantFromUInt64Array')(prgn, cElems, pvar_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-initvariantfromvariantarrayelem
-  public static InitVariantFromVariantArrayElem(varIn: REFVARIANT, iElem: ULONG, pvar: LPVARIANT): HRESULT {
-    return Propsys.Load('InitVariantFromVariantArrayElem')(varIn, iElem, pvar);
+  public static InitVariantFromVariantArrayElem(varIn: REFVARIANT, iElem: ULONG, pvar_out: LPVARIANT): HRESULT {
+    return Propsys.Load('InitVariantFromVariantArrayElem')(varIn, iElem, pvar_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propsys/nf-propsys-pscoercetocanonicalvalue
-  public static PSCoerceToCanonicalValue(key: REFPROPERTYKEY, ppropvar: LPPROPVARIANT): HRESULT {
-    return Propsys.Load('PSCoerceToCanonicalValue')(key, ppropvar);
+  public static PSCoerceToCanonicalValue(key: REFPROPERTYKEY, ppropvar_in_out: LPPROPVARIANT): HRESULT {
+    return Propsys.Load('PSCoerceToCanonicalValue')(key, ppropvar_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propsys/nf-propsys-pscreateadapterfrompropertystore
-  public static PSCreateAdapterFromPropertyStore(pps: IPropertyStore, riid: REFIID, ppv: LPLPVOID): HRESULT {
-    return Propsys.Load('PSCreateAdapterFromPropertyStore')(pps, riid, ppv);
+  public static PSCreateAdapterFromPropertyStore(pps: IPropertyStore, riid: REFIID, ppv_out: LPLPVOID): HRESULT {
+    return Propsys.Load('PSCreateAdapterFromPropertyStore')(pps, riid, ppv_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propsys/nf-propsys-pscreatedelayedmultiplexpropertystore
-  public static PSCreateDelayedMultiplexPropertyStore(flags: GETPROPERTYSTOREFLAGS, pdpsf: IDelayedPropertyStoreFactory, rgStoreIds: LPDWORD, cStores: DWORD, riid: REFIID, ppv: LPLPVOID): HRESULT {
-    return Propsys.Load('PSCreateDelayedMultiplexPropertyStore')(flags, pdpsf, rgStoreIds, cStores, riid, ppv);
+  public static PSCreateDelayedMultiplexPropertyStore(flags: GETPROPERTYSTOREFLAGS, pdpsf: IDelayedPropertyStoreFactory, rgStoreIds: LPDWORD, cStores: DWORD, riid: REFIID, ppv_out: LPLPVOID): HRESULT {
+    return Propsys.Load('PSCreateDelayedMultiplexPropertyStore')(flags, pdpsf, rgStoreIds, cStores, riid, ppv_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propsys/nf-propsys-pscreatememorypropertystore
-  public static PSCreateMemoryPropertyStore(riid: REFIID, ppv: LPLPVOID): HRESULT {
-    return Propsys.Load('PSCreateMemoryPropertyStore')(riid, ppv);
+  public static PSCreateMemoryPropertyStore(riid: REFIID, ppv_out: LPLPVOID): HRESULT {
+    return Propsys.Load('PSCreateMemoryPropertyStore')(riid, ppv_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propsys/nf-propsys-pscreatemultiplexpropertystore
-  public static PSCreateMultiplexPropertyStore(prgpunkStores: LPUNKNOWN, cStores: DWORD, riid: REFIID, ppv: LPLPVOID): HRESULT {
-    return Propsys.Load('PSCreateMultiplexPropertyStore')(prgpunkStores, cStores, riid, ppv);
+  public static PSCreateMultiplexPropertyStore(prgpunkStores: LPUNKNOWN, cStores: DWORD, riid: REFIID, ppv_out: LPLPVOID): HRESULT {
+    return Propsys.Load('PSCreateMultiplexPropertyStore')(prgpunkStores, cStores, riid, ppv_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propsys/nf-propsys-pscreatepropertychangearray
-  public static PSCreatePropertyChangeArray(rgpropkey: LPPROPERTYKEY | NULL, rgflags: LPPKA_FLAGS | NULL, rgpropvar: LPPROPVARIANT | NULL, cChanges: UINT, riid: REFIID, ppv: LPLPVOID): HRESULT {
-    return Propsys.Load('PSCreatePropertyChangeArray')(rgpropkey, rgflags, rgpropvar, cChanges, riid, ppv);
+  public static PSCreatePropertyChangeArray(rgpropkey: OPTIONAL<LPPROPERTYKEY>, rgflags: OPTIONAL<LPPKA_FLAGS>, rgpropvar: OPTIONAL<LPPROPVARIANT>, cChanges: UINT, riid: REFIID, ppv_out: LPLPVOID): HRESULT {
+    return Propsys.Load('PSCreatePropertyChangeArray')(rgpropkey, rgflags, rgpropvar, cChanges, riid, ppv_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propsys/nf-propsys-pscreatepropertystorefromobject
-  public static PSCreatePropertyStoreFromObject(punk: IUnknown, grfMode: DWORD, riid: REFIID, ppv: LPLPVOID): HRESULT {
-    return Propsys.Load('PSCreatePropertyStoreFromObject')(punk, grfMode, riid, ppv);
+  public static PSCreatePropertyStoreFromObject(punk: IUnknown, grfMode: DWORD, riid: REFIID, ppv_out: LPLPVOID): HRESULT {
+    return Propsys.Load('PSCreatePropertyStoreFromObject')(punk, grfMode, riid, ppv_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propsys/nf-propsys-pscreatepropertystorefrompropertysetstorage
-  public static PSCreatePropertyStoreFromPropertySetStorage(ppss: IPropertySetStorage, grfMode: DWORD, riid: REFIID, ppv: LPLPVOID): HRESULT {
-    return Propsys.Load('PSCreatePropertyStoreFromPropertySetStorage')(ppss, grfMode, riid, ppv);
+  public static PSCreatePropertyStoreFromPropertySetStorage(ppss: IPropertySetStorage, grfMode: DWORD, riid: REFIID, ppv_out: LPLPVOID): HRESULT {
+    return Propsys.Load('PSCreatePropertyStoreFromPropertySetStorage')(ppss, grfMode, riid, ppv_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propsys/nf-propsys-pscreatesimplepropertychange
-  public static PSCreateSimplePropertyChange(flags: PKA_FLAGS, key: REFPROPERTYKEY, propvar: REFPROPVARIANT, riid: REFIID, ppv: LPLPVOID): HRESULT {
-    return Propsys.Load('PSCreateSimplePropertyChange')(flags, key, propvar, riid, ppv);
+  public static PSCreateSimplePropertyChange(flags: PKA_FLAGS, key: REFPROPERTYKEY, propvar: REFPROPVARIANT, riid: REFIID, ppv_out: LPLPVOID): HRESULT {
+    return Propsys.Load('PSCreateSimplePropertyChange')(flags, key, propvar, riid, ppv_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propsys/nf-propsys-psenumeratepropertydescriptions
-  public static PSEnumeratePropertyDescriptions(filterOn: PROPDESC_ENUMFILTER, riid: REFIID, ppv: LPLPVOID): HRESULT {
-    return Propsys.Load('PSEnumeratePropertyDescriptions')(filterOn, riid, ppv);
+  public static PSEnumeratePropertyDescriptions(filterOn: PROPDESC_ENUMFILTER, riid: REFIID, ppv_out: LPLPVOID): HRESULT {
+    return Propsys.Load('PSEnumeratePropertyDescriptions')(filterOn, riid, ppv_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propsys/nf-propsys-psformatfordisplay
-  public static PSFormatForDisplay(propkey: REFPROPERTYKEY, propvar: REFPROPVARIANT, pdfFlags: PROPDESC_FORMAT_FLAGS, pwszText: LPWSTR, cchText: DWORD): HRESULT {
-    return Propsys.Load('PSFormatForDisplay')(propkey, propvar, pdfFlags, pwszText, cchText);
+  public static PSFormatForDisplay(propkey: REFPROPERTYKEY, propvar: REFPROPVARIANT, pdfFlags: PROPDESC_FORMAT_FLAGS, pwszText_out: LPWSTR, cchText: DWORD): HRESULT {
+    return Propsys.Load('PSFormatForDisplay')(propkey, propvar, pdfFlags, pwszText_out, cchText);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propsys/nf-propsys-psformatfordisplayalloc
-  public static PSFormatForDisplayAlloc(key: REFPROPERTYKEY, propvar: REFPROPVARIANT, pdff: PROPDESC_FORMAT_FLAGS, ppszDisplay: LPPWSTR): HRESULT {
-    return Propsys.Load('PSFormatForDisplayAlloc')(key, propvar, pdff, ppszDisplay);
+  public static PSFormatForDisplayAlloc(key: REFPROPERTYKEY, propvar: REFPROPVARIANT, pdff: PROPDESC_FORMAT_FLAGS, ppszDisplay_out: LPPWSTR): HRESULT {
+    return Propsys.Load('PSFormatForDisplayAlloc')(key, propvar, pdff, ppszDisplay_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propsys/nf-propsys-psformatpropertyvalue
-  public static PSFormatPropertyValue(pps: IPropertyStore, ppd: IPropertyDescription, pdff: PROPDESC_FORMAT_FLAGS, ppszDisplay: LPLPWSTR): HRESULT {
-    return Propsys.Load('PSFormatPropertyValue')(pps, ppd, pdff, ppszDisplay);
+  public static PSFormatPropertyValue(pps: IPropertyStore, ppd: IPropertyDescription, pdff: PROPDESC_FORMAT_FLAGS, ppszDisplay_out: LPLPWSTR): HRESULT {
+    return Propsys.Load('PSFormatPropertyValue')(pps, ppd, pdff, ppszDisplay_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propsys/nf-propsys-psgetimagereferenceforvalue
-  public static PSGetImageReferenceForValue(propkey: REFPROPERTYKEY, propvar: REFPROPVARIANT, ppszImageRes: LPPWSTR): HRESULT {
-    return Propsys.Load('PSGetImageReferenceForValue')(propkey, propvar, ppszImageRes);
+  public static PSGetImageReferenceForValue(propkey: REFPROPERTYKEY, propvar: REFPROPVARIANT, ppszImageRes_out: LPPWSTR): HRESULT {
+    return Propsys.Load('PSGetImageReferenceForValue')(propkey, propvar, ppszImageRes_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propsys/nf-propsys-psgetitempropertyhandler
-  public static PSGetItemPropertyHandler(punkItem: IUnknown, fReadWrite: BOOL, riid: REFIID, ppv: LPLPVOID): HRESULT {
-    return Propsys.Load('PSGetItemPropertyHandler')(punkItem, fReadWrite, riid, ppv);
+  public static PSGetItemPropertyHandler(punkItem: IUnknown, fReadWrite: BOOL, riid: REFIID, ppv_out: LPLPVOID): HRESULT {
+    return Propsys.Load('PSGetItemPropertyHandler')(punkItem, fReadWrite, riid, ppv_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propsys/nf-propsys-psgetitempropertyhandlerwithcreateobject
-  public static PSGetItemPropertyHandlerWithCreateObject(punkItem: IUnknown, fReadWrite: BOOL, punkCreateObject: IUnknown, riid: REFIID, ppv: LPLPVOID): HRESULT {
-    return Propsys.Load('PSGetItemPropertyHandlerWithCreateObject')(punkItem, fReadWrite, punkCreateObject, riid, ppv);
+  public static PSGetItemPropertyHandlerWithCreateObject(punkItem: IUnknown, fReadWrite: BOOL, punkCreateObject: IUnknown, riid: REFIID, ppv_out: LPLPVOID): HRESULT {
+    return Propsys.Load('PSGetItemPropertyHandlerWithCreateObject')(punkItem, fReadWrite, punkCreateObject, riid, ppv_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propsys/nf-propsys-psgetnamefrompropertykey
-  public static PSGetNameFromPropertyKey(propkey: REFPROPERTYKEY, ppszCanonicalName: LPPWSTR): HRESULT {
-    return Propsys.Load('PSGetNameFromPropertyKey')(propkey, ppszCanonicalName);
+  public static PSGetNameFromPropertyKey(propkey: REFPROPERTYKEY, ppszCanonicalName_out: LPPWSTR): HRESULT {
+    return Propsys.Load('PSGetNameFromPropertyKey')(propkey, ppszCanonicalName_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propsys/nf-propsys-psgetnamedpropertyfrompropertystorage
-  public static PSGetNamedPropertyFromPropertyStorage(psps: PCUSERIALIZEDPROPSTORAGE, cb: DWORD, pszName: LPCWSTR, ppropvar: LPPROPVARIANT): HRESULT {
-    return Propsys.Load('PSGetNamedPropertyFromPropertyStorage')(psps, cb, pszName, ppropvar);
+  public static PSGetNamedPropertyFromPropertyStorage(psps: PCUSERIALIZEDPROPSTORAGE, cb: DWORD, pszName: LPCWSTR, ppropvar_out: LPPROPVARIANT): HRESULT {
+    return Propsys.Load('PSGetNamedPropertyFromPropertyStorage')(psps, cb, pszName, ppropvar_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propsys/nf-propsys-psgetpropertydescription
-  public static PSGetPropertyDescription(propkey: REFPROPERTYKEY, riid: REFIID, ppv: LPLPVOID): HRESULT {
-    return Propsys.Load('PSGetPropertyDescription')(propkey, riid, ppv);
+  public static PSGetPropertyDescription(propkey: REFPROPERTYKEY, riid: REFIID, ppv_out: LPLPVOID): HRESULT {
+    return Propsys.Load('PSGetPropertyDescription')(propkey, riid, ppv_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propsys/nf-propsys-psgetpropertydescriptionbyname
-  public static PSGetPropertyDescriptionByName(pszCanonicalName: LPCWSTR, riid: REFIID, ppv: LPLPVOID): HRESULT {
-    return Propsys.Load('PSGetPropertyDescriptionByName')(pszCanonicalName, riid, ppv);
+  public static PSGetPropertyDescriptionByName(pszCanonicalName: LPCWSTR, riid: REFIID, ppv_out: LPLPVOID): HRESULT {
+    return Propsys.Load('PSGetPropertyDescriptionByName')(pszCanonicalName, riid, ppv_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propsys/nf-propsys-psgetpropertydescriptionlistfromstring
-  public static PSGetPropertyDescriptionListFromString(pszPropList: LPCWSTR, riid: REFIID, ppv: LPLPVOID): HRESULT {
-    return Propsys.Load('PSGetPropertyDescriptionListFromString')(pszPropList, riid, ppv);
+  public static PSGetPropertyDescriptionListFromString(pszPropList: LPCWSTR, riid: REFIID, ppv_out: LPLPVOID): HRESULT {
+    return Propsys.Load('PSGetPropertyDescriptionListFromString')(pszPropList, riid, ppv_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propsys/nf-propsys-psgetpropertyfrompropertystorage
-  public static PSGetPropertyFromPropertyStorage(psps: PCUSERIALIZEDPROPSTORAGE, cb: DWORD, rpkey: REFPROPERTYKEY, ppropvar: LPPROPVARIANT): HRESULT {
-    return Propsys.Load('PSGetPropertyFromPropertyStorage')(psps, cb, rpkey, ppropvar);
+  public static PSGetPropertyFromPropertyStorage(psps: PCUSERIALIZEDPROPSTORAGE, cb: DWORD, rpkey: REFPROPERTYKEY, ppropvar_out: LPPROPVARIANT): HRESULT {
+    return Propsys.Load('PSGetPropertyFromPropertyStorage')(psps, cb, rpkey, ppropvar_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propsys/nf-propsys-psgetpropertykeyfromname
-  public static PSGetPropertyKeyFromName(pszName: PCWSTR, ppropkey: LPPROPERTYKEY): HRESULT {
-    return Propsys.Load('PSGetPropertyKeyFromName')(pszName, ppropkey);
+  public static PSGetPropertyKeyFromName(pszName: PCWSTR, ppropkey_out: LPPROPERTYKEY): HRESULT {
+    return Propsys.Load('PSGetPropertyKeyFromName')(pszName, ppropkey_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propsys/nf-propsys-psgetpropertysystem
-  public static PSGetPropertySystem(riid: REFIID, ppv: LPLPVOID): HRESULT {
-    return Propsys.Load('PSGetPropertySystem')(riid, ppv);
+  public static PSGetPropertySystem(riid: REFIID, ppv_out: LPLPVOID): HRESULT {
+    return Propsys.Load('PSGetPropertySystem')(riid, ppv_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propsys/nf-propsys-psgetpropertyvalue
-  public static PSGetPropertyValue(pps: IPropertyStore, ppd: IPropertyDescription, ppropvar: LPPROPVARIANT): HRESULT {
-    return Propsys.Load('PSGetPropertyValue')(pps, ppd, ppropvar);
+  public static PSGetPropertyValue(pps: IPropertyStore, ppd: IPropertyDescription, ppropvar_out: LPPROPVARIANT): HRESULT {
+    return Propsys.Load('PSGetPropertyValue')(pps, ppd, ppropvar_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propsys/nf-propsys-pslookuppropertyhandlerclsid
-  public static PSLookupPropertyHandlerCLSID(pszFilePath: PCWSTR, pclsid: LPCLSID): HRESULT {
-    return Propsys.Load('PSLookupPropertyHandlerCLSID')(pszFilePath, pclsid);
+  public static PSLookupPropertyHandlerCLSID(pszFilePath: PCWSTR, pclsid_out: LPCLSID): HRESULT {
+    return Propsys.Load('PSLookupPropertyHandlerCLSID')(pszFilePath, pclsid_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propsys/nf-propsys-pspropertybag_delete
@@ -654,88 +654,88 @@ class Propsys extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propsys/nf-propsys-pspropertybag_readbool
-  public static PSPropertyBag_ReadBOOL(propBag: IPropertyBag, propName: LPCWSTR, value: LPBOOL): HRESULT {
-    return Propsys.Load('PSPropertyBag_ReadBOOL')(propBag, propName, value);
+  public static PSPropertyBag_ReadBOOL(propBag: IPropertyBag, propName: LPCWSTR, value_out: LPBOOL): HRESULT {
+    return Propsys.Load('PSPropertyBag_ReadBOOL')(propBag, propName, value_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propsys/nf-propsys-pspropertybag_readbstr
-  public static PSPropertyBag_ReadBSTR(propBag: IPropertyBag, propName: LPCWSTR, value: LPBSTR): HRESULT {
-    return Propsys.Load('PSPropertyBag_ReadBSTR')(propBag, propName, value);
+  public static PSPropertyBag_ReadBSTR(propBag: IPropertyBag, propName: LPCWSTR, value_out: LPBSTR): HRESULT {
+    return Propsys.Load('PSPropertyBag_ReadBSTR')(propBag, propName, value_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propsys/nf-propsys-pspropertybag_readdword
-  public static PSPropertyBag_ReadDWORD(propBag: IPropertyBag, propName: LPCWSTR, value: LPDWORD): HRESULT {
-    return Propsys.Load('PSPropertyBag_ReadDWORD')(propBag, propName, value);
+  public static PSPropertyBag_ReadDWORD(propBag: IPropertyBag, propName: LPCWSTR, value_out: LPDWORD): HRESULT {
+    return Propsys.Load('PSPropertyBag_ReadDWORD')(propBag, propName, value_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propsys/nf-propsys-pspropertybag_readguid
-  public static PSPropertyBag_ReadGUID(propBag: IPropertyBag, propName: LPCWSTR, value: LPGUID): HRESULT {
-    return Propsys.Load('PSPropertyBag_ReadGUID')(propBag, propName, value);
+  public static PSPropertyBag_ReadGUID(propBag: IPropertyBag, propName: LPCWSTR, value_out: LPGUID): HRESULT {
+    return Propsys.Load('PSPropertyBag_ReadGUID')(propBag, propName, value_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propsys/nf-propsys-pspropertybag_readint
-  public static PSPropertyBag_ReadInt(propBag: IPropertyBag, propName: LPCWSTR, value: LPINT): HRESULT {
-    return Propsys.Load('PSPropertyBag_ReadInt')(propBag, propName, value);
+  public static PSPropertyBag_ReadInt(propBag: IPropertyBag, propName: LPCWSTR, value_out: LPINT): HRESULT {
+    return Propsys.Load('PSPropertyBag_ReadInt')(propBag, propName, value_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propsys/nf-propsys-pspropertybag_readlong
-  public static PSPropertyBag_ReadLONG(propBag: IPropertyBag, propName: LPCWSTR, value: LPLONG): HRESULT {
-    return Propsys.Load('PSPropertyBag_ReadLONG')(propBag, propName, value);
+  public static PSPropertyBag_ReadLONG(propBag: IPropertyBag, propName: LPCWSTR, value_out: LPLONG): HRESULT {
+    return Propsys.Load('PSPropertyBag_ReadLONG')(propBag, propName, value_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propsys/nf-propsys-pspropertybag_readpointl
-  public static PSPropertyBag_ReadPOINTL(propBag: IPropertyBag, propName: LPCWSTR, value: LPPOINTL): HRESULT {
-    return Propsys.Load('PSPropertyBag_ReadPOINTL')(propBag, propName, value);
+  public static PSPropertyBag_ReadPOINTL(propBag: IPropertyBag, propName: LPCWSTR, value_out: LPPOINTL): HRESULT {
+    return Propsys.Load('PSPropertyBag_ReadPOINTL')(propBag, propName, value_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propsys/nf-propsys-pspropertybag_readpoints
-  public static PSPropertyBag_ReadPOINTS(propBag: IPropertyBag, propName: LPCWSTR, value: LPPOINTS): HRESULT {
-    return Propsys.Load('PSPropertyBag_ReadPOINTS')(propBag, propName, value);
+  public static PSPropertyBag_ReadPOINTS(propBag: IPropertyBag, propName: LPCWSTR, value_out: LPPOINTS): HRESULT {
+    return Propsys.Load('PSPropertyBag_ReadPOINTS')(propBag, propName, value_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propsys/nf-propsys-pspropertybag_readpropertykey
-  public static PSPropertyBag_ReadPropertyKey(propBag: IPropertyBag, propName: LPCWSTR, value: LPPROPERTYKEY): HRESULT {
-    return Propsys.Load('PSPropertyBag_ReadPropertyKey')(propBag, propName, value);
+  public static PSPropertyBag_ReadPropertyKey(propBag: IPropertyBag, propName: LPCWSTR, value_out: LPPROPERTYKEY): HRESULT {
+    return Propsys.Load('PSPropertyBag_ReadPropertyKey')(propBag, propName, value_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propsys/nf-propsys-pspropertybag_readrectl
-  public static PSPropertyBag_ReadRECTL(propBag: IPropertyBag, propName: LPCWSTR, value: LPRECTL): HRESULT {
-    return Propsys.Load('PSPropertyBag_ReadRECTL')(propBag, propName, value);
+  public static PSPropertyBag_ReadRECTL(propBag: IPropertyBag, propName: LPCWSTR, value_out: LPRECTL): HRESULT {
+    return Propsys.Load('PSPropertyBag_ReadRECTL')(propBag, propName, value_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propsys/nf-propsys-pspropertybag_readshort
-  public static PSPropertyBag_ReadSHORT(propBag: IPropertyBag, propName: LPCWSTR, value: LPSHORT): HRESULT {
-    return Propsys.Load('PSPropertyBag_ReadSHORT')(propBag, propName, value);
+  public static PSPropertyBag_ReadSHORT(propBag: IPropertyBag, propName: LPCWSTR, value_out: LPSHORT): HRESULT {
+    return Propsys.Load('PSPropertyBag_ReadSHORT')(propBag, propName, value_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propsys/nf-propsys-pspropertybag_readstr
-  public static PSPropertyBag_ReadStr(propBag: IPropertyBag, propName: LPCWSTR, value: LPWSTR, characterCount: INT): HRESULT {
-    return Propsys.Load('PSPropertyBag_ReadStr')(propBag, propName, value, characterCount);
+  public static PSPropertyBag_ReadStr(propBag: IPropertyBag, propName: LPCWSTR, value_out: LPWSTR, characterCount: INT): HRESULT {
+    return Propsys.Load('PSPropertyBag_ReadStr')(propBag, propName, value_out, characterCount);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propsys/nf-propsys-pspropertybag_readstralloc
-  public static PSPropertyBag_ReadStrAlloc(propBag: IPropertyBag, propName: LPCWSTR, value: LPPWSTR): HRESULT {
-    return Propsys.Load('PSPropertyBag_ReadStrAlloc')(propBag, propName, value);
+  public static PSPropertyBag_ReadStrAlloc(propBag: IPropertyBag, propName: LPCWSTR, value_out: LPPWSTR): HRESULT {
+    return Propsys.Load('PSPropertyBag_ReadStrAlloc')(propBag, propName, value_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propsys/nf-propsys-pspropertybag_readstream
-  public static PSPropertyBag_ReadStream(propBag: IPropertyBag, propName: LPCWSTR, value: LPSTREAM): HRESULT {
-    return Propsys.Load('PSPropertyBag_ReadStream')(propBag, propName, value);
+  public static PSPropertyBag_ReadStream(propBag: IPropertyBag, propName: LPCWSTR, value_out: LPSTREAM): HRESULT {
+    return Propsys.Load('PSPropertyBag_ReadStream')(propBag, propName, value_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propsys/nf-propsys-pspropertybag_readtype
-  public static PSPropertyBag_ReadType(propBag: IPropertyBag, propName: LPCWSTR, var_: LPVARIANT, type: VARTYPE): HRESULT {
-    return Propsys.Load('PSPropertyBag_ReadType')(propBag, propName, var_, type);
+  public static PSPropertyBag_ReadType(propBag: IPropertyBag, propName: LPCWSTR, var_out: LPVARIANT, type: VARTYPE): HRESULT {
+    return Propsys.Load('PSPropertyBag_ReadType')(propBag, propName, var_out, type);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propsys/nf-propsys-pspropertybag_readulonglong
-  public static PSPropertyBag_ReadULONGLONG(propBag: IPropertyBag, propName: LPCWSTR, value: LPULONGLONG): HRESULT {
-    return Propsys.Load('PSPropertyBag_ReadULONGLONG')(propBag, propName, value);
+  public static PSPropertyBag_ReadULONGLONG(propBag: IPropertyBag, propName: LPCWSTR, value_out: LPULONGLONG): HRESULT {
+    return Propsys.Load('PSPropertyBag_ReadULONGLONG')(propBag, propName, value_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propsys/nf-propsys-pspropertybag_readunknown
-  public static PSPropertyBag_ReadUnknown(propBag: IPropertyBag, propName: LPCWSTR, riid: REFIID, ppv: LPLPVOID): HRESULT {
-    return Propsys.Load('PSPropertyBag_ReadUnknown')(propBag, propName, riid, ppv);
+  public static PSPropertyBag_ReadUnknown(propBag: IPropertyBag, propName: LPCWSTR, riid: REFIID, ppv_out: LPLPVOID): HRESULT {
+    return Propsys.Load('PSPropertyBag_ReadUnknown')(propBag, propName, riid, ppv_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propsys/nf-propsys-pspropertybag_writebool
@@ -814,8 +814,8 @@ class Propsys extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propsys/nf-propsys-pspropertykeyfromstring
-  public static PSPropertyKeyFromString(pszString: LPCWSTR, pkey: LPPROPERTYKEY): HRESULT {
-    return Propsys.Load('PSPropertyKeyFromString')(pszString, pkey);
+  public static PSPropertyKeyFromString(pszString: LPCWSTR, pkey_out: LPPROPERTYKEY): HRESULT {
+    return Propsys.Load('PSPropertyKeyFromString')(pszString, pkey_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propsys/nf-propsys-psrefreshpropertyschema
@@ -834,8 +834,8 @@ class Propsys extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propsys/nf-propsys-psstringfrompropertykey
-  public static PSStringFromPropertyKey(pkey: REFPROPERTYKEY, psz: LPWSTR, cch: UINT): HRESULT {
-    return Propsys.Load('PSStringFromPropertyKey')(pkey, psz, cch);
+  public static PSStringFromPropertyKey(pkey: REFPROPERTYKEY, psz_out: LPWSTR, cch: UINT): HRESULT {
+    return Propsys.Load('PSStringFromPropertyKey')(pkey, psz_out, cch);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propsys/nf-propsys-psunregisterpropertyschema
@@ -844,8 +844,8 @@ class Propsys extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-propvariantchangetype
-  public static PropVariantChangeType(ppropvarDest: LPPROPVARIANT, propvarSrc: REFPROPVARIANT, flags: PROPVAR_CHANGE_FLAGS, vt: VARTYPE): HRESULT {
-    return Propsys.Load('PropVariantChangeType')(ppropvarDest, propvarSrc, flags, vt);
+  public static PropVariantChangeType(ppropvarDest_out: LPPROPVARIANT, propvarSrc: REFPROPVARIANT, flags: PROPVAR_CHANGE_FLAGS, vt: VARTYPE): HRESULT {
+    return Propsys.Load('PropVariantChangeType')(ppropvarDest_out, propvarSrc, flags, vt);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-propvariantcompareex
@@ -854,13 +854,13 @@ class Propsys extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-propvariantgetbooleanelem
-  public static PropVariantGetBooleanElem(propvar: REFPROPVARIANT, iElem: ULONG, pfVal: LPBOOL): HRESULT {
-    return Propsys.Load('PropVariantGetBooleanElem')(propvar, iElem, pfVal);
+  public static PropVariantGetBooleanElem(propvar: REFPROPVARIANT, iElem: ULONG, pfVal_out: LPBOOL): HRESULT {
+    return Propsys.Load('PropVariantGetBooleanElem')(propvar, iElem, pfVal_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-propvariantgetdoubleelem
-  public static PropVariantGetDoubleElem(propvar: REFPROPVARIANT, iElem: ULONG, pnVal: LPDOUBLE): HRESULT {
-    return Propsys.Load('PropVariantGetDoubleElem')(propvar, iElem, pnVal);
+  public static PropVariantGetDoubleElem(propvar: REFPROPVARIANT, iElem: ULONG, pnVal_out: LPDOUBLE): HRESULT {
+    return Propsys.Load('PropVariantGetDoubleElem')(propvar, iElem, pnVal_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-propvariantgetelementcount
@@ -869,63 +869,63 @@ class Propsys extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-propvariantgetfiletimeelem
-  public static PropVariantGetFileTimeElem(propvar: REFPROPVARIANT, iElem: ULONG, pftVal: LPFILETIME): HRESULT {
-    return Propsys.Load('PropVariantGetFileTimeElem')(propvar, iElem, pftVal);
+  public static PropVariantGetFileTimeElem(propvar: REFPROPVARIANT, iElem: ULONG, pftVal_out: LPFILETIME): HRESULT {
+    return Propsys.Load('PropVariantGetFileTimeElem')(propvar, iElem, pftVal_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-propvariantgetint16elem
-  public static PropVariantGetInt16Elem(propvar: REFPROPVARIANT, iElem: ULONG, pnVal: LPSHORT): HRESULT {
-    return Propsys.Load('PropVariantGetInt16Elem')(propvar, iElem, pnVal);
+  public static PropVariantGetInt16Elem(propvar: REFPROPVARIANT, iElem: ULONG, pnVal_out: LPSHORT): HRESULT {
+    return Propsys.Load('PropVariantGetInt16Elem')(propvar, iElem, pnVal_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-propvariantgetint32elem
-  public static PropVariantGetInt32Elem(propvar: REFPROPVARIANT, iElem: ULONG, pnVal: LPLONG): HRESULT {
-    return Propsys.Load('PropVariantGetInt32Elem')(propvar, iElem, pnVal);
+  public static PropVariantGetInt32Elem(propvar: REFPROPVARIANT, iElem: ULONG, pnVal_out: LPLONG): HRESULT {
+    return Propsys.Load('PropVariantGetInt32Elem')(propvar, iElem, pnVal_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-propvariantgetint64elem
-  public static PropVariantGetInt64Elem(propvar: REFPROPVARIANT, iElem: ULONG, pnVal: LPLONGLONG): HRESULT {
-    return Propsys.Load('PropVariantGetInt64Elem')(propvar, iElem, pnVal);
+  public static PropVariantGetInt64Elem(propvar: REFPROPVARIANT, iElem: ULONG, pnVal_out: LPLONGLONG): HRESULT {
+    return Propsys.Load('PropVariantGetInt64Elem')(propvar, iElem, pnVal_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-propvariantgetstringelem
-  public static PropVariantGetStringElem(propvar: REFPROPVARIANT, iElem: ULONG, ppszVal: LPPWSTR): HRESULT {
-    return Propsys.Load('PropVariantGetStringElem')(propvar, iElem, ppszVal);
+  public static PropVariantGetStringElem(propvar: REFPROPVARIANT, iElem: ULONG, ppszVal_out: LPPWSTR): HRESULT {
+    return Propsys.Load('PropVariantGetStringElem')(propvar, iElem, ppszVal_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-propvariantgetuint16elem
-  public static PropVariantGetUInt16Elem(propvar: REFPROPVARIANT, iElem: ULONG, pnVal: LPUSHORT): HRESULT {
-    return Propsys.Load('PropVariantGetUInt16Elem')(propvar, iElem, pnVal);
+  public static PropVariantGetUInt16Elem(propvar: REFPROPVARIANT, iElem: ULONG, pnVal_out: LPUSHORT): HRESULT {
+    return Propsys.Load('PropVariantGetUInt16Elem')(propvar, iElem, pnVal_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-propvariantgetuint32elem
-  public static PropVariantGetUInt32Elem(propvar: REFPROPVARIANT, iElem: ULONG, pnVal: LPULONG): HRESULT {
-    return Propsys.Load('PropVariantGetUInt32Elem')(propvar, iElem, pnVal);
+  public static PropVariantGetUInt32Elem(propvar: REFPROPVARIANT, iElem: ULONG, pnVal_out: LPULONG): HRESULT {
+    return Propsys.Load('PropVariantGetUInt32Elem')(propvar, iElem, pnVal_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-propvariantgetuint64elem
-  public static PropVariantGetUInt64Elem(propvar: REFPROPVARIANT, iElem: ULONG, pnVal: LPULONGLONG): HRESULT {
-    return Propsys.Load('PropVariantGetUInt64Elem')(propvar, iElem, pnVal);
+  public static PropVariantGetUInt64Elem(propvar: REFPROPVARIANT, iElem: ULONG, pnVal_out: LPULONGLONG): HRESULT {
+    return Propsys.Load('PropVariantGetUInt64Elem')(propvar, iElem, pnVal_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-propvarianttobstr
-  public static PropVariantToBSTR(propvar: REFPROPVARIANT, pbstrOut: LPBSTR): HRESULT {
-    return Propsys.Load('PropVariantToBSTR')(propvar, pbstrOut);
+  public static PropVariantToBSTR(propvar: REFPROPVARIANT, pbstrOut_out: LPBSTR): HRESULT {
+    return Propsys.Load('PropVariantToBSTR')(propvar, pbstrOut_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-propvarianttoboolean
-  public static PropVariantToBoolean(propvarIn: REFPROPVARIANT, pfRet: LPBOOL): HRESULT {
-    return Propsys.Load('PropVariantToBoolean')(propvarIn, pfRet);
+  public static PropVariantToBoolean(propvarIn: REFPROPVARIANT, pfRet_out: LPBOOL): HRESULT {
+    return Propsys.Load('PropVariantToBoolean')(propvarIn, pfRet_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-propvarianttobooleanvector
-  public static PropVariantToBooleanVector(propvar: REFPROPVARIANT, prgf: LPBOOL, crgf: ULONG, pcElem: LPULONG): HRESULT {
-    return Propsys.Load('PropVariantToBooleanVector')(propvar, prgf, crgf, pcElem);
+  public static PropVariantToBooleanVector(propvar: REFPROPVARIANT, prgf_out: LPBOOL, crgf: ULONG, pcElem_out: LPULONG): HRESULT {
+    return Propsys.Load('PropVariantToBooleanVector')(propvar, prgf_out, crgf, pcElem_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-propvarianttobooleanvectoralloc
-  public static PropVariantToBooleanVectorAlloc(propvar: REFPROPVARIANT, pprgf: LPLPBOOL, pcElem: LPULONG): HRESULT {
-    return Propsys.Load('PropVariantToBooleanVectorAlloc')(propvar, pprgf, pcElem);
+  public static PropVariantToBooleanVectorAlloc(propvar: REFPROPVARIANT, pprgf_out: LPLPBOOL, pcElem_out: LPULONG): HRESULT {
+    return Propsys.Load('PropVariantToBooleanVectorAlloc')(propvar, pprgf_out, pcElem_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-propvarianttobooleanwithdefault
@@ -934,23 +934,23 @@ class Propsys extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-propvarianttobuffer
-  public static PropVariantToBuffer(propvar: REFPROPVARIANT, pv: LPVOID, cb: UINT): HRESULT {
-    return Propsys.Load('PropVariantToBuffer')(propvar, pv, cb);
+  public static PropVariantToBuffer(propvar: REFPROPVARIANT, pv_out: LPVOID, cb: UINT): HRESULT {
+    return Propsys.Load('PropVariantToBuffer')(propvar, pv_out, cb);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-propvarianttodouble
-  public static PropVariantToDouble(propvarIn: REFPROPVARIANT, pdblRet: LPDOUBLE): HRESULT {
-    return Propsys.Load('PropVariantToDouble')(propvarIn, pdblRet);
+  public static PropVariantToDouble(propvarIn: REFPROPVARIANT, pdblRet_out: LPDOUBLE): HRESULT {
+    return Propsys.Load('PropVariantToDouble')(propvarIn, pdblRet_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-propvarianttodoublevector
-  public static PropVariantToDoubleVector(propvar: REFPROPVARIANT, prgn: LPDOUBLE, crgn: ULONG, pcElem: LPULONG): HRESULT {
-    return Propsys.Load('PropVariantToDoubleVector')(propvar, prgn, crgn, pcElem);
+  public static PropVariantToDoubleVector(propvar: REFPROPVARIANT, prgn_out: LPDOUBLE, crgn: ULONG, pcElem_out: LPULONG): HRESULT {
+    return Propsys.Load('PropVariantToDoubleVector')(propvar, prgn_out, crgn, pcElem_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-propvarianttodoublevectoralloc
-  public static PropVariantToDoubleVectorAlloc(propvar: REFPROPVARIANT, pprgn: LPLPDOUBLE, pcElem: LPULONG): HRESULT {
-    return Propsys.Load('PropVariantToDoubleVectorAlloc')(propvar, pprgn, pcElem);
+  public static PropVariantToDoubleVectorAlloc(propvar: REFPROPVARIANT, pprgn_out: LPLPDOUBLE, pcElem_out: LPULONG): HRESULT {
+    return Propsys.Load('PropVariantToDoubleVectorAlloc')(propvar, pprgn_out, pcElem_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-propvarianttodoublewithdefault
@@ -959,38 +959,38 @@ class Propsys extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-propvarianttofiletime
-  public static PropVariantToFileTime(propvar: REFPROPVARIANT, pstfOut: PSTIME_FLAGS, pftOut: LPFILETIME): HRESULT {
-    return Propsys.Load('PropVariantToFileTime')(propvar, pstfOut, pftOut);
+  public static PropVariantToFileTime(propvar: REFPROPVARIANT, pstfOut: PSTIME_FLAGS, pftOut_out: LPFILETIME): HRESULT {
+    return Propsys.Load('PropVariantToFileTime')(propvar, pstfOut, pftOut_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-propvarianttofiletimevector
-  public static PropVariantToFileTimeVector(propvar: REFPROPVARIANT, prgft: LPFILETIME, crgft: ULONG, pcElem: LPULONG): HRESULT {
-    return Propsys.Load('PropVariantToFileTimeVector')(propvar, prgft, crgft, pcElem);
+  public static PropVariantToFileTimeVector(propvar: REFPROPVARIANT, prgft_out: LPFILETIME, crgft: ULONG, pcElem_out: LPULONG): HRESULT {
+    return Propsys.Load('PropVariantToFileTimeVector')(propvar, prgft_out, crgft, pcElem_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-propvarianttofiletimevectoralloc
-  public static PropVariantToFileTimeVectorAlloc(propvar: REFPROPVARIANT, pprgft: LPLPFILETIME, pcElem: LPULONG): HRESULT {
-    return Propsys.Load('PropVariantToFileTimeVectorAlloc')(propvar, pprgft, pcElem);
+  public static PropVariantToFileTimeVectorAlloc(propvar: REFPROPVARIANT, pprgft_out: LPLPFILETIME, pcElem_out: LPULONG): HRESULT {
+    return Propsys.Load('PropVariantToFileTimeVectorAlloc')(propvar, pprgft_out, pcElem_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-propvarianttoguid
-  public static PropVariantToGUID(propvar: REFPROPVARIANT, pguid: LPGUID): HRESULT {
-    return Propsys.Load('PropVariantToGUID')(propvar, pguid);
+  public static PropVariantToGUID(propvar: REFPROPVARIANT, pguid_out: LPGUID): HRESULT {
+    return Propsys.Load('PropVariantToGUID')(propvar, pguid_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-propvarianttoint16
-  public static PropVariantToInt16(propvarIn: REFPROPVARIANT, piRet: LPSHORT): HRESULT {
-    return Propsys.Load('PropVariantToInt16')(propvarIn, piRet);
+  public static PropVariantToInt16(propvarIn: REFPROPVARIANT, piRet_out: LPSHORT): HRESULT {
+    return Propsys.Load('PropVariantToInt16')(propvarIn, piRet_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-propvarianttoint16vector
-  public static PropVariantToInt16Vector(propvar: REFPROPVARIANT, prgn: LPSHORT, crgn: ULONG, pcElem: LPULONG): HRESULT {
-    return Propsys.Load('PropVariantToInt16Vector')(propvar, prgn, crgn, pcElem);
+  public static PropVariantToInt16Vector(propvar: REFPROPVARIANT, prgn_out: LPSHORT, crgn: ULONG, pcElem_out: LPULONG): HRESULT {
+    return Propsys.Load('PropVariantToInt16Vector')(propvar, prgn_out, crgn, pcElem_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-propvarianttoint16vectoralloc
-  public static PropVariantToInt16VectorAlloc(propvar: REFPROPVARIANT, pprgn: LPLPSHORT, pcElem: LPULONG): HRESULT {
-    return Propsys.Load('PropVariantToInt16VectorAlloc')(propvar, pprgn, pcElem);
+  public static PropVariantToInt16VectorAlloc(propvar: REFPROPVARIANT, pprgn_out: LPLPSHORT, pcElem_out: LPULONG): HRESULT {
+    return Propsys.Load('PropVariantToInt16VectorAlloc')(propvar, pprgn_out, pcElem_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-propvarianttoint16withdefault
@@ -999,18 +999,18 @@ class Propsys extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-propvarianttoint32
-  public static PropVariantToInt32(propvarIn: REFPROPVARIANT, plRet: LPLONG): HRESULT {
-    return Propsys.Load('PropVariantToInt32')(propvarIn, plRet);
+  public static PropVariantToInt32(propvarIn: REFPROPVARIANT, plRet_out: LPLONG): HRESULT {
+    return Propsys.Load('PropVariantToInt32')(propvarIn, plRet_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-propvarianttoint32vector
-  public static PropVariantToInt32Vector(propvar: REFPROPVARIANT, prgn: LPLONG, crgn: ULONG, pcElem: LPULONG): HRESULT {
-    return Propsys.Load('PropVariantToInt32Vector')(propvar, prgn, crgn, pcElem);
+  public static PropVariantToInt32Vector(propvar: REFPROPVARIANT, prgn_out: LPLONG, crgn: ULONG, pcElem_out: LPULONG): HRESULT {
+    return Propsys.Load('PropVariantToInt32Vector')(propvar, prgn_out, crgn, pcElem_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-propvarianttoint32vectoralloc
-  public static PropVariantToInt32VectorAlloc(propvar: REFPROPVARIANT, pprgn: LPLPLONG, pcElem: LPULONG): HRESULT {
-    return Propsys.Load('PropVariantToInt32VectorAlloc')(propvar, pprgn, pcElem);
+  public static PropVariantToInt32VectorAlloc(propvar: REFPROPVARIANT, pprgn_out: LPLPLONG, pcElem_out: LPULONG): HRESULT {
+    return Propsys.Load('PropVariantToInt32VectorAlloc')(propvar, pprgn_out, pcElem_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-propvarianttoint32withdefault
@@ -1019,18 +1019,18 @@ class Propsys extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-propvarianttoint64
-  public static PropVariantToInt64(propvarIn: REFPROPVARIANT, pllRet: LPLONGLONG): HRESULT {
-    return Propsys.Load('PropVariantToInt64')(propvarIn, pllRet);
+  public static PropVariantToInt64(propvarIn: REFPROPVARIANT, pllRet_out: LPLONGLONG): HRESULT {
+    return Propsys.Load('PropVariantToInt64')(propvarIn, pllRet_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-propvarianttoint64vector
-  public static PropVariantToInt64Vector(propvar: REFPROPVARIANT, prgn: LPLONGLONG, crgn: ULONG, pcElem: LPULONG): HRESULT {
-    return Propsys.Load('PropVariantToInt64Vector')(propvar, prgn, crgn, pcElem);
+  public static PropVariantToInt64Vector(propvar: REFPROPVARIANT, prgn_out: LPLONGLONG, crgn: ULONG, pcElem_out: LPULONG): HRESULT {
+    return Propsys.Load('PropVariantToInt64Vector')(propvar, prgn_out, crgn, pcElem_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-propvarianttoint64vectoralloc
-  public static PropVariantToInt64VectorAlloc(propvar: REFPROPVARIANT, pprgn: LPLPLONGLONG, pcElem: LPULONG): HRESULT {
-    return Propsys.Load('PropVariantToInt64VectorAlloc')(propvar, pprgn, pcElem);
+  public static PropVariantToInt64VectorAlloc(propvar: REFPROPVARIANT, pprgn_out: LPLPLONGLONG, pcElem_out: LPULONG): HRESULT {
+    return Propsys.Load('PropVariantToInt64VectorAlloc')(propvar, pprgn_out, pcElem_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-propvarianttoint64withdefault
@@ -1039,48 +1039,48 @@ class Propsys extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-propvarianttostrret
-  public static PropVariantToStrRet(propvar: REFPROPVARIANT, pstrret: LPSTRRET): HRESULT {
-    return Propsys.Load('PropVariantToStrRet')(propvar, pstrret);
+  public static PropVariantToStrRet(propvar: REFPROPVARIANT, pstrret_out: LPSTRRET): HRESULT {
+    return Propsys.Load('PropVariantToStrRet')(propvar, pstrret_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-propvarianttostring
-  public static PropVariantToString(propvar: REFPROPVARIANT, psz: PWSTR, cch: UINT): HRESULT {
-    return Propsys.Load('PropVariantToString')(propvar, psz, cch);
+  public static PropVariantToString(propvar: REFPROPVARIANT, psz_out: PWSTR, cch: UINT): HRESULT {
+    return Propsys.Load('PropVariantToString')(propvar, psz_out, cch);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-propvarianttostringalloc
-  public static PropVariantToStringAlloc(propvar: REFPROPVARIANT, ppszOut: LPPWSTR): HRESULT {
-    return Propsys.Load('PropVariantToStringAlloc')(propvar, ppszOut);
+  public static PropVariantToStringAlloc(propvar: REFPROPVARIANT, ppszOut_out: LPPWSTR): HRESULT {
+    return Propsys.Load('PropVariantToStringAlloc')(propvar, ppszOut_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-propvarianttostringvector
-  public static PropVariantToStringVector(propvar: REFPROPVARIANT, prgsz: LPPWSTR, crgsz: ULONG, pcElem: LPULONG): HRESULT {
-    return Propsys.Load('PropVariantToStringVector')(propvar, prgsz, crgsz, pcElem);
+  public static PropVariantToStringVector(propvar: REFPROPVARIANT, prgsz_out: LPPWSTR, crgsz: ULONG, pcElem_out: LPULONG): HRESULT {
+    return Propsys.Load('PropVariantToStringVector')(propvar, prgsz_out, crgsz, pcElem_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-propvarianttostringvectoralloc
-  public static PropVariantToStringVectorAlloc(propvar: REFPROPVARIANT, pprgsz: LPLPPWSTR, pcElem: LPULONG): HRESULT {
-    return Propsys.Load('PropVariantToStringVectorAlloc')(propvar, pprgsz, pcElem);
+  public static PropVariantToStringVectorAlloc(propvar: REFPROPVARIANT, pprgsz_out: LPLPPWSTR, pcElem_out: LPULONG): HRESULT {
+    return Propsys.Load('PropVariantToStringVectorAlloc')(propvar, pprgsz_out, pcElem_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-propvarianttostringwithdefault
-  public static PropVariantToStringWithDefault(propvarIn: REFPROPVARIANT, pszDefault: LPCWSTR | NULL): PCWSTR {
+  public static PropVariantToStringWithDefault(propvarIn: REFPROPVARIANT, pszDefault: OPTIONAL<LPCWSTR>): PCWSTR {
     return Propsys.Load('PropVariantToStringWithDefault')(propvarIn, pszDefault);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-propvarianttouint16
-  public static PropVariantToUInt16(propvarIn: REFPROPVARIANT, puiRet: LPUSHORT): HRESULT {
-    return Propsys.Load('PropVariantToUInt16')(propvarIn, puiRet);
+  public static PropVariantToUInt16(propvarIn: REFPROPVARIANT, puiRet_out: LPUSHORT): HRESULT {
+    return Propsys.Load('PropVariantToUInt16')(propvarIn, puiRet_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-propvarianttouint16vector
-  public static PropVariantToUInt16Vector(propvar: REFPROPVARIANT, prgn: LPUSHORT, crgn: ULONG, pcElem: LPULONG): HRESULT {
-    return Propsys.Load('PropVariantToUInt16Vector')(propvar, prgn, crgn, pcElem);
+  public static PropVariantToUInt16Vector(propvar: REFPROPVARIANT, prgn_out: LPUSHORT, crgn: ULONG, pcElem_out: LPULONG): HRESULT {
+    return Propsys.Load('PropVariantToUInt16Vector')(propvar, prgn_out, crgn, pcElem_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-propvarianttouint16vectoralloc
-  public static PropVariantToUInt16VectorAlloc(propvar: REFPROPVARIANT, pprgn: LPLPUSHORT, pcElem: LPULONG): HRESULT {
-    return Propsys.Load('PropVariantToUInt16VectorAlloc')(propvar, pprgn, pcElem);
+  public static PropVariantToUInt16VectorAlloc(propvar: REFPROPVARIANT, pprgn_out: LPLPUSHORT, pcElem_out: LPULONG): HRESULT {
+    return Propsys.Load('PropVariantToUInt16VectorAlloc')(propvar, pprgn_out, pcElem_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-propvarianttouint16withdefault
@@ -1089,18 +1089,18 @@ class Propsys extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-propvarianttouint32
-  public static PropVariantToUInt32(propvarIn: REFPROPVARIANT, pulRet: LPULONG): HRESULT {
-    return Propsys.Load('PropVariantToUInt32')(propvarIn, pulRet);
+  public static PropVariantToUInt32(propvarIn: REFPROPVARIANT, pulRet_out: LPULONG): HRESULT {
+    return Propsys.Load('PropVariantToUInt32')(propvarIn, pulRet_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-propvarianttouint32vector
-  public static PropVariantToUInt32Vector(propvar: REFPROPVARIANT, prgn: LPULONG, crgn: ULONG, pcElem: LPULONG): HRESULT {
-    return Propsys.Load('PropVariantToUInt32Vector')(propvar, prgn, crgn, pcElem);
+  public static PropVariantToUInt32Vector(propvar: REFPROPVARIANT, prgn_out: LPULONG, crgn: ULONG, pcElem_out: LPULONG): HRESULT {
+    return Propsys.Load('PropVariantToUInt32Vector')(propvar, prgn_out, crgn, pcElem_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-propvarianttouint32vectoralloc
-  public static PropVariantToUInt32VectorAlloc(propvar: REFPROPVARIANT, pprgn: LPLPULONG, pcElem: LPULONG): HRESULT {
-    return Propsys.Load('PropVariantToUInt32VectorAlloc')(propvar, pprgn, pcElem);
+  public static PropVariantToUInt32VectorAlloc(propvar: REFPROPVARIANT, pprgn_out: LPLPULONG, pcElem_out: LPULONG): HRESULT {
+    return Propsys.Load('PropVariantToUInt32VectorAlloc')(propvar, pprgn_out, pcElem_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-propvarianttouint32withdefault
@@ -1109,18 +1109,18 @@ class Propsys extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-propvarianttouint64
-  public static PropVariantToUInt64(propvarIn: REFPROPVARIANT, pullRet: LPULONGLONG): HRESULT {
-    return Propsys.Load('PropVariantToUInt64')(propvarIn, pullRet);
+  public static PropVariantToUInt64(propvarIn: REFPROPVARIANT, pullRet_out: LPULONGLONG): HRESULT {
+    return Propsys.Load('PropVariantToUInt64')(propvarIn, pullRet_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-propvarianttouint64vector
-  public static PropVariantToUInt64Vector(propvar: REFPROPVARIANT, prgn: LPULONGLONG, crgn: ULONG, pcElem: LPULONG): HRESULT {
-    return Propsys.Load('PropVariantToUInt64Vector')(propvar, prgn, crgn, pcElem);
+  public static PropVariantToUInt64Vector(propvar: REFPROPVARIANT, prgn_out: LPULONGLONG, crgn: ULONG, pcElem_out: LPULONG): HRESULT {
+    return Propsys.Load('PropVariantToUInt64Vector')(propvar, prgn_out, crgn, pcElem_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-propvarianttouint64vectoralloc
-  public static PropVariantToUInt64VectorAlloc(propvar: REFPROPVARIANT, pprgn: LPLPULONGLONG, pcElem: LPULONG): HRESULT {
-    return Propsys.Load('PropVariantToUInt64VectorAlloc')(propvar, pprgn, pcElem);
+  public static PropVariantToUInt64VectorAlloc(propvar: REFPROPVARIANT, pprgn_out: LPLPULONGLONG, pcElem_out: LPULONG): HRESULT {
+    return Propsys.Load('PropVariantToUInt64VectorAlloc')(propvar, pprgn_out, pcElem_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-propvarianttouint64withdefault
@@ -1129,28 +1129,28 @@ class Propsys extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-propvarianttovariant
-  public static PropVariantToVariant(pPropVar: LPPROPVARIANT, pVar: LPVARIANT): HRESULT {
-    return Propsys.Load('PropVariantToVariant')(pPropVar, pVar);
+  public static PropVariantToVariant(pPropVar: LPPROPVARIANT, pVar_out: LPVARIANT): HRESULT {
+    return Propsys.Load('PropVariantToVariant')(pPropVar, pVar_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propsys/nf-propsys-propvarianttowinrtpropertyvalue
-  public static PropVariantToWinRTPropertyValue(propvar: REFPROPVARIANT, riid: REFIID, ppv: LPLPVOID): HRESULT {
-    return Propsys.Load('PropVariantToWinRTPropertyValue')(propvar, riid, ppv);
+  public static PropVariantToWinRTPropertyValue(propvar: REFPROPVARIANT, riid: REFIID, ppv_out: LPLPVOID): HRESULT {
+    return Propsys.Load('PropVariantToWinRTPropertyValue')(propvar, riid, ppv_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-shgetpropertystoreforwindow
-  public static SHGetPropertyStoreForWindow(hwnd: HWND, riid: REFIID, ppv: LPLPVOID): HRESULT {
-    return Propsys.Load('SHGetPropertyStoreForWindow')(hwnd, riid, ppv);
+  public static SHGetPropertyStoreForWindow(hwnd: HWND, riid: REFIID, ppv_out: LPLPVOID): HRESULT {
+    return Propsys.Load('SHGetPropertyStoreForWindow')(hwnd, riid, ppv_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-stgdeserializepropvariant
-  public static StgDeserializePropVariant(pprop: LPSERIALIZEDPROPERTYVALUE, cbMax: ULONG, ppropvar: LPPROPVARIANT): HRESULT {
-    return Propsys.Load('StgDeserializePropVariant')(pprop, cbMax, ppropvar);
+  public static StgDeserializePropVariant(pprop: LPSERIALIZEDPROPERTYVALUE, cbMax: ULONG, ppropvar_out: LPPROPVARIANT): HRESULT {
+    return Propsys.Load('StgDeserializePropVariant')(pprop, cbMax, ppropvar_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-stgserializepropvariant
-  public static StgSerializePropVariant(ppropvar: LPPROPVARIANT, ppProp: LPLPSERIALIZEDPROPERTYVALUE, pcb: LPULONG): HRESULT {
-    return Propsys.Load('StgSerializePropVariant')(ppropvar, ppProp, pcb);
+  public static StgSerializePropVariant(ppropvar: LPPROPVARIANT, ppProp_out: LPLPSERIALIZEDPROPERTYVALUE, pcb_out: LPULONG): HRESULT {
+    return Propsys.Load('StgSerializePropVariant')(ppropvar, ppProp_out, pcb_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-variantcompare
@@ -1159,13 +1159,13 @@ class Propsys extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-variantgetbooleanelem
-  public static VariantGetBooleanElem(var_: REFVARIANT, iElem: ULONG, pfVal: LPBOOL): HRESULT {
-    return Propsys.Load('VariantGetBooleanElem')(var_, iElem, pfVal);
+  public static VariantGetBooleanElem(var_: REFVARIANT, iElem: ULONG, pfVal_out: LPBOOL): HRESULT {
+    return Propsys.Load('VariantGetBooleanElem')(var_, iElem, pfVal_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-variantgetdoubleelem
-  public static VariantGetDoubleElem(var_: REFVARIANT, iElem: ULONG, pnVal: LPDOUBLE): HRESULT {
-    return Propsys.Load('VariantGetDoubleElem')(var_, iElem, pnVal);
+  public static VariantGetDoubleElem(var_: REFVARIANT, iElem: ULONG, pnVal_out: LPDOUBLE): HRESULT {
+    return Propsys.Load('VariantGetDoubleElem')(var_, iElem, pnVal_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-variantgetelementcount
@@ -1174,53 +1174,53 @@ class Propsys extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-variantgetint16elem
-  public static VariantGetInt16Elem(var_: REFVARIANT, iElem: ULONG, pnVal: LPSHORT): HRESULT {
-    return Propsys.Load('VariantGetInt16Elem')(var_, iElem, pnVal);
+  public static VariantGetInt16Elem(var_: REFVARIANT, iElem: ULONG, pnVal_out: LPSHORT): HRESULT {
+    return Propsys.Load('VariantGetInt16Elem')(var_, iElem, pnVal_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-variantgetint32elem
-  public static VariantGetInt32Elem(var_: REFVARIANT, iElem: ULONG, pnVal: LPLONG): HRESULT {
-    return Propsys.Load('VariantGetInt32Elem')(var_, iElem, pnVal);
+  public static VariantGetInt32Elem(var_: REFVARIANT, iElem: ULONG, pnVal_out: LPLONG): HRESULT {
+    return Propsys.Load('VariantGetInt32Elem')(var_, iElem, pnVal_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-variantgetint64elem
-  public static VariantGetInt64Elem(var_: REFVARIANT, iElem: ULONG, pnVal: LPLONGLONG): HRESULT {
-    return Propsys.Load('VariantGetInt64Elem')(var_, iElem, pnVal);
+  public static VariantGetInt64Elem(var_: REFVARIANT, iElem: ULONG, pnVal_out: LPLONGLONG): HRESULT {
+    return Propsys.Load('VariantGetInt64Elem')(var_, iElem, pnVal_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-variantgetstringelem
-  public static VariantGetStringElem(var_: REFVARIANT, iElem: ULONG, ppszVal: LPPWSTR): HRESULT {
-    return Propsys.Load('VariantGetStringElem')(var_, iElem, ppszVal);
+  public static VariantGetStringElem(var_: REFVARIANT, iElem: ULONG, ppszVal_out: LPPWSTR): HRESULT {
+    return Propsys.Load('VariantGetStringElem')(var_, iElem, ppszVal_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-variantgetuint16elem
-  public static VariantGetUInt16Elem(var_: REFVARIANT, iElem: ULONG, pnVal: LPUSHORT): HRESULT {
-    return Propsys.Load('VariantGetUInt16Elem')(var_, iElem, pnVal);
+  public static VariantGetUInt16Elem(var_: REFVARIANT, iElem: ULONG, pnVal_out: LPUSHORT): HRESULT {
+    return Propsys.Load('VariantGetUInt16Elem')(var_, iElem, pnVal_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-variantgetuint32elem
-  public static VariantGetUInt32Elem(var_: REFVARIANT, iElem: ULONG, pnVal: LPULONG): HRESULT {
-    return Propsys.Load('VariantGetUInt32Elem')(var_, iElem, pnVal);
+  public static VariantGetUInt32Elem(var_: REFVARIANT, iElem: ULONG, pnVal_out: LPULONG): HRESULT {
+    return Propsys.Load('VariantGetUInt32Elem')(var_, iElem, pnVal_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-variantgetuint64elem
-  public static VariantGetUInt64Elem(var_: REFVARIANT, iElem: ULONG, pnVal: LPULONGLONG): HRESULT {
-    return Propsys.Load('VariantGetUInt64Elem')(var_, iElem, pnVal);
+  public static VariantGetUInt64Elem(var_: REFVARIANT, iElem: ULONG, pnVal_out: LPULONGLONG): HRESULT {
+    return Propsys.Load('VariantGetUInt64Elem')(var_, iElem, pnVal_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-varianttoboolean
-  public static VariantToBoolean(varIn: REFVARIANT, pfRet: LPBOOL): HRESULT {
-    return Propsys.Load('VariantToBoolean')(varIn, pfRet);
+  public static VariantToBoolean(varIn: REFVARIANT, pfRet_out: LPBOOL): HRESULT {
+    return Propsys.Load('VariantToBoolean')(varIn, pfRet_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-varianttobooleanarray
-  public static VariantToBooleanArray(var_: REFVARIANT, prgf: LPBOOL, crgn: ULONG, pcElem: LPULONG): HRESULT {
-    return Propsys.Load('VariantToBooleanArray')(var_, prgf, crgn, pcElem);
+  public static VariantToBooleanArray(var_: REFVARIANT, prgf_out: LPBOOL, crgn: ULONG, pcElem_out: LPULONG): HRESULT {
+    return Propsys.Load('VariantToBooleanArray')(var_, prgf_out, crgn, pcElem_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-varianttobooleanarrayalloc
-  public static VariantToBooleanArrayAlloc(var_: REFVARIANT, pprgf: LPLPBOOL, pcElem: LPULONG): HRESULT {
-    return Propsys.Load('VariantToBooleanArrayAlloc')(var_, pprgf, pcElem);
+  public static VariantToBooleanArrayAlloc(var_: REFVARIANT, pprgf_out: LPLPBOOL, pcElem_out: LPULONG): HRESULT {
+    return Propsys.Load('VariantToBooleanArrayAlloc')(var_, pprgf_out, pcElem_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-varianttobooleanwithdefault
@@ -1229,28 +1229,28 @@ class Propsys extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-varianttobuffer
-  public static VariantToBuffer(varIn: REFVARIANT, pv: LPVOID, cb: UINT): HRESULT {
-    return Propsys.Load('VariantToBuffer')(varIn, pv, cb);
+  public static VariantToBuffer(varIn: REFVARIANT, pv_out: LPVOID, cb: UINT): HRESULT {
+    return Propsys.Load('VariantToBuffer')(varIn, pv_out, cb);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-varianttodosdatetime
-  public static VariantToDosDateTime(varIn: REFVARIANT, pwDate: LPWORD, pwTime: LPWORD): HRESULT {
-    return Propsys.Load('VariantToDosDateTime')(varIn, pwDate, pwTime);
+  public static VariantToDosDateTime(varIn: REFVARIANT, pwDate_out: LPWORD, pwTime_out: LPWORD): HRESULT {
+    return Propsys.Load('VariantToDosDateTime')(varIn, pwDate_out, pwTime_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-varianttodouble
-  public static VariantToDouble(varIn: REFVARIANT, pdblRet: LPDOUBLE): HRESULT {
-    return Propsys.Load('VariantToDouble')(varIn, pdblRet);
+  public static VariantToDouble(varIn: REFVARIANT, pdblRet_out: LPDOUBLE): HRESULT {
+    return Propsys.Load('VariantToDouble')(varIn, pdblRet_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-varianttodoublearray
-  public static VariantToDoubleArray(var_: REFVARIANT, prgn: LPDOUBLE, crgn: ULONG, pcElem: LPULONG): HRESULT {
-    return Propsys.Load('VariantToDoubleArray')(var_, prgn, crgn, pcElem);
+  public static VariantToDoubleArray(var_: REFVARIANT, prgn_out: LPDOUBLE, crgn: ULONG, pcElem_out: LPULONG): HRESULT {
+    return Propsys.Load('VariantToDoubleArray')(var_, prgn_out, crgn, pcElem_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-varianttodoublearrayalloc
-  public static VariantToDoubleArrayAlloc(var_: REFVARIANT, pprgn: LPLPDOUBLE, pcElem: LPULONG): HRESULT {
-    return Propsys.Load('VariantToDoubleArrayAlloc')(var_, pprgn, pcElem);
+  public static VariantToDoubleArrayAlloc(var_: REFVARIANT, pprgn_out: LPLPDOUBLE, pcElem_out: LPULONG): HRESULT {
+    return Propsys.Load('VariantToDoubleArrayAlloc')(var_, pprgn_out, pcElem_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-varianttodoublewithdefault
@@ -1259,28 +1259,28 @@ class Propsys extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-varianttofiletime
-  public static VariantToFileTime(varIn: REFVARIANT, stfOut: PSTIME_FLAGS, pftOut: LPFILETIME): HRESULT {
-    return Propsys.Load('VariantToFileTime')(varIn, stfOut, pftOut);
+  public static VariantToFileTime(varIn: REFVARIANT, stfOut: PSTIME_FLAGS, pftOut_out: LPFILETIME): HRESULT {
+    return Propsys.Load('VariantToFileTime')(varIn, stfOut, pftOut_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-varianttoguid
-  public static VariantToGUID(varIn: REFVARIANT, pguid: LPGUID): HRESULT {
-    return Propsys.Load('VariantToGUID')(varIn, pguid);
+  public static VariantToGUID(varIn: REFVARIANT, pguid_out: LPGUID): HRESULT {
+    return Propsys.Load('VariantToGUID')(varIn, pguid_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-varianttoint16
-  public static VariantToInt16(varIn: REFVARIANT, piRet: LPSHORT): HRESULT {
-    return Propsys.Load('VariantToInt16')(varIn, piRet);
+  public static VariantToInt16(varIn: REFVARIANT, piRet_out: LPSHORT): HRESULT {
+    return Propsys.Load('VariantToInt16')(varIn, piRet_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-varianttoint16array
-  public static VariantToInt16Array(var_: REFVARIANT, prgn: LPSHORT, crgn: ULONG, pcElem: LPULONG): HRESULT {
-    return Propsys.Load('VariantToInt16Array')(var_, prgn, crgn, pcElem);
+  public static VariantToInt16Array(var_: REFVARIANT, prgn_out: LPSHORT, crgn: ULONG, pcElem_out: LPULONG): HRESULT {
+    return Propsys.Load('VariantToInt16Array')(var_, prgn_out, crgn, pcElem_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-varianttoint16arrayalloc
-  public static VariantToInt16ArrayAlloc(var_: REFVARIANT, pprgn: LPLPSHORT, pcElem: LPULONG): HRESULT {
-    return Propsys.Load('VariantToInt16ArrayAlloc')(var_, pprgn, pcElem);
+  public static VariantToInt16ArrayAlloc(var_: REFVARIANT, pprgn_out: LPLPSHORT, pcElem_out: LPULONG): HRESULT {
+    return Propsys.Load('VariantToInt16ArrayAlloc')(var_, pprgn_out, pcElem_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-varianttoint16withdefault
@@ -1289,18 +1289,18 @@ class Propsys extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-varianttoint32
-  public static VariantToInt32(varIn: REFVARIANT, plRet: LPLONG): HRESULT {
-    return Propsys.Load('VariantToInt32')(varIn, plRet);
+  public static VariantToInt32(varIn: REFVARIANT, plRet_out: LPLONG): HRESULT {
+    return Propsys.Load('VariantToInt32')(varIn, plRet_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-varianttoint32array
-  public static VariantToInt32Array(var_: REFVARIANT, prgn: LPLONG, crgn: ULONG, pcElem: LPULONG): HRESULT {
-    return Propsys.Load('VariantToInt32Array')(var_, prgn, crgn, pcElem);
+  public static VariantToInt32Array(var_: REFVARIANT, prgn_out: LPLONG, crgn: ULONG, pcElem_out: LPULONG): HRESULT {
+    return Propsys.Load('VariantToInt32Array')(var_, prgn_out, crgn, pcElem_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-varianttoint32arrayalloc
-  public static VariantToInt32ArrayAlloc(var_: REFVARIANT, pprgn: LPLPLONG, pcElem: LPULONG): HRESULT {
-    return Propsys.Load('VariantToInt32ArrayAlloc')(var_, pprgn, pcElem);
+  public static VariantToInt32ArrayAlloc(var_: REFVARIANT, pprgn_out: LPLPLONG, pcElem_out: LPULONG): HRESULT {
+    return Propsys.Load('VariantToInt32ArrayAlloc')(var_, pprgn_out, pcElem_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-varianttoint32withdefault
@@ -1309,18 +1309,18 @@ class Propsys extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-varianttoint64
-  public static VariantToInt64(varIn: REFVARIANT, pllRet: LPLONGLONG): HRESULT {
-    return Propsys.Load('VariantToInt64')(varIn, pllRet);
+  public static VariantToInt64(varIn: REFVARIANT, pllRet_out: LPLONGLONG): HRESULT {
+    return Propsys.Load('VariantToInt64')(varIn, pllRet_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-varianttoint64array
-  public static VariantToInt64Array(var_: REFVARIANT, prgn: LPLONGLONG, crgn: ULONG, pcElem: LPULONG): HRESULT {
-    return Propsys.Load('VariantToInt64Array')(var_, prgn, crgn, pcElem);
+  public static VariantToInt64Array(var_: REFVARIANT, prgn_out: LPLONGLONG, crgn: ULONG, pcElem_out: LPULONG): HRESULT {
+    return Propsys.Load('VariantToInt64Array')(var_, prgn_out, crgn, pcElem_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-varianttoint64arrayalloc
-  public static VariantToInt64ArrayAlloc(var_: REFVARIANT, pprgn: LPLPLONGLONG, pcElem: LPULONG): HRESULT {
-    return Propsys.Load('VariantToInt64ArrayAlloc')(var_, pprgn, pcElem);
+  public static VariantToInt64ArrayAlloc(var_: REFVARIANT, pprgn_out: LPLPLONGLONG, pcElem_out: LPULONG): HRESULT {
+    return Propsys.Load('VariantToInt64ArrayAlloc')(var_, pprgn_out, pcElem_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-varianttoint64withdefault
@@ -1329,53 +1329,53 @@ class Propsys extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-varianttopropvariant
-  public static VariantToPropVariant(pVar: LPVARIANT, pPropVar: LPPROPVARIANT): HRESULT {
-    return Propsys.Load('VariantToPropVariant')(pVar, pPropVar);
+  public static VariantToPropVariant(pVar: LPVARIANT, pPropVar_out: LPPROPVARIANT): HRESULT {
+    return Propsys.Load('VariantToPropVariant')(pVar, pPropVar_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-varianttostrret
-  public static VariantToStrRet(varIn: REFVARIANT, pstrret: LPSTRRET): HRESULT {
-    return Propsys.Load('VariantToStrRet')(varIn, pstrret);
+  public static VariantToStrRet(varIn: REFVARIANT, pstrret_out: LPSTRRET): HRESULT {
+    return Propsys.Load('VariantToStrRet')(varIn, pstrret_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-varianttostring
-  public static VariantToString(varIn: REFVARIANT, pszBuf: PWSTR, cchBuf: UINT): HRESULT {
-    return Propsys.Load('VariantToString')(varIn, pszBuf, cchBuf);
+  public static VariantToString(varIn: REFVARIANT, pszBuf_out: PWSTR, cchBuf: UINT): HRESULT {
+    return Propsys.Load('VariantToString')(varIn, pszBuf_out, cchBuf);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-varianttostringalloc
-  public static VariantToStringAlloc(varIn: REFVARIANT, ppszBuf: LPPWSTR): HRESULT {
-    return Propsys.Load('VariantToStringAlloc')(varIn, ppszBuf);
+  public static VariantToStringAlloc(varIn: REFVARIANT, ppszBuf_out: LPPWSTR): HRESULT {
+    return Propsys.Load('VariantToStringAlloc')(varIn, ppszBuf_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-varianttostringarray
-  public static VariantToStringArray(var_: REFVARIANT, prgsz: LPPWSTR, crgsz: ULONG, pcElem: LPULONG): HRESULT {
-    return Propsys.Load('VariantToStringArray')(var_, prgsz, crgsz, pcElem);
+  public static VariantToStringArray(var_: REFVARIANT, prgsz_out: LPPWSTR, crgsz: ULONG, pcElem_out: LPULONG): HRESULT {
+    return Propsys.Load('VariantToStringArray')(var_, prgsz_out, crgsz, pcElem_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-varianttostringarrayalloc
-  public static VariantToStringArrayAlloc(var_: REFVARIANT, pprgsz: LPLPPWSTR, pcElem: LPULONG): HRESULT {
-    return Propsys.Load('VariantToStringArrayAlloc')(var_, pprgsz, pcElem);
+  public static VariantToStringArrayAlloc(var_: REFVARIANT, pprgsz_out: LPLPPWSTR, pcElem_out: LPULONG): HRESULT {
+    return Propsys.Load('VariantToStringArrayAlloc')(var_, pprgsz_out, pcElem_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-varianttostringwithdefault
-  public static VariantToStringWithDefault(varIn: REFVARIANT, pszDefault: LPCWSTR | NULL): PCWSTR {
+  public static VariantToStringWithDefault(varIn: REFVARIANT, pszDefault: OPTIONAL<LPCWSTR>): PCWSTR {
     return Propsys.Load('VariantToStringWithDefault')(varIn, pszDefault);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-varianttouint16
-  public static VariantToUInt16(varIn: REFVARIANT, puiRet: LPUSHORT): HRESULT {
-    return Propsys.Load('VariantToUInt16')(varIn, puiRet);
+  public static VariantToUInt16(varIn: REFVARIANT, puiRet_out: LPUSHORT): HRESULT {
+    return Propsys.Load('VariantToUInt16')(varIn, puiRet_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-varianttouint16array
-  public static VariantToUInt16Array(var_: REFVARIANT, prgn: LPUSHORT, crgn: ULONG, pcElem: LPULONG): HRESULT {
-    return Propsys.Load('VariantToUInt16Array')(var_, prgn, crgn, pcElem);
+  public static VariantToUInt16Array(var_: REFVARIANT, prgn_out: LPUSHORT, crgn: ULONG, pcElem_out: LPULONG): HRESULT {
+    return Propsys.Load('VariantToUInt16Array')(var_, prgn_out, crgn, pcElem_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-varianttouint16arrayalloc
-  public static VariantToUInt16ArrayAlloc(var_: REFVARIANT, pprgn: LPLPUSHORT, pcElem: LPULONG): HRESULT {
-    return Propsys.Load('VariantToUInt16ArrayAlloc')(var_, pprgn, pcElem);
+  public static VariantToUInt16ArrayAlloc(var_: REFVARIANT, pprgn_out: LPLPUSHORT, pcElem_out: LPULONG): HRESULT {
+    return Propsys.Load('VariantToUInt16ArrayAlloc')(var_, pprgn_out, pcElem_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-varianttouint16withdefault
@@ -1384,18 +1384,18 @@ class Propsys extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-varianttouint32
-  public static VariantToUInt32(varIn: REFVARIANT, pulRet: LPULONG): HRESULT {
-    return Propsys.Load('VariantToUInt32')(varIn, pulRet);
+  public static VariantToUInt32(varIn: REFVARIANT, pulRet_out: LPULONG): HRESULT {
+    return Propsys.Load('VariantToUInt32')(varIn, pulRet_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-varianttouint32array
-  public static VariantToUInt32Array(var_: REFVARIANT, prgn: LPULONG, crgn: ULONG, pcElem: LPULONG): HRESULT {
-    return Propsys.Load('VariantToUInt32Array')(var_, prgn, crgn, pcElem);
+  public static VariantToUInt32Array(var_: REFVARIANT, prgn_out: LPULONG, crgn: ULONG, pcElem_out: LPULONG): HRESULT {
+    return Propsys.Load('VariantToUInt32Array')(var_, prgn_out, crgn, pcElem_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-varianttouint32arrayalloc
-  public static VariantToUInt32ArrayAlloc(var_: REFVARIANT, pprgn: LPLPULONG, pcElem: LPULONG): HRESULT {
-    return Propsys.Load('VariantToUInt32ArrayAlloc')(var_, pprgn, pcElem);
+  public static VariantToUInt32ArrayAlloc(var_: REFVARIANT, pprgn_out: LPLPULONG, pcElem_out: LPULONG): HRESULT {
+    return Propsys.Load('VariantToUInt32ArrayAlloc')(var_, pprgn_out, pcElem_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-varianttouint32withdefault
@@ -1404,18 +1404,18 @@ class Propsys extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-varianttouint64
-  public static VariantToUInt64(varIn: REFVARIANT, pullRet: LPULONGLONG): HRESULT {
-    return Propsys.Load('VariantToUInt64')(varIn, pullRet);
+  public static VariantToUInt64(varIn: REFVARIANT, pullRet_out: LPULONGLONG): HRESULT {
+    return Propsys.Load('VariantToUInt64')(varIn, pullRet_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-varianttouint64array
-  public static VariantToUInt64Array(var_: REFVARIANT, prgn: LPULONGLONG, crgn: ULONG, pcElem: LPULONG): HRESULT {
-    return Propsys.Load('VariantToUInt64Array')(var_, prgn, crgn, pcElem);
+  public static VariantToUInt64Array(var_: REFVARIANT, prgn_out: LPULONGLONG, crgn: ULONG, pcElem_out: LPULONG): HRESULT {
+    return Propsys.Load('VariantToUInt64Array')(var_, prgn_out, crgn, pcElem_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-varianttouint64arrayalloc
-  public static VariantToUInt64ArrayAlloc(var_: REFVARIANT, pprgn: LPLPULONGLONG, pcElem: LPULONG): HRESULT {
-    return Propsys.Load('VariantToUInt64ArrayAlloc')(var_, pprgn, pcElem);
+  public static VariantToUInt64ArrayAlloc(var_: REFVARIANT, pprgn_out: LPLPULONGLONG, pcElem_out: LPULONG): HRESULT {
+    return Propsys.Load('VariantToUInt64ArrayAlloc')(var_, pprgn_out, pcElem_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-varianttouint64withdefault
@@ -1424,8 +1424,8 @@ class Propsys extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propsys/nf-propsys-winrtpropertyvaluetopropvariant
-  public static WinRTPropertyValueToPropVariant(punkPropertyValue: IUnknown | NULL, ppropvar: LPPROPVARIANT): HRESULT {
-    return Propsys.Load('WinRTPropertyValueToPropVariant')(punkPropertyValue, ppropvar);
+  public static WinRTPropertyValueToPropVariant(punkPropertyValue: OPTIONAL<IUnknown>, ppropvar_out: LPPROPVARIANT): HRESULT {
+    return Propsys.Load('WinRTPropertyValueToPropVariant')(punkPropertyValue, ppropvar_out);
   }
 }
 

@@ -9,7 +9,7 @@ import type {
   LONG,
   LPGUID,
   NTSTATUS,
-  NULL,
+  OPTIONAL,
   PCHAR,
   PHIDD_ATTRIBUTES,
   PHIDD_CONFIGURATION,
@@ -121,63 +121,63 @@ class Hid extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/hidsdi/nf-hidsdi-hidd_getattributes
-  public static HidD_GetAttributes(HidDeviceObject: HANDLE, Attributes: PHIDD_ATTRIBUTES): BOOLEAN {
-    return Hid.Load('HidD_GetAttributes')(HidDeviceObject, Attributes);
+  public static HidD_GetAttributes(HidDeviceObject: HANDLE, Attributes_out: PHIDD_ATTRIBUTES): BOOLEAN {
+    return Hid.Load('HidD_GetAttributes')(HidDeviceObject, Attributes_out);
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/hidsdi/nf-hidsdi-hidd_getconfiguration
-  public static HidD_GetConfiguration(HidDeviceObject: HANDLE, Configuration: PHIDD_CONFIGURATION, ConfigurationLength: ULONG): BOOLEAN {
-    return Hid.Load('HidD_GetConfiguration')(HidDeviceObject, Configuration, ConfigurationLength);
+  public static HidD_GetConfiguration(HidDeviceObject: HANDLE, Configuration_out: PHIDD_CONFIGURATION, ConfigurationLength: ULONG): BOOLEAN {
+    return Hid.Load('HidD_GetConfiguration')(HidDeviceObject, Configuration_out, ConfigurationLength);
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/hidsdi/nf-hidsdi-hidd_getfeature
-  public static HidD_GetFeature(HidDeviceObject: HANDLE, ReportBuffer: PVOID, ReportBufferLength: ULONG): BOOLEAN {
-    return Hid.Load('HidD_GetFeature')(HidDeviceObject, ReportBuffer, ReportBufferLength);
+  public static HidD_GetFeature(HidDeviceObject: HANDLE, ReportBuffer_out: PVOID, ReportBufferLength: ULONG): BOOLEAN {
+    return Hid.Load('HidD_GetFeature')(HidDeviceObject, ReportBuffer_out, ReportBufferLength);
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/hidsdi/nf-hidsdi-hidd_gethidguid
-  public static HidD_GetHidGuid(HidGuid: LPGUID): VOID {
-    return Hid.Load('HidD_GetHidGuid')(HidGuid);
+  public static HidD_GetHidGuid(HidGuid_out: LPGUID): VOID {
+    return Hid.Load('HidD_GetHidGuid')(HidGuid_out);
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/hidsdi/nf-hidsdi-hidd_getindexedstring
-  public static HidD_GetIndexedString(HidDeviceObject: HANDLE, StringIndex: ULONG, Buffer: PVOID, BufferLength: ULONG): BOOLEAN {
-    return Hid.Load('HidD_GetIndexedString')(HidDeviceObject, StringIndex, Buffer, BufferLength);
+  public static HidD_GetIndexedString(HidDeviceObject: HANDLE, StringIndex: ULONG, Buffer_out: PVOID, BufferLength: ULONG): BOOLEAN {
+    return Hid.Load('HidD_GetIndexedString')(HidDeviceObject, StringIndex, Buffer_out, BufferLength);
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/hidsdi/nf-hidsdi-hidd_getinputreport
-  public static HidD_GetInputReport(HidDeviceObject: HANDLE, ReportBuffer: PVOID, ReportBufferLength: ULONG): BOOLEAN {
-    return Hid.Load('HidD_GetInputReport')(HidDeviceObject, ReportBuffer, ReportBufferLength);
+  public static HidD_GetInputReport(HidDeviceObject: HANDLE, ReportBuffer_out: PVOID, ReportBufferLength: ULONG): BOOLEAN {
+    return Hid.Load('HidD_GetInputReport')(HidDeviceObject, ReportBuffer_out, ReportBufferLength);
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/hidsdi/nf-hidsdi-hidd_getmanufacturerstring
-  public static HidD_GetManufacturerString(HidDeviceObject: HANDLE, Buffer: PVOID, BufferLength: ULONG): BOOLEAN {
-    return Hid.Load('HidD_GetManufacturerString')(HidDeviceObject, Buffer, BufferLength);
+  public static HidD_GetManufacturerString(HidDeviceObject: HANDLE, Buffer_out: PVOID, BufferLength: ULONG): BOOLEAN {
+    return Hid.Load('HidD_GetManufacturerString')(HidDeviceObject, Buffer_out, BufferLength);
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/hidsdi/nf-hidsdi-hidd_getnuminputbuffers
-  public static HidD_GetNumInputBuffers(HidDeviceObject: HANDLE, NumberBuffers: PULONG): BOOLEAN {
-    return Hid.Load('HidD_GetNumInputBuffers')(HidDeviceObject, NumberBuffers);
+  public static HidD_GetNumInputBuffers(HidDeviceObject: HANDLE, NumberBuffers_out: PULONG): BOOLEAN {
+    return Hid.Load('HidD_GetNumInputBuffers')(HidDeviceObject, NumberBuffers_out);
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/hidsdi/nf-hidsdi-hidd_getphysicaldescriptor
-  public static HidD_GetPhysicalDescriptor(HidDeviceObject: HANDLE, Buffer: PVOID, BufferLength: ULONG): BOOLEAN {
-    return Hid.Load('HidD_GetPhysicalDescriptor')(HidDeviceObject, Buffer, BufferLength);
+  public static HidD_GetPhysicalDescriptor(HidDeviceObject: HANDLE, Buffer_out: PVOID, BufferLength: ULONG): BOOLEAN {
+    return Hid.Load('HidD_GetPhysicalDescriptor')(HidDeviceObject, Buffer_out, BufferLength);
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/hidsdi/nf-hidsdi-hidd_getpreparseddata
-  public static HidD_GetPreparsedData(HidDeviceObject: HANDLE, PreparsedData: PVOID): BOOLEAN {
-    return Hid.Load('HidD_GetPreparsedData')(HidDeviceObject, PreparsedData);
+  public static HidD_GetPreparsedData(HidDeviceObject: HANDLE, PreparsedData_out: PVOID): BOOLEAN {
+    return Hid.Load('HidD_GetPreparsedData')(HidDeviceObject, PreparsedData_out);
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/hidsdi/nf-hidsdi-hidd_getproductstring
-  public static HidD_GetProductString(HidDeviceObject: HANDLE, Buffer: PVOID, BufferLength: ULONG): BOOLEAN {
-    return Hid.Load('HidD_GetProductString')(HidDeviceObject, Buffer, BufferLength);
+  public static HidD_GetProductString(HidDeviceObject: HANDLE, Buffer_out: PVOID, BufferLength: ULONG): BOOLEAN {
+    return Hid.Load('HidD_GetProductString')(HidDeviceObject, Buffer_out, BufferLength);
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/hidsdi/nf-hidsdi-hidd_getserialnumberstring
-  public static HidD_GetSerialNumberString(HidDeviceObject: HANDLE, Buffer: PVOID, BufferLength: ULONG): BOOLEAN {
-    return Hid.Load('HidD_GetSerialNumberString')(HidDeviceObject, Buffer, BufferLength);
+  public static HidD_GetSerialNumberString(HidDeviceObject: HANDLE, Buffer_out: PVOID, BufferLength: ULONG): BOOLEAN {
+    return Hid.Load('HidD_GetSerialNumberString')(HidDeviceObject, Buffer_out, BufferLength);
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/hidsdi/nf-hidsdi-hidd_setconfiguration
@@ -206,58 +206,74 @@ class Hid extends Win32 {
     UsagePage: USAGE,
     LinkCollection: USHORT,
     Usage: USAGE,
-    ButtonData: PHIDP_BUTTON_ARRAY_DATA,
-    ButtonDataLength: PUSHORT,
+    ButtonData_out: PHIDP_BUTTON_ARRAY_DATA,
+    ButtonDataLength_in_out: PUSHORT,
     PreparsedData: PHIDP_PREPARSED_DATA,
     Report: PCHAR,
     ReportLength: ULONG,
   ): NTSTATUS {
-    return Hid.Load('HidP_GetButtonArray')(ReportType, UsagePage, LinkCollection, Usage, ButtonData, ButtonDataLength, PreparsedData, Report, ReportLength);
+    return Hid.Load('HidP_GetButtonArray')(ReportType, UsagePage, LinkCollection, Usage, ButtonData_out, ButtonDataLength_in_out, PreparsedData, Report, ReportLength);
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/hidpi/nf-hidpi-hidp_getbuttoncaps
-  public static HidP_GetButtonCaps(ReportType: HIDP_REPORT_TYPE, ButtonCaps: PHIDP_BUTTON_CAPS, ButtonCapsLength: PUSHORT, PreparsedData: PHIDP_PREPARSED_DATA): NTSTATUS {
-    return Hid.Load('HidP_GetButtonCaps')(ReportType, ButtonCaps, ButtonCapsLength, PreparsedData);
+  public static HidP_GetButtonCaps(ReportType: HIDP_REPORT_TYPE, ButtonCaps_out: PHIDP_BUTTON_CAPS, ButtonCapsLength_in_out: PUSHORT, PreparsedData: PHIDP_PREPARSED_DATA): NTSTATUS {
+    return Hid.Load('HidP_GetButtonCaps')(ReportType, ButtonCaps_out, ButtonCapsLength_in_out, PreparsedData);
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/hidpi/nf-hidpi-hidp_getcaps
-  public static HidP_GetCaps(PreparsedData: PHIDP_PREPARSED_DATA, Capabilities: PHIDP_CAPS): NTSTATUS {
-    return Hid.Load('HidP_GetCaps')(PreparsedData, Capabilities);
+  public static HidP_GetCaps(PreparsedData: PHIDP_PREPARSED_DATA, Capabilities_out: PHIDP_CAPS): NTSTATUS {
+    return Hid.Load('HidP_GetCaps')(PreparsedData, Capabilities_out);
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/hidpi/nf-hidpi-hidp_getdata
-  public static HidP_GetData(ReportType: HIDP_REPORT_TYPE, DataList: PHIDP_DATA, DataLength: PULONG, PreparsedData: PHIDP_PREPARSED_DATA, Report: PCHAR, ReportLength: ULONG): NTSTATUS {
-    return Hid.Load('HidP_GetData')(ReportType, DataList, DataLength, PreparsedData, Report, ReportLength);
+  public static HidP_GetData(ReportType: HIDP_REPORT_TYPE, DataList_out: PHIDP_DATA, DataLength_in_out: PULONG, PreparsedData: PHIDP_PREPARSED_DATA, Report_out: PCHAR, ReportLength: ULONG): NTSTATUS {
+    return Hid.Load('HidP_GetData')(ReportType, DataList_out, DataLength_in_out, PreparsedData, Report_out, ReportLength);
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/hidpi/nf-hidpi-hidp_getextendedattributes
-  public static HidP_GetExtendedAttributes(ReportType: HIDP_REPORT_TYPE, DataIndex: USHORT, PreparsedData: PHIDP_PREPARSED_DATA, Attributes: PHIDP_EXTENDED_ATTRIBUTES, LengthAttributes: PULONG): NTSTATUS {
-    return Hid.Load('HidP_GetExtendedAttributes')(ReportType, DataIndex, PreparsedData, Attributes, LengthAttributes);
+  public static HidP_GetExtendedAttributes(ReportType: HIDP_REPORT_TYPE, DataIndex: USHORT, PreparsedData: PHIDP_PREPARSED_DATA, Attributes_out: PHIDP_EXTENDED_ATTRIBUTES, LengthAttributes_in_out: PULONG): NTSTATUS {
+    return Hid.Load('HidP_GetExtendedAttributes')(ReportType, DataIndex, PreparsedData, Attributes_out, LengthAttributes_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/hidpi/nf-hidpi-hidp_getlinkcollectionnodes
-  public static HidP_GetLinkCollectionNodes(LinkCollectionNodes: PHIDP_LINK_COLLECTION_NODE, LinkCollectionNodesLength: PULONG, PreparsedData: PHIDP_PREPARSED_DATA): NTSTATUS {
-    return Hid.Load('HidP_GetLinkCollectionNodes')(LinkCollectionNodes, LinkCollectionNodesLength, PreparsedData);
+  public static HidP_GetLinkCollectionNodes(LinkCollectionNodes_out: PHIDP_LINK_COLLECTION_NODE, LinkCollectionNodesLength_in_out: PULONG, PreparsedData: PHIDP_PREPARSED_DATA): NTSTATUS {
+    return Hid.Load('HidP_GetLinkCollectionNodes')(LinkCollectionNodes_out, LinkCollectionNodesLength_in_out, PreparsedData);
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/hidpi/nf-hidpi-hidp_getscaledusagevalue
-  public static HidP_GetScaledUsageValue(ReportType: HIDP_REPORT_TYPE, UsagePage: USAGE, LinkCollection: USHORT, Usage: USAGE, UsageValue: PLONG, PreparsedData: PHIDP_PREPARSED_DATA, Report: PCHAR, ReportLength: ULONG): NTSTATUS {
-    return Hid.Load('HidP_GetScaledUsageValue')(ReportType, UsagePage, LinkCollection, Usage, UsageValue, PreparsedData, Report, ReportLength);
+  public static HidP_GetScaledUsageValue(ReportType: HIDP_REPORT_TYPE, UsagePage: USAGE, LinkCollection: USHORT, Usage: USAGE, UsageValue_out: PLONG, PreparsedData: PHIDP_PREPARSED_DATA, Report: PCHAR, ReportLength: ULONG): NTSTATUS {
+    return Hid.Load('HidP_GetScaledUsageValue')(ReportType, UsagePage, LinkCollection, Usage, UsageValue_out, PreparsedData, Report, ReportLength);
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/hidpi/nf-hidpi-hidp_getspecificbuttoncaps
-  public static HidP_GetSpecificButtonCaps(ReportType: HIDP_REPORT_TYPE, UsagePage: USAGE, LinkCollection: USHORT, Usage: USAGE, ButtonCaps: PHIDP_BUTTON_CAPS, ButtonCapsLength: PUSHORT, PreparsedData: PHIDP_PREPARSED_DATA): NTSTATUS {
-    return Hid.Load('HidP_GetSpecificButtonCaps')(ReportType, UsagePage, LinkCollection, Usage, ButtonCaps, ButtonCapsLength, PreparsedData);
+  public static HidP_GetSpecificButtonCaps(
+    ReportType: HIDP_REPORT_TYPE,
+    UsagePage: USAGE,
+    LinkCollection: USHORT,
+    Usage: USAGE,
+    ButtonCaps_out: PHIDP_BUTTON_CAPS,
+    ButtonCapsLength_in_out: PUSHORT,
+    PreparsedData: PHIDP_PREPARSED_DATA,
+  ): NTSTATUS {
+    return Hid.Load('HidP_GetSpecificButtonCaps')(ReportType, UsagePage, LinkCollection, Usage, ButtonCaps_out, ButtonCapsLength_in_out, PreparsedData);
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/hidpi/nf-hidpi-hidp_getspecificvaluecaps
-  public static HidP_GetSpecificValueCaps(ReportType: HIDP_REPORT_TYPE, UsagePage: USAGE, LinkCollection: USHORT, Usage: USAGE, ValueCaps: PHIDP_VALUE_CAPS, ValueCapsLength: PUSHORT, PreparsedData: PHIDP_PREPARSED_DATA): NTSTATUS {
-    return Hid.Load('HidP_GetSpecificValueCaps')(ReportType, UsagePage, LinkCollection, Usage, ValueCaps, ValueCapsLength, PreparsedData);
+  public static HidP_GetSpecificValueCaps(
+    ReportType: HIDP_REPORT_TYPE,
+    UsagePage: USAGE,
+    LinkCollection: USHORT,
+    Usage: USAGE,
+    ValueCaps_out: PHIDP_VALUE_CAPS,
+    ValueCapsLength_in_out: PUSHORT,
+    PreparsedData: PHIDP_PREPARSED_DATA,
+  ): NTSTATUS {
+    return Hid.Load('HidP_GetSpecificValueCaps')(ReportType, UsagePage, LinkCollection, Usage, ValueCaps_out, ValueCapsLength_in_out, PreparsedData);
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/hidpi/nf-hidpi-hidp_getusagevalue
-  public static HidP_GetUsageValue(ReportType: HIDP_REPORT_TYPE, UsagePage: USAGE, LinkCollection: USHORT, Usage: USAGE, UsageValue: PULONG, PreparsedData: PHIDP_PREPARSED_DATA, Report: PCHAR, ReportLength: ULONG): NTSTATUS {
-    return Hid.Load('HidP_GetUsageValue')(ReportType, UsagePage, LinkCollection, Usage, UsageValue, PreparsedData, Report, ReportLength);
+  public static HidP_GetUsageValue(ReportType: HIDP_REPORT_TYPE, UsagePage: USAGE, LinkCollection: USHORT, Usage: USAGE, UsageValue_out: PULONG, PreparsedData: PHIDP_PREPARSED_DATA, Report: PCHAR, ReportLength: ULONG): NTSTATUS {
+    return Hid.Load('HidP_GetUsageValue')(ReportType, UsagePage, LinkCollection, Usage, UsageValue_out, PreparsedData, Report, ReportLength);
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/hidpi/nf-hidpi-hidp_getusagevaluearray
@@ -266,33 +282,42 @@ class Hid extends Win32 {
     UsagePage: USAGE,
     LinkCollection: USHORT,
     Usage: USAGE,
-    UsageValue: PCHAR,
+    UsageValue_in_out: PCHAR,
     UsageValueByteLength: USHORT,
     PreparsedData: PHIDP_PREPARSED_DATA,
     Report: PCHAR,
     ReportLength: ULONG,
   ): NTSTATUS {
-    return Hid.Load('HidP_GetUsageValueArray')(ReportType, UsagePage, LinkCollection, Usage, UsageValue, UsageValueByteLength, PreparsedData, Report, ReportLength);
+    return Hid.Load('HidP_GetUsageValueArray')(ReportType, UsagePage, LinkCollection, Usage, UsageValue_in_out, UsageValueByteLength, PreparsedData, Report, ReportLength);
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/hidpi/nf-hidpi-hidp_getusages
-  public static HidP_GetUsages(ReportType: HIDP_REPORT_TYPE, UsagePage: USAGE, LinkCollection: USHORT, UsageList: PUSAGE, UsageLength: PULONG, PreparsedData: PHIDP_PREPARSED_DATA, Report: PCHAR, ReportLength: ULONG): NTSTATUS {
-    return Hid.Load('HidP_GetUsages')(ReportType, UsagePage, LinkCollection, UsageList, UsageLength, PreparsedData, Report, ReportLength);
+  public static HidP_GetUsages(
+    ReportType: HIDP_REPORT_TYPE,
+    UsagePage: USAGE,
+    LinkCollection: USHORT,
+    UsageList_out: PUSAGE,
+    UsageLength_in_out: PULONG,
+    PreparsedData: PHIDP_PREPARSED_DATA,
+    Report_out: PCHAR,
+    ReportLength: ULONG,
+  ): NTSTATUS {
+    return Hid.Load('HidP_GetUsages')(ReportType, UsagePage, LinkCollection, UsageList_out, UsageLength_in_out, PreparsedData, Report_out, ReportLength);
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/hidpi/nf-hidpi-hidp_getusagesex
-  public static HidP_GetUsagesEx(ReportType: HIDP_REPORT_TYPE, LinkCollection: USHORT, ButtonList: PUSAGE_AND_PAGE, UsageLength: PULONG, PreparsedData: PHIDP_PREPARSED_DATA, Report: PCHAR, ReportLength: ULONG): NTSTATUS {
-    return Hid.Load('HidP_GetUsagesEx')(ReportType, LinkCollection, ButtonList, UsageLength, PreparsedData, Report, ReportLength);
+  public static HidP_GetUsagesEx(ReportType: HIDP_REPORT_TYPE, LinkCollection: USHORT, ButtonList_in_out: PUSAGE_AND_PAGE, UsageLength_in_out: PULONG, PreparsedData: PHIDP_PREPARSED_DATA, Report: PCHAR, ReportLength: ULONG): NTSTATUS {
+    return Hid.Load('HidP_GetUsagesEx')(ReportType, LinkCollection, ButtonList_in_out, UsageLength_in_out, PreparsedData, Report, ReportLength);
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/hidpi/nf-hidpi-hidp_getvaluecaps
-  public static HidP_GetValueCaps(ReportType: HIDP_REPORT_TYPE, ValueCaps: PHIDP_VALUE_CAPS, ValueCapsLength: PUSHORT, PreparsedData: PHIDP_PREPARSED_DATA): NTSTATUS {
-    return Hid.Load('HidP_GetValueCaps')(ReportType, ValueCaps, ValueCapsLength, PreparsedData);
+  public static HidP_GetValueCaps(ReportType: HIDP_REPORT_TYPE, ValueCaps_out: PHIDP_VALUE_CAPS, ValueCapsLength_in_out: PUSHORT, PreparsedData: PHIDP_PREPARSED_DATA): NTSTATUS {
+    return Hid.Load('HidP_GetValueCaps')(ReportType, ValueCaps_out, ValueCapsLength_in_out, PreparsedData);
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/hidpi/nf-hidpi-hidp_initializereportforid
-  public static HidP_InitializeReportForID(ReportType: HIDP_REPORT_TYPE, ReportID: UCHAR, PreparsedData: PHIDP_PREPARSED_DATA, Report: PCHAR, ReportLength: ULONG): NTSTATUS {
-    return Hid.Load('HidP_InitializeReportForID')(ReportType, ReportID, PreparsedData, Report, ReportLength);
+  public static HidP_InitializeReportForID(ReportType: HIDP_REPORT_TYPE, ReportID: UCHAR, PreparsedData: PHIDP_PREPARSED_DATA, Report_out: PCHAR, ReportLength: ULONG): NTSTATUS {
+    return Hid.Load('HidP_InitializeReportForID')(ReportType, ReportID, PreparsedData, Report_out, ReportLength);
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/hidpi/nf-hidpi-hidp_maxdatalistlength
@@ -314,25 +339,25 @@ class Hid extends Win32 {
     ButtonData: PHIDP_BUTTON_ARRAY_DATA,
     ButtonDataLength: USHORT,
     PreparsedData: PHIDP_PREPARSED_DATA,
-    Report: PCHAR,
+    Report_in_out: PCHAR,
     ReportLength: ULONG,
   ): NTSTATUS {
-    return Hid.Load('HidP_SetButtonArray')(ReportType, UsagePage, LinkCollection, Usage, ButtonData, ButtonDataLength, PreparsedData, Report, ReportLength);
+    return Hid.Load('HidP_SetButtonArray')(ReportType, UsagePage, LinkCollection, Usage, ButtonData, ButtonDataLength, PreparsedData, Report_in_out, ReportLength);
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/hidpi/nf-hidpi-hidp_setdata
-  public static HidP_SetData(ReportType: HIDP_REPORT_TYPE, DataList: PHIDP_DATA, DataLength: PULONG, PreparsedData: PHIDP_PREPARSED_DATA, Report: PCHAR, ReportLength: ULONG): NTSTATUS {
-    return Hid.Load('HidP_SetData')(ReportType, DataList, DataLength, PreparsedData, Report, ReportLength);
+  public static HidP_SetData(ReportType: HIDP_REPORT_TYPE, DataList_in_out: PHIDP_DATA, DataLength_in_out: PULONG, PreparsedData: PHIDP_PREPARSED_DATA, Report: PCHAR, ReportLength: ULONG): NTSTATUS {
+    return Hid.Load('HidP_SetData')(ReportType, DataList_in_out, DataLength_in_out, PreparsedData, Report, ReportLength);
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/hidpi/nf-hidpi-hidp_setscaledusagevalue
-  public static HidP_SetScaledUsageValue(ReportType: HIDP_REPORT_TYPE, UsagePage: USAGE, LinkCollection: USHORT, Usage: USAGE, UsageValue: LONG, PreparsedData: PHIDP_PREPARSED_DATA, Report: PCHAR, ReportLength: ULONG): NTSTATUS {
-    return Hid.Load('HidP_SetScaledUsageValue')(ReportType, UsagePage, LinkCollection, Usage, UsageValue, PreparsedData, Report, ReportLength);
+  public static HidP_SetScaledUsageValue(ReportType: HIDP_REPORT_TYPE, UsagePage: USAGE, LinkCollection: USHORT, Usage: USAGE, UsageValue: LONG, PreparsedData: PHIDP_PREPARSED_DATA, Report_in_out: PCHAR, ReportLength: ULONG): NTSTATUS {
+    return Hid.Load('HidP_SetScaledUsageValue')(ReportType, UsagePage, LinkCollection, Usage, UsageValue, PreparsedData, Report_in_out, ReportLength);
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/hidpi/nf-hidpi-hidp_setusagevalue
-  public static HidP_SetUsageValue(ReportType: HIDP_REPORT_TYPE, UsagePage: USAGE, LinkCollection: USHORT, Usage: USAGE, UsageValue: ULONG, PreparsedData: PHIDP_PREPARSED_DATA, Report: PCHAR, ReportLength: ULONG): NTSTATUS {
-    return Hid.Load('HidP_SetUsageValue')(ReportType, UsagePage, LinkCollection, Usage, UsageValue, PreparsedData, Report, ReportLength);
+  public static HidP_SetUsageValue(ReportType: HIDP_REPORT_TYPE, UsagePage: USAGE, LinkCollection: USHORT, Usage: USAGE, UsageValue: ULONG, PreparsedData: PHIDP_PREPARSED_DATA, Report_in_out: PCHAR, ReportLength: ULONG): NTSTATUS {
+    return Hid.Load('HidP_SetUsageValue')(ReportType, UsagePage, LinkCollection, Usage, UsageValue, PreparsedData, Report_in_out, ReportLength);
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/hidpi/nf-hidpi-hidp_setusagevaluearray
@@ -344,15 +369,24 @@ class Hid extends Win32 {
     UsageValue: PCHAR,
     UsageValueByteLength: USHORT,
     PreparsedData: PHIDP_PREPARSED_DATA,
-    Report: PCHAR,
+    Report_in_out: PCHAR,
     ReportLength: ULONG,
   ): NTSTATUS {
-    return Hid.Load('HidP_SetUsageValueArray')(ReportType, UsagePage, LinkCollection, Usage, UsageValue, UsageValueByteLength, PreparsedData, Report, ReportLength);
+    return Hid.Load('HidP_SetUsageValueArray')(ReportType, UsagePage, LinkCollection, Usage, UsageValue, UsageValueByteLength, PreparsedData, Report_in_out, ReportLength);
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/hidpi/nf-hidpi-hidp_setusages
-  public static HidP_SetUsages(ReportType: HIDP_REPORT_TYPE, UsagePage: USAGE, LinkCollection: USHORT, UsageList: PUSAGE, UsageLength: PULONG, PreparsedData: PHIDP_PREPARSED_DATA, Report: PCHAR, ReportLength: ULONG): NTSTATUS {
-    return Hid.Load('HidP_SetUsages')(ReportType, UsagePage, LinkCollection, UsageList, UsageLength, PreparsedData, Report, ReportLength);
+  public static HidP_SetUsages(
+    ReportType: HIDP_REPORT_TYPE,
+    UsagePage: USAGE,
+    LinkCollection: USHORT,
+    UsageList_in_out: PUSAGE,
+    UsageLength_in_out: PULONG,
+    PreparsedData: PHIDP_PREPARSED_DATA,
+    Report: PCHAR,
+    ReportLength: ULONG,
+  ): NTSTATUS {
+    return Hid.Load('HidP_SetUsages')(ReportType, UsagePage, LinkCollection, UsageList_in_out, UsageLength_in_out, PreparsedData, Report, ReportLength);
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/hidpi/nf-hidpi-hidp_translateusagestoi8042scancodes
@@ -360,21 +394,30 @@ class Hid extends Win32 {
     ChangedUsageList: PUSAGE,
     UsageListLength: ULONG,
     KeyAction: HIDP_KEYBOARD_DIRECTION,
-    ModifierState: PHIDP_KEYBOARD_MODIFIER_STATE,
+    ModifierState_in_out: PHIDP_KEYBOARD_MODIFIER_STATE,
     InsertCodesProcedure: PHIDP_INSERT_SCANCODES,
-    InsertCodesContext: PVOID | NULL,
+    InsertCodesContext: OPTIONAL<PVOID>,
   ): NTSTATUS {
-    return Hid.Load('HidP_TranslateUsagesToI8042ScanCodes')(ChangedUsageList, UsageListLength, KeyAction, ModifierState, InsertCodesProcedure, InsertCodesContext);
+    return Hid.Load('HidP_TranslateUsagesToI8042ScanCodes')(ChangedUsageList, UsageListLength, KeyAction, ModifierState_in_out, InsertCodesProcedure, InsertCodesContext);
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/hidpi/nf-hidpi-hidp_unsetusages
-  public static HidP_UnsetUsages(ReportType: HIDP_REPORT_TYPE, UsagePage: USAGE, LinkCollection: USHORT, UsageList: PUSAGE, UsageLength: PULONG, PreparsedData: PHIDP_PREPARSED_DATA, Report: PCHAR, ReportLength: ULONG): NTSTATUS {
-    return Hid.Load('HidP_UnsetUsages')(ReportType, UsagePage, LinkCollection, UsageList, UsageLength, PreparsedData, Report, ReportLength);
+  public static HidP_UnsetUsages(
+    ReportType: HIDP_REPORT_TYPE,
+    UsagePage: USAGE,
+    LinkCollection: USHORT,
+    UsageList_in_out: PUSAGE,
+    UsageLength_in_out: PULONG,
+    PreparsedData: PHIDP_PREPARSED_DATA,
+    Report: PCHAR,
+    ReportLength: ULONG,
+  ): NTSTATUS {
+    return Hid.Load('HidP_UnsetUsages')(ReportType, UsagePage, LinkCollection, UsageList_in_out, UsageLength_in_out, PreparsedData, Report, ReportLength);
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/hidpi/nf-hidpi-hidp_usagelistdifference
-  public static HidP_UsageListDifference(PreviousUsageList: PUSAGE, CurrentUsageList: PUSAGE, BreakUsageList: PUSAGE, MakeUsageList: PUSAGE, UsageListLength: ULONG): NTSTATUS {
-    return Hid.Load('HidP_UsageListDifference')(PreviousUsageList, CurrentUsageList, BreakUsageList, MakeUsageList, UsageListLength);
+  public static HidP_UsageListDifference(PreviousUsageList: PUSAGE, CurrentUsageList: PUSAGE, BreakUsageList_out: PUSAGE, MakeUsageList_out: PUSAGE, UsageListLength: ULONG): NTSTATUS {
+    return Hid.Load('HidP_UsageListDifference')(PreviousUsageList, CurrentUsageList, BreakUsageList_out, MakeUsageList_out, UsageListLength);
   }
 }
 

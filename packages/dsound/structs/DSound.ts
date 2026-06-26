@@ -2,7 +2,7 @@ import { type FFIFunction, FFIType } from 'bun:ffi';
 
 import { Win32 } from '@bun-win32/core';
 
-import type { DWORD, HRESULT, HWND, LPCDSBUFFERDESC, LPCDSCBUFFERDESC, LPCGUID, LPDSENUMCALLBACKA, LPDSENUMCALLBACKW, LPGUID, LPLPVOID, LPUNKNOWN, LPVOID, NULL, REFCLSID, REFIID } from '../types/DSound';
+import type { DWORD, HRESULT, HWND, LPCDSBUFFERDESC, LPCDSCBUFFERDESC, LPCGUID, LPDSENUMCALLBACKA, LPDSENUMCALLBACKW, LPGUID, LPLPVOID, LPVOID, NULL, OPTIONAL, REFCLSID, REFIID } from '../types/DSound';
 
 /**
  * Thin, lazy-loaded FFI bindings for `dsound.dll`.
@@ -50,59 +50,59 @@ class DSound extends Win32 {
   } as const satisfies Record<string, FFIFunction>;
 
   // https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee416362(v=vs.85)
-  public static DirectSoundCaptureCreate(pcGuidDevice: LPCGUID | NULL, ppDSC: LPLPVOID, pUnkOuter: LPUNKNOWN | NULL): HRESULT {
-    return DSound.Load('DirectSoundCaptureCreate')(pcGuidDevice, ppDSC, pUnkOuter);
+  public static DirectSoundCaptureCreate(pcGuidDevice: OPTIONAL<LPCGUID>, ppDSC_out: LPLPVOID, pUnkOuter: NULL): HRESULT {
+    return DSound.Load('DirectSoundCaptureCreate')(pcGuidDevice, ppDSC_out, pUnkOuter);
   }
 
   // https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee416760(v=vs.85)
-  public static DirectSoundCaptureCreate8(pcGuidDevice: LPCGUID | NULL, ppDSC8: LPLPVOID, pUnkOuter: LPUNKNOWN | NULL): HRESULT {
-    return DSound.Load('DirectSoundCaptureCreate8')(pcGuidDevice, ppDSC8, pUnkOuter);
+  public static DirectSoundCaptureCreate8(pcGuidDevice: OPTIONAL<LPCGUID>, ppDSC8_out: LPLPVOID, pUnkOuter: NULL): HRESULT {
+    return DSound.Load('DirectSoundCaptureCreate8')(pcGuidDevice, ppDSC8_out, pUnkOuter);
   }
 
   // https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee416761(v=vs.85)
-  public static DirectSoundCaptureEnumerateA(pDSEnumCallback: LPDSENUMCALLBACKA, pContext: LPVOID | NULL): HRESULT {
+  public static DirectSoundCaptureEnumerateA(pDSEnumCallback: LPDSENUMCALLBACKA, pContext: OPTIONAL<LPVOID>): HRESULT {
     return DSound.Load('DirectSoundCaptureEnumerateA')(pDSEnumCallback, pContext);
   }
 
   // https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee416761(v=vs.85)
-  public static DirectSoundCaptureEnumerateW(pDSEnumCallback: LPDSENUMCALLBACKW, pContext: LPVOID | NULL): HRESULT {
+  public static DirectSoundCaptureEnumerateW(pDSEnumCallback: LPDSENUMCALLBACKW, pContext: OPTIONAL<LPVOID>): HRESULT {
     return DSound.Load('DirectSoundCaptureEnumerateW')(pDSEnumCallback, pContext);
   }
 
   // https://learn.microsoft.com/en-us/previous-versions/windows/desktop/mt708921(v=vs.85)
-  public static DirectSoundCreate(pcGuidDevice: LPCGUID | NULL, ppDS: LPLPVOID, pUnkOuter: LPUNKNOWN | NULL): HRESULT {
-    return DSound.Load('DirectSoundCreate')(pcGuidDevice, ppDS, pUnkOuter);
+  public static DirectSoundCreate(pcGuidDevice: OPTIONAL<LPCGUID>, ppDS_out: LPLPVOID, pUnkOuter: NULL): HRESULT {
+    return DSound.Load('DirectSoundCreate')(pcGuidDevice, ppDS_out, pUnkOuter);
   }
 
   // https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee416762(v=vs.85)
-  public static DirectSoundCreate8(pcGuidDevice: LPCGUID | NULL, ppDS8: LPLPVOID, pUnkOuter: LPUNKNOWN | NULL): HRESULT {
-    return DSound.Load('DirectSoundCreate8')(pcGuidDevice, ppDS8, pUnkOuter);
+  public static DirectSoundCreate8(pcGuidDevice: OPTIONAL<LPCGUID>, ppDS8_out: LPLPVOID, pUnkOuter: NULL): HRESULT {
+    return DSound.Load('DirectSoundCreate8')(pcGuidDevice, ppDS8_out, pUnkOuter);
   }
 
   // https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee416763(v=vs.85)
-  public static DirectSoundEnumerateA(pDSEnumCallback: LPDSENUMCALLBACKA, pContext: LPVOID | NULL): HRESULT {
+  public static DirectSoundEnumerateA(pDSEnumCallback: LPDSENUMCALLBACKA, pContext: OPTIONAL<LPVOID>): HRESULT {
     return DSound.Load('DirectSoundEnumerateA')(pDSEnumCallback, pContext);
   }
 
   // https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee416763(v=vs.85)
-  public static DirectSoundEnumerateW(pDSEnumCallback: LPDSENUMCALLBACKW, pContext: LPVOID | NULL): HRESULT {
+  public static DirectSoundEnumerateW(pDSEnumCallback: LPDSENUMCALLBACKW, pContext: OPTIONAL<LPVOID>): HRESULT {
     return DSound.Load('DirectSoundEnumerateW')(pDSEnumCallback, pContext);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/devnotes/directsoundfullduplexcreate
   public static DirectSoundFullDuplexCreate(
-    pcGuidCaptureDevice: LPCGUID | NULL,
-    pcGuidRenderDevice: LPCGUID | NULL,
+    pcGuidCaptureDevice: OPTIONAL<LPCGUID>,
+    pcGuidRenderDevice: OPTIONAL<LPCGUID>,
     pcDSCBufferDesc: LPCDSCBUFFERDESC,
     pcDSBufferDesc: LPCDSBUFFERDESC,
     hWnd: HWND,
     dwLevel: DWORD,
-    ppDSFD: LPLPVOID,
-    ppDSCBuffer8: LPLPVOID,
-    ppDSBuffer8: LPLPVOID,
-    pUnkOuter: LPUNKNOWN | NULL,
+    ppDSFD_out: LPLPVOID,
+    ppDSCBuffer8_out: LPLPVOID,
+    ppDSBuffer8_out: LPLPVOID,
+    pUnkOuter: NULL,
   ): HRESULT {
-    return DSound.Load('DirectSoundFullDuplexCreate')(pcGuidCaptureDevice, pcGuidRenderDevice, pcDSCBufferDesc, pcDSBufferDesc, hWnd, dwLevel, ppDSFD, ppDSCBuffer8, ppDSBuffer8, pUnkOuter);
+    return DSound.Load('DirectSoundFullDuplexCreate')(pcGuidCaptureDevice, pcGuidRenderDevice, pcDSCBufferDesc, pcDSBufferDesc, hWnd, dwLevel, ppDSFD_out, ppDSCBuffer8_out, ppDSBuffer8_out, pUnkOuter);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/combaseapi/nf-combaseapi-dllcanunloadnow
@@ -111,13 +111,13 @@ class DSound extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/combaseapi/nf-combaseapi-dllgetclassobject
-  public static DllGetClassObject(rclsid: REFCLSID, riid: REFIID, ppv: LPLPVOID): HRESULT {
-    return DSound.Load('DllGetClassObject')(rclsid, riid, ppv);
+  public static DllGetClassObject(rclsid: REFCLSID, riid: REFIID, ppv_out: LPLPVOID): HRESULT {
+    return DSound.Load('DllGetClassObject')(rclsid, riid, ppv_out);
   }
 
   // https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee417724(v=vs.85)
-  public static GetDeviceID(pGuidSrc: LPCGUID | NULL, pGuidDest: LPGUID): HRESULT {
-    return DSound.Load('GetDeviceID')(pGuidSrc, pGuidDest);
+  public static GetDeviceID(pGuidSrc: OPTIONAL<LPCGUID>, pGuidDest_out: LPGUID): HRESULT {
+    return DSound.Load('GetDeviceID')(pGuidSrc, pGuidDest_out);
   }
 }
 

@@ -1,6 +1,6 @@
 import type { Pointer } from 'bun:ffi';
 
-export type { BOOLEAN, DWORD, HANDLE, LPCWSTR, LPVOID, LPWSTR, NULL, PBYTE, PDWORD, PHANDLE, PULONG, PVOID, ULONG, USHORT } from '@bun-win32/core';
+export type { BOOLEAN, DWORD, HANDLE, LPCWSTR, LPVOID, LPWSTR, NULL, OPTIONAL, PBYTE, PDWORD, PHANDLE, PULONG, PVOID, ULONG, USHORT } from '@bun-win32/core';
 
 // ── BCrypt primitives ───────────────────────────────────────────────────────
 

@@ -1,6 +1,6 @@
 import type { Pointer } from 'bun:ffi';
 
-export type { HRESULT, LPCVOID, LPVOID, NULL, SIZE_T, UINT } from '@bun-win32/core';
+export type { HRESULT, LPCVOID, LPVOID, NULL, OPTIONAL, SIZE_T, UINT } from '@bun-win32/core';
 
 export enum D3D_FEATURE_LEVEL {
   D3D_FEATURE_LEVEL_10_0 = 0xa000,

@@ -1,6 +1,6 @@
 import type { Pointer } from 'bun:ffi';
 
-export type { BOOL, DWORD, INT, INT_PTR, LPCVOID, LPSTR, LPVOID, NULL, PVOID, SIZE_T, USHORT, VOID } from '@bun-win32/core';
+export type { BOOL, DWORD, INT, INT_PTR, LPCVOID, LPSTR, LPVOID, NULL, NULLABLE, OPTIONAL, PVOID, SIZE_T, USHORT, VOID } from '@bun-win32/core';
 
 export const COMPRESS_RAW = 0x2000_0000;
 

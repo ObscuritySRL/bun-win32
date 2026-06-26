@@ -12,7 +12,7 @@ import type {
   DismSession,
   HANDLE,
   HRESULT,
-  NULL,
+  OPTIONAL,
   PCWSTR,
   PDWORD,
   PDismCapability,
@@ -99,7 +99,16 @@ class Dismapi extends Win32 {
   } as const satisfies Record<string, FFIFunction>;
 
   // https://learn.microsoft.com/en-us/windows-hardware/manufacture/desktop/dism/dismaddcapability?view=windows-11
-  public static DismAddCapability(Session: DismSession, Name: PCWSTR, LimitAccess: BOOL, SourcePaths: PPCWSTR, SourcePathCount: UINT, CancelEvent: HANDLE | 0n, Progress: DISM_PROGRESS_CALLBACK | NULL, UserData: PVOID | NULL): HRESULT {
+  public static DismAddCapability(
+    Session: DismSession,
+    Name: PCWSTR,
+    LimitAccess: BOOL,
+    SourcePaths: OPTIONAL<PPCWSTR>,
+    SourcePathCount: UINT,
+    CancelEvent: OPTIONAL<HANDLE>,
+    Progress: OPTIONAL<DISM_PROGRESS_CALLBACK>,
+    UserData: OPTIONAL<PVOID>,
+  ): HRESULT {
     return Dismapi.Load('DismAddCapability')(Session, Name, LimitAccess, SourcePaths, SourcePathCount, CancelEvent, Progress, UserData);
   }
 
@@ -109,7 +118,7 @@ class Dismapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/manufacture/desktop/dism/dismaddpackage-function?view=windows-11
-  public static DismAddPackage(Session: DismSession, PackagePath: PCWSTR, IgnoreCheck: BOOL, PreventPending: BOOL, CancelEvent: HANDLE | 0n, Progress: DISM_PROGRESS_CALLBACK | NULL, UserData: PVOID | NULL): HRESULT {
+  public static DismAddPackage(Session: DismSession, PackagePath: PCWSTR, IgnoreCheck: BOOL, PreventPending: BOOL, CancelEvent: OPTIONAL<HANDLE>, Progress: OPTIONAL<DISM_PROGRESS_CALLBACK>, UserData: OPTIONAL<PVOID>): HRESULT {
     return Dismapi.Load('DismAddPackage')(Session, PackagePath, IgnoreCheck, PreventPending, CancelEvent, Progress, UserData);
   }
 
@@ -119,8 +128,8 @@ class Dismapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/manufacture/desktop/dism/dismcheckimagehealth-function?view=windows-11
-  public static DismCheckImageHealth(Session: DismSession, ScanImage: BOOL, CancelEvent: HANDLE | 0n, Progress: DISM_PROGRESS_CALLBACK | NULL, UserData: PVOID | NULL, ImageHealth: PDismImageHealthState): HRESULT {
-    return Dismapi.Load('DismCheckImageHealth')(Session, ScanImage, CancelEvent, Progress, UserData, ImageHealth);
+  public static DismCheckImageHealth(Session: DismSession, ScanImage: BOOL, CancelEvent: OPTIONAL<HANDLE>, Progress: OPTIONAL<DISM_PROGRESS_CALLBACK>, UserData: OPTIONAL<PVOID>, ImageHealth_out: PDismImageHealthState): HRESULT {
+    return Dismapi.Load('DismCheckImageHealth')(Session, ScanImage, CancelEvent, Progress, UserData, ImageHealth_out);
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/manufacture/desktop/dism/dismcleanupmountpoints-function?view=windows-11
@@ -134,7 +143,7 @@ class Dismapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/manufacture/desktop/dism/dismcommitimage-function?view=windows-11
-  public static DismCommitImage(Session: DismSession, Flags: DWORD, CancelEvent: HANDLE | 0n, Progress: DISM_PROGRESS_CALLBACK | NULL, UserData: PVOID | NULL): HRESULT {
+  public static DismCommitImage(Session: DismSession, Flags: DWORD, CancelEvent: OPTIONAL<HANDLE>, Progress: OPTIONAL<DISM_PROGRESS_CALLBACK>, UserData: OPTIONAL<PVOID>): HRESULT {
     return Dismapi.Load('DismCommitImage')(Session, Flags, CancelEvent, Progress, UserData);
   }
 
@@ -144,7 +153,15 @@ class Dismapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/manufacture/desktop/dism/dismdisablefeature-function?view=windows-11
-  public static DismDisableFeature(Session: DismSession, FeatureName: PCWSTR, PackageName: PCWSTR | NULL, RemovePayload: BOOL, CancelEvent: HANDLE | 0n, Progress: DISM_PROGRESS_CALLBACK | NULL, UserData: PVOID | NULL): HRESULT {
+  public static DismDisableFeature(
+    Session: DismSession,
+    FeatureName: PCWSTR,
+    PackageName: OPTIONAL<PCWSTR>,
+    RemovePayload: BOOL,
+    CancelEvent: OPTIONAL<HANDLE>,
+    Progress: OPTIONAL<DISM_PROGRESS_CALLBACK>,
+    UserData: OPTIONAL<PVOID>,
+  ): HRESULT {
     return Dismapi.Load('DismDisableFeature')(Session, FeatureName, PackageName, RemovePayload, CancelEvent, Progress, UserData);
   }
 
@@ -152,86 +169,86 @@ class Dismapi extends Win32 {
   public static DismEnableFeature(
     Session: DismSession,
     FeatureName: PCWSTR,
-    Identifier: PCWSTR | NULL,
+    Identifier: OPTIONAL<PCWSTR>,
     PackageIdentifier: DismPackageIdentifier,
     LimitAccess: BOOL,
-    SourcePaths: PPCWSTR | NULL,
+    SourcePaths: OPTIONAL<PPCWSTR>,
     SourcePathCount: UINT,
     EnableAll: BOOL,
-    CancelEvent: HANDLE | 0n,
-    Progress: DISM_PROGRESS_CALLBACK | NULL,
-    UserData: PVOID | NULL,
+    CancelEvent: OPTIONAL<HANDLE>,
+    Progress: OPTIONAL<DISM_PROGRESS_CALLBACK>,
+    UserData: OPTIONAL<PVOID>,
   ): HRESULT {
     return Dismapi.Load('DismEnableFeature')(Session, FeatureName, Identifier, PackageIdentifier, LimitAccess, SourcePaths, SourcePathCount, EnableAll, CancelEvent, Progress, UserData);
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/manufacture/desktop/dism/dismgetcapabilities?view=windows-11
-  public static DismGetCapabilities(Session: DismSession, Capability: PDismCapability, Count: PUINT): HRESULT {
-    return Dismapi.Load('DismGetCapabilities')(Session, Capability, Count);
+  public static DismGetCapabilities(Session: DismSession, Capability_out: PDismCapability, Count_out: PUINT): HRESULT {
+    return Dismapi.Load('DismGetCapabilities')(Session, Capability_out, Count_out);
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/manufacture/desktop/dism/dismgetcapabilityinfo?view=windows-11
-  public static DismGetCapabilityInfo(Session: DismSession, Name: PCWSTR, Info: PDismCapabilityInfo): HRESULT {
-    return Dismapi.Load('DismGetCapabilityInfo')(Session, Name, Info);
+  public static DismGetCapabilityInfo(Session: DismSession, Name: PCWSTR, Info_out: PDismCapabilityInfo): HRESULT {
+    return Dismapi.Load('DismGetCapabilityInfo')(Session, Name, Info_out);
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/manufacture/desktop/dism/dismgetdriverinfo-function?view=windows-11
-  public static DismGetDriverInfo(Session: DismSession, DriverPath: PCWSTR, Driver: PDismDriver, Count: PUINT, DriverPackage: PDismDriverPackage | NULL): HRESULT {
-    return Dismapi.Load('DismGetDriverInfo')(Session, DriverPath, Driver, Count, DriverPackage);
+  public static DismGetDriverInfo(Session: DismSession, DriverPath: PCWSTR, Driver_out: PDismDriver, Count_out: PUINT, DriverPackage_out: OPTIONAL<PDismDriverPackage>): HRESULT {
+    return Dismapi.Load('DismGetDriverInfo')(Session, DriverPath, Driver_out, Count_out, DriverPackage_out);
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/manufacture/desktop/dism/dismgetdrivers-function?view=windows-11
-  public static DismGetDrivers(Session: DismSession, AllDrivers: BOOL, DriverPackage: PDismDriverPackage, Count: PUINT): HRESULT {
-    return Dismapi.Load('DismGetDrivers')(Session, AllDrivers, DriverPackage, Count);
+  public static DismGetDrivers(Session: DismSession, AllDrivers: BOOL, DriverPackage_out: PDismDriverPackage, Count_out: PUINT): HRESULT {
+    return Dismapi.Load('DismGetDrivers')(Session, AllDrivers, DriverPackage_out, Count_out);
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/manufacture/desktop/dism/dismgetfeatureinfo-function?view=windows-11
-  public static DismGetFeatureInfo(Session: DismSession, FeatureName: PCWSTR, Identifier: PCWSTR | NULL, PackageIdentifier: DismPackageIdentifier, FeatureInfo: PDismFeatureInfo): HRESULT {
-    return Dismapi.Load('DismGetFeatureInfo')(Session, FeatureName, Identifier, PackageIdentifier, FeatureInfo);
+  public static DismGetFeatureInfo(Session: DismSession, FeatureName: PCWSTR, Identifier: OPTIONAL<PCWSTR>, PackageIdentifier: DismPackageIdentifier, FeatureInfo_out: PDismFeatureInfo): HRESULT {
+    return Dismapi.Load('DismGetFeatureInfo')(Session, FeatureName, Identifier, PackageIdentifier, FeatureInfo_out);
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/manufacture/desktop/dism/dismgetfeatureparent-function?view=windows-11
-  public static DismGetFeatureParent(Session: DismSession, FeatureName: PCWSTR, Identifier: PCWSTR | NULL, PackageIdentifier: DismPackageIdentifier, Feature: PDismFeature, Count: PUINT): HRESULT {
-    return Dismapi.Load('DismGetFeatureParent')(Session, FeatureName, Identifier, PackageIdentifier, Feature, Count);
+  public static DismGetFeatureParent(Session: DismSession, FeatureName: PCWSTR, Identifier: OPTIONAL<PCWSTR>, PackageIdentifier: DismPackageIdentifier, Feature_out: PDismFeature, Count_out: PUINT): HRESULT {
+    return Dismapi.Load('DismGetFeatureParent')(Session, FeatureName, Identifier, PackageIdentifier, Feature_out, Count_out);
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/manufacture/desktop/dism/dismgetfeatures-function?view=windows-11
-  public static DismGetFeatures(Session: DismSession, Identifier: PCWSTR | NULL, PackageIdentifier: DismPackageIdentifier, Feature: PDismFeature, Count: PUINT): HRESULT {
-    return Dismapi.Load('DismGetFeatures')(Session, Identifier, PackageIdentifier, Feature, Count);
+  public static DismGetFeatures(Session: DismSession, Identifier: OPTIONAL<PCWSTR>, PackageIdentifier: DismPackageIdentifier, Feature_out: PDismFeature, Count_out: PUINT): HRESULT {
+    return Dismapi.Load('DismGetFeatures')(Session, Identifier, PackageIdentifier, Feature_out, Count_out);
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/manufacture/desktop/dism/dismgetimageinfo-function?view=windows-11
-  public static DismGetImageInfo(ImageFilePath: PCWSTR, ImageInfo: PDismImageInfo, Count: PUINT): HRESULT {
-    return Dismapi.Load('DismGetImageInfo')(ImageFilePath, ImageInfo, Count);
+  public static DismGetImageInfo(ImageFilePath: PCWSTR, ImageInfo_out: PDismImageInfo, Count_out: PUINT): HRESULT {
+    return Dismapi.Load('DismGetImageInfo')(ImageFilePath, ImageInfo_out, Count_out);
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/manufacture/desktop/dism/dismgetlasterrormessage-function?view=windows-11
-  public static DismGetLastErrorMessage(ErrorMessage: PDismString): HRESULT {
-    return Dismapi.Load('DismGetLastErrorMessage')(ErrorMessage);
+  public static DismGetLastErrorMessage(ErrorMessage_out: PDismString): HRESULT {
+    return Dismapi.Load('DismGetLastErrorMessage')(ErrorMessage_out);
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/manufacture/desktop/dism/dismgetmountedimageinfo-function?view=windows-11
-  public static DismGetMountedImageInfo(MountedImageInfo: PDismMountedImageInfo, Count: PUINT): HRESULT {
-    return Dismapi.Load('DismGetMountedImageInfo')(MountedImageInfo, Count);
+  public static DismGetMountedImageInfo(MountedImageInfo_out: PDismMountedImageInfo, Count_out: PUINT): HRESULT {
+    return Dismapi.Load('DismGetMountedImageInfo')(MountedImageInfo_out, Count_out);
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/manufacture/desktop/dism/dismgetpackageinfo-function?view=windows-11
-  public static DismGetPackageInfo(Session: DismSession, Identifier: PCWSTR, PackageIdentifier: DismPackageIdentifier, PackageInfo: PDismPackageInfo): HRESULT {
-    return Dismapi.Load('DismGetPackageInfo')(Session, Identifier, PackageIdentifier, PackageInfo);
+  public static DismGetPackageInfo(Session: DismSession, Identifier: PCWSTR, PackageIdentifier: DismPackageIdentifier, PackageInfo_out: PDismPackageInfo): HRESULT {
+    return Dismapi.Load('DismGetPackageInfo')(Session, Identifier, PackageIdentifier, PackageInfo_out);
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/manufacture/desktop/dism/dismgetpackages-function?view=windows-11
-  public static DismGetPackages(Session: DismSession, Package: PDismPackage, Count: PUINT): HRESULT {
-    return Dismapi.Load('DismGetPackages')(Session, Package, Count);
+  public static DismGetPackages(Session: DismSession, Package_out: PDismPackage, Count_out: PUINT): HRESULT {
+    return Dismapi.Load('DismGetPackages')(Session, Package_out, Count_out);
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/manufacture/desktop/dism/dismgetreservedstoragestate-function?view=windows-11
-  public static DismGetReservedStorageState(Session: DismSession, State: PDWORD): HRESULT {
-    return Dismapi.Load('DismGetReservedStorageState')(Session, State);
+  public static DismGetReservedStorageState(Session: DismSession, State_out: PDWORD): HRESULT {
+    return Dismapi.Load('DismGetReservedStorageState')(Session, State_out);
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/manufacture/desktop/dism/disminitialize-function?view=windows-11
-  public static DismInitialize(LogLevel: DismLogLevel, LogFilePath: PCWSTR | NULL, ScratchDirectory: PCWSTR | NULL): HRESULT {
+  public static DismInitialize(LogLevel: DismLogLevel, LogFilePath: OPTIONAL<PCWSTR>, ScratchDirectory: OPTIONAL<PCWSTR>): HRESULT {
     return Dismapi.Load('DismInitialize')(LogLevel, LogFilePath, ScratchDirectory);
   }
 
@@ -240,19 +257,19 @@ class Dismapi extends Win32 {
     ImageFilePath: PCWSTR,
     MountPath: PCWSTR,
     ImageIndex: UINT,
-    ImageName: PCWSTR | NULL,
+    ImageName: OPTIONAL<PCWSTR>,
     ImageIdentifier: DismImageIdentifier,
     Flags: DWORD,
-    CancelEvent: HANDLE | 0n,
-    Progress: DISM_PROGRESS_CALLBACK | NULL,
-    UserData: PVOID | NULL,
+    CancelEvent: OPTIONAL<HANDLE>,
+    Progress: OPTIONAL<DISM_PROGRESS_CALLBACK>,
+    UserData: OPTIONAL<PVOID>,
   ): HRESULT {
     return Dismapi.Load('DismMountImage')(ImageFilePath, MountPath, ImageIndex, ImageName, ImageIdentifier, Flags, CancelEvent, Progress, UserData);
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/manufacture/desktop/dism/dismopensession-function?view=windows-11
-  public static DismOpenSession(ImagePath: PCWSTR, WindowsDirectory: PCWSTR | NULL, SystemDrive: PCWSTR | NULL, Session: PDismSession): HRESULT {
-    return Dismapi.Load('DismOpenSession')(ImagePath, WindowsDirectory, SystemDrive, Session);
+  public static DismOpenSession(ImagePath: PCWSTR, WindowsDirectory: OPTIONAL<PCWSTR>, SystemDrive: OPTIONAL<PCWSTR>, Session_out: PDismSession): HRESULT {
+    return Dismapi.Load('DismOpenSession')(ImagePath, WindowsDirectory, SystemDrive, Session_out);
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/manufacture/desktop/dism/dismremountimage-function?view=windows-11
@@ -261,7 +278,7 @@ class Dismapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/manufacture/desktop/dism/dismremovecapability?view=windows-11
-  public static DismRemoveCapability(Session: DismSession, Name: PCWSTR, CancelEvent: HANDLE | 0n, Progress: DISM_PROGRESS_CALLBACK | NULL, UserData: PVOID | NULL): HRESULT {
+  public static DismRemoveCapability(Session: DismSession, Name: PCWSTR, CancelEvent: OPTIONAL<HANDLE>, Progress: OPTIONAL<DISM_PROGRESS_CALLBACK>, UserData: OPTIONAL<PVOID>): HRESULT {
     return Dismapi.Load('DismRemoveCapability')(Session, Name, CancelEvent, Progress, UserData);
   }
 
@@ -271,12 +288,20 @@ class Dismapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/manufacture/desktop/dism/dismremovepackage-function?view=windows-11
-  public static DismRemovePackage(Session: DismSession, Identifier: PCWSTR, PackageIdentifier: DismPackageIdentifier, CancelEvent: HANDLE | 0n, Progress: DISM_PROGRESS_CALLBACK | NULL, UserData: PVOID | NULL): HRESULT {
+  public static DismRemovePackage(Session: DismSession, Identifier: PCWSTR, PackageIdentifier: DismPackageIdentifier, CancelEvent: OPTIONAL<HANDLE>, Progress: OPTIONAL<DISM_PROGRESS_CALLBACK>, UserData: OPTIONAL<PVOID>): HRESULT {
     return Dismapi.Load('DismRemovePackage')(Session, Identifier, PackageIdentifier, CancelEvent, Progress, UserData);
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/manufacture/desktop/dism/dismrestoreimagehealth-function?view=windows-11
-  public static DismRestoreImageHealth(Session: DismSession, SourcePaths: PPCWSTR | NULL, SourcePathCount: UINT, LimitAccess: BOOL, CancelEvent: HANDLE | 0n, Progress: DISM_PROGRESS_CALLBACK | NULL, UserData: PVOID | NULL): HRESULT {
+  public static DismRestoreImageHealth(
+    Session: DismSession,
+    SourcePaths: OPTIONAL<PPCWSTR>,
+    SourcePathCount: UINT,
+    LimitAccess: BOOL,
+    CancelEvent: OPTIONAL<HANDLE>,
+    Progress: OPTIONAL<DISM_PROGRESS_CALLBACK>,
+    UserData: OPTIONAL<PVOID>,
+  ): HRESULT {
     return Dismapi.Load('DismRestoreImageHealth')(Session, SourcePaths, SourcePathCount, LimitAccess, CancelEvent, Progress, UserData);
   }
 
@@ -291,7 +316,7 @@ class Dismapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/manufacture/desktop/dism/dismunmountimage-function?view=windows-11
-  public static DismUnmountImage(MountPath: PCWSTR, Flags: DWORD, CancelEvent: HANDLE | 0n, Progress: DISM_PROGRESS_CALLBACK | NULL, UserData: PVOID | NULL): HRESULT {
+  public static DismUnmountImage(MountPath: PCWSTR, Flags: DWORD, CancelEvent: OPTIONAL<HANDLE>, Progress: OPTIONAL<DISM_PROGRESS_CALLBACK>, UserData: OPTIONAL<PVOID>): HRESULT {
     return Dismapi.Load('DismUnmountImage')(MountPath, Flags, CancelEvent, Progress, UserData);
   }
 }

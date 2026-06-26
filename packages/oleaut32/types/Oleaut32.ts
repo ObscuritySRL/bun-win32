@@ -1,7 +1,37 @@
 import type { Pointer } from 'bun:ffi';
 
 import type { DWORD, LONG, SHORT, ULONG, USHORT } from '@bun-win32/core';
-export type { BOOL, BOOLEAN, BYTE, CHAR, DWORD, HANDLE, HRESULT, HWND, INT, LONG, LONG_PTR, LPCSTR, LPCVOID, LPCWSTR, LPDWORD, LPSTR, LPVOID, LPWSTR, NULL, PULONG, PVOID, SHORT, UINT, ULONG, ULONG_PTR, USHORT, WORD } from '@bun-win32/core';
+export type {
+  BOOL,
+  BOOLEAN,
+  BYTE,
+  CHAR,
+  DWORD,
+  HANDLE,
+  HRESULT,
+  HWND,
+  INT,
+  LONG,
+  LONG_PTR,
+  LPCSTR,
+  LPCVOID,
+  LPCWSTR,
+  LPDWORD,
+  LPSTR,
+  LPVOID,
+  LPWSTR,
+  NULL,
+  NULLABLE,
+  OPTIONAL,
+  PULONG,
+  PVOID,
+  SHORT,
+  UINT,
+  ULONG,
+  ULONG_PTR,
+  USHORT,
+  WORD,
+} from '@bun-win32/core';
 
 export type DOUBLE = number;
 export type FLOAT = number;

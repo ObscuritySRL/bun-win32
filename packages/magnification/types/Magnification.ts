@@ -1,6 +1,6 @@
 import type { Pointer } from 'bun:ffi';
 
-export type { BOOL, DWORD, HWND, INT, LPDWORD, NULL } from '@bun-win32/core';
+export type { BOOL, DWORD, HWND, INT, LPDWORD, NULL, NULLABLE } from '@bun-win32/core';
 
 export const MS_CLIPAROUNDCURSOR = 0x0000_0002;
 export const MS_INVERTCOLORS = 0x0000_0004;

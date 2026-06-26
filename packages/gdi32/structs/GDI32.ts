@@ -87,6 +87,7 @@ import type {
   METAFILEPICT_,
   MFENUMPROC,
   NULL,
+  OPTIONAL,
   PALETTEENTRY_,
   PFLOAT,
   PIXELFORMATDESCRIPTOR_,
@@ -467,7 +468,7 @@ class GDI32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-addfontmemresourceex
-  public static AddFontMemResourceEx(pFileView: PVOID, cjSize: DWORD, pvResrved: PVOID | NULL, pNumFonts: DWORD_): HANDLE {
+  public static AddFontMemResourceEx(pFileView: PVOID, cjSize: DWORD, pvResrved: NULL, pNumFonts: DWORD_): HANDLE {
     return GDI32.Load('AddFontMemResourceEx')(pFileView, cjSize, pvResrved, pNumFonts);
   }
 
@@ -477,12 +478,12 @@ class GDI32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-addfontresourceexa
-  public static AddFontResourceExA(name: LPCSTR, fl: DWORD, res: PVOID | NULL): int {
+  public static AddFontResourceExA(name: LPCSTR, fl: DWORD, res: NULL): int {
     return GDI32.Load('AddFontResourceExA')(name, fl, res);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-addfontresourceexw
-  public static AddFontResourceExW(name: LPCWSTR, fl: DWORD, res: PVOID | NULL): int {
+  public static AddFontResourceExW(name: LPCWSTR, fl: DWORD, res: NULL): int {
     return GDI32.Load('AddFontResourceExW')(name, fl, res);
   }
 
@@ -517,7 +518,7 @@ class GDI32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-bitblt
-  public static BitBlt(hdc: HDC, x: int, y: int, cx: int, cy: int, hdcSrc: HDC | 0n, x1: int, y1: int, rop: DWORD): BOOL {
+  public static BitBlt(hdc: HDC, x: int, y: int, cx: int, cy: int, hdcSrc: OPTIONAL<HDC>, x1: int, y1: int, rop: DWORD): BOOL {
     return GDI32.Load('BitBlt')(hdc, x, y, cx, cy, hdcSrc, x1, y1, rop);
   }
 
@@ -527,8 +528,8 @@ class GDI32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-checkcolorsingamut
-  public static CheckColorsInGamut(hdc: HDC, lpRGBTriple: LPRGBTRIPLE, dlpBuffer: LPVOID, nCount: DWORD): BOOL {
-    return GDI32.Load('CheckColorsInGamut')(hdc, lpRGBTriple, dlpBuffer, nCount);
+  public static CheckColorsInGamut(hdc: HDC, lpRGBTriple: LPRGBTRIPLE, dlpBuffer_out: LPVOID, nCount: DWORD): BOOL {
+    return GDI32.Load('CheckColorsInGamut')(hdc, lpRGBTriple, dlpBuffer_out, nCount);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-choosepixelformat
@@ -567,37 +568,37 @@ class GDI32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-combinergn
-  public static CombineRgn(hrgnDst: HRGN | 0n, hrgnSrc1: HRGN | 0n, hrgnSrc2: HRGN | 0n, iMode: int): int {
+  public static CombineRgn(hrgnDst: OPTIONAL<HRGN>, hrgnSrc1: OPTIONAL<HRGN>, hrgnSrc2: OPTIONAL<HRGN>, iMode: int): int {
     return GDI32.Load('CombineRgn')(hrgnDst, hrgnSrc1, hrgnSrc2, iMode);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-combinetransform
-  public static CombineTransform(lpxfOut: LPXFORM, lpxf1: XFORM_, lpxf2: XFORM_): BOOL {
-    return GDI32.Load('CombineTransform')(lpxfOut, lpxf1, lpxf2);
+  public static CombineTransform(lpxfOut_out: LPXFORM, lpxf1: XFORM_, lpxf2: XFORM_): BOOL {
+    return GDI32.Load('CombineTransform')(lpxfOut_out, lpxf1, lpxf2);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-copyenhmetafilea
-  public static CopyEnhMetaFileA(hEnh: HENHMETAFILE, lpFileName: LPCSTR | NULL): HENHMETAFILE {
+  public static CopyEnhMetaFileA(hEnh: HENHMETAFILE, lpFileName: OPTIONAL<LPCSTR>): HENHMETAFILE {
     return GDI32.Load('CopyEnhMetaFileA')(hEnh, lpFileName);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-copyenhmetafilew
-  public static CopyEnhMetaFileW(hEnh: HENHMETAFILE, lpFileName: LPCWSTR | NULL): HENHMETAFILE {
+  public static CopyEnhMetaFileW(hEnh: HENHMETAFILE, lpFileName: OPTIONAL<LPCWSTR>): HENHMETAFILE {
     return GDI32.Load('CopyEnhMetaFileW')(hEnh, lpFileName);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-copymetafilea
-  public static CopyMetaFileA(hmf: HMETAFILE, lpFileName: LPCSTR | NULL): HMETAFILE {
+  public static CopyMetaFileA(hmf: HMETAFILE, lpFileName: OPTIONAL<LPCSTR>): HMETAFILE {
     return GDI32.Load('CopyMetaFileA')(hmf, lpFileName);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-copymetafilew
-  public static CopyMetaFileW(hmf: HMETAFILE, lpFileName: LPCWSTR | NULL): HMETAFILE {
+  public static CopyMetaFileW(hmf: HMETAFILE, lpFileName: OPTIONAL<LPCWSTR>): HMETAFILE {
     return GDI32.Load('CopyMetaFileW')(hmf, lpFileName);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-createbitmap
-  public static CreateBitmap(nWidth: int, nHeight: int, nPlanes: UINT, nBitCount: UINT, lpBits: LPVOID | NULL): HBITMAP {
+  public static CreateBitmap(nWidth: int, nHeight: int, nPlanes: UINT, nBitCount: UINT, lpBits: OPTIONAL<LPVOID>): HBITMAP {
     return GDI32.Load('CreateBitmap')(nWidth, nHeight, nPlanes, nBitCount, lpBits);
   }
 
@@ -627,22 +628,22 @@ class GDI32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-createcompatibledc
-  public static CreateCompatibleDC(hdc: HDC | 0n): HDC {
+  public static CreateCompatibleDC(hdc: OPTIONAL<HDC>): HDC {
     return GDI32.Load('CreateCompatibleDC')(hdc);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-createdca
-  public static CreateDCA(pwszDriver: LPCSTR | NULL, pwszDevice: LPCSTR | NULL, pszPort: LPCSTR | NULL, pdm: DEVMODEA_ | NULL): HDC {
+  public static CreateDCA(pwszDriver: OPTIONAL<LPCSTR>, pwszDevice: OPTIONAL<LPCSTR>, pszPort: OPTIONAL<LPCSTR>, pdm: OPTIONAL<DEVMODEA_>): HDC {
     return GDI32.Load('CreateDCA')(pwszDriver, pwszDevice, pszPort, pdm);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-createdcw
-  public static CreateDCW(pwszDriver: LPCWSTR | NULL, pwszDevice: LPCWSTR | NULL, pszPort: LPCWSTR | NULL, pdm: DEVMODEW_ | NULL): HDC {
+  public static CreateDCW(pwszDriver: OPTIONAL<LPCWSTR>, pwszDevice: OPTIONAL<LPCWSTR>, pszPort: OPTIONAL<LPCWSTR>, pdm: OPTIONAL<DEVMODEW_>): HDC {
     return GDI32.Load('CreateDCW')(pwszDriver, pwszDevice, pszPort, pdm);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-createdibitmap
-  public static CreateDIBitmap(hdc: HDC, pbmih: BITMAPINFOHEADER_ | NULL, flInit: DWORD, pjBits: LPVOID | NULL, pbmi: BITMAPINFO_ | NULL, iUsage: UINT): HBITMAP {
+  public static CreateDIBitmap(hdc: HDC, pbmih: OPTIONAL<BITMAPINFOHEADER_>, flInit: DWORD, pjBits: OPTIONAL<LPVOID>, pbmi: OPTIONAL<BITMAPINFO_>, iUsage: UINT): HBITMAP {
     return GDI32.Load('CreateDIBitmap')(hdc, pbmih, flInit, pjBits, pbmi, iUsage);
   }
 
@@ -657,8 +658,8 @@ class GDI32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-createdibsection
-  public static CreateDIBSection(hdc: HDC | 0n, pbmi: BITMAPINFO_, usage: UINT, ppvBits: LPVOID, hSection: HANDLE | 0n, offset: DWORD): HBITMAP {
-    return GDI32.Load('CreateDIBSection')(hdc, pbmi, usage, ppvBits, hSection, offset);
+  public static CreateDIBSection(hdc: OPTIONAL<HDC>, pbmi: BITMAPINFO_, usage: UINT, ppvBits_out: LPVOID, hSection: OPTIONAL<HANDLE>, offset: DWORD): HBITMAP {
+    return GDI32.Load('CreateDIBSection')(hdc, pbmi, usage, ppvBits_out, hSection, offset);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-creatediscardablebitmap
@@ -677,12 +678,12 @@ class GDI32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-createenhmetafilea
-  public static CreateEnhMetaFileA(hdc: HDC | 0n, lpFilename: LPCSTR | NULL, lprc: RECT_ | NULL, lpDesc: LPCSTR | NULL): HDC {
+  public static CreateEnhMetaFileA(hdc: OPTIONAL<HDC>, lpFilename: OPTIONAL<LPCSTR>, lprc: OPTIONAL<RECT_>, lpDesc: OPTIONAL<LPCSTR>): HDC {
     return GDI32.Load('CreateEnhMetaFileA')(hdc, lpFilename, lprc, lpDesc);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-createenhmetafilew
-  public static CreateEnhMetaFileW(hdc: HDC | 0n, lpFilename: LPCWSTR | NULL, lprc: RECT_ | NULL, lpDesc: LPCWSTR | NULL): HDC {
+  public static CreateEnhMetaFileW(hdc: OPTIONAL<HDC>, lpFilename: OPTIONAL<LPCWSTR>, lprc: OPTIONAL<RECT_>, lpDesc: OPTIONAL<LPCWSTR>): HDC {
     return GDI32.Load('CreateEnhMetaFileW')(hdc, lpFilename, lprc, lpDesc);
   }
 
@@ -701,7 +702,7 @@ class GDI32 extends Win32 {
     iClipPrecision: DWORD,
     iQuality: DWORD,
     iPitchAndFamily: DWORD,
-    pszFaceName: LPCSTR | NULL,
+    pszFaceName: OPTIONAL<LPCSTR>,
   ): HFONT {
     return GDI32.Load('CreateFontA')(cHeight, cWidth, cEscapement, cOrientation, cWeight, bItalic, bUnderline, bStrikeOut, iCharSet, iOutPrecision, iClipPrecision, iQuality, iPitchAndFamily, pszFaceName);
   }
@@ -741,13 +742,13 @@ class GDI32 extends Win32 {
     iClipPrecision: DWORD,
     iQuality: DWORD,
     iPitchAndFamily: DWORD,
-    pszFaceName: LPCWSTR | NULL,
+    pszFaceName: OPTIONAL<LPCWSTR>,
   ): HFONT {
     return GDI32.Load('CreateFontW')(cHeight, cWidth, cEscapement, cOrientation, cWeight, bItalic, bUnderline, bStrikeOut, iCharSet, iOutPrecision, iClipPrecision, iQuality, iPitchAndFamily, pszFaceName);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-createhalftonepalette
-  public static CreateHalftonePalette(hdc: HDC | 0n): HPALETTE {
+  public static CreateHalftonePalette(hdc: OPTIONAL<HDC>): HPALETTE {
     return GDI32.Load('CreateHalftonePalette')(hdc);
   }
 
@@ -757,22 +758,22 @@ class GDI32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-createica
-  public static CreateICA(pszDriver: LPCSTR | NULL, pszDevice: LPCSTR | NULL, pszPort: LPCSTR | NULL, pdm: DEVMODEA_ | NULL): HDC {
+  public static CreateICA(pszDriver: OPTIONAL<LPCSTR>, pszDevice: OPTIONAL<LPCSTR>, pszPort: OPTIONAL<LPCSTR>, pdm: OPTIONAL<DEVMODEA_>): HDC {
     return GDI32.Load('CreateICA')(pszDriver, pszDevice, pszPort, pdm);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-createicw
-  public static CreateICW(pszDriver: LPCWSTR | NULL, pszDevice: LPCWSTR | NULL, pszPort: LPCWSTR | NULL, pdm: DEVMODEW_ | NULL): HDC {
+  public static CreateICW(pszDriver: OPTIONAL<LPCWSTR>, pszDevice: OPTIONAL<LPCWSTR>, pszPort: OPTIONAL<LPCWSTR>, pdm: OPTIONAL<DEVMODEW_>): HDC {
     return GDI32.Load('CreateICW')(pszDriver, pszDevice, pszPort, pdm);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-createmetafilea
-  public static CreateMetaFileA(pszFile: LPCSTR | NULL): HDC {
+  public static CreateMetaFileA(pszFile: OPTIONAL<LPCSTR>): HDC {
     return GDI32.Load('CreateMetaFileA')(pszFile);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-createmetafilew
-  public static CreateMetaFileW(pszFile: LPCWSTR | NULL): HDC {
+  public static CreateMetaFileW(pszFile: OPTIONAL<LPCWSTR>): HDC {
     return GDI32.Load('CreateMetaFileW')(pszFile);
   }
 
@@ -822,12 +823,12 @@ class GDI32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-createscalablefontresourcea
-  public static CreateScalableFontResourceA(fdwHidden: DWORD, lpszFont: LPCSTR, lpszFile: LPCSTR, lpszPath: LPCSTR | NULL): BOOL {
+  public static CreateScalableFontResourceA(fdwHidden: DWORD, lpszFont: LPCSTR, lpszFile: LPCSTR, lpszPath: OPTIONAL<LPCSTR>): BOOL {
     return GDI32.Load('CreateScalableFontResourceA')(fdwHidden, lpszFont, lpszFile, lpszPath);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-createscalablefontresourcew
-  public static CreateScalableFontResourceW(fdwHidden: DWORD, lpszFont: LPCWSTR, lpszFile: LPCWSTR, lpszPath: LPCWSTR | NULL): BOOL {
+  public static CreateScalableFontResourceW(fdwHidden: DWORD, lpszFont: LPCWSTR, lpszFile: LPCWSTR, lpszPath: OPTIONAL<LPCWSTR>): BOOL {
     return GDI32.Load('CreateScalableFontResourceW')(fdwHidden, lpszFont, lpszFile, lpszPath);
   }
 
@@ -847,7 +848,7 @@ class GDI32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-deleteenhmetafile
-  public static DeleteEnhMetaFile(hmf: HENHMETAFILE | 0n): BOOL {
+  public static DeleteEnhMetaFile(hmf: OPTIONAL<HENHMETAFILE>): BOOL {
     return GDI32.Load('DeleteEnhMetaFile')(hmf);
   }
 
@@ -862,17 +863,17 @@ class GDI32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-describepixelformat
-  public static DescribePixelFormat(hdc: HDC, iPixelFormat: int, nBytes: UINT, ppfd: LPPIXELFORMATDESCRIPTOR | NULL): int {
-    return GDI32.Load('DescribePixelFormat')(hdc, iPixelFormat, nBytes, ppfd);
+  public static DescribePixelFormat(hdc: HDC, iPixelFormat: int, nBytes: UINT, ppfd_out: OPTIONAL<LPPIXELFORMATDESCRIPTOR>): int {
+    return GDI32.Load('DescribePixelFormat')(hdc, iPixelFormat, nBytes, ppfd_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-dptolp
-  public static DPtoLP(hdc: HDC, lppt: LPPOINT, c: int): BOOL {
-    return GDI32.Load('DPtoLP')(hdc, lppt, c);
+  public static DPtoLP(hdc: HDC, lppt_in_out: LPPOINT, c: int): BOOL {
+    return GDI32.Load('DPtoLP')(hdc, lppt_in_out, c);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-drawescape
-  public static DrawEscape(hdc: HDC, iEscape: int, cjIn: int, lpIn: LPCSTR | NULL): int {
+  public static DrawEscape(hdc: HDC, iEscape: int, cjIn: int, lpIn: OPTIONAL<LPCSTR>): int {
     return GDI32.Load('DrawEscape')(hdc, iEscape, cjIn, lpIn);
   }
 
@@ -897,12 +898,12 @@ class GDI32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-enumenhmetafile
-  public static EnumEnhMetaFile(hdc: HDC | 0n, hmf: HENHMETAFILE, proc: ENHMFENUMPROC, param: LPVOID | NULL, lpRect: RECT_ | NULL): BOOL {
+  public static EnumEnhMetaFile(hdc: OPTIONAL<HDC>, hmf: HENHMETAFILE, proc: ENHMFENUMPROC, param: OPTIONAL<LPVOID>, lpRect: OPTIONAL<RECT_>): BOOL {
     return GDI32.Load('EnumEnhMetaFile')(hdc, hmf, proc, param, lpRect);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-enumfontfamiliesa
-  public static EnumFontFamiliesA(hdc: HDC, lpLogfont: LPCSTR | NULL, lpProc: FONTENUMPROCA, lParam: LPVOID): int {
+  public static EnumFontFamiliesA(hdc: HDC, lpLogfont: OPTIONAL<LPCSTR>, lpProc: FONTENUMPROCA, lParam: LPVOID): int {
     return GDI32.Load('EnumFontFamiliesA')(hdc, lpLogfont, lpProc, lParam);
   }
 
@@ -917,32 +918,32 @@ class GDI32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-enumfontfamiliesw
-  public static EnumFontFamiliesW(hdc: HDC, lpLogfont: LPCWSTR | NULL, lpProc: FONTENUMPROCW, lParam: LPVOID): int {
+  public static EnumFontFamiliesW(hdc: HDC, lpLogfont: OPTIONAL<LPCWSTR>, lpProc: FONTENUMPROCW, lParam: LPVOID): int {
     return GDI32.Load('EnumFontFamiliesW')(hdc, lpLogfont, lpProc, lParam);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-enumfontsa
-  public static EnumFontsA(hdc: HDC, lpLogfont: LPCSTR | NULL, lpProc: FONTENUMPROCA, lParam: LPVOID): int {
+  public static EnumFontsA(hdc: HDC, lpLogfont: OPTIONAL<LPCSTR>, lpProc: FONTENUMPROCA, lParam: LPVOID): int {
     return GDI32.Load('EnumFontsA')(hdc, lpLogfont, lpProc, lParam);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-enumfontsw
-  public static EnumFontsW(hdc: HDC, lpLogfont: LPCWSTR | NULL, lpProc: FONTENUMPROCW, lParam: LPVOID): int {
+  public static EnumFontsW(hdc: HDC, lpLogfont: OPTIONAL<LPCWSTR>, lpProc: FONTENUMPROCW, lParam: LPVOID): int {
     return GDI32.Load('EnumFontsW')(hdc, lpLogfont, lpProc, lParam);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-enumicmprofilesa
-  public static EnumICMProfilesA(hdc: HDC, proc: ICMENUMPROCA, param: LPVOID | NULL): int {
+  public static EnumICMProfilesA(hdc: HDC, proc: ICMENUMPROCA, param: OPTIONAL<LPVOID>): int {
     return GDI32.Load('EnumICMProfilesA')(hdc, proc, param);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-enumicmprofilesw
-  public static EnumICMProfilesW(hdc: HDC, proc: ICMENUMPROCW, param: LPVOID | NULL): int {
+  public static EnumICMProfilesW(hdc: HDC, proc: ICMENUMPROCW, param: OPTIONAL<LPVOID>): int {
     return GDI32.Load('EnumICMProfilesW')(hdc, proc, param);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-enummetafile
-  public static EnumMetaFile(hdc: HDC, hmf: HMETAFILE, proc: MFENUMPROC, param: LPVOID | NULL): BOOL {
+  public static EnumMetaFile(hdc: HDC, hmf: HMETAFILE, proc: MFENUMPROC, param: OPTIONAL<LPVOID>): BOOL {
     return GDI32.Load('EnumMetaFile')(hdc, hmf, proc, param);
   }
 
@@ -957,8 +958,8 @@ class GDI32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-escape
-  public static Escape(hdc: HDC, iEscape: int, cjIn: int, pvIn: LPCSTR | NULL, pvOut: LPVOID | NULL): int {
-    return GDI32.Load('Escape')(hdc, iEscape, cjIn, pvIn, pvOut);
+  public static Escape(hdc: HDC, iEscape: int, cjIn: int, pvIn: OPTIONAL<LPCSTR>, pvOut_out: OPTIONAL<LPVOID>): int {
+    return GDI32.Load('Escape')(hdc, iEscape, cjIn, pvIn, pvOut_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-excludecliprect
@@ -967,18 +968,18 @@ class GDI32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-extcreatepen
-  public static ExtCreatePen(iPenStyle: DWORD, cWidth: DWORD, plbrush: LOGBRUSH_, cStyle: DWORD, pstyle: DWORD_ | NULL): HPEN {
+  public static ExtCreatePen(iPenStyle: DWORD, cWidth: DWORD, plbrush: LOGBRUSH_, cStyle: DWORD, pstyle: OPTIONAL<DWORD_>): HPEN {
     return GDI32.Load('ExtCreatePen')(iPenStyle, cWidth, plbrush, cStyle, pstyle);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-extcreateregion
-  public static ExtCreateRegion(lpx: XFORM_ | NULL, nCount: DWORD, lpData: RGNDATA_): HRGN {
+  public static ExtCreateRegion(lpx: OPTIONAL<XFORM_>, nCount: DWORD, lpData: RGNDATA_): HRGN {
     return GDI32.Load('ExtCreateRegion')(lpx, nCount, lpData);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-extescape
-  public static ExtEscape(hdc: HDC, iEscape: int, cjInput: int, lpInData: LPCSTR | NULL, cjOutput: int, lpOutData: LPSTR | NULL): int {
-    return GDI32.Load('ExtEscape')(hdc, iEscape, cjInput, lpInData, cjOutput, lpOutData);
+  public static ExtEscape(hdc: HDC, iEscape: int, cjInput: int, lpInData: OPTIONAL<LPCSTR>, cjOutput: int, lpOutData_out: OPTIONAL<LPSTR>): int {
+    return GDI32.Load('ExtEscape')(hdc, iEscape, cjInput, lpInData, cjOutput, lpOutData_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-extfloodfill
@@ -987,17 +988,17 @@ class GDI32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-extselectcliprgn
-  public static ExtSelectClipRgn(hdc: HDC, hrgn: HRGN | 0n, mode: int): int {
+  public static ExtSelectClipRgn(hdc: HDC, hrgn: OPTIONAL<HRGN>, mode: int): int {
     return GDI32.Load('ExtSelectClipRgn')(hdc, hrgn, mode);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-exttextouta
-  public static ExtTextOutA(hdc: HDC, x: int, y: int, options: UINT, lprect: RECT_ | NULL, lpString: LPCSTR | NULL, c: UINT, lpDx: INT_ | NULL): BOOL {
+  public static ExtTextOutA(hdc: HDC, x: int, y: int, options: UINT, lprect: OPTIONAL<RECT_>, lpString: OPTIONAL<LPCSTR>, c: UINT, lpDx: OPTIONAL<INT_>): BOOL {
     return GDI32.Load('ExtTextOutA')(hdc, x, y, options, lprect, lpString, c, lpDx);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-exttextoutw
-  public static ExtTextOutW(hdc: HDC, x: int, y: int, options: UINT, lprect: RECT_ | NULL, lpString: LPCWSTR | NULL, c: UINT, lpDx: INT_ | NULL): BOOL {
+  public static ExtTextOutW(hdc: HDC, x: int, y: int, options: UINT, lprect: OPTIONAL<RECT_>, lpString: OPTIONAL<LPCWSTR>, c: UINT, lpDx: OPTIONAL<INT_>): BOOL {
     return GDI32.Load('ExtTextOutW')(hdc, x, y, options, lprect, lpString, c, lpDx);
   }
 
@@ -1012,7 +1013,7 @@ class GDI32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-fixbrushorgex
-  public static FixBrushOrgEx(hdc: HDC, x: int, y: int, ptl: LPPOINT | NULL): BOOL {
+  public static FixBrushOrgEx(hdc: HDC, x: int, y: int, ptl: OPTIONAL<LPPOINT>): BOOL {
     return GDI32.Load('FixBrushOrgEx')(hdc, x, y, ptl);
   }
 
@@ -1072,18 +1073,18 @@ class GDI32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getaspectratiofilterex
-  public static GetAspectRatioFilterEx(hdc: HDC, lpsize: LPSIZE): BOOL {
-    return GDI32.Load('GetAspectRatioFilterEx')(hdc, lpsize);
+  public static GetAspectRatioFilterEx(hdc: HDC, lpsize_out: LPSIZE): BOOL {
+    return GDI32.Load('GetAspectRatioFilterEx')(hdc, lpsize_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getbitmapbits
-  public static GetBitmapBits(hbit: HBITMAP, cb: LONG, lpvBits: LPVOID): LONG {
-    return GDI32.Load('GetBitmapBits')(hbit, cb, lpvBits);
+  public static GetBitmapBits(hbit: HBITMAP, cb: LONG, lpvBits_out: LPVOID): LONG {
+    return GDI32.Load('GetBitmapBits')(hbit, cb, lpvBits_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getbitmapdimensionex
-  public static GetBitmapDimensionEx(hbit: HBITMAP, lpsize: LPSIZE): BOOL {
-    return GDI32.Load('GetBitmapDimensionEx')(hbit, lpsize);
+  public static GetBitmapDimensionEx(hbit: HBITMAP, lpsize_out: LPSIZE): BOOL {
+    return GDI32.Load('GetBitmapDimensionEx')(hbit, lpsize_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getbkcolor
@@ -1097,18 +1098,18 @@ class GDI32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getboundsrect
-  public static GetBoundsRect(hdc: HDC, lprect: LPRECT, flags: UINT): UINT {
-    return GDI32.Load('GetBoundsRect')(hdc, lprect, flags);
+  public static GetBoundsRect(hdc: HDC, lprect_out: LPRECT, flags: UINT): UINT {
+    return GDI32.Load('GetBoundsRect')(hdc, lprect_out, flags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getbrushorgex
-  public static GetBrushOrgEx(hdc: HDC, lppt: LPPOINT): BOOL {
-    return GDI32.Load('GetBrushOrgEx')(hdc, lppt);
+  public static GetBrushOrgEx(hdc: HDC, lppt_out: LPPOINT): BOOL {
+    return GDI32.Load('GetBrushOrgEx')(hdc, lppt_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getcharabcwidthsi
-  public static GetCharABCWidthsI(hdc: HDC, giFirst: UINT, cgi: UINT, pgi: LPWORD | NULL, pabc: LPABC): BOOL {
-    return GDI32.Load('GetCharABCWidthsI')(hdc, giFirst, cgi, pgi, pabc);
+  public static GetCharABCWidthsI(hdc: HDC, giFirst: UINT, cgi: UINT, pgi: OPTIONAL<LPWORD>, pabc_out: LPABC): BOOL {
+    return GDI32.Load('GetCharABCWidthsI')(hdc, giFirst, cgi, pgi, pabc_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getcharacterplacementa
@@ -1122,33 +1123,33 @@ class GDI32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getcharwidth32a
-  public static GetCharWidth32A(hdc: HDC, iFirst: UINT, iLast: UINT, lpBuffer: LPINT): BOOL {
-    return GDI32.Load('GetCharWidth32A')(hdc, iFirst, iLast, lpBuffer);
+  public static GetCharWidth32A(hdc: HDC, iFirst: UINT, iLast: UINT, lpBuffer_out: LPINT): BOOL {
+    return GDI32.Load('GetCharWidth32A')(hdc, iFirst, iLast, lpBuffer_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getcharwidth32w
-  public static GetCharWidth32W(hdc: HDC, iFirst: UINT, iLast: UINT, lpBuffer: LPINT): BOOL {
-    return GDI32.Load('GetCharWidth32W')(hdc, iFirst, iLast, lpBuffer);
+  public static GetCharWidth32W(hdc: HDC, iFirst: UINT, iLast: UINT, lpBuffer_out: LPINT): BOOL {
+    return GDI32.Load('GetCharWidth32W')(hdc, iFirst, iLast, lpBuffer_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getcharwidtha
-  public static GetCharWidthA(hdc: HDC, iFirst: UINT, iLast: UINT, lpBuffer: LPINT): BOOL {
-    return GDI32.Load('GetCharWidthA')(hdc, iFirst, iLast, lpBuffer);
+  public static GetCharWidthA(hdc: HDC, iFirst: UINT, iLast: UINT, lpBuffer_out: LPINT): BOOL {
+    return GDI32.Load('GetCharWidthA')(hdc, iFirst, iLast, lpBuffer_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getcharwidthi
-  public static GetCharWidthI(hdc: HDC, giFirst: UINT, cgi: UINT, pgi: LPWORD | NULL, piWidths: LPINT): BOOL {
-    return GDI32.Load('GetCharWidthI')(hdc, giFirst, cgi, pgi, piWidths);
+  public static GetCharWidthI(hdc: HDC, giFirst: UINT, cgi: UINT, pgi: OPTIONAL<LPWORD>, piWidths_out: LPINT): BOOL {
+    return GDI32.Load('GetCharWidthI')(hdc, giFirst, cgi, pgi, piWidths_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getcharwidthw
-  public static GetCharWidthW(hdc: HDC, iFirst: UINT, iLast: UINT, lpBuffer: LPINT): BOOL {
-    return GDI32.Load('GetCharWidthW')(hdc, iFirst, iLast, lpBuffer);
+  public static GetCharWidthW(hdc: HDC, iFirst: UINT, iLast: UINT, lpBuffer_out: LPINT): BOOL {
+    return GDI32.Load('GetCharWidthW')(hdc, iFirst, iLast, lpBuffer_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getclipbox
-  public static GetClipBox(hdc: HDC, lprect: LPRECT): int {
-    return GDI32.Load('GetClipBox')(hdc, lprect);
+  public static GetClipBox(hdc: HDC, lprect_out: LPRECT): int {
+    return GDI32.Load('GetClipBox')(hdc, lprect_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getcliprgn
@@ -1157,8 +1158,8 @@ class GDI32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getcoloradjustment
-  public static GetColorAdjustment(hdc: HDC, lpca: LPCOLORADJUSTMENT): BOOL {
-    return GDI32.Load('GetColorAdjustment')(hdc, lpca);
+  public static GetColorAdjustment(hdc: HDC, lpca_out: LPCOLORADJUSTMENT): BOOL {
+    return GDI32.Load('GetColorAdjustment')(hdc, lpca_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getcolorspace
@@ -1172,8 +1173,8 @@ class GDI32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getcurrentpositionex
-  public static GetCurrentPositionEx(hdc: HDC, lppt: LPPOINT): BOOL {
-    return GDI32.Load('GetCurrentPositionEx')(hdc, lppt);
+  public static GetCurrentPositionEx(hdc: HDC, lppt_out: LPPOINT): BOOL {
+    return GDI32.Load('GetCurrentPositionEx')(hdc, lppt_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getdcbrushcolor
@@ -1182,8 +1183,8 @@ class GDI32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getdcorgex
-  public static GetDCOrgEx(hdc: HDC, lppt: LPPOINT): BOOL {
-    return GDI32.Load('GetDCOrgEx')(hdc, lppt);
+  public static GetDCOrgEx(hdc: HDC, lppt_out: LPPOINT): BOOL {
+    return GDI32.Load('GetDCOrgEx')(hdc, lppt_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getdcpencolor
@@ -1192,23 +1193,23 @@ class GDI32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getdevicecaps
-  public static GetDeviceCaps(hdc: HDC | 0n, index: int): int {
+  public static GetDeviceCaps(hdc: OPTIONAL<HDC>, index: int): int {
     return GDI32.Load('GetDeviceCaps')(hdc, index);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getdevicegammaramp
-  public static GetDeviceGammaRamp(hdc: HDC, lpRamp: LPVOID): BOOL {
-    return GDI32.Load('GetDeviceGammaRamp')(hdc, lpRamp);
+  public static GetDeviceGammaRamp(hdc: HDC, lpRamp_out: LPVOID): BOOL {
+    return GDI32.Load('GetDeviceGammaRamp')(hdc, lpRamp_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getdibcolortable
-  public static GetDIBColorTable(hdc: HDC, iStart: UINT, cEntries: UINT, prgbq: RGBQUAD_): UINT {
-    return GDI32.Load('GetDIBColorTable')(hdc, iStart, cEntries, prgbq);
+  public static GetDIBColorTable(hdc: HDC, iStart: UINT, cEntries: UINT, prgbq_out: RGBQUAD_): UINT {
+    return GDI32.Load('GetDIBColorTable')(hdc, iStart, cEntries, prgbq_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getdibits
-  public static GetDIBits(hdc: HDC, hbm: HBITMAP, start: UINT, cLines: UINT, lpvBits: LPVOID | NULL, lpbmi: LPBITMAPINFO, usage: UINT): int {
-    return GDI32.Load('GetDIBits')(hdc, hbm, start, cLines, lpvBits, lpbmi, usage);
+  public static GetDIBits(hdc: HDC, hbm: HBITMAP, start: UINT, cLines: UINT, lpvBits_out: OPTIONAL<LPVOID>, lpbmi_in_out: LPBITMAPINFO, usage: UINT): int {
+    return GDI32.Load('GetDIBits')(hdc, hbm, start, cLines, lpvBits_out, lpbmi_in_out, usage);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getenhmetafilea
@@ -1217,33 +1218,33 @@ class GDI32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getenhmetafilebits
-  public static GetEnhMetaFileBits(hEMF: HENHMETAFILE, nSize: UINT, lpData: LPBYTE | NULL): UINT {
-    return GDI32.Load('GetEnhMetaFileBits')(hEMF, nSize, lpData);
+  public static GetEnhMetaFileBits(hEMF: HENHMETAFILE, nSize: UINT, lpData_out: OPTIONAL<LPBYTE>): UINT {
+    return GDI32.Load('GetEnhMetaFileBits')(hEMF, nSize, lpData_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getenhmetafiledescriptiona
-  public static GetEnhMetaFileDescriptionA(hemf: HENHMETAFILE, cchBuffer: UINT, lpDescription: LPSTR | NULL): UINT {
-    return GDI32.Load('GetEnhMetaFileDescriptionA')(hemf, cchBuffer, lpDescription);
+  public static GetEnhMetaFileDescriptionA(hemf: HENHMETAFILE, cchBuffer: UINT, lpDescription_out: OPTIONAL<LPSTR>): UINT {
+    return GDI32.Load('GetEnhMetaFileDescriptionA')(hemf, cchBuffer, lpDescription_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getenhmetafiledescriptionw
-  public static GetEnhMetaFileDescriptionW(hemf: HENHMETAFILE, cchBuffer: UINT, lpDescription: LPWSTR | NULL): UINT {
-    return GDI32.Load('GetEnhMetaFileDescriptionW')(hemf, cchBuffer, lpDescription);
+  public static GetEnhMetaFileDescriptionW(hemf: HENHMETAFILE, cchBuffer: UINT, lpDescription_out: OPTIONAL<LPWSTR>): UINT {
+    return GDI32.Load('GetEnhMetaFileDescriptionW')(hemf, cchBuffer, lpDescription_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getenhmetafileheader
-  public static GetEnhMetaFileHeader(hemf: HENHMETAFILE, nSize: UINT, lpEnhMetaHeader: LPENHMETAHEADER | NULL): UINT {
-    return GDI32.Load('GetEnhMetaFileHeader')(hemf, nSize, lpEnhMetaHeader);
+  public static GetEnhMetaFileHeader(hemf: HENHMETAFILE, nSize: UINT, lpEnhMetaHeader_out: OPTIONAL<LPENHMETAHEADER>): UINT {
+    return GDI32.Load('GetEnhMetaFileHeader')(hemf, nSize, lpEnhMetaHeader_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getenhmetafilepaletteentries
-  public static GetEnhMetaFilePaletteEntries(hemf: HENHMETAFILE, nNumEntries: UINT, lpPaletteEntries: LPPALETTEENTRY | NULL): UINT {
-    return GDI32.Load('GetEnhMetaFilePaletteEntries')(hemf, nNumEntries, lpPaletteEntries);
+  public static GetEnhMetaFilePaletteEntries(hemf: HENHMETAFILE, nNumEntries: UINT, lpPaletteEntries_out: OPTIONAL<LPPALETTEENTRY>): UINT {
+    return GDI32.Load('GetEnhMetaFilePaletteEntries')(hemf, nNumEntries, lpPaletteEntries_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getenhmetafilepixelformat
-  public static GetEnhMetaFilePixelFormat(hemf: HENHMETAFILE, cbBuffer: UINT, ppfd: PIXELFORMATDESCRIPTOR_ | NULL): UINT {
-    return GDI32.Load('GetEnhMetaFilePixelFormat')(hemf, cbBuffer, ppfd);
+  public static GetEnhMetaFilePixelFormat(hemf: HENHMETAFILE, cbBuffer: UINT, ppfd_out: OPTIONAL<PIXELFORMATDESCRIPTOR_>): UINT {
+    return GDI32.Load('GetEnhMetaFilePixelFormat')(hemf, cbBuffer, ppfd_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getenhmetafilew
@@ -1252,8 +1253,8 @@ class GDI32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getfontdata
-  public static GetFontData(hdc: HDC, dwTable: DWORD, dwOffset: DWORD, pvBuffer: PVOID | NULL, cjBuffer: DWORD): DWORD {
-    return GDI32.Load('GetFontData')(hdc, dwTable, dwOffset, pvBuffer, cjBuffer);
+  public static GetFontData(hdc: HDC, dwTable: DWORD, dwOffset: DWORD, pvBuffer_out: OPTIONAL<PVOID>, cjBuffer: DWORD): DWORD {
+    return GDI32.Load('GetFontData')(hdc, dwTable, dwOffset, pvBuffer_out, cjBuffer);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getfontlanguageinfo
@@ -1262,28 +1263,28 @@ class GDI32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getfontunicoderanges
-  public static GetFontUnicodeRanges(hdc: HDC, lpgs: LPGLYPHSET | NULL): DWORD {
-    return GDI32.Load('GetFontUnicodeRanges')(hdc, lpgs);
+  public static GetFontUnicodeRanges(hdc: HDC, lpgs_out: OPTIONAL<LPGLYPHSET>): DWORD {
+    return GDI32.Load('GetFontUnicodeRanges')(hdc, lpgs_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getglyphindicesa
-  public static GetGlyphIndicesA(hdc: HDC, lpstr: LPCSTR, c: int, pgi: LPWORD, fl: DWORD): DWORD {
-    return GDI32.Load('GetGlyphIndicesA')(hdc, lpstr, c, pgi, fl);
+  public static GetGlyphIndicesA(hdc: HDC, lpstr: LPCSTR, c: int, pgi_out: LPWORD, fl: DWORD): DWORD {
+    return GDI32.Load('GetGlyphIndicesA')(hdc, lpstr, c, pgi_out, fl);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getglyphindicesw
-  public static GetGlyphIndicesW(hdc: HDC, lpstr: LPCWSTR, c: int, pgi: LPWORD, fl: DWORD): DWORD {
-    return GDI32.Load('GetGlyphIndicesW')(hdc, lpstr, c, pgi, fl);
+  public static GetGlyphIndicesW(hdc: HDC, lpstr: LPCWSTR, c: int, pgi_out: LPWORD, fl: DWORD): DWORD {
+    return GDI32.Load('GetGlyphIndicesW')(hdc, lpstr, c, pgi_out, fl);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getglyphoutlinea
-  public static GetGlyphOutlineA(hdc: HDC, uChar: UINT, fuFormat: UINT, lpgm: LPGLYPHMETRICS, cjBuffer: DWORD, pvBuffer: LPVOID | NULL, lpmat2: MAT2_): DWORD {
-    return GDI32.Load('GetGlyphOutlineA')(hdc, uChar, fuFormat, lpgm, cjBuffer, pvBuffer, lpmat2);
+  public static GetGlyphOutlineA(hdc: HDC, uChar: UINT, fuFormat: UINT, lpgm_out: LPGLYPHMETRICS, cjBuffer: DWORD, pvBuffer_out: OPTIONAL<LPVOID>, lpmat2: MAT2_): DWORD {
+    return GDI32.Load('GetGlyphOutlineA')(hdc, uChar, fuFormat, lpgm_out, cjBuffer, pvBuffer_out, lpmat2);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getglyphoutlinew
-  public static GetGlyphOutlineW(hdc: HDC, uChar: UINT, fuFormat: UINT, lpgm: LPGLYPHMETRICS, cjBuffer: DWORD, pvBuffer: LPVOID | NULL, lpmat2: MAT2_): DWORD {
-    return GDI32.Load('GetGlyphOutlineW')(hdc, uChar, fuFormat, lpgm, cjBuffer, pvBuffer, lpmat2);
+  public static GetGlyphOutlineW(hdc: HDC, uChar: UINT, fuFormat: UINT, lpgm_out: LPGLYPHMETRICS, cjBuffer: DWORD, pvBuffer_out: OPTIONAL<LPVOID>, lpmat2: MAT2_): DWORD {
+    return GDI32.Load('GetGlyphOutlineW')(hdc, uChar, fuFormat, lpgm_out, cjBuffer, pvBuffer_out, lpmat2);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getgraphicsmode
@@ -1292,23 +1293,23 @@ class GDI32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-geticmprofilea
-  public static GetICMProfileA(hdc: HDC, pBufSize: LPDWORD, pszFilename: LPSTR | NULL): BOOL {
-    return GDI32.Load('GetICMProfileA')(hdc, pBufSize, pszFilename);
+  public static GetICMProfileA(hdc: HDC, pBufSize_in_out: LPDWORD, pszFilename_out: OPTIONAL<LPSTR>): BOOL {
+    return GDI32.Load('GetICMProfileA')(hdc, pBufSize_in_out, pszFilename_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-geticmprofilew
-  public static GetICMProfileW(hdc: HDC, pBufSize: LPDWORD, pszFilename: LPWSTR | NULL): BOOL {
-    return GDI32.Load('GetICMProfileW')(hdc, pBufSize, pszFilename);
+  public static GetICMProfileW(hdc: HDC, pBufSize_in_out: LPDWORD, pszFilename_out: OPTIONAL<LPWSTR>): BOOL {
+    return GDI32.Load('GetICMProfileW')(hdc, pBufSize_in_out, pszFilename_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getkerningpairsa
-  public static GetKerningPairsA(hdc: HDC, nPairs: DWORD, lpKernPair: LPKERNINGPAIR | NULL): DWORD {
-    return GDI32.Load('GetKerningPairsA')(hdc, nPairs, lpKernPair);
+  public static GetKerningPairsA(hdc: HDC, nPairs: DWORD, lpKernPair_out: OPTIONAL<LPKERNINGPAIR>): DWORD {
+    return GDI32.Load('GetKerningPairsA')(hdc, nPairs, lpKernPair_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getkerningpairsw
-  public static GetKerningPairsW(hdc: HDC, nPairs: DWORD, lpKernPair: LPKERNINGPAIR | NULL): DWORD {
-    return GDI32.Load('GetKerningPairsW')(hdc, nPairs, lpKernPair);
+  public static GetKerningPairsW(hdc: HDC, nPairs: DWORD, lpKernPair_out: OPTIONAL<LPKERNINGPAIR>): DWORD {
+    return GDI32.Load('GetKerningPairsW')(hdc, nPairs, lpKernPair_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getlayout
@@ -1317,13 +1318,13 @@ class GDI32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getlogcolorspacea
-  public static GetLogColorSpaceA(hColorSpace: HCOLORSPACE, lpBuffer: LPLOGCOLORSPACEA, nSize: DWORD): BOOL {
-    return GDI32.Load('GetLogColorSpaceA')(hColorSpace, lpBuffer, nSize);
+  public static GetLogColorSpaceA(hColorSpace: HCOLORSPACE, lpBuffer_out: LPLOGCOLORSPACEA, nSize: DWORD): BOOL {
+    return GDI32.Load('GetLogColorSpaceA')(hColorSpace, lpBuffer_out, nSize);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getlogcolorspacew
-  public static GetLogColorSpaceW(hColorSpace: HCOLORSPACE, lpBuffer: LPLOGCOLORSPACEW, nSize: DWORD): BOOL {
-    return GDI32.Load('GetLogColorSpaceW')(hColorSpace, lpBuffer, nSize);
+  public static GetLogColorSpaceW(hColorSpace: HCOLORSPACE, lpBuffer_out: LPLOGCOLORSPACEW, nSize: DWORD): BOOL {
+    return GDI32.Load('GetLogColorSpaceW')(hColorSpace, lpBuffer_out, nSize);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getmapmode
@@ -1337,8 +1338,8 @@ class GDI32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getmetafilebitsex
-  public static GetMetaFileBitsEx(hMF: HMETAFILE, cbBuffer: UINT, lpData: LPVOID | NULL): UINT {
-    return GDI32.Load('GetMetaFileBitsEx')(hMF, cbBuffer, lpData);
+  public static GetMetaFileBitsEx(hMF: HMETAFILE, cbBuffer: UINT, lpData_out: OPTIONAL<LPVOID>): UINT {
+    return GDI32.Load('GetMetaFileBitsEx')(hMF, cbBuffer, lpData_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getmetafilew
@@ -1352,8 +1353,8 @@ class GDI32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getmiterlimit
-  public static GetMiterLimit(hdc: HDC, plimit: PFLOAT): BOOL {
-    return GDI32.Load('GetMiterLimit')(hdc, plimit);
+  public static GetMiterLimit(hdc: HDC, plimit_out: PFLOAT): BOOL {
+    return GDI32.Load('GetMiterLimit')(hdc, plimit_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getnearestcolor
@@ -1367,8 +1368,8 @@ class GDI32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getobjecta
-  public static GetObjectA(h: HANDLE, c: int, pv: LPVOID | NULL): int {
-    return GDI32.Load('GetObjectA')(h, c, pv);
+  public static GetObjectA(h: HANDLE, c: int, pv_out: OPTIONAL<LPVOID>): int {
+    return GDI32.Load('GetObjectA')(h, c, pv_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getobjecttype
@@ -1377,18 +1378,18 @@ class GDI32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getobjectw
-  public static GetObjectW(h: HANDLE, c: int, pv: LPVOID | NULL): int {
-    return GDI32.Load('GetObjectW')(h, c, pv);
+  public static GetObjectW(h: HANDLE, c: int, pv_out: OPTIONAL<LPVOID>): int {
+    return GDI32.Load('GetObjectW')(h, c, pv_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getpaletteentries
-  public static GetPaletteEntries(hpal: HPALETTE, iStart: UINT, cEntries: UINT, pPalEntries: LPPALETTEENTRY | NULL): UINT {
-    return GDI32.Load('GetPaletteEntries')(hpal, iStart, cEntries, pPalEntries);
+  public static GetPaletteEntries(hpal: HPALETTE, iStart: UINT, cEntries: UINT, pPalEntries_out: OPTIONAL<LPPALETTEENTRY>): UINT {
+    return GDI32.Load('GetPaletteEntries')(hpal, iStart, cEntries, pPalEntries_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getpath
-  public static GetPath(hdc: HDC, apt: LPPOINT | NULL, aj: LPBYTE | NULL, cpt: int): int {
-    return GDI32.Load('GetPath')(hdc, apt, aj, cpt);
+  public static GetPath(hdc: HDC, apt_out: OPTIONAL<LPPOINT>, aj_out: OPTIONAL<LPBYTE>, cpt: int): int {
+    return GDI32.Load('GetPath')(hdc, apt_out, aj_out, cpt);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getpixel
@@ -1412,18 +1413,18 @@ class GDI32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getrasterizercaps
-  public static GetRasterizerCaps(lpraststat: LPVOID, cjBytes: UINT): BOOL {
-    return GDI32.Load('GetRasterizerCaps')(lpraststat, cjBytes);
+  public static GetRasterizerCaps(lpraststat_out: LPVOID, cjBytes: UINT): BOOL {
+    return GDI32.Load('GetRasterizerCaps')(lpraststat_out, cjBytes);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getregiondata
-  public static GetRegionData(hrgn: HRGN, nCount: DWORD, lpRgnData: LPRGNDATA | NULL): DWORD {
-    return GDI32.Load('GetRegionData')(hrgn, nCount, lpRgnData);
+  public static GetRegionData(hrgn: HRGN, nCount: DWORD, lpRgnData_out: OPTIONAL<LPRGNDATA>): DWORD {
+    return GDI32.Load('GetRegionData')(hrgn, nCount, lpRgnData_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getrgnbox
-  public static GetRgnBox(hrgn: HRGN, lprc: LPRECT): int {
-    return GDI32.Load('GetRgnBox')(hrgn, lprc);
+  public static GetRgnBox(hrgn: HRGN, lprc_out: LPRECT): int {
+    return GDI32.Load('GetRgnBox')(hrgn, lprc_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getrop2
@@ -1442,8 +1443,8 @@ class GDI32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getsystempaletteentries
-  public static GetSystemPaletteEntries(hdc: HDC, iStart: UINT, cEntries: UINT, pPalEntries: LPPALETTEENTRY | NULL): UINT {
-    return GDI32.Load('GetSystemPaletteEntries')(hdc, iStart, cEntries, pPalEntries);
+  public static GetSystemPaletteEntries(hdc: HDC, iStart: UINT, cEntries: UINT, pPalEntries_out: OPTIONAL<LPPALETTEENTRY>): UINT {
+    return GDI32.Load('GetSystemPaletteEntries')(hdc, iStart, cEntries, pPalEntries_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getsystempaletteuse
@@ -1467,8 +1468,8 @@ class GDI32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-gettextcharsetinfo
-  public static GetTextCharsetInfo(hdc: HDC, lpSig: LPFONTSIGNATURE | NULL, dwFlags: DWORD): int {
-    return GDI32.Load('GetTextCharsetInfo')(hdc, lpSig, dwFlags);
+  public static GetTextCharsetInfo(hdc: HDC, lpSig_out: OPTIONAL<LPFONTSIGNATURE>, dwFlags: DWORD): int {
+    return GDI32.Load('GetTextCharsetInfo')(hdc, lpSig_out, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-gettextcolor
@@ -1477,63 +1478,63 @@ class GDI32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-gettextextentexpointi
-  public static GetTextExtentExPointI(hdc: HDC, lpwszString: LPWORD, cwchString: int, nMaxExtent: int, lpnFit: LPINT | NULL, lpnDx: LPINT | NULL, lpSize: LPSIZE): BOOL {
-    return GDI32.Load('GetTextExtentExPointI')(hdc, lpwszString, cwchString, nMaxExtent, lpnFit, lpnDx, lpSize);
+  public static GetTextExtentExPointI(hdc: HDC, lpwszString: LPWORD, cwchString: int, nMaxExtent: int, lpnFit_out: OPTIONAL<LPINT>, lpnDx_out: OPTIONAL<LPINT>, lpSize_out: LPSIZE): BOOL {
+    return GDI32.Load('GetTextExtentExPointI')(hdc, lpwszString, cwchString, nMaxExtent, lpnFit_out, lpnDx_out, lpSize_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-gettextextentpointi
-  public static GetTextExtentPointI(hdc: HDC, pgiIn: LPWORD, cgi: int, psize: LPSIZE): BOOL {
-    return GDI32.Load('GetTextExtentPointI')(hdc, pgiIn, cgi, psize);
+  public static GetTextExtentPointI(hdc: HDC, pgiIn: LPWORD, cgi: int, psize_out: LPSIZE): BOOL {
+    return GDI32.Load('GetTextExtentPointI')(hdc, pgiIn, cgi, psize_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-gettextfacea
-  public static GetTextFaceA(hdc: HDC, c: int, lpName: LPSTR | NULL): int {
-    return GDI32.Load('GetTextFaceA')(hdc, c, lpName);
+  public static GetTextFaceA(hdc: HDC, c: int, lpName_out: OPTIONAL<LPSTR>): int {
+    return GDI32.Load('GetTextFaceA')(hdc, c, lpName_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-gettextfacew
-  public static GetTextFaceW(hdc: HDC, c: int, lpName: LPWSTR | NULL): int {
-    return GDI32.Load('GetTextFaceW')(hdc, c, lpName);
+  public static GetTextFaceW(hdc: HDC, c: int, lpName_out: OPTIONAL<LPWSTR>): int {
+    return GDI32.Load('GetTextFaceW')(hdc, c, lpName_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-gettextmetricsa
-  public static GetTextMetricsA(hdc: HDC, lptm: LPTEXTMETRICA): BOOL {
-    return GDI32.Load('GetTextMetricsA')(hdc, lptm);
+  public static GetTextMetricsA(hdc: HDC, lptm_out: LPTEXTMETRICA): BOOL {
+    return GDI32.Load('GetTextMetricsA')(hdc, lptm_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-gettextmetricsw
-  public static GetTextMetricsW(hdc: HDC, lptm: LPTEXTMETRICW): BOOL {
-    return GDI32.Load('GetTextMetricsW')(hdc, lptm);
+  public static GetTextMetricsW(hdc: HDC, lptm_out: LPTEXTMETRICW): BOOL {
+    return GDI32.Load('GetTextMetricsW')(hdc, lptm_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getviewportextex
-  public static GetViewportExtEx(hdc: HDC, lpsize: LPSIZE): BOOL {
-    return GDI32.Load('GetViewportExtEx')(hdc, lpsize);
+  public static GetViewportExtEx(hdc: HDC, lpsize_out: LPSIZE): BOOL {
+    return GDI32.Load('GetViewportExtEx')(hdc, lpsize_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getviewportorgex
-  public static GetViewportOrgEx(hdc: HDC, lppoint: LPPOINT): BOOL {
-    return GDI32.Load('GetViewportOrgEx')(hdc, lppoint);
+  public static GetViewportOrgEx(hdc: HDC, lppoint_out: LPPOINT): BOOL {
+    return GDI32.Load('GetViewportOrgEx')(hdc, lppoint_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getwindowextex
-  public static GetWindowExtEx(hdc: HDC, lpsize: LPSIZE): BOOL {
-    return GDI32.Load('GetWindowExtEx')(hdc, lpsize);
+  public static GetWindowExtEx(hdc: HDC, lpsize_out: LPSIZE): BOOL {
+    return GDI32.Load('GetWindowExtEx')(hdc, lpsize_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getwindoworgex
-  public static GetWindowOrgEx(hdc: HDC, lppoint: LPPOINT): BOOL {
-    return GDI32.Load('GetWindowOrgEx')(hdc, lppoint);
+  public static GetWindowOrgEx(hdc: HDC, lppoint_out: LPPOINT): BOOL {
+    return GDI32.Load('GetWindowOrgEx')(hdc, lppoint_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getwinmetafilebits
-  public static GetWinMetaFileBits(hemf: HENHMETAFILE, cbData16: UINT, pData16: LPBYTE | NULL, iMapMode: INT, hdcRef: HDC): UINT {
-    return GDI32.Load('GetWinMetaFileBits')(hemf, cbData16, pData16, iMapMode, hdcRef);
+  public static GetWinMetaFileBits(hemf: HENHMETAFILE, cbData16: UINT, pData16_out: OPTIONAL<LPBYTE>, iMapMode: INT, hdcRef: HDC): UINT {
+    return GDI32.Load('GetWinMetaFileBits')(hemf, cbData16, pData16_out, iMapMode, hdcRef);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getworldtransform
-  public static GetWorldTransform(hdc: HDC, lpxf: LPXFORM): BOOL {
-    return GDI32.Load('GetWorldTransform')(hdc, lpxf);
+  public static GetWorldTransform(hdc: HDC, lpxf_out: LPXFORM): BOOL {
+    return GDI32.Load('GetWorldTransform')(hdc, lpxf_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-intersectcliprect
@@ -1547,7 +1548,7 @@ class GDI32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-linedda
-  public static LineDDA(xStart: int, yStart: int, xEnd: int, yEnd: int, lpProc: LINEDDAPROC, data: LPVOID | NULL): BOOL {
+  public static LineDDA(xStart: int, yStart: int, xEnd: int, yEnd: int, lpProc: LINEDDAPROC, data: OPTIONAL<LPVOID>): BOOL {
     return GDI32.Load('LineDDA')(xStart, yStart, xEnd, yEnd, lpProc, data);
   }
 
@@ -1557,23 +1558,23 @@ class GDI32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-lptodp
-  public static LPtoDP(hdc: HDC, lppt: LPPOINT, c: int): BOOL {
-    return GDI32.Load('LPtoDP')(hdc, lppt, c);
+  public static LPtoDP(hdc: HDC, lppt_in_out: LPPOINT, c: int): BOOL {
+    return GDI32.Load('LPtoDP')(hdc, lppt_in_out, c);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-maskblt
-  public static MaskBlt(hdcDest: HDC, xDest: int, yDest: int, width: int, height: int, hdcSrc: HDC, xSrc: int, ySrc: int, hbmMask: HBITMAP | 0n, xMask: int, yMask: int, rop: DWORD): BOOL {
+  public static MaskBlt(hdcDest: HDC, xDest: int, yDest: int, width: int, height: int, hdcSrc: HDC, xSrc: int, ySrc: int, hbmMask: HBITMAP, xMask: int, yMask: int, rop: DWORD): BOOL {
     return GDI32.Load('MaskBlt')(hdcDest, xDest, yDest, width, height, hdcSrc, xSrc, ySrc, hbmMask, xMask, yMask, rop);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-modifyworldtransform
-  public static ModifyWorldTransform(hdc: HDC, lpxf: XFORM_ | NULL, mode: DWORD): BOOL {
+  public static ModifyWorldTransform(hdc: HDC, lpxf: OPTIONAL<XFORM_>, mode: DWORD): BOOL {
     return GDI32.Load('ModifyWorldTransform')(hdc, lpxf, mode);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-movetoex
-  public static MoveToEx(hdc: HDC, x: int, y: int, lppt: LPPOINT | NULL): BOOL {
-    return GDI32.Load('MoveToEx')(hdc, x, y, lppt);
+  public static MoveToEx(hdc: HDC, x: int, y: int, lppt_out: OPTIONAL<LPPOINT>): BOOL {
+    return GDI32.Load('MoveToEx')(hdc, x, y, lppt_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-offsetcliprgn
@@ -1587,13 +1588,13 @@ class GDI32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-offsetviewportorgex
-  public static OffsetViewportOrgEx(hdc: HDC, x: int, y: int, lppt: LPPOINT | NULL): BOOL {
-    return GDI32.Load('OffsetViewportOrgEx')(hdc, x, y, lppt);
+  public static OffsetViewportOrgEx(hdc: HDC, x: int, y: int, lppt_out: OPTIONAL<LPPOINT>): BOOL {
+    return GDI32.Load('OffsetViewportOrgEx')(hdc, x, y, lppt_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-offsetwindoworgex
-  public static OffsetWindowOrgEx(hdc: HDC, x: int, y: int, lppt: LPPOINT | NULL): BOOL {
-    return GDI32.Load('OffsetWindowOrgEx')(hdc, x, y, lppt);
+  public static OffsetWindowOrgEx(hdc: HDC, x: int, y: int, lppt_out: OPTIONAL<LPPOINT>): BOOL {
+    return GDI32.Load('OffsetWindowOrgEx')(hdc, x, y, lppt_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-paintrgn
@@ -1637,7 +1638,7 @@ class GDI32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-plgblt
-  public static PlgBlt(hdcDest: HDC, lpPoint: POINT_, hdcSrc: HDC, xSrc: int, ySrc: int, width: int, height: int, hbmMask: HBITMAP | 0n, xMask: int, yMask: int): BOOL {
+  public static PlgBlt(hdcDest: HDC, lpPoint: POINT_, hdcSrc: HDC, xSrc: int, ySrc: int, width: int, height: int, hbmMask: OPTIONAL<HBITMAP>, xMask: int, yMask: int): BOOL {
     return GDI32.Load('PlgBlt')(hdcDest, lpPoint, hdcSrc, xSrc, ySrc, width, height, hbmMask, xMask, yMask);
   }
 
@@ -1732,12 +1733,12 @@ class GDI32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-removefontresourceexa
-  public static RemoveFontResourceExA(name: LPCSTR, fl: DWORD, pdv: PVOID | NULL): BOOL {
+  public static RemoveFontResourceExA(name: LPCSTR, fl: DWORD, pdv: NULL): BOOL {
     return GDI32.Load('RemoveFontResourceExA')(name, fl, pdv);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-removefontresourceexw
-  public static RemoveFontResourceExW(name: LPCWSTR, fl: DWORD, pdv: PVOID | NULL): BOOL {
+  public static RemoveFontResourceExW(name: LPCWSTR, fl: DWORD, pdv: NULL): BOOL {
     return GDI32.Load('RemoveFontResourceExW')(name, fl, pdv);
   }
 
@@ -1777,13 +1778,13 @@ class GDI32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-scaleviewportextex
-  public static ScaleViewportExtEx(hdc: HDC, xn: int, dx: int, yn: int, yd: int, lpsz: LPSIZE | NULL): BOOL {
-    return GDI32.Load('ScaleViewportExtEx')(hdc, xn, dx, yn, yd, lpsz);
+  public static ScaleViewportExtEx(hdc: HDC, xn: int, dx: int, yn: int, yd: int, lpsz_out: OPTIONAL<LPSIZE>): BOOL {
+    return GDI32.Load('ScaleViewportExtEx')(hdc, xn, dx, yn, yd, lpsz_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-scalewindowextex
-  public static ScaleWindowExtEx(hdc: HDC, xn: int, xd: int, yn: int, yd: int, lpsz: LPSIZE | NULL): BOOL {
-    return GDI32.Load('ScaleWindowExtEx')(hdc, xn, xd, yn, yd, lpsz);
+  public static ScaleWindowExtEx(hdc: HDC, xn: int, xd: int, yn: int, yd: int, lpsz_out: OPTIONAL<LPSIZE>): BOOL {
+    return GDI32.Load('ScaleWindowExtEx')(hdc, xn, xd, yn, yd, lpsz_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-selectclippath
@@ -1792,7 +1793,7 @@ class GDI32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-selectcliprgn
-  public static SelectClipRgn(hdc: HDC, hrgn: HRGN | 0n): int {
+  public static SelectClipRgn(hdc: HDC, hrgn: OPTIONAL<HRGN>): int {
     return GDI32.Load('SelectClipRgn')(hdc, hrgn);
   }
 
@@ -1822,8 +1823,8 @@ class GDI32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-setbitmapdimensionex
-  public static SetBitmapDimensionEx(hbm: HBITMAP, w: int, h: int, lpsz: LPSIZE | NULL): BOOL {
-    return GDI32.Load('SetBitmapDimensionEx')(hbm, w, h, lpsz);
+  public static SetBitmapDimensionEx(hbm: HBITMAP, w: int, h: int, lpsz_out: OPTIONAL<LPSIZE>): BOOL {
+    return GDI32.Load('SetBitmapDimensionEx')(hbm, w, h, lpsz_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-setbkcolor
@@ -1837,13 +1838,13 @@ class GDI32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-setboundsrect
-  public static SetBoundsRect(hdc: HDC, lprect: RECT_ | NULL, flags: UINT): UINT {
+  public static SetBoundsRect(hdc: HDC, lprect: OPTIONAL<RECT_>, flags: UINT): UINT {
     return GDI32.Load('SetBoundsRect')(hdc, lprect, flags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-setbrushorgex
-  public static SetBrushOrgEx(hdc: HDC, x: int, y: int, lppt: LPPOINT | NULL): BOOL {
-    return GDI32.Load('SetBrushOrgEx')(hdc, x, y, lppt);
+  public static SetBrushOrgEx(hdc: HDC, x: int, y: int, lppt_out: OPTIONAL<LPPOINT>): BOOL {
+    return GDI32.Load('SetBrushOrgEx')(hdc, x, y, lppt_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-setcoloradjustment
@@ -1877,7 +1878,7 @@ class GDI32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-setdibits
-  public static SetDIBits(hdc: HDC | 0n, hbm: HBITMAP, start: UINT, cLines: UINT, lpBits: LPVOID, lpbmi: BITMAPINFO_, ColorUse: UINT): int {
+  public static SetDIBits(hdc: OPTIONAL<HDC>, hbm: HBITMAP, start: UINT, cLines: UINT, lpBits: LPVOID, lpbmi: BITMAPINFO_, ColorUse: UINT): int {
     return GDI32.Load('SetDIBits')(hdc, hbm, start, cLines, lpBits, lpbmi, ColorUse);
   }
 
@@ -1937,8 +1938,8 @@ class GDI32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-setmiterlimit
-  public static SetMiterLimit(hdc: HDC, limit: FLOAT, old: PFLOAT | NULL): BOOL {
-    return GDI32.Load('SetMiterLimit')(hdc, limit, old);
+  public static SetMiterLimit(hdc: HDC, limit: FLOAT, old_out: OPTIONAL<PFLOAT>): BOOL {
+    return GDI32.Load('SetMiterLimit')(hdc, limit, old_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-setpaletteentries
@@ -2007,27 +2008,27 @@ class GDI32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-setviewportextex
-  public static SetViewportExtEx(hdc: HDC, x: int, y: int, lpsz: LPSIZE | NULL): BOOL {
-    return GDI32.Load('SetViewportExtEx')(hdc, x, y, lpsz);
+  public static SetViewportExtEx(hdc: HDC, x: int, y: int, lpsz_out: OPTIONAL<LPSIZE>): BOOL {
+    return GDI32.Load('SetViewportExtEx')(hdc, x, y, lpsz_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-setviewportorgex
-  public static SetViewportOrgEx(hdc: HDC, x: int, y: int, lppt: LPPOINT | NULL): BOOL {
-    return GDI32.Load('SetViewportOrgEx')(hdc, x, y, lppt);
+  public static SetViewportOrgEx(hdc: HDC, x: int, y: int, lppt_out: OPTIONAL<LPPOINT>): BOOL {
+    return GDI32.Load('SetViewportOrgEx')(hdc, x, y, lppt_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-setwindowextex
-  public static SetWindowExtEx(hdc: HDC, x: int, y: int, lpsz: LPSIZE | NULL): BOOL {
-    return GDI32.Load('SetWindowExtEx')(hdc, x, y, lpsz);
+  public static SetWindowExtEx(hdc: HDC, x: int, y: int, lpsz_out: OPTIONAL<LPSIZE>): BOOL {
+    return GDI32.Load('SetWindowExtEx')(hdc, x, y, lpsz_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-setwindoworgex
-  public static SetWindowOrgEx(hdc: HDC, x: int, y: int, lppt: LPPOINT | NULL): BOOL {
-    return GDI32.Load('SetWindowOrgEx')(hdc, x, y, lppt);
+  public static SetWindowOrgEx(hdc: HDC, x: int, y: int, lppt_out: OPTIONAL<LPPOINT>): BOOL {
+    return GDI32.Load('SetWindowOrgEx')(hdc, x, y, lppt_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-setwinmetafilebits
-  public static SetWinMetaFileBits(nSize: UINT, lpMeta16Data: BYTE_, hdcRef: HDC | 0n, lpMFP: METAFILEPICT_ | NULL): HENHMETAFILE {
+  public static SetWinMetaFileBits(nSize: UINT, lpMeta16Data: BYTE_, hdcRef: OPTIONAL<HDC>, lpMFP: OPTIONAL<METAFILEPICT_>): HENHMETAFILE {
     return GDI32.Load('SetWinMetaFileBits')(nSize, lpMeta16Data, hdcRef, lpMFP);
   }
 
@@ -2052,12 +2053,12 @@ class GDI32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-stretchblt
-  public static StretchBlt(hdcDest: HDC, xDest: int, yDest: int, wDest: int, hDest: int, hdcSrc: HDC | 0n, xSrc: int, ySrc: int, wSrc: int, hSrc: int, rop: DWORD): BOOL {
+  public static StretchBlt(hdcDest: HDC, xDest: int, yDest: int, wDest: int, hDest: int, hdcSrc: OPTIONAL<HDC>, xSrc: int, ySrc: int, wSrc: int, hSrc: int, rop: DWORD): BOOL {
     return GDI32.Load('StretchBlt')(hdcDest, xDest, yDest, wDest, hDest, hdcSrc, xSrc, ySrc, wSrc, hSrc, rop);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-stretchdibits
-  public static StretchDIBits(hdc: HDC, xDest: int, yDest: int, DestWidth: int, DestHeight: int, xSrc: int, ySrc: int, SrcWidth: int, SrcHeight: int, lpBits: LPVOID | NULL, lpbmi: BITMAPINFO_, iUsage: UINT, rop: DWORD): int {
+  public static StretchDIBits(hdc: HDC, xDest: int, yDest: int, DestWidth: int, DestHeight: int, xSrc: int, ySrc: int, SrcWidth: int, SrcHeight: int, lpBits: OPTIONAL<LPVOID>, lpbmi: BITMAPINFO_, iUsage: UINT, rop: DWORD): int {
     return GDI32.Load('StretchDIBits')(hdc, xDest, yDest, DestWidth, DestHeight, xSrc, ySrc, SrcWidth, SrcHeight, lpBits, lpbmi, iUsage, rop);
   }
 
@@ -2087,8 +2088,8 @@ class GDI32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-translatecharsetinfo
-  public static TranslateCharsetInfo(lpSrc: DWORD_, lpCs: LPCHARSETINFO, dwFlags: DWORD): BOOL {
-    return GDI32.Load('TranslateCharsetInfo')(lpSrc, lpCs, dwFlags);
+  public static TranslateCharsetInfo(lpSrc_in_out: DWORD_, lpCs_out: LPCHARSETINFO, dwFlags: DWORD): BOOL {
+    return GDI32.Load('TranslateCharsetInfo')(lpSrc_in_out, lpCs_out, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-unrealizeobject

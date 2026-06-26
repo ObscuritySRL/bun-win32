@@ -1,6 +1,6 @@
 import type { Pointer } from 'bun:ffi';
 
-export type { BOOL, HANDLE, LPCSTR, LPCWSTR, LPDWORD, NULL, PHANDLE, PULONG } from '@bun-win32/core';
+export type { BOOL, HANDLE, LPCSTR, LPCWSTR, LPDWORD, NULL, OPTIONAL, PHANDLE, PULONG } from '@bun-win32/core';
 
 export const THREAD_ORDER_GROUP_INFINITE_TIMEOUT = -1n;
 

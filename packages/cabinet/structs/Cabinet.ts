@@ -15,7 +15,8 @@ import type {
   LPCVOID,
   LPSTR,
   LPVOID,
-  NULL,
+  NULLABLE,
+  OPTIONAL,
   PCABINETDLLVERSIONINFO,
   PCCAB,
   PCOMPRESS_ALLOCATION_ROUTINES,
@@ -117,28 +118,35 @@ class Cabinet extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/compressapi/nf-compressapi-compress
-  public static Compress(CompressorHandle: COMPRESSOR_HANDLE, UncompressedData: LPCVOID | NULL, UncompressedDataSize: SIZE_T, CompressedBuffer: PVOID | NULL, CompressedBufferSize: SIZE_T, CompressedDataSize: PSIZE_T): BOOL {
-    return Cabinet.Load('Compress')(CompressorHandle, UncompressedData, UncompressedDataSize, CompressedBuffer, CompressedBufferSize, CompressedDataSize);
+  public static Compress(CompressorHandle: COMPRESSOR_HANDLE, UncompressedData: OPTIONAL<LPCVOID>, UncompressedDataSize: SIZE_T, CompressedBuffer_out: OPTIONAL<PVOID>, CompressedBufferSize: SIZE_T, CompressedDataSize_out: PSIZE_T): BOOL {
+    return Cabinet.Load('Compress')(CompressorHandle, UncompressedData, UncompressedDataSize, CompressedBuffer_out, CompressedBufferSize, CompressedDataSize_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/compressapi/nf-compressapi-createcompressor
-  public static CreateCompressor(Algorithm: DWORD, AllocationRoutines: PCOMPRESS_ALLOCATION_ROUTINES | NULL, CompressorHandle: PCOMPRESSOR_HANDLE): BOOL {
-    return Cabinet.Load('CreateCompressor')(Algorithm, AllocationRoutines, CompressorHandle);
+  public static CreateCompressor(Algorithm: DWORD, AllocationRoutines: OPTIONAL<PCOMPRESS_ALLOCATION_ROUTINES>, CompressorHandle_out: PCOMPRESSOR_HANDLE): BOOL {
+    return Cabinet.Load('CreateCompressor')(Algorithm, AllocationRoutines, CompressorHandle_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/compressapi/nf-compressapi-createdecompressor
-  public static CreateDecompressor(Algorithm: DWORD, AllocationRoutines: PCOMPRESS_ALLOCATION_ROUTINES | NULL, DecompressorHandle: PDECOMPRESSOR_HANDLE): BOOL {
-    return Cabinet.Load('CreateDecompressor')(Algorithm, AllocationRoutines, DecompressorHandle);
+  public static CreateDecompressor(Algorithm: DWORD, AllocationRoutines: OPTIONAL<PCOMPRESS_ALLOCATION_ROUTINES>, DecompressorHandle_out: PDECOMPRESSOR_HANDLE): BOOL {
+    return Cabinet.Load('CreateDecompressor')(Algorithm, AllocationRoutines, DecompressorHandle_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/compressapi/nf-compressapi-decompress
-  public static Decompress(DecompressorHandle: DECOMPRESSOR_HANDLE, CompressedData: LPCVOID | NULL, CompressedDataSize: SIZE_T, UncompressedBuffer: PVOID | NULL, UncompressedBufferSize: SIZE_T, UncompressedDataSize: PSIZE_T | NULL): BOOL {
-    return Cabinet.Load('Decompress')(DecompressorHandle, CompressedData, CompressedDataSize, UncompressedBuffer, UncompressedBufferSize, UncompressedDataSize);
+  public static Decompress(
+    DecompressorHandle: DECOMPRESSOR_HANDLE,
+    CompressedData: OPTIONAL<LPCVOID>,
+    CompressedDataSize: SIZE_T,
+    UncompressedBuffer_out: OPTIONAL<PVOID>,
+    UncompressedBufferSize: SIZE_T,
+    UncompressedDataSize_out: OPTIONAL<PSIZE_T>,
+  ): BOOL {
+    return Cabinet.Load('Decompress')(DecompressorHandle, CompressedData, CompressedDataSize, UncompressedBuffer_out, UncompressedBufferSize, UncompressedDataSize_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/devnotes/dllgetversion
-  public static DllGetVersion(pcdvi: PCABINETDLLVERSIONINFO): VOID {
-    return Cabinet.Load('DllGetVersion')(pcdvi);
+  public static DllGetVersion(pcdvi_in_out: PCABINETDLLVERSIONINFO): VOID {
+    return Cabinet.Load('DllGetVersion')(pcdvi_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fci/nf-fci-fciaddfile
@@ -160,7 +168,7 @@ class Cabinet extends Win32 {
     pfndelete: PFNFCIDELETE,
     pfnfcigtf: PFNFCIGETTEMPFILE,
     pccab: PCCAB,
-    pv: LPVOID | NULL,
+    pv: OPTIONAL<LPVOID>,
   ): HFCI {
     return Cabinet.Load('FCICreate')(perf, pfnfcifp, pfna, pfnf, pfnopen, pfnread, pfnwrite, pfnclose, pfnseek, pfndelete, pfnfcigtf, pccab, pv);
   }
@@ -181,13 +189,13 @@ class Cabinet extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fdi/nf-fdi-fdicopy
-  public static FDICopy(hfdi: HFDI, pszCabinet: LPSTR, pszCabPath: LPSTR, flags: INT, pfnfdin: PFNFDINOTIFY, pfnfdid: PFNFDIDECRYPT | NULL, pvUser: LPVOID | NULL): BOOL {
+  public static FDICopy(hfdi: HFDI, pszCabinet: LPSTR, pszCabPath: LPSTR, flags: INT, pfnfdin: PFNFDINOTIFY, pfnfdid: NULLABLE<PFNFDIDECRYPT>, pvUser: OPTIONAL<LPVOID>): BOOL {
     return Cabinet.Load('FDICopy')(hfdi, pszCabinet, pszCabPath, flags, pfnfdin, pfnfdid, pvUser);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fdi/nf-fdi-fdicreate
-  public static FDICreate(pfnalloc: PFNALLOC, pfnfree: PFNFREE, pfnopen: PFNOPEN, pfnread: PFNREAD, pfnwrite: PFNWRITE, pfnclose: PFNCLOSE, pfnseek: PFNSEEK, cpuType: INT, perf: PERF): HFDI {
-    return Cabinet.Load('FDICreate')(pfnalloc, pfnfree, pfnopen, pfnread, pfnwrite, pfnclose, pfnseek, cpuType, perf);
+  public static FDICreate(pfnalloc: PFNALLOC, pfnfree: PFNFREE, pfnopen: PFNOPEN, pfnread: PFNREAD, pfnwrite: PFNWRITE, pfnclose: PFNCLOSE, pfnseek: PFNSEEK, cpuType: INT, perf_in_out: PERF): HFDI {
+    return Cabinet.Load('FDICreate')(pfnalloc, pfnfree, pfnopen, pfnread, pfnwrite, pfnclose, pfnseek, cpuType, perf_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fdi/nf-fdi-fdidestroy
@@ -196,8 +204,8 @@ class Cabinet extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fdi/nf-fdi-fdiiscabinet
-  public static FDIIsCabinet(hfdi: HFDI, hf: INT_PTR, pfdici: PFDICABINETINFO | NULL): BOOL {
-    return Cabinet.Load('FDIIsCabinet')(hfdi, hf, pfdici);
+  public static FDIIsCabinet(hfdi: HFDI, hf: INT_PTR, pfdici_out: OPTIONAL<PFDICABINETINFO>): BOOL {
+    return Cabinet.Load('FDIIsCabinet')(hfdi, hf, pfdici_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fdi/nf-fdi-fditruncatecabinet
@@ -206,13 +214,13 @@ class Cabinet extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/compressapi/nf-compressapi-querycompressorinformation
-  public static QueryCompressorInformation(CompressorHandle: COMPRESSOR_HANDLE, CompressInformationClass: COMPRESS_INFORMATION_CLASS, CompressInformation: PVOID, CompressInformationSize: SIZE_T): BOOL {
-    return Cabinet.Load('QueryCompressorInformation')(CompressorHandle, CompressInformationClass, CompressInformation, CompressInformationSize);
+  public static QueryCompressorInformation(CompressorHandle: COMPRESSOR_HANDLE, CompressInformationClass: COMPRESS_INFORMATION_CLASS, CompressInformation_out: PVOID, CompressInformationSize: SIZE_T): BOOL {
+    return Cabinet.Load('QueryCompressorInformation')(CompressorHandle, CompressInformationClass, CompressInformation_out, CompressInformationSize);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/compressapi/nf-compressapi-querydecompressorinformation
-  public static QueryDecompressorInformation(DecompressorHandle: DECOMPRESSOR_HANDLE, CompressInformationClass: COMPRESS_INFORMATION_CLASS, CompressInformation: PVOID, CompressInformationSize: SIZE_T): BOOL {
-    return Cabinet.Load('QueryDecompressorInformation')(DecompressorHandle, CompressInformationClass, CompressInformation, CompressInformationSize);
+  public static QueryDecompressorInformation(DecompressorHandle: DECOMPRESSOR_HANDLE, CompressInformationClass: COMPRESS_INFORMATION_CLASS, CompressInformation_out: PVOID, CompressInformationSize: SIZE_T): BOOL {
+    return Cabinet.Load('QueryDecompressorInformation')(DecompressorHandle, CompressInformationClass, CompressInformation_out, CompressInformationSize);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/compressapi/nf-compressapi-resetcompressor

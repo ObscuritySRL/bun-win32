@@ -41,8 +41,8 @@ class Taskschd extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/combaseapi/nf-combaseapi-dllgetclassobject
-  public static DllGetClassObject(rclsid: REFCLSID, riid: REFIID, ppv: PPVOID): HRESULT {
-    return Taskschd.Load('DllGetClassObject')(rclsid, riid, ppv);
+  public static DllGetClassObject(rclsid: REFCLSID, riid: REFIID, ppv_out: PPVOID): HRESULT {
+    return Taskschd.Load('DllGetClassObject')(rclsid, riid, ppv_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/olectl/nf-olectl-dllregisterserver

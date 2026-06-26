@@ -2,7 +2,7 @@ import { type FFIFunction, FFIType } from 'bun:ffi';
 
 import { Win32 } from '@bun-win32/core';
 
-import type { DWORD, HRESULT, HWND, IAccessible, LONG, LPCSTR, LPCWSTR, LPSTR, LPUNKNOWN, LPWSTR, LRESULT, NULL, PACKED_POINT, PDWORD, PHWND, PLONG, PPVOID, PVARIANT, REFCLSID, REFIID, UINT, VOID, WPARAM } from '../types/Oleacc';
+import type { DWORD, HRESULT, HWND, IAccessible, LONG, LPCSTR, LPCWSTR, LPSTR, LPUNKNOWN, LPWSTR, LRESULT, OPTIONAL, PACKED_POINT, PDWORD, PHWND, PLONG, PPVOID, PVARIANT, REFCLSID, REFIID, UINT, VOID, WPARAM } from '../types/Oleacc';
 
 /**
  * Thin, lazy-loaded FFI bindings for `oleacc.dll`.
@@ -66,38 +66,38 @@ class Oleacc extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/oleacc/nf-oleacc-accessiblechildren
-  public static AccessibleChildren(paccContainer: IAccessible, iChildStart: LONG, cChildren: LONG, rgvarChildren: PVARIANT, pcObtained: PLONG): HRESULT {
-    return Oleacc.Load('AccessibleChildren')(paccContainer, iChildStart, cChildren, rgvarChildren, pcObtained);
+  public static AccessibleChildren(paccContainer: IAccessible, iChildStart: LONG, cChildren: LONG, rgvarChildren_out: PVARIANT, pcObtained_out: PLONG): HRESULT {
+    return Oleacc.Load('AccessibleChildren')(paccContainer, iChildStart, cChildren, rgvarChildren_out, pcObtained_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/oleacc/nf-oleacc-accessibleobjectfromevent
-  public static AccessibleObjectFromEvent(hwnd: HWND, dwId: DWORD, dwChildId: DWORD, ppacc: PPVOID, pvarChild: PVARIANT): HRESULT {
-    return Oleacc.Load('AccessibleObjectFromEvent')(hwnd, dwId, dwChildId, ppacc, pvarChild);
+  public static AccessibleObjectFromEvent(hwnd: HWND, dwId: DWORD, dwChildId: DWORD, ppacc_out: PPVOID, pvarChild_out: PVARIANT): HRESULT {
+    return Oleacc.Load('AccessibleObjectFromEvent')(hwnd, dwId, dwChildId, ppacc_out, pvarChild_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/oleacc/nf-oleacc-accessibleobjectfrompoint
-  public static AccessibleObjectFromPoint(ptScreen: PACKED_POINT, ppacc: PPVOID, pvarChild: PVARIANT): HRESULT {
-    return Oleacc.Load('AccessibleObjectFromPoint')(ptScreen, ppacc, pvarChild);
+  public static AccessibleObjectFromPoint(ptScreen: PACKED_POINT, ppacc_out: PPVOID, pvarChild_out: PVARIANT): HRESULT {
+    return Oleacc.Load('AccessibleObjectFromPoint')(ptScreen, ppacc_out, pvarChild_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/oleacc/nf-oleacc-accessibleobjectfromwindow
-  public static AccessibleObjectFromWindow(hwnd: HWND, dwId: DWORD, riid: REFIID, ppvObject: PPVOID): HRESULT {
-    return Oleacc.Load('AccessibleObjectFromWindow')(hwnd, dwId, riid, ppvObject);
+  public static AccessibleObjectFromWindow(hwnd: HWND, dwId: DWORD, riid: REFIID, ppvObject_out: PPVOID): HRESULT {
+    return Oleacc.Load('AccessibleObjectFromWindow')(hwnd, dwId, riid, ppvObject_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/oleacc/nf-oleacc-createstdaccessibleobject
-  public static CreateStdAccessibleObject(hwnd: HWND, idObject: LONG, riid: REFIID, ppvObject: PPVOID): HRESULT {
-    return Oleacc.Load('CreateStdAccessibleObject')(hwnd, idObject, riid, ppvObject);
+  public static CreateStdAccessibleObject(hwnd: HWND, idObject: LONG, riid: REFIID, ppvObject_out: PPVOID): HRESULT {
+    return Oleacc.Load('CreateStdAccessibleObject')(hwnd, idObject, riid, ppvObject_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/oleacc/nf-oleacc-createstdaccessibleproxya
-  public static CreateStdAccessibleProxyA(hwnd: HWND, pClassName: LPCSTR, idObject: LONG, riid: REFIID, ppvObject: PPVOID): HRESULT {
-    return Oleacc.Load('CreateStdAccessibleProxyA')(hwnd, pClassName, idObject, riid, ppvObject);
+  public static CreateStdAccessibleProxyA(hwnd: HWND, pClassName: LPCSTR, idObject: LONG, riid: REFIID, ppvObject_out: PPVOID): HRESULT {
+    return Oleacc.Load('CreateStdAccessibleProxyA')(hwnd, pClassName, idObject, riid, ppvObject_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/oleacc/nf-oleacc-createstdaccessibleproxyw
-  public static CreateStdAccessibleProxyW(hwnd: HWND, pClassName: LPCWSTR, idObject: LONG, riid: REFIID, ppvObject: PPVOID): HRESULT {
-    return Oleacc.Load('CreateStdAccessibleProxyW')(hwnd, pClassName, idObject, riid, ppvObject);
+  public static CreateStdAccessibleProxyW(hwnd: HWND, pClassName: LPCWSTR, idObject: LONG, riid: REFIID, ppvObject_out: PPVOID): HRESULT {
+    return Oleacc.Load('CreateStdAccessibleProxyW')(hwnd, pClassName, idObject, riid, ppvObject_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/combaseapi/nf-combaseapi-dllcanunloadnow
@@ -106,8 +106,8 @@ class Oleacc extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/combaseapi/nf-combaseapi-dllgetclassobject
-  public static DllGetClassObject(rclsid: REFCLSID, riid: REFIID, ppv: PPVOID): HRESULT {
-    return Oleacc.Load('DllGetClassObject')(rclsid, riid, ppv);
+  public static DllGetClassObject(rclsid: REFCLSID, riid: REFIID, ppv_out: PPVOID): HRESULT {
+    return Oleacc.Load('DllGetClassObject')(rclsid, riid, ppv_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/olectl/nf-olectl-dllregisterserver
@@ -121,28 +121,28 @@ class Oleacc extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/oleacc/nf-oleacc-getoleaccversioninfo
-  public static GetOleaccVersionInfo(pVer: PDWORD, pBuild: PDWORD): VOID {
-    return Oleacc.Load('GetOleaccVersionInfo')(pVer, pBuild);
+  public static GetOleaccVersionInfo(pVer_out: PDWORD, pBuild_out: PDWORD): VOID {
+    return Oleacc.Load('GetOleaccVersionInfo')(pVer_out, pBuild_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/oleacc/nf-oleacc-getroletexta
-  public static GetRoleTextA(lRole: DWORD, lpszRole: LPSTR | NULL, cchRoleMax: UINT): UINT {
-    return Oleacc.Load('GetRoleTextA')(lRole, lpszRole, cchRoleMax);
+  public static GetRoleTextA(lRole: DWORD, lpszRole_out: OPTIONAL<LPSTR>, cchRoleMax: UINT): UINT {
+    return Oleacc.Load('GetRoleTextA')(lRole, lpszRole_out, cchRoleMax);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/oleacc/nf-oleacc-getroletextw
-  public static GetRoleTextW(lRole: DWORD, lpszRole: LPWSTR | NULL, cchRoleMax: UINT): UINT {
-    return Oleacc.Load('GetRoleTextW')(lRole, lpszRole, cchRoleMax);
+  public static GetRoleTextW(lRole: DWORD, lpszRole_out: OPTIONAL<LPWSTR>, cchRoleMax: UINT): UINT {
+    return Oleacc.Load('GetRoleTextW')(lRole, lpszRole_out, cchRoleMax);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/oleacc/nf-oleacc-getstatetexta
-  public static GetStateTextA(lStateBit: DWORD, lpszState: LPSTR | NULL, cchState: UINT): UINT {
-    return Oleacc.Load('GetStateTextA')(lStateBit, lpszState, cchState);
+  public static GetStateTextA(lStateBit: DWORD, lpszState_out: OPTIONAL<LPSTR>, cchState: UINT): UINT {
+    return Oleacc.Load('GetStateTextA')(lStateBit, lpszState_out, cchState);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/oleacc/nf-oleacc-getstatetextw
-  public static GetStateTextW(lStateBit: DWORD, lpszState: LPWSTR | NULL, cchState: UINT): UINT {
-    return Oleacc.Load('GetStateTextW')(lStateBit, lpszState, cchState);
+  public static GetStateTextW(lStateBit: DWORD, lpszState_out: OPTIONAL<LPWSTR>, cchState: UINT): UINT {
+    return Oleacc.Load('GetStateTextW')(lStateBit, lpszState_out, cchState);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/oleacc/nf-oleacc-lresultfromobject
@@ -151,13 +151,13 @@ class Oleacc extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/oleacc/nf-oleacc-objectfromlresult
-  public static ObjectFromLresult(lResult: LRESULT, riid: REFIID, wParam: WPARAM, ppvObject: PPVOID): HRESULT {
-    return Oleacc.Load('ObjectFromLresult')(lResult, riid, wParam, ppvObject);
+  public static ObjectFromLresult(lResult: LRESULT, riid: REFIID, wParam: WPARAM, ppvObject_out: PPVOID): HRESULT {
+    return Oleacc.Load('ObjectFromLresult')(lResult, riid, wParam, ppvObject_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/oleacc/nf-oleacc-windowfromaccessibleobject
-  public static WindowFromAccessibleObject(unnamedParam1: IAccessible, phwnd: PHWND | NULL): HRESULT {
-    return Oleacc.Load('WindowFromAccessibleObject')(unnamedParam1, phwnd);
+  public static WindowFromAccessibleObject(unnamedParam1: IAccessible, phwnd_out: OPTIONAL<PHWND>): HRESULT {
+    return Oleacc.Load('WindowFromAccessibleObject')(unnamedParam1, phwnd_out);
   }
 }
 

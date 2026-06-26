@@ -1,6 +1,6 @@
 import type { Pointer } from 'bun:ffi';
 
-export type { BOOL, DWORD, HANDLE, HRESULT, HWND, LPSECURITY_ATTRIBUTES, NULL, PHANDLE, UINT } from '@bun-win32/core';
+export type { BOOL, DWORD, HANDLE, HRESULT, HWND, LPSECURITY_ATTRIBUTES, NULL, OPTIONAL, PHANDLE, UINT } from '@bun-win32/core';
 
 export const COMPOSITIONOBJECT_ALL_ACCESS = 0x0000_0003;
 export const COMPOSITIONOBJECT_READ = 0x0000_0001;

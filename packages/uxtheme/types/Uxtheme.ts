@@ -1,6 +1,6 @@
 import type { Pointer } from 'bun:ffi';
 
-export type { BOOL, BYTE, DWORD, HINSTANCE, HRESULT, HWND, INT, LONG, LPCWSTR, LPDWORD, LPVOID, LPWSTR, NULL, PVOID, UINT, ULONG, WORD } from '@bun-win32/core';
+export type { BOOL, BYTE, DWORD, HINSTANCE, HRESULT, HWND, INT, LONG, LPCWSTR, LPDWORD, LPVOID, LPWSTR, NULL, OPTIONAL, PVOID, UINT, ULONG, WORD } from '@bun-win32/core';
 
 export const BPBF_COMPOSITED = 2;
 export const MAX_INTLIST_COUNT = 402;

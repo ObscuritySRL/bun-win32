@@ -13,7 +13,7 @@ import type {
   HWCT,
   LPBOOL,
   LPDWORD,
-  NULL,
+  OPTIONAL,
   PCOGETACTIVATIONSTATE,
   PCOGETCALLSTATE,
   PCWSTR,
@@ -100,12 +100,12 @@ class Wer extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wct/nf-wct-getthreadwaitchain
-  public static GetThreadWaitChain(WctHandle: HWCT, Context: DWORD_PTR | 0n, Flags: DWORD, ThreadId: DWORD, NodeCount: LPDWORD, NodeInfoArray: PWAITCHAIN_NODE_INFO, IsCycle: LPBOOL): BOOL {
-    return Wer.Load('GetThreadWaitChain')(WctHandle, Context, Flags, ThreadId, NodeCount, NodeInfoArray, IsCycle);
+  public static GetThreadWaitChain(WctHandle: HWCT, Context: OPTIONAL<DWORD_PTR>, Flags: DWORD, ThreadId: DWORD, NodeCount_in_out: LPDWORD, NodeInfoArray_out: PWAITCHAIN_NODE_INFO, IsCycle_out: LPBOOL): BOOL {
+    return Wer.Load('GetThreadWaitChain')(WctHandle, Context, Flags, ThreadId, NodeCount_in_out, NodeInfoArray_out, IsCycle_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wct/nf-wct-openthreadwaitchainsession
-  public static OpenThreadWaitChainSession(Flags: DWORD, callback: PWAITCHAINCALLBACK | NULL): HWCT {
+  public static OpenThreadWaitChainSession(Flags: DWORD, callback: OPTIONAL<PWAITCHAINCALLBACK>): HWCT {
     return Wer.Load('OpenThreadWaitChainSession')(Flags, callback);
   }
 
@@ -133,10 +133,10 @@ class Wer extends Win32 {
   public static WerReportAddDump(
     hReportHandle: HREPORT,
     hProcess: HANDLE,
-    hThread: HANDLE | 0n,
+    hThread: OPTIONAL<HANDLE>,
     dumpType: WER_DUMP_TYPE,
-    pExceptionParam: PWER_EXCEPTION_INFORMATION | NULL,
-    pDumpCustomOptions: PWER_DUMP_CUSTOM_OPTIONS | NULL,
+    pExceptionParam: OPTIONAL<PWER_EXCEPTION_INFORMATION>,
+    pDumpCustomOptions: OPTIONAL<PWER_DUMP_CUSTOM_OPTIONS>,
     dwFlags: DWORD,
   ): HRESULT {
     return Wer.Load('WerReportAddDump')(hReportHandle, hProcess, hThread, dumpType, pExceptionParam, pDumpCustomOptions, dwFlags);
@@ -153,12 +153,12 @@ class Wer extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/werapi/nf-werapi-werreportcreate
-  public static WerReportCreate(pwzEventType: PCWSTR, repType: WER_REPORT_TYPE, pReportInformation: PWER_REPORT_INFORMATION | NULL, phReportHandle: PHREPORT): HRESULT {
-    return Wer.Load('WerReportCreate')(pwzEventType, repType, pReportInformation, phReportHandle);
+  public static WerReportCreate(pwzEventType: PCWSTR, repType: WER_REPORT_TYPE, pReportInformation: OPTIONAL<PWER_REPORT_INFORMATION>, phReportHandle_out: PHREPORT): HRESULT {
+    return Wer.Load('WerReportCreate')(pwzEventType, repType, pReportInformation, phReportHandle_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/werapi/nf-werapi-werreportsetparameter
-  public static WerReportSetParameter(hReportHandle: HREPORT, dwparamID: DWORD, pwzName: PCWSTR | NULL, pwzValue: PCWSTR): HRESULT {
+  public static WerReportSetParameter(hReportHandle: HREPORT, dwparamID: DWORD, pwzName: OPTIONAL<PCWSTR>, pwzValue: PCWSTR): HRESULT {
     return Wer.Load('WerReportSetParameter')(hReportHandle, dwparamID, pwzName, pwzValue);
   }
 
@@ -168,38 +168,38 @@ class Wer extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/werapi/nf-werapi-werreportsubmit
-  public static WerReportSubmit(hReportHandle: HREPORT, consent: WER_CONSENT, dwFlags: DWORD, pSubmitResult: PWER_SUBMIT_RESULT | NULL): HRESULT {
-    return Wer.Load('WerReportSubmit')(hReportHandle, consent, dwFlags, pSubmitResult);
+  public static WerReportSubmit(hReportHandle: HREPORT, consent: WER_CONSENT, dwFlags: DWORD, pSubmitResult_out: OPTIONAL<PWER_SUBMIT_RESULT>): HRESULT {
+    return Wer.Load('WerReportSubmit')(hReportHandle, consent, dwFlags, pSubmitResult_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/werapi/nf-werapi-werstoreclose
-  public static WerStoreClose(hReportStore: HREPORTSTORE | 0n): void {
+  public static WerStoreClose(hReportStore: OPTIONAL<HREPORTSTORE>): void {
     return Wer.Load('WerStoreClose')(hReportStore);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/werapi/nf-werapi-werstoregetfirstreportkey
-  public static WerStoreGetFirstReportKey(hReportStore: HREPORTSTORE, ppszReportKey: PPCWSTR): HRESULT {
-    return Wer.Load('WerStoreGetFirstReportKey')(hReportStore, ppszReportKey);
+  public static WerStoreGetFirstReportKey(hReportStore: HREPORTSTORE, ppszReportKey_out: PPCWSTR): HRESULT {
+    return Wer.Load('WerStoreGetFirstReportKey')(hReportStore, ppszReportKey_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/werapi/nf-werapi-werstoregetnextreportkey
-  public static WerStoreGetNextReportKey(hReportStore: HREPORTSTORE, ppszReportKey: PPCWSTR): HRESULT {
-    return Wer.Load('WerStoreGetNextReportKey')(hReportStore, ppszReportKey);
+  public static WerStoreGetNextReportKey(hReportStore: HREPORTSTORE, ppszReportKey_out: PPCWSTR): HRESULT {
+    return Wer.Load('WerStoreGetNextReportKey')(hReportStore, ppszReportKey_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/werapi/nf-werapi-werstoregetreportcount
-  public static WerStoreGetReportCount(hReportStore: HREPORTSTORE, pdwReportCount: LPDWORD): HRESULT {
-    return Wer.Load('WerStoreGetReportCount')(hReportStore, pdwReportCount);
+  public static WerStoreGetReportCount(hReportStore: HREPORTSTORE, pdwReportCount_out: LPDWORD): HRESULT {
+    return Wer.Load('WerStoreGetReportCount')(hReportStore, pdwReportCount_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/werapi/nf-werapi-werstoregetsizeondisk
-  public static WerStoreGetSizeOnDisk(hReportStore: HREPORTSTORE, pqwSizeInBytes: PULONGLONG): HRESULT {
-    return Wer.Load('WerStoreGetSizeOnDisk')(hReportStore, pqwSizeInBytes);
+  public static WerStoreGetSizeOnDisk(hReportStore: HREPORTSTORE, pqwSizeInBytes_out: PULONGLONG): HRESULT {
+    return Wer.Load('WerStoreGetSizeOnDisk')(hReportStore, pqwSizeInBytes_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/werapi/nf-werapi-werstoreopen
-  public static WerStoreOpen(repStoreType: REPORT_STORE_TYPES, phReportStore: PHREPORTSTORE): HRESULT {
-    return Wer.Load('WerStoreOpen')(repStoreType, phReportStore);
+  public static WerStoreOpen(repStoreType: REPORT_STORE_TYPES, phReportStore_out: PHREPORTSTORE): HRESULT {
+    return Wer.Load('WerStoreOpen')(repStoreType, phReportStore_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/werapi/nf-werapi-werstorepurge
@@ -208,18 +208,18 @@ class Wer extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/werapi/nf-werapi-werstorequeryreportmetadatav2
-  public static WerStoreQueryReportMetadataV2(hReportStore: HREPORTSTORE, pszReportKey: PCWSTR, pReportMetadata: PWER_REPORT_METADATA_V2): HRESULT {
-    return Wer.Load('WerStoreQueryReportMetadataV2')(hReportStore, pszReportKey, pReportMetadata);
+  public static WerStoreQueryReportMetadataV2(hReportStore: HREPORTSTORE, pszReportKey: PCWSTR, pReportMetadata_out: PWER_REPORT_METADATA_V2): HRESULT {
+    return Wer.Load('WerStoreQueryReportMetadataV2')(hReportStore, pszReportKey, pReportMetadata_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/werapi/nf-werapi-werstorequeryreportmetadatav3
-  public static WerStoreQueryReportMetadataV3(hReportStore: HREPORTSTORE, pszReportKey: PCWSTR, pReportMetadata: PWER_REPORT_METADATA_V3): HRESULT {
-    return Wer.Load('WerStoreQueryReportMetadataV3')(hReportStore, pszReportKey, pReportMetadata);
+  public static WerStoreQueryReportMetadataV3(hReportStore: HREPORTSTORE, pszReportKey: PCWSTR, pReportMetadata_out: PWER_REPORT_METADATA_V3): HRESULT {
+    return Wer.Load('WerStoreQueryReportMetadataV3')(hReportStore, pszReportKey, pReportMetadata_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/werapi/nf-werapi-werstoreuploadreport
-  public static WerStoreUploadReport(hReportStore: HREPORTSTORE, pszReportKey: PCWSTR, dwFlags: DWORD, pSubmitResult: PWER_SUBMIT_RESULT | NULL): HRESULT {
-    return Wer.Load('WerStoreUploadReport')(hReportStore, pszReportKey, dwFlags, pSubmitResult);
+  public static WerStoreUploadReport(hReportStore: HREPORTSTORE, pszReportKey: PCWSTR, dwFlags: DWORD, pSubmitResult_out: OPTIONAL<PWER_SUBMIT_RESULT>): HRESULT {
+    return Wer.Load('WerStoreUploadReport')(hReportStore, pszReportKey, dwFlags, pSubmitResult_out);
   }
 }
 

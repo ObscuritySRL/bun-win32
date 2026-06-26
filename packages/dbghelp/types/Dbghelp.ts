@@ -1,6 +1,6 @@
 import type { Pointer } from 'bun:ffi';
 
-export type { BOOL, BOOLEAN, DWORD, HANDLE, HMODULE, HWND, LPCSTR, LPCWSTR, LPDWORD, LPSTR, LPVOID, LPWSTR, NULL, PDWORD, PULONG, PVOID, SIZE_T, UINT, ULONG, USHORT } from '@bun-win32/core';
+export type { BOOL, BOOLEAN, DWORD, HANDLE, HMODULE, HWND, LPCSTR, LPCWSTR, LPDWORD, LPSTR, LPVOID, LPWSTR, NULL, OPTIONAL, PDWORD, PULONG, PVOID, SIZE_T, UINT, ULONG, USHORT } from '@bun-win32/core';
 
 export type DWORD64 = bigint;
 export type ULONG64 = bigint;

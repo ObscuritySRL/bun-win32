@@ -1,6 +1,6 @@
 import type { Pointer } from 'bun:ffi';
 
-export type { HRESULT, HWND, LPCWSTR, LPVOID, LPWSTR, NULL } from '@bun-win32/core';
+export type { HRESULT, HWND, LPCWSTR, LPVOID, LPWSTR, NULL, NULLABLE, OPTIONAL } from '@bun-win32/core';
 
 export type GUID = Pointer;
 export type IMFASFContentInfo = Pointer;

@@ -24,11 +24,12 @@ import type {
   LPARAM,
   LPCWSTR,
   LRESULT,
-  NULL,
+  NULLABLE,
   NavigateDirection,
   NormalizeState,
   NotificationKind,
   NotificationProcessing,
+  OPTIONAL,
   PATTERNID,
   PBOOL,
   PBSTR,
@@ -203,8 +204,8 @@ class UIAutomationCore extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/combaseapi/nf-combaseapi-dllgetclassobject
-  public static DllGetClassObject(rclsid: REFCLSID, riid: REFIID, ppv: PPVOID): HRESULT {
-    return UIAutomationCore.Load('DllGetClassObject')(rclsid, riid, ppv);
+  public static DllGetClassObject(rclsid: REFCLSID, riid: REFIID, ppv_out: PPVOID): HRESULT {
+    return UIAutomationCore.Load('DllGetClassObject')(rclsid, riid, ppv_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/olectl/nf-olectl-dllregisterserver
@@ -233,8 +234,8 @@ class UIAutomationCore extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uiautomationcoreapi/nf-uiautomationcoreapi-gridpattern_getitem
-  public static GridPattern_GetItem(hobj: HUIAPATTERNOBJECT, row: int, column: int, pResult: PHUIANODE): HRESULT {
-    return UIAutomationCore.Load('GridPattern_GetItem')(hobj, row, column, pResult);
+  public static GridPattern_GetItem(hobj: HUIAPATTERNOBJECT, row: int, column: int, pResult_out: PHUIANODE): HRESULT {
+    return UIAutomationCore.Load('GridPattern_GetItem')(hobj, row, column, pResult_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uiautomationcoreapi/nf-uiautomationcoreapi-invokepattern_invoke
@@ -243,8 +244,8 @@ class UIAutomationCore extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uiautomationcoreapi/nf-uiautomationcoreapi-itemcontainerpattern_finditembyproperty
-  public static ItemContainerPattern_FindItemByProperty(hobj: HUIAPATTERNOBJECT, hnodeStartAfter: HUIANODE, propertyId: PROPERTYID, value: VARIANT, pFound: PHUIANODE): HRESULT {
-    return UIAutomationCore.Load('ItemContainerPattern_FindItemByProperty')(hobj, hnodeStartAfter, propertyId, value, pFound);
+  public static ItemContainerPattern_FindItemByProperty(hobj: HUIAPATTERNOBJECT, hnodeStartAfter: NULLABLE<HUIANODE>, propertyId: PROPERTYID, value: VARIANT, pFound_out: PHUIANODE): HRESULT {
+    return UIAutomationCore.Load('ItemContainerPattern_FindItemByProperty')(hobj, hnodeStartAfter, propertyId, value, pFound_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uiautomationcoreapi/nf-uiautomationcoreapi-legacyiaccessiblepattern_dodefaultaction
@@ -253,8 +254,8 @@ class UIAutomationCore extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uiautomationcoreapi/nf-uiautomationcoreapi-legacyiaccessiblepattern_getiaccessible
-  public static LegacyIAccessiblePattern_GetIAccessible(hobj: HUIAPATTERNOBJECT, pAccessible: PPIAccessible): HRESULT {
-    return UIAutomationCore.Load('LegacyIAccessiblePattern_GetIAccessible')(hobj, pAccessible);
+  public static LegacyIAccessiblePattern_GetIAccessible(hobj: HUIAPATTERNOBJECT, pAccessible_out: PPIAccessible): HRESULT {
+    return UIAutomationCore.Load('LegacyIAccessiblePattern_GetIAccessible')(hobj, pAccessible_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uiautomationcoreapi/nf-uiautomationcoreapi-legacyiaccessiblepattern_select
@@ -268,8 +269,8 @@ class UIAutomationCore extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uiautomationcoreapi/nf-uiautomationcoreapi-multipleviewpattern_getviewname
-  public static MultipleViewPattern_GetViewName(hobj: HUIAPATTERNOBJECT, viewId: int, ppStr: PBSTR): HRESULT {
-    return UIAutomationCore.Load('MultipleViewPattern_GetViewName')(hobj, viewId, ppStr);
+  public static MultipleViewPattern_GetViewName(hobj: HUIAPATTERNOBJECT, viewId: int, ppStr_out: PBSTR): HRESULT {
+    return UIAutomationCore.Load('MultipleViewPattern_GetViewName')(hobj, viewId, ppStr_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uiautomationcoreapi/nf-uiautomationcoreapi-multipleviewpattern_setcurrentview
@@ -323,33 +324,33 @@ class UIAutomationCore extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uiautomationcoreapi/nf-uiautomationcoreapi-textpattern_get_documentrange
-  public static TextPattern_get_DocumentRange(hobj: HUIAPATTERNOBJECT, pRetVal: PHUIATEXTRANGE): HRESULT {
-    return UIAutomationCore.Load('TextPattern_get_DocumentRange')(hobj, pRetVal);
+  public static TextPattern_get_DocumentRange(hobj: HUIAPATTERNOBJECT, pRetVal_out: PHUIATEXTRANGE): HRESULT {
+    return UIAutomationCore.Load('TextPattern_get_DocumentRange')(hobj, pRetVal_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uiautomationcoreapi/nf-uiautomationcoreapi-textpattern_get_supportedtextselection
-  public static TextPattern_get_SupportedTextSelection(hobj: HUIAPATTERNOBJECT, pRetVal: PSupportedTextSelection): HRESULT {
-    return UIAutomationCore.Load('TextPattern_get_SupportedTextSelection')(hobj, pRetVal);
+  public static TextPattern_get_SupportedTextSelection(hobj: HUIAPATTERNOBJECT, pRetVal_out: PSupportedTextSelection): HRESULT {
+    return UIAutomationCore.Load('TextPattern_get_SupportedTextSelection')(hobj, pRetVal_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uiautomationcoreapi/nf-uiautomationcoreapi-textpattern_getselection
-  public static TextPattern_GetSelection(hobj: HUIAPATTERNOBJECT, pRetVal: PSAFEARRAY): HRESULT {
-    return UIAutomationCore.Load('TextPattern_GetSelection')(hobj, pRetVal);
+  public static TextPattern_GetSelection(hobj: HUIAPATTERNOBJECT, pRetVal_out: PSAFEARRAY): HRESULT {
+    return UIAutomationCore.Load('TextPattern_GetSelection')(hobj, pRetVal_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uiautomationcoreapi/nf-uiautomationcoreapi-textpattern_getvisibleranges
-  public static TextPattern_GetVisibleRanges(hobj: HUIAPATTERNOBJECT, pRetVal: PSAFEARRAY): HRESULT {
-    return UIAutomationCore.Load('TextPattern_GetVisibleRanges')(hobj, pRetVal);
+  public static TextPattern_GetVisibleRanges(hobj: HUIAPATTERNOBJECT, pRetVal_out: PSAFEARRAY): HRESULT {
+    return UIAutomationCore.Load('TextPattern_GetVisibleRanges')(hobj, pRetVal_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uiautomationcoreapi/nf-uiautomationcoreapi-textpattern_rangefromchild
-  public static TextPattern_RangeFromChild(hobj: HUIAPATTERNOBJECT, hnodeChild: HUIANODE, pRetVal: PHUIATEXTRANGE): HRESULT {
-    return UIAutomationCore.Load('TextPattern_RangeFromChild')(hobj, hnodeChild, pRetVal);
+  public static TextPattern_RangeFromChild(hobj: HUIAPATTERNOBJECT, hnodeChild: HUIANODE, pRetVal_out: PHUIATEXTRANGE): HRESULT {
+    return UIAutomationCore.Load('TextPattern_RangeFromChild')(hobj, hnodeChild, pRetVal_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uiautomationcoreapi/nf-uiautomationcoreapi-textpattern_rangefrompoint
-  public static TextPattern_RangeFromPoint(hobj: HUIAPATTERNOBJECT, point: UiaPoint, pRetVal: PHUIATEXTRANGE): HRESULT {
-    return UIAutomationCore.Load('TextPattern_RangeFromPoint')(hobj, point, pRetVal);
+  public static TextPattern_RangeFromPoint(hobj: HUIAPATTERNOBJECT, point: UiaPoint, pRetVal_out: PHUIATEXTRANGE): HRESULT {
+    return UIAutomationCore.Load('TextPattern_RangeFromPoint')(hobj, point, pRetVal_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uiautomationcoreapi/nf-uiautomationcoreapi-textrange_addtoselection
@@ -358,18 +359,18 @@ class UIAutomationCore extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uiautomationcoreapi/nf-uiautomationcoreapi-textrange_clone
-  public static TextRange_Clone(hobj: HUIATEXTRANGE, pRetVal: PHUIATEXTRANGE): HRESULT {
-    return UIAutomationCore.Load('TextRange_Clone')(hobj, pRetVal);
+  public static TextRange_Clone(hobj: HUIATEXTRANGE, pRetVal_out: PHUIATEXTRANGE): HRESULT {
+    return UIAutomationCore.Load('TextRange_Clone')(hobj, pRetVal_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uiautomationcoreapi/nf-uiautomationcoreapi-textrange_compare
-  public static TextRange_Compare(hobj: HUIATEXTRANGE, range: HUIATEXTRANGE, pRetVal: PBOOL): HRESULT {
-    return UIAutomationCore.Load('TextRange_Compare')(hobj, range, pRetVal);
+  public static TextRange_Compare(hobj: HUIATEXTRANGE, range: HUIATEXTRANGE, pRetVal_out: PBOOL): HRESULT {
+    return UIAutomationCore.Load('TextRange_Compare')(hobj, range, pRetVal_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uiautomationcoreapi/nf-uiautomationcoreapi-textrange_compareendpoints
-  public static TextRange_CompareEndpoints(hobj: HUIATEXTRANGE, endpoint: TextPatternRangeEndpoint, targetRange: HUIATEXTRANGE, targetEndpoint: TextPatternRangeEndpoint, pRetVal: PINT): HRESULT {
-    return UIAutomationCore.Load('TextRange_CompareEndpoints')(hobj, endpoint, targetRange, targetEndpoint, pRetVal);
+  public static TextRange_CompareEndpoints(hobj: HUIATEXTRANGE, endpoint: TextPatternRangeEndpoint, targetRange: HUIATEXTRANGE, targetEndpoint: TextPatternRangeEndpoint, pRetVal_out: PINT): HRESULT {
+    return UIAutomationCore.Load('TextRange_CompareEndpoints')(hobj, endpoint, targetRange, targetEndpoint, pRetVal_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uiautomationcoreapi/nf-uiautomationcoreapi-textrange_expandtoenclosingunit
@@ -378,43 +379,43 @@ class UIAutomationCore extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uiautomationcoreapi/nf-uiautomationcoreapi-textrange_findattribute
-  public static TextRange_FindAttribute(hobj: HUIATEXTRANGE, attributeId: TEXTATTRIBUTEID, val: VARIANT, backward: BOOL, pRetVal: PHUIATEXTRANGE): HRESULT {
-    return UIAutomationCore.Load('TextRange_FindAttribute')(hobj, attributeId, val, backward, pRetVal);
+  public static TextRange_FindAttribute(hobj: HUIATEXTRANGE, attributeId: TEXTATTRIBUTEID, val: VARIANT, backward: BOOL, pRetVal_out: PHUIATEXTRANGE): HRESULT {
+    return UIAutomationCore.Load('TextRange_FindAttribute')(hobj, attributeId, val, backward, pRetVal_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uiautomationcoreapi/nf-uiautomationcoreapi-textrange_findtext
-  public static TextRange_FindText(hobj: HUIATEXTRANGE, text: BSTR, backward: BOOL, ignoreCase: BOOL, pRetVal: PHUIATEXTRANGE): HRESULT {
-    return UIAutomationCore.Load('TextRange_FindText')(hobj, text, backward, ignoreCase, pRetVal);
+  public static TextRange_FindText(hobj: HUIATEXTRANGE, text: BSTR, backward: BOOL, ignoreCase: BOOL, pRetVal_out: PHUIATEXTRANGE): HRESULT {
+    return UIAutomationCore.Load('TextRange_FindText')(hobj, text, backward, ignoreCase, pRetVal_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uiautomationcoreapi/nf-uiautomationcoreapi-textrange_getattributevalue
-  public static TextRange_GetAttributeValue(hobj: HUIATEXTRANGE, attributeId: TEXTATTRIBUTEID, pRetVal: PVARIANT): HRESULT {
-    return UIAutomationCore.Load('TextRange_GetAttributeValue')(hobj, attributeId, pRetVal);
+  public static TextRange_GetAttributeValue(hobj: HUIATEXTRANGE, attributeId: TEXTATTRIBUTEID, pRetVal_out: PVARIANT): HRESULT {
+    return UIAutomationCore.Load('TextRange_GetAttributeValue')(hobj, attributeId, pRetVal_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uiautomationcoreapi/nf-uiautomationcoreapi-textrange_getboundingrectangles
-  public static TextRange_GetBoundingRectangles(hobj: HUIATEXTRANGE, pRetVal: PSAFEARRAY): HRESULT {
-    return UIAutomationCore.Load('TextRange_GetBoundingRectangles')(hobj, pRetVal);
+  public static TextRange_GetBoundingRectangles(hobj: HUIATEXTRANGE, pRetVal_out: PSAFEARRAY): HRESULT {
+    return UIAutomationCore.Load('TextRange_GetBoundingRectangles')(hobj, pRetVal_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uiautomationcoreapi/nf-uiautomationcoreapi-textrange_getchildren
-  public static TextRange_GetChildren(hobj: HUIATEXTRANGE, pRetVal: PSAFEARRAY): HRESULT {
-    return UIAutomationCore.Load('TextRange_GetChildren')(hobj, pRetVal);
+  public static TextRange_GetChildren(hobj: HUIATEXTRANGE, pRetVal_out: PSAFEARRAY): HRESULT {
+    return UIAutomationCore.Load('TextRange_GetChildren')(hobj, pRetVal_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uiautomationcoreapi/nf-uiautomationcoreapi-textrange_getenclosingelement
-  public static TextRange_GetEnclosingElement(hobj: HUIATEXTRANGE, pRetVal: PHUIANODE): HRESULT {
-    return UIAutomationCore.Load('TextRange_GetEnclosingElement')(hobj, pRetVal);
+  public static TextRange_GetEnclosingElement(hobj: HUIATEXTRANGE, pRetVal_out: PHUIANODE): HRESULT {
+    return UIAutomationCore.Load('TextRange_GetEnclosingElement')(hobj, pRetVal_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uiautomationcoreapi/nf-uiautomationcoreapi-textrange_gettext
-  public static TextRange_GetText(hobj: HUIATEXTRANGE, maxLength: int, pRetVal: PBSTR): HRESULT {
-    return UIAutomationCore.Load('TextRange_GetText')(hobj, maxLength, pRetVal);
+  public static TextRange_GetText(hobj: HUIATEXTRANGE, maxLength: int, pRetVal_out: PBSTR): HRESULT {
+    return UIAutomationCore.Load('TextRange_GetText')(hobj, maxLength, pRetVal_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uiautomationcoreapi/nf-uiautomationcoreapi-textrange_move
-  public static TextRange_Move(hobj: HUIATEXTRANGE, unit: TextUnit, count: int, pRetVal: PINT): HRESULT {
-    return UIAutomationCore.Load('TextRange_Move')(hobj, unit, count, pRetVal);
+  public static TextRange_Move(hobj: HUIATEXTRANGE, unit: TextUnit, count: int, pRetVal_out: PINT): HRESULT {
+    return UIAutomationCore.Load('TextRange_Move')(hobj, unit, count, pRetVal_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uiautomationcoreapi/nf-uiautomationcoreapi-textrange_moveendpointbyrange
@@ -423,8 +424,8 @@ class UIAutomationCore extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uiautomationcoreapi/nf-uiautomationcoreapi-textrange_moveendpointbyunit
-  public static TextRange_MoveEndpointByUnit(hobj: HUIATEXTRANGE, endpoint: TextPatternRangeEndpoint, unit: TextUnit, count: int, pRetVal: PINT): HRESULT {
-    return UIAutomationCore.Load('TextRange_MoveEndpointByUnit')(hobj, endpoint, unit, count, pRetVal);
+  public static TextRange_MoveEndpointByUnit(hobj: HUIATEXTRANGE, endpoint: TextPatternRangeEndpoint, unit: TextUnit, count: int, pRetVal_out: PINT): HRESULT {
+    return UIAutomationCore.Load('TextRange_MoveEndpointByUnit')(hobj, endpoint, unit, count, pRetVal_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uiautomationcoreapi/nf-uiautomationcoreapi-textrange_removefromselection
@@ -463,8 +464,8 @@ class UIAutomationCore extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uiautomationcoreapi/nf-uiautomationcoreapi-uiaaddevent
-  public static UiaAddEvent(hnode: HUIANODE, eventId: EVENTID, pCallback: UiaEventCallback, scope: TreeScope, pProperties: PPROPERTYID | NULL, cProperties: int, pRequest: UiaCacheRequest, phEvent: PHUIAEVENT): HRESULT {
-    return UIAutomationCore.Load('UiaAddEvent')(hnode, eventId, pCallback, scope, pProperties, cProperties, pRequest, phEvent);
+  public static UiaAddEvent(hnode: HUIANODE, eventId: EVENTID, pCallback: UiaEventCallback, scope: TreeScope, pProperties: NULLABLE<PPROPERTYID>, cProperties: int, pRequest: UiaCacheRequest, phEvent_out: PHUIAEVENT): HRESULT {
+    return UIAutomationCore.Load('UiaAddEvent')(hnode, eventId, pCallback, scope, pProperties, cProperties, pRequest, phEvent_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uiautomationcoreapi/nf-uiautomationcoreapi-uiaclientsarelistening
@@ -493,48 +494,48 @@ class UIAutomationCore extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uiautomationcoreapi/nf-uiautomationcoreapi-uiafind
-  public static UiaFind(hnode: HUIANODE, pParams: UiaFindParams, pRequest: UiaCacheRequest, ppRequestedData: PSAFEARRAY, ppOffsets: PSAFEARRAY, ppTreeStructures: PSAFEARRAY): HRESULT {
-    return UIAutomationCore.Load('UiaFind')(hnode, pParams, pRequest, ppRequestedData, ppOffsets, ppTreeStructures);
+  public static UiaFind(hnode: HUIANODE, pParams: UiaFindParams, pRequest: UiaCacheRequest, ppRequestedData_out: PSAFEARRAY, ppOffsets_out: PSAFEARRAY, ppTreeStructures_out: PSAFEARRAY): HRESULT {
+    return UIAutomationCore.Load('UiaFind')(hnode, pParams, pRequest, ppRequestedData_out, ppOffsets_out, ppTreeStructures_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uiautomationcoreapi/nf-uiautomationcoreapi-uiageterrordescription
-  public static UiaGetErrorDescription(pDescription: PBSTR): BOOL {
-    return UIAutomationCore.Load('UiaGetErrorDescription')(pDescription);
+  public static UiaGetErrorDescription(pDescription_out: PBSTR): BOOL {
+    return UIAutomationCore.Load('UiaGetErrorDescription')(pDescription_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uiautomationcoreapi/nf-uiautomationcoreapi-uiagetpatternprovider
-  public static UiaGetPatternProvider(hnode: HUIANODE, patternId: PATTERNID, phobj: PHUIAPATTERNOBJECT): HRESULT {
-    return UIAutomationCore.Load('UiaGetPatternProvider')(hnode, patternId, phobj);
+  public static UiaGetPatternProvider(hnode: HUIANODE, patternId: PATTERNID, phobj_out: PHUIAPATTERNOBJECT): HRESULT {
+    return UIAutomationCore.Load('UiaGetPatternProvider')(hnode, patternId, phobj_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uiautomationcoreapi/nf-uiautomationcoreapi-uiagetpropertyvalue
-  public static UiaGetPropertyValue(hnode: HUIANODE, propertyId: PROPERTYID, pValue: PVARIANT): HRESULT {
-    return UIAutomationCore.Load('UiaGetPropertyValue')(hnode, propertyId, pValue);
+  public static UiaGetPropertyValue(hnode: HUIANODE, propertyId: PROPERTYID, pValue_out: PVARIANT): HRESULT {
+    return UIAutomationCore.Load('UiaGetPropertyValue')(hnode, propertyId, pValue_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uiautomationcoreapi/nf-uiautomationcoreapi-uiagetreservedmixedattributevalue
-  public static UiaGetReservedMixedAttributeValue(punkMixedAttributeValue: PPIUnknown): HRESULT {
-    return UIAutomationCore.Load('UiaGetReservedMixedAttributeValue')(punkMixedAttributeValue);
+  public static UiaGetReservedMixedAttributeValue(punkMixedAttributeValue_out: PPIUnknown): HRESULT {
+    return UIAutomationCore.Load('UiaGetReservedMixedAttributeValue')(punkMixedAttributeValue_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uiautomationcoreapi/nf-uiautomationcoreapi-uiagetreservednotsupportedvalue
-  public static UiaGetReservedNotSupportedValue(punkNotSupportedValue: PPIUnknown): HRESULT {
-    return UIAutomationCore.Load('UiaGetReservedNotSupportedValue')(punkNotSupportedValue);
+  public static UiaGetReservedNotSupportedValue(punkNotSupportedValue_out: PPIUnknown): HRESULT {
+    return UIAutomationCore.Load('UiaGetReservedNotSupportedValue')(punkNotSupportedValue_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uiautomationcoreapi/nf-uiautomationcoreapi-uiagetrootnode
-  public static UiaGetRootNode(phnode: PHUIANODE): HRESULT {
-    return UIAutomationCore.Load('UiaGetRootNode')(phnode);
+  public static UiaGetRootNode(phnode_out: PHUIANODE): HRESULT {
+    return UIAutomationCore.Load('UiaGetRootNode')(phnode_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uiautomationcoreapi/nf-uiautomationcoreapi-uiagetruntimeid
-  public static UiaGetRuntimeId(hnode: HUIANODE, pruntimeId: PSAFEARRAY): HRESULT {
-    return UIAutomationCore.Load('UiaGetRuntimeId')(hnode, pruntimeId);
+  public static UiaGetRuntimeId(hnode: HUIANODE, pruntimeId_out: PSAFEARRAY): HRESULT {
+    return UIAutomationCore.Load('UiaGetRuntimeId')(hnode, pruntimeId_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uiautomationcoreapi/nf-uiautomationcoreapi-uiagetupdatedcache
-  public static UiaGetUpdatedCache(hnode: HUIANODE, pRequest: UiaCacheRequest, normalizeState: NormalizeState, pNormalizeCondition: UiaCondition, ppRequestedData: PSAFEARRAY, ppTreeStructure: PBSTR): HRESULT {
-    return UIAutomationCore.Load('UiaGetUpdatedCache')(hnode, pRequest, normalizeState, pNormalizeCondition, ppRequestedData, ppTreeStructure);
+  public static UiaGetUpdatedCache(hnode: HUIANODE, pRequest: UiaCacheRequest, normalizeState: NormalizeState, pNormalizeCondition: UiaCondition, ppRequestedData_out: PSAFEARRAY, ppTreeStructure_out: PBSTR): HRESULT {
+    return UIAutomationCore.Load('UiaGetUpdatedCache')(hnode, pRequest, normalizeState, pNormalizeCondition, ppRequestedData_out, ppTreeStructure_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uiautomationcoreapi/nf-uiautomationcoreapi-uiahasserversideprovider
@@ -543,28 +544,28 @@ class UIAutomationCore extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uiautomationcoreapi/nf-uiautomationcoreapi-uiahostproviderfromhwnd
-  public static UiaHostProviderFromHwnd(hwnd: HWND, ppProvider: PPIRawElementProviderSimple): HRESULT {
-    return UIAutomationCore.Load('UiaHostProviderFromHwnd')(hwnd, ppProvider);
+  public static UiaHostProviderFromHwnd(hwnd: HWND, ppProvider_out: PPIRawElementProviderSimple): HRESULT {
+    return UIAutomationCore.Load('UiaHostProviderFromHwnd')(hwnd, ppProvider_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uiautomationcoreapi/nf-uiautomationcoreapi-uiahpatternobjectfromvariant
-  public static UiaHPatternObjectFromVariant(pvar: PVARIANT, phobj: PHUIAPATTERNOBJECT): HRESULT {
-    return UIAutomationCore.Load('UiaHPatternObjectFromVariant')(pvar, phobj);
+  public static UiaHPatternObjectFromVariant(pvar: PVARIANT, phobj_out: PHUIAPATTERNOBJECT): HRESULT {
+    return UIAutomationCore.Load('UiaHPatternObjectFromVariant')(pvar, phobj_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uiautomationcoreapi/nf-uiautomationcoreapi-uiahtextrangefromvariant
-  public static UiaHTextRangeFromVariant(pvar: PVARIANT, phtextrange: PHUIATEXTRANGE): HRESULT {
-    return UIAutomationCore.Load('UiaHTextRangeFromVariant')(pvar, phtextrange);
+  public static UiaHTextRangeFromVariant(pvar: PVARIANT, phtextrange_out: PHUIATEXTRANGE): HRESULT {
+    return UIAutomationCore.Load('UiaHTextRangeFromVariant')(pvar, phtextrange_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uiautomationcoreapi/nf-uiautomationcoreapi-uiahuianodefromvariant
-  public static UiaHUiaNodeFromVariant(pvar: PVARIANT, phnode: PHUIANODE): HRESULT {
-    return UIAutomationCore.Load('UiaHUiaNodeFromVariant')(pvar, phnode);
+  public static UiaHUiaNodeFromVariant(pvar: PVARIANT, phnode_out: PHUIANODE): HRESULT {
+    return UIAutomationCore.Load('UiaHUiaNodeFromVariant')(pvar, phnode_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uiautomationcoreapi/nf-uiautomationcoreapi-uiaiaccessiblefromprovider
-  public static UiaIAccessibleFromProvider(pProvider: IRawElementProviderSimple, dwFlags: DWORD, ppAccessible: PPIAccessible, pvarChild: PVARIANT): HRESULT {
-    return UIAutomationCore.Load('UiaIAccessibleFromProvider')(pProvider, dwFlags, ppAccessible, pvarChild);
+  public static UiaIAccessibleFromProvider(pProvider: IRawElementProviderSimple, dwFlags: DWORD, ppAccessible_out: PPIAccessible, pvarChild_out: PVARIANT): HRESULT {
+    return UIAutomationCore.Load('UiaIAccessibleFromProvider')(pProvider, dwFlags, ppAccessible_out, pvarChild_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uiautomationcoreapi/nf-uiautomationcoreapi-uialookupid
@@ -573,28 +574,28 @@ class UIAutomationCore extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uiautomationcoreapi/nf-uiautomationcoreapi-uianavigate
-  public static UiaNavigate(hnode: HUIANODE, direction: NavigateDirection, pCondition: UiaCondition, pRequest: UiaCacheRequest, ppRequestedData: PSAFEARRAY, ppTreeStructure: PBSTR): HRESULT {
-    return UIAutomationCore.Load('UiaNavigate')(hnode, direction, pCondition, pRequest, ppRequestedData, ppTreeStructure);
+  public static UiaNavigate(hnode: HUIANODE, direction: NavigateDirection, pCondition: UiaCondition, pRequest: UiaCacheRequest, ppRequestedData_out: PSAFEARRAY, ppTreeStructure_out: PBSTR): HRESULT {
+    return UIAutomationCore.Load('UiaNavigate')(hnode, direction, pCondition, pRequest, ppRequestedData_out, ppTreeStructure_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uiautomationcoreapi/nf-uiautomationcoreapi-uianodefromfocus
-  public static UiaNodeFromFocus(pRequest: UiaCacheRequest, ppRequestedData: PSAFEARRAY, ppTreeStructure: PBSTR): HRESULT {
-    return UIAutomationCore.Load('UiaNodeFromFocus')(pRequest, ppRequestedData, ppTreeStructure);
+  public static UiaNodeFromFocus(pRequest: UiaCacheRequest, ppRequestedData_out: PSAFEARRAY, ppTreeStructure_out: PBSTR): HRESULT {
+    return UIAutomationCore.Load('UiaNodeFromFocus')(pRequest, ppRequestedData_out, ppTreeStructure_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uiautomationcoreapi/nf-uiautomationcoreapi-uianodefromhandle
-  public static UiaNodeFromHandle(hwnd: HWND, phnode: PHUIANODE): HRESULT {
-    return UIAutomationCore.Load('UiaNodeFromHandle')(hwnd, phnode);
+  public static UiaNodeFromHandle(hwnd: HWND, phnode_out: PHUIANODE): HRESULT {
+    return UIAutomationCore.Load('UiaNodeFromHandle')(hwnd, phnode_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uiautomationcoreapi/nf-uiautomationcoreapi-uianodefrompoint
-  public static UiaNodeFromPoint(x: number, y: number, pRequest: UiaCacheRequest, ppRequestedData: PSAFEARRAY, ppTreeStructure: PBSTR): HRESULT {
-    return UIAutomationCore.Load('UiaNodeFromPoint')(x, y, pRequest, ppRequestedData, ppTreeStructure);
+  public static UiaNodeFromPoint(x: number, y: number, pRequest: UiaCacheRequest, ppRequestedData_out: PSAFEARRAY, ppTreeStructure_out: PBSTR): HRESULT {
+    return UIAutomationCore.Load('UiaNodeFromPoint')(x, y, pRequest, ppRequestedData_out, ppTreeStructure_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uiautomationcoreapi/nf-uiautomationcoreapi-uianodefromprovider
-  public static UiaNodeFromProvider(pProvider: IRawElementProviderSimple, phnode: PHUIANODE): HRESULT {
-    return UIAutomationCore.Load('UiaNodeFromProvider')(pProvider, phnode);
+  public static UiaNodeFromProvider(pProvider: IRawElementProviderSimple, phnode_out: PHUIANODE): HRESULT {
+    return UIAutomationCore.Load('UiaNodeFromProvider')(pProvider, phnode_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uiautomationcoreapi/nf-uiautomationcoreapi-uianoderelease
@@ -608,17 +609,17 @@ class UIAutomationCore extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uiautomationcoreapi/nf-uiautomationcoreapi-uiaproviderfornonclient
-  public static UiaProviderForNonClient(hwnd: HWND, idObject: LONG, idChild: LONG, ppProvider: PPIRawElementProviderSimple): HRESULT {
-    return UIAutomationCore.Load('UiaProviderForNonClient')(hwnd, idObject, idChild, ppProvider);
+  public static UiaProviderForNonClient(hwnd: HWND, idObject: LONG, idChild: LONG, ppProvider_out: PPIRawElementProviderSimple): HRESULT {
+    return UIAutomationCore.Load('UiaProviderForNonClient')(hwnd, idObject, idChild, ppProvider_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uiautomationcoreapi/nf-uiautomationcoreapi-uiaproviderfromiaccessible
-  public static UiaProviderFromIAccessible(pAccessible: IAccessible, idChild: LONG, dwFlags: DWORD, ppProvider: PPIRawElementProviderSimple): HRESULT {
-    return UIAutomationCore.Load('UiaProviderFromIAccessible')(pAccessible, idChild, dwFlags, ppProvider);
+  public static UiaProviderFromIAccessible(pAccessible: IAccessible, idChild: LONG, dwFlags: DWORD, ppProvider_out: PPIRawElementProviderSimple): HRESULT {
+    return UIAutomationCore.Load('UiaProviderFromIAccessible')(pAccessible, idChild, dwFlags, ppProvider_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uiautomationcoreapi/nf-uiautomationcoreapi-uiaraiseactivetextpositionchangedevent
-  public static UiaRaiseActiveTextPositionChangedEvent(provider: IRawElementProviderSimple, textRange: ITextRangeProvider | NULL): HRESULT {
+  public static UiaRaiseActiveTextPositionChangedEvent(provider: IRawElementProviderSimple, textRange: OPTIONAL<ITextRangeProvider>): HRESULT {
     return UIAutomationCore.Load('UiaRaiseActiveTextPositionChangedEvent')(provider, textRange);
   }
 
@@ -643,12 +644,12 @@ class UIAutomationCore extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uiautomationcoreapi/nf-uiautomationcoreapi-uiaraisenotificationevent
-  public static UiaRaiseNotificationEvent(provider: IRawElementProviderSimple, notificationKind: NotificationKind, notificationProcessing: NotificationProcessing, displayString: BSTR | NULL, activityId: BSTR): HRESULT {
+  public static UiaRaiseNotificationEvent(provider: IRawElementProviderSimple, notificationKind: NotificationKind, notificationProcessing: NotificationProcessing, displayString: OPTIONAL<BSTR>, activityId: BSTR): HRESULT {
     return UIAutomationCore.Load('UiaRaiseNotificationEvent')(provider, notificationKind, notificationProcessing, displayString, activityId);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uiautomationcoreapi/nf-uiautomationcoreapi-uiaraisestructurechangedevent
-  public static UiaRaiseStructureChangedEvent(pProvider: IRawElementProviderSimple, structureChangeType: StructureChangeType, pRuntimeId: PINT, cRuntimeIdLen: int): HRESULT {
+  public static UiaRaiseStructureChangedEvent(pProvider: IRawElementProviderSimple, structureChangeType: StructureChangeType, pRuntimeId: NULLABLE<PINT>, cRuntimeIdLen: int): HRESULT {
     return UIAutomationCore.Load('UiaRaiseStructureChangedEvent')(pProvider, structureChangeType, pRuntimeId, cRuntimeIdLen);
   }
 
@@ -658,7 +659,7 @@ class UIAutomationCore extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uiautomationcoreapi/nf-uiautomationcoreapi-uiaregisterprovidercallback
-  public static UiaRegisterProviderCallback(pCallback: UiaProviderCallback): void {
+  public static UiaRegisterProviderCallback(pCallback: NULLABLE<UiaProviderCallback>): void {
     return UIAutomationCore.Load('UiaRegisterProviderCallback')(pCallback);
   }
 
@@ -668,7 +669,7 @@ class UIAutomationCore extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uiautomationcoreapi/nf-uiautomationcoreapi-uiareturnrawelementprovider
-  public static UiaReturnRawElementProvider(hwnd: HWND, wParam: WPARAM, lParam: LPARAM, el: IRawElementProviderSimple | NULL): LRESULT {
+  public static UiaReturnRawElementProvider(hwnd: HWND, wParam: WPARAM, lParam: LPARAM, el: NULLABLE<IRawElementProviderSimple>): LRESULT {
     return UIAutomationCore.Load('UiaReturnRawElementProvider')(hwnd, wParam, lParam, el);
   }
 
@@ -703,8 +704,8 @@ class UIAutomationCore extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uiautomationcoreapi/nf-uiautomationcoreapi-windowpattern_waitforinputidle
-  public static WindowPattern_WaitForInputIdle(hobj: HUIAPATTERNOBJECT, milliseconds: int, pResult: PBOOL): HRESULT {
-    return UIAutomationCore.Load('WindowPattern_WaitForInputIdle')(hobj, milliseconds, pResult);
+  public static WindowPattern_WaitForInputIdle(hobj: HUIAPATTERNOBJECT, milliseconds: int, pResult_out: PBOOL): HRESULT {
+    return UIAutomationCore.Load('WindowPattern_WaitForInputIdle')(hobj, milliseconds, pResult_out);
   }
 }
 

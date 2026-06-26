@@ -2,7 +2,7 @@ import { type FFIFunction, FFIType } from 'bun:ffi';
 
 import { Win32 } from '@bun-win32/core';
 
-import type { DWORD, HANDLE, INT, LPCWSTR, LPVOID, NULL, PHANDLE, PULONG, PVOID, ULONG } from '../types/Fwpuclnt';
+import type { DWORD, HANDLE, INT, LPCWSTR, LPVOID, OPTIONAL, PHANDLE, PULONG, PVOID, ULONG } from '../types/Fwpuclnt';
 import type {
   FWPM_CALLOUT_CHANGE_CALLBACK0,
   FWPM_CONNECTION_CALLBACK0,
@@ -341,13 +341,13 @@ class Fwpuclnt extends Win32 {
   } as const satisfies Record<string, FFIFunction>;
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmcalloutadd0
-  public static FwpmCalloutAdd0(engineHandle: HANDLE, callout: PFWPM_CALLOUT0, sd: PSECURITY_DESCRIPTOR | NULL, id: PUINT32 | NULL): DWORD {
-    return Fwpuclnt.Load('FwpmCalloutAdd0')(engineHandle, callout, sd, id);
+  public static FwpmCalloutAdd0(engineHandle: HANDLE, callout: PFWPM_CALLOUT0, sd: OPTIONAL<PSECURITY_DESCRIPTOR>, id_out: OPTIONAL<PUINT32>): DWORD {
+    return Fwpuclnt.Load('FwpmCalloutAdd0')(engineHandle, callout, sd, id_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmcalloutcreateenumhandle0
-  public static FwpmCalloutCreateEnumHandle0(engineHandle: HANDLE, enumTemplate: PFWPM_CALLOUT_ENUM_TEMPLATE0 | NULL, enumHandle: PHANDLE): DWORD {
-    return Fwpuclnt.Load('FwpmCalloutCreateEnumHandle0')(engineHandle, enumTemplate, enumHandle);
+  public static FwpmCalloutCreateEnumHandle0(engineHandle: HANDLE, enumTemplate: OPTIONAL<PFWPM_CALLOUT_ENUM_TEMPLATE0>, enumHandle_out: PHANDLE): DWORD {
+    return Fwpuclnt.Load('FwpmCalloutCreateEnumHandle0')(engineHandle, enumTemplate, enumHandle_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmcalloutdeletebyid0
@@ -361,53 +361,62 @@ class Fwpuclnt extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmcalloutdestroyenumhandle0
-  public static FwpmCalloutDestroyEnumHandle0(engineHandle: HANDLE, enumHandle: HANDLE): DWORD {
-    return Fwpuclnt.Load('FwpmCalloutDestroyEnumHandle0')(engineHandle, enumHandle);
+  public static FwpmCalloutDestroyEnumHandle0(engineHandle: HANDLE, enumHandle_in_out: HANDLE): DWORD {
+    return Fwpuclnt.Load('FwpmCalloutDestroyEnumHandle0')(engineHandle, enumHandle_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmcalloutenum0
-  public static FwpmCalloutEnum0(engineHandle: HANDLE, enumHandle: HANDLE, numEntriesRequested: UINT32, entries: PFWPM_CALLOUT0, numEntriesReturned: PUINT32): DWORD {
-    return Fwpuclnt.Load('FwpmCalloutEnum0')(engineHandle, enumHandle, numEntriesRequested, entries, numEntriesReturned);
+  public static FwpmCalloutEnum0(engineHandle: HANDLE, enumHandle: HANDLE, numEntriesRequested: UINT32, entries_out: PFWPM_CALLOUT0, numEntriesReturned_out: PUINT32): DWORD {
+    return Fwpuclnt.Load('FwpmCalloutEnum0')(engineHandle, enumHandle, numEntriesRequested, entries_out, numEntriesReturned_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmcalloutgetbyid0
-  public static FwpmCalloutGetById0(engineHandle: HANDLE, id: UINT32, callout: PFWPM_CALLOUT0): DWORD {
-    return Fwpuclnt.Load('FwpmCalloutGetById0')(engineHandle, id, callout);
+  public static FwpmCalloutGetById0(engineHandle: HANDLE, id: UINT32, callout_out: PFWPM_CALLOUT0): DWORD {
+    return Fwpuclnt.Load('FwpmCalloutGetById0')(engineHandle, id, callout_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmcalloutgetbykey0
-  public static FwpmCalloutGetByKey0(engineHandle: HANDLE, key: LPGUID, callout: PFWPM_CALLOUT0): DWORD {
-    return Fwpuclnt.Load('FwpmCalloutGetByKey0')(engineHandle, key, callout);
+  public static FwpmCalloutGetByKey0(engineHandle: HANDLE, key: LPGUID, callout_out: PFWPM_CALLOUT0): DWORD {
+    return Fwpuclnt.Load('FwpmCalloutGetByKey0')(engineHandle, key, callout_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmcalloutgetsecurityinfobykey0
-  public static FwpmCalloutGetSecurityInfoByKey0(engineHandle: HANDLE, key: LPGUID | NULL, securityInfo: SECURITY_INFORMATION, sidOwner: PVOID, sidGroup: PVOID, dacl: PVOID, sacl: PVOID, securityDescriptor: PVOID): DWORD {
-    return Fwpuclnt.Load('FwpmCalloutGetSecurityInfoByKey0')(engineHandle, key, securityInfo, sidOwner, sidGroup, dacl, sacl, securityDescriptor);
+  public static FwpmCalloutGetSecurityInfoByKey0(
+    engineHandle: HANDLE,
+    key: OPTIONAL<LPGUID>,
+    securityInfo: SECURITY_INFORMATION,
+    sidOwner_out: PVOID,
+    sidGroup_out: PVOID,
+    dacl_out: PVOID,
+    sacl_out: PVOID,
+    securityDescriptor_out: PVOID,
+  ): DWORD {
+    return Fwpuclnt.Load('FwpmCalloutGetSecurityInfoByKey0')(engineHandle, key, securityInfo, sidOwner_out, sidGroup_out, dacl_out, sacl_out, securityDescriptor_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmcalloutsetsecurityinfobykey0
-  public static FwpmCalloutSetSecurityInfoByKey0(engineHandle: HANDLE, key: LPGUID | NULL, securityInfo: SECURITY_INFORMATION, sidOwner: PSID | NULL, sidGroup: PSID | NULL, dacl: PACL | NULL, sacl: PACL | NULL): DWORD {
+  public static FwpmCalloutSetSecurityInfoByKey0(engineHandle: HANDLE, key: OPTIONAL<LPGUID>, securityInfo: SECURITY_INFORMATION, sidOwner: OPTIONAL<PSID>, sidGroup: OPTIONAL<PSID>, dacl: OPTIONAL<PACL>, sacl: OPTIONAL<PACL>): DWORD {
     return Fwpuclnt.Load('FwpmCalloutSetSecurityInfoByKey0')(engineHandle, key, securityInfo, sidOwner, sidGroup, dacl, sacl);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmcalloutsubscribechanges0
-  public static FwpmCalloutSubscribeChanges0(engineHandle: HANDLE, subscription: PFWPM_CALLOUT_SUBSCRIPTION0, callback: FWPM_CALLOUT_CHANGE_CALLBACK0, context: LPVOID | NULL, changeHandle: PHANDLE): DWORD {
-    return Fwpuclnt.Load('FwpmCalloutSubscribeChanges0')(engineHandle, subscription, callback, context, changeHandle);
+  public static FwpmCalloutSubscribeChanges0(engineHandle: HANDLE, subscription: PFWPM_CALLOUT_SUBSCRIPTION0, callback: FWPM_CALLOUT_CHANGE_CALLBACK0, context: OPTIONAL<LPVOID>, changeHandle_out: PHANDLE): DWORD {
+    return Fwpuclnt.Load('FwpmCalloutSubscribeChanges0')(engineHandle, subscription, callback, context, changeHandle_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmcalloutsubscriptionsget0
-  public static FwpmCalloutSubscriptionsGet0(engineHandle: HANDLE, entries: PFWPM_CALLOUT_SUBSCRIPTION0, numEntries: PUINT32): DWORD {
-    return Fwpuclnt.Load('FwpmCalloutSubscriptionsGet0')(engineHandle, entries, numEntries);
+  public static FwpmCalloutSubscriptionsGet0(engineHandle: HANDLE, entries_out: PFWPM_CALLOUT_SUBSCRIPTION0, numEntries_out: PUINT32): DWORD {
+    return Fwpuclnt.Load('FwpmCalloutSubscriptionsGet0')(engineHandle, entries_out, numEntries_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmcalloutunsubscribechanges0
-  public static FwpmCalloutUnsubscribeChanges0(engineHandle: HANDLE, changeHandle: HANDLE): DWORD {
-    return Fwpuclnt.Load('FwpmCalloutUnsubscribeChanges0')(engineHandle, changeHandle);
+  public static FwpmCalloutUnsubscribeChanges0(engineHandle: HANDLE, changeHandle_in_out: HANDLE): DWORD {
+    return Fwpuclnt.Load('FwpmCalloutUnsubscribeChanges0')(engineHandle, changeHandle_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmconnectioncreateenumhandle0
-  public static FwpmConnectionCreateEnumHandle0(engineHandle: HANDLE, enumTemplate: PFWPM_CONNECTION_ENUM_TEMPLATE0 | NULL, enumHandle: PHANDLE): DWORD {
-    return Fwpuclnt.Load('FwpmConnectionCreateEnumHandle0')(engineHandle, enumTemplate, enumHandle);
+  public static FwpmConnectionCreateEnumHandle0(engineHandle: HANDLE, enumTemplate: OPTIONAL<PFWPM_CONNECTION_ENUM_TEMPLATE0>, enumHandle_out: PHANDLE): DWORD {
+    return Fwpuclnt.Load('FwpmConnectionCreateEnumHandle0')(engineHandle, enumTemplate, enumHandle_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmconnectiondestroyenumhandle0
@@ -416,38 +425,38 @@ class Fwpuclnt extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmconnectionenum0
-  public static FwpmConnectionEnum0(engineHandle: HANDLE, enumHandle: HANDLE, numEntriesRequested: UINT32, entries: PFWPM_CONNECTION0, numEntriesReturned: PUINT32): DWORD {
-    return Fwpuclnt.Load('FwpmConnectionEnum0')(engineHandle, enumHandle, numEntriesRequested, entries, numEntriesReturned);
+  public static FwpmConnectionEnum0(engineHandle: HANDLE, enumHandle: HANDLE, numEntriesRequested: UINT32, entries_out: PFWPM_CONNECTION0, numEntriesReturned_out: PUINT32): DWORD {
+    return Fwpuclnt.Load('FwpmConnectionEnum0')(engineHandle, enumHandle, numEntriesRequested, entries_out, numEntriesReturned_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmconnectiongetbyid0
-  public static FwpmConnectionGetById0(engineHandle: HANDLE, id: UINT64, connection: PFWPM_CONNECTION0): DWORD {
-    return Fwpuclnt.Load('FwpmConnectionGetById0')(engineHandle, id, connection);
+  public static FwpmConnectionGetById0(engineHandle: HANDLE, id: UINT64, connection_out: PFWPM_CONNECTION0): DWORD {
+    return Fwpuclnt.Load('FwpmConnectionGetById0')(engineHandle, id, connection_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmconnectiongetsecurityinfo0
-  public static FwpmConnectionGetSecurityInfo0(engineHandle: HANDLE, securityInfo: SECURITY_INFORMATION, sidOwner: PVOID, sidGroup: PVOID, dacl: PVOID, sacl: PVOID, securityDescriptor: PVOID): DWORD {
-    return Fwpuclnt.Load('FwpmConnectionGetSecurityInfo0')(engineHandle, securityInfo, sidOwner, sidGroup, dacl, sacl, securityDescriptor);
+  public static FwpmConnectionGetSecurityInfo0(engineHandle: HANDLE, securityInfo: SECURITY_INFORMATION, sidOwner_out: PVOID, sidGroup_out: PVOID, dacl_out: PVOID, sacl_out: PVOID, securityDescriptor_out: PVOID): DWORD {
+    return Fwpuclnt.Load('FwpmConnectionGetSecurityInfo0')(engineHandle, securityInfo, sidOwner_out, sidGroup_out, dacl_out, sacl_out, securityDescriptor_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmconnectionsetsecurityinfo0
-  public static FwpmConnectionSetSecurityInfo0(engineHandle: HANDLE, securityInfo: SECURITY_INFORMATION, sidOwner: PSID | NULL, sidGroup: PSID | NULL, dacl: PACL | NULL, sacl: PACL | NULL): DWORD {
+  public static FwpmConnectionSetSecurityInfo0(engineHandle: HANDLE, securityInfo: SECURITY_INFORMATION, sidOwner: OPTIONAL<PSID>, sidGroup: OPTIONAL<PSID>, dacl: OPTIONAL<PACL>, sacl: OPTIONAL<PACL>): DWORD {
     return Fwpuclnt.Load('FwpmConnectionSetSecurityInfo0')(engineHandle, securityInfo, sidOwner, sidGroup, dacl, sacl);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmconnectionsubscribe0
-  public static FwpmConnectionSubscribe0(engineHandle: HANDLE, subscription: PFWPM_CONNECTION_SUBSCRIPTION0, callback: FWPM_CONNECTION_CALLBACK0, context: LPVOID | NULL, eventsHandle: PHANDLE): DWORD {
-    return Fwpuclnt.Load('FwpmConnectionSubscribe0')(engineHandle, subscription, callback, context, eventsHandle);
+  public static FwpmConnectionSubscribe0(engineHandle: HANDLE, subscription: PFWPM_CONNECTION_SUBSCRIPTION0, callback: FWPM_CONNECTION_CALLBACK0, context: OPTIONAL<LPVOID>, eventsHandle_out: PHANDLE): DWORD {
+    return Fwpuclnt.Load('FwpmConnectionSubscribe0')(engineHandle, subscription, callback, context, eventsHandle_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmconnectionunsubscribe0
-  public static FwpmConnectionUnsubscribe0(engineHandle: HANDLE, eventsHandle: HANDLE): DWORD {
-    return Fwpuclnt.Load('FwpmConnectionUnsubscribe0')(engineHandle, eventsHandle);
+  public static FwpmConnectionUnsubscribe0(engineHandle: HANDLE, eventsHandle_in_out: HANDLE): DWORD {
+    return Fwpuclnt.Load('FwpmConnectionUnsubscribe0')(engineHandle, eventsHandle_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmdynamickeywordsubscribe0
-  public static FwpmDynamicKeywordSubscribe0(flags: DWORD, callback: FWPM_DYNAMIC_KEYWORD_CALLBACK0, context: LPVOID | NULL, subscriptionHandle: PHANDLE): DWORD {
-    return Fwpuclnt.Load('FwpmDynamicKeywordSubscribe0')(flags, callback, context, subscriptionHandle);
+  public static FwpmDynamicKeywordSubscribe0(flags: DWORD, callback: FWPM_DYNAMIC_KEYWORD_CALLBACK0, context: OPTIONAL<LPVOID>, subscriptionHandle_out: PHANDLE): DWORD {
+    return Fwpuclnt.Load('FwpmDynamicKeywordSubscribe0')(flags, callback, context, subscriptionHandle_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmdynamickeywordunsubscribe0
@@ -456,23 +465,23 @@ class Fwpuclnt extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmengineclose0
-  public static FwpmEngineClose0(engineHandle: HANDLE): DWORD {
-    return Fwpuclnt.Load('FwpmEngineClose0')(engineHandle);
+  public static FwpmEngineClose0(engineHandle_in_out: HANDLE): DWORD {
+    return Fwpuclnt.Load('FwpmEngineClose0')(engineHandle_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmenginegetoption0
-  public static FwpmEngineGetOption0(engineHandle: HANDLE, option: FWPM_ENGINE_OPTION, value: PFWP_VALUE0): DWORD {
-    return Fwpuclnt.Load('FwpmEngineGetOption0')(engineHandle, option, value);
+  public static FwpmEngineGetOption0(engineHandle: HANDLE, option: FWPM_ENGINE_OPTION, value_out: PFWP_VALUE0): DWORD {
+    return Fwpuclnt.Load('FwpmEngineGetOption0')(engineHandle, option, value_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmenginegetsecurityinfo0
-  public static FwpmEngineGetSecurityInfo0(engineHandle: HANDLE, securityInfo: SECURITY_INFORMATION, sidOwner: PVOID, sidGroup: PVOID, dacl: PVOID, sacl: PVOID, securityDescriptor: PVOID): DWORD {
-    return Fwpuclnt.Load('FwpmEngineGetSecurityInfo0')(engineHandle, securityInfo, sidOwner, sidGroup, dacl, sacl, securityDescriptor);
+  public static FwpmEngineGetSecurityInfo0(engineHandle: HANDLE, securityInfo: SECURITY_INFORMATION, sidOwner_out: PVOID, sidGroup_out: PVOID, dacl_out: PVOID, sacl_out: PVOID, securityDescriptor_out: PVOID): DWORD {
+    return Fwpuclnt.Load('FwpmEngineGetSecurityInfo0')(engineHandle, securityInfo, sidOwner_out, sidGroup_out, dacl_out, sacl_out, securityDescriptor_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmengineopen0
-  public static FwpmEngineOpen0(serverName: LPCWSTR | NULL, authnService: UINT32, authIdentity: PSEC_WINNT_AUTH_IDENTITY_W | NULL, session: PFWPM_SESSION0 | NULL, engineHandle: PHANDLE): DWORD {
-    return Fwpuclnt.Load('FwpmEngineOpen0')(serverName, authnService, authIdentity, session, engineHandle);
+  public static FwpmEngineOpen0(serverName: OPTIONAL<LPCWSTR>, authnService: UINT32, authIdentity: OPTIONAL<PSEC_WINNT_AUTH_IDENTITY_W>, session: OPTIONAL<PFWPM_SESSION0>, engineHandle_out: PHANDLE): DWORD {
+    return Fwpuclnt.Load('FwpmEngineOpen0')(serverName, authnService, authIdentity, session, engineHandle_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmenginesetoption0
@@ -481,18 +490,18 @@ class Fwpuclnt extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmenginesetsecurityinfo0
-  public static FwpmEngineSetSecurityInfo0(engineHandle: HANDLE, securityInfo: SECURITY_INFORMATION, sidOwner: PSID | NULL, sidGroup: PSID | NULL, dacl: PACL | NULL, sacl: PACL | NULL): DWORD {
+  public static FwpmEngineSetSecurityInfo0(engineHandle: HANDLE, securityInfo: SECURITY_INFORMATION, sidOwner: OPTIONAL<PSID>, sidGroup: OPTIONAL<PSID>, dacl: OPTIONAL<PACL>, sacl: OPTIONAL<PACL>): DWORD {
     return Fwpuclnt.Load('FwpmEngineSetSecurityInfo0')(engineHandle, securityInfo, sidOwner, sidGroup, dacl, sacl);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmfilteradd0
-  public static FwpmFilterAdd0(engineHandle: HANDLE, filter: PFWPM_FILTER0, sd: PSECURITY_DESCRIPTOR | NULL, id: PUINT64 | NULL): DWORD {
-    return Fwpuclnt.Load('FwpmFilterAdd0')(engineHandle, filter, sd, id);
+  public static FwpmFilterAdd0(engineHandle: HANDLE, filter: PFWPM_FILTER0, sd: OPTIONAL<PSECURITY_DESCRIPTOR>, id_out: OPTIONAL<PUINT64>): DWORD {
+    return Fwpuclnt.Load('FwpmFilterAdd0')(engineHandle, filter, sd, id_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmfiltercreateenumhandle0
-  public static FwpmFilterCreateEnumHandle0(engineHandle: HANDLE, enumTemplate: PFWPM_FILTER_ENUM_TEMPLATE0 | NULL, enumHandle: PHANDLE): DWORD {
-    return Fwpuclnt.Load('FwpmFilterCreateEnumHandle0')(engineHandle, enumTemplate, enumHandle);
+  public static FwpmFilterCreateEnumHandle0(engineHandle: HANDLE, enumTemplate: OPTIONAL<PFWPM_FILTER_ENUM_TEMPLATE0>, enumHandle_out: PHANDLE): DWORD {
+    return Fwpuclnt.Load('FwpmFilterCreateEnumHandle0')(engineHandle, enumTemplate, enumHandle_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmfilterdeletebyid0
@@ -506,69 +515,78 @@ class Fwpuclnt extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmfilterdestroyenumhandle0
-  public static FwpmFilterDestroyEnumHandle0(engineHandle: HANDLE, enumHandle: HANDLE): DWORD {
-    return Fwpuclnt.Load('FwpmFilterDestroyEnumHandle0')(engineHandle, enumHandle);
+  public static FwpmFilterDestroyEnumHandle0(engineHandle: HANDLE, enumHandle_in_out: HANDLE): DWORD {
+    return Fwpuclnt.Load('FwpmFilterDestroyEnumHandle0')(engineHandle, enumHandle_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmfilterenum0
-  public static FwpmFilterEnum0(engineHandle: HANDLE, enumHandle: HANDLE, numEntriesRequested: UINT32, entries: PFWPM_FILTER0, numEntriesReturned: PUINT32): DWORD {
-    return Fwpuclnt.Load('FwpmFilterEnum0')(engineHandle, enumHandle, numEntriesRequested, entries, numEntriesReturned);
+  public static FwpmFilterEnum0(engineHandle: HANDLE, enumHandle: HANDLE, numEntriesRequested: UINT32, entries_out: PFWPM_FILTER0, numEntriesReturned_out: PUINT32): DWORD {
+    return Fwpuclnt.Load('FwpmFilterEnum0')(engineHandle, enumHandle, numEntriesRequested, entries_out, numEntriesReturned_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmfiltergetbyid0
-  public static FwpmFilterGetById0(engineHandle: HANDLE, id: UINT64, filter: PFWPM_FILTER0): DWORD {
-    return Fwpuclnt.Load('FwpmFilterGetById0')(engineHandle, id, filter);
+  public static FwpmFilterGetById0(engineHandle: HANDLE, id: UINT64, filter_out: PFWPM_FILTER0): DWORD {
+    return Fwpuclnt.Load('FwpmFilterGetById0')(engineHandle, id, filter_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmfiltergetbykey0
-  public static FwpmFilterGetByKey0(engineHandle: HANDLE, key: LPGUID, filter: PFWPM_FILTER0): DWORD {
-    return Fwpuclnt.Load('FwpmFilterGetByKey0')(engineHandle, key, filter);
+  public static FwpmFilterGetByKey0(engineHandle: HANDLE, key: LPGUID, filter_out: PFWPM_FILTER0): DWORD {
+    return Fwpuclnt.Load('FwpmFilterGetByKey0')(engineHandle, key, filter_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmfiltergetsecurityinfobykey0
-  public static FwpmFilterGetSecurityInfoByKey0(engineHandle: HANDLE, key: LPGUID | NULL, securityInfo: SECURITY_INFORMATION, sidOwner: PVOID, sidGroup: PVOID, dacl: PVOID, sacl: PVOID, securityDescriptor: PVOID): DWORD {
-    return Fwpuclnt.Load('FwpmFilterGetSecurityInfoByKey0')(engineHandle, key, securityInfo, sidOwner, sidGroup, dacl, sacl, securityDescriptor);
+  public static FwpmFilterGetSecurityInfoByKey0(
+    engineHandle: HANDLE,
+    key: OPTIONAL<LPGUID>,
+    securityInfo: SECURITY_INFORMATION,
+    sidOwner_out: PVOID,
+    sidGroup_out: PVOID,
+    dacl_out: PVOID,
+    sacl_out: PVOID,
+    securityDescriptor_out: PVOID,
+  ): DWORD {
+    return Fwpuclnt.Load('FwpmFilterGetSecurityInfoByKey0')(engineHandle, key, securityInfo, sidOwner_out, sidGroup_out, dacl_out, sacl_out, securityDescriptor_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmfiltersetsecurityinfobykey0
-  public static FwpmFilterSetSecurityInfoByKey0(engineHandle: HANDLE, key: LPGUID | NULL, securityInfo: SECURITY_INFORMATION, sidOwner: PSID | NULL, sidGroup: PSID | NULL, dacl: PACL | NULL, sacl: PACL | NULL): DWORD {
+  public static FwpmFilterSetSecurityInfoByKey0(engineHandle: HANDLE, key: OPTIONAL<LPGUID>, securityInfo: SECURITY_INFORMATION, sidOwner: OPTIONAL<PSID>, sidGroup: OPTIONAL<PSID>, dacl: OPTIONAL<PACL>, sacl: OPTIONAL<PACL>): DWORD {
     return Fwpuclnt.Load('FwpmFilterSetSecurityInfoByKey0')(engineHandle, key, securityInfo, sidOwner, sidGroup, dacl, sacl);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmfiltersubscribechanges0
-  public static FwpmFilterSubscribeChanges0(engineHandle: HANDLE, subscription: PFWPM_FILTER_SUBSCRIPTION0, callback: FWPM_FILTER_CHANGE_CALLBACK0, context: LPVOID | NULL, changeHandle: PHANDLE): DWORD {
-    return Fwpuclnt.Load('FwpmFilterSubscribeChanges0')(engineHandle, subscription, callback, context, changeHandle);
+  public static FwpmFilterSubscribeChanges0(engineHandle: HANDLE, subscription: PFWPM_FILTER_SUBSCRIPTION0, callback: FWPM_FILTER_CHANGE_CALLBACK0, context: OPTIONAL<LPVOID>, changeHandle_out: PHANDLE): DWORD {
+    return Fwpuclnt.Load('FwpmFilterSubscribeChanges0')(engineHandle, subscription, callback, context, changeHandle_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmfiltersubscriptionsget0
-  public static FwpmFilterSubscriptionsGet0(engineHandle: HANDLE, entries: PFWPM_FILTER_SUBSCRIPTION0, numEntries: PUINT32): DWORD {
-    return Fwpuclnt.Load('FwpmFilterSubscriptionsGet0')(engineHandle, entries, numEntries);
+  public static FwpmFilterSubscriptionsGet0(engineHandle: HANDLE, entries_out: PFWPM_FILTER_SUBSCRIPTION0, numEntries_out: PUINT32): DWORD {
+    return Fwpuclnt.Load('FwpmFilterSubscriptionsGet0')(engineHandle, entries_out, numEntries_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmfilterunsubscribechanges0
-  public static FwpmFilterUnsubscribeChanges0(engineHandle: HANDLE, changeHandle: HANDLE): DWORD {
-    return Fwpuclnt.Load('FwpmFilterUnsubscribeChanges0')(engineHandle, changeHandle);
+  public static FwpmFilterUnsubscribeChanges0(engineHandle: HANDLE, changeHandle_in_out: HANDLE): DWORD {
+    return Fwpuclnt.Load('FwpmFilterUnsubscribeChanges0')(engineHandle, changeHandle_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmfreememory0
-  public static FwpmFreeMemory0(p: PVOID): void {
-    return Fwpuclnt.Load('FwpmFreeMemory0')(p);
+  public static FwpmFreeMemory0(p_in_out: PVOID): void {
+    return Fwpuclnt.Load('FwpmFreeMemory0')(p_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmgetappidfromfilename0
-  public static FwpmGetAppIdFromFileName0(fileName: LPCWSTR, appId: PFWP_BYTE_BLOB): DWORD {
-    return Fwpuclnt.Load('FwpmGetAppIdFromFileName0')(fileName, appId);
+  public static FwpmGetAppIdFromFileName0(fileName: LPCWSTR, appId_out: PFWP_BYTE_BLOB): DWORD {
+    return Fwpuclnt.Load('FwpmGetAppIdFromFileName0')(fileName, appId_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmipsectunneladd0
   public static FwpmIPsecTunnelAdd0(
     engineHandle: HANDLE,
     flags: UINT32,
-    mainModePolicy: PFWPM_PROVIDER_CONTEXT0 | NULL,
+    mainModePolicy: OPTIONAL<PFWPM_PROVIDER_CONTEXT0>,
     tunnelPolicy: PFWPM_PROVIDER_CONTEXT0,
     numFilterConditions: UINT32,
     filterConditions: PFWPM_FILTER_CONDITION0,
-    sd: PSECURITY_DESCRIPTOR | NULL,
+    sd: OPTIONAL<PSECURITY_DESCRIPTOR>,
   ): DWORD {
     return Fwpuclnt.Load('FwpmIPsecTunnelAdd0')(engineHandle, flags, mainModePolicy, tunnelPolicy, numFilterConditions, filterConditions, sd);
   }
@@ -577,12 +595,12 @@ class Fwpuclnt extends Win32 {
   public static FwpmIPsecTunnelAdd1(
     engineHandle: HANDLE,
     flags: UINT32,
-    mainModePolicy: PFWPM_PROVIDER_CONTEXT1 | NULL,
+    mainModePolicy: OPTIONAL<PFWPM_PROVIDER_CONTEXT1>,
     tunnelPolicy: PFWPM_PROVIDER_CONTEXT1,
     numFilterConditions: UINT32,
     filterConditions: PFWPM_FILTER_CONDITION0,
-    keyModKey: LPGUID | NULL,
-    sd: PSECURITY_DESCRIPTOR | NULL,
+    keyModKey: OPTIONAL<LPGUID>,
+    sd: OPTIONAL<PSECURITY_DESCRIPTOR>,
   ): DWORD {
     return Fwpuclnt.Load('FwpmIPsecTunnelAdd1')(engineHandle, flags, mainModePolicy, tunnelPolicy, numFilterConditions, filterConditions, keyModKey, sd);
   }
@@ -591,12 +609,12 @@ class Fwpuclnt extends Win32 {
   public static FwpmIPsecTunnelAdd2(
     engineHandle: HANDLE,
     flags: UINT32,
-    mainModePolicy: PFWPM_PROVIDER_CONTEXT2 | NULL,
+    mainModePolicy: OPTIONAL<PFWPM_PROVIDER_CONTEXT2>,
     tunnelPolicy: PFWPM_PROVIDER_CONTEXT2,
     numFilterConditions: UINT32,
     filterConditions: PFWPM_FILTER_CONDITION0,
-    keyModKey: LPGUID | NULL,
-    sd: PSECURITY_DESCRIPTOR | NULL,
+    keyModKey: OPTIONAL<LPGUID>,
+    sd: OPTIONAL<PSECURITY_DESCRIPTOR>,
   ): DWORD {
     return Fwpuclnt.Load('FwpmIPsecTunnelAdd2')(engineHandle, flags, mainModePolicy, tunnelPolicy, numFilterConditions, filterConditions, keyModKey, sd);
   }
@@ -605,12 +623,12 @@ class Fwpuclnt extends Win32 {
   public static FwpmIPsecTunnelAdd3(
     engineHandle: HANDLE,
     flags: UINT32,
-    mainModePolicy: PFWPM_PROVIDER_CONTEXT3 | NULL,
+    mainModePolicy: OPTIONAL<PFWPM_PROVIDER_CONTEXT3>,
     tunnelPolicy: PFWPM_PROVIDER_CONTEXT3,
     numFilterConditions: UINT32,
     filterConditions: PFWPM_FILTER_CONDITION0,
-    keyModKey: LPGUID | NULL,
-    sd: PSECURITY_DESCRIPTOR | NULL,
+    keyModKey: OPTIONAL<LPGUID>,
+    sd: OPTIONAL<PSECURITY_DESCRIPTOR>,
   ): DWORD {
     return Fwpuclnt.Load('FwpmIPsecTunnelAdd3')(engineHandle, flags, mainModePolicy, tunnelPolicy, numFilterConditions, filterConditions, keyModKey, sd);
   }
@@ -621,153 +639,162 @@ class Fwpuclnt extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmlayercreateenumhandle0
-  public static FwpmLayerCreateEnumHandle0(engineHandle: HANDLE, enumTemplate: PFWPM_LAYER_ENUM_TEMPLATE0 | NULL, enumHandle: PHANDLE): DWORD {
-    return Fwpuclnt.Load('FwpmLayerCreateEnumHandle0')(engineHandle, enumTemplate, enumHandle);
+  public static FwpmLayerCreateEnumHandle0(engineHandle: HANDLE, enumTemplate: OPTIONAL<PFWPM_LAYER_ENUM_TEMPLATE0>, enumHandle_out: PHANDLE): DWORD {
+    return Fwpuclnt.Load('FwpmLayerCreateEnumHandle0')(engineHandle, enumTemplate, enumHandle_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmlayerdestroyenumhandle0
-  public static FwpmLayerDestroyEnumHandle0(engineHandle: HANDLE, enumHandle: HANDLE): DWORD {
-    return Fwpuclnt.Load('FwpmLayerDestroyEnumHandle0')(engineHandle, enumHandle);
+  public static FwpmLayerDestroyEnumHandle0(engineHandle: HANDLE, enumHandle_in_out: HANDLE): DWORD {
+    return Fwpuclnt.Load('FwpmLayerDestroyEnumHandle0')(engineHandle, enumHandle_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmlayerenum0
-  public static FwpmLayerEnum0(engineHandle: HANDLE, enumHandle: HANDLE, numEntriesRequested: UINT32, entries: PFWPM_LAYER0, numEntriesReturned: PUINT32): DWORD {
-    return Fwpuclnt.Load('FwpmLayerEnum0')(engineHandle, enumHandle, numEntriesRequested, entries, numEntriesReturned);
+  public static FwpmLayerEnum0(engineHandle: HANDLE, enumHandle: HANDLE, numEntriesRequested: UINT32, entries_out: PFWPM_LAYER0, numEntriesReturned_out: PUINT32): DWORD {
+    return Fwpuclnt.Load('FwpmLayerEnum0')(engineHandle, enumHandle, numEntriesRequested, entries_out, numEntriesReturned_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmlayergetbyid0
-  public static FwpmLayerGetById0(engineHandle: HANDLE, id: UINT16, layer: PFWPM_LAYER0): DWORD {
-    return Fwpuclnt.Load('FwpmLayerGetById0')(engineHandle, id, layer);
+  public static FwpmLayerGetById0(engineHandle: HANDLE, id: UINT16, layer_out: PFWPM_LAYER0): DWORD {
+    return Fwpuclnt.Load('FwpmLayerGetById0')(engineHandle, id, layer_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmlayergetbykey0
-  public static FwpmLayerGetByKey0(engineHandle: HANDLE, key: LPGUID, layer: PFWPM_LAYER0): DWORD {
-    return Fwpuclnt.Load('FwpmLayerGetByKey0')(engineHandle, key, layer);
+  public static FwpmLayerGetByKey0(engineHandle: HANDLE, key: LPGUID, layer_out: PFWPM_LAYER0): DWORD {
+    return Fwpuclnt.Load('FwpmLayerGetByKey0')(engineHandle, key, layer_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmlayergetsecurityinfobykey0
-  public static FwpmLayerGetSecurityInfoByKey0(engineHandle: HANDLE, key: LPGUID | NULL, securityInfo: SECURITY_INFORMATION, sidOwner: PVOID, sidGroup: PVOID, dacl: PVOID, sacl: PVOID, securityDescriptor: PVOID): DWORD {
-    return Fwpuclnt.Load('FwpmLayerGetSecurityInfoByKey0')(engineHandle, key, securityInfo, sidOwner, sidGroup, dacl, sacl, securityDescriptor);
+  public static FwpmLayerGetSecurityInfoByKey0(
+    engineHandle: HANDLE,
+    key: OPTIONAL<LPGUID>,
+    securityInfo: SECURITY_INFORMATION,
+    sidOwner_out: PVOID,
+    sidGroup_out: PVOID,
+    dacl_out: PVOID,
+    sacl_out: PVOID,
+    securityDescriptor_out: PVOID,
+  ): DWORD {
+    return Fwpuclnt.Load('FwpmLayerGetSecurityInfoByKey0')(engineHandle, key, securityInfo, sidOwner_out, sidGroup_out, dacl_out, sacl_out, securityDescriptor_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmlayersetsecurityinfobykey0
-  public static FwpmLayerSetSecurityInfoByKey0(engineHandle: HANDLE, key: LPGUID | NULL, securityInfo: SECURITY_INFORMATION, sidOwner: PSID | NULL, sidGroup: PSID | NULL, dacl: PACL | NULL, sacl: PACL | NULL): DWORD {
+  public static FwpmLayerSetSecurityInfoByKey0(engineHandle: HANDLE, key: OPTIONAL<LPGUID>, securityInfo: SECURITY_INFORMATION, sidOwner: OPTIONAL<PSID>, sidGroup: OPTIONAL<PSID>, dacl: OPTIONAL<PACL>, sacl: OPTIONAL<PACL>): DWORD {
     return Fwpuclnt.Load('FwpmLayerSetSecurityInfoByKey0')(engineHandle, key, securityInfo, sidOwner, sidGroup, dacl, sacl);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmneteventcreateenumhandle0
-  public static FwpmNetEventCreateEnumHandle0(engineHandle: HANDLE, enumTemplate: PFWPM_NET_EVENT_ENUM_TEMPLATE0 | NULL, enumHandle: PHANDLE): DWORD {
-    return Fwpuclnt.Load('FwpmNetEventCreateEnumHandle0')(engineHandle, enumTemplate, enumHandle);
+  public static FwpmNetEventCreateEnumHandle0(engineHandle: HANDLE, enumTemplate: OPTIONAL<PFWPM_NET_EVENT_ENUM_TEMPLATE0>, enumHandle_out: PHANDLE): DWORD {
+    return Fwpuclnt.Load('FwpmNetEventCreateEnumHandle0')(engineHandle, enumTemplate, enumHandle_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmneteventdestroyenumhandle0
-  public static FwpmNetEventDestroyEnumHandle0(engineHandle: HANDLE, enumHandle: HANDLE): DWORD {
-    return Fwpuclnt.Load('FwpmNetEventDestroyEnumHandle0')(engineHandle, enumHandle);
+  public static FwpmNetEventDestroyEnumHandle0(engineHandle: HANDLE, enumHandle_in_out: HANDLE): DWORD {
+    return Fwpuclnt.Load('FwpmNetEventDestroyEnumHandle0')(engineHandle, enumHandle_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmneteventenum0
-  public static FwpmNetEventEnum0(engineHandle: HANDLE, enumHandle: HANDLE, numEntriesRequested: UINT32, entries: PFWPM_NET_EVENT0, numEntriesReturned: PUINT32): DWORD {
-    return Fwpuclnt.Load('FwpmNetEventEnum0')(engineHandle, enumHandle, numEntriesRequested, entries, numEntriesReturned);
+  public static FwpmNetEventEnum0(engineHandle: HANDLE, enumHandle: HANDLE, numEntriesRequested: UINT32, entries_out: PFWPM_NET_EVENT0, numEntriesReturned_out: PUINT32): DWORD {
+    return Fwpuclnt.Load('FwpmNetEventEnum0')(engineHandle, enumHandle, numEntriesRequested, entries_out, numEntriesReturned_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmneteventenum1
-  public static FwpmNetEventEnum1(engineHandle: HANDLE, enumHandle: HANDLE, numEntriesRequested: UINT32, entries: PFWPM_NET_EVENT1, numEntriesReturned: PUINT32): DWORD {
-    return Fwpuclnt.Load('FwpmNetEventEnum1')(engineHandle, enumHandle, numEntriesRequested, entries, numEntriesReturned);
+  public static FwpmNetEventEnum1(engineHandle: HANDLE, enumHandle: HANDLE, numEntriesRequested: UINT32, entries_out: PFWPM_NET_EVENT1, numEntriesReturned_out: PUINT32): DWORD {
+    return Fwpuclnt.Load('FwpmNetEventEnum1')(engineHandle, enumHandle, numEntriesRequested, entries_out, numEntriesReturned_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmneteventenum2
-  public static FwpmNetEventEnum2(engineHandle: HANDLE, enumHandle: HANDLE, numEntriesRequested: UINT32, entries: PFWPM_NET_EVENT2, numEntriesReturned: PUINT32): DWORD {
-    return Fwpuclnt.Load('FwpmNetEventEnum2')(engineHandle, enumHandle, numEntriesRequested, entries, numEntriesReturned);
+  public static FwpmNetEventEnum2(engineHandle: HANDLE, enumHandle: HANDLE, numEntriesRequested: UINT32, entries_out: PFWPM_NET_EVENT2, numEntriesReturned_out: PUINT32): DWORD {
+    return Fwpuclnt.Load('FwpmNetEventEnum2')(engineHandle, enumHandle, numEntriesRequested, entries_out, numEntriesReturned_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmneteventenum3
-  public static FwpmNetEventEnum3(engineHandle: HANDLE, enumHandle: HANDLE, numEntriesRequested: UINT32, entries: PFWPM_NET_EVENT3, numEntriesReturned: PUINT32): DWORD {
-    return Fwpuclnt.Load('FwpmNetEventEnum3')(engineHandle, enumHandle, numEntriesRequested, entries, numEntriesReturned);
+  public static FwpmNetEventEnum3(engineHandle: HANDLE, enumHandle: HANDLE, numEntriesRequested: UINT32, entries_out: PFWPM_NET_EVENT3, numEntriesReturned_out: PUINT32): DWORD {
+    return Fwpuclnt.Load('FwpmNetEventEnum3')(engineHandle, enumHandle, numEntriesRequested, entries_out, numEntriesReturned_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmneteventenum4
-  public static FwpmNetEventEnum4(engineHandle: HANDLE, enumHandle: HANDLE, numEntriesRequested: UINT32, entries: PFWPM_NET_EVENT4, numEntriesReturned: PUINT32): DWORD {
-    return Fwpuclnt.Load('FwpmNetEventEnum4')(engineHandle, enumHandle, numEntriesRequested, entries, numEntriesReturned);
+  public static FwpmNetEventEnum4(engineHandle: HANDLE, enumHandle: HANDLE, numEntriesRequested: UINT32, entries_out: PFWPM_NET_EVENT4, numEntriesReturned_out: PUINT32): DWORD {
+    return Fwpuclnt.Load('FwpmNetEventEnum4')(engineHandle, enumHandle, numEntriesRequested, entries_out, numEntriesReturned_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmneteventenum5
-  public static FwpmNetEventEnum5(engineHandle: HANDLE, enumHandle: HANDLE, numEntriesRequested: UINT32, entries: PFWPM_NET_EVENT5, numEntriesReturned: PUINT32): DWORD {
-    return Fwpuclnt.Load('FwpmNetEventEnum5')(engineHandle, enumHandle, numEntriesRequested, entries, numEntriesReturned);
+  public static FwpmNetEventEnum5(engineHandle: HANDLE, enumHandle: HANDLE, numEntriesRequested: UINT32, entries_out: PFWPM_NET_EVENT5, numEntriesReturned_out: PUINT32): DWORD {
+    return Fwpuclnt.Load('FwpmNetEventEnum5')(engineHandle, enumHandle, numEntriesRequested, entries_out, numEntriesReturned_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmneteventsubscribe0
-  public static FwpmNetEventSubscribe0(engineHandle: HANDLE, subscription: PFWPM_NET_EVENT_SUBSCRIPTION0, callback: FWPM_NET_EVENT_CALLBACK0, context: LPVOID | NULL, eventsHandle: PHANDLE): DWORD {
-    return Fwpuclnt.Load('FwpmNetEventSubscribe0')(engineHandle, subscription, callback, context, eventsHandle);
+  public static FwpmNetEventSubscribe0(engineHandle: HANDLE, subscription: PFWPM_NET_EVENT_SUBSCRIPTION0, callback: FWPM_NET_EVENT_CALLBACK0, context: OPTIONAL<LPVOID>, eventsHandle_out: PHANDLE): DWORD {
+    return Fwpuclnt.Load('FwpmNetEventSubscribe0')(engineHandle, subscription, callback, context, eventsHandle_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmneteventsubscribe1
-  public static FwpmNetEventSubscribe1(engineHandle: HANDLE, subscription: PFWPM_NET_EVENT_SUBSCRIPTION0, callback: FWPM_NET_EVENT_CALLBACK1, context: LPVOID | NULL, eventsHandle: PHANDLE): DWORD {
-    return Fwpuclnt.Load('FwpmNetEventSubscribe1')(engineHandle, subscription, callback, context, eventsHandle);
+  public static FwpmNetEventSubscribe1(engineHandle: HANDLE, subscription: PFWPM_NET_EVENT_SUBSCRIPTION0, callback: FWPM_NET_EVENT_CALLBACK1, context: OPTIONAL<LPVOID>, eventsHandle_out: PHANDLE): DWORD {
+    return Fwpuclnt.Load('FwpmNetEventSubscribe1')(engineHandle, subscription, callback, context, eventsHandle_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmneteventsubscribe2
-  public static FwpmNetEventSubscribe2(engineHandle: HANDLE, subscription: PFWPM_NET_EVENT_SUBSCRIPTION0, callback: FWPM_NET_EVENT_CALLBACK2, context: LPVOID | NULL, eventsHandle: PHANDLE): DWORD {
-    return Fwpuclnt.Load('FwpmNetEventSubscribe2')(engineHandle, subscription, callback, context, eventsHandle);
+  public static FwpmNetEventSubscribe2(engineHandle: HANDLE, subscription: PFWPM_NET_EVENT_SUBSCRIPTION0, callback: FWPM_NET_EVENT_CALLBACK2, context: OPTIONAL<LPVOID>, eventsHandle_out: PHANDLE): DWORD {
+    return Fwpuclnt.Load('FwpmNetEventSubscribe2')(engineHandle, subscription, callback, context, eventsHandle_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmneteventsubscribe3
-  public static FwpmNetEventSubscribe3(engineHandle: HANDLE, subscription: PFWPM_NET_EVENT_SUBSCRIPTION0, callback: FWPM_NET_EVENT_CALLBACK3, context: LPVOID | NULL, eventsHandle: PHANDLE): DWORD {
-    return Fwpuclnt.Load('FwpmNetEventSubscribe3')(engineHandle, subscription, callback, context, eventsHandle);
+  public static FwpmNetEventSubscribe3(engineHandle: HANDLE, subscription: PFWPM_NET_EVENT_SUBSCRIPTION0, callback: FWPM_NET_EVENT_CALLBACK3, context: OPTIONAL<LPVOID>, eventsHandle_out: PHANDLE): DWORD {
+    return Fwpuclnt.Load('FwpmNetEventSubscribe3')(engineHandle, subscription, callback, context, eventsHandle_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmneteventsubscribe4
-  public static FwpmNetEventSubscribe4(engineHandle: HANDLE, subscription: PFWPM_NET_EVENT_SUBSCRIPTION0, callback: FWPM_NET_EVENT_CALLBACK4, context: LPVOID | NULL, eventsHandle: PHANDLE): DWORD {
-    return Fwpuclnt.Load('FwpmNetEventSubscribe4')(engineHandle, subscription, callback, context, eventsHandle);
+  public static FwpmNetEventSubscribe4(engineHandle: HANDLE, subscription: PFWPM_NET_EVENT_SUBSCRIPTION0, callback: FWPM_NET_EVENT_CALLBACK4, context: OPTIONAL<LPVOID>, eventsHandle_out: PHANDLE): DWORD {
+    return Fwpuclnt.Load('FwpmNetEventSubscribe4')(engineHandle, subscription, callback, context, eventsHandle_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmneteventsubscriptionsget0
-  public static FwpmNetEventSubscriptionsGet0(engineHandle: HANDLE, entries: PFWPM_NET_EVENT_SUBSCRIPTION0, numEntries: PUINT32): DWORD {
-    return Fwpuclnt.Load('FwpmNetEventSubscriptionsGet0')(engineHandle, entries, numEntries);
+  public static FwpmNetEventSubscriptionsGet0(engineHandle: HANDLE, entries_out: PFWPM_NET_EVENT_SUBSCRIPTION0, numEntries_out: PUINT32): DWORD {
+    return Fwpuclnt.Load('FwpmNetEventSubscriptionsGet0')(engineHandle, entries_out, numEntries_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmneteventunsubscribe0
-  public static FwpmNetEventUnsubscribe0(engineHandle: HANDLE, eventsHandle: HANDLE): DWORD {
-    return Fwpuclnt.Load('FwpmNetEventUnsubscribe0')(engineHandle, eventsHandle);
+  public static FwpmNetEventUnsubscribe0(engineHandle: HANDLE, eventsHandle_in_out: HANDLE): DWORD {
+    return Fwpuclnt.Load('FwpmNetEventUnsubscribe0')(engineHandle, eventsHandle_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmneteventsgetsecurityinfo0
-  public static FwpmNetEventsGetSecurityInfo0(engineHandle: HANDLE, securityInfo: SECURITY_INFORMATION, sidOwner: PVOID, sidGroup: PVOID, dacl: PVOID, sacl: PVOID, securityDescriptor: PVOID): DWORD {
-    return Fwpuclnt.Load('FwpmNetEventsGetSecurityInfo0')(engineHandle, securityInfo, sidOwner, sidGroup, dacl, sacl, securityDescriptor);
+  public static FwpmNetEventsGetSecurityInfo0(engineHandle: HANDLE, securityInfo: SECURITY_INFORMATION, sidOwner_out: PVOID, sidGroup_out: PVOID, dacl_out: PVOID, sacl_out: PVOID, securityDescriptor_out: PVOID): DWORD {
+    return Fwpuclnt.Load('FwpmNetEventsGetSecurityInfo0')(engineHandle, securityInfo, sidOwner_out, sidGroup_out, dacl_out, sacl_out, securityDescriptor_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmneteventssetsecurityinfo0
-  public static FwpmNetEventsSetSecurityInfo0(engineHandle: HANDLE, securityInfo: SECURITY_INFORMATION, sidOwner: PSID | NULL, sidGroup: PSID | NULL, dacl: PACL | NULL, sacl: PACL | NULL): DWORD {
+  public static FwpmNetEventsSetSecurityInfo0(engineHandle: HANDLE, securityInfo: SECURITY_INFORMATION, sidOwner: OPTIONAL<PSID>, sidGroup: OPTIONAL<PSID>, dacl: OPTIONAL<PACL>, sacl: OPTIONAL<PACL>): DWORD {
     return Fwpuclnt.Load('FwpmNetEventsSetSecurityInfo0')(engineHandle, securityInfo, sidOwner, sidGroup, dacl, sacl);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmprovideradd0
-  public static FwpmProviderAdd0(engineHandle: HANDLE, provider: PFWPM_PROVIDER0, sd: PSECURITY_DESCRIPTOR | NULL): DWORD {
+  public static FwpmProviderAdd0(engineHandle: HANDLE, provider: PFWPM_PROVIDER0, sd: OPTIONAL<PSECURITY_DESCRIPTOR>): DWORD {
     return Fwpuclnt.Load('FwpmProviderAdd0')(engineHandle, provider, sd);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmprovidercontextadd0
-  public static FwpmProviderContextAdd0(engineHandle: HANDLE, providerContext: PFWPM_PROVIDER_CONTEXT0, sd: PSECURITY_DESCRIPTOR | NULL, id: PUINT64 | NULL): DWORD {
-    return Fwpuclnt.Load('FwpmProviderContextAdd0')(engineHandle, providerContext, sd, id);
+  public static FwpmProviderContextAdd0(engineHandle: HANDLE, providerContext: PFWPM_PROVIDER_CONTEXT0, sd: OPTIONAL<PSECURITY_DESCRIPTOR>, id_out: OPTIONAL<PUINT64>): DWORD {
+    return Fwpuclnt.Load('FwpmProviderContextAdd0')(engineHandle, providerContext, sd, id_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmprovidercontextadd1
-  public static FwpmProviderContextAdd1(engineHandle: HANDLE, providerContext: PFWPM_PROVIDER_CONTEXT1, sd: PSECURITY_DESCRIPTOR | NULL, id: PUINT64 | NULL): DWORD {
-    return Fwpuclnt.Load('FwpmProviderContextAdd1')(engineHandle, providerContext, sd, id);
+  public static FwpmProviderContextAdd1(engineHandle: HANDLE, providerContext: PFWPM_PROVIDER_CONTEXT1, sd: OPTIONAL<PSECURITY_DESCRIPTOR>, id_out: OPTIONAL<PUINT64>): DWORD {
+    return Fwpuclnt.Load('FwpmProviderContextAdd1')(engineHandle, providerContext, sd, id_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmprovidercontextadd2
-  public static FwpmProviderContextAdd2(engineHandle: HANDLE, providerContext: PFWPM_PROVIDER_CONTEXT2, sd: PSECURITY_DESCRIPTOR | NULL, id: PUINT64 | NULL): DWORD {
-    return Fwpuclnt.Load('FwpmProviderContextAdd2')(engineHandle, providerContext, sd, id);
+  public static FwpmProviderContextAdd2(engineHandle: HANDLE, providerContext: PFWPM_PROVIDER_CONTEXT2, sd: OPTIONAL<PSECURITY_DESCRIPTOR>, id_out: OPTIONAL<PUINT64>): DWORD {
+    return Fwpuclnt.Load('FwpmProviderContextAdd2')(engineHandle, providerContext, sd, id_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmprovidercontextadd3
-  public static FwpmProviderContextAdd3(engineHandle: HANDLE, providerContext: PFWPM_PROVIDER_CONTEXT3, sd: PSECURITY_DESCRIPTOR | NULL, id: PUINT64 | NULL): DWORD {
-    return Fwpuclnt.Load('FwpmProviderContextAdd3')(engineHandle, providerContext, sd, id);
+  public static FwpmProviderContextAdd3(engineHandle: HANDLE, providerContext: PFWPM_PROVIDER_CONTEXT3, sd: OPTIONAL<PSECURITY_DESCRIPTOR>, id_out: OPTIONAL<PUINT64>): DWORD {
+    return Fwpuclnt.Load('FwpmProviderContextAdd3')(engineHandle, providerContext, sd, id_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmprovidercontextcreateenumhandle0
-  public static FwpmProviderContextCreateEnumHandle0(engineHandle: HANDLE, enumTemplate: PFWPM_PROVIDER_CONTEXT_ENUM_TEMPLATE0 | NULL, enumHandle: PHANDLE): DWORD {
-    return Fwpuclnt.Load('FwpmProviderContextCreateEnumHandle0')(engineHandle, enumTemplate, enumHandle);
+  public static FwpmProviderContextCreateEnumHandle0(engineHandle: HANDLE, enumTemplate: OPTIONAL<PFWPM_PROVIDER_CONTEXT_ENUM_TEMPLATE0>, enumHandle_out: PHANDLE): DWORD {
+    return Fwpuclnt.Load('FwpmProviderContextCreateEnumHandle0')(engineHandle, enumTemplate, enumHandle_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmprovidercontextdeletebyid0
@@ -781,98 +808,115 @@ class Fwpuclnt extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmprovidercontextdestroyenumhandle0
-  public static FwpmProviderContextDestroyEnumHandle0(engineHandle: HANDLE, enumHandle: HANDLE): DWORD {
-    return Fwpuclnt.Load('FwpmProviderContextDestroyEnumHandle0')(engineHandle, enumHandle);
+  public static FwpmProviderContextDestroyEnumHandle0(engineHandle: HANDLE, enumHandle_in_out: HANDLE): DWORD {
+    return Fwpuclnt.Load('FwpmProviderContextDestroyEnumHandle0')(engineHandle, enumHandle_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmprovidercontextenum0
-  public static FwpmProviderContextEnum0(engineHandle: HANDLE, enumHandle: HANDLE, numEntriesRequested: UINT32, entries: PFWPM_PROVIDER_CONTEXT0, numEntriesReturned: PUINT32): DWORD {
-    return Fwpuclnt.Load('FwpmProviderContextEnum0')(engineHandle, enumHandle, numEntriesRequested, entries, numEntriesReturned);
+  public static FwpmProviderContextEnum0(engineHandle: HANDLE, enumHandle: HANDLE, numEntriesRequested: UINT32, entries_out: PFWPM_PROVIDER_CONTEXT0, numEntriesReturned_out: PUINT32): DWORD {
+    return Fwpuclnt.Load('FwpmProviderContextEnum0')(engineHandle, enumHandle, numEntriesRequested, entries_out, numEntriesReturned_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmprovidercontextenum1
-  public static FwpmProviderContextEnum1(engineHandle: HANDLE, enumHandle: HANDLE, numEntriesRequested: UINT32, entries: PFWPM_PROVIDER_CONTEXT1, numEntriesReturned: PUINT32): DWORD {
-    return Fwpuclnt.Load('FwpmProviderContextEnum1')(engineHandle, enumHandle, numEntriesRequested, entries, numEntriesReturned);
+  public static FwpmProviderContextEnum1(engineHandle: HANDLE, enumHandle: HANDLE, numEntriesRequested: UINT32, entries_out: PFWPM_PROVIDER_CONTEXT1, numEntriesReturned_out: PUINT32): DWORD {
+    return Fwpuclnt.Load('FwpmProviderContextEnum1')(engineHandle, enumHandle, numEntriesRequested, entries_out, numEntriesReturned_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmprovidercontextenum2
-  public static FwpmProviderContextEnum2(engineHandle: HANDLE, enumHandle: HANDLE, numEntriesRequested: UINT32, entries: PFWPM_PROVIDER_CONTEXT2, numEntriesReturned: PUINT32): DWORD {
-    return Fwpuclnt.Load('FwpmProviderContextEnum2')(engineHandle, enumHandle, numEntriesRequested, entries, numEntriesReturned);
+  public static FwpmProviderContextEnum2(engineHandle: HANDLE, enumHandle: HANDLE, numEntriesRequested: UINT32, entries_out: PFWPM_PROVIDER_CONTEXT2, numEntriesReturned_out: PUINT32): DWORD {
+    return Fwpuclnt.Load('FwpmProviderContextEnum2')(engineHandle, enumHandle, numEntriesRequested, entries_out, numEntriesReturned_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmprovidercontextenum3
-  public static FwpmProviderContextEnum3(engineHandle: HANDLE, enumHandle: HANDLE, numEntriesRequested: UINT32, entries: PFWPM_PROVIDER_CONTEXT3, numEntriesReturned: PUINT32): DWORD {
-    return Fwpuclnt.Load('FwpmProviderContextEnum3')(engineHandle, enumHandle, numEntriesRequested, entries, numEntriesReturned);
+  public static FwpmProviderContextEnum3(engineHandle: HANDLE, enumHandle: HANDLE, numEntriesRequested: UINT32, entries_out: PFWPM_PROVIDER_CONTEXT3, numEntriesReturned_out: PUINT32): DWORD {
+    return Fwpuclnt.Load('FwpmProviderContextEnum3')(engineHandle, enumHandle, numEntriesRequested, entries_out, numEntriesReturned_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmprovidercontextgetbyid0
-  public static FwpmProviderContextGetById0(engineHandle: HANDLE, id: UINT64, providerContext: PFWPM_PROVIDER_CONTEXT0): DWORD {
-    return Fwpuclnt.Load('FwpmProviderContextGetById0')(engineHandle, id, providerContext);
+  public static FwpmProviderContextGetById0(engineHandle: HANDLE, id: UINT64, providerContext_out: PFWPM_PROVIDER_CONTEXT0): DWORD {
+    return Fwpuclnt.Load('FwpmProviderContextGetById0')(engineHandle, id, providerContext_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmprovidercontextgetbyid1
-  public static FwpmProviderContextGetById1(engineHandle: HANDLE, id: UINT64, providerContext: PFWPM_PROVIDER_CONTEXT1): DWORD {
-    return Fwpuclnt.Load('FwpmProviderContextGetById1')(engineHandle, id, providerContext);
+  public static FwpmProviderContextGetById1(engineHandle: HANDLE, id: UINT64, providerContext_out: PFWPM_PROVIDER_CONTEXT1): DWORD {
+    return Fwpuclnt.Load('FwpmProviderContextGetById1')(engineHandle, id, providerContext_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmprovidercontextgetbyid2
-  public static FwpmProviderContextGetById2(engineHandle: HANDLE, id: UINT64, providerContext: PFWPM_PROVIDER_CONTEXT2): DWORD {
-    return Fwpuclnt.Load('FwpmProviderContextGetById2')(engineHandle, id, providerContext);
+  public static FwpmProviderContextGetById2(engineHandle: HANDLE, id: UINT64, providerContext_out: PFWPM_PROVIDER_CONTEXT2): DWORD {
+    return Fwpuclnt.Load('FwpmProviderContextGetById2')(engineHandle, id, providerContext_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmprovidercontextgetbyid3
-  public static FwpmProviderContextGetById3(engineHandle: HANDLE, id: UINT64, providerContext: PFWPM_PROVIDER_CONTEXT3): DWORD {
-    return Fwpuclnt.Load('FwpmProviderContextGetById3')(engineHandle, id, providerContext);
+  public static FwpmProviderContextGetById3(engineHandle: HANDLE, id: UINT64, providerContext_out: PFWPM_PROVIDER_CONTEXT3): DWORD {
+    return Fwpuclnt.Load('FwpmProviderContextGetById3')(engineHandle, id, providerContext_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmprovidercontextgetbykey0
-  public static FwpmProviderContextGetByKey0(engineHandle: HANDLE, key: LPGUID, providerContext: PFWPM_PROVIDER_CONTEXT0): DWORD {
-    return Fwpuclnt.Load('FwpmProviderContextGetByKey0')(engineHandle, key, providerContext);
+  public static FwpmProviderContextGetByKey0(engineHandle: HANDLE, key: LPGUID, providerContext_out: PFWPM_PROVIDER_CONTEXT0): DWORD {
+    return Fwpuclnt.Load('FwpmProviderContextGetByKey0')(engineHandle, key, providerContext_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmprovidercontextgetbykey1
-  public static FwpmProviderContextGetByKey1(engineHandle: HANDLE, key: LPGUID, providerContext: PFWPM_PROVIDER_CONTEXT1): DWORD {
-    return Fwpuclnt.Load('FwpmProviderContextGetByKey1')(engineHandle, key, providerContext);
+  public static FwpmProviderContextGetByKey1(engineHandle: HANDLE, key: LPGUID, providerContext_out: PFWPM_PROVIDER_CONTEXT1): DWORD {
+    return Fwpuclnt.Load('FwpmProviderContextGetByKey1')(engineHandle, key, providerContext_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmprovidercontextgetbykey2
-  public static FwpmProviderContextGetByKey2(engineHandle: HANDLE, key: LPGUID, providerContext: PFWPM_PROVIDER_CONTEXT2): DWORD {
-    return Fwpuclnt.Load('FwpmProviderContextGetByKey2')(engineHandle, key, providerContext);
+  public static FwpmProviderContextGetByKey2(engineHandle: HANDLE, key: LPGUID, providerContext_out: PFWPM_PROVIDER_CONTEXT2): DWORD {
+    return Fwpuclnt.Load('FwpmProviderContextGetByKey2')(engineHandle, key, providerContext_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmprovidercontextgetbykey3
-  public static FwpmProviderContextGetByKey3(engineHandle: HANDLE, key: LPGUID, providerContext: PFWPM_PROVIDER_CONTEXT3): DWORD {
-    return Fwpuclnt.Load('FwpmProviderContextGetByKey3')(engineHandle, key, providerContext);
+  public static FwpmProviderContextGetByKey3(engineHandle: HANDLE, key: LPGUID, providerContext_out: PFWPM_PROVIDER_CONTEXT3): DWORD {
+    return Fwpuclnt.Load('FwpmProviderContextGetByKey3')(engineHandle, key, providerContext_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmprovidercontextgetsecurityinfobykey0
-  public static FwpmProviderContextGetSecurityInfoByKey0(engineHandle: HANDLE, key: LPGUID | NULL, securityInfo: SECURITY_INFORMATION, sidOwner: PVOID, sidGroup: PVOID, dacl: PVOID, sacl: PVOID, securityDescriptor: PVOID): DWORD {
-    return Fwpuclnt.Load('FwpmProviderContextGetSecurityInfoByKey0')(engineHandle, key, securityInfo, sidOwner, sidGroup, dacl, sacl, securityDescriptor);
+  public static FwpmProviderContextGetSecurityInfoByKey0(
+    engineHandle: HANDLE,
+    key: OPTIONAL<LPGUID>,
+    securityInfo: SECURITY_INFORMATION,
+    sidOwner_out: PVOID,
+    sidGroup_out: PVOID,
+    dacl_out: PVOID,
+    sacl_out: PVOID,
+    securityDescriptor_out: PVOID,
+  ): DWORD {
+    return Fwpuclnt.Load('FwpmProviderContextGetSecurityInfoByKey0')(engineHandle, key, securityInfo, sidOwner_out, sidGroup_out, dacl_out, sacl_out, securityDescriptor_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmprovidercontextsetsecurityinfobykey0
-  public static FwpmProviderContextSetSecurityInfoByKey0(engineHandle: HANDLE, key: LPGUID | NULL, securityInfo: SECURITY_INFORMATION, sidOwner: PSID | NULL, sidGroup: PSID | NULL, dacl: PACL | NULL, sacl: PACL | NULL): DWORD {
+  public static FwpmProviderContextSetSecurityInfoByKey0(
+    engineHandle: HANDLE,
+    key: OPTIONAL<LPGUID>,
+    securityInfo: SECURITY_INFORMATION,
+    sidOwner: OPTIONAL<PSID>,
+    sidGroup: OPTIONAL<PSID>,
+    dacl: OPTIONAL<PACL>,
+    sacl: OPTIONAL<PACL>,
+  ): DWORD {
     return Fwpuclnt.Load('FwpmProviderContextSetSecurityInfoByKey0')(engineHandle, key, securityInfo, sidOwner, sidGroup, dacl, sacl);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmprovidercontextsubscribechanges0
-  public static FwpmProviderContextSubscribeChanges0(engineHandle: HANDLE, subscription: PFWPM_PROVIDER_CONTEXT_SUBSCRIPTION0, callback: FWPM_PROVIDER_CONTEXT_CHANGE_CALLBACK0, context: LPVOID | NULL, changeHandle: PHANDLE): DWORD {
-    return Fwpuclnt.Load('FwpmProviderContextSubscribeChanges0')(engineHandle, subscription, callback, context, changeHandle);
+  public static FwpmProviderContextSubscribeChanges0(engineHandle: HANDLE, subscription: PFWPM_PROVIDER_CONTEXT_SUBSCRIPTION0, callback: FWPM_PROVIDER_CONTEXT_CHANGE_CALLBACK0, context: OPTIONAL<LPVOID>, changeHandle_out: PHANDLE): DWORD {
+    return Fwpuclnt.Load('FwpmProviderContextSubscribeChanges0')(engineHandle, subscription, callback, context, changeHandle_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmprovidercontextsubscriptionsget0
-  public static FwpmProviderContextSubscriptionsGet0(engineHandle: HANDLE, entries: PFWPM_PROVIDER_CONTEXT_SUBSCRIPTION0, numEntries: PUINT32): DWORD {
-    return Fwpuclnt.Load('FwpmProviderContextSubscriptionsGet0')(engineHandle, entries, numEntries);
+  public static FwpmProviderContextSubscriptionsGet0(engineHandle: HANDLE, entries_out: PFWPM_PROVIDER_CONTEXT_SUBSCRIPTION0, numEntries_out: PUINT32): DWORD {
+    return Fwpuclnt.Load('FwpmProviderContextSubscriptionsGet0')(engineHandle, entries_out, numEntries_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmprovidercontextunsubscribechanges0
-  public static FwpmProviderContextUnsubscribeChanges0(engineHandle: HANDLE, changeHandle: HANDLE): DWORD {
-    return Fwpuclnt.Load('FwpmProviderContextUnsubscribeChanges0')(engineHandle, changeHandle);
+  public static FwpmProviderContextUnsubscribeChanges0(engineHandle: HANDLE, changeHandle_in_out: HANDLE): DWORD {
+    return Fwpuclnt.Load('FwpmProviderContextUnsubscribeChanges0')(engineHandle, changeHandle_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmprovidercreateenumhandle0
-  public static FwpmProviderCreateEnumHandle0(engineHandle: HANDLE, enumTemplate: PFWPM_PROVIDER_ENUM_TEMPLATE0 | NULL, enumHandle: PHANDLE): DWORD {
-    return Fwpuclnt.Load('FwpmProviderCreateEnumHandle0')(engineHandle, enumTemplate, enumHandle);
+  public static FwpmProviderCreateEnumHandle0(engineHandle: HANDLE, enumTemplate: OPTIONAL<PFWPM_PROVIDER_ENUM_TEMPLATE0>, enumHandle_out: PHANDLE): DWORD {
+    return Fwpuclnt.Load('FwpmProviderCreateEnumHandle0')(engineHandle, enumTemplate, enumHandle_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmproviderdeletebykey0
@@ -881,68 +925,77 @@ class Fwpuclnt extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmproviderdestroyenumhandle0
-  public static FwpmProviderDestroyEnumHandle0(engineHandle: HANDLE, enumHandle: HANDLE): DWORD {
-    return Fwpuclnt.Load('FwpmProviderDestroyEnumHandle0')(engineHandle, enumHandle);
+  public static FwpmProviderDestroyEnumHandle0(engineHandle: HANDLE, enumHandle_in_out: HANDLE): DWORD {
+    return Fwpuclnt.Load('FwpmProviderDestroyEnumHandle0')(engineHandle, enumHandle_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmproviderenum0
-  public static FwpmProviderEnum0(engineHandle: HANDLE, enumHandle: HANDLE, numEntriesRequested: UINT32, entries: PFWPM_PROVIDER0, numEntriesReturned: PUINT32): DWORD {
-    return Fwpuclnt.Load('FwpmProviderEnum0')(engineHandle, enumHandle, numEntriesRequested, entries, numEntriesReturned);
+  public static FwpmProviderEnum0(engineHandle: HANDLE, enumHandle: HANDLE, numEntriesRequested: UINT32, entries_out: PFWPM_PROVIDER0, numEntriesReturned_out: PUINT32): DWORD {
+    return Fwpuclnt.Load('FwpmProviderEnum0')(engineHandle, enumHandle, numEntriesRequested, entries_out, numEntriesReturned_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmprovidergetbykey0
-  public static FwpmProviderGetByKey0(engineHandle: HANDLE, key: LPGUID, provider: PFWPM_PROVIDER0): DWORD {
-    return Fwpuclnt.Load('FwpmProviderGetByKey0')(engineHandle, key, provider);
+  public static FwpmProviderGetByKey0(engineHandle: HANDLE, key: LPGUID, provider_out: PFWPM_PROVIDER0): DWORD {
+    return Fwpuclnt.Load('FwpmProviderGetByKey0')(engineHandle, key, provider_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmprovidergetsecurityinfobykey0
-  public static FwpmProviderGetSecurityInfoByKey0(engineHandle: HANDLE, key: LPGUID | NULL, securityInfo: SECURITY_INFORMATION, sidOwner: PVOID, sidGroup: PVOID, dacl: PVOID, sacl: PVOID, securityDescriptor: PVOID): DWORD {
-    return Fwpuclnt.Load('FwpmProviderGetSecurityInfoByKey0')(engineHandle, key, securityInfo, sidOwner, sidGroup, dacl, sacl, securityDescriptor);
+  public static FwpmProviderGetSecurityInfoByKey0(
+    engineHandle: HANDLE,
+    key: OPTIONAL<LPGUID>,
+    securityInfo: SECURITY_INFORMATION,
+    sidOwner_out: PVOID,
+    sidGroup_out: PVOID,
+    dacl_out: PVOID,
+    sacl_out: PVOID,
+    securityDescriptor_out: PVOID,
+  ): DWORD {
+    return Fwpuclnt.Load('FwpmProviderGetSecurityInfoByKey0')(engineHandle, key, securityInfo, sidOwner_out, sidGroup_out, dacl_out, sacl_out, securityDescriptor_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmprovidersetsecurityinfobykey0
-  public static FwpmProviderSetSecurityInfoByKey0(engineHandle: HANDLE, key: LPGUID | NULL, securityInfo: SECURITY_INFORMATION, sidOwner: PSID | NULL, sidGroup: PSID | NULL, dacl: PACL | NULL, sacl: PACL | NULL): DWORD {
+  public static FwpmProviderSetSecurityInfoByKey0(engineHandle: HANDLE, key: OPTIONAL<LPGUID>, securityInfo: SECURITY_INFORMATION, sidOwner: OPTIONAL<PSID>, sidGroup: OPTIONAL<PSID>, dacl: OPTIONAL<PACL>, sacl: OPTIONAL<PACL>): DWORD {
     return Fwpuclnt.Load('FwpmProviderSetSecurityInfoByKey0')(engineHandle, key, securityInfo, sidOwner, sidGroup, dacl, sacl);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmprovidersubscribechanges0
-  public static FwpmProviderSubscribeChanges0(engineHandle: HANDLE, subscription: PFWPM_PROVIDER_SUBSCRIPTION0, callback: FWPM_PROVIDER_CHANGE_CALLBACK0, context: LPVOID | NULL, changeHandle: PHANDLE): DWORD {
-    return Fwpuclnt.Load('FwpmProviderSubscribeChanges0')(engineHandle, subscription, callback, context, changeHandle);
+  public static FwpmProviderSubscribeChanges0(engineHandle: HANDLE, subscription: PFWPM_PROVIDER_SUBSCRIPTION0, callback: FWPM_PROVIDER_CHANGE_CALLBACK0, context: OPTIONAL<LPVOID>, changeHandle_out: PHANDLE): DWORD {
+    return Fwpuclnt.Load('FwpmProviderSubscribeChanges0')(engineHandle, subscription, callback, context, changeHandle_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmprovidersubscriptionsget0
-  public static FwpmProviderSubscriptionsGet0(engineHandle: HANDLE, entries: PFWPM_PROVIDER_SUBSCRIPTION0, numEntries: PUINT32): DWORD {
-    return Fwpuclnt.Load('FwpmProviderSubscriptionsGet0')(engineHandle, entries, numEntries);
+  public static FwpmProviderSubscriptionsGet0(engineHandle: HANDLE, entries_out: PFWPM_PROVIDER_SUBSCRIPTION0, numEntries_out: PUINT32): DWORD {
+    return Fwpuclnt.Load('FwpmProviderSubscriptionsGet0')(engineHandle, entries_out, numEntries_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmproviderunsubscribechanges0
-  public static FwpmProviderUnsubscribeChanges0(engineHandle: HANDLE, changeHandle: HANDLE): DWORD {
-    return Fwpuclnt.Load('FwpmProviderUnsubscribeChanges0')(engineHandle, changeHandle);
+  public static FwpmProviderUnsubscribeChanges0(engineHandle: HANDLE, changeHandle_in_out: HANDLE): DWORD {
+    return Fwpuclnt.Load('FwpmProviderUnsubscribeChanges0')(engineHandle, changeHandle_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmsessioncreateenumhandle0
-  public static FwpmSessionCreateEnumHandle0(engineHandle: HANDLE, enumTemplate: PFWPM_SESSION_ENUM_TEMPLATE0 | NULL, enumHandle: PHANDLE): DWORD {
-    return Fwpuclnt.Load('FwpmSessionCreateEnumHandle0')(engineHandle, enumTemplate, enumHandle);
+  public static FwpmSessionCreateEnumHandle0(engineHandle: HANDLE, enumTemplate: OPTIONAL<PFWPM_SESSION_ENUM_TEMPLATE0>, enumHandle_out: PHANDLE): DWORD {
+    return Fwpuclnt.Load('FwpmSessionCreateEnumHandle0')(engineHandle, enumTemplate, enumHandle_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmsessiondestroyenumhandle0
-  public static FwpmSessionDestroyEnumHandle0(engineHandle: HANDLE, enumHandle: HANDLE): DWORD {
-    return Fwpuclnt.Load('FwpmSessionDestroyEnumHandle0')(engineHandle, enumHandle);
+  public static FwpmSessionDestroyEnumHandle0(engineHandle: HANDLE, enumHandle_in_out: HANDLE): DWORD {
+    return Fwpuclnt.Load('FwpmSessionDestroyEnumHandle0')(engineHandle, enumHandle_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmsessionenum0
-  public static FwpmSessionEnum0(engineHandle: HANDLE, enumHandle: HANDLE, numEntriesRequested: UINT32, entries: PFWPM_SESSION0, numEntriesReturned: PUINT32): DWORD {
-    return Fwpuclnt.Load('FwpmSessionEnum0')(engineHandle, enumHandle, numEntriesRequested, entries, numEntriesReturned);
+  public static FwpmSessionEnum0(engineHandle: HANDLE, enumHandle: HANDLE, numEntriesRequested: UINT32, entries_out: PFWPM_SESSION0, numEntriesReturned_out: PUINT32): DWORD {
+    return Fwpuclnt.Load('FwpmSessionEnum0')(engineHandle, enumHandle, numEntriesRequested, entries_out, numEntriesReturned_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmsublayeradd0
-  public static FwpmSubLayerAdd0(engineHandle: HANDLE, subLayer: PFWPM_SUBLAYER0, sd: PSECURITY_DESCRIPTOR | NULL): DWORD {
+  public static FwpmSubLayerAdd0(engineHandle: HANDLE, subLayer: PFWPM_SUBLAYER0, sd: OPTIONAL<PSECURITY_DESCRIPTOR>): DWORD {
     return Fwpuclnt.Load('FwpmSubLayerAdd0')(engineHandle, subLayer, sd);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmsublayercreateenumhandle0
-  public static FwpmSubLayerCreateEnumHandle0(engineHandle: HANDLE, enumTemplate: PFWPM_SUBLAYER_ENUM_TEMPLATE0 | NULL, enumHandle: PHANDLE): DWORD {
-    return Fwpuclnt.Load('FwpmSubLayerCreateEnumHandle0')(engineHandle, enumTemplate, enumHandle);
+  public static FwpmSubLayerCreateEnumHandle0(engineHandle: HANDLE, enumTemplate: OPTIONAL<PFWPM_SUBLAYER_ENUM_TEMPLATE0>, enumHandle_out: PHANDLE): DWORD {
+    return Fwpuclnt.Load('FwpmSubLayerCreateEnumHandle0')(engineHandle, enumTemplate, enumHandle_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmsublayerdeletebykey0
@@ -951,58 +1004,67 @@ class Fwpuclnt extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmsublayerdestroyenumhandle0
-  public static FwpmSubLayerDestroyEnumHandle0(engineHandle: HANDLE, enumHandle: HANDLE): DWORD {
-    return Fwpuclnt.Load('FwpmSubLayerDestroyEnumHandle0')(engineHandle, enumHandle);
+  public static FwpmSubLayerDestroyEnumHandle0(engineHandle: HANDLE, enumHandle_in_out: HANDLE): DWORD {
+    return Fwpuclnt.Load('FwpmSubLayerDestroyEnumHandle0')(engineHandle, enumHandle_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmsublayerenum0
-  public static FwpmSubLayerEnum0(engineHandle: HANDLE, enumHandle: HANDLE, numEntriesRequested: UINT32, entries: PFWPM_SUBLAYER0, numEntriesReturned: PUINT32): DWORD {
-    return Fwpuclnt.Load('FwpmSubLayerEnum0')(engineHandle, enumHandle, numEntriesRequested, entries, numEntriesReturned);
+  public static FwpmSubLayerEnum0(engineHandle: HANDLE, enumHandle: HANDLE, numEntriesRequested: UINT32, entries_out: PFWPM_SUBLAYER0, numEntriesReturned_out: PUINT32): DWORD {
+    return Fwpuclnt.Load('FwpmSubLayerEnum0')(engineHandle, enumHandle, numEntriesRequested, entries_out, numEntriesReturned_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmsublayergetbykey0
-  public static FwpmSubLayerGetByKey0(engineHandle: HANDLE, key: LPGUID, subLayer: PFWPM_SUBLAYER0): DWORD {
-    return Fwpuclnt.Load('FwpmSubLayerGetByKey0')(engineHandle, key, subLayer);
+  public static FwpmSubLayerGetByKey0(engineHandle: HANDLE, key: LPGUID, subLayer_out: PFWPM_SUBLAYER0): DWORD {
+    return Fwpuclnt.Load('FwpmSubLayerGetByKey0')(engineHandle, key, subLayer_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmsublayergetsecurityinfobykey0
-  public static FwpmSubLayerGetSecurityInfoByKey0(engineHandle: HANDLE, key: LPGUID | NULL, securityInfo: SECURITY_INFORMATION, sidOwner: PVOID, sidGroup: PVOID, dacl: PVOID, sacl: PVOID, securityDescriptor: PVOID): DWORD {
-    return Fwpuclnt.Load('FwpmSubLayerGetSecurityInfoByKey0')(engineHandle, key, securityInfo, sidOwner, sidGroup, dacl, sacl, securityDescriptor);
+  public static FwpmSubLayerGetSecurityInfoByKey0(
+    engineHandle: HANDLE,
+    key: OPTIONAL<LPGUID>,
+    securityInfo: SECURITY_INFORMATION,
+    sidOwner_out: PVOID,
+    sidGroup_out: PVOID,
+    dacl_out: PVOID,
+    sacl_out: PVOID,
+    securityDescriptor_out: PVOID,
+  ): DWORD {
+    return Fwpuclnt.Load('FwpmSubLayerGetSecurityInfoByKey0')(engineHandle, key, securityInfo, sidOwner_out, sidGroup_out, dacl_out, sacl_out, securityDescriptor_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmsublayersetsecurityinfobykey0
-  public static FwpmSubLayerSetSecurityInfoByKey0(engineHandle: HANDLE, key: LPGUID | NULL, securityInfo: SECURITY_INFORMATION, sidOwner: PSID | NULL, sidGroup: PSID | NULL, dacl: PACL | NULL, sacl: PACL | NULL): DWORD {
+  public static FwpmSubLayerSetSecurityInfoByKey0(engineHandle: HANDLE, key: OPTIONAL<LPGUID>, securityInfo: SECURITY_INFORMATION, sidOwner: OPTIONAL<PSID>, sidGroup: OPTIONAL<PSID>, dacl: OPTIONAL<PACL>, sacl: OPTIONAL<PACL>): DWORD {
     return Fwpuclnt.Load('FwpmSubLayerSetSecurityInfoByKey0')(engineHandle, key, securityInfo, sidOwner, sidGroup, dacl, sacl);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmsublayersubscribechanges0
-  public static FwpmSubLayerSubscribeChanges0(engineHandle: HANDLE, subscription: PFWPM_SUBLAYER_SUBSCRIPTION0, callback: FWPM_SUBLAYER_CHANGE_CALLBACK0, context: LPVOID | NULL, changeHandle: PHANDLE): DWORD {
-    return Fwpuclnt.Load('FwpmSubLayerSubscribeChanges0')(engineHandle, subscription, callback, context, changeHandle);
+  public static FwpmSubLayerSubscribeChanges0(engineHandle: HANDLE, subscription: PFWPM_SUBLAYER_SUBSCRIPTION0, callback: FWPM_SUBLAYER_CHANGE_CALLBACK0, context: OPTIONAL<LPVOID>, changeHandle_out: PHANDLE): DWORD {
+    return Fwpuclnt.Load('FwpmSubLayerSubscribeChanges0')(engineHandle, subscription, callback, context, changeHandle_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmsublayersubscriptionsget0
-  public static FwpmSubLayerSubscriptionsGet0(engineHandle: HANDLE, entries: PFWPM_SUBLAYER_SUBSCRIPTION0, numEntries: PUINT32): DWORD {
-    return Fwpuclnt.Load('FwpmSubLayerSubscriptionsGet0')(engineHandle, entries, numEntries);
+  public static FwpmSubLayerSubscriptionsGet0(engineHandle: HANDLE, entries_out: PFWPM_SUBLAYER_SUBSCRIPTION0, numEntries_out: PUINT32): DWORD {
+    return Fwpuclnt.Load('FwpmSubLayerSubscriptionsGet0')(engineHandle, entries_out, numEntries_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmsublayerunsubscribechanges0
-  public static FwpmSubLayerUnsubscribeChanges0(engineHandle: HANDLE, changeHandle: HANDLE): DWORD {
-    return Fwpuclnt.Load('FwpmSubLayerUnsubscribeChanges0')(engineHandle, changeHandle);
+  public static FwpmSubLayerUnsubscribeChanges0(engineHandle: HANDLE, changeHandle_in_out: HANDLE): DWORD {
+    return Fwpuclnt.Load('FwpmSubLayerUnsubscribeChanges0')(engineHandle, changeHandle_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmsystemportsget0
-  public static FwpmSystemPortsGet0(engineHandle: HANDLE | 0n, sysPorts: PFWPM_SYSTEM_PORTS0): DWORD {
-    return Fwpuclnt.Load('FwpmSystemPortsGet0')(engineHandle, sysPorts);
+  public static FwpmSystemPortsGet0(engineHandle: OPTIONAL<HANDLE>, sysPorts_out: PFWPM_SYSTEM_PORTS0): DWORD {
+    return Fwpuclnt.Load('FwpmSystemPortsGet0')(engineHandle, sysPorts_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmsystemportssubscribe0
-  public static FwpmSystemPortsSubscribe0(engineHandle: HANDLE | 0n, reserved: LPVOID | NULL, callback: FWPM_SYSTEM_PORTS_CALLBACK0, context: LPVOID | NULL, sysPortsHandle: PHANDLE): DWORD {
-    return Fwpuclnt.Load('FwpmSystemPortsSubscribe0')(engineHandle, reserved, callback, context, sysPortsHandle);
+  public static FwpmSystemPortsSubscribe0(engineHandle: OPTIONAL<HANDLE>, reserved: OPTIONAL<LPVOID>, callback: FWPM_SYSTEM_PORTS_CALLBACK0, context: OPTIONAL<LPVOID>, sysPortsHandle_out: PHANDLE): DWORD {
+    return Fwpuclnt.Load('FwpmSystemPortsSubscribe0')(engineHandle, reserved, callback, context, sysPortsHandle_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmsystemportsunsubscribe0
-  public static FwpmSystemPortsUnsubscribe0(engineHandle: HANDLE | 0n, sysPortsHandle: HANDLE): DWORD {
-    return Fwpuclnt.Load('FwpmSystemPortsUnsubscribe0')(engineHandle, sysPortsHandle);
+  public static FwpmSystemPortsUnsubscribe0(engineHandle: OPTIONAL<HANDLE>, sysPortsHandle_in_out: HANDLE): DWORD {
+    return Fwpuclnt.Load('FwpmSystemPortsUnsubscribe0')(engineHandle, sysPortsHandle_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmtransactionabort0
@@ -1021,112 +1083,129 @@ class Fwpuclnt extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmvswitcheventsubscribe0
-  public static FwpmvSwitchEventSubscribe0(engineHandle: HANDLE, subscription: PFWPM_VSWITCH_EVENT_SUBSCRIPTION0, callback: FWPM_VSWITCH_EVENT_CALLBACK0, context: LPVOID | NULL, subscriptionHandle: PHANDLE): DWORD {
-    return Fwpuclnt.Load('FwpmvSwitchEventSubscribe0')(engineHandle, subscription, callback, context, subscriptionHandle);
+  public static FwpmvSwitchEventSubscribe0(engineHandle: HANDLE, subscription: PFWPM_VSWITCH_EVENT_SUBSCRIPTION0, callback: FWPM_VSWITCH_EVENT_CALLBACK0, context: OPTIONAL<LPVOID>, subscriptionHandle_out: PHANDLE): DWORD {
+    return Fwpuclnt.Load('FwpmvSwitchEventSubscribe0')(engineHandle, subscription, callback, context, subscriptionHandle_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmvswitcheventunsubscribe0
-  public static FwpmvSwitchEventUnsubscribe0(engineHandle: HANDLE, subscriptionHandle: HANDLE): DWORD {
-    return Fwpuclnt.Load('FwpmvSwitchEventUnsubscribe0')(engineHandle, subscriptionHandle);
+  public static FwpmvSwitchEventUnsubscribe0(engineHandle: HANDLE, subscriptionHandle_in_out: HANDLE): DWORD {
+    return Fwpuclnt.Load('FwpmvSwitchEventUnsubscribe0')(engineHandle, subscriptionHandle_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmvswitcheventsgetsecurityinfo0
-  public static FwpmvSwitchEventsGetSecurityInfo0(engineHandle: HANDLE, securityInfo: SECURITY_INFORMATION, sidOwner: PVOID, sidGroup: PVOID, dacl: PVOID, sacl: PVOID, securityDescriptor: PVOID): DWORD {
-    return Fwpuclnt.Load('FwpmvSwitchEventsGetSecurityInfo0')(engineHandle, securityInfo, sidOwner, sidGroup, dacl, sacl, securityDescriptor);
+  public static FwpmvSwitchEventsGetSecurityInfo0(engineHandle: HANDLE, securityInfo: SECURITY_INFORMATION, sidOwner_out: PVOID, sidGroup_out: PVOID, dacl_out: PVOID, sacl_out: PVOID, securityDescriptor_out: PVOID): DWORD {
+    return Fwpuclnt.Load('FwpmvSwitchEventsGetSecurityInfo0')(engineHandle, securityInfo, sidOwner_out, sidGroup_out, dacl_out, sacl_out, securityDescriptor_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmvswitcheventssetsecurityinfo0
-  public static FwpmvSwitchEventsSetSecurityInfo0(engineHandle: HANDLE, securityInfo: SECURITY_INFORMATION, sidOwner: PSID | NULL, sidGroup: PSID | NULL, dacl: PACL | NULL, sacl: PACL | NULL): DWORD {
+  public static FwpmvSwitchEventsSetSecurityInfo0(engineHandle: HANDLE, securityInfo: SECURITY_INFORMATION, sidOwner: OPTIONAL<PSID>, sidGroup: OPTIONAL<PSID>, dacl: OPTIONAL<PACL>, sacl: OPTIONAL<PACL>): DWORD {
     return Fwpuclnt.Load('FwpmvSwitchEventsSetSecurityInfo0')(engineHandle, securityInfo, sidOwner, sidGroup, dacl, sacl);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpsu/nf-fwpsu-fwpsaleendpointcreateenumhandle0
-  public static FwpsAleEndpointCreateEnumHandle0(engineHandle: HANDLE, enumTemplate: PFWPS_ALE_ENDPOINT_ENUM_TEMPLATE0 | NULL, enumHandle: PHANDLE): DWORD {
-    return Fwpuclnt.Load('FwpsAleEndpointCreateEnumHandle0')(engineHandle, enumTemplate, enumHandle);
+  public static FwpsAleEndpointCreateEnumHandle0(engineHandle: HANDLE, enumTemplate: OPTIONAL<PFWPS_ALE_ENDPOINT_ENUM_TEMPLATE0>, enumHandle_out: PHANDLE): DWORD {
+    return Fwpuclnt.Load('FwpsAleEndpointCreateEnumHandle0')(engineHandle, enumTemplate, enumHandle_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpsu/nf-fwpsu-fwpsaleendpointdestroyenumhandle0
-  public static FwpsAleEndpointDestroyEnumHandle0(engineHandle: HANDLE, enumHandle: HANDLE): DWORD {
-    return Fwpuclnt.Load('FwpsAleEndpointDestroyEnumHandle0')(engineHandle, enumHandle);
+  public static FwpsAleEndpointDestroyEnumHandle0(engineHandle: HANDLE, enumHandle_in_out: HANDLE): DWORD {
+    return Fwpuclnt.Load('FwpsAleEndpointDestroyEnumHandle0')(engineHandle, enumHandle_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpsu/nf-fwpsu-fwpsaleendpointenum0
-  public static FwpsAleEndpointEnum0(engineHandle: HANDLE, enumHandle: HANDLE, numEntriesRequested: UINT32, entries: PFWPS_ALE_ENDPOINT_PROPERTIES0, numEntriesReturned: PUINT32): DWORD {
-    return Fwpuclnt.Load('FwpsAleEndpointEnum0')(engineHandle, enumHandle, numEntriesRequested, entries, numEntriesReturned);
+  public static FwpsAleEndpointEnum0(engineHandle: HANDLE, enumHandle: HANDLE, numEntriesRequested: UINT32, entries_out: PFWPS_ALE_ENDPOINT_PROPERTIES0, numEntriesReturned_out: PUINT32): DWORD {
+    return Fwpuclnt.Load('FwpsAleEndpointEnum0')(engineHandle, enumHandle, numEntriesRequested, entries_out, numEntriesReturned_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpsu/nf-fwpsu-fwpsaleendpointgetbyid0
-  public static FwpsAleEndpointGetById0(engineHandle: HANDLE, endpointId: UINT64, properties: PFWPS_ALE_ENDPOINT_PROPERTIES0): DWORD {
-    return Fwpuclnt.Load('FwpsAleEndpointGetById0')(engineHandle, endpointId, properties);
+  public static FwpsAleEndpointGetById0(engineHandle: HANDLE, endpointId: UINT64, properties_out: PFWPS_ALE_ENDPOINT_PROPERTIES0): DWORD {
+    return Fwpuclnt.Load('FwpsAleEndpointGetById0')(engineHandle, endpointId, properties_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpsu/nf-fwpsu-fwpsaleendpointgetsecurityinfo0
-  public static FwpsAleEndpointGetSecurityInfo0(engineHandle: HANDLE, securityInfo: SECURITY_INFORMATION, sidOwner: PVOID, sidGroup: PVOID, dacl: PVOID, sacl: PVOID, securityDescriptor: PVOID): DWORD {
-    return Fwpuclnt.Load('FwpsAleEndpointGetSecurityInfo0')(engineHandle, securityInfo, sidOwner, sidGroup, dacl, sacl, securityDescriptor);
+  public static FwpsAleEndpointGetSecurityInfo0(engineHandle: HANDLE, securityInfo: SECURITY_INFORMATION, sidOwner_out: PVOID, sidGroup_out: PVOID, dacl_out: PVOID, sacl_out: PVOID, securityDescriptor_out: PVOID): DWORD {
+    return Fwpuclnt.Load('FwpsAleEndpointGetSecurityInfo0')(engineHandle, securityInfo, sidOwner_out, sidGroup_out, dacl_out, sacl_out, securityDescriptor_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpsu/nf-fwpsu-fwpsaleendpointsetsecurityinfo0
-  public static FwpsAleEndpointSetSecurityInfo0(engineHandle: HANDLE, securityInfo: SECURITY_INFORMATION, sidOwner: PSID | NULL, sidGroup: PSID | NULL, dacl: PACL | NULL, sacl: PACL | NULL): DWORD {
+  public static FwpsAleEndpointSetSecurityInfo0(engineHandle: HANDLE, securityInfo: SECURITY_INFORMATION, sidOwner: OPTIONAL<PSID>, sidGroup: OPTIONAL<PSID>, dacl: OPTIONAL<PACL>, sacl: OPTIONAL<PACL>): DWORD {
     return Fwpuclnt.Load('FwpsAleEndpointSetSecurityInfo0')(engineHandle, securityInfo, sidOwner, sidGroup, dacl, sacl);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpsu/nf-fwpsu-fwpsopentoken0
-  public static FwpsOpenToken0(engineHandle: HANDLE, modifiedId: LUID, desiredAccess: DWORD, accessToken: PHANDLE): DWORD {
-    return Fwpuclnt.Load('FwpsOpenToken0')(engineHandle, modifiedId, desiredAccess, accessToken);
+  public static FwpsOpenToken0(engineHandle: HANDLE, modifiedId: LUID, desiredAccess: DWORD, accessToken_out: PHANDLE): DWORD {
+    return Fwpuclnt.Load('FwpsOpenToken0')(engineHandle, modifiedId, desiredAccess, accessToken_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-ipsecdospgetsecurityinfo0
-  public static IPsecDospGetSecurityInfo0(engineHandle: HANDLE, securityInfo: SECURITY_INFORMATION, sidOwner: PVOID, sidGroup: PVOID, dacl: PVOID, sacl: PVOID, securityDescriptor: PVOID): DWORD {
-    return Fwpuclnt.Load('IPsecDospGetSecurityInfo0')(engineHandle, securityInfo, sidOwner, sidGroup, dacl, sacl, securityDescriptor);
+  public static IPsecDospGetSecurityInfo0(engineHandle: HANDLE, securityInfo: SECURITY_INFORMATION, sidOwner_out: PVOID, sidGroup_out: PVOID, dacl_out: PVOID, sacl_out: PVOID, securityDescriptor_out: PVOID): DWORD {
+    return Fwpuclnt.Load('IPsecDospGetSecurityInfo0')(engineHandle, securityInfo, sidOwner_out, sidGroup_out, dacl_out, sacl_out, securityDescriptor_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-ipsecdospgetstatistics0
-  public static IPsecDospGetStatistics0(engineHandle: HANDLE, idpStatistics: PIPSEC_DOSP_STATISTICS0): DWORD {
-    return Fwpuclnt.Load('IPsecDospGetStatistics0')(engineHandle, idpStatistics);
+  public static IPsecDospGetStatistics0(engineHandle: HANDLE, idpStatistics_out: PIPSEC_DOSP_STATISTICS0): DWORD {
+    return Fwpuclnt.Load('IPsecDospGetStatistics0')(engineHandle, idpStatistics_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-ipsecdospsetsecurityinfo0
-  public static IPsecDospSetSecurityInfo0(engineHandle: HANDLE, securityInfo: SECURITY_INFORMATION, sidOwner: PSID | NULL, sidGroup: PSID | NULL, dacl: PACL | NULL, sacl: PACL | NULL): DWORD {
+  public static IPsecDospSetSecurityInfo0(engineHandle: HANDLE, securityInfo: SECURITY_INFORMATION, sidOwner: OPTIONAL<PSID>, sidGroup: OPTIONAL<PSID>, dacl: OPTIONAL<PACL>, sacl: OPTIONAL<PACL>): DWORD {
     return Fwpuclnt.Load('IPsecDospSetSecurityInfo0')(engineHandle, securityInfo, sidOwner, sidGroup, dacl, sacl);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-ipsecdospstatecreateenumhandle0
-  public static IPsecDospStateCreateEnumHandle0(engineHandle: HANDLE, enumTemplate: PIPSEC_DOSP_STATE_ENUM_TEMPLATE0 | NULL, enumHandle: PHANDLE): DWORD {
-    return Fwpuclnt.Load('IPsecDospStateCreateEnumHandle0')(engineHandle, enumTemplate, enumHandle);
+  public static IPsecDospStateCreateEnumHandle0(engineHandle: HANDLE, enumTemplate: OPTIONAL<PIPSEC_DOSP_STATE_ENUM_TEMPLATE0>, enumHandle_out: PHANDLE): DWORD {
+    return Fwpuclnt.Load('IPsecDospStateCreateEnumHandle0')(engineHandle, enumTemplate, enumHandle_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-ipsecdospstatedestroyenumhandle0
-  public static IPsecDospStateDestroyEnumHandle0(engineHandle: HANDLE, enumHandle: HANDLE): DWORD {
-    return Fwpuclnt.Load('IPsecDospStateDestroyEnumHandle0')(engineHandle, enumHandle);
+  public static IPsecDospStateDestroyEnumHandle0(engineHandle: HANDLE, enumHandle_in_out: HANDLE): DWORD {
+    return Fwpuclnt.Load('IPsecDospStateDestroyEnumHandle0')(engineHandle, enumHandle_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-ipsecdospstateenum0
-  public static IPsecDospStateEnum0(engineHandle: HANDLE, enumHandle: HANDLE, numEntriesRequested: UINT32, entries: PIPSEC_DOSP_STATE0, numEntries: PUINT32): DWORD {
-    return Fwpuclnt.Load('IPsecDospStateEnum0')(engineHandle, enumHandle, numEntriesRequested, entries, numEntries);
+  public static IPsecDospStateEnum0(engineHandle: HANDLE, enumHandle: HANDLE, numEntriesRequested: UINT32, entries_out: PIPSEC_DOSP_STATE0, numEntries_out: PUINT32): DWORD {
+    return Fwpuclnt.Load('IPsecDospStateEnum0')(engineHandle, enumHandle, numEntriesRequested, entries_out, numEntries_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-ipsecgetstatistics0
-  public static IPsecGetStatistics0(engineHandle: HANDLE, ipsecStatistics: PIPSEC_STATISTICS0): DWORD {
-    return Fwpuclnt.Load('IPsecGetStatistics0')(engineHandle, ipsecStatistics);
+  public static IPsecGetStatistics0(engineHandle: HANDLE, ipsecStatistics_out: PIPSEC_STATISTICS0): DWORD {
+    return Fwpuclnt.Load('IPsecGetStatistics0')(engineHandle, ipsecStatistics_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-ipsecgetstatistics1
-  public static IPsecGetStatistics1(engineHandle: HANDLE, ipsecStatistics: PIPSEC_STATISTICS1): DWORD {
-    return Fwpuclnt.Load('IPsecGetStatistics1')(engineHandle, ipsecStatistics);
+  public static IPsecGetStatistics1(engineHandle: HANDLE, ipsecStatistics_out: PIPSEC_STATISTICS1): DWORD {
+    return Fwpuclnt.Load('IPsecGetStatistics1')(engineHandle, ipsecStatistics_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-ipseckeymanageraddandregister0
-  public static IPsecKeyManagerAddAndRegister0(engineHandle: HANDLE, keyManager: PIPSEC_KEY_MANAGER0, keyManagerCallbacks: PIPSEC_KEY_MANAGER_CALLBACKS0, keyMgmtHandle: PHANDLE): DWORD {
-    return Fwpuclnt.Load('IPsecKeyManagerAddAndRegister0')(engineHandle, keyManager, keyManagerCallbacks, keyMgmtHandle);
+  public static IPsecKeyManagerAddAndRegister0(engineHandle: HANDLE, keyManager: PIPSEC_KEY_MANAGER0, keyManagerCallbacks: PIPSEC_KEY_MANAGER_CALLBACKS0, keyMgmtHandle_out: PHANDLE): DWORD {
+    return Fwpuclnt.Load('IPsecKeyManagerAddAndRegister0')(engineHandle, keyManager, keyManagerCallbacks, keyMgmtHandle_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-ipseckeymanagergetsecurityinfobykey0
-  public static IPsecKeyManagerGetSecurityInfoByKey0(engineHandle: HANDLE, reserved: LPVOID | NULL, securityInfo: SECURITY_INFORMATION, sidOwner: PVOID, sidGroup: PVOID, dacl: PVOID, sacl: PVOID, securityDescriptor: PVOID): DWORD {
-    return Fwpuclnt.Load('IPsecKeyManagerGetSecurityInfoByKey0')(engineHandle, reserved, securityInfo, sidOwner, sidGroup, dacl, sacl, securityDescriptor);
+  public static IPsecKeyManagerGetSecurityInfoByKey0(
+    engineHandle: HANDLE,
+    reserved: OPTIONAL<LPVOID>,
+    securityInfo: SECURITY_INFORMATION,
+    sidOwner_out: PVOID,
+    sidGroup_out: PVOID,
+    dacl_out: PVOID,
+    sacl_out: PVOID,
+    securityDescriptor_out: PVOID,
+  ): DWORD {
+    return Fwpuclnt.Load('IPsecKeyManagerGetSecurityInfoByKey0')(engineHandle, reserved, securityInfo, sidOwner_out, sidGroup_out, dacl_out, sacl_out, securityDescriptor_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-ipseckeymanagersetsecurityinfobykey0
-  public static IPsecKeyManagerSetSecurityInfoByKey0(engineHandle: HANDLE, reserved: LPVOID | NULL, securityInfo: SECURITY_INFORMATION, sidOwner: PSID | NULL, sidGroup: PSID | NULL, dacl: PACL | NULL, sacl: PACL | NULL): DWORD {
+  public static IPsecKeyManagerSetSecurityInfoByKey0(
+    engineHandle: HANDLE,
+    reserved: OPTIONAL<LPVOID>,
+    securityInfo: SECURITY_INFORMATION,
+    sidOwner: OPTIONAL<PSID>,
+    sidGroup: OPTIONAL<PSID>,
+    dacl: OPTIONAL<PACL>,
+    sacl: OPTIONAL<PACL>,
+  ): DWORD {
     return Fwpuclnt.Load('IPsecKeyManagerSetSecurityInfoByKey0')(engineHandle, reserved, securityInfo, sidOwner, sidGroup, dacl, sacl);
   }
 
@@ -1136,8 +1215,8 @@ class Fwpuclnt extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-ipseckeymanagersget0
-  public static IPsecKeyManagersGet0(engineHandle: HANDLE, entries: PIPSEC_KEY_MANAGER0, numEntries: PUINT32): DWORD {
-    return Fwpuclnt.Load('IPsecKeyManagersGet0')(engineHandle, entries, numEntries);
+  public static IPsecKeyManagersGet0(engineHandle: HANDLE, entries_out: PIPSEC_KEY_MANAGER0, numEntries_out: PUINT32): DWORD {
+    return Fwpuclnt.Load('IPsecKeyManagersGet0')(engineHandle, entries_out, numEntries_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-ipsecsacontextaddinbound0
@@ -1161,18 +1240,18 @@ class Fwpuclnt extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-ipsecsacontextcreate0
-  public static IPsecSaContextCreate0(engineHandle: HANDLE, outboundTraffic: PIPSEC_TRAFFIC0, inboundFilterId: PUINT64 | NULL, id: PUINT64): DWORD {
-    return Fwpuclnt.Load('IPsecSaContextCreate0')(engineHandle, outboundTraffic, inboundFilterId, id);
+  public static IPsecSaContextCreate0(engineHandle: HANDLE, outboundTraffic: PIPSEC_TRAFFIC0, inboundFilterId_out: OPTIONAL<PUINT64>, id_out: PUINT64): DWORD {
+    return Fwpuclnt.Load('IPsecSaContextCreate0')(engineHandle, outboundTraffic, inboundFilterId_out, id_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-ipsecsacontextcreate1
-  public static IPsecSaContextCreate1(engineHandle: HANDLE, outboundTraffic: PIPSEC_TRAFFIC1, virtualIfTunnelInfo: PIPSEC_VIRTUAL_IF_TUNNEL_INFO0 | NULL, inboundFilterId: PUINT64 | NULL, id: PUINT64): DWORD {
-    return Fwpuclnt.Load('IPsecSaContextCreate1')(engineHandle, outboundTraffic, virtualIfTunnelInfo, inboundFilterId, id);
+  public static IPsecSaContextCreate1(engineHandle: HANDLE, outboundTraffic: PIPSEC_TRAFFIC1, virtualIfTunnelInfo: OPTIONAL<PIPSEC_VIRTUAL_IF_TUNNEL_INFO0>, inboundFilterId_out: OPTIONAL<PUINT64>, id_out: PUINT64): DWORD {
+    return Fwpuclnt.Load('IPsecSaContextCreate1')(engineHandle, outboundTraffic, virtualIfTunnelInfo, inboundFilterId_out, id_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-ipsecsacontextcreateenumhandle0
-  public static IPsecSaContextCreateEnumHandle0(engineHandle: HANDLE, enumTemplate: PIPSEC_SA_CONTEXT_ENUM_TEMPLATE0 | NULL, enumHandle: PHANDLE): DWORD {
-    return Fwpuclnt.Load('IPsecSaContextCreateEnumHandle0')(engineHandle, enumTemplate, enumHandle);
+  public static IPsecSaContextCreateEnumHandle0(engineHandle: HANDLE, enumTemplate: OPTIONAL<PIPSEC_SA_CONTEXT_ENUM_TEMPLATE0>, enumHandle_out: PHANDLE): DWORD {
+    return Fwpuclnt.Load('IPsecSaContextCreateEnumHandle0')(engineHandle, enumTemplate, enumHandle_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-ipsecsacontextdeletebyid0
@@ -1181,18 +1260,18 @@ class Fwpuclnt extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-ipsecsacontextdestroyenumhandle0
-  public static IPsecSaContextDestroyEnumHandle0(engineHandle: HANDLE, enumHandle: HANDLE): DWORD {
-    return Fwpuclnt.Load('IPsecSaContextDestroyEnumHandle0')(engineHandle, enumHandle);
+  public static IPsecSaContextDestroyEnumHandle0(engineHandle: HANDLE, enumHandle_in_out: HANDLE): DWORD {
+    return Fwpuclnt.Load('IPsecSaContextDestroyEnumHandle0')(engineHandle, enumHandle_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-ipsecsacontextenum0
-  public static IPsecSaContextEnum0(engineHandle: HANDLE, enumHandle: HANDLE, numEntriesRequested: UINT32, entries: PIPSEC_SA_CONTEXT0, numEntriesReturned: PUINT32): DWORD {
-    return Fwpuclnt.Load('IPsecSaContextEnum0')(engineHandle, enumHandle, numEntriesRequested, entries, numEntriesReturned);
+  public static IPsecSaContextEnum0(engineHandle: HANDLE, enumHandle: HANDLE, numEntriesRequested: UINT32, entries_out: PIPSEC_SA_CONTEXT0, numEntriesReturned_out: PUINT32): DWORD {
+    return Fwpuclnt.Load('IPsecSaContextEnum0')(engineHandle, enumHandle, numEntriesRequested, entries_out, numEntriesReturned_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-ipsecsacontextenum1
-  public static IPsecSaContextEnum1(engineHandle: HANDLE, enumHandle: HANDLE, numEntriesRequested: UINT32, entries: PIPSEC_SA_CONTEXT1, numEntriesReturned: PUINT32): DWORD {
-    return Fwpuclnt.Load('IPsecSaContextEnum1')(engineHandle, enumHandle, numEntriesRequested, entries, numEntriesReturned);
+  public static IPsecSaContextEnum1(engineHandle: HANDLE, enumHandle: HANDLE, numEntriesRequested: UINT32, entries_out: PIPSEC_SA_CONTEXT1, numEntriesReturned_out: PUINT32): DWORD {
+    return Fwpuclnt.Load('IPsecSaContextEnum1')(engineHandle, enumHandle, numEntriesRequested, entries_out, numEntriesReturned_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-ipsecsacontextexpire0
@@ -1201,23 +1280,23 @@ class Fwpuclnt extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-ipsecsacontextgetbyid0
-  public static IPsecSaContextGetById0(engineHandle: HANDLE, id: UINT64, saContext: PIPSEC_SA_CONTEXT0): DWORD {
-    return Fwpuclnt.Load('IPsecSaContextGetById0')(engineHandle, id, saContext);
+  public static IPsecSaContextGetById0(engineHandle: HANDLE, id: UINT64, saContext_out: PIPSEC_SA_CONTEXT0): DWORD {
+    return Fwpuclnt.Load('IPsecSaContextGetById0')(engineHandle, id, saContext_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-ipsecsacontextgetbyid1
-  public static IPsecSaContextGetById1(engineHandle: HANDLE, id: UINT64, saContext: PIPSEC_SA_CONTEXT1): DWORD {
-    return Fwpuclnt.Load('IPsecSaContextGetById1')(engineHandle, id, saContext);
+  public static IPsecSaContextGetById1(engineHandle: HANDLE, id: UINT64, saContext_out: PIPSEC_SA_CONTEXT1): DWORD {
+    return Fwpuclnt.Load('IPsecSaContextGetById1')(engineHandle, id, saContext_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-ipsecsacontextgetspi0
-  public static IPsecSaContextGetSpi0(engineHandle: HANDLE, id: UINT64, getSpi: PIPSEC_GETSPI0, inboundSpi: PIPSEC_SA_SPI): DWORD {
-    return Fwpuclnt.Load('IPsecSaContextGetSpi0')(engineHandle, id, getSpi, inboundSpi);
+  public static IPsecSaContextGetSpi0(engineHandle: HANDLE, id: UINT64, getSpi: PIPSEC_GETSPI0, inboundSpi_out: PIPSEC_SA_SPI): DWORD {
+    return Fwpuclnt.Load('IPsecSaContextGetSpi0')(engineHandle, id, getSpi, inboundSpi_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-ipsecsacontextgetspi1
-  public static IPsecSaContextGetSpi1(engineHandle: HANDLE, id: UINT64, getSpi: PIPSEC_GETSPI1, inboundSpi: PIPSEC_SA_SPI): DWORD {
-    return Fwpuclnt.Load('IPsecSaContextGetSpi1')(engineHandle, id, getSpi, inboundSpi);
+  public static IPsecSaContextGetSpi1(engineHandle: HANDLE, id: UINT64, getSpi: PIPSEC_GETSPI1, inboundSpi_out: PIPSEC_SA_SPI): DWORD {
+    return Fwpuclnt.Load('IPsecSaContextGetSpi1')(engineHandle, id, getSpi, inboundSpi_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-ipsecsacontextsetspi0
@@ -1226,18 +1305,18 @@ class Fwpuclnt extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-ipsecsacontextsubscribe0
-  public static IPsecSaContextSubscribe0(engineHandle: HANDLE, subscription: PIPSEC_SA_CONTEXT_SUBSCRIPTION0, callback: IPSEC_SA_CONTEXT_CALLBACK0, context: LPVOID | NULL, eventsHandle: PHANDLE): DWORD {
-    return Fwpuclnt.Load('IPsecSaContextSubscribe0')(engineHandle, subscription, callback, context, eventsHandle);
+  public static IPsecSaContextSubscribe0(engineHandle: HANDLE, subscription: PIPSEC_SA_CONTEXT_SUBSCRIPTION0, callback: IPSEC_SA_CONTEXT_CALLBACK0, context: OPTIONAL<LPVOID>, eventsHandle_out: PHANDLE): DWORD {
+    return Fwpuclnt.Load('IPsecSaContextSubscribe0')(engineHandle, subscription, callback, context, eventsHandle_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-ipsecsacontextsubscriptionsget0
-  public static IPsecSaContextSubscriptionsGet0(engineHandle: HANDLE, entries: PIPSEC_SA_CONTEXT_SUBSCRIPTION0, numEntries: PUINT32): DWORD {
-    return Fwpuclnt.Load('IPsecSaContextSubscriptionsGet0')(engineHandle, entries, numEntries);
+  public static IPsecSaContextSubscriptionsGet0(engineHandle: HANDLE, entries_out: PIPSEC_SA_CONTEXT_SUBSCRIPTION0, numEntries_out: PUINT32): DWORD {
+    return Fwpuclnt.Load('IPsecSaContextSubscriptionsGet0')(engineHandle, entries_out, numEntries_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-ipsecsacontextunsubscribe0
-  public static IPsecSaContextUnsubscribe0(engineHandle: HANDLE, eventsHandle: HANDLE): DWORD {
-    return Fwpuclnt.Load('IPsecSaContextUnsubscribe0')(engineHandle, eventsHandle);
+  public static IPsecSaContextUnsubscribe0(engineHandle: HANDLE, eventsHandle_in_out: HANDLE): DWORD {
+    return Fwpuclnt.Load('IPsecSaContextUnsubscribe0')(engineHandle, eventsHandle_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-ipsecsacontextupdate0
@@ -1246,57 +1325,57 @@ class Fwpuclnt extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-ipsecsacreateenumhandle0
-  public static IPsecSaCreateEnumHandle0(engineHandle: HANDLE, enumTemplate: PIPSEC_SA_ENUM_TEMPLATE0 | NULL, enumHandle: PHANDLE): DWORD {
-    return Fwpuclnt.Load('IPsecSaCreateEnumHandle0')(engineHandle, enumTemplate, enumHandle);
+  public static IPsecSaCreateEnumHandle0(engineHandle: HANDLE, enumTemplate: OPTIONAL<PIPSEC_SA_ENUM_TEMPLATE0>, enumHandle_out: PHANDLE): DWORD {
+    return Fwpuclnt.Load('IPsecSaCreateEnumHandle0')(engineHandle, enumTemplate, enumHandle_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-ipsecsadbgetsecurityinfo0
-  public static IPsecSaDbGetSecurityInfo0(engineHandle: HANDLE, securityInfo: SECURITY_INFORMATION, sidOwner: PVOID, sidGroup: PVOID, dacl: PVOID, sacl: PVOID, securityDescriptor: PVOID): DWORD {
-    return Fwpuclnt.Load('IPsecSaDbGetSecurityInfo0')(engineHandle, securityInfo, sidOwner, sidGroup, dacl, sacl, securityDescriptor);
+  public static IPsecSaDbGetSecurityInfo0(engineHandle: HANDLE, securityInfo: SECURITY_INFORMATION, sidOwner_out: PVOID, sidGroup_out: PVOID, dacl_out: PVOID, sacl_out: PVOID, securityDescriptor_out: PVOID): DWORD {
+    return Fwpuclnt.Load('IPsecSaDbGetSecurityInfo0')(engineHandle, securityInfo, sidOwner_out, sidGroup_out, dacl_out, sacl_out, securityDescriptor_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-ipsecsadbsetsecurityinfo0
-  public static IPsecSaDbSetSecurityInfo0(engineHandle: HANDLE, securityInfo: SECURITY_INFORMATION, sidOwner: PSID | NULL, sidGroup: PSID | NULL, dacl: PACL | NULL, sacl: PACL | NULL): DWORD {
+  public static IPsecSaDbSetSecurityInfo0(engineHandle: HANDLE, securityInfo: SECURITY_INFORMATION, sidOwner: OPTIONAL<PSID>, sidGroup: OPTIONAL<PSID>, dacl: OPTIONAL<PACL>, sacl: OPTIONAL<PACL>): DWORD {
     return Fwpuclnt.Load('IPsecSaDbSetSecurityInfo0')(engineHandle, securityInfo, sidOwner, sidGroup, dacl, sacl);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-ipsecsadestroyenumhandle0
-  public static IPsecSaDestroyEnumHandle0(engineHandle: HANDLE, enumHandle: HANDLE): DWORD {
-    return Fwpuclnt.Load('IPsecSaDestroyEnumHandle0')(engineHandle, enumHandle);
+  public static IPsecSaDestroyEnumHandle0(engineHandle: HANDLE, enumHandle_in_out: HANDLE): DWORD {
+    return Fwpuclnt.Load('IPsecSaDestroyEnumHandle0')(engineHandle, enumHandle_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-ipsecsaenum0
-  public static IPsecSaEnum0(engineHandle: HANDLE, enumHandle: HANDLE, numEntriesRequested: UINT32, entries: PIPSEC_SA_DETAILS0, numEntriesReturned: PUINT32): DWORD {
-    return Fwpuclnt.Load('IPsecSaEnum0')(engineHandle, enumHandle, numEntriesRequested, entries, numEntriesReturned);
+  public static IPsecSaEnum0(engineHandle: HANDLE, enumHandle: HANDLE, numEntriesRequested: UINT32, entries_out: PIPSEC_SA_DETAILS0, numEntriesReturned_out: PUINT32): DWORD {
+    return Fwpuclnt.Load('IPsecSaEnum0')(engineHandle, enumHandle, numEntriesRequested, entries_out, numEntriesReturned_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-ipsecsaenum1
-  public static IPsecSaEnum1(engineHandle: HANDLE, enumHandle: HANDLE, numEntriesRequested: UINT32, entries: PIPSEC_SA_DETAILS1, numEntriesReturned: PUINT32): DWORD {
-    return Fwpuclnt.Load('IPsecSaEnum1')(engineHandle, enumHandle, numEntriesRequested, entries, numEntriesReturned);
+  public static IPsecSaEnum1(engineHandle: HANDLE, enumHandle: HANDLE, numEntriesRequested: UINT32, entries_out: PIPSEC_SA_DETAILS1, numEntriesReturned_out: PUINT32): DWORD {
+    return Fwpuclnt.Load('IPsecSaEnum1')(engineHandle, enumHandle, numEntriesRequested, entries_out, numEntriesReturned_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-ikeextgetstatistics0
-  public static IkeextGetStatistics0(engineHandle: HANDLE, ikeextStatistics: PIKEEXT_STATISTICS0): DWORD {
-    return Fwpuclnt.Load('IkeextGetStatistics0')(engineHandle, ikeextStatistics);
+  public static IkeextGetStatistics0(engineHandle: HANDLE, ikeextStatistics_out: PIKEEXT_STATISTICS0): DWORD {
+    return Fwpuclnt.Load('IkeextGetStatistics0')(engineHandle, ikeextStatistics_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-ikeextgetstatistics1
-  public static IkeextGetStatistics1(engineHandle: HANDLE, ikeextStatistics: PIKEEXT_STATISTICS1): DWORD {
-    return Fwpuclnt.Load('IkeextGetStatistics1')(engineHandle, ikeextStatistics);
+  public static IkeextGetStatistics1(engineHandle: HANDLE, ikeextStatistics_out: PIKEEXT_STATISTICS1): DWORD {
+    return Fwpuclnt.Load('IkeextGetStatistics1')(engineHandle, ikeextStatistics_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-ikeextsacreateenumhandle0
-  public static IkeextSaCreateEnumHandle0(engineHandle: HANDLE, enumTemplate: PIKEEXT_SA_ENUM_TEMPLATE0 | NULL, enumHandle: PHANDLE): DWORD {
-    return Fwpuclnt.Load('IkeextSaCreateEnumHandle0')(engineHandle, enumTemplate, enumHandle);
+  public static IkeextSaCreateEnumHandle0(engineHandle: HANDLE, enumTemplate: OPTIONAL<PIKEEXT_SA_ENUM_TEMPLATE0>, enumHandle_out: PHANDLE): DWORD {
+    return Fwpuclnt.Load('IkeextSaCreateEnumHandle0')(engineHandle, enumTemplate, enumHandle_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-ikeextsadbgetsecurityinfo0
-  public static IkeextSaDbGetSecurityInfo0(engineHandle: HANDLE, securityInfo: SECURITY_INFORMATION, sidOwner: PVOID, sidGroup: PVOID, dacl: PVOID, sacl: PVOID, securityDescriptor: PVOID): DWORD {
-    return Fwpuclnt.Load('IkeextSaDbGetSecurityInfo0')(engineHandle, securityInfo, sidOwner, sidGroup, dacl, sacl, securityDescriptor);
+  public static IkeextSaDbGetSecurityInfo0(engineHandle: HANDLE, securityInfo: SECURITY_INFORMATION, sidOwner_out: PVOID, sidGroup_out: PVOID, dacl_out: PVOID, sacl_out: PVOID, securityDescriptor_out: PVOID): DWORD {
+    return Fwpuclnt.Load('IkeextSaDbGetSecurityInfo0')(engineHandle, securityInfo, sidOwner_out, sidGroup_out, dacl_out, sacl_out, securityDescriptor_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-ikeextsadbsetsecurityinfo0
-  public static IkeextSaDbSetSecurityInfo0(engineHandle: HANDLE, securityInfo: SECURITY_INFORMATION, sidOwner: PSID | NULL, sidGroup: PSID | NULL, dacl: PACL | NULL, sacl: PACL | NULL): DWORD {
+  public static IkeextSaDbSetSecurityInfo0(engineHandle: HANDLE, securityInfo: SECURITY_INFORMATION, sidOwner: OPTIONAL<PSID>, sidGroup: OPTIONAL<PSID>, dacl: OPTIONAL<PACL>, sacl: OPTIONAL<PACL>): DWORD {
     return Fwpuclnt.Load('IkeextSaDbSetSecurityInfo0')(engineHandle, securityInfo, sidOwner, sidGroup, dacl, sacl);
   }
 
@@ -1306,61 +1385,61 @@ class Fwpuclnt extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-ikeextsadestroyenumhandle0
-  public static IkeextSaDestroyEnumHandle0(engineHandle: HANDLE, enumHandle: HANDLE): DWORD {
-    return Fwpuclnt.Load('IkeextSaDestroyEnumHandle0')(engineHandle, enumHandle);
+  public static IkeextSaDestroyEnumHandle0(engineHandle: HANDLE, enumHandle_in_out: HANDLE): DWORD {
+    return Fwpuclnt.Load('IkeextSaDestroyEnumHandle0')(engineHandle, enumHandle_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-ikeextsaenum0
-  public static IkeextSaEnum0(engineHandle: HANDLE, enumHandle: HANDLE, numEntriesRequested: UINT32, entries: PIKEEXT_SA_DETAILS0, numEntriesReturned: PUINT32): DWORD {
-    return Fwpuclnt.Load('IkeextSaEnum0')(engineHandle, enumHandle, numEntriesRequested, entries, numEntriesReturned);
+  public static IkeextSaEnum0(engineHandle: HANDLE, enumHandle: HANDLE, numEntriesRequested: UINT32, entries_out: PIKEEXT_SA_DETAILS0, numEntriesReturned_out: PUINT32): DWORD {
+    return Fwpuclnt.Load('IkeextSaEnum0')(engineHandle, enumHandle, numEntriesRequested, entries_out, numEntriesReturned_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-ikeextsaenum1
-  public static IkeextSaEnum1(engineHandle: HANDLE, enumHandle: HANDLE, numEntriesRequested: UINT32, entries: PIKEEXT_SA_DETAILS1, numEntriesReturned: PUINT32): DWORD {
-    return Fwpuclnt.Load('IkeextSaEnum1')(engineHandle, enumHandle, numEntriesRequested, entries, numEntriesReturned);
+  public static IkeextSaEnum1(engineHandle: HANDLE, enumHandle: HANDLE, numEntriesRequested: UINT32, entries_out: PIKEEXT_SA_DETAILS1, numEntriesReturned_out: PUINT32): DWORD {
+    return Fwpuclnt.Load('IkeextSaEnum1')(engineHandle, enumHandle, numEntriesRequested, entries_out, numEntriesReturned_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-ikeextsaenum2
-  public static IkeextSaEnum2(engineHandle: HANDLE, enumHandle: HANDLE, numEntriesRequested: UINT32, entries: PIKEEXT_SA_DETAILS2, numEntriesReturned: PUINT32): DWORD {
-    return Fwpuclnt.Load('IkeextSaEnum2')(engineHandle, enumHandle, numEntriesRequested, entries, numEntriesReturned);
+  public static IkeextSaEnum2(engineHandle: HANDLE, enumHandle: HANDLE, numEntriesRequested: UINT32, entries_out: PIKEEXT_SA_DETAILS2, numEntriesReturned_out: PUINT32): DWORD {
+    return Fwpuclnt.Load('IkeextSaEnum2')(engineHandle, enumHandle, numEntriesRequested, entries_out, numEntriesReturned_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-ikeextsagetbyid0
-  public static IkeextSaGetById0(engineHandle: HANDLE, id: UINT64, sa: PIKEEXT_SA_DETAILS0): DWORD {
-    return Fwpuclnt.Load('IkeextSaGetById0')(engineHandle, id, sa);
+  public static IkeextSaGetById0(engineHandle: HANDLE, id: UINT64, sa_out: PIKEEXT_SA_DETAILS0): DWORD {
+    return Fwpuclnt.Load('IkeextSaGetById0')(engineHandle, id, sa_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-ikeextsagetbyid1
-  public static IkeextSaGetById1(engineHandle: HANDLE, id: UINT64, saLookupContext: LPGUID | NULL, sa: PIKEEXT_SA_DETAILS1): DWORD {
-    return Fwpuclnt.Load('IkeextSaGetById1')(engineHandle, id, saLookupContext, sa);
+  public static IkeextSaGetById1(engineHandle: HANDLE, id: UINT64, saLookupContext: OPTIONAL<LPGUID>, sa_out: PIKEEXT_SA_DETAILS1): DWORD {
+    return Fwpuclnt.Load('IkeextSaGetById1')(engineHandle, id, saLookupContext, sa_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-ikeextsagetbyid2
-  public static IkeextSaGetById2(engineHandle: HANDLE, id: UINT64, saLookupContext: LPGUID | NULL, sa: PIKEEXT_SA_DETAILS2): DWORD {
-    return Fwpuclnt.Load('IkeextSaGetById2')(engineHandle, id, saLookupContext, sa);
+  public static IkeextSaGetById2(engineHandle: HANDLE, id: UINT64, saLookupContext: OPTIONAL<LPGUID>, sa_out: PIKEEXT_SA_DETAILS2): DWORD {
+    return Fwpuclnt.Load('IkeextSaGetById2')(engineHandle, id, saLookupContext, sa_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ws2tcpip/nf-ws2tcpip-wsadeletesocketpeertargetname
-  public static WSADeleteSocketPeerTargetName(Socket: SOCKET, PeerAddr: PSOCKADDR, PeerAddrLen: ULONG, Overlapped: LPWSAOVERLAPPED | NULL, CompletionRoutine: LPWSAOVERLAPPED_COMPLETION_ROUTINE | NULL): INT {
+  public static WSADeleteSocketPeerTargetName(Socket: SOCKET, PeerAddr: PSOCKADDR, PeerAddrLen: ULONG, Overlapped: OPTIONAL<LPWSAOVERLAPPED>, CompletionRoutine: OPTIONAL<LPWSAOVERLAPPED_COMPLETION_ROUTINE>): INT {
     return Fwpuclnt.Load('WSADeleteSocketPeerTargetName')(Socket, PeerAddr, PeerAddrLen, Overlapped, CompletionRoutine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ws2tcpip/nf-ws2tcpip-wsaimpersonatesocketpeer
-  public static WSAImpersonateSocketPeer(Socket: SOCKET, PeerAddr: PSOCKADDR | NULL, PeerAddrLen: ULONG): INT {
+  public static WSAImpersonateSocketPeer(Socket: SOCKET, PeerAddr: OPTIONAL<PSOCKADDR>, PeerAddrLen: ULONG): INT {
     return Fwpuclnt.Load('WSAImpersonateSocketPeer')(Socket, PeerAddr, PeerAddrLen);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ws2tcpip/nf-ws2tcpip-wsaquerysocketsecurity
   public static WSAQuerySocketSecurity(
     Socket: SOCKET,
-    SecurityQueryTemplate: PSOCKET_SECURITY_QUERY_TEMPLATE | NULL,
+    SecurityQueryTemplate: OPTIONAL<PSOCKET_SECURITY_QUERY_TEMPLATE>,
     SecurityQueryTemplateLen: ULONG,
-    SecurityQueryInfo: PSOCKET_SECURITY_QUERY_INFO | NULL,
-    SecurityQueryInfoLen: PULONG,
-    Overlapped: LPWSAOVERLAPPED | NULL,
-    CompletionRoutine: LPWSAOVERLAPPED_COMPLETION_ROUTINE | NULL,
+    SecurityQueryInfo_out: OPTIONAL<PSOCKET_SECURITY_QUERY_INFO>,
+    SecurityQueryInfoLen_in_out: PULONG,
+    Overlapped: OPTIONAL<LPWSAOVERLAPPED>,
+    CompletionRoutine: OPTIONAL<LPWSAOVERLAPPED_COMPLETION_ROUTINE>,
   ): INT {
-    return Fwpuclnt.Load('WSAQuerySocketSecurity')(Socket, SecurityQueryTemplate, SecurityQueryTemplateLen, SecurityQueryInfo, SecurityQueryInfoLen, Overlapped, CompletionRoutine);
+    return Fwpuclnt.Load('WSAQuerySocketSecurity')(Socket, SecurityQueryTemplate, SecurityQueryTemplateLen, SecurityQueryInfo_out, SecurityQueryInfoLen_in_out, Overlapped, CompletionRoutine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ws2tcpip/nf-ws2tcpip-wsarevertimpersonation
@@ -1369,12 +1448,18 @@ class Fwpuclnt extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ws2tcpip/nf-ws2tcpip-wsasetsocketpeertargetname
-  public static WSASetSocketPeerTargetName(Socket: SOCKET, PeerTargetName: PSOCKET_PEER_TARGET_NAME, PeerTargetNameLen: ULONG, Overlapped: LPWSAOVERLAPPED | NULL, CompletionRoutine: LPWSAOVERLAPPED_COMPLETION_ROUTINE | NULL): INT {
+  public static WSASetSocketPeerTargetName(Socket: SOCKET, PeerTargetName: PSOCKET_PEER_TARGET_NAME, PeerTargetNameLen: ULONG, Overlapped: OPTIONAL<LPWSAOVERLAPPED>, CompletionRoutine: OPTIONAL<LPWSAOVERLAPPED_COMPLETION_ROUTINE>): INT {
     return Fwpuclnt.Load('WSASetSocketPeerTargetName')(Socket, PeerTargetName, PeerTargetNameLen, Overlapped, CompletionRoutine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ws2tcpip/nf-ws2tcpip-wsasetsocketsecurity
-  public static WSASetSocketSecurity(Socket: SOCKET, SecuritySettings: PSOCKET_SECURITY_SETTINGS | NULL, SecuritySettingsLen: ULONG, Overlapped: LPWSAOVERLAPPED | NULL, CompletionRoutine: LPWSAOVERLAPPED_COMPLETION_ROUTINE | NULL): INT {
+  public static WSASetSocketSecurity(
+    Socket: SOCKET,
+    SecuritySettings: OPTIONAL<PSOCKET_SECURITY_SETTINGS>,
+    SecuritySettingsLen: ULONG,
+    Overlapped: OPTIONAL<LPWSAOVERLAPPED>,
+    CompletionRoutine: OPTIONAL<LPWSAOVERLAPPED_COMPLETION_ROUTINE>,
+  ): INT {
     return Fwpuclnt.Load('WSASetSocketSecurity')(Socket, SecuritySettings, SecuritySettingsLen, Overlapped, CompletionRoutine);
   }
 }

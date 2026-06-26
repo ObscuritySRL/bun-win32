@@ -11,6 +11,7 @@ import type {
   LPCWSTR,
   LPGUID,
   NULL,
+  OPTIONAL,
   PBOOL,
   PBYTE,
   PDOT11_MAC_ADDRESS,
@@ -150,18 +151,18 @@ class Wlanapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wlanapi/nf-wlanapi-wfdopenhandle
-  public static WFDOpenHandle(dwClientVersion: DWORD, pdwNegotiatedVersion: PDWORD, phClientHandle: PHANDLE): DWORD {
-    return Wlanapi.Load('WFDOpenHandle')(dwClientVersion, pdwNegotiatedVersion, phClientHandle);
+  public static WFDOpenHandle(dwClientVersion: DWORD, pdwNegotiatedVersion_out: PDWORD, phClientHandle_out: PHANDLE): DWORD {
+    return Wlanapi.Load('WFDOpenHandle')(dwClientVersion, pdwNegotiatedVersion_out, phClientHandle_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wlanapi/nf-wlanapi-wfdopenlegacysession
-  public static WFDOpenLegacySession(hClientHandle: HANDLE, pLegacyMacAddress: PDOT11_MAC_ADDRESS, phSessionHandle: PHANDLE, pGuidSessionInterface: LPGUID): DWORD {
-    return Wlanapi.Load('WFDOpenLegacySession')(hClientHandle, pLegacyMacAddress, phSessionHandle, pGuidSessionInterface);
+  public static WFDOpenLegacySession(hClientHandle: HANDLE, pLegacyMacAddress: PDOT11_MAC_ADDRESS, phSessionHandle_out: PHANDLE, pGuidSessionInterface_out: LPGUID): DWORD {
+    return Wlanapi.Load('WFDOpenLegacySession')(hClientHandle, pLegacyMacAddress, phSessionHandle_out, pGuidSessionInterface_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wlanapi/nf-wlanapi-wfdstartopensession
-  public static WFDStartOpenSession(hClientHandle: HANDLE, pDeviceAddress: PDOT11_MAC_ADDRESS, pvContext: PVOID | NULL, pfnCallback: WFD_OPEN_SESSION_COMPLETE_CALLBACK, phSessionHandle: PHANDLE): DWORD {
-    return Wlanapi.Load('WFDStartOpenSession')(hClientHandle, pDeviceAddress, pvContext, pfnCallback, phSessionHandle);
+  public static WFDStartOpenSession(hClientHandle: HANDLE, pDeviceAddress: PDOT11_MAC_ADDRESS, pvContext: OPTIONAL<PVOID>, pfnCallback: WFD_OPEN_SESSION_COMPLETE_CALLBACK, phSessionHandle_out: PHANDLE): DWORD {
+    return Wlanapi.Load('WFDStartOpenSession')(hClientHandle, pDeviceAddress, pvContext, pfnCallback, phSessionHandle_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wlanapi/nf-wlanapi-wfdupdatedevicevisibility
@@ -196,12 +197,12 @@ class Wlanapi extends Win32 {
     pDeviceServiceGuid: LPGUID,
     dwOpCode: DWORD,
     dwInBufferSize: DWORD,
-    pInBuffer: PVOID | NULL,
+    pInBuffer: OPTIONAL<PVOID>,
     dwOutBufferSize: DWORD,
-    pOutBuffer: PVOID | NULL,
-    pdwBytesReturned: PDWORD,
+    pOutBuffer_in_out: OPTIONAL<PVOID>,
+    pdwBytesReturned_out: PDWORD,
   ): DWORD {
-    return Wlanapi.Load('WlanDeviceServiceCommand')(hClientHandle, pInterfaceGuid, pDeviceServiceGuid, dwOpCode, dwInBufferSize, pInBuffer, dwOutBufferSize, pOutBuffer, pdwBytesReturned);
+    return Wlanapi.Load('WlanDeviceServiceCommand')(hClientHandle, pInterfaceGuid, pDeviceServiceGuid, dwOpCode, dwInBufferSize, pInBuffer, dwOutBufferSize, pOutBuffer_in_out, pdwBytesReturned_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wlanapi/nf-wlanapi-wlandisconnect
@@ -210,13 +211,13 @@ class Wlanapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wlanapi/nf-wlanapi-wlanenuminterfaces
-  public static WlanEnumInterfaces(hClientHandle: HANDLE, pReserved: NULL, ppInterfaceList: PWLAN_INTERFACE_INFO_LIST): DWORD {
-    return Wlanapi.Load('WlanEnumInterfaces')(hClientHandle, pReserved, ppInterfaceList);
+  public static WlanEnumInterfaces(hClientHandle: HANDLE, pReserved: NULL, ppInterfaceList_out: PWLAN_INTERFACE_INFO_LIST): DWORD {
+    return Wlanapi.Load('WlanEnumInterfaces')(hClientHandle, pReserved, ppInterfaceList_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wlanapi/nf-wlanapi-wlanextractpsdiedatalist
-  public static WlanExtractPsdIEDataList(hClientHandle: HANDLE, dwIeDataSize: DWORD, pRawIeData: PBYTE, strFormat: LPCWSTR, pReserved: NULL, ppPsdIEDataList: PWLAN_RAW_DATA_LIST): DWORD {
-    return Wlanapi.Load('WlanExtractPsdIEDataList')(hClientHandle, dwIeDataSize, pRawIeData, strFormat, pReserved, ppPsdIEDataList);
+  public static WlanExtractPsdIEDataList(hClientHandle: HANDLE, dwIeDataSize: DWORD, pRawIeData: PBYTE, strFormat: LPCWSTR, pReserved: NULL, ppPsdIEDataList_out: PWLAN_RAW_DATA_LIST): DWORD {
+    return Wlanapi.Load('WlanExtractPsdIEDataList')(hClientHandle, dwIeDataSize, pRawIeData, strFormat, pReserved, ppPsdIEDataList_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wlanapi/nf-wlanapi-wlanfreememory
@@ -225,123 +226,140 @@ class Wlanapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wlanapi/nf-wlanapi-wlangetavailablenetworklist
-  public static WlanGetAvailableNetworkList(hClientHandle: HANDLE, pInterfaceGuid: LPCGUID, dwFlags: DWORD, pReserved: NULL, ppAvailableNetworkList: PWLAN_AVAILABLE_NETWORK_LIST): DWORD {
-    return Wlanapi.Load('WlanGetAvailableNetworkList')(hClientHandle, pInterfaceGuid, dwFlags, pReserved, ppAvailableNetworkList);
+  public static WlanGetAvailableNetworkList(hClientHandle: HANDLE, pInterfaceGuid: LPCGUID, dwFlags: DWORD, pReserved: NULL, ppAvailableNetworkList_out: PWLAN_AVAILABLE_NETWORK_LIST): DWORD {
+    return Wlanapi.Load('WlanGetAvailableNetworkList')(hClientHandle, pInterfaceGuid, dwFlags, pReserved, ppAvailableNetworkList_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wlanapi/nf-wlanapi-wlangetfilterlist
-  public static WlanGetFilterList(hClientHandle: HANDLE, wlanFilterListType: WlanFilterListType, pReserved: NULL, ppNetworkList: PDOT11_NETWORK_LIST): DWORD {
-    return Wlanapi.Load('WlanGetFilterList')(hClientHandle, wlanFilterListType, pReserved, ppNetworkList);
+  public static WlanGetFilterList(hClientHandle: HANDLE, wlanFilterListType: WlanFilterListType, pReserved: NULL, ppNetworkList_out: PDOT11_NETWORK_LIST): DWORD {
+    return Wlanapi.Load('WlanGetFilterList')(hClientHandle, wlanFilterListType, pReserved, ppNetworkList_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wlanapi/nf-wlanapi-wlangetinterfacecapability
-  public static WlanGetInterfaceCapability(hClientHandle: HANDLE, pInterfaceGuid: LPCGUID, pReserved: NULL, ppCapability: PWLAN_INTERFACE_CAPABILITY): DWORD {
-    return Wlanapi.Load('WlanGetInterfaceCapability')(hClientHandle, pInterfaceGuid, pReserved, ppCapability);
+  public static WlanGetInterfaceCapability(hClientHandle: HANDLE, pInterfaceGuid: LPCGUID, pReserved: NULL, ppCapability_out: PWLAN_INTERFACE_CAPABILITY): DWORD {
+    return Wlanapi.Load('WlanGetInterfaceCapability')(hClientHandle, pInterfaceGuid, pReserved, ppCapability_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wlanapi/nf-wlanapi-wlangetnetworkbsslist
-  public static WlanGetNetworkBssList(hClientHandle: HANDLE, pInterfaceGuid: LPCGUID, pDot11Ssid: PDOT11_SSID | NULL, dot11BssType: Dot11BssType, bSecurityEnabled: BOOL, pReserved: NULL, ppWlanBssList: PWLAN_BSS_LIST): DWORD {
-    return Wlanapi.Load('WlanGetNetworkBssList')(hClientHandle, pInterfaceGuid, pDot11Ssid, dot11BssType, bSecurityEnabled, pReserved, ppWlanBssList);
+  public static WlanGetNetworkBssList(hClientHandle: HANDLE, pInterfaceGuid: LPCGUID, pDot11Ssid: OPTIONAL<PDOT11_SSID>, dot11BssType: Dot11BssType, bSecurityEnabled: BOOL, pReserved: NULL, ppWlanBssList_out: PWLAN_BSS_LIST): DWORD {
+    return Wlanapi.Load('WlanGetNetworkBssList')(hClientHandle, pInterfaceGuid, pDot11Ssid, dot11BssType, bSecurityEnabled, pReserved, ppWlanBssList_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wlanapi/nf-wlanapi-wlangetprofile
-  public static WlanGetProfile(hClientHandle: HANDLE, pInterfaceGuid: LPCGUID, strProfileName: LPCWSTR, pReserved: NULL, pstrProfileXml: PZPWSTR, pdwFlags: PDWORD | NULL, pdwGrantedAccess: PDWORD | NULL): DWORD {
-    return Wlanapi.Load('WlanGetProfile')(hClientHandle, pInterfaceGuid, strProfileName, pReserved, pstrProfileXml, pdwFlags, pdwGrantedAccess);
+  public static WlanGetProfile(hClientHandle: HANDLE, pInterfaceGuid: LPCGUID, strProfileName: LPCWSTR, pReserved: NULL, pstrProfileXml_out: PZPWSTR, pdwFlags_in_out: OPTIONAL<PDWORD>, pdwGrantedAccess_out: OPTIONAL<PDWORD>): DWORD {
+    return Wlanapi.Load('WlanGetProfile')(hClientHandle, pInterfaceGuid, strProfileName, pReserved, pstrProfileXml_out, pdwFlags_in_out, pdwGrantedAccess_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wlanapi/nf-wlanapi-wlangetprofilecustomuserdata
-  public static WlanGetProfileCustomUserData(hClientHandle: HANDLE, pInterfaceGuid: LPCGUID, strProfileName: LPCWSTR, pReserved: NULL, pdwDataSize: PDWORD, ppData: PPBYTE): DWORD {
-    return Wlanapi.Load('WlanGetProfileCustomUserData')(hClientHandle, pInterfaceGuid, strProfileName, pReserved, pdwDataSize, ppData);
+  public static WlanGetProfileCustomUserData(hClientHandle: HANDLE, pInterfaceGuid: LPCGUID, strProfileName: LPCWSTR, pReserved: NULL, pdwDataSize_out: PDWORD, ppData_out: PPBYTE): DWORD {
+    return Wlanapi.Load('WlanGetProfileCustomUserData')(hClientHandle, pInterfaceGuid, strProfileName, pReserved, pdwDataSize_out, ppData_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wlanapi/nf-wlanapi-wlangetprofilelist
-  public static WlanGetProfileList(hClientHandle: HANDLE, pInterfaceGuid: LPCGUID, pReserved: NULL, ppProfileList: PWLAN_PROFILE_INFO_LIST): DWORD {
-    return Wlanapi.Load('WlanGetProfileList')(hClientHandle, pInterfaceGuid, pReserved, ppProfileList);
+  public static WlanGetProfileList(hClientHandle: HANDLE, pInterfaceGuid: LPCGUID, pReserved: NULL, ppProfileList_out: PWLAN_PROFILE_INFO_LIST): DWORD {
+    return Wlanapi.Load('WlanGetProfileList')(hClientHandle, pInterfaceGuid, pReserved, ppProfileList_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wlanapi/nf-wlanapi-wlangetsecuritysettings
-  public static WlanGetSecuritySettings(hClientHandle: HANDLE, SecurableObject: WlanSecurableObject, pValueType: PWLAN_OPCODE_VALUE_TYPE | NULL, pstrCurrentSDDL: PZPWSTR, pdwGrantedAccess: PDWORD): DWORD {
-    return Wlanapi.Load('WlanGetSecuritySettings')(hClientHandle, SecurableObject, pValueType, pstrCurrentSDDL, pdwGrantedAccess);
+  public static WlanGetSecuritySettings(hClientHandle: HANDLE, SecurableObject: WlanSecurableObject, pValueType_out: OPTIONAL<PWLAN_OPCODE_VALUE_TYPE>, pstrCurrentSDDL_out: PZPWSTR, pdwGrantedAccess_out: PDWORD): DWORD {
+    return Wlanapi.Load('WlanGetSecuritySettings')(hClientHandle, SecurableObject, pValueType_out, pstrCurrentSDDL_out, pdwGrantedAccess_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wlanapi/nf-wlanapi-wlangetsupporteddeviceservices
-  public static WlanGetSupportedDeviceServices(hClientHandle: HANDLE, pInterfaceGuid: LPCGUID, ppDevSvcGuidList: PWLAN_DEVICE_SERVICE_GUID_LIST): DWORD {
-    return Wlanapi.Load('WlanGetSupportedDeviceServices')(hClientHandle, pInterfaceGuid, ppDevSvcGuidList);
+  public static WlanGetSupportedDeviceServices(hClientHandle: HANDLE, pInterfaceGuid: LPCGUID, ppDevSvcGuidList_out: PWLAN_DEVICE_SERVICE_GUID_LIST): DWORD {
+    return Wlanapi.Load('WlanGetSupportedDeviceServices')(hClientHandle, pInterfaceGuid, ppDevSvcGuidList_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wlanapi/nf-wlanapi-wlanhostednetworkforcestart
-  public static WlanHostedNetworkForceStart(hClientHandle: HANDLE, pFailReason: PWLAN_HOSTED_NETWORK_REASON | NULL, pvReserved: NULL): DWORD {
-    return Wlanapi.Load('WlanHostedNetworkForceStart')(hClientHandle, pFailReason, pvReserved);
+  public static WlanHostedNetworkForceStart(hClientHandle: HANDLE, pFailReason_out: OPTIONAL<PWLAN_HOSTED_NETWORK_REASON>, pvReserved: NULL): DWORD {
+    return Wlanapi.Load('WlanHostedNetworkForceStart')(hClientHandle, pFailReason_out, pvReserved);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wlanapi/nf-wlanapi-wlanhostednetworkforcestop
-  public static WlanHostedNetworkForceStop(hClientHandle: HANDLE, pFailReason: PWLAN_HOSTED_NETWORK_REASON | NULL, pvReserved: NULL): DWORD {
-    return Wlanapi.Load('WlanHostedNetworkForceStop')(hClientHandle, pFailReason, pvReserved);
+  public static WlanHostedNetworkForceStop(hClientHandle: HANDLE, pFailReason_out: OPTIONAL<PWLAN_HOSTED_NETWORK_REASON>, pvReserved: NULL): DWORD {
+    return Wlanapi.Load('WlanHostedNetworkForceStop')(hClientHandle, pFailReason_out, pvReserved);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wlanapi/nf-wlanapi-wlanhostednetworkinitsettings
-  public static WlanHostedNetworkInitSettings(hClientHandle: HANDLE, pFailReason: PWLAN_HOSTED_NETWORK_REASON | NULL, pvReserved: NULL): DWORD {
-    return Wlanapi.Load('WlanHostedNetworkInitSettings')(hClientHandle, pFailReason, pvReserved);
+  public static WlanHostedNetworkInitSettings(hClientHandle: HANDLE, pFailReason_out: OPTIONAL<PWLAN_HOSTED_NETWORK_REASON>, pvReserved: NULL): DWORD {
+    return Wlanapi.Load('WlanHostedNetworkInitSettings')(hClientHandle, pFailReason_out, pvReserved);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wlanapi/nf-wlanapi-wlanhostednetworkqueryproperty
-  public static WlanHostedNetworkQueryProperty(hClientHandle: HANDLE, OpCode: WlanHostedNetworkOpcode, pdwDataSize: PDWORD, ppvData: PPVOID, pWlanOpcodeValueType: PWLAN_OPCODE_VALUE_TYPE, pvReserved: NULL): DWORD {
-    return Wlanapi.Load('WlanHostedNetworkQueryProperty')(hClientHandle, OpCode, pdwDataSize, ppvData, pWlanOpcodeValueType, pvReserved);
+  public static WlanHostedNetworkQueryProperty(hClientHandle: HANDLE, OpCode: WlanHostedNetworkOpcode, pdwDataSize_out: PDWORD, ppvData_out: PPVOID, pWlanOpcodeValueType_out: PWLAN_OPCODE_VALUE_TYPE, pvReserved: NULL): DWORD {
+    return Wlanapi.Load('WlanHostedNetworkQueryProperty')(hClientHandle, OpCode, pdwDataSize_out, ppvData_out, pWlanOpcodeValueType_out, pvReserved);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wlanapi/nf-wlanapi-wlanhostednetworkquerysecondarykey
-  public static WlanHostedNetworkQuerySecondaryKey(hClientHandle: HANDLE, pdwKeyLength: PDWORD, ppucKeyData: PPBYTE, pbIsPassPhrase: PBOOL, pbPersistent: PBOOL, pFailReason: PWLAN_HOSTED_NETWORK_REASON | NULL, pvReserved: NULL): DWORD {
-    return Wlanapi.Load('WlanHostedNetworkQuerySecondaryKey')(hClientHandle, pdwKeyLength, ppucKeyData, pbIsPassPhrase, pbPersistent, pFailReason, pvReserved);
+  public static WlanHostedNetworkQuerySecondaryKey(
+    hClientHandle: HANDLE,
+    pdwKeyLength_out: PDWORD,
+    ppucKeyData_out: PPBYTE,
+    pbIsPassPhrase_out: PBOOL,
+    pbPersistent_out: PBOOL,
+    pFailReason_out: OPTIONAL<PWLAN_HOSTED_NETWORK_REASON>,
+    pvReserved: NULL,
+  ): DWORD {
+    return Wlanapi.Load('WlanHostedNetworkQuerySecondaryKey')(hClientHandle, pdwKeyLength_out, ppucKeyData_out, pbIsPassPhrase_out, pbPersistent_out, pFailReason_out, pvReserved);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wlanapi/nf-wlanapi-wlanhostednetworkquerystatus
-  public static WlanHostedNetworkQueryStatus(hClientHandle: HANDLE, ppWlanHostedNetworkStatus: PWLAN_HOSTED_NETWORK_STATUS, pvReserved: NULL): DWORD {
-    return Wlanapi.Load('WlanHostedNetworkQueryStatus')(hClientHandle, ppWlanHostedNetworkStatus, pvReserved);
+  public static WlanHostedNetworkQueryStatus(hClientHandle: HANDLE, ppWlanHostedNetworkStatus_out: PWLAN_HOSTED_NETWORK_STATUS, pvReserved: NULL): DWORD {
+    return Wlanapi.Load('WlanHostedNetworkQueryStatus')(hClientHandle, ppWlanHostedNetworkStatus_out, pvReserved);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wlanapi/nf-wlanapi-wlanhostednetworkrefreshsecuritysettings
-  public static WlanHostedNetworkRefreshSecuritySettings(hClientHandle: HANDLE, pFailReason: PWLAN_HOSTED_NETWORK_REASON | NULL, pvReserved: NULL): DWORD {
-    return Wlanapi.Load('WlanHostedNetworkRefreshSecuritySettings')(hClientHandle, pFailReason, pvReserved);
+  public static WlanHostedNetworkRefreshSecuritySettings(hClientHandle: HANDLE, pFailReason_out: OPTIONAL<PWLAN_HOSTED_NETWORK_REASON>, pvReserved: NULL): DWORD {
+    return Wlanapi.Load('WlanHostedNetworkRefreshSecuritySettings')(hClientHandle, pFailReason_out, pvReserved);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wlanapi/nf-wlanapi-wlanhostednetworksetproperty
-  public static WlanHostedNetworkSetProperty(hClientHandle: HANDLE, OpCode: WlanHostedNetworkOpcode, dwDataSize: DWORD, pvData: PVOID, pFailReason: PWLAN_HOSTED_NETWORK_REASON | NULL, pvReserved: NULL): DWORD {
-    return Wlanapi.Load('WlanHostedNetworkSetProperty')(hClientHandle, OpCode, dwDataSize, pvData, pFailReason, pvReserved);
+  public static WlanHostedNetworkSetProperty(hClientHandle: HANDLE, OpCode: WlanHostedNetworkOpcode, dwDataSize: DWORD, pvData: PVOID, pFailReason_out: OPTIONAL<PWLAN_HOSTED_NETWORK_REASON>, pvReserved: NULL): DWORD {
+    return Wlanapi.Load('WlanHostedNetworkSetProperty')(hClientHandle, OpCode, dwDataSize, pvData, pFailReason_out, pvReserved);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wlanapi/nf-wlanapi-wlanhostednetworksetsecondarykey
-  public static WlanHostedNetworkSetSecondaryKey(hClientHandle: HANDLE, dwKeyLength: DWORD, pucKeyData: PBYTE, bIsPassPhrase: BOOL, bPersistent: BOOL, pFailReason: PWLAN_HOSTED_NETWORK_REASON | NULL, pvReserved: NULL): DWORD {
-    return Wlanapi.Load('WlanHostedNetworkSetSecondaryKey')(hClientHandle, dwKeyLength, pucKeyData, bIsPassPhrase, bPersistent, pFailReason, pvReserved);
+  public static WlanHostedNetworkSetSecondaryKey(hClientHandle: HANDLE, dwKeyLength: DWORD, pucKeyData: PBYTE, bIsPassPhrase: BOOL, bPersistent: BOOL, pFailReason_out: OPTIONAL<PWLAN_HOSTED_NETWORK_REASON>, pvReserved: NULL): DWORD {
+    return Wlanapi.Load('WlanHostedNetworkSetSecondaryKey')(hClientHandle, dwKeyLength, pucKeyData, bIsPassPhrase, bPersistent, pFailReason_out, pvReserved);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wlanapi/nf-wlanapi-wlanhostednetworkstartusing
-  public static WlanHostedNetworkStartUsing(hClientHandle: HANDLE, pFailReason: PWLAN_HOSTED_NETWORK_REASON | NULL, pvReserved: NULL): DWORD {
-    return Wlanapi.Load('WlanHostedNetworkStartUsing')(hClientHandle, pFailReason, pvReserved);
+  public static WlanHostedNetworkStartUsing(hClientHandle: HANDLE, pFailReason_out: OPTIONAL<PWLAN_HOSTED_NETWORK_REASON>, pvReserved: NULL): DWORD {
+    return Wlanapi.Load('WlanHostedNetworkStartUsing')(hClientHandle, pFailReason_out, pvReserved);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wlanapi/nf-wlanapi-wlanhostednetworkstopusing
-  public static WlanHostedNetworkStopUsing(hClientHandle: HANDLE, pFailReason: PWLAN_HOSTED_NETWORK_REASON | NULL, pvReserved: NULL): DWORD {
-    return Wlanapi.Load('WlanHostedNetworkStopUsing')(hClientHandle, pFailReason, pvReserved);
+  public static WlanHostedNetworkStopUsing(hClientHandle: HANDLE, pFailReason_out: OPTIONAL<PWLAN_HOSTED_NETWORK_REASON>, pvReserved: NULL): DWORD {
+    return Wlanapi.Load('WlanHostedNetworkStopUsing')(hClientHandle, pFailReason_out, pvReserved);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wlanapi/nf-wlanapi-wlanihvcontrol
-  public static WlanIhvControl(hClientHandle: HANDLE, pInterfaceGuid: LPCGUID, Type: WlanIhvControlType, dwInBufferSize: DWORD, pInBuffer: PVOID, dwOutBufferSize: DWORD, pOutBuffer: PVOID | NULL, pdwBytesReturned: PDWORD): DWORD {
-    return Wlanapi.Load('WlanIhvControl')(hClientHandle, pInterfaceGuid, Type, dwInBufferSize, pInBuffer, dwOutBufferSize, pOutBuffer, pdwBytesReturned);
+  public static WlanIhvControl(
+    hClientHandle: HANDLE,
+    pInterfaceGuid: LPCGUID,
+    Type: WlanIhvControlType,
+    dwInBufferSize: DWORD,
+    pInBuffer: PVOID,
+    dwOutBufferSize: DWORD,
+    pOutBuffer_in_out: OPTIONAL<PVOID>,
+    pdwBytesReturned_out: PDWORD,
+  ): DWORD {
+    return Wlanapi.Load('WlanIhvControl')(hClientHandle, pInterfaceGuid, Type, dwInBufferSize, pInBuffer, dwOutBufferSize, pOutBuffer_in_out, pdwBytesReturned_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wlanapi/nf-wlanapi-wlanopenhandle
-  public static WlanOpenHandle(dwClientVersion: DWORD, pReserved: NULL, pdwNegotiatedVersion: PDWORD, phClientHandle: PHANDLE): DWORD {
-    return Wlanapi.Load('WlanOpenHandle')(dwClientVersion, pReserved, pdwNegotiatedVersion, phClientHandle);
+  public static WlanOpenHandle(dwClientVersion: DWORD, pReserved: NULL, pdwNegotiatedVersion_out: PDWORD, phClientHandle_out: PHANDLE): DWORD {
+    return Wlanapi.Load('WlanOpenHandle')(dwClientVersion, pReserved, pdwNegotiatedVersion_out, phClientHandle_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wlanapi/nf-wlanapi-wlanqueryautoconfigparameter
-  public static WlanQueryAutoConfigParameter(hClientHandle: HANDLE, OpCode: WlanAutoconfOpcode, pReserved: NULL, pdwDataSize: PDWORD, ppData: PPVOID, pWlanOpcodeValueType: PWLAN_OPCODE_VALUE_TYPE | NULL): DWORD {
-    return Wlanapi.Load('WlanQueryAutoConfigParameter')(hClientHandle, OpCode, pReserved, pdwDataSize, ppData, pWlanOpcodeValueType);
+  public static WlanQueryAutoConfigParameter(hClientHandle: HANDLE, OpCode: WlanAutoconfOpcode, pReserved: NULL, pdwDataSize_out: PDWORD, ppData_out: PPVOID, pWlanOpcodeValueType_out: OPTIONAL<PWLAN_OPCODE_VALUE_TYPE>): DWORD {
+    return Wlanapi.Load('WlanQueryAutoConfigParameter')(hClientHandle, OpCode, pReserved, pdwDataSize_out, ppData_out, pWlanOpcodeValueType_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wlanapi/nf-wlanapi-wlanqueryinterface
-  public static WlanQueryInterface(hClientHandle: HANDLE, pInterfaceGuid: LPCGUID, OpCode: WlanIntfOpcode, pReserved: NULL, pdwDataSize: PDWORD, ppData: PPVOID, pWlanOpcodeValueType: PWLAN_OPCODE_VALUE_TYPE | NULL): DWORD {
-    return Wlanapi.Load('WlanQueryInterface')(hClientHandle, pInterfaceGuid, OpCode, pReserved, pdwDataSize, ppData, pWlanOpcodeValueType);
+  public static WlanQueryInterface(hClientHandle: HANDLE, pInterfaceGuid: LPCGUID, OpCode: WlanIntfOpcode, pReserved: NULL, pdwDataSize_out: PDWORD, ppData_out: PPVOID, pWlanOpcodeValueType_out: OPTIONAL<PWLAN_OPCODE_VALUE_TYPE>): DWORD {
+    return Wlanapi.Load('WlanQueryInterface')(hClientHandle, pInterfaceGuid, OpCode, pReserved, pdwDataSize_out, ppData_out, pWlanOpcodeValueType_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wlanapi/nf-wlanapi-wlanreasoncodetostring
@@ -350,7 +368,7 @@ class Wlanapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wlanapi/nf-wlanapi-wlanregisterdeviceservicenotification
-  public static WlanRegisterDeviceServiceNotification(hClientHandle: HANDLE, pDevSvcGuidList: PWLAN_DEVICE_SERVICE_GUID_LIST | NULL): DWORD {
+  public static WlanRegisterDeviceServiceNotification(hClientHandle: HANDLE, pDevSvcGuidList: OPTIONAL<PWLAN_DEVICE_SERVICE_GUID_LIST>): DWORD {
     return Wlanapi.Load('WlanRegisterDeviceServiceNotification')(hClientHandle, pDevSvcGuidList);
   }
 
@@ -359,12 +377,12 @@ class Wlanapi extends Win32 {
     hClientHandle: HANDLE,
     dwNotifSource: DWORD,
     bIgnoreDuplicate: BOOL,
-    funcCallback: WLAN_NOTIFICATION_CALLBACK | NULL,
-    pCallbackContext: PVOID | NULL,
+    funcCallback: OPTIONAL<WLAN_NOTIFICATION_CALLBACK>,
+    pCallbackContext: OPTIONAL<PVOID>,
     pReserved: NULL,
-    pdwPrevNotifSource: PDWORD | NULL,
+    pdwPrevNotifSource_out: OPTIONAL<PDWORD>,
   ): DWORD {
-    return Wlanapi.Load('WlanRegisterNotification')(hClientHandle, dwNotifSource, bIgnoreDuplicate, funcCallback, pCallbackContext, pReserved, pdwPrevNotifSource);
+    return Wlanapi.Load('WlanRegisterNotification')(hClientHandle, dwNotifSource, bIgnoreDuplicate, funcCallback, pCallbackContext, pReserved, pdwPrevNotifSource_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wlanapi/nf-wlanapi-wlanregistervirtualstationnotification
@@ -378,12 +396,12 @@ class Wlanapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wlanapi/nf-wlanapi-wlansavetemporaryprofile
-  public static WlanSaveTemporaryProfile(hClientHandle: HANDLE, pInterfaceGuid: LPCGUID, strProfileName: LPCWSTR, strAllUserProfileSecurity: LPCWSTR | NULL, dwFlags: DWORD, bOverWrite: BOOL, pReserved: NULL): DWORD {
+  public static WlanSaveTemporaryProfile(hClientHandle: HANDLE, pInterfaceGuid: LPCGUID, strProfileName: LPCWSTR, strAllUserProfileSecurity: OPTIONAL<LPCWSTR>, dwFlags: DWORD, bOverWrite: BOOL, pReserved: NULL): DWORD {
     return Wlanapi.Load('WlanSaveTemporaryProfile')(hClientHandle, pInterfaceGuid, strProfileName, strAllUserProfileSecurity, dwFlags, bOverWrite, pReserved);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wlanapi/nf-wlanapi-wlanscan
-  public static WlanScan(hClientHandle: HANDLE, pInterfaceGuid: LPCGUID, pDot11Ssid: PDOT11_SSID | NULL, pIeData: PWLAN_RAW_DATA | NULL, pReserved: NULL): DWORD {
+  public static WlanScan(hClientHandle: HANDLE, pInterfaceGuid: LPCGUID, pDot11Ssid: OPTIONAL<PDOT11_SSID>, pIeData: OPTIONAL<PWLAN_RAW_DATA>, pReserved: NULL): DWORD {
     return Wlanapi.Load('WlanScan')(hClientHandle, pInterfaceGuid, pDot11Ssid, pIeData, pReserved);
   }
 
@@ -393,7 +411,7 @@ class Wlanapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wlanapi/nf-wlanapi-wlansetfilterlist
-  public static WlanSetFilterList(hClientHandle: HANDLE, wlanFilterListType: WlanFilterListType, pNetworkList: PDOT11_NETWORK_LIST | NULL, pReserved: NULL): DWORD {
+  public static WlanSetFilterList(hClientHandle: HANDLE, wlanFilterListType: WlanFilterListType, pNetworkList: OPTIONAL<PDOT11_NETWORK_LIST>, pReserved: NULL): DWORD {
     return Wlanapi.Load('WlanSetFilterList')(hClientHandle, wlanFilterListType, pNetworkList, pReserved);
   }
 
@@ -403,8 +421,8 @@ class Wlanapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wlanapi/nf-wlanapi-wlansetprofile
-  public static WlanSetProfile(hClientHandle: HANDLE, pInterfaceGuid: LPCGUID, dwFlags: DWORD, strProfileXml: LPCWSTR, strAllUserProfileSecurity: LPCWSTR | NULL, bOverwrite: BOOL, pReserved: NULL, pdwReasonCode: PDWORD): DWORD {
-    return Wlanapi.Load('WlanSetProfile')(hClientHandle, pInterfaceGuid, dwFlags, strProfileXml, strAllUserProfileSecurity, bOverwrite, pReserved, pdwReasonCode);
+  public static WlanSetProfile(hClientHandle: HANDLE, pInterfaceGuid: LPCGUID, dwFlags: DWORD, strProfileXml: LPCWSTR, strAllUserProfileSecurity: OPTIONAL<LPCWSTR>, bOverwrite: BOOL, pReserved: NULL, pdwReasonCode_out: PDWORD): DWORD {
+    return Wlanapi.Load('WlanSetProfile')(hClientHandle, pInterfaceGuid, dwFlags, strProfileXml, strAllUserProfileSecurity, bOverwrite, pReserved, pdwReasonCode_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wlanapi/nf-wlanapi-wlansetprofilecustomuserdata
@@ -413,7 +431,7 @@ class Wlanapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wlanapi/nf-wlanapi-wlansetprofileeapuserdata
-  public static WlanSetProfileEapUserData(hClientHandle: HANDLE, pInterfaceGuid: LPCGUID, strProfileName: LPCWSTR, eapType: EAP_METHOD_TYPE, dwFlags: DWORD, dwEapUserDataSize: DWORD, pbEapUserData: PBYTE | NULL, pReserved: NULL): DWORD {
+  public static WlanSetProfileEapUserData(hClientHandle: HANDLE, pInterfaceGuid: LPCGUID, strProfileName: LPCWSTR, eapType: EAP_METHOD_TYPE, dwFlags: DWORD, dwEapUserDataSize: DWORD, pbEapUserData: OPTIONAL<PBYTE>, pReserved: NULL): DWORD {
     return Wlanapi.Load('WlanSetProfileEapUserData')(hClientHandle, pInterfaceGuid, strProfileName, eapType, dwFlags, dwEapUserDataSize, pbEapUserData, pReserved);
   }
 
@@ -433,7 +451,7 @@ class Wlanapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wlanapi/nf-wlanapi-wlansetpsdiedatalist
-  public static WlanSetPsdIEDataList(hClientHandle: HANDLE, strFormat: LPCWSTR | NULL, pPsdIEDataList: PWLAN_RAW_DATA_LIST | NULL, pReserved: NULL): DWORD {
+  public static WlanSetPsdIEDataList(hClientHandle: HANDLE, strFormat: OPTIONAL<LPCWSTR>, pPsdIEDataList: OPTIONAL<PWLAN_RAW_DATA_LIST>, pReserved: NULL): DWORD {
     return Wlanapi.Load('WlanSetPsdIEDataList')(hClientHandle, strFormat, pPsdIEDataList, pReserved);
   }
 

@@ -10,6 +10,7 @@ import type {
   LONG,
   LPOVERLAPPED,
   NULL,
+  OPTIONAL,
   PLARGE_INTEGER,
   PUCHAR,
   PULONG,
@@ -102,8 +103,15 @@ class WinUsb extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winusb/nf-winusb-winusb_controltransfer
-  public static WinUsb_ControlTransfer(InterfaceHandle: WINUSB_INTERFACE_HANDLE, SetupPacket: WINUSB_SETUP_PACKET, Buffer: PUCHAR | NULL, BufferLength: ULONG, LengthTransferred: PULONG | NULL, Overlapped: LPOVERLAPPED | NULL): BOOL {
-    return WinUsb.Load('WinUsb_ControlTransfer')(InterfaceHandle, SetupPacket, Buffer, BufferLength, LengthTransferred, Overlapped);
+  public static WinUsb_ControlTransfer(
+    InterfaceHandle: WINUSB_INTERFACE_HANDLE,
+    SetupPacket: WINUSB_SETUP_PACKET,
+    Buffer_out: OPTIONAL<PUCHAR>,
+    BufferLength: ULONG,
+    LengthTransferred_out: OPTIONAL<PULONG>,
+    Overlapped: OPTIONAL<LPOVERLAPPED>,
+  ): BOOL {
+    return WinUsb.Load('WinUsb_ControlTransfer')(InterfaceHandle, SetupPacket, Buffer_out, BufferLength, LengthTransferred_out, Overlapped);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winusb/nf-winusb-winusb_flushpipe
@@ -117,23 +125,23 @@ class WinUsb extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winusb/nf-winusb-winusb_getadjustedframenumber
-  public static WinUsb_GetAdjustedFrameNumber(CurrentFrameNumber: PULONG, TimeStamp: LARGE_INTEGER): BOOL {
-    return WinUsb.Load('WinUsb_GetAdjustedFrameNumber')(CurrentFrameNumber, TimeStamp);
+  public static WinUsb_GetAdjustedFrameNumber(CurrentFrameNumber_in_out: PULONG, TimeStamp: LARGE_INTEGER): BOOL {
+    return WinUsb.Load('WinUsb_GetAdjustedFrameNumber')(CurrentFrameNumber_in_out, TimeStamp);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winusb/nf-winusb-winusb_getassociatedinterface
-  public static WinUsb_GetAssociatedInterface(InterfaceHandle: WINUSB_INTERFACE_HANDLE, AssociatedInterfaceIndex: UCHAR, AssociatedInterfaceHandle: PWINUSB_INTERFACE_HANDLE): BOOL {
-    return WinUsb.Load('WinUsb_GetAssociatedInterface')(InterfaceHandle, AssociatedInterfaceIndex, AssociatedInterfaceHandle);
+  public static WinUsb_GetAssociatedInterface(InterfaceHandle: WINUSB_INTERFACE_HANDLE, AssociatedInterfaceIndex: UCHAR, AssociatedInterfaceHandle_out: PWINUSB_INTERFACE_HANDLE): BOOL {
+    return WinUsb.Load('WinUsb_GetAssociatedInterface')(InterfaceHandle, AssociatedInterfaceIndex, AssociatedInterfaceHandle_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winusb/nf-winusb-winusb_getcurrentalternatesetting
-  public static WinUsb_GetCurrentAlternateSetting(InterfaceHandle: WINUSB_INTERFACE_HANDLE, SettingNumber: PUCHAR): BOOL {
-    return WinUsb.Load('WinUsb_GetCurrentAlternateSetting')(InterfaceHandle, SettingNumber);
+  public static WinUsb_GetCurrentAlternateSetting(InterfaceHandle: WINUSB_INTERFACE_HANDLE, SettingNumber_out: PUCHAR): BOOL {
+    return WinUsb.Load('WinUsb_GetCurrentAlternateSetting')(InterfaceHandle, SettingNumber_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winusb/nf-winusb-winusb_getcurrentframenumber
-  public static WinUsb_GetCurrentFrameNumber(InterfaceHandle: WINUSB_INTERFACE_HANDLE, CurrentFrameNumber: PULONG, TimeStamp: PLARGE_INTEGER): BOOL {
-    return WinUsb.Load('WinUsb_GetCurrentFrameNumber')(InterfaceHandle, CurrentFrameNumber, TimeStamp);
+  public static WinUsb_GetCurrentFrameNumber(InterfaceHandle: WINUSB_INTERFACE_HANDLE, CurrentFrameNumber_out: PULONG, TimeStamp_out: PLARGE_INTEGER): BOOL {
+    return WinUsb.Load('WinUsb_GetCurrentFrameNumber')(InterfaceHandle, CurrentFrameNumber_out, TimeStamp_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winusb/nf-winusb-winusb_getcurrentframenumberandqpc
@@ -142,28 +150,28 @@ class WinUsb extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winusb/nf-winusb-winusb_getdescriptor
-  public static WinUsb_GetDescriptor(InterfaceHandle: WINUSB_INTERFACE_HANDLE, DescriptorType: UCHAR, Index: UCHAR, LanguageID: USHORT, Buffer: PUCHAR | NULL, BufferLength: ULONG, LengthTransferred: PULONG): BOOL {
-    return WinUsb.Load('WinUsb_GetDescriptor')(InterfaceHandle, DescriptorType, Index, LanguageID, Buffer, BufferLength, LengthTransferred);
+  public static WinUsb_GetDescriptor(InterfaceHandle: WINUSB_INTERFACE_HANDLE, DescriptorType: UCHAR, Index: UCHAR, LanguageID: USHORT, Buffer_out: OPTIONAL<PUCHAR>, BufferLength: ULONG, LengthTransferred_out: PULONG): BOOL {
+    return WinUsb.Load('WinUsb_GetDescriptor')(InterfaceHandle, DescriptorType, Index, LanguageID, Buffer_out, BufferLength, LengthTransferred_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winusb/nf-winusb-winusb_getoverlappedresult
-  public static WinUsb_GetOverlappedResult(InterfaceHandle: WINUSB_INTERFACE_HANDLE, lpOverlapped: LPOVERLAPPED, lpNumberOfBytesTransferred: LPDWORD, bWait: BOOL): BOOL {
-    return WinUsb.Load('WinUsb_GetOverlappedResult')(InterfaceHandle, lpOverlapped, lpNumberOfBytesTransferred, bWait);
+  public static WinUsb_GetOverlappedResult(InterfaceHandle: WINUSB_INTERFACE_HANDLE, lpOverlapped: LPOVERLAPPED, lpNumberOfBytesTransferred_out: LPDWORD, bWait: BOOL): BOOL {
+    return WinUsb.Load('WinUsb_GetOverlappedResult')(InterfaceHandle, lpOverlapped, lpNumberOfBytesTransferred_out, bWait);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winusb/nf-winusb-winusb_getpipepolicy
-  public static WinUsb_GetPipePolicy(InterfaceHandle: WINUSB_INTERFACE_HANDLE, PipeID: UCHAR, PolicyType: ULONG, ValueLength: PULONG, Value: PVOID): BOOL {
-    return WinUsb.Load('WinUsb_GetPipePolicy')(InterfaceHandle, PipeID, PolicyType, ValueLength, Value);
+  public static WinUsb_GetPipePolicy(InterfaceHandle: WINUSB_INTERFACE_HANDLE, PipeID: UCHAR, PolicyType: ULONG, ValueLength_in_out: PULONG, Value_out: PVOID): BOOL {
+    return WinUsb.Load('WinUsb_GetPipePolicy')(InterfaceHandle, PipeID, PolicyType, ValueLength_in_out, Value_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winusb/nf-winusb-winusb_getpowerpolicy
-  public static WinUsb_GetPowerPolicy(InterfaceHandle: WINUSB_INTERFACE_HANDLE, PolicyType: ULONG, ValueLength: PULONG, Value: PVOID): BOOL {
-    return WinUsb.Load('WinUsb_GetPowerPolicy')(InterfaceHandle, PolicyType, ValueLength, Value);
+  public static WinUsb_GetPowerPolicy(InterfaceHandle: WINUSB_INTERFACE_HANDLE, PolicyType: ULONG, ValueLength_in_out: PULONG, Value_out: PVOID): BOOL {
+    return WinUsb.Load('WinUsb_GetPowerPolicy')(InterfaceHandle, PolicyType, ValueLength_in_out, Value_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winusb/nf-winusb-winusb_initialize
-  public static WinUsb_Initialize(DeviceHandle: HANDLE, InterfaceHandle: PWINUSB_INTERFACE_HANDLE): BOOL {
-    return WinUsb.Load('WinUsb_Initialize')(DeviceHandle, InterfaceHandle);
+  public static WinUsb_Initialize(DeviceHandle: HANDLE, InterfaceHandle_out: PWINUSB_INTERFACE_HANDLE): BOOL {
+    return WinUsb.Load('WinUsb_Initialize')(DeviceHandle, InterfaceHandle_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winusb/nf-winusb-winusb_parseconfigurationdescriptor
@@ -185,23 +193,23 @@ class WinUsb extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winusb/nf-winusb-winusb_querydeviceinformation
-  public static WinUsb_QueryDeviceInformation(InterfaceHandle: WINUSB_INTERFACE_HANDLE, InformationType: ULONG, BufferLength: PULONG, Buffer: PVOID): BOOL {
-    return WinUsb.Load('WinUsb_QueryDeviceInformation')(InterfaceHandle, InformationType, BufferLength, Buffer);
+  public static WinUsb_QueryDeviceInformation(InterfaceHandle: WINUSB_INTERFACE_HANDLE, InformationType: ULONG, BufferLength_in_out: PULONG, Buffer_out: PVOID): BOOL {
+    return WinUsb.Load('WinUsb_QueryDeviceInformation')(InterfaceHandle, InformationType, BufferLength_in_out, Buffer_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winusb/nf-winusb-winusb_queryinterfacesettings
-  public static WinUsb_QueryInterfaceSettings(InterfaceHandle: WINUSB_INTERFACE_HANDLE, AlternateInterfaceNumber: UCHAR, UsbAltInterfaceDescriptor: PUSB_INTERFACE_DESCRIPTOR): BOOL {
-    return WinUsb.Load('WinUsb_QueryInterfaceSettings')(InterfaceHandle, AlternateInterfaceNumber, UsbAltInterfaceDescriptor);
+  public static WinUsb_QueryInterfaceSettings(InterfaceHandle: WINUSB_INTERFACE_HANDLE, AlternateInterfaceNumber: UCHAR, UsbAltInterfaceDescriptor_out: PUSB_INTERFACE_DESCRIPTOR): BOOL {
+    return WinUsb.Load('WinUsb_QueryInterfaceSettings')(InterfaceHandle, AlternateInterfaceNumber, UsbAltInterfaceDescriptor_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winusb/nf-winusb-winusb_querypipe
-  public static WinUsb_QueryPipe(InterfaceHandle: WINUSB_INTERFACE_HANDLE, AlternateInterfaceNumber: UCHAR, PipeIndex: UCHAR, PipeInformation: PWINUSB_PIPE_INFORMATION): BOOL {
-    return WinUsb.Load('WinUsb_QueryPipe')(InterfaceHandle, AlternateInterfaceNumber, PipeIndex, PipeInformation);
+  public static WinUsb_QueryPipe(InterfaceHandle: WINUSB_INTERFACE_HANDLE, AlternateInterfaceNumber: UCHAR, PipeIndex: UCHAR, PipeInformation_out: PWINUSB_PIPE_INFORMATION): BOOL {
+    return WinUsb.Load('WinUsb_QueryPipe')(InterfaceHandle, AlternateInterfaceNumber, PipeIndex, PipeInformation_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winusb/nf-winusb-winusb_querypipeex
-  public static WinUsb_QueryPipeEx(InterfaceHandle: WINUSB_INTERFACE_HANDLE, AlternateSettingNumber: UCHAR, PipeIndex: UCHAR, PipeInformationEx: PWINUSB_PIPE_INFORMATION_EX): BOOL {
-    return WinUsb.Load('WinUsb_QueryPipeEx')(InterfaceHandle, AlternateSettingNumber, PipeIndex, PipeInformationEx);
+  public static WinUsb_QueryPipeEx(InterfaceHandle: WINUSB_INTERFACE_HANDLE, AlternateSettingNumber: UCHAR, PipeIndex: UCHAR, PipeInformationEx_out: PWINUSB_PIPE_INFORMATION_EX): BOOL {
+    return WinUsb.Load('WinUsb_QueryPipeEx')(InterfaceHandle, AlternateSettingNumber, PipeIndex, PipeInformationEx_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winusb/nf-winusb-winusb_readisochpipe
@@ -209,12 +217,12 @@ class WinUsb extends Win32 {
     BufferHandle: WINUSB_ISOCH_BUFFER_HANDLE,
     Offset: ULONG,
     Length: ULONG,
-    FrameNumber: PULONG,
+    FrameNumber_in_out: PULONG,
     NumberOfPackets: ULONG,
-    IsoPacketDescriptors: PUSBD_ISO_PACKET_DESCRIPTOR,
-    Overlapped: LPOVERLAPPED | NULL,
+    IsoPacketDescriptors_out: PUSBD_ISO_PACKET_DESCRIPTOR,
+    Overlapped: OPTIONAL<LPOVERLAPPED>,
   ): BOOL {
-    return WinUsb.Load('WinUsb_ReadIsochPipe')(BufferHandle, Offset, Length, FrameNumber, NumberOfPackets, IsoPacketDescriptors, Overlapped);
+    return WinUsb.Load('WinUsb_ReadIsochPipe')(BufferHandle, Offset, Length, FrameNumber_in_out, NumberOfPackets, IsoPacketDescriptors_out, Overlapped);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winusb/nf-winusb-winusb_readisochpipeasap
@@ -224,20 +232,20 @@ class WinUsb extends Win32 {
     Length: ULONG,
     ContinueStream: BOOL,
     NumberOfPackets: ULONG,
-    IsoPacketDescriptors: PUSBD_ISO_PACKET_DESCRIPTOR,
-    Overlapped: LPOVERLAPPED | NULL,
+    IsoPacketDescriptors_out: PUSBD_ISO_PACKET_DESCRIPTOR,
+    Overlapped: OPTIONAL<LPOVERLAPPED>,
   ): BOOL {
-    return WinUsb.Load('WinUsb_ReadIsochPipeAsap')(BufferHandle, Offset, Length, ContinueStream, NumberOfPackets, IsoPacketDescriptors, Overlapped);
+    return WinUsb.Load('WinUsb_ReadIsochPipeAsap')(BufferHandle, Offset, Length, ContinueStream, NumberOfPackets, IsoPacketDescriptors_out, Overlapped);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winusb/nf-winusb-winusb_readpipe
-  public static WinUsb_ReadPipe(InterfaceHandle: WINUSB_INTERFACE_HANDLE, PipeID: UCHAR, Buffer: PUCHAR | NULL, BufferLength: ULONG, LengthTransferred: PULONG | NULL, Overlapped: LPOVERLAPPED | NULL): BOOL {
-    return WinUsb.Load('WinUsb_ReadPipe')(InterfaceHandle, PipeID, Buffer, BufferLength, LengthTransferred, Overlapped);
+  public static WinUsb_ReadPipe(InterfaceHandle: WINUSB_INTERFACE_HANDLE, PipeID: UCHAR, Buffer_out: OPTIONAL<PUCHAR>, BufferLength: ULONG, LengthTransferred_out: OPTIONAL<PULONG>, Overlapped: OPTIONAL<LPOVERLAPPED>): BOOL {
+    return WinUsb.Load('WinUsb_ReadPipe')(InterfaceHandle, PipeID, Buffer_out, BufferLength, LengthTransferred_out, Overlapped);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winusb/nf-winusb-winusb_registerisochbuffer
-  public static WinUsb_RegisterIsochBuffer(InterfaceHandle: WINUSB_INTERFACE_HANDLE, PipeID: UCHAR, Buffer: PUCHAR, BufferLength: ULONG, IsochBufferHandle: PWINUSB_ISOCH_BUFFER_HANDLE): BOOL {
-    return WinUsb.Load('WinUsb_RegisterIsochBuffer')(InterfaceHandle, PipeID, Buffer, BufferLength, IsochBufferHandle);
+  public static WinUsb_RegisterIsochBuffer(InterfaceHandle: WINUSB_INTERFACE_HANDLE, PipeID: UCHAR, Buffer_in_out: PUCHAR, BufferLength: ULONG, IsochBufferHandle_out: PWINUSB_ISOCH_BUFFER_HANDLE): BOOL {
+    return WinUsb.Load('WinUsb_RegisterIsochBuffer')(InterfaceHandle, PipeID, Buffer_in_out, BufferLength, IsochBufferHandle_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winusb/nf-winusb-winusb_resetpipe
@@ -276,18 +284,18 @@ class WinUsb extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winusb/nf-winusb-winusb_writeisochpipe
-  public static WinUsb_WriteIsochPipe(BufferHandle: WINUSB_ISOCH_BUFFER_HANDLE, Offset: ULONG, Length: ULONG, FrameNumber: PULONG, Overlapped: LPOVERLAPPED | NULL): BOOL {
-    return WinUsb.Load('WinUsb_WriteIsochPipe')(BufferHandle, Offset, Length, FrameNumber, Overlapped);
+  public static WinUsb_WriteIsochPipe(BufferHandle: WINUSB_ISOCH_BUFFER_HANDLE, Offset: ULONG, Length: ULONG, FrameNumber_in_out: PULONG, Overlapped: OPTIONAL<LPOVERLAPPED>): BOOL {
+    return WinUsb.Load('WinUsb_WriteIsochPipe')(BufferHandle, Offset, Length, FrameNumber_in_out, Overlapped);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winusb/nf-winusb-winusb_writeisochpipeasap
-  public static WinUsb_WriteIsochPipeAsap(BufferHandle: WINUSB_ISOCH_BUFFER_HANDLE, Offset: ULONG, Length: ULONG, ContinueStream: BOOL, Overlapped: LPOVERLAPPED | NULL): BOOL {
+  public static WinUsb_WriteIsochPipeAsap(BufferHandle: WINUSB_ISOCH_BUFFER_HANDLE, Offset: ULONG, Length: ULONG, ContinueStream: BOOL, Overlapped: OPTIONAL<LPOVERLAPPED>): BOOL {
     return WinUsb.Load('WinUsb_WriteIsochPipeAsap')(BufferHandle, Offset, Length, ContinueStream, Overlapped);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winusb/nf-winusb-winusb_writepipe
-  public static WinUsb_WritePipe(InterfaceHandle: WINUSB_INTERFACE_HANDLE, PipeID: UCHAR, Buffer: PUCHAR, BufferLength: ULONG, LengthTransferred: PULONG | NULL, Overlapped: LPOVERLAPPED | NULL): BOOL {
-    return WinUsb.Load('WinUsb_WritePipe')(InterfaceHandle, PipeID, Buffer, BufferLength, LengthTransferred, Overlapped);
+  public static WinUsb_WritePipe(InterfaceHandle: WINUSB_INTERFACE_HANDLE, PipeID: UCHAR, Buffer: PUCHAR, BufferLength: ULONG, LengthTransferred_out: OPTIONAL<PULONG>, Overlapped: OPTIONAL<LPOVERLAPPED>): BOOL {
+    return WinUsb.Load('WinUsb_WritePipe')(InterfaceHandle, PipeID, Buffer, BufferLength, LengthTransferred_out, Overlapped);
   }
 }
 

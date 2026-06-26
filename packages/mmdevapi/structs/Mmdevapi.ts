@@ -2,7 +2,7 @@ import { type FFIFunction, FFIType } from 'bun:ffi';
 
 import { Win32 } from '@bun-win32/core';
 
-import type { HRESULT, IActivateAudioInterfaceCompletionHandler, LPCWSTR, NULL, PIActivateAudioInterfaceAsyncOperation, PPROPVARIANT, PPVOID, REFCLSID, REFIID } from '../types/Mmdevapi';
+import type { HRESULT, IActivateAudioInterfaceCompletionHandler, LPCWSTR, OPTIONAL, PIActivateAudioInterfaceAsyncOperation, PPROPVARIANT, PPVOID, REFCLSID, REFIID } from '../types/Mmdevapi';
 
 /**
  * Thin, lazy-loaded FFI bindings for `mmdevapi.dll`.
@@ -43,11 +43,11 @@ class Mmdevapi extends Win32 {
   public static ActivateAudioInterfaceAsync(
     deviceInterfacePath: LPCWSTR,
     riid: REFIID,
-    activationParams: PPROPVARIANT | NULL,
+    activationParams: OPTIONAL<PPROPVARIANT>,
     completionHandler: IActivateAudioInterfaceCompletionHandler,
-    activationOperation: PIActivateAudioInterfaceAsyncOperation,
+    activationOperation_out: PIActivateAudioInterfaceAsyncOperation,
   ): HRESULT {
-    return Mmdevapi.Load('ActivateAudioInterfaceAsync')(deviceInterfacePath, riid, activationParams, completionHandler, activationOperation);
+    return Mmdevapi.Load('ActivateAudioInterfaceAsync')(deviceInterfacePath, riid, activationParams, completionHandler, activationOperation_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/combaseapi/nf-combaseapi-dllcanunloadnow
@@ -56,8 +56,8 @@ class Mmdevapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/combaseapi/nf-combaseapi-dllgetclassobject
-  public static DllGetClassObject(rclsid: REFCLSID, riid: REFIID, ppv: PPVOID): HRESULT {
-    return Mmdevapi.Load('DllGetClassObject')(rclsid, riid, ppv);
+  public static DllGetClassObject(rclsid: REFCLSID, riid: REFIID, ppv_out: PPVOID): HRESULT {
+    return Mmdevapi.Load('DllGetClassObject')(rclsid, riid, ppv_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/olectl/nf-olectl-dllregisterserver

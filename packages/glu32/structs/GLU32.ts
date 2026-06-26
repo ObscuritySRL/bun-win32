@@ -19,7 +19,7 @@ import type {
   GLubyte_,
   GLvoid_,
   GLWChar_,
-  NULL,
+  NULLABLE,
 } from '../types/GLU32';
 
 /**
@@ -186,8 +186,8 @@ class GLU32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/opengl/glugetnurbsproperty
-  public static gluGetNurbsProperty(nobj: GLUnurbs, property: GLenum, value: GLfloat_): void {
-    return GLU32.Load('gluGetNurbsProperty')(nobj, property, value);
+  public static gluGetNurbsProperty(nobj: GLUnurbs, property: GLenum, value_out: GLfloat_): void {
+    return GLU32.Load('gluGetNurbsProperty')(nobj, property, value_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/opengl/glugetstring
@@ -196,8 +196,8 @@ class GLU32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/opengl/glugettessproperty
-  public static gluGetTessProperty(tess: GLUtesselator, which: GLenum, value: GLdouble_): void {
-    return GLU32.Load('gluGetTessProperty')(tess, which, value);
+  public static gluGetTessProperty(tess: GLUtesselator, which: GLenum, value_out: GLdouble_): void {
+    return GLU32.Load('gluGetTessProperty')(tess, which, value_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/opengl/gluloadsamplingmatrices
@@ -231,7 +231,7 @@ class GLU32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/opengl/glunurbscallback
-  public static gluNurbsCallback(nobj: GLUnurbs, which: GLenum, fn: GLUnurbsErrorProc | NULL): void {
+  public static gluNurbsCallback(nobj: GLUnurbs, which: GLenum, fn: NULLABLE<GLUnurbsErrorProc>): void {
     return GLU32.Load('gluNurbsCallback')(nobj, which, fn);
   }
 
@@ -271,8 +271,8 @@ class GLU32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/opengl/gluproject
-  public static gluProject(objx: GLdouble, objy: GLdouble, objz: GLdouble, modelMatrix: GLdouble_, projMatrix: GLdouble_, viewport: GLint_, winx: GLdouble_, winy: GLdouble_, winz: GLdouble_): GLint {
-    return GLU32.Load('gluProject')(objx, objy, objz, modelMatrix, projMatrix, viewport, winx, winy, winz);
+  public static gluProject(objx: GLdouble, objy: GLdouble, objz: GLdouble, modelMatrix: GLdouble_, projMatrix: GLdouble_, viewport: GLint_, winx_out: GLdouble_, winy_out: GLdouble_, winz_out: GLdouble_): GLint {
+    return GLU32.Load('gluProject')(objx, objy, objz, modelMatrix, projMatrix, viewport, winx_out, winy_out, winz_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/opengl/glupwlcurve
@@ -281,7 +281,7 @@ class GLU32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/opengl/gluquadriccallback
-  public static gluQuadricCallback(qobj: GLUquadric, which: GLenum, fn: GLUquadricErrorProc | NULL): void {
+  public static gluQuadricCallback(qobj: GLUquadric, which: GLenum, fn: NULLABLE<GLUquadricErrorProc>): void {
     return GLU32.Load('gluQuadricCallback')(qobj, which, fn);
   }
 
@@ -306,8 +306,8 @@ class GLU32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/opengl/gluscaleimage
-  public static gluScaleImage(format: GLenum, widthin: GLint, heightin: GLint, typein: GLenum, datain: GLvoid_, widthout: GLint, heightout: GLint, typeout: GLenum, dataout: GLvoid_): GLint {
-    return GLU32.Load('gluScaleImage')(format, widthin, heightin, typein, datain, widthout, heightout, typeout, dataout);
+  public static gluScaleImage(format: GLenum, widthin: GLint, heightin: GLint, typein: GLenum, datain: GLvoid_, widthout: GLint, heightout: GLint, typeout: GLenum, dataout_out: GLvoid_): GLint {
+    return GLU32.Load('gluScaleImage')(format, widthin, heightin, typein, datain, widthout, heightout, typeout, dataout_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/opengl/glusphere
@@ -321,12 +321,12 @@ class GLU32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/opengl/glutessbeginpolygon
-  public static gluTessBeginPolygon(tess: GLUtesselator, polygon_data: GLvoid_ | NULL): void {
+  public static gluTessBeginPolygon(tess: GLUtesselator, polygon_data: NULLABLE<GLvoid_>): void {
     return GLU32.Load('gluTessBeginPolygon')(tess, polygon_data);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/opengl/glutesscallback
-  public static gluTessCallback(tess: GLUtesselator, which: GLenum, fn: GLUtessCallbackProc | NULL): void {
+  public static gluTessCallback(tess: GLUtesselator, which: GLenum, fn: NULLABLE<GLUtessCallbackProc>): void {
     return GLU32.Load('gluTessCallback')(tess, which, fn);
   }
 
@@ -351,13 +351,13 @@ class GLU32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/opengl/glutessvertex
-  public static gluTessVertex(tess: GLUtesselator, coords: GLdouble_, data: GLvoid_): void {
+  public static gluTessVertex(tess: GLUtesselator, coords: GLdouble_, data: NULLABLE<GLvoid_>): void {
     return GLU32.Load('gluTessVertex')(tess, coords, data);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/opengl/gluunproject
-  public static gluUnProject(winx: GLdouble, winy: GLdouble, winz: GLdouble, modelMatrix: GLdouble_, projMatrix: GLdouble_, viewport: GLint_, objx: GLdouble_, objy: GLdouble_, objz: GLdouble_): GLint {
-    return GLU32.Load('gluUnProject')(winx, winy, winz, modelMatrix, projMatrix, viewport, objx, objy, objz);
+  public static gluUnProject(winx: GLdouble, winy: GLdouble, winz: GLdouble, modelMatrix: GLdouble_, projMatrix: GLdouble_, viewport: GLint_, objx_out: GLdouble_, objy_out: GLdouble_, objz_out: GLdouble_): GLint {
+    return GLU32.Load('gluUnProject')(winx, winy, winz, modelMatrix, projMatrix, viewport, objx_out, objy_out, objz_out);
   }
 }
 

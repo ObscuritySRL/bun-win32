@@ -1,6 +1,6 @@
 import type { Pointer } from 'bun:ffi';
 
-export type { HRESULT, NULL } from '@bun-win32/core';
+export type { HRESULT, NULL, OPTIONAL } from '@bun-win32/core';
 
 export enum DML_CREATE_DEVICE_FLAGS {
   DML_CREATE_DEVICE_FLAG_DEBUG = 0x0000_0001,

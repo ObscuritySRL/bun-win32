@@ -1,6 +1,36 @@
 import type { Pointer } from 'bun:ffi';
 
-export type { BOOL, BYTE, CHAR, DWORD, HANDLE, HINSTANCE, HMODULE, INT, LONG, LPBOOL, LPBYTE, LPCSTR, LPCWSTR, LPDWORD, LPSTR, LPVOID, LPWSTR, NULL, SHORT, SIZE_T, UINT, ULONG, ULONG_PTR, USHORT, VOID, WCHAR, WORD } from '@bun-win32/core';
+export type {
+  BOOL,
+  BYTE,
+  CHAR,
+  DWORD,
+  HANDLE,
+  HINSTANCE,
+  HMODULE,
+  INT,
+  LONG,
+  LPBOOL,
+  LPBYTE,
+  LPCSTR,
+  LPCWSTR,
+  LPDWORD,
+  LPSTR,
+  LPVOID,
+  LPWSTR,
+  NULL,
+  NULLABLE,
+  OPTIONAL,
+  SHORT,
+  SIZE_T,
+  UINT,
+  ULONG,
+  ULONG_PTR,
+  USHORT,
+  VOID,
+  WCHAR,
+  WORD,
+} from '@bun-win32/core';
 
 export enum BrushType {
   BrushTypeSolidColor = 0,

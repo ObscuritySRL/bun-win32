@@ -19,7 +19,7 @@ import type {
   LPSTR,
   LPVOID,
   LPWSTR,
-  NULL,
+  OPTIONAL,
   PDS_NAME_RESULTA,
   PDS_NAME_RESULTW,
   PDS_REPSYNCALL_ERRINFOA,
@@ -149,91 +149,123 @@ class Ntdsapi extends Win32 {
   } as const satisfies Record<string, FFIFunction>;
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntdsapi/nf-ntdsapi-dsaddsidhistorya
-  public static DsAddSidHistoryA(hDS: HANDLE, Flags: DWORD, SrcDomain: LPCSTR, SrcPrincipal: LPCSTR, SrcDomainController: LPCSTR | NULL, SrcDomainCreds: RPC_AUTH_IDENTITY_HANDLE | 0n, DstDomain: LPCSTR, DstPrincipal: LPCSTR): DWORD {
+  public static DsAddSidHistoryA(
+    hDS: HANDLE,
+    Flags: DWORD,
+    SrcDomain: LPCSTR,
+    SrcPrincipal: LPCSTR,
+    SrcDomainController: OPTIONAL<LPCSTR>,
+    SrcDomainCreds: OPTIONAL<RPC_AUTH_IDENTITY_HANDLE>,
+    DstDomain: LPCSTR,
+    DstPrincipal: LPCSTR,
+  ): DWORD {
     return Ntdsapi.Load('DsAddSidHistoryA')(hDS, Flags, SrcDomain, SrcPrincipal, SrcDomainController, SrcDomainCreds, DstDomain, DstPrincipal);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntdsapi/nf-ntdsapi-dsaddsidhistoryw
-  public static DsAddSidHistoryW(hDS: HANDLE, Flags: DWORD, SrcDomain: LPCWSTR, SrcPrincipal: LPCWSTR, SrcDomainController: LPCWSTR | NULL, SrcDomainCreds: RPC_AUTH_IDENTITY_HANDLE | 0n, DstDomain: LPCWSTR, DstPrincipal: LPCWSTR): DWORD {
+  public static DsAddSidHistoryW(
+    hDS: HANDLE,
+    Flags: DWORD,
+    SrcDomain: LPCWSTR,
+    SrcPrincipal: LPCWSTR,
+    SrcDomainController: OPTIONAL<LPCWSTR>,
+    SrcDomainCreds: OPTIONAL<RPC_AUTH_IDENTITY_HANDLE>,
+    DstDomain: LPCWSTR,
+    DstPrincipal: LPCWSTR,
+  ): DWORD {
     return Ntdsapi.Load('DsAddSidHistoryW')(hDS, Flags, SrcDomain, SrcPrincipal, SrcDomainController, SrcDomainCreds, DstDomain, DstPrincipal);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntdsapi/nf-ntdsapi-dsbinda
-  public static DsBindA(DomainControllerName: LPCSTR | NULL, DnsDomainName: LPCSTR | NULL, phDS: PHANDLE): DWORD {
-    return Ntdsapi.Load('DsBindA')(DomainControllerName, DnsDomainName, phDS);
+  public static DsBindA(DomainControllerName: OPTIONAL<LPCSTR>, DnsDomainName: OPTIONAL<LPCSTR>, phDS_out: PHANDLE): DWORD {
+    return Ntdsapi.Load('DsBindA')(DomainControllerName, DnsDomainName, phDS_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntdsapi/nf-ntdsapi-dsbindbyinstancea
   public static DsBindByInstanceA(
-    ServerName: LPCSTR | NULL,
-    Annotation: LPCSTR | NULL,
-    InstanceGuid: LPGUID | NULL,
-    DnsDomainName: LPCSTR | NULL,
-    AuthIdentity: RPC_AUTH_IDENTITY_HANDLE | 0n,
-    ServicePrincipalName: LPCSTR | NULL,
+    ServerName: OPTIONAL<LPCSTR>,
+    Annotation: OPTIONAL<LPCSTR>,
+    InstanceGuid: OPTIONAL<LPGUID>,
+    DnsDomainName: OPTIONAL<LPCSTR>,
+    AuthIdentity: OPTIONAL<RPC_AUTH_IDENTITY_HANDLE>,
+    ServicePrincipalName: OPTIONAL<LPCSTR>,
     BindFlags: DWORD,
-    phDS: PHANDLE,
+    phDS_out: PHANDLE,
   ): DWORD {
-    return Ntdsapi.Load('DsBindByInstanceA')(ServerName, Annotation, InstanceGuid, DnsDomainName, AuthIdentity, ServicePrincipalName, BindFlags, phDS);
+    return Ntdsapi.Load('DsBindByInstanceA')(ServerName, Annotation, InstanceGuid, DnsDomainName, AuthIdentity, ServicePrincipalName, BindFlags, phDS_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntdsapi/nf-ntdsapi-dsbindbyinstancew
   public static DsBindByInstanceW(
-    ServerName: LPCWSTR | NULL,
-    Annotation: LPCWSTR | NULL,
-    InstanceGuid: LPGUID | NULL,
-    DnsDomainName: LPCWSTR | NULL,
-    AuthIdentity: RPC_AUTH_IDENTITY_HANDLE | 0n,
-    ServicePrincipalName: LPCWSTR | NULL,
+    ServerName: OPTIONAL<LPCWSTR>,
+    Annotation: OPTIONAL<LPCWSTR>,
+    InstanceGuid: OPTIONAL<LPGUID>,
+    DnsDomainName: OPTIONAL<LPCWSTR>,
+    AuthIdentity: OPTIONAL<RPC_AUTH_IDENTITY_HANDLE>,
+    ServicePrincipalName: OPTIONAL<LPCWSTR>,
     BindFlags: DWORD,
-    phDS: PHANDLE,
+    phDS_out: PHANDLE,
   ): DWORD {
-    return Ntdsapi.Load('DsBindByInstanceW')(ServerName, Annotation, InstanceGuid, DnsDomainName, AuthIdentity, ServicePrincipalName, BindFlags, phDS);
+    return Ntdsapi.Load('DsBindByInstanceW')(ServerName, Annotation, InstanceGuid, DnsDomainName, AuthIdentity, ServicePrincipalName, BindFlags, phDS_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntdsapi/nf-ntdsapi-dsbindtoistga
-  public static DsBindToISTGA(SiteName: LPCSTR | NULL, phDS: PHANDLE): DWORD {
-    return Ntdsapi.Load('DsBindToISTGA')(SiteName, phDS);
+  public static DsBindToISTGA(SiteName: OPTIONAL<LPCSTR>, phDS_out: PHANDLE): DWORD {
+    return Ntdsapi.Load('DsBindToISTGA')(SiteName, phDS_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntdsapi/nf-ntdsapi-dsbindtoistgw
-  public static DsBindToISTGW(SiteName: LPCWSTR | NULL, phDS: PHANDLE): DWORD {
-    return Ntdsapi.Load('DsBindToISTGW')(SiteName, phDS);
+  public static DsBindToISTGW(SiteName: OPTIONAL<LPCWSTR>, phDS_out: PHANDLE): DWORD {
+    return Ntdsapi.Load('DsBindToISTGW')(SiteName, phDS_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntdsapi/nf-ntdsapi-dsbindw
-  public static DsBindW(DomainControllerName: LPCWSTR | NULL, DnsDomainName: LPCWSTR | NULL, phDS: PHANDLE): DWORD {
-    return Ntdsapi.Load('DsBindW')(DomainControllerName, DnsDomainName, phDS);
+  public static DsBindW(DomainControllerName: OPTIONAL<LPCWSTR>, DnsDomainName: OPTIONAL<LPCWSTR>, phDS_out: PHANDLE): DWORD {
+    return Ntdsapi.Load('DsBindW')(DomainControllerName, DnsDomainName, phDS_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntdsapi/nf-ntdsapi-dsbindwithcreda
-  public static DsBindWithCredA(DomainControllerName: LPCSTR | NULL, DnsDomainName: LPCSTR | NULL, AuthIdentity: RPC_AUTH_IDENTITY_HANDLE | 0n, phDS: PHANDLE): DWORD {
-    return Ntdsapi.Load('DsBindWithCredA')(DomainControllerName, DnsDomainName, AuthIdentity, phDS);
+  public static DsBindWithCredA(DomainControllerName: OPTIONAL<LPCSTR>, DnsDomainName: OPTIONAL<LPCSTR>, AuthIdentity: OPTIONAL<RPC_AUTH_IDENTITY_HANDLE>, phDS_out: PHANDLE): DWORD {
+    return Ntdsapi.Load('DsBindWithCredA')(DomainControllerName, DnsDomainName, AuthIdentity, phDS_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntdsapi/nf-ntdsapi-dsbindwithcredw
-  public static DsBindWithCredW(DomainControllerName: LPCWSTR | NULL, DnsDomainName: LPCWSTR | NULL, AuthIdentity: RPC_AUTH_IDENTITY_HANDLE | 0n, phDS: PHANDLE): DWORD {
-    return Ntdsapi.Load('DsBindWithCredW')(DomainControllerName, DnsDomainName, AuthIdentity, phDS);
+  public static DsBindWithCredW(DomainControllerName: OPTIONAL<LPCWSTR>, DnsDomainName: OPTIONAL<LPCWSTR>, AuthIdentity: OPTIONAL<RPC_AUTH_IDENTITY_HANDLE>, phDS_out: PHANDLE): DWORD {
+    return Ntdsapi.Load('DsBindWithCredW')(DomainControllerName, DnsDomainName, AuthIdentity, phDS_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntdsapi/nf-ntdsapi-dsbindwithspna
-  public static DsBindWithSpnA(DomainControllerName: LPCSTR | NULL, DnsDomainName: LPCSTR | NULL, AuthIdentity: RPC_AUTH_IDENTITY_HANDLE | 0n, ServicePrincipalName: LPCSTR | NULL, phDS: PHANDLE): DWORD {
-    return Ntdsapi.Load('DsBindWithSpnA')(DomainControllerName, DnsDomainName, AuthIdentity, ServicePrincipalName, phDS);
+  public static DsBindWithSpnA(DomainControllerName: OPTIONAL<LPCSTR>, DnsDomainName: OPTIONAL<LPCSTR>, AuthIdentity: OPTIONAL<RPC_AUTH_IDENTITY_HANDLE>, ServicePrincipalName: OPTIONAL<LPCSTR>, phDS_out: PHANDLE): DWORD {
+    return Ntdsapi.Load('DsBindWithSpnA')(DomainControllerName, DnsDomainName, AuthIdentity, ServicePrincipalName, phDS_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntdsapi/nf-ntdsapi-dsbindwithspnexa
-  public static DsBindWithSpnExA(DomainControllerName: LPCSTR | NULL, DnsDomainName: LPCSTR | NULL, AuthIdentity: RPC_AUTH_IDENTITY_HANDLE | 0n, ServicePrincipalName: LPCSTR | NULL, BindFlags: DWORD, phDS: PHANDLE): DWORD {
-    return Ntdsapi.Load('DsBindWithSpnExA')(DomainControllerName, DnsDomainName, AuthIdentity, ServicePrincipalName, BindFlags, phDS);
+  public static DsBindWithSpnExA(
+    DomainControllerName: OPTIONAL<LPCSTR>,
+    DnsDomainName: OPTIONAL<LPCSTR>,
+    AuthIdentity: OPTIONAL<RPC_AUTH_IDENTITY_HANDLE>,
+    ServicePrincipalName: OPTIONAL<LPCSTR>,
+    BindFlags: DWORD,
+    phDS_out: PHANDLE,
+  ): DWORD {
+    return Ntdsapi.Load('DsBindWithSpnExA')(DomainControllerName, DnsDomainName, AuthIdentity, ServicePrincipalName, BindFlags, phDS_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntdsapi/nf-ntdsapi-dsbindwithspnexw
-  public static DsBindWithSpnExW(DomainControllerName: LPCWSTR | NULL, DnsDomainName: LPCWSTR | NULL, AuthIdentity: RPC_AUTH_IDENTITY_HANDLE | 0n, ServicePrincipalName: LPCWSTR | NULL, BindFlags: DWORD, phDS: PHANDLE): DWORD {
-    return Ntdsapi.Load('DsBindWithSpnExW')(DomainControllerName, DnsDomainName, AuthIdentity, ServicePrincipalName, BindFlags, phDS);
+  public static DsBindWithSpnExW(
+    DomainControllerName: OPTIONAL<LPCWSTR>,
+    DnsDomainName: OPTIONAL<LPCWSTR>,
+    AuthIdentity: OPTIONAL<RPC_AUTH_IDENTITY_HANDLE>,
+    ServicePrincipalName: OPTIONAL<LPCWSTR>,
+    BindFlags: DWORD,
+    phDS_out: PHANDLE,
+  ): DWORD {
+    return Ntdsapi.Load('DsBindWithSpnExW')(DomainControllerName, DnsDomainName, AuthIdentity, ServicePrincipalName, BindFlags, phDS_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntdsapi/nf-ntdsapi-dsbindwithspnw
-  public static DsBindWithSpnW(DomainControllerName: LPCWSTR | NULL, DnsDomainName: LPCWSTR | NULL, AuthIdentity: RPC_AUTH_IDENTITY_HANDLE | 0n, ServicePrincipalName: LPCWSTR | NULL, phDS: PHANDLE): DWORD {
-    return Ntdsapi.Load('DsBindWithSpnW')(DomainControllerName, DnsDomainName, AuthIdentity, ServicePrincipalName, phDS);
+  public static DsBindWithSpnW(DomainControllerName: OPTIONAL<LPCWSTR>, DnsDomainName: OPTIONAL<LPCWSTR>, AuthIdentity: OPTIONAL<RPC_AUTH_IDENTITY_HANDLE>, ServicePrincipalName: OPTIONAL<LPCWSTR>, phDS_out: PHANDLE): DWORD {
+    return Ntdsapi.Load('DsBindWithSpnW')(DomainControllerName, DnsDomainName, AuthIdentity, ServicePrincipalName, phDS_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntdsapi/nf-ntdsapi-dsbindingsettimeout
@@ -242,23 +274,23 @@ class Ntdsapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntdsapi/nf-ntdsapi-dsclientmakespnfortargetservera
-  public static DsClientMakeSpnForTargetServerA(ServiceClass: LPCSTR, ServiceName: LPCSTR, pcSpnLength: PDWORD, pszSpn: LPSTR): DWORD {
-    return Ntdsapi.Load('DsClientMakeSpnForTargetServerA')(ServiceClass, ServiceName, pcSpnLength, pszSpn);
+  public static DsClientMakeSpnForTargetServerA(ServiceClass: LPCSTR, ServiceName: LPCSTR, pcSpnLength_in_out: PDWORD, pszSpn_out: LPSTR): DWORD {
+    return Ntdsapi.Load('DsClientMakeSpnForTargetServerA')(ServiceClass, ServiceName, pcSpnLength_in_out, pszSpn_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntdsapi/nf-ntdsapi-dsclientmakespnfortargetserverw
-  public static DsClientMakeSpnForTargetServerW(ServiceClass: LPCWSTR, ServiceName: LPCWSTR, pcSpnLength: PDWORD, pszSpn: LPWSTR): DWORD {
-    return Ntdsapi.Load('DsClientMakeSpnForTargetServerW')(ServiceClass, ServiceName, pcSpnLength, pszSpn);
+  public static DsClientMakeSpnForTargetServerW(ServiceClass: LPCWSTR, ServiceName: LPCWSTR, pcSpnLength_in_out: PDWORD, pszSpn_out: LPWSTR): DWORD {
+    return Ntdsapi.Load('DsClientMakeSpnForTargetServerW')(ServiceClass, ServiceName, pcSpnLength_in_out, pszSpn_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntdsapi/nf-ntdsapi-dscracknamesa
-  public static DsCrackNamesA(hDS: HANDLE | 0n, flags: DS_NAME_FLAGS, formatOffered: DS_NAME_FORMAT, formatDesired: DS_NAME_FORMAT, cNames: DWORD, rpNames: LPVOID, ppResult: PDS_NAME_RESULTA): DWORD {
-    return Ntdsapi.Load('DsCrackNamesA')(hDS, flags, formatOffered, formatDesired, cNames, rpNames, ppResult);
+  public static DsCrackNamesA(hDS: OPTIONAL<HANDLE>, flags: DS_NAME_FLAGS, formatOffered: DS_NAME_FORMAT, formatDesired: DS_NAME_FORMAT, cNames: DWORD, rpNames: LPVOID, ppResult_out: PDS_NAME_RESULTA): DWORD {
+    return Ntdsapi.Load('DsCrackNamesA')(hDS, flags, formatOffered, formatDesired, cNames, rpNames, ppResult_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntdsapi/nf-ntdsapi-dscracknamesw
-  public static DsCrackNamesW(hDS: HANDLE | 0n, flags: DS_NAME_FLAGS, formatOffered: DS_NAME_FORMAT, formatDesired: DS_NAME_FORMAT, cNames: DWORD, rpNames: LPVOID, ppResult: PDS_NAME_RESULTW): DWORD {
-    return Ntdsapi.Load('DsCrackNamesW')(hDS, flags, formatOffered, formatDesired, cNames, rpNames, ppResult);
+  public static DsCrackNamesW(hDS: OPTIONAL<HANDLE>, flags: DS_NAME_FLAGS, formatOffered: DS_NAME_FORMAT, formatDesired: DS_NAME_FORMAT, cNames: DWORD, rpNames: LPVOID, ppResult_out: PDS_NAME_RESULTW): DWORD {
+    return Ntdsapi.Load('DsCrackNamesW')(hDS, flags, formatOffered, formatDesired, cNames, rpNames, ppResult_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntdsapi/nf-ntdsapi-dsfreedomaincontrollerinfoa
@@ -297,53 +329,53 @@ class Ntdsapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntdsapi/nf-ntdsapi-dsfreespnarraya
-  public static DsFreeSpnArrayA(cSpn: DWORD, rpszSpn: LPVOID): void {
-    return Ntdsapi.Load('DsFreeSpnArrayA')(cSpn, rpszSpn);
+  public static DsFreeSpnArrayA(cSpn: DWORD, rpszSpn_in_out: LPVOID): void {
+    return Ntdsapi.Load('DsFreeSpnArrayA')(cSpn, rpszSpn_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntdsapi/nf-ntdsapi-dsfreespnarrayw
-  public static DsFreeSpnArrayW(cSpn: DWORD, rpszSpn: LPVOID): void {
-    return Ntdsapi.Load('DsFreeSpnArrayW')(cSpn, rpszSpn);
+  public static DsFreeSpnArrayW(cSpn: DWORD, rpszSpn_in_out: LPVOID): void {
+    return Ntdsapi.Load('DsFreeSpnArrayW')(cSpn, rpszSpn_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntdsapi/nf-ntdsapi-dsgetdomaincontrollerinfoa
-  public static DsGetDomainControllerInfoA(hDs: HANDLE, DomainName: LPCSTR, InfoLevel: DWORD, pcOut: PDWORD, ppInfo: LPVOID): DWORD {
-    return Ntdsapi.Load('DsGetDomainControllerInfoA')(hDs, DomainName, InfoLevel, pcOut, ppInfo);
+  public static DsGetDomainControllerInfoA(hDs: HANDLE, DomainName: LPCSTR, InfoLevel: DWORD, pcOut_out: PDWORD, ppInfo_out: LPVOID): DWORD {
+    return Ntdsapi.Load('DsGetDomainControllerInfoA')(hDs, DomainName, InfoLevel, pcOut_out, ppInfo_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntdsapi/nf-ntdsapi-dsgetdomaincontrollerinfow
-  public static DsGetDomainControllerInfoW(hDs: HANDLE, DomainName: LPCWSTR, InfoLevel: DWORD, pcOut: PDWORD, ppInfo: LPVOID): DWORD {
-    return Ntdsapi.Load('DsGetDomainControllerInfoW')(hDs, DomainName, InfoLevel, pcOut, ppInfo);
+  public static DsGetDomainControllerInfoW(hDs: HANDLE, DomainName: LPCWSTR, InfoLevel: DWORD, pcOut_out: PDWORD, ppInfo_out: LPVOID): DWORD {
+    return Ntdsapi.Load('DsGetDomainControllerInfoW')(hDs, DomainName, InfoLevel, pcOut_out, ppInfo_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntdsapi/nf-ntdsapi-dsgetspna
   public static DsGetSpnA(
     ServiceType: DS_SPN_NAME_TYPE,
     ServiceClass: LPCSTR,
-    ServiceName: LPCSTR | NULL,
+    ServiceName: OPTIONAL<LPCSTR>,
     InstancePort: USHORT,
     cInstanceNames: USHORT,
-    pInstanceNames: LPVOID | NULL,
-    pInstancePorts: LPVOID | NULL,
-    pcSpn: PDWORD,
-    prpszSpn: LPVOID,
+    pInstanceNames: OPTIONAL<LPVOID>,
+    pInstancePorts: OPTIONAL<LPVOID>,
+    pcSpn_out: PDWORD,
+    prpszSpn_out: LPVOID,
   ): DWORD {
-    return Ntdsapi.Load('DsGetSpnA')(ServiceType, ServiceClass, ServiceName, InstancePort, cInstanceNames, pInstanceNames, pInstancePorts, pcSpn, prpszSpn);
+    return Ntdsapi.Load('DsGetSpnA')(ServiceType, ServiceClass, ServiceName, InstancePort, cInstanceNames, pInstanceNames, pInstancePorts, pcSpn_out, prpszSpn_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntdsapi/nf-ntdsapi-dsgetspnw
   public static DsGetSpnW(
     ServiceType: DS_SPN_NAME_TYPE,
     ServiceClass: LPCWSTR,
-    ServiceName: LPCWSTR | NULL,
+    ServiceName: OPTIONAL<LPCWSTR>,
     InstancePort: USHORT,
     cInstanceNames: USHORT,
-    pInstanceNames: LPVOID | NULL,
-    pInstancePorts: LPVOID | NULL,
-    pcSpn: PDWORD,
-    prpszSpn: LPVOID,
+    pInstanceNames: OPTIONAL<LPVOID>,
+    pInstancePorts: OPTIONAL<LPVOID>,
+    pcSpn_out: PDWORD,
+    prpszSpn_out: LPVOID,
   ): DWORD {
-    return Ntdsapi.Load('DsGetSpnW')(ServiceType, ServiceClass, ServiceName, InstancePort, cInstanceNames, pInstanceNames, pInstancePorts, pcSpn, prpszSpn);
+    return Ntdsapi.Load('DsGetSpnW')(ServiceType, ServiceClass, ServiceName, InstancePort, cInstanceNames, pInstanceNames, pInstancePorts, pcSpn_out, prpszSpn_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntdsapi/nf-ntdsapi-dsinheritsecurityidentitya
@@ -357,93 +389,93 @@ class Ntdsapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntdsapi/nf-ntdsapi-dslistdomainsinsitea
-  public static DsListDomainsInSiteA(hDs: HANDLE, site: LPCSTR, ppDomains: PDS_NAME_RESULTA): DWORD {
-    return Ntdsapi.Load('DsListDomainsInSiteA')(hDs, site, ppDomains);
+  public static DsListDomainsInSiteA(hDs: HANDLE, site: LPCSTR, ppDomains_out: PDS_NAME_RESULTA): DWORD {
+    return Ntdsapi.Load('DsListDomainsInSiteA')(hDs, site, ppDomains_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntdsapi/nf-ntdsapi-dslistdomainsinsitew
-  public static DsListDomainsInSiteW(hDs: HANDLE, site: LPCWSTR, ppDomains: PDS_NAME_RESULTW): DWORD {
-    return Ntdsapi.Load('DsListDomainsInSiteW')(hDs, site, ppDomains);
+  public static DsListDomainsInSiteW(hDs: HANDLE, site: LPCWSTR, ppDomains_out: PDS_NAME_RESULTW): DWORD {
+    return Ntdsapi.Load('DsListDomainsInSiteW')(hDs, site, ppDomains_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntdsapi/nf-ntdsapi-dslistinfoforservera
-  public static DsListInfoForServerA(hDs: HANDLE, server: LPCSTR, ppInfo: PDS_NAME_RESULTA): DWORD {
-    return Ntdsapi.Load('DsListInfoForServerA')(hDs, server, ppInfo);
+  public static DsListInfoForServerA(hDs: HANDLE, server: LPCSTR, ppInfo_out: PDS_NAME_RESULTA): DWORD {
+    return Ntdsapi.Load('DsListInfoForServerA')(hDs, server, ppInfo_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntdsapi/nf-ntdsapi-dslistinfoforserverw
-  public static DsListInfoForServerW(hDs: HANDLE, server: LPCWSTR, ppInfo: PDS_NAME_RESULTW): DWORD {
-    return Ntdsapi.Load('DsListInfoForServerW')(hDs, server, ppInfo);
+  public static DsListInfoForServerW(hDs: HANDLE, server: LPCWSTR, ppInfo_out: PDS_NAME_RESULTW): DWORD {
+    return Ntdsapi.Load('DsListInfoForServerW')(hDs, server, ppInfo_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntdsapi/nf-ntdsapi-dslistrolesa
-  public static DsListRolesA(hDs: HANDLE, ppRoles: PDS_NAME_RESULTA): DWORD {
-    return Ntdsapi.Load('DsListRolesA')(hDs, ppRoles);
+  public static DsListRolesA(hDs: HANDLE, ppRoles_out: PDS_NAME_RESULTA): DWORD {
+    return Ntdsapi.Load('DsListRolesA')(hDs, ppRoles_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntdsapi/nf-ntdsapi-dslistrolesw
-  public static DsListRolesW(hDs: HANDLE, ppRoles: PDS_NAME_RESULTW): DWORD {
-    return Ntdsapi.Load('DsListRolesW')(hDs, ppRoles);
+  public static DsListRolesW(hDs: HANDLE, ppRoles_out: PDS_NAME_RESULTW): DWORD {
+    return Ntdsapi.Load('DsListRolesW')(hDs, ppRoles_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntdsapi/nf-ntdsapi-dslistserversfordomaininsitea
-  public static DsListServersForDomainInSiteA(hDs: HANDLE, domain: LPCSTR, site: LPCSTR, ppServers: PDS_NAME_RESULTA): DWORD {
-    return Ntdsapi.Load('DsListServersForDomainInSiteA')(hDs, domain, site, ppServers);
+  public static DsListServersForDomainInSiteA(hDs: HANDLE, domain: LPCSTR, site: LPCSTR, ppServers_out: PDS_NAME_RESULTA): DWORD {
+    return Ntdsapi.Load('DsListServersForDomainInSiteA')(hDs, domain, site, ppServers_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntdsapi/nf-ntdsapi-dslistserversfordomaininsitew
-  public static DsListServersForDomainInSiteW(hDs: HANDLE, domain: LPCWSTR, site: LPCWSTR, ppServers: PDS_NAME_RESULTW): DWORD {
-    return Ntdsapi.Load('DsListServersForDomainInSiteW')(hDs, domain, site, ppServers);
+  public static DsListServersForDomainInSiteW(hDs: HANDLE, domain: LPCWSTR, site: LPCWSTR, ppServers_out: PDS_NAME_RESULTW): DWORD {
+    return Ntdsapi.Load('DsListServersForDomainInSiteW')(hDs, domain, site, ppServers_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntdsapi/nf-ntdsapi-dslistserversinsitea
-  public static DsListServersInSiteA(hDs: HANDLE, site: LPCSTR, ppServers: PDS_NAME_RESULTA): DWORD {
-    return Ntdsapi.Load('DsListServersInSiteA')(hDs, site, ppServers);
+  public static DsListServersInSiteA(hDs: HANDLE, site: LPCSTR, ppServers_out: PDS_NAME_RESULTA): DWORD {
+    return Ntdsapi.Load('DsListServersInSiteA')(hDs, site, ppServers_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntdsapi/nf-ntdsapi-dslistserversinsitew
-  public static DsListServersInSiteW(hDs: HANDLE, site: LPCWSTR, ppServers: PDS_NAME_RESULTW): DWORD {
-    return Ntdsapi.Load('DsListServersInSiteW')(hDs, site, ppServers);
+  public static DsListServersInSiteW(hDs: HANDLE, site: LPCWSTR, ppServers_out: PDS_NAME_RESULTW): DWORD {
+    return Ntdsapi.Load('DsListServersInSiteW')(hDs, site, ppServers_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntdsapi/nf-ntdsapi-dslistsitesa
-  public static DsListSitesA(hDs: HANDLE, ppSites: PDS_NAME_RESULTA): DWORD {
-    return Ntdsapi.Load('DsListSitesA')(hDs, ppSites);
+  public static DsListSitesA(hDs: HANDLE, ppSites_out: PDS_NAME_RESULTA): DWORD {
+    return Ntdsapi.Load('DsListSitesA')(hDs, ppSites_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntdsapi/nf-ntdsapi-dslistsitesw
-  public static DsListSitesW(hDs: HANDLE, ppSites: PDS_NAME_RESULTW): DWORD {
-    return Ntdsapi.Load('DsListSitesW')(hDs, ppSites);
+  public static DsListSitesW(hDs: HANDLE, ppSites_out: PDS_NAME_RESULTW): DWORD {
+    return Ntdsapi.Load('DsListSitesW')(hDs, ppSites_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntdsapi/nf-ntdsapi-dsmakepasswordcredentialsa
-  public static DsMakePasswordCredentialsA(User: LPCSTR | NULL, Domain: LPCSTR | NULL, Password: LPCSTR | NULL, pAuthIdentity: PRPC_AUTH_IDENTITY_HANDLE): DWORD {
-    return Ntdsapi.Load('DsMakePasswordCredentialsA')(User, Domain, Password, pAuthIdentity);
+  public static DsMakePasswordCredentialsA(User: OPTIONAL<LPCSTR>, Domain: OPTIONAL<LPCSTR>, Password: OPTIONAL<LPCSTR>, pAuthIdentity_out: PRPC_AUTH_IDENTITY_HANDLE): DWORD {
+    return Ntdsapi.Load('DsMakePasswordCredentialsA')(User, Domain, Password, pAuthIdentity_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntdsapi/nf-ntdsapi-dsmakepasswordcredentialsw
-  public static DsMakePasswordCredentialsW(User: LPCWSTR | NULL, Domain: LPCWSTR | NULL, Password: LPCWSTR | NULL, pAuthIdentity: PRPC_AUTH_IDENTITY_HANDLE): DWORD {
-    return Ntdsapi.Load('DsMakePasswordCredentialsW')(User, Domain, Password, pAuthIdentity);
+  public static DsMakePasswordCredentialsW(User: OPTIONAL<LPCWSTR>, Domain: OPTIONAL<LPCWSTR>, Password: OPTIONAL<LPCWSTR>, pAuthIdentity_out: PRPC_AUTH_IDENTITY_HANDLE): DWORD {
+    return Ntdsapi.Load('DsMakePasswordCredentialsW')(User, Domain, Password, pAuthIdentity_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntdsapi/nf-ntdsapi-dsmapschemaguidsa
-  public static DsMapSchemaGuidsA(hDs: HANDLE, cGuids: DWORD, rGuids: LPGUID, ppGuidMap: PDS_SCHEMA_GUID_MAPA): DWORD {
-    return Ntdsapi.Load('DsMapSchemaGuidsA')(hDs, cGuids, rGuids, ppGuidMap);
+  public static DsMapSchemaGuidsA(hDs: HANDLE, cGuids: DWORD, rGuids: LPGUID, ppGuidMap_out: PDS_SCHEMA_GUID_MAPA): DWORD {
+    return Ntdsapi.Load('DsMapSchemaGuidsA')(hDs, cGuids, rGuids, ppGuidMap_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntdsapi/nf-ntdsapi-dsmapschemaguidsw
-  public static DsMapSchemaGuidsW(hDs: HANDLE, cGuids: DWORD, rGuids: LPGUID, ppGuidMap: PDS_SCHEMA_GUID_MAPW): DWORD {
-    return Ntdsapi.Load('DsMapSchemaGuidsW')(hDs, cGuids, rGuids, ppGuidMap);
+  public static DsMapSchemaGuidsW(hDs: HANDLE, cGuids: DWORD, rGuids: LPGUID, ppGuidMap_out: PDS_SCHEMA_GUID_MAPW): DWORD {
+    return Ntdsapi.Load('DsMapSchemaGuidsW')(hDs, cGuids, rGuids, ppGuidMap_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntdsapi/nf-ntdsapi-dsquerysitesbycosta
-  public static DsQuerySitesByCostA(hDS: HANDLE, pszFromSite: LPSTR, rgszToSites: LPVOID, cToSites: DWORD, dwFlags: DWORD, prgSiteInfo: LPVOID): DWORD {
-    return Ntdsapi.Load('DsQuerySitesByCostA')(hDS, pszFromSite, rgszToSites, cToSites, dwFlags, prgSiteInfo);
+  public static DsQuerySitesByCostA(hDS: HANDLE, pszFromSite: LPSTR, rgszToSites: LPVOID, cToSites: DWORD, dwFlags: DWORD, prgSiteInfo_out: LPVOID): DWORD {
+    return Ntdsapi.Load('DsQuerySitesByCostA')(hDS, pszFromSite, rgszToSites, cToSites, dwFlags, prgSiteInfo_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntdsapi/nf-ntdsapi-dsquerysitesbycostw
-  public static DsQuerySitesByCostW(hDS: HANDLE, pwszFromSite: LPWSTR, rgwszToSites: LPVOID, cToSites: DWORD, dwFlags: DWORD, prgSiteInfo: LPVOID): DWORD {
-    return Ntdsapi.Load('DsQuerySitesByCostW')(hDS, pwszFromSite, rgwszToSites, cToSites, dwFlags, prgSiteInfo);
+  public static DsQuerySitesByCostW(hDS: HANDLE, pwszFromSite: LPWSTR, rgwszToSites: LPVOID, cToSites: DWORD, dwFlags: DWORD, prgSiteInfo_out: LPVOID): DWORD {
+    return Ntdsapi.Load('DsQuerySitesByCostW')(hDS, pwszFromSite, rgwszToSites, cToSites, dwFlags, prgSiteInfo_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntdsapi/nf-ntdsapi-dsquerysitesfree
@@ -462,22 +494,22 @@ class Ntdsapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntdsapi/nf-ntdsapi-dsremovedsservera
-  public static DsRemoveDsServerA(hDs: HANDLE, ServerDN: LPSTR, DomainDN: LPSTR | NULL, fLastDcInDomain: LPBOOL | NULL, fCommit: BOOL): DWORD {
-    return Ntdsapi.Load('DsRemoveDsServerA')(hDs, ServerDN, DomainDN, fLastDcInDomain, fCommit);
+  public static DsRemoveDsServerA(hDs: HANDLE, ServerDN: LPSTR, DomainDN: OPTIONAL<LPSTR>, fLastDcInDomain_out: OPTIONAL<LPBOOL>, fCommit: BOOL): DWORD {
+    return Ntdsapi.Load('DsRemoveDsServerA')(hDs, ServerDN, DomainDN, fLastDcInDomain_out, fCommit);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntdsapi/nf-ntdsapi-dsremovedsserverw
-  public static DsRemoveDsServerW(hDs: HANDLE, ServerDN: LPWSTR, DomainDN: LPWSTR | NULL, fLastDcInDomain: LPBOOL | NULL, fCommit: BOOL): DWORD {
-    return Ntdsapi.Load('DsRemoveDsServerW')(hDs, ServerDN, DomainDN, fLastDcInDomain, fCommit);
+  public static DsRemoveDsServerW(hDs: HANDLE, ServerDN: LPWSTR, DomainDN: OPTIONAL<LPWSTR>, fLastDcInDomain_out: OPTIONAL<LPBOOL>, fCommit: BOOL): DWORD {
+    return Ntdsapi.Load('DsRemoveDsServerW')(hDs, ServerDN, DomainDN, fLastDcInDomain_out, fCommit);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntdsapi/nf-ntdsapi-dsreplicaadda
-  public static DsReplicaAddA(hDS: HANDLE, NameContext: LPCSTR, SourceDsaDn: LPCSTR, TransportDn: LPCSTR, SourceDsaAddress: LPCSTR, pSchedule: PSCHEDULE | NULL, Options: DWORD): DWORD {
+  public static DsReplicaAddA(hDS: HANDLE, NameContext: LPCSTR, SourceDsaDn: LPCSTR, TransportDn: LPCSTR, SourceDsaAddress: LPCSTR, pSchedule: OPTIONAL<PSCHEDULE>, Options: DWORD): DWORD {
     return Ntdsapi.Load('DsReplicaAddA')(hDS, NameContext, SourceDsaDn, TransportDn, SourceDsaAddress, pSchedule, Options);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntdsapi/nf-ntdsapi-dsreplicaaddw
-  public static DsReplicaAddW(hDS: HANDLE, NameContext: LPCWSTR, SourceDsaDn: LPCWSTR, TransportDn: LPCWSTR, SourceDsaAddress: LPCWSTR, pSchedule: PSCHEDULE | NULL, Options: DWORD): DWORD {
+  public static DsReplicaAddW(hDS: HANDLE, NameContext: LPCWSTR, SourceDsaDn: LPCWSTR, TransportDn: LPCWSTR, SourceDsaAddress: LPCWSTR, pSchedule: OPTIONAL<PSCHEDULE>, Options: DWORD): DWORD {
     return Ntdsapi.Load('DsReplicaAddW')(hDS, NameContext, SourceDsaDn, TransportDn, SourceDsaAddress, pSchedule, Options);
   }
 
@@ -505,30 +537,30 @@ class Ntdsapi extends Win32 {
   public static DsReplicaGetInfo2W(
     hDS: HANDLE,
     InfoType: DS_REPL_INFO_TYPE,
-    pszObject: LPCWSTR | NULL,
-    puuidForSourceDsaObjGuid: LPGUID | NULL,
-    pszAttributeName: LPCWSTR | NULL,
-    pszValue: LPCWSTR | NULL,
+    pszObject: OPTIONAL<LPCWSTR>,
+    puuidForSourceDsaObjGuid: OPTIONAL<LPGUID>,
+    pszAttributeName: OPTIONAL<LPCWSTR>,
+    pszValue: OPTIONAL<LPCWSTR>,
     dwFlags: DWORD,
     dwEnumerationContext: DWORD,
-    ppInfo: LPVOID,
+    ppInfo_out: LPVOID,
   ): DWORD {
-    return Ntdsapi.Load('DsReplicaGetInfo2W')(hDS, InfoType, pszObject, puuidForSourceDsaObjGuid, pszAttributeName, pszValue, dwFlags, dwEnumerationContext, ppInfo);
+    return Ntdsapi.Load('DsReplicaGetInfo2W')(hDS, InfoType, pszObject, puuidForSourceDsaObjGuid, pszAttributeName, pszValue, dwFlags, dwEnumerationContext, ppInfo_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntdsapi/nf-ntdsapi-dsreplicagetinfow
-  public static DsReplicaGetInfoW(hDS: HANDLE, InfoType: DS_REPL_INFO_TYPE, pszObject: LPCWSTR | NULL, puuidForSourceDsaObjGuid: LPGUID | NULL, ppInfo: LPVOID): DWORD {
-    return Ntdsapi.Load('DsReplicaGetInfoW')(hDS, InfoType, pszObject, puuidForSourceDsaObjGuid, ppInfo);
+  public static DsReplicaGetInfoW(hDS: HANDLE, InfoType: DS_REPL_INFO_TYPE, pszObject: OPTIONAL<LPCWSTR>, puuidForSourceDsaObjGuid: OPTIONAL<LPGUID>, ppInfo_out: LPVOID): DWORD {
+    return Ntdsapi.Load('DsReplicaGetInfoW')(hDS, InfoType, pszObject, puuidForSourceDsaObjGuid, ppInfo_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntdsapi/nf-ntdsapi-dsreplicamodifya
   public static DsReplicaModifyA(
     hDS: HANDLE,
     NameContext: LPCSTR,
-    pUuidSourceDsa: LPGUID | NULL,
-    TransportDn: LPCSTR | NULL,
+    pUuidSourceDsa: OPTIONAL<LPGUID>,
+    TransportDn: OPTIONAL<LPCSTR>,
     SourceDsaAddress: LPCSTR,
-    pSchedule: PSCHEDULE | NULL,
+    pSchedule: OPTIONAL<PSCHEDULE>,
     ReplicaFlags: DWORD,
     ModifyFields: DWORD,
     Options: DWORD,
@@ -540,10 +572,10 @@ class Ntdsapi extends Win32 {
   public static DsReplicaModifyW(
     hDS: HANDLE,
     NameContext: LPCWSTR,
-    pUuidSourceDsa: LPGUID | NULL,
-    TransportDn: LPCWSTR | NULL,
+    pUuidSourceDsa: OPTIONAL<LPGUID>,
+    TransportDn: OPTIONAL<LPCWSTR>,
     SourceDsaAddress: LPCWSTR,
-    pSchedule: PSCHEDULE | NULL,
+    pSchedule: OPTIONAL<PSCHEDULE>,
     ReplicaFlags: DWORD,
     ModifyFields: DWORD,
     Options: DWORD,
@@ -557,13 +589,13 @@ class Ntdsapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntdsapi/nf-ntdsapi-dsreplicasyncalla
-  public static DsReplicaSyncAllA(hDS: HANDLE, pszNameContext: LPCSTR | NULL, ulFlags: ULONG, pFnCallBack: LPVOID, pCallbackData: LPVOID | NULL, pErrors: PDS_REPSYNCALL_ERRINFOA | NULL): DWORD {
-    return Ntdsapi.Load('DsReplicaSyncAllA')(hDS, pszNameContext, ulFlags, pFnCallBack, pCallbackData, pErrors);
+  public static DsReplicaSyncAllA(hDS: HANDLE, pszNameContext: LPCSTR, ulFlags: ULONG, pFnCallBack: LPVOID, pCallbackData: OPTIONAL<LPVOID>, pErrors_out: OPTIONAL<PDS_REPSYNCALL_ERRINFOA>): DWORD {
+    return Ntdsapi.Load('DsReplicaSyncAllA')(hDS, pszNameContext, ulFlags, pFnCallBack, pCallbackData, pErrors_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntdsapi/nf-ntdsapi-dsreplicasyncallw
-  public static DsReplicaSyncAllW(hDS: HANDLE, pszNameContext: LPCWSTR | NULL, ulFlags: ULONG, pFnCallBack: LPVOID, pCallbackData: LPVOID | NULL, pErrors: PDS_REPSYNCALL_ERRINFOW | NULL): DWORD {
-    return Ntdsapi.Load('DsReplicaSyncAllW')(hDS, pszNameContext, ulFlags, pFnCallBack, pCallbackData, pErrors);
+  public static DsReplicaSyncAllW(hDS: HANDLE, pszNameContext: LPCWSTR, ulFlags: ULONG, pFnCallBack: LPVOID, pCallbackData: OPTIONAL<LPVOID>, pErrors_out: OPTIONAL<PDS_REPSYNCALL_ERRINFOW>): DWORD {
+    return Ntdsapi.Load('DsReplicaSyncAllW')(hDS, pszNameContext, ulFlags, pFnCallBack, pCallbackData, pErrors_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntdsapi/nf-ntdsapi-dsreplicasyncw
@@ -592,12 +624,12 @@ class Ntdsapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntdsapi/nf-ntdsapi-dsserverregisterspna
-  public static DsServerRegisterSpnA(Operation: DS_SPN_WRITE_OP, ServiceClass: LPCSTR, UserObjectDN: LPCSTR | NULL): DWORD {
+  public static DsServerRegisterSpnA(Operation: DS_SPN_WRITE_OP, ServiceClass: LPCSTR, UserObjectDN: OPTIONAL<LPCSTR>): DWORD {
     return Ntdsapi.Load('DsServerRegisterSpnA')(Operation, ServiceClass, UserObjectDN);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntdsapi/nf-ntdsapi-dsserverregisterspnw
-  public static DsServerRegisterSpnW(Operation: DS_SPN_WRITE_OP, ServiceClass: LPCWSTR, UserObjectDN: LPCWSTR | NULL): DWORD {
+  public static DsServerRegisterSpnW(Operation: DS_SPN_WRITE_OP, ServiceClass: LPCWSTR, UserObjectDN: OPTIONAL<LPCWSTR>): DWORD {
     return Ntdsapi.Load('DsServerRegisterSpnW')(Operation, ServiceClass, UserObjectDN);
   }
 

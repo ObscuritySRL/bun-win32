@@ -2,7 +2,7 @@ import type { Pointer } from 'bun:ffi';
 
 import type { WORD } from '@bun-win32/core';
 
-export type { BOOL, BOOLEAN, BYTE, DWORD, HANDLE, HINSTANCE, HRESULT, HWND, INT, LONG, LPCWSTR, LPDWORD, LPVOID, LPWSTR, NULL, PULONG, UINT, ULONG, USHORT, WORD } from '@bun-win32/core';
+export type { BOOL, BOOLEAN, BYTE, DWORD, HANDLE, HINSTANCE, HRESULT, HWND, INT, LONG, LPCWSTR, LPDWORD, LPVOID, LPWSTR, NULL, NULLABLE, OPTIONAL, PULONG, UINT, ULONG, USHORT, WORD } from '@bun-win32/core';
 
 export const CCH_MAX_PROPSTG_NAME = 31;
 

@@ -16,8 +16,8 @@ import type {
   LPGUID,
   LPARAM,
   LPBYTE,
-  NULL,
   NTSTATUS,
+  OPTIONAL,
   PADMINISTRATOR_POWER_POLICY,
   PBYTE,
   PGLOBAL_POWER_POLICY,
@@ -157,8 +157,8 @@ class PowrProf extends Win32 {
   } as const satisfies Record<string, FFIFunction>;
 
   // https://learn.microsoft.com/en-us/windows/win32/api/powerbase/nf-powerbase-callntpowerinformation
-  public static CallNtPowerInformation(InformationLevel: POWER_INFORMATION_LEVEL, InputBuffer: PVOID | NULL, InputBufferLength: ULONG, OutputBuffer: PVOID | NULL, OutputBufferLength: ULONG): NTSTATUS {
-    return PowrProf.Load('CallNtPowerInformation')(InformationLevel, InputBuffer, InputBufferLength, OutputBuffer, OutputBufferLength);
+  public static CallNtPowerInformation(InformationLevel: POWER_INFORMATION_LEVEL, InputBuffer: OPTIONAL<PVOID>, InputBufferLength: ULONG, OutputBuffer_out: OPTIONAL<PVOID>, OutputBufferLength: ULONG): NTSTATUS {
+    return PowrProf.Load('CallNtPowerInformation')(InformationLevel, InputBuffer, InputBufferLength, OutputBuffer_out, OutputBufferLength);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/powrprof/nf-powrprof-canuserwritepwrscheme
@@ -177,8 +177,8 @@ class PowrProf extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/powrprof/nf-powrprof-devicepowerenumdevices
-  public static DevicePowerEnumDevices(QueryIndex: ULONG, QueryInterpretationFlags: ULONG, QueryFlags: ULONG, pReturnBuffer: PBYTE | NULL, pBufferSize: PULONG): BOOLEAN {
-    return PowrProf.Load('DevicePowerEnumDevices')(QueryIndex, QueryInterpretationFlags, QueryFlags, pReturnBuffer, pBufferSize);
+  public static DevicePowerEnumDevices(QueryIndex: ULONG, QueryInterpretationFlags: ULONG, QueryFlags: ULONG, pReturnBuffer_out: OPTIONAL<PBYTE>, pBufferSize_in_out: PULONG): BOOLEAN {
+    return PowrProf.Load('DevicePowerEnumDevices')(QueryIndex, QueryInterpretationFlags, QueryFlags, pReturnBuffer_out, pBufferSize_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/powrprof/nf-powrprof-devicepoweropen
@@ -187,7 +187,7 @@ class PowrProf extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/powrprof/nf-powrprof-devicepowersetdevicestate
-  public static DevicePowerSetDeviceState(DeviceDescription: LPCWSTR, SetFlags: ULONG, SetData: PVOID | NULL): DWORD {
+  public static DevicePowerSetDeviceState(DeviceDescription: LPCWSTR, SetFlags: ULONG, SetData: OPTIONAL<PVOID>): DWORD {
     return PowrProf.Load('DevicePowerSetDeviceState')(DeviceDescription, SetFlags, SetData);
   }
 
@@ -197,23 +197,23 @@ class PowrProf extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/powrprof/nf-powrprof-getactivepwrscheme
-  public static GetActivePwrScheme(puiID: PUINT): BOOLEAN {
-    return PowrProf.Load('GetActivePwrScheme')(puiID);
+  public static GetActivePwrScheme(puiID_out: PUINT): BOOLEAN {
+    return PowrProf.Load('GetActivePwrScheme')(puiID_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/powrprof/nf-powrprof-getcurrentpowerpolicies
-  public static GetCurrentPowerPolicies(pGlobalPowerPolicy: PGLOBAL_POWER_POLICY, pPowerPolicy: PPOWER_POLICY): BOOLEAN {
-    return PowrProf.Load('GetCurrentPowerPolicies')(pGlobalPowerPolicy, pPowerPolicy);
+  public static GetCurrentPowerPolicies(pGlobalPowerPolicy_out: PGLOBAL_POWER_POLICY, pPowerPolicy_out: PPOWER_POLICY): BOOLEAN {
+    return PowrProf.Load('GetCurrentPowerPolicies')(pGlobalPowerPolicy_out, pPowerPolicy_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/powerbase/nf-powerbase-getpwrcapabilities
-  public static GetPwrCapabilities(lpspc: PSYSTEM_POWER_CAPABILITIES): BOOLEAN {
-    return PowrProf.Load('GetPwrCapabilities')(lpspc);
+  public static GetPwrCapabilities(lpspc_out: PSYSTEM_POWER_CAPABILITIES): BOOLEAN {
+    return PowrProf.Load('GetPwrCapabilities')(lpspc_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/powrprof/nf-powrprof-getpwrdiskspindownrange
-  public static GetPwrDiskSpindownRange(puiMax: PUINT, puiMin: PUINT): BOOLEAN {
-    return PowrProf.Load('GetPwrDiskSpindownRange')(puiMax, puiMin);
+  public static GetPwrDiskSpindownRange(puiMax_out: PUINT, puiMin_out: PUINT): BOOLEAN {
+    return PowrProf.Load('GetPwrDiskSpindownRange')(puiMax_out, puiMin_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/powrprof/nf-powrprof-isadminoverrideactive
@@ -242,17 +242,17 @@ class PowrProf extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/powrprof/nf-powrprof-powercreatepossiblesetting
-  public static PowerCreatePossibleSetting(RootSystemPowerKey: HKEY | 0n, SubGroupOfPowerSettingsGuid: LPCGUID, PowerSettingGuid: LPCGUID, PossibleSettingIndex: ULONG): DWORD {
+  public static PowerCreatePossibleSetting(RootSystemPowerKey: OPTIONAL<HKEY>, SubGroupOfPowerSettingsGuid: LPCGUID, PowerSettingGuid: LPCGUID, PossibleSettingIndex: ULONG): DWORD {
     return PowrProf.Load('PowerCreatePossibleSetting')(RootSystemPowerKey, SubGroupOfPowerSettingsGuid, PowerSettingGuid, PossibleSettingIndex);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/powrprof/nf-powrprof-powercreatesetting
-  public static PowerCreateSetting(RootSystemPowerKey: HKEY | 0n, SubGroupOfPowerSettingsGuid: LPCGUID, PowerSettingGuid: LPCGUID): DWORD {
+  public static PowerCreateSetting(RootSystemPowerKey: OPTIONAL<HKEY>, SubGroupOfPowerSettingsGuid: LPCGUID, PowerSettingGuid: LPCGUID): DWORD {
     return PowrProf.Load('PowerCreateSetting')(RootSystemPowerKey, SubGroupOfPowerSettingsGuid, PowerSettingGuid);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/powrprof/nf-powrprof-powerdeletescheme
-  public static PowerDeleteScheme(RootPowerKey: HKEY | 0n, SchemeGuid: LPCGUID): DWORD {
+  public static PowerDeleteScheme(RootPowerKey: OPTIONAL<HKEY>, SchemeGuid: LPCGUID): DWORD {
     return PowrProf.Load('PowerDeleteScheme')(RootPowerKey, SchemeGuid);
   }
 
@@ -267,159 +267,210 @@ class PowrProf extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/powrprof/nf-powrprof-powerduplicatescheme
-  public static PowerDuplicateScheme(RootPowerKey: HKEY | 0n, SourceSchemeGuid: LPCGUID, DestinationSchemeGuid: PVOID): DWORD {
-    return PowrProf.Load('PowerDuplicateScheme')(RootPowerKey, SourceSchemeGuid, DestinationSchemeGuid);
+  public static PowerDuplicateScheme(RootPowerKey: OPTIONAL<HKEY>, SourceSchemeGuid: LPCGUID, DestinationSchemeGuid_in_out: PVOID): DWORD {
+    return PowrProf.Load('PowerDuplicateScheme')(RootPowerKey, SourceSchemeGuid, DestinationSchemeGuid_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/powrprof/nf-powrprof-powerenumerate
-  public static PowerEnumerate(RootPowerKey: HKEY | 0n, SchemeGuid: LPCGUID | NULL, SubGroupOfPowerSettingsGuid: LPCGUID | NULL, AccessFlags: POWER_DATA_ACCESSOR, Index: ULONG, Buffer: PUCHAR | NULL, BufferSize: LPDWORD): DWORD {
-    return PowrProf.Load('PowerEnumerate')(RootPowerKey, SchemeGuid, SubGroupOfPowerSettingsGuid, AccessFlags, Index, Buffer, BufferSize);
+  public static PowerEnumerate(
+    RootPowerKey: OPTIONAL<HKEY>,
+    SchemeGuid: OPTIONAL<LPCGUID>,
+    SubGroupOfPowerSettingsGuid: OPTIONAL<LPCGUID>,
+    AccessFlags: POWER_DATA_ACCESSOR,
+    Index: ULONG,
+    Buffer_out: OPTIONAL<PUCHAR>,
+    BufferSize_in_out: LPDWORD,
+  ): DWORD {
+    return PowrProf.Load('PowerEnumerate')(RootPowerKey, SchemeGuid, SubGroupOfPowerSettingsGuid, AccessFlags, Index, Buffer_out, BufferSize_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/powersetting/nf-powersetting-powergetactivescheme
-  public static PowerGetActiveScheme(UserRootPowerKey: HKEY | 0n, ActivePolicyGuid: PVOID): DWORD {
-    return PowrProf.Load('PowerGetActiveScheme')(UserRootPowerKey, ActivePolicyGuid);
+  public static PowerGetActiveScheme(UserRootPowerKey: OPTIONAL<HKEY>, ActivePolicyGuid_out: PVOID): DWORD {
+    return PowrProf.Load('PowerGetActiveScheme')(UserRootPowerKey, ActivePolicyGuid_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/powrprof/nf-powrprof-powergetuserconfiguredacpowermode
-  public static PowerGetUserConfiguredACPowerMode(PowerModeGuid: LPGUID): DWORD {
-    return PowrProf.Load('PowerGetUserConfiguredACPowerMode')(PowerModeGuid);
+  public static PowerGetUserConfiguredACPowerMode(PowerModeGuid_out: LPGUID): DWORD {
+    return PowrProf.Load('PowerGetUserConfiguredACPowerMode')(PowerModeGuid_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/powrprof/nf-powrprof-powergetuserconfigureddcpowermode
-  public static PowerGetUserConfiguredDCPowerMode(PowerModeGuid: LPGUID): DWORD {
-    return PowrProf.Load('PowerGetUserConfiguredDCPowerMode')(PowerModeGuid);
+  public static PowerGetUserConfiguredDCPowerMode(PowerModeGuid_out: LPGUID): DWORD {
+    return PowrProf.Load('PowerGetUserConfiguredDCPowerMode')(PowerModeGuid_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/powrprof/nf-powrprof-powerimportpowerscheme
-  public static PowerImportPowerScheme(RootPowerKey: HKEY | 0n, ImportFileNamePath: LPCWSTR, DestinationSchemeGuid: PVOID): DWORD {
-    return PowrProf.Load('PowerImportPowerScheme')(RootPowerKey, ImportFileNamePath, DestinationSchemeGuid);
+  public static PowerImportPowerScheme(RootPowerKey: OPTIONAL<HKEY>, ImportFileNamePath: LPCWSTR, DestinationSchemeGuid_in_out: PVOID): DWORD {
+    return PowrProf.Load('PowerImportPowerScheme')(RootPowerKey, ImportFileNamePath, DestinationSchemeGuid_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/powrprof/nf-powrprof-powerissettingrangedefined
-  public static PowerIsSettingRangeDefined(SubKeyGuid: LPCGUID | NULL, SettingGuid: LPCGUID | NULL): BOOLEAN {
+  public static PowerIsSettingRangeDefined(SubKeyGuid: OPTIONAL<LPCGUID>, SettingGuid: OPTIONAL<LPCGUID>): BOOLEAN {
     return PowrProf.Load('PowerIsSettingRangeDefined')(SubKeyGuid, SettingGuid);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/powrprof/nf-powrprof-poweropensystempowerkey
-  public static PowerOpenSystemPowerKey(phSystemPowerKey: PVOID, Access: REGSAM, OpenExisting: BOOL): DWORD {
-    return PowrProf.Load('PowerOpenSystemPowerKey')(phSystemPowerKey, Access, OpenExisting);
+  public static PowerOpenSystemPowerKey(phSystemPowerKey_out: PVOID, Access: REGSAM, OpenExisting: BOOL): DWORD {
+    return PowrProf.Load('PowerOpenSystemPowerKey')(phSystemPowerKey_out, Access, OpenExisting);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/powrprof/nf-powrprof-poweropenuserpowerkey
-  public static PowerOpenUserPowerKey(phUserPowerKey: PVOID, Access: REGSAM, OpenExisting: BOOL): DWORD {
-    return PowrProf.Load('PowerOpenUserPowerKey')(phUserPowerKey, Access, OpenExisting);
+  public static PowerOpenUserPowerKey(phUserPowerKey_out: PVOID, Access: REGSAM, OpenExisting: BOOL): DWORD {
+    return PowrProf.Load('PowerOpenUserPowerKey')(phUserPowerKey_out, Access, OpenExisting);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/powrprof/nf-powrprof-powerreadacdefaultindex
-  public static PowerReadACDefaultIndex(RootPowerKey: HKEY | 0n, SchemePersonalityGuid: LPCGUID, SubGroupOfPowerSettingsGuid: LPCGUID | NULL, PowerSettingGuid: LPCGUID, AcDefaultIndex: LPDWORD): DWORD {
-    return PowrProf.Load('PowerReadACDefaultIndex')(RootPowerKey, SchemePersonalityGuid, SubGroupOfPowerSettingsGuid, PowerSettingGuid, AcDefaultIndex);
+  public static PowerReadACDefaultIndex(RootPowerKey: OPTIONAL<HKEY>, SchemePersonalityGuid: LPCGUID, SubGroupOfPowerSettingsGuid: OPTIONAL<LPCGUID>, PowerSettingGuid: LPCGUID, AcDefaultIndex_out: LPDWORD): DWORD {
+    return PowrProf.Load('PowerReadACDefaultIndex')(RootPowerKey, SchemePersonalityGuid, SubGroupOfPowerSettingsGuid, PowerSettingGuid, AcDefaultIndex_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/powersetting/nf-powersetting-powerreadacvalue
   public static PowerReadACValue(
-    RootPowerKey: HKEY | 0n,
-    SchemeGuid: LPCGUID | NULL,
-    SubGroupOfPowerSettingsGuid: LPCGUID | NULL,
-    PowerSettingGuid: LPCGUID | NULL,
-    Type: PULONG | NULL,
-    Buffer: LPBYTE | NULL,
-    BufferSize: LPDWORD | NULL,
+    RootPowerKey: OPTIONAL<HKEY>,
+    SchemeGuid: OPTIONAL<LPCGUID>,
+    SubGroupOfPowerSettingsGuid: OPTIONAL<LPCGUID>,
+    PowerSettingGuid: OPTIONAL<LPCGUID>,
+    Type_out: OPTIONAL<PULONG>,
+    Buffer_out: OPTIONAL<LPBYTE>,
+    BufferSize_in_out: OPTIONAL<LPDWORD>,
   ): DWORD {
-    return PowrProf.Load('PowerReadACValue')(RootPowerKey, SchemeGuid, SubGroupOfPowerSettingsGuid, PowerSettingGuid, Type, Buffer, BufferSize);
+    return PowrProf.Load('PowerReadACValue')(RootPowerKey, SchemeGuid, SubGroupOfPowerSettingsGuid, PowerSettingGuid, Type_out, Buffer_out, BufferSize_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/powrprof/nf-powrprof-powerreadacvalueindex
-  public static PowerReadACValueIndex(RootPowerKey: HKEY | 0n, SchemeGuid: LPCGUID | NULL, SubGroupOfPowerSettingsGuid: LPCGUID | NULL, PowerSettingGuid: LPCGUID | NULL, AcValueIndex: LPDWORD): DWORD {
-    return PowrProf.Load('PowerReadACValueIndex')(RootPowerKey, SchemeGuid, SubGroupOfPowerSettingsGuid, PowerSettingGuid, AcValueIndex);
+  public static PowerReadACValueIndex(RootPowerKey: OPTIONAL<HKEY>, SchemeGuid: OPTIONAL<LPCGUID>, SubGroupOfPowerSettingsGuid: OPTIONAL<LPCGUID>, PowerSettingGuid: OPTIONAL<LPCGUID>, AcValueIndex_out: LPDWORD): DWORD {
+    return PowrProf.Load('PowerReadACValueIndex')(RootPowerKey, SchemeGuid, SubGroupOfPowerSettingsGuid, PowerSettingGuid, AcValueIndex_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/powrprof/nf-powrprof-powerreaddcdefaultindex
-  public static PowerReadDCDefaultIndex(RootPowerKey: HKEY | 0n, SchemePersonalityGuid: LPCGUID, SubGroupOfPowerSettingsGuid: LPCGUID | NULL, PowerSettingGuid: LPCGUID, DcDefaultIndex: LPDWORD): DWORD {
-    return PowrProf.Load('PowerReadDCDefaultIndex')(RootPowerKey, SchemePersonalityGuid, SubGroupOfPowerSettingsGuid, PowerSettingGuid, DcDefaultIndex);
+  public static PowerReadDCDefaultIndex(RootPowerKey: OPTIONAL<HKEY>, SchemePersonalityGuid: LPCGUID, SubGroupOfPowerSettingsGuid: OPTIONAL<LPCGUID>, PowerSettingGuid: LPCGUID, DcDefaultIndex_out: LPDWORD): DWORD {
+    return PowrProf.Load('PowerReadDCDefaultIndex')(RootPowerKey, SchemePersonalityGuid, SubGroupOfPowerSettingsGuid, PowerSettingGuid, DcDefaultIndex_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/powersetting/nf-powersetting-powerreaddcvalue
-  public static PowerReadDCValue(RootPowerKey: HKEY | 0n, SchemeGuid: LPCGUID | NULL, SubGroupOfPowerSettingsGuid: LPCGUID | NULL, PowerSettingGuid: LPCGUID | NULL, Type: PULONG | NULL, Buffer: PUCHAR | NULL, BufferSize: LPDWORD): DWORD {
-    return PowrProf.Load('PowerReadDCValue')(RootPowerKey, SchemeGuid, SubGroupOfPowerSettingsGuid, PowerSettingGuid, Type, Buffer, BufferSize);
+  public static PowerReadDCValue(
+    RootPowerKey: OPTIONAL<HKEY>,
+    SchemeGuid: OPTIONAL<LPCGUID>,
+    SubGroupOfPowerSettingsGuid: OPTIONAL<LPCGUID>,
+    PowerSettingGuid: OPTIONAL<LPCGUID>,
+    Type_out: OPTIONAL<PULONG>,
+    Buffer_out: OPTIONAL<PUCHAR>,
+    BufferSize_in_out: LPDWORD,
+  ): DWORD {
+    return PowrProf.Load('PowerReadDCValue')(RootPowerKey, SchemeGuid, SubGroupOfPowerSettingsGuid, PowerSettingGuid, Type_out, Buffer_out, BufferSize_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/powrprof/nf-powrprof-powerreaddcvalueindex
-  public static PowerReadDCValueIndex(RootPowerKey: HKEY | 0n, SchemeGuid: LPCGUID | NULL, SubGroupOfPowerSettingsGuid: LPCGUID | NULL, PowerSettingGuid: LPCGUID | NULL, DcValueIndex: LPDWORD): DWORD {
-    return PowrProf.Load('PowerReadDCValueIndex')(RootPowerKey, SchemeGuid, SubGroupOfPowerSettingsGuid, PowerSettingGuid, DcValueIndex);
+  public static PowerReadDCValueIndex(RootPowerKey: OPTIONAL<HKEY>, SchemeGuid: OPTIONAL<LPCGUID>, SubGroupOfPowerSettingsGuid: OPTIONAL<LPCGUID>, PowerSettingGuid: OPTIONAL<LPCGUID>, DcValueIndex_out: LPDWORD): DWORD {
+    return PowrProf.Load('PowerReadDCValueIndex')(RootPowerKey, SchemeGuid, SubGroupOfPowerSettingsGuid, PowerSettingGuid, DcValueIndex_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/powrprof/nf-powrprof-powerreaddescription
-  public static PowerReadDescription(RootPowerKey: HKEY | 0n, SchemeGuid: LPCGUID | NULL, SubGroupOfPowerSettingsGuid: LPCGUID | NULL, PowerSettingGuid: LPCGUID | NULL, Buffer: PUCHAR | NULL, BufferSize: LPDWORD): DWORD {
-    return PowrProf.Load('PowerReadDescription')(RootPowerKey, SchemeGuid, SubGroupOfPowerSettingsGuid, PowerSettingGuid, Buffer, BufferSize);
+  public static PowerReadDescription(
+    RootPowerKey: OPTIONAL<HKEY>,
+    SchemeGuid: OPTIONAL<LPCGUID>,
+    SubGroupOfPowerSettingsGuid: OPTIONAL<LPCGUID>,
+    PowerSettingGuid: OPTIONAL<LPCGUID>,
+    Buffer_out: OPTIONAL<PUCHAR>,
+    BufferSize_in_out: LPDWORD,
+  ): DWORD {
+    return PowrProf.Load('PowerReadDescription')(RootPowerKey, SchemeGuid, SubGroupOfPowerSettingsGuid, PowerSettingGuid, Buffer_out, BufferSize_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/powrprof/nf-powrprof-powerreadfriendlyname
-  public static PowerReadFriendlyName(RootPowerKey: HKEY | 0n, SchemeGuid: LPCGUID | NULL, SubGroupOfPowerSettingsGuid: LPCGUID | NULL, PowerSettingGuid: LPCGUID | NULL, Buffer: PUCHAR | NULL, BufferSize: LPDWORD): DWORD {
-    return PowrProf.Load('PowerReadFriendlyName')(RootPowerKey, SchemeGuid, SubGroupOfPowerSettingsGuid, PowerSettingGuid, Buffer, BufferSize);
+  public static PowerReadFriendlyName(
+    RootPowerKey: OPTIONAL<HKEY>,
+    SchemeGuid: OPTIONAL<LPCGUID>,
+    SubGroupOfPowerSettingsGuid: OPTIONAL<LPCGUID>,
+    PowerSettingGuid: OPTIONAL<LPCGUID>,
+    Buffer_out: OPTIONAL<PUCHAR>,
+    BufferSize_in_out: LPDWORD,
+  ): DWORD {
+    return PowrProf.Load('PowerReadFriendlyName')(RootPowerKey, SchemeGuid, SubGroupOfPowerSettingsGuid, PowerSettingGuid, Buffer_out, BufferSize_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/powrprof/nf-powrprof-powerreadiconresourcespecifier
-  public static PowerReadIconResourceSpecifier(RootPowerKey: HKEY | 0n, SchemeGuid: LPCGUID | NULL, SubGroupOfPowerSettingsGuid: LPCGUID | NULL, PowerSettingGuid: LPCGUID | NULL, Buffer: PUCHAR | NULL, BufferSize: LPDWORD): DWORD {
-    return PowrProf.Load('PowerReadIconResourceSpecifier')(RootPowerKey, SchemeGuid, SubGroupOfPowerSettingsGuid, PowerSettingGuid, Buffer, BufferSize);
+  public static PowerReadIconResourceSpecifier(
+    RootPowerKey: OPTIONAL<HKEY>,
+    SchemeGuid: OPTIONAL<LPCGUID>,
+    SubGroupOfPowerSettingsGuid: OPTIONAL<LPCGUID>,
+    PowerSettingGuid: OPTIONAL<LPCGUID>,
+    Buffer_out: OPTIONAL<PUCHAR>,
+    BufferSize_in_out: LPDWORD,
+  ): DWORD {
+    return PowrProf.Load('PowerReadIconResourceSpecifier')(RootPowerKey, SchemeGuid, SubGroupOfPowerSettingsGuid, PowerSettingGuid, Buffer_out, BufferSize_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/powrprof/nf-powrprof-powerreadpossibledescription
-  public static PowerReadPossibleDescription(RootPowerKey: HKEY | 0n, SubGroupOfPowerSettingsGuid: LPCGUID | NULL, PowerSettingGuid: LPCGUID | NULL, PossibleSettingIndex: ULONG, Buffer: PUCHAR | NULL, BufferSize: LPDWORD): DWORD {
-    return PowrProf.Load('PowerReadPossibleDescription')(RootPowerKey, SubGroupOfPowerSettingsGuid, PowerSettingGuid, PossibleSettingIndex, Buffer, BufferSize);
+  public static PowerReadPossibleDescription(
+    RootPowerKey: OPTIONAL<HKEY>,
+    SubGroupOfPowerSettingsGuid: OPTIONAL<LPCGUID>,
+    PowerSettingGuid: OPTIONAL<LPCGUID>,
+    PossibleSettingIndex: ULONG,
+    Buffer_out: OPTIONAL<PUCHAR>,
+    BufferSize_in_out: LPDWORD,
+  ): DWORD {
+    return PowrProf.Load('PowerReadPossibleDescription')(RootPowerKey, SubGroupOfPowerSettingsGuid, PowerSettingGuid, PossibleSettingIndex, Buffer_out, BufferSize_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/powrprof/nf-powrprof-powerreadpossiblefriendlyname
-  public static PowerReadPossibleFriendlyName(RootPowerKey: HKEY | 0n, SubGroupOfPowerSettingsGuid: LPCGUID | NULL, PowerSettingGuid: LPCGUID | NULL, PossibleSettingIndex: ULONG, Buffer: PUCHAR | NULL, BufferSize: LPDWORD): DWORD {
-    return PowrProf.Load('PowerReadPossibleFriendlyName')(RootPowerKey, SubGroupOfPowerSettingsGuid, PowerSettingGuid, PossibleSettingIndex, Buffer, BufferSize);
+  public static PowerReadPossibleFriendlyName(
+    RootPowerKey: OPTIONAL<HKEY>,
+    SubGroupOfPowerSettingsGuid: OPTIONAL<LPCGUID>,
+    PowerSettingGuid: OPTIONAL<LPCGUID>,
+    PossibleSettingIndex: ULONG,
+    Buffer_out: OPTIONAL<PUCHAR>,
+    BufferSize_in_out: LPDWORD,
+  ): DWORD {
+    return PowrProf.Load('PowerReadPossibleFriendlyName')(RootPowerKey, SubGroupOfPowerSettingsGuid, PowerSettingGuid, PossibleSettingIndex, Buffer_out, BufferSize_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/powrprof/nf-powrprof-powerreadpossiblevalue
   public static PowerReadPossibleValue(
-    RootPowerKey: HKEY | 0n,
-    SubGroupOfPowerSettingsGuid: LPCGUID | NULL,
-    PowerSettingGuid: LPCGUID | NULL,
-    Type: PULONG | NULL,
+    RootPowerKey: OPTIONAL<HKEY>,
+    SubGroupOfPowerSettingsGuid: OPTIONAL<LPCGUID>,
+    PowerSettingGuid: OPTIONAL<LPCGUID>,
+    Type_out: OPTIONAL<PULONG>,
     PossibleSettingIndex: ULONG,
-    Buffer: PUCHAR | NULL,
-    BufferSize: LPDWORD,
+    Buffer_out: OPTIONAL<PUCHAR>,
+    BufferSize_in_out: LPDWORD,
   ): DWORD {
-    return PowrProf.Load('PowerReadPossibleValue')(RootPowerKey, SubGroupOfPowerSettingsGuid, PowerSettingGuid, Type, PossibleSettingIndex, Buffer, BufferSize);
+    return PowrProf.Load('PowerReadPossibleValue')(RootPowerKey, SubGroupOfPowerSettingsGuid, PowerSettingGuid, Type_out, PossibleSettingIndex, Buffer_out, BufferSize_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/powrprof/nf-powrprof-powerreadsettingattributes
-  public static PowerReadSettingAttributes(SubGroupGuid: LPCGUID | NULL, PowerSettingGuid: LPCGUID | NULL): DWORD {
+  public static PowerReadSettingAttributes(SubGroupGuid: OPTIONAL<LPCGUID>, PowerSettingGuid: OPTIONAL<LPCGUID>): DWORD {
     return PowrProf.Load('PowerReadSettingAttributes')(SubGroupGuid, PowerSettingGuid);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/powrprof/nf-powrprof-powerreadvalueincrement
-  public static PowerReadValueIncrement(RootPowerKey: HKEY | 0n, SubGroupOfPowerSettingsGuid: LPCGUID | NULL, PowerSettingGuid: LPCGUID | NULL, ValueIncrement: LPDWORD): DWORD {
-    return PowrProf.Load('PowerReadValueIncrement')(RootPowerKey, SubGroupOfPowerSettingsGuid, PowerSettingGuid, ValueIncrement);
+  public static PowerReadValueIncrement(RootPowerKey: OPTIONAL<HKEY>, SubGroupOfPowerSettingsGuid: OPTIONAL<LPCGUID>, PowerSettingGuid: OPTIONAL<LPCGUID>, ValueIncrement_out: LPDWORD): DWORD {
+    return PowrProf.Load('PowerReadValueIncrement')(RootPowerKey, SubGroupOfPowerSettingsGuid, PowerSettingGuid, ValueIncrement_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/powrprof/nf-powrprof-powerreadvaluemax
-  public static PowerReadValueMax(RootPowerKey: HKEY | 0n, SubGroupOfPowerSettingsGuid: LPCGUID | NULL, PowerSettingGuid: LPCGUID | NULL, ValueMaximum: LPDWORD): DWORD {
-    return PowrProf.Load('PowerReadValueMax')(RootPowerKey, SubGroupOfPowerSettingsGuid, PowerSettingGuid, ValueMaximum);
+  public static PowerReadValueMax(RootPowerKey: OPTIONAL<HKEY>, SubGroupOfPowerSettingsGuid: OPTIONAL<LPCGUID>, PowerSettingGuid: OPTIONAL<LPCGUID>, ValueMaximum_out: LPDWORD): DWORD {
+    return PowrProf.Load('PowerReadValueMax')(RootPowerKey, SubGroupOfPowerSettingsGuid, PowerSettingGuid, ValueMaximum_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/powrprof/nf-powrprof-powerreadvaluemin
-  public static PowerReadValueMin(RootPowerKey: HKEY | 0n, SubGroupOfPowerSettingsGuid: LPCGUID | NULL, PowerSettingGuid: LPCGUID | NULL, ValueMinimum: LPDWORD): DWORD {
-    return PowrProf.Load('PowerReadValueMin')(RootPowerKey, SubGroupOfPowerSettingsGuid, PowerSettingGuid, ValueMinimum);
+  public static PowerReadValueMin(RootPowerKey: OPTIONAL<HKEY>, SubGroupOfPowerSettingsGuid: OPTIONAL<LPCGUID>, PowerSettingGuid: OPTIONAL<LPCGUID>, ValueMinimum_out: LPDWORD): DWORD {
+    return PowrProf.Load('PowerReadValueMin')(RootPowerKey, SubGroupOfPowerSettingsGuid, PowerSettingGuid, ValueMinimum_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/powrprof/nf-powrprof-powerreadvalueunitsspecifier
-  public static PowerReadValueUnitsSpecifier(RootPowerKey: HKEY | 0n, SubGroupOfPowerSettingsGuid: LPCGUID | NULL, PowerSettingGuid: LPCGUID | NULL, Buffer: PUCHAR | NULL, BufferSize: LPDWORD): DWORD {
-    return PowrProf.Load('PowerReadValueUnitsSpecifier')(RootPowerKey, SubGroupOfPowerSettingsGuid, PowerSettingGuid, Buffer, BufferSize);
+  public static PowerReadValueUnitsSpecifier(RootPowerKey: OPTIONAL<HKEY>, SubGroupOfPowerSettingsGuid: OPTIONAL<LPCGUID>, PowerSettingGuid: OPTIONAL<LPCGUID>, Buffer_out: OPTIONAL<PUCHAR>, BufferSize_in_out: LPDWORD): DWORD {
+    return PowrProf.Load('PowerReadValueUnitsSpecifier')(RootPowerKey, SubGroupOfPowerSettingsGuid, PowerSettingGuid, Buffer_out, BufferSize_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/powersetting/nf-powersetting-powerregisterforeffectivepowermodenotifications
-  public static PowerRegisterForEffectivePowerModeNotifications(Version: ULONG, Callback: EFFECTIVE_POWER_MODE_CALLBACK, Context: PVOID | NULL, RegistrationHandle: PVOID): HRESULT {
-    return PowrProf.Load('PowerRegisterForEffectivePowerModeNotifications')(Version, Callback, Context, RegistrationHandle);
+  public static PowerRegisterForEffectivePowerModeNotifications(Version: ULONG, Callback: EFFECTIVE_POWER_MODE_CALLBACK, Context: OPTIONAL<PVOID>, RegistrationHandle_out: PVOID): HRESULT {
+    return PowrProf.Load('PowerRegisterForEffectivePowerModeNotifications')(Version, Callback, Context, RegistrationHandle_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/powerbase/nf-powerbase-powerregistersuspendresumenotification
-  public static PowerRegisterSuspendResumeNotification(Flags: DWORD, Recipient: HANDLE, RegistrationHandle: PHPOWERNOTIFY): DWORD {
-    return PowrProf.Load('PowerRegisterSuspendResumeNotification')(Flags, Recipient, RegistrationHandle);
+  public static PowerRegisterSuspendResumeNotification(Flags: DWORD, Recipient: HANDLE, RegistrationHandle_out: PHPOWERNOTIFY): DWORD {
+    return PowrProf.Load('PowerRegisterSuspendResumeNotification')(Flags, Recipient, RegistrationHandle_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/powrprof/nf-powrprof-powerremovepowersetting
@@ -448,7 +499,7 @@ class PowrProf extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/powersetting/nf-powersetting-powersetactivescheme
-  public static PowerSetActiveScheme(UserRootPowerKey: HKEY | 0n, SchemeGuid: LPCGUID | NULL): DWORD {
+  public static PowerSetActiveScheme(UserRootPowerKey: OPTIONAL<HKEY>, SchemeGuid: OPTIONAL<LPCGUID>): DWORD {
     return PowrProf.Load('PowerSetActiveScheme')(UserRootPowerKey, SchemeGuid);
   }
 
@@ -463,107 +514,107 @@ class PowrProf extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/powrprof/nf-powrprof-powersettingaccesscheck
-  public static PowerSettingAccessCheck(AccessFlags: POWER_DATA_ACCESSOR, PowerGuid: LPCGUID | NULL): DWORD {
+  public static PowerSettingAccessCheck(AccessFlags: POWER_DATA_ACCESSOR, PowerGuid: OPTIONAL<LPCGUID>): DWORD {
     return PowrProf.Load('PowerSettingAccessCheck')(AccessFlags, PowerGuid);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/powrprof/nf-powrprof-powersettingaccesscheckex
-  public static PowerSettingAccessCheckEx(AccessFlags: POWER_DATA_ACCESSOR, PowerGuid: LPCGUID | NULL, AccessType: REGSAM): DWORD {
+  public static PowerSettingAccessCheckEx(AccessFlags: POWER_DATA_ACCESSOR, PowerGuid: OPTIONAL<LPCGUID>, AccessType: REGSAM): DWORD {
     return PowrProf.Load('PowerSettingAccessCheckEx')(AccessFlags, PowerGuid, AccessType);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/powersetting/nf-powersetting-powersettingregisternotification
-  public static PowerSettingRegisterNotification(SettingGuid: LPCGUID, Flags: DWORD, Recipient: HANDLE, RegistrationHandle: PHPOWERNOTIFY): DWORD {
-    return PowrProf.Load('PowerSettingRegisterNotification')(SettingGuid, Flags, Recipient, RegistrationHandle);
+  public static PowerSettingRegisterNotification(SettingGuid: LPCGUID, Flags: DWORD, Recipient: HANDLE, RegistrationHandle_out: PHPOWERNOTIFY): DWORD {
+    return PowrProf.Load('PowerSettingRegisterNotification')(SettingGuid, Flags, Recipient, RegistrationHandle_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/powersetting/nf-powersetting-powersettingunregisternotification
-  public static PowerSettingUnregisterNotification(RegistrationHandle: HPOWERNOTIFY): DWORD {
-    return PowrProf.Load('PowerSettingUnregisterNotification')(RegistrationHandle);
+  public static PowerSettingUnregisterNotification(RegistrationHandle_in_out: HPOWERNOTIFY): DWORD {
+    return PowrProf.Load('PowerSettingUnregisterNotification')(RegistrationHandle_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/powersetting/nf-powersetting-powerunregisterfromeffectivepowermodenotifications
-  public static PowerUnregisterFromEffectivePowerModeNotifications(RegistrationHandle: HPOWERNOTIFY): HRESULT {
+  public static PowerUnregisterFromEffectivePowerModeNotifications(RegistrationHandle: PVOID<bigint>): HRESULT {
     return PowrProf.Load('PowerUnregisterFromEffectivePowerModeNotifications')(RegistrationHandle);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/powerbase/nf-powerbase-powerunregistersuspendresumenotification
-  public static PowerUnregisterSuspendResumeNotification(RegistrationHandle: HPOWERNOTIFY): DWORD {
-    return PowrProf.Load('PowerUnregisterSuspendResumeNotification')(RegistrationHandle);
+  public static PowerUnregisterSuspendResumeNotification(RegistrationHandle_in_out: HPOWERNOTIFY): DWORD {
+    return PowrProf.Load('PowerUnregisterSuspendResumeNotification')(RegistrationHandle_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/powrprof/nf-powrprof-powerwriteacdefaultindex
-  public static PowerWriteACDefaultIndex(RootSystemPowerKey: HKEY | 0n, SchemePersonalityGuid: LPCGUID, SubGroupOfPowerSettingsGuid: LPCGUID | NULL, PowerSettingGuid: LPCGUID, DefaultAcIndex: DWORD): DWORD {
+  public static PowerWriteACDefaultIndex(RootSystemPowerKey: OPTIONAL<HKEY>, SchemePersonalityGuid: LPCGUID, SubGroupOfPowerSettingsGuid: OPTIONAL<LPCGUID>, PowerSettingGuid: LPCGUID, DefaultAcIndex: DWORD): DWORD {
     return PowrProf.Load('PowerWriteACDefaultIndex')(RootSystemPowerKey, SchemePersonalityGuid, SubGroupOfPowerSettingsGuid, PowerSettingGuid, DefaultAcIndex);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/powersetting/nf-powersetting-powerwriteacvalueindex
-  public static PowerWriteACValueIndex(RootPowerKey: HKEY | 0n, SchemeGuid: LPCGUID, SubGroupOfPowerSettingsGuid: LPCGUID | NULL, PowerSettingGuid: LPCGUID | NULL, AcValueIndex: DWORD): DWORD {
+  public static PowerWriteACValueIndex(RootPowerKey: OPTIONAL<HKEY>, SchemeGuid: LPCGUID, SubGroupOfPowerSettingsGuid: OPTIONAL<LPCGUID>, PowerSettingGuid: OPTIONAL<LPCGUID>, AcValueIndex: DWORD): DWORD {
     return PowrProf.Load('PowerWriteACValueIndex')(RootPowerKey, SchemeGuid, SubGroupOfPowerSettingsGuid, PowerSettingGuid, AcValueIndex);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/powrprof/nf-powrprof-powerwritedcdefaultindex
-  public static PowerWriteDCDefaultIndex(RootSystemPowerKey: HKEY | 0n, SchemePersonalityGuid: LPCGUID, SubGroupOfPowerSettingsGuid: LPCGUID | NULL, PowerSettingGuid: LPCGUID, DefaultDcIndex: DWORD): DWORD {
+  public static PowerWriteDCDefaultIndex(RootSystemPowerKey: OPTIONAL<HKEY>, SchemePersonalityGuid: LPCGUID, SubGroupOfPowerSettingsGuid: OPTIONAL<LPCGUID>, PowerSettingGuid: LPCGUID, DefaultDcIndex: DWORD): DWORD {
     return PowrProf.Load('PowerWriteDCDefaultIndex')(RootSystemPowerKey, SchemePersonalityGuid, SubGroupOfPowerSettingsGuid, PowerSettingGuid, DefaultDcIndex);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/powersetting/nf-powersetting-powerwritedcvalueindex
-  public static PowerWriteDCValueIndex(RootPowerKey: HKEY | 0n, SchemeGuid: LPCGUID, SubGroupOfPowerSettingsGuid: LPCGUID | NULL, PowerSettingGuid: LPCGUID | NULL, DcValueIndex: DWORD): DWORD {
+  public static PowerWriteDCValueIndex(RootPowerKey: OPTIONAL<HKEY>, SchemeGuid: LPCGUID, SubGroupOfPowerSettingsGuid: OPTIONAL<LPCGUID>, PowerSettingGuid: OPTIONAL<LPCGUID>, DcValueIndex: DWORD): DWORD {
     return PowrProf.Load('PowerWriteDCValueIndex')(RootPowerKey, SchemeGuid, SubGroupOfPowerSettingsGuid, PowerSettingGuid, DcValueIndex);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/powrprof/nf-powrprof-powerwritedescription
-  public static PowerWriteDescription(RootPowerKey: HKEY | 0n, SchemeGuid: LPCGUID, SubGroupOfPowerSettingsGuid: LPCGUID | NULL, PowerSettingGuid: LPCGUID | NULL, Buffer: PUCHAR, BufferSize: DWORD): DWORD {
+  public static PowerWriteDescription(RootPowerKey: OPTIONAL<HKEY>, SchemeGuid: LPCGUID, SubGroupOfPowerSettingsGuid: OPTIONAL<LPCGUID>, PowerSettingGuid: OPTIONAL<LPCGUID>, Buffer: PUCHAR, BufferSize: DWORD): DWORD {
     return PowrProf.Load('PowerWriteDescription')(RootPowerKey, SchemeGuid, SubGroupOfPowerSettingsGuid, PowerSettingGuid, Buffer, BufferSize);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/powrprof/nf-powrprof-powerwritefriendlyname
-  public static PowerWriteFriendlyName(RootPowerKey: HKEY | 0n, SchemeGuid: LPCGUID, SubGroupOfPowerSettingsGuid: LPCGUID | NULL, PowerSettingGuid: LPCGUID | NULL, Buffer: PUCHAR, BufferSize: DWORD): DWORD {
+  public static PowerWriteFriendlyName(RootPowerKey: OPTIONAL<HKEY>, SchemeGuid: LPCGUID, SubGroupOfPowerSettingsGuid: OPTIONAL<LPCGUID>, PowerSettingGuid: OPTIONAL<LPCGUID>, Buffer: PUCHAR, BufferSize: DWORD): DWORD {
     return PowrProf.Load('PowerWriteFriendlyName')(RootPowerKey, SchemeGuid, SubGroupOfPowerSettingsGuid, PowerSettingGuid, Buffer, BufferSize);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/powrprof/nf-powrprof-powerwriteiconresourcespecifier
-  public static PowerWriteIconResourceSpecifier(RootPowerKey: HKEY | 0n, SchemeGuid: LPCGUID, SubGroupOfPowerSettingsGuid: LPCGUID | NULL, PowerSettingGuid: LPCGUID | NULL, Buffer: PUCHAR, BufferSize: DWORD): DWORD {
+  public static PowerWriteIconResourceSpecifier(RootPowerKey: OPTIONAL<HKEY>, SchemeGuid: LPCGUID, SubGroupOfPowerSettingsGuid: OPTIONAL<LPCGUID>, PowerSettingGuid: OPTIONAL<LPCGUID>, Buffer: PUCHAR, BufferSize: DWORD): DWORD {
     return PowrProf.Load('PowerWriteIconResourceSpecifier')(RootPowerKey, SchemeGuid, SubGroupOfPowerSettingsGuid, PowerSettingGuid, Buffer, BufferSize);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/powrprof/nf-powrprof-powerwritepossibledescription
-  public static PowerWritePossibleDescription(RootPowerKey: HKEY | 0n, SubGroupOfPowerSettingsGuid: LPCGUID | NULL, PowerSettingGuid: LPCGUID | NULL, PossibleSettingIndex: ULONG, Buffer: PUCHAR, BufferSize: DWORD): DWORD {
+  public static PowerWritePossibleDescription(RootPowerKey: OPTIONAL<HKEY>, SubGroupOfPowerSettingsGuid: OPTIONAL<LPCGUID>, PowerSettingGuid: OPTIONAL<LPCGUID>, PossibleSettingIndex: ULONG, Buffer: PUCHAR, BufferSize: DWORD): DWORD {
     return PowrProf.Load('PowerWritePossibleDescription')(RootPowerKey, SubGroupOfPowerSettingsGuid, PowerSettingGuid, PossibleSettingIndex, Buffer, BufferSize);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/powrprof/nf-powrprof-powerwritepossiblefriendlyname
-  public static PowerWritePossibleFriendlyName(RootPowerKey: HKEY | 0n, SubGroupOfPowerSettingsGuid: LPCGUID | NULL, PowerSettingGuid: LPCGUID | NULL, PossibleSettingIndex: ULONG, Buffer: PUCHAR, BufferSize: DWORD): DWORD {
+  public static PowerWritePossibleFriendlyName(RootPowerKey: OPTIONAL<HKEY>, SubGroupOfPowerSettingsGuid: OPTIONAL<LPCGUID>, PowerSettingGuid: OPTIONAL<LPCGUID>, PossibleSettingIndex: ULONG, Buffer: PUCHAR, BufferSize: DWORD): DWORD {
     return PowrProf.Load('PowerWritePossibleFriendlyName')(RootPowerKey, SubGroupOfPowerSettingsGuid, PowerSettingGuid, PossibleSettingIndex, Buffer, BufferSize);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/powrprof/nf-powrprof-powerwritepossiblevalue
-  public static PowerWritePossibleValue(RootPowerKey: HKEY | 0n, SubGroupOfPowerSettingsGuid: LPCGUID | NULL, PowerSettingGuid: LPCGUID | NULL, Type: ULONG, PossibleSettingIndex: ULONG, Buffer: PUCHAR, BufferSize: DWORD): DWORD {
+  public static PowerWritePossibleValue(RootPowerKey: OPTIONAL<HKEY>, SubGroupOfPowerSettingsGuid: OPTIONAL<LPCGUID>, PowerSettingGuid: OPTIONAL<LPCGUID>, Type: ULONG, PossibleSettingIndex: ULONG, Buffer: PUCHAR, BufferSize: DWORD): DWORD {
     return PowrProf.Load('PowerWritePossibleValue')(RootPowerKey, SubGroupOfPowerSettingsGuid, PowerSettingGuid, Type, PossibleSettingIndex, Buffer, BufferSize);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/powrprof/nf-powrprof-powerwritesettingattributes
-  public static PowerWriteSettingAttributes(SubGroupGuid: LPCGUID | NULL, PowerSettingGuid: LPCGUID | NULL, Attributes: DWORD): DWORD {
+  public static PowerWriteSettingAttributes(SubGroupGuid: OPTIONAL<LPCGUID>, PowerSettingGuid: OPTIONAL<LPCGUID>, Attributes: DWORD): DWORD {
     return PowrProf.Load('PowerWriteSettingAttributes')(SubGroupGuid, PowerSettingGuid, Attributes);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/powrprof/nf-powrprof-powerwritevalueincrement
-  public static PowerWriteValueIncrement(RootPowerKey: HKEY | 0n, SubGroupOfPowerSettingsGuid: LPCGUID | NULL, PowerSettingGuid: LPCGUID | NULL, ValueIncrement: DWORD): DWORD {
+  public static PowerWriteValueIncrement(RootPowerKey: OPTIONAL<HKEY>, SubGroupOfPowerSettingsGuid: OPTIONAL<LPCGUID>, PowerSettingGuid: OPTIONAL<LPCGUID>, ValueIncrement: DWORD): DWORD {
     return PowrProf.Load('PowerWriteValueIncrement')(RootPowerKey, SubGroupOfPowerSettingsGuid, PowerSettingGuid, ValueIncrement);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/powrprof/nf-powrprof-powerwritevaluemax
-  public static PowerWriteValueMax(RootPowerKey: HKEY | 0n, SubGroupOfPowerSettingsGuid: LPCGUID | NULL, PowerSettingGuid: LPCGUID | NULL, ValueMaximum: DWORD): DWORD {
+  public static PowerWriteValueMax(RootPowerKey: OPTIONAL<HKEY>, SubGroupOfPowerSettingsGuid: OPTIONAL<LPCGUID>, PowerSettingGuid: OPTIONAL<LPCGUID>, ValueMaximum: DWORD): DWORD {
     return PowrProf.Load('PowerWriteValueMax')(RootPowerKey, SubGroupOfPowerSettingsGuid, PowerSettingGuid, ValueMaximum);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/powrprof/nf-powrprof-powerwritevaluemin
-  public static PowerWriteValueMin(RootPowerKey: HKEY | 0n, SubGroupOfPowerSettingsGuid: LPCGUID | NULL, PowerSettingGuid: LPCGUID | NULL, ValueMinimum: DWORD): DWORD {
+  public static PowerWriteValueMin(RootPowerKey: OPTIONAL<HKEY>, SubGroupOfPowerSettingsGuid: OPTIONAL<LPCGUID>, PowerSettingGuid: OPTIONAL<LPCGUID>, ValueMinimum: DWORD): DWORD {
     return PowrProf.Load('PowerWriteValueMin')(RootPowerKey, SubGroupOfPowerSettingsGuid, PowerSettingGuid, ValueMinimum);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/powrprof/nf-powrprof-powerwritevalueunitsspecifier
-  public static PowerWriteValueUnitsSpecifier(RootPowerKey: HKEY | 0n, SubGroupOfPowerSettingsGuid: LPCGUID | NULL, PowerSettingGuid: LPCGUID | NULL, Buffer: PUCHAR, BufferSize: DWORD): DWORD {
+  public static PowerWriteValueUnitsSpecifier(RootPowerKey: OPTIONAL<HKEY>, SubGroupOfPowerSettingsGuid: OPTIONAL<LPCGUID>, PowerSettingGuid: OPTIONAL<LPCGUID>, Buffer: PUCHAR, BufferSize: DWORD): DWORD {
     return PowrProf.Load('PowerWriteValueUnitsSpecifier')(RootPowerKey, SubGroupOfPowerSettingsGuid, PowerSettingGuid, Buffer, BufferSize);
   }
 
@@ -573,17 +624,17 @@ class PowrProf extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/powrprof/nf-powrprof-readprocessorpwrscheme
-  public static ReadProcessorPwrScheme(uiID: UINT, pMachineProcessorPowerPolicy: PMACHINE_PROCESSOR_POWER_POLICY): BOOLEAN {
-    return PowrProf.Load('ReadProcessorPwrScheme')(uiID, pMachineProcessorPowerPolicy);
+  public static ReadProcessorPwrScheme(uiID: UINT, pMachineProcessorPowerPolicy_out: PMACHINE_PROCESSOR_POWER_POLICY): BOOLEAN {
+    return PowrProf.Load('ReadProcessorPwrScheme')(uiID, pMachineProcessorPowerPolicy_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/powrprof/nf-powrprof-readpwrscheme
-  public static ReadPwrScheme(uiID: UINT, pPowerPolicy: PPOWER_POLICY): BOOLEAN {
-    return PowrProf.Load('ReadPwrScheme')(uiID, pPowerPolicy);
+  public static ReadPwrScheme(uiID: UINT, pPowerPolicy_out: PPOWER_POLICY): BOOLEAN {
+    return PowrProf.Load('ReadPwrScheme')(uiID, pPowerPolicy_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/powrprof/nf-powrprof-setactivepwrscheme
-  public static SetActivePwrScheme(uiID: UINT, pGlobalPowerPolicy: PGLOBAL_POWER_POLICY | NULL, pPowerPolicy: PPOWER_POLICY | NULL): BOOLEAN {
+  public static SetActivePwrScheme(uiID: UINT, pGlobalPowerPolicy: OPTIONAL<PGLOBAL_POWER_POLICY>, pPowerPolicy: OPTIONAL<PPOWER_POLICY>): BOOLEAN {
     return PowrProf.Load('SetActivePwrScheme')(uiID, pGlobalPowerPolicy, pPowerPolicy);
   }
 
@@ -593,8 +644,8 @@ class PowrProf extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/powrprof/nf-powrprof-validatepowerpolicies
-  public static ValidatePowerPolicies(pGlobalPowerPolicy: PGLOBAL_POWER_POLICY | NULL, pPowerPolicy: PPOWER_POLICY | NULL): BOOLEAN {
-    return PowrProf.Load('ValidatePowerPolicies')(pGlobalPowerPolicy, pPowerPolicy);
+  public static ValidatePowerPolicies(pGlobalPowerPolicy_in_out: OPTIONAL<PGLOBAL_POWER_POLICY>, pPowerPolicy_in_out: OPTIONAL<PPOWER_POLICY>): BOOLEAN {
+    return PowrProf.Load('ValidatePowerPolicies')(pGlobalPowerPolicy_in_out, pPowerPolicy_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/powrprof/nf-powrprof-writeglobalpwrpolicy
@@ -608,7 +659,7 @@ class PowrProf extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/powrprof/nf-powrprof-writepwrscheme
-  public static WritePwrScheme(puiID: PUINT, lpszSchemeName: LPCWSTR, lpszDescription: LPCWSTR | NULL, lpScheme: PPOWER_POLICY): BOOLEAN {
+  public static WritePwrScheme(puiID: PUINT, lpszSchemeName: LPCWSTR, lpszDescription: OPTIONAL<LPCWSTR>, lpScheme: PPOWER_POLICY): BOOLEAN {
     return PowrProf.Load('WritePwrScheme')(puiID, lpszSchemeName, lpszDescription, lpScheme);
   }
 }

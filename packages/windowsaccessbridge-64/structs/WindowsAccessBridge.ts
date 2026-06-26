@@ -219,13 +219,13 @@ class WindowsAccessBridge extends Win32 {
   }
 
   // https://github.com/openjdk/jdk/blob/master/src/jdk.accessibility/windows/native/include/bridge/AccessBridgeCalls.h
-  public static doAccessibleActions(vmID: LONG, accessibleContext: AccessibleContext, actionsToDo: PAccessibleActionsToDo, failure: PJINT): BOOL {
-    return WindowsAccessBridge.Load('doAccessibleActions')(vmID, accessibleContext, actionsToDo, failure);
+  public static doAccessibleActions(vmID: LONG, accessibleContext: AccessibleContext, actionsToDo: PAccessibleActionsToDo, failure_out: PJINT): BOOL {
+    return WindowsAccessBridge.Load('doAccessibleActions')(vmID, accessibleContext, actionsToDo, failure_out);
   }
 
   // https://github.com/openjdk/jdk/blob/master/src/jdk.accessibility/windows/native/include/bridge/AccessBridgeCalls.h
-  public static getAccessibleActions(vmID: LONG, accessibleContext: AccessibleContext, actions: PAccessibleActions): BOOL {
-    return WindowsAccessBridge.Load('getAccessibleActions')(vmID, accessibleContext, actions);
+  public static getAccessibleActions(vmID: LONG, accessibleContext: AccessibleContext, actions_out: PAccessibleActions): BOOL {
+    return WindowsAccessBridge.Load('getAccessibleActions')(vmID, accessibleContext, actions_out);
   }
 
   // https://github.com/openjdk/jdk/blob/master/src/jdk.accessibility/windows/native/include/bridge/AccessBridgeCalls.h
@@ -234,28 +234,28 @@ class WindowsAccessBridge extends Win32 {
   }
 
   // https://github.com/openjdk/jdk/blob/master/src/jdk.accessibility/windows/native/include/bridge/AccessBridgeCalls.h
-  public static getAccessibleContextAt(vmID: LONG, acParent: AccessibleContext, x: JINT, y: JINT, ac: PAccessibleContext): BOOL {
-    return WindowsAccessBridge.Load('getAccessibleContextAt')(vmID, acParent, x, y, ac);
+  public static getAccessibleContextAt(vmID: LONG, acParent: AccessibleContext, x: JINT, y: JINT, ac_out: PAccessibleContext): BOOL {
+    return WindowsAccessBridge.Load('getAccessibleContextAt')(vmID, acParent, x, y, ac_out);
   }
 
   // https://github.com/openjdk/jdk/blob/master/src/jdk.accessibility/windows/native/include/bridge/AccessBridgeCalls.h
-  public static getAccessibleContextFromHWND(target: HWND, vmID: PLONG, ac: PAccessibleContext): BOOL {
-    return WindowsAccessBridge.Load('getAccessibleContextFromHWND')(target, vmID, ac);
+  public static getAccessibleContextFromHWND(target: HWND, vmID_out: PLONG, ac_out: PAccessibleContext): BOOL {
+    return WindowsAccessBridge.Load('getAccessibleContextFromHWND')(target, vmID_out, ac_out);
   }
 
   // https://github.com/openjdk/jdk/blob/master/src/jdk.accessibility/windows/native/include/bridge/AccessBridgeCalls.h
-  public static getAccessibleContextInfo(vmID: LONG, ac: AccessibleContext, info: PAccessibleContextInfo): BOOL {
-    return WindowsAccessBridge.Load('getAccessibleContextInfo')(vmID, ac, info);
+  public static getAccessibleContextInfo(vmID: LONG, ac: AccessibleContext, info_out: PAccessibleContextInfo): BOOL {
+    return WindowsAccessBridge.Load('getAccessibleContextInfo')(vmID, ac, info_out);
   }
 
   // https://github.com/openjdk/jdk/blob/master/src/jdk.accessibility/windows/native/include/bridge/AccessBridgeCalls.h
-  public static getAccessibleContextWithFocus(window: HWND, vmID: PLONG, ac: PAccessibleContext): BOOL {
-    return WindowsAccessBridge.Load('getAccessibleContextWithFocus')(window, vmID, ac);
+  public static getAccessibleContextWithFocus(window: HWND, vmID_out: PLONG, ac_out: PAccessibleContext): BOOL {
+    return WindowsAccessBridge.Load('getAccessibleContextWithFocus')(window, vmID_out, ac_out);
   }
 
   // https://github.com/openjdk/jdk/blob/master/src/jdk.accessibility/windows/native/include/bridge/AccessBridgeCalls.h
-  public static getAccessibleHyperlink(vmID: LONG, hypertext: AccessibleHypertext, nIndex: JINT, hyperlinkInfo: PAccessibleHyperlinkInfo): BOOL {
-    return WindowsAccessBridge.Load('getAccessibleHyperlink')(vmID, hypertext, nIndex, hyperlinkInfo);
+  public static getAccessibleHyperlink(vmID: LONG, hypertext: AccessibleHypertext, nIndex: JINT, hyperlinkInfo_out: PAccessibleHyperlinkInfo): BOOL {
+    return WindowsAccessBridge.Load('getAccessibleHyperlink')(vmID, hypertext, nIndex, hyperlinkInfo_out);
   }
 
   // https://github.com/openjdk/jdk/blob/master/src/jdk.accessibility/windows/native/include/bridge/AccessBridgeCalls.h
@@ -264,13 +264,13 @@ class WindowsAccessBridge extends Win32 {
   }
 
   // https://github.com/openjdk/jdk/blob/master/src/jdk.accessibility/windows/native/include/bridge/AccessBridgeCalls.h
-  public static getAccessibleHypertext(vmID: LONG, accessibleContext: AccessibleContext, hypertextInfo: PAccessibleHypertextInfo): BOOL {
-    return WindowsAccessBridge.Load('getAccessibleHypertext')(vmID, accessibleContext, hypertextInfo);
+  public static getAccessibleHypertext(vmID: LONG, accessibleContext: AccessibleContext, hypertextInfo_out: PAccessibleHypertextInfo): BOOL {
+    return WindowsAccessBridge.Load('getAccessibleHypertext')(vmID, accessibleContext, hypertextInfo_out);
   }
 
   // https://github.com/openjdk/jdk/blob/master/src/jdk.accessibility/windows/native/include/bridge/AccessBridgeCalls.h
-  public static getAccessibleHypertextExt(vmID: LONG, accessibleContext: AccessibleContext, nStartIndex: JINT, hypertextInfo: PAccessibleHypertextInfo): BOOL {
-    return WindowsAccessBridge.Load('getAccessibleHypertextExt')(vmID, accessibleContext, nStartIndex, hypertextInfo);
+  public static getAccessibleHypertextExt(vmID: LONG, accessibleContext: AccessibleContext, nStartIndex: JINT, hypertextInfo_out: PAccessibleHypertextInfo): BOOL {
+    return WindowsAccessBridge.Load('getAccessibleHypertextExt')(vmID, accessibleContext, nStartIndex, hypertextInfo_out);
   }
 
   // https://github.com/openjdk/jdk/blob/master/src/jdk.accessibility/windows/native/include/bridge/AccessBridgeCalls.h
@@ -279,13 +279,13 @@ class WindowsAccessBridge extends Win32 {
   }
 
   // https://github.com/openjdk/jdk/blob/master/src/jdk.accessibility/windows/native/include/bridge/AccessBridgeCalls.h
-  public static getAccessibleIcons(vmID: LONG, accessibleContext: AccessibleContext, icons: PAccessibleIcons): BOOL {
-    return WindowsAccessBridge.Load('getAccessibleIcons')(vmID, accessibleContext, icons);
+  public static getAccessibleIcons(vmID: LONG, accessibleContext: AccessibleContext, icons_out: PAccessibleIcons): BOOL {
+    return WindowsAccessBridge.Load('getAccessibleIcons')(vmID, accessibleContext, icons_out);
   }
 
   // https://github.com/openjdk/jdk/blob/master/src/jdk.accessibility/windows/native/include/bridge/AccessBridgeCalls.h
-  public static getAccessibleKeyBindings(vmID: LONG, accessibleContext: AccessibleContext, keyBindings: PAccessibleKeyBindings): BOOL {
-    return WindowsAccessBridge.Load('getAccessibleKeyBindings')(vmID, accessibleContext, keyBindings);
+  public static getAccessibleKeyBindings(vmID: LONG, accessibleContext: AccessibleContext, keyBindings_out: PAccessibleKeyBindings): BOOL {
+    return WindowsAccessBridge.Load('getAccessibleKeyBindings')(vmID, accessibleContext, keyBindings_out);
   }
 
   // https://github.com/openjdk/jdk/blob/master/src/jdk.accessibility/windows/native/include/bridge/AccessBridgeCalls.h
@@ -294,8 +294,8 @@ class WindowsAccessBridge extends Win32 {
   }
 
   // https://github.com/openjdk/jdk/blob/master/src/jdk.accessibility/windows/native/include/bridge/AccessBridgeCalls.h
-  public static getAccessibleRelationSet(vmID: LONG, accessibleContext: AccessibleContext, relationSetInfo: PAccessibleRelationSetInfo): BOOL {
-    return WindowsAccessBridge.Load('getAccessibleRelationSet')(vmID, accessibleContext, relationSetInfo);
+  public static getAccessibleRelationSet(vmID: LONG, accessibleContext: AccessibleContext, relationSetInfo_out: PAccessibleRelationSetInfo): BOOL {
+    return WindowsAccessBridge.Load('getAccessibleRelationSet')(vmID, accessibleContext, relationSetInfo_out);
   }
 
   // https://github.com/openjdk/jdk/blob/master/src/jdk.accessibility/windows/native/include/bridge/AccessBridgeCalls.h
@@ -309,8 +309,8 @@ class WindowsAccessBridge extends Win32 {
   }
 
   // https://github.com/openjdk/jdk/blob/master/src/jdk.accessibility/windows/native/include/bridge/AccessBridgeCalls.h
-  public static getAccessibleTableCellInfo(vmID: LONG, accessibleTable: AccessibleTable, row: JINT, column: JINT, tableCellInfo: PAccessibleTableCellInfo): BOOL {
-    return WindowsAccessBridge.Load('getAccessibleTableCellInfo')(vmID, accessibleTable, row, column, tableCellInfo);
+  public static getAccessibleTableCellInfo(vmID: LONG, accessibleTable: AccessibleTable, row: JINT, column: JINT, tableCellInfo_out: PAccessibleTableCellInfo): BOOL {
+    return WindowsAccessBridge.Load('getAccessibleTableCellInfo')(vmID, accessibleTable, row, column, tableCellInfo_out);
   }
 
   // https://github.com/openjdk/jdk/blob/master/src/jdk.accessibility/windows/native/include/bridge/AccessBridgeCalls.h
@@ -324,8 +324,8 @@ class WindowsAccessBridge extends Win32 {
   }
 
   // https://github.com/openjdk/jdk/blob/master/src/jdk.accessibility/windows/native/include/bridge/AccessBridgeCalls.h
-  public static getAccessibleTableColumnHeader(vmID: LONG, acParent: AccessibleContext, tableInfo: PAccessibleTableInfo): BOOL {
-    return WindowsAccessBridge.Load('getAccessibleTableColumnHeader')(vmID, acParent, tableInfo);
+  public static getAccessibleTableColumnHeader(vmID: LONG, acParent: AccessibleContext, tableInfo_out: PAccessibleTableInfo): BOOL {
+    return WindowsAccessBridge.Load('getAccessibleTableColumnHeader')(vmID, acParent, tableInfo_out);
   }
 
   // https://github.com/openjdk/jdk/blob/master/src/jdk.accessibility/windows/native/include/bridge/AccessBridgeCalls.h
@@ -334,8 +334,8 @@ class WindowsAccessBridge extends Win32 {
   }
 
   // https://github.com/openjdk/jdk/blob/master/src/jdk.accessibility/windows/native/include/bridge/AccessBridgeCalls.h
-  public static getAccessibleTableColumnSelections(vmID: LONG, table: AccessibleTable, count: JINT, selections: PJINT): BOOL {
-    return WindowsAccessBridge.Load('getAccessibleTableColumnSelections')(vmID, table, count, selections);
+  public static getAccessibleTableColumnSelections(vmID: LONG, table: AccessibleTable, count: JINT, selections_out: PJINT): BOOL {
+    return WindowsAccessBridge.Load('getAccessibleTableColumnSelections')(vmID, table, count, selections_out);
   }
 
   // https://github.com/openjdk/jdk/blob/master/src/jdk.accessibility/windows/native/include/bridge/AccessBridgeCalls.h
@@ -344,8 +344,8 @@ class WindowsAccessBridge extends Win32 {
   }
 
   // https://github.com/openjdk/jdk/blob/master/src/jdk.accessibility/windows/native/include/bridge/AccessBridgeCalls.h
-  public static getAccessibleTableInfo(vmID: LONG, acParent: AccessibleContext, tableInfo: PAccessibleTableInfo): BOOL {
-    return WindowsAccessBridge.Load('getAccessibleTableInfo')(vmID, acParent, tableInfo);
+  public static getAccessibleTableInfo(vmID: LONG, acParent: AccessibleContext, tableInfo_out: PAccessibleTableInfo): BOOL {
+    return WindowsAccessBridge.Load('getAccessibleTableInfo')(vmID, acParent, tableInfo_out);
   }
 
   // https://github.com/openjdk/jdk/blob/master/src/jdk.accessibility/windows/native/include/bridge/AccessBridgeCalls.h
@@ -359,8 +359,8 @@ class WindowsAccessBridge extends Win32 {
   }
 
   // https://github.com/openjdk/jdk/blob/master/src/jdk.accessibility/windows/native/include/bridge/AccessBridgeCalls.h
-  public static getAccessibleTableRowHeader(vmID: LONG, acParent: AccessibleContext, tableInfo: PAccessibleTableInfo): BOOL {
-    return WindowsAccessBridge.Load('getAccessibleTableRowHeader')(vmID, acParent, tableInfo);
+  public static getAccessibleTableRowHeader(vmID: LONG, acParent: AccessibleContext, tableInfo_out: PAccessibleTableInfo): BOOL {
+    return WindowsAccessBridge.Load('getAccessibleTableRowHeader')(vmID, acParent, tableInfo_out);
   }
 
   // https://github.com/openjdk/jdk/blob/master/src/jdk.accessibility/windows/native/include/bridge/AccessBridgeCalls.h
@@ -369,43 +369,43 @@ class WindowsAccessBridge extends Win32 {
   }
 
   // https://github.com/openjdk/jdk/blob/master/src/jdk.accessibility/windows/native/include/bridge/AccessBridgeCalls.h
-  public static getAccessibleTableRowSelections(vmID: LONG, table: AccessibleTable, count: JINT, selections: PJINT): BOOL {
-    return WindowsAccessBridge.Load('getAccessibleTableRowSelections')(vmID, table, count, selections);
+  public static getAccessibleTableRowSelections(vmID: LONG, table: AccessibleTable, count: JINT, selections_out: PJINT): BOOL {
+    return WindowsAccessBridge.Load('getAccessibleTableRowSelections')(vmID, table, count, selections_out);
   }
 
   // https://github.com/openjdk/jdk/blob/master/src/jdk.accessibility/windows/native/include/bridge/AccessBridgeCalls.h
-  public static getAccessibleTextAttributes(vmID: LONG, at: AccessibleText, index: JINT, attributes: PAccessibleTextAttributesInfo): BOOL {
-    return WindowsAccessBridge.Load('getAccessibleTextAttributes')(vmID, at, index, attributes);
+  public static getAccessibleTextAttributes(vmID: LONG, at: AccessibleText, index: JINT, attributes_out: PAccessibleTextAttributesInfo): BOOL {
+    return WindowsAccessBridge.Load('getAccessibleTextAttributes')(vmID, at, index, attributes_out);
   }
 
   // https://github.com/openjdk/jdk/blob/master/src/jdk.accessibility/windows/native/include/bridge/AccessBridgeCalls.h
-  public static getAccessibleTextInfo(vmID: LONG, at: AccessibleText, textInfo: PAccessibleTextInfo, x: JINT, y: JINT): BOOL {
-    return WindowsAccessBridge.Load('getAccessibleTextInfo')(vmID, at, textInfo, x, y);
+  public static getAccessibleTextInfo(vmID: LONG, at: AccessibleText, textInfo_out: PAccessibleTextInfo, x: JINT, y: JINT): BOOL {
+    return WindowsAccessBridge.Load('getAccessibleTextInfo')(vmID, at, textInfo_out, x, y);
   }
 
   // https://github.com/openjdk/jdk/blob/master/src/jdk.accessibility/windows/native/include/bridge/AccessBridgeCalls.h
-  public static getAccessibleTextItems(vmID: LONG, at: AccessibleText, textItems: PAccessibleTextItemsInfo, index: JINT): BOOL {
-    return WindowsAccessBridge.Load('getAccessibleTextItems')(vmID, at, textItems, index);
+  public static getAccessibleTextItems(vmID: LONG, at: AccessibleText, textItems_out: PAccessibleTextItemsInfo, index: JINT): BOOL {
+    return WindowsAccessBridge.Load('getAccessibleTextItems')(vmID, at, textItems_out, index);
   }
 
   // https://github.com/openjdk/jdk/blob/master/src/jdk.accessibility/windows/native/include/bridge/AccessBridgeCalls.h
-  public static getAccessibleTextLineBounds(vmID: LONG, at: AccessibleText, index: JINT, startIndex: PJINT, endIndex: PJINT): BOOL {
-    return WindowsAccessBridge.Load('getAccessibleTextLineBounds')(vmID, at, index, startIndex, endIndex);
+  public static getAccessibleTextLineBounds(vmID: LONG, at: AccessibleText, index: JINT, startIndex_out: PJINT, endIndex_out: PJINT): BOOL {
+    return WindowsAccessBridge.Load('getAccessibleTextLineBounds')(vmID, at, index, startIndex_out, endIndex_out);
   }
 
   // https://github.com/openjdk/jdk/blob/master/src/jdk.accessibility/windows/native/include/bridge/AccessBridgeCalls.h
-  public static getAccessibleTextRange(vmID: LONG, at: AccessibleText, start: JINT, end: JINT, text: LPWSTR, len: SHORT): BOOL {
-    return WindowsAccessBridge.Load('getAccessibleTextRange')(vmID, at, start, end, text, len);
+  public static getAccessibleTextRange(vmID: LONG, at: AccessibleText, start: JINT, end: JINT, text_out: LPWSTR, len: SHORT): BOOL {
+    return WindowsAccessBridge.Load('getAccessibleTextRange')(vmID, at, start, end, text_out, len);
   }
 
   // https://github.com/openjdk/jdk/blob/master/src/jdk.accessibility/windows/native/include/bridge/AccessBridgeCalls.h
-  public static getAccessibleTextRect(vmID: LONG, at: AccessibleText, rectInfo: PAccessibleTextRectInfo, index: JINT): BOOL {
-    return WindowsAccessBridge.Load('getAccessibleTextRect')(vmID, at, rectInfo, index);
+  public static getAccessibleTextRect(vmID: LONG, at: AccessibleText, rectInfo_out: PAccessibleTextRectInfo, index: JINT): BOOL {
+    return WindowsAccessBridge.Load('getAccessibleTextRect')(vmID, at, rectInfo_out, index);
   }
 
   // https://github.com/openjdk/jdk/blob/master/src/jdk.accessibility/windows/native/include/bridge/AccessBridgeCalls.h
-  public static getAccessibleTextSelectionInfo(vmID: LONG, at: AccessibleText, textSelection: PAccessibleTextSelectionInfo): BOOL {
-    return WindowsAccessBridge.Load('getAccessibleTextSelectionInfo')(vmID, at, textSelection);
+  public static getAccessibleTextSelectionInfo(vmID: LONG, at: AccessibleText, textSelection_out: PAccessibleTextSelectionInfo): BOOL {
+    return WindowsAccessBridge.Load('getAccessibleTextSelectionInfo')(vmID, at, textSelection_out);
   }
 
   // https://github.com/openjdk/jdk/blob/master/src/jdk.accessibility/windows/native/include/bridge/AccessBridgeCalls.h
@@ -414,13 +414,13 @@ class WindowsAccessBridge extends Win32 {
   }
 
   // https://github.com/openjdk/jdk/blob/master/src/jdk.accessibility/windows/native/include/bridge/AccessBridgeCalls.h
-  public static getCaretLocation(vmID: LONG, ac: AccessibleContext, rectInfo: PAccessibleTextRectInfo, index: JINT): BOOL {
-    return WindowsAccessBridge.Load('getCaretLocation')(vmID, ac, rectInfo, index);
+  public static getCaretLocation(vmID: LONG, ac: AccessibleContext, rectInfo_out: PAccessibleTextRectInfo, index: JINT): BOOL {
+    return WindowsAccessBridge.Load('getCaretLocation')(vmID, ac, rectInfo_out, index);
   }
 
   // https://github.com/openjdk/jdk/blob/master/src/jdk.accessibility/windows/native/include/bridge/AccessBridgeCalls.h
-  public static getCurrentAccessibleValueFromContext(vmID: LONG, av: AccessibleValue, value: LPWSTR, len: SHORT): BOOL {
-    return WindowsAccessBridge.Load('getCurrentAccessibleValueFromContext')(vmID, av, value, len);
+  public static getCurrentAccessibleValueFromContext(vmID: LONG, av: AccessibleValue, value_out: LPWSTR, len: SHORT): BOOL {
+    return WindowsAccessBridge.Load('getCurrentAccessibleValueFromContext')(vmID, av, value_out, len);
   }
 
   // https://github.com/openjdk/jdk/blob/master/src/jdk.accessibility/windows/native/include/bridge/AccessBridgeCalls.h
@@ -434,13 +434,13 @@ class WindowsAccessBridge extends Win32 {
   }
 
   // https://github.com/openjdk/jdk/blob/master/src/jdk.accessibility/windows/native/include/bridge/AccessBridgeCalls.h
-  public static getMaximumAccessibleValueFromContext(vmID: LONG, av: AccessibleValue, value: LPWSTR, len: SHORT): BOOL {
-    return WindowsAccessBridge.Load('getMaximumAccessibleValueFromContext')(vmID, av, value, len);
+  public static getMaximumAccessibleValueFromContext(vmID: LONG, av: AccessibleValue, value_out: LPWSTR, len: SHORT): BOOL {
+    return WindowsAccessBridge.Load('getMaximumAccessibleValueFromContext')(vmID, av, value_out, len);
   }
 
   // https://github.com/openjdk/jdk/blob/master/src/jdk.accessibility/windows/native/include/bridge/AccessBridgeCalls.h
-  public static getMinimumAccessibleValueFromContext(vmID: LONG, av: AccessibleValue, value: LPWSTR, len: SHORT): BOOL {
-    return WindowsAccessBridge.Load('getMinimumAccessibleValueFromContext')(vmID, av, value, len);
+  public static getMinimumAccessibleValueFromContext(vmID: LONG, av: AccessibleValue, value_out: LPWSTR, len: SHORT): BOOL {
+    return WindowsAccessBridge.Load('getMinimumAccessibleValueFromContext')(vmID, av, value_out, len);
   }
 
   // https://github.com/openjdk/jdk/blob/master/src/jdk.accessibility/windows/native/include/bridge/AccessBridgeCalls.h
@@ -459,8 +459,8 @@ class WindowsAccessBridge extends Win32 {
   }
 
   // https://github.com/openjdk/jdk/blob/master/src/jdk.accessibility/windows/native/include/bridge/AccessBridgeCalls.h
-  public static getTextAttributesInRange(vmID: LONG, accessibleContext: AccessibleContext, startIndex: INT, endIndex: INT, attributes: PAccessibleTextAttributesInfo, len: PSHORT): BOOL {
-    return WindowsAccessBridge.Load('getTextAttributesInRange')(vmID, accessibleContext, startIndex, endIndex, attributes, len);
+  public static getTextAttributesInRange(vmID: LONG, accessibleContext: AccessibleContext, startIndex: INT, endIndex: INT, attributes_out: PAccessibleTextAttributesInfo, len_out: PSHORT): BOOL {
+    return WindowsAccessBridge.Load('getTextAttributesInRange')(vmID, accessibleContext, startIndex, endIndex, attributes_out, len_out);
   }
 
   // https://github.com/openjdk/jdk/blob/master/src/jdk.accessibility/windows/native/include/bridge/AccessBridgeCalls.h
@@ -469,18 +469,18 @@ class WindowsAccessBridge extends Win32 {
   }
 
   // https://github.com/openjdk/jdk/blob/master/src/jdk.accessibility/windows/native/include/bridge/AccessBridgeCalls.h
-  public static getVersionInfo(vmID: LONG, info: PAccessBridgeVersionInfo): BOOL {
-    return WindowsAccessBridge.Load('getVersionInfo')(vmID, info);
+  public static getVersionInfo(vmID: LONG, info_out: PAccessBridgeVersionInfo): BOOL {
+    return WindowsAccessBridge.Load('getVersionInfo')(vmID, info_out);
   }
 
   // https://github.com/openjdk/jdk/blob/master/src/jdk.accessibility/windows/native/include/bridge/AccessBridgeCalls.h
-  public static getVirtualAccessibleName(vmID: LONG, accessibleContext: AccessibleContext, name: LPWSTR, len: INT): BOOL {
-    return WindowsAccessBridge.Load('getVirtualAccessibleName')(vmID, accessibleContext, name, len);
+  public static getVirtualAccessibleName(vmID: LONG, accessibleContext: AccessibleContext, name_out: LPWSTR, len: INT): BOOL {
+    return WindowsAccessBridge.Load('getVirtualAccessibleName')(vmID, accessibleContext, name_out, len);
   }
 
   // https://github.com/openjdk/jdk/blob/master/src/jdk.accessibility/windows/native/include/bridge/AccessBridgeCalls.h
-  public static getVisibleChildren(vmID: LONG, accessibleContext: AccessibleContext, startIndex: INT, visibleChildrenInfo: PVisibleChildrenInfo): BOOL {
-    return WindowsAccessBridge.Load('getVisibleChildren')(vmID, accessibleContext, startIndex, visibleChildrenInfo);
+  public static getVisibleChildren(vmID: LONG, accessibleContext: AccessibleContext, startIndex: INT, visibleChildrenInfo_out: PVisibleChildrenInfo): BOOL {
+    return WindowsAccessBridge.Load('getVisibleChildren')(vmID, accessibleContext, startIndex, visibleChildrenInfo_out);
   }
 
   // https://github.com/openjdk/jdk/blob/master/src/jdk.accessibility/windows/native/include/bridge/AccessBridgeCalls.h

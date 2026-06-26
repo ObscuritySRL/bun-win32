@@ -2,7 +2,7 @@ import { type FFIFunction, FFIType } from 'bun:ffi';
 
 import { Win32 } from '@bun-win32/core';
 
-import type { BOOL, DWORD, FLOAT, HWND, INT, LPDWORD, LPRECT, MagImageScalingCallback, NULL, PBOOL, PFLOAT, PHWND, PINT, PMAGCOLOREFFECT, PMAGTRANSFORM, PRECT, RECT } from '../types/Magnification';
+import type { BOOL, DWORD, FLOAT, HWND, INT, LPDWORD, LPRECT, MagImageScalingCallback, NULL, NULLABLE, PBOOL, PFLOAT, PHWND, PINT, PMAGCOLOREFFECT, PMAGTRANSFORM, PRECT, RECT } from '../types/Magnification';
 
 /**
  * Thin, lazy-loaded FFI bindings for `magnification.dll`.
@@ -53,18 +53,18 @@ class Magnification extends Win32 {
   } as const satisfies Record<string, FFIFunction>;
 
   // https://learn.microsoft.com/en-us/windows/win32/api/magnification/nf-magnification-maggetcoloreffect
-  public static MagGetColorEffect(hwnd: HWND, pEffect: PMAGCOLOREFFECT): BOOL {
-    return Magnification.Load('MagGetColorEffect')(hwnd, pEffect);
+  public static MagGetColorEffect(hwnd: HWND, pEffect_out: PMAGCOLOREFFECT): BOOL {
+    return Magnification.Load('MagGetColorEffect')(hwnd, pEffect_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/magnification/nf-magnification-maggetfullscreencoloreffect
-  public static MagGetFullscreenColorEffect(pEffect: PMAGCOLOREFFECT): BOOL {
-    return Magnification.Load('MagGetFullscreenColorEffect')(pEffect);
+  public static MagGetFullscreenColorEffect(pEffect_out: PMAGCOLOREFFECT): BOOL {
+    return Magnification.Load('MagGetFullscreenColorEffect')(pEffect_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/magnification/nf-magnification-maggetfullscreentransform
-  public static MagGetFullscreenTransform(pMagLevel: PFLOAT, pxOffset: PINT, pyOffset: PINT): BOOL {
-    return Magnification.Load('MagGetFullscreenTransform')(pMagLevel, pxOffset, pyOffset);
+  public static MagGetFullscreenTransform(pMagLevel_out: PFLOAT, pxOffset_out: PINT, pyOffset_out: PINT): BOOL {
+    return Magnification.Load('MagGetFullscreenTransform')(pMagLevel_out, pxOffset_out, pyOffset_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/magnification/nf-magnification-maggetimagescalingcallback
@@ -73,23 +73,23 @@ class Magnification extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/magnification/nf-magnification-maggetinputtransform
-  public static MagGetInputTransform(pfEnabled: PBOOL, pRectSource: LPRECT, pRectDest: LPRECT): BOOL {
-    return Magnification.Load('MagGetInputTransform')(pfEnabled, pRectSource, pRectDest);
+  public static MagGetInputTransform(pfEnabled_out: PBOOL, pRectSource_out: LPRECT, pRectDest_out: LPRECT): BOOL {
+    return Magnification.Load('MagGetInputTransform')(pfEnabled_out, pRectSource_out, pRectDest_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/magnification/nf-magnification-maggetwindowfilterlist
-  public static MagGetWindowFilterList(hwnd: HWND, pdwFilterMode: LPDWORD, count: INT, pHWND: PHWND): INT {
-    return Magnification.Load('MagGetWindowFilterList')(hwnd, pdwFilterMode, count, pHWND);
+  public static MagGetWindowFilterList(hwnd: HWND, pdwFilterMode_out: LPDWORD, count: INT, pHWND_out: PHWND): INT {
+    return Magnification.Load('MagGetWindowFilterList')(hwnd, pdwFilterMode_out, count, pHWND_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/magnification/nf-magnification-maggetwindowsource
-  public static MagGetWindowSource(hwnd: HWND, pRect: PRECT): BOOL {
-    return Magnification.Load('MagGetWindowSource')(hwnd, pRect);
+  public static MagGetWindowSource(hwnd: HWND, pRect_out: PRECT): BOOL {
+    return Magnification.Load('MagGetWindowSource')(hwnd, pRect_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/magnification/nf-magnification-maggetwindowtransform
-  public static MagGetWindowTransform(hwnd: HWND, pTransform: PMAGTRANSFORM): BOOL {
-    return Magnification.Load('MagGetWindowTransform')(hwnd, pTransform);
+  public static MagGetWindowTransform(hwnd: HWND, pTransform_out: PMAGTRANSFORM): BOOL {
+    return Magnification.Load('MagGetWindowTransform')(hwnd, pTransform_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/magnification/nf-magnification-maginitialize
@@ -98,7 +98,7 @@ class Magnification extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/magnification/nf-magnification-magsetcoloreffect
-  public static MagSetColorEffect(hwnd: HWND, pEffect: PMAGCOLOREFFECT | NULL): BOOL {
+  public static MagSetColorEffect(hwnd: HWND, pEffect: NULLABLE<PMAGCOLOREFFECT>): BOOL {
     return Magnification.Load('MagSetColorEffect')(hwnd, pEffect);
   }
 
@@ -113,7 +113,7 @@ class Magnification extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/magnification/nf-magnification-magsetimagescalingcallback
-  public static MagSetImageScalingCallback(hwnd: HWND, callback: MagImageScalingCallback | NULL): BOOL {
+  public static MagSetImageScalingCallback(hwnd: HWND, callback: NULLABLE<MagImageScalingCallback>): BOOL {
     return Magnification.Load('MagSetImageScalingCallback')(hwnd, callback);
   }
 

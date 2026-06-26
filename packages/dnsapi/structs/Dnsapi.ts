@@ -2,7 +2,7 @@ import { type FFIFunction, FFIType } from 'bun:ffi';
 
 import { Win32 } from '@bun-win32/core';
 
-import type { BOOL, DWORD, HANDLE, LPCWSTR, NULL, PDWORD, PHANDLE, PVOID, WORD } from '../types/Dnsapi';
+import type { BOOL, DWORD, HANDLE, LPCWSTR, NULLABLE, OPTIONAL, PDWORD, PHANDLE, PVOID, WORD } from '../types/Dnsapi';
 import type {
   DNS_STATUS,
   DnsCharSet,
@@ -123,13 +123,13 @@ class Dnsapi extends Win32 {
   } as const satisfies Record<string, FFIFunction>;
 
   // https://learn.microsoft.com/en-us/windows/win32/api/windns/nf-windns-dnsacquirecontexthandle_a
-  public static DnsAcquireContextHandle_A(CredentialFlags: DWORD, Credentials: PVOID | NULL, pContext: PHANDLE): DNS_STATUS {
-    return Dnsapi.Load('DnsAcquireContextHandle_A')(CredentialFlags, Credentials, pContext);
+  public static DnsAcquireContextHandle_A(CredentialFlags: DWORD, Credentials: OPTIONAL<PVOID>, pContext_out: PHANDLE): DNS_STATUS {
+    return Dnsapi.Load('DnsAcquireContextHandle_A')(CredentialFlags, Credentials, pContext_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/windns/nf-windns-dnsacquirecontexthandle_w
-  public static DnsAcquireContextHandle_W(CredentialFlags: DWORD, Credentials: PVOID | NULL, pContext: PHANDLE): DNS_STATUS {
-    return Dnsapi.Load('DnsAcquireContextHandle_W')(CredentialFlags, Credentials, pContext);
+  public static DnsAcquireContextHandle_W(CredentialFlags: DWORD, Credentials: OPTIONAL<PVOID>, pContext_out: PHANDLE): DNS_STATUS {
+    return Dnsapi.Load('DnsAcquireContextHandle_W')(CredentialFlags, Credentials, pContext_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/windns/nf-windns-dnscancelquery
@@ -143,38 +143,44 @@ class Dnsapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/windns/nf-windns-dnsextractrecordsfrommessage_utf8
-  public static DnsExtractRecordsFromMessage_UTF8(pDnsBuffer: PDNS_MESSAGE_BUFFER, wMessageLength: WORD, ppRecord: PVOID): DNS_STATUS {
-    return Dnsapi.Load('DnsExtractRecordsFromMessage_UTF8')(pDnsBuffer, wMessageLength, ppRecord);
+  public static DnsExtractRecordsFromMessage_UTF8(pDnsBuffer: PDNS_MESSAGE_BUFFER, wMessageLength: WORD, ppRecord_out: PVOID): DNS_STATUS {
+    return Dnsapi.Load('DnsExtractRecordsFromMessage_UTF8')(pDnsBuffer, wMessageLength, ppRecord_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/windns/nf-windns-dnsextractrecordsfrommessage_w
-  public static DnsExtractRecordsFromMessage_W(pDnsBuffer: PDNS_MESSAGE_BUFFER, wMessageLength: WORD, ppRecord: PVOID): DNS_STATUS {
-    return Dnsapi.Load('DnsExtractRecordsFromMessage_W')(pDnsBuffer, wMessageLength, ppRecord);
+  public static DnsExtractRecordsFromMessage_W(pDnsBuffer: PDNS_MESSAGE_BUFFER, wMessageLength: WORD, ppRecord_out: PVOID): DNS_STATUS {
+    return Dnsapi.Load('DnsExtractRecordsFromMessage_W')(pDnsBuffer, wMessageLength, ppRecord_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/windns/nf-windns-dnsfree
-  public static DnsFree(pData: PVOID | NULL, FreeType: DnsFreeType): void {
+  public static DnsFree(pData: OPTIONAL<PVOID>, FreeType: DnsFreeType): void {
     return Dnsapi.Load('DnsFree')(pData, FreeType);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/windns/nf-windns-dnsfreecustomservers
-  public static DnsFreeCustomServers(pcServers: PDWORD, ppServers: PVOID): void {
-    return Dnsapi.Load('DnsFreeCustomServers')(pcServers, ppServers);
+  public static DnsFreeCustomServers(pcServers_in_out: PDWORD, ppServers_in_out: PVOID): void {
+    return Dnsapi.Load('DnsFreeCustomServers')(pcServers_in_out, ppServers_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/windns/nf-windns-dnsfreeproxyname
-  public static DnsFreeProxyName(proxyName: PWSTR | NULL): void {
+  public static DnsFreeProxyName(proxyName: OPTIONAL<PWSTR>): void {
     return Dnsapi.Load('DnsFreeProxyName')(proxyName);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/windns/nf-windns-dnsgetapplicationsettings
-  public static DnsGetApplicationSettings(pcServers: PDWORD, ppDefaultServers: PVOID, pSettings: PDNS_APPLICATION_SETTINGS | NULL): DWORD {
-    return Dnsapi.Load('DnsGetApplicationSettings')(pcServers, ppDefaultServers, pSettings);
+  public static DnsGetApplicationSettings(pcServers_out: PDWORD, ppDefaultServers_out: PVOID, pSettings_out: OPTIONAL<PDNS_APPLICATION_SETTINGS>): DWORD {
+    return Dnsapi.Load('DnsGetApplicationSettings')(pcServers_out, ppDefaultServers_out, pSettings_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/windns/nf-windns-dnsgetproxyinformation
-  public static DnsGetProxyInformation(hostName: PCWSTR, proxyInformation: PDNS_PROXY_INFORMATION, defaultProxyInformation: PDNS_PROXY_INFORMATION | NULL, completionRoutine: PVOID | NULL, completionContext: PVOID | NULL): DWORD {
-    return Dnsapi.Load('DnsGetProxyInformation')(hostName, proxyInformation, defaultProxyInformation, completionRoutine, completionContext);
+  public static DnsGetProxyInformation(
+    hostName: PCWSTR,
+    proxyInformation_in_out: PDNS_PROXY_INFORMATION,
+    defaultProxyInformation_in_out: OPTIONAL<PDNS_PROXY_INFORMATION>,
+    completionRoutine: OPTIONAL<PVOID>,
+    completionContext: OPTIONAL<PVOID>,
+  ): DWORD {
+    return Dnsapi.Load('DnsGetProxyInformation')(hostName, proxyInformation_in_out, defaultProxyInformation_in_out, completionRoutine, completionContext);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/windns/nf-windns-dnsisflatrecord
@@ -188,18 +194,39 @@ class Dnsapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/windns/nf-windns-dnsmodifyrecordsinset_a
-  public static DnsModifyRecordsInSet_A(pAddRecords: PDNS_RECORD | NULL, pDeleteRecords: PDNS_RECORD | NULL, Options: DWORD, hCredentials: HANDLE | 0n, pExtraList: PVOID | NULL, pReserved: PVOID | NULL): DNS_STATUS {
-    return Dnsapi.Load('DnsModifyRecordsInSet_A')(pAddRecords, pDeleteRecords, Options, hCredentials, pExtraList, pReserved);
+  public static DnsModifyRecordsInSet_A(
+    pAddRecords: OPTIONAL<PDNS_RECORD>,
+    pDeleteRecords: OPTIONAL<PDNS_RECORD>,
+    Options: DWORD,
+    hCredentials: OPTIONAL<HANDLE>,
+    pExtraList_in_out: OPTIONAL<PVOID>,
+    pReserved_in_out: OPTIONAL<PVOID>,
+  ): DNS_STATUS {
+    return Dnsapi.Load('DnsModifyRecordsInSet_A')(pAddRecords, pDeleteRecords, Options, hCredentials, pExtraList_in_out, pReserved_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/windns/nf-windns-dnsmodifyrecordsinset_utf8
-  public static DnsModifyRecordsInSet_UTF8(pAddRecords: PDNS_RECORD | NULL, pDeleteRecords: PDNS_RECORD | NULL, Options: DWORD, hCredentials: HANDLE | 0n, pExtraList: PVOID | NULL, pReserved: PVOID | NULL): DNS_STATUS {
-    return Dnsapi.Load('DnsModifyRecordsInSet_UTF8')(pAddRecords, pDeleteRecords, Options, hCredentials, pExtraList, pReserved);
+  public static DnsModifyRecordsInSet_UTF8(
+    pAddRecords: OPTIONAL<PDNS_RECORD>,
+    pDeleteRecords: OPTIONAL<PDNS_RECORD>,
+    Options: DWORD,
+    hCredentials: OPTIONAL<HANDLE>,
+    pExtraList_in_out: OPTIONAL<PVOID>,
+    pReserved_in_out: OPTIONAL<PVOID>,
+  ): DNS_STATUS {
+    return Dnsapi.Load('DnsModifyRecordsInSet_UTF8')(pAddRecords, pDeleteRecords, Options, hCredentials, pExtraList_in_out, pReserved_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/windns/nf-windns-dnsmodifyrecordsinset_w
-  public static DnsModifyRecordsInSet_W(pAddRecords: PDNS_RECORD | NULL, pDeleteRecords: PDNS_RECORD | NULL, Options: DWORD, hCredentials: HANDLE | 0n, pExtraList: PVOID | NULL, pReserved: PVOID | NULL): DNS_STATUS {
-    return Dnsapi.Load('DnsModifyRecordsInSet_W')(pAddRecords, pDeleteRecords, Options, hCredentials, pExtraList, pReserved);
+  public static DnsModifyRecordsInSet_W(
+    pAddRecords: OPTIONAL<PDNS_RECORD>,
+    pDeleteRecords: OPTIONAL<PDNS_RECORD>,
+    Options: DWORD,
+    hCredentials: OPTIONAL<HANDLE>,
+    pExtraList_in_out: OPTIONAL<PVOID>,
+    pReserved_in_out: OPTIONAL<PVOID>,
+  ): DNS_STATUS {
+    return Dnsapi.Load('DnsModifyRecordsInSet_W')(pAddRecords, pDeleteRecords, Options, hCredentials, pExtraList_in_out, pReserved_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/windns/nf-windns-dnsnamecompare_a
@@ -213,18 +240,18 @@ class Dnsapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/windns/nf-windns-dnsqueryconfig
-  public static DnsQueryConfig(Config: DnsConfigType, Flag: DWORD, pwsAdapterName: PCWSTR | NULL, pReserved: PVOID | NULL, pBuffer: PVOID | NULL, pBufLen: PDWORD): DNS_STATUS {
-    return Dnsapi.Load('DnsQueryConfig')(Config, Flag, pwsAdapterName, pReserved, pBuffer, pBufLen);
+  public static DnsQueryConfig(Config: DnsConfigType, Flag: DWORD, pwsAdapterName: OPTIONAL<PCWSTR>, pReserved: OPTIONAL<PVOID>, pBuffer_out: OPTIONAL<PVOID>, pBufLen_in_out: PDWORD): DNS_STATUS {
+    return Dnsapi.Load('DnsQueryConfig')(Config, Flag, pwsAdapterName, pReserved, pBuffer_out, pBufLen_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/windns/nf-windns-dnsqueryex
-  public static DnsQueryEx(pQueryRequest: PDNS_QUERY_REQUEST, pQueryResults: PDNS_QUERY_RESULT, pCancelHandle: PDNS_QUERY_CANCEL | NULL): DNS_STATUS {
-    return Dnsapi.Load('DnsQueryEx')(pQueryRequest, pQueryResults, pCancelHandle);
+  public static DnsQueryEx(pQueryRequest: PDNS_QUERY_REQUEST, pQueryResults_in_out: PDNS_QUERY_RESULT, pCancelHandle_in_out: OPTIONAL<PDNS_QUERY_CANCEL>): DNS_STATUS {
+    return Dnsapi.Load('DnsQueryEx')(pQueryRequest, pQueryResults_in_out, pCancelHandle_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/windns/nf-windns-dnsqueryraw
-  public static DnsQueryRaw(queryRequest: PDNS_QUERY_RAW_REQUEST, cancelHandle: PDNS_QUERY_RAW_CANCEL): DNS_STATUS {
-    return Dnsapi.Load('DnsQueryRaw')(queryRequest, cancelHandle);
+  public static DnsQueryRaw(queryRequest: PDNS_QUERY_RAW_REQUEST, cancelHandle_in_out: PDNS_QUERY_RAW_CANCEL): DNS_STATUS {
+    return Dnsapi.Load('DnsQueryRaw')(queryRequest, cancelHandle_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/windns/nf-windns-dnsqueryrawresultfree
@@ -233,18 +260,18 @@ class Dnsapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/windns/nf-windns-dnsquery_a
-  public static DnsQuery_A(pszName: PCSTR, wType: WORD, Options: DWORD, pExtra: PVOID | NULL, ppQueryResults: PVOID | NULL, pReserved: PVOID | NULL): DNS_STATUS {
-    return Dnsapi.Load('DnsQuery_A')(pszName, wType, Options, pExtra, ppQueryResults, pReserved);
+  public static DnsQuery_A(pszName: PCSTR, wType: WORD, Options: DWORD, pExtra_in_out: OPTIONAL<PVOID>, ppQueryResults_out: PVOID, pReserved_out: OPTIONAL<PVOID>): DNS_STATUS {
+    return Dnsapi.Load('DnsQuery_A')(pszName, wType, Options, pExtra_in_out, ppQueryResults_out, pReserved_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/windns/nf-windns-dnsquery_utf8
-  public static DnsQuery_UTF8(pszName: PCSTR, wType: WORD, Options: DWORD, pExtra: PVOID | NULL, ppQueryResults: PVOID | NULL, pReserved: PVOID | NULL): DNS_STATUS {
-    return Dnsapi.Load('DnsQuery_UTF8')(pszName, wType, Options, pExtra, ppQueryResults, pReserved);
+  public static DnsQuery_UTF8(pszName: PCSTR, wType: WORD, Options: DWORD, pExtra_in_out: OPTIONAL<PVOID>, ppQueryResults_out: PVOID, pReserved_out: OPTIONAL<PVOID>): DNS_STATUS {
+    return Dnsapi.Load('DnsQuery_UTF8')(pszName, wType, Options, pExtra_in_out, ppQueryResults_out, pReserved_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/windns/nf-windns-dnsquery_w
-  public static DnsQuery_W(pszName: PCWSTR, wType: WORD, Options: DWORD, pExtra: PVOID | NULL, ppQueryResults: PVOID | NULL, pReserved: PVOID | NULL): DNS_STATUS {
-    return Dnsapi.Load('DnsQuery_W')(pszName, wType, Options, pExtra, ppQueryResults, pReserved);
+  public static DnsQuery_W(pszName: PCWSTR, wType: WORD, Options: DWORD, pExtra_in_out: OPTIONAL<PVOID>, ppQueryResults_out: PVOID, pReserved_out: OPTIONAL<PVOID>): DNS_STATUS {
+    return Dnsapi.Load('DnsQuery_W')(pszName, wType, Options, pExtra_in_out, ppQueryResults_out, pReserved_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/windns/nf-windns-dnsrecordcompare
@@ -258,13 +285,13 @@ class Dnsapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/windns/nf-windns-dnsrecordlistfree
-  public static DnsRecordListFree(p: PDNS_RECORD | NULL, t: DnsFreeType): void {
-    return Dnsapi.Load('DnsRecordListFree')(p, t);
+  public static DnsRecordListFree(p_in_out: OPTIONAL<PDNS_RECORD>, t: DnsFreeType): void {
+    return Dnsapi.Load('DnsRecordListFree')(p_in_out, t);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/windns/nf-windns-dnsrecordsetcompare
-  public static DnsRecordSetCompare(pRR1: PDNS_RECORD, pRR2: PDNS_RECORD, ppDiff1: PVOID | NULL, ppDiff2: PVOID | NULL): BOOL {
-    return Dnsapi.Load('DnsRecordSetCompare')(pRR1, pRR2, ppDiff1, ppDiff2);
+  public static DnsRecordSetCompare(pRR1_in_out: PDNS_RECORD, pRR2_in_out: PDNS_RECORD, ppDiff1_out: OPTIONAL<PVOID>, ppDiff2_out: OPTIONAL<PVOID>): BOOL {
+    return Dnsapi.Load('DnsRecordSetCompare')(pRR1_in_out, pRR2_in_out, ppDiff1_out, ppDiff2_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/windns/nf-windns-dnsrecordsetcopyex
@@ -273,8 +300,8 @@ class Dnsapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/windns/nf-windns-dnsrecordsetdetach
-  public static DnsRecordSetDetach(pRecordList: PDNS_RECORD): PDNS_RECORD {
-    return Dnsapi.Load('DnsRecordSetDetach')(pRecordList);
+  public static DnsRecordSetDetach(pRecordList_in_out: PDNS_RECORD): PDNS_RECORD {
+    return Dnsapi.Load('DnsRecordSetDetach')(pRecordList_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/windns/nf-windns-dnsreleasecontexthandle
@@ -283,23 +310,23 @@ class Dnsapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/windns/nf-windns-dnsreplacerecordseta
-  public static DnsReplaceRecordSetA(pReplaceSet: PDNS_RECORD, Options: DWORD, hContext: HANDLE | 0n, pExtraInfo: PVOID | NULL, pReserved: PVOID | NULL): DNS_STATUS {
-    return Dnsapi.Load('DnsReplaceRecordSetA')(pReplaceSet, Options, hContext, pExtraInfo, pReserved);
+  public static DnsReplaceRecordSetA(pReplaceSet: PDNS_RECORD, Options: DWORD, hContext: OPTIONAL<HANDLE>, pExtraInfo_in_out: OPTIONAL<PVOID>, pReserved_in_out: OPTIONAL<PVOID>): DNS_STATUS {
+    return Dnsapi.Load('DnsReplaceRecordSetA')(pReplaceSet, Options, hContext, pExtraInfo_in_out, pReserved_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/windns/nf-windns-dnsreplacerecordsetutf8
-  public static DnsReplaceRecordSetUTF8(pReplaceSet: PDNS_RECORD, Options: DWORD, hContext: HANDLE | 0n, pExtraInfo: PVOID | NULL, pReserved: PVOID | NULL): DNS_STATUS {
-    return Dnsapi.Load('DnsReplaceRecordSetUTF8')(pReplaceSet, Options, hContext, pExtraInfo, pReserved);
+  public static DnsReplaceRecordSetUTF8(pReplaceSet: PDNS_RECORD, Options: DWORD, hContext: OPTIONAL<HANDLE>, pExtraInfo_in_out: OPTIONAL<PVOID>, pReserved_in_out: OPTIONAL<PVOID>): DNS_STATUS {
+    return Dnsapi.Load('DnsReplaceRecordSetUTF8')(pReplaceSet, Options, hContext, pExtraInfo_in_out, pReserved_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/windns/nf-windns-dnsreplacerecordsetw
-  public static DnsReplaceRecordSetW(pReplaceSet: PDNS_RECORD, Options: DWORD, hContext: HANDLE | 0n, pExtraInfo: PVOID | NULL, pReserved: PVOID | NULL): DNS_STATUS {
-    return Dnsapi.Load('DnsReplaceRecordSetW')(pReplaceSet, Options, hContext, pExtraInfo, pReserved);
+  public static DnsReplaceRecordSetW(pReplaceSet: PDNS_RECORD, Options: DWORD, hContext: OPTIONAL<HANDLE>, pExtraInfo_in_out: OPTIONAL<PVOID>, pReserved_in_out: OPTIONAL<PVOID>): DNS_STATUS {
+    return Dnsapi.Load('DnsReplaceRecordSetW')(pReplaceSet, Options, hContext, pExtraInfo_in_out, pReserved_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/windns/nf-windns-dnsservicebrowse
-  public static DnsServiceBrowse(pRequest: PDNS_SERVICE_BROWSE_REQUEST, pCancel: PDNS_SERVICE_CANCEL): DNS_STATUS {
-    return Dnsapi.Load('DnsServiceBrowse')(pRequest, pCancel);
+  public static DnsServiceBrowse(pRequest: PDNS_SERVICE_BROWSE_REQUEST, pCancel_in_out: PDNS_SERVICE_CANCEL): DNS_STATUS {
+    return Dnsapi.Load('DnsServiceBrowse')(pRequest, pCancel_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/windns/nf-windns-dnsservicebrowsecancel
@@ -311,14 +338,14 @@ class Dnsapi extends Win32 {
   public static DnsServiceConstructInstance(
     pServiceName: PCWSTR,
     pHostName: PCWSTR,
-    pIp4: PIP4_ADDRESS | NULL,
-    pIp6: PIP6_ADDRESS | NULL,
+    pIp4: OPTIONAL<PIP4_ADDRESS>,
+    pIp6: OPTIONAL<PIP6_ADDRESS>,
     wPort: WORD,
     wPriority: WORD,
     wWeight: WORD,
     dwPropertiesCount: DWORD,
-    keys: PVOID | NULL,
-    values: PVOID | NULL,
+    keys: PVOID,
+    values: PVOID,
   ): PDNS_SERVICE_INSTANCE {
     return Dnsapi.Load('DnsServiceConstructInstance')(pServiceName, pHostName, pIp4, pIp6, wPort, wPriority, wWeight, dwPropertiesCount, keys, values);
   }
@@ -329,8 +356,8 @@ class Dnsapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/windns/nf-windns-dnsservicederegister
-  public static DnsServiceDeRegister(pRequest: PDNS_SERVICE_REGISTER_REQUEST, pCancel: PDNS_SERVICE_CANCEL | NULL): DWORD {
-    return Dnsapi.Load('DnsServiceDeRegister')(pRequest, pCancel);
+  public static DnsServiceDeRegister(pRequest: PDNS_SERVICE_REGISTER_REQUEST, pCancel_in_out: OPTIONAL<PDNS_SERVICE_CANCEL>): DWORD {
+    return Dnsapi.Load('DnsServiceDeRegister')(pRequest, pCancel_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/windns/nf-windns-dnsservicefreeinstance
@@ -339,8 +366,8 @@ class Dnsapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/windns/nf-windns-dnsserviceregister
-  public static DnsServiceRegister(pRequest: PDNS_SERVICE_REGISTER_REQUEST, pCancel: PDNS_SERVICE_CANCEL | NULL): DWORD {
-    return Dnsapi.Load('DnsServiceRegister')(pRequest, pCancel);
+  public static DnsServiceRegister(pRequest: PDNS_SERVICE_REGISTER_REQUEST, pCancel_in_out: OPTIONAL<PDNS_SERVICE_CANCEL>): DWORD {
+    return Dnsapi.Load('DnsServiceRegister')(pRequest, pCancel_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/windns/nf-windns-dnsserviceregistercancel
@@ -349,8 +376,8 @@ class Dnsapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/windns/nf-windns-dnsserviceresolve
-  public static DnsServiceResolve(pRequest: PDNS_SERVICE_RESOLVE_REQUEST, pCancel: PDNS_SERVICE_CANCEL): DNS_STATUS {
-    return Dnsapi.Load('DnsServiceResolve')(pRequest, pCancel);
+  public static DnsServiceResolve(pRequest: PDNS_SERVICE_RESOLVE_REQUEST, pCancel_in_out: PDNS_SERVICE_CANCEL): DNS_STATUS {
+    return Dnsapi.Load('DnsServiceResolve')(pRequest, pCancel_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/windns/nf-windns-dnsserviceresolvecancel
@@ -359,18 +386,18 @@ class Dnsapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/windns/nf-windns-dnssetapplicationsettings
-  public static DnsSetApplicationSettings(cServers: DWORD, pServers: PDNS_CUSTOM_SERVER | NULL, pSettings: PDNS_APPLICATION_SETTINGS | NULL): DWORD {
+  public static DnsSetApplicationSettings(cServers: DWORD, pServers: NULLABLE<PDNS_CUSTOM_SERVER>, pSettings: OPTIONAL<PDNS_APPLICATION_SETTINGS>): DWORD {
     return Dnsapi.Load('DnsSetApplicationSettings')(cServers, pServers, pSettings);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/windns/nf-windns-dnsstartmulticastquery
-  public static DnsStartMulticastQuery(pQueryRequest: PMDNS_QUERY_REQUEST, pHandle: PMDNS_QUERY_HANDLE): DNS_STATUS {
-    return Dnsapi.Load('DnsStartMulticastQuery')(pQueryRequest, pHandle);
+  public static DnsStartMulticastQuery(pQueryRequest: PMDNS_QUERY_REQUEST, pHandle_in_out: PMDNS_QUERY_HANDLE): DNS_STATUS {
+    return Dnsapi.Load('DnsStartMulticastQuery')(pQueryRequest, pHandle_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/windns/nf-windns-dnsstopmulticastquery
-  public static DnsStopMulticastQuery(pHandle: PMDNS_QUERY_HANDLE): DNS_STATUS {
-    return Dnsapi.Load('DnsStopMulticastQuery')(pHandle);
+  public static DnsStopMulticastQuery(pHandle_in_out: PMDNS_QUERY_HANDLE): DNS_STATUS {
+    return Dnsapi.Load('DnsStopMulticastQuery')(pHandle_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/windns/nf-windns-dnsvalidatename_a
@@ -389,18 +416,18 @@ class Dnsapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/windns/nf-windns-dnsvalidateserverstatus
-  public static DnsValidateServerStatus(server: PSOCKADDR, queryName: PCWSTR | NULL, serverStatus: PDWORD): DNS_STATUS {
-    return Dnsapi.Load('DnsValidateServerStatus')(server, queryName, serverStatus);
+  public static DnsValidateServerStatus(server: PSOCKADDR, queryName: OPTIONAL<PCWSTR>, serverStatus_out: PDWORD): DNS_STATUS {
+    return Dnsapi.Load('DnsValidateServerStatus')(server, queryName, serverStatus_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/windns/nf-windns-dnswritequestiontobuffer_utf8
-  public static DnsWriteQuestionToBuffer_UTF8(pDnsBuffer: PDNS_MESSAGE_BUFFER, pdwBufferSize: PDWORD, pszName: PCSTR, wType: WORD, Xid: WORD, fRecursionDesired: BOOL): BOOL {
-    return Dnsapi.Load('DnsWriteQuestionToBuffer_UTF8')(pDnsBuffer, pdwBufferSize, pszName, wType, Xid, fRecursionDesired);
+  public static DnsWriteQuestionToBuffer_UTF8(pDnsBuffer_in_out: PDNS_MESSAGE_BUFFER, pdwBufferSize_in_out: PDWORD, pszName: PCSTR, wType: WORD, Xid: WORD, fRecursionDesired: BOOL): BOOL {
+    return Dnsapi.Load('DnsWriteQuestionToBuffer_UTF8')(pDnsBuffer_in_out, pdwBufferSize_in_out, pszName, wType, Xid, fRecursionDesired);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/windns/nf-windns-dnswritequestiontobuffer_w
-  public static DnsWriteQuestionToBuffer_W(pDnsBuffer: PDNS_MESSAGE_BUFFER, pdwBufferSize: PDWORD, pszName: PCWSTR, wType: WORD, Xid: WORD, fRecursionDesired: BOOL): BOOL {
-    return Dnsapi.Load('DnsWriteQuestionToBuffer_W')(pDnsBuffer, pdwBufferSize, pszName, wType, Xid, fRecursionDesired);
+  public static DnsWriteQuestionToBuffer_W(pDnsBuffer_in_out: PDNS_MESSAGE_BUFFER, pdwBufferSize_in_out: PDWORD, pszName: PCWSTR, wType: WORD, Xid: WORD, fRecursionDesired: BOOL): BOOL {
+    return Dnsapi.Load('DnsWriteQuestionToBuffer_W')(pDnsBuffer_in_out, pdwBufferSize_in_out, pszName, wType, Xid, fRecursionDesired);
   }
 }
 

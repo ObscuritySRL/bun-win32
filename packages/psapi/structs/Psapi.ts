@@ -12,6 +12,8 @@ import type {
   LPSTR,
   LPVOID,
   LPWSTR,
+  NULLABLE,
+  OPTIONAL,
   PDWORD,
   PENUM_PAGE_FILE_CALLBACKA,
   PENUM_PAGE_FILE_CALLBACKW,
@@ -84,118 +86,118 @@ class Psapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/psapi/nf-psapi-enumdevicedrivers
-  public static EnumDeviceDrivers(lpImageBase: LPVOID, cb: DWORD, lpcbNeeded: LPDWORD): BOOL {
-    return Psapi.Load('EnumDeviceDrivers')(lpImageBase, cb, lpcbNeeded);
+  public static EnumDeviceDrivers(lpImageBase_out: LPVOID, cb: DWORD, lpcbNeeded_out: LPDWORD): BOOL {
+    return Psapi.Load('EnumDeviceDrivers')(lpImageBase_out, cb, lpcbNeeded_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/psapi/nf-psapi-enumpagefilesa
-  public static EnumPageFilesA(pCallBackRoutine: PENUM_PAGE_FILE_CALLBACKA, pContext: LPVOID): BOOL {
+  public static EnumPageFilesA(pCallBackRoutine: PENUM_PAGE_FILE_CALLBACKA, pContext: NULLABLE<LPVOID>): BOOL {
     return Psapi.Load('EnumPageFilesA')(pCallBackRoutine, pContext);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/psapi/nf-psapi-enumpagefilesw
-  public static EnumPageFilesW(pCallBackRoutine: PENUM_PAGE_FILE_CALLBACKW, pContext: LPVOID): BOOL {
+  public static EnumPageFilesW(pCallBackRoutine: PENUM_PAGE_FILE_CALLBACKW, pContext: NULLABLE<LPVOID>): BOOL {
     return Psapi.Load('EnumPageFilesW')(pCallBackRoutine, pContext);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/psapi/nf-psapi-enumprocessmodules
-  public static EnumProcessModules(hProcess: HANDLE, lphModule: LPHMODULE, cb: DWORD, lpcbNeeded: LPDWORD): BOOL {
-    return Psapi.Load('EnumProcessModules')(hProcess, lphModule, cb, lpcbNeeded);
+  public static EnumProcessModules(hProcess: HANDLE, lphModule_out: LPHMODULE, cb: DWORD, lpcbNeeded_out: LPDWORD): BOOL {
+    return Psapi.Load('EnumProcessModules')(hProcess, lphModule_out, cb, lpcbNeeded_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/psapi/nf-psapi-enumprocessmodulesex
-  public static EnumProcessModulesEx(hProcess: HANDLE, lphModule: LPHMODULE, cb: DWORD, lpcbNeeded: LPDWORD, dwFilterFlag: DWORD): BOOL {
-    return Psapi.Load('EnumProcessModulesEx')(hProcess, lphModule, cb, lpcbNeeded, dwFilterFlag);
+  public static EnumProcessModulesEx(hProcess: HANDLE, lphModule_out: LPHMODULE, cb: DWORD, lpcbNeeded_out: LPDWORD, dwFilterFlag: DWORD): BOOL {
+    return Psapi.Load('EnumProcessModulesEx')(hProcess, lphModule_out, cb, lpcbNeeded_out, dwFilterFlag);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/psapi/nf-psapi-enumprocesses
-  public static EnumProcesses(lpidProcess: LPDWORD, cb: DWORD, lpcbNeeded: LPDWORD): BOOL {
-    return Psapi.Load('EnumProcesses')(lpidProcess, cb, lpcbNeeded);
+  public static EnumProcesses(lpidProcess_out: LPDWORD, cb: DWORD, lpcbNeeded_out: LPDWORD): BOOL {
+    return Psapi.Load('EnumProcesses')(lpidProcess_out, cb, lpcbNeeded_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/psapi/nf-psapi-getdevicedriverbasenamea
-  public static GetDeviceDriverBaseNameA(ImageBase: bigint, lpBaseName: LPSTR, nSize: DWORD): DWORD {
-    return Psapi.Load('GetDeviceDriverBaseNameA')(ImageBase, lpBaseName, nSize);
+  public static GetDeviceDriverBaseNameA(ImageBase: LPVOID<bigint>, lpBaseName_out: LPSTR, nSize: DWORD): DWORD {
+    return Psapi.Load('GetDeviceDriverBaseNameA')(ImageBase, lpBaseName_out, nSize);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/psapi/nf-psapi-getdevicedriverbasenamew
-  public static GetDeviceDriverBaseNameW(ImageBase: bigint, lpBaseName: LPWSTR, nSize: DWORD): DWORD {
-    return Psapi.Load('GetDeviceDriverBaseNameW')(ImageBase, lpBaseName, nSize);
+  public static GetDeviceDriverBaseNameW(ImageBase: LPVOID<bigint>, lpBaseName_out: LPWSTR, nSize: DWORD): DWORD {
+    return Psapi.Load('GetDeviceDriverBaseNameW')(ImageBase, lpBaseName_out, nSize);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/psapi/nf-psapi-getdevicedriverfilenamea
-  public static GetDeviceDriverFileNameA(ImageBase: bigint, lpFilename: LPSTR, nSize: DWORD): DWORD {
-    return Psapi.Load('GetDeviceDriverFileNameA')(ImageBase, lpFilename, nSize);
+  public static GetDeviceDriverFileNameA(ImageBase: LPVOID<bigint>, lpFilename_out: LPSTR, nSize: DWORD): DWORD {
+    return Psapi.Load('GetDeviceDriverFileNameA')(ImageBase, lpFilename_out, nSize);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/psapi/nf-psapi-getdevicedriverfilenamew
-  public static GetDeviceDriverFileNameW(ImageBase: bigint, lpFilename: LPWSTR, nSize: DWORD): DWORD {
-    return Psapi.Load('GetDeviceDriverFileNameW')(ImageBase, lpFilename, nSize);
+  public static GetDeviceDriverFileNameW(ImageBase: LPVOID<bigint>, lpFilename_out: LPWSTR, nSize: DWORD): DWORD {
+    return Psapi.Load('GetDeviceDriverFileNameW')(ImageBase, lpFilename_out, nSize);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/psapi/nf-psapi-getmappedfilenamea
-  public static GetMappedFileNameA(hProcess: HANDLE, lpv: bigint, lpFilename: LPSTR, nSize: DWORD): DWORD {
-    return Psapi.Load('GetMappedFileNameA')(hProcess, lpv, lpFilename, nSize);
+  public static GetMappedFileNameA(hProcess: HANDLE, lpv: LPVOID<bigint>, lpFilename_out: LPSTR, nSize: DWORD): DWORD {
+    return Psapi.Load('GetMappedFileNameA')(hProcess, lpv, lpFilename_out, nSize);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/psapi/nf-psapi-getmappedfilenamew
-  public static GetMappedFileNameW(hProcess: HANDLE, lpv: bigint, lpFilename: LPWSTR, nSize: DWORD): DWORD {
-    return Psapi.Load('GetMappedFileNameW')(hProcess, lpv, lpFilename, nSize);
+  public static GetMappedFileNameW(hProcess: HANDLE, lpv: LPVOID<bigint>, lpFilename_out: LPWSTR, nSize: DWORD): DWORD {
+    return Psapi.Load('GetMappedFileNameW')(hProcess, lpv, lpFilename_out, nSize);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/psapi/nf-psapi-getmodulebasenamea
-  public static GetModuleBaseNameA(hProcess: HANDLE, hModule: HMODULE | 0n, lpBaseName: LPSTR, nSize: DWORD): DWORD {
-    return Psapi.Load('GetModuleBaseNameA')(hProcess, hModule, lpBaseName, nSize);
+  public static GetModuleBaseNameA(hProcess: HANDLE, hModule: OPTIONAL<HMODULE>, lpBaseName_out: LPSTR, nSize: DWORD): DWORD {
+    return Psapi.Load('GetModuleBaseNameA')(hProcess, hModule, lpBaseName_out, nSize);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/psapi/nf-psapi-getmodulebasenamew
-  public static GetModuleBaseNameW(hProcess: HANDLE, hModule: HMODULE | 0n, lpBaseName: LPWSTR, nSize: DWORD): DWORD {
-    return Psapi.Load('GetModuleBaseNameW')(hProcess, hModule, lpBaseName, nSize);
+  public static GetModuleBaseNameW(hProcess: HANDLE, hModule: OPTIONAL<HMODULE>, lpBaseName_out: LPWSTR, nSize: DWORD): DWORD {
+    return Psapi.Load('GetModuleBaseNameW')(hProcess, hModule, lpBaseName_out, nSize);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/psapi/nf-psapi-getmodulefilenameexa
-  public static GetModuleFileNameExA(hProcess: HANDLE | 0n, hModule: HMODULE | 0n, lpFilename: LPSTR, nSize: DWORD): DWORD {
-    return Psapi.Load('GetModuleFileNameExA')(hProcess, hModule, lpFilename, nSize);
+  public static GetModuleFileNameExA(hProcess: OPTIONAL<HANDLE>, hModule: OPTIONAL<HMODULE>, lpFilename_out: LPSTR, nSize: DWORD): DWORD {
+    return Psapi.Load('GetModuleFileNameExA')(hProcess, hModule, lpFilename_out, nSize);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/psapi/nf-psapi-getmodulefilenameexw
-  public static GetModuleFileNameExW(hProcess: HANDLE | 0n, hModule: HMODULE | 0n, lpFilename: LPWSTR, nSize: DWORD): DWORD {
-    return Psapi.Load('GetModuleFileNameExW')(hProcess, hModule, lpFilename, nSize);
+  public static GetModuleFileNameExW(hProcess: OPTIONAL<HANDLE>, hModule: OPTIONAL<HMODULE>, lpFilename_out: LPWSTR, nSize: DWORD): DWORD {
+    return Psapi.Load('GetModuleFileNameExW')(hProcess, hModule, lpFilename_out, nSize);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/psapi/nf-psapi-getmoduleinformation
-  public static GetModuleInformation(hProcess: HANDLE, hModule: HMODULE, lpmodinfo: LPMODULEINFO, cb: DWORD): BOOL {
-    return Psapi.Load('GetModuleInformation')(hProcess, hModule, lpmodinfo, cb);
+  public static GetModuleInformation(hProcess: HANDLE, hModule: HMODULE, lpmodinfo_out: LPMODULEINFO, cb: DWORD): BOOL {
+    return Psapi.Load('GetModuleInformation')(hProcess, hModule, lpmodinfo_out, cb);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/psapi/nf-psapi-getperformanceinfo
-  public static GetPerformanceInfo(pPerformanceInformation: PPERFORMANCE_INFORMATION, cb: DWORD): BOOL {
-    return Psapi.Load('GetPerformanceInfo')(pPerformanceInformation, cb);
+  public static GetPerformanceInfo(pPerformanceInformation_out: PPERFORMANCE_INFORMATION, cb: DWORD): BOOL {
+    return Psapi.Load('GetPerformanceInfo')(pPerformanceInformation_out, cb);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/psapi/nf-psapi-getprocessimagefilenamea
-  public static GetProcessImageFileNameA(hProcess: HANDLE, lpImageFileName: LPSTR, nSize: DWORD): DWORD {
-    return Psapi.Load('GetProcessImageFileNameA')(hProcess, lpImageFileName, nSize);
+  public static GetProcessImageFileNameA(hProcess: HANDLE, lpImageFileName_out: LPSTR, nSize: DWORD): DWORD {
+    return Psapi.Load('GetProcessImageFileNameA')(hProcess, lpImageFileName_out, nSize);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/psapi/nf-psapi-getprocessimagefilenamew
-  public static GetProcessImageFileNameW(hProcess: HANDLE, lpImageFileName: LPWSTR, nSize: DWORD): DWORD {
-    return Psapi.Load('GetProcessImageFileNameW')(hProcess, lpImageFileName, nSize);
+  public static GetProcessImageFileNameW(hProcess: HANDLE, lpImageFileName_out: LPWSTR, nSize: DWORD): DWORD {
+    return Psapi.Load('GetProcessImageFileNameW')(hProcess, lpImageFileName_out, nSize);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/psapi/nf-psapi-getprocessmemoryinfo
-  public static GetProcessMemoryInfo(Process: HANDLE, ppsmemCounters: PPROCESS_MEMORY_COUNTERS, cb: DWORD): BOOL {
-    return Psapi.Load('GetProcessMemoryInfo')(Process, ppsmemCounters, cb);
+  public static GetProcessMemoryInfo(Process: HANDLE, ppsmemCounters_out: PPROCESS_MEMORY_COUNTERS, cb: DWORD): BOOL {
+    return Psapi.Load('GetProcessMemoryInfo')(Process, ppsmemCounters_out, cb);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/psapi/nf-psapi-getwschanges
-  public static GetWsChanges(hProcess: HANDLE, lpWatchInfo: PPSAPI_WS_WATCH_INFORMATION, cb: DWORD): BOOL {
-    return Psapi.Load('GetWsChanges')(hProcess, lpWatchInfo, cb);
+  public static GetWsChanges(hProcess: HANDLE, lpWatchInfo_out: PPSAPI_WS_WATCH_INFORMATION, cb: DWORD): BOOL {
+    return Psapi.Load('GetWsChanges')(hProcess, lpWatchInfo_out, cb);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/psapi/nf-psapi-getwschangesex
-  public static GetWsChangesEx(hProcess: HANDLE, lpWatchInfoEx: PPSAPI_WS_WATCH_INFORMATION_EX, cb: PDWORD): BOOL {
-    return Psapi.Load('GetWsChangesEx')(hProcess, lpWatchInfoEx, cb);
+  public static GetWsChangesEx(hProcess: HANDLE, lpWatchInfoEx_out: PPSAPI_WS_WATCH_INFORMATION_EX, cb_in_out: PDWORD): BOOL {
+    return Psapi.Load('GetWsChangesEx')(hProcess, lpWatchInfoEx_out, cb_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/psapi/nf-psapi-initializeprocessforwswatch
@@ -204,13 +206,13 @@ class Psapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/psapi/nf-psapi-queryworkingset
-  public static QueryWorkingSet(hProcess: HANDLE, pv: PVOID, cb: DWORD): BOOL {
-    return Psapi.Load('QueryWorkingSet')(hProcess, pv, cb);
+  public static QueryWorkingSet(hProcess: HANDLE, pv_out: PVOID, cb: DWORD): BOOL {
+    return Psapi.Load('QueryWorkingSet')(hProcess, pv_out, cb);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/psapi/nf-psapi-queryworkingsetex
-  public static QueryWorkingSetEx(hProcess: HANDLE, pv: PVOID, cb: DWORD): BOOL {
-    return Psapi.Load('QueryWorkingSetEx')(hProcess, pv, cb);
+  public static QueryWorkingSetEx(hProcess: HANDLE, pv_in_out: PVOID, cb: DWORD): BOOL {
+    return Psapi.Load('QueryWorkingSetEx')(hProcess, pv_in_out, cb);
   }
 }
 

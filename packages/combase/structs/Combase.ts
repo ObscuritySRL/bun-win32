@@ -21,7 +21,7 @@ import type {
   LPPCWSTR,
   LPUNKNOWN,
   LPVOID,
-  NULL,
+  OPTIONAL,
   PAPARTMENT_SHUTDOWN_REGISTRATION_COOKIE,
   PCNZWCH,
   PCSTR,
@@ -147,17 +147,17 @@ class Combase extends Win32 {
   } as const satisfies Record<string, FFIFunction>;
 
   // https://learn.microsoft.com/en-us/windows/win32/api/combaseapi/nf-combaseapi-clsidfromstring
-  public static CLSIDFromString(lpsz: PCWSTR, pclsid: LPCLSID): HRESULT {
-    return Combase.Load('CLSIDFromString')(lpsz, pclsid);
+  public static CLSIDFromString(lpsz: PCWSTR, pclsid_out: LPCLSID): HRESULT {
+    return Combase.Load('CLSIDFromString')(lpsz, pclsid_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/combaseapi/nf-combaseapi-cocreateinstance
-  public static CoCreateInstance(rclsid: REFCLSID, pUnkOuter: LPUNKNOWN | 0n, dwClsContext: DWORD, riid: REFIID, ppv: LPLPVOID): HRESULT {
-    return Combase.Load('CoCreateInstance')(rclsid, pUnkOuter, dwClsContext, riid, ppv);
+  public static CoCreateInstance(rclsid: REFCLSID, pUnkOuter: OPTIONAL<LPUNKNOWN>, dwClsContext: DWORD, riid: REFIID, ppv_out: LPLPVOID): HRESULT {
+    return Combase.Load('CoCreateInstance')(rclsid, pUnkOuter, dwClsContext, riid, ppv_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/combaseapi/nf-combaseapi-coinitializeex
-  public static CoInitializeEx(pvReserved: LPVOID | NULL, dwCoInit: DWORD): HRESULT {
+  public static CoInitializeEx(pvReserved: OPTIONAL<LPVOID>, dwCoInit: DWORD): HRESULT {
     return Combase.Load('CoInitializeEx')(pvReserved, dwCoInit);
   }
 
@@ -167,8 +167,8 @@ class Combase extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/roerrorapi/nf-roerrorapi-getrestrictederrorinfo
-  public static GetRestrictedErrorInfo(ppRestrictedErrorInfo: LPLPVOID): HRESULT {
-    return Combase.Load('GetRestrictedErrorInfo')(ppRestrictedErrorInfo);
+  public static GetRestrictedErrorInfo(ppRestrictedErrorInfo_out: LPLPVOID): HRESULT {
+    return Combase.Load('GetRestrictedErrorInfo')(ppRestrictedErrorInfo_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winstring/nf-winstring-hstring_userfree
@@ -177,8 +177,8 @@ class Combase extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winstring/nf-winstring-hstring_usermarshal
-  public static HSTRING_UserMarshal(pFlags: PULONG, pBuffer: PUCHAR, ppidl: PHSTRING): PUCHAR {
-    return Combase.Load('HSTRING_UserMarshal')(pFlags, pBuffer, ppidl);
+  public static HSTRING_UserMarshal(pFlags: PULONG, pBuffer_in_out: PUCHAR, ppidl: PHSTRING): PUCHAR {
+    return Combase.Load('HSTRING_UserMarshal')(pFlags, pBuffer_in_out, ppidl);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winstring/nf-winstring-hstring_usersize
@@ -187,8 +187,8 @@ class Combase extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winstring/nf-winstring-hstring_userunmarshal
-  public static HSTRING_UserUnmarshal(pFlags: PULONG, pBuffer: PUCHAR, ppidl: PHSTRING): PUCHAR {
-    return Combase.Load('HSTRING_UserUnmarshal')(pFlags, pBuffer, ppidl);
+  public static HSTRING_UserUnmarshal(pFlags: PULONG, pBuffer: PUCHAR, ppidl_out: PHSTRING): PUCHAR {
+    return Combase.Load('HSTRING_UserUnmarshal')(pFlags, pBuffer, ppidl_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/roerrorapi/nf-roerrorapi-iserrorpropagationenabled
@@ -197,8 +197,8 @@ class Combase extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/roapi/nf-roapi-roactivateinstance
-  public static RoActivateInstance(activatableClassId: HSTRING, instance: LPLPVOID): HRESULT {
-    return Combase.Load('RoActivateInstance')(activatableClassId, instance);
+  public static RoActivateInstance(activatableClassId: HSTRING, instance_out: LPLPVOID): HRESULT {
+    return Combase.Load('RoActivateInstance')(activatableClassId, instance_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/roerrorapi/nf-roerrorapi-rocaptureerrorcontext
@@ -222,33 +222,33 @@ class Combase extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/roapi/nf-roapi-rogetactivationfactory
-  public static RoGetActivationFactory(activatableClassId: HSTRING, iid: REFIID, factory: LPLPVOID): HRESULT {
-    return Combase.Load('RoGetActivationFactory')(activatableClassId, iid, factory);
+  public static RoGetActivationFactory(activatableClassId: HSTRING, iid: REFIID, factory_out: LPLPVOID): HRESULT {
+    return Combase.Load('RoGetActivationFactory')(activatableClassId, iid, factory_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/combaseapi/nf-combaseapi-rogetagilereference
-  public static RoGetAgileReference(options: AgileReferenceOptions, riid: REFIID, pUnk: IUnknown, ppAgileReference: LPLPVOID): HRESULT {
-    return Combase.Load('RoGetAgileReference')(options, riid, pUnk, ppAgileReference);
+  public static RoGetAgileReference(options: AgileReferenceOptions, riid: REFIID, pUnk: IUnknown, ppAgileReference_out: LPLPVOID): HRESULT {
+    return Combase.Load('RoGetAgileReference')(options, riid, pUnk, ppAgileReference_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/roapi/nf-roapi-rogetapartmentidentifier
-  public static RoGetApartmentIdentifier(apartmentIdentifier: PUINT64): HRESULT {
-    return Combase.Load('RoGetApartmentIdentifier')(apartmentIdentifier);
+  public static RoGetApartmentIdentifier(apartmentIdentifier_out: PUINT64): HRESULT {
+    return Combase.Load('RoGetApartmentIdentifier')(apartmentIdentifier_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/roerrorapi/nf-roerrorapi-rogeterrorreportingflags
-  public static RoGetErrorReportingFlags(pflags: PUINT32): HRESULT {
-    return Combase.Load('RoGetErrorReportingFlags')(pflags);
+  public static RoGetErrorReportingFlags(pflags_out: PUINT32): HRESULT {
+    return Combase.Load('RoGetErrorReportingFlags')(pflags_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/roerrorapi/nf-roerrorapi-rogetmatchingrestrictederrorinfo
-  public static RoGetMatchingRestrictedErrorInfo(hrIn: HRESULT, ppRestrictedErrorInfo: LPLPVOID): HRESULT {
-    return Combase.Load('RoGetMatchingRestrictedErrorInfo')(hrIn, ppRestrictedErrorInfo);
+  public static RoGetMatchingRestrictedErrorInfo(hrIn: HRESULT, ppRestrictedErrorInfo_out: LPLPVOID): HRESULT {
+    return Combase.Load('RoGetMatchingRestrictedErrorInfo')(hrIn, ppRestrictedErrorInfo_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/roparameterizediid/nf-roparameterizediid-rogetparameterizedtypeinstanceiid
-  public static RoGetParameterizedTypeInstanceIID(nameElementCount: UINT32, nameElements: LPPCWSTR, metaDataLocator: IRoMetaDataLocator, iid: LPGUID, pExtra: PROPARAMIIDHANDLE | NULL): HRESULT {
-    return Combase.Load('RoGetParameterizedTypeInstanceIID')(nameElementCount, nameElements, metaDataLocator, iid, pExtra);
+  public static RoGetParameterizedTypeInstanceIID(nameElementCount: UINT32, nameElements: LPPCWSTR, metaDataLocator: IRoMetaDataLocator, iid_out: LPGUID, pExtra_out: OPTIONAL<PROPARAMIIDHANDLE>): HRESULT {
+    return Combase.Load('RoGetParameterizedTypeInstanceIID')(nameElementCount, nameElements, metaDataLocator, iid_out, pExtra_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/roapi/nf-roapi-roinitialize
@@ -257,27 +257,34 @@ class Combase extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/roerrorapi/nf-roerrorapi-roinspectcapturedstackbacktrace
-  public static RoInspectCapturedStackBackTrace(targetErrorInfoAddress: UINT_PTR, machine: USHORT, readMemoryCallback: PINSPECT_MEMORY_CALLBACK, context: PVOID | NULL, frameCount: PUINT32, targetBackTraceAddress: PUINT_PTR): HRESULT {
-    return Combase.Load('RoInspectCapturedStackBackTrace')(targetErrorInfoAddress, machine, readMemoryCallback, context, frameCount, targetBackTraceAddress);
+  public static RoInspectCapturedStackBackTrace(
+    targetErrorInfoAddress: UINT_PTR,
+    machine: USHORT,
+    readMemoryCallback: PINSPECT_MEMORY_CALLBACK,
+    context: OPTIONAL<PVOID>,
+    frameCount_out: PUINT32,
+    targetBackTraceAddress_out: PUINT_PTR,
+  ): HRESULT {
+    return Combase.Load('RoInspectCapturedStackBackTrace')(targetErrorInfoAddress, machine, readMemoryCallback, context, frameCount_out, targetBackTraceAddress_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/roerrorapi/nf-roerrorapi-roinspectthreaderrorinfo
-  public static RoInspectThreadErrorInfo(targetTebAddress: UINT_PTR, machine: USHORT, readMemoryCallback: PINSPECT_MEMORY_CALLBACK, context: PVOID | NULL, targetErrorInfoAddress: PUINT_PTR): HRESULT {
-    return Combase.Load('RoInspectThreadErrorInfo')(targetTebAddress, machine, readMemoryCallback, context, targetErrorInfoAddress);
+  public static RoInspectThreadErrorInfo(targetTebAddress: UINT_PTR, machine: USHORT, readMemoryCallback: PINSPECT_MEMORY_CALLBACK, context: OPTIONAL<PVOID>, targetErrorInfoAddress_out: PUINT_PTR): HRESULT {
+    return Combase.Load('RoInspectThreadErrorInfo')(targetTebAddress, machine, readMemoryCallback, context, targetErrorInfoAddress_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/roerrorapi/nf-roerrorapi-rooriginateerror
-  public static RoOriginateError(error: HRESULT, message: HSTRING | 0n): BOOL {
+  public static RoOriginateError(error: HRESULT, message: OPTIONAL<HSTRING>): BOOL {
     return Combase.Load('RoOriginateError')(error, message);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/roerrorapi/nf-roerrorapi-rooriginateerrorw
-  public static RoOriginateErrorW(error: HRESULT, cchMax: UINT, message: PCWSTR | NULL): BOOL {
+  public static RoOriginateErrorW(error: HRESULT, cchMax: UINT, message: OPTIONAL<PCWSTR>): BOOL {
     return Combase.Load('RoOriginateErrorW')(error, cchMax, message);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/roerrorapi/nf-roerrorapi-rooriginatelanguageexception
-  public static RoOriginateLanguageException(error: HRESULT, message: HSTRING | 0n, languageException: IUnknown | NULL): BOOL {
+  public static RoOriginateLanguageException(error: HRESULT, message: OPTIONAL<HSTRING>, languageException: OPTIONAL<IUnknown>): BOOL {
     return Combase.Load('RoOriginateLanguageException')(error, message, languageException);
   }
 
@@ -287,13 +294,13 @@ class Combase extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/roapi/nf-roapi-roregisteractivationfactories
-  public static RoRegisterActivationFactories(activatableClassIds: PHSTRING, activationFactoryCallbacks: PFNGETACTIVATIONFACTORY, count: UINT32, cookie: PRO_REGISTRATION_COOKIE): HRESULT {
-    return Combase.Load('RoRegisterActivationFactories')(activatableClassIds, activationFactoryCallbacks, count, cookie);
+  public static RoRegisterActivationFactories(activatableClassIds: PHSTRING, activationFactoryCallbacks: PFNGETACTIVATIONFACTORY, count: UINT32, cookie_out: PRO_REGISTRATION_COOKIE): HRESULT {
+    return Combase.Load('RoRegisterActivationFactories')(activatableClassIds, activationFactoryCallbacks, count, cookie_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/roapi/nf-roapi-roregisterforapartmentshutdown
-  public static RoRegisterForApartmentShutdown(callbackObject: IApartmentShutdown, apartmentIdentifier: PUINT64, regCookie: PAPARTMENT_SHUTDOWN_REGISTRATION_COOKIE): HRESULT {
-    return Combase.Load('RoRegisterForApartmentShutdown')(callbackObject, apartmentIdentifier, regCookie);
+  public static RoRegisterForApartmentShutdown(callbackObject: IApartmentShutdown, apartmentIdentifier_out: PUINT64, regCookie_out: PAPARTMENT_SHUTDOWN_REGISTRATION_COOKIE): HRESULT {
+    return Combase.Load('RoRegisterForApartmentShutdown')(callbackObject, apartmentIdentifier_out, regCookie_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/roerrorapi/nf-roerrorapi-roreportfaileddelegate
@@ -307,8 +314,8 @@ class Combase extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/roerrorapi/nf-roerrorapi-roresolverestrictederrorinforeference
-  public static RoResolveRestrictedErrorInfoReference(reference: PCWSTR, ppRestrictedErrorInfo: LPLPVOID): HRESULT {
-    return Combase.Load('RoResolveRestrictedErrorInfoReference')(reference, ppRestrictedErrorInfo);
+  public static RoResolveRestrictedErrorInfoReference(reference: PCWSTR, ppRestrictedErrorInfo_out: LPLPVOID): HRESULT {
+    return Combase.Load('RoResolveRestrictedErrorInfoReference')(reference, ppRestrictedErrorInfo_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/roapi/nf-roapi-rorevokeactivationfactories
@@ -322,12 +329,12 @@ class Combase extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/roerrorapi/nf-roerrorapi-rotransformerror
-  public static RoTransformError(oldError: HRESULT, newError: HRESULT, message: HSTRING | 0n): BOOL {
+  public static RoTransformError(oldError: HRESULT, newError: HRESULT, message: OPTIONAL<HSTRING>): BOOL {
     return Combase.Load('RoTransformError')(oldError, newError, message);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/roerrorapi/nf-roerrorapi-rotransformerrorw
-  public static RoTransformErrorW(oldError: HRESULT, newError: HRESULT, cchMax: UINT, message: PCWSTR | NULL): BOOL {
+  public static RoTransformErrorW(oldError: HRESULT, newError: HRESULT, cchMax: UINT, message: OPTIONAL<PCWSTR>): BOOL {
     return Combase.Load('RoTransformErrorW')(oldError, newError, cchMax, message);
   }
 
@@ -342,108 +349,108 @@ class Combase extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/roerrorapi/nf-roerrorapi-setrestrictederrorinfo
-  public static SetRestrictedErrorInfo(pRestrictedErrorInfo: IRestrictedErrorInfo | NULL): HRESULT {
+  public static SetRestrictedErrorInfo(pRestrictedErrorInfo: OPTIONAL<IRestrictedErrorInfo>): HRESULT {
     return Combase.Load('SetRestrictedErrorInfo')(pRestrictedErrorInfo);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winstring/nf-winstring-windowscomparestringordinal
-  public static WindowsCompareStringOrdinal(string1: HSTRING | 0n, string2: HSTRING | 0n, result: PINT32): HRESULT {
-    return Combase.Load('WindowsCompareStringOrdinal')(string1, string2, result);
+  public static WindowsCompareStringOrdinal(string1: OPTIONAL<HSTRING>, string2: OPTIONAL<HSTRING>, result_out: PINT32): HRESULT {
+    return Combase.Load('WindowsCompareStringOrdinal')(string1, string2, result_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winstring/nf-winstring-windowsconcatstring
-  public static WindowsConcatString(string1: HSTRING | 0n, string2: HSTRING | 0n, newString: PHSTRING): HRESULT {
-    return Combase.Load('WindowsConcatString')(string1, string2, newString);
+  public static WindowsConcatString(string1: OPTIONAL<HSTRING>, string2: OPTIONAL<HSTRING>, newString_out: PHSTRING): HRESULT {
+    return Combase.Load('WindowsConcatString')(string1, string2, newString_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winstring/nf-winstring-windowscreatestring
-  public static WindowsCreateString(sourceString: PCNZWCH | NULL, length: UINT32, string: PHSTRING): HRESULT {
-    return Combase.Load('WindowsCreateString')(sourceString, length, string);
+  public static WindowsCreateString(sourceString: OPTIONAL<PCNZWCH>, length: UINT32, string_out: PHSTRING): HRESULT {
+    return Combase.Load('WindowsCreateString')(sourceString, length, string_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winstring/nf-winstring-windowscreatestringreference
-  public static WindowsCreateStringReference(sourceString: PCWSTR | NULL, length: UINT32, hstringHeader: PHSTRING_HEADER, string: PHSTRING): HRESULT {
-    return Combase.Load('WindowsCreateStringReference')(sourceString, length, hstringHeader, string);
+  public static WindowsCreateStringReference(sourceString: OPTIONAL<PCWSTR>, length: UINT32, hstringHeader_out: PHSTRING_HEADER, string_out: PHSTRING): HRESULT {
+    return Combase.Load('WindowsCreateStringReference')(sourceString, length, hstringHeader_out, string_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winstring/nf-winstring-windowsdeletestring
-  public static WindowsDeleteString(string: HSTRING | 0n): HRESULT {
+  public static WindowsDeleteString(string: OPTIONAL<HSTRING>): HRESULT {
     return Combase.Load('WindowsDeleteString')(string);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winstring/nf-winstring-windowsdeletestringbuffer
-  public static WindowsDeleteStringBuffer(bufferHandle: HSTRING_BUFFER | 0n): HRESULT {
+  public static WindowsDeleteStringBuffer(bufferHandle: OPTIONAL<HSTRING_BUFFER>): HRESULT {
     return Combase.Load('WindowsDeleteStringBuffer')(bufferHandle);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winstring/nf-winstring-windowsduplicatestring
-  public static WindowsDuplicateString(string: HSTRING | 0n, newString: PHSTRING): HRESULT {
-    return Combase.Load('WindowsDuplicateString')(string, newString);
+  public static WindowsDuplicateString(string: OPTIONAL<HSTRING>, newString_out: PHSTRING): HRESULT {
+    return Combase.Load('WindowsDuplicateString')(string, newString_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winstring/nf-winstring-windowsgetstringlen
-  public static WindowsGetStringLen(string: HSTRING | 0n): UINT32 {
+  public static WindowsGetStringLen(string: OPTIONAL<HSTRING>): UINT32 {
     return Combase.Load('WindowsGetStringLen')(string);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winstring/nf-winstring-windowsgetstringrawbuffer
-  public static WindowsGetStringRawBuffer(string: HSTRING | 0n, length: PUINT32 | NULL): PCWSTR {
-    return Combase.Load('WindowsGetStringRawBuffer')(string, length);
+  public static WindowsGetStringRawBuffer(string: OPTIONAL<HSTRING>, length_out: OPTIONAL<PUINT32>): PCWSTR {
+    return Combase.Load('WindowsGetStringRawBuffer')(string, length_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winstring/nf-winstring-windowsinspectstring
-  public static WindowsInspectString(targetHString: UINT_PTR, machine: USHORT, callback: PINSPECT_HSTRING_CALLBACK, context: LPVOID | NULL, length: PUINT32, targetStringAddress: PUINT_PTR): HRESULT {
-    return Combase.Load('WindowsInspectString')(targetHString, machine, callback, context, length, targetStringAddress);
+  public static WindowsInspectString(targetHString: UINT_PTR, machine: USHORT, callback: PINSPECT_HSTRING_CALLBACK, context: OPTIONAL<LPVOID>, length_out: PUINT32, targetStringAddress_out: PUINT_PTR): HRESULT {
+    return Combase.Load('WindowsInspectString')(targetHString, machine, callback, context, length_out, targetStringAddress_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winstring/nf-winstring-windowsinspectstring2
-  public static WindowsInspectString2(targetHString: UINT64, machine: USHORT, callback: PINSPECT_HSTRING_CALLBACK2, context: LPVOID | NULL, length: PUINT32, targetStringAddress: PUINT64): HRESULT {
-    return Combase.Load('WindowsInspectString2')(targetHString, machine, callback, context, length, targetStringAddress);
+  public static WindowsInspectString2(targetHString: UINT64, machine: USHORT, callback: PINSPECT_HSTRING_CALLBACK2, context: OPTIONAL<LPVOID>, length_out: PUINT32, targetStringAddress_out: PUINT64): HRESULT {
+    return Combase.Load('WindowsInspectString2')(targetHString, machine, callback, context, length_out, targetStringAddress_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winstring/nf-winstring-windowsisstringempty
-  public static WindowsIsStringEmpty(string: HSTRING | 0n): BOOL {
+  public static WindowsIsStringEmpty(string: OPTIONAL<HSTRING>): BOOL {
     return Combase.Load('WindowsIsStringEmpty')(string);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winstring/nf-winstring-windowspreallocatestringbuffer
-  public static WindowsPreallocateStringBuffer(length: UINT32, charBuffer: LPLPWSTR, bufferHandle: PHSTRING_BUFFER): HRESULT {
-    return Combase.Load('WindowsPreallocateStringBuffer')(length, charBuffer, bufferHandle);
+  public static WindowsPreallocateStringBuffer(length: UINT32, charBuffer_out: LPLPWSTR, bufferHandle_out: PHSTRING_BUFFER): HRESULT {
+    return Combase.Load('WindowsPreallocateStringBuffer')(length, charBuffer_out, bufferHandle_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winstring/nf-winstring-windowspromotestringbuffer
-  public static WindowsPromoteStringBuffer(bufferHandle: HSTRING_BUFFER, string: PHSTRING): HRESULT {
-    return Combase.Load('WindowsPromoteStringBuffer')(bufferHandle, string);
+  public static WindowsPromoteStringBuffer(bufferHandle: HSTRING_BUFFER, string_out: PHSTRING): HRESULT {
+    return Combase.Load('WindowsPromoteStringBuffer')(bufferHandle, string_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winstring/nf-winstring-windowsreplacestring
-  public static WindowsReplaceString(string: HSTRING | 0n, stringReplaced: HSTRING | 0n, stringReplaceWith: HSTRING | 0n, newString: PHSTRING): HRESULT {
-    return Combase.Load('WindowsReplaceString')(string, stringReplaced, stringReplaceWith, newString);
+  public static WindowsReplaceString(string: OPTIONAL<HSTRING>, stringReplaced: OPTIONAL<HSTRING>, stringReplaceWith: OPTIONAL<HSTRING>, newString_out: PHSTRING): HRESULT {
+    return Combase.Load('WindowsReplaceString')(string, stringReplaced, stringReplaceWith, newString_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winstring/nf-winstring-windowsstringhasembeddednull
-  public static WindowsStringHasEmbeddedNull(string: HSTRING | 0n, hasEmbedNull: LPBOOL): HRESULT {
-    return Combase.Load('WindowsStringHasEmbeddedNull')(string, hasEmbedNull);
+  public static WindowsStringHasEmbeddedNull(string: OPTIONAL<HSTRING>, hasEmbedNull_out: LPBOOL): HRESULT {
+    return Combase.Load('WindowsStringHasEmbeddedNull')(string, hasEmbedNull_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winstring/nf-winstring-windowssubstring
-  public static WindowsSubstring(string: HSTRING | 0n, startIndex: UINT32, newString: PHSTRING): HRESULT {
-    return Combase.Load('WindowsSubstring')(string, startIndex, newString);
+  public static WindowsSubstring(string: OPTIONAL<HSTRING>, startIndex: UINT32, newString_out: PHSTRING): HRESULT {
+    return Combase.Load('WindowsSubstring')(string, startIndex, newString_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winstring/nf-winstring-windowssubstringwithspecifiedlength
-  public static WindowsSubstringWithSpecifiedLength(string: HSTRING | 0n, startIndex: UINT32, length: UINT32, newString: PHSTRING): HRESULT {
-    return Combase.Load('WindowsSubstringWithSpecifiedLength')(string, startIndex, length, newString);
+  public static WindowsSubstringWithSpecifiedLength(string: OPTIONAL<HSTRING>, startIndex: UINT32, length: UINT32, newString_out: PHSTRING): HRESULT {
+    return Combase.Load('WindowsSubstringWithSpecifiedLength')(string, startIndex, length, newString_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winstring/nf-winstring-windowstrimstringend
-  public static WindowsTrimStringEnd(string: HSTRING | 0n, trimString: HSTRING | 0n, newString: PHSTRING): HRESULT {
-    return Combase.Load('WindowsTrimStringEnd')(string, trimString, newString);
+  public static WindowsTrimStringEnd(string: OPTIONAL<HSTRING>, trimString: OPTIONAL<HSTRING>, newString_out: PHSTRING): HRESULT {
+    return Combase.Load('WindowsTrimStringEnd')(string, trimString, newString_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winstring/nf-winstring-windowstrimstringstart
-  public static WindowsTrimStringStart(string: HSTRING | 0n, trimString: HSTRING | 0n, newString: PHSTRING): HRESULT {
-    return Combase.Load('WindowsTrimStringStart')(string, trimString, newString);
+  public static WindowsTrimStringStart(string: OPTIONAL<HSTRING>, trimString: OPTIONAL<HSTRING>, newString_out: PHSTRING): HRESULT {
+    return Combase.Load('WindowsTrimStringStart')(string, trimString, newString_out);
   }
 }
 

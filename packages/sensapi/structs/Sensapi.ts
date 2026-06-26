@@ -2,7 +2,7 @@ import { type FFIFunction, FFIType } from 'bun:ffi';
 
 import { Win32 } from '@bun-win32/core';
 
-import type { BOOL, LPCSTR, LPCWSTR, LPDWORD, LPQOCINFO, NULL } from '../types/Sensapi';
+import type { BOOL, LPCSTR, LPCWSTR, LPDWORD, LPQOCINFO, NULLABLE } from '../types/Sensapi';
 
 /**
  * Thin, lazy-loaded FFI bindings for `sensapi.dll`.
@@ -38,18 +38,18 @@ class Sensapi extends Win32 {
   } as const satisfies Record<string, FFIFunction>;
 
   // https://learn.microsoft.com/en-us/windows/win32/api/sensapi/nf-sensapi-isdestinationreachablea
-  public static IsDestinationReachableA(lpszDestination: LPCSTR, lpQOCInfo: LPQOCINFO | NULL): BOOL {
-    return Sensapi.Load('IsDestinationReachableA')(lpszDestination, lpQOCInfo);
+  public static IsDestinationReachableA(lpszDestination: LPCSTR, lpQOCInfo_in_out: NULLABLE<LPQOCINFO>): BOOL {
+    return Sensapi.Load('IsDestinationReachableA')(lpszDestination, lpQOCInfo_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/sensapi/nf-sensapi-isdestinationreachablew
-  public static IsDestinationReachableW(lpszDestination: LPCWSTR, lpQOCInfo: LPQOCINFO | NULL): BOOL {
-    return Sensapi.Load('IsDestinationReachableW')(lpszDestination, lpQOCInfo);
+  public static IsDestinationReachableW(lpszDestination: LPCWSTR, lpQOCInfo_in_out: NULLABLE<LPQOCINFO>): BOOL {
+    return Sensapi.Load('IsDestinationReachableW')(lpszDestination, lpQOCInfo_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/sensapi/nf-sensapi-isnetworkalive
-  public static IsNetworkAlive(lpdwFlags: LPDWORD): BOOL {
-    return Sensapi.Load('IsNetworkAlive')(lpdwFlags);
+  public static IsNetworkAlive(lpdwFlags_out: LPDWORD): BOOL {
+    return Sensapi.Load('IsNetworkAlive')(lpdwFlags_out);
   }
 }
 

@@ -1,6 +1,6 @@
 import type { Pointer } from 'bun:ffi';
 
-export type { BOOL, HRESULT, LPCSTR, LPCVOID, LPCWSTR, LPVOID, NULL, SIZE_T, UINT, ULONG } from '@bun-win32/core';
+export type { BOOL, HRESULT, LPCSTR, LPCVOID, LPCWSTR, LPVOID, NULL, OPTIONAL, SIZE_T, UINT, ULONG } from '@bun-win32/core';
 
 export const D3DCOMPILE_DEBUG = 0x0000_0001;
 export const D3DCOMPILE_SKIP_VALIDATION = 0x0000_0002;

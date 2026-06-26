@@ -23,7 +23,8 @@ import type {
   LPSTR,
   LPVOID,
   LPWSTR,
-  NULL,
+  NULLABLE,
+  OPTIONAL,
   PBOOL,
   PBYTE,
   PCORE_PRINTER_DRIVERA,
@@ -256,77 +257,77 @@ class Winspool extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/addjob
-  public static AddJobA(hPrinter: HANDLE, Level: DWORD, pData: LPBYTE | NULL, cbBuf: DWORD, pcbNeeded: LPDWORD): BOOL {
-    return Winspool.Load('AddJobA')(hPrinter, Level, pData, cbBuf, pcbNeeded);
+  public static AddJobA(hPrinter: HANDLE, Level: DWORD, pData_out: OPTIONAL<LPBYTE>, cbBuf: DWORD, pcbNeeded_out: LPDWORD): BOOL {
+    return Winspool.Load('AddJobA')(hPrinter, Level, pData_out, cbBuf, pcbNeeded_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/addjob
-  public static AddJobW(hPrinter: HANDLE, Level: DWORD, pData: LPBYTE | NULL, cbBuf: DWORD, pcbNeeded: LPDWORD): BOOL {
-    return Winspool.Load('AddJobW')(hPrinter, Level, pData, cbBuf, pcbNeeded);
+  public static AddJobW(hPrinter: HANDLE, Level: DWORD, pData_out: OPTIONAL<LPBYTE>, cbBuf: DWORD, pcbNeeded_out: LPDWORD): BOOL {
+    return Winspool.Load('AddJobW')(hPrinter, Level, pData_out, cbBuf, pcbNeeded_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/addmonitor
-  public static AddMonitorA(pName: LPSTR | NULL, Level: DWORD, pMonitorInfo: LPBYTE | NULL): BOOL {
+  public static AddMonitorA(pName: OPTIONAL<LPSTR>, Level: DWORD, pMonitorInfo: OPTIONAL<LPBYTE>): BOOL {
     return Winspool.Load('AddMonitorA')(pName, Level, pMonitorInfo);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/addmonitor
-  public static AddMonitorW(pName: LPWSTR | NULL, Level: DWORD, pMonitorInfo: LPBYTE | NULL): BOOL {
+  public static AddMonitorW(pName: OPTIONAL<LPWSTR>, Level: DWORD, pMonitorInfo: OPTIONAL<LPBYTE>): BOOL {
     return Winspool.Load('AddMonitorW')(pName, Level, pMonitorInfo);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/addport
-  public static AddPortA(pName: LPSTR | NULL, hWnd: HWND, pMonitorName: LPSTR): BOOL {
+  public static AddPortA(pName: OPTIONAL<LPSTR>, hWnd: HWND, pMonitorName: LPSTR): BOOL {
     return Winspool.Load('AddPortA')(pName, hWnd, pMonitorName);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/addportex
-  public static AddPortExA(pName: LPSTR | NULL, dwLevel: DWORD, lpBuffer: LPBYTE, lpMonitorName: LPSTR): BOOL {
+  public static AddPortExA(pName: OPTIONAL<LPSTR>, dwLevel: DWORD, lpBuffer: LPBYTE, lpMonitorName: LPSTR): BOOL {
     return Winspool.Load('AddPortExA')(pName, dwLevel, lpBuffer, lpMonitorName);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/addportex
-  public static AddPortExW(pName: LPWSTR | NULL, dwLevel: DWORD, lpBuffer: LPBYTE, lpMonitorName: LPWSTR): BOOL {
+  public static AddPortExW(pName: OPTIONAL<LPWSTR>, dwLevel: DWORD, lpBuffer: LPBYTE, lpMonitorName: LPWSTR): BOOL {
     return Winspool.Load('AddPortExW')(pName, dwLevel, lpBuffer, lpMonitorName);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/addport
-  public static AddPortW(pName: LPWSTR | NULL, hWnd: HWND, pMonitorName: LPWSTR): BOOL {
+  public static AddPortW(pName: OPTIONAL<LPWSTR>, hWnd: HWND, pMonitorName: LPWSTR): BOOL {
     return Winspool.Load('AddPortW')(pName, hWnd, pMonitorName);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/addprintprocessor
-  public static AddPrintProcessorA(pName: LPSTR | NULL, pEnvironment: LPSTR | NULL, pPathName: LPSTR, pPrintProcessorName: LPSTR): BOOL {
+  public static AddPrintProcessorA(pName: OPTIONAL<LPSTR>, pEnvironment: OPTIONAL<LPSTR>, pPathName: LPSTR, pPrintProcessorName: LPSTR): BOOL {
     return Winspool.Load('AddPrintProcessorA')(pName, pEnvironment, pPathName, pPrintProcessorName);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/addprintprocessor
-  public static AddPrintProcessorW(pName: LPWSTR | NULL, pEnvironment: LPWSTR | NULL, pPathName: LPWSTR, pPrintProcessorName: LPWSTR): BOOL {
+  public static AddPrintProcessorW(pName: OPTIONAL<LPWSTR>, pEnvironment: OPTIONAL<LPWSTR>, pPathName: LPWSTR, pPrintProcessorName: LPWSTR): BOOL {
     return Winspool.Load('AddPrintProcessorW')(pName, pEnvironment, pPathName, pPrintProcessorName);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/addprintprovidor
-  public static AddPrintProvidorA(pName: LPSTR | NULL, Level: DWORD, pProviderInfo: LPBYTE): BOOL {
+  public static AddPrintProvidorA(pName: OPTIONAL<LPSTR>, Level: DWORD, pProviderInfo: LPBYTE): BOOL {
     return Winspool.Load('AddPrintProvidorA')(pName, Level, pProviderInfo);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/addprintprovidor
-  public static AddPrintProvidorW(pName: LPWSTR | NULL, Level: DWORD, pProviderInfo: LPBYTE): BOOL {
+  public static AddPrintProvidorW(pName: OPTIONAL<LPWSTR>, Level: DWORD, pProviderInfo: LPBYTE): BOOL {
     return Winspool.Load('AddPrintProvidorW')(pName, Level, pProviderInfo);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/addprinter
-  public static AddPrinterA(pName: LPSTR | NULL, Level: DWORD, pPrinter: LPBYTE): HANDLE {
+  public static AddPrinterA(pName: OPTIONAL<LPSTR>, Level: DWORD, pPrinter: LPBYTE): HANDLE {
     return Winspool.Load('AddPrinterA')(pName, Level, pPrinter);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/addprinterconnection2
-  public static AddPrinterConnection2A(hWnd: HWND | 0n, pszName: LPCSTR, dwLevel: DWORD, pConnectionInfo: PVOID): BOOL {
+  public static AddPrinterConnection2A(hWnd: OPTIONAL<HWND>, pszName: LPCSTR, dwLevel: DWORD, pConnectionInfo: PVOID): BOOL {
     return Winspool.Load('AddPrinterConnection2A')(hWnd, pszName, dwLevel, pConnectionInfo);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/addprinterconnection2
-  public static AddPrinterConnection2W(hWnd: HWND | 0n, pszName: LPCWSTR, dwLevel: DWORD, pConnectionInfo: PVOID): BOOL {
+  public static AddPrinterConnection2W(hWnd: OPTIONAL<HWND>, pszName: LPCWSTR, dwLevel: DWORD, pConnectionInfo: PVOID): BOOL {
     return Winspool.Load('AddPrinterConnection2W')(hWnd, pszName, dwLevel, pConnectionInfo);
   }
 
@@ -341,38 +342,38 @@ class Winspool extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/addprinterdriver
-  public static AddPrinterDriverA(pName: LPSTR | NULL, Level: DWORD, pDriverInfo: LPBYTE): BOOL {
+  public static AddPrinterDriverA(pName: OPTIONAL<LPSTR>, Level: DWORD, pDriverInfo: LPBYTE): BOOL {
     return Winspool.Load('AddPrinterDriverA')(pName, Level, pDriverInfo);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/addprinterdriverex
-  public static AddPrinterDriverExA(pName: LPSTR | NULL, Level: DWORD, pDriverInfo: LPBYTE, dwFileCopyFlags: DWORD): BOOL {
+  public static AddPrinterDriverExA(pName: OPTIONAL<LPSTR>, Level: DWORD, pDriverInfo: LPBYTE, dwFileCopyFlags: DWORD): BOOL {
     return Winspool.Load('AddPrinterDriverExA')(pName, Level, pDriverInfo, dwFileCopyFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/addprinterdriverex
-  public static AddPrinterDriverExW(pName: LPWSTR | NULL, Level: DWORD, pDriverInfo: LPBYTE, dwFileCopyFlags: DWORD): BOOL {
+  public static AddPrinterDriverExW(pName: OPTIONAL<LPWSTR>, Level: DWORD, pDriverInfo: LPBYTE, dwFileCopyFlags: DWORD): BOOL {
     return Winspool.Load('AddPrinterDriverExW')(pName, Level, pDriverInfo, dwFileCopyFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/addprinterdriver
-  public static AddPrinterDriverW(pName: LPWSTR | NULL, Level: DWORD, pDriverInfo: LPBYTE): BOOL {
+  public static AddPrinterDriverW(pName: OPTIONAL<LPWSTR>, Level: DWORD, pDriverInfo: LPBYTE): BOOL {
     return Winspool.Load('AddPrinterDriverW')(pName, Level, pDriverInfo);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/addprinter
-  public static AddPrinterW(pName: LPWSTR | NULL, Level: DWORD, pPrinter: LPBYTE): HANDLE {
+  public static AddPrinterW(pName: OPTIONAL<LPWSTR>, Level: DWORD, pPrinter: LPBYTE): HANDLE {
     return Winspool.Load('AddPrinterW')(pName, Level, pPrinter);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/advanceddocumentproperties
-  public static AdvancedDocumentPropertiesA(hWnd: HWND, hPrinter: HANDLE, pDeviceName: LPSTR, pDevModeOutput: PDEVMODEA | NULL, pDevModeInput: PDEVMODEA | NULL): LONG {
-    return Winspool.Load('AdvancedDocumentPropertiesA')(hWnd, hPrinter, pDeviceName, pDevModeOutput, pDevModeInput);
+  public static AdvancedDocumentPropertiesA(hWnd: HWND, hPrinter: HANDLE, pDeviceName: LPSTR, pDevModeOutput_in_out: OPTIONAL<PDEVMODEA>, pDevModeInput: OPTIONAL<PDEVMODEA>): LONG {
+    return Winspool.Load('AdvancedDocumentPropertiesA')(hWnd, hPrinter, pDeviceName, pDevModeOutput_in_out, pDevModeInput);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/advanceddocumentproperties
-  public static AdvancedDocumentPropertiesW(hWnd: HWND, hPrinter: HANDLE, pDeviceName: LPWSTR, pDevModeOutput: PDEVMODEW | NULL, pDevModeInput: PDEVMODEW | NULL): LONG {
-    return Winspool.Load('AdvancedDocumentPropertiesW')(hWnd, hPrinter, pDeviceName, pDevModeOutput, pDevModeInput);
+  public static AdvancedDocumentPropertiesW(hWnd: HWND, hPrinter: HANDLE, pDeviceName: LPWSTR, pDevModeOutput_in_out: OPTIONAL<PDEVMODEW>, pDevModeInput: OPTIONAL<PDEVMODEW>): LONG {
+    return Winspool.Load('AdvancedDocumentPropertiesW')(hWnd, hPrinter, pDeviceName, pDevModeOutput_in_out, pDevModeInput);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/closeprinter
@@ -391,12 +392,12 @@ class Winspool extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/configureport
-  public static ConfigurePortA(pName: LPSTR | NULL, hWnd: HWND, pPortName: LPSTR): BOOL {
+  public static ConfigurePortA(pName: OPTIONAL<LPSTR>, hWnd: HWND, pPortName: LPSTR): BOOL {
     return Winspool.Load('ConfigurePortA')(pName, hWnd, pPortName);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/configureport
-  public static ConfigurePortW(pName: LPWSTR | NULL, hWnd: HWND, pPortName: LPWSTR): BOOL {
+  public static ConfigurePortW(pName: OPTIONAL<LPWSTR>, hWnd: HWND, pPortName: LPWSTR): BOOL {
     return Winspool.Load('ConfigurePortW')(pName, hWnd, pPortName);
   }
 
@@ -406,18 +407,18 @@ class Winspool extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/coreprinterdriverinstalled
-  public static CorePrinterDriverInstalledA(pszServer: LPCSTR | NULL, pszEnvironment: LPCSTR | NULL, CoreDriverGUID: LPVOID, ftDriverDate: FILETIME, dwlDriverVersion: DWORDLONG, pbDriverInstalled: PBOOL): HRESULT {
-    return Winspool.Load('CorePrinterDriverInstalledA')(pszServer, pszEnvironment, CoreDriverGUID, ftDriverDate, dwlDriverVersion, pbDriverInstalled);
+  public static CorePrinterDriverInstalledA(pszServer: OPTIONAL<LPCSTR>, pszEnvironment: OPTIONAL<LPCSTR>, CoreDriverGUID: LPVOID, ftDriverDate: FILETIME, dwlDriverVersion: DWORDLONG, pbDriverInstalled_out: PBOOL): HRESULT {
+    return Winspool.Load('CorePrinterDriverInstalledA')(pszServer, pszEnvironment, CoreDriverGUID, ftDriverDate, dwlDriverVersion, pbDriverInstalled_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/coreprinterdriverinstalled
-  public static CorePrinterDriverInstalledW(pszServer: LPCWSTR | NULL, pszEnvironment: LPCWSTR | NULL, CoreDriverGUID: LPVOID, ftDriverDate: FILETIME, dwlDriverVersion: DWORDLONG, pbDriverInstalled: PBOOL): HRESULT {
-    return Winspool.Load('CorePrinterDriverInstalledW')(pszServer, pszEnvironment, CoreDriverGUID, ftDriverDate, dwlDriverVersion, pbDriverInstalled);
+  public static CorePrinterDriverInstalledW(pszServer: OPTIONAL<LPCWSTR>, pszEnvironment: OPTIONAL<LPCWSTR>, CoreDriverGUID: LPVOID, ftDriverDate: FILETIME, dwlDriverVersion: DWORDLONG, pbDriverInstalled_out: PBOOL): HRESULT {
+    return Winspool.Load('CorePrinterDriverInstalledW')(pszServer, pszEnvironment, CoreDriverGUID, ftDriverDate, dwlDriverVersion, pbDriverInstalled_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/prnasnot/nf-prnasnot-createprintasyncnotifychannel
-  public static CreatePrintAsyncNotifyChannel(pszName: LPCWSTR | NULL, pNotificationType: LPVOID, eUserFilter: DWORD, eConversationStyle: DWORD, pCallback: LPVOID | NULL, ppIAsynchNotification: LPVOID): HRESULT {
-    return Winspool.Load('CreatePrintAsyncNotifyChannel')(pszName, pNotificationType, eUserFilter, eConversationStyle, pCallback, ppIAsynchNotification);
+  public static CreatePrintAsyncNotifyChannel(pszName: OPTIONAL<LPCWSTR>, pNotificationType: LPVOID, eUserFilter: DWORD, eConversationStyle: DWORD, pCallback: OPTIONAL<LPVOID>, ppIAsynchNotification_out: LPVOID): HRESULT {
+    return Winspool.Load('CreatePrintAsyncNotifyChannel')(pszName, pNotificationType, eUserFilter, eConversationStyle, pCallback, ppIAsynchNotification_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/deleteform
@@ -436,48 +437,48 @@ class Winspool extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/deletemonitor
-  public static DeleteMonitorA(pName: LPSTR | NULL, pEnvironment: LPSTR | NULL, pMonitorName: LPSTR): BOOL {
+  public static DeleteMonitorA(pName: OPTIONAL<LPSTR>, pEnvironment: OPTIONAL<LPSTR>, pMonitorName: LPSTR): BOOL {
     return Winspool.Load('DeleteMonitorA')(pName, pEnvironment, pMonitorName);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/deletemonitor
-  public static DeleteMonitorW(pName: LPWSTR | NULL, pEnvironment: LPWSTR | NULL, pMonitorName: LPWSTR): BOOL {
+  public static DeleteMonitorW(pName: OPTIONAL<LPWSTR>, pEnvironment: OPTIONAL<LPWSTR>, pMonitorName: LPWSTR): BOOL {
     return Winspool.Load('DeleteMonitorW')(pName, pEnvironment, pMonitorName);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/deleteport
-  public static DeletePortA(pName: LPSTR | NULL, hWnd: HWND, pPortName: LPSTR): BOOL {
+  public static DeletePortA(pName: OPTIONAL<LPSTR>, hWnd: HWND, pPortName: LPSTR): BOOL {
     return Winspool.Load('DeletePortA')(pName, hWnd, pPortName);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/deleteport
-  public static DeletePortW(pName: LPWSTR | NULL, hWnd: HWND, pPortName: LPWSTR): BOOL {
+  public static DeletePortW(pName: OPTIONAL<LPWSTR>, hWnd: HWND, pPortName: LPWSTR): BOOL {
     return Winspool.Load('DeletePortW')(pName, hWnd, pPortName);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/deleteprintprocessor
-  public static DeletePrintProcessorA(pName: LPSTR | NULL, pEnvironment: LPSTR | NULL, pPrintProcessorName: LPSTR): BOOL {
+  public static DeletePrintProcessorA(pName: OPTIONAL<LPSTR>, pEnvironment: OPTIONAL<LPSTR>, pPrintProcessorName: LPSTR): BOOL {
     return Winspool.Load('DeletePrintProcessorA')(pName, pEnvironment, pPrintProcessorName);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/deleteprintprocessor
-  public static DeletePrintProcessorW(pName: LPWSTR | NULL, pEnvironment: LPWSTR | NULL, pPrintProcessorName: LPWSTR): BOOL {
+  public static DeletePrintProcessorW(pName: OPTIONAL<LPWSTR>, pEnvironment: OPTIONAL<LPWSTR>, pPrintProcessorName: LPWSTR): BOOL {
     return Winspool.Load('DeletePrintProcessorW')(pName, pEnvironment, pPrintProcessorName);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/deleteprintprovidor
-  public static DeletePrintProvidorA(pName: LPSTR | NULL, pEnvironment: LPSTR | NULL, pPrintProvidorName: LPSTR): BOOL {
+  public static DeletePrintProvidorA(pName: OPTIONAL<LPSTR>, pEnvironment: OPTIONAL<LPSTR>, pPrintProvidorName: LPSTR): BOOL {
     return Winspool.Load('DeletePrintProvidorA')(pName, pEnvironment, pPrintProvidorName);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/deleteprintprovidor
-  public static DeletePrintProvidorW(pName: LPWSTR | NULL, pEnvironment: LPWSTR | NULL, pPrintProvidorName: LPWSTR): BOOL {
+  public static DeletePrintProvidorW(pName: OPTIONAL<LPWSTR>, pEnvironment: OPTIONAL<LPWSTR>, pPrintProvidorName: LPWSTR): BOOL {
     return Winspool.Load('DeletePrintProvidorW')(pName, pEnvironment, pPrintProvidorName);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/deleteprinter
-  public static DeletePrinter(hPrinter: HANDLE): BOOL {
-    return Winspool.Load('DeletePrinter')(hPrinter);
+  public static DeletePrinter(hPrinter_in_out: HANDLE): BOOL {
+    return Winspool.Load('DeletePrinter')(hPrinter_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/deleteprinterconnection
@@ -511,32 +512,32 @@ class Winspool extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/deleteprinterdriver
-  public static DeletePrinterDriverA(pName: LPSTR | NULL, pEnvironment: LPSTR | NULL, pDriverName: LPSTR): BOOL {
+  public static DeletePrinterDriverA(pName: OPTIONAL<LPSTR>, pEnvironment: OPTIONAL<LPSTR>, pDriverName: LPSTR): BOOL {
     return Winspool.Load('DeletePrinterDriverA')(pName, pEnvironment, pDriverName);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/deleteprinterdriverex
-  public static DeletePrinterDriverExA(pName: LPSTR | NULL, pEnvironment: LPSTR | NULL, pDriverName: LPSTR, dwDeleteFlag: DWORD, dwVersionFlag: DWORD): BOOL {
+  public static DeletePrinterDriverExA(pName: OPTIONAL<LPSTR>, pEnvironment: OPTIONAL<LPSTR>, pDriverName: LPSTR, dwDeleteFlag: DWORD, dwVersionFlag: DWORD): BOOL {
     return Winspool.Load('DeletePrinterDriverExA')(pName, pEnvironment, pDriverName, dwDeleteFlag, dwVersionFlag);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/deleteprinterdriverex
-  public static DeletePrinterDriverExW(pName: LPWSTR | NULL, pEnvironment: LPWSTR | NULL, pDriverName: LPWSTR, dwDeleteFlag: DWORD, dwVersionFlag: DWORD): BOOL {
+  public static DeletePrinterDriverExW(pName: OPTIONAL<LPWSTR>, pEnvironment: OPTIONAL<LPWSTR>, pDriverName: LPWSTR, dwDeleteFlag: DWORD, dwVersionFlag: DWORD): BOOL {
     return Winspool.Load('DeletePrinterDriverExW')(pName, pEnvironment, pDriverName, dwDeleteFlag, dwVersionFlag);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/deleteprinterdriverpackage
-  public static DeletePrinterDriverPackageA(pszServer: LPCSTR | NULL, pszInfPath: LPCSTR, pszEnvironment: LPCSTR | NULL): HRESULT {
+  public static DeletePrinterDriverPackageA(pszServer: OPTIONAL<LPCSTR>, pszInfPath: LPCSTR, pszEnvironment: OPTIONAL<LPCSTR>): HRESULT {
     return Winspool.Load('DeletePrinterDriverPackageA')(pszServer, pszInfPath, pszEnvironment);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/deleteprinterdriverpackage
-  public static DeletePrinterDriverPackageW(pszServer: LPCWSTR | NULL, pszInfPath: LPCWSTR, pszEnvironment: LPCWSTR | NULL): HRESULT {
+  public static DeletePrinterDriverPackageW(pszServer: OPTIONAL<LPCWSTR>, pszInfPath: LPCWSTR, pszEnvironment: OPTIONAL<LPCWSTR>): HRESULT {
     return Winspool.Load('DeletePrinterDriverPackageW')(pszServer, pszInfPath, pszEnvironment);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/deleteprinterdriver
-  public static DeletePrinterDriverW(pName: LPWSTR | NULL, pEnvironment: LPWSTR | NULL, pDriverName: LPWSTR): BOOL {
+  public static DeletePrinterDriverW(pName: OPTIONAL<LPWSTR>, pEnvironment: OPTIONAL<LPWSTR>, pDriverName: LPWSTR): BOOL {
     return Winspool.Load('DeletePrinterDriverW')(pName, pEnvironment, pDriverName);
   }
 
@@ -551,23 +552,23 @@ class Winspool extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-devicecapabilitiesa
-  public static DeviceCapabilitiesA(pDevice: LPCSTR, pPort: LPCSTR | NULL, fwCapability: WORD, pOutput: LPSTR | NULL, pDevMode: PDEVMODEA | NULL): INT {
-    return Winspool.Load('DeviceCapabilitiesA')(pDevice, pPort, fwCapability, pOutput, pDevMode);
+  public static DeviceCapabilitiesA(pDevice: LPCSTR, pPort: OPTIONAL<LPCSTR>, fwCapability: WORD, pOutput_out: OPTIONAL<LPSTR>, pDevMode: OPTIONAL<PDEVMODEA>): INT {
+    return Winspool.Load('DeviceCapabilitiesA')(pDevice, pPort, fwCapability, pOutput_out, pDevMode);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-devicecapabilitiesw
-  public static DeviceCapabilitiesW(pDevice: LPCWSTR, pPort: LPCWSTR | NULL, fwCapability: WORD, pOutput: LPWSTR | NULL, pDevMode: PDEVMODEW | NULL): INT {
-    return Winspool.Load('DeviceCapabilitiesW')(pDevice, pPort, fwCapability, pOutput, pDevMode);
+  public static DeviceCapabilitiesW(pDevice: LPCWSTR, pPort: OPTIONAL<LPCWSTR>, fwCapability: WORD, pOutput_out: OPTIONAL<LPWSTR>, pDevMode: OPTIONAL<PDEVMODEW>): INT {
+    return Winspool.Load('DeviceCapabilitiesW')(pDevice, pPort, fwCapability, pOutput_out, pDevMode);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/documentproperties
-  public static DocumentPropertiesA(hWnd: HWND | 0n, hPrinter: HANDLE, pDeviceName: LPSTR, pDevModeOutput: PDEVMODEA | NULL, pDevModeInput: PDEVMODEA | NULL, fMode: DWORD): LONG {
-    return Winspool.Load('DocumentPropertiesA')(hWnd, hPrinter, pDeviceName, pDevModeOutput, pDevModeInput, fMode);
+  public static DocumentPropertiesA(hWnd: OPTIONAL<HWND>, hPrinter: HANDLE, pDeviceName: LPSTR, pDevModeOutput_out: OPTIONAL<PDEVMODEA>, pDevModeInput: OPTIONAL<PDEVMODEA>, fMode: DWORD): LONG {
+    return Winspool.Load('DocumentPropertiesA')(hWnd, hPrinter, pDeviceName, pDevModeOutput_out, pDevModeInput, fMode);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/documentproperties
-  public static DocumentPropertiesW(hWnd: HWND | 0n, hPrinter: HANDLE, pDeviceName: LPWSTR, pDevModeOutput: PDEVMODEW | NULL, pDevModeInput: PDEVMODEW | NULL, fMode: DWORD): LONG {
-    return Winspool.Load('DocumentPropertiesW')(hWnd, hPrinter, pDeviceName, pDevModeOutput, pDevModeInput, fMode);
+  public static DocumentPropertiesW(hWnd: OPTIONAL<HWND>, hPrinter: HANDLE, pDeviceName: LPWSTR, pDevModeOutput_out: OPTIONAL<PDEVMODEW>, pDevModeInput: OPTIONAL<PDEVMODEW>, fMode: DWORD): LONG {
+    return Winspool.Load('DocumentPropertiesW')(hWnd, hPrinter, pDeviceName, pDevModeOutput_out, pDevModeInput, fMode);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/enddocprinter
@@ -581,118 +582,138 @@ class Winspool extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/enumforms
-  public static EnumFormsA(hPrinter: HANDLE, Level: DWORD, pForm: LPBYTE | NULL, cbBuf: DWORD, pcbNeeded: LPDWORD, pcReturned: LPDWORD): BOOL {
-    return Winspool.Load('EnumFormsA')(hPrinter, Level, pForm, cbBuf, pcbNeeded, pcReturned);
+  public static EnumFormsA(hPrinter: HANDLE, Level: DWORD, pForm_out: OPTIONAL<LPBYTE>, cbBuf: DWORD, pcbNeeded_out: LPDWORD, pcReturned_out: LPDWORD): BOOL {
+    return Winspool.Load('EnumFormsA')(hPrinter, Level, pForm_out, cbBuf, pcbNeeded_out, pcReturned_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/enumforms
-  public static EnumFormsW(hPrinter: HANDLE, Level: DWORD, pForm: LPBYTE | NULL, cbBuf: DWORD, pcbNeeded: LPDWORD, pcReturned: LPDWORD): BOOL {
-    return Winspool.Load('EnumFormsW')(hPrinter, Level, pForm, cbBuf, pcbNeeded, pcReturned);
+  public static EnumFormsW(hPrinter: HANDLE, Level: DWORD, pForm_out: OPTIONAL<LPBYTE>, cbBuf: DWORD, pcbNeeded_out: LPDWORD, pcReturned_out: LPDWORD): BOOL {
+    return Winspool.Load('EnumFormsW')(hPrinter, Level, pForm_out, cbBuf, pcbNeeded_out, pcReturned_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/enumjobnamedproperties
-  public static EnumJobNamedProperties(hPrinter: HANDLE, JobId: DWORD, pcProperties: LPDWORD, ppProperties: PPrintNamedProperty): DWORD {
-    return Winspool.Load('EnumJobNamedProperties')(hPrinter, JobId, pcProperties, ppProperties);
+  public static EnumJobNamedProperties(hPrinter: HANDLE, JobId: DWORD, pcProperties_out: LPDWORD, ppProperties_out: PPrintNamedProperty): DWORD {
+    return Winspool.Load('EnumJobNamedProperties')(hPrinter, JobId, pcProperties_out, ppProperties_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/enumjobs
-  public static EnumJobsA(hPrinter: HANDLE, FirstJob: DWORD, NoJobs: DWORD, Level: DWORD, pJob: LPBYTE | NULL, cbBuf: DWORD, pcbNeeded: LPDWORD, pcReturned: LPDWORD): BOOL {
-    return Winspool.Load('EnumJobsA')(hPrinter, FirstJob, NoJobs, Level, pJob, cbBuf, pcbNeeded, pcReturned);
+  public static EnumJobsA(hPrinter: HANDLE, FirstJob: DWORD, NoJobs: DWORD, Level: DWORD, pJob_out: OPTIONAL<LPBYTE>, cbBuf: DWORD, pcbNeeded_out: LPDWORD, pcReturned_out: LPDWORD): BOOL {
+    return Winspool.Load('EnumJobsA')(hPrinter, FirstJob, NoJobs, Level, pJob_out, cbBuf, pcbNeeded_out, pcReturned_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/enumjobs
-  public static EnumJobsW(hPrinter: HANDLE, FirstJob: DWORD, NoJobs: DWORD, Level: DWORD, pJob: LPBYTE | NULL, cbBuf: DWORD, pcbNeeded: LPDWORD, pcReturned: LPDWORD): BOOL {
-    return Winspool.Load('EnumJobsW')(hPrinter, FirstJob, NoJobs, Level, pJob, cbBuf, pcbNeeded, pcReturned);
+  public static EnumJobsW(hPrinter: HANDLE, FirstJob: DWORD, NoJobs: DWORD, Level: DWORD, pJob_out: OPTIONAL<LPBYTE>, cbBuf: DWORD, pcbNeeded_out: LPDWORD, pcReturned_out: LPDWORD): BOOL {
+    return Winspool.Load('EnumJobsW')(hPrinter, FirstJob, NoJobs, Level, pJob_out, cbBuf, pcbNeeded_out, pcReturned_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/enummonitors
-  public static EnumMonitorsA(pName: LPSTR | NULL, Level: DWORD, pMonitor: LPBYTE | NULL, cbBuf: DWORD, pcbNeeded: LPDWORD, pcReturned: LPDWORD): BOOL {
-    return Winspool.Load('EnumMonitorsA')(pName, Level, pMonitor, cbBuf, pcbNeeded, pcReturned);
+  public static EnumMonitorsA(pName: OPTIONAL<LPSTR>, Level: DWORD, pMonitor_out: OPTIONAL<LPBYTE>, cbBuf: DWORD, pcbNeeded_out: LPDWORD, pcReturned_out: LPDWORD): BOOL {
+    return Winspool.Load('EnumMonitorsA')(pName, Level, pMonitor_out, cbBuf, pcbNeeded_out, pcReturned_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/enummonitors
-  public static EnumMonitorsW(pName: LPWSTR | NULL, Level: DWORD, pMonitor: LPBYTE | NULL, cbBuf: DWORD, pcbNeeded: LPDWORD, pcReturned: LPDWORD): BOOL {
-    return Winspool.Load('EnumMonitorsW')(pName, Level, pMonitor, cbBuf, pcbNeeded, pcReturned);
+  public static EnumMonitorsW(pName: OPTIONAL<LPWSTR>, Level: DWORD, pMonitor_out: OPTIONAL<LPBYTE>, cbBuf: DWORD, pcbNeeded_out: LPDWORD, pcReturned_out: LPDWORD): BOOL {
+    return Winspool.Load('EnumMonitorsW')(pName, Level, pMonitor_out, cbBuf, pcbNeeded_out, pcReturned_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/enumports
-  public static EnumPortsA(pName: LPSTR | NULL, Level: DWORD, pPorts: LPBYTE | NULL, cbBuf: DWORD, pcbNeeded: LPDWORD, pcReturned: LPDWORD): BOOL {
-    return Winspool.Load('EnumPortsA')(pName, Level, pPorts, cbBuf, pcbNeeded, pcReturned);
+  public static EnumPortsA(pName: OPTIONAL<LPSTR>, Level: DWORD, pPorts_out: OPTIONAL<LPBYTE>, cbBuf: DWORD, pcbNeeded_out: LPDWORD, pcReturned_out: LPDWORD): BOOL {
+    return Winspool.Load('EnumPortsA')(pName, Level, pPorts_out, cbBuf, pcbNeeded_out, pcReturned_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/enumports
-  public static EnumPortsW(pName: LPWSTR | NULL, Level: DWORD, pPorts: LPBYTE | NULL, cbBuf: DWORD, pcbNeeded: LPDWORD, pcReturned: LPDWORD): BOOL {
-    return Winspool.Load('EnumPortsW')(pName, Level, pPorts, cbBuf, pcbNeeded, pcReturned);
+  public static EnumPortsW(pName: OPTIONAL<LPWSTR>, Level: DWORD, pPorts_out: OPTIONAL<LPBYTE>, cbBuf: DWORD, pcbNeeded_out: LPDWORD, pcReturned_out: LPDWORD): BOOL {
+    return Winspool.Load('EnumPortsW')(pName, Level, pPorts_out, cbBuf, pcbNeeded_out, pcReturned_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/enumprintprocessordatatypes
-  public static EnumPrintProcessorDatatypesA(pName: LPSTR | NULL, pPrintProcessorName: LPSTR, Level: DWORD, pDatatypes: LPBYTE | NULL, cbBuf: DWORD, pcbNeeded: LPDWORD, pcReturned: LPDWORD): BOOL {
-    return Winspool.Load('EnumPrintProcessorDatatypesA')(pName, pPrintProcessorName, Level, pDatatypes, cbBuf, pcbNeeded, pcReturned);
+  public static EnumPrintProcessorDatatypesA(pName: OPTIONAL<LPSTR>, pPrintProcessorName: LPSTR, Level: DWORD, pDatatypes_out: OPTIONAL<LPBYTE>, cbBuf: DWORD, pcbNeeded_out: LPDWORD, pcReturned_out: LPDWORD): BOOL {
+    return Winspool.Load('EnumPrintProcessorDatatypesA')(pName, pPrintProcessorName, Level, pDatatypes_out, cbBuf, pcbNeeded_out, pcReturned_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/enumprintprocessordatatypes
-  public static EnumPrintProcessorDatatypesW(pName: LPWSTR | NULL, pPrintProcessorName: LPWSTR, Level: DWORD, pDatatypes: LPBYTE | NULL, cbBuf: DWORD, pcbNeeded: LPDWORD, pcReturned: LPDWORD): BOOL {
-    return Winspool.Load('EnumPrintProcessorDatatypesW')(pName, pPrintProcessorName, Level, pDatatypes, cbBuf, pcbNeeded, pcReturned);
+  public static EnumPrintProcessorDatatypesW(pName: OPTIONAL<LPWSTR>, pPrintProcessorName: LPWSTR, Level: DWORD, pDatatypes_out: OPTIONAL<LPBYTE>, cbBuf: DWORD, pcbNeeded_out: LPDWORD, pcReturned_out: LPDWORD): BOOL {
+    return Winspool.Load('EnumPrintProcessorDatatypesW')(pName, pPrintProcessorName, Level, pDatatypes_out, cbBuf, pcbNeeded_out, pcReturned_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/enumprintprocessors
-  public static EnumPrintProcessorsA(pName: LPSTR | NULL, pEnvironment: LPSTR | NULL, Level: DWORD, pPrintProcessorInfo: LPBYTE | NULL, cbBuf: DWORD, pcbNeeded: LPDWORD, pcReturned: LPDWORD): BOOL {
-    return Winspool.Load('EnumPrintProcessorsA')(pName, pEnvironment, Level, pPrintProcessorInfo, cbBuf, pcbNeeded, pcReturned);
+  public static EnumPrintProcessorsA(pName: OPTIONAL<LPSTR>, pEnvironment: OPTIONAL<LPSTR>, Level: DWORD, pPrintProcessorInfo_out: OPTIONAL<LPBYTE>, cbBuf: DWORD, pcbNeeded_out: LPDWORD, pcReturned_out: LPDWORD): BOOL {
+    return Winspool.Load('EnumPrintProcessorsA')(pName, pEnvironment, Level, pPrintProcessorInfo_out, cbBuf, pcbNeeded_out, pcReturned_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/enumprintprocessors
-  public static EnumPrintProcessorsW(pName: LPWSTR | NULL, pEnvironment: LPWSTR | NULL, Level: DWORD, pPrintProcessorInfo: LPBYTE | NULL, cbBuf: DWORD, pcbNeeded: LPDWORD, pcReturned: LPDWORD): BOOL {
-    return Winspool.Load('EnumPrintProcessorsW')(pName, pEnvironment, Level, pPrintProcessorInfo, cbBuf, pcbNeeded, pcReturned);
+  public static EnumPrintProcessorsW(pName: OPTIONAL<LPWSTR>, pEnvironment: OPTIONAL<LPWSTR>, Level: DWORD, pPrintProcessorInfo_out: OPTIONAL<LPBYTE>, cbBuf: DWORD, pcbNeeded_out: LPDWORD, pcReturned_out: LPDWORD): BOOL {
+    return Winspool.Load('EnumPrintProcessorsW')(pName, pEnvironment, Level, pPrintProcessorInfo_out, cbBuf, pcbNeeded_out, pcReturned_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/enumprinterdata
-  public static EnumPrinterDataA(hPrinter: HANDLE, dwIndex: DWORD, pValueName: LPSTR, cbValueName: DWORD, pcbValueName: LPDWORD, pType: LPDWORD | NULL, pData: LPBYTE | NULL, cbData: DWORD, pcbData: LPDWORD | NULL): DWORD {
-    return Winspool.Load('EnumPrinterDataA')(hPrinter, dwIndex, pValueName, cbValueName, pcbValueName, pType, pData, cbData, pcbData);
+  public static EnumPrinterDataA(
+    hPrinter: HANDLE,
+    dwIndex: DWORD,
+    pValueName_out: LPSTR,
+    cbValueName: DWORD,
+    pcbValueName_out: LPDWORD,
+    pType_out: OPTIONAL<LPDWORD>,
+    pData_out: OPTIONAL<LPBYTE>,
+    cbData: DWORD,
+    pcbData_out: OPTIONAL<LPDWORD>,
+  ): DWORD {
+    return Winspool.Load('EnumPrinterDataA')(hPrinter, dwIndex, pValueName_out, cbValueName, pcbValueName_out, pType_out, pData_out, cbData, pcbData_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/enumprinterdataex
-  public static EnumPrinterDataExA(hPrinter: HANDLE, pKeyName: LPCSTR, pEnumValues: LPBYTE | NULL, cbEnumValues: DWORD, pcbEnumValues: LPDWORD, pnEnumValues: LPDWORD): DWORD {
-    return Winspool.Load('EnumPrinterDataExA')(hPrinter, pKeyName, pEnumValues, cbEnumValues, pcbEnumValues, pnEnumValues);
+  public static EnumPrinterDataExA(hPrinter: HANDLE, pKeyName: LPCSTR, pEnumValues_out: OPTIONAL<LPBYTE>, cbEnumValues: DWORD, pcbEnumValues_out: LPDWORD, pnEnumValues_out: LPDWORD): DWORD {
+    return Winspool.Load('EnumPrinterDataExA')(hPrinter, pKeyName, pEnumValues_out, cbEnumValues, pcbEnumValues_out, pnEnumValues_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/enumprinterdataex
-  public static EnumPrinterDataExW(hPrinter: HANDLE, pKeyName: LPCWSTR, pEnumValues: LPBYTE | NULL, cbEnumValues: DWORD, pcbEnumValues: LPDWORD, pnEnumValues: LPDWORD): DWORD {
-    return Winspool.Load('EnumPrinterDataExW')(hPrinter, pKeyName, pEnumValues, cbEnumValues, pcbEnumValues, pnEnumValues);
+  public static EnumPrinterDataExW(hPrinter: HANDLE, pKeyName: LPCWSTR, pEnumValues_out: OPTIONAL<LPBYTE>, cbEnumValues: DWORD, pcbEnumValues_out: LPDWORD, pnEnumValues_out: LPDWORD): DWORD {
+    return Winspool.Load('EnumPrinterDataExW')(hPrinter, pKeyName, pEnumValues_out, cbEnumValues, pcbEnumValues_out, pnEnumValues_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/enumprinterdata
-  public static EnumPrinterDataW(hPrinter: HANDLE, dwIndex: DWORD, pValueName: LPWSTR, cbValueName: DWORD, pcbValueName: LPDWORD, pType: LPDWORD | NULL, pData: LPBYTE | NULL, cbData: DWORD, pcbData: LPDWORD | NULL): DWORD {
-    return Winspool.Load('EnumPrinterDataW')(hPrinter, dwIndex, pValueName, cbValueName, pcbValueName, pType, pData, cbData, pcbData);
+  public static EnumPrinterDataW(
+    hPrinter: HANDLE,
+    dwIndex: DWORD,
+    pValueName_out: LPWSTR,
+    cbValueName: DWORD,
+    pcbValueName_out: LPDWORD,
+    pType_out: OPTIONAL<LPDWORD>,
+    pData_out: OPTIONAL<LPBYTE>,
+    cbData: DWORD,
+    pcbData_out: OPTIONAL<LPDWORD>,
+  ): DWORD {
+    return Winspool.Load('EnumPrinterDataW')(hPrinter, dwIndex, pValueName_out, cbValueName, pcbValueName_out, pType_out, pData_out, cbData, pcbData_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/enumprinterdrivers
-  public static EnumPrinterDriversA(pName: LPSTR | NULL, pEnvironment: LPSTR | NULL, Level: DWORD, pDriverInfo: LPBYTE | NULL, cbBuf: DWORD, pcbNeeded: LPDWORD, pcReturned: LPDWORD): BOOL {
-    return Winspool.Load('EnumPrinterDriversA')(pName, pEnvironment, Level, pDriverInfo, cbBuf, pcbNeeded, pcReturned);
+  public static EnumPrinterDriversA(pName: OPTIONAL<LPSTR>, pEnvironment: OPTIONAL<LPSTR>, Level: DWORD, pDriverInfo_out: OPTIONAL<LPBYTE>, cbBuf: DWORD, pcbNeeded_out: LPDWORD, pcReturned_out: LPDWORD): BOOL {
+    return Winspool.Load('EnumPrinterDriversA')(pName, pEnvironment, Level, pDriverInfo_out, cbBuf, pcbNeeded_out, pcReturned_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/enumprinterdrivers
-  public static EnumPrinterDriversW(pName: LPWSTR | NULL, pEnvironment: LPWSTR | NULL, Level: DWORD, pDriverInfo: LPBYTE | NULL, cbBuf: DWORD, pcbNeeded: LPDWORD, pcReturned: LPDWORD): BOOL {
-    return Winspool.Load('EnumPrinterDriversW')(pName, pEnvironment, Level, pDriverInfo, cbBuf, pcbNeeded, pcReturned);
+  public static EnumPrinterDriversW(pName: OPTIONAL<LPWSTR>, pEnvironment: OPTIONAL<LPWSTR>, Level: DWORD, pDriverInfo_out: OPTIONAL<LPBYTE>, cbBuf: DWORD, pcbNeeded_out: LPDWORD, pcReturned_out: LPDWORD): BOOL {
+    return Winspool.Load('EnumPrinterDriversW')(pName, pEnvironment, Level, pDriverInfo_out, cbBuf, pcbNeeded_out, pcReturned_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/enumprinterkey
-  public static EnumPrinterKeyA(hPrinter: HANDLE, pKeyName: LPCSTR, pSubkey: LPSTR | NULL, cbSubkey: DWORD, pcbSubkey: LPDWORD): DWORD {
-    return Winspool.Load('EnumPrinterKeyA')(hPrinter, pKeyName, pSubkey, cbSubkey, pcbSubkey);
+  public static EnumPrinterKeyA(hPrinter: HANDLE, pKeyName: LPCSTR, pSubkey_out: OPTIONAL<LPSTR>, cbSubkey: DWORD, pcbSubkey_out: LPDWORD): DWORD {
+    return Winspool.Load('EnumPrinterKeyA')(hPrinter, pKeyName, pSubkey_out, cbSubkey, pcbSubkey_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/enumprinterkey
-  public static EnumPrinterKeyW(hPrinter: HANDLE, pKeyName: LPCWSTR, pSubkey: LPWSTR | NULL, cbSubkey: DWORD, pcbSubkey: LPDWORD): DWORD {
-    return Winspool.Load('EnumPrinterKeyW')(hPrinter, pKeyName, pSubkey, cbSubkey, pcbSubkey);
+  public static EnumPrinterKeyW(hPrinter: HANDLE, pKeyName: LPCWSTR, pSubkey_out: OPTIONAL<LPWSTR>, cbSubkey: DWORD, pcbSubkey_out: LPDWORD): DWORD {
+    return Winspool.Load('EnumPrinterKeyW')(hPrinter, pKeyName, pSubkey_out, cbSubkey, pcbSubkey_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/enumprinters
-  public static EnumPrintersA(Flags: DWORD, Name: LPSTR | NULL, Level: DWORD, pPrinterEnum: LPBYTE | NULL, cbBuf: DWORD, pcbNeeded: LPDWORD, pcReturned: LPDWORD): BOOL {
-    return Winspool.Load('EnumPrintersA')(Flags, Name, Level, pPrinterEnum, cbBuf, pcbNeeded, pcReturned);
+  public static EnumPrintersA(Flags: DWORD, Name: OPTIONAL<LPSTR>, Level: DWORD, pPrinterEnum_out: OPTIONAL<LPBYTE>, cbBuf: DWORD, pcbNeeded_out: LPDWORD, pcReturned_out: LPDWORD): BOOL {
+    return Winspool.Load('EnumPrintersA')(Flags, Name, Level, pPrinterEnum_out, cbBuf, pcbNeeded_out, pcReturned_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/enumprinters
-  public static EnumPrintersW(Flags: DWORD, Name: LPWSTR | NULL, Level: DWORD, pPrinterEnum: LPBYTE | NULL, cbBuf: DWORD, pcbNeeded: LPDWORD, pcReturned: LPDWORD): BOOL {
-    return Winspool.Load('EnumPrintersW')(Flags, Name, Level, pPrinterEnum, cbBuf, pcbNeeded, pcReturned);
+  public static EnumPrintersW(Flags: DWORD, Name: OPTIONAL<LPWSTR>, Level: DWORD, pPrinterEnum_out: OPTIONAL<LPBYTE>, cbBuf: DWORD, pcbNeeded_out: LPDWORD, pcReturned_out: LPDWORD): BOOL {
+    return Winspool.Load('EnumPrintersW')(Flags, Name, Level, pPrinterEnum_out, cbBuf, pcbNeeded_out, pcReturned_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/findcloseprinterchangenotification
@@ -701,28 +722,28 @@ class Winspool extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/findfirstprinterchangenotification
-  public static FindFirstPrinterChangeNotification(hPrinter: HANDLE, fdwFilter: DWORD, fdwOptions: DWORD, pPrinterNotifyOptions: PPRINTER_NOTIFY_OPTIONS | NULL): HANDLE {
+  public static FindFirstPrinterChangeNotification(hPrinter: HANDLE, fdwFilter: DWORD, fdwOptions: DWORD, pPrinterNotifyOptions: OPTIONAL<PPRINTER_NOTIFY_OPTIONS>): HANDLE {
     return Winspool.Load('FindFirstPrinterChangeNotification')(hPrinter, fdwFilter, fdwOptions, pPrinterNotifyOptions);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/findnextprinterchangenotification
-  public static FindNextPrinterChangeNotification(hChange: HANDLE, pdwChange: PDWORD | NULL, pPrinterNotifyOptions: LPVOID | NULL, ppPrinterNotifyInfo: LPVOID | NULL): BOOL {
-    return Winspool.Load('FindNextPrinterChangeNotification')(hChange, pdwChange, pPrinterNotifyOptions, ppPrinterNotifyInfo);
+  public static FindNextPrinterChangeNotification(hChange: HANDLE, pdwChange_out: OPTIONAL<PDWORD>, pPrinterNotifyOptions: OPTIONAL<LPVOID>, ppPrinterNotifyInfo_out: OPTIONAL<LPVOID>): BOOL {
+    return Winspool.Load('FindNextPrinterChangeNotification')(hChange, pdwChange_out, pPrinterNotifyOptions, ppPrinterNotifyInfo_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/flushprinter
-  public static FlushPrinter(hPrinter: HANDLE, pBuf: LPVOID | NULL, cbBuf: DWORD, pcWritten: LPDWORD, cSleep: DWORD): BOOL {
-    return Winspool.Load('FlushPrinter')(hPrinter, pBuf, cbBuf, pcWritten, cSleep);
+  public static FlushPrinter(hPrinter: HANDLE, pBuf: OPTIONAL<LPVOID>, cbBuf: DWORD, pcWritten_out: LPDWORD, cSleep: DWORD): BOOL {
+    return Winspool.Load('FlushPrinter')(hPrinter, pBuf, cbBuf, pcWritten_out, cSleep);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/freeprintnamedpropertyarray
-  public static FreePrintNamedPropertyArray(cProperties: DWORD, ppProperties: PPrintNamedProperty | NULL): void {
-    return Winspool.Load('FreePrintNamedPropertyArray')(cProperties, ppProperties);
+  public static FreePrintNamedPropertyArray(cProperties: DWORD, ppProperties_in_out: OPTIONAL<PPrintNamedProperty>): void {
+    return Winspool.Load('FreePrintNamedPropertyArray')(cProperties, ppProperties_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/freeprintpropertyvalue
-  public static FreePrintPropertyValue(pValue: PPrintPropertyValue): void {
-    return Winspool.Load('FreePrintPropertyValue')(pValue);
+  public static FreePrintPropertyValue(pValue_in_out: PPrintPropertyValue): void {
+    return Winspool.Load('FreePrintPropertyValue')(pValue_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/freeprinternotifyinfo
@@ -731,144 +752,144 @@ class Winspool extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/getcoreprinterdrivers
-  public static GetCorePrinterDriversA(pszServer: LPCSTR | NULL, pszEnvironment: LPCSTR | NULL, pszzCoreDriverDependencies: LPCSTR, cCorePrinterDrivers: DWORD, pCorePrinterDrivers: PCORE_PRINTER_DRIVERA): HRESULT {
-    return Winspool.Load('GetCorePrinterDriversA')(pszServer, pszEnvironment, pszzCoreDriverDependencies, cCorePrinterDrivers, pCorePrinterDrivers);
+  public static GetCorePrinterDriversA(pszServer: OPTIONAL<LPCSTR>, pszEnvironment: OPTIONAL<LPCSTR>, pszzCoreDriverDependencies: LPCSTR, cCorePrinterDrivers: DWORD, pCorePrinterDrivers_out: PCORE_PRINTER_DRIVERA): HRESULT {
+    return Winspool.Load('GetCorePrinterDriversA')(pszServer, pszEnvironment, pszzCoreDriverDependencies, cCorePrinterDrivers, pCorePrinterDrivers_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/getcoreprinterdrivers
-  public static GetCorePrinterDriversW(pszServer: LPCWSTR | NULL, pszEnvironment: LPCWSTR | NULL, pszzCoreDriverDependencies: LPCWSTR, cCorePrinterDrivers: DWORD, pCorePrinterDrivers: PCORE_PRINTER_DRIVERW): HRESULT {
-    return Winspool.Load('GetCorePrinterDriversW')(pszServer, pszEnvironment, pszzCoreDriverDependencies, cCorePrinterDrivers, pCorePrinterDrivers);
+  public static GetCorePrinterDriversW(pszServer: OPTIONAL<LPCWSTR>, pszEnvironment: OPTIONAL<LPCWSTR>, pszzCoreDriverDependencies: LPCWSTR, cCorePrinterDrivers: DWORD, pCorePrinterDrivers_out: PCORE_PRINTER_DRIVERW): HRESULT {
+    return Winspool.Load('GetCorePrinterDriversW')(pszServer, pszEnvironment, pszzCoreDriverDependencies, cCorePrinterDrivers, pCorePrinterDrivers_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/getdefaultprinter
-  public static GetDefaultPrinterA(pszBuffer: LPSTR | NULL, pcchBuffer: LPDWORD): BOOL {
-    return Winspool.Load('GetDefaultPrinterA')(pszBuffer, pcchBuffer);
+  public static GetDefaultPrinterA(pszBuffer_out: OPTIONAL<LPSTR>, pcchBuffer_in_out: LPDWORD): BOOL {
+    return Winspool.Load('GetDefaultPrinterA')(pszBuffer_out, pcchBuffer_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/getdefaultprinter
-  public static GetDefaultPrinterW(pszBuffer: LPWSTR | NULL, pcchBuffer: LPDWORD): BOOL {
-    return Winspool.Load('GetDefaultPrinterW')(pszBuffer, pcchBuffer);
+  public static GetDefaultPrinterW(pszBuffer_out: OPTIONAL<LPWSTR>, pcchBuffer_in_out: LPDWORD): BOOL {
+    return Winspool.Load('GetDefaultPrinterW')(pszBuffer_out, pcchBuffer_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/getform
-  public static GetFormA(hPrinter: HANDLE, pFormName: LPSTR, Level: DWORD, pForm: LPBYTE | NULL, cbBuf: DWORD, pcbNeeded: LPDWORD): BOOL {
-    return Winspool.Load('GetFormA')(hPrinter, pFormName, Level, pForm, cbBuf, pcbNeeded);
+  public static GetFormA(hPrinter: HANDLE, pFormName: LPSTR, Level: DWORD, pForm_out: OPTIONAL<LPBYTE>, cbBuf: DWORD, pcbNeeded_out: LPDWORD): BOOL {
+    return Winspool.Load('GetFormA')(hPrinter, pFormName, Level, pForm_out, cbBuf, pcbNeeded_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/getform
-  public static GetFormW(hPrinter: HANDLE, pFormName: LPWSTR, Level: DWORD, pForm: LPBYTE | NULL, cbBuf: DWORD, pcbNeeded: LPDWORD): BOOL {
-    return Winspool.Load('GetFormW')(hPrinter, pFormName, Level, pForm, cbBuf, pcbNeeded);
+  public static GetFormW(hPrinter: HANDLE, pFormName: LPWSTR, Level: DWORD, pForm_out: OPTIONAL<LPBYTE>, cbBuf: DWORD, pcbNeeded_out: LPDWORD): BOOL {
+    return Winspool.Load('GetFormW')(hPrinter, pFormName, Level, pForm_out, cbBuf, pcbNeeded_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/getjob
-  public static GetJobA(hPrinter: HANDLE, JobId: DWORD, Level: DWORD, pJob: LPBYTE | NULL, cbBuf: DWORD, pcbNeeded: LPDWORD): BOOL {
-    return Winspool.Load('GetJobA')(hPrinter, JobId, Level, pJob, cbBuf, pcbNeeded);
+  public static GetJobA(hPrinter: HANDLE, JobId: DWORD, Level: DWORD, pJob_out: OPTIONAL<LPBYTE>, cbBuf: DWORD, pcbNeeded_out: LPDWORD): BOOL {
+    return Winspool.Load('GetJobA')(hPrinter, JobId, Level, pJob_out, cbBuf, pcbNeeded_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/getjobnamedpropertyvalue
-  public static GetJobNamedPropertyValue(hPrinter: HANDLE, JobId: DWORD, pszName: LPCWSTR, pValue: PPrintPropertyValue): DWORD {
-    return Winspool.Load('GetJobNamedPropertyValue')(hPrinter, JobId, pszName, pValue);
+  public static GetJobNamedPropertyValue(hPrinter: HANDLE, JobId: DWORD, pszName: LPCWSTR, pValue_out: PPrintPropertyValue): DWORD {
+    return Winspool.Load('GetJobNamedPropertyValue')(hPrinter, JobId, pszName, pValue_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/getjob
-  public static GetJobW(hPrinter: HANDLE, JobId: DWORD, Level: DWORD, pJob: LPBYTE | NULL, cbBuf: DWORD, pcbNeeded: LPDWORD): BOOL {
-    return Winspool.Load('GetJobW')(hPrinter, JobId, Level, pJob, cbBuf, pcbNeeded);
+  public static GetJobW(hPrinter: HANDLE, JobId: DWORD, Level: DWORD, pJob_out: OPTIONAL<LPBYTE>, cbBuf: DWORD, pcbNeeded_out: LPDWORD): BOOL {
+    return Winspool.Load('GetJobW')(hPrinter, JobId, Level, pJob_out, cbBuf, pcbNeeded_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/getprintexecutiondata
-  public static GetPrintExecutionData(pData: PPRINT_EXECUTION_DATA): BOOL {
-    return Winspool.Load('GetPrintExecutionData')(pData);
+  public static GetPrintExecutionData(pData_out: PPRINT_EXECUTION_DATA): BOOL {
+    return Winspool.Load('GetPrintExecutionData')(pData_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/getprintoutputinfo
-  public static GetPrintOutputInfo(hWnd: HWND, pszPrinter: LPCWSTR, phFile: LPHANDLE, ppszOutputFile: LPVOID): HRESULT {
-    return Winspool.Load('GetPrintOutputInfo')(hWnd, pszPrinter, phFile, ppszOutputFile);
+  public static GetPrintOutputInfo(hWnd: HWND, pszPrinter: LPCWSTR, phFile_out: LPHANDLE, ppszOutputFile_out: LPVOID): HRESULT {
+    return Winspool.Load('GetPrintOutputInfo')(hWnd, pszPrinter, phFile_out, ppszOutputFile_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/getprintprocessordirectory
-  public static GetPrintProcessorDirectoryA(pName: LPSTR | NULL, pEnvironment: LPSTR | NULL, Level: DWORD, pPrintProcessorInfo: LPBYTE | NULL, cbBuf: DWORD, pcbNeeded: LPDWORD): BOOL {
-    return Winspool.Load('GetPrintProcessorDirectoryA')(pName, pEnvironment, Level, pPrintProcessorInfo, cbBuf, pcbNeeded);
+  public static GetPrintProcessorDirectoryA(pName: OPTIONAL<LPSTR>, pEnvironment: OPTIONAL<LPSTR>, Level: DWORD, pPrintProcessorInfo_out: OPTIONAL<LPBYTE>, cbBuf: DWORD, pcbNeeded_out: LPDWORD): BOOL {
+    return Winspool.Load('GetPrintProcessorDirectoryA')(pName, pEnvironment, Level, pPrintProcessorInfo_out, cbBuf, pcbNeeded_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/getprintprocessordirectory
-  public static GetPrintProcessorDirectoryW(pName: LPWSTR | NULL, pEnvironment: LPWSTR | NULL, Level: DWORD, pPrintProcessorInfo: LPBYTE | NULL, cbBuf: DWORD, pcbNeeded: LPDWORD): BOOL {
-    return Winspool.Load('GetPrintProcessorDirectoryW')(pName, pEnvironment, Level, pPrintProcessorInfo, cbBuf, pcbNeeded);
+  public static GetPrintProcessorDirectoryW(pName: OPTIONAL<LPWSTR>, pEnvironment: OPTIONAL<LPWSTR>, Level: DWORD, pPrintProcessorInfo_out: OPTIONAL<LPBYTE>, cbBuf: DWORD, pcbNeeded_out: LPDWORD): BOOL {
+    return Winspool.Load('GetPrintProcessorDirectoryW')(pName, pEnvironment, Level, pPrintProcessorInfo_out, cbBuf, pcbNeeded_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/getprinter
-  public static GetPrinterA(hPrinter: HANDLE, Level: DWORD, pPrinter: LPBYTE | NULL, cbBuf: DWORD, pcbNeeded: LPDWORD): BOOL {
-    return Winspool.Load('GetPrinterA')(hPrinter, Level, pPrinter, cbBuf, pcbNeeded);
+  public static GetPrinterA(hPrinter: HANDLE, Level: DWORD, pPrinter_out: OPTIONAL<LPBYTE>, cbBuf: DWORD, pcbNeeded_out: LPDWORD): BOOL {
+    return Winspool.Load('GetPrinterA')(hPrinter, Level, pPrinter_out, cbBuf, pcbNeeded_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/getprinterdata
-  public static GetPrinterDataA(hPrinter: HANDLE, pValueName: LPSTR, pType: LPDWORD | NULL, pData: LPBYTE | NULL, nSize: DWORD, pcbNeeded: LPDWORD): DWORD {
-    return Winspool.Load('GetPrinterDataA')(hPrinter, pValueName, pType, pData, nSize, pcbNeeded);
+  public static GetPrinterDataA(hPrinter: HANDLE, pValueName: LPSTR, pType_out: OPTIONAL<LPDWORD>, pData_out: OPTIONAL<LPBYTE>, nSize: DWORD, pcbNeeded_out: LPDWORD): DWORD {
+    return Winspool.Load('GetPrinterDataA')(hPrinter, pValueName, pType_out, pData_out, nSize, pcbNeeded_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/getprinterdataex
-  public static GetPrinterDataExA(hPrinter: HANDLE, pKeyName: LPCSTR, pValueName: LPCSTR, pType: LPDWORD | NULL, pData: LPBYTE | NULL, nSize: DWORD, pcbNeeded: LPDWORD): DWORD {
-    return Winspool.Load('GetPrinterDataExA')(hPrinter, pKeyName, pValueName, pType, pData, nSize, pcbNeeded);
+  public static GetPrinterDataExA(hPrinter: HANDLE, pKeyName: LPCSTR, pValueName: LPCSTR, pType_out: OPTIONAL<LPDWORD>, pData_out: OPTIONAL<LPBYTE>, nSize: DWORD, pcbNeeded_out: LPDWORD): DWORD {
+    return Winspool.Load('GetPrinterDataExA')(hPrinter, pKeyName, pValueName, pType_out, pData_out, nSize, pcbNeeded_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/getprinterdataex
-  public static GetPrinterDataExW(hPrinter: HANDLE, pKeyName: LPCWSTR, pValueName: LPCWSTR, pType: LPDWORD | NULL, pData: LPBYTE | NULL, nSize: DWORD, pcbNeeded: LPDWORD): DWORD {
-    return Winspool.Load('GetPrinterDataExW')(hPrinter, pKeyName, pValueName, pType, pData, nSize, pcbNeeded);
+  public static GetPrinterDataExW(hPrinter: HANDLE, pKeyName: LPCWSTR, pValueName: LPCWSTR, pType_out: OPTIONAL<LPDWORD>, pData_out: OPTIONAL<LPBYTE>, nSize: DWORD, pcbNeeded_out: LPDWORD): DWORD {
+    return Winspool.Load('GetPrinterDataExW')(hPrinter, pKeyName, pValueName, pType_out, pData_out, nSize, pcbNeeded_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/getprinterdata
-  public static GetPrinterDataW(hPrinter: HANDLE, pValueName: LPWSTR, pType: LPDWORD | NULL, pData: LPBYTE | NULL, nSize: DWORD, pcbNeeded: LPDWORD): DWORD {
-    return Winspool.Load('GetPrinterDataW')(hPrinter, pValueName, pType, pData, nSize, pcbNeeded);
+  public static GetPrinterDataW(hPrinter: HANDLE, pValueName: LPWSTR, pType_out: OPTIONAL<LPDWORD>, pData_out: OPTIONAL<LPBYTE>, nSize: DWORD, pcbNeeded_out: LPDWORD): DWORD {
+    return Winspool.Load('GetPrinterDataW')(hPrinter, pValueName, pType_out, pData_out, nSize, pcbNeeded_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/getprinterdriver
-  public static GetPrinterDriverA(hPrinter: HANDLE, pEnvironment: LPSTR | NULL, Level: DWORD, pDriverInfo: LPBYTE | NULL, cbBuf: DWORD, pcbNeeded: LPDWORD): BOOL {
-    return Winspool.Load('GetPrinterDriverA')(hPrinter, pEnvironment, Level, pDriverInfo, cbBuf, pcbNeeded);
+  public static GetPrinterDriverA(hPrinter: HANDLE, pEnvironment: OPTIONAL<LPSTR>, Level: DWORD, pDriverInfo_out: OPTIONAL<LPBYTE>, cbBuf: DWORD, pcbNeeded_out: LPDWORD): BOOL {
+    return Winspool.Load('GetPrinterDriverA')(hPrinter, pEnvironment, Level, pDriverInfo_out, cbBuf, pcbNeeded_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/getprinterdriverdirectory
-  public static GetPrinterDriverDirectoryA(pName: LPSTR | NULL, pEnvironment: LPSTR | NULL, Level: DWORD, pDriverDirectory: LPBYTE | NULL, cbBuf: DWORD, pcbNeeded: LPDWORD): BOOL {
-    return Winspool.Load('GetPrinterDriverDirectoryA')(pName, pEnvironment, Level, pDriverDirectory, cbBuf, pcbNeeded);
+  public static GetPrinterDriverDirectoryA(pName: OPTIONAL<LPSTR>, pEnvironment: OPTIONAL<LPSTR>, Level: DWORD, pDriverDirectory_out: OPTIONAL<LPBYTE>, cbBuf: DWORD, pcbNeeded_out: LPDWORD): BOOL {
+    return Winspool.Load('GetPrinterDriverDirectoryA')(pName, pEnvironment, Level, pDriverDirectory_out, cbBuf, pcbNeeded_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/getprinterdriverdirectory
-  public static GetPrinterDriverDirectoryW(pName: LPWSTR | NULL, pEnvironment: LPWSTR | NULL, Level: DWORD, pDriverDirectory: LPBYTE | NULL, cbBuf: DWORD, pcbNeeded: LPDWORD): BOOL {
-    return Winspool.Load('GetPrinterDriverDirectoryW')(pName, pEnvironment, Level, pDriverDirectory, cbBuf, pcbNeeded);
+  public static GetPrinterDriverDirectoryW(pName: OPTIONAL<LPWSTR>, pEnvironment: OPTIONAL<LPWSTR>, Level: DWORD, pDriverDirectory_out: OPTIONAL<LPBYTE>, cbBuf: DWORD, pcbNeeded_out: LPDWORD): BOOL {
+    return Winspool.Load('GetPrinterDriverDirectoryW')(pName, pEnvironment, Level, pDriverDirectory_out, cbBuf, pcbNeeded_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/getprinterdriverpackagepath
   public static GetPrinterDriverPackagePathA(
-    pszServer: LPCSTR | NULL,
-    pszEnvironment: LPCSTR | NULL,
-    pszLanguage: LPCSTR | NULL,
+    pszServer: OPTIONAL<LPCSTR>,
+    pszEnvironment: OPTIONAL<LPCSTR>,
+    pszLanguage: OPTIONAL<LPCSTR>,
     pszPackageID: LPCSTR,
-    pszDriverPackageCab: LPSTR | NULL,
+    pszDriverPackageCab_in_out: OPTIONAL<LPSTR>,
     cchDriverPackageCab: DWORD,
-    pcchRequiredSize: LPDWORD,
+    pcchRequiredSize_out: LPDWORD,
   ): HRESULT {
-    return Winspool.Load('GetPrinterDriverPackagePathA')(pszServer, pszEnvironment, pszLanguage, pszPackageID, pszDriverPackageCab, cchDriverPackageCab, pcchRequiredSize);
+    return Winspool.Load('GetPrinterDriverPackagePathA')(pszServer, pszEnvironment, pszLanguage, pszPackageID, pszDriverPackageCab_in_out, cchDriverPackageCab, pcchRequiredSize_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/getprinterdriverpackagepath
   public static GetPrinterDriverPackagePathW(
-    pszServer: LPCWSTR | NULL,
-    pszEnvironment: LPCWSTR | NULL,
-    pszLanguage: LPCWSTR | NULL,
+    pszServer: OPTIONAL<LPCWSTR>,
+    pszEnvironment: OPTIONAL<LPCWSTR>,
+    pszLanguage: OPTIONAL<LPCWSTR>,
     pszPackageID: LPCWSTR,
-    pszDriverPackageCab: LPWSTR | NULL,
+    pszDriverPackageCab_in_out: OPTIONAL<LPWSTR>,
     cchDriverPackageCab: DWORD,
-    pcchRequiredSize: LPDWORD,
+    pcchRequiredSize_out: LPDWORD,
   ): HRESULT {
-    return Winspool.Load('GetPrinterDriverPackagePathW')(pszServer, pszEnvironment, pszLanguage, pszPackageID, pszDriverPackageCab, cchDriverPackageCab, pcchRequiredSize);
+    return Winspool.Load('GetPrinterDriverPackagePathW')(pszServer, pszEnvironment, pszLanguage, pszPackageID, pszDriverPackageCab_in_out, cchDriverPackageCab, pcchRequiredSize_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/getprinterdriver
-  public static GetPrinterDriverW(hPrinter: HANDLE, pEnvironment: LPWSTR | NULL, Level: DWORD, pDriverInfo: LPBYTE | NULL, cbBuf: DWORD, pcbNeeded: LPDWORD): BOOL {
-    return Winspool.Load('GetPrinterDriverW')(hPrinter, pEnvironment, Level, pDriverInfo, cbBuf, pcbNeeded);
+  public static GetPrinterDriverW(hPrinter: HANDLE, pEnvironment: OPTIONAL<LPWSTR>, Level: DWORD, pDriverInfo_out: OPTIONAL<LPBYTE>, cbBuf: DWORD, pcbNeeded_out: LPDWORD): BOOL {
+    return Winspool.Load('GetPrinterDriverW')(hPrinter, pEnvironment, Level, pDriverInfo_out, cbBuf, pcbNeeded_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/getprinter
-  public static GetPrinterW(hPrinter: HANDLE, Level: DWORD, pPrinter: LPBYTE | NULL, cbBuf: DWORD, pcbNeeded: LPDWORD): BOOL {
-    return Winspool.Load('GetPrinterW')(hPrinter, Level, pPrinter, cbBuf, pcbNeeded);
+  public static GetPrinterW(hPrinter: HANDLE, Level: DWORD, pPrinter_out: OPTIONAL<LPBYTE>, cbBuf: DWORD, pcbNeeded_out: LPDWORD): BOOL {
+    return Winspool.Load('GetPrinterW')(hPrinter, Level, pPrinter_out, cbBuf, pcbNeeded_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/getspoolfilehandle
@@ -877,43 +898,43 @@ class Winspool extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/installprinterdriverfrompackage
-  public static InstallPrinterDriverFromPackageA(pszServer: LPCSTR | NULL, pszInfPath: LPCSTR | NULL, pszDriverName: LPCSTR, pszEnvironment: LPCSTR | NULL, dwFlags: DWORD): HRESULT {
+  public static InstallPrinterDriverFromPackageA(pszServer: OPTIONAL<LPCSTR>, pszInfPath: OPTIONAL<LPCSTR>, pszDriverName: LPCSTR, pszEnvironment: OPTIONAL<LPCSTR>, dwFlags: DWORD): HRESULT {
     return Winspool.Load('InstallPrinterDriverFromPackageA')(pszServer, pszInfPath, pszDriverName, pszEnvironment, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/installprinterdriverfrompackage
-  public static InstallPrinterDriverFromPackageW(pszServer: LPCWSTR | NULL, pszInfPath: LPCWSTR | NULL, pszDriverName: LPCWSTR, pszEnvironment: LPCWSTR | NULL, dwFlags: DWORD): HRESULT {
+  public static InstallPrinterDriverFromPackageW(pszServer: OPTIONAL<LPCWSTR>, pszInfPath: OPTIONAL<LPCWSTR>, pszDriverName: LPCWSTR, pszEnvironment: OPTIONAL<LPCWSTR>, dwFlags: DWORD): HRESULT {
     return Winspool.Load('InstallPrinterDriverFromPackageW')(pszServer, pszInfPath, pszDriverName, pszEnvironment, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/isvaliddevmode
-  public static IsValidDevmodeA(pDevmode: PDEVMODEA | NULL, DevmodeSize: SIZE_T): BOOL {
+  public static IsValidDevmodeA(pDevmode: OPTIONAL<PDEVMODEA>, DevmodeSize: SIZE_T): BOOL {
     return Winspool.Load('IsValidDevmodeA')(pDevmode, DevmodeSize);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/isvaliddevmode
-  public static IsValidDevmodeW(pDevmode: PDEVMODEW | NULL, DevmodeSize: SIZE_T): BOOL {
+  public static IsValidDevmodeW(pDevmode: OPTIONAL<PDEVMODEW>, DevmodeSize: SIZE_T): BOOL {
     return Winspool.Load('IsValidDevmodeW')(pDevmode, DevmodeSize);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/openprinter2
-  public static OpenPrinter2A(pPrinterName: LPCSTR | NULL, phPrinter: LPHANDLE, pDefault: LPPRINTER_DEFAULTSA | NULL, pOptions: PPRINTER_OPTIONSA | NULL): BOOL {
-    return Winspool.Load('OpenPrinter2A')(pPrinterName, phPrinter, pDefault, pOptions);
+  public static OpenPrinter2A(pPrinterName: OPTIONAL<LPCSTR>, phPrinter_out: LPHANDLE, pDefault: OPTIONAL<LPPRINTER_DEFAULTSA>, pOptions: OPTIONAL<PPRINTER_OPTIONSA>): BOOL {
+    return Winspool.Load('OpenPrinter2A')(pPrinterName, phPrinter_out, pDefault, pOptions);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/openprinter2
-  public static OpenPrinter2W(pPrinterName: LPCWSTR | NULL, phPrinter: LPHANDLE, pDefault: LPPRINTER_DEFAULTSW | NULL, pOptions: PPRINTER_OPTIONSW | NULL): BOOL {
-    return Winspool.Load('OpenPrinter2W')(pPrinterName, phPrinter, pDefault, pOptions);
+  public static OpenPrinter2W(pPrinterName: OPTIONAL<LPCWSTR>, phPrinter_out: LPHANDLE, pDefault: OPTIONAL<LPPRINTER_DEFAULTSW>, pOptions: OPTIONAL<PPRINTER_OPTIONSW>): BOOL {
+    return Winspool.Load('OpenPrinter2W')(pPrinterName, phPrinter_out, pDefault, pOptions);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/openprinter
-  public static OpenPrinterA(pPrinterName: LPSTR | NULL, phPrinter: LPHANDLE, pDefault: LPPRINTER_DEFAULTSA | NULL): BOOL {
-    return Winspool.Load('OpenPrinterA')(pPrinterName, phPrinter, pDefault);
+  public static OpenPrinterA(pPrinterName: OPTIONAL<LPSTR>, phPrinter_out: LPHANDLE, pDefault: OPTIONAL<LPPRINTER_DEFAULTSA>): BOOL {
+    return Winspool.Load('OpenPrinterA')(pPrinterName, phPrinter_out, pDefault);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/openprinter
-  public static OpenPrinterW(pPrinterName: LPWSTR | NULL, phPrinter: LPHANDLE, pDefault: LPPRINTER_DEFAULTSW | NULL): BOOL {
-    return Winspool.Load('OpenPrinterW')(pPrinterName, phPrinter, pDefault);
+  public static OpenPrinterW(pPrinterName: OPTIONAL<LPWSTR>, phPrinter_out: LPHANDLE, pDefault: OPTIONAL<LPPRINTER_DEFAULTSW>): BOOL {
+    return Winspool.Load('OpenPrinterW')(pPrinterName, phPrinter_out, pDefault);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/printermessagebox
@@ -932,13 +953,13 @@ class Winspool extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/readprinter
-  public static ReadPrinter(hPrinter: HANDLE, pBuf: LPVOID, cbBuf: DWORD, pNoBytesRead: LPDWORD): BOOL {
-    return Winspool.Load('ReadPrinter')(hPrinter, pBuf, cbBuf, pNoBytesRead);
+  public static ReadPrinter(hPrinter: HANDLE, pBuf_out: LPVOID, cbBuf: DWORD, pNoBytesRead_out: LPDWORD): BOOL {
+    return Winspool.Load('ReadPrinter')(hPrinter, pBuf_out, cbBuf, pNoBytesRead_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/prnasnot/nf-prnasnot-registerforprintasyncnotifications
-  public static RegisterForPrintAsyncNotifications(pszName: LPCWSTR | NULL, pNotificationType: LPVOID, eUserFilter: DWORD, eConversationStyle: DWORD, pCallback: LPVOID, phNotify: LPHANDLE): HRESULT {
-    return Winspool.Load('RegisterForPrintAsyncNotifications')(pszName, pNotificationType, eUserFilter, eConversationStyle, pCallback, phNotify);
+  public static RegisterForPrintAsyncNotifications(pszName: OPTIONAL<LPCWSTR>, pNotificationType: LPVOID, eUserFilter: DWORD, eConversationStyle: DWORD, pCallback: LPVOID, phNotify_out: LPHANDLE): HRESULT {
+    return Winspool.Load('RegisterForPrintAsyncNotifications')(pszName, pNotificationType, eUserFilter, eConversationStyle, pCallback, phNotify_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/reportjobprocessingprogress
@@ -947,12 +968,12 @@ class Winspool extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/resetprinter
-  public static ResetPrinterA(hPrinter: HANDLE, pDefault: LPPRINTER_DEFAULTSA | NULL): BOOL {
+  public static ResetPrinterA(hPrinter: HANDLE, pDefault: OPTIONAL<LPPRINTER_DEFAULTSA>): BOOL {
     return Winspool.Load('ResetPrinterA')(hPrinter, pDefault);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/resetprinter
-  public static ResetPrinterW(hPrinter: HANDLE, pDefault: LPPRINTER_DEFAULTSW | NULL): BOOL {
+  public static ResetPrinterW(hPrinter: HANDLE, pDefault: OPTIONAL<LPPRINTER_DEFAULTSW>): BOOL {
     return Winspool.Load('ResetPrinterW')(hPrinter, pDefault);
   }
 
@@ -962,17 +983,17 @@ class Winspool extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/seekprinter
-  public static SeekPrinter(hPrinter: HANDLE, liDistanceToMove: LARGE_INTEGER, pliNewPointer: PLARGE_INTEGER | NULL, dwMoveMethod: DWORD, bWrite: BOOL): BOOL {
-    return Winspool.Load('SeekPrinter')(hPrinter, liDistanceToMove, pliNewPointer, dwMoveMethod, bWrite);
+  public static SeekPrinter(hPrinter: HANDLE, liDistanceToMove: LARGE_INTEGER, pliNewPointer_out: NULLABLE<PLARGE_INTEGER>, dwMoveMethod: DWORD, bWrite: BOOL): BOOL {
+    return Winspool.Load('SeekPrinter')(hPrinter, liDistanceToMove, pliNewPointer_out, dwMoveMethod, bWrite);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/setdefaultprinter
-  public static SetDefaultPrinterA(pszPrinter: LPCSTR | NULL): BOOL {
+  public static SetDefaultPrinterA(pszPrinter: OPTIONAL<LPCSTR>): BOOL {
     return Winspool.Load('SetDefaultPrinterA')(pszPrinter);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/setdefaultprinter
-  public static SetDefaultPrinterW(pszPrinter: LPCWSTR | NULL): BOOL {
+  public static SetDefaultPrinterW(pszPrinter: OPTIONAL<LPCWSTR>): BOOL {
     return Winspool.Load('SetDefaultPrinterW')(pszPrinter);
   }
 
@@ -987,7 +1008,7 @@ class Winspool extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/setjob
-  public static SetJobA(hPrinter: HANDLE, JobId: DWORD, Level: DWORD, pJob: LPBYTE | NULL, Command: DWORD): BOOL {
+  public static SetJobA(hPrinter: HANDLE, JobId: DWORD, Level: DWORD, pJob: OPTIONAL<LPBYTE>, Command: DWORD): BOOL {
     return Winspool.Load('SetJobA')(hPrinter, JobId, Level, pJob, Command);
   }
 
@@ -997,22 +1018,22 @@ class Winspool extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/setjob
-  public static SetJobW(hPrinter: HANDLE, JobId: DWORD, Level: DWORD, pJob: LPBYTE | NULL, Command: DWORD): BOOL {
+  public static SetJobW(hPrinter: HANDLE, JobId: DWORD, Level: DWORD, pJob: OPTIONAL<LPBYTE>, Command: DWORD): BOOL {
     return Winspool.Load('SetJobW')(hPrinter, JobId, Level, pJob, Command);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/setport
-  public static SetPortA(pName: LPSTR | NULL, pPortName: LPSTR, dwLevel: DWORD, pPortInfo: LPBYTE): BOOL {
+  public static SetPortA(pName: OPTIONAL<LPSTR>, pPortName: LPSTR, dwLevel: DWORD, pPortInfo: LPBYTE): BOOL {
     return Winspool.Load('SetPortA')(pName, pPortName, dwLevel, pPortInfo);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/setport
-  public static SetPortW(pName: LPWSTR | NULL, pPortName: LPWSTR, dwLevel: DWORD, pPortInfo: LPBYTE): BOOL {
+  public static SetPortW(pName: OPTIONAL<LPWSTR>, pPortName: LPWSTR, dwLevel: DWORD, pPortInfo: LPBYTE): BOOL {
     return Winspool.Load('SetPortW')(pName, pPortName, dwLevel, pPortInfo);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/setprinter
-  public static SetPrinterA(hPrinter: HANDLE, Level: DWORD, pPrinter: LPBYTE | NULL, Command: DWORD): BOOL {
+  public static SetPrinterA(hPrinter: HANDLE, Level: DWORD, pPrinter: OPTIONAL<LPBYTE>, Command: DWORD): BOOL {
     return Winspool.Load('SetPrinterA')(hPrinter, Level, pPrinter, Command);
   }
 
@@ -1037,7 +1058,7 @@ class Winspool extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/setprinter
-  public static SetPrinterW(hPrinter: HANDLE, Level: DWORD, pPrinter: LPBYTE | NULL, Command: DWORD): BOOL {
+  public static SetPrinterW(hPrinter: HANDLE, Level: DWORD, pPrinter: OPTIONAL<LPBYTE>, Command: DWORD): BOOL {
     return Winspool.Load('SetPrinterW')(hPrinter, Level, pPrinter, Command);
   }
 
@@ -1062,13 +1083,13 @@ class Winspool extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/uploadprinterdriverpackage
-  public static UploadPrinterDriverPackageA(pszServer: LPCSTR | NULL, pszInfPath: LPCSTR, pszEnvironment: LPCSTR | NULL, dwFlags: DWORD, hwnd: HWND | 0n, pszDestInfPath: LPSTR, pcchDestInfPath: LPDWORD): HRESULT {
-    return Winspool.Load('UploadPrinterDriverPackageA')(pszServer, pszInfPath, pszEnvironment, dwFlags, hwnd, pszDestInfPath, pcchDestInfPath);
+  public static UploadPrinterDriverPackageA(pszServer: OPTIONAL<LPCSTR>, pszInfPath: LPCSTR, pszEnvironment: OPTIONAL<LPCSTR>, dwFlags: DWORD, hwnd: NULLABLE<HWND>, pszDestInfPath_out: LPSTR, pcchDestInfPath_in_out: LPDWORD): HRESULT {
+    return Winspool.Load('UploadPrinterDriverPackageA')(pszServer, pszInfPath, pszEnvironment, dwFlags, hwnd, pszDestInfPath_out, pcchDestInfPath_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/uploadprinterdriverpackage
-  public static UploadPrinterDriverPackageW(pszServer: LPCWSTR | NULL, pszInfPath: LPCWSTR, pszEnvironment: LPCWSTR | NULL, dwFlags: DWORD, hwnd: HWND | 0n, pszDestInfPath: LPWSTR, pcchDestInfPath: LPDWORD): HRESULT {
-    return Winspool.Load('UploadPrinterDriverPackageW')(pszServer, pszInfPath, pszEnvironment, dwFlags, hwnd, pszDestInfPath, pcchDestInfPath);
+  public static UploadPrinterDriverPackageW(pszServer: OPTIONAL<LPCWSTR>, pszInfPath: LPCWSTR, pszEnvironment: OPTIONAL<LPCWSTR>, dwFlags: DWORD, hwnd: NULLABLE<HWND>, pszDestInfPath_out: LPWSTR, pcchDestInfPath_in_out: LPDWORD): HRESULT {
+    return Winspool.Load('UploadPrinterDriverPackageW')(pszServer, pszInfPath, pszEnvironment, dwFlags, hwnd, pszDestInfPath_out, pcchDestInfPath_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/waitforprinterchange
@@ -1077,13 +1098,13 @@ class Winspool extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/writeprinter
-  public static WritePrinter(hPrinter: HANDLE, pBuf: LPVOID, cbBuf: DWORD, pcWritten: LPDWORD): BOOL {
-    return Winspool.Load('WritePrinter')(hPrinter, pBuf, cbBuf, pcWritten);
+  public static WritePrinter(hPrinter: HANDLE, pBuf: LPVOID, cbBuf: DWORD, pcWritten_out: LPDWORD): BOOL {
+    return Winspool.Load('WritePrinter')(hPrinter, pBuf, cbBuf, pcWritten_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/printdocs/xcvdata
-  public static XcvDataW(hXcv: HANDLE, pszDataName: LPCWSTR, pInputData: PBYTE | NULL, cbInputData: DWORD, pOutputData: PBYTE | NULL, cbOutputData: DWORD, pcbOutputNeeded: PDWORD, pdwStatus: PDWORD | NULL): BOOL {
-    return Winspool.Load('XcvDataW')(hXcv, pszDataName, pInputData, cbInputData, pOutputData, cbOutputData, pcbOutputNeeded, pdwStatus);
+  public static XcvDataW(hXcv: HANDLE, pszDataName: LPCWSTR, pInputData: OPTIONAL<PBYTE>, cbInputData: DWORD, pOutputData_out: OPTIONAL<PBYTE>, cbOutputData: DWORD, pcbOutputNeeded_out: PDWORD, pdwStatus_out: OPTIONAL<PDWORD>): BOOL {
+    return Winspool.Load('XcvDataW')(hXcv, pszDataName, pInputData, cbInputData, pOutputData_out, cbOutputData, pcbOutputNeeded_out, pdwStatus_out);
   }
 }
 

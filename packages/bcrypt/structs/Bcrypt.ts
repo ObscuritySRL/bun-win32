@@ -11,8 +11,8 @@ import type {
   BCRYPT_SECRET_HANDLE,
   HANDLE,
   LPCWSTR,
-  NULL,
   NTSTATUS,
+  OPTIONAL,
   PBCRYPT_ALG_HANDLE,
   PBCRYPT_HASH_HANDLE,
   PBCRYPT_KEY_HANDLE,
@@ -128,8 +128,8 @@ class Bcrypt extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/bcrypt/nf-bcrypt-bcryptclosealgorithmprovider
-  public static BCryptCloseAlgorithmProvider(hAlgorithm: BCRYPT_ALG_HANDLE, dwFlags: ULONG): NTSTATUS {
-    return Bcrypt.Load('BCryptCloseAlgorithmProvider')(hAlgorithm, dwFlags);
+  public static BCryptCloseAlgorithmProvider(hAlgorithm_in_out: BCRYPT_ALG_HANDLE, dwFlags: ULONG): NTSTATUS {
+    return Bcrypt.Load('BCryptCloseAlgorithmProvider')(hAlgorithm_in_out, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/bcrypt/nf-bcrypt-bcryptconfigurecontext
@@ -143,34 +143,43 @@ class Bcrypt extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/bcrypt/nf-bcrypt-bcryptcreatecontext
-  public static BCryptCreateContext(dwTable: ULONG, pszContext: LPCWSTR, pConfig: PCRYPT_CONTEXT_CONFIG | NULL): NTSTATUS {
+  public static BCryptCreateContext(dwTable: ULONG, pszContext: LPCWSTR, pConfig: OPTIONAL<PCRYPT_CONTEXT_CONFIG>): NTSTATUS {
     return Bcrypt.Load('BCryptCreateContext')(dwTable, pszContext, pConfig);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/bcrypt/nf-bcrypt-bcryptcreatehash
-  public static BCryptCreateHash(hAlgorithm: BCRYPT_ALG_HANDLE, phHash: PBCRYPT_HASH_HANDLE, pbHashObject: PUCHAR | NULL, cbHashObject: ULONG, pbSecret: PUCHAR | NULL, cbSecret: ULONG, dwFlags: ULONG): NTSTATUS {
-    return Bcrypt.Load('BCryptCreateHash')(hAlgorithm, phHash, pbHashObject, cbHashObject, pbSecret, cbSecret, dwFlags);
+  public static BCryptCreateHash(hAlgorithm_in_out: BCRYPT_ALG_HANDLE, phHash_out: PBCRYPT_HASH_HANDLE, pbHashObject_out: OPTIONAL<PUCHAR>, cbHashObject: ULONG, pbSecret: OPTIONAL<PUCHAR>, cbSecret: ULONG, dwFlags: ULONG): NTSTATUS {
+    return Bcrypt.Load('BCryptCreateHash')(hAlgorithm_in_out, phHash_out, pbHashObject_out, cbHashObject, pbSecret, cbSecret, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/bcrypt/nf-bcrypt-bcryptcreatemultihash
-  public static BCryptCreateMultiHash(hAlgorithm: BCRYPT_ALG_HANDLE, phHash: PBCRYPT_HASH_HANDLE, nHashes: ULONG, pbHashObject: PUCHAR | NULL, cbHashObject: ULONG, pbSecret: PUCHAR | NULL, cbSecret: ULONG, dwFlags: ULONG): NTSTATUS {
-    return Bcrypt.Load('BCryptCreateMultiHash')(hAlgorithm, phHash, nHashes, pbHashObject, cbHashObject, pbSecret, cbSecret, dwFlags);
+  public static BCryptCreateMultiHash(
+    hAlgorithm_in_out: BCRYPT_ALG_HANDLE,
+    phHash_out: PBCRYPT_HASH_HANDLE,
+    nHashes: ULONG,
+    pbHashObject_out: OPTIONAL<PUCHAR>,
+    cbHashObject: ULONG,
+    pbSecret: OPTIONAL<PUCHAR>,
+    cbSecret: ULONG,
+    dwFlags: ULONG,
+  ): NTSTATUS {
+    return Bcrypt.Load('BCryptCreateMultiHash')(hAlgorithm_in_out, phHash_out, nHashes, pbHashObject_out, cbHashObject, pbSecret, cbSecret, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/bcrypt/nf-bcrypt-bcryptdecrypt
   public static BCryptDecrypt(
-    hKey: BCRYPT_KEY_HANDLE,
-    pbInput: PUCHAR | NULL,
+    hKey_in_out: BCRYPT_KEY_HANDLE,
+    pbInput: OPTIONAL<PUCHAR>,
     cbInput: ULONG,
-    pPaddingInfo: PVOID | NULL,
-    pbIV: PUCHAR | NULL,
+    pPaddingInfo: OPTIONAL<PVOID>,
+    pbIV_in_out: OPTIONAL<PUCHAR>,
     cbIV: ULONG,
-    pbOutput: PUCHAR | NULL,
+    pbOutput_out: OPTIONAL<PUCHAR>,
     cbOutput: ULONG,
-    pcbResult: PULONG,
+    pcbResult_out: PULONG,
     dwFlags: ULONG,
   ): NTSTATUS {
-    return Bcrypt.Load('BCryptDecrypt')(hKey, pbInput, cbInput, pPaddingInfo, pbIV, cbIV, pbOutput, cbOutput, pcbResult, dwFlags);
+    return Bcrypt.Load('BCryptDecrypt')(hKey_in_out, pbInput, cbInput, pPaddingInfo, pbIV_in_out, cbIV, pbOutput_out, cbOutput, pcbResult_out, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/bcrypt/nf-bcrypt-bcryptdeletecontext
@@ -179,114 +188,114 @@ class Bcrypt extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/bcrypt/nf-bcrypt-bcryptderivekey
-  public static BCryptDeriveKey(hSharedSecret: BCRYPT_SECRET_HANDLE, pwszKDF: LPCWSTR, pParameterList: PBCryptBufferDesc | NULL, pbDerivedKey: PUCHAR | NULL, cbDerivedKey: ULONG, pcbResult: PULONG, dwFlags: ULONG): NTSTATUS {
-    return Bcrypt.Load('BCryptDeriveKey')(hSharedSecret, pwszKDF, pParameterList, pbDerivedKey, cbDerivedKey, pcbResult, dwFlags);
+  public static BCryptDeriveKey(hSharedSecret: BCRYPT_SECRET_HANDLE, pwszKDF: LPCWSTR, pParameterList: OPTIONAL<PBCryptBufferDesc>, pbDerivedKey_out: OPTIONAL<PUCHAR>, cbDerivedKey: ULONG, pcbResult_out: PULONG, dwFlags: ULONG): NTSTATUS {
+    return Bcrypt.Load('BCryptDeriveKey')(hSharedSecret, pwszKDF, pParameterList, pbDerivedKey_out, cbDerivedKey, pcbResult_out, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/bcrypt/nf-bcrypt-bcryptderivekeycapi
-  public static BCryptDeriveKeyCapi(hHash: BCRYPT_HASH_HANDLE, hTargetAlg: BCRYPT_ALG_HANDLE | 0n, pbDerivedKey: PUCHAR, cbDerivedKey: ULONG, dwFlags: ULONG): NTSTATUS {
-    return Bcrypt.Load('BCryptDeriveKeyCapi')(hHash, hTargetAlg, pbDerivedKey, cbDerivedKey, dwFlags);
+  public static BCryptDeriveKeyCapi(hHash: BCRYPT_HASH_HANDLE, hTargetAlg: OPTIONAL<BCRYPT_ALG_HANDLE>, pbDerivedKey_out: PUCHAR, cbDerivedKey: ULONG, dwFlags: ULONG): NTSTATUS {
+    return Bcrypt.Load('BCryptDeriveKeyCapi')(hHash, hTargetAlg, pbDerivedKey_out, cbDerivedKey, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/bcrypt/nf-bcrypt-bcryptderivekeypbkdf2
   public static BCryptDeriveKeyPBKDF2(
     hPrf: BCRYPT_ALG_HANDLE,
-    pbPassword: PUCHAR | NULL,
+    pbPassword: OPTIONAL<PUCHAR>,
     cbPassword: ULONG,
-    pbSalt: PUCHAR | NULL,
+    pbSalt: OPTIONAL<PUCHAR>,
     cbSalt: ULONG,
     cIterations: ULONGLONG,
-    pbDerivedKey: PUCHAR,
+    pbDerivedKey_out: PUCHAR,
     cbDerivedKey: ULONG,
     dwFlags: ULONG,
   ): NTSTATUS {
-    return Bcrypt.Load('BCryptDeriveKeyPBKDF2')(hPrf, pbPassword, cbPassword, pbSalt, cbSalt, cIterations, pbDerivedKey, cbDerivedKey, dwFlags);
+    return Bcrypt.Load('BCryptDeriveKeyPBKDF2')(hPrf, pbPassword, cbPassword, pbSalt, cbSalt, cIterations, pbDerivedKey_out, cbDerivedKey, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/bcrypt/nf-bcrypt-bcryptdestroyhash
-  public static BCryptDestroyHash(hHash: BCRYPT_HASH_HANDLE): NTSTATUS {
-    return Bcrypt.Load('BCryptDestroyHash')(hHash);
+  public static BCryptDestroyHash(hHash_in_out: BCRYPT_HASH_HANDLE): NTSTATUS {
+    return Bcrypt.Load('BCryptDestroyHash')(hHash_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/bcrypt/nf-bcrypt-bcryptdestroykey
-  public static BCryptDestroyKey(hKey: BCRYPT_KEY_HANDLE): NTSTATUS {
-    return Bcrypt.Load('BCryptDestroyKey')(hKey);
+  public static BCryptDestroyKey(hKey_in_out: BCRYPT_KEY_HANDLE): NTSTATUS {
+    return Bcrypt.Load('BCryptDestroyKey')(hKey_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/bcrypt/nf-bcrypt-bcryptdestroysecret
-  public static BCryptDestroySecret(hSecret: BCRYPT_SECRET_HANDLE): NTSTATUS {
-    return Bcrypt.Load('BCryptDestroySecret')(hSecret);
+  public static BCryptDestroySecret(hSecret_in_out: BCRYPT_SECRET_HANDLE): NTSTATUS {
+    return Bcrypt.Load('BCryptDestroySecret')(hSecret_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/bcrypt/nf-bcrypt-bcryptduplicatehash
-  public static BCryptDuplicateHash(hHash: BCRYPT_HASH_HANDLE, phNewHash: PBCRYPT_HASH_HANDLE, pbHashObject: PUCHAR | NULL, cbHashObject: ULONG, dwFlags: ULONG): NTSTATUS {
-    return Bcrypt.Load('BCryptDuplicateHash')(hHash, phNewHash, pbHashObject, cbHashObject, dwFlags);
+  public static BCryptDuplicateHash(hHash: BCRYPT_HASH_HANDLE, phNewHash_out: PBCRYPT_HASH_HANDLE, pbHashObject_out: OPTIONAL<PUCHAR>, cbHashObject: ULONG, dwFlags: ULONG): NTSTATUS {
+    return Bcrypt.Load('BCryptDuplicateHash')(hHash, phNewHash_out, pbHashObject_out, cbHashObject, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/bcrypt/nf-bcrypt-bcryptduplicatekey
-  public static BCryptDuplicateKey(hKey: BCRYPT_KEY_HANDLE, phNewKey: PBCRYPT_KEY_HANDLE, pbKeyObject: PUCHAR | NULL, cbKeyObject: ULONG, dwFlags: ULONG): NTSTATUS {
-    return Bcrypt.Load('BCryptDuplicateKey')(hKey, phNewKey, pbKeyObject, cbKeyObject, dwFlags);
+  public static BCryptDuplicateKey(hKey: BCRYPT_KEY_HANDLE, phNewKey_out: PBCRYPT_KEY_HANDLE, pbKeyObject_out: OPTIONAL<PUCHAR>, cbKeyObject: ULONG, dwFlags: ULONG): NTSTATUS {
+    return Bcrypt.Load('BCryptDuplicateKey')(hKey, phNewKey_out, pbKeyObject_out, cbKeyObject, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/bcrypt/nf-bcrypt-bcryptencrypt
   public static BCryptEncrypt(
-    hKey: BCRYPT_KEY_HANDLE,
-    pbInput: PUCHAR | NULL,
+    hKey_in_out: BCRYPT_KEY_HANDLE,
+    pbInput: OPTIONAL<PUCHAR>,
     cbInput: ULONG,
-    pPaddingInfo: PVOID | NULL,
-    pbIV: PUCHAR | NULL,
+    pPaddingInfo: OPTIONAL<PVOID>,
+    pbIV_in_out: OPTIONAL<PUCHAR>,
     cbIV: ULONG,
-    pbOutput: PUCHAR | NULL,
+    pbOutput_out: OPTIONAL<PUCHAR>,
     cbOutput: ULONG,
-    pcbResult: PULONG,
+    pcbResult_out: PULONG,
     dwFlags: ULONG,
   ): NTSTATUS {
-    return Bcrypt.Load('BCryptEncrypt')(hKey, pbInput, cbInput, pPaddingInfo, pbIV, cbIV, pbOutput, cbOutput, pcbResult, dwFlags);
+    return Bcrypt.Load('BCryptEncrypt')(hKey_in_out, pbInput, cbInput, pPaddingInfo, pbIV_in_out, cbIV, pbOutput_out, cbOutput, pcbResult_out, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/bcrypt/nf-bcrypt-bcryptenumalgorithms
-  public static BCryptEnumAlgorithms(dwAlgOperations: ULONG, pAlgCount: PULONG, ppAlgList: PPBCRYPT_ALGORITHM_IDENTIFIER, dwFlags: ULONG): NTSTATUS {
-    return Bcrypt.Load('BCryptEnumAlgorithms')(dwAlgOperations, pAlgCount, ppAlgList, dwFlags);
+  public static BCryptEnumAlgorithms(dwAlgOperations: ULONG, pAlgCount_out: PULONG, ppAlgList_out: PPBCRYPT_ALGORITHM_IDENTIFIER, dwFlags: ULONG): NTSTATUS {
+    return Bcrypt.Load('BCryptEnumAlgorithms')(dwAlgOperations, pAlgCount_out, ppAlgList_out, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/bcrypt/nf-bcrypt-bcryptenumcontextfunctionproviders
-  public static BCryptEnumContextFunctionProviders(dwTable: ULONG, pszContext: LPCWSTR, dwInterface: ULONG, pszFunction: LPCWSTR, pcbBuffer: PULONG, ppBuffer: PPCRYPT_CONTEXT_FUNCTION_PROVIDERS): NTSTATUS {
-    return Bcrypt.Load('BCryptEnumContextFunctionProviders')(dwTable, pszContext, dwInterface, pszFunction, pcbBuffer, ppBuffer);
+  public static BCryptEnumContextFunctionProviders(dwTable: ULONG, pszContext: LPCWSTR, dwInterface: ULONG, pszFunction: LPCWSTR, pcbBuffer_in_out: PULONG, ppBuffer_in_out: PPCRYPT_CONTEXT_FUNCTION_PROVIDERS): NTSTATUS {
+    return Bcrypt.Load('BCryptEnumContextFunctionProviders')(dwTable, pszContext, dwInterface, pszFunction, pcbBuffer_in_out, ppBuffer_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/bcrypt/nf-bcrypt-bcryptenumcontextfunctions
-  public static BCryptEnumContextFunctions(dwTable: ULONG, pszContext: LPCWSTR, dwInterface: ULONG, pcbBuffer: PULONG, ppBuffer: PPCRYPT_CONTEXT_FUNCTIONS): NTSTATUS {
-    return Bcrypt.Load('BCryptEnumContextFunctions')(dwTable, pszContext, dwInterface, pcbBuffer, ppBuffer);
+  public static BCryptEnumContextFunctions(dwTable: ULONG, pszContext: LPCWSTR, dwInterface: ULONG, pcbBuffer_in_out: PULONG, ppBuffer_in_out: PPCRYPT_CONTEXT_FUNCTIONS): NTSTATUS {
+    return Bcrypt.Load('BCryptEnumContextFunctions')(dwTable, pszContext, dwInterface, pcbBuffer_in_out, ppBuffer_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/bcrypt/nf-bcrypt-bcryptenumcontexts
-  public static BCryptEnumContexts(dwTable: ULONG, pcbBuffer: PULONG, ppBuffer: PPCRYPT_CONTEXTS): NTSTATUS {
-    return Bcrypt.Load('BCryptEnumContexts')(dwTable, pcbBuffer, ppBuffer);
+  public static BCryptEnumContexts(dwTable: ULONG, pcbBuffer_in_out: PULONG, ppBuffer_in_out: PPCRYPT_CONTEXTS): NTSTATUS {
+    return Bcrypt.Load('BCryptEnumContexts')(dwTable, pcbBuffer_in_out, ppBuffer_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/bcrypt/nf-bcrypt-bcryptenumproviders
-  public static BCryptEnumProviders(pszAlgId: LPCWSTR, pImplCount: PULONG, ppImplList: PPBCRYPT_PROVIDER_NAME, dwFlags: ULONG): NTSTATUS {
-    return Bcrypt.Load('BCryptEnumProviders')(pszAlgId, pImplCount, ppImplList, dwFlags);
+  public static BCryptEnumProviders(pszAlgId: LPCWSTR, pImplCount_out: PULONG, ppImplList_out: PPBCRYPT_PROVIDER_NAME, dwFlags: ULONG): NTSTATUS {
+    return Bcrypt.Load('BCryptEnumProviders')(pszAlgId, pImplCount_out, ppImplList_out, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/bcrypt/nf-bcrypt-bcryptenumregisteredproviders
-  public static BCryptEnumRegisteredProviders(pcbBuffer: PULONG, ppBuffer: PPCRYPT_PROVIDERS): NTSTATUS {
-    return Bcrypt.Load('BCryptEnumRegisteredProviders')(pcbBuffer, ppBuffer);
+  public static BCryptEnumRegisteredProviders(pcbBuffer_in_out: PULONG, ppBuffer_in_out: PPCRYPT_PROVIDERS): NTSTATUS {
+    return Bcrypt.Load('BCryptEnumRegisteredProviders')(pcbBuffer_in_out, ppBuffer_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/bcrypt/nf-bcrypt-bcryptexportkey
-  public static BCryptExportKey(hKey: BCRYPT_KEY_HANDLE, hExportKey: BCRYPT_KEY_HANDLE | 0n, pszBlobType: LPCWSTR, pbOutput: PUCHAR | NULL, cbOutput: ULONG, pcbResult: PULONG, dwFlags: ULONG): NTSTATUS {
-    return Bcrypt.Load('BCryptExportKey')(hKey, hExportKey, pszBlobType, pbOutput, cbOutput, pcbResult, dwFlags);
+  public static BCryptExportKey(hKey: BCRYPT_KEY_HANDLE, hExportKey: OPTIONAL<BCRYPT_KEY_HANDLE>, pszBlobType: LPCWSTR, pbOutput_out: OPTIONAL<PUCHAR>, cbOutput: ULONG, pcbResult_out: PULONG, dwFlags: ULONG): NTSTATUS {
+    return Bcrypt.Load('BCryptExportKey')(hKey, hExportKey, pszBlobType, pbOutput_out, cbOutput, pcbResult_out, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/bcrypt/nf-bcrypt-bcryptfinalizekeypair
-  public static BCryptFinalizeKeyPair(hKey: BCRYPT_KEY_HANDLE, dwFlags: ULONG): NTSTATUS {
-    return Bcrypt.Load('BCryptFinalizeKeyPair')(hKey, dwFlags);
+  public static BCryptFinalizeKeyPair(hKey_in_out: BCRYPT_KEY_HANDLE, dwFlags: ULONG): NTSTATUS {
+    return Bcrypt.Load('BCryptFinalizeKeyPair')(hKey_in_out, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/bcrypt/nf-bcrypt-bcryptfinishhash
-  public static BCryptFinishHash(hHash: BCRYPT_HASH_HANDLE, pbOutput: PUCHAR, cbOutput: ULONG, dwFlags: ULONG): NTSTATUS {
-    return Bcrypt.Load('BCryptFinishHash')(hHash, pbOutput, cbOutput, dwFlags);
+  public static BCryptFinishHash(hHash_in_out: BCRYPT_HASH_HANDLE, pbOutput_out: PUCHAR, cbOutput: ULONG, dwFlags: ULONG): NTSTATUS {
+    return Bcrypt.Load('BCryptFinishHash')(hHash_in_out, pbOutput_out, cbOutput, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/bcrypt/nf-bcrypt-bcryptfreebuffer
@@ -295,98 +304,98 @@ class Bcrypt extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/bcrypt/nf-bcrypt-bcryptgenrandom
-  public static BCryptGenRandom(hAlgorithm: BCRYPT_ALG_HANDLE | 0n, pbBuffer: PUCHAR, cbBuffer: ULONG, dwFlags: ULONG): NTSTATUS {
-    return Bcrypt.Load('BCryptGenRandom')(hAlgorithm, pbBuffer, cbBuffer, dwFlags);
+  public static BCryptGenRandom(hAlgorithm: OPTIONAL<BCRYPT_ALG_HANDLE>, pbBuffer_out: PUCHAR, cbBuffer: ULONG, dwFlags: ULONG): NTSTATUS {
+    return Bcrypt.Load('BCryptGenRandom')(hAlgorithm, pbBuffer_out, cbBuffer, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/bcrypt/nf-bcrypt-bcryptgeneratekeypair
-  public static BCryptGenerateKeyPair(hAlgorithm: BCRYPT_ALG_HANDLE, phKey: PBCRYPT_KEY_HANDLE, dwLength: ULONG, dwFlags: ULONG): NTSTATUS {
-    return Bcrypt.Load('BCryptGenerateKeyPair')(hAlgorithm, phKey, dwLength, dwFlags);
+  public static BCryptGenerateKeyPair(hAlgorithm_in_out: BCRYPT_ALG_HANDLE, phKey_out: PBCRYPT_KEY_HANDLE, dwLength: ULONG, dwFlags: ULONG): NTSTATUS {
+    return Bcrypt.Load('BCryptGenerateKeyPair')(hAlgorithm_in_out, phKey_out, dwLength, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/bcrypt/nf-bcrypt-bcryptgeneratesymmetrickey
-  public static BCryptGenerateSymmetricKey(hAlgorithm: BCRYPT_ALG_HANDLE, phKey: PBCRYPT_KEY_HANDLE, pbKeyObject: PUCHAR | NULL, cbKeyObject: ULONG, pbSecret: PUCHAR, cbSecret: ULONG, dwFlags: ULONG): NTSTATUS {
-    return Bcrypt.Load('BCryptGenerateSymmetricKey')(hAlgorithm, phKey, pbKeyObject, cbKeyObject, pbSecret, cbSecret, dwFlags);
+  public static BCryptGenerateSymmetricKey(hAlgorithm_in_out: BCRYPT_ALG_HANDLE, phKey_out: PBCRYPT_KEY_HANDLE, pbKeyObject_out: OPTIONAL<PUCHAR>, cbKeyObject: ULONG, pbSecret: PUCHAR, cbSecret: ULONG, dwFlags: ULONG): NTSTATUS {
+    return Bcrypt.Load('BCryptGenerateSymmetricKey')(hAlgorithm_in_out, phKey_out, pbKeyObject_out, cbKeyObject, pbSecret, cbSecret, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/bcrypt/nf-bcrypt-bcryptgetfipsalgorithmmode
-  public static BCryptGetFipsAlgorithmMode(pfEnabled: PBOOLEAN): NTSTATUS {
-    return Bcrypt.Load('BCryptGetFipsAlgorithmMode')(pfEnabled);
+  public static BCryptGetFipsAlgorithmMode(pfEnabled_out: PBOOLEAN): NTSTATUS {
+    return Bcrypt.Load('BCryptGetFipsAlgorithmMode')(pfEnabled_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/bcrypt/nf-bcrypt-bcryptgetproperty
-  public static BCryptGetProperty(hObject: BCRYPT_HANDLE, pszProperty: LPCWSTR, pbOutput: PUCHAR | NULL, cbOutput: ULONG, pcbResult: PULONG, dwFlags: ULONG): NTSTATUS {
-    return Bcrypt.Load('BCryptGetProperty')(hObject, pszProperty, pbOutput, cbOutput, pcbResult, dwFlags);
+  public static BCryptGetProperty(hObject: BCRYPT_HANDLE, pszProperty: LPCWSTR, pbOutput_out: OPTIONAL<PUCHAR>, cbOutput: ULONG, pcbResult_out: PULONG, dwFlags: ULONG): NTSTATUS {
+    return Bcrypt.Load('BCryptGetProperty')(hObject, pszProperty, pbOutput_out, cbOutput, pcbResult_out, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/bcrypt/nf-bcrypt-bcrypthash
-  public static BCryptHash(hAlgorithm: BCRYPT_ALG_HANDLE, pbSecret: PUCHAR | NULL, cbSecret: ULONG, pbInput: PUCHAR, cbInput: ULONG, pbOutput: PUCHAR, cbOutput: ULONG): NTSTATUS {
-    return Bcrypt.Load('BCryptHash')(hAlgorithm, pbSecret, cbSecret, pbInput, cbInput, pbOutput, cbOutput);
+  public static BCryptHash(hAlgorithm_in_out: BCRYPT_ALG_HANDLE, pbSecret: OPTIONAL<PUCHAR>, cbSecret: ULONG, pbInput: PUCHAR, cbInput: ULONG, pbOutput_out: PUCHAR, cbOutput: ULONG): NTSTATUS {
+    return Bcrypt.Load('BCryptHash')(hAlgorithm_in_out, pbSecret, cbSecret, pbInput, cbInput, pbOutput_out, cbOutput);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/bcrypt/nf-bcrypt-bcrypthashdata
-  public static BCryptHashData(hHash: BCRYPT_HASH_HANDLE, pbInput: PUCHAR, cbInput: ULONG, dwFlags: ULONG): NTSTATUS {
-    return Bcrypt.Load('BCryptHashData')(hHash, pbInput, cbInput, dwFlags);
+  public static BCryptHashData(hHash_in_out: BCRYPT_HASH_HANDLE, pbInput: PUCHAR, cbInput: ULONG, dwFlags: ULONG): NTSTATUS {
+    return Bcrypt.Load('BCryptHashData')(hHash_in_out, pbInput, cbInput, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/bcrypt/nf-bcrypt-bcryptimportkey
   public static BCryptImportKey(
     hAlgorithm: BCRYPT_ALG_HANDLE,
-    hImportKey: BCRYPT_KEY_HANDLE | 0n,
+    hImportKey: OPTIONAL<BCRYPT_KEY_HANDLE>,
     pszBlobType: LPCWSTR,
-    phKey: PBCRYPT_KEY_HANDLE,
-    pbKeyObject: PUCHAR | NULL,
+    phKey_out: PBCRYPT_KEY_HANDLE,
+    pbKeyObject_out: OPTIONAL<PUCHAR>,
     cbKeyObject: ULONG,
     pbInput: PUCHAR,
     cbInput: ULONG,
     dwFlags: ULONG,
   ): NTSTATUS {
-    return Bcrypt.Load('BCryptImportKey')(hAlgorithm, hImportKey, pszBlobType, phKey, pbKeyObject, cbKeyObject, pbInput, cbInput, dwFlags);
+    return Bcrypt.Load('BCryptImportKey')(hAlgorithm, hImportKey, pszBlobType, phKey_out, pbKeyObject_out, cbKeyObject, pbInput, cbInput, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/bcrypt/nf-bcrypt-bcryptimportkeypair
-  public static BCryptImportKeyPair(hAlgorithm: BCRYPT_ALG_HANDLE, hImportKey: BCRYPT_KEY_HANDLE | 0n, pszBlobType: LPCWSTR, phKey: PBCRYPT_KEY_HANDLE, pbInput: PUCHAR, cbInput: ULONG, dwFlags: ULONG): NTSTATUS {
-    return Bcrypt.Load('BCryptImportKeyPair')(hAlgorithm, hImportKey, pszBlobType, phKey, pbInput, cbInput, dwFlags);
+  public static BCryptImportKeyPair(hAlgorithm: BCRYPT_ALG_HANDLE, hImportKey: OPTIONAL<BCRYPT_KEY_HANDLE>, pszBlobType: LPCWSTR, phKey_out: PBCRYPT_KEY_HANDLE, pbInput: PUCHAR, cbInput: ULONG, dwFlags: ULONG): NTSTATUS {
+    return Bcrypt.Load('BCryptImportKeyPair')(hAlgorithm, hImportKey, pszBlobType, phKey_out, pbInput, cbInput, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/bcrypt/nf-bcrypt-bcryptkeyderivation
-  public static BCryptKeyDerivation(hKey: BCRYPT_KEY_HANDLE, pParameterList: PBCryptBufferDesc | NULL, pbDerivedKey: PUCHAR, cbDerivedKey: ULONG, pcbResult: PULONG, dwFlags: ULONG): NTSTATUS {
-    return Bcrypt.Load('BCryptKeyDerivation')(hKey, pParameterList, pbDerivedKey, cbDerivedKey, pcbResult, dwFlags);
+  public static BCryptKeyDerivation(hKey: BCRYPT_KEY_HANDLE, pParameterList: OPTIONAL<PBCryptBufferDesc>, pbDerivedKey_out: PUCHAR, cbDerivedKey: ULONG, pcbResult_out: PULONG, dwFlags: ULONG): NTSTATUS {
+    return Bcrypt.Load('BCryptKeyDerivation')(hKey, pParameterList, pbDerivedKey_out, cbDerivedKey, pcbResult_out, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/bcrypt/nf-bcrypt-bcryptopenalgorithmprovider
-  public static BCryptOpenAlgorithmProvider(phAlgorithm: PBCRYPT_ALG_HANDLE, pszAlgId: LPCWSTR, pszImplementation: LPCWSTR | NULL, dwFlags: ULONG): NTSTATUS {
-    return Bcrypt.Load('BCryptOpenAlgorithmProvider')(phAlgorithm, pszAlgId, pszImplementation, dwFlags);
+  public static BCryptOpenAlgorithmProvider(phAlgorithm_out: PBCRYPT_ALG_HANDLE, pszAlgId: LPCWSTR, pszImplementation: OPTIONAL<LPCWSTR>, dwFlags: ULONG): NTSTATUS {
+    return Bcrypt.Load('BCryptOpenAlgorithmProvider')(phAlgorithm_out, pszAlgId, pszImplementation, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/bcrypt/nf-bcrypt-bcryptprocessmultioperations
-  public static BCryptProcessMultiOperations(hObject: BCRYPT_HANDLE, operationType: BCRYPT_MULTI_OPERATION_TYPE, pOperations: PVOID, cbOperations: ULONG, dwFlags: ULONG): NTSTATUS {
-    return Bcrypt.Load('BCryptProcessMultiOperations')(hObject, operationType, pOperations, cbOperations, dwFlags);
+  public static BCryptProcessMultiOperations(hObject_in_out: BCRYPT_HANDLE, operationType: BCRYPT_MULTI_OPERATION_TYPE, pOperations: PVOID, cbOperations: ULONG, dwFlags: ULONG): NTSTATUS {
+    return Bcrypt.Load('BCryptProcessMultiOperations')(hObject_in_out, operationType, pOperations, cbOperations, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/bcrypt/nf-bcrypt-bcryptquerycontextconfiguration
-  public static BCryptQueryContextConfiguration(dwTable: ULONG, pszContext: LPCWSTR, pcbBuffer: PULONG, ppBuffer: PPCRYPT_CONTEXT_CONFIG): NTSTATUS {
-    return Bcrypt.Load('BCryptQueryContextConfiguration')(dwTable, pszContext, pcbBuffer, ppBuffer);
+  public static BCryptQueryContextConfiguration(dwTable: ULONG, pszContext: LPCWSTR, pcbBuffer_in_out: PULONG, ppBuffer_in_out: PPCRYPT_CONTEXT_CONFIG): NTSTATUS {
+    return Bcrypt.Load('BCryptQueryContextConfiguration')(dwTable, pszContext, pcbBuffer_in_out, ppBuffer_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/bcrypt/nf-bcrypt-bcryptquerycontextfunctionconfiguration
-  public static BCryptQueryContextFunctionConfiguration(dwTable: ULONG, pszContext: LPCWSTR, dwInterface: ULONG, pszFunction: LPCWSTR, pcbBuffer: PULONG, ppBuffer: PPCRYPT_CONTEXT_FUNCTION_CONFIG): NTSTATUS {
-    return Bcrypt.Load('BCryptQueryContextFunctionConfiguration')(dwTable, pszContext, dwInterface, pszFunction, pcbBuffer, ppBuffer);
+  public static BCryptQueryContextFunctionConfiguration(dwTable: ULONG, pszContext: LPCWSTR, dwInterface: ULONG, pszFunction: LPCWSTR, pcbBuffer_in_out: PULONG, ppBuffer_in_out: PPCRYPT_CONTEXT_FUNCTION_CONFIG): NTSTATUS {
+    return Bcrypt.Load('BCryptQueryContextFunctionConfiguration')(dwTable, pszContext, dwInterface, pszFunction, pcbBuffer_in_out, ppBuffer_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/bcrypt/nf-bcrypt-bcryptquerycontextfunctionproperty
-  public static BCryptQueryContextFunctionProperty(dwTable: ULONG, pszContext: LPCWSTR, dwInterface: ULONG, pszFunction: LPCWSTR, pszProperty: LPCWSTR, pcbValue: PULONG, ppbValue: PPUCHAR): NTSTATUS {
-    return Bcrypt.Load('BCryptQueryContextFunctionProperty')(dwTable, pszContext, dwInterface, pszFunction, pszProperty, pcbValue, ppbValue);
+  public static BCryptQueryContextFunctionProperty(dwTable: ULONG, pszContext: LPCWSTR, dwInterface: ULONG, pszFunction: LPCWSTR, pszProperty: LPCWSTR, pcbValue_in_out: PULONG, ppbValue_in_out: PPUCHAR): NTSTATUS {
+    return Bcrypt.Load('BCryptQueryContextFunctionProperty')(dwTable, pszContext, dwInterface, pszFunction, pszProperty, pcbValue_in_out, ppbValue_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/bcrypt/nf-bcrypt-bcryptqueryproviderregistration
-  public static BCryptQueryProviderRegistration(pszProvider: LPCWSTR, dwMode: ULONG, dwInterface: ULONG, pcbBuffer: PULONG, ppBuffer: PPCRYPT_PROVIDER_REG): NTSTATUS {
-    return Bcrypt.Load('BCryptQueryProviderRegistration')(pszProvider, dwMode, dwInterface, pcbBuffer, ppBuffer);
+  public static BCryptQueryProviderRegistration(pszProvider: LPCWSTR, dwMode: ULONG, dwInterface: ULONG, pcbBuffer_in_out: PULONG, ppBuffer_in_out: PPCRYPT_PROVIDER_REG): NTSTATUS {
+    return Bcrypt.Load('BCryptQueryProviderRegistration')(pszProvider, dwMode, dwInterface, pcbBuffer_in_out, ppBuffer_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/bcrypt/nf-bcrypt-bcryptregisterconfigchangenotify
-  public static BCryptRegisterConfigChangeNotify(phEvent: PHANDLE): NTSTATUS {
-    return Bcrypt.Load('BCryptRegisterConfigChangeNotify')(phEvent);
+  public static BCryptRegisterConfigChangeNotify(phEvent_out: PHANDLE): NTSTATUS {
+    return Bcrypt.Load('BCryptRegisterConfigChangeNotify')(phEvent_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/bcrypt/nf-bcrypt-bcryptremovecontextfunction
@@ -395,28 +404,37 @@ class Bcrypt extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/bcrypt/nf-bcrypt-bcryptresolveproviders
-  public static BCryptResolveProviders(pszContext: LPCWSTR | NULL, dwInterface: ULONG, pszFunction: LPCWSTR | NULL, pszProvider: LPCWSTR | NULL, dwMode: ULONG, dwFlags: ULONG, pcbBuffer: PULONG, ppBuffer: PPCRYPT_PROVIDER_REFS): NTSTATUS {
-    return Bcrypt.Load('BCryptResolveProviders')(pszContext, dwInterface, pszFunction, pszProvider, dwMode, dwFlags, pcbBuffer, ppBuffer);
+  public static BCryptResolveProviders(
+    pszContext: OPTIONAL<LPCWSTR>,
+    dwInterface: ULONG,
+    pszFunction: OPTIONAL<LPCWSTR>,
+    pszProvider: OPTIONAL<LPCWSTR>,
+    dwMode: ULONG,
+    dwFlags: ULONG,
+    pcbBuffer_in_out: PULONG,
+    ppBuffer_in_out: PPCRYPT_PROVIDER_REFS,
+  ): NTSTATUS {
+    return Bcrypt.Load('BCryptResolveProviders')(pszContext, dwInterface, pszFunction, pszProvider, dwMode, dwFlags, pcbBuffer_in_out, ppBuffer_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/bcrypt/nf-bcrypt-bcryptsecretagreement
-  public static BCryptSecretAgreement(hPrivKey: BCRYPT_KEY_HANDLE, hPubKey: BCRYPT_KEY_HANDLE, phAgreedSecret: PBCRYPT_SECRET_HANDLE, dwFlags: ULONG): NTSTATUS {
-    return Bcrypt.Load('BCryptSecretAgreement')(hPrivKey, hPubKey, phAgreedSecret, dwFlags);
+  public static BCryptSecretAgreement(hPrivKey: BCRYPT_KEY_HANDLE, hPubKey: BCRYPT_KEY_HANDLE, phAgreedSecret_out: PBCRYPT_SECRET_HANDLE, dwFlags: ULONG): NTSTATUS {
+    return Bcrypt.Load('BCryptSecretAgreement')(hPrivKey, hPubKey, phAgreedSecret_out, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/bcrypt/nf-bcrypt-bcryptsetcontextfunctionproperty
-  public static BCryptSetContextFunctionProperty(dwTable: ULONG, pszContext: LPCWSTR, dwInterface: ULONG, pszFunction: LPCWSTR, pszProperty: LPCWSTR, cbValue: ULONG, pbValue: PUCHAR | NULL): NTSTATUS {
+  public static BCryptSetContextFunctionProperty(dwTable: ULONG, pszContext: LPCWSTR, dwInterface: ULONG, pszFunction: LPCWSTR, pszProperty: LPCWSTR, cbValue: ULONG, pbValue: OPTIONAL<PUCHAR>): NTSTATUS {
     return Bcrypt.Load('BCryptSetContextFunctionProperty')(dwTable, pszContext, dwInterface, pszFunction, pszProperty, cbValue, pbValue);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/bcrypt/nf-bcrypt-bcryptsetproperty
-  public static BCryptSetProperty(hObject: BCRYPT_HANDLE, pszProperty: LPCWSTR, pbInput: PUCHAR, cbInput: ULONG, dwFlags: ULONG): NTSTATUS {
-    return Bcrypt.Load('BCryptSetProperty')(hObject, pszProperty, pbInput, cbInput, dwFlags);
+  public static BCryptSetProperty(hObject_in_out: BCRYPT_HANDLE, pszProperty: LPCWSTR, pbInput: PUCHAR, cbInput: ULONG, dwFlags: ULONG): NTSTATUS {
+    return Bcrypt.Load('BCryptSetProperty')(hObject_in_out, pszProperty, pbInput, cbInput, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/bcrypt/nf-bcrypt-bcryptsignhash
-  public static BCryptSignHash(hKey: BCRYPT_KEY_HANDLE, pPaddingInfo: PVOID | NULL, pbInput: PUCHAR, cbInput: ULONG, pbOutput: PUCHAR | NULL, cbOutput: ULONG, pcbResult: PULONG, dwFlags: ULONG): NTSTATUS {
-    return Bcrypt.Load('BCryptSignHash')(hKey, pPaddingInfo, pbInput, cbInput, pbOutput, cbOutput, pcbResult, dwFlags);
+  public static BCryptSignHash(hKey: BCRYPT_KEY_HANDLE, pPaddingInfo: OPTIONAL<PVOID>, pbInput: PUCHAR, cbInput: ULONG, pbOutput_out: OPTIONAL<PUCHAR>, cbOutput: ULONG, pcbResult_out: PULONG, dwFlags: ULONG): NTSTATUS {
+    return Bcrypt.Load('BCryptSignHash')(hKey, pPaddingInfo, pbInput, cbInput, pbOutput_out, cbOutput, pcbResult_out, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/bcrypt/nf-bcrypt-bcryptunregisterconfigchangenotify
@@ -425,7 +443,7 @@ class Bcrypt extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/bcrypt/nf-bcrypt-bcryptverifysignature
-  public static BCryptVerifySignature(hKey: BCRYPT_KEY_HANDLE, pPaddingInfo: PVOID | NULL, pbHash: PUCHAR, cbHash: ULONG, pbSignature: PUCHAR, cbSignature: ULONG, dwFlags: ULONG): NTSTATUS {
+  public static BCryptVerifySignature(hKey: BCRYPT_KEY_HANDLE, pPaddingInfo: OPTIONAL<PVOID>, pbHash: PUCHAR, cbHash: ULONG, pbSignature: PUCHAR, cbSignature: ULONG, dwFlags: ULONG): NTSTATUS {
     return Bcrypt.Load('BCryptVerifySignature')(hKey, pPaddingInfo, pbHash, cbHash, pbSignature, cbSignature, dwFlags);
   }
 }

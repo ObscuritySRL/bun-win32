@@ -1,5 +1,5 @@
 import type { Pointer } from 'bun:ffi';
-export type { BOOL, BYTE, DWORD, HANDLE, HMODULE, LPCSTR, LPCWSTR, LPDWORD, LONG, LPSTR, LPVOID, LPWSTR, NULL, PBYTE, PDWORD, PVOID, ULONG } from '@bun-win32/core';
+export type { BOOL, BYTE, DWORD, HANDLE, HMODULE, LPCSTR, LPCWSTR, LPDWORD, LONG, LPSTR, LPVOID, LPWSTR, NULL, NULLABLE, OPTIONAL, PBYTE, PDWORD, PVOID, ULONG } from '@bun-win32/core';
 
 export enum CertCloseStoreFlag {
   CERT_CLOSE_STORE_CHECK_FLAG = 0x0000_0002,

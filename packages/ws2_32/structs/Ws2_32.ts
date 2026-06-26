@@ -44,6 +44,8 @@ import type {
   LPWSASERVICECLASSINFOW,
   LPWSTR,
   NULL,
+  NULLABLE,
+  OPTIONAL,
   PADDRINFOA,
   PADDRINFOEXA,
   PADDRINFOEXW,
@@ -252,34 +254,34 @@ class Ws2_32 extends Win32 {
   } as const satisfies Record<string, FFIFunction>;
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ws2tcpip/nf-ws2tcpip-freeaddrinfoex
-  public static FreeAddrInfoEx(pAddrInfoEx: PADDRINFOEXA | NULL): void {
+  public static FreeAddrInfoEx(pAddrInfoEx: OPTIONAL<PADDRINFOEXA>): void {
     return Ws2_32.Load('FreeAddrInfoEx')(pAddrInfoEx);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ws2tcpip/nf-ws2tcpip-freeaddrinfoexw
-  public static FreeAddrInfoExW(pAddrInfoEx: PADDRINFOEXW | NULL): void {
+  public static FreeAddrInfoExW(pAddrInfoEx: OPTIONAL<PADDRINFOEXW>): void {
     return Ws2_32.Load('FreeAddrInfoExW')(pAddrInfoEx);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ws2tcpip/nf-ws2tcpip-freeaddrinfow
-  public static FreeAddrInfoW(pAddrInfo: PADDRINFOW | NULL): void {
+  public static FreeAddrInfoW(pAddrInfo: OPTIONAL<PADDRINFOW>): void {
     return Ws2_32.Load('FreeAddrInfoW')(pAddrInfo);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ws2tcpip/nf-ws2tcpip-getaddrinfoexa
   public static GetAddrInfoExA(
-    pName: LPCSTR | NULL,
-    pServiceName: LPCSTR | NULL,
+    pName: OPTIONAL<LPCSTR>,
+    pServiceName: OPTIONAL<LPCSTR>,
     dwNameSpace: DWORD,
-    lpNspId: LPGUID | NULL,
-    hints: PADDRINFOEXA | NULL,
-    ppResult: PVOID,
-    timeout: PTIMEVAL | NULL,
-    lpOverlapped: LPOVERLAPPED | NULL,
-    lpCompletionRoutine: LPLOOKUPSERVICE_COMPLETION_ROUTINE | NULL,
-    lpNameHandle: LPHANDLE | NULL,
+    lpNspId: OPTIONAL<LPGUID>,
+    hints: OPTIONAL<PADDRINFOEXA>,
+    ppResult_out: PVOID,
+    timeout: OPTIONAL<PTIMEVAL>,
+    lpOverlapped: OPTIONAL<LPOVERLAPPED>,
+    lpCompletionRoutine: OPTIONAL<LPLOOKUPSERVICE_COMPLETION_ROUTINE>,
+    lpNameHandle_out: OPTIONAL<LPHANDLE>,
   ): INT {
-    return Ws2_32.Load('GetAddrInfoExA')(pName, pServiceName, dwNameSpace, lpNspId, hints, ppResult, timeout, lpOverlapped, lpCompletionRoutine, lpNameHandle);
+    return Ws2_32.Load('GetAddrInfoExA')(pName, pServiceName, dwNameSpace, lpNspId, hints, ppResult_out, timeout, lpOverlapped, lpCompletionRoutine, lpNameHandle_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ws2tcpip/nf-ws2tcpip-getaddrinfoexcancel
@@ -294,99 +296,99 @@ class Ws2_32 extends Win32 {
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ws2tcpip/nf-ws2tcpip-getaddrinfoexw
   public static GetAddrInfoExW(
-    pName: LPCWSTR | NULL,
-    pServiceName: LPCWSTR | NULL,
+    pName: OPTIONAL<LPCWSTR>,
+    pServiceName: OPTIONAL<LPCWSTR>,
     dwNameSpace: DWORD,
-    lpNspId: LPGUID | NULL,
-    hints: PADDRINFOEXW | NULL,
-    ppResult: PVOID,
-    timeout: PTIMEVAL | NULL,
-    lpOverlapped: LPOVERLAPPED | NULL,
-    lpCompletionRoutine: LPLOOKUPSERVICE_COMPLETION_ROUTINE | NULL,
-    lpNameHandle: LPHANDLE | NULL,
+    lpNspId: OPTIONAL<LPGUID>,
+    hints: OPTIONAL<PADDRINFOEXW>,
+    ppResult_out: PVOID,
+    timeout: OPTIONAL<PTIMEVAL>,
+    lpOverlapped: OPTIONAL<LPOVERLAPPED>,
+    lpCompletionRoutine: OPTIONAL<LPLOOKUPSERVICE_COMPLETION_ROUTINE>,
+    lpNameHandle_out: OPTIONAL<LPHANDLE>,
   ): INT {
-    return Ws2_32.Load('GetAddrInfoExW')(pName, pServiceName, dwNameSpace, lpNspId, hints, ppResult, timeout, lpOverlapped, lpCompletionRoutine, lpNameHandle);
+    return Ws2_32.Load('GetAddrInfoExW')(pName, pServiceName, dwNameSpace, lpNspId, hints, ppResult_out, timeout, lpOverlapped, lpCompletionRoutine, lpNameHandle_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ws2tcpip/nf-ws2tcpip-getaddrinfow
-  public static GetAddrInfoW(pNodeName: LPCWSTR | NULL, pServiceName: LPCWSTR | NULL, pHints: PADDRINFOW | NULL, ppResult: PVOID): INT {
-    return Ws2_32.Load('GetAddrInfoW')(pNodeName, pServiceName, pHints, ppResult);
+  public static GetAddrInfoW(pNodeName: OPTIONAL<LPCWSTR>, pServiceName: OPTIONAL<LPCWSTR>, pHints: OPTIONAL<PADDRINFOW>, ppResult_out: PVOID): INT {
+    return Ws2_32.Load('GetAddrInfoW')(pNodeName, pServiceName, pHints, ppResult_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-gethostnamew
-  public static GetHostNameW(name: LPWSTR, namelen: INT): INT {
-    return Ws2_32.Load('GetHostNameW')(name, namelen);
+  public static GetHostNameW(name_out: LPWSTR, namelen: INT): INT {
+    return Ws2_32.Load('GetHostNameW')(name_out, namelen);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ws2tcpip/nf-ws2tcpip-getnameinfow
-  public static GetNameInfoW(pSockaddr: LPSOCKADDR, SockaddrLength: INT, pNodeBuffer: LPWSTR | NULL, NodeBufferSize: DWORD, pServiceBuffer: LPWSTR | NULL, ServiceBufferSize: DWORD, Flags: INT): INT {
-    return Ws2_32.Load('GetNameInfoW')(pSockaddr, SockaddrLength, pNodeBuffer, NodeBufferSize, pServiceBuffer, ServiceBufferSize, Flags);
+  public static GetNameInfoW(pSockaddr: LPSOCKADDR, SockaddrLength: INT, pNodeBuffer_out: OPTIONAL<LPWSTR>, NodeBufferSize: DWORD, pServiceBuffer_out: OPTIONAL<LPWSTR>, ServiceBufferSize: DWORD, Flags: INT): INT {
+    return Ws2_32.Load('GetNameInfoW')(pSockaddr, SockaddrLength, pNodeBuffer_out, NodeBufferSize, pServiceBuffer_out, ServiceBufferSize, Flags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ws2tcpip/nf-ws2tcpip-inetntopw
-  public static InetNtopW(Family: INT, pAddr: PVOID, pStringBuf: LPWSTR, StringBufSize: DWORD_PTR): LPCWSTR {
-    return Ws2_32.Load('InetNtopW')(Family, pAddr, pStringBuf, StringBufSize);
+  public static InetNtopW(Family: INT, pAddr: PVOID, pStringBuf_out: LPWSTR, StringBufSize: DWORD_PTR): LPCWSTR {
+    return Ws2_32.Load('InetNtopW')(Family, pAddr, pStringBuf_out, StringBufSize);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ws2tcpip/nf-ws2tcpip-inetptonw
-  public static InetPtonW(Family: INT, pszAddrString: LPCWSTR, pAddrBuf: PVOID): INT {
-    return Ws2_32.Load('InetPtonW')(Family, pszAddrString, pAddrBuf);
+  public static InetPtonW(Family: INT, pszAddrString: LPCWSTR, pAddrBuf_out: PVOID): INT {
+    return Ws2_32.Load('InetPtonW')(Family, pszAddrString, pAddrBuf_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ws2tcpip/nf-ws2tcpip-setaddrinfoexw
   public static SetAddrInfoExA(
     pName: LPCSTR,
-    pServiceName: LPCSTR,
-    pAddresses: PSOCKET_ADDRESS | NULL,
+    pServiceName: OPTIONAL<LPCSTR>,
+    pAddresses: OPTIONAL<PSOCKET_ADDRESS>,
     dwAddressCount: DWORD,
-    lpBlob: LPBLOB | NULL,
+    lpBlob: OPTIONAL<LPBLOB>,
     dwFlags: DWORD,
     dwNameSpace: DWORD,
-    lpNspId: LPGUID | NULL,
-    timeout: PTIMEVAL | NULL,
-    lpOverlapped: LPOVERLAPPED | NULL,
-    lpCompletionRoutine: LPLOOKUPSERVICE_COMPLETION_ROUTINE | NULL,
-    lpNameHandle: LPHANDLE | NULL,
+    lpNspId: OPTIONAL<LPGUID>,
+    timeout: OPTIONAL<PTIMEVAL>,
+    lpOverlapped: OPTIONAL<LPOVERLAPPED>,
+    lpCompletionRoutine: OPTIONAL<LPLOOKUPSERVICE_COMPLETION_ROUTINE>,
+    lpNameHandle_out: OPTIONAL<LPHANDLE>,
   ): INT {
-    return Ws2_32.Load('SetAddrInfoExA')(pName, pServiceName, pAddresses, dwAddressCount, lpBlob, dwFlags, dwNameSpace, lpNspId, timeout, lpOverlapped, lpCompletionRoutine, lpNameHandle);
+    return Ws2_32.Load('SetAddrInfoExA')(pName, pServiceName, pAddresses, dwAddressCount, lpBlob, dwFlags, dwNameSpace, lpNspId, timeout, lpOverlapped, lpCompletionRoutine, lpNameHandle_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ws2tcpip/nf-ws2tcpip-setaddrinfoexw
   public static SetAddrInfoExW(
     pName: LPCWSTR,
-    pServiceName: LPCWSTR,
-    pAddresses: PSOCKET_ADDRESS | NULL,
+    pServiceName: OPTIONAL<LPCWSTR>,
+    pAddresses: OPTIONAL<PSOCKET_ADDRESS>,
     dwAddressCount: DWORD,
-    lpBlob: LPBLOB | NULL,
+    lpBlob: OPTIONAL<LPBLOB>,
     dwFlags: DWORD,
     dwNameSpace: DWORD,
-    lpNspId: LPGUID | NULL,
-    timeout: PTIMEVAL | NULL,
-    lpOverlapped: LPOVERLAPPED | NULL,
-    lpCompletionRoutine: LPLOOKUPSERVICE_COMPLETION_ROUTINE | NULL,
-    lpNameHandle: LPHANDLE | NULL,
+    lpNspId: OPTIONAL<LPGUID>,
+    timeout: OPTIONAL<PTIMEVAL>,
+    lpOverlapped: OPTIONAL<LPOVERLAPPED>,
+    lpCompletionRoutine: OPTIONAL<LPLOOKUPSERVICE_COMPLETION_ROUTINE>,
+    lpNameHandle_out: OPTIONAL<LPHANDLE>,
   ): INT {
-    return Ws2_32.Load('SetAddrInfoExW')(pName, pServiceName, pAddresses, dwAddressCount, lpBlob, dwFlags, dwNameSpace, lpNspId, timeout, lpOverlapped, lpCompletionRoutine, lpNameHandle);
+    return Ws2_32.Load('SetAddrInfoExW')(pName, pServiceName, pAddresses, dwAddressCount, lpBlob, dwFlags, dwNameSpace, lpNspId, timeout, lpOverlapped, lpCompletionRoutine, lpNameHandle_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ws2spi/nf-ws2spi-wpucompleteoverlappedrequest
-  public static WPUCompleteOverlappedRequest(s: SOCKET, lpOverlapped: LPWSAOVERLAPPED, dwError: DWORD, cbTransferred: DWORD, lpErrno: LPINT): INT {
-    return Ws2_32.Load('WPUCompleteOverlappedRequest')(s, lpOverlapped, dwError, cbTransferred, lpErrno);
+  public static WPUCompleteOverlappedRequest(s: SOCKET, lpOverlapped_in_out: LPWSAOVERLAPPED, dwError: DWORD, cbTransferred: DWORD, lpErrno_out: LPINT): INT {
+    return Ws2_32.Load('WPUCompleteOverlappedRequest')(s, lpOverlapped_in_out, dwError, cbTransferred, lpErrno_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-wsaaccept
-  public static WSAAccept(s: SOCKET, addr: LPSOCKADDR | NULL, addrlen: LPINT | NULL, lpfnCondition: LPCONDITIONPROC | NULL, dwCallbackData: DWORD_PTR): SOCKET {
-    return Ws2_32.Load('WSAAccept')(s, addr, addrlen, lpfnCondition, dwCallbackData);
+  public static WSAAccept(s: SOCKET, addr_out: OPTIONAL<LPSOCKADDR>, addrlen_in_out: OPTIONAL<LPINT>, lpfnCondition: OPTIONAL<LPCONDITIONPROC>, dwCallbackData: DWORD_PTR): SOCKET {
+    return Ws2_32.Load('WSAAccept')(s, addr_out, addrlen_in_out, lpfnCondition, dwCallbackData);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-wsaaddresstostringa
-  public static WSAAddressToStringA(lpsaAddress: LPSOCKADDR, dwAddressLength: DWORD, lpProtocolInfo: LPWSAPROTOCOL_INFOA | NULL, lpszAddressString: LPSTR, lpdwAddressStringLength: LPDWORD): INT {
-    return Ws2_32.Load('WSAAddressToStringA')(lpsaAddress, dwAddressLength, lpProtocolInfo, lpszAddressString, lpdwAddressStringLength);
+  public static WSAAddressToStringA(lpsaAddress: LPSOCKADDR, dwAddressLength: DWORD, lpProtocolInfo: OPTIONAL<LPWSAPROTOCOL_INFOA>, lpszAddressString_out: LPSTR, lpdwAddressStringLength_in_out: LPDWORD): INT {
+    return Ws2_32.Load('WSAAddressToStringA')(lpsaAddress, dwAddressLength, lpProtocolInfo, lpszAddressString_out, lpdwAddressStringLength_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-wsaaddresstostringw
-  public static WSAAddressToStringW(lpsaAddress: LPSOCKADDR, dwAddressLength: DWORD, lpProtocolInfo: LPWSAPROTOCOL_INFOW | NULL, lpszAddressString: LPWSTR, lpdwAddressStringLength: LPDWORD): INT {
-    return Ws2_32.Load('WSAAddressToStringW')(lpsaAddress, dwAddressLength, lpProtocolInfo, lpszAddressString, lpdwAddressStringLength);
+  public static WSAAddressToStringW(lpsaAddress: LPSOCKADDR, dwAddressLength: DWORD, lpProtocolInfo: OPTIONAL<LPWSAPROTOCOL_INFOW>, lpszAddressString_out: LPWSTR, lpdwAddressStringLength_in_out: LPDWORD): INT {
+    return Ws2_32.Load('WSAAddressToStringW')(lpsaAddress, dwAddressLength, lpProtocolInfo, lpszAddressString_out, lpdwAddressStringLength_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ws2spi/nf-ws2spi-wsaadvertiseprovider
@@ -395,33 +397,33 @@ class Ws2_32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsock/nf-winsock-wsaasyncgethostbyaddr
-  public static WSAAsyncGetHostByAddr(hWnd: HWND, wMsg: UINT, addr: LPCSTR, len: INT, type: INT, buf: LPSTR, buflen: INT): HANDLE {
-    return Ws2_32.Load('WSAAsyncGetHostByAddr')(hWnd, wMsg, addr, len, type, buf, buflen);
+  public static WSAAsyncGetHostByAddr(hWnd: HWND, wMsg: UINT, addr: LPCSTR, len: INT, type: INT, buf_out: LPSTR, buflen: INT): HANDLE {
+    return Ws2_32.Load('WSAAsyncGetHostByAddr')(hWnd, wMsg, addr, len, type, buf_out, buflen);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsock/nf-winsock-wsaasyncgethostbyname
-  public static WSAAsyncGetHostByName(hWnd: HWND, wMsg: UINT, name: LPCSTR, buf: LPSTR, buflen: INT): HANDLE {
-    return Ws2_32.Load('WSAAsyncGetHostByName')(hWnd, wMsg, name, buf, buflen);
+  public static WSAAsyncGetHostByName(hWnd: HWND, wMsg: UINT, name: LPCSTR, buf_out: LPSTR, buflen: INT): HANDLE {
+    return Ws2_32.Load('WSAAsyncGetHostByName')(hWnd, wMsg, name, buf_out, buflen);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsock/nf-winsock-wsaasyncgetprotobyname
-  public static WSAAsyncGetProtoByName(hWnd: HWND, wMsg: UINT, name: LPCSTR, buf: LPSTR, buflen: INT): HANDLE {
-    return Ws2_32.Load('WSAAsyncGetProtoByName')(hWnd, wMsg, name, buf, buflen);
+  public static WSAAsyncGetProtoByName(hWnd: HWND, wMsg: UINT, name: LPCSTR, buf_out: LPSTR, buflen: INT): HANDLE {
+    return Ws2_32.Load('WSAAsyncGetProtoByName')(hWnd, wMsg, name, buf_out, buflen);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsock/nf-winsock-wsaasyncgetprotobynumber
-  public static WSAAsyncGetProtoByNumber(hWnd: HWND, wMsg: UINT, number: INT, buf: LPSTR, buflen: INT): HANDLE {
-    return Ws2_32.Load('WSAAsyncGetProtoByNumber')(hWnd, wMsg, number, buf, buflen);
+  public static WSAAsyncGetProtoByNumber(hWnd: HWND, wMsg: UINT, number: INT, buf_out: LPSTR, buflen: INT): HANDLE {
+    return Ws2_32.Load('WSAAsyncGetProtoByNumber')(hWnd, wMsg, number, buf_out, buflen);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsock/nf-winsock-wsaasyncgetservbyname
-  public static WSAAsyncGetServByName(hWnd: HWND, wMsg: UINT, name: LPCSTR, proto: LPCSTR | NULL, buf: LPSTR, buflen: INT): HANDLE {
-    return Ws2_32.Load('WSAAsyncGetServByName')(hWnd, wMsg, name, proto, buf, buflen);
+  public static WSAAsyncGetServByName(hWnd: HWND, wMsg: UINT, name: LPCSTR, proto: LPCSTR, buf_out: LPSTR, buflen: INT): HANDLE {
+    return Ws2_32.Load('WSAAsyncGetServByName')(hWnd, wMsg, name, proto, buf_out, buflen);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsock/nf-winsock-wsaasyncgetservbyport
-  public static WSAAsyncGetServByPort(hWnd: HWND, wMsg: UINT, port: INT, proto: LPCSTR | NULL, buf: LPSTR, buflen: INT): HANDLE {
-    return Ws2_32.Load('WSAAsyncGetServByPort')(hWnd, wMsg, port, proto, buf, buflen);
+  public static WSAAsyncGetServByPort(hWnd: HWND, wMsg: UINT, port: INT, proto: NULLABLE<LPCSTR>, buf_out: LPSTR, buflen: INT): HANDLE {
+    return Ws2_32.Load('WSAAsyncGetServByPort')(hWnd, wMsg, port, proto, buf_out, buflen);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-wsaasyncselect
@@ -450,22 +452,22 @@ class Ws2_32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-wsaconnect
-  public static WSAConnect(s: SOCKET, name: LPSOCKADDR, namelen: INT, lpCallerData: LPWSABUF | NULL, lpCalleeData: LPWSABUF | NULL, lpSQOS: LPQOS | NULL, lpGQOS: LPQOS | NULL): INT {
-    return Ws2_32.Load('WSAConnect')(s, name, namelen, lpCallerData, lpCalleeData, lpSQOS, lpGQOS);
+  public static WSAConnect(s: SOCKET, name: LPSOCKADDR, namelen: INT, lpCallerData: OPTIONAL<LPWSABUF>, lpCalleeData_out: OPTIONAL<LPWSABUF>, lpSQOS: OPTIONAL<LPQOS>, lpGQOS: OPTIONAL<LPQOS>): INT {
+    return Ws2_32.Load('WSAConnect')(s, name, namelen, lpCallerData, lpCalleeData_out, lpSQOS, lpGQOS);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-wsaconnectbylist
   public static WSAConnectByList(
     s: SOCKET,
     SocketAddress: PSOCKET_ADDRESS_LIST,
-    LocalAddressLength: LPDWORD | NULL,
-    LocalAddress: LPSOCKADDR | NULL,
-    RemoteAddressLength: LPDWORD | NULL,
-    RemoteAddress: LPSOCKADDR | NULL,
-    timeout: PTIMEVAL | NULL,
-    Reserved: LPWSAOVERLAPPED | NULL,
+    LocalAddressLength_in_out: OPTIONAL<LPDWORD>,
+    LocalAddress_out: OPTIONAL<LPSOCKADDR>,
+    RemoteAddressLength_in_out: OPTIONAL<LPDWORD>,
+    RemoteAddress_out: OPTIONAL<LPSOCKADDR>,
+    timeout: OPTIONAL<PTIMEVAL>,
+    Reserved: NULL,
   ): BOOL {
-    return Ws2_32.Load('WSAConnectByList')(s, SocketAddress, LocalAddressLength, LocalAddress, RemoteAddressLength, RemoteAddress, timeout, Reserved);
+    return Ws2_32.Load('WSAConnectByList')(s, SocketAddress, LocalAddressLength_in_out, LocalAddress_out, RemoteAddressLength_in_out, RemoteAddress_out, timeout, Reserved);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-wsaconnectbynamea
@@ -473,14 +475,14 @@ class Ws2_32 extends Win32 {
     s: SOCKET,
     nodename: LPCSTR,
     servicename: LPCSTR,
-    LocalAddressLength: LPDWORD | NULL,
-    LocalAddress: LPSOCKADDR | NULL,
-    RemoteAddressLength: LPDWORD | NULL,
-    RemoteAddress: LPSOCKADDR | NULL,
-    timeout: PTIMEVAL | NULL,
-    Reserved: LPWSAOVERLAPPED | NULL,
+    LocalAddressLength_in_out: OPTIONAL<LPDWORD>,
+    LocalAddress_out: OPTIONAL<LPSOCKADDR>,
+    RemoteAddressLength_in_out: OPTIONAL<LPDWORD>,
+    RemoteAddress_out: OPTIONAL<LPSOCKADDR>,
+    timeout: OPTIONAL<PTIMEVAL>,
+    Reserved: OPTIONAL<LPWSAOVERLAPPED>,
   ): BOOL {
-    return Ws2_32.Load('WSAConnectByNameA')(s, nodename, servicename, LocalAddressLength, LocalAddress, RemoteAddressLength, RemoteAddress, timeout, Reserved);
+    return Ws2_32.Load('WSAConnectByNameA')(s, nodename, servicename, LocalAddressLength_in_out, LocalAddress_out, RemoteAddressLength_in_out, RemoteAddress_out, timeout, Reserved);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-wsaconnectbynamew
@@ -488,14 +490,14 @@ class Ws2_32 extends Win32 {
     s: SOCKET,
     nodename: LPCWSTR,
     servicename: LPCWSTR,
-    LocalAddressLength: LPDWORD | NULL,
-    LocalAddress: LPSOCKADDR | NULL,
-    RemoteAddressLength: LPDWORD | NULL,
-    RemoteAddress: LPSOCKADDR | NULL,
-    timeout: PTIMEVAL | NULL,
-    Reserved: LPWSAOVERLAPPED | NULL,
+    LocalAddressLength_in_out: OPTIONAL<LPDWORD>,
+    LocalAddress_out: OPTIONAL<LPSOCKADDR>,
+    RemoteAddressLength_in_out: OPTIONAL<LPDWORD>,
+    RemoteAddress_out: OPTIONAL<LPSOCKADDR>,
+    timeout: OPTIONAL<PTIMEVAL>,
+    Reserved: OPTIONAL<LPWSAOVERLAPPED>,
   ): BOOL {
-    return Ws2_32.Load('WSAConnectByNameW')(s, nodename, servicename, LocalAddressLength, LocalAddress, RemoteAddressLength, RemoteAddress, timeout, Reserved);
+    return Ws2_32.Load('WSAConnectByNameW')(s, nodename, servicename, LocalAddressLength_in_out, LocalAddress_out, RemoteAddressLength_in_out, RemoteAddress_out, timeout, Reserved);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-wsacreateevent
@@ -504,52 +506,52 @@ class Ws2_32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-wsaduplicatesocketa
-  public static WSADuplicateSocketA(s: SOCKET, dwProcessId: DWORD, lpProtocolInfo: LPWSAPROTOCOL_INFOA): INT {
-    return Ws2_32.Load('WSADuplicateSocketA')(s, dwProcessId, lpProtocolInfo);
+  public static WSADuplicateSocketA(s: SOCKET, dwProcessId: DWORD, lpProtocolInfo_out: LPWSAPROTOCOL_INFOA): INT {
+    return Ws2_32.Load('WSADuplicateSocketA')(s, dwProcessId, lpProtocolInfo_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-wsaduplicatesocketw
-  public static WSADuplicateSocketW(s: SOCKET, dwProcessId: DWORD, lpProtocolInfo: LPWSAPROTOCOL_INFOW): INT {
-    return Ws2_32.Load('WSADuplicateSocketW')(s, dwProcessId, lpProtocolInfo);
+  public static WSADuplicateSocketW(s: SOCKET, dwProcessId: DWORD, lpProtocolInfo_out: LPWSAPROTOCOL_INFOW): INT {
+    return Ws2_32.Load('WSADuplicateSocketW')(s, dwProcessId, lpProtocolInfo_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-wsaenumnamespaceprovidersa
-  public static WSAEnumNameSpaceProvidersA(lpdwBufferLength: LPDWORD, lpnspBuffer: LPWSANAMESPACE_INFOA): INT {
-    return Ws2_32.Load('WSAEnumNameSpaceProvidersA')(lpdwBufferLength, lpnspBuffer);
+  public static WSAEnumNameSpaceProvidersA(lpdwBufferLength_in_out: LPDWORD, lpnspBuffer_out: LPWSANAMESPACE_INFOA): INT {
+    return Ws2_32.Load('WSAEnumNameSpaceProvidersA')(lpdwBufferLength_in_out, lpnspBuffer_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-wsaenumnamespaceprovidersexa
-  public static WSAEnumNameSpaceProvidersExA(lpdwBufferLength: LPDWORD, lpnspBuffer: LPVOID): INT {
-    return Ws2_32.Load('WSAEnumNameSpaceProvidersExA')(lpdwBufferLength, lpnspBuffer);
+  public static WSAEnumNameSpaceProvidersExA(lpdwBufferLength_in_out: LPDWORD, lpnspBuffer_out: LPVOID): INT {
+    return Ws2_32.Load('WSAEnumNameSpaceProvidersExA')(lpdwBufferLength_in_out, lpnspBuffer_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-wsaenumnamespaceprovidersexw
-  public static WSAEnumNameSpaceProvidersExW(lpdwBufferLength: LPDWORD, lpnspBuffer: LPVOID): INT {
-    return Ws2_32.Load('WSAEnumNameSpaceProvidersExW')(lpdwBufferLength, lpnspBuffer);
+  public static WSAEnumNameSpaceProvidersExW(lpdwBufferLength_in_out: LPDWORD, lpnspBuffer_out: LPVOID): INT {
+    return Ws2_32.Load('WSAEnumNameSpaceProvidersExW')(lpdwBufferLength_in_out, lpnspBuffer_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-wsaenumnamespaceprovidersw
-  public static WSAEnumNameSpaceProvidersW(lpdwBufferLength: LPDWORD, lpnspBuffer: LPWSANAMESPACE_INFOW): INT {
-    return Ws2_32.Load('WSAEnumNameSpaceProvidersW')(lpdwBufferLength, lpnspBuffer);
+  public static WSAEnumNameSpaceProvidersW(lpdwBufferLength_in_out: LPDWORD, lpnspBuffer_out: LPWSANAMESPACE_INFOW): INT {
+    return Ws2_32.Load('WSAEnumNameSpaceProvidersW')(lpdwBufferLength_in_out, lpnspBuffer_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-wsaenumnetworkevents
-  public static WSAEnumNetworkEvents(s: SOCKET, hEventObject: WSAEVENT | 0n, lpNetworkEvents: LPWSANETWORKEVENTS): INT {
-    return Ws2_32.Load('WSAEnumNetworkEvents')(s, hEventObject, lpNetworkEvents);
+  public static WSAEnumNetworkEvents(s: SOCKET, hEventObject: NULLABLE<WSAEVENT>, lpNetworkEvents_out: LPWSANETWORKEVENTS): INT {
+    return Ws2_32.Load('WSAEnumNetworkEvents')(s, hEventObject, lpNetworkEvents_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-wsaenumprotocolsa
-  public static WSAEnumProtocolsA(lpiProtocols: LPINT | NULL, lpProtocolBuffer: LPWSAPROTOCOL_INFOA | NULL, lpdwBufferLength: LPDWORD): INT {
-    return Ws2_32.Load('WSAEnumProtocolsA')(lpiProtocols, lpProtocolBuffer, lpdwBufferLength);
+  public static WSAEnumProtocolsA(lpiProtocols: OPTIONAL<LPINT>, lpProtocolBuffer_out: OPTIONAL<LPWSAPROTOCOL_INFOA>, lpdwBufferLength_in_out: LPDWORD): INT {
+    return Ws2_32.Load('WSAEnumProtocolsA')(lpiProtocols, lpProtocolBuffer_out, lpdwBufferLength_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-wsaenumprotocolsw
-  public static WSAEnumProtocolsW(lpiProtocols: LPINT | NULL, lpProtocolBuffer: LPWSAPROTOCOL_INFOW | NULL, lpdwBufferLength: LPDWORD): INT {
-    return Ws2_32.Load('WSAEnumProtocolsW')(lpiProtocols, lpProtocolBuffer, lpdwBufferLength);
+  public static WSAEnumProtocolsW(lpiProtocols: OPTIONAL<LPINT>, lpProtocolBuffer_out: OPTIONAL<LPWSAPROTOCOL_INFOW>, lpdwBufferLength_in_out: LPDWORD): INT {
+    return Ws2_32.Load('WSAEnumProtocolsW')(lpiProtocols, lpProtocolBuffer_out, lpdwBufferLength_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-wsaeventselect
-  public static WSAEventSelect(s: SOCKET, hEventObject: WSAEVENT | 0n, lNetworkEvents: INT): INT {
+  public static WSAEventSelect(s: SOCKET, hEventObject: OPTIONAL<WSAEVENT>, lNetworkEvents: INT): INT {
     return Ws2_32.Load('WSAEventSelect')(s, hEventObject, lNetworkEvents);
   }
 
@@ -559,43 +561,43 @@ class Ws2_32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-wsagetoverlappedresult
-  public static WSAGetOverlappedResult(s: SOCKET, lpOverlapped: LPWSAOVERLAPPED, lpcbTransfer: LPDWORD, fWait: BOOL, lpdwFlags: LPDWORD): BOOL {
-    return Ws2_32.Load('WSAGetOverlappedResult')(s, lpOverlapped, lpcbTransfer, fWait, lpdwFlags);
+  public static WSAGetOverlappedResult(s: SOCKET, lpOverlapped: LPWSAOVERLAPPED, lpcbTransfer_out: LPDWORD, fWait: BOOL, lpdwFlags_out: LPDWORD): BOOL {
+    return Ws2_32.Load('WSAGetOverlappedResult')(s, lpOverlapped, lpcbTransfer_out, fWait, lpdwFlags_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-wsagetqosbyname
-  public static WSAGetQOSByName(s: SOCKET, lpQOSName: LPWSABUF, lpQOS: LPQOS): BOOL {
-    return Ws2_32.Load('WSAGetQOSByName')(s, lpQOSName, lpQOS);
+  public static WSAGetQOSByName(s: SOCKET, lpQOSName: LPWSABUF, lpQOS_out: LPQOS): BOOL {
+    return Ws2_32.Load('WSAGetQOSByName')(s, lpQOSName, lpQOS_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-wsagetserviceclassinfoa
-  public static WSAGetServiceClassInfoA(lpProviderId: LPGUID, lpServiceClassId: LPGUID, lpdwBufSize: LPDWORD, lpServiceClassInfo: LPWSASERVICECLASSINFOA): INT {
-    return Ws2_32.Load('WSAGetServiceClassInfoA')(lpProviderId, lpServiceClassId, lpdwBufSize, lpServiceClassInfo);
+  public static WSAGetServiceClassInfoA(lpProviderId: LPGUID, lpServiceClassId: LPGUID, lpdwBufSize_in_out: LPDWORD, lpServiceClassInfo_out: LPWSASERVICECLASSINFOA): INT {
+    return Ws2_32.Load('WSAGetServiceClassInfoA')(lpProviderId, lpServiceClassId, lpdwBufSize_in_out, lpServiceClassInfo_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-wsagetserviceclassinfow
-  public static WSAGetServiceClassInfoW(lpProviderId: LPGUID, lpServiceClassId: LPGUID, lpdwBufSize: LPDWORD, lpServiceClassInfo: LPWSASERVICECLASSINFOW): INT {
-    return Ws2_32.Load('WSAGetServiceClassInfoW')(lpProviderId, lpServiceClassId, lpdwBufSize, lpServiceClassInfo);
+  public static WSAGetServiceClassInfoW(lpProviderId: LPGUID, lpServiceClassId: LPGUID, lpdwBufSize_in_out: LPDWORD, lpServiceClassInfo_out: LPWSASERVICECLASSINFOW): INT {
+    return Ws2_32.Load('WSAGetServiceClassInfoW')(lpProviderId, lpServiceClassId, lpdwBufSize_in_out, lpServiceClassInfo_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-wsagetserviceclassnamebyclassida
-  public static WSAGetServiceClassNameByClassIdA(lpServiceClassId: LPGUID, lpszServiceClassName: LPSTR, lpdwBufferLength: LPDWORD): INT {
-    return Ws2_32.Load('WSAGetServiceClassNameByClassIdA')(lpServiceClassId, lpszServiceClassName, lpdwBufferLength);
+  public static WSAGetServiceClassNameByClassIdA(lpServiceClassId: LPGUID, lpszServiceClassName_out: LPSTR, lpdwBufferLength_in_out: LPDWORD): INT {
+    return Ws2_32.Load('WSAGetServiceClassNameByClassIdA')(lpServiceClassId, lpszServiceClassName_out, lpdwBufferLength_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-wsagetserviceclassnamebyclassidw
-  public static WSAGetServiceClassNameByClassIdW(lpServiceClassId: LPGUID, lpszServiceClassName: LPWSTR, lpdwBufferLength: LPDWORD): INT {
-    return Ws2_32.Load('WSAGetServiceClassNameByClassIdW')(lpServiceClassId, lpszServiceClassName, lpdwBufferLength);
+  public static WSAGetServiceClassNameByClassIdW(lpServiceClassId: LPGUID, lpszServiceClassName_out: LPWSTR, lpdwBufferLength_in_out: LPDWORD): INT {
+    return Ws2_32.Load('WSAGetServiceClassNameByClassIdW')(lpServiceClassId, lpszServiceClassName_out, lpdwBufferLength_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-wsahtonl
-  public static WSAHtonl(s: SOCKET, hostlong: ULONG, lpnetlong: LPDWORD): INT {
-    return Ws2_32.Load('WSAHtonl')(s, hostlong, lpnetlong);
+  public static WSAHtonl(s: SOCKET, hostlong: ULONG, lpnetlong_out: LPDWORD): INT {
+    return Ws2_32.Load('WSAHtonl')(s, hostlong, lpnetlong_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-wsahtons
-  public static WSAHtons(s: SOCKET, hostshort: WORD, lpnetshort: LPVOID): INT {
-    return Ws2_32.Load('WSAHtons')(s, hostshort, lpnetshort);
+  public static WSAHtons(s: SOCKET, hostshort: WORD, lpnetshort_out: LPVOID): INT {
+    return Ws2_32.Load('WSAHtons')(s, hostshort, lpnetshort_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-wsainstallserviceclassa
@@ -612,15 +614,15 @@ class Ws2_32 extends Win32 {
   public static WSAIoctl(
     s: SOCKET,
     dwIoControlCode: DWORD,
-    lpvInBuffer: LPVOID | NULL,
+    lpvInBuffer: OPTIONAL<LPVOID>,
     cbInBuffer: DWORD,
-    lpvOutBuffer: LPVOID | NULL,
+    lpvOutBuffer_out: OPTIONAL<LPVOID>,
     cbOutBuffer: DWORD,
-    lpcbBytesReturned: LPDWORD,
-    lpOverlapped: LPWSAOVERLAPPED | NULL,
-    lpCompletionRoutine: LPWSAOVERLAPPED_COMPLETION_ROUTINE | NULL,
+    lpcbBytesReturned_out: LPDWORD,
+    lpOverlapped_in_out: OPTIONAL<LPWSAOVERLAPPED>,
+    lpCompletionRoutine: OPTIONAL<LPWSAOVERLAPPED_COMPLETION_ROUTINE>,
   ): INT {
-    return Ws2_32.Load('WSAIoctl')(s, dwIoControlCode, lpvInBuffer, cbInBuffer, lpvOutBuffer, cbOutBuffer, lpcbBytesReturned, lpOverlapped, lpCompletionRoutine);
+    return Ws2_32.Load('WSAIoctl')(s, dwIoControlCode, lpvInBuffer, cbInBuffer, lpvOutBuffer_out, cbOutBuffer, lpcbBytesReturned_out, lpOverlapped_in_out, lpCompletionRoutine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-wsaisblocking
@@ -629,18 +631,18 @@ class Ws2_32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-wsajoinleaf
-  public static WSAJoinLeaf(s: SOCKET, name: LPSOCKADDR, namelen: INT, lpCallerData: LPWSABUF | NULL, lpCalleeData: LPWSABUF | NULL, lpSQOS: LPQOS | NULL, lpGQOS: LPQOS | NULL, dwFlags: DWORD): SOCKET {
-    return Ws2_32.Load('WSAJoinLeaf')(s, name, namelen, lpCallerData, lpCalleeData, lpSQOS, lpGQOS, dwFlags);
+  public static WSAJoinLeaf(s: SOCKET, name: LPSOCKADDR, namelen: INT, lpCallerData: OPTIONAL<LPWSABUF>, lpCalleeData_out: OPTIONAL<LPWSABUF>, lpSQOS: OPTIONAL<LPQOS>, lpGQOS: OPTIONAL<LPQOS>, dwFlags: DWORD): SOCKET {
+    return Ws2_32.Load('WSAJoinLeaf')(s, name, namelen, lpCallerData, lpCalleeData_out, lpSQOS, lpGQOS, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-wsalookupservicebegina
-  public static WSALookupServiceBeginA(lpqsRestrictions: LPWSAQUERYSETA, dwControlFlags: DWORD, lphLookup: LPHANDLE): INT {
-    return Ws2_32.Load('WSALookupServiceBeginA')(lpqsRestrictions, dwControlFlags, lphLookup);
+  public static WSALookupServiceBeginA(lpqsRestrictions: LPWSAQUERYSETA, dwControlFlags: DWORD, lphLookup_out: LPHANDLE): INT {
+    return Ws2_32.Load('WSALookupServiceBeginA')(lpqsRestrictions, dwControlFlags, lphLookup_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-wsalookupservicebeginw
-  public static WSALookupServiceBeginW(lpqsRestrictions: LPWSAQUERYSETW, dwControlFlags: DWORD, lphLookup: LPHANDLE): INT {
-    return Ws2_32.Load('WSALookupServiceBeginW')(lpqsRestrictions, dwControlFlags, lphLookup);
+  public static WSALookupServiceBeginW(lpqsRestrictions: LPWSAQUERYSETW, dwControlFlags: DWORD, lphLookup_out: LPHANDLE): INT {
+    return Ws2_32.Load('WSALookupServiceBeginW')(lpqsRestrictions, dwControlFlags, lphLookup_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-wsalookupserviceend
@@ -649,33 +651,42 @@ class Ws2_32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-wsalookupservicenexta
-  public static WSALookupServiceNextA(hLookup: HANDLE, dwControlFlags: DWORD, lpdwBufferLength: LPDWORD, lpqsResults: LPWSAQUERYSETA): INT {
-    return Ws2_32.Load('WSALookupServiceNextA')(hLookup, dwControlFlags, lpdwBufferLength, lpqsResults);
+  public static WSALookupServiceNextA(hLookup: HANDLE, dwControlFlags: DWORD, lpdwBufferLength_in_out: LPDWORD, lpqsResults_out: LPWSAQUERYSETA): INT {
+    return Ws2_32.Load('WSALookupServiceNextA')(hLookup, dwControlFlags, lpdwBufferLength_in_out, lpqsResults_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-wsalookupservicenextw
-  public static WSALookupServiceNextW(hLookup: HANDLE, dwControlFlags: DWORD, lpdwBufferLength: LPDWORD, lpqsResults: LPWSAQUERYSETW | NULL): INT {
-    return Ws2_32.Load('WSALookupServiceNextW')(hLookup, dwControlFlags, lpdwBufferLength, lpqsResults);
+  public static WSALookupServiceNextW(hLookup: HANDLE, dwControlFlags: DWORD, lpdwBufferLength_in_out: LPDWORD, lpqsResults_out: OPTIONAL<LPWSAQUERYSETW>): INT {
+    return Ws2_32.Load('WSALookupServiceNextW')(hLookup, dwControlFlags, lpdwBufferLength_in_out, lpqsResults_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-wsanspioctl
-  public static WSANSPIoctl(hLookup: HANDLE, dwControlCode: DWORD, lpvInBuffer: LPVOID | NULL, cbInBuffer: DWORD, lpvOutBuffer: LPVOID | NULL, cbOutBuffer: DWORD, lpcbBytesReturned: LPDWORD, lpCompletion: LPWSACOMPLETION | NULL): INT {
-    return Ws2_32.Load('WSANSPIoctl')(hLookup, dwControlCode, lpvInBuffer, cbInBuffer, lpvOutBuffer, cbOutBuffer, lpcbBytesReturned, lpCompletion);
+  public static WSANSPIoctl(
+    hLookup: HANDLE,
+    dwControlCode: DWORD,
+    lpvInBuffer: OPTIONAL<LPVOID>,
+    cbInBuffer: DWORD,
+    lpvOutBuffer_out: OPTIONAL<LPVOID>,
+    cbOutBuffer: DWORD,
+    lpcbBytesReturned_out: LPDWORD,
+    lpCompletion: OPTIONAL<LPWSACOMPLETION>,
+  ): INT {
+    return Ws2_32.Load('WSANSPIoctl')(hLookup, dwControlCode, lpvInBuffer, cbInBuffer, lpvOutBuffer_out, cbOutBuffer, lpcbBytesReturned_out, lpCompletion);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-wsantohl
-  public static WSANtohl(s: SOCKET, netlong: ULONG, lphostlong: LPDWORD): INT {
-    return Ws2_32.Load('WSANtohl')(s, netlong, lphostlong);
+  public static WSANtohl(s: SOCKET, netlong: ULONG, lphostlong_out: LPDWORD): INT {
+    return Ws2_32.Load('WSANtohl')(s, netlong, lphostlong_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-wsantohs
-  public static WSANtohs(s: SOCKET, netshort: WORD, lphostshort: LPVOID): INT {
-    return Ws2_32.Load('WSANtohs')(s, netshort, lphostshort);
+  public static WSANtohs(s: SOCKET, netshort: WORD, lphostshort_out: LPVOID): INT {
+    return Ws2_32.Load('WSANtohs')(s, netshort, lphostshort_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-wsapoll
-  public static WSAPoll(fdArray: LPWSAPOLLFD, fds: ULONG, timeout: INT): INT {
-    return Ws2_32.Load('WSAPoll')(fdArray, fds, timeout);
+  public static WSAPoll(fdArray_in_out: LPWSAPOLLFD, fds: ULONG, timeout: INT): INT {
+    return Ws2_32.Load('WSAPoll')(fdArray_in_out, fds, timeout);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ws2spi/nf-ws2spi-wsaprovidercompleteasyccall
@@ -684,8 +695,8 @@ class Ws2_32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-wsaproviderconfigchange
-  public static WSAProviderConfigChange(lpNotificationHandle: LPHANDLE, lpOverlapped: LPWSAOVERLAPPED | NULL, lpCompletionRoutine: LPWSAOVERLAPPED_COMPLETION_ROUTINE | NULL): INT {
-    return Ws2_32.Load('WSAProviderConfigChange')(lpNotificationHandle, lpOverlapped, lpCompletionRoutine);
+  public static WSAProviderConfigChange(lpNotificationHandle_in_out: LPHANDLE, lpOverlapped_in_out: OPTIONAL<LPWSAOVERLAPPED>, lpCompletionRoutine: OPTIONAL<LPWSAOVERLAPPED_COMPLETION_ROUTINE>): INT {
+    return Ws2_32.Load('WSAProviderConfigChange')(lpNotificationHandle_in_out, lpOverlapped_in_out, lpCompletionRoutine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-wsarecv
@@ -693,16 +704,16 @@ class Ws2_32 extends Win32 {
     s: SOCKET,
     lpBuffers: LPWSABUF,
     dwBufferCount: DWORD,
-    lpNumberOfBytesRecvd: LPDWORD | NULL,
-    lpFlags: LPDWORD,
-    lpOverlapped: LPWSAOVERLAPPED | NULL,
-    lpCompletionRoutine: LPWSAOVERLAPPED_COMPLETION_ROUTINE | NULL,
+    lpNumberOfBytesRecvd_out: OPTIONAL<LPDWORD>,
+    lpFlags_in_out: LPDWORD,
+    lpOverlapped_in_out: OPTIONAL<LPWSAOVERLAPPED>,
+    lpCompletionRoutine: OPTIONAL<LPWSAOVERLAPPED_COMPLETION_ROUTINE>,
   ): INT {
-    return Ws2_32.Load('WSARecv')(s, lpBuffers, dwBufferCount, lpNumberOfBytesRecvd, lpFlags, lpOverlapped, lpCompletionRoutine);
+    return Ws2_32.Load('WSARecv')(s, lpBuffers, dwBufferCount, lpNumberOfBytesRecvd_out, lpFlags_in_out, lpOverlapped_in_out, lpCompletionRoutine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-wsarecvdisconnect
-  public static WSARecvDisconnect(s: SOCKET, lpInboundDisconnectData: LPWSABUF | NULL): INT {
+  public static WSARecvDisconnect(s: SOCKET, lpInboundDisconnectData: OPTIONAL<LPWSABUF>): INT {
     return Ws2_32.Load('WSARecvDisconnect')(s, lpInboundDisconnectData);
   }
 
@@ -711,14 +722,14 @@ class Ws2_32 extends Win32 {
     s: SOCKET,
     lpBuffers: LPWSABUF,
     dwBufferCount: DWORD,
-    lpNumberOfBytesRecvd: LPDWORD | NULL,
-    lpFlags: LPDWORD,
-    lpFrom: LPSOCKADDR | NULL,
-    lpFromlen: LPINT | NULL,
-    lpOverlapped: LPWSAOVERLAPPED | NULL,
-    lpCompletionRoutine: LPWSAOVERLAPPED_COMPLETION_ROUTINE | NULL,
+    lpNumberOfBytesRecvd_out: OPTIONAL<LPDWORD>,
+    lpFlags_in_out: LPDWORD,
+    lpFrom_out: OPTIONAL<LPSOCKADDR>,
+    lpFromlen_in_out: OPTIONAL<LPINT>,
+    lpOverlapped_in_out: OPTIONAL<LPWSAOVERLAPPED>,
+    lpCompletionRoutine: OPTIONAL<LPWSAOVERLAPPED_COMPLETION_ROUTINE>,
   ): INT {
-    return Ws2_32.Load('WSARecvFrom')(s, lpBuffers, dwBufferCount, lpNumberOfBytesRecvd, lpFlags, lpFrom, lpFromlen, lpOverlapped, lpCompletionRoutine);
+    return Ws2_32.Load('WSARecvFrom')(s, lpBuffers, dwBufferCount, lpNumberOfBytesRecvd_out, lpFlags_in_out, lpFrom_out, lpFromlen_in_out, lpOverlapped_in_out, lpCompletionRoutine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-wsaremoveserviceclass
@@ -732,18 +743,33 @@ class Ws2_32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-wsasend
-  public static WSASend(s: SOCKET, lpBuffers: LPWSABUF, dwBufferCount: DWORD, lpNumberOfBytesSent: LPDWORD | NULL, dwFlags: DWORD, lpOverlapped: LPWSAOVERLAPPED | NULL, lpCompletionRoutine: LPWSAOVERLAPPED_COMPLETION_ROUTINE | NULL): INT {
-    return Ws2_32.Load('WSASend')(s, lpBuffers, dwBufferCount, lpNumberOfBytesSent, dwFlags, lpOverlapped, lpCompletionRoutine);
+  public static WSASend(
+    s: SOCKET,
+    lpBuffers: LPWSABUF,
+    dwBufferCount: DWORD,
+    lpNumberOfBytesSent_out: OPTIONAL<LPDWORD>,
+    dwFlags: DWORD,
+    lpOverlapped_in_out: OPTIONAL<LPWSAOVERLAPPED>,
+    lpCompletionRoutine: OPTIONAL<LPWSAOVERLAPPED_COMPLETION_ROUTINE>,
+  ): INT {
+    return Ws2_32.Load('WSASend')(s, lpBuffers, dwBufferCount, lpNumberOfBytesSent_out, dwFlags, lpOverlapped_in_out, lpCompletionRoutine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-wsasenddisconnect
-  public static WSASendDisconnect(s: SOCKET, lpOutboundDisconnectData: LPWSABUF | NULL): INT {
+  public static WSASendDisconnect(s: SOCKET, lpOutboundDisconnectData: OPTIONAL<LPWSABUF>): INT {
     return Ws2_32.Load('WSASendDisconnect')(s, lpOutboundDisconnectData);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-wsasendmsg
-  public static WSASendMsg(Handle: SOCKET, lpMsg: LPWSAMSG, dwFlags: DWORD, lpNumberOfBytesSent: LPDWORD | NULL, lpOverlapped: LPWSAOVERLAPPED | NULL, lpCompletionRoutine: LPWSAOVERLAPPED_COMPLETION_ROUTINE | NULL): INT {
-    return Ws2_32.Load('WSASendMsg')(Handle, lpMsg, dwFlags, lpNumberOfBytesSent, lpOverlapped, lpCompletionRoutine);
+  public static WSASendMsg(
+    Handle: SOCKET,
+    lpMsg: LPWSAMSG,
+    dwFlags: DWORD,
+    lpNumberOfBytesSent_out: OPTIONAL<LPDWORD>,
+    lpOverlapped_in_out: OPTIONAL<LPWSAOVERLAPPED>,
+    lpCompletionRoutine: OPTIONAL<LPWSAOVERLAPPED_COMPLETION_ROUTINE>,
+  ): INT {
+    return Ws2_32.Load('WSASendMsg')(Handle, lpMsg, dwFlags, lpNumberOfBytesSent_out, lpOverlapped_in_out, lpCompletionRoutine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-wsasendto
@@ -751,14 +777,14 @@ class Ws2_32 extends Win32 {
     s: SOCKET,
     lpBuffers: LPWSABUF,
     dwBufferCount: DWORD,
-    lpNumberOfBytesSent: LPDWORD | NULL,
+    lpNumberOfBytesSent_out: OPTIONAL<LPDWORD>,
     dwFlags: DWORD,
-    lpTo: LPSOCKADDR | NULL,
+    lpTo: OPTIONAL<LPSOCKADDR>,
     iTolen: INT,
-    lpOverlapped: LPWSAOVERLAPPED | NULL,
-    lpCompletionRoutine: LPWSAOVERLAPPED_COMPLETION_ROUTINE | NULL,
+    lpOverlapped_in_out: OPTIONAL<LPWSAOVERLAPPED>,
+    lpCompletionRoutine: OPTIONAL<LPWSAOVERLAPPED_COMPLETION_ROUTINE>,
   ): INT {
-    return Ws2_32.Load('WSASendTo')(s, lpBuffers, dwBufferCount, lpNumberOfBytesSent, dwFlags, lpTo, iTolen, lpOverlapped, lpCompletionRoutine);
+    return Ws2_32.Load('WSASendTo')(s, lpBuffers, dwBufferCount, lpNumberOfBytesSent_out, dwFlags, lpTo, iTolen, lpOverlapped_in_out, lpCompletionRoutine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-wsasetblockinghook
@@ -787,28 +813,28 @@ class Ws2_32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-wsasocketa
-  public static WSASocketA(af: INT, type: INT, protocol: INT, lpProtocolInfo: LPWSAPROTOCOL_INFOA | NULL, g: GROUP, dwFlags: DWORD): SOCKET {
+  public static WSASocketA(af: INT, type: INT, protocol: INT, lpProtocolInfo: OPTIONAL<LPWSAPROTOCOL_INFOA>, g: GROUP, dwFlags: DWORD): SOCKET {
     return Ws2_32.Load('WSASocketA')(af, type, protocol, lpProtocolInfo, g, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-wsasocketw
-  public static WSASocketW(af: INT, type: INT, protocol: INT, lpProtocolInfo: LPWSAPROTOCOL_INFOW | NULL, g: GROUP, dwFlags: DWORD): SOCKET {
+  public static WSASocketW(af: INT, type: INT, protocol: INT, lpProtocolInfo: OPTIONAL<LPWSAPROTOCOL_INFOW>, g: GROUP, dwFlags: DWORD): SOCKET {
     return Ws2_32.Load('WSASocketW')(af, type, protocol, lpProtocolInfo, g, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-wsastartup
-  public static WSAStartup(wVersionRequested: WORD, lpWSAData: LPWSADATA): INT {
-    return Ws2_32.Load('WSAStartup')(wVersionRequested, lpWSAData);
+  public static WSAStartup(wVersionRequested: WORD, lpWSAData_out: LPWSADATA): INT {
+    return Ws2_32.Load('WSAStartup')(wVersionRequested, lpWSAData_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-wsastringtoaddressa
-  public static WSAStringToAddressA(AddressString: LPSTR, AddressFamily: INT, lpProtocolInfo: LPWSAPROTOCOL_INFOA | NULL, lpAddress: LPSOCKADDR, lpAddressLength: LPINT): INT {
-    return Ws2_32.Load('WSAStringToAddressA')(AddressString, AddressFamily, lpProtocolInfo, lpAddress, lpAddressLength);
+  public static WSAStringToAddressA(AddressString: LPSTR, AddressFamily: INT, lpProtocolInfo: OPTIONAL<LPWSAPROTOCOL_INFOA>, lpAddress_out: LPSOCKADDR, lpAddressLength_in_out: LPINT): INT {
+    return Ws2_32.Load('WSAStringToAddressA')(AddressString, AddressFamily, lpProtocolInfo, lpAddress_out, lpAddressLength_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-wsastringtoaddressw
-  public static WSAStringToAddressW(AddressString: LPWSTR, AddressFamily: INT, lpProtocolInfo: LPWSAPROTOCOL_INFOW | NULL, lpAddress: LPSOCKADDR, lpAddressLength: LPINT): INT {
-    return Ws2_32.Load('WSAStringToAddressW')(AddressString, AddressFamily, lpProtocolInfo, lpAddress, lpAddressLength);
+  public static WSAStringToAddressW(AddressString: LPWSTR, AddressFamily: INT, lpProtocolInfo: OPTIONAL<LPWSAPROTOCOL_INFOW>, lpAddress_out: LPSOCKADDR, lpAddressLength_in_out: LPINT): INT {
+    return Ws2_32.Load('WSAStringToAddressW')(AddressString, AddressFamily, lpProtocolInfo, lpAddress_out, lpAddressLength_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ws2spi/nf-ws2spi-wsaunadvertiseprovider
@@ -827,13 +853,13 @@ class Ws2_32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ws2spi/nf-ws2spi-wscdeinstallprovider
-  public static WSCDeinstallProvider(lpProviderId: LPGUID, lpErrno: LPINT): INT {
-    return Ws2_32.Load('WSCDeinstallProvider')(lpProviderId, lpErrno);
+  public static WSCDeinstallProvider(lpProviderId: LPGUID, lpErrno_out: LPINT): INT {
+    return Ws2_32.Load('WSCDeinstallProvider')(lpProviderId, lpErrno_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ws2spi/nf-ws2spi-wscdeinstallprovider32
-  public static WSCDeinstallProvider32(lpProviderId: LPGUID, lpErrno: LPINT): INT {
-    return Ws2_32.Load('WSCDeinstallProvider32')(lpProviderId, lpErrno);
+  public static WSCDeinstallProvider32(lpProviderId: LPGUID, lpErrno_out: LPINT): INT {
+    return Ws2_32.Load('WSCDeinstallProvider32')(lpProviderId, lpErrno_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ws2spi/nf-ws2spi-wscenablensprovider
@@ -847,48 +873,48 @@ class Ws2_32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ws2spi/nf-ws2spi-wscenumnamespaceproviders32
-  public static WSCEnumNameSpaceProviders32(lpdwBufferLength: LPDWORD, lpnspBuffer: LPWSANAMESPACE_INFOW): INT {
-    return Ws2_32.Load('WSCEnumNameSpaceProviders32')(lpdwBufferLength, lpnspBuffer);
+  public static WSCEnumNameSpaceProviders32(lpdwBufferLength_in_out: LPDWORD, lpnspBuffer_out: LPWSANAMESPACE_INFOW): INT {
+    return Ws2_32.Load('WSCEnumNameSpaceProviders32')(lpdwBufferLength_in_out, lpnspBuffer_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ws2spi/nf-ws2spi-wscenumnamespaceprovidersex32
-  public static WSCEnumNameSpaceProvidersEx32(lpdwBufferLength: LPDWORD, lpnspBuffer: LPVOID): INT {
-    return Ws2_32.Load('WSCEnumNameSpaceProvidersEx32')(lpdwBufferLength, lpnspBuffer);
+  public static WSCEnumNameSpaceProvidersEx32(lpdwBufferLength_in_out: LPDWORD, lpnspBuffer_out: LPVOID): INT {
+    return Ws2_32.Load('WSCEnumNameSpaceProvidersEx32')(lpdwBufferLength_in_out, lpnspBuffer_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ws2spi/nf-ws2spi-wscenumprotocols
-  public static WSCEnumProtocols(lpiProtocols: LPINT | NULL, lpProtocolBuffer: LPWSAPROTOCOL_INFOW | NULL, lpdwBufferLength: LPDWORD, lpErrno: LPINT): INT {
-    return Ws2_32.Load('WSCEnumProtocols')(lpiProtocols, lpProtocolBuffer, lpdwBufferLength, lpErrno);
+  public static WSCEnumProtocols(lpiProtocols: OPTIONAL<LPINT>, lpProtocolBuffer_out: OPTIONAL<LPWSAPROTOCOL_INFOW>, lpdwBufferLength_in_out: LPDWORD, lpErrno_out: LPINT): INT {
+    return Ws2_32.Load('WSCEnumProtocols')(lpiProtocols, lpProtocolBuffer_out, lpdwBufferLength_in_out, lpErrno_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ws2spi/nf-ws2spi-wscenumprotocols32
-  public static WSCEnumProtocols32(lpiProtocols: LPINT | NULL, lpProtocolBuffer: LPWSAPROTOCOL_INFOW, lpdwBufferLength: LPDWORD, lpErrno: LPINT): INT {
-    return Ws2_32.Load('WSCEnumProtocols32')(lpiProtocols, lpProtocolBuffer, lpdwBufferLength, lpErrno);
+  public static WSCEnumProtocols32(lpiProtocols: OPTIONAL<LPINT>, lpProtocolBuffer_out: LPWSAPROTOCOL_INFOW, lpdwBufferLength_in_out: LPDWORD, lpErrno_out: LPINT): INT {
+    return Ws2_32.Load('WSCEnumProtocols32')(lpiProtocols, lpProtocolBuffer_out, lpdwBufferLength_in_out, lpErrno_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ws2spi/nf-ws2spi-wscgetapplicationcategory
-  public static WSCGetApplicationCategory(Path: LPCWSTR, PathLength: DWORD, Extra: LPCWSTR | NULL, ExtraLength: DWORD, pPermittedLspCategories: LPDWORD, lpErrno: LPINT): INT {
-    return Ws2_32.Load('WSCGetApplicationCategory')(Path, PathLength, Extra, ExtraLength, pPermittedLspCategories, lpErrno);
+  public static WSCGetApplicationCategory(Path: LPCWSTR, PathLength: DWORD, Extra: OPTIONAL<LPCWSTR>, ExtraLength: DWORD, pPermittedLspCategories_out: LPDWORD, lpErrno_out: LPINT): INT {
+    return Ws2_32.Load('WSCGetApplicationCategory')(Path, PathLength, Extra, ExtraLength, pPermittedLspCategories_out, lpErrno_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ws2spi/nf-ws2spi-wscgetproviderinfo
-  public static WSCGetProviderInfo(lpProviderId: LPGUID, InfoType: WSC_PROVIDER_INFO_TYPE, Info: PBYTE, InfoSize: PVOID, Flags: DWORD, lpErrno: LPINT): INT {
-    return Ws2_32.Load('WSCGetProviderInfo')(lpProviderId, InfoType, Info, InfoSize, Flags, lpErrno);
+  public static WSCGetProviderInfo(lpProviderId: LPGUID, InfoType: WSC_PROVIDER_INFO_TYPE, Info_out: PBYTE, InfoSize_in_out: PVOID, Flags: DWORD, lpErrno_out: LPINT): INT {
+    return Ws2_32.Load('WSCGetProviderInfo')(lpProviderId, InfoType, Info_out, InfoSize_in_out, Flags, lpErrno_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ws2spi/nf-ws2spi-wscgetproviderinfo32
-  public static WSCGetProviderInfo32(lpProviderId: LPGUID, InfoType: WSC_PROVIDER_INFO_TYPE, Info: PBYTE, InfoSize: PVOID, Flags: DWORD, lpErrno: LPINT): INT {
-    return Ws2_32.Load('WSCGetProviderInfo32')(lpProviderId, InfoType, Info, InfoSize, Flags, lpErrno);
+  public static WSCGetProviderInfo32(lpProviderId: LPGUID, InfoType: WSC_PROVIDER_INFO_TYPE, Info_out: PBYTE, InfoSize_in_out: PVOID, Flags: DWORD, lpErrno_out: LPINT): INT {
+    return Ws2_32.Load('WSCGetProviderInfo32')(lpProviderId, InfoType, Info_out, InfoSize_in_out, Flags, lpErrno_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ws2spi/nf-ws2spi-wscgetproviderpath
-  public static WSCGetProviderPath(lpProviderId: LPGUID, lpszProviderDllPath: LPWSTR, lpProviderDllPathLen: LPINT, lpErrno: LPINT): INT {
-    return Ws2_32.Load('WSCGetProviderPath')(lpProviderId, lpszProviderDllPath, lpProviderDllPathLen, lpErrno);
+  public static WSCGetProviderPath(lpProviderId: LPGUID, lpszProviderDllPath_out: LPWSTR, lpProviderDllPathLen_in_out: LPINT, lpErrno_out: LPINT): INT {
+    return Ws2_32.Load('WSCGetProviderPath')(lpProviderId, lpszProviderDllPath_out, lpProviderDllPathLen_in_out, lpErrno_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ws2spi/nf-ws2spi-wscgetproviderpath32
-  public static WSCGetProviderPath32(lpProviderId: LPGUID, lpszProviderDllPath: LPWSTR, lpProviderDllPathLen: LPINT, lpErrno: LPINT): INT {
-    return Ws2_32.Load('WSCGetProviderPath32')(lpProviderId, lpszProviderDllPath, lpProviderDllPathLen, lpErrno);
+  public static WSCGetProviderPath32(lpProviderId: LPGUID, lpszProviderDllPath_out: LPWSTR, lpProviderDllPathLen_in_out: LPINT, lpErrno_out: LPINT): INT {
+    return Ws2_32.Load('WSCGetProviderPath32')(lpProviderId, lpszProviderDllPath_out, lpProviderDllPathLen_in_out, lpErrno_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ws2spi/nf-ws2spi-wscinstallnamespace
@@ -912,13 +938,13 @@ class Ws2_32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ws2spi/nf-ws2spi-wscinstallprovider
-  public static WSCInstallProvider(lpProviderId: LPGUID, lpszProviderDllPath: LPCWSTR, lpProtocolInfoList: LPWSAPROTOCOL_INFOW, dwNumberOfEntries: DWORD, lpErrno: LPINT): INT {
-    return Ws2_32.Load('WSCInstallProvider')(lpProviderId, lpszProviderDllPath, lpProtocolInfoList, dwNumberOfEntries, lpErrno);
+  public static WSCInstallProvider(lpProviderId: LPGUID, lpszProviderDllPath: LPCWSTR, lpProtocolInfoList: LPWSAPROTOCOL_INFOW, dwNumberOfEntries: DWORD, lpErrno_out: LPINT): INT {
+    return Ws2_32.Load('WSCInstallProvider')(lpProviderId, lpszProviderDllPath, lpProtocolInfoList, dwNumberOfEntries, lpErrno_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ws2spi/nf-ws2spi-wscinstallprovider64_32
-  public static WSCInstallProvider64_32(lpProviderId: LPGUID, lpszProviderDllPath: LPCWSTR, lpProtocolInfoList: LPWSAPROTOCOL_INFOW, dwNumberOfEntries: DWORD, lpErrno: LPINT): INT {
-    return Ws2_32.Load('WSCInstallProvider64_32')(lpProviderId, lpszProviderDllPath, lpProtocolInfoList, dwNumberOfEntries, lpErrno);
+  public static WSCInstallProvider64_32(lpProviderId: LPGUID, lpszProviderDllPath: LPCWSTR, lpProtocolInfoList: LPWSAPROTOCOL_INFOW, dwNumberOfEntries: DWORD, lpErrno_out: LPINT): INT {
+    return Ws2_32.Load('WSCInstallProvider64_32')(lpProviderId, lpszProviderDllPath, lpProtocolInfoList, dwNumberOfEntries, lpErrno_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ws2spi/nf-ws2spi-wscinstallproviderandchains64_32
@@ -928,27 +954,27 @@ class Ws2_32 extends Win32 {
     lpszProviderDllPath32: LPCWSTR,
     lpszLspName: LPCWSTR,
     dwServiceFlags: DWORD,
-    lpProtocolInfoList: LPWSAPROTOCOL_INFOW,
+    lpProtocolInfoList_in_out: LPWSAPROTOCOL_INFOW,
     dwNumberOfEntries: DWORD,
-    lpdwCatalogEntryId: LPDWORD | NULL,
-    lpErrno: LPINT,
+    lpdwCatalogEntryId_out: OPTIONAL<LPDWORD>,
+    lpErrno_out: LPINT,
   ): INT {
-    return Ws2_32.Load('WSCInstallProviderAndChains64_32')(lpProviderId, lpszProviderDllPath, lpszProviderDllPath32, lpszLspName, dwServiceFlags, lpProtocolInfoList, dwNumberOfEntries, lpdwCatalogEntryId, lpErrno);
+    return Ws2_32.Load('WSCInstallProviderAndChains64_32')(lpProviderId, lpszProviderDllPath, lpszProviderDllPath32, lpszLspName, dwServiceFlags, lpProtocolInfoList_in_out, dwNumberOfEntries, lpdwCatalogEntryId_out, lpErrno_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ws2spi/nf-ws2spi-wscsetapplicationcategory
-  public static WSCSetApplicationCategory(Path: LPCWSTR, PathLength: DWORD, Extra: LPCWSTR | NULL, ExtraLength: DWORD, dwPermittedLspCategories: DWORD, pPrevPermLspCat: LPDWORD | NULL, lpErrno: LPINT): INT {
-    return Ws2_32.Load('WSCSetApplicationCategory')(Path, PathLength, Extra, ExtraLength, dwPermittedLspCategories, pPrevPermLspCat, lpErrno);
+  public static WSCSetApplicationCategory(Path: LPCWSTR, PathLength: DWORD, Extra: OPTIONAL<LPCWSTR>, ExtraLength: DWORD, dwPermittedLspCategories: DWORD, pPrevPermLspCat_out: OPTIONAL<LPDWORD>, lpErrno_out: LPINT): INT {
+    return Ws2_32.Load('WSCSetApplicationCategory')(Path, PathLength, Extra, ExtraLength, dwPermittedLspCategories, pPrevPermLspCat_out, lpErrno_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ws2spi/nf-ws2spi-wscsetproviderinfo
-  public static WSCSetProviderInfo(lpProviderId: LPGUID, InfoType: WSC_PROVIDER_INFO_TYPE, Info: PBYTE, InfoSize: DWORD_PTR, Flags: DWORD, lpErrno: LPINT): INT {
-    return Ws2_32.Load('WSCSetProviderInfo')(lpProviderId, InfoType, Info, InfoSize, Flags, lpErrno);
+  public static WSCSetProviderInfo(lpProviderId: LPGUID, InfoType: WSC_PROVIDER_INFO_TYPE, Info: PBYTE, InfoSize: DWORD_PTR, Flags: DWORD, lpErrno_out: LPINT): INT {
+    return Ws2_32.Load('WSCSetProviderInfo')(lpProviderId, InfoType, Info, InfoSize, Flags, lpErrno_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ws2spi/nf-ws2spi-wscsetproviderinfo32
-  public static WSCSetProviderInfo32(lpProviderId: LPGUID, InfoType: WSC_PROVIDER_INFO_TYPE, Info: PBYTE, InfoSize: DWORD_PTR, Flags: DWORD, lpErrno: LPINT): INT {
-    return Ws2_32.Load('WSCSetProviderInfo32')(lpProviderId, InfoType, Info, InfoSize, Flags, lpErrno);
+  public static WSCSetProviderInfo32(lpProviderId: LPGUID, InfoType: WSC_PROVIDER_INFO_TYPE, Info: PBYTE, InfoSize: DWORD_PTR, Flags: DWORD, lpErrno_out: LPINT): INT {
+    return Ws2_32.Load('WSCSetProviderInfo32')(lpProviderId, InfoType, Info, InfoSize, Flags, lpErrno_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ws2spi/nf-ws2spi-wscuninstallnamespace
@@ -962,13 +988,13 @@ class Ws2_32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ws2spi/nf-ws2spi-wscupdateprovider
-  public static WSCUpdateProvider(lpProviderId: LPGUID, lpszProviderDllPath: LPCWSTR, lpProtocolInfoList: LPWSAPROTOCOL_INFOW, dwNumberOfEntries: DWORD, lpErrno: LPINT): INT {
-    return Ws2_32.Load('WSCUpdateProvider')(lpProviderId, lpszProviderDllPath, lpProtocolInfoList, dwNumberOfEntries, lpErrno);
+  public static WSCUpdateProvider(lpProviderId: LPGUID, lpszProviderDllPath: LPCWSTR, lpProtocolInfoList: LPWSAPROTOCOL_INFOW, dwNumberOfEntries: DWORD, lpErrno_out: LPINT): INT {
+    return Ws2_32.Load('WSCUpdateProvider')(lpProviderId, lpszProviderDllPath, lpProtocolInfoList, dwNumberOfEntries, lpErrno_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ws2spi/nf-ws2spi-wscupdateprovider32
-  public static WSCUpdateProvider32(lpProviderId: LPGUID, lpszProviderDllPath: LPCWSTR, lpProtocolInfoList: LPWSAPROTOCOL_INFOW, dwNumberOfEntries: DWORD, lpErrno: LPINT): INT {
-    return Ws2_32.Load('WSCUpdateProvider32')(lpProviderId, lpszProviderDllPath, lpProtocolInfoList, dwNumberOfEntries, lpErrno);
+  public static WSCUpdateProvider32(lpProviderId: LPGUID, lpszProviderDllPath: LPCWSTR, lpProtocolInfoList: LPWSAPROTOCOL_INFOW, dwNumberOfEntries: DWORD, lpErrno_out: LPINT): INT {
+    return Ws2_32.Load('WSCUpdateProvider32')(lpProviderId, lpszProviderDllPath, lpProtocolInfoList, dwNumberOfEntries, lpErrno_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ws2spi/nf-ws2spi-wscwritenamespaceorder
@@ -992,8 +1018,8 @@ class Ws2_32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-accept
-  public static accept(s: SOCKET, addr: LPSOCKADDR | NULL, addrlen: LPINT | NULL): SOCKET {
-    return Ws2_32.Load('accept')(s, addr, addrlen);
+  public static accept(s: SOCKET, addr_out: OPTIONAL<LPSOCKADDR>, addrlen_in_out: OPTIONAL<LPINT>): SOCKET {
+    return Ws2_32.Load('accept')(s, addr_out, addrlen_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-bind
@@ -1012,13 +1038,13 @@ class Ws2_32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ws2tcpip/nf-ws2tcpip-freeaddrinfo
-  public static freeaddrinfo(pAddrInfo: PADDRINFOA | NULL): void {
+  public static freeaddrinfo(pAddrInfo: OPTIONAL<PADDRINFOA>): void {
     return Ws2_32.Load('freeaddrinfo')(pAddrInfo);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ws2tcpip/nf-ws2tcpip-getaddrinfo
-  public static getaddrinfo(pNodeName: LPCSTR | NULL, pServiceName: LPCSTR | NULL, pHints: PADDRINFOA | NULL, ppResult: PVOID): INT {
-    return Ws2_32.Load('getaddrinfo')(pNodeName, pServiceName, pHints, ppResult);
+  public static getaddrinfo(pNodeName: OPTIONAL<LPCSTR>, pServiceName: OPTIONAL<LPCSTR>, pHints: OPTIONAL<PADDRINFOA>, ppResult_out: PVOID): INT {
+    return Ws2_32.Load('getaddrinfo')(pNodeName, pServiceName, pHints, ppResult_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsock/nf-winsock-gethostbyaddr
@@ -1032,18 +1058,18 @@ class Ws2_32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-gethostname
-  public static gethostname(name: LPSTR, namelen: INT): INT {
-    return Ws2_32.Load('gethostname')(name, namelen);
+  public static gethostname(name_out: LPSTR, namelen: INT): INT {
+    return Ws2_32.Load('gethostname')(name_out, namelen);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ws2tcpip/nf-ws2tcpip-getnameinfo
-  public static getnameinfo(pSockaddr: LPSOCKADDR, SockaddrLength: INT, pNodeBuffer: LPSTR | NULL, NodeBufferSize: DWORD, pServiceBuffer: LPSTR | NULL, ServiceBufferSize: DWORD, Flags: INT): INT {
-    return Ws2_32.Load('getnameinfo')(pSockaddr, SockaddrLength, pNodeBuffer, NodeBufferSize, pServiceBuffer, ServiceBufferSize, Flags);
+  public static getnameinfo(pSockaddr: LPSOCKADDR, SockaddrLength: INT, pNodeBuffer_out: OPTIONAL<LPSTR>, NodeBufferSize: DWORD, pServiceBuffer_out: OPTIONAL<LPSTR>, ServiceBufferSize: DWORD, Flags: INT): INT {
+    return Ws2_32.Load('getnameinfo')(pSockaddr, SockaddrLength, pNodeBuffer_out, NodeBufferSize, pServiceBuffer_out, ServiceBufferSize, Flags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-getpeername
-  public static getpeername(s: SOCKET, name: LPSOCKADDR, namelen: LPINT): INT {
-    return Ws2_32.Load('getpeername')(s, name, namelen);
+  public static getpeername(s: SOCKET, name_out: LPSOCKADDR, namelen_in_out: LPINT): INT {
+    return Ws2_32.Load('getpeername')(s, name_out, namelen_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsock/nf-winsock-getprotobyname
@@ -1057,23 +1083,23 @@ class Ws2_32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsock/nf-winsock-getservbyname
-  public static getservbyname(name: LPCSTR, proto: LPCSTR | NULL): PSERVENT {
+  public static getservbyname(name: LPCSTR, proto: OPTIONAL<LPCSTR>): PSERVENT {
     return Ws2_32.Load('getservbyname')(name, proto);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsock/nf-winsock-getservbyport
-  public static getservbyport(port: INT, proto: LPCSTR | NULL): PSERVENT {
+  public static getservbyport(port: INT, proto: OPTIONAL<LPCSTR>): PSERVENT {
     return Ws2_32.Load('getservbyport')(port, proto);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-getsockname
-  public static getsockname(s: SOCKET, name: LPSOCKADDR, namelen: LPINT): INT {
-    return Ws2_32.Load('getsockname')(s, name, namelen);
+  public static getsockname(s: SOCKET, name_out: LPSOCKADDR, namelen_in_out: LPINT): INT {
+    return Ws2_32.Load('getsockname')(s, name_out, namelen_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-getsockopt
-  public static getsockopt(s: SOCKET, level: INT, optname: INT, optval: LPSTR, optlen: LPINT): INT {
-    return Ws2_32.Load('getsockopt')(s, level, optname, optval, optlen);
+  public static getsockopt(s: SOCKET, level: INT, optname: INT, optval_out: LPSTR, optlen_in_out: LPINT): INT {
+    return Ws2_32.Load('getsockopt')(s, level, optname, optval_out, optlen_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsock/nf-winsock-htonl
@@ -1097,18 +1123,18 @@ class Ws2_32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ws2tcpip/nf-ws2tcpip-inet_ntop
-  public static inet_ntop(Family: INT, pAddr: PVOID, pStringBuf: LPSTR, StringBufSize: DWORD_PTR): LPCSTR {
-    return Ws2_32.Load('inet_ntop')(Family, pAddr, pStringBuf, StringBufSize);
+  public static inet_ntop(Family: INT, pAddr: PVOID, pStringBuf_out: LPSTR, StringBufSize: DWORD_PTR): LPCSTR {
+    return Ws2_32.Load('inet_ntop')(Family, pAddr, pStringBuf_out, StringBufSize);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ws2tcpip/nf-ws2tcpip-inet_pton
-  public static inet_pton(Family: INT, pszAddrString: LPCSTR, pAddrBuf: PVOID): INT {
-    return Ws2_32.Load('inet_pton')(Family, pszAddrString, pAddrBuf);
+  public static inet_pton(Family: INT, pszAddrString: LPCSTR, pAddrBuf_out: PVOID): INT {
+    return Ws2_32.Load('inet_pton')(Family, pszAddrString, pAddrBuf_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-ioctlsocket
-  public static ioctlsocket(s: SOCKET, cmd: INT, argp: LPDWORD): INT {
-    return Ws2_32.Load('ioctlsocket')(s, cmd, argp);
+  public static ioctlsocket(s: SOCKET, cmd: INT, argp_in_out: LPDWORD): INT {
+    return Ws2_32.Load('ioctlsocket')(s, cmd, argp_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-listen
@@ -1127,18 +1153,18 @@ class Ws2_32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-recv
-  public static recv(s: SOCKET, buf: LPSTR, len: INT, flags: INT): INT {
-    return Ws2_32.Load('recv')(s, buf, len, flags);
+  public static recv(s: SOCKET, buf_out: LPSTR, len: INT, flags: INT): INT {
+    return Ws2_32.Load('recv')(s, buf_out, len, flags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-recvfrom
-  public static recvfrom(s: SOCKET, buf: LPSTR, len: INT, flags: INT, from: LPSOCKADDR | NULL, fromlen: LPINT | NULL): INT {
-    return Ws2_32.Load('recvfrom')(s, buf, len, flags, from, fromlen);
+  public static recvfrom(s: SOCKET, buf_out: LPSTR, len: INT, flags: INT, from_out: OPTIONAL<LPSOCKADDR>, fromlen_in_out: OPTIONAL<LPINT>): INT {
+    return Ws2_32.Load('recvfrom')(s, buf_out, len, flags, from_out, fromlen_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-select
-  public static select(nfds: INT, readfds: LPVOID | NULL, writefds: LPVOID | NULL, exceptfds: LPVOID | NULL, timeout: PTIMEVAL | NULL): INT {
-    return Ws2_32.Load('select')(nfds, readfds, writefds, exceptfds, timeout);
+  public static select(nfds: INT, readfds_in_out: OPTIONAL<LPVOID>, writefds_in_out: OPTIONAL<LPVOID>, exceptfds_in_out: OPTIONAL<LPVOID>, timeout: OPTIONAL<PTIMEVAL>): INT {
+    return Ws2_32.Load('select')(nfds, readfds_in_out, writefds_in_out, exceptfds_in_out, timeout);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-send
@@ -1152,7 +1178,7 @@ class Ws2_32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-setsockopt
-  public static setsockopt(s: SOCKET, level: INT, optname: INT, optval: LPCSTR | NULL, optlen: INT): INT {
+  public static setsockopt(s: SOCKET, level: INT, optname: INT, optval: OPTIONAL<LPCSTR>, optlen: INT): INT {
     return Ws2_32.Load('setsockopt')(s, level, optname, optval, optlen);
   }
 

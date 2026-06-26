@@ -5,7 +5,7 @@ import { Win32 } from '@bun-win32/core';
 import type {
   HRESULT,
   LPBOOL,
-  NULL,
+  OPTIONAL,
   PBYTE,
   PCBYTE,
   PCTBS_CONTEXT_PARAMS,
@@ -68,18 +68,18 @@ class Tbs extends Win32 {
   } as const satisfies Record<string, FFIFunction>;
 
   // https://learn.microsoft.com/en-us/windows/win32/api/tbs/nf-tbs-getdeviceid
-  public static GetDeviceID(pbWindowsAIK: PBYTE | NULL, cbWindowsAIK: UINT32, pcbResult: PUINT32, pfProtectedByTPM: LPBOOL | NULL): HRESULT {
-    return Tbs.Load('GetDeviceID')(pbWindowsAIK, cbWindowsAIK, pcbResult, pfProtectedByTPM);
+  public static GetDeviceID(pbWindowsAIK_out: OPTIONAL<PBYTE>, cbWindowsAIK: UINT32, pcbResult_out: PUINT32, pfProtectedByTPM_out: OPTIONAL<LPBOOL>): HRESULT {
+    return Tbs.Load('GetDeviceID')(pbWindowsAIK_out, cbWindowsAIK, pcbResult_out, pfProtectedByTPM_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/tbs/nf-tbs-getdeviceidstring
-  public static GetDeviceIDString(pszWindowsAIK: PWSTR | NULL, cchWindowsAIK: UINT32, pcchResult: PUINT32, pfProtectedByTPM: LPBOOL | NULL): HRESULT {
-    return Tbs.Load('GetDeviceIDString')(pszWindowsAIK, cchWindowsAIK, pcchResult, pfProtectedByTPM);
+  public static GetDeviceIDString(pszWindowsAIK_out: OPTIONAL<PWSTR>, cchWindowsAIK: UINT32, pcchResult_out: PUINT32, pfProtectedByTPM_out: OPTIONAL<LPBOOL>): HRESULT {
+    return Tbs.Load('GetDeviceIDString')(pszWindowsAIK_out, cchWindowsAIK, pcchResult_out, pfProtectedByTPM_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/tbs/nf-tbs-tbsi_context_create
-  public static Tbsi_Context_Create(pContextParams: PCTBS_CONTEXT_PARAMS, phContext: PTBS_HCONTEXT): TBS_RESULT {
-    return Tbs.Load('Tbsi_Context_Create')(pContextParams, phContext);
+  public static Tbsi_Context_Create(pContextParams: PCTBS_CONTEXT_PARAMS, phContext_out: PTBS_HCONTEXT): TBS_RESULT {
+    return Tbs.Load('Tbsi_Context_Create')(pContextParams, phContext_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/tbs/nf-tbs-tbsi_create_windows_key
@@ -88,28 +88,28 @@ class Tbs extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/tbs/nf-tbs-tbsi_getdeviceinfo
-  public static Tbsi_GetDeviceInfo(Size: UINT32, Info: PVOID): TBS_RESULT {
-    return Tbs.Load('Tbsi_GetDeviceInfo')(Size, Info);
+  public static Tbsi_GetDeviceInfo(Size: UINT32, Info_out: PVOID): TBS_RESULT {
+    return Tbs.Load('Tbsi_GetDeviceInfo')(Size, Info_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/tbs/nf-tbs-tbsi_get_ownerauth
-  public static Tbsi_Get_OwnerAuth(hContext: TBS_HCONTEXT, ownerauthType: TBS_OWNERAUTH_TYPE, pOutputBuf: PBYTE | NULL, pOutputBufLen: PUINT32): TBS_RESULT {
-    return Tbs.Load('Tbsi_Get_OwnerAuth')(hContext, ownerauthType, pOutputBuf, pOutputBufLen);
+  public static Tbsi_Get_OwnerAuth(hContext: TBS_HCONTEXT, ownerauthType: TBS_OWNERAUTH_TYPE, pOutputBuf_out: OPTIONAL<PBYTE>, pOutputBufLen_in_out: PUINT32): TBS_RESULT {
+    return Tbs.Load('Tbsi_Get_OwnerAuth')(hContext, ownerauthType, pOutputBuf_out, pOutputBufLen_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/tbs/nf-tbs-tbsi_get_tcg_log
-  public static Tbsi_Get_TCG_Log(hContext: TBS_HCONTEXT, pOutputBuf: PBYTE | NULL, pOutputBufLen: PUINT32): TBS_RESULT {
-    return Tbs.Load('Tbsi_Get_TCG_Log')(hContext, pOutputBuf, pOutputBufLen);
+  public static Tbsi_Get_TCG_Log(hContext: TBS_HCONTEXT, pOutputBuf_out: OPTIONAL<PBYTE>, pOutputBufLen_in_out: PUINT32): TBS_RESULT {
+    return Tbs.Load('Tbsi_Get_TCG_Log')(hContext, pOutputBuf_out, pOutputBufLen_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/tbs/nf-tbs-tbsi_get_tcg_log_ex
-  public static Tbsi_Get_TCG_Log_Ex(logType: UINT32, pbOutput: PBYTE | NULL, pcbOutput: PUINT32): TBS_RESULT {
-    return Tbs.Load('Tbsi_Get_TCG_Log_Ex')(logType, pbOutput, pcbOutput);
+  public static Tbsi_Get_TCG_Log_Ex(logType: UINT32, pbOutput_out: OPTIONAL<PBYTE>, pcbOutput_in_out: PUINT32): TBS_RESULT {
+    return Tbs.Load('Tbsi_Get_TCG_Log_Ex')(logType, pbOutput_out, pcbOutput_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/tbs/nf-tbs-tbsi_physical_presence_command
-  public static Tbsi_Physical_Presence_Command(hContext: TBS_HCONTEXT, pabInput: PCBYTE, cbInput: UINT32, pabOutput: PBYTE, pcbOutput: PUINT32): TBS_RESULT {
-    return Tbs.Load('Tbsi_Physical_Presence_Command')(hContext, pabInput, cbInput, pabOutput, pcbOutput);
+  public static Tbsi_Physical_Presence_Command(hContext: TBS_HCONTEXT, pabInput: PCBYTE, cbInput: UINT32, pabOutput_out: PBYTE, pcbOutput_out: PUINT32): TBS_RESULT {
+    return Tbs.Load('Tbsi_Physical_Presence_Command')(hContext, pabInput, cbInput, pabOutput_out, pcbOutput_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/tbs/nf-tbs-tbsi_revoke_attestation
@@ -128,8 +128,8 @@ class Tbs extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/tbs/nf-tbs-tbsip_submit_command
-  public static Tbsip_Submit_Command(hContext: TBS_HCONTEXT, Locality: TBS_COMMAND_LOCALITY, Priority: TBS_COMMAND_PRIORITY, pabCommand: PCBYTE, cbCommand: UINT32, pabResult: PBYTE, pcbResult: PUINT32): TBS_RESULT {
-    return Tbs.Load('Tbsip_Submit_Command')(hContext, Locality, Priority, pabCommand, cbCommand, pabResult, pcbResult);
+  public static Tbsip_Submit_Command(hContext: TBS_HCONTEXT, Locality: TBS_COMMAND_LOCALITY, Priority: TBS_COMMAND_PRIORITY, pabCommand: PCBYTE, cbCommand: UINT32, pabResult_out: PBYTE, pcbResult_in_out: PUINT32): TBS_RESULT {
+    return Tbs.Load('Tbsip_Submit_Command')(hContext, Locality, Priority, pabCommand, cbCommand, pabResult_out, pcbResult_in_out);
   }
 }
 

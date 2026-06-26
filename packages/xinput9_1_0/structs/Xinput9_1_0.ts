@@ -38,18 +38,18 @@ class Xinput9_1_0 extends Win32 {
   } as const satisfies Record<string, FFIFunction>;
 
   // https://learn.microsoft.com/en-us/windows/win32/api/xinput/nf-xinput-xinputgetcapabilities
-  public static XInputGetCapabilities(dwUserIndex: DWORD, dwFlags: DWORD, pCapabilities: PXINPUT_CAPABILITIES): DWORD {
-    return Xinput9_1_0.Load('XInputGetCapabilities')(dwUserIndex, dwFlags, pCapabilities);
+  public static XInputGetCapabilities(dwUserIndex: DWORD, dwFlags: DWORD, pCapabilities_out: PXINPUT_CAPABILITIES): DWORD {
+    return Xinput9_1_0.Load('XInputGetCapabilities')(dwUserIndex, dwFlags, pCapabilities_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/xinput/nf-xinput-xinputgetdsoundaudiodeviceguids
-  public static XInputGetDSoundAudioDeviceGuids(dwUserIndex: DWORD, pDSoundRenderGuid: PGUID, pDSoundCaptureGuid: PGUID): DWORD {
-    return Xinput9_1_0.Load('XInputGetDSoundAudioDeviceGuids')(dwUserIndex, pDSoundRenderGuid, pDSoundCaptureGuid);
+  public static XInputGetDSoundAudioDeviceGuids(dwUserIndex: DWORD, pDSoundRenderGuid_out: PGUID, pDSoundCaptureGuid_out: PGUID): DWORD {
+    return Xinput9_1_0.Load('XInputGetDSoundAudioDeviceGuids')(dwUserIndex, pDSoundRenderGuid_out, pDSoundCaptureGuid_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/xinput/nf-xinput-xinputgetstate
-  public static XInputGetState(dwUserIndex: DWORD, pState: PXINPUT_STATE): DWORD {
-    return Xinput9_1_0.Load('XInputGetState')(dwUserIndex, pState);
+  public static XInputGetState(dwUserIndex: DWORD, pState_out: PXINPUT_STATE): DWORD {
+    return Xinput9_1_0.Load('XInputGetState')(dwUserIndex, pState_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/xinput/nf-xinput-xinputsetstate

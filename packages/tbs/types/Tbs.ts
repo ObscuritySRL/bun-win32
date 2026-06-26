@@ -1,6 +1,6 @@
 import type { Pointer } from 'bun:ffi';
 
-export type { HRESULT, LPBOOL, NULL, PBYTE, PVOID } from '@bun-win32/core';
+export type { HRESULT, LPBOOL, OPTIONAL, PBYTE, PVOID } from '@bun-win32/core';
 
 export const TBS_COMMAND_LOCALITY_ZERO = 0;
 export const TBS_COMMAND_LOCALITY_ONE = 1;

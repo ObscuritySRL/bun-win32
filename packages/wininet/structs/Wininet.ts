@@ -38,6 +38,8 @@ import type {
   LPWIN32_FIND_DATAW,
   LPWSTR,
   NULL,
+  NULLABLE,
+  OPTIONAL,
   PACKED_FILETIME,
   PCWSTR,
   PDWORD,
@@ -263,14 +265,14 @@ class Wininet extends Win32 {
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-commiturlcacheentrya
   public static CommitUrlCacheEntryA(
     lpszUrlName: LPCSTR,
-    lpszLocalFileName: LPCSTR | NULL,
+    lpszLocalFileName: OPTIONAL<LPCSTR>,
     ExpireTime: PACKED_FILETIME,
     LastModifiedTime: PACKED_FILETIME,
     CacheEntryType: DWORD,
-    lpHeaderInfo: LPBYTE | NULL,
+    lpHeaderInfo: OPTIONAL<LPBYTE>,
     cchHeaderInfo: DWORD,
-    lpszFileExtension: LPCSTR | NULL,
-    lpszOriginalUrl: LPCSTR | NULL,
+    lpszFileExtension: OPTIONAL<LPCSTR>,
+    lpszOriginalUrl: OPTIONAL<LPCSTR>,
   ): BOOL {
     return Wininet.Load('CommitUrlCacheEntryA')(lpszUrlName, lpszLocalFileName, ExpireTime, LastModifiedTime, CacheEntryType, lpHeaderInfo, cchHeaderInfo, lpszFileExtension, lpszOriginalUrl);
   }
@@ -278,40 +280,49 @@ class Wininet extends Win32 {
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-commiturlcacheentryw
   public static CommitUrlCacheEntryW(
     lpszUrlName: LPCWSTR,
-    lpszLocalFileName: LPCWSTR | NULL,
+    lpszLocalFileName: OPTIONAL<LPCWSTR>,
     ExpireTime: PACKED_FILETIME,
     LastModifiedTime: PACKED_FILETIME,
     CacheEntryType: DWORD,
-    lpszHeaderInfo: LPWSTR | NULL,
+    lpszHeaderInfo: OPTIONAL<LPWSTR>,
     cchHeaderInfo: DWORD,
-    lpszFileExtension: LPCWSTR | NULL,
-    lpszOriginalUrl: LPCWSTR | NULL,
+    lpszFileExtension: OPTIONAL<LPCWSTR>,
+    lpszOriginalUrl: OPTIONAL<LPCWSTR>,
   ): BOOL {
     return Wininet.Load('CommitUrlCacheEntryW')(lpszUrlName, lpszLocalFileName, ExpireTime, LastModifiedTime, CacheEntryType, lpszHeaderInfo, cchHeaderInfo, lpszFileExtension, lpszOriginalUrl);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-createurlcachecontainera
-  public static CreateUrlCacheContainerA(Name: LPCSTR, lpCachePrefix: LPCSTR, lpszCachePath: LPCSTR | NULL, KBCacheLimit: DWORD, dwContainerType: DWORD, dwOptions: DWORD, pvBuffer: LPVOID | NULL, cbBuffer: LPDWORD | NULL): BOOL {
+  public static CreateUrlCacheContainerA(Name: LPCSTR, lpCachePrefix: LPCSTR, lpszCachePath: OPTIONAL<LPCSTR>, KBCacheLimit: DWORD, dwContainerType: DWORD, dwOptions: DWORD, pvBuffer: OPTIONAL<LPVOID>, cbBuffer: OPTIONAL<LPDWORD>): BOOL {
     return Wininet.Load('CreateUrlCacheContainerA')(Name, lpCachePrefix, lpszCachePath, KBCacheLimit, dwContainerType, dwOptions, pvBuffer, cbBuffer);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-createurlcachecontainerw
-  public static CreateUrlCacheContainerW(Name: LPCWSTR, lpCachePrefix: LPCWSTR, lpszCachePath: LPCWSTR | NULL, KBCacheLimit: DWORD, dwContainerType: DWORD, dwOptions: DWORD, pvBuffer: LPVOID | NULL, cbBuffer: LPDWORD | NULL): BOOL {
+  public static CreateUrlCacheContainerW(
+    Name: LPCWSTR,
+    lpCachePrefix: LPCWSTR,
+    lpszCachePath: OPTIONAL<LPCWSTR>,
+    KBCacheLimit: DWORD,
+    dwContainerType: DWORD,
+    dwOptions: DWORD,
+    pvBuffer: OPTIONAL<LPVOID>,
+    cbBuffer: OPTIONAL<LPDWORD>,
+  ): BOOL {
     return Wininet.Load('CreateUrlCacheContainerW')(Name, lpCachePrefix, lpszCachePath, KBCacheLimit, dwContainerType, dwOptions, pvBuffer, cbBuffer);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-createurlcacheentrya
-  public static CreateUrlCacheEntryA(lpszUrlName: LPCSTR, dwExpectedFileSize: DWORD, lpszFileExtension: LPCSTR | NULL, lpszFileName: LPSTR, dwReserved: DWORD): BOOL {
-    return Wininet.Load('CreateUrlCacheEntryA')(lpszUrlName, dwExpectedFileSize, lpszFileExtension, lpszFileName, dwReserved);
+  public static CreateUrlCacheEntryA(lpszUrlName: LPCSTR, dwExpectedFileSize: DWORD, lpszFileExtension: OPTIONAL<LPCSTR>, lpszFileName_out: LPSTR, dwReserved: DWORD): BOOL {
+    return Wininet.Load('CreateUrlCacheEntryA')(lpszUrlName, dwExpectedFileSize, lpszFileExtension, lpszFileName_out, dwReserved);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-createurlcacheentryw
-  public static CreateUrlCacheEntryW(lpszUrlName: LPCWSTR, dwExpectedFileSize: DWORD, lpszFileExtension: LPCWSTR | NULL, lpszFileName: LPWSTR, dwReserved: DWORD): BOOL {
-    return Wininet.Load('CreateUrlCacheEntryW')(lpszUrlName, dwExpectedFileSize, lpszFileExtension, lpszFileName, dwReserved);
+  public static CreateUrlCacheEntryW(lpszUrlName: LPCWSTR, dwExpectedFileSize: DWORD, lpszFileExtension: OPTIONAL<LPCWSTR>, lpszFileName_out: LPWSTR, dwReserved: DWORD): BOOL {
+    return Wininet.Load('CreateUrlCacheEntryW')(lpszUrlName, dwExpectedFileSize, lpszFileExtension, lpszFileName_out, dwReserved);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-createurlcachegroup
-  public static CreateUrlCacheGroup(dwFlags: DWORD, lpReserved: LPVOID | NULL): GROUPID {
+  public static CreateUrlCacheGroup(dwFlags: DWORD, lpReserved: OPTIONAL<LPVOID>): GROUPID {
     return Wininet.Load('CreateUrlCacheGroup')(dwFlags, lpReserved);
   }
 
@@ -341,13 +352,13 @@ class Wininet extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-deleteurlcachegroup
-  public static DeleteUrlCacheGroup(GroupId: GROUPID, dwFlags: DWORD, lpReserved: LPVOID | NULL): BOOL {
+  public static DeleteUrlCacheGroup(GroupId: GROUPID, dwFlags: DWORD, lpReserved: OPTIONAL<LPVOID>): BOOL {
     return Wininet.Load('DeleteUrlCacheGroup')(GroupId, dwFlags, lpReserved);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-detectautoproxyurl
-  public static DetectAutoProxyUrl(pszAutoProxyUrl: LPSTR, cchAutoProxyUrl: DWORD, dwDetectFlags: DWORD): BOOL {
-    return Wininet.Load('DetectAutoProxyUrl')(pszAutoProxyUrl, cchAutoProxyUrl, dwDetectFlags);
+  public static DetectAutoProxyUrl(pszAutoProxyUrl_out: LPSTR, cchAutoProxyUrl: DWORD, dwDetectFlags: DWORD): BOOL {
+    return Wininet.Load('DetectAutoProxyUrl')(pszAutoProxyUrl_out, cchAutoProxyUrl, dwDetectFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-findcloseurlcache
@@ -356,127 +367,127 @@ class Wininet extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-findfirsturlcachecontainera
-  public static FindFirstUrlCacheContainerA(pdwModified: LPDWORD | NULL, lpContainerInfo: LPINTERNET_CACHE_CONTAINER_INFOA, lpcbContainerInfo: LPDWORD, dwOptions: DWORD): HANDLE {
-    return Wininet.Load('FindFirstUrlCacheContainerA')(pdwModified, lpContainerInfo, lpcbContainerInfo, dwOptions);
+  public static FindFirstUrlCacheContainerA(pdwModified_out: LPDWORD, lpContainerInfo_out: LPINTERNET_CACHE_CONTAINER_INFOA, lpcbContainerInfo_in_out: LPDWORD, dwOptions: DWORD): HANDLE {
+    return Wininet.Load('FindFirstUrlCacheContainerA')(pdwModified_out, lpContainerInfo_out, lpcbContainerInfo_in_out, dwOptions);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-findfirsturlcachecontainerw
-  public static FindFirstUrlCacheContainerW(pdwModified: LPDWORD | NULL, lpContainerInfo: LPINTERNET_CACHE_CONTAINER_INFOW, lpcbContainerInfo: LPDWORD, dwOptions: DWORD): HANDLE {
-    return Wininet.Load('FindFirstUrlCacheContainerW')(pdwModified, lpContainerInfo, lpcbContainerInfo, dwOptions);
+  public static FindFirstUrlCacheContainerW(pdwModified_out: LPDWORD, lpContainerInfo_out: LPINTERNET_CACHE_CONTAINER_INFOW, lpcbContainerInfo_in_out: LPDWORD, dwOptions: DWORD): HANDLE {
+    return Wininet.Load('FindFirstUrlCacheContainerW')(pdwModified_out, lpContainerInfo_out, lpcbContainerInfo_in_out, dwOptions);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-findfirsturlcacheentrya
-  public static FindFirstUrlCacheEntryA(lpszUrlSearchPattern: LPCSTR | NULL, lpFirstCacheEntryInfo: LPINTERNET_CACHE_ENTRY_INFOA | NULL, lpcbCacheEntryInfo: LPDWORD): HANDLE {
-    return Wininet.Load('FindFirstUrlCacheEntryA')(lpszUrlSearchPattern, lpFirstCacheEntryInfo, lpcbCacheEntryInfo);
+  public static FindFirstUrlCacheEntryA(lpszUrlSearchPattern: OPTIONAL<LPCSTR>, lpFirstCacheEntryInfo_in_out: OPTIONAL<LPINTERNET_CACHE_ENTRY_INFOA>, lpcbCacheEntryInfo_in_out: LPDWORD): HANDLE {
+    return Wininet.Load('FindFirstUrlCacheEntryA')(lpszUrlSearchPattern, lpFirstCacheEntryInfo_in_out, lpcbCacheEntryInfo_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-findfirsturlcacheentryexa
   public static FindFirstUrlCacheEntryExA(
-    lpszUrlSearchPattern: LPCSTR | NULL,
+    lpszUrlSearchPattern: OPTIONAL<LPCSTR>,
     dwFlags: DWORD,
     dwFilter: DWORD,
     GroupId: GROUPID,
-    lpFirstCacheEntryInfo: LPINTERNET_CACHE_ENTRY_INFOA | NULL,
-    lpcbCacheEntryInfo: LPDWORD,
-    lpGroupAttributes: LPVOID | NULL,
-    lpcbGroupAttributes: LPDWORD | NULL,
-    lpReserved: LPVOID | NULL,
+    lpFirstCacheEntryInfo_in_out: OPTIONAL<LPINTERNET_CACHE_ENTRY_INFOA>,
+    lpcbCacheEntryInfo_in_out: LPDWORD,
+    lpGroupAttributes: OPTIONAL<LPVOID>,
+    lpcbGroupAttributes: OPTIONAL<LPDWORD>,
+    lpReserved: OPTIONAL<LPVOID>,
   ): HANDLE {
-    return Wininet.Load('FindFirstUrlCacheEntryExA')(lpszUrlSearchPattern, dwFlags, dwFilter, GroupId, lpFirstCacheEntryInfo, lpcbCacheEntryInfo, lpGroupAttributes, lpcbGroupAttributes, lpReserved);
+    return Wininet.Load('FindFirstUrlCacheEntryExA')(lpszUrlSearchPattern, dwFlags, dwFilter, GroupId, lpFirstCacheEntryInfo_in_out, lpcbCacheEntryInfo_in_out, lpGroupAttributes, lpcbGroupAttributes, lpReserved);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-findfirsturlcacheentryexw
   public static FindFirstUrlCacheEntryExW(
-    lpszUrlSearchPattern: LPCWSTR | NULL,
+    lpszUrlSearchPattern: OPTIONAL<LPCWSTR>,
     dwFlags: DWORD,
     dwFilter: DWORD,
     GroupId: GROUPID,
-    lpFirstCacheEntryInfo: LPINTERNET_CACHE_ENTRY_INFOW | NULL,
-    lpcbCacheEntryInfo: LPDWORD,
-    lpGroupAttributes: LPVOID | NULL,
-    lpcbGroupAttributes: LPDWORD | NULL,
-    lpReserved: LPVOID | NULL,
+    lpFirstCacheEntryInfo_in_out: OPTIONAL<LPINTERNET_CACHE_ENTRY_INFOW>,
+    lpcbCacheEntryInfo_in_out: LPDWORD,
+    lpGroupAttributes: OPTIONAL<LPVOID>,
+    lpcbGroupAttributes: OPTIONAL<LPDWORD>,
+    lpReserved: OPTIONAL<LPVOID>,
   ): HANDLE {
-    return Wininet.Load('FindFirstUrlCacheEntryExW')(lpszUrlSearchPattern, dwFlags, dwFilter, GroupId, lpFirstCacheEntryInfo, lpcbCacheEntryInfo, lpGroupAttributes, lpcbGroupAttributes, lpReserved);
+    return Wininet.Load('FindFirstUrlCacheEntryExW')(lpszUrlSearchPattern, dwFlags, dwFilter, GroupId, lpFirstCacheEntryInfo_in_out, lpcbCacheEntryInfo_in_out, lpGroupAttributes, lpcbGroupAttributes, lpReserved);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-findfirsturlcacheentryw
-  public static FindFirstUrlCacheEntryW(lpszUrlSearchPattern: LPCWSTR | NULL, lpFirstCacheEntryInfo: LPINTERNET_CACHE_ENTRY_INFOW | NULL, lpcbCacheEntryInfo: LPDWORD): HANDLE {
-    return Wininet.Load('FindFirstUrlCacheEntryW')(lpszUrlSearchPattern, lpFirstCacheEntryInfo, lpcbCacheEntryInfo);
+  public static FindFirstUrlCacheEntryW(lpszUrlSearchPattern: OPTIONAL<LPCWSTR>, lpFirstCacheEntryInfo_in_out: OPTIONAL<LPINTERNET_CACHE_ENTRY_INFOW>, lpcbCacheEntryInfo_in_out: LPDWORD): HANDLE {
+    return Wininet.Load('FindFirstUrlCacheEntryW')(lpszUrlSearchPattern, lpFirstCacheEntryInfo_in_out, lpcbCacheEntryInfo_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-findfirsturlcachegroup
-  public static FindFirstUrlCacheGroup(dwFlags: DWORD, dwFilter: DWORD, lpSearchCondition: LPVOID | NULL, dwSearchCondition: DWORD, lpGroupId: LPGROUPID, lpReserved: LPVOID | NULL): HANDLE {
-    return Wininet.Load('FindFirstUrlCacheGroup')(dwFlags, dwFilter, lpSearchCondition, dwSearchCondition, lpGroupId, lpReserved);
+  public static FindFirstUrlCacheGroup(dwFlags: DWORD, dwFilter: DWORD, lpSearchCondition: OPTIONAL<LPVOID>, dwSearchCondition: DWORD, lpGroupId_out: LPGROUPID, lpReserved: OPTIONAL<LPVOID>): HANDLE {
+    return Wininet.Load('FindFirstUrlCacheGroup')(dwFlags, dwFilter, lpSearchCondition, dwSearchCondition, lpGroupId_out, lpReserved);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-findnexturlcachecontainera
-  public static FindNextUrlCacheContainerA(hEnumHandle: HANDLE, lpContainerInfo: LPINTERNET_CACHE_CONTAINER_INFOA, lpcbContainerInfo: LPDWORD): BOOL {
-    return Wininet.Load('FindNextUrlCacheContainerA')(hEnumHandle, lpContainerInfo, lpcbContainerInfo);
+  public static FindNextUrlCacheContainerA(hEnumHandle: HANDLE, lpContainerInfo_out: LPINTERNET_CACHE_CONTAINER_INFOA, lpcbContainerInfo_in_out: LPDWORD): BOOL {
+    return Wininet.Load('FindNextUrlCacheContainerA')(hEnumHandle, lpContainerInfo_out, lpcbContainerInfo_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-findnexturlcachecontainerw
-  public static FindNextUrlCacheContainerW(hEnumHandle: HANDLE, lpContainerInfo: LPINTERNET_CACHE_CONTAINER_INFOW, lpcbContainerInfo: LPDWORD): BOOL {
-    return Wininet.Load('FindNextUrlCacheContainerW')(hEnumHandle, lpContainerInfo, lpcbContainerInfo);
+  public static FindNextUrlCacheContainerW(hEnumHandle: HANDLE, lpContainerInfo_out: LPINTERNET_CACHE_CONTAINER_INFOW, lpcbContainerInfo_in_out: LPDWORD): BOOL {
+    return Wininet.Load('FindNextUrlCacheContainerW')(hEnumHandle, lpContainerInfo_out, lpcbContainerInfo_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-findnexturlcacheentrya
-  public static FindNextUrlCacheEntryA(hEnumHandle: HANDLE, lpNextCacheEntryInfo: LPINTERNET_CACHE_ENTRY_INFOA | NULL, lpcbCacheEntryInfo: LPDWORD): BOOL {
-    return Wininet.Load('FindNextUrlCacheEntryA')(hEnumHandle, lpNextCacheEntryInfo, lpcbCacheEntryInfo);
+  public static FindNextUrlCacheEntryA(hEnumHandle: HANDLE, lpNextCacheEntryInfo_in_out: OPTIONAL<LPINTERNET_CACHE_ENTRY_INFOA>, lpcbCacheEntryInfo_in_out: LPDWORD): BOOL {
+    return Wininet.Load('FindNextUrlCacheEntryA')(hEnumHandle, lpNextCacheEntryInfo_in_out, lpcbCacheEntryInfo_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-findnexturlcacheentryexa
   public static FindNextUrlCacheEntryExA(
     hEnumHandle: HANDLE,
-    lpNextCacheEntryInfo: LPINTERNET_CACHE_ENTRY_INFOA | NULL,
-    lpcbCacheEntryInfo: LPDWORD,
-    lpGroupAttributes: LPVOID | NULL,
-    lpcbGroupAttributes: LPDWORD | NULL,
-    lpReserved: LPVOID | NULL,
+    lpNextCacheEntryInfo_in_out: OPTIONAL<LPINTERNET_CACHE_ENTRY_INFOA>,
+    lpcbCacheEntryInfo_in_out: LPDWORD,
+    lpGroupAttributes: OPTIONAL<LPVOID>,
+    lpcbGroupAttributes: OPTIONAL<LPDWORD>,
+    lpReserved: OPTIONAL<LPVOID>,
   ): BOOL {
-    return Wininet.Load('FindNextUrlCacheEntryExA')(hEnumHandle, lpNextCacheEntryInfo, lpcbCacheEntryInfo, lpGroupAttributes, lpcbGroupAttributes, lpReserved);
+    return Wininet.Load('FindNextUrlCacheEntryExA')(hEnumHandle, lpNextCacheEntryInfo_in_out, lpcbCacheEntryInfo_in_out, lpGroupAttributes, lpcbGroupAttributes, lpReserved);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-findnexturlcacheentryexw
   public static FindNextUrlCacheEntryExW(
     hEnumHandle: HANDLE,
-    lpNextCacheEntryInfo: LPINTERNET_CACHE_ENTRY_INFOW | NULL,
-    lpcbCacheEntryInfo: LPDWORD,
-    lpGroupAttributes: LPVOID | NULL,
-    lpcbGroupAttributes: LPDWORD | NULL,
-    lpReserved: LPVOID | NULL,
+    lpNextCacheEntryInfo_in_out: OPTIONAL<LPINTERNET_CACHE_ENTRY_INFOW>,
+    lpcbCacheEntryInfo_in_out: LPDWORD,
+    lpGroupAttributes: OPTIONAL<LPVOID>,
+    lpcbGroupAttributes: OPTIONAL<LPDWORD>,
+    lpReserved: OPTIONAL<LPVOID>,
   ): BOOL {
-    return Wininet.Load('FindNextUrlCacheEntryExW')(hEnumHandle, lpNextCacheEntryInfo, lpcbCacheEntryInfo, lpGroupAttributes, lpcbGroupAttributes, lpReserved);
+    return Wininet.Load('FindNextUrlCacheEntryExW')(hEnumHandle, lpNextCacheEntryInfo_in_out, lpcbCacheEntryInfo_in_out, lpGroupAttributes, lpcbGroupAttributes, lpReserved);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-findnexturlcacheentryw
-  public static FindNextUrlCacheEntryW(hEnumHandle: HANDLE, lpNextCacheEntryInfo: LPINTERNET_CACHE_ENTRY_INFOW | NULL, lpcbCacheEntryInfo: LPDWORD): BOOL {
-    return Wininet.Load('FindNextUrlCacheEntryW')(hEnumHandle, lpNextCacheEntryInfo, lpcbCacheEntryInfo);
+  public static FindNextUrlCacheEntryW(hEnumHandle: HANDLE, lpNextCacheEntryInfo_in_out: OPTIONAL<LPINTERNET_CACHE_ENTRY_INFOW>, lpcbCacheEntryInfo_in_out: LPDWORD): BOOL {
+    return Wininet.Load('FindNextUrlCacheEntryW')(hEnumHandle, lpNextCacheEntryInfo_in_out, lpcbCacheEntryInfo_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-findnexturlcachegroup
-  public static FindNextUrlCacheGroup(hFind: HANDLE, lpGroupId: LPGROUPID, lpReserved: LPVOID | NULL): BOOL {
-    return Wininet.Load('FindNextUrlCacheGroup')(hFind, lpGroupId, lpReserved);
+  public static FindNextUrlCacheGroup(hFind: HANDLE, lpGroupId_out: LPGROUPID, lpReserved: OPTIONAL<LPVOID>): BOOL {
+    return Wininet.Load('FindNextUrlCacheGroup')(hFind, lpGroupId_out, lpReserved);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-freeurlcachespacea
-  public static FreeUrlCacheSpaceA(lpszCachePath: LPCSTR | NULL, dwSize: DWORD, dwFilter: DWORD): BOOL {
+  public static FreeUrlCacheSpaceA(lpszCachePath: OPTIONAL<LPCSTR>, dwSize: DWORD, dwFilter: DWORD): BOOL {
     return Wininet.Load('FreeUrlCacheSpaceA')(lpszCachePath, dwSize, dwFilter);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-freeurlcachespacew
-  public static FreeUrlCacheSpaceW(lpszCachePath: LPCWSTR | NULL, dwSize: DWORD, dwFilter: DWORD): BOOL {
+  public static FreeUrlCacheSpaceW(lpszCachePath: OPTIONAL<LPCWSTR>, dwSize: DWORD, dwFilter: DWORD): BOOL {
     return Wininet.Load('FreeUrlCacheSpaceW')(lpszCachePath, dwSize, dwFilter);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-ftpcommanda
-  public static FtpCommandA(hConnect: HINTERNET, fExpectResponse: BOOL, dwFlags: DWORD, lpszCommand: LPCSTR, dwContext: DWORD_PTR | 0n, phFtpCommand: LPHINTERNET | NULL): BOOL {
-    return Wininet.Load('FtpCommandA')(hConnect, fExpectResponse, dwFlags, lpszCommand, dwContext, phFtpCommand);
+  public static FtpCommandA(hConnect: HINTERNET, fExpectResponse: BOOL, dwFlags: DWORD, lpszCommand: LPCSTR, dwContext: OPTIONAL<DWORD_PTR>, phFtpCommand_out: OPTIONAL<LPHINTERNET>): BOOL {
+    return Wininet.Load('FtpCommandA')(hConnect, fExpectResponse, dwFlags, lpszCommand, dwContext, phFtpCommand_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-ftpcommandw
-  public static FtpCommandW(hConnect: HINTERNET, fExpectResponse: BOOL, dwFlags: DWORD, lpszCommand: LPCWSTR, dwContext: DWORD_PTR | 0n, phFtpCommand: LPHINTERNET | NULL): BOOL {
-    return Wininet.Load('FtpCommandW')(hConnect, fExpectResponse, dwFlags, lpszCommand, dwContext, phFtpCommand);
+  public static FtpCommandW(hConnect: HINTERNET, fExpectResponse: BOOL, dwFlags: DWORD, lpszCommand: LPCWSTR, dwContext: OPTIONAL<DWORD_PTR>, phFtpCommand_out: OPTIONAL<LPHINTERNET>): BOOL {
+    return Wininet.Load('FtpCommandW')(hConnect, fExpectResponse, dwFlags, lpszCommand, dwContext, phFtpCommand_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-ftpcreatedirectorya
@@ -500,57 +511,57 @@ class Wininet extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-ftpfindfirstfilea
-  public static FtpFindFirstFileA(hConnect: HINTERNET, lpszSearchFile: LPCSTR | NULL, lpFindFileData: LPWIN32_FIND_DATAA | NULL, dwFlags: DWORD, dwContext: DWORD_PTR | 0n): HINTERNET {
-    return Wininet.Load('FtpFindFirstFileA')(hConnect, lpszSearchFile, lpFindFileData, dwFlags, dwContext);
+  public static FtpFindFirstFileA(hConnect: HINTERNET, lpszSearchFile: OPTIONAL<LPCSTR>, lpFindFileData_out: OPTIONAL<LPWIN32_FIND_DATAA>, dwFlags: DWORD, dwContext: OPTIONAL<DWORD_PTR>): HINTERNET {
+    return Wininet.Load('FtpFindFirstFileA')(hConnect, lpszSearchFile, lpFindFileData_out, dwFlags, dwContext);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-ftpfindfirstfilew
-  public static FtpFindFirstFileW(hConnect: HINTERNET, lpszSearchFile: LPCWSTR | NULL, lpFindFileData: LPWIN32_FIND_DATAW | NULL, dwFlags: DWORD, dwContext: DWORD_PTR | 0n): HINTERNET {
-    return Wininet.Load('FtpFindFirstFileW')(hConnect, lpszSearchFile, lpFindFileData, dwFlags, dwContext);
+  public static FtpFindFirstFileW(hConnect: HINTERNET, lpszSearchFile: OPTIONAL<LPCWSTR>, lpFindFileData_out: OPTIONAL<LPWIN32_FIND_DATAW>, dwFlags: DWORD, dwContext: OPTIONAL<DWORD_PTR>): HINTERNET {
+    return Wininet.Load('FtpFindFirstFileW')(hConnect, lpszSearchFile, lpFindFileData_out, dwFlags, dwContext);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-ftpgetcurrentdirectorya
-  public static FtpGetCurrentDirectoryA(hConnect: HINTERNET, lpszCurrentDirectory: LPSTR, lpdwCurrentDirectory: LPDWORD): BOOL {
-    return Wininet.Load('FtpGetCurrentDirectoryA')(hConnect, lpszCurrentDirectory, lpdwCurrentDirectory);
+  public static FtpGetCurrentDirectoryA(hConnect: HINTERNET, lpszCurrentDirectory_out: LPSTR, lpdwCurrentDirectory_in_out: LPDWORD): BOOL {
+    return Wininet.Load('FtpGetCurrentDirectoryA')(hConnect, lpszCurrentDirectory_out, lpdwCurrentDirectory_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-ftpgetcurrentdirectoryw
-  public static FtpGetCurrentDirectoryW(hConnect: HINTERNET, lpszCurrentDirectory: LPWSTR, lpdwCurrentDirectory: LPDWORD): BOOL {
-    return Wininet.Load('FtpGetCurrentDirectoryW')(hConnect, lpszCurrentDirectory, lpdwCurrentDirectory);
+  public static FtpGetCurrentDirectoryW(hConnect: HINTERNET, lpszCurrentDirectory_out: LPWSTR, lpdwCurrentDirectory_in_out: LPDWORD): BOOL {
+    return Wininet.Load('FtpGetCurrentDirectoryW')(hConnect, lpszCurrentDirectory_out, lpdwCurrentDirectory_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-ftpgetfilea
-  public static FtpGetFileA(hConnect: HINTERNET, lpszRemoteFile: LPCSTR, lpszNewFile: LPCSTR, fFailIfExists: BOOL, dwFlagsAndAttributes: DWORD, dwFlags: DWORD, dwContext: DWORD_PTR | 0n): BOOL {
+  public static FtpGetFileA(hConnect: HINTERNET, lpszRemoteFile: LPCSTR, lpszNewFile: LPCSTR, fFailIfExists: BOOL, dwFlagsAndAttributes: DWORD, dwFlags: DWORD, dwContext: OPTIONAL<DWORD_PTR>): BOOL {
     return Wininet.Load('FtpGetFileA')(hConnect, lpszRemoteFile, lpszNewFile, fFailIfExists, dwFlagsAndAttributes, dwFlags, dwContext);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-ftpgetfilesize
-  public static FtpGetFileSize(hFile: HINTERNET, lpdwFileSizeHigh: LPDWORD | NULL): DWORD {
-    return Wininet.Load('FtpGetFileSize')(hFile, lpdwFileSizeHigh);
+  public static FtpGetFileSize(hFile: HINTERNET, lpdwFileSizeHigh_out: OPTIONAL<LPDWORD>): DWORD {
+    return Wininet.Load('FtpGetFileSize')(hFile, lpdwFileSizeHigh_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-ftpgetfilew
-  public static FtpGetFileW(hConnect: HINTERNET, lpszRemoteFile: LPCWSTR, lpszNewFile: LPCWSTR, fFailIfExists: BOOL, dwFlagsAndAttributes: DWORD, dwFlags: DWORD, dwContext: DWORD_PTR | 0n): BOOL {
+  public static FtpGetFileW(hConnect: HINTERNET, lpszRemoteFile: LPCWSTR, lpszNewFile: LPCWSTR, fFailIfExists: BOOL, dwFlagsAndAttributes: DWORD, dwFlags: DWORD, dwContext: OPTIONAL<DWORD_PTR>): BOOL {
     return Wininet.Load('FtpGetFileW')(hConnect, lpszRemoteFile, lpszNewFile, fFailIfExists, dwFlagsAndAttributes, dwFlags, dwContext);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-ftpopenfilea
-  public static FtpOpenFileA(hConnect: HINTERNET, lpszFileName: LPCSTR, dwAccess: DWORD, dwFlags: DWORD, dwContext: DWORD_PTR | 0n): HINTERNET {
+  public static FtpOpenFileA(hConnect: HINTERNET, lpszFileName: LPCSTR, dwAccess: DWORD, dwFlags: DWORD, dwContext: OPTIONAL<DWORD_PTR>): HINTERNET {
     return Wininet.Load('FtpOpenFileA')(hConnect, lpszFileName, dwAccess, dwFlags, dwContext);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-ftpopenfilew
-  public static FtpOpenFileW(hConnect: HINTERNET, lpszFileName: LPCWSTR, dwAccess: DWORD, dwFlags: DWORD, dwContext: DWORD_PTR | 0n): HINTERNET {
+  public static FtpOpenFileW(hConnect: HINTERNET, lpszFileName: LPCWSTR, dwAccess: DWORD, dwFlags: DWORD, dwContext: OPTIONAL<DWORD_PTR>): HINTERNET {
     return Wininet.Load('FtpOpenFileW')(hConnect, lpszFileName, dwAccess, dwFlags, dwContext);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-ftpputfilea
-  public static FtpPutFileA(hConnect: HINTERNET, lpszLocalFile: LPCSTR, lpszNewRemoteFile: LPCSTR, dwFlags: DWORD, dwContext: DWORD_PTR | 0n): BOOL {
+  public static FtpPutFileA(hConnect: HINTERNET, lpszLocalFile: LPCSTR, lpszNewRemoteFile: LPCSTR, dwFlags: DWORD, dwContext: OPTIONAL<DWORD_PTR>): BOOL {
     return Wininet.Load('FtpPutFileA')(hConnect, lpszLocalFile, lpszNewRemoteFile, dwFlags, dwContext);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-ftpputfilew
-  public static FtpPutFileW(hConnect: HINTERNET, lpszLocalFile: LPCWSTR, lpszNewRemoteFile: LPCWSTR, dwFlags: DWORD, dwContext: DWORD_PTR | 0n): BOOL {
+  public static FtpPutFileW(hConnect: HINTERNET, lpszLocalFile: LPCWSTR, lpszNewRemoteFile: LPCWSTR, dwFlags: DWORD, dwContext: OPTIONAL<DWORD_PTR>): BOOL {
     return Wininet.Load('FtpPutFileW')(hConnect, lpszLocalFile, lpszNewRemoteFile, dwFlags, dwContext);
   }
 
@@ -585,59 +596,59 @@ class Wininet extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-geturlcacheconfiginfoa
-  public static GetUrlCacheConfigInfoA(lpCacheConfigInfo: LPINTERNET_CACHE_CONFIG_INFOA, lpcbCacheConfigInfo: LPDWORD | NULL, dwFieldControl: DWORD): BOOL {
-    return Wininet.Load('GetUrlCacheConfigInfoA')(lpCacheConfigInfo, lpcbCacheConfigInfo, dwFieldControl);
+  public static GetUrlCacheConfigInfoA(lpCacheConfigInfo_out: LPINTERNET_CACHE_CONFIG_INFOA, lpcbCacheConfigInfo_in_out: OPTIONAL<LPDWORD>, dwFieldControl: DWORD): BOOL {
+    return Wininet.Load('GetUrlCacheConfigInfoA')(lpCacheConfigInfo_out, lpcbCacheConfigInfo_in_out, dwFieldControl);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-geturlcacheconfiginfow
-  public static GetUrlCacheConfigInfoW(lpCacheConfigInfo: LPINTERNET_CACHE_CONFIG_INFOW, lpcbCacheConfigInfo: LPDWORD | NULL, dwFieldControl: DWORD): BOOL {
-    return Wininet.Load('GetUrlCacheConfigInfoW')(lpCacheConfigInfo, lpcbCacheConfigInfo, dwFieldControl);
+  public static GetUrlCacheConfigInfoW(lpCacheConfigInfo_out: LPINTERNET_CACHE_CONFIG_INFOW, lpcbCacheConfigInfo_in_out: OPTIONAL<LPDWORD>, dwFieldControl: DWORD): BOOL {
+    return Wininet.Load('GetUrlCacheConfigInfoW')(lpCacheConfigInfo_out, lpcbCacheConfigInfo_in_out, dwFieldControl);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-geturlcacheentryinfoa
-  public static GetUrlCacheEntryInfoA(lpszUrlName: LPCSTR, lpCacheEntryInfo: LPINTERNET_CACHE_ENTRY_INFOA | NULL, lpcbCacheEntryInfo: LPDWORD | NULL): BOOL {
-    return Wininet.Load('GetUrlCacheEntryInfoA')(lpszUrlName, lpCacheEntryInfo, lpcbCacheEntryInfo);
+  public static GetUrlCacheEntryInfoA(lpszUrlName: LPCSTR, lpCacheEntryInfo_out: NULLABLE<LPINTERNET_CACHE_ENTRY_INFOA>, lpcbCacheEntryInfo_in_out: NULLABLE<LPDWORD>): BOOL {
+    return Wininet.Load('GetUrlCacheEntryInfoA')(lpszUrlName, lpCacheEntryInfo_out, lpcbCacheEntryInfo_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-geturlcacheentryinfoexa
   public static GetUrlCacheEntryInfoExA(
     lpszUrl: LPCSTR,
-    lpCacheEntryInfo: LPINTERNET_CACHE_ENTRY_INFOA | NULL,
-    lpcbCacheEntryInfo: LPDWORD | NULL,
-    lpszRedirectUrl: LPSTR | NULL,
-    lpcbRedirectUrl: LPDWORD | NULL,
-    lpReserved: LPVOID | NULL,
+    lpCacheEntryInfo_out: NULLABLE<LPINTERNET_CACHE_ENTRY_INFOA>,
+    lpcbCacheEntryInfo_in_out: NULLABLE<LPDWORD>,
+    lpszRedirectUrl_out: NULLABLE<LPSTR>,
+    lpcbRedirectUrl_in_out: NULLABLE<LPDWORD>,
+    lpReserved: OPTIONAL<LPVOID>,
     dwFlags: DWORD,
   ): BOOL {
-    return Wininet.Load('GetUrlCacheEntryInfoExA')(lpszUrl, lpCacheEntryInfo, lpcbCacheEntryInfo, lpszRedirectUrl, lpcbRedirectUrl, lpReserved, dwFlags);
+    return Wininet.Load('GetUrlCacheEntryInfoExA')(lpszUrl, lpCacheEntryInfo_out, lpcbCacheEntryInfo_in_out, lpszRedirectUrl_out, lpcbRedirectUrl_in_out, lpReserved, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-geturlcacheentryinfoexw
   public static GetUrlCacheEntryInfoExW(
     lpszUrl: LPCWSTR,
-    lpCacheEntryInfo: LPINTERNET_CACHE_ENTRY_INFOW | NULL,
-    lpcbCacheEntryInfo: LPDWORD | NULL,
-    lpszRedirectUrl: LPWSTR | NULL,
-    lpcbRedirectUrl: LPDWORD | NULL,
-    lpReserved: LPVOID | NULL,
+    lpCacheEntryInfo_out: NULLABLE<LPINTERNET_CACHE_ENTRY_INFOW>,
+    lpcbCacheEntryInfo_in_out: NULLABLE<LPDWORD>,
+    lpszRedirectUrl_out: NULLABLE<LPWSTR>,
+    lpcbRedirectUrl_in_out: NULLABLE<LPDWORD>,
+    lpReserved: OPTIONAL<LPVOID>,
     dwFlags: DWORD,
   ): BOOL {
-    return Wininet.Load('GetUrlCacheEntryInfoExW')(lpszUrl, lpCacheEntryInfo, lpcbCacheEntryInfo, lpszRedirectUrl, lpcbRedirectUrl, lpReserved, dwFlags);
+    return Wininet.Load('GetUrlCacheEntryInfoExW')(lpszUrl, lpCacheEntryInfo_out, lpcbCacheEntryInfo_in_out, lpszRedirectUrl_out, lpcbRedirectUrl_in_out, lpReserved, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-geturlcacheentryinfow
-  public static GetUrlCacheEntryInfoW(lpszUrlName: LPCWSTR, lpCacheEntryInfo: LPINTERNET_CACHE_ENTRY_INFOW | NULL, lpcbCacheEntryInfo: LPDWORD | NULL): BOOL {
-    return Wininet.Load('GetUrlCacheEntryInfoW')(lpszUrlName, lpCacheEntryInfo, lpcbCacheEntryInfo);
+  public static GetUrlCacheEntryInfoW(lpszUrlName: LPCWSTR, lpCacheEntryInfo_out: NULLABLE<LPINTERNET_CACHE_ENTRY_INFOW>, lpcbCacheEntryInfo_in_out: NULLABLE<LPDWORD>): BOOL {
+    return Wininet.Load('GetUrlCacheEntryInfoW')(lpszUrlName, lpCacheEntryInfo_out, lpcbCacheEntryInfo_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-geturlcachegroupattributea
-  public static GetUrlCacheGroupAttributeA(gid: GROUPID, dwFlags: DWORD, dwAttributes: DWORD, lpGroupInfo: LPINTERNET_CACHE_GROUP_INFOA, lpcbGroupInfo: LPDWORD, lpReserved: LPVOID | NULL): BOOL {
-    return Wininet.Load('GetUrlCacheGroupAttributeA')(gid, dwFlags, dwAttributes, lpGroupInfo, lpcbGroupInfo, lpReserved);
+  public static GetUrlCacheGroupAttributeA(gid: GROUPID, dwFlags: DWORD, dwAttributes: DWORD, lpGroupInfo_out: LPINTERNET_CACHE_GROUP_INFOA, lpcbGroupInfo_in_out: LPDWORD, lpReserved: OPTIONAL<LPVOID>): BOOL {
+    return Wininet.Load('GetUrlCacheGroupAttributeA')(gid, dwFlags, dwAttributes, lpGroupInfo_out, lpcbGroupInfo_in_out, lpReserved);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-geturlcachegroupattributew
-  public static GetUrlCacheGroupAttributeW(gid: GROUPID, dwFlags: DWORD, dwAttributes: DWORD, lpGroupInfo: LPINTERNET_CACHE_GROUP_INFOW, lpcbGroupInfo: LPDWORD, lpReserved: LPVOID | NULL): BOOL {
-    return Wininet.Load('GetUrlCacheGroupAttributeW')(gid, dwFlags, dwAttributes, lpGroupInfo, lpcbGroupInfo, lpReserved);
+  public static GetUrlCacheGroupAttributeW(gid: GROUPID, dwFlags: DWORD, dwAttributes: DWORD, lpGroupInfo_out: LPINTERNET_CACHE_GROUP_INFOW, lpcbGroupInfo_in_out: LPDWORD, lpReserved: OPTIONAL<LPVOID>): BOOL {
+    return Wininet.Load('GetUrlCacheGroupAttributeW')(gid, dwFlags, dwAttributes, lpGroupInfo_out, lpcbGroupInfo_in_out, lpReserved);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-httpaddrequestheadersa
@@ -651,25 +662,25 @@ class Wininet extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-httpendrequesta
-  public static HttpEndRequestA(hRequest: HINTERNET, lpBuffersOut: LPINTERNET_BUFFERSA | NULL, dwFlags: DWORD, dwContext: DWORD_PTR | 0n): BOOL {
+  public static HttpEndRequestA(hRequest: HINTERNET, lpBuffersOut: OPTIONAL<LPINTERNET_BUFFERSA>, dwFlags: DWORD, dwContext: OPTIONAL<DWORD_PTR>): BOOL {
     return Wininet.Load('HttpEndRequestA')(hRequest, lpBuffersOut, dwFlags, dwContext);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-httpendrequestw
-  public static HttpEndRequestW(hRequest: HINTERNET, lpBuffersOut: LPINTERNET_BUFFERSW | NULL, dwFlags: DWORD, dwContext: DWORD_PTR | 0n): BOOL {
+  public static HttpEndRequestW(hRequest: HINTERNET, lpBuffersOut: OPTIONAL<LPINTERNET_BUFFERSW>, dwFlags: DWORD, dwContext: OPTIONAL<DWORD_PTR>): BOOL {
     return Wininet.Load('HttpEndRequestW')(hRequest, lpBuffersOut, dwFlags, dwContext);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-httpopenrequesta
   public static HttpOpenRequestA(
     hConnect: HINTERNET,
-    lpszVerb: LPCSTR | NULL,
-    lpszObjectName: LPCSTR | NULL,
-    lpszVersion: LPCSTR | NULL,
-    lpszReferrer: LPCSTR | NULL,
-    lplpszAcceptTypes: LPVOID | NULL,
+    lpszVerb: OPTIONAL<LPCSTR>,
+    lpszObjectName: OPTIONAL<LPCSTR>,
+    lpszVersion: OPTIONAL<LPCSTR>,
+    lpszReferrer: OPTIONAL<LPCSTR>,
+    lplpszAcceptTypes: OPTIONAL<LPVOID>,
     dwFlags: DWORD,
-    dwContext: DWORD_PTR | 0n,
+    dwContext: OPTIONAL<DWORD_PTR>,
   ): HINTERNET {
     return Wininet.Load('HttpOpenRequestA')(hConnect, lpszVerb, lpszObjectName, lpszVersion, lpszReferrer, lplpszAcceptTypes, dwFlags, dwContext);
   }
@@ -677,44 +688,44 @@ class Wininet extends Win32 {
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-httpopenrequestw
   public static HttpOpenRequestW(
     hConnect: HINTERNET,
-    lpszVerb: LPCWSTR | NULL,
-    lpszObjectName: LPCWSTR | NULL,
-    lpszVersion: LPCWSTR | NULL,
-    lpszReferrer: LPCWSTR | NULL,
-    lplpszAcceptTypes: LPVOID | NULL,
+    lpszVerb: OPTIONAL<LPCWSTR>,
+    lpszObjectName: OPTIONAL<LPCWSTR>,
+    lpszVersion: OPTIONAL<LPCWSTR>,
+    lpszReferrer: OPTIONAL<LPCWSTR>,
+    lplpszAcceptTypes: OPTIONAL<LPVOID>,
     dwFlags: DWORD,
-    dwContext: DWORD_PTR | 0n,
+    dwContext: OPTIONAL<DWORD_PTR>,
   ): HINTERNET {
     return Wininet.Load('HttpOpenRequestW')(hConnect, lpszVerb, lpszObjectName, lpszVersion, lpszReferrer, lplpszAcceptTypes, dwFlags, dwContext);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-httpqueryinfoa
-  public static HttpQueryInfoA(hRequest: HINTERNET, dwInfoLevel: DWORD, lpBuffer: LPVOID | NULL, lpdwBufferLength: LPDWORD, lpdwIndex: LPDWORD | NULL): BOOL {
-    return Wininet.Load('HttpQueryInfoA')(hRequest, dwInfoLevel, lpBuffer, lpdwBufferLength, lpdwIndex);
+  public static HttpQueryInfoA(hRequest: HINTERNET, dwInfoLevel: DWORD, lpBuffer_in_out: NULLABLE<LPVOID>, lpdwBufferLength_in_out: LPDWORD, lpdwIndex_in_out: NULLABLE<LPDWORD>): BOOL {
+    return Wininet.Load('HttpQueryInfoA')(hRequest, dwInfoLevel, lpBuffer_in_out, lpdwBufferLength_in_out, lpdwIndex_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-httpqueryinfow
-  public static HttpQueryInfoW(hRequest: HINTERNET, dwInfoLevel: DWORD, lpBuffer: LPVOID | NULL, lpdwBufferLength: LPDWORD, lpdwIndex: LPDWORD | NULL): BOOL {
-    return Wininet.Load('HttpQueryInfoW')(hRequest, dwInfoLevel, lpBuffer, lpdwBufferLength, lpdwIndex);
+  public static HttpQueryInfoW(hRequest: HINTERNET, dwInfoLevel: DWORD, lpBuffer_in_out: NULLABLE<LPVOID>, lpdwBufferLength_in_out: LPDWORD, lpdwIndex_in_out: NULLABLE<LPDWORD>): BOOL {
+    return Wininet.Load('HttpQueryInfoW')(hRequest, dwInfoLevel, lpBuffer_in_out, lpdwBufferLength_in_out, lpdwIndex_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-httpsendrequesta
-  public static HttpSendRequestA(hRequest: HINTERNET, lpszHeaders: LPCSTR | NULL, dwHeadersLength: DWORD, lpOptional: LPVOID | NULL, dwOptionalLength: DWORD): BOOL {
+  public static HttpSendRequestA(hRequest: HINTERNET, lpszHeaders: OPTIONAL<LPCSTR>, dwHeadersLength: DWORD, lpOptional: OPTIONAL<LPVOID>, dwOptionalLength: DWORD): BOOL {
     return Wininet.Load('HttpSendRequestA')(hRequest, lpszHeaders, dwHeadersLength, lpOptional, dwOptionalLength);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-httpsendrequestexa
-  public static HttpSendRequestExA(hRequest: HINTERNET, lpBuffersIn: LPINTERNET_BUFFERSA | NULL, lpBuffersOut: LPINTERNET_BUFFERSA | NULL, dwFlags: DWORD, dwContext: DWORD_PTR | 0n): BOOL {
-    return Wininet.Load('HttpSendRequestExA')(hRequest, lpBuffersIn, lpBuffersOut, dwFlags, dwContext);
+  public static HttpSendRequestExA(hRequest: HINTERNET, lpBuffersIn: OPTIONAL<LPINTERNET_BUFFERSA>, lpBuffersOut_out: OPTIONAL<LPINTERNET_BUFFERSA>, dwFlags: DWORD, dwContext: OPTIONAL<DWORD_PTR>): BOOL {
+    return Wininet.Load('HttpSendRequestExA')(hRequest, lpBuffersIn, lpBuffersOut_out, dwFlags, dwContext);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-httpsendrequestexw
-  public static HttpSendRequestExW(hRequest: HINTERNET, lpBuffersIn: LPINTERNET_BUFFERSW | NULL, lpBuffersOut: LPINTERNET_BUFFERSW | NULL, dwFlags: DWORD, dwContext: DWORD_PTR | 0n): BOOL {
-    return Wininet.Load('HttpSendRequestExW')(hRequest, lpBuffersIn, lpBuffersOut, dwFlags, dwContext);
+  public static HttpSendRequestExW(hRequest: HINTERNET, lpBuffersIn: OPTIONAL<LPINTERNET_BUFFERSW>, lpBuffersOut_out: OPTIONAL<LPINTERNET_BUFFERSW>, dwFlags: DWORD, dwContext: OPTIONAL<DWORD_PTR>): BOOL {
+    return Wininet.Load('HttpSendRequestExW')(hRequest, lpBuffersIn, lpBuffersOut_out, dwFlags, dwContext);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-httpsendrequestw
-  public static HttpSendRequestW(hRequest: HINTERNET, lpszHeaders: LPCWSTR | NULL, dwHeadersLength: DWORD, lpOptional: LPVOID | NULL, dwOptionalLength: DWORD): BOOL {
+  public static HttpSendRequestW(hRequest: HINTERNET, lpszHeaders: OPTIONAL<LPCWSTR>, dwHeadersLength: DWORD, lpOptional: OPTIONAL<LPVOID>, dwOptionalLength: DWORD): BOOL {
     return Wininet.Load('HttpSendRequestW')(hRequest, lpszHeaders, dwHeadersLength, lpOptional, dwOptionalLength);
   }
 
@@ -724,7 +735,7 @@ class Wininet extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-internetautodial
-  public static InternetAutodial(dwFlags: DWORD, hwndParent: HWND | 0n): BOOL {
+  public static InternetAutodial(dwFlags: DWORD, hwndParent: OPTIONAL<HWND>): BOOL {
     return Wininet.Load('InternetAutodial')(dwFlags, hwndParent);
   }
 
@@ -734,22 +745,22 @@ class Wininet extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-internetcanonicalizeurla
-  public static InternetCanonicalizeUrlA(lpszUrl: LPCSTR, lpszBuffer: LPSTR, lpdwBufferLength: LPDWORD, dwFlags: DWORD): BOOL {
-    return Wininet.Load('InternetCanonicalizeUrlA')(lpszUrl, lpszBuffer, lpdwBufferLength, dwFlags);
+  public static InternetCanonicalizeUrlA(lpszUrl: LPCSTR, lpszBuffer_out: LPSTR, lpdwBufferLength_in_out: LPDWORD, dwFlags: DWORD): BOOL {
+    return Wininet.Load('InternetCanonicalizeUrlA')(lpszUrl, lpszBuffer_out, lpdwBufferLength_in_out, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-internetcanonicalizeurlw
-  public static InternetCanonicalizeUrlW(lpszUrl: LPCWSTR, lpszBuffer: LPWSTR, lpdwBufferLength: LPDWORD, dwFlags: DWORD): BOOL {
-    return Wininet.Load('InternetCanonicalizeUrlW')(lpszUrl, lpszBuffer, lpdwBufferLength, dwFlags);
+  public static InternetCanonicalizeUrlW(lpszUrl: LPCWSTR, lpszBuffer_out: LPWSTR, lpdwBufferLength_in_out: LPDWORD, dwFlags: DWORD): BOOL {
+    return Wininet.Load('InternetCanonicalizeUrlW')(lpszUrl, lpszBuffer_out, lpdwBufferLength_in_out, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-internetcheckconnectiona
-  public static InternetCheckConnectionA(lpszUrl: LPCSTR | NULL, dwFlags: DWORD, dwReserved: DWORD): BOOL {
+  public static InternetCheckConnectionA(lpszUrl: NULLABLE<LPCSTR>, dwFlags: DWORD, dwReserved: DWORD): BOOL {
     return Wininet.Load('InternetCheckConnectionA')(lpszUrl, dwFlags, dwReserved);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-internetcheckconnectionw
-  public static InternetCheckConnectionW(lpszUrl: LPCWSTR | NULL, dwFlags: DWORD, dwReserved: DWORD): BOOL {
+  public static InternetCheckConnectionW(lpszUrl: NULLABLE<LPCWSTR>, dwFlags: DWORD, dwReserved: DWORD): BOOL {
     return Wininet.Load('InternetCheckConnectionW')(lpszUrl, dwFlags, dwReserved);
   }
 
@@ -764,13 +775,13 @@ class Wininet extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-internetcombineurla
-  public static InternetCombineUrlA(lpszBaseUrl: LPCSTR, lpszRelativeUrl: LPCSTR, lpszBuffer: LPSTR | NULL, lpdwBufferLength: LPDWORD, dwFlags: DWORD): BOOL {
-    return Wininet.Load('InternetCombineUrlA')(lpszBaseUrl, lpszRelativeUrl, lpszBuffer, lpdwBufferLength, dwFlags);
+  public static InternetCombineUrlA(lpszBaseUrl: LPCSTR, lpszRelativeUrl: LPCSTR, lpszBuffer_out: NULLABLE<LPSTR>, lpdwBufferLength_in_out: LPDWORD, dwFlags: DWORD): BOOL {
+    return Wininet.Load('InternetCombineUrlA')(lpszBaseUrl, lpszRelativeUrl, lpszBuffer_out, lpdwBufferLength_in_out, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-internetcombineurlw
-  public static InternetCombineUrlW(lpszBaseUrl: LPCWSTR, lpszRelativeUrl: LPCWSTR, lpszBuffer: LPWSTR | NULL, lpdwBufferLength: LPDWORD, dwFlags: DWORD): BOOL {
-    return Wininet.Load('InternetCombineUrlW')(lpszBaseUrl, lpszRelativeUrl, lpszBuffer, lpdwBufferLength, dwFlags);
+  public static InternetCombineUrlW(lpszBaseUrl: LPCWSTR, lpszRelativeUrl: LPCWSTR, lpszBuffer_out: NULLABLE<LPWSTR>, lpdwBufferLength_in_out: LPDWORD, dwFlags: DWORD): BOOL {
+    return Wininet.Load('InternetCombineUrlW')(lpszBaseUrl, lpszRelativeUrl, lpszBuffer_out, lpdwBufferLength_in_out, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-internetconfirmzonecrossing
@@ -789,7 +800,16 @@ class Wininet extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-internetconnecta
-  public static InternetConnectA(hInternet: HINTERNET, lpszServerName: LPCSTR, nServerPort: INTERNET_PORT, lpszUserName: LPCSTR | NULL, lpszPassword: LPCSTR | NULL, dwService: DWORD, dwFlags: DWORD, dwContext: DWORD_PTR | 0n): HINTERNET {
+  public static InternetConnectA(
+    hInternet: HINTERNET,
+    lpszServerName: LPCSTR,
+    nServerPort: INTERNET_PORT,
+    lpszUserName: OPTIONAL<LPCSTR>,
+    lpszPassword: OPTIONAL<LPCSTR>,
+    dwService: DWORD,
+    dwFlags: DWORD,
+    dwContext: OPTIONAL<DWORD_PTR>,
+  ): HINTERNET {
     return Wininet.Load('InternetConnectA')(hInternet, lpszServerName, nServerPort, lpszUserName, lpszPassword, dwService, dwFlags, dwContext);
   }
 
@@ -798,77 +818,77 @@ class Wininet extends Win32 {
     hInternet: HINTERNET,
     lpszServerName: LPCWSTR,
     nServerPort: INTERNET_PORT,
-    lpszUserName: LPCWSTR | NULL,
-    lpszPassword: LPCWSTR | NULL,
+    lpszUserName: OPTIONAL<LPCWSTR>,
+    lpszPassword: OPTIONAL<LPCWSTR>,
     dwService: DWORD,
     dwFlags: DWORD,
-    dwContext: DWORD_PTR | 0n,
+    dwContext: OPTIONAL<DWORD_PTR>,
   ): HINTERNET {
     return Wininet.Load('InternetConnectW')(hInternet, lpszServerName, nServerPort, lpszUserName, lpszPassword, dwService, dwFlags, dwContext);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-internetcrackurla
-  public static InternetCrackUrlA(lpszUrl: LPCSTR, dwUrlLength: DWORD, dwFlags: DWORD, lpUrlComponents: LPURL_COMPONENTSA): BOOL {
-    return Wininet.Load('InternetCrackUrlA')(lpszUrl, dwUrlLength, dwFlags, lpUrlComponents);
+  public static InternetCrackUrlA(lpszUrl: LPCSTR, dwUrlLength: DWORD, dwFlags: DWORD, lpUrlComponents_in_out: LPURL_COMPONENTSA): BOOL {
+    return Wininet.Load('InternetCrackUrlA')(lpszUrl, dwUrlLength, dwFlags, lpUrlComponents_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-internetcrackurlw
-  public static InternetCrackUrlW(lpszUrl: LPCWSTR, dwUrlLength: DWORD, dwFlags: DWORD, lpUrlComponents: LPURL_COMPONENTSW): BOOL {
-    return Wininet.Load('InternetCrackUrlW')(lpszUrl, dwUrlLength, dwFlags, lpUrlComponents);
+  public static InternetCrackUrlW(lpszUrl: LPCWSTR, dwUrlLength: DWORD, dwFlags: DWORD, lpUrlComponents_in_out: LPURL_COMPONENTSW): BOOL {
+    return Wininet.Load('InternetCrackUrlW')(lpszUrl, dwUrlLength, dwFlags, lpUrlComponents_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-internetcreateurla
-  public static InternetCreateUrlA(lpUrlComponents: LPURL_COMPONENTSA, dwFlags: DWORD, lpszUrl: LPSTR | NULL, lpdwUrlLength: LPDWORD): BOOL {
-    return Wininet.Load('InternetCreateUrlA')(lpUrlComponents, dwFlags, lpszUrl, lpdwUrlLength);
+  public static InternetCreateUrlA(lpUrlComponents: LPURL_COMPONENTSA, dwFlags: DWORD, lpszUrl_out: NULLABLE<LPSTR>, lpdwUrlLength_in_out: LPDWORD): BOOL {
+    return Wininet.Load('InternetCreateUrlA')(lpUrlComponents, dwFlags, lpszUrl_out, lpdwUrlLength_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-internetcreateurlw
-  public static InternetCreateUrlW(lpUrlComponents: LPURL_COMPONENTSW, dwFlags: DWORD, lpszUrl: LPWSTR | NULL, lpdwUrlLength: LPDWORD): BOOL {
-    return Wininet.Load('InternetCreateUrlW')(lpUrlComponents, dwFlags, lpszUrl, lpdwUrlLength);
+  public static InternetCreateUrlW(lpUrlComponents: LPURL_COMPONENTSW, dwFlags: DWORD, lpszUrl_out: NULLABLE<LPWSTR>, lpdwUrlLength_in_out: LPDWORD): BOOL {
+    return Wininet.Load('InternetCreateUrlW')(lpUrlComponents, dwFlags, lpszUrl_out, lpdwUrlLength_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-internetdial
-  public static InternetDial(hwndParent: HWND | 0n, lpszConnectoid: LPSTR | NULL, dwFlags: DWORD, lpdwConnection: PDWORD, dwReserved: DWORD): DWORD {
-    return Wininet.Load('InternetDial')(hwndParent, lpszConnectoid, dwFlags, lpdwConnection, dwReserved);
+  public static InternetDial(hwndParent: HWND, lpszConnectoid: OPTIONAL<LPSTR>, dwFlags: DWORD, lpdwConnection_out: PDWORD, dwReserved: DWORD): DWORD {
+    return Wininet.Load('InternetDial')(hwndParent, lpszConnectoid, dwFlags, lpdwConnection_out, dwReserved);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-internetdiala
-  public static InternetDialA(hwndParent: HWND | 0n, lpszConnectoid: LPSTR | NULL, dwFlags: DWORD, lpdwConnection: PDWORD, dwReserved: DWORD): DWORD {
-    return Wininet.Load('InternetDialA')(hwndParent, lpszConnectoid, dwFlags, lpdwConnection, dwReserved);
+  public static InternetDialA(hwndParent: HWND, lpszConnectoid: OPTIONAL<LPSTR>, dwFlags: DWORD, lpdwConnection_out: PDWORD, dwReserved: DWORD): DWORD {
+    return Wininet.Load('InternetDialA')(hwndParent, lpszConnectoid, dwFlags, lpdwConnection_out, dwReserved);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-internetdialw
-  public static InternetDialW(hwndParent: HWND | 0n, lpszConnectoid: LPWSTR | NULL, dwFlags: DWORD, lpdwConnection: PDWORD, dwReserved: DWORD): DWORD {
-    return Wininet.Load('InternetDialW')(hwndParent, lpszConnectoid, dwFlags, lpdwConnection, dwReserved);
+  public static InternetDialW(hwndParent: HWND, lpszConnectoid: OPTIONAL<LPWSTR>, dwFlags: DWORD, lpdwConnection_out: PDWORD, dwReserved: DWORD): DWORD {
+    return Wininet.Load('InternetDialW')(hwndParent, lpszConnectoid, dwFlags, lpdwConnection_out, dwReserved);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-internetenumpersitecookiedecisiona
-  public static InternetEnumPerSiteCookieDecisionA(pszSiteName: LPSTR, pcSiteNameSize: LPDWORD, pdwDecision: LPDWORD, dwIndex: DWORD): BOOL {
-    return Wininet.Load('InternetEnumPerSiteCookieDecisionA')(pszSiteName, pcSiteNameSize, pdwDecision, dwIndex);
+  public static InternetEnumPerSiteCookieDecisionA(pszSiteName_out: LPSTR, pcSiteNameSize_in_out: LPDWORD, pdwDecision_out: LPDWORD, dwIndex: DWORD): BOOL {
+    return Wininet.Load('InternetEnumPerSiteCookieDecisionA')(pszSiteName_out, pcSiteNameSize_in_out, pdwDecision_out, dwIndex);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-internetenumpersitecookiedecisionw
-  public static InternetEnumPerSiteCookieDecisionW(pszSiteName: LPWSTR, pcSiteNameSize: LPDWORD, pdwDecision: LPDWORD, dwIndex: DWORD): BOOL {
-    return Wininet.Load('InternetEnumPerSiteCookieDecisionW')(pszSiteName, pcSiteNameSize, pdwDecision, dwIndex);
+  public static InternetEnumPerSiteCookieDecisionW(pszSiteName_out: LPWSTR, pcSiteNameSize_in_out: LPDWORD, pdwDecision_out: LPDWORD, dwIndex: DWORD): BOOL {
+    return Wininet.Load('InternetEnumPerSiteCookieDecisionW')(pszSiteName_out, pcSiteNameSize_in_out, pdwDecision_out, dwIndex);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-interneterrordlg
-  public static InternetErrorDlg(hWnd: HWND, hRequest: HINTERNET | 0n, dwError: DWORD, dwFlags: DWORD, lppvData: LPVOID | NULL): DWORD {
-    return Wininet.Load('InternetErrorDlg')(hWnd, hRequest, dwError, dwFlags, lppvData);
+  public static InternetErrorDlg(hWnd: HWND, hRequest: OPTIONAL<HINTERNET>, dwError: DWORD, dwFlags: DWORD, lppvData_in_out: OPTIONAL<LPVOID>): DWORD {
+    return Wininet.Load('InternetErrorDlg')(hWnd, hRequest, dwError, dwFlags, lppvData_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-internetfindnextfilea
-  public static InternetFindNextFileA(hFind: HINTERNET, lpvFindData: LPVOID): BOOL {
-    return Wininet.Load('InternetFindNextFileA')(hFind, lpvFindData);
+  public static InternetFindNextFileA(hFind: HINTERNET, lpvFindData_out: LPVOID): BOOL {
+    return Wininet.Load('InternetFindNextFileA')(hFind, lpvFindData_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-internetfindnextfilew
-  public static InternetFindNextFileW(hFind: HINTERNET, lpvFindData: LPVOID): BOOL {
-    return Wininet.Load('InternetFindNextFileW')(hFind, lpvFindData);
+  public static InternetFindNextFileW(hFind: HINTERNET, lpvFindData_out: LPVOID): BOOL {
+    return Wininet.Load('InternetFindNextFileW')(hFind, lpvFindData_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-internetfreecookies
-  public static InternetFreeCookies(pCookies: PINTERNET_COOKIE2 | NULL, dwCookieCount: DWORD): void {
+  public static InternetFreeCookies(pCookies: OPTIONAL<PINTERNET_COOKIE2>, dwCookieCount: DWORD): void {
     return Wininet.Load('InternetFreeCookies')(pCookies, dwCookieCount);
   }
 
@@ -878,87 +898,87 @@ class Wininet extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-internetgetconnectedstate
-  public static InternetGetConnectedState(lpdwFlags: LPDWORD, dwReserved: DWORD): BOOL {
-    return Wininet.Load('InternetGetConnectedState')(lpdwFlags, dwReserved);
+  public static InternetGetConnectedState(lpdwFlags_out: LPDWORD, dwReserved: DWORD): BOOL {
+    return Wininet.Load('InternetGetConnectedState')(lpdwFlags_out, dwReserved);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-internetgetconnectedstateex
-  public static InternetGetConnectedStateEx(lpdwFlags: LPDWORD | NULL, lpszConnectionName: LPSTR | NULL, cchNameLen: DWORD, dwReserved: DWORD): BOOL {
-    return Wininet.Load('InternetGetConnectedStateEx')(lpdwFlags, lpszConnectionName, cchNameLen, dwReserved);
+  public static InternetGetConnectedStateEx(lpdwFlags_out: LPDWORD, lpszConnectionName_out: OPTIONAL<LPSTR>, cchNameLen: DWORD, dwReserved: DWORD): BOOL {
+    return Wininet.Load('InternetGetConnectedStateEx')(lpdwFlags_out, lpszConnectionName_out, cchNameLen, dwReserved);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-internetgetconnectedstateexa
-  public static InternetGetConnectedStateExA(lpdwFlags: LPDWORD | NULL, lpszConnectionName: LPSTR | NULL, cchNameLen: DWORD, dwReserved: DWORD): BOOL {
-    return Wininet.Load('InternetGetConnectedStateExA')(lpdwFlags, lpszConnectionName, cchNameLen, dwReserved);
+  public static InternetGetConnectedStateExA(lpdwFlags_out: OPTIONAL<LPDWORD>, lpszConnectionName_out: OPTIONAL<LPSTR>, cchNameLen: DWORD, dwReserved: DWORD): BOOL {
+    return Wininet.Load('InternetGetConnectedStateExA')(lpdwFlags_out, lpszConnectionName_out, cchNameLen, dwReserved);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-internetgetconnectedstateexw
-  public static InternetGetConnectedStateExW(lpdwFlags: LPDWORD | NULL, lpszConnectionName: LPWSTR | NULL, cchNameLen: DWORD, dwReserved: DWORD): BOOL {
-    return Wininet.Load('InternetGetConnectedStateExW')(lpdwFlags, lpszConnectionName, cchNameLen, dwReserved);
+  public static InternetGetConnectedStateExW(lpdwFlags_out: OPTIONAL<LPDWORD>, lpszConnectionName_out: OPTIONAL<LPWSTR>, cchNameLen: DWORD, dwReserved: DWORD): BOOL {
+    return Wininet.Load('InternetGetConnectedStateExW')(lpdwFlags_out, lpszConnectionName_out, cchNameLen, dwReserved);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-internetgetcookiea
-  public static InternetGetCookieA(lpszUrl: LPCSTR, lpszCookieName: LPCSTR | NULL, lpszCookieData: LPSTR | NULL, lpdwSize: LPDWORD): BOOL {
-    return Wininet.Load('InternetGetCookieA')(lpszUrl, lpszCookieName, lpszCookieData, lpdwSize);
+  public static InternetGetCookieA(lpszUrl: LPCSTR, lpszCookieName: OPTIONAL<LPCSTR>, lpszCookieData_out: NULLABLE<LPSTR>, lpdwSize_in_out: LPDWORD): BOOL {
+    return Wininet.Load('InternetGetCookieA')(lpszUrl, lpszCookieName, lpszCookieData_out, lpdwSize_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-internetgetcookieex2
-  public static InternetGetCookieEx2(pcwszUrl: PCWSTR, pcwszCookieName: PCWSTR | NULL, dwFlags: DWORD, ppCookies: PPINTERNET_COOKIE2, pdwCookieCount: PDWORD): DWORD {
-    return Wininet.Load('InternetGetCookieEx2')(pcwszUrl, pcwszCookieName, dwFlags, ppCookies, pdwCookieCount);
+  public static InternetGetCookieEx2(pcwszUrl: PCWSTR, pcwszCookieName: OPTIONAL<PCWSTR>, dwFlags: DWORD, ppCookies_out: PPINTERNET_COOKIE2, pdwCookieCount_out: PDWORD): DWORD {
+    return Wininet.Load('InternetGetCookieEx2')(pcwszUrl, pcwszCookieName, dwFlags, ppCookies_out, pdwCookieCount_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-internetgetcookieexa
-  public static InternetGetCookieExA(lpszUrl: LPCSTR, lpszCookieName: LPCSTR | NULL, lpszCookieData: LPSTR | NULL, lpdwSize: LPDWORD, dwFlags: DWORD, lpReserved: LPVOID | NULL): BOOL {
-    return Wininet.Load('InternetGetCookieExA')(lpszUrl, lpszCookieName, lpszCookieData, lpdwSize, dwFlags, lpReserved);
+  public static InternetGetCookieExA(lpszUrl: LPCSTR, lpszCookieName: OPTIONAL<LPCSTR>, lpszCookieData_out: NULLABLE<LPSTR>, lpdwSize_in_out: LPDWORD, dwFlags: DWORD, lpReserved: OPTIONAL<LPVOID>): BOOL {
+    return Wininet.Load('InternetGetCookieExA')(lpszUrl, lpszCookieName, lpszCookieData_out, lpdwSize_in_out, dwFlags, lpReserved);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-internetgetcookieexw
-  public static InternetGetCookieExW(lpszUrl: LPCWSTR, lpszCookieName: LPCWSTR | NULL, lpszCookieData: LPWSTR | NULL, lpdwSize: LPDWORD, dwFlags: DWORD, lpReserved: LPVOID | NULL): BOOL {
-    return Wininet.Load('InternetGetCookieExW')(lpszUrl, lpszCookieName, lpszCookieData, lpdwSize, dwFlags, lpReserved);
+  public static InternetGetCookieExW(lpszUrl: LPCWSTR, lpszCookieName: OPTIONAL<LPCWSTR>, lpszCookieData_out: NULLABLE<LPWSTR>, lpdwSize_in_out: LPDWORD, dwFlags: DWORD, lpReserved: OPTIONAL<LPVOID>): BOOL {
+    return Wininet.Load('InternetGetCookieExW')(lpszUrl, lpszCookieName, lpszCookieData_out, lpdwSize_in_out, dwFlags, lpReserved);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-internetgetcookiew
-  public static InternetGetCookieW(lpszUrl: LPCWSTR, lpszCookieName: LPCWSTR | NULL, lpszCookieData: LPWSTR | NULL, lpdwSize: LPDWORD): BOOL {
-    return Wininet.Load('InternetGetCookieW')(lpszUrl, lpszCookieName, lpszCookieData, lpdwSize);
+  public static InternetGetCookieW(lpszUrl: LPCWSTR, lpszCookieName: OPTIONAL<LPCWSTR>, lpszCookieData_out: NULLABLE<LPWSTR>, lpdwSize_in_out: LPDWORD): BOOL {
+    return Wininet.Load('InternetGetCookieW')(lpszUrl, lpszCookieName, lpszCookieData_out, lpdwSize_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-internetgetlastresponseinfoa
-  public static InternetGetLastResponseInfoA(lpdwError: LPDWORD, lpszBuffer: LPSTR | NULL, lpdwBufferLength: LPDWORD): BOOL {
-    return Wininet.Load('InternetGetLastResponseInfoA')(lpdwError, lpszBuffer, lpdwBufferLength);
+  public static InternetGetLastResponseInfoA(lpdwError_out: LPDWORD, lpszBuffer_out: NULLABLE<LPSTR>, lpdwBufferLength_in_out: LPDWORD): BOOL {
+    return Wininet.Load('InternetGetLastResponseInfoA')(lpdwError_out, lpszBuffer_out, lpdwBufferLength_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-internetgetlastresponseinfow
-  public static InternetGetLastResponseInfoW(lpdwError: LPDWORD, lpszBuffer: LPWSTR | NULL, lpdwBufferLength: LPDWORD): BOOL {
-    return Wininet.Load('InternetGetLastResponseInfoW')(lpdwError, lpszBuffer, lpdwBufferLength);
+  public static InternetGetLastResponseInfoW(lpdwError_out: LPDWORD, lpszBuffer_out: NULLABLE<LPWSTR>, lpdwBufferLength_in_out: LPDWORD): BOOL {
+    return Wininet.Load('InternetGetLastResponseInfoW')(lpdwError_out, lpszBuffer_out, lpdwBufferLength_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-internetgetpersitecookiedecisiona
-  public static InternetGetPerSiteCookieDecisionA(pchHostName: LPCSTR, pResult: LPDWORD): BOOL {
-    return Wininet.Load('InternetGetPerSiteCookieDecisionA')(pchHostName, pResult);
+  public static InternetGetPerSiteCookieDecisionA(pchHostName: LPCSTR, pResult_out: LPDWORD): BOOL {
+    return Wininet.Load('InternetGetPerSiteCookieDecisionA')(pchHostName, pResult_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-internetgetpersitecookiedecisionw
-  public static InternetGetPerSiteCookieDecisionW(pchHostName: LPCWSTR, pResult: LPDWORD): BOOL {
-    return Wininet.Load('InternetGetPerSiteCookieDecisionW')(pchHostName, pResult);
+  public static InternetGetPerSiteCookieDecisionW(pchHostName: LPCWSTR, pResult_out: LPDWORD): BOOL {
+    return Wininet.Load('InternetGetPerSiteCookieDecisionW')(pchHostName, pResult_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-internetgetproxyforurl
-  public static InternetGetProxyForUrl(hInternet: HINTERNET, lpszUrl: LPCWSTR, pProxyInfoList: PWININET_PROXY_INFO_LIST): BOOL {
-    return Wininet.Load('InternetGetProxyForUrl')(hInternet, lpszUrl, pProxyInfoList);
+  public static InternetGetProxyForUrl(hInternet: HINTERNET, lpszUrl: LPCWSTR, pProxyInfoList_out: PWININET_PROXY_INFO_LIST): BOOL {
+    return Wininet.Load('InternetGetProxyForUrl')(hInternet, lpszUrl, pProxyInfoList_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-internetgoonline
-  public static InternetGoOnline(lpszURL: LPSTR | NULL, hwndParent: HWND | 0n, dwReserved: DWORD): BOOL {
+  public static InternetGoOnline(lpszURL: OPTIONAL<LPSTR>, hwndParent: HWND, dwReserved: DWORD): BOOL {
     return Wininet.Load('InternetGoOnline')(lpszURL, hwndParent, dwReserved);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-internetgoonlinea
-  public static InternetGoOnlineA(lpszURL: LPSTR | NULL, hwndParent: HWND | 0n, dwReserved: DWORD): BOOL {
+  public static InternetGoOnlineA(lpszURL: OPTIONAL<LPSTR>, hwndParent: HWND, dwReserved: DWORD): BOOL {
     return Wininet.Load('InternetGoOnlineA')(lpszURL, hwndParent, dwReserved);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-internetgoonlinew
-  public static InternetGoOnlineW(lpszURL: LPWSTR | NULL, hwndParent: HWND | 0n, dwReserved: DWORD): BOOL {
+  public static InternetGoOnlineW(lpszURL: OPTIONAL<LPWSTR>, hwndParent: HWND, dwReserved: DWORD): BOOL {
     return Wininet.Load('InternetGoOnlineW')(lpszURL, hwndParent, dwReserved);
   }
 
@@ -968,122 +988,122 @@ class Wininet extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-internetlockrequestfile
-  public static InternetLockRequestFile(hInternet: HINTERNET, lphLockRequestInfo: PHANDLE): BOOL {
-    return Wininet.Load('InternetLockRequestFile')(hInternet, lphLockRequestInfo);
+  public static InternetLockRequestFile(hInternet: HINTERNET, lphLockRequestInfo_out: PHANDLE): BOOL {
+    return Wininet.Load('InternetLockRequestFile')(hInternet, lphLockRequestInfo_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-internetopena
-  public static InternetOpenA(lpszAgent: LPCSTR | NULL, dwAccessType: DWORD, lpszProxy: LPCSTR | NULL, lpszProxyBypass: LPCSTR | NULL, dwFlags: DWORD): HINTERNET {
+  public static InternetOpenA(lpszAgent: OPTIONAL<LPCSTR>, dwAccessType: DWORD, lpszProxy: OPTIONAL<LPCSTR>, lpszProxyBypass: OPTIONAL<LPCSTR>, dwFlags: DWORD): HINTERNET {
     return Wininet.Load('InternetOpenA')(lpszAgent, dwAccessType, lpszProxy, lpszProxyBypass, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-internetopenurla
-  public static InternetOpenUrlA(hInternet: HINTERNET, lpszUrl: LPCSTR, lpszHeaders: LPCSTR | NULL, dwHeadersLength: DWORD, dwFlags: DWORD, dwContext: DWORD_PTR | 0n): HINTERNET {
+  public static InternetOpenUrlA(hInternet: HINTERNET, lpszUrl: LPCSTR, lpszHeaders: OPTIONAL<LPCSTR>, dwHeadersLength: DWORD, dwFlags: DWORD, dwContext: OPTIONAL<DWORD_PTR>): HINTERNET {
     return Wininet.Load('InternetOpenUrlA')(hInternet, lpszUrl, lpszHeaders, dwHeadersLength, dwFlags, dwContext);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-internetopenurlw
-  public static InternetOpenUrlW(hInternet: HINTERNET, lpszUrl: LPCWSTR, lpszHeaders: LPCWSTR | NULL, dwHeadersLength: DWORD, dwFlags: DWORD, dwContext: DWORD_PTR | 0n): HINTERNET {
+  public static InternetOpenUrlW(hInternet: HINTERNET, lpszUrl: LPCWSTR, lpszHeaders: OPTIONAL<LPCWSTR>, dwHeadersLength: DWORD, dwFlags: DWORD, dwContext: OPTIONAL<DWORD_PTR>): HINTERNET {
     return Wininet.Load('InternetOpenUrlW')(hInternet, lpszUrl, lpszHeaders, dwHeadersLength, dwFlags, dwContext);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-internetopenw
-  public static InternetOpenW(lpszAgent: LPCWSTR | NULL, dwAccessType: DWORD, lpszProxy: LPCWSTR | NULL, lpszProxyBypass: LPCWSTR | NULL, dwFlags: DWORD): HINTERNET {
+  public static InternetOpenW(lpszAgent: OPTIONAL<LPCWSTR>, dwAccessType: DWORD, lpszProxy: OPTIONAL<LPCWSTR>, lpszProxyBypass: OPTIONAL<LPCWSTR>, dwFlags: DWORD): HINTERNET {
     return Wininet.Load('InternetOpenW')(lpszAgent, dwAccessType, lpszProxy, lpszProxyBypass, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-internetquerydataavailable
-  public static InternetQueryDataAvailable(hFile: HINTERNET, lpdwNumberOfBytesAvailable: LPDWORD | NULL, dwFlags: DWORD, dwContext: DWORD_PTR | 0n): BOOL {
-    return Wininet.Load('InternetQueryDataAvailable')(hFile, lpdwNumberOfBytesAvailable, dwFlags, dwContext);
+  public static InternetQueryDataAvailable(hFile: HINTERNET, lpdwNumberOfBytesAvailable_out: OPTIONAL<LPDWORD>, dwFlags: DWORD, dwContext: OPTIONAL<DWORD_PTR>): BOOL {
+    return Wininet.Load('InternetQueryDataAvailable')(hFile, lpdwNumberOfBytesAvailable_out, dwFlags, dwContext);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-internetqueryoptiona
-  public static InternetQueryOptionA(hInternet: HINTERNET | 0n, dwOption: DWORD, lpBuffer: LPVOID | NULL, lpdwBufferLength: LPDWORD): BOOL {
-    return Wininet.Load('InternetQueryOptionA')(hInternet, dwOption, lpBuffer, lpdwBufferLength);
+  public static InternetQueryOptionA(hInternet: OPTIONAL<HINTERNET>, dwOption: DWORD, lpBuffer_out: NULLABLE<LPVOID>, lpdwBufferLength_in_out: LPDWORD): BOOL {
+    return Wininet.Load('InternetQueryOptionA')(hInternet, dwOption, lpBuffer_out, lpdwBufferLength_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-internetqueryoptionw
-  public static InternetQueryOptionW(hInternet: HINTERNET | 0n, dwOption: DWORD, lpBuffer: LPVOID | NULL, lpdwBufferLength: LPDWORD): BOOL {
-    return Wininet.Load('InternetQueryOptionW')(hInternet, dwOption, lpBuffer, lpdwBufferLength);
+  public static InternetQueryOptionW(hInternet: OPTIONAL<HINTERNET>, dwOption: DWORD, lpBuffer_out: NULLABLE<LPVOID>, lpdwBufferLength_in_out: LPDWORD): BOOL {
+    return Wininet.Load('InternetQueryOptionW')(hInternet, dwOption, lpBuffer_out, lpdwBufferLength_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-internetreadfile
-  public static InternetReadFile(hFile: HINTERNET, lpBuffer: LPVOID, dwNumberOfBytesToRead: DWORD, lpdwNumberOfBytesRead: LPDWORD): BOOL {
-    return Wininet.Load('InternetReadFile')(hFile, lpBuffer, dwNumberOfBytesToRead, lpdwNumberOfBytesRead);
+  public static InternetReadFile(hFile: HINTERNET, lpBuffer_out: LPVOID, dwNumberOfBytesToRead: DWORD, lpdwNumberOfBytesRead_out: LPDWORD): BOOL {
+    return Wininet.Load('InternetReadFile')(hFile, lpBuffer_out, dwNumberOfBytesToRead, lpdwNumberOfBytesRead_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-internetreadfileexa
-  public static InternetReadFileExA(hFile: HINTERNET, lpBuffersOut: LPINTERNET_BUFFERSA, dwFlags: DWORD, dwContext: DWORD_PTR | 0n): BOOL {
-    return Wininet.Load('InternetReadFileExA')(hFile, lpBuffersOut, dwFlags, dwContext);
+  public static InternetReadFileExA(hFile: HINTERNET, lpBuffersOut_in_out: LPINTERNET_BUFFERSA, dwFlags: DWORD, dwContext: OPTIONAL<DWORD_PTR>): BOOL {
+    return Wininet.Load('InternetReadFileExA')(hFile, lpBuffersOut_in_out, dwFlags, dwContext);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-internetreadfileexw
-  public static InternetReadFileExW(hFile: HINTERNET, lpBuffersOut: LPINTERNET_BUFFERSW, dwFlags: DWORD, dwContext: DWORD_PTR | 0n): BOOL {
-    return Wininet.Load('InternetReadFileExW')(hFile, lpBuffersOut, dwFlags, dwContext);
+  public static InternetReadFileExW(hFile: HINTERNET, lpBuffersOut_in_out: LPINTERNET_BUFFERSW, dwFlags: DWORD, dwContext: OPTIONAL<DWORD_PTR>): BOOL {
+    return Wininet.Load('InternetReadFileExW')(hFile, lpBuffersOut_in_out, dwFlags, dwContext);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-internetsetcookiea
-  public static InternetSetCookieA(lpszUrl: LPCSTR, lpszCookieName: LPCSTR | NULL, lpszCookieData: LPCSTR): BOOL {
+  public static InternetSetCookieA(lpszUrl: LPCSTR, lpszCookieName: OPTIONAL<LPCSTR>, lpszCookieData: LPCSTR): BOOL {
     return Wininet.Load('InternetSetCookieA')(lpszUrl, lpszCookieName, lpszCookieData);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-internetsetcookieex2
-  public static InternetSetCookieEx2(pcwszUrl: PCWSTR, pCookie: PINTERNET_COOKIE2, pcwszP3PPolicy: PCWSTR | NULL, dwFlags: DWORD, pdwCookieState: PDWORD): DWORD {
-    return Wininet.Load('InternetSetCookieEx2')(pcwszUrl, pCookie, pcwszP3PPolicy, dwFlags, pdwCookieState);
+  public static InternetSetCookieEx2(pcwszUrl: PCWSTR, pCookie: PINTERNET_COOKIE2, pcwszP3PPolicy: OPTIONAL<PCWSTR>, dwFlags: DWORD, pdwCookieState_out: PDWORD): DWORD {
+    return Wininet.Load('InternetSetCookieEx2')(pcwszUrl, pCookie, pcwszP3PPolicy, dwFlags, pdwCookieState_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-internetsetcookieexa
-  public static InternetSetCookieExA(lpszUrl: LPCSTR, lpszCookieName: LPCSTR | NULL, lpszCookieData: LPCSTR, dwFlags: DWORD, dwReserved: DWORD_PTR | 0n): DWORD {
+  public static InternetSetCookieExA(lpszUrl: LPCSTR, lpszCookieName: OPTIONAL<LPCSTR>, lpszCookieData: LPCSTR, dwFlags: DWORD, dwReserved: OPTIONAL<DWORD_PTR>): DWORD {
     return Wininet.Load('InternetSetCookieExA')(lpszUrl, lpszCookieName, lpszCookieData, dwFlags, dwReserved);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-internetsetcookieexw
-  public static InternetSetCookieExW(lpszUrl: LPCWSTR, lpszCookieName: LPCWSTR | NULL, lpszCookieData: LPCWSTR, dwFlags: DWORD, dwReserved: DWORD_PTR | 0n): DWORD {
+  public static InternetSetCookieExW(lpszUrl: LPCWSTR, lpszCookieName: OPTIONAL<LPCWSTR>, lpszCookieData: LPCWSTR, dwFlags: DWORD, dwReserved: OPTIONAL<DWORD_PTR>): DWORD {
     return Wininet.Load('InternetSetCookieExW')(lpszUrl, lpszCookieName, lpszCookieData, dwFlags, dwReserved);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-internetsetcookiew
-  public static InternetSetCookieW(lpszUrl: LPCWSTR, lpszCookieName: LPCWSTR | NULL, lpszCookieData: LPCWSTR): BOOL {
+  public static InternetSetCookieW(lpszUrl: LPCWSTR, lpszCookieName: OPTIONAL<LPCWSTR>, lpszCookieData: LPCWSTR): BOOL {
     return Wininet.Load('InternetSetCookieW')(lpszUrl, lpszCookieName, lpszCookieData);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-internetsetdialstate
-  public static InternetSetDialState(lpszConnectoid: LPCSTR | NULL, dwState: DWORD, dwReserved: DWORD): DWORD {
+  public static InternetSetDialState(lpszConnectoid: OPTIONAL<LPCSTR>, dwState: DWORD, dwReserved: DWORD): DWORD {
     return Wininet.Load('InternetSetDialState')(lpszConnectoid, dwState, dwReserved);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-internetsetdialstatea
-  public static InternetSetDialStateA(lpszConnectoid: LPCSTR | NULL, dwState: DWORD, dwReserved: DWORD): DWORD {
+  public static InternetSetDialStateA(lpszConnectoid: OPTIONAL<LPCSTR>, dwState: DWORD, dwReserved: DWORD): DWORD {
     return Wininet.Load('InternetSetDialStateA')(lpszConnectoid, dwState, dwReserved);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-internetsetdialstatew
-  public static InternetSetDialStateW(lpszConnectoid: LPCWSTR | NULL, dwState: DWORD, dwReserved: DWORD): DWORD {
+  public static InternetSetDialStateW(lpszConnectoid: OPTIONAL<LPCWSTR>, dwState: DWORD, dwReserved: DWORD): DWORD {
     return Wininet.Load('InternetSetDialStateW')(lpszConnectoid, dwState, dwReserved);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-internetsetfilepointer
-  public static InternetSetFilePointer(hFile: HINTERNET, lDistanceToMove: LONG, pReserved: LPVOID | NULL, dwMoveContext: DWORD, dwContext: DWORD_PTR | 0n): DWORD {
+  public static InternetSetFilePointer(hFile: HINTERNET, lDistanceToMove: LONG, pReserved: OPTIONAL<LPVOID>, dwMoveContext: DWORD, dwContext: OPTIONAL<DWORD_PTR>): DWORD {
     return Wininet.Load('InternetSetFilePointer')(hFile, lDistanceToMove, pReserved, dwMoveContext, dwContext);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-internetsetoptiona
-  public static InternetSetOptionA(hInternet: HINTERNET | 0n, dwOption: DWORD, lpBuffer: LPVOID | NULL, dwBufferLength: DWORD): BOOL {
+  public static InternetSetOptionA(hInternet: OPTIONAL<HINTERNET>, dwOption: DWORD, lpBuffer: OPTIONAL<LPVOID>, dwBufferLength: DWORD): BOOL {
     return Wininet.Load('InternetSetOptionA')(hInternet, dwOption, lpBuffer, dwBufferLength);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-internetsetoptionexa
-  public static InternetSetOptionExA(hInternet: HINTERNET | 0n, dwOption: DWORD, lpBuffer: LPVOID | NULL, dwBufferLength: DWORD, dwFlags: DWORD): BOOL {
+  public static InternetSetOptionExA(hInternet: OPTIONAL<HINTERNET>, dwOption: DWORD, lpBuffer: OPTIONAL<LPVOID>, dwBufferLength: DWORD, dwFlags: DWORD): BOOL {
     return Wininet.Load('InternetSetOptionExA')(hInternet, dwOption, lpBuffer, dwBufferLength, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-internetsetoptionexw
-  public static InternetSetOptionExW(hInternet: HINTERNET | 0n, dwOption: DWORD, lpBuffer: LPVOID | NULL, dwBufferLength: DWORD, dwFlags: DWORD): BOOL {
+  public static InternetSetOptionExW(hInternet: OPTIONAL<HINTERNET>, dwOption: DWORD, lpBuffer: OPTIONAL<LPVOID>, dwBufferLength: DWORD, dwFlags: DWORD): BOOL {
     return Wininet.Load('InternetSetOptionExW')(hInternet, dwOption, lpBuffer, dwBufferLength, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-internetsetoptionw
-  public static InternetSetOptionW(hInternet: HINTERNET | 0n, dwOption: DWORD, lpBuffer: LPVOID | NULL, dwBufferLength: DWORD): BOOL {
+  public static InternetSetOptionW(hInternet: OPTIONAL<HINTERNET>, dwOption: DWORD, lpBuffer: OPTIONAL<LPVOID>, dwBufferLength: DWORD): BOOL {
     return Wininet.Load('InternetSetOptionW')(hInternet, dwOption, lpBuffer, dwBufferLength);
   }
 
@@ -1098,48 +1118,48 @@ class Wininet extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-internetsetstatuscallback
-  public static InternetSetStatusCallback(hInternet: HINTERNET, lpfnInternetCallback: INTERNET_STATUS_CALLBACK | NULL): INTERNET_STATUS_CALLBACK | NULL {
+  public static InternetSetStatusCallback(hInternet: HINTERNET, lpfnInternetCallback: OPTIONAL<INTERNET_STATUS_CALLBACK>): INTERNET_STATUS_CALLBACK | NULL {
     return Wininet.Load('InternetSetStatusCallback')(hInternet, lpfnInternetCallback);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-internetsetstatuscallbacka
-  public static InternetSetStatusCallbackA(hInternet: HINTERNET, lpfnInternetCallback: INTERNET_STATUS_CALLBACK | NULL): INTERNET_STATUS_CALLBACK | NULL {
+  public static InternetSetStatusCallbackA(hInternet: HINTERNET, lpfnInternetCallback: OPTIONAL<INTERNET_STATUS_CALLBACK>): INTERNET_STATUS_CALLBACK | NULL {
     return Wininet.Load('InternetSetStatusCallbackA')(hInternet, lpfnInternetCallback);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-internetsetstatuscallbackw
-  public static InternetSetStatusCallbackW(hInternet: HINTERNET, lpfnInternetCallback: INTERNET_STATUS_CALLBACK | NULL): INTERNET_STATUS_CALLBACK | NULL {
+  public static InternetSetStatusCallbackW(hInternet: HINTERNET, lpfnInternetCallback: OPTIONAL<INTERNET_STATUS_CALLBACK>): INTERNET_STATUS_CALLBACK | NULL {
     return Wininet.Load('InternetSetStatusCallbackW')(hInternet, lpfnInternetCallback);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-internettimefromsystemtime
-  public static InternetTimeFromSystemTime(pst: PSYSTEMTIME, dwRFC: DWORD, lpszTime: LPSTR, cbTime: DWORD): BOOL {
-    return Wininet.Load('InternetTimeFromSystemTime')(pst, dwRFC, lpszTime, cbTime);
+  public static InternetTimeFromSystemTime(pst: PSYSTEMTIME, dwRFC: DWORD, lpszTime_out: LPSTR, cbTime: DWORD): BOOL {
+    return Wininet.Load('InternetTimeFromSystemTime')(pst, dwRFC, lpszTime_out, cbTime);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-internettimefromsystemtimea
-  public static InternetTimeFromSystemTimeA(pst: PSYSTEMTIME, dwRFC: DWORD, lpszTime: LPSTR, cbTime: DWORD): BOOL {
-    return Wininet.Load('InternetTimeFromSystemTimeA')(pst, dwRFC, lpszTime, cbTime);
+  public static InternetTimeFromSystemTimeA(pst: PSYSTEMTIME, dwRFC: DWORD, lpszTime_out: LPSTR, cbTime: DWORD): BOOL {
+    return Wininet.Load('InternetTimeFromSystemTimeA')(pst, dwRFC, lpszTime_out, cbTime);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-internettimefromsystemtimew
-  public static InternetTimeFromSystemTimeW(pst: PSYSTEMTIME, dwRFC: DWORD, lpszTime: LPWSTR, cbTime: DWORD): BOOL {
-    return Wininet.Load('InternetTimeFromSystemTimeW')(pst, dwRFC, lpszTime, cbTime);
+  public static InternetTimeFromSystemTimeW(pst: PSYSTEMTIME, dwRFC: DWORD, lpszTime_out: LPWSTR, cbTime: DWORD): BOOL {
+    return Wininet.Load('InternetTimeFromSystemTimeW')(pst, dwRFC, lpszTime_out, cbTime);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-internettimetosystemtime
-  public static InternetTimeToSystemTime(lpszTime: LPCSTR, pst: PSYSTEMTIME, dwReserved: DWORD): BOOL {
-    return Wininet.Load('InternetTimeToSystemTime')(lpszTime, pst, dwReserved);
+  public static InternetTimeToSystemTime(lpszTime: LPCSTR, pst_out: PSYSTEMTIME, dwReserved: DWORD): BOOL {
+    return Wininet.Load('InternetTimeToSystemTime')(lpszTime, pst_out, dwReserved);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-internettimetosystemtimea
-  public static InternetTimeToSystemTimeA(lpszTime: LPCSTR, pst: PSYSTEMTIME, dwReserved: DWORD): BOOL {
-    return Wininet.Load('InternetTimeToSystemTimeA')(lpszTime, pst, dwReserved);
+  public static InternetTimeToSystemTimeA(lpszTime: LPCSTR, pst_out: PSYSTEMTIME, dwReserved: DWORD): BOOL {
+    return Wininet.Load('InternetTimeToSystemTimeA')(lpszTime, pst_out, dwReserved);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-internettimetosystemtimew
-  public static InternetTimeToSystemTimeW(lpszTime: LPCWSTR, pst: PSYSTEMTIME, dwReserved: DWORD): BOOL {
-    return Wininet.Load('InternetTimeToSystemTimeW')(lpszTime, pst, dwReserved);
+  public static InternetTimeToSystemTimeW(lpszTime: LPCWSTR, pst_out: PSYSTEMTIME, dwReserved: DWORD): BOOL {
+    return Wininet.Load('InternetTimeToSystemTimeW')(lpszTime, pst_out, dwReserved);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-internetunlockrequestfile
@@ -1148,53 +1168,53 @@ class Wininet extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-internetwritefile
-  public static InternetWriteFile(hFile: HINTERNET, lpBuffer: LPCVOID, dwNumberOfBytesToWrite: DWORD, lpdwNumberOfBytesWritten: LPDWORD): BOOL {
-    return Wininet.Load('InternetWriteFile')(hFile, lpBuffer, dwNumberOfBytesToWrite, lpdwNumberOfBytesWritten);
+  public static InternetWriteFile(hFile: HINTERNET, lpBuffer: LPCVOID, dwNumberOfBytesToWrite: DWORD, lpdwNumberOfBytesWritten_out: LPDWORD): BOOL {
+    return Wininet.Load('InternetWriteFile')(hFile, lpBuffer, dwNumberOfBytesToWrite, lpdwNumberOfBytesWritten_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-isurlcacheentryexpireda
-  public static IsUrlCacheEntryExpiredA(lpszUrlName: LPCSTR, dwFlags: DWORD, pftLastModified: PFILETIME): BOOL {
-    return Wininet.Load('IsUrlCacheEntryExpiredA')(lpszUrlName, dwFlags, pftLastModified);
+  public static IsUrlCacheEntryExpiredA(lpszUrlName: LPCSTR, dwFlags: DWORD, pftLastModified_out: PFILETIME): BOOL {
+    return Wininet.Load('IsUrlCacheEntryExpiredA')(lpszUrlName, dwFlags, pftLastModified_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-isurlcacheentryexpiredw
-  public static IsUrlCacheEntryExpiredW(lpszUrlName: LPCWSTR, dwFlags: DWORD, pftLastModified: PFILETIME): BOOL {
-    return Wininet.Load('IsUrlCacheEntryExpiredW')(lpszUrlName, dwFlags, pftLastModified);
+  public static IsUrlCacheEntryExpiredW(lpszUrlName: LPCWSTR, dwFlags: DWORD, pftLastModified_out: PFILETIME): BOOL {
+    return Wininet.Load('IsUrlCacheEntryExpiredW')(lpszUrlName, dwFlags, pftLastModified_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-readurlcacheentrystream
-  public static ReadUrlCacheEntryStream(hUrlCacheStream: HANDLE, dwLocation: DWORD, lpBuffer: LPVOID, lpdwLen: LPDWORD, Reserved: DWORD): BOOL {
-    return Wininet.Load('ReadUrlCacheEntryStream')(hUrlCacheStream, dwLocation, lpBuffer, lpdwLen, Reserved);
+  public static ReadUrlCacheEntryStream(hUrlCacheStream: HANDLE, dwLocation: DWORD, lpBuffer_out: LPVOID, lpdwLen_in_out: LPDWORD, Reserved: DWORD): BOOL {
+    return Wininet.Load('ReadUrlCacheEntryStream')(hUrlCacheStream, dwLocation, lpBuffer_out, lpdwLen_in_out, Reserved);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-readurlcacheentrystreamex
-  public static ReadUrlCacheEntryStreamEx(hUrlCacheStream: HANDLE, qwLocation: ULONGLONG, lpBuffer: LPVOID, lpdwLen: LPDWORD): BOOL {
-    return Wininet.Load('ReadUrlCacheEntryStreamEx')(hUrlCacheStream, qwLocation, lpBuffer, lpdwLen);
+  public static ReadUrlCacheEntryStreamEx(hUrlCacheStream: HANDLE, qwLocation: ULONGLONG, lpBuffer_out: LPVOID, lpdwLen_in_out: LPDWORD): BOOL {
+    return Wininet.Load('ReadUrlCacheEntryStreamEx')(hUrlCacheStream, qwLocation, lpBuffer_out, lpdwLen_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-registerurlcachenotification
-  public static RegisterUrlCacheNotification(hWnd: HWND | 0n, uMsg: UINT, gid: GROUPID, dwOpsFilter: DWORD, dwReserved: DWORD): BOOL {
+  public static RegisterUrlCacheNotification(hWnd: OPTIONAL<HWND>, uMsg: UINT, gid: GROUPID, dwOpsFilter: DWORD, dwReserved: DWORD): BOOL {
     return Wininet.Load('RegisterUrlCacheNotification')(hWnd, uMsg, gid, dwOpsFilter, dwReserved);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-retrieveurlcacheentryfilea
-  public static RetrieveUrlCacheEntryFileA(lpszUrlName: LPCSTR, lpCacheEntryInfo: LPINTERNET_CACHE_ENTRY_INFOA | NULL, lpcbCacheEntryInfo: LPDWORD, dwReserved: DWORD): BOOL {
-    return Wininet.Load('RetrieveUrlCacheEntryFileA')(lpszUrlName, lpCacheEntryInfo, lpcbCacheEntryInfo, dwReserved);
+  public static RetrieveUrlCacheEntryFileA(lpszUrlName: LPCSTR, lpCacheEntryInfo_out: NULLABLE<LPINTERNET_CACHE_ENTRY_INFOA>, lpcbCacheEntryInfo_in_out: LPDWORD, dwReserved: DWORD): BOOL {
+    return Wininet.Load('RetrieveUrlCacheEntryFileA')(lpszUrlName, lpCacheEntryInfo_out, lpcbCacheEntryInfo_in_out, dwReserved);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-retrieveurlcacheentryfilew
-  public static RetrieveUrlCacheEntryFileW(lpszUrlName: LPCWSTR, lpCacheEntryInfo: LPINTERNET_CACHE_ENTRY_INFOW | NULL, lpcbCacheEntryInfo: LPDWORD, dwReserved: DWORD): BOOL {
-    return Wininet.Load('RetrieveUrlCacheEntryFileW')(lpszUrlName, lpCacheEntryInfo, lpcbCacheEntryInfo, dwReserved);
+  public static RetrieveUrlCacheEntryFileW(lpszUrlName: LPCWSTR, lpCacheEntryInfo_out: NULLABLE<LPINTERNET_CACHE_ENTRY_INFOW>, lpcbCacheEntryInfo_in_out: LPDWORD, dwReserved: DWORD): BOOL {
+    return Wininet.Load('RetrieveUrlCacheEntryFileW')(lpszUrlName, lpCacheEntryInfo_out, lpcbCacheEntryInfo_in_out, dwReserved);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-retrieveurlcacheentrystreama
-  public static RetrieveUrlCacheEntryStreamA(lpszUrlName: LPCSTR, lpCacheEntryInfo: LPINTERNET_CACHE_ENTRY_INFOA | NULL, lpcbCacheEntryInfo: LPDWORD, fRandomRead: BOOL, dwReserved: DWORD): HANDLE {
-    return Wininet.Load('RetrieveUrlCacheEntryStreamA')(lpszUrlName, lpCacheEntryInfo, lpcbCacheEntryInfo, fRandomRead, dwReserved);
+  public static RetrieveUrlCacheEntryStreamA(lpszUrlName: LPCSTR, lpCacheEntryInfo_out: NULLABLE<LPINTERNET_CACHE_ENTRY_INFOA>, lpcbCacheEntryInfo_in_out: LPDWORD, fRandomRead: BOOL, dwReserved: DWORD): HANDLE {
+    return Wininet.Load('RetrieveUrlCacheEntryStreamA')(lpszUrlName, lpCacheEntryInfo_out, lpcbCacheEntryInfo_in_out, fRandomRead, dwReserved);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-retrieveurlcacheentrystreamw
-  public static RetrieveUrlCacheEntryStreamW(lpszUrlName: LPCWSTR, lpCacheEntryInfo: LPINTERNET_CACHE_ENTRY_INFOW | NULL, lpcbCacheEntryInfo: LPDWORD, fRandomRead: BOOL, dwReserved: DWORD): HANDLE {
-    return Wininet.Load('RetrieveUrlCacheEntryStreamW')(lpszUrlName, lpCacheEntryInfo, lpcbCacheEntryInfo, fRandomRead, dwReserved);
+  public static RetrieveUrlCacheEntryStreamW(lpszUrlName: LPCWSTR, lpCacheEntryInfo_out: NULLABLE<LPINTERNET_CACHE_ENTRY_INFOW>, lpcbCacheEntryInfo_in_out: LPDWORD, fRandomRead: BOOL, dwReserved: DWORD): HANDLE {
+    return Wininet.Load('RetrieveUrlCacheEntryStreamW')(lpszUrlName, lpCacheEntryInfo_out, lpcbCacheEntryInfo_in_out, fRandomRead, dwReserved);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-seturlcacheconfiginfoa
@@ -1208,17 +1228,17 @@ class Wininet extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-seturlcacheentrygroup
-  public static SetUrlCacheEntryGroup(lpszUrlName: LPCSTR, dwFlags: DWORD, GroupId: GROUPID, pbGroupAttributes: LPBYTE | NULL, cbGroupAttributes: DWORD, lpReserved: LPVOID | NULL): BOOL {
+  public static SetUrlCacheEntryGroup(lpszUrlName: LPCSTR, dwFlags: DWORD, GroupId: GROUPID, pbGroupAttributes: OPTIONAL<LPBYTE>, cbGroupAttributes: DWORD, lpReserved: OPTIONAL<LPVOID>): BOOL {
     return Wininet.Load('SetUrlCacheEntryGroup')(lpszUrlName, dwFlags, GroupId, pbGroupAttributes, cbGroupAttributes, lpReserved);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-seturlcacheentrygroupa
-  public static SetUrlCacheEntryGroupA(lpszUrlName: LPCSTR, dwFlags: DWORD, GroupId: GROUPID, pbGroupAttributes: LPBYTE | NULL, cbGroupAttributes: DWORD, lpReserved: LPVOID | NULL): BOOL {
+  public static SetUrlCacheEntryGroupA(lpszUrlName: LPCSTR, dwFlags: DWORD, GroupId: GROUPID, pbGroupAttributes: OPTIONAL<LPBYTE>, cbGroupAttributes: DWORD, lpReserved: OPTIONAL<LPVOID>): BOOL {
     return Wininet.Load('SetUrlCacheEntryGroupA')(lpszUrlName, dwFlags, GroupId, pbGroupAttributes, cbGroupAttributes, lpReserved);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-seturlcacheentrygroupw
-  public static SetUrlCacheEntryGroupW(lpszUrlName: LPCWSTR, dwFlags: DWORD, GroupId: GROUPID, pbGroupAttributes: LPBYTE | NULL, cbGroupAttributes: DWORD, lpReserved: LPVOID | NULL): BOOL {
+  public static SetUrlCacheEntryGroupW(lpszUrlName: LPCWSTR, dwFlags: DWORD, GroupId: GROUPID, pbGroupAttributes: OPTIONAL<LPBYTE>, cbGroupAttributes: DWORD, lpReserved: OPTIONAL<LPVOID>): BOOL {
     return Wininet.Load('SetUrlCacheEntryGroupW')(lpszUrlName, dwFlags, GroupId, pbGroupAttributes, cbGroupAttributes, lpReserved);
   }
 
@@ -1233,12 +1253,12 @@ class Wininet extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-seturlcachegroupattributea
-  public static SetUrlCacheGroupAttributeA(gid: GROUPID, dwFlags: DWORD, dwAttributes: DWORD, lpGroupInfo: LPINTERNET_CACHE_GROUP_INFOA, lpReserved: LPVOID | NULL): BOOL {
+  public static SetUrlCacheGroupAttributeA(gid: GROUPID, dwFlags: DWORD, dwAttributes: DWORD, lpGroupInfo: LPINTERNET_CACHE_GROUP_INFOA, lpReserved: OPTIONAL<LPVOID>): BOOL {
     return Wininet.Load('SetUrlCacheGroupAttributeA')(gid, dwFlags, dwAttributes, lpGroupInfo, lpReserved);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-seturlcachegroupattributew
-  public static SetUrlCacheGroupAttributeW(gid: GROUPID, dwFlags: DWORD, dwAttributes: DWORD, lpGroupInfo: LPINTERNET_CACHE_GROUP_INFOW, lpReserved: LPVOID | NULL): BOOL {
+  public static SetUrlCacheGroupAttributeW(gid: GROUPID, dwFlags: DWORD, dwAttributes: DWORD, lpGroupInfo: LPINTERNET_CACHE_GROUP_INFOW, lpReserved: OPTIONAL<LPVOID>): BOOL {
     return Wininet.Load('SetUrlCacheGroupAttributeW')(gid, dwFlags, dwAttributes, lpGroupInfo, lpReserved);
   }
 

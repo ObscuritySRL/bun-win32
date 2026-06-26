@@ -20,7 +20,7 @@ import type {
   LPPHYSICAL_MONITOR,
   LPSTR,
   LPUINT,
-  NULL,
+  OPTIONAL,
   PDXVAHD_CONTENT_DESC,
   PDXVAHDSW_Plugin,
   PIDirect3DDeviceManager9,
@@ -102,8 +102,8 @@ class Dxva2 extends Win32 {
   } as const satisfies Record<string, FFIFunction>;
 
   // https://learn.microsoft.com/en-us/windows/win32/api/lowlevelmonitorconfigurationapi/nf-lowlevelmonitorconfigurationapi-capabilitiesrequestandcapabilitiesreply
-  public static CapabilitiesRequestAndCapabilitiesReply(hMonitor: HANDLE, pszASCIICapabilitiesString: LPSTR, dwCapabilitiesStringLengthInCharacters: DWORD): BOOL {
-    return Dxva2.Load('CapabilitiesRequestAndCapabilitiesReply')(hMonitor, pszASCIICapabilitiesString, dwCapabilitiesStringLengthInCharacters);
+  public static CapabilitiesRequestAndCapabilitiesReply(hMonitor: HANDLE, pszASCIICapabilitiesString_out: LPSTR, dwCapabilitiesStringLengthInCharacters: DWORD): BOOL {
+    return Dxva2.Load('CapabilitiesRequestAndCapabilitiesReply')(hMonitor, pszASCIICapabilitiesString_out, dwCapabilitiesStringLengthInCharacters);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/highlevelmonitorconfigurationapi/nf-highlevelmonitorconfigurationapi-degaussmonitor
@@ -122,113 +122,113 @@ class Dxva2 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dxva2api/nf-dxva2api-dxva2createdirect3ddevicemanager9
-  public static DXVA2CreateDirect3DDeviceManager9(pResetToken: LPUINT, ppDeviceManager: PIDirect3DDeviceManager9): HRESULT {
-    return Dxva2.Load('DXVA2CreateDirect3DDeviceManager9')(pResetToken, ppDeviceManager);
+  public static DXVA2CreateDirect3DDeviceManager9(pResetToken_out: LPUINT, ppDeviceManager_out: PIDirect3DDeviceManager9): HRESULT {
+    return Dxva2.Load('DXVA2CreateDirect3DDeviceManager9')(pResetToken_out, ppDeviceManager_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dxva2api/nf-dxva2api-dxva2createvideoservice
-  public static DXVA2CreateVideoService(pDD: IDirect3DDevice9, riid: REFIID, ppService: PVOID_PTR): HRESULT {
-    return Dxva2.Load('DXVA2CreateVideoService')(pDD, riid, ppService);
+  public static DXVA2CreateVideoService(pDD: IDirect3DDevice9, riid: REFIID, ppService_out: PVOID_PTR): HRESULT {
+    return Dxva2.Load('DXVA2CreateVideoService')(pDD, riid, ppService_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dxvahd/nf-dxvahd-dxvahd_createdevice
-  public static DXVAHD_CreateDevice(pD3DDevice: IDirect3DDevice9Ex, pContentDesc: PDXVAHD_CONTENT_DESC, Usage: DXVAHD_DEVICE_USAGE, pPlugin: PDXVAHDSW_Plugin | NULL, ppDevice: PIDXVAHD_Device): HRESULT {
-    return Dxva2.Load('DXVAHD_CreateDevice')(pD3DDevice, pContentDesc, Usage, pPlugin, ppDevice);
+  public static DXVAHD_CreateDevice(pD3DDevice: IDirect3DDevice9Ex, pContentDesc: PDXVAHD_CONTENT_DESC, Usage: DXVAHD_DEVICE_USAGE, pPlugin: OPTIONAL<PDXVAHDSW_Plugin>, ppDevice_out: PIDXVAHD_Device): HRESULT {
+    return Dxva2.Load('DXVAHD_CreateDevice')(pD3DDevice, pContentDesc, Usage, pPlugin, ppDevice_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/lowlevelmonitorconfigurationapi/nf-lowlevelmonitorconfigurationapi-getcapabilitiesstringlength
-  public static GetCapabilitiesStringLength(hMonitor: HANDLE, pdwCapabilitiesStringLengthInCharacters: LPDWORD): BOOL {
-    return Dxva2.Load('GetCapabilitiesStringLength')(hMonitor, pdwCapabilitiesStringLengthInCharacters);
+  public static GetCapabilitiesStringLength(hMonitor: HANDLE, pdwCapabilitiesStringLengthInCharacters_out: LPDWORD): BOOL {
+    return Dxva2.Load('GetCapabilitiesStringLength')(hMonitor, pdwCapabilitiesStringLengthInCharacters_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/highlevelmonitorconfigurationapi/nf-highlevelmonitorconfigurationapi-getmonitorbrightness
-  public static GetMonitorBrightness(hMonitor: HANDLE, pdwMinimumBrightness: LPDWORD, pdwCurrentBrightness: LPDWORD, pdwMaximumBrightness: LPDWORD): BOOL {
-    return Dxva2.Load('GetMonitorBrightness')(hMonitor, pdwMinimumBrightness, pdwCurrentBrightness, pdwMaximumBrightness);
+  public static GetMonitorBrightness(hMonitor: HANDLE, pdwMinimumBrightness_out: LPDWORD, pdwCurrentBrightness_out: LPDWORD, pdwMaximumBrightness_out: LPDWORD): BOOL {
+    return Dxva2.Load('GetMonitorBrightness')(hMonitor, pdwMinimumBrightness_out, pdwCurrentBrightness_out, pdwMaximumBrightness_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/highlevelmonitorconfigurationapi/nf-highlevelmonitorconfigurationapi-getmonitorcapabilities
-  public static GetMonitorCapabilities(hMonitor: HANDLE, pdwMonitorCapabilities: LPDWORD, pdwSupportedColorTemperatures: LPDWORD): BOOL {
-    return Dxva2.Load('GetMonitorCapabilities')(hMonitor, pdwMonitorCapabilities, pdwSupportedColorTemperatures);
+  public static GetMonitorCapabilities(hMonitor: HANDLE, pdwMonitorCapabilities_out: LPDWORD, pdwSupportedColorTemperatures_out: LPDWORD): BOOL {
+    return Dxva2.Load('GetMonitorCapabilities')(hMonitor, pdwMonitorCapabilities_out, pdwSupportedColorTemperatures_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/highlevelmonitorconfigurationapi/nf-highlevelmonitorconfigurationapi-getmonitorcolortemperature
-  public static GetMonitorColorTemperature(hMonitor: HANDLE, pctCurrentColorTemperature: LPMC_COLOR_TEMPERATURE): BOOL {
-    return Dxva2.Load('GetMonitorColorTemperature')(hMonitor, pctCurrentColorTemperature);
+  public static GetMonitorColorTemperature(hMonitor: HANDLE, pctCurrentColorTemperature_out: LPMC_COLOR_TEMPERATURE): BOOL {
+    return Dxva2.Load('GetMonitorColorTemperature')(hMonitor, pctCurrentColorTemperature_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/highlevelmonitorconfigurationapi/nf-highlevelmonitorconfigurationapi-getmonitorcontrast
-  public static GetMonitorContrast(hMonitor: HANDLE, pdwMinimumContrast: LPDWORD, pdwCurrentContrast: LPDWORD, pdwMaximumContrast: LPDWORD): BOOL {
-    return Dxva2.Load('GetMonitorContrast')(hMonitor, pdwMinimumContrast, pdwCurrentContrast, pdwMaximumContrast);
+  public static GetMonitorContrast(hMonitor: HANDLE, pdwMinimumContrast_out: LPDWORD, pdwCurrentContrast_out: LPDWORD, pdwMaximumContrast_out: LPDWORD): BOOL {
+    return Dxva2.Load('GetMonitorContrast')(hMonitor, pdwMinimumContrast_out, pdwCurrentContrast_out, pdwMaximumContrast_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/highlevelmonitorconfigurationapi/nf-highlevelmonitorconfigurationapi-getmonitordisplayareaposition
-  public static GetMonitorDisplayAreaPosition(hMonitor: HANDLE, ptPositionType: MC_POSITION_TYPE, pdwMinimumPosition: LPDWORD, pdwCurrentPosition: LPDWORD, pdwMaximumPosition: LPDWORD): BOOL {
-    return Dxva2.Load('GetMonitorDisplayAreaPosition')(hMonitor, ptPositionType, pdwMinimumPosition, pdwCurrentPosition, pdwMaximumPosition);
+  public static GetMonitorDisplayAreaPosition(hMonitor: HANDLE, ptPositionType: MC_POSITION_TYPE, pdwMinimumPosition_out: LPDWORD, pdwCurrentPosition_out: LPDWORD, pdwMaximumPosition_out: LPDWORD): BOOL {
+    return Dxva2.Load('GetMonitorDisplayAreaPosition')(hMonitor, ptPositionType, pdwMinimumPosition_out, pdwCurrentPosition_out, pdwMaximumPosition_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/highlevelmonitorconfigurationapi/nf-highlevelmonitorconfigurationapi-getmonitordisplayareasize
-  public static GetMonitorDisplayAreaSize(hMonitor: HANDLE, stSizeType: MC_SIZE_TYPE, pdwMinimumWidthOrHeight: LPDWORD, pdwCurrentWidthOrHeight: LPDWORD, pdwMaximumWidthOrHeight: LPDWORD): BOOL {
-    return Dxva2.Load('GetMonitorDisplayAreaSize')(hMonitor, stSizeType, pdwMinimumWidthOrHeight, pdwCurrentWidthOrHeight, pdwMaximumWidthOrHeight);
+  public static GetMonitorDisplayAreaSize(hMonitor: HANDLE, stSizeType: MC_SIZE_TYPE, pdwMinimumWidthOrHeight_out: LPDWORD, pdwCurrentWidthOrHeight_out: LPDWORD, pdwMaximumWidthOrHeight_out: LPDWORD): BOOL {
+    return Dxva2.Load('GetMonitorDisplayAreaSize')(hMonitor, stSizeType, pdwMinimumWidthOrHeight_out, pdwCurrentWidthOrHeight_out, pdwMaximumWidthOrHeight_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/highlevelmonitorconfigurationapi/nf-highlevelmonitorconfigurationapi-getmonitorredgreenorbluedrive
-  public static GetMonitorRedGreenOrBlueDrive(hMonitor: HANDLE, dtDriveType: MC_DRIVE_TYPE, pdwMinimumDrive: LPDWORD, pdwCurrentDrive: LPDWORD, pdwMaximumDrive: LPDWORD): BOOL {
-    return Dxva2.Load('GetMonitorRedGreenOrBlueDrive')(hMonitor, dtDriveType, pdwMinimumDrive, pdwCurrentDrive, pdwMaximumDrive);
+  public static GetMonitorRedGreenOrBlueDrive(hMonitor: HANDLE, dtDriveType: MC_DRIVE_TYPE, pdwMinimumDrive_out: LPDWORD, pdwCurrentDrive_out: LPDWORD, pdwMaximumDrive_out: LPDWORD): BOOL {
+    return Dxva2.Load('GetMonitorRedGreenOrBlueDrive')(hMonitor, dtDriveType, pdwMinimumDrive_out, pdwCurrentDrive_out, pdwMaximumDrive_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/highlevelmonitorconfigurationapi/nf-highlevelmonitorconfigurationapi-getmonitorredgreenorbluegain
-  public static GetMonitorRedGreenOrBlueGain(hMonitor: HANDLE, gtGainType: MC_GAIN_TYPE, pdwMinimumGain: LPDWORD, pdwCurrentGain: LPDWORD, pdwMaximumGain: LPDWORD): BOOL {
-    return Dxva2.Load('GetMonitorRedGreenOrBlueGain')(hMonitor, gtGainType, pdwMinimumGain, pdwCurrentGain, pdwMaximumGain);
+  public static GetMonitorRedGreenOrBlueGain(hMonitor: HANDLE, gtGainType: MC_GAIN_TYPE, pdwMinimumGain_out: LPDWORD, pdwCurrentGain_out: LPDWORD, pdwMaximumGain_out: LPDWORD): BOOL {
+    return Dxva2.Load('GetMonitorRedGreenOrBlueGain')(hMonitor, gtGainType, pdwMinimumGain_out, pdwCurrentGain_out, pdwMaximumGain_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/highlevelmonitorconfigurationapi/nf-highlevelmonitorconfigurationapi-getmonitortechnologytype
-  public static GetMonitorTechnologyType(hMonitor: HANDLE, pdtyDisplayTechnologyType: LPMC_DISPLAY_TECHNOLOGY_TYPE): BOOL {
-    return Dxva2.Load('GetMonitorTechnologyType')(hMonitor, pdtyDisplayTechnologyType);
+  public static GetMonitorTechnologyType(hMonitor: HANDLE, pdtyDisplayTechnologyType_out: LPMC_DISPLAY_TECHNOLOGY_TYPE): BOOL {
+    return Dxva2.Load('GetMonitorTechnologyType')(hMonitor, pdtyDisplayTechnologyType_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/physicalmonitorenumerationapi/nf-physicalmonitorenumerationapi-getnumberofphysicalmonitorsfromhmonitor
-  public static GetNumberOfPhysicalMonitorsFromHMONITOR(hMonitor: HMONITOR, pdwNumberOfPhysicalMonitors: LPDWORD): BOOL {
-    return Dxva2.Load('GetNumberOfPhysicalMonitorsFromHMONITOR')(hMonitor, pdwNumberOfPhysicalMonitors);
+  public static GetNumberOfPhysicalMonitorsFromHMONITOR(hMonitor: HMONITOR, pdwNumberOfPhysicalMonitors_out: LPDWORD): BOOL {
+    return Dxva2.Load('GetNumberOfPhysicalMonitorsFromHMONITOR')(hMonitor, pdwNumberOfPhysicalMonitors_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/physicalmonitorenumerationapi/nf-physicalmonitorenumerationapi-getnumberofphysicalmonitorsfromidirect3ddevice9
-  public static GetNumberOfPhysicalMonitorsFromIDirect3DDevice9(pDirect3DDevice9: IDirect3DDevice9, pdwNumberOfPhysicalMonitors: LPDWORD): HRESULT {
-    return Dxva2.Load('GetNumberOfPhysicalMonitorsFromIDirect3DDevice9')(pDirect3DDevice9, pdwNumberOfPhysicalMonitors);
+  public static GetNumberOfPhysicalMonitorsFromIDirect3DDevice9(pDirect3DDevice9: IDirect3DDevice9, pdwNumberOfPhysicalMonitors_out: LPDWORD): HRESULT {
+    return Dxva2.Load('GetNumberOfPhysicalMonitorsFromIDirect3DDevice9')(pDirect3DDevice9, pdwNumberOfPhysicalMonitors_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/physicalmonitorenumerationapi/nf-physicalmonitorenumerationapi-getphysicalmonitorsfromhmonitor
-  public static GetPhysicalMonitorsFromHMONITOR(hMonitor: HMONITOR, dwPhysicalMonitorArraySize: DWORD, pPhysicalMonitorArray: LPPHYSICAL_MONITOR): BOOL {
-    return Dxva2.Load('GetPhysicalMonitorsFromHMONITOR')(hMonitor, dwPhysicalMonitorArraySize, pPhysicalMonitorArray);
+  public static GetPhysicalMonitorsFromHMONITOR(hMonitor: HMONITOR, dwPhysicalMonitorArraySize: DWORD, pPhysicalMonitorArray_out: LPPHYSICAL_MONITOR): BOOL {
+    return Dxva2.Load('GetPhysicalMonitorsFromHMONITOR')(hMonitor, dwPhysicalMonitorArraySize, pPhysicalMonitorArray_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/physicalmonitorenumerationapi/nf-physicalmonitorenumerationapi-getphysicalmonitorsfromidirect3ddevice9
-  public static GetPhysicalMonitorsFromIDirect3DDevice9(pDirect3DDevice9: IDirect3DDevice9, dwPhysicalMonitorArraySize: DWORD, pPhysicalMonitorArray: LPPHYSICAL_MONITOR): HRESULT {
-    return Dxva2.Load('GetPhysicalMonitorsFromIDirect3DDevice9')(pDirect3DDevice9, dwPhysicalMonitorArraySize, pPhysicalMonitorArray);
+  public static GetPhysicalMonitorsFromIDirect3DDevice9(pDirect3DDevice9: IDirect3DDevice9, dwPhysicalMonitorArraySize: DWORD, pPhysicalMonitorArray_out: LPPHYSICAL_MONITOR): HRESULT {
+    return Dxva2.Load('GetPhysicalMonitorsFromIDirect3DDevice9')(pDirect3DDevice9, dwPhysicalMonitorArraySize, pPhysicalMonitorArray_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/lowlevelmonitorconfigurationapi/nf-lowlevelmonitorconfigurationapi-gettimingreport
-  public static GetTimingReport(hMonitor: HANDLE, pmtrMonitorTimingReport: LPMC_TIMING_REPORT): BOOL {
-    return Dxva2.Load('GetTimingReport')(hMonitor, pmtrMonitorTimingReport);
+  public static GetTimingReport(hMonitor: HANDLE, pmtrMonitorTimingReport_out: LPMC_TIMING_REPORT): BOOL {
+    return Dxva2.Load('GetTimingReport')(hMonitor, pmtrMonitorTimingReport_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/lowlevelmonitorconfigurationapi/nf-lowlevelmonitorconfigurationapi-getvcpfeatureandvcpfeaturereply
-  public static GetVCPFeatureAndVCPFeatureReply(hMonitor: HANDLE, bVCPCode: BYTE, pvct: LPMC_VCP_CODE_TYPE | NULL, pdwCurrentValue: LPDWORD, pdwMaximumValue: LPDWORD | NULL): BOOL {
-    return Dxva2.Load('GetVCPFeatureAndVCPFeatureReply')(hMonitor, bVCPCode, pvct, pdwCurrentValue, pdwMaximumValue);
+  public static GetVCPFeatureAndVCPFeatureReply(hMonitor: HANDLE, bVCPCode: BYTE, pvct_out: OPTIONAL<LPMC_VCP_CODE_TYPE>, pdwCurrentValue_out: LPDWORD, pdwMaximumValue_out: OPTIONAL<LPDWORD>): BOOL {
+    return Dxva2.Load('GetVCPFeatureAndVCPFeatureReply')(hMonitor, bVCPCode, pvct_out, pdwCurrentValue_out, pdwMaximumValue_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/opmapi/nf-opmapi-opmgetvideooutputfortarget
-  public static OPMGetVideoOutputForTarget(pAdapterLuid: LPLUID, VidPnTarget: ULONG, vos: OPM_VIDEO_OUTPUT_SEMANTICS, ppOPMVideoOutput: PIOPMVideoOutput): HRESULT {
-    return Dxva2.Load('OPMGetVideoOutputForTarget')(pAdapterLuid, VidPnTarget, vos, ppOPMVideoOutput);
+  public static OPMGetVideoOutputForTarget(pAdapterLuid: LPLUID, VidPnTarget: ULONG, vos: OPM_VIDEO_OUTPUT_SEMANTICS, ppOPMVideoOutput_out: PIOPMVideoOutput): HRESULT {
+    return Dxva2.Load('OPMGetVideoOutputForTarget')(pAdapterLuid, VidPnTarget, vos, ppOPMVideoOutput_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/opmapi/nf-opmapi-opmgetvideooutputsfromhmonitor
-  public static OPMGetVideoOutputsFromHMONITOR(hMonitor: HMONITOR, vos: OPM_VIDEO_OUTPUT_SEMANTICS, pulNumVideoOutputs: LPDWORD, pppOPMVideoOutputArray: PIOPMVideoOutputArray): HRESULT {
-    return Dxva2.Load('OPMGetVideoOutputsFromHMONITOR')(hMonitor, vos, pulNumVideoOutputs, pppOPMVideoOutputArray);
+  public static OPMGetVideoOutputsFromHMONITOR(hMonitor: HMONITOR, vos: OPM_VIDEO_OUTPUT_SEMANTICS, pulNumVideoOutputs_out: LPDWORD, pppOPMVideoOutputArray_out: PIOPMVideoOutputArray): HRESULT {
+    return Dxva2.Load('OPMGetVideoOutputsFromHMONITOR')(hMonitor, vos, pulNumVideoOutputs_out, pppOPMVideoOutputArray_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/opmapi/nf-opmapi-opmgetvideooutputsfromidirect3ddevice9object
-  public static OPMGetVideoOutputsFromIDirect3DDevice9Object(pDirect3DDevice9: IDirect3DDevice9, vos: OPM_VIDEO_OUTPUT_SEMANTICS, pulNumVideoOutputs: LPDWORD, pppOPMVideoOutputArray: PIOPMVideoOutputArray): HRESULT {
-    return Dxva2.Load('OPMGetVideoOutputsFromIDirect3DDevice9Object')(pDirect3DDevice9, vos, pulNumVideoOutputs, pppOPMVideoOutputArray);
+  public static OPMGetVideoOutputsFromIDirect3DDevice9Object(pDirect3DDevice9: IDirect3DDevice9, vos: OPM_VIDEO_OUTPUT_SEMANTICS, pulNumVideoOutputs_out: LPDWORD, pppOPMVideoOutputArray_out: PIOPMVideoOutputArray): HRESULT {
+    return Dxva2.Load('OPMGetVideoOutputsFromIDirect3DDevice9Object')(pDirect3DDevice9, vos, pulNumVideoOutputs_out, pppOPMVideoOutputArray_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/highlevelmonitorconfigurationapi/nf-highlevelmonitorconfigurationapi-restoremonitorfactorycolordefaults

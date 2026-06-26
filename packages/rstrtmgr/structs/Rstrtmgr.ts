@@ -2,7 +2,7 @@ import { type FFIFunction, FFIType } from 'bun:ffi';
 
 import { Win32 } from '@bun-win32/core';
 
-import type { DWORD, LPCWSTR, LPDWORD, LPWSTR, NULL, PBYTE, PLPCWSTR, PRM_PROCESS_INFO, PRM_UNIQUE_PROCESS, RM_FILTER_ACTION, RM_WRITE_STATUS_CALLBACK, UINT, ULONG } from '../types/Rstrtmgr';
+import type { DWORD, LPCWSTR, LPDWORD, LPWSTR, OPTIONAL, PBYTE, PLPCWSTR, PRM_PROCESS_INFO, PRM_UNIQUE_PROCESS, RM_FILTER_ACTION, RM_WRITE_STATUS_CALLBACK, UINT, ULONG } from '../types/Rstrtmgr';
 
 /**
  * Thin, lazy-loaded FFI bindings for `rstrtmgr.dll`.
@@ -49,7 +49,7 @@ class Rstrtmgr extends Win32 {
   } as const satisfies Record<string, FFIFunction>;
 
   // https://learn.microsoft.com/en-us/windows/win32/api/restartmanager/nf-restartmanager-rmaddfilter
-  public static RmAddFilter(dwSessionHandle: DWORD, strModuleName: LPCWSTR | NULL, pProcess: PRM_UNIQUE_PROCESS | NULL, strServiceShortName: LPCWSTR | NULL, FilterAction: RM_FILTER_ACTION): DWORD {
+  public static RmAddFilter(dwSessionHandle: DWORD, strModuleName: OPTIONAL<LPCWSTR>, pProcess: OPTIONAL<PRM_UNIQUE_PROCESS>, strServiceShortName: OPTIONAL<LPCWSTR>, FilterAction: RM_FILTER_ACTION): DWORD {
     return Rstrtmgr.Load('RmAddFilter')(dwSessionHandle, strModuleName, pProcess, strServiceShortName, FilterAction);
   }
 
@@ -64,43 +64,43 @@ class Rstrtmgr extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/restartmanager/nf-restartmanager-rmgetfilterlist
-  public static RmGetFilterList(dwSessionHandle: DWORD, pbFilterBuf: PBYTE | NULL, cbFilterBuf: DWORD, cbFilterBufNeeded: LPDWORD): DWORD {
-    return Rstrtmgr.Load('RmGetFilterList')(dwSessionHandle, pbFilterBuf, cbFilterBuf, cbFilterBufNeeded);
+  public static RmGetFilterList(dwSessionHandle: DWORD, pbFilterBuf_out: OPTIONAL<PBYTE>, cbFilterBuf: DWORD, cbFilterBufNeeded_out: LPDWORD): DWORD {
+    return Rstrtmgr.Load('RmGetFilterList')(dwSessionHandle, pbFilterBuf_out, cbFilterBuf, cbFilterBufNeeded_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/restartmanager/nf-restartmanager-rmgetlist
-  public static RmGetList(dwSessionHandle: DWORD, pnProcInfoNeeded: LPDWORD, pnProcInfo: LPDWORD, rgAffectedApps: PRM_PROCESS_INFO | NULL, lpdwRebootReasons: LPDWORD): DWORD {
-    return Rstrtmgr.Load('RmGetList')(dwSessionHandle, pnProcInfoNeeded, pnProcInfo, rgAffectedApps, lpdwRebootReasons);
+  public static RmGetList(dwSessionHandle: DWORD, pnProcInfoNeeded_out: LPDWORD, pnProcInfo_in_out: LPDWORD, rgAffectedApps_in_out: OPTIONAL<PRM_PROCESS_INFO>, lpdwRebootReasons_out: LPDWORD): DWORD {
+    return Rstrtmgr.Load('RmGetList')(dwSessionHandle, pnProcInfoNeeded_out, pnProcInfo_in_out, rgAffectedApps_in_out, lpdwRebootReasons_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/restartmanager/nf-restartmanager-rmjoinsession
-  public static RmJoinSession(pSessionHandle: LPDWORD, strSessionKey: LPCWSTR): DWORD {
-    return Rstrtmgr.Load('RmJoinSession')(pSessionHandle, strSessionKey);
+  public static RmJoinSession(pSessionHandle_out: LPDWORD, strSessionKey: LPCWSTR): DWORD {
+    return Rstrtmgr.Load('RmJoinSession')(pSessionHandle_out, strSessionKey);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/restartmanager/nf-restartmanager-rmregisterresources
-  public static RmRegisterResources(dwSessionHandle: DWORD, nFiles: UINT, rgsFileNames: PLPCWSTR | NULL, nApplications: UINT, rgApplications: PRM_UNIQUE_PROCESS | NULL, nServices: UINT, rgsServiceNames: PLPCWSTR | NULL): DWORD {
+  public static RmRegisterResources(dwSessionHandle: DWORD, nFiles: UINT, rgsFileNames: OPTIONAL<PLPCWSTR>, nApplications: UINT, rgApplications: OPTIONAL<PRM_UNIQUE_PROCESS>, nServices: UINT, rgsServiceNames: OPTIONAL<PLPCWSTR>): DWORD {
     return Rstrtmgr.Load('RmRegisterResources')(dwSessionHandle, nFiles, rgsFileNames, nApplications, rgApplications, nServices, rgsServiceNames);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/restartmanager/nf-restartmanager-rmremovefilter
-  public static RmRemoveFilter(dwSessionHandle: DWORD, strModuleName: LPCWSTR | NULL, pProcess: PRM_UNIQUE_PROCESS | NULL, strServiceShortName: LPCWSTR | NULL): DWORD {
+  public static RmRemoveFilter(dwSessionHandle: DWORD, strModuleName: OPTIONAL<LPCWSTR>, pProcess: OPTIONAL<PRM_UNIQUE_PROCESS>, strServiceShortName: OPTIONAL<LPCWSTR>): DWORD {
     return Rstrtmgr.Load('RmRemoveFilter')(dwSessionHandle, strModuleName, pProcess, strServiceShortName);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/restartmanager/nf-restartmanager-rmrestart
-  public static RmRestart(dwSessionHandle: DWORD, dwRestartFlags: DWORD, fnStatus: RM_WRITE_STATUS_CALLBACK | NULL): DWORD {
+  public static RmRestart(dwSessionHandle: DWORD, dwRestartFlags: DWORD, fnStatus: OPTIONAL<RM_WRITE_STATUS_CALLBACK>): DWORD {
     return Rstrtmgr.Load('RmRestart')(dwSessionHandle, dwRestartFlags, fnStatus);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/restartmanager/nf-restartmanager-rmshutdown
-  public static RmShutdown(dwSessionHandle: DWORD, lActionFlags: ULONG, fnStatus: RM_WRITE_STATUS_CALLBACK | NULL): DWORD {
+  public static RmShutdown(dwSessionHandle: DWORD, lActionFlags: ULONG, fnStatus: OPTIONAL<RM_WRITE_STATUS_CALLBACK>): DWORD {
     return Rstrtmgr.Load('RmShutdown')(dwSessionHandle, lActionFlags, fnStatus);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/restartmanager/nf-restartmanager-rmstartsession
-  public static RmStartSession(pSessionHandle: LPDWORD, dwSessionFlags: DWORD, strSessionKey: LPWSTR): DWORD {
-    return Rstrtmgr.Load('RmStartSession')(pSessionHandle, dwSessionFlags, strSessionKey);
+  public static RmStartSession(pSessionHandle_out: LPDWORD, dwSessionFlags: DWORD, strSessionKey_out: LPWSTR): DWORD {
+    return Rstrtmgr.Load('RmStartSession')(pSessionHandle_out, dwSessionFlags, strSessionKey_out);
   }
 }
 

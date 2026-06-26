@@ -41,13 +41,13 @@ class Quartz extends Win32 {
   } as const satisfies Record<string, FFIFunction>;
 
   // https://learn.microsoft.com/en-us/windows/win32/api/errors/nf-errors-amgeterrortexta
-  public static AMGetErrorTextA(hr: HRESULT, pbuffer: LPSTR, MaxLen: DWORD): DWORD {
-    return Quartz.Load('AMGetErrorTextA')(hr, pbuffer, MaxLen);
+  public static AMGetErrorTextA(hr: HRESULT, pbuffer_out: LPSTR, MaxLen: DWORD): DWORD {
+    return Quartz.Load('AMGetErrorTextA')(hr, pbuffer_out, MaxLen);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/errors/nf-errors-amgeterrortextw
-  public static AMGetErrorTextW(hr: HRESULT, pbuffer: LPWSTR, MaxLen: DWORD): DWORD {
-    return Quartz.Load('AMGetErrorTextW')(hr, pbuffer, MaxLen);
+  public static AMGetErrorTextW(hr: HRESULT, pbuffer_out: LPWSTR, MaxLen: DWORD): DWORD {
+    return Quartz.Load('AMGetErrorTextW')(hr, pbuffer_out, MaxLen);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/combaseapi/nf-combaseapi-dllcanunloadnow
@@ -56,8 +56,8 @@ class Quartz extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/combaseapi/nf-combaseapi-dllgetclassobject
-  public static DllGetClassObject(rclsid: REFCLSID, riid: REFIID, ppv: PPVOID): HRESULT {
-    return Quartz.Load('DllGetClassObject')(rclsid, riid, ppv);
+  public static DllGetClassObject(rclsid: REFCLSID, riid: REFIID, ppv_out: PPVOID): HRESULT {
+    return Quartz.Load('DllGetClassObject')(rclsid, riid, ppv_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/olectl/nf-olectl-dllregisterserver

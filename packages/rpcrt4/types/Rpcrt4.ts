@@ -1,6 +1,6 @@
 import type { Pointer } from 'bun:ffi';
 
-export type { BOOL, DWORD, HANDLE, LONG, LPSTR, LPVOID, LPWSTR, NULL, PVOID, ULONG, USHORT, VOID, WORD } from '@bun-win32/core';
+export type { BOOL, DWORD, HANDLE, LONG, LPSTR, LPVOID, LPWSTR, NULL, NULLABLE, OPTIONAL, PVOID, SIZE_T, ULONG, ULONG_PTR, USHORT, VOID, WORD } from '@bun-win32/core';
 
 export const RPC_C_AUTHN_DEFAULT = 0xffff_ffff;
 export const RPC_C_AUTHZ_DEFAULT = 0xffff_ffff;
@@ -154,6 +154,7 @@ export enum MidlEsHandleStyle {
 }
 
 export type DCERPC_ERROR_CODE = number;
+export type LUID = bigint;
 export type MIDL_ES_HANDLE = bigint;
 export type PCCERT_CONTEXT = bigint;
 export type PMIDL_ES_HANDLE = Pointer;

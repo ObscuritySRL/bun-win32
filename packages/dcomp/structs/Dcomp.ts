@@ -14,7 +14,7 @@ import type {
   IUnknown,
   LPLPVOID,
   LPSECURITY_ATTRIBUTES,
-  NULL,
+  OPTIONAL,
   PCOMPOSITION_FRAME_ID,
   PCOMPOSITION_FRAME_STATS,
   PCOMPOSITION_TARGET_ID,
@@ -89,42 +89,42 @@ class Dcomp extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dcomp/nf-dcomp-dcompositioncreatedevice
-  public static DCompositionCreateDevice(dxgiDevice: IDXGIDevice | NULL, iid: REFIID, dcompositionDevice: LPLPVOID): HRESULT {
-    return Dcomp.Load('DCompositionCreateDevice')(dxgiDevice, iid, dcompositionDevice);
+  public static DCompositionCreateDevice(dxgiDevice: OPTIONAL<IDXGIDevice>, iid: REFIID, dcompositionDevice_out: LPLPVOID): HRESULT {
+    return Dcomp.Load('DCompositionCreateDevice')(dxgiDevice, iid, dcompositionDevice_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dcomp/nf-dcomp-dcompositioncreatedevice2
-  public static DCompositionCreateDevice2(renderingDevice: IUnknown | NULL, iid: REFIID, dcompositionDevice: LPLPVOID): HRESULT {
-    return Dcomp.Load('DCompositionCreateDevice2')(renderingDevice, iid, dcompositionDevice);
+  public static DCompositionCreateDevice2(renderingDevice: OPTIONAL<IUnknown>, iid: REFIID, dcompositionDevice_out: LPLPVOID): HRESULT {
+    return Dcomp.Load('DCompositionCreateDevice2')(renderingDevice, iid, dcompositionDevice_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dcomp/nf-dcomp-dcompositioncreatedevice3
-  public static DCompositionCreateDevice3(renderingDevice: IUnknown | NULL, iid: REFIID, dcompositionDevice: LPLPVOID): HRESULT {
-    return Dcomp.Load('DCompositionCreateDevice3')(renderingDevice, iid, dcompositionDevice);
+  public static DCompositionCreateDevice3(renderingDevice: OPTIONAL<IUnknown>, iid: REFIID, dcompositionDevice_out: LPLPVOID): HRESULT {
+    return Dcomp.Load('DCompositionCreateDevice3')(renderingDevice, iid, dcompositionDevice_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dcomp/nf-dcomp-dcompositioncreatesurfacehandle
-  public static DCompositionCreateSurfaceHandle(desiredAccess: DWORD, securityAttributes: LPSECURITY_ATTRIBUTES | NULL, surfaceHandle: PHANDLE): HRESULT {
-    return Dcomp.Load('DCompositionCreateSurfaceHandle')(desiredAccess, securityAttributes, surfaceHandle);
+  public static DCompositionCreateSurfaceHandle(desiredAccess: DWORD, securityAttributes: OPTIONAL<LPSECURITY_ATTRIBUTES>, surfaceHandle_out: PHANDLE): HRESULT {
+    return Dcomp.Load('DCompositionCreateSurfaceHandle')(desiredAccess, securityAttributes, surfaceHandle_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dcomp/nf-dcomp-dcompositiongetframeid
-  public static DCompositionGetFrameId(frameIdType: COMPOSITION_FRAME_ID_TYPE, frameId: PCOMPOSITION_FRAME_ID): HRESULT {
-    return Dcomp.Load('DCompositionGetFrameId')(frameIdType, frameId);
+  public static DCompositionGetFrameId(frameIdType: COMPOSITION_FRAME_ID_TYPE, frameId_out: PCOMPOSITION_FRAME_ID): HRESULT {
+    return Dcomp.Load('DCompositionGetFrameId')(frameIdType, frameId_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dcomp/nf-dcomp-dcompositiongetstatistics
-  public static DCompositionGetStatistics(frameId: COMPOSITION_FRAME_ID, frameStats: PCOMPOSITION_FRAME_STATS, targetIdCount: UINT, targetIds: PCOMPOSITION_TARGET_ID | NULL, actualTargetIdCount: PUINT | NULL): HRESULT {
-    return Dcomp.Load('DCompositionGetStatistics')(frameId, frameStats, targetIdCount, targetIds, actualTargetIdCount);
+  public static DCompositionGetStatistics(frameId: COMPOSITION_FRAME_ID, frameStats_out: PCOMPOSITION_FRAME_STATS, targetIdCount: UINT, targetIds_out: OPTIONAL<PCOMPOSITION_TARGET_ID>, actualTargetIdCount_out: OPTIONAL<PUINT>): HRESULT {
+    return Dcomp.Load('DCompositionGetStatistics')(frameId, frameStats_out, targetIdCount, targetIds_out, actualTargetIdCount_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dcomp/nf-dcomp-dcompositiongettargetstatistics
-  public static DCompositionGetTargetStatistics(frameId: COMPOSITION_FRAME_ID, targetId: PCOMPOSITION_TARGET_ID, targetStats: PCOMPOSITION_TARGET_STATS): HRESULT {
-    return Dcomp.Load('DCompositionGetTargetStatistics')(frameId, targetId, targetStats);
+  public static DCompositionGetTargetStatistics(frameId: COMPOSITION_FRAME_ID, targetId: PCOMPOSITION_TARGET_ID, targetStats_out: PCOMPOSITION_TARGET_STATS): HRESULT {
+    return Dcomp.Load('DCompositionGetTargetStatistics')(frameId, targetId, targetStats_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dcomp/nf-dcomp-dcompositionwaitforcompositorclock
-  public static DCompositionWaitForCompositorClock(count: UINT, handles: PHANDLE | NULL, timeoutInMs: DWORD): DWORD {
+  public static DCompositionWaitForCompositorClock(count: UINT, handles: OPTIONAL<PHANDLE>, timeoutInMs: DWORD): DWORD {
     return Dcomp.Load('DCompositionWaitForCompositorClock')(count, handles, timeoutInMs);
   }
 
@@ -134,8 +134,8 @@ class Dcomp extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/combaseapi/nf-combaseapi-dllgetclassobject
-  public static DllGetClassObject(rclsid: REFCLSID, riid: REFIID, ppv: LPLPVOID): HRESULT {
-    return Dcomp.Load('DllGetClassObject')(rclsid, riid, ppv);
+  public static DllGetClassObject(rclsid: REFCLSID, riid: REFIID, ppv_out: LPLPVOID): HRESULT {
+    return Dcomp.Load('DllGetClassObject')(rclsid, riid, ppv_out);
   }
 }
 

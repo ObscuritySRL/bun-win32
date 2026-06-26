@@ -25,7 +25,7 @@ import type {
   LPPRINTDLGW,
   LPSTR,
   LPWSTR,
-  NULL,
+  NULLABLE,
   SHORT,
   WORD,
 } from '../types/Comdlg32';
@@ -81,23 +81,23 @@ class Comdlg32 extends Win32 {
   } as const satisfies Record<string, FFIFunction>;
 
   // https://learn.microsoft.com/en-us/windows/win32/api/commdlg/nf-commdlg-choosecolora
-  public static ChooseColorA(lpcc: LPCHOOSECOLORA): BOOL {
-    return Comdlg32.Load('ChooseColorA')(lpcc);
+  public static ChooseColorA(lpcc_in_out: LPCHOOSECOLORA): BOOL {
+    return Comdlg32.Load('ChooseColorA')(lpcc_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/commdlg/nf-commdlg-choosecolorw
-  public static ChooseColorW(lpcc: LPCHOOSECOLORW): BOOL {
-    return Comdlg32.Load('ChooseColorW')(lpcc);
+  public static ChooseColorW(lpcc_in_out: LPCHOOSECOLORW): BOOL {
+    return Comdlg32.Load('ChooseColorW')(lpcc_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/commdlg/nf-commdlg-choosefonta
-  public static ChooseFontA(lpcf: LPCHOOSEFONTA): BOOL {
-    return Comdlg32.Load('ChooseFontA')(lpcf);
+  public static ChooseFontA(lpcf_in_out: LPCHOOSEFONTA): BOOL {
+    return Comdlg32.Load('ChooseFontA')(lpcf_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/commdlg/nf-commdlg-choosefontw
-  public static ChooseFontW(lpcf: LPCHOOSEFONTW): BOOL {
-    return Comdlg32.Load('ChooseFontW')(lpcf);
+  public static ChooseFontW(lpcf_in_out: LPCHOOSEFONTW): BOOL {
+    return Comdlg32.Load('ChooseFontW')(lpcf_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/commdlg/nf-commdlg-commdlgextendederror
@@ -106,83 +106,83 @@ class Comdlg32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/commdlg/nf-commdlg-findtexta
-  public static FindTextA(lpfr: LPFINDREPLACEA): HWND {
-    return Comdlg32.Load('FindTextA')(lpfr);
+  public static FindTextA(lpfr_in_out: LPFINDREPLACEA): HWND {
+    return Comdlg32.Load('FindTextA')(lpfr_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/commdlg/nf-commdlg-findtextw
-  public static FindTextW(lpfr: LPFINDREPLACEW): HWND {
-    return Comdlg32.Load('FindTextW')(lpfr);
+  public static FindTextW(lpfr_in_out: LPFINDREPLACEW): HWND {
+    return Comdlg32.Load('FindTextW')(lpfr_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/commdlg/nf-commdlg-getfiletitlea
-  public static GetFileTitleA(lpszFile: LPCSTR, Buf: LPSTR | NULL, cchSize: WORD): SHORT {
-    return Comdlg32.Load('GetFileTitleA')(lpszFile, Buf, cchSize);
+  public static GetFileTitleA(lpszFile: LPCSTR, Buf_out: NULLABLE<LPSTR>, cchSize: WORD): SHORT {
+    return Comdlg32.Load('GetFileTitleA')(lpszFile, Buf_out, cchSize);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/commdlg/nf-commdlg-getfiletitlew
-  public static GetFileTitleW(lpszFile: LPCWSTR, Buf: LPWSTR | NULL, cchSize: WORD): SHORT {
-    return Comdlg32.Load('GetFileTitleW')(lpszFile, Buf, cchSize);
+  public static GetFileTitleW(lpszFile: LPCWSTR, Buf_out: NULLABLE<LPWSTR>, cchSize: WORD): SHORT {
+    return Comdlg32.Load('GetFileTitleW')(lpszFile, Buf_out, cchSize);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/commdlg/nf-commdlg-getopenfilenamea
-  public static GetOpenFileNameA(lpofn: LPOPENFILENAMEA): BOOL {
-    return Comdlg32.Load('GetOpenFileNameA')(lpofn);
+  public static GetOpenFileNameA(lpofn_in_out: LPOPENFILENAMEA): BOOL {
+    return Comdlg32.Load('GetOpenFileNameA')(lpofn_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/commdlg/nf-commdlg-getopenfilenamew
-  public static GetOpenFileNameW(lpofn: LPOPENFILENAMEW): BOOL {
-    return Comdlg32.Load('GetOpenFileNameW')(lpofn);
+  public static GetOpenFileNameW(lpofn_in_out: LPOPENFILENAMEW): BOOL {
+    return Comdlg32.Load('GetOpenFileNameW')(lpofn_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/commdlg/nf-commdlg-getsavefilenamea
-  public static GetSaveFileNameA(lpofn: LPOPENFILENAMEA): BOOL {
-    return Comdlg32.Load('GetSaveFileNameA')(lpofn);
+  public static GetSaveFileNameA(lpofn_in_out: LPOPENFILENAMEA): BOOL {
+    return Comdlg32.Load('GetSaveFileNameA')(lpofn_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/commdlg/nf-commdlg-getsavefilenamew
-  public static GetSaveFileNameW(lpofn: LPOPENFILENAMEW): BOOL {
-    return Comdlg32.Load('GetSaveFileNameW')(lpofn);
+  public static GetSaveFileNameW(lpofn_in_out: LPOPENFILENAMEW): BOOL {
+    return Comdlg32.Load('GetSaveFileNameW')(lpofn_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/commdlg/nf-commdlg-pagesetupdlga
-  public static PageSetupDlgA(lppsd: LPPAGESETUPDLGA): BOOL {
-    return Comdlg32.Load('PageSetupDlgA')(lppsd);
+  public static PageSetupDlgA(lppsd_in_out: LPPAGESETUPDLGA): BOOL {
+    return Comdlg32.Load('PageSetupDlgA')(lppsd_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/commdlg/nf-commdlg-pagesetupdlgw
-  public static PageSetupDlgW(lppsd: LPPAGESETUPDLGW): BOOL {
-    return Comdlg32.Load('PageSetupDlgW')(lppsd);
+  public static PageSetupDlgW(lppsd_in_out: LPPAGESETUPDLGW): BOOL {
+    return Comdlg32.Load('PageSetupDlgW')(lppsd_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/commdlg/nf-commdlg-printdlga
-  public static PrintDlgA(pPD: LPPRINTDLGA): BOOL {
-    return Comdlg32.Load('PrintDlgA')(pPD);
+  public static PrintDlgA(pPD_in_out: LPPRINTDLGA): BOOL {
+    return Comdlg32.Load('PrintDlgA')(pPD_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/commdlg/nf-commdlg-printdlgexa
-  public static PrintDlgExA(pPD: LPPRINTDLGEXA): HRESULT {
-    return Comdlg32.Load('PrintDlgExA')(pPD);
+  public static PrintDlgExA(pPD_in_out: LPPRINTDLGEXA): HRESULT {
+    return Comdlg32.Load('PrintDlgExA')(pPD_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/commdlg/nf-commdlg-printdlgexw
-  public static PrintDlgExW(pPD: LPPRINTDLGEXW): HRESULT {
-    return Comdlg32.Load('PrintDlgExW')(pPD);
+  public static PrintDlgExW(pPD_in_out: LPPRINTDLGEXW): HRESULT {
+    return Comdlg32.Load('PrintDlgExW')(pPD_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/commdlg/nf-commdlg-printdlgw
-  public static PrintDlgW(pPD: LPPRINTDLGW): BOOL {
-    return Comdlg32.Load('PrintDlgW')(pPD);
+  public static PrintDlgW(pPD_in_out: LPPRINTDLGW): BOOL {
+    return Comdlg32.Load('PrintDlgW')(pPD_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/commdlg/nf-commdlg-replacetexta
-  public static ReplaceTextA(lpfr: LPFINDREPLACEA): HWND {
-    return Comdlg32.Load('ReplaceTextA')(lpfr);
+  public static ReplaceTextA(lpfr_in_out: LPFINDREPLACEA): HWND {
+    return Comdlg32.Load('ReplaceTextA')(lpfr_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/commdlg/nf-commdlg-replacetextw
-  public static ReplaceTextW(lpfr: LPFINDREPLACEW): HWND {
-    return Comdlg32.Load('ReplaceTextW')(lpfr);
+  public static ReplaceTextW(lpfr_in_out: LPFINDREPLACEW): HWND {
+    return Comdlg32.Load('ReplaceTextW')(lpfr_in_out);
   }
 }
 

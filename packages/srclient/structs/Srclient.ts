@@ -42,13 +42,13 @@ class Srclient extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/srrestoreptapi/nf-srrestoreptapi-srsetrestorepointa
-  public static SRSetRestorePointA(pRestorePtSpec: PRESTOREPOINTINFOA, pSMgrStatus: PSTATEMGRSTATUS): BOOL {
-    return Srclient.Load('SRSetRestorePointA')(pRestorePtSpec, pSMgrStatus);
+  public static SRSetRestorePointA(pRestorePtSpec: PRESTOREPOINTINFOA, pSMgrStatus_out: PSTATEMGRSTATUS): BOOL {
+    return Srclient.Load('SRSetRestorePointA')(pRestorePtSpec, pSMgrStatus_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/srrestoreptapi/nf-srrestoreptapi-srsetrestorepointw
-  public static SRSetRestorePointW(pRestorePtSpec: PRESTOREPOINTINFOW, pSMgrStatus: PSTATEMGRSTATUS): BOOL {
-    return Srclient.Load('SRSetRestorePointW')(pRestorePtSpec, pSMgrStatus);
+  public static SRSetRestorePointW(pRestorePtSpec: PRESTOREPOINTINFOW, pSMgrStatus_out: PSTATEMGRSTATUS): BOOL {
+    return Srclient.Load('SRSetRestorePointW')(pRestorePtSpec, pSMgrStatus_out);
   }
 }
 

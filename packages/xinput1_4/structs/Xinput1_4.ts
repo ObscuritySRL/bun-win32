@@ -2,7 +2,7 @@ import { type FFIFunction, FFIType } from 'bun:ffi';
 
 import { Win32 } from '@bun-win32/core';
 
-import type { BOOL, BYTE, DWORD, LPWSTR, NULL, PXINPUT_BATTERY_INFORMATION, PXINPUT_CAPABILITIES, PXINPUT_KEYSTROKE, PXINPUT_STATE, PXINPUT_VIBRATION, PUINT, VOID } from '../types/Xinput1_4';
+import type { BOOL, BYTE, DWORD, LPWSTR, OPTIONAL, PUINT, PXINPUT_BATTERY_INFORMATION, PXINPUT_CAPABILITIES, PXINPUT_KEYSTROKE, PXINPUT_STATE, PXINPUT_VIBRATION, VOID } from '../types/Xinput1_4';
 
 /**
  * Thin, lazy-loaded FFI bindings for `xinput1_4.dll`.
@@ -46,33 +46,33 @@ class Xinput1_4 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/xinput/nf-xinput-xinputgetaudiodeviceids
-  public static XInputGetAudioDeviceIds(dwUserIndex: DWORD, pRenderDeviceId: LPWSTR | NULL, pRenderCount: PUINT | NULL, pCaptureDeviceId: LPWSTR | NULL, pCaptureCount: PUINT | NULL): DWORD {
-    return Xinput1_4.Load('XInputGetAudioDeviceIds')(dwUserIndex, pRenderDeviceId, pRenderCount, pCaptureDeviceId, pCaptureCount);
+  public static XInputGetAudioDeviceIds(dwUserIndex: DWORD, pRenderDeviceId_out: OPTIONAL<LPWSTR>, pRenderCount_in_out: OPTIONAL<PUINT>, pCaptureDeviceId_out: OPTIONAL<LPWSTR>, pCaptureCount_in_out: OPTIONAL<PUINT>): DWORD {
+    return Xinput1_4.Load('XInputGetAudioDeviceIds')(dwUserIndex, pRenderDeviceId_out, pRenderCount_in_out, pCaptureDeviceId_out, pCaptureCount_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/xinput/nf-xinput-xinputgetbatteryinformation
-  public static XInputGetBatteryInformation(dwUserIndex: DWORD, devType: BYTE, pBatteryInformation: PXINPUT_BATTERY_INFORMATION): DWORD {
-    return Xinput1_4.Load('XInputGetBatteryInformation')(dwUserIndex, devType, pBatteryInformation);
+  public static XInputGetBatteryInformation(dwUserIndex: DWORD, devType: BYTE, pBatteryInformation_out: PXINPUT_BATTERY_INFORMATION): DWORD {
+    return Xinput1_4.Load('XInputGetBatteryInformation')(dwUserIndex, devType, pBatteryInformation_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/xinput/nf-xinput-xinputgetcapabilities
-  public static XInputGetCapabilities(dwUserIndex: DWORD, dwFlags: DWORD, pCapabilities: PXINPUT_CAPABILITIES): DWORD {
-    return Xinput1_4.Load('XInputGetCapabilities')(dwUserIndex, dwFlags, pCapabilities);
+  public static XInputGetCapabilities(dwUserIndex: DWORD, dwFlags: DWORD, pCapabilities_out: PXINPUT_CAPABILITIES): DWORD {
+    return Xinput1_4.Load('XInputGetCapabilities')(dwUserIndex, dwFlags, pCapabilities_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/xinput/nf-xinput-xinputgetkeystroke
-  public static XInputGetKeystroke(dwUserIndex: DWORD, dwReserved: DWORD, pKeystroke: PXINPUT_KEYSTROKE): DWORD {
-    return Xinput1_4.Load('XInputGetKeystroke')(dwUserIndex, dwReserved, pKeystroke);
+  public static XInputGetKeystroke(dwUserIndex: DWORD, dwReserved: DWORD, pKeystroke_out: PXINPUT_KEYSTROKE): DWORD {
+    return Xinput1_4.Load('XInputGetKeystroke')(dwUserIndex, dwReserved, pKeystroke_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/xinput/nf-xinput-xinputgetstate
-  public static XInputGetState(dwUserIndex: DWORD, pState: PXINPUT_STATE): DWORD {
-    return Xinput1_4.Load('XInputGetState')(dwUserIndex, pState);
+  public static XInputGetState(dwUserIndex: DWORD, pState_out: PXINPUT_STATE): DWORD {
+    return Xinput1_4.Load('XInputGetState')(dwUserIndex, pState_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/xinput/nf-xinput-xinputsetstate
-  public static XInputSetState(dwUserIndex: DWORD, pVibration: PXINPUT_VIBRATION): DWORD {
-    return Xinput1_4.Load('XInputSetState')(dwUserIndex, pVibration);
+  public static XInputSetState(dwUserIndex: DWORD, pVibration_in_out: PXINPUT_VIBRATION): DWORD {
+    return Xinput1_4.Load('XInputSetState')(dwUserIndex, pVibration_in_out);
   }
 }
 

@@ -12,7 +12,8 @@ import type {
   LPVOID,
   LPWSTR,
   NTSTATUS,
-  NULL,
+  NULLABLE,
+  OPTIONAL,
   PBOOLEAN,
   PCredHandle,
   PCtxtHandle,
@@ -167,84 +168,84 @@ class Secur32 extends Win32 {
 
   // https://learn.microsoft.com/en-us/windows/win32/api/sspi/nf-sspi-acceptsecuritycontext
   public static AcceptSecurityContext(
-    phCredential: PCredHandle | NULL,
-    phContext: PCtxtHandle | NULL,
-    pInput: PSecBufferDesc | NULL,
+    phCredential: OPTIONAL<PCredHandle>,
+    phContext: OPTIONAL<PCtxtHandle>,
+    pInput: OPTIONAL<PSecBufferDesc>,
     fContextReq: ULONG,
     TargetDataRep: ULONG,
-    phNewContext: PCtxtHandle | NULL,
-    pOutput: PSecBufferDesc | NULL,
-    pfContextAttr: PULONG,
-    ptsExpiry: PTimeStamp | NULL,
+    phNewContext_in_out: OPTIONAL<PCtxtHandle>,
+    pOutput_in_out: OPTIONAL<PSecBufferDesc>,
+    pfContextAttr_out: PULONG,
+    ptsExpiry_out: OPTIONAL<PTimeStamp>,
   ): SECURITY_STATUS {
-    return Secur32.Load('AcceptSecurityContext')(phCredential, phContext, pInput, fContextReq, TargetDataRep, phNewContext, pOutput, pfContextAttr, ptsExpiry);
+    return Secur32.Load('AcceptSecurityContext')(phCredential, phContext, pInput, fContextReq, TargetDataRep, phNewContext_in_out, pOutput_in_out, pfContextAttr_out, ptsExpiry_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/sspi/nf-sspi-acquirecredentialshandlea
   public static AcquireCredentialsHandleA(
-    pszPrincipal: LPSTR | NULL,
+    pszPrincipal: OPTIONAL<LPSTR>,
     pszPackage: LPSTR,
     fCredentialUse: ULONG,
-    pvLogonId: PLUID | NULL,
-    pAuthData: PVOID | NULL,
-    pGetKeyFn: SEC_GET_KEY_FN | NULL,
-    pvGetKeyArgument: PVOID | NULL,
-    phCredential: PCredHandle,
-    ptsExpiry: PTimeStamp | NULL,
+    pvLogonId: OPTIONAL<PLUID>,
+    pAuthData: OPTIONAL<PVOID>,
+    pGetKeyFn: OPTIONAL<SEC_GET_KEY_FN>,
+    pvGetKeyArgument: OPTIONAL<PVOID>,
+    phCredential_out: PCredHandle,
+    ptsExpiry_out: OPTIONAL<PTimeStamp>,
   ): SECURITY_STATUS {
-    return Secur32.Load('AcquireCredentialsHandleA')(pszPrincipal, pszPackage, fCredentialUse, pvLogonId, pAuthData, pGetKeyFn, pvGetKeyArgument, phCredential, ptsExpiry);
+    return Secur32.Load('AcquireCredentialsHandleA')(pszPrincipal, pszPackage, fCredentialUse, pvLogonId, pAuthData, pGetKeyFn, pvGetKeyArgument, phCredential_out, ptsExpiry_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/sspi/nf-sspi-acquirecredentialshandlew
   public static AcquireCredentialsHandleW(
-    pszPrincipal: LPWSTR | NULL,
+    pszPrincipal: OPTIONAL<LPWSTR>,
     pszPackage: LPWSTR,
     fCredentialUse: ULONG,
-    pvLogonId: PLUID | NULL,
-    pAuthData: PVOID | NULL,
-    pGetKeyFn: SEC_GET_KEY_FN | NULL,
-    pvGetKeyArgument: PVOID | NULL,
-    phCredential: PCredHandle,
-    ptsExpiry: PTimeStamp | NULL,
+    pvLogonId: OPTIONAL<PLUID>,
+    pAuthData: OPTIONAL<PVOID>,
+    pGetKeyFn: OPTIONAL<SEC_GET_KEY_FN>,
+    pvGetKeyArgument: OPTIONAL<PVOID>,
+    phCredential_out: PCredHandle,
+    ptsExpiry_out: OPTIONAL<PTimeStamp>,
   ): SECURITY_STATUS {
-    return Secur32.Load('AcquireCredentialsHandleW')(pszPrincipal, pszPackage, fCredentialUse, pvLogonId, pAuthData, pGetKeyFn, pvGetKeyArgument, phCredential, ptsExpiry);
+    return Secur32.Load('AcquireCredentialsHandleW')(pszPrincipal, pszPackage, fCredentialUse, pvLogonId, pAuthData, pGetKeyFn, pvGetKeyArgument, phCredential_out, ptsExpiry_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/sspi/nf-sspi-addcredentialsa
   public static AddCredentialsA(
     hCredentials: PCredHandle,
-    pszPrincipal: LPSTR | NULL,
+    pszPrincipal: OPTIONAL<LPSTR>,
     pszPackage: LPSTR,
     fCredentialUse: ULONG,
-    pAuthData: PVOID | NULL,
-    pGetKeyFn: SEC_GET_KEY_FN | NULL,
-    pvGetKeyArgument: PVOID | NULL,
-    ptsExpiry: PTimeStamp | NULL,
+    pAuthData: OPTIONAL<PVOID>,
+    pGetKeyFn: OPTIONAL<SEC_GET_KEY_FN>,
+    pvGetKeyArgument: OPTIONAL<PVOID>,
+    ptsExpiry_out: OPTIONAL<PTimeStamp>,
   ): SECURITY_STATUS {
-    return Secur32.Load('AddCredentialsA')(hCredentials, pszPrincipal, pszPackage, fCredentialUse, pAuthData, pGetKeyFn, pvGetKeyArgument, ptsExpiry);
+    return Secur32.Load('AddCredentialsA')(hCredentials, pszPrincipal, pszPackage, fCredentialUse, pAuthData, pGetKeyFn, pvGetKeyArgument, ptsExpiry_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/sspi/nf-sspi-addcredentialsw
   public static AddCredentialsW(
     hCredentials: PCredHandle,
-    pszPrincipal: LPWSTR | NULL,
+    pszPrincipal: OPTIONAL<LPWSTR>,
     pszPackage: LPWSTR,
     fCredentialUse: ULONG,
-    pAuthData: PVOID | NULL,
-    pGetKeyFn: SEC_GET_KEY_FN | NULL,
-    pvGetKeyArgument: PVOID | NULL,
-    ptsExpiry: PTimeStamp | NULL,
+    pAuthData: OPTIONAL<PVOID>,
+    pGetKeyFn: OPTIONAL<SEC_GET_KEY_FN>,
+    pvGetKeyArgument: OPTIONAL<PVOID>,
+    ptsExpiry_out: OPTIONAL<PTimeStamp>,
   ): SECURITY_STATUS {
-    return Secur32.Load('AddCredentialsW')(hCredentials, pszPrincipal, pszPackage, fCredentialUse, pAuthData, pGetKeyFn, pvGetKeyArgument, ptsExpiry);
+    return Secur32.Load('AddCredentialsW')(hCredentials, pszPrincipal, pszPackage, fCredentialUse, pAuthData, pGetKeyFn, pvGetKeyArgument, ptsExpiry_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/sspi/nf-sspi-addsecuritypackagea
-  public static AddSecurityPackageA(pszPackageName: LPSTR, pOptions: PSECURITY_PACKAGE_OPTIONS | NULL): SECURITY_STATUS {
+  public static AddSecurityPackageA(pszPackageName: LPSTR, pOptions: OPTIONAL<PSECURITY_PACKAGE_OPTIONS>): SECURITY_STATUS {
     return Secur32.Load('AddSecurityPackageA')(pszPackageName, pOptions);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/sspi/nf-sspi-addsecuritypackagew
-  public static AddSecurityPackageW(pszPackageName: LPWSTR, pOptions: PSECURITY_PACKAGE_OPTIONS | NULL): SECURITY_STATUS {
+  public static AddSecurityPackageW(pszPackageName: LPWSTR, pOptions: OPTIONAL<PSECURITY_PACKAGE_OPTIONS>): SECURITY_STATUS {
     return Secur32.Load('AddSecurityPackageW')(pszPackageName, pOptions);
   }
 
@@ -254,8 +255,17 @@ class Secur32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/sspi/nf-sspi-changeaccountpassworda
-  public static ChangeAccountPasswordA(pszPackageName: LPSTR, pszDomainName: LPSTR, pszAccountName: LPSTR, pszOldPassword: LPSTR, pszNewPassword: LPSTR, bImpersonating: BOOLEAN, dwReserved: ULONG, pOutput: PSecBufferDesc): SECURITY_STATUS {
-    return Secur32.Load('ChangeAccountPasswordA')(pszPackageName, pszDomainName, pszAccountName, pszOldPassword, pszNewPassword, bImpersonating, dwReserved, pOutput);
+  public static ChangeAccountPasswordA(
+    pszPackageName: LPSTR,
+    pszDomainName: LPSTR,
+    pszAccountName: LPSTR,
+    pszOldPassword: LPSTR,
+    pszNewPassword: LPSTR,
+    bImpersonating: BOOLEAN,
+    dwReserved: ULONG,
+    pOutput_in_out: PSecBufferDesc,
+  ): SECURITY_STATUS {
+    return Secur32.Load('ChangeAccountPasswordA')(pszPackageName, pszDomainName, pszAccountName, pszOldPassword, pszNewPassword, bImpersonating, dwReserved, pOutput_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/sspi/nf-sspi-changeaccountpasswordw
@@ -267,9 +277,9 @@ class Secur32 extends Win32 {
     pszNewPassword: LPWSTR,
     bImpersonating: BOOLEAN,
     dwReserved: ULONG,
-    pOutput: PSecBufferDesc,
+    pOutput_in_out: PSecBufferDesc,
   ): SECURITY_STATUS {
-    return Secur32.Load('ChangeAccountPasswordW')(pszPackageName, pszDomainName, pszAccountName, pszOldPassword, pszNewPassword, bImpersonating, dwReserved, pOutput);
+    return Secur32.Load('ChangeAccountPasswordW')(pszPackageName, pszDomainName, pszAccountName, pszOldPassword, pszNewPassword, bImpersonating, dwReserved, pOutput_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/sspi/nf-sspi-completeauthtoken
@@ -278,8 +288,8 @@ class Secur32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/sspi/nf-sspi-decryptmessage
-  public static DecryptMessage(phContext: PCtxtHandle, pMessage: PSecBufferDesc, MessageSeqNo: ULONG, pfQOP: PULONG | NULL): SECURITY_STATUS {
-    return Secur32.Load('DecryptMessage')(phContext, pMessage, MessageSeqNo, pfQOP);
+  public static DecryptMessage(phContext: PCtxtHandle, pMessage: PSecBufferDesc, MessageSeqNo: ULONG, pfQOP_out: OPTIONAL<PULONG>): SECURITY_STATUS {
+    return Secur32.Load('DecryptMessage')(phContext, pMessage, MessageSeqNo, pfQOP_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/sspi/nf-sspi-deletesecuritycontext
@@ -303,23 +313,23 @@ class Secur32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/sspi/nf-sspi-enumeratesecuritypackagesa
-  public static EnumerateSecurityPackagesA(pcPackages: PULONG, ppPackageInfo: PSecPkgInfoA): SECURITY_STATUS {
-    return Secur32.Load('EnumerateSecurityPackagesA')(pcPackages, ppPackageInfo);
+  public static EnumerateSecurityPackagesA(pcPackages_out: PULONG, ppPackageInfo_out: PSecPkgInfoA): SECURITY_STATUS {
+    return Secur32.Load('EnumerateSecurityPackagesA')(pcPackages_out, ppPackageInfo_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/sspi/nf-sspi-enumeratesecuritypackagesw
-  public static EnumerateSecurityPackagesW(pcPackages: PULONG, ppPackageInfo: PSecPkgInfoW): SECURITY_STATUS {
-    return Secur32.Load('EnumerateSecurityPackagesW')(pcPackages, ppPackageInfo);
+  public static EnumerateSecurityPackagesW(pcPackages_out: PULONG, ppPackageInfo_out: PSecPkgInfoW): SECURITY_STATUS {
+    return Secur32.Load('EnumerateSecurityPackagesW')(pcPackages_out, ppPackageInfo_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/sspi/nf-sspi-exportsecuritycontext
-  public static ExportSecurityContext(phContext: PCtxtHandle, fFlags: ULONG, pPackedContext: PSecBuffer, pToken: PHANDLE | NULL): SECURITY_STATUS {
-    return Secur32.Load('ExportSecurityContext')(phContext, fFlags, pPackedContext, pToken);
+  public static ExportSecurityContext(phContext: PCtxtHandle, fFlags: ULONG, pPackedContext_out: PSecBuffer, pToken_out: OPTIONAL<PHANDLE>): SECURITY_STATUS {
+    return Secur32.Load('ExportSecurityContext')(phContext, fFlags, pPackedContext_out, pToken_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/sspi/nf-sspi-freecontextbuffer
-  public static FreeContextBuffer(pvContextBuffer: PVOID): SECURITY_STATUS {
-    return Secur32.Load('FreeContextBuffer')(pvContextBuffer);
+  public static FreeContextBuffer(pvContextBuffer_in_out: PVOID): SECURITY_STATUS {
+    return Secur32.Load('FreeContextBuffer')(pvContextBuffer_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/sspi/nf-sspi-freecredentialshandle
@@ -328,28 +338,28 @@ class Secur32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/secext/nf-secext-getcomputerobjectnamea
-  public static GetComputerObjectNameA(NameFormat: EXTENDED_NAME_FORMAT, lpNameBuffer: LPSTR | NULL, nSize: PULONG): BOOLEAN {
-    return Secur32.Load('GetComputerObjectNameA')(NameFormat, lpNameBuffer, nSize);
+  public static GetComputerObjectNameA(NameFormat: EXTENDED_NAME_FORMAT, lpNameBuffer_out: OPTIONAL<LPSTR>, nSize_in_out: PULONG): BOOLEAN {
+    return Secur32.Load('GetComputerObjectNameA')(NameFormat, lpNameBuffer_out, nSize_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/secext/nf-secext-getcomputerobjectnamew
-  public static GetComputerObjectNameW(NameFormat: EXTENDED_NAME_FORMAT, lpNameBuffer: LPWSTR | NULL, nSize: PULONG): BOOLEAN {
-    return Secur32.Load('GetComputerObjectNameW')(NameFormat, lpNameBuffer, nSize);
+  public static GetComputerObjectNameW(NameFormat: EXTENDED_NAME_FORMAT, lpNameBuffer_out: OPTIONAL<LPWSTR>, nSize_in_out: PULONG): BOOLEAN {
+    return Secur32.Load('GetComputerObjectNameW')(NameFormat, lpNameBuffer_out, nSize_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntsecapi/nf-ntsecapi-getsecurityuserinfo
-  public static GetSecurityUserInfo(LogonId: PLUID | NULL, Flags: ULONG, UserInformation: PSecurityUserData): NTSTATUS {
-    return Secur32.Load('GetSecurityUserInfo')(LogonId, Flags, UserInformation);
+  public static GetSecurityUserInfo(LogonId: OPTIONAL<PLUID>, Flags: ULONG, UserInformation_out: PSecurityUserData): NTSTATUS {
+    return Secur32.Load('GetSecurityUserInfo')(LogonId, Flags, UserInformation_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/secext/nf-secext-getusernameexa
-  public static GetUserNameExA(NameFormat: EXTENDED_NAME_FORMAT, lpNameBuffer: LPSTR | NULL, nSize: PULONG): BOOLEAN {
-    return Secur32.Load('GetUserNameExA')(NameFormat, lpNameBuffer, nSize);
+  public static GetUserNameExA(NameFormat: EXTENDED_NAME_FORMAT, lpNameBuffer_out: OPTIONAL<LPSTR>, nSize_in_out: PULONG): BOOLEAN {
+    return Secur32.Load('GetUserNameExA')(NameFormat, lpNameBuffer_out, nSize_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/secext/nf-secext-getusernameexw
-  public static GetUserNameExW(NameFormat: EXTENDED_NAME_FORMAT, lpNameBuffer: LPWSTR | NULL, nSize: PULONG): BOOLEAN {
-    return Secur32.Load('GetUserNameExW')(NameFormat, lpNameBuffer, nSize);
+  public static GetUserNameExW(NameFormat: EXTENDED_NAME_FORMAT, lpNameBuffer_out: OPTIONAL<LPWSTR>, nSize_in_out: PULONG): BOOLEAN {
+    return Secur32.Load('GetUserNameExW')(NameFormat, lpNameBuffer_out, nSize_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/sspi/nf-sspi-impersonatesecuritycontext
@@ -358,13 +368,13 @@ class Secur32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/sspi/nf-sspi-importsecuritycontexta
-  public static ImportSecurityContextA(pszPackage: LPSTR, pPackedContext: PSecBuffer, Token: HANDLE | 0n, phContext: PCtxtHandle): SECURITY_STATUS {
-    return Secur32.Load('ImportSecurityContextA')(pszPackage, pPackedContext, Token, phContext);
+  public static ImportSecurityContextA(pszPackage: LPSTR, pPackedContext: PSecBuffer, Token: NULLABLE<HANDLE>, phContext_out: PCtxtHandle): SECURITY_STATUS {
+    return Secur32.Load('ImportSecurityContextA')(pszPackage, pPackedContext, Token, phContext_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/sspi/nf-sspi-importsecuritycontextw
-  public static ImportSecurityContextW(pszPackage: LPWSTR, pPackedContext: PSecBuffer, Token: HANDLE | 0n, phContext: PCtxtHandle): SECURITY_STATUS {
-    return Secur32.Load('ImportSecurityContextW')(pszPackage, pPackedContext, Token, phContext);
+  public static ImportSecurityContextW(pszPackage: LPWSTR, pPackedContext: PSecBuffer, Token: NULLABLE<HANDLE>, phContext_out: PCtxtHandle): SECURITY_STATUS {
+    return Secur32.Load('ImportSecurityContextW')(pszPackage, pPackedContext, Token, phContext_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/sspi/nf-sspi-initsecurityinterfacea
@@ -379,38 +389,38 @@ class Secur32 extends Win32 {
 
   // https://learn.microsoft.com/en-us/windows/win32/api/sspi/nf-sspi-initializesecuritycontexta
   public static InitializeSecurityContextA(
-    phCredential: PCredHandle | NULL,
-    phContext: PCtxtHandle | NULL,
-    pszTargetName: LPSTR | NULL,
+    phCredential: OPTIONAL<PCredHandle>,
+    phContext: OPTIONAL<PCtxtHandle>,
+    pszTargetName: OPTIONAL<LPSTR>,
     fContextReq: ULONG,
     Reserved1: ULONG,
     TargetDataRep: ULONG,
-    pInput: PSecBufferDesc | NULL,
+    pInput: OPTIONAL<PSecBufferDesc>,
     Reserved2: ULONG,
-    phNewContext: PCtxtHandle | NULL,
-    pOutput: PSecBufferDesc,
-    pfContextAttr: PULONG,
-    ptsExpiry: PTimeStamp | NULL,
+    phNewContext_in_out: OPTIONAL<PCtxtHandle>,
+    pOutput_in_out: OPTIONAL<PSecBufferDesc>,
+    pfContextAttr_out: PULONG,
+    ptsExpiry_out: OPTIONAL<PTimeStamp>,
   ): SECURITY_STATUS {
-    return Secur32.Load('InitializeSecurityContextA')(phCredential, phContext, pszTargetName, fContextReq, Reserved1, TargetDataRep, pInput, Reserved2, phNewContext, pOutput, pfContextAttr, ptsExpiry);
+    return Secur32.Load('InitializeSecurityContextA')(phCredential, phContext, pszTargetName, fContextReq, Reserved1, TargetDataRep, pInput, Reserved2, phNewContext_in_out, pOutput_in_out, pfContextAttr_out, ptsExpiry_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/sspi/nf-sspi-initializesecuritycontextw
   public static InitializeSecurityContextW(
-    phCredential: PCredHandle | NULL,
-    phContext: PCtxtHandle | NULL,
-    pszTargetName: LPWSTR | NULL,
+    phCredential: OPTIONAL<PCredHandle>,
+    phContext: OPTIONAL<PCtxtHandle>,
+    pszTargetName: OPTIONAL<LPWSTR>,
     fContextReq: ULONG,
     Reserved1: ULONG,
     TargetDataRep: ULONG,
-    pInput: PSecBufferDesc | NULL,
+    pInput: OPTIONAL<PSecBufferDesc>,
     Reserved2: ULONG,
-    phNewContext: PCtxtHandle | NULL,
-    pOutput: PSecBufferDesc,
-    pfContextAttr: PULONG,
-    ptsExpiry: PTimeStamp | NULL,
+    phNewContext_in_out: OPTIONAL<PCtxtHandle>,
+    pOutput_in_out: OPTIONAL<PSecBufferDesc>,
+    pfContextAttr_out: PULONG,
+    ptsExpiry_out: OPTIONAL<PTimeStamp>,
   ): SECURITY_STATUS {
-    return Secur32.Load('InitializeSecurityContextW')(phCredential, phContext, pszTargetName, fContextReq, Reserved1, TargetDataRep, pInput, Reserved2, phNewContext, pOutput, pfContextAttr, ptsExpiry);
+    return Secur32.Load('InitializeSecurityContextW')(phCredential, phContext, pszTargetName, fContextReq, Reserved1, TargetDataRep, pInput, Reserved2, phNewContext_in_out, pOutput_in_out, pfContextAttr_out, ptsExpiry_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntsecapi/nf-ntsecapi-lsacallauthenticationpackage
@@ -419,16 +429,16 @@ class Secur32 extends Win32 {
     AuthenticationPackage: ULONG,
     ProtocolSubmitBuffer: PVOID,
     SubmitBufferLength: ULONG,
-    ProtocolReturnBuffer: PVOID,
-    ReturnBufferLength: PULONG,
-    ProtocolStatus: PNTSTATUS,
+    ProtocolReturnBuffer_out: OPTIONAL<PVOID>,
+    ReturnBufferLength_out: OPTIONAL<PULONG>,
+    ProtocolStatus_out: OPTIONAL<PNTSTATUS>,
   ): NTSTATUS {
-    return Secur32.Load('LsaCallAuthenticationPackage')(LsaHandle, AuthenticationPackage, ProtocolSubmitBuffer, SubmitBufferLength, ProtocolReturnBuffer, ReturnBufferLength, ProtocolStatus);
+    return Secur32.Load('LsaCallAuthenticationPackage')(LsaHandle, AuthenticationPackage, ProtocolSubmitBuffer, SubmitBufferLength, ProtocolReturnBuffer_out, ReturnBufferLength_out, ProtocolStatus_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntsecapi/nf-ntsecapi-lsaconnectuntrusted
-  public static LsaConnectUntrusted(LsaHandle: PHANDLE): NTSTATUS {
-    return Secur32.Load('LsaConnectUntrusted')(LsaHandle);
+  public static LsaConnectUntrusted(LsaHandle_out: PHANDLE): NTSTATUS {
+    return Secur32.Load('LsaConnectUntrusted')(LsaHandle_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntsecapi/nf-ntsecapi-lsaderegisterlogonprocess
@@ -437,8 +447,8 @@ class Secur32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntsecapi/nf-ntsecapi-lsaenumeratelogonsessions
-  public static LsaEnumerateLogonSessions(LogonSessionCount: PULONG, LogonSessionList: PLUID): NTSTATUS {
-    return Secur32.Load('LsaEnumerateLogonSessions')(LogonSessionCount, LogonSessionList);
+  public static LsaEnumerateLogonSessions(LogonSessionCount_out: PULONG, LogonSessionList_out: PLUID): NTSTATUS {
+    return Secur32.Load('LsaEnumerateLogonSessions')(LogonSessionCount_out, LogonSessionList_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntsecapi/nf-ntsecapi-lsafreereturnbuffer
@@ -447,8 +457,8 @@ class Secur32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntsecapi/nf-ntsecapi-lsagetlogonsessiondata
-  public static LsaGetLogonSessionData(LogonId: PLUID, ppLogonSessionData: PSECURITY_LOGON_SESSION_DATA): NTSTATUS {
-    return Secur32.Load('LsaGetLogonSessionData')(LogonId, ppLogonSessionData);
+  public static LsaGetLogonSessionData(LogonId: PLUID, ppLogonSessionData_out: PSECURITY_LOGON_SESSION_DATA): NTSTATUS {
+    return Secur32.Load('LsaGetLogonSessionData')(LogonId, ppLogonSessionData_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntsecapi/nf-ntsecapi-lsalogonuser
@@ -459,14 +469,14 @@ class Secur32 extends Win32 {
     AuthenticationPackage: ULONG,
     AuthenticationInformation: PVOID,
     AuthenticationInformationLength: ULONG,
-    LocalGroups: PTOKEN_GROUPS | NULL,
+    LocalGroups: OPTIONAL<PTOKEN_GROUPS>,
     SourceContext: PTOKEN_SOURCE,
-    ProfileBuffer: PVOID,
-    ProfileBufferLength: PULONG,
-    LogonId: PLUID,
-    Token: PHANDLE,
-    Quotas: QUOTA_LIMITS,
-    SubStatus: PNTSTATUS,
+    ProfileBuffer_out: PVOID,
+    ProfileBufferLength_out: PULONG,
+    LogonId_in_out: PLUID,
+    Token_out: PHANDLE,
+    Quotas_out: QUOTA_LIMITS,
+    SubStatus_out: PNTSTATUS,
   ): NTSTATUS {
     return Secur32.Load('LsaLogonUser')(
       LsaHandle,
@@ -477,23 +487,23 @@ class Secur32 extends Win32 {
       AuthenticationInformationLength,
       LocalGroups,
       SourceContext,
-      ProfileBuffer,
-      ProfileBufferLength,
-      LogonId,
-      Token,
-      Quotas,
-      SubStatus,
+      ProfileBuffer_out,
+      ProfileBufferLength_out,
+      LogonId_in_out,
+      Token_out,
+      Quotas_out,
+      SubStatus_out,
     );
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntsecapi/nf-ntsecapi-lsalookupauthenticationpackage
-  public static LsaLookupAuthenticationPackage(LsaHandle: HANDLE, PackageName: PLSA_STRING, AuthenticationPackage: PULONG): NTSTATUS {
-    return Secur32.Load('LsaLookupAuthenticationPackage')(LsaHandle, PackageName, AuthenticationPackage);
+  public static LsaLookupAuthenticationPackage(LsaHandle: HANDLE, PackageName: PLSA_STRING, AuthenticationPackage_out: PULONG): NTSTATUS {
+    return Secur32.Load('LsaLookupAuthenticationPackage')(LsaHandle, PackageName, AuthenticationPackage_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntsecapi/nf-ntsecapi-lsaregisterlogonprocess
-  public static LsaRegisterLogonProcess(LogonProcessName: PLSA_STRING, LsaHandle: PHANDLE, SecurityMode: PLSA_OPERATIONAL_MODE): NTSTATUS {
-    return Secur32.Load('LsaRegisterLogonProcess')(LogonProcessName, LsaHandle, SecurityMode);
+  public static LsaRegisterLogonProcess(LogonProcessName: PLSA_STRING, LsaHandle_out: PHANDLE, SecurityMode_out: PLSA_OPERATIONAL_MODE): NTSTATUS {
+    return Secur32.Load('LsaRegisterLogonProcess')(LogonProcessName, LsaHandle_out, SecurityMode_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntsecapi/nf-ntsecapi-lsaregisterpolicychangenotification
@@ -512,38 +522,38 @@ class Secur32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/sspi/nf-sspi-querycontextattributesa
-  public static QueryContextAttributesA(phContext: PCtxtHandle, ulAttribute: ULONG, pBuffer: PVOID): SECURITY_STATUS {
-    return Secur32.Load('QueryContextAttributesA')(phContext, ulAttribute, pBuffer);
+  public static QueryContextAttributesA(phContext: PCtxtHandle, ulAttribute: ULONG, pBuffer_out: PVOID): SECURITY_STATUS {
+    return Secur32.Load('QueryContextAttributesA')(phContext, ulAttribute, pBuffer_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/sspi/nf-sspi-querycontextattributesw
-  public static QueryContextAttributesW(phContext: PCtxtHandle, ulAttribute: ULONG, pBuffer: PVOID): SECURITY_STATUS {
-    return Secur32.Load('QueryContextAttributesW')(phContext, ulAttribute, pBuffer);
+  public static QueryContextAttributesW(phContext: PCtxtHandle, ulAttribute: ULONG, pBuffer_out: PVOID): SECURITY_STATUS {
+    return Secur32.Load('QueryContextAttributesW')(phContext, ulAttribute, pBuffer_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/sspi/nf-sspi-querycredentialsattributesa
-  public static QueryCredentialsAttributesA(phCredential: PCredHandle, ulAttribute: ULONG, pBuffer: PVOID): SECURITY_STATUS {
-    return Secur32.Load('QueryCredentialsAttributesA')(phCredential, ulAttribute, pBuffer);
+  public static QueryCredentialsAttributesA(phCredential: PCredHandle, ulAttribute: ULONG, pBuffer_in_out: PVOID): SECURITY_STATUS {
+    return Secur32.Load('QueryCredentialsAttributesA')(phCredential, ulAttribute, pBuffer_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/sspi/nf-sspi-querycredentialsattributesw
-  public static QueryCredentialsAttributesW(phCredential: PCredHandle, ulAttribute: ULONG, pBuffer: PVOID): SECURITY_STATUS {
-    return Secur32.Load('QueryCredentialsAttributesW')(phCredential, ulAttribute, pBuffer);
+  public static QueryCredentialsAttributesW(phCredential: PCredHandle, ulAttribute: ULONG, pBuffer_in_out: PVOID): SECURITY_STATUS {
+    return Secur32.Load('QueryCredentialsAttributesW')(phCredential, ulAttribute, pBuffer_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/sspi/nf-sspi-querysecuritycontexttoken
-  public static QuerySecurityContextToken(phContext: PCtxtHandle, Token: PHANDLE): SECURITY_STATUS {
-    return Secur32.Load('QuerySecurityContextToken')(phContext, Token);
+  public static QuerySecurityContextToken(phContext: PCtxtHandle, Token_out: PHANDLE): SECURITY_STATUS {
+    return Secur32.Load('QuerySecurityContextToken')(phContext, Token_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/sspi/nf-sspi-querysecuritypackageinfoa
-  public static QuerySecurityPackageInfoA(pszPackageName: LPSTR, ppPackageInfo: PSecPkgInfoA): SECURITY_STATUS {
-    return Secur32.Load('QuerySecurityPackageInfoA')(pszPackageName, ppPackageInfo);
+  public static QuerySecurityPackageInfoA(pszPackageName: LPSTR, ppPackageInfo_out: PSecPkgInfoA): SECURITY_STATUS {
+    return Secur32.Load('QuerySecurityPackageInfoA')(pszPackageName, ppPackageInfo_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/sspi/nf-sspi-querysecuritypackageinfow
-  public static QuerySecurityPackageInfoW(pszPackageName: LPWSTR, ppPackageInfo: PSecPkgInfoW): SECURITY_STATUS {
-    return Secur32.Load('QuerySecurityPackageInfoW')(pszPackageName, ppPackageInfo);
+  public static QuerySecurityPackageInfoW(pszPackageName: LPWSTR, ppPackageInfo_out: PSecPkgInfoW): SECURITY_STATUS {
+    return Secur32.Load('QuerySecurityPackageInfoW')(pszPackageName, ppPackageInfo_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/sspi/nf-sspi-revertsecuritycontext
@@ -553,88 +563,88 @@ class Secur32 extends Win32 {
 
   // https://learn.microsoft.com/en-us/windows/win32/api/sspi/nf-sspi-saslacceptsecuritycontext
   public static SaslAcceptSecurityContext(
-    phCredential: PCredHandle | NULL,
-    phContext: PCtxtHandle | NULL,
-    pInput: PSecBufferDesc | NULL,
+    phCredential: OPTIONAL<PCredHandle>,
+    phContext: OPTIONAL<PCtxtHandle>,
+    pInput: OPTIONAL<PSecBufferDesc>,
     fContextReq: ULONG,
     TargetDataRep: ULONG,
-    phNewContext: PCtxtHandle | NULL,
-    pOutput: PSecBufferDesc | NULL,
-    pfContextAttr: PULONG,
-    ptsExpiry: PTimeStamp | NULL,
+    phNewContext_in_out: OPTIONAL<PCtxtHandle>,
+    pOutput_in_out: OPTIONAL<PSecBufferDesc>,
+    pfContextAttr_out: PULONG,
+    ptsExpiry_out: OPTIONAL<PTimeStamp>,
   ): SECURITY_STATUS {
-    return Secur32.Load('SaslAcceptSecurityContext')(phCredential, phContext, pInput, fContextReq, TargetDataRep, phNewContext, pOutput, pfContextAttr, ptsExpiry);
+    return Secur32.Load('SaslAcceptSecurityContext')(phCredential, phContext, pInput, fContextReq, TargetDataRep, phNewContext_in_out, pOutput_in_out, pfContextAttr_out, ptsExpiry_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/sspi/nf-sspi-saslenumerateprofilesa
-  public static SaslEnumerateProfilesA(ProfileList: LPSTR, ProfileCount: PULONG): SECURITY_STATUS {
-    return Secur32.Load('SaslEnumerateProfilesA')(ProfileList, ProfileCount);
+  public static SaslEnumerateProfilesA(ProfileList_out: LPSTR, ProfileCount_out: PULONG): SECURITY_STATUS {
+    return Secur32.Load('SaslEnumerateProfilesA')(ProfileList_out, ProfileCount_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/sspi/nf-sspi-saslenumerateprofilesw
-  public static SaslEnumerateProfilesW(ProfileList: LPWSTR, ProfileCount: PULONG): SECURITY_STATUS {
-    return Secur32.Load('SaslEnumerateProfilesW')(ProfileList, ProfileCount);
+  public static SaslEnumerateProfilesW(ProfileList_out: LPWSTR, ProfileCount_out: PULONG): SECURITY_STATUS {
+    return Secur32.Load('SaslEnumerateProfilesW')(ProfileList_out, ProfileCount_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/sspi/nf-sspi-saslgetcontextoption
-  public static SaslGetContextOption(ContextHandle: PCtxtHandle, Option: ULONG, Value: PVOID, Size: ULONG, Needed: PULONG | NULL): SECURITY_STATUS {
-    return Secur32.Load('SaslGetContextOption')(ContextHandle, Option, Value, Size, Needed);
+  public static SaslGetContextOption(ContextHandle: PCtxtHandle, Option: ULONG, Value_out: PVOID, Size: ULONG, Needed_out: OPTIONAL<PULONG>): SECURITY_STATUS {
+    return Secur32.Load('SaslGetContextOption')(ContextHandle, Option, Value_out, Size, Needed_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/sspi/nf-sspi-saslgetprofilepackagea
-  public static SaslGetProfilePackageA(ProfileName: LPSTR, PackageInfo: PSecPkgInfoA): SECURITY_STATUS {
-    return Secur32.Load('SaslGetProfilePackageA')(ProfileName, PackageInfo);
+  public static SaslGetProfilePackageA(ProfileName: LPSTR, PackageInfo_out: PSecPkgInfoA): SECURITY_STATUS {
+    return Secur32.Load('SaslGetProfilePackageA')(ProfileName, PackageInfo_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/sspi/nf-sspi-saslgetprofilepackagew
-  public static SaslGetProfilePackageW(ProfileName: LPWSTR, PackageInfo: PSecPkgInfoW): SECURITY_STATUS {
-    return Secur32.Load('SaslGetProfilePackageW')(ProfileName, PackageInfo);
+  public static SaslGetProfilePackageW(ProfileName: LPWSTR, PackageInfo_out: PSecPkgInfoW): SECURITY_STATUS {
+    return Secur32.Load('SaslGetProfilePackageW')(ProfileName, PackageInfo_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/sspi/nf-sspi-saslidentifypackagea
-  public static SaslIdentifyPackageA(pInput: PSecBufferDesc, PackageInfo: PSecPkgInfoA): SECURITY_STATUS {
-    return Secur32.Load('SaslIdentifyPackageA')(pInput, PackageInfo);
+  public static SaslIdentifyPackageA(pInput: PSecBufferDesc, PackageInfo_out: PSecPkgInfoA): SECURITY_STATUS {
+    return Secur32.Load('SaslIdentifyPackageA')(pInput, PackageInfo_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/sspi/nf-sspi-saslidentifypackagew
-  public static SaslIdentifyPackageW(pInput: PSecBufferDesc, PackageInfo: PSecPkgInfoW): SECURITY_STATUS {
-    return Secur32.Load('SaslIdentifyPackageW')(pInput, PackageInfo);
+  public static SaslIdentifyPackageW(pInput: PSecBufferDesc, PackageInfo_out: PSecPkgInfoW): SECURITY_STATUS {
+    return Secur32.Load('SaslIdentifyPackageW')(pInput, PackageInfo_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/sspi/nf-sspi-saslinitializesecuritycontexta
   public static SaslInitializeSecurityContextA(
-    phCredential: PCredHandle | NULL,
-    phContext: PCtxtHandle | NULL,
-    pszTargetName: LPSTR | NULL,
+    phCredential: OPTIONAL<PCredHandle>,
+    phContext: OPTIONAL<PCtxtHandle>,
+    pszTargetName: OPTIONAL<LPSTR>,
     fContextReq: ULONG,
     Reserved1: ULONG,
     TargetDataRep: ULONG,
-    pInput: PSecBufferDesc | NULL,
+    pInput: OPTIONAL<PSecBufferDesc>,
     Reserved2: ULONG,
-    phNewContext: PCtxtHandle | NULL,
-    pOutput: PSecBufferDesc,
-    pfContextAttr: PULONG,
-    ptsExpiry: PTimeStamp | NULL,
+    phNewContext_in_out: OPTIONAL<PCtxtHandle>,
+    pOutput_in_out: OPTIONAL<PSecBufferDesc>,
+    pfContextAttr_out: PULONG,
+    ptsExpiry_out: OPTIONAL<PTimeStamp>,
   ): SECURITY_STATUS {
-    return Secur32.Load('SaslInitializeSecurityContextA')(phCredential, phContext, pszTargetName, fContextReq, Reserved1, TargetDataRep, pInput, Reserved2, phNewContext, pOutput, pfContextAttr, ptsExpiry);
+    return Secur32.Load('SaslInitializeSecurityContextA')(phCredential, phContext, pszTargetName, fContextReq, Reserved1, TargetDataRep, pInput, Reserved2, phNewContext_in_out, pOutput_in_out, pfContextAttr_out, ptsExpiry_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/sspi/nf-sspi-saslinitializesecuritycontextw
   public static SaslInitializeSecurityContextW(
-    phCredential: PCredHandle | NULL,
-    phContext: PCtxtHandle | NULL,
-    pszTargetName: LPWSTR | NULL,
+    phCredential: OPTIONAL<PCredHandle>,
+    phContext: OPTIONAL<PCtxtHandle>,
+    pszTargetName: OPTIONAL<LPWSTR>,
     fContextReq: ULONG,
     Reserved1: ULONG,
     TargetDataRep: ULONG,
-    pInput: PSecBufferDesc | NULL,
+    pInput: OPTIONAL<PSecBufferDesc>,
     Reserved2: ULONG,
-    phNewContext: PCtxtHandle | NULL,
-    pOutput: PSecBufferDesc,
-    pfContextAttr: PULONG,
-    ptsExpiry: PTimeStamp | NULL,
+    phNewContext_in_out: OPTIONAL<PCtxtHandle>,
+    pOutput_in_out: OPTIONAL<PSecBufferDesc>,
+    pfContextAttr_out: PULONG,
+    ptsExpiry_out: OPTIONAL<PTimeStamp>,
   ): SECURITY_STATUS {
-    return Secur32.Load('SaslInitializeSecurityContextW')(phCredential, phContext, pszTargetName, fContextReq, Reserved1, TargetDataRep, pInput, Reserved2, phNewContext, pOutput, pfContextAttr, ptsExpiry);
+    return Secur32.Load('SaslInitializeSecurityContextW')(phCredential, phContext, pszTargetName, fContextReq, Reserved1, TargetDataRep, pInput, Reserved2, phNewContext_in_out, pOutput_in_out, pfContextAttr_out, ptsExpiry_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/sspi/nf-sspi-saslsetcontextoption
@@ -669,52 +679,52 @@ class Secur32 extends Win32 {
 
   // https://learn.microsoft.com/en-us/windows/win32/api/sspi/nf-sspi-sspicompareauthidentities
   public static SspiCompareAuthIdentities(
-    AuthIdentity1: PSEC_WINNT_AUTH_IDENTITY_OPAQUE | NULL,
-    AuthIdentity2: PSEC_WINNT_AUTH_IDENTITY_OPAQUE | NULL,
-    SameSuppliedUser: PBOOLEAN | NULL,
-    SameSuppliedIdentity: PBOOLEAN | NULL,
+    AuthIdentity1: OPTIONAL<PSEC_WINNT_AUTH_IDENTITY_OPAQUE>,
+    AuthIdentity2: OPTIONAL<PSEC_WINNT_AUTH_IDENTITY_OPAQUE>,
+    SameSuppliedUser_out: OPTIONAL<PBOOLEAN>,
+    SameSuppliedIdentity_out: OPTIONAL<PBOOLEAN>,
   ): SECURITY_STATUS {
-    return Secur32.Load('SspiCompareAuthIdentities')(AuthIdentity1, AuthIdentity2, SameSuppliedUser, SameSuppliedIdentity);
+    return Secur32.Load('SspiCompareAuthIdentities')(AuthIdentity1, AuthIdentity2, SameSuppliedUser_out, SameSuppliedIdentity_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/sspi/nf-sspi-sspicopyauthidentity
-  public static SspiCopyAuthIdentity(AuthData: PSEC_WINNT_AUTH_IDENTITY_OPAQUE, AuthDataCopy: PSEC_WINNT_AUTH_IDENTITY_OPAQUE): SECURITY_STATUS {
-    return Secur32.Load('SspiCopyAuthIdentity')(AuthData, AuthDataCopy);
+  public static SspiCopyAuthIdentity(AuthData: PSEC_WINNT_AUTH_IDENTITY_OPAQUE, AuthDataCopy_out: PSEC_WINNT_AUTH_IDENTITY_OPAQUE): SECURITY_STATUS {
+    return Secur32.Load('SspiCopyAuthIdentity')(AuthData, AuthDataCopy_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/sspi/nf-sspi-sspidecryptauthidentity
-  public static SspiDecryptAuthIdentity(EncryptedAuthData: PSEC_WINNT_AUTH_IDENTITY_OPAQUE): SECURITY_STATUS {
-    return Secur32.Load('SspiDecryptAuthIdentity')(EncryptedAuthData);
+  public static SspiDecryptAuthIdentity(EncryptedAuthData_in_out: PSEC_WINNT_AUTH_IDENTITY_OPAQUE): SECURITY_STATUS {
+    return Secur32.Load('SspiDecryptAuthIdentity')(EncryptedAuthData_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/sspi/nf-sspi-sspiencodeauthidentityasstrings
-  public static SspiEncodeAuthIdentityAsStrings(pAuthIdentity: PSEC_WINNT_AUTH_IDENTITY_OPAQUE, pszUserName: LPCWSTR, pszDomainName: LPCWSTR, pszPackedCredentialsString: LPCWSTR | NULL): SECURITY_STATUS {
-    return Secur32.Load('SspiEncodeAuthIdentityAsStrings')(pAuthIdentity, pszUserName, pszDomainName, pszPackedCredentialsString);
+  public static SspiEncodeAuthIdentityAsStrings(pAuthIdentity: PSEC_WINNT_AUTH_IDENTITY_OPAQUE, pszUserName_out: LPCWSTR, pszDomainName_out: LPCWSTR, pszPackedCredentialsString_out: OPTIONAL<LPCWSTR>): SECURITY_STATUS {
+    return Secur32.Load('SspiEncodeAuthIdentityAsStrings')(pAuthIdentity, pszUserName_out, pszDomainName_out, pszPackedCredentialsString_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/sspi/nf-sspi-sspiencodestringsasauthidentity
-  public static SspiEncodeStringsAsAuthIdentity(pszUserName: LPCWSTR | NULL, pszDomainName: LPCWSTR | NULL, pszPackedCredentialsString: LPCWSTR | NULL, ppAuthIdentity: PSEC_WINNT_AUTH_IDENTITY_OPAQUE): SECURITY_STATUS {
-    return Secur32.Load('SspiEncodeStringsAsAuthIdentity')(pszUserName, pszDomainName, pszPackedCredentialsString, ppAuthIdentity);
+  public static SspiEncodeStringsAsAuthIdentity(pszUserName: OPTIONAL<LPCWSTR>, pszDomainName: OPTIONAL<LPCWSTR>, pszPackedCredentialsString: OPTIONAL<LPCWSTR>, ppAuthIdentity_out: PSEC_WINNT_AUTH_IDENTITY_OPAQUE): SECURITY_STATUS {
+    return Secur32.Load('SspiEncodeStringsAsAuthIdentity')(pszUserName, pszDomainName, pszPackedCredentialsString, ppAuthIdentity_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/sspi/nf-sspi-sspiencryptauthidentity
-  public static SspiEncryptAuthIdentity(AuthData: PSEC_WINNT_AUTH_IDENTITY_OPAQUE): SECURITY_STATUS {
-    return Secur32.Load('SspiEncryptAuthIdentity')(AuthData);
+  public static SspiEncryptAuthIdentity(AuthData_in_out: PSEC_WINNT_AUTH_IDENTITY_OPAQUE): SECURITY_STATUS {
+    return Secur32.Load('SspiEncryptAuthIdentity')(AuthData_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/sspi/nf-sspi-sspiexcludepackage
-  public static SspiExcludePackage(AuthIdentity: PSEC_WINNT_AUTH_IDENTITY_OPAQUE | NULL, pszPackageName: LPCWSTR, ppNewAuthIdentity: PSEC_WINNT_AUTH_IDENTITY_OPAQUE): SECURITY_STATUS {
-    return Secur32.Load('SspiExcludePackage')(AuthIdentity, pszPackageName, ppNewAuthIdentity);
+  public static SspiExcludePackage(AuthIdentity: OPTIONAL<PSEC_WINNT_AUTH_IDENTITY_OPAQUE>, pszPackageName: LPCWSTR, ppNewAuthIdentity_out: PSEC_WINNT_AUTH_IDENTITY_OPAQUE): SECURITY_STATUS {
+    return Secur32.Load('SspiExcludePackage')(AuthIdentity, pszPackageName, ppNewAuthIdentity_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/sspi/nf-sspi-sspifreeauthidentity
-  public static SspiFreeAuthIdentity(AuthData: PSEC_WINNT_AUTH_IDENTITY_OPAQUE | NULL): VOID {
+  public static SspiFreeAuthIdentity(AuthData: OPTIONAL<PSEC_WINNT_AUTH_IDENTITY_OPAQUE>): VOID {
     return Secur32.Load('SspiFreeAuthIdentity')(AuthData);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/sspi/nf-sspi-sspigettargethostname
-  public static SspiGetTargetHostName(pszTargetName: LPCWSTR, pszHostName: LPWSTR): SECURITY_STATUS {
-    return Secur32.Load('SspiGetTargetHostName')(pszTargetName, pszHostName);
+  public static SspiGetTargetHostName(pszTargetName: LPCWSTR, pszHostName_out: LPWSTR): SECURITY_STATUS {
+    return Secur32.Load('SspiGetTargetHostName')(pszTargetName, pszHostName_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/sspi/nf-sspi-sspiisauthidentityencrypted
@@ -723,36 +733,36 @@ class Secur32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/sspi/nf-sspi-sspilocalfree
-  public static SspiLocalFree(DataBuffer: PVOID | NULL): VOID {
+  public static SspiLocalFree(DataBuffer: OPTIONAL<PVOID>): VOID {
     return Secur32.Load('SspiLocalFree')(DataBuffer);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/sspi/nf-sspi-sspimarshalauthidentity
-  public static SspiMarshalAuthIdentity(AuthIdentity: PSEC_WINNT_AUTH_IDENTITY_OPAQUE, AuthIdentityLength: PULONG, AuthIdentityByteArray: PVOID): SECURITY_STATUS {
-    return Secur32.Load('SspiMarshalAuthIdentity')(AuthIdentity, AuthIdentityLength, AuthIdentityByteArray);
+  public static SspiMarshalAuthIdentity(AuthIdentity: PSEC_WINNT_AUTH_IDENTITY_OPAQUE, AuthIdentityLength_out: PULONG, AuthIdentityByteArray_out: PVOID): SECURITY_STATUS {
+    return Secur32.Load('SspiMarshalAuthIdentity')(AuthIdentity, AuthIdentityLength_out, AuthIdentityByteArray_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/sspi/nf-sspi-sspiprepareforcreedread
-  public static SspiPrepareForCredRead(AuthIdentity: PSEC_WINNT_AUTH_IDENTITY_OPAQUE, pszTargetName: LPCWSTR, pCredmanCredentialType: PULONG, ppszCredmanTargetName: LPCWSTR): SECURITY_STATUS {
-    return Secur32.Load('SspiPrepareForCredRead')(AuthIdentity, pszTargetName, pCredmanCredentialType, ppszCredmanTargetName);
+  public static SspiPrepareForCredRead(AuthIdentity: PSEC_WINNT_AUTH_IDENTITY_OPAQUE, pszTargetName: LPCWSTR, pCredmanCredentialType_out: PULONG, ppszCredmanTargetName_out: LPCWSTR): SECURITY_STATUS {
+    return Secur32.Load('SspiPrepareForCredRead')(AuthIdentity, pszTargetName, pCredmanCredentialType_out, ppszCredmanTargetName_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/sspi/nf-sspi-sspiprepareforcredwrite
   public static SspiPrepareForCredWrite(
     AuthIdentity: PSEC_WINNT_AUTH_IDENTITY_OPAQUE,
-    pszTargetName: LPCWSTR | NULL,
-    pCredmanCredentialType: PULONG,
-    ppszCredmanTargetName: LPCWSTR,
-    ppszCredmanUserName: LPCWSTR,
-    ppCredentialBlob: PUCHAR,
-    pCredentialBlobSize: PULONG,
+    pszTargetName: OPTIONAL<LPCWSTR>,
+    pCredmanCredentialType_out: PULONG,
+    ppszCredmanTargetName_out: LPCWSTR,
+    ppszCredmanUserName_out: LPCWSTR,
+    ppCredentialBlob_out: PUCHAR,
+    pCredentialBlobSize_out: PULONG,
   ): SECURITY_STATUS {
-    return Secur32.Load('SspiPrepareForCredWrite')(AuthIdentity, pszTargetName, pCredmanCredentialType, ppszCredmanTargetName, ppszCredmanUserName, ppCredentialBlob, pCredentialBlobSize);
+    return Secur32.Load('SspiPrepareForCredWrite')(AuthIdentity, pszTargetName, pCredmanCredentialType_out, ppszCredmanTargetName_out, ppszCredmanUserName_out, ppCredentialBlob_out, pCredentialBlobSize_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/sspi/nf-sspi-sspiunmarshalauthidentity
-  public static SspiUnmarshalAuthIdentity(AuthIdentityLength: ULONG, AuthIdentityByteArray: PVOID, ppAuthIdentity: PSEC_WINNT_AUTH_IDENTITY_OPAQUE): SECURITY_STATUS {
-    return Secur32.Load('SspiUnmarshalAuthIdentity')(AuthIdentityLength, AuthIdentityByteArray, ppAuthIdentity);
+  public static SspiUnmarshalAuthIdentity(AuthIdentityLength: ULONG, AuthIdentityByteArray: PVOID, ppAuthIdentity_out: PSEC_WINNT_AUTH_IDENTITY_OPAQUE): SECURITY_STATUS {
+    return Secur32.Load('SspiUnmarshalAuthIdentity')(AuthIdentityLength, AuthIdentityByteArray, ppAuthIdentity_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/sspi/nf-sspi-sspivalidateauthidentity
@@ -761,28 +771,28 @@ class Secur32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/sspi/nf-sspi-sspizeroauthidentity
-  public static SspiZeroAuthIdentity(AuthData: PSEC_WINNT_AUTH_IDENTITY_OPAQUE | NULL): VOID {
+  public static SspiZeroAuthIdentity(AuthData: OPTIONAL<PSEC_WINNT_AUTH_IDENTITY_OPAQUE>): VOID {
     return Secur32.Load('SspiZeroAuthIdentity')(AuthData);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/secext/nf-secext-translatenamea
-  public static TranslateNameA(lpAccountName: LPCSTR, AccountNameFormat: EXTENDED_NAME_FORMAT, DesiredNameFormat: EXTENDED_NAME_FORMAT, lpTranslatedName: LPSTR | NULL, nSize: PULONG): BOOLEAN {
-    return Secur32.Load('TranslateNameA')(lpAccountName, AccountNameFormat, DesiredNameFormat, lpTranslatedName, nSize);
+  public static TranslateNameA(lpAccountName: LPCSTR, AccountNameFormat: EXTENDED_NAME_FORMAT, DesiredNameFormat: EXTENDED_NAME_FORMAT, lpTranslatedName_out: OPTIONAL<LPSTR>, nSize_in_out: PULONG): BOOLEAN {
+    return Secur32.Load('TranslateNameA')(lpAccountName, AccountNameFormat, DesiredNameFormat, lpTranslatedName_out, nSize_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/secext/nf-secext-translatenamew
-  public static TranslateNameW(lpAccountName: LPCWSTR, AccountNameFormat: EXTENDED_NAME_FORMAT, DesiredNameFormat: EXTENDED_NAME_FORMAT, lpTranslatedName: LPWSTR | NULL, nSize: PULONG): BOOLEAN {
-    return Secur32.Load('TranslateNameW')(lpAccountName, AccountNameFormat, DesiredNameFormat, lpTranslatedName, nSize);
+  public static TranslateNameW(lpAccountName: LPCWSTR, AccountNameFormat: EXTENDED_NAME_FORMAT, DesiredNameFormat: EXTENDED_NAME_FORMAT, lpTranslatedName_out: OPTIONAL<LPWSTR>, nSize_in_out: PULONG): BOOLEAN {
+    return Secur32.Load('TranslateNameW')(lpAccountName, AccountNameFormat, DesiredNameFormat, lpTranslatedName_out, nSize_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/sspi/nf-sspi-unsealmessage
-  public static UnsealMessage(phContext: PCtxtHandle, pMessage: PSecBufferDesc, MessageSeqNo: ULONG, pfQOP: PULONG): SECURITY_STATUS {
-    return Secur32.Load('UnsealMessage')(phContext, pMessage, MessageSeqNo, pfQOP);
+  public static UnsealMessage(phContext: PCtxtHandle, pMessage: PSecBufferDesc, MessageSeqNo: ULONG, pfQOP_out: OPTIONAL<PULONG>): SECURITY_STATUS {
+    return Secur32.Load('UnsealMessage')(phContext, pMessage, MessageSeqNo, pfQOP_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/sspi/nf-sspi-verifysignature
-  public static VerifySignature(phContext: PCtxtHandle, pMessage: PSecBufferDesc, MessageSeqNo: ULONG, pfQOP: PULONG): SECURITY_STATUS {
-    return Secur32.Load('VerifySignature')(phContext, pMessage, MessageSeqNo, pfQOP);
+  public static VerifySignature(phContext: PCtxtHandle, pMessage: PSecBufferDesc, MessageSeqNo: ULONG, pfQOP_out: OPTIONAL<PULONG>): SECURITY_STATUS {
+    return Secur32.Load('VerifySignature')(phContext, pMessage, MessageSeqNo, pfQOP_out);
   }
 }
 

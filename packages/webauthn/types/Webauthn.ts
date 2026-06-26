@@ -1,6 +1,6 @@
 import type { Pointer } from 'bun:ffi';
 
-export type { DWORD, HRESULT, HWND, LPBOOL, LPCWSTR, NULL } from '@bun-win32/core';
+export type { DWORD, HRESULT, HWND, LPBOOL, LPCWSTR, NULL, OPTIONAL } from '@bun-win32/core';
 
 export const WEBAUTHN_API_VERSION_1 = 1;
 export const WEBAUTHN_API_VERSION_2 = 2;

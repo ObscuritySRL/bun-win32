@@ -1,6 +1,6 @@
 import type { Pointer } from 'bun:ffi';
 
-export type { BOOL, DWORD, HANDLE, HRESULT, HWND, INT, INT_PTR, LONG, LPCSTR, LPCWSTR, LPSTR, LPVOID, LPWSTR, NULL, UINT, ULONG } from '@bun-win32/core';
+export type { BOOL, DWORD, HANDLE, HRESULT, HWND, INT, INT_PTR, LONG, LPCSTR, LPCWSTR, LPSTR, LPVOID, LPWSTR, NULLABLE, OPTIONAL, UINT, ULONG } from '@bun-win32/core';
 
 export const AVISTREAMREAD_CONVENIENT = -1;
 

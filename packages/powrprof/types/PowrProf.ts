@@ -1,6 +1,6 @@
 import type { Pointer } from 'bun:ffi';
 
-export type { BOOL, BOOLEAN, DWORD, HANDLE, HRESULT, LPARAM, LPBYTE, LPCWSTR, LPDWORD, NULL, PBYTE, PULONG, PVOID, UINT, ULONG } from '@bun-win32/core';
+export type { BOOL, BOOLEAN, DWORD, HANDLE, HRESULT, LPARAM, LPBYTE, LPCWSTR, LPDWORD, NULL, OPTIONAL, PBYTE, PULONG, PVOID, UINT, ULONG } from '@bun-win32/core';
 
 export const NO_SUBGROUP_GUID = Buffer.from([0x3e, 0x41, 0xa3, 0xfe, 0x05, 0x7e, 0x11, 0x49, 0x9a, 0x71, 0x70, 0x03, 0x31, 0xf1, 0xc2, 0x94]);
 

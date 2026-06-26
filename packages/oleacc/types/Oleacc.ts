@@ -1,6 +1,6 @@
 import type { Pointer } from 'bun:ffi';
 
-export type { DWORD, HRESULT, HWND, LONG, LPCSTR, LPCWSTR, LPSTR, LPVOID, LPWSTR, LRESULT, NULL, UINT, VOID, WPARAM } from '@bun-win32/core';
+export type { DWORD, HRESULT, HWND, LONG, LPCSTR, LPCWSTR, LPSTR, LPVOID, LPWSTR, LRESULT, NULL, OPTIONAL, UINT, VOID, WPARAM } from '@bun-win32/core';
 
 export const CLSID_AccPropServices = 'b5f8350b-0548-48b1-a6ee-88bd00b4a5e7';
 

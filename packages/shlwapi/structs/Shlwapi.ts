@@ -33,6 +33,7 @@ import type {
   LRESULT,
   LPTHREAD_START_ROUTINE,
   NULL,
+  OPTIONAL,
   PCSTR,
   PCUIDLIST_RELATIVE,
   PCWSTR,
@@ -462,13 +463,13 @@ class Shlwapi extends Win32 {
   } as const satisfies Record<string, FFIFunction>;
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-assoccreate
-  public static AssocCreate(clsid: LPVOID, riid: REFIID, ppv: LPVOID): HRESULT {
-    return Shlwapi.Load('AssocCreate')(clsid, riid, ppv);
+  public static AssocCreate(clsid: LPVOID, riid: REFIID, ppv_out: LPVOID): HRESULT {
+    return Shlwapi.Load('AssocCreate')(clsid, riid, ppv_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-assocgetperceivedtype
-  public static AssocGetPerceivedType(pszExt: LPCWSTR, ptype: LPVOID, pflag: LPVOID, ppszType: LPVOID | NULL): HRESULT {
-    return Shlwapi.Load('AssocGetPerceivedType')(pszExt, ptype, pflag, ppszType);
+  public static AssocGetPerceivedType(pszExt: LPCWSTR, ptype_out: LPVOID, pflag_out: LPVOID, ppszType_out: OPTIONAL<LPVOID>): HRESULT {
+    return Shlwapi.Load('AssocGetPerceivedType')(pszExt, ptype_out, pflag_out, ppszType_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-associsdangerous
@@ -477,33 +478,33 @@ class Shlwapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-assocquerykeya
-  public static AssocQueryKeyA(flags: DWORD, key: DWORD, pszAssoc: LPCSTR, pszExtra: LPCSTR | NULL, phkeyOut: LPVOID): HRESULT {
-    return Shlwapi.Load('AssocQueryKeyA')(flags, key, pszAssoc, pszExtra, phkeyOut);
+  public static AssocQueryKeyA(flags: DWORD, key: DWORD, pszAssoc: LPCSTR, pszExtra: OPTIONAL<LPCSTR>, phkeyOut_out: LPVOID): HRESULT {
+    return Shlwapi.Load('AssocQueryKeyA')(flags, key, pszAssoc, pszExtra, phkeyOut_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-assocquerykeyw
-  public static AssocQueryKeyW(flags: DWORD, key: DWORD, pszAssoc: LPCWSTR, pszExtra: LPCWSTR | NULL, phkeyOut: LPVOID): HRESULT {
-    return Shlwapi.Load('AssocQueryKeyW')(flags, key, pszAssoc, pszExtra, phkeyOut);
+  public static AssocQueryKeyW(flags: DWORD, key: DWORD, pszAssoc: LPCWSTR, pszExtra: OPTIONAL<LPCWSTR>, phkeyOut_out: LPVOID): HRESULT {
+    return Shlwapi.Load('AssocQueryKeyW')(flags, key, pszAssoc, pszExtra, phkeyOut_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-assocquerystringa
-  public static AssocQueryStringA(flags: DWORD, str: DWORD, pszAssoc: LPCSTR, pszExtra: LPCSTR | NULL, pszOut: LPSTR | NULL, pcchOut: LPDWORD): HRESULT {
-    return Shlwapi.Load('AssocQueryStringA')(flags, str, pszAssoc, pszExtra, pszOut, pcchOut);
+  public static AssocQueryStringA(flags: DWORD, str: DWORD, pszAssoc: LPCSTR, pszExtra: OPTIONAL<LPCSTR>, pszOut_out: OPTIONAL<LPSTR>, pcchOut_in_out: LPDWORD): HRESULT {
+    return Shlwapi.Load('AssocQueryStringA')(flags, str, pszAssoc, pszExtra, pszOut_out, pcchOut_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-assocquerystringbykeya
-  public static AssocQueryStringByKeyA(flags: DWORD, str: DWORD, hkAssoc: HKEY, pszExtra: LPCSTR | NULL, pszOut: LPSTR | NULL, pcchOut: LPDWORD): HRESULT {
-    return Shlwapi.Load('AssocQueryStringByKeyA')(flags, str, hkAssoc, pszExtra, pszOut, pcchOut);
+  public static AssocQueryStringByKeyA(flags: DWORD, str: DWORD, hkAssoc: HKEY, pszExtra: OPTIONAL<LPCSTR>, pszOut_out: OPTIONAL<LPSTR>, pcchOut_in_out: LPDWORD): HRESULT {
+    return Shlwapi.Load('AssocQueryStringByKeyA')(flags, str, hkAssoc, pszExtra, pszOut_out, pcchOut_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-assocquerystringbykeyw
-  public static AssocQueryStringByKeyW(flags: DWORD, str: DWORD, hkAssoc: HKEY, pszExtra: LPCWSTR | NULL, pszOut: LPWSTR | NULL, pcchOut: LPDWORD): HRESULT {
-    return Shlwapi.Load('AssocQueryStringByKeyW')(flags, str, hkAssoc, pszExtra, pszOut, pcchOut);
+  public static AssocQueryStringByKeyW(flags: DWORD, str: DWORD, hkAssoc: HKEY, pszExtra: OPTIONAL<LPCWSTR>, pszOut_out: OPTIONAL<LPWSTR>, pcchOut_in_out: LPDWORD): HRESULT {
+    return Shlwapi.Load('AssocQueryStringByKeyW')(flags, str, hkAssoc, pszExtra, pszOut_out, pcchOut_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-assocquerystringw
-  public static AssocQueryStringW(flags: DWORD, str: DWORD, pszAssoc: LPCWSTR, pszExtra: LPCWSTR | NULL, pszOut: LPWSTR | NULL, pcchOut: LPDWORD): HRESULT {
-    return Shlwapi.Load('AssocQueryStringW')(flags, str, pszAssoc, pszExtra, pszOut, pcchOut);
+  public static AssocQueryStringW(flags: DWORD, str: DWORD, pszAssoc: LPCWSTR, pszExtra: OPTIONAL<LPCWSTR>, pszOut_out: OPTIONAL<LPWSTR>, pcchOut_in_out: LPDWORD): HRESULT {
+    return Shlwapi.Load('AssocQueryStringW')(flags, str, pszAssoc, pszExtra, pszOut_out, pcchOut_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-chrcmpia
@@ -527,13 +528,13 @@ class Shlwapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-colorrgbtohls
-  public static ColorRGBToHLS(clrRGB: COLORREF, pwHue: LPVOID, pwLuminance: LPVOID, pwSaturation: LPVOID): VOID {
-    return Shlwapi.Load('ColorRGBToHLS')(clrRGB, pwHue, pwLuminance, pwSaturation);
+  public static ColorRGBToHLS(clrRGB: COLORREF, pwHue_out: LPVOID, pwLuminance_out: LPVOID, pwSaturation_out: LPVOID): VOID {
+    return Shlwapi.Load('ColorRGBToHLS')(clrRGB, pwHue_out, pwLuminance_out, pwSaturation_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-connecttoconnectionpoint
-  public static ConnectToConnectionPoint(punk: HANDLE | 0n, riidEvent: REFIID, fConnect: BOOL, punkTarget: HANDLE, pdwCookie: LPDWORD, ppcpOut: LPVOID | NULL): HRESULT {
-    return Shlwapi.Load('ConnectToConnectionPoint')(punk, riidEvent, fConnect, punkTarget, pdwCookie, ppcpOut);
+  public static ConnectToConnectionPoint(punk: OPTIONAL<HANDLE>, riidEvent: REFIID, fConnect: BOOL, punkTarget: HANDLE, pdwCookie_out: LPDWORD, ppcpOut_out: OPTIONAL<LPVOID>): HRESULT {
+    return Shlwapi.Load('ConnectToConnectionPoint')(punk, riidEvent, fConnect, punkTarget, pdwCookie_out, ppcpOut_out);
   }
 
   public static DelayLoadFailureHook(pszDllName: LPCSTR, pszProcName: LPCSTR): LONG_PTR {
@@ -549,13 +550,13 @@ class Shlwapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-getacceptlanguagesa
-  public static GetAcceptLanguagesA(pszLanguages: LPSTR, pcchLanguages: LPDWORD): HRESULT {
-    return Shlwapi.Load('GetAcceptLanguagesA')(pszLanguages, pcchLanguages);
+  public static GetAcceptLanguagesA(pszLanguages_out: LPSTR, pcchLanguages_in_out: LPDWORD): HRESULT {
+    return Shlwapi.Load('GetAcceptLanguagesA')(pszLanguages_out, pcchLanguages_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-getacceptlanguagesw
-  public static GetAcceptLanguagesW(pszLanguages: LPWSTR, pcchLanguages: LPDWORD): HRESULT {
-    return Shlwapi.Load('GetAcceptLanguagesW')(pszLanguages, pcchLanguages);
+  public static GetAcceptLanguagesW(pszLanguages_out: LPWSTR, pcchLanguages_in_out: LPDWORD): HRESULT {
+    return Shlwapi.Load('GetAcceptLanguagesW')(pszLanguages_out, pcchLanguages_in_out);
   }
 
   public static GetMenuPosFromID(hMenu: HMENU, wID: UINT): INT {
@@ -567,8 +568,8 @@ class Shlwapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-hashdata
-  public static HashData(pbData: LPBYTE, cbData: DWORD, pbHash: LPBYTE, cbHash: DWORD): HRESULT {
-    return Shlwapi.Load('HashData')(pbData, cbData, pbHash, cbHash);
+  public static HashData(pbData: LPBYTE, cbData: DWORD, pbHash_out: LPBYTE, cbHash: DWORD): HRESULT {
+    return Shlwapi.Load('HashData')(pbData, cbData, pbHash_out, cbHash);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-intlstreqworkera
@@ -605,18 +606,18 @@ class Shlwapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-istream_read
-  public static IStream_Read(pstm: HANDLE, pv: LPVOID, cb: ULONG): HRESULT {
-    return Shlwapi.Load('IStream_Read')(pstm, pv, cb);
+  public static IStream_Read(pstm: HANDLE, pv_out: LPVOID, cb: ULONG): HRESULT {
+    return Shlwapi.Load('IStream_Read')(pstm, pv_out, cb);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-istream_readpidl
-  public static IStream_ReadPidl(pstm: HANDLE, ppidlOut: LPVOID): HRESULT {
-    return Shlwapi.Load('IStream_ReadPidl')(pstm, ppidlOut);
+  public static IStream_ReadPidl(pstm: HANDLE, ppidlOut_out: LPVOID): HRESULT {
+    return Shlwapi.Load('IStream_ReadPidl')(pstm, ppidlOut_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-istream_readstr
-  public static IStream_ReadStr(pstm: HANDLE, ppsz: LPVOID): HRESULT {
-    return Shlwapi.Load('IStream_ReadStr')(pstm, ppsz);
+  public static IStream_ReadStr(pstm: HANDLE, ppsz_out: LPVOID): HRESULT {
+    return Shlwapi.Load('IStream_ReadStr')(pstm, ppsz_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-istream_reset
@@ -625,8 +626,8 @@ class Shlwapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-istream_size
-  public static IStream_Size(pstm: HANDLE, pui: LPVOID): HRESULT {
-    return Shlwapi.Load('IStream_Size')(pstm, pui);
+  public static IStream_Size(pstm: HANDLE, pui_out: LPVOID): HRESULT {
+    return Shlwapi.Load('IStream_Size')(pstm, pui_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-istream_write
@@ -645,42 +646,42 @@ class Shlwapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-iunknown_atomicrelease
-  public static IUnknown_AtomicRelease(ppunk: LPVOID | NULL): VOID {
-    return Shlwapi.Load('IUnknown_AtomicRelease')(ppunk);
+  public static IUnknown_AtomicRelease(ppunk_in_out: OPTIONAL<LPVOID>): VOID {
+    return Shlwapi.Load('IUnknown_AtomicRelease')(ppunk_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-iunknown_exec
-  public static IUnknown_Exec(punk: HANDLE, pguidCmdGroup: LPVOID | NULL, nCmdID: DWORD, nCmdexecopt: DWORD, pvarargIn: LPVOID | NULL, pvarargOut: LPVOID | NULL): HRESULT {
+  public static IUnknown_Exec(punk: HANDLE, pguidCmdGroup: OPTIONAL<LPVOID>, nCmdID: DWORD, nCmdexecopt: DWORD, pvarargIn: OPTIONAL<LPVOID>, pvarargOut: OPTIONAL<LPVOID>): HRESULT {
     return Shlwapi.Load('IUnknown_Exec')(punk, pguidCmdGroup, nCmdID, nCmdexecopt, pvarargIn, pvarargOut);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-iunknown_getsite
-  public static IUnknown_GetSite(punk: HANDLE, riid: REFIID, ppv: LPVOID): HRESULT {
-    return Shlwapi.Load('IUnknown_GetSite')(punk, riid, ppv);
+  public static IUnknown_GetSite(punk: HANDLE, riid: REFIID, ppv_out: LPVOID): HRESULT {
+    return Shlwapi.Load('IUnknown_GetSite')(punk, riid, ppv_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-iunknown_getwindow
-  public static IUnknown_GetWindow(punk: HANDLE, phwnd: LPVOID): HRESULT {
-    return Shlwapi.Load('IUnknown_GetWindow')(punk, phwnd);
+  public static IUnknown_GetWindow(punk: HANDLE, phwnd_out: LPVOID): HRESULT {
+    return Shlwapi.Load('IUnknown_GetWindow')(punk, phwnd_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-iunknown_queryservice
-  public static IUnknown_QueryService(punk: HANDLE | 0n, guidService: REFIID, riid: REFIID, ppvOut: LPVOID): HRESULT {
-    return Shlwapi.Load('IUnknown_QueryService')(punk, guidService, riid, ppvOut);
+  public static IUnknown_QueryService(punk: OPTIONAL<HANDLE>, guidService: REFIID, riid: REFIID, ppvOut_out: LPVOID): HRESULT {
+    return Shlwapi.Load('IUnknown_QueryService')(punk, guidService, riid, ppvOut_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-iunknown_querystatus
-  public static IUnknown_QueryStatus(punk: HANDLE, pguidCmdGroup: LPVOID | NULL, cCmds: ULONG, prgCmds: LPVOID, pCmdText: LPVOID | NULL): HRESULT {
+  public static IUnknown_QueryStatus(punk: HANDLE, pguidCmdGroup: OPTIONAL<LPVOID>, cCmds: ULONG, prgCmds: LPVOID, pCmdText: OPTIONAL<LPVOID>): HRESULT {
     return Shlwapi.Load('IUnknown_QueryStatus')(punk, pguidCmdGroup, cCmds, prgCmds, pCmdText);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-iunknown_set
-  public static IUnknown_Set(ppunk: LPVOID, punk: HANDLE | NULL): VOID {
-    return Shlwapi.Load('IUnknown_Set')(ppunk, punk);
+  public static IUnknown_Set(ppunk_in_out: LPVOID, punk: OPTIONAL<HANDLE>): VOID {
+    return Shlwapi.Load('IUnknown_Set')(ppunk_in_out, punk);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-iunknown_setsite
-  public static IUnknown_SetSite(punk: HANDLE, punkSite: HANDLE | 0n): HRESULT {
+  public static IUnknown_SetSite(punk: HANDLE, punkSite: OPTIONAL<HANDLE>): HRESULT {
     return Shlwapi.Load('IUnknown_SetSite')(punk, punkSite);
   }
 
@@ -695,118 +696,118 @@ class Shlwapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-parseurla
-  public static ParseURLA(pcszURL: LPCSTR, ppu: LPVOID): HRESULT {
-    return Shlwapi.Load('ParseURLA')(pcszURL, ppu);
+  public static ParseURLA(pcszURL: LPCSTR, ppu_in_out: LPVOID): HRESULT {
+    return Shlwapi.Load('ParseURLA')(pcszURL, ppu_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-parseurlw
-  public static ParseURLW(pcszURL: LPCWSTR, ppu: LPVOID): HRESULT {
-    return Shlwapi.Load('ParseURLW')(pcszURL, ppu);
+  public static ParseURLW(pcszURL: LPCWSTR, ppu_in_out: LPVOID): HRESULT {
+    return Shlwapi.Load('ParseURLW')(pcszURL, ppu_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-pathaddbackslasha
-  public static PathAddBackslashA(pszPath: LPSTR): LONG_PTR {
-    return Shlwapi.Load('PathAddBackslashA')(pszPath);
+  public static PathAddBackslashA(pszPath_in_out: LPSTR): LONG_PTR {
+    return Shlwapi.Load('PathAddBackslashA')(pszPath_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-pathaddbackslashw
-  public static PathAddBackslashW(pszPath: LPWSTR): LONG_PTR {
-    return Shlwapi.Load('PathAddBackslashW')(pszPath);
+  public static PathAddBackslashW(pszPath_in_out: LPWSTR): LONG_PTR {
+    return Shlwapi.Load('PathAddBackslashW')(pszPath_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-pathaddextensiona
-  public static PathAddExtensionA(pszPath: LPSTR, pszExt: LPCSTR | NULL): BOOL {
-    return Shlwapi.Load('PathAddExtensionA')(pszPath, pszExt);
+  public static PathAddExtensionA(pszPath_in_out: LPSTR, pszExt: OPTIONAL<LPCSTR>): BOOL {
+    return Shlwapi.Load('PathAddExtensionA')(pszPath_in_out, pszExt);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-pathaddextensionw
-  public static PathAddExtensionW(pszPath: LPWSTR, pszExt: LPCWSTR | NULL): BOOL {
-    return Shlwapi.Load('PathAddExtensionW')(pszPath, pszExt);
+  public static PathAddExtensionW(pszPath_in_out: LPWSTR, pszExt: OPTIONAL<LPCWSTR>): BOOL {
+    return Shlwapi.Load('PathAddExtensionW')(pszPath_in_out, pszExt);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-pathappenda
-  public static PathAppendA(pszPath: LPSTR, pszMore: LPCSTR): BOOL {
-    return Shlwapi.Load('PathAppendA')(pszPath, pszMore);
+  public static PathAppendA(pszPath_in_out: LPSTR, pszMore: LPCSTR): BOOL {
+    return Shlwapi.Load('PathAppendA')(pszPath_in_out, pszMore);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-pathappendw
-  public static PathAppendW(pszPath: LPWSTR, pszMore: LPCWSTR): BOOL {
-    return Shlwapi.Load('PathAppendW')(pszPath, pszMore);
+  public static PathAppendW(pszPath_in_out: LPWSTR, pszMore: LPCWSTR): BOOL {
+    return Shlwapi.Load('PathAppendW')(pszPath_in_out, pszMore);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-pathbuildroota
-  public static PathBuildRootA(pszRoot: LPSTR, iDrive: INT): LONG_PTR {
-    return Shlwapi.Load('PathBuildRootA')(pszRoot, iDrive);
+  public static PathBuildRootA(pszRoot_out: LPSTR, iDrive: INT): LONG_PTR {
+    return Shlwapi.Load('PathBuildRootA')(pszRoot_out, iDrive);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-pathbuildrootw
-  public static PathBuildRootW(pszRoot: LPWSTR, iDrive: INT): LONG_PTR {
-    return Shlwapi.Load('PathBuildRootW')(pszRoot, iDrive);
+  public static PathBuildRootW(pszRoot_out: LPWSTR, iDrive: INT): LONG_PTR {
+    return Shlwapi.Load('PathBuildRootW')(pszRoot_out, iDrive);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-pathcanonicalizea
-  public static PathCanonicalizeA(pszBuf: LPSTR, pszPath: LPCSTR): BOOL {
-    return Shlwapi.Load('PathCanonicalizeA')(pszBuf, pszPath);
+  public static PathCanonicalizeA(pszBuf_out: LPSTR, pszPath: LPCSTR): BOOL {
+    return Shlwapi.Load('PathCanonicalizeA')(pszBuf_out, pszPath);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-pathcanonicalizew
-  public static PathCanonicalizeW(pszBuf: LPWSTR, pszPath: LPCWSTR): BOOL {
-    return Shlwapi.Load('PathCanonicalizeW')(pszBuf, pszPath);
+  public static PathCanonicalizeW(pszBuf_out: LPWSTR, pszPath: LPCWSTR): BOOL {
+    return Shlwapi.Load('PathCanonicalizeW')(pszBuf_out, pszPath);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-pathcombinea
-  public static PathCombineA(pszDest: LPSTR, pszDir: LPCSTR | NULL, pszFile: LPCSTR | NULL): LONG_PTR {
-    return Shlwapi.Load('PathCombineA')(pszDest, pszDir, pszFile);
+  public static PathCombineA(pszDest_out: LPSTR, pszDir: OPTIONAL<LPCSTR>, pszFile: OPTIONAL<LPCSTR>): LONG_PTR {
+    return Shlwapi.Load('PathCombineA')(pszDest_out, pszDir, pszFile);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-pathcombinew
-  public static PathCombineW(pszDest: LPWSTR, pszDir: LPCWSTR | NULL, pszFile: LPCWSTR | NULL): LONG_PTR {
-    return Shlwapi.Load('PathCombineW')(pszDest, pszDir, pszFile);
+  public static PathCombineW(pszDest_out: LPWSTR, pszDir: OPTIONAL<LPCWSTR>, pszFile: OPTIONAL<LPCWSTR>): LONG_PTR {
+    return Shlwapi.Load('PathCombineW')(pszDest_out, pszDir, pszFile);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-pathcommonprefixa
-  public static PathCommonPrefixA(pszFile1: LPCSTR, pszFile2: LPCSTR, achPath: LPSTR | NULL): INT {
-    return Shlwapi.Load('PathCommonPrefixA')(pszFile1, pszFile2, achPath);
+  public static PathCommonPrefixA(pszFile1: LPCSTR, pszFile2: LPCSTR, achPath_out: OPTIONAL<LPSTR>): INT {
+    return Shlwapi.Load('PathCommonPrefixA')(pszFile1, pszFile2, achPath_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-pathcommonprefixw
-  public static PathCommonPrefixW(pszFile1: LPCWSTR, pszFile2: LPCWSTR, achPath: LPWSTR | NULL): INT {
-    return Shlwapi.Load('PathCommonPrefixW')(pszFile1, pszFile2, achPath);
+  public static PathCommonPrefixW(pszFile1: LPCWSTR, pszFile2: LPCWSTR, achPath_out: OPTIONAL<LPWSTR>): INT {
+    return Shlwapi.Load('PathCommonPrefixW')(pszFile1, pszFile2, achPath_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-pathcompactpatha
-  public static PathCompactPathA(hDC: HDC | 0n, pszPath: LPSTR, dx: UINT): BOOL {
-    return Shlwapi.Load('PathCompactPathA')(hDC, pszPath, dx);
+  public static PathCompactPathA(hDC: OPTIONAL<HDC>, pszPath_in_out: LPSTR, dx: UINT): BOOL {
+    return Shlwapi.Load('PathCompactPathA')(hDC, pszPath_in_out, dx);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-pathcompactpathexa
-  public static PathCompactPathExA(pszOut: LPSTR, pszSrc: LPCSTR, cchMax: UINT, dwFlags: DWORD): BOOL {
-    return Shlwapi.Load('PathCompactPathExA')(pszOut, pszSrc, cchMax, dwFlags);
+  public static PathCompactPathExA(pszOut_out: LPSTR, pszSrc: LPCSTR, cchMax: UINT, dwFlags: DWORD): BOOL {
+    return Shlwapi.Load('PathCompactPathExA')(pszOut_out, pszSrc, cchMax, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-pathcompactpathexw
-  public static PathCompactPathExW(pszOut: LPWSTR, pszSrc: LPCWSTR, cchMax: UINT, dwFlags: DWORD): BOOL {
-    return Shlwapi.Load('PathCompactPathExW')(pszOut, pszSrc, cchMax, dwFlags);
+  public static PathCompactPathExW(pszOut_out: LPWSTR, pszSrc: LPCWSTR, cchMax: UINT, dwFlags: DWORD): BOOL {
+    return Shlwapi.Load('PathCompactPathExW')(pszOut_out, pszSrc, cchMax, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-pathcompactpathw
-  public static PathCompactPathW(hDC: HDC | 0n, pszPath: LPWSTR, dx: UINT): BOOL {
-    return Shlwapi.Load('PathCompactPathW')(hDC, pszPath, dx);
+  public static PathCompactPathW(hDC: OPTIONAL<HDC>, pszPath_in_out: LPWSTR, dx: UINT): BOOL {
+    return Shlwapi.Load('PathCompactPathW')(hDC, pszPath_in_out, dx);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-pathcreatefromurla
-  public static PathCreateFromUrlA(pszUrl: LPCSTR, pszPath: LPSTR, pcchPath: LPDWORD, dwFlags: DWORD): HRESULT {
-    return Shlwapi.Load('PathCreateFromUrlA')(pszUrl, pszPath, pcchPath, dwFlags);
+  public static PathCreateFromUrlA(pszUrl: LPCSTR, pszPath_out: LPSTR, pcchPath_in_out: LPDWORD, dwFlags: DWORD): HRESULT {
+    return Shlwapi.Load('PathCreateFromUrlA')(pszUrl, pszPath_out, pcchPath_in_out, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-pathcreatefromurlalloc
-  public static PathCreateFromUrlAlloc(pszIn: LPCWSTR, ppszOut: LPVOID, dwFlags: DWORD): HRESULT {
-    return Shlwapi.Load('PathCreateFromUrlAlloc')(pszIn, ppszOut, dwFlags);
+  public static PathCreateFromUrlAlloc(pszIn: LPCWSTR, ppszOut_out: LPVOID, dwFlags: DWORD): HRESULT {
+    return Shlwapi.Load('PathCreateFromUrlAlloc')(pszIn, ppszOut_out, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-pathcreatefromurlw
-  public static PathCreateFromUrlW(pszUrl: LPCWSTR, pszPath: LPWSTR, pcchPath: LPDWORD, dwFlags: DWORD): HRESULT {
-    return Shlwapi.Load('PathCreateFromUrlW')(pszUrl, pszPath, pcchPath, dwFlags);
+  public static PathCreateFromUrlW(pszUrl: LPCWSTR, pszPath_out: LPWSTR, pcchPath_in_out: LPDWORD, dwFlags: DWORD): HRESULT {
+    return Shlwapi.Load('PathCreateFromUrlW')(pszUrl, pszPath_out, pcchPath_in_out, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-pathfileexistsa
@@ -854,13 +855,13 @@ class Shlwapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-pathfindonpatha
-  public static PathFindOnPathA(pszPath: LPSTR, ppszOtherDirs: LPVOID | NULL): BOOL {
-    return Shlwapi.Load('PathFindOnPathA')(pszPath, ppszOtherDirs);
+  public static PathFindOnPathA(pszPath_in_out: LPSTR, ppszOtherDirs: OPTIONAL<LPVOID>): BOOL {
+    return Shlwapi.Load('PathFindOnPathA')(pszPath_in_out, ppszOtherDirs);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-pathfindonpathw
-  public static PathFindOnPathW(pszPath: LPWSTR, ppszOtherDirs: LPVOID | NULL): BOOL {
-    return Shlwapi.Load('PathFindOnPathW')(pszPath, ppszOtherDirs);
+  public static PathFindOnPathW(pszPath_in_out: LPWSTR, ppszOtherDirs: OPTIONAL<LPVOID>): BOOL {
+    return Shlwapi.Load('PathFindOnPathW')(pszPath_in_out, ppszOtherDirs);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-pathfindsuffixarraya
@@ -1004,12 +1005,12 @@ class Shlwapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-pathissystemfoldera
-  public static PathIsSystemFolderA(pszPath: LPCSTR | NULL, dwAttrb: DWORD): BOOL {
+  public static PathIsSystemFolderA(pszPath: OPTIONAL<LPCSTR>, dwAttrb: DWORD): BOOL {
     return Shlwapi.Load('PathIsSystemFolderA')(pszPath, dwAttrb);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-pathissystemfolderw
-  public static PathIsSystemFolderW(pszPath: LPCWSTR | NULL, dwAttrb: DWORD): BOOL {
+  public static PathIsSystemFolderW(pszPath: OPTIONAL<LPCWSTR>, dwAttrb: DWORD): BOOL {
     return Shlwapi.Load('PathIsSystemFolderW')(pszPath, dwAttrb);
   }
 
@@ -1054,13 +1055,13 @@ class Shlwapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-pathmakeprettya
-  public static PathMakePrettyA(pszPath: LPSTR): BOOL {
-    return Shlwapi.Load('PathMakePrettyA')(pszPath);
+  public static PathMakePrettyA(pszPath_in_out: LPSTR): BOOL {
+    return Shlwapi.Load('PathMakePrettyA')(pszPath_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-pathmakeprettyw
-  public static PathMakePrettyW(pszPath: LPWSTR): BOOL {
-    return Shlwapi.Load('PathMakePrettyW')(pszPath);
+  public static PathMakePrettyW(pszPath_in_out: LPWSTR): BOOL {
+    return Shlwapi.Load('PathMakePrettyW')(pszPath_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-pathmakesystemfoldera
@@ -1094,103 +1095,103 @@ class Shlwapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-pathparseiconlocationa
-  public static PathParseIconLocationA(pszIconFile: LPSTR): INT {
-    return Shlwapi.Load('PathParseIconLocationA')(pszIconFile);
+  public static PathParseIconLocationA(pszIconFile_in_out: LPSTR): INT {
+    return Shlwapi.Load('PathParseIconLocationA')(pszIconFile_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-pathparseiconlocationw
-  public static PathParseIconLocationW(pszIconFile: LPWSTR): INT {
-    return Shlwapi.Load('PathParseIconLocationW')(pszIconFile);
+  public static PathParseIconLocationW(pszIconFile_in_out: LPWSTR): INT {
+    return Shlwapi.Load('PathParseIconLocationW')(pszIconFile_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-pathquotespacesa
-  public static PathQuoteSpacesA(lpsz: LPSTR): BOOL {
-    return Shlwapi.Load('PathQuoteSpacesA')(lpsz);
+  public static PathQuoteSpacesA(lpsz_in_out: LPSTR): BOOL {
+    return Shlwapi.Load('PathQuoteSpacesA')(lpsz_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-pathquotespacesw
-  public static PathQuoteSpacesW(lpsz: LPWSTR): BOOL {
-    return Shlwapi.Load('PathQuoteSpacesW')(lpsz);
+  public static PathQuoteSpacesW(lpsz_in_out: LPWSTR): BOOL {
+    return Shlwapi.Load('PathQuoteSpacesW')(lpsz_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-pathrelativepathtoa
-  public static PathRelativePathToA(pszPath: LPSTR, pszFrom: LPCSTR, dwAttrFrom: DWORD, pszTo: LPCSTR, dwAttrTo: DWORD): BOOL {
-    return Shlwapi.Load('PathRelativePathToA')(pszPath, pszFrom, dwAttrFrom, pszTo, dwAttrTo);
+  public static PathRelativePathToA(pszPath_out: LPSTR, pszFrom: LPCSTR, dwAttrFrom: DWORD, pszTo: LPCSTR, dwAttrTo: DWORD): BOOL {
+    return Shlwapi.Load('PathRelativePathToA')(pszPath_out, pszFrom, dwAttrFrom, pszTo, dwAttrTo);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-pathrelativepathtow
-  public static PathRelativePathToW(pszPath: LPWSTR, pszFrom: LPCWSTR, dwAttrFrom: DWORD, pszTo: LPCWSTR, dwAttrTo: DWORD): BOOL {
-    return Shlwapi.Load('PathRelativePathToW')(pszPath, pszFrom, dwAttrFrom, pszTo, dwAttrTo);
+  public static PathRelativePathToW(pszPath_out: LPWSTR, pszFrom: LPCWSTR, dwAttrFrom: DWORD, pszTo: LPCWSTR, dwAttrTo: DWORD): BOOL {
+    return Shlwapi.Load('PathRelativePathToW')(pszPath_out, pszFrom, dwAttrFrom, pszTo, dwAttrTo);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-pathremoveargsa
-  public static PathRemoveArgsA(pszPath: LPSTR): VOID {
-    return Shlwapi.Load('PathRemoveArgsA')(pszPath);
+  public static PathRemoveArgsA(pszPath_in_out: LPSTR): VOID {
+    return Shlwapi.Load('PathRemoveArgsA')(pszPath_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-pathremoveargsw
-  public static PathRemoveArgsW(pszPath: LPWSTR): VOID {
-    return Shlwapi.Load('PathRemoveArgsW')(pszPath);
+  public static PathRemoveArgsW(pszPath_in_out: LPWSTR): VOID {
+    return Shlwapi.Load('PathRemoveArgsW')(pszPath_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-pathremovebackslasha
-  public static PathRemoveBackslashA(pszPath: LPSTR): LONG_PTR {
-    return Shlwapi.Load('PathRemoveBackslashA')(pszPath);
+  public static PathRemoveBackslashA(pszPath_in_out: LPSTR): LONG_PTR {
+    return Shlwapi.Load('PathRemoveBackslashA')(pszPath_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-pathremovebackslashw
-  public static PathRemoveBackslashW(pszPath: LPWSTR): LONG_PTR {
-    return Shlwapi.Load('PathRemoveBackslashW')(pszPath);
+  public static PathRemoveBackslashW(pszPath_in_out: LPWSTR): LONG_PTR {
+    return Shlwapi.Load('PathRemoveBackslashW')(pszPath_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-pathremoveblanksa
-  public static PathRemoveBlanksA(pszPath: LPSTR): VOID {
-    return Shlwapi.Load('PathRemoveBlanksA')(pszPath);
+  public static PathRemoveBlanksA(pszPath_in_out: LPSTR): VOID {
+    return Shlwapi.Load('PathRemoveBlanksA')(pszPath_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-pathremoveblanksw
-  public static PathRemoveBlanksW(pszPath: LPWSTR): VOID {
-    return Shlwapi.Load('PathRemoveBlanksW')(pszPath);
+  public static PathRemoveBlanksW(pszPath_in_out: LPWSTR): VOID {
+    return Shlwapi.Load('PathRemoveBlanksW')(pszPath_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-pathremoveextensiona
-  public static PathRemoveExtensionA(pszPath: LPSTR): VOID {
-    return Shlwapi.Load('PathRemoveExtensionA')(pszPath);
+  public static PathRemoveExtensionA(pszPath_in_out: LPSTR): VOID {
+    return Shlwapi.Load('PathRemoveExtensionA')(pszPath_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-pathremoveextensionw
-  public static PathRemoveExtensionW(pszPath: LPWSTR): VOID {
-    return Shlwapi.Load('PathRemoveExtensionW')(pszPath);
+  public static PathRemoveExtensionW(pszPath_in_out: LPWSTR): VOID {
+    return Shlwapi.Load('PathRemoveExtensionW')(pszPath_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-pathremovefilespeca
-  public static PathRemoveFileSpecA(pszPath: LPSTR): BOOL {
-    return Shlwapi.Load('PathRemoveFileSpecA')(pszPath);
+  public static PathRemoveFileSpecA(pszPath_in_out: LPSTR): BOOL {
+    return Shlwapi.Load('PathRemoveFileSpecA')(pszPath_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-pathremovefilespecw
-  public static PathRemoveFileSpecW(pszPath: LPWSTR): BOOL {
-    return Shlwapi.Load('PathRemoveFileSpecW')(pszPath);
+  public static PathRemoveFileSpecW(pszPath_in_out: LPWSTR): BOOL {
+    return Shlwapi.Load('PathRemoveFileSpecW')(pszPath_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-pathrenameextensiona
-  public static PathRenameExtensionA(pszPath: LPSTR, pszExt: LPCSTR): BOOL {
-    return Shlwapi.Load('PathRenameExtensionA')(pszPath, pszExt);
+  public static PathRenameExtensionA(pszPath_in_out: LPSTR, pszExt: LPCSTR): BOOL {
+    return Shlwapi.Load('PathRenameExtensionA')(pszPath_in_out, pszExt);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-pathrenameextensionw
-  public static PathRenameExtensionW(pszPath: LPWSTR, pszExt: LPCWSTR): BOOL {
-    return Shlwapi.Load('PathRenameExtensionW')(pszPath, pszExt);
+  public static PathRenameExtensionW(pszPath_in_out: LPWSTR, pszExt: LPCWSTR): BOOL {
+    return Shlwapi.Load('PathRenameExtensionW')(pszPath_in_out, pszExt);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-pathsearchandqualifya
-  public static PathSearchAndQualifyA(pszPath: LPCSTR, pszBuf: LPSTR, cchBuf: UINT): BOOL {
-    return Shlwapi.Load('PathSearchAndQualifyA')(pszPath, pszBuf, cchBuf);
+  public static PathSearchAndQualifyA(pszPath: LPCSTR, pszBuf_out: LPSTR, cchBuf: UINT): BOOL {
+    return Shlwapi.Load('PathSearchAndQualifyA')(pszPath, pszBuf_out, cchBuf);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-pathsearchandqualifyw
-  public static PathSearchAndQualifyW(pszPath: LPCWSTR, pszBuf: LPWSTR, cchBuf: UINT): BOOL {
-    return Shlwapi.Load('PathSearchAndQualifyW')(pszPath, pszBuf, cchBuf);
+  public static PathSearchAndQualifyW(pszPath: LPCWSTR, pszBuf_out: LPWSTR, cchBuf: UINT): BOOL {
+    return Shlwapi.Load('PathSearchAndQualifyW')(pszPath, pszBuf_out, cchBuf);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-pathsetdlgitempatha
@@ -1214,43 +1215,43 @@ class Shlwapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-pathstrippatha
-  public static PathStripPathA(pszPath: LPSTR): VOID {
-    return Shlwapi.Load('PathStripPathA')(pszPath);
+  public static PathStripPathA(pszPath_in_out: LPSTR): VOID {
+    return Shlwapi.Load('PathStripPathA')(pszPath_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-pathstrippathw
-  public static PathStripPathW(pszPath: LPWSTR): VOID {
-    return Shlwapi.Load('PathStripPathW')(pszPath);
+  public static PathStripPathW(pszPath_in_out: LPWSTR): VOID {
+    return Shlwapi.Load('PathStripPathW')(pszPath_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-pathstriptoroota
-  public static PathStripToRootA(pszPath: LPSTR): BOOL {
-    return Shlwapi.Load('PathStripToRootA')(pszPath);
+  public static PathStripToRootA(pszPath_in_out: LPSTR): BOOL {
+    return Shlwapi.Load('PathStripToRootA')(pszPath_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-pathstriptorootw
-  public static PathStripToRootW(pszPath: LPWSTR): BOOL {
-    return Shlwapi.Load('PathStripToRootW')(pszPath);
+  public static PathStripToRootW(pszPath_in_out: LPWSTR): BOOL {
+    return Shlwapi.Load('PathStripToRootW')(pszPath_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-pathunexpandenvstringsa
-  public static PathUnExpandEnvStringsA(pszPath: LPCSTR, pszBuf: LPSTR, cchBuf: UINT): BOOL {
-    return Shlwapi.Load('PathUnExpandEnvStringsA')(pszPath, pszBuf, cchBuf);
+  public static PathUnExpandEnvStringsA(pszPath: LPCSTR, pszBuf_out: LPSTR, cchBuf: UINT): BOOL {
+    return Shlwapi.Load('PathUnExpandEnvStringsA')(pszPath, pszBuf_out, cchBuf);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-pathunexpandenvstringsw
-  public static PathUnExpandEnvStringsW(pszPath: LPCWSTR, pszBuf: LPWSTR, cchBuf: UINT): BOOL {
-    return Shlwapi.Load('PathUnExpandEnvStringsW')(pszPath, pszBuf, cchBuf);
+  public static PathUnExpandEnvStringsW(pszPath: LPCWSTR, pszBuf_out: LPWSTR, cchBuf: UINT): BOOL {
+    return Shlwapi.Load('PathUnExpandEnvStringsW')(pszPath, pszBuf_out, cchBuf);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-pathundecoratea
-  public static PathUndecorateA(pszPath: LPSTR): VOID {
-    return Shlwapi.Load('PathUndecorateA')(pszPath);
+  public static PathUndecorateA(pszPath_in_out: LPSTR): VOID {
+    return Shlwapi.Load('PathUndecorateA')(pszPath_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-pathundecoratew
-  public static PathUndecorateW(pszPath: LPWSTR): VOID {
-    return Shlwapi.Load('PathUndecorateW')(pszPath);
+  public static PathUndecorateW(pszPath_in_out: LPWSTR): VOID {
+    return Shlwapi.Load('PathUndecorateW')(pszPath_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-pathunmakesystemfoldera
@@ -1264,30 +1265,30 @@ class Shlwapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-pathunquotespacesa
-  public static PathUnquoteSpacesA(lpsz: LPSTR): BOOL {
-    return Shlwapi.Load('PathUnquoteSpacesA')(lpsz);
+  public static PathUnquoteSpacesA(lpsz_in_out: LPSTR): BOOL {
+    return Shlwapi.Load('PathUnquoteSpacesA')(lpsz_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-pathunquotespacesw
-  public static PathUnquoteSpacesW(lpsz: LPWSTR): BOOL {
-    return Shlwapi.Load('PathUnquoteSpacesW')(lpsz);
+  public static PathUnquoteSpacesW(lpsz_in_out: LPWSTR): BOOL {
+    return Shlwapi.Load('PathUnquoteSpacesW')(lpsz_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-qisearch
-  public static QISearch(that: HANDLE, pqit: LPVOID, riid: REFIID, ppv: LPVOID): HRESULT {
-    return Shlwapi.Load('QISearch')(that, pqit, riid, ppv);
+  public static QISearch(that_in_out: LPVOID<bigint>, pqit: LPVOID, riid: REFIID, ppv_out: LPVOID): HRESULT {
+    return Shlwapi.Load('QISearch')(that_in_out, pqit, riid, ppv_out);
   }
 
-  public static SHAllocShared(pvData: LPVOID | NULL, dwSize: DWORD, dwProcessId: DWORD): HANDLE {
+  public static SHAllocShared(pvData: OPTIONAL<LPVOID>, dwSize: DWORD, dwProcessId: DWORD): HANDLE {
     return Shlwapi.Load('SHAllocShared')(pvData, dwSize, dwProcessId);
   }
 
-  public static SHAnsiToAnsi(pszSrc: LPCSTR, pszDst: LPSTR, cchBuf: INT): INT {
-    return Shlwapi.Load('SHAnsiToAnsi')(pszSrc, pszDst, cchBuf);
+  public static SHAnsiToAnsi(pszSrc: LPCSTR, pszDst_out: LPSTR, cchBuf: INT): INT {
+    return Shlwapi.Load('SHAnsiToAnsi')(pszSrc, pszDst_out, cchBuf);
   }
 
-  public static SHAnsiToUnicode(pszSrc: LPCSTR, pwszDst: LPWSTR, cwchBuf: INT): INT {
-    return Shlwapi.Load('SHAnsiToUnicode')(pszSrc, pwszDst, cwchBuf);
+  public static SHAnsiToUnicode(pszSrc: LPCSTR, pwszDst_out: LPWSTR, cwchBuf: INT): INT {
+    return Shlwapi.Load('SHAnsiToUnicode')(pszSrc, pwszDst_out, cwchBuf);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-shautocomplete
@@ -1296,38 +1297,38 @@ class Shlwapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-shcopykeya
-  public static SHCopyKeyA(hkeySrc: HKEY, pszSrcSubKey: LPCSTR | NULL, hkeyDest: HKEY, fReserved: DWORD): LONG {
+  public static SHCopyKeyA(hkeySrc: HKEY, pszSrcSubKey: OPTIONAL<LPCSTR>, hkeyDest: HKEY, fReserved: DWORD): LONG {
     return Shlwapi.Load('SHCopyKeyA')(hkeySrc, pszSrcSubKey, hkeyDest, fReserved);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-shcopykeyw
-  public static SHCopyKeyW(hkeySrc: HKEY, pszSrcSubKey: LPCWSTR | NULL, hkeyDest: HKEY, fReserved: DWORD): LONG {
+  public static SHCopyKeyW(hkeySrc: HKEY, pszSrcSubKey: OPTIONAL<LPCWSTR>, hkeyDest: HKEY, fReserved: DWORD): LONG {
     return Shlwapi.Load('SHCopyKeyW')(hkeySrc, pszSrcSubKey, hkeyDest, fReserved);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-shcreatememstream
-  public static SHCreateMemStream(pInit: LPBYTE | NULL, cbInit: UINT): LONG_PTR {
+  public static SHCreateMemStream(pInit: OPTIONAL<LPBYTE>, cbInit: UINT): LONG_PTR {
     return Shlwapi.Load('SHCreateMemStream')(pInit, cbInit);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-shcreateshellpalette
-  public static SHCreateShellPalette(hdc: HDC | 0n): HPALETTE {
+  public static SHCreateShellPalette(hdc: OPTIONAL<HDC>): HPALETTE {
     return Shlwapi.Load('SHCreateShellPalette')(hdc);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-shcreatestreamonfilea
-  public static SHCreateStreamOnFileA(pszFile: LPCSTR, grfMode: DWORD, ppstm: LPVOID): HRESULT {
-    return Shlwapi.Load('SHCreateStreamOnFileA')(pszFile, grfMode, ppstm);
+  public static SHCreateStreamOnFileA(pszFile: LPCSTR, grfMode: DWORD, ppstm_out: LPVOID): HRESULT {
+    return Shlwapi.Load('SHCreateStreamOnFileA')(pszFile, grfMode, ppstm_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-shcreatestreamonfileex
-  public static SHCreateStreamOnFileEx(pszFile: LPCWSTR, grfMode: DWORD, dwAttributes: DWORD, fCreate: BOOL, pstmTemplate: HANDLE | 0n, ppstm: LPVOID): HRESULT {
-    return Shlwapi.Load('SHCreateStreamOnFileEx')(pszFile, grfMode, dwAttributes, fCreate, pstmTemplate, ppstm);
+  public static SHCreateStreamOnFileEx(pszFile: LPCWSTR, grfMode: DWORD, dwAttributes: DWORD, fCreate: BOOL, pstmTemplate: OPTIONAL<HANDLE>, ppstm_out: LPVOID): HRESULT {
+    return Shlwapi.Load('SHCreateStreamOnFileEx')(pszFile, grfMode, dwAttributes, fCreate, pstmTemplate, ppstm_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-shcreatestreamonfilew
-  public static SHCreateStreamOnFileW(pszFile: LPCWSTR, grfMode: DWORD, ppstm: LPVOID): HRESULT {
-    return Shlwapi.Load('SHCreateStreamOnFileW')(pszFile, grfMode, ppstm);
+  public static SHCreateStreamOnFileW(pszFile: LPCWSTR, grfMode: DWORD, ppstm_out: LPVOID): HRESULT {
+    return Shlwapi.Load('SHCreateStreamOnFileW')(pszFile, grfMode, ppstm_out);
   }
 
   public static SHCreateStreamWrapper(pStream: HANDLE, pStreamWrapper: LPVOID, ppStreamResult: LPVOID): HRESULT {
@@ -1335,41 +1336,41 @@ class Shlwapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-shcreatethread
-  public static SHCreateThread(pfnThreadProc: LPTHREAD_START_ROUTINE, pData: LPVOID | NULL, dwFlags: DWORD, pfnCallback: LPTHREAD_START_ROUTINE | NULL): BOOL {
+  public static SHCreateThread(pfnThreadProc: LPTHREAD_START_ROUTINE, pData: OPTIONAL<LPVOID>, dwFlags: DWORD, pfnCallback: OPTIONAL<LPTHREAD_START_ROUTINE>): BOOL {
     return Shlwapi.Load('SHCreateThread')(pfnThreadProc, pData, dwFlags, pfnCallback);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-shcreatethreadref
-  public static SHCreateThreadRef(pcRef: LPVOID, ppunk: LPVOID): HRESULT {
-    return Shlwapi.Load('SHCreateThreadRef')(pcRef, ppunk);
+  public static SHCreateThreadRef(pcRef_in_out: LPVOID, ppunk_out: LPVOID): HRESULT {
+    return Shlwapi.Load('SHCreateThreadRef')(pcRef_in_out, ppunk_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-shcreatethreadwithhandle
-  public static SHCreateThreadWithHandle(pfnThreadProc: LPTHREAD_START_ROUTINE, pData: LPVOID | NULL, dwFlags: DWORD, pfnCallback: LPTHREAD_START_ROUTINE | NULL, pHandle: LPVOID | NULL): BOOL {
-    return Shlwapi.Load('SHCreateThreadWithHandle')(pfnThreadProc, pData, dwFlags, pfnCallback, pHandle);
+  public static SHCreateThreadWithHandle(pfnThreadProc: LPTHREAD_START_ROUTINE, pData: OPTIONAL<LPVOID>, dwFlags: DWORD, pfnCallback: OPTIONAL<LPTHREAD_START_ROUTINE>, pHandle_out: OPTIONAL<LPVOID>): BOOL {
+    return Shlwapi.Load('SHCreateThreadWithHandle')(pfnThreadProc, pData, dwFlags, pfnCallback, pHandle_out);
   }
 
-  public static SHCreateWorkerWindowW(pfnWndProc: WNDPROC | NULL, hwndParent: HWND, dwExStyle: DWORD, dwFlags: DWORD, hMenu: HMENU | 0n, lParam: LONG_PTR): HWND {
+  public static SHCreateWorkerWindowW(pfnWndProc: OPTIONAL<WNDPROC>, hwndParent: HWND, dwExStyle: DWORD, dwFlags: DWORD, hMenu: OPTIONAL<HMENU>, lParam: LONG_PTR): HWND {
     return Shlwapi.Load('SHCreateWorkerWindowW')(pfnWndProc, hwndParent, dwExStyle, dwFlags, hMenu, lParam);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-shdeleteemptykeya
-  public static SHDeleteEmptyKeyA(hkey: HKEY, pszSubKey: LPCSTR | NULL): LONG {
+  public static SHDeleteEmptyKeyA(hkey: HKEY, pszSubKey: OPTIONAL<LPCSTR>): LONG {
     return Shlwapi.Load('SHDeleteEmptyKeyA')(hkey, pszSubKey);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-shdeleteemptykeyw
-  public static SHDeleteEmptyKeyW(hkey: HKEY, pszSubKey: LPCWSTR | NULL): LONG {
+  public static SHDeleteEmptyKeyW(hkey: HKEY, pszSubKey: OPTIONAL<LPCWSTR>): LONG {
     return Shlwapi.Load('SHDeleteEmptyKeyW')(hkey, pszSubKey);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-shdeletekeya
-  public static SHDeleteKeyA(hkey: HKEY, pszSubKey: LPCSTR | NULL): LONG {
+  public static SHDeleteKeyA(hkey: HKEY, pszSubKey: OPTIONAL<LPCSTR>): LONG {
     return Shlwapi.Load('SHDeleteKeyA')(hkey, pszSubKey);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-shdeletekeyw
-  public static SHDeleteKeyW(hkey: HKEY, pszSubKey: LPCWSTR | NULL): LONG {
+  public static SHDeleteKeyW(hkey: HKEY, pszSubKey: OPTIONAL<LPCWSTR>): LONG {
     return Shlwapi.Load('SHDeleteKeyW')(hkey, pszSubKey);
   }
 
@@ -1382,43 +1383,43 @@ class Shlwapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-shdeletevaluea
-  public static SHDeleteValueA(hkey: HKEY, pszSubKey: LPCSTR | NULL, pszValue: LPCSTR): LONG {
+  public static SHDeleteValueA(hkey: HKEY, pszSubKey: OPTIONAL<LPCSTR>, pszValue: LPCSTR): LONG {
     return Shlwapi.Load('SHDeleteValueA')(hkey, pszSubKey, pszValue);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-shdeletevaluew
-  public static SHDeleteValueW(hkey: HKEY, pszSubKey: LPCWSTR | NULL, pszValue: LPCWSTR): LONG {
+  public static SHDeleteValueW(hkey: HKEY, pszSubKey: OPTIONAL<LPCWSTR>, pszValue: LPCWSTR): LONG {
     return Shlwapi.Load('SHDeleteValueW')(hkey, pszSubKey, pszValue);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-shenumkeyexa
-  public static SHEnumKeyExA(hkey: HKEY, dwIndex: DWORD, pszName: LPSTR, pcchName: LPDWORD): LONG {
-    return Shlwapi.Load('SHEnumKeyExA')(hkey, dwIndex, pszName, pcchName);
+  public static SHEnumKeyExA(hkey: HKEY, dwIndex: DWORD, pszName_out: LPSTR, pcchName_in_out: LPDWORD): LONG {
+    return Shlwapi.Load('SHEnumKeyExA')(hkey, dwIndex, pszName_out, pcchName_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-shenumkeyexw
-  public static SHEnumKeyExW(hkey: HKEY, dwIndex: DWORD, pszName: LPWSTR, pcchName: LPDWORD): LONG {
-    return Shlwapi.Load('SHEnumKeyExW')(hkey, dwIndex, pszName, pcchName);
+  public static SHEnumKeyExW(hkey: HKEY, dwIndex: DWORD, pszName_out: LPWSTR, pcchName_in_out: LPDWORD): LONG {
+    return Shlwapi.Load('SHEnumKeyExW')(hkey, dwIndex, pszName_out, pcchName_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-shenumvaluea
-  public static SHEnumValueA(hkey: HKEY, dwIndex: DWORD, pszValueName: LPSTR | NULL, pcchValueName: LPDWORD | NULL, pdwType: LPDWORD | NULL, pvData: LPVOID | NULL, pcbData: LPDWORD | NULL): LONG {
-    return Shlwapi.Load('SHEnumValueA')(hkey, dwIndex, pszValueName, pcchValueName, pdwType, pvData, pcbData);
+  public static SHEnumValueA(hkey: HKEY, dwIndex: DWORD, pszValueName_out: OPTIONAL<LPSTR>, pcchValueName_in_out: OPTIONAL<LPDWORD>, pdwType_out: OPTIONAL<LPDWORD>, pvData_out: OPTIONAL<LPVOID>, pcbData_in_out: OPTIONAL<LPDWORD>): LONG {
+    return Shlwapi.Load('SHEnumValueA')(hkey, dwIndex, pszValueName_out, pcchValueName_in_out, pdwType_out, pvData_out, pcbData_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-shenumvaluew
-  public static SHEnumValueW(hkey: HKEY, dwIndex: DWORD, pszValueName: LPWSTR | NULL, pcchValueName: LPDWORD | NULL, pdwType: LPDWORD | NULL, pvData: LPVOID | NULL, pcbData: LPDWORD | NULL): LONG {
-    return Shlwapi.Load('SHEnumValueW')(hkey, dwIndex, pszValueName, pcchValueName, pdwType, pvData, pcbData);
+  public static SHEnumValueW(hkey: HKEY, dwIndex: DWORD, pszValueName_out: OPTIONAL<LPWSTR>, pcchValueName_in_out: OPTIONAL<LPDWORD>, pdwType_out: OPTIONAL<LPDWORD>, pvData_out: OPTIONAL<LPVOID>, pcbData_in_out: OPTIONAL<LPDWORD>): LONG {
+    return Shlwapi.Load('SHEnumValueW')(hkey, dwIndex, pszValueName_out, pcchValueName_in_out, pdwType_out, pvData_out, pcbData_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-shformatdatetimea
-  public static SHFormatDateTimeA(pft: LPVOID, pdwFlags: LPDWORD | NULL, pszBuf: LPSTR, cchBuf: UINT): INT {
-    return Shlwapi.Load('SHFormatDateTimeA')(pft, pdwFlags, pszBuf, cchBuf);
+  public static SHFormatDateTimeA(pft: LPVOID, pdwFlags_in_out: OPTIONAL<LPDWORD>, pszBuf_out: LPSTR, cchBuf: UINT): INT {
+    return Shlwapi.Load('SHFormatDateTimeA')(pft, pdwFlags_in_out, pszBuf_out, cchBuf);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-shformatdatetimew
-  public static SHFormatDateTimeW(pft: LPVOID, pdwFlags: LPDWORD | NULL, pszBuf: LPWSTR, cchBuf: UINT): INT {
-    return Shlwapi.Load('SHFormatDateTimeW')(pft, pdwFlags, pszBuf, cchBuf);
+  public static SHFormatDateTimeW(pft: LPVOID, pdwFlags_in_out: OPTIONAL<LPDWORD>, pszBuf_out: LPWSTR, cchBuf: UINT): INT {
+    return Shlwapi.Load('SHFormatDateTimeW')(pft, pdwFlags_in_out, pszBuf_out, cchBuf);
   }
 
   public static SHFreeShared(hData: HANDLE, dwProcessId: DWORD): BOOL {
@@ -1426,39 +1427,39 @@ class Shlwapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-shgetinversecmap
-  public static SHGetInverseCMAP(pbMap: LPBYTE, cbMap: ULONG): HRESULT {
-    return Shlwapi.Load('SHGetInverseCMAP')(pbMap, cbMap);
+  public static SHGetInverseCMAP(pbMap_out: LPBYTE, cbMap: ULONG): HRESULT {
+    return Shlwapi.Load('SHGetInverseCMAP')(pbMap_out, cbMap);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-shgetthreadref
-  public static SHGetThreadRef(ppunk: LPVOID): HRESULT {
-    return Shlwapi.Load('SHGetThreadRef')(ppunk);
+  public static SHGetThreadRef(ppunk_out: LPVOID): HRESULT {
+    return Shlwapi.Load('SHGetThreadRef')(ppunk_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-shgetvaluea
-  public static SHGetValueA(hkey: HKEY, pszSubKey: LPCSTR | NULL, pszValue: LPCSTR | NULL, pdwType: LPDWORD | NULL, pvData: LPVOID | NULL, pcbData: LPDWORD | NULL): LONG {
-    return Shlwapi.Load('SHGetValueA')(hkey, pszSubKey, pszValue, pdwType, pvData, pcbData);
+  public static SHGetValueA(hkey: HKEY, pszSubKey: OPTIONAL<LPCSTR>, pszValue: OPTIONAL<LPCSTR>, pdwType_out: OPTIONAL<LPDWORD>, pvData_out: OPTIONAL<LPVOID>, pcbData_in_out: OPTIONAL<LPDWORD>): LONG {
+    return Shlwapi.Load('SHGetValueA')(hkey, pszSubKey, pszValue, pdwType_out, pvData_out, pcbData_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-shgetvaluew
-  public static SHGetValueW(hkey: HKEY, pszSubKey: LPCWSTR | NULL, pszValue: LPCWSTR | NULL, pdwType: LPDWORD | NULL, pvData: LPVOID | NULL, pcbData: LPDWORD | NULL): LONG {
-    return Shlwapi.Load('SHGetValueW')(hkey, pszSubKey, pszValue, pdwType, pvData, pcbData);
+  public static SHGetValueW(hkey: HKEY, pszSubKey: OPTIONAL<LPCWSTR>, pszValue: OPTIONAL<LPCWSTR>, pdwType_out: OPTIONAL<LPDWORD>, pvData_out: OPTIONAL<LPVOID>, pcbData_in_out: OPTIONAL<LPDWORD>): LONG {
+    return Shlwapi.Load('SHGetValueW')(hkey, pszSubKey, pszValue, pdwType_out, pvData_out, pcbData_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-shgetviewstatepropertybag
-  public static SHGetViewStatePropertyBag(pidl: PIDLIST_ABSOLUTE | NULL, pszBagName: PCWSTR | NULL, dwFlags: DWORD, riid: REFIID, ppv: LPVOID): HRESULT {
-    return Shlwapi.Load('SHGetViewStatePropertyBag')(pidl, pszBagName, dwFlags, riid, ppv);
+  public static SHGetViewStatePropertyBag(pidl: OPTIONAL<PIDLIST_ABSOLUTE>, pszBagName: OPTIONAL<PCWSTR>, dwFlags: DWORD, riid: REFIID, ppv_out: LPVOID): HRESULT {
+    return Shlwapi.Load('SHGetViewStatePropertyBag')(pidl, pszBagName, dwFlags, riid, ppv_out);
   }
 
-  public static ShellMessageBoxA(hAppInst: HINSTANCE | 0n, hWnd: HWND | 0n, lpcText: LPCSTR, lpcTitle: LPCSTR | NULL, fuStyle: UINT): INT {
+  public static ShellMessageBoxA(hAppInst: OPTIONAL<HINSTANCE>, hWnd: OPTIONAL<HWND>, lpcText: LPCSTR, lpcTitle: OPTIONAL<LPCSTR>, fuStyle: UINT): INT {
     return Shlwapi.Load('ShellMessageBoxA')(hAppInst, hWnd, lpcText, lpcTitle, fuStyle);
   }
 
-  public static ShellMessageBoxInternal(hAppInst: HINSTANCE, hWnd: HWND | 0n, lpcText: LPCWSTR, lpcTitle: LPCWSTR | NULL, fuStyle: UINT, bUnicode: BOOL): INT {
+  public static ShellMessageBoxInternal(hAppInst: HINSTANCE, hWnd: OPTIONAL<HWND>, lpcText: LPCWSTR, lpcTitle: OPTIONAL<LPCWSTR>, fuStyle: UINT, bUnicode: BOOL): INT {
     return Shlwapi.Load('ShellMessageBoxInternal')(hAppInst, hWnd, lpcText, lpcTitle, fuStyle, bUnicode);
   }
 
-  public static ShellMessageBoxW(hAppInst: HINSTANCE | 0n, hWnd: HWND | 0n, lpcText: LPCWSTR, lpcTitle: LPCWSTR | NULL, fuStyle: UINT): INT {
+  public static ShellMessageBoxW(hAppInst: OPTIONAL<HINSTANCE>, hWnd: OPTIONAL<HWND>, lpcText: LPCWSTR, lpcTitle: OPTIONAL<LPCWSTR>, fuStyle: UINT): INT {
     return Shlwapi.Load('ShellMessageBoxW')(hAppInst, hWnd, lpcText, lpcTitle, fuStyle);
   }
 
@@ -1473,39 +1474,39 @@ class Shlwapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-shloadindirectstring
-  public static SHLoadIndirectString(pszSource: PCWSTR, pszOutBuf: PWSTR, cchOutBuf: UINT, ppvReserved: LPVOID | NULL): HRESULT {
-    return Shlwapi.Load('SHLoadIndirectString')(pszSource, pszOutBuf, cchOutBuf, ppvReserved);
+  public static SHLoadIndirectString(pszSource: PCWSTR, pszOutBuf_out: PWSTR, cchOutBuf: UINT, ppvReserved: NULL): HRESULT {
+    return Shlwapi.Load('SHLoadIndirectString')(pszSource, pszOutBuf_out, cchOutBuf, ppvReserved);
   }
 
   public static SHLockShared(hData: HANDLE, dwProcessId: DWORD): LONG_PTR {
     return Shlwapi.Load('SHLockShared')(hData, dwProcessId);
   }
 
-  public static SHMessageBoxCheckA(hwnd: HWND | 0n, pszText: LPCSTR, pszTitle: LPCSTR | NULL, uType: UINT, iDefault: INT, pszRegVal: LPCSTR): INT {
+  public static SHMessageBoxCheckA(hwnd: OPTIONAL<HWND>, pszText: LPCSTR, pszTitle: LPCSTR, uType: UINT, iDefault: INT, pszRegVal: LPCSTR): INT {
     return Shlwapi.Load('SHMessageBoxCheckA')(hwnd, pszText, pszTitle, uType, iDefault, pszRegVal);
   }
 
-  public static SHMessageBoxCheckW(hwnd: HWND | 0n, pszText: LPCWSTR, pszTitle: LPCWSTR | NULL, uType: UINT, iDefault: INT, pszRegVal: LPCWSTR): INT {
+  public static SHMessageBoxCheckW(hwnd: OPTIONAL<HWND>, pszText: LPCWSTR, pszTitle: LPCWSTR, uType: UINT, iDefault: INT, pszRegVal: LPCWSTR): INT {
     return Shlwapi.Load('SHMessageBoxCheckW')(hwnd, pszText, pszTitle, uType, iDefault, pszRegVal);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-shopenregstream2a
-  public static SHOpenRegStream2A(hkey: HKEY, pszSubkey: LPCSTR | NULL, pszValue: LPCSTR | NULL, grfMode: DWORD): LONG_PTR {
+  public static SHOpenRegStream2A(hkey: HKEY, pszSubkey: OPTIONAL<LPCSTR>, pszValue: OPTIONAL<LPCSTR>, grfMode: DWORD): LONG_PTR {
     return Shlwapi.Load('SHOpenRegStream2A')(hkey, pszSubkey, pszValue, grfMode);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-shopenregstream2w
-  public static SHOpenRegStream2W(hkey: HKEY, pszSubkey: LPCWSTR | NULL, pszValue: LPCWSTR | NULL, grfMode: DWORD): LONG_PTR {
+  public static SHOpenRegStream2W(hkey: HKEY, pszSubkey: OPTIONAL<LPCWSTR>, pszValue: OPTIONAL<LPCWSTR>, grfMode: DWORD): LONG_PTR {
     return Shlwapi.Load('SHOpenRegStream2W')(hkey, pszSubkey, pszValue, grfMode);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-shopenregstreama
-  public static SHOpenRegStreamA(hkey: HKEY, pszSubkey: LPCSTR | NULL, pszValue: LPCSTR | NULL, grfMode: DWORD): LONG_PTR {
+  public static SHOpenRegStreamA(hkey: HKEY, pszSubkey: OPTIONAL<LPCSTR>, pszValue: OPTIONAL<LPCSTR>, grfMode: DWORD): LONG_PTR {
     return Shlwapi.Load('SHOpenRegStreamA')(hkey, pszSubkey, pszValue, grfMode);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-shopenregstreamw
-  public static SHOpenRegStreamW(hkey: HKEY, pszSubkey: LPCWSTR | NULL, pszValue: LPCWSTR | NULL, grfMode: DWORD): LONG_PTR {
+  public static SHOpenRegStreamW(hkey: HKEY, pszSubkey: OPTIONAL<LPCWSTR>, pszValue: OPTIONAL<LPCWSTR>, grfMode: DWORD): LONG_PTR {
     return Shlwapi.Load('SHOpenRegStreamW')(hkey, pszSubkey, pszValue, grfMode);
   }
 
@@ -1526,23 +1527,23 @@ class Shlwapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-shqueryinfokeya
-  public static SHQueryInfoKeyA(hkey: HKEY, pcSubKeys: LPDWORD | NULL, pcchMaxSubKeyLen: LPDWORD | NULL, pcValues: LPDWORD | NULL, pcchMaxValueNameLen: LPDWORD | NULL): LONG {
-    return Shlwapi.Load('SHQueryInfoKeyA')(hkey, pcSubKeys, pcchMaxSubKeyLen, pcValues, pcchMaxValueNameLen);
+  public static SHQueryInfoKeyA(hkey: HKEY, pcSubKeys_out: OPTIONAL<LPDWORD>, pcchMaxSubKeyLen_out: OPTIONAL<LPDWORD>, pcValues_out: OPTIONAL<LPDWORD>, pcchMaxValueNameLen_out: OPTIONAL<LPDWORD>): LONG {
+    return Shlwapi.Load('SHQueryInfoKeyA')(hkey, pcSubKeys_out, pcchMaxSubKeyLen_out, pcValues_out, pcchMaxValueNameLen_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-shqueryinfokeyw
-  public static SHQueryInfoKeyW(hkey: HKEY, pcSubKeys: LPDWORD | NULL, pcchMaxSubKeyLen: LPDWORD | NULL, pcValues: LPDWORD | NULL, pcchMaxValueNameLen: LPDWORD | NULL): LONG {
-    return Shlwapi.Load('SHQueryInfoKeyW')(hkey, pcSubKeys, pcchMaxSubKeyLen, pcValues, pcchMaxValueNameLen);
+  public static SHQueryInfoKeyW(hkey: HKEY, pcSubKeys_out: OPTIONAL<LPDWORD>, pcchMaxSubKeyLen_out: OPTIONAL<LPDWORD>, pcValues_out: OPTIONAL<LPDWORD>, pcchMaxValueNameLen_out: OPTIONAL<LPDWORD>): LONG {
+    return Shlwapi.Load('SHQueryInfoKeyW')(hkey, pcSubKeys_out, pcchMaxSubKeyLen_out, pcValues_out, pcchMaxValueNameLen_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-shqueryvalueexa
-  public static SHQueryValueExA(hkey: HKEY, pszValue: LPCSTR | NULL, pdwReserved: LPDWORD | NULL, pdwType: LPDWORD | NULL, pvData: LPVOID | NULL, pcbData: LPDWORD | NULL): LONG {
-    return Shlwapi.Load('SHQueryValueExA')(hkey, pszValue, pdwReserved, pdwType, pvData, pcbData);
+  public static SHQueryValueExA(hkey: HKEY, pszValue: OPTIONAL<LPCSTR>, pdwReserved: NULL, pdwType_out: OPTIONAL<LPDWORD>, pvData_out: OPTIONAL<LPVOID>, pcbData_in_out: OPTIONAL<LPDWORD>): LONG {
+    return Shlwapi.Load('SHQueryValueExA')(hkey, pszValue, pdwReserved, pdwType_out, pvData_out, pcbData_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-shqueryvalueexw
-  public static SHQueryValueExW(hkey: HKEY, pszValue: LPCWSTR | NULL, pdwReserved: LPDWORD | NULL, pdwType: LPDWORD | NULL, pvData: LPVOID | NULL, pcbData: LPDWORD | NULL): LONG {
-    return Shlwapi.Load('SHQueryValueExW')(hkey, pszValue, pdwReserved, pdwType, pvData, pcbData);
+  public static SHQueryValueExW(hkey: HKEY, pszValue: OPTIONAL<LPCWSTR>, pdwReserved: NULL, pdwType_out: OPTIONAL<LPDWORD>, pvData_out: OPTIONAL<LPVOID>, pcbData_in_out: OPTIONAL<LPDWORD>): LONG {
+    return Shlwapi.Load('SHQueryValueExW')(hkey, pszValue, pdwReserved, pdwType_out, pvData_out, pcbData_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-shregcloseuskey
@@ -1551,13 +1552,13 @@ class Shlwapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-shregcreateuskeya
-  public static SHRegCreateUSKeyA(pszPath: LPCSTR, samDesired: REGSAM, hRelativeUSKey: HUSKEY | 0n, phNewUSKey: PHUSKEY, dwFlags: DWORD): LONG {
-    return Shlwapi.Load('SHRegCreateUSKeyA')(pszPath, samDesired, hRelativeUSKey, phNewUSKey, dwFlags);
+  public static SHRegCreateUSKeyA(pszPath: LPCSTR, samDesired: REGSAM, hRelativeUSKey: OPTIONAL<HUSKEY>, phNewUSKey_out: PHUSKEY, dwFlags: DWORD): LONG {
+    return Shlwapi.Load('SHRegCreateUSKeyA')(pszPath, samDesired, hRelativeUSKey, phNewUSKey_out, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-shregcreateuskeyw
-  public static SHRegCreateUSKeyW(pszPath: LPCWSTR, samDesired: REGSAM, hRelativeUSKey: HUSKEY | 0n, phNewUSKey: PHUSKEY, dwFlags: DWORD): LONG {
-    return Shlwapi.Load('SHRegCreateUSKeyW')(pszPath, samDesired, hRelativeUSKey, phNewUSKey, dwFlags);
+  public static SHRegCreateUSKeyW(pszPath: LPCWSTR, samDesired: REGSAM, hRelativeUSKey: OPTIONAL<HUSKEY>, phNewUSKey_out: PHUSKEY, dwFlags: DWORD): LONG {
+    return Shlwapi.Load('SHRegCreateUSKeyW')(pszPath, samDesired, hRelativeUSKey, phNewUSKey_out, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-shregdeleteemptyuskeya
@@ -1586,76 +1587,112 @@ class Shlwapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-shregenummuskeya
-  public static SHRegEnumUSKeyA(hUSKey: HUSKEY, dwIndex: DWORD, pszName: LPSTR, pcchName: LPDWORD, enumRegFlags: DWORD): LONG {
-    return Shlwapi.Load('SHRegEnumUSKeyA')(hUSKey, dwIndex, pszName, pcchName, enumRegFlags);
+  public static SHRegEnumUSKeyA(hUSKey: HUSKEY, dwIndex: DWORD, pszName_out: LPSTR, pcchName_in_out: LPDWORD, enumRegFlags: DWORD): LONG {
+    return Shlwapi.Load('SHRegEnumUSKeyA')(hUSKey, dwIndex, pszName_out, pcchName_in_out, enumRegFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-shregenummuskeyw
-  public static SHRegEnumUSKeyW(hUSKey: HUSKEY, dwIndex: DWORD, pszName: LPWSTR, pcchName: LPDWORD, enumRegFlags: DWORD): LONG {
-    return Shlwapi.Load('SHRegEnumUSKeyW')(hUSKey, dwIndex, pszName, pcchName, enumRegFlags);
+  public static SHRegEnumUSKeyW(hUSKey: HUSKEY, dwIndex: DWORD, pszName_out: LPWSTR, pcchName_in_out: LPDWORD, enumRegFlags: DWORD): LONG {
+    return Shlwapi.Load('SHRegEnumUSKeyW')(hUSKey, dwIndex, pszName_out, pcchName_in_out, enumRegFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-shregenumvaluea
-  public static SHRegEnumUSValueA(hUSKey: HUSKEY, dwIndex: DWORD, pszValueName: LPSTR, pcchValueName: LPDWORD, pdwType: LPDWORD | NULL, pvData: LPVOID | NULL, pcbData: LPDWORD | NULL, enumRegFlags: DWORD): LONG {
-    return Shlwapi.Load('SHRegEnumUSValueA')(hUSKey, dwIndex, pszValueName, pcchValueName, pdwType, pvData, pcbData, enumRegFlags);
+  public static SHRegEnumUSValueA(
+    hUSKey: HUSKEY,
+    dwIndex: DWORD,
+    pszValueName_out: LPSTR,
+    pcchValueName_in_out: LPDWORD,
+    pdwType_out: OPTIONAL<LPDWORD>,
+    pvData_out: OPTIONAL<LPVOID>,
+    pcbData_in_out: OPTIONAL<LPDWORD>,
+    enumRegFlags: DWORD,
+  ): LONG {
+    return Shlwapi.Load('SHRegEnumUSValueA')(hUSKey, dwIndex, pszValueName_out, pcchValueName_in_out, pdwType_out, pvData_out, pcbData_in_out, enumRegFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-shregenumvaluew
-  public static SHRegEnumUSValueW(hUSKey: HUSKEY, dwIndex: DWORD, pszValueName: LPWSTR, pcchValueName: LPDWORD, pdwType: LPDWORD | NULL, pvData: LPVOID | NULL, pcbData: LPDWORD | NULL, enumRegFlags: DWORD): LONG {
-    return Shlwapi.Load('SHRegEnumUSValueW')(hUSKey, dwIndex, pszValueName, pcchValueName, pdwType, pvData, pcbData, enumRegFlags);
+  public static SHRegEnumUSValueW(
+    hUSKey: HUSKEY,
+    dwIndex: DWORD,
+    pszValueName_out: LPWSTR,
+    pcchValueName_in_out: LPDWORD,
+    pdwType_out: OPTIONAL<LPDWORD>,
+    pvData_out: OPTIONAL<LPVOID>,
+    pcbData_in_out: OPTIONAL<LPDWORD>,
+    enumRegFlags: DWORD,
+  ): LONG {
+    return Shlwapi.Load('SHRegEnumUSValueW')(hUSKey, dwIndex, pszValueName_out, pcchValueName_in_out, pdwType_out, pvData_out, pcbData_in_out, enumRegFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-shreggetboolusvaluea
-  public static SHRegGetBoolUSValueA(pszSubKey: LPCSTR, pszValue: LPCSTR | NULL, fIgnoreHKCU: BOOL, fDefault: BOOL): BOOL {
+  public static SHRegGetBoolUSValueA(pszSubKey: LPCSTR, pszValue: OPTIONAL<LPCSTR>, fIgnoreHKCU: BOOL, fDefault: BOOL): BOOL {
     return Shlwapi.Load('SHRegGetBoolUSValueA')(pszSubKey, pszValue, fIgnoreHKCU, fDefault);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-shreggetboolusvaluew
-  public static SHRegGetBoolUSValueW(pszSubKey: LPCWSTR, pszValue: LPCWSTR | NULL, fIgnoreHKCU: BOOL, fDefault: BOOL): BOOL {
+  public static SHRegGetBoolUSValueW(pszSubKey: LPCWSTR, pszValue: OPTIONAL<LPCWSTR>, fIgnoreHKCU: BOOL, fDefault: BOOL): BOOL {
     return Shlwapi.Load('SHRegGetBoolUSValueW')(pszSubKey, pszValue, fIgnoreHKCU, fDefault);
   }
 
-  public static SHRegGetBoolValueFromHKCUHKLM(pszKey: PCWSTR, pszValue: PCWSTR | NULL, fDefault: BOOL): BOOL {
+  public static SHRegGetBoolValueFromHKCUHKLM(pszKey: PCWSTR, pszValue: OPTIONAL<PCWSTR>, fDefault: BOOL): BOOL {
     return Shlwapi.Load('SHRegGetBoolValueFromHKCUHKLM')(pszKey, pszValue, fDefault);
   }
 
-  public static SHRegGetIntW(hk: HKEY, pszValue: PCWSTR | NULL, iDefault: INT): INT {
+  public static SHRegGetIntW(hk: HKEY, pszValue: OPTIONAL<PCWSTR>, iDefault: INT): INT {
     return Shlwapi.Load('SHRegGetIntW')(hk, pszValue, iDefault);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-shreggetpatha
-  public static SHRegGetPathA(hKey: HKEY, pcszSubKey: LPCSTR | NULL, pcszValue: LPCSTR | NULL, pszPath: LPSTR, dwFlags: DWORD): LONG {
-    return Shlwapi.Load('SHRegGetPathA')(hKey, pcszSubKey, pcszValue, pszPath, dwFlags);
+  public static SHRegGetPathA(hKey: HKEY, pcszSubKey: OPTIONAL<LPCSTR>, pcszValue: OPTIONAL<LPCSTR>, pszPath_out: LPSTR, dwFlags: DWORD): LONG {
+    return Shlwapi.Load('SHRegGetPathA')(hKey, pcszSubKey, pcszValue, pszPath_out, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-shreggetpathw
-  public static SHRegGetPathW(hKey: HKEY, pcszSubKey: LPCWSTR | NULL, pcszValue: LPCWSTR | NULL, pszPath: LPWSTR, dwFlags: DWORD): LONG {
-    return Shlwapi.Load('SHRegGetPathW')(hKey, pcszSubKey, pcszValue, pszPath, dwFlags);
+  public static SHRegGetPathW(hKey: HKEY, pcszSubKey: OPTIONAL<LPCWSTR>, pcszValue: OPTIONAL<LPCWSTR>, pszPath_out: LPWSTR, dwFlags: DWORD): LONG {
+    return Shlwapi.Load('SHRegGetPathW')(hKey, pcszSubKey, pcszValue, pszPath_out, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-shreggetusvaluea
-  public static SHRegGetUSValueA(pszSubKey: LPCSTR, pszValue: LPCSTR | NULL, pdwType: LPDWORD | NULL, pvData: LPVOID | NULL, pcbData: LPDWORD | NULL, fIgnoreHKCU: BOOL, pvDefaultData: LPVOID | NULL, dwDefaultDataSize: DWORD): LONG {
-    return Shlwapi.Load('SHRegGetUSValueA')(pszSubKey, pszValue, pdwType, pvData, pcbData, fIgnoreHKCU, pvDefaultData, dwDefaultDataSize);
+  public static SHRegGetUSValueA(
+    pszSubKey: LPCSTR,
+    pszValue: OPTIONAL<LPCSTR>,
+    pdwType_in_out: OPTIONAL<LPDWORD>,
+    pvData_out: OPTIONAL<LPVOID>,
+    pcbData_in_out: OPTIONAL<LPDWORD>,
+    fIgnoreHKCU: BOOL,
+    pvDefaultData: OPTIONAL<LPVOID>,
+    dwDefaultDataSize: DWORD,
+  ): LONG {
+    return Shlwapi.Load('SHRegGetUSValueA')(pszSubKey, pszValue, pdwType_in_out, pvData_out, pcbData_in_out, fIgnoreHKCU, pvDefaultData, dwDefaultDataSize);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-shreggetusvaluew
-  public static SHRegGetUSValueW(pszSubKey: LPCWSTR, pszValue: LPCWSTR | NULL, pdwType: LPDWORD | NULL, pvData: LPVOID | NULL, pcbData: LPDWORD | NULL, fIgnoreHKCU: BOOL, pvDefaultData: LPVOID | NULL, dwDefaultDataSize: DWORD): LONG {
-    return Shlwapi.Load('SHRegGetUSValueW')(pszSubKey, pszValue, pdwType, pvData, pcbData, fIgnoreHKCU, pvDefaultData, dwDefaultDataSize);
+  public static SHRegGetUSValueW(
+    pszSubKey: LPCWSTR,
+    pszValue: OPTIONAL<LPCWSTR>,
+    pdwType_in_out: OPTIONAL<LPDWORD>,
+    pvData_out: OPTIONAL<LPVOID>,
+    pcbData_in_out: OPTIONAL<LPDWORD>,
+    fIgnoreHKCU: BOOL,
+    pvDefaultData: OPTIONAL<LPVOID>,
+    dwDefaultDataSize: DWORD,
+  ): LONG {
+    return Shlwapi.Load('SHRegGetUSValueW')(pszSubKey, pszValue, pdwType_in_out, pvData_out, pcbData_in_out, fIgnoreHKCU, pvDefaultData, dwDefaultDataSize);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-shreggetvaluea
-  public static SHRegGetValueA(hkey: HKEY, pszSubKey: LPCSTR | NULL, pszValue: LPCSTR | NULL, srrfFlags: DWORD, pdwType: LPDWORD | NULL, pvData: LPVOID | NULL, pcbData: LPDWORD | NULL): LONG {
-    return Shlwapi.Load('SHRegGetValueA')(hkey, pszSubKey, pszValue, srrfFlags, pdwType, pvData, pcbData);
+  public static SHRegGetValueA(hkey: HKEY, pszSubKey: OPTIONAL<LPCSTR>, pszValue: OPTIONAL<LPCSTR>, srrfFlags: DWORD, pdwType_out: OPTIONAL<LPDWORD>, pvData_out: OPTIONAL<LPVOID>, pcbData_in_out: OPTIONAL<LPDWORD>): LONG {
+    return Shlwapi.Load('SHRegGetValueA')(hkey, pszSubKey, pszValue, srrfFlags, pdwType_out, pvData_out, pcbData_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-shreggetvaluefromhkcuhklm
-  public static SHRegGetValueFromHKCUHKLM(pwszKey: PCWSTR, pwszValue: PCWSTR | NULL, srrfFlags: DWORD, pdwType: LPDWORD | NULL, pvData: LPVOID | NULL, pcbData: LPDWORD | NULL): LONG {
-    return Shlwapi.Load('SHRegGetValueFromHKCUHKLM')(pwszKey, pwszValue, srrfFlags, pdwType, pvData, pcbData);
+  public static SHRegGetValueFromHKCUHKLM(pwszKey: PCWSTR, pwszValue: OPTIONAL<PCWSTR>, srrfFlags: DWORD, pdwType_out: OPTIONAL<LPDWORD>, pvData_out: OPTIONAL<LPVOID>, pcbData_in_out: OPTIONAL<LPDWORD>): LONG {
+    return Shlwapi.Load('SHRegGetValueFromHKCUHKLM')(pwszKey, pwszValue, srrfFlags, pdwType_out, pvData_out, pcbData_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-shreggetvaluew
-  public static SHRegGetValueW(hkey: HKEY, pszSubKey: LPCWSTR | NULL, pszValue: LPCWSTR | NULL, srrfFlags: DWORD, pdwType: LPDWORD | NULL, pvData: LPVOID | NULL, pcbData: LPDWORD | NULL): LONG {
-    return Shlwapi.Load('SHRegGetValueW')(hkey, pszSubKey, pszValue, srrfFlags, pdwType, pvData, pcbData);
+  public static SHRegGetValueW(hkey: HKEY, pszSubKey: OPTIONAL<LPCWSTR>, pszValue: OPTIONAL<LPCWSTR>, srrfFlags: DWORD, pdwType_out: OPTIONAL<LPDWORD>, pvData_out: OPTIONAL<LPVOID>, pcbData_in_out: OPTIONAL<LPDWORD>): LONG {
+    return Shlwapi.Load('SHRegGetValueW')(hkey, pszSubKey, pszValue, srrfFlags, pdwType_out, pvData_out, pcbData_in_out);
   }
 
   public static SHRegisterValidateTemplate(pcszTemplate: PCWSTR, bOkToAddToGlobalTemplate: BOOL): HRESULT {
@@ -1663,62 +1700,80 @@ class Shlwapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-shregopenuskeya
-  public static SHRegOpenUSKeyA(pszPath: LPCSTR, samDesired: REGSAM, hRelativeUSKey: HUSKEY | 0n, phNewUSKey: PHUSKEY, fIgnoreHKCU: BOOL): LONG {
-    return Shlwapi.Load('SHRegOpenUSKeyA')(pszPath, samDesired, hRelativeUSKey, phNewUSKey, fIgnoreHKCU);
+  public static SHRegOpenUSKeyA(pszPath: LPCSTR, samDesired: REGSAM, hRelativeUSKey: OPTIONAL<HUSKEY>, phNewUSKey_out: PHUSKEY, fIgnoreHKCU: BOOL): LONG {
+    return Shlwapi.Load('SHRegOpenUSKeyA')(pszPath, samDesired, hRelativeUSKey, phNewUSKey_out, fIgnoreHKCU);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-shregopenuskeyw
-  public static SHRegOpenUSKeyW(pszPath: LPCWSTR, samDesired: REGSAM, hRelativeUSKey: HUSKEY | 0n, phNewUSKey: PHUSKEY, fIgnoreHKCU: BOOL): LONG {
-    return Shlwapi.Load('SHRegOpenUSKeyW')(pszPath, samDesired, hRelativeUSKey, phNewUSKey, fIgnoreHKCU);
+  public static SHRegOpenUSKeyW(pszPath: LPCWSTR, samDesired: REGSAM, hRelativeUSKey: OPTIONAL<HUSKEY>, phNewUSKey_out: PHUSKEY, fIgnoreHKCU: BOOL): LONG {
+    return Shlwapi.Load('SHRegOpenUSKeyW')(pszPath, samDesired, hRelativeUSKey, phNewUSKey_out, fIgnoreHKCU);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-shregqueryinfouskeya
-  public static SHRegQueryInfoUSKeyA(hUSKey: HUSKEY, pcSubKeys: LPDWORD | NULL, pcchMaxSubKeyLen: LPDWORD | NULL, pcValues: LPDWORD | NULL, pcchMaxValueNameLen: LPDWORD | NULL, enumRegFlags: DWORD): LONG {
-    return Shlwapi.Load('SHRegQueryInfoUSKeyA')(hUSKey, pcSubKeys, pcchMaxSubKeyLen, pcValues, pcchMaxValueNameLen, enumRegFlags);
+  public static SHRegQueryInfoUSKeyA(hUSKey: HUSKEY, pcSubKeys_out: OPTIONAL<LPDWORD>, pcchMaxSubKeyLen_out: OPTIONAL<LPDWORD>, pcValues_out: OPTIONAL<LPDWORD>, pcchMaxValueNameLen_out: OPTIONAL<LPDWORD>, enumRegFlags: DWORD): LONG {
+    return Shlwapi.Load('SHRegQueryInfoUSKeyA')(hUSKey, pcSubKeys_out, pcchMaxSubKeyLen_out, pcValues_out, pcchMaxValueNameLen_out, enumRegFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-shregqueryinfouskeyw
-  public static SHRegQueryInfoUSKeyW(hUSKey: HUSKEY, pcSubKeys: LPDWORD | NULL, pcchMaxSubKeyLen: LPDWORD | NULL, pcValues: LPDWORD | NULL, pcchMaxValueNameLen: LPDWORD | NULL, enumRegFlags: DWORD): LONG {
-    return Shlwapi.Load('SHRegQueryInfoUSKeyW')(hUSKey, pcSubKeys, pcchMaxSubKeyLen, pcValues, pcchMaxValueNameLen, enumRegFlags);
+  public static SHRegQueryInfoUSKeyW(hUSKey: HUSKEY, pcSubKeys_out: OPTIONAL<LPDWORD>, pcchMaxSubKeyLen_out: OPTIONAL<LPDWORD>, pcValues_out: OPTIONAL<LPDWORD>, pcchMaxValueNameLen_out: OPTIONAL<LPDWORD>, enumRegFlags: DWORD): LONG {
+    return Shlwapi.Load('SHRegQueryInfoUSKeyW')(hUSKey, pcSubKeys_out, pcchMaxSubKeyLen_out, pcValues_out, pcchMaxValueNameLen_out, enumRegFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-shregqueryusvaluea
-  public static SHRegQueryUSValueA(hUSKey: HUSKEY, pszValue: LPCSTR | NULL, pdwType: LPDWORD | NULL, pvData: LPVOID | NULL, pcbData: LPDWORD | NULL, fIgnoreHKCU: BOOL, pvDefaultData: LPVOID | NULL, dwDefaultDataSize: DWORD): LONG {
-    return Shlwapi.Load('SHRegQueryUSValueA')(hUSKey, pszValue, pdwType, pvData, pcbData, fIgnoreHKCU, pvDefaultData, dwDefaultDataSize);
+  public static SHRegQueryUSValueA(
+    hUSKey: HUSKEY,
+    pszValue: OPTIONAL<LPCSTR>,
+    pdwType_in_out: OPTIONAL<LPDWORD>,
+    pvData_out: OPTIONAL<LPVOID>,
+    pcbData_in_out: OPTIONAL<LPDWORD>,
+    fIgnoreHKCU: BOOL,
+    pvDefaultData: OPTIONAL<LPVOID>,
+    dwDefaultDataSize: DWORD,
+  ): LONG {
+    return Shlwapi.Load('SHRegQueryUSValueA')(hUSKey, pszValue, pdwType_in_out, pvData_out, pcbData_in_out, fIgnoreHKCU, pvDefaultData, dwDefaultDataSize);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-shregqueryusvaluew
-  public static SHRegQueryUSValueW(hUSKey: HUSKEY, pszValue: LPCWSTR | NULL, pdwType: LPDWORD | NULL, pvData: LPVOID | NULL, pcbData: LPDWORD | NULL, fIgnoreHKCU: BOOL, pvDefaultData: LPVOID | NULL, dwDefaultDataSize: DWORD): LONG {
-    return Shlwapi.Load('SHRegQueryUSValueW')(hUSKey, pszValue, pdwType, pvData, pcbData, fIgnoreHKCU, pvDefaultData, dwDefaultDataSize);
+  public static SHRegQueryUSValueW(
+    hUSKey: HUSKEY,
+    pszValue: OPTIONAL<LPCWSTR>,
+    pdwType_in_out: OPTIONAL<LPDWORD>,
+    pvData_out: OPTIONAL<LPVOID>,
+    pcbData_in_out: OPTIONAL<LPDWORD>,
+    fIgnoreHKCU: BOOL,
+    pvDefaultData: OPTIONAL<LPVOID>,
+    dwDefaultDataSize: DWORD,
+  ): LONG {
+    return Shlwapi.Load('SHRegQueryUSValueW')(hUSKey, pszValue, pdwType_in_out, pvData_out, pcbData_in_out, fIgnoreHKCU, pvDefaultData, dwDefaultDataSize);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-shregsetpatha
-  public static SHRegSetPathA(hKey: HKEY, pcszSubKey: LPCSTR | NULL, pcszValue: LPCSTR | NULL, pcszPath: LPCSTR, dwFlags: DWORD): LONG {
+  public static SHRegSetPathA(hKey: HKEY, pcszSubKey: OPTIONAL<LPCSTR>, pcszValue: OPTIONAL<LPCSTR>, pcszPath: LPCSTR, dwFlags: DWORD): LONG {
     return Shlwapi.Load('SHRegSetPathA')(hKey, pcszSubKey, pcszValue, pcszPath, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-shregsetpathw
-  public static SHRegSetPathW(hKey: HKEY, pcszSubKey: LPCWSTR | NULL, pcszValue: LPCWSTR | NULL, pcszPath: LPCWSTR, dwFlags: DWORD): LONG {
+  public static SHRegSetPathW(hKey: HKEY, pcszSubKey: OPTIONAL<LPCWSTR>, pcszValue: OPTIONAL<LPCWSTR>, pcszPath: LPCWSTR, dwFlags: DWORD): LONG {
     return Shlwapi.Load('SHRegSetPathW')(hKey, pcszSubKey, pcszValue, pcszPath, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-shregsetusvaluea
-  public static SHRegSetUSValueA(pszSubKey: LPCSTR, pszValue: LPCSTR, dwType: DWORD, pvData: LPVOID | NULL, cbData: DWORD, dwFlags: DWORD): LONG {
+  public static SHRegSetUSValueA(pszSubKey: LPCSTR, pszValue: LPCSTR, dwType: DWORD, pvData: OPTIONAL<LPVOID>, cbData: DWORD, dwFlags: DWORD): LONG {
     return Shlwapi.Load('SHRegSetUSValueA')(pszSubKey, pszValue, dwType, pvData, cbData, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-shregsetusvaluew
-  public static SHRegSetUSValueW(pszSubKey: LPCWSTR, pszValue: LPCWSTR, dwType: DWORD, pvData: LPVOID | NULL, cbData: DWORD, dwFlags: DWORD): LONG {
+  public static SHRegSetUSValueW(pszSubKey: LPCWSTR, pszValue: LPCWSTR, dwType: DWORD, pvData: OPTIONAL<LPVOID>, cbData: DWORD, dwFlags: DWORD): LONG {
     return Shlwapi.Load('SHRegSetUSValueW')(pszSubKey, pszValue, dwType, pvData, cbData, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-shregwriteusvaluea
-  public static SHRegWriteUSValueA(hUSKey: HUSKEY, pszValue: LPCSTR | NULL, dwType: DWORD, pvData: LPVOID, cbData: DWORD, dwFlags: DWORD): LONG {
+  public static SHRegWriteUSValueA(hUSKey: HUSKEY, pszValue: LPCSTR, dwType: DWORD, pvData: LPVOID, cbData: DWORD, dwFlags: DWORD): LONG {
     return Shlwapi.Load('SHRegWriteUSValueA')(hUSKey, pszValue, dwType, pvData, cbData, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-shregwriteusvaluew
-  public static SHRegWriteUSValueW(hUSKey: HUSKEY, pszValue: LPCWSTR | NULL, dwType: DWORD, pvData: LPVOID, cbData: DWORD, dwFlags: DWORD): LONG {
+  public static SHRegWriteUSValueW(hUSKey: HUSKEY, pszValue: LPCWSTR, dwType: DWORD, pvData: LPVOID, cbData: DWORD, dwFlags: DWORD): LONG {
     return Shlwapi.Load('SHRegWriteUSValueW')(hUSKey, pszValue, dwType, pvData, cbData, dwFlags);
   }
 
@@ -1740,53 +1795,53 @@ class Shlwapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-shsetthreadref
-  public static SHSetThreadRef(punk: HANDLE | 0n): HRESULT {
+  public static SHSetThreadRef(punk: OPTIONAL<HANDLE>): HRESULT {
     return Shlwapi.Load('SHSetThreadRef')(punk);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-shsetvaluea
-  public static SHSetValueA(hkey: HKEY, pszSubKey: LPCSTR | NULL, pszValue: LPCSTR | NULL, dwType: DWORD, pvData: LPVOID | NULL, cbData: DWORD): LONG {
+  public static SHSetValueA(hkey: HKEY, pszSubKey: OPTIONAL<LPCSTR>, pszValue: OPTIONAL<LPCSTR>, dwType: DWORD, pvData: OPTIONAL<LPVOID>, cbData: DWORD): LONG {
     return Shlwapi.Load('SHSetValueA')(hkey, pszSubKey, pszValue, dwType, pvData, cbData);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-shsetvaluew
-  public static SHSetValueW(hkey: HKEY, pszSubKey: LPCWSTR | NULL, pszValue: LPCWSTR | NULL, dwType: DWORD, pvData: LPVOID | NULL, cbData: DWORD): LONG {
+  public static SHSetValueW(hkey: HKEY, pszSubKey: OPTIONAL<LPCWSTR>, pszValue: OPTIONAL<LPCWSTR>, dwType: DWORD, pvData: OPTIONAL<LPVOID>, cbData: DWORD): LONG {
     return Shlwapi.Load('SHSetValueW')(hkey, pszSubKey, pszValue, dwType, pvData, cbData);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-shskipjunction
-  public static SHSkipJunction(pbc: HANDLE | 0n, pclsid: LPVOID): BOOL {
+  public static SHSkipJunction(pbc: OPTIONAL<HANDLE>, pclsid: LPVOID): BOOL {
     return Shlwapi.Load('SHSkipJunction')(pbc, pclsid);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-shstrdupa
-  public static SHStrDupA(psz: LPCSTR, ppwsz: LPVOID): HRESULT {
-    return Shlwapi.Load('SHStrDupA')(psz, ppwsz);
+  public static SHStrDupA(psz: LPCSTR, ppwsz_out: LPVOID): HRESULT {
+    return Shlwapi.Load('SHStrDupA')(psz, ppwsz_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-shstrdupw
-  public static SHStrDupW(psz: LPCWSTR, ppwsz: LPVOID): HRESULT {
-    return Shlwapi.Load('SHStrDupW')(psz, ppwsz);
+  public static SHStrDupW(psz: LPCWSTR, ppwsz_out: LPVOID): HRESULT {
+    return Shlwapi.Load('SHStrDupW')(psz, ppwsz_out);
   }
 
-  public static SHStripMneumonicA(pszMenu: LPSTR): CHAR {
-    return Shlwapi.Load('SHStripMneumonicA')(pszMenu);
+  public static SHStripMneumonicA(pszMenu_in_out: LPSTR): CHAR {
+    return Shlwapi.Load('SHStripMneumonicA')(pszMenu_in_out);
   }
 
-  public static SHStripMneumonicW(pszMenu: LPWSTR): WCHAR {
-    return Shlwapi.Load('SHStripMneumonicW')(pszMenu);
+  public static SHStripMneumonicW(pszMenu_in_out: LPWSTR): WCHAR {
+    return Shlwapi.Load('SHStripMneumonicW')(pszMenu_in_out);
   }
 
-  public static SHUnicodeToAnsi(pwszSrc: PCWSTR, pszDst: LPSTR, cchBuf: INT): INT {
-    return Shlwapi.Load('SHUnicodeToAnsi')(pwszSrc, pszDst, cchBuf);
+  public static SHUnicodeToAnsi(pwszSrc: PCWSTR, pszDst_out: LPSTR, cchBuf: INT): INT {
+    return Shlwapi.Load('SHUnicodeToAnsi')(pwszSrc, pszDst_out, cchBuf);
   }
 
   public static SHUnicodeToAnsiCP(uiCodePage: UINT, pwszSrc: PCWSTR, pszDst: LPSTR, cchBuf: INT): INT {
     return Shlwapi.Load('SHUnicodeToAnsiCP')(uiCodePage, pwszSrc, pszDst, cchBuf);
   }
 
-  public static SHUnicodeToUnicode(pwszSrc: PCWSTR, pwszDst: LPWSTR, cwchBuf: INT): INT {
-    return Shlwapi.Load('SHUnicodeToUnicode')(pwszSrc, pwszDst, cwchBuf);
+  public static SHUnicodeToUnicode(pwszSrc: PCWSTR, pwszDst_out: LPWSTR, cwchBuf: INT): INT {
+    return Shlwapi.Load('SHUnicodeToUnicode')(pwszSrc, pwszDst_out, cwchBuf);
   }
 
   public static SHUnlockShared(pvData: LONG_PTR): BOOL {
@@ -1794,23 +1849,23 @@ class Shlwapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-strcatbuffa
-  public static StrCatBuffA(pszDest: LPSTR, pszSrc: LPCSTR, cchDestBuffSize: INT): LONG_PTR {
-    return Shlwapi.Load('StrCatBuffA')(pszDest, pszSrc, cchDestBuffSize);
+  public static StrCatBuffA(pszDest_in_out: LPSTR, pszSrc: LPCSTR, cchDestBuffSize: INT): LONG_PTR {
+    return Shlwapi.Load('StrCatBuffA')(pszDest_in_out, pszSrc, cchDestBuffSize);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-strcatbuffw
-  public static StrCatBuffW(pszDest: LPWSTR, pszSrc: LPCWSTR, cchDestBuffSize: INT): LONG_PTR {
-    return Shlwapi.Load('StrCatBuffW')(pszDest, pszSrc, cchDestBuffSize);
+  public static StrCatBuffW(pszDest_in_out: LPWSTR, pszSrc: LPCWSTR, cchDestBuffSize: INT): LONG_PTR {
+    return Shlwapi.Load('StrCatBuffW')(pszDest_in_out, pszSrc, cchDestBuffSize);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-strcatchainw
-  public static StrCatChainW(pszDst: LPWSTR, cchDst: DWORD, ichAt: DWORD, pszSrc: LPCWSTR): DWORD {
-    return Shlwapi.Load('StrCatChainW')(pszDst, cchDst, ichAt, pszSrc);
+  public static StrCatChainW(pszDst_out: LPWSTR, cchDst: DWORD, ichAt: DWORD, pszSrc: LPCWSTR): DWORD {
+    return Shlwapi.Load('StrCatChainW')(pszDst_out, cchDst, ichAt, pszSrc);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-strcatw
-  public static StrCatW(psz1: LPWSTR, psz2: LPCWSTR): LONG_PTR {
-    return Shlwapi.Load('StrCatW')(psz1, psz2);
+  public static StrCatW(psz1_in_out: LPWSTR, psz2: LPCWSTR): LONG_PTR {
+    return Shlwapi.Load('StrCatW')(psz1_in_out, psz2);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-strchra
@@ -1911,13 +1966,13 @@ class Shlwapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-strcpynw
-  public static StrCpyNW(pszDst: LPWSTR, pszSrc: LPCWSTR, cchMax: INT): LONG_PTR {
-    return Shlwapi.Load('StrCpyNW')(pszDst, pszSrc, cchMax);
+  public static StrCpyNW(pszDst_out: LPWSTR, pszSrc: LPCWSTR, cchMax: INT): LONG_PTR {
+    return Shlwapi.Load('StrCpyNW')(pszDst_out, pszSrc, cchMax);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-strcpyw
-  public static StrCpyW(psz1: LPWSTR, psz2: LPCWSTR): LONG_PTR {
-    return Shlwapi.Load('StrCpyW')(psz1, psz2);
+  public static StrCpyW(psz1_out: LPWSTR, psz2: LPCWSTR): LONG_PTR {
+    return Shlwapi.Load('StrCpyW')(psz1_out, psz2);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-strcspna
@@ -1951,43 +2006,43 @@ class Shlwapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-strformatbytesize64a
-  public static StrFormatByteSize64A(qdw: LONGLONG, pszBuf: LPSTR, cchBuf: UINT): LONG_PTR {
-    return Shlwapi.Load('StrFormatByteSize64A')(qdw, pszBuf, cchBuf);
+  public static StrFormatByteSize64A(qdw: LONGLONG, pszBuf_out: LPSTR, cchBuf: UINT): LONG_PTR {
+    return Shlwapi.Load('StrFormatByteSize64A')(qdw, pszBuf_out, cchBuf);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-strformatbytesizea
-  public static StrFormatByteSizeA(dw: DWORD, pszBuf: LPSTR, cchBuf: UINT): LONG_PTR {
-    return Shlwapi.Load('StrFormatByteSizeA')(dw, pszBuf, cchBuf);
+  public static StrFormatByteSizeA(dw: DWORD, pszBuf_out: LPSTR, cchBuf: UINT): LONG_PTR {
+    return Shlwapi.Load('StrFormatByteSizeA')(dw, pszBuf_out, cchBuf);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-strformatbytesizeex
-  public static StrFormatByteSizeEx(ull: ULONGLONG, flags: DWORD, pszBuf: LPWSTR, cchBuf: UINT): HRESULT {
-    return Shlwapi.Load('StrFormatByteSizeEx')(ull, flags, pszBuf, cchBuf);
+  public static StrFormatByteSizeEx(ull: ULONGLONG, flags: DWORD, pszBuf_out: LPWSTR, cchBuf: UINT): HRESULT {
+    return Shlwapi.Load('StrFormatByteSizeEx')(ull, flags, pszBuf_out, cchBuf);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-strformatbytesizew
-  public static StrFormatByteSizeW(qdw: LONGLONG, pszBuf: LPWSTR, cchBuf: UINT): LONG_PTR {
-    return Shlwapi.Load('StrFormatByteSizeW')(qdw, pszBuf, cchBuf);
+  public static StrFormatByteSizeW(qdw: LONGLONG, pszBuf_out: LPWSTR, cchBuf: UINT): LONG_PTR {
+    return Shlwapi.Load('StrFormatByteSizeW')(qdw, pszBuf_out, cchBuf);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-strformatkbsizea
-  public static StrFormatKBSizeA(qdw: LONGLONG, pszBuf: LPSTR, cchBuf: UINT): LONG_PTR {
-    return Shlwapi.Load('StrFormatKBSizeA')(qdw, pszBuf, cchBuf);
+  public static StrFormatKBSizeA(qdw: LONGLONG, pszBuf_out: LPSTR, cchBuf: UINT): LONG_PTR {
+    return Shlwapi.Load('StrFormatKBSizeA')(qdw, pszBuf_out, cchBuf);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-strformatkbsizew
-  public static StrFormatKBSizeW(qdw: LONGLONG, pszBuf: LPWSTR, cchBuf: UINT): LONG_PTR {
-    return Shlwapi.Load('StrFormatKBSizeW')(qdw, pszBuf, cchBuf);
+  public static StrFormatKBSizeW(qdw: LONGLONG, pszBuf_out: LPWSTR, cchBuf: UINT): LONG_PTR {
+    return Shlwapi.Load('StrFormatKBSizeW')(qdw, pszBuf_out, cchBuf);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-strfromtimeintervala
-  public static StrFromTimeIntervalA(pszOut: LPSTR, cchMax: UINT, dwTimeMS: DWORD, digits: INT): INT {
-    return Shlwapi.Load('StrFromTimeIntervalA')(pszOut, cchMax, dwTimeMS, digits);
+  public static StrFromTimeIntervalA(pszOut_out: LPSTR, cchMax: UINT, dwTimeMS: DWORD, digits: INT): INT {
+    return Shlwapi.Load('StrFromTimeIntervalA')(pszOut_out, cchMax, dwTimeMS, digits);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-strfromtimeintervalw
-  public static StrFromTimeIntervalW(pszOut: LPWSTR, cchMax: UINT, dwTimeMS: DWORD, digits: INT): INT {
-    return Shlwapi.Load('StrFromTimeIntervalW')(pszOut, cchMax, dwTimeMS, digits);
+  public static StrFromTimeIntervalW(pszOut_out: LPWSTR, cchMax: UINT, dwTimeMS: DWORD, digits: INT): INT {
+    return Shlwapi.Load('StrFromTimeIntervalW')(pszOut_out, cchMax, dwTimeMS, digits);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-strisintlequala
@@ -2001,13 +2056,13 @@ class Shlwapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-strncata
-  public static StrNCatA(psz1: LPSTR, psz2: LPCSTR, cchMax: INT): LONG_PTR {
-    return Shlwapi.Load('StrNCatA')(psz1, psz2, cchMax);
+  public static StrNCatA(psz1_in_out: LPSTR, psz2: LPCSTR, cchMax: INT): LONG_PTR {
+    return Shlwapi.Load('StrNCatA')(psz1_in_out, psz2, cchMax);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-strncatw
-  public static StrNCatW(psz1: LPWSTR, psz2: LPCWSTR, cchMax: INT): LONG_PTR {
-    return Shlwapi.Load('StrNCatW')(psz1, psz2, cchMax);
+  public static StrNCatW(psz1_in_out: LPWSTR, psz2: LPCWSTR, cchMax: INT): LONG_PTR {
+    return Shlwapi.Load('StrNCatW')(psz1_in_out, psz2, cchMax);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-strpbrka
@@ -2021,57 +2076,57 @@ class Shlwapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-strrchra
-  public static StrRChrA(pszStart: LPCSTR, pszEnd: LPCSTR | NULL, wMatch: WORD): LONG_PTR {
+  public static StrRChrA(pszStart: LPCSTR, pszEnd: OPTIONAL<LPCSTR>, wMatch: WORD): LONG_PTR {
     return Shlwapi.Load('StrRChrA')(pszStart, pszEnd, wMatch);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-strrchria
-  public static StrRChrIA(pszStart: LPCSTR, pszEnd: LPCSTR | NULL, wMatch: WORD): LONG_PTR {
+  public static StrRChrIA(pszStart: LPCSTR, pszEnd: OPTIONAL<LPCSTR>, wMatch: WORD): LONG_PTR {
     return Shlwapi.Load('StrRChrIA')(pszStart, pszEnd, wMatch);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-strrchriw
-  public static StrRChrIW(pszStart: LPCWSTR, pszEnd: LPCWSTR | NULL, wMatch: WCHAR): LONG_PTR {
+  public static StrRChrIW(pszStart: LPCWSTR, pszEnd: OPTIONAL<LPCWSTR>, wMatch: WCHAR): LONG_PTR {
     return Shlwapi.Load('StrRChrIW')(pszStart, pszEnd, wMatch);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-strrchrw
-  public static StrRChrW(pszStart: LPCWSTR, pszEnd: LPCWSTR | NULL, wMatch: WCHAR): LONG_PTR {
+  public static StrRChrW(pszStart: LPCWSTR, pszEnd: OPTIONAL<LPCWSTR>, wMatch: WCHAR): LONG_PTR {
     return Shlwapi.Load('StrRChrW')(pszStart, pszEnd, wMatch);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-strrettobstr
-  public static StrRetToBSTR(pstr: LPVOID, pidl: LPVOID | NULL, pbstr: LPVOID): HRESULT {
-    return Shlwapi.Load('StrRetToBSTR')(pstr, pidl, pbstr);
+  public static StrRetToBSTR(pstr_in_out: LPVOID, pidl: OPTIONAL<LPVOID>, pbstr_out: LPVOID): HRESULT {
+    return Shlwapi.Load('StrRetToBSTR')(pstr_in_out, pidl, pbstr_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-strrettobufa
-  public static StrRetToBufA(pstr: LPVOID, pidl: LPVOID | NULL, pszBuf: LPSTR, cchBuf: UINT): HRESULT {
-    return Shlwapi.Load('StrRetToBufA')(pstr, pidl, pszBuf, cchBuf);
+  public static StrRetToBufA(pstr_in_out: LPVOID, pidl: OPTIONAL<LPVOID>, pszBuf_out: LPSTR, cchBuf: UINT): HRESULT {
+    return Shlwapi.Load('StrRetToBufA')(pstr_in_out, pidl, pszBuf_out, cchBuf);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-strrettobufw
-  public static StrRetToBufW(pstr: LPVOID, pidl: LPVOID | NULL, pszBuf: LPWSTR, cchBuf: UINT): HRESULT {
-    return Shlwapi.Load('StrRetToBufW')(pstr, pidl, pszBuf, cchBuf);
+  public static StrRetToBufW(pstr_in_out: LPVOID, pidl: OPTIONAL<LPVOID>, pszBuf_out: LPWSTR, cchBuf: UINT): HRESULT {
+    return Shlwapi.Load('StrRetToBufW')(pstr_in_out, pidl, pszBuf_out, cchBuf);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-strrettostra
-  public static StrRetToStrA(pstr: LPVOID, pidl: LPVOID | NULL, ppsz: LPVOID): HRESULT {
-    return Shlwapi.Load('StrRetToStrA')(pstr, pidl, ppsz);
+  public static StrRetToStrA(pstr_in_out: LPVOID, pidl: OPTIONAL<LPVOID>, ppsz_out: LPVOID): HRESULT {
+    return Shlwapi.Load('StrRetToStrA')(pstr_in_out, pidl, ppsz_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-strrettostrw
-  public static StrRetToStrW(pstr: LPVOID, pidl: LPVOID | NULL, ppsz: LPVOID): HRESULT {
-    return Shlwapi.Load('StrRetToStrW')(pstr, pidl, ppsz);
+  public static StrRetToStrW(pstr_in_out: LPVOID, pidl: OPTIONAL<LPVOID>, ppsz_out: LPVOID): HRESULT {
+    return Shlwapi.Load('StrRetToStrW')(pstr_in_out, pidl, ppsz_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-strrstria
-  public static StrRStrIA(pszSource: LPCSTR, pszLast: LPCSTR | NULL, pszSrch: LPCSTR): LONG_PTR {
+  public static StrRStrIA(pszSource: LPCSTR, pszLast: OPTIONAL<LPCSTR>, pszSrch: LPCSTR): LONG_PTR {
     return Shlwapi.Load('StrRStrIA')(pszSource, pszLast, pszSrch);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-strrstriw
-  public static StrRStrIW(pszSource: LPCWSTR, pszLast: LPCWSTR | NULL, pszSrch: LPCWSTR): LONG_PTR {
+  public static StrRStrIW(pszSource: LPCWSTR, pszLast: OPTIONAL<LPCWSTR>, pszSrch: LPCWSTR): LONG_PTR {
     return Shlwapi.Load('StrRStrIW')(pszSource, pszLast, pszSrch);
   }
 
@@ -2116,13 +2171,13 @@ class Shlwapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-strtoint64exa
-  public static StrToInt64ExA(pszString: LPCSTR, dwFlags: DWORD, pllRet: LPVOID): BOOL {
-    return Shlwapi.Load('StrToInt64ExA')(pszString, dwFlags, pllRet);
+  public static StrToInt64ExA(pszString: LPCSTR, dwFlags: DWORD, pllRet_out: LPVOID): BOOL {
+    return Shlwapi.Load('StrToInt64ExA')(pszString, dwFlags, pllRet_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-strtoint64exw
-  public static StrToInt64ExW(pszString: LPCWSTR, dwFlags: DWORD, pllRet: LPVOID): BOOL {
-    return Shlwapi.Load('StrToInt64ExW')(pszString, dwFlags, pllRet);
+  public static StrToInt64ExW(pszString: LPCWSTR, dwFlags: DWORD, pllRet_out: LPVOID): BOOL {
+    return Shlwapi.Load('StrToInt64ExW')(pszString, dwFlags, pllRet_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-strtointa
@@ -2131,13 +2186,13 @@ class Shlwapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-strtointexa
-  public static StrToIntExA(pszString: LPCSTR, dwFlags: DWORD, piRet: LPVOID): BOOL {
-    return Shlwapi.Load('StrToIntExA')(pszString, dwFlags, piRet);
+  public static StrToIntExA(pszString: LPCSTR, dwFlags: DWORD, piRet_out: LPVOID): BOOL {
+    return Shlwapi.Load('StrToIntExA')(pszString, dwFlags, piRet_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-strtointexw
-  public static StrToIntExW(pszString: LPCWSTR, dwFlags: DWORD, piRet: LPVOID): BOOL {
-    return Shlwapi.Load('StrToIntExW')(pszString, dwFlags, piRet);
+  public static StrToIntExW(pszString: LPCWSTR, dwFlags: DWORD, piRet_out: LPVOID): BOOL {
+    return Shlwapi.Load('StrToIntExW')(pszString, dwFlags, piRet_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-strtointw
@@ -2146,43 +2201,43 @@ class Shlwapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-strtrima
-  public static StrTrimA(psz: LPSTR, pszTrimChars: LPCSTR): BOOL {
-    return Shlwapi.Load('StrTrimA')(psz, pszTrimChars);
+  public static StrTrimA(psz_in_out: LPSTR, pszTrimChars: LPCSTR): BOOL {
+    return Shlwapi.Load('StrTrimA')(psz_in_out, pszTrimChars);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-strtrimw
-  public static StrTrimW(psz: LPWSTR, pszTrimChars: LPCWSTR): BOOL {
-    return Shlwapi.Load('StrTrimW')(psz, pszTrimChars);
+  public static StrTrimW(psz_in_out: LPWSTR, pszTrimChars: LPCWSTR): BOOL {
+    return Shlwapi.Load('StrTrimW')(psz_in_out, pszTrimChars);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-urlapplyschemea
-  public static UrlApplySchemeA(pszIn: LPCSTR, pszOut: LPSTR, pcchOut: LPDWORD, dwFlags: DWORD): HRESULT {
-    return Shlwapi.Load('UrlApplySchemeA')(pszIn, pszOut, pcchOut, dwFlags);
+  public static UrlApplySchemeA(pszIn: LPCSTR, pszOut_out: LPSTR, pcchOut_in_out: LPDWORD, dwFlags: DWORD): HRESULT {
+    return Shlwapi.Load('UrlApplySchemeA')(pszIn, pszOut_out, pcchOut_in_out, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-urlapplyschemew
-  public static UrlApplySchemeW(pszIn: LPCWSTR, pszOut: LPWSTR, pcchOut: LPDWORD, dwFlags: DWORD): HRESULT {
-    return Shlwapi.Load('UrlApplySchemeW')(pszIn, pszOut, pcchOut, dwFlags);
+  public static UrlApplySchemeW(pszIn: LPCWSTR, pszOut_out: LPWSTR, pcchOut_in_out: LPDWORD, dwFlags: DWORD): HRESULT {
+    return Shlwapi.Load('UrlApplySchemeW')(pszIn, pszOut_out, pcchOut_in_out, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-urlcanonicalizea
-  public static UrlCanonicalizeA(pszUrl: LPCSTR, pszCanonicalized: LPSTR, pcchCanonicalized: LPDWORD, dwFlags: DWORD): HRESULT {
-    return Shlwapi.Load('UrlCanonicalizeA')(pszUrl, pszCanonicalized, pcchCanonicalized, dwFlags);
+  public static UrlCanonicalizeA(pszUrl: LPCSTR, pszCanonicalized_out: LPSTR, pcchCanonicalized_in_out: LPDWORD, dwFlags: DWORD): HRESULT {
+    return Shlwapi.Load('UrlCanonicalizeA')(pszUrl, pszCanonicalized_out, pcchCanonicalized_in_out, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-urlcanonicalizew
-  public static UrlCanonicalizeW(pszUrl: LPCWSTR, pszCanonicalized: LPWSTR, pcchCanonicalized: LPDWORD, dwFlags: DWORD): HRESULT {
-    return Shlwapi.Load('UrlCanonicalizeW')(pszUrl, pszCanonicalized, pcchCanonicalized, dwFlags);
+  public static UrlCanonicalizeW(pszUrl: LPCWSTR, pszCanonicalized_out: LPWSTR, pcchCanonicalized_in_out: LPDWORD, dwFlags: DWORD): HRESULT {
+    return Shlwapi.Load('UrlCanonicalizeW')(pszUrl, pszCanonicalized_out, pcchCanonicalized_in_out, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-urlcombinea
-  public static UrlCombineA(pszBase: LPCSTR, pszRelative: LPCSTR, pszCombined: LPSTR | NULL, pcchCombined: LPDWORD, dwFlags: DWORD): HRESULT {
-    return Shlwapi.Load('UrlCombineA')(pszBase, pszRelative, pszCombined, pcchCombined, dwFlags);
+  public static UrlCombineA(pszBase: LPCSTR, pszRelative: LPCSTR, pszCombined_out: OPTIONAL<LPSTR>, pcchCombined_in_out: LPDWORD, dwFlags: DWORD): HRESULT {
+    return Shlwapi.Load('UrlCombineA')(pszBase, pszRelative, pszCombined_out, pcchCombined_in_out, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-urlcombinew
-  public static UrlCombineW(pszBase: LPCWSTR, pszRelative: LPCWSTR, pszCombined: LPWSTR | NULL, pcchCombined: LPDWORD, dwFlags: DWORD): HRESULT {
-    return Shlwapi.Load('UrlCombineW')(pszBase, pszRelative, pszCombined, pcchCombined, dwFlags);
+  public static UrlCombineW(pszBase: LPCWSTR, pszRelative: LPCWSTR, pszCombined_out: OPTIONAL<LPWSTR>, pcchCombined_in_out: LPDWORD, dwFlags: DWORD): HRESULT {
+    return Shlwapi.Load('UrlCombineW')(pszBase, pszRelative, pszCombined_out, pcchCombined_in_out, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-urlcomparea
@@ -2196,28 +2251,28 @@ class Shlwapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-urlcreatefrompatha
-  public static UrlCreateFromPathA(pszPath: LPCSTR, pszUrl: LPSTR, pcchUrl: LPDWORD, dwFlags: DWORD): HRESULT {
-    return Shlwapi.Load('UrlCreateFromPathA')(pszPath, pszUrl, pcchUrl, dwFlags);
+  public static UrlCreateFromPathA(pszPath: LPCSTR, pszUrl_out: LPSTR, pcchUrl_in_out: LPDWORD, dwFlags: DWORD): HRESULT {
+    return Shlwapi.Load('UrlCreateFromPathA')(pszPath, pszUrl_out, pcchUrl_in_out, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-urlcreatefrompathw
-  public static UrlCreateFromPathW(pszPath: LPCWSTR, pszUrl: LPWSTR, pcchUrl: LPDWORD, dwFlags: DWORD): HRESULT {
-    return Shlwapi.Load('UrlCreateFromPathW')(pszPath, pszUrl, pcchUrl, dwFlags);
+  public static UrlCreateFromPathW(pszPath: LPCWSTR, pszUrl_out: LPWSTR, pcchUrl_in_out: LPDWORD, dwFlags: DWORD): HRESULT {
+    return Shlwapi.Load('UrlCreateFromPathW')(pszPath, pszUrl_out, pcchUrl_in_out, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-urlescapea
-  public static UrlEscapeA(pszUrl: LPCSTR, pszEscaped: LPSTR, pcchEscaped: LPDWORD, dwFlags: DWORD): HRESULT {
-    return Shlwapi.Load('UrlEscapeA')(pszUrl, pszEscaped, pcchEscaped, dwFlags);
+  public static UrlEscapeA(pszUrl: LPCSTR, pszEscaped_out: LPSTR, pcchEscaped_in_out: LPDWORD, dwFlags: DWORD): HRESULT {
+    return Shlwapi.Load('UrlEscapeA')(pszUrl, pszEscaped_out, pcchEscaped_in_out, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-urlescapew
-  public static UrlEscapeW(pszUrl: LPCWSTR, pszEscaped: LPWSTR, pcchEscaped: LPDWORD, dwFlags: DWORD): HRESULT {
-    return Shlwapi.Load('UrlEscapeW')(pszUrl, pszEscaped, pcchEscaped, dwFlags);
+  public static UrlEscapeW(pszUrl: LPCWSTR, pszEscaped_out: LPWSTR, pcchEscaped_in_out: LPDWORD, dwFlags: DWORD): HRESULT {
+    return Shlwapi.Load('UrlEscapeW')(pszUrl, pszEscaped_out, pcchEscaped_in_out, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-urlfixupw
-  public static UrlFixupW(pcszUrl: LPCWSTR, pszTranslatedUrl: LPWSTR, cchMax: DWORD): HRESULT {
-    return Shlwapi.Load('UrlFixupW')(pcszUrl, pszTranslatedUrl, cchMax);
+  public static UrlFixupW(pcszUrl: LPCWSTR, pszTranslatedUrl_out: LPWSTR, cchMax: DWORD): HRESULT {
+    return Shlwapi.Load('UrlFixupW')(pcszUrl, pszTranslatedUrl_out, cchMax);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-urlgetlocationa
@@ -2231,23 +2286,23 @@ class Shlwapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-urlgetparta
-  public static UrlGetPartA(pszIn: LPCSTR, pszOut: LPSTR, pcchOut: LPDWORD, dwPart: DWORD, dwFlags: DWORD): HRESULT {
-    return Shlwapi.Load('UrlGetPartA')(pszIn, pszOut, pcchOut, dwPart, dwFlags);
+  public static UrlGetPartA(pszIn: LPCSTR, pszOut_out: LPSTR, pcchOut_in_out: LPDWORD, dwPart: DWORD, dwFlags: DWORD): HRESULT {
+    return Shlwapi.Load('UrlGetPartA')(pszIn, pszOut_out, pcchOut_in_out, dwPart, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-urlgetpartw
-  public static UrlGetPartW(pszIn: LPCWSTR, pszOut: LPWSTR, pcchOut: LPDWORD, dwPart: DWORD, dwFlags: DWORD): HRESULT {
-    return Shlwapi.Load('UrlGetPartW')(pszIn, pszOut, pcchOut, dwPart, dwFlags);
+  public static UrlGetPartW(pszIn: LPCWSTR, pszOut_out: LPWSTR, pcchOut_in_out: LPDWORD, dwPart: DWORD, dwFlags: DWORD): HRESULT {
+    return Shlwapi.Load('UrlGetPartW')(pszIn, pszOut_out, pcchOut_in_out, dwPart, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-urlhasha
-  public static UrlHashA(pszUrl: LPCSTR, pbHash: LPBYTE, cbHash: DWORD): HRESULT {
-    return Shlwapi.Load('UrlHashA')(pszUrl, pbHash, cbHash);
+  public static UrlHashA(pszUrl: LPCSTR, pbHash_out: LPBYTE, cbHash: DWORD): HRESULT {
+    return Shlwapi.Load('UrlHashA')(pszUrl, pbHash_out, cbHash);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-urlhashw
-  public static UrlHashW(pszUrl: LPCWSTR, pbHash: LPBYTE, cbHash: DWORD): HRESULT {
-    return Shlwapi.Load('UrlHashW')(pszUrl, pbHash, cbHash);
+  public static UrlHashW(pszUrl: LPCWSTR, pbHash_out: LPBYTE, cbHash: DWORD): HRESULT {
+    return Shlwapi.Load('UrlHashW')(pszUrl, pbHash_out, cbHash);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-urlisa
@@ -2281,13 +2336,13 @@ class Shlwapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-urlunescapea
-  public static UrlUnescapeA(pszUrl: LPSTR, pszUnescaped: LPSTR | NULL, pcchUnescaped: LPDWORD | NULL, dwFlags: DWORD): HRESULT {
-    return Shlwapi.Load('UrlUnescapeA')(pszUrl, pszUnescaped, pcchUnescaped, dwFlags);
+  public static UrlUnescapeA(pszUrl_in_out: LPSTR, pszUnescaped_out: OPTIONAL<LPSTR>, pcchUnescaped_in_out: OPTIONAL<LPDWORD>, dwFlags: DWORD): HRESULT {
+    return Shlwapi.Load('UrlUnescapeA')(pszUrl_in_out, pszUnescaped_out, pcchUnescaped_in_out, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-urlunescapew
-  public static UrlUnescapeW(pszUrl: LPWSTR, pszUnescaped: LPWSTR | NULL, pcchUnescaped: LPDWORD | NULL, dwFlags: DWORD): HRESULT {
-    return Shlwapi.Load('UrlUnescapeW')(pszUrl, pszUnescaped, pcchUnescaped, dwFlags);
+  public static UrlUnescapeW(pszUrl_in_out: LPWSTR, pszUnescaped_out: OPTIONAL<LPWSTR>, pcchUnescaped_in_out: OPTIONAL<LPDWORD>, dwFlags: DWORD): HRESULT {
+    return Shlwapi.Load('UrlUnescapeW')(pszUrl_in_out, pszUnescaped_out, pcchUnescaped_in_out, dwFlags);
   }
 
   public static WhichPlatform(): UINT {
@@ -2295,23 +2350,23 @@ class Shlwapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-wnsprintfa
-  public static wnsprintfA(pszDest: LPSTR, cchDest: INT, pszFmt: LPCSTR): INT {
-    return Shlwapi.Load('wnsprintfA')(pszDest, cchDest, pszFmt);
+  public static wnsprintfA(pszDest_out: LPSTR, cchDest: INT, pszFmt: LPCSTR): INT {
+    return Shlwapi.Load('wnsprintfA')(pszDest_out, cchDest, pszFmt);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-wnsprintfw
-  public static wnsprintfW(pszDest: LPWSTR, cchDest: INT, pszFmt: LPCWSTR): INT {
-    return Shlwapi.Load('wnsprintfW')(pszDest, cchDest, pszFmt);
+  public static wnsprintfW(pszDest_out: LPWSTR, cchDest: INT, pszFmt: LPCWSTR): INT {
+    return Shlwapi.Load('wnsprintfW')(pszDest_out, cchDest, pszFmt);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-wvnsprintfa
-  public static wvnsprintfA(pszDest: LPSTR, cchDest: INT, pszFmt: LPCSTR, arglist: LPVOID): INT {
-    return Shlwapi.Load('wvnsprintfA')(pszDest, cchDest, pszFmt, arglist);
+  public static wvnsprintfA(pszDest_out: LPSTR, cchDest: INT, pszFmt: LPCSTR, arglist: LPVOID): INT {
+    return Shlwapi.Load('wvnsprintfA')(pszDest_out, cchDest, pszFmt, arglist);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-wvnsprintfw
-  public static wvnsprintfW(pszDest: LPWSTR, cchDest: INT, pszFmt: LPCWSTR, arglist: LPVOID): INT {
-    return Shlwapi.Load('wvnsprintfW')(pszDest, cchDest, pszFmt, arglist);
+  public static wvnsprintfW(pszDest_out: LPWSTR, cchDest: INT, pszFmt: LPCWSTR, arglist: LPVOID): INT {
+    return Shlwapi.Load('wvnsprintfW')(pszDest_out, cchDest, pszFmt, arglist);
   }
 }
 

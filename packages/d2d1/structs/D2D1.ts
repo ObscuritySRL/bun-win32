@@ -9,7 +9,7 @@ import type {
   IDXGIDevice,
   IDXGISurface,
   LPLPVOID,
-  NULL,
+  OPTIONAL,
   PACKED_D2D1_POINT_2F,
   PD2D1_COLOR_F,
   PD2D1_CREATION_PROPERTIES,
@@ -81,23 +81,23 @@ class D2D1 extends Win32 {
   // The x64 ABI returns the 16-byte D2D1_COLOR_F by hidden pointer: the caller allocates the
   // result buffer and passes it as an implicit leading argument; the same pointer is returned.
   // https://learn.microsoft.com/en-us/windows/win32/api/d2d1_1/nf-d2d1_1-d2d1convertcolorspace
-  public static D2D1ConvertColorSpace(convertedColor: PD2D1_COLOR_F, sourceColorSpace: D2D1_COLOR_SPACE, destinationColorSpace: D2D1_COLOR_SPACE, color: PD2D1_COLOR_F): PD2D1_COLOR_F {
-    return D2D1.Load('D2D1ConvertColorSpace')(convertedColor, sourceColorSpace, destinationColorSpace, color);
+  public static D2D1ConvertColorSpace(convertedColor_out: PD2D1_COLOR_F, sourceColorSpace: D2D1_COLOR_SPACE, destinationColorSpace: D2D1_COLOR_SPACE, color: PD2D1_COLOR_F): PD2D1_COLOR_F {
+    return D2D1.Load('D2D1ConvertColorSpace')(convertedColor_out, sourceColorSpace, destinationColorSpace, color);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/d2d1_1/nf-d2d1_1-d2d1createdevice
-  public static D2D1CreateDevice(dxgiDevice: IDXGIDevice, creationProperties: PD2D1_CREATION_PROPERTIES | NULL, d2dDevice: PID2D1Device): HRESULT {
-    return D2D1.Load('D2D1CreateDevice')(dxgiDevice, creationProperties, d2dDevice);
+  public static D2D1CreateDevice(dxgiDevice: IDXGIDevice, creationProperties: OPTIONAL<PD2D1_CREATION_PROPERTIES>, d2dDevice_out: PID2D1Device): HRESULT {
+    return D2D1.Load('D2D1CreateDevice')(dxgiDevice, creationProperties, d2dDevice_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/d2d1_1/nf-d2d1_1-d2d1createdevicecontext
-  public static D2D1CreateDeviceContext(dxgiSurface: IDXGISurface, creationProperties: PD2D1_CREATION_PROPERTIES | NULL, d2dDeviceContext: PID2D1DeviceContext): HRESULT {
-    return D2D1.Load('D2D1CreateDeviceContext')(dxgiSurface, creationProperties, d2dDeviceContext);
+  public static D2D1CreateDeviceContext(dxgiSurface: IDXGISurface, creationProperties: OPTIONAL<PD2D1_CREATION_PROPERTIES>, d2dDeviceContext_out: PID2D1DeviceContext): HRESULT {
+    return D2D1.Load('D2D1CreateDeviceContext')(dxgiSurface, creationProperties, d2dDeviceContext_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/d2d1/nf-d2d1-d2d1createfactory
-  public static D2D1CreateFactory(factoryType: D2D1_FACTORY_TYPE, riid: REFIID, pFactoryOptions: PD2D1_FACTORY_OPTIONS | NULL, ppIFactory: LPLPVOID): HRESULT {
-    return D2D1.Load('D2D1CreateFactory')(factoryType, riid, pFactoryOptions, ppIFactory);
+  public static D2D1CreateFactory(factoryType: D2D1_FACTORY_TYPE, riid: REFIID, pFactoryOptions: OPTIONAL<PD2D1_FACTORY_OPTIONS>, ppIFactory_out: LPLPVOID): HRESULT {
+    return D2D1.Load('D2D1CreateFactory')(factoryType, riid, pFactoryOptions, ppIFactory_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/d2d1_3/nf-d2d1_3-d2d1getgradientmeshinteriorpointsfromcoonspatch
@@ -114,10 +114,10 @@ class D2D1 extends Win32 {
     pPoint9: PD2D1_POINT_2F,
     pPoint10: PD2D1_POINT_2F,
     pPoint11: PD2D1_POINT_2F,
-    pTensorPoint11: PD2D1_POINT_2F,
-    pTensorPoint12: PD2D1_POINT_2F,
-    pTensorPoint21: PD2D1_POINT_2F,
-    pTensorPoint22: PD2D1_POINT_2F,
+    pTensorPoint11_out: PD2D1_POINT_2F,
+    pTensorPoint12_out: PD2D1_POINT_2F,
+    pTensorPoint21_out: PD2D1_POINT_2F,
+    pTensorPoint22_out: PD2D1_POINT_2F,
   ): void {
     return D2D1.Load('D2D1GetGradientMeshInteriorPointsFromCoonsPatch')(
       pPoint0,
@@ -132,16 +132,16 @@ class D2D1 extends Win32 {
       pPoint9,
       pPoint10,
       pPoint11,
-      pTensorPoint11,
-      pTensorPoint12,
-      pTensorPoint21,
-      pTensorPoint22,
+      pTensorPoint11_out,
+      pTensorPoint12_out,
+      pTensorPoint21_out,
+      pTensorPoint22_out,
     );
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/d2d1/nf-d2d1-d2d1invertmatrix
-  public static D2D1InvertMatrix(matrix: PD2D1_MATRIX_3X2_F): BOOL {
-    return D2D1.Load('D2D1InvertMatrix')(matrix);
+  public static D2D1InvertMatrix(matrix_in_out: PD2D1_MATRIX_3X2_F): BOOL {
+    return D2D1.Load('D2D1InvertMatrix')(matrix_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/d2d1/nf-d2d1-d2d1ismatrixinvertible
@@ -150,18 +150,18 @@ class D2D1 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/d2d1/nf-d2d1-d2d1makerotatematrix
-  public static D2D1MakeRotateMatrix(angle: FLOAT, center: PACKED_D2D1_POINT_2F, matrix: PD2D1_MATRIX_3X2_F): void {
-    return D2D1.Load('D2D1MakeRotateMatrix')(angle, center, matrix);
+  public static D2D1MakeRotateMatrix(angle: FLOAT, center: PACKED_D2D1_POINT_2F, matrix_out: PD2D1_MATRIX_3X2_F): void {
+    return D2D1.Load('D2D1MakeRotateMatrix')(angle, center, matrix_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/d2d1/nf-d2d1-d2d1makeskewmatrix
-  public static D2D1MakeSkewMatrix(angleX: FLOAT, angleY: FLOAT, center: PACKED_D2D1_POINT_2F, matrix: PD2D1_MATRIX_3X2_F): void {
-    return D2D1.Load('D2D1MakeSkewMatrix')(angleX, angleY, center, matrix);
+  public static D2D1MakeSkewMatrix(angleX: FLOAT, angleY: FLOAT, center: PACKED_D2D1_POINT_2F, matrix_out: PD2D1_MATRIX_3X2_F): void {
+    return D2D1.Load('D2D1MakeSkewMatrix')(angleX, angleY, center, matrix_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/d2d1_1/nf-d2d1_1-d2d1sincos
-  public static D2D1SinCos(angle: FLOAT, s: PFLOAT, c: PFLOAT): void {
-    return D2D1.Load('D2D1SinCos')(angle, s, c);
+  public static D2D1SinCos(angle: FLOAT, s_out: PFLOAT, c_out: PFLOAT): void {
+    return D2D1.Load('D2D1SinCos')(angle, s_out, c_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/d2d1_1/nf-d2d1_1-d2d1tan

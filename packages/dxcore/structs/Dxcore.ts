@@ -42,8 +42,8 @@ class Dxcore extends Win32 {
   } as const satisfies Record<string, FFIFunction>;
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dxcore/nf-dxcore-dxcorecreateadapterfactory
-  public static DXCoreCreateAdapterFactory(riid: REFIID, ppvFactory: LPLPVOID): HRESULT {
-    return Dxcore.Load('DXCoreCreateAdapterFactory')(riid, ppvFactory);
+  public static DXCoreCreateAdapterFactory(riid: REFIID, ppvFactory_out: LPLPVOID): HRESULT {
+    return Dxcore.Load('DXCoreCreateAdapterFactory')(riid, ppvFactory_out);
   }
 }
 

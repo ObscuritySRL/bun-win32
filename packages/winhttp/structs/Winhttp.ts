@@ -20,6 +20,8 @@ import type {
   LPWINHTTP_PROXY_INFO,
   LPWSTR,
   NULL,
+  NULLABLE,
+  OPTIONAL,
   PBYTE,
   PCWSTR,
   PDWORD,
@@ -153,8 +155,8 @@ class Winhttp extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winhttp/nf-winhttp-winhttpcrackurl
-  public static WinHttpCrackUrl(pwszUrl: LPCWSTR, dwUrlLength: DWORD, dwFlags: DWORD, lpUrlComponents: LPURL_COMPONENTS): BOOL {
-    return Winhttp.Load('WinHttpCrackUrl')(pwszUrl, dwUrlLength, dwFlags, lpUrlComponents);
+  public static WinHttpCrackUrl(pwszUrl: LPCWSTR, dwUrlLength: DWORD, dwFlags: DWORD, lpUrlComponents_in_out: LPURL_COMPONENTS): BOOL {
+    return Winhttp.Load('WinHttpCrackUrl')(pwszUrl, dwUrlLength, dwFlags, lpUrlComponents_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winhttp/nf-winhttp-winhttpcreateproxyresolver
@@ -163,23 +165,23 @@ class Winhttp extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winhttp/nf-winhttp-winhttpcreateurl
-  public static WinHttpCreateUrl(lpUrlComponents: LPURL_COMPONENTS, dwFlags: DWORD, pwszUrl: LPWSTR | NULL, pdwUrlLength: LPDWORD): BOOL {
-    return Winhttp.Load('WinHttpCreateUrl')(lpUrlComponents, dwFlags, pwszUrl, pdwUrlLength);
+  public static WinHttpCreateUrl(lpUrlComponents: LPURL_COMPONENTS, dwFlags: DWORD, pwszUrl_out: OPTIONAL<LPWSTR>, pdwUrlLength_in_out: LPDWORD): BOOL {
+    return Winhttp.Load('WinHttpCreateUrl')(lpUrlComponents, dwFlags, pwszUrl_out, pdwUrlLength_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winhttp/nf-winhttp-winhttpdetectautoproxyconfigurl
-  public static WinHttpDetectAutoProxyConfigUrl(dwAutoDetectFlags: DWORD, ppwstrAutoConfigUrl: LPVOID | NULL): BOOL {
-    return Winhttp.Load('WinHttpDetectAutoProxyConfigUrl')(dwAutoDetectFlags, ppwstrAutoConfigUrl);
+  public static WinHttpDetectAutoProxyConfigUrl(dwAutoDetectFlags: DWORD, ppwstrAutoConfigUrl_out: LPVOID): BOOL {
+    return Winhttp.Load('WinHttpDetectAutoProxyConfigUrl')(dwAutoDetectFlags, ppwstrAutoConfigUrl_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winhttp/nf-winhttp-winhttpfreeproxyresult
-  public static WinHttpFreeProxyResult(pProxyResult: PWINHTTP_PROXY_RESULT): void {
-    return Winhttp.Load('WinHttpFreeProxyResult')(pProxyResult);
+  public static WinHttpFreeProxyResult(pProxyResult_in_out: PWINHTTP_PROXY_RESULT): void {
+    return Winhttp.Load('WinHttpFreeProxyResult')(pProxyResult_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winhttp/nf-winhttp-winhttpfreeproxyresultex
-  public static WinHttpFreeProxyResultEx(pProxyResultEx: PWINHTTP_PROXY_RESULT_EX): void {
-    return Winhttp.Load('WinHttpFreeProxyResultEx')(pProxyResultEx);
+  public static WinHttpFreeProxyResultEx(pProxyResultEx_in_out: PWINHTTP_PROXY_RESULT_EX): void {
+    return Winhttp.Load('WinHttpFreeProxyResultEx')(pProxyResultEx_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winhttp/nf-winhttp-winhttpfreeproxysettings
@@ -188,88 +190,95 @@ class Winhttp extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winhttp/nf-winhttp-winhttpfreequeryconnectiongroupresult
-  public static WinHttpFreeQueryConnectionGroupResult(pResult: PWINHTTP_QUERY_CONNECTION_GROUP_RESULT): void {
-    return Winhttp.Load('WinHttpFreeQueryConnectionGroupResult')(pResult);
+  public static WinHttpFreeQueryConnectionGroupResult(pResult_in_out: PWINHTTP_QUERY_CONNECTION_GROUP_RESULT): void {
+    return Winhttp.Load('WinHttpFreeQueryConnectionGroupResult')(pResult_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winhttp/nf-winhttp-winhttpgetdefaultproxyconfiguration
-  public static WinHttpGetDefaultProxyConfiguration(pProxyInfo: LPWINHTTP_PROXY_INFO): BOOL {
-    return Winhttp.Load('WinHttpGetDefaultProxyConfiguration')(pProxyInfo);
+  public static WinHttpGetDefaultProxyConfiguration(pProxyInfo_in_out: LPWINHTTP_PROXY_INFO): BOOL {
+    return Winhttp.Load('WinHttpGetDefaultProxyConfiguration')(pProxyInfo_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winhttp/nf-winhttp-winhttpgetieproxyconfigforcurrentuser
-  public static WinHttpGetIEProxyConfigForCurrentUser(pProxyConfig: PWINHTTP_CURRENT_USER_IE_PROXY_CONFIG): BOOL {
-    return Winhttp.Load('WinHttpGetIEProxyConfigForCurrentUser')(pProxyConfig);
+  public static WinHttpGetIEProxyConfigForCurrentUser(pProxyConfig_in_out: PWINHTTP_CURRENT_USER_IE_PROXY_CONFIG): BOOL {
+    return Winhttp.Load('WinHttpGetIEProxyConfigForCurrentUser')(pProxyConfig_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winhttp/nf-winhttp-winhttpgetproxyforurl
-  public static WinHttpGetProxyForUrl(hSession: HINTERNET, lpcwszUrl: LPCWSTR, pAutoProxyOptions: PWINHTTP_AUTOPROXY_OPTIONS, pProxyInfo: PWINHTTP_PROXY_INFO): BOOL {
-    return Winhttp.Load('WinHttpGetProxyForUrl')(hSession, lpcwszUrl, pAutoProxyOptions, pProxyInfo);
+  public static WinHttpGetProxyForUrl(hSession: HINTERNET, lpcwszUrl: LPCWSTR, pAutoProxyOptions: PWINHTTP_AUTOPROXY_OPTIONS, pProxyInfo_out: PWINHTTP_PROXY_INFO): BOOL {
+    return Winhttp.Load('WinHttpGetProxyForUrl')(hSession, lpcwszUrl, pAutoProxyOptions, pProxyInfo_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winhttp/nf-winhttp-winhttpgetproxyforurlex
-  public static WinHttpGetProxyForUrlEx(hResolver: HINTERNET, pcwszUrl: PCWSTR, pAutoProxyOptions: PWINHTTP_AUTOPROXY_OPTIONS, pContext: DWORD_PTR | 0n): DWORD {
+  public static WinHttpGetProxyForUrlEx(hResolver: HINTERNET, pcwszUrl: PCWSTR, pAutoProxyOptions: PWINHTTP_AUTOPROXY_OPTIONS, pContext: OPTIONAL<DWORD_PTR>): DWORD {
     return Winhttp.Load('WinHttpGetProxyForUrlEx')(hResolver, pcwszUrl, pAutoProxyOptions, pContext);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winhttp/nf-winhttp-winhttpgetproxyforurlex2
-  public static WinHttpGetProxyForUrlEx2(hResolver: HINTERNET, pcwszUrl: PCWSTR, pAutoProxyOptions: PWINHTTP_AUTOPROXY_OPTIONS, cbInterfaceSelectionContext: DWORD, pInterfaceSelectionContext: PBYTE | NULL, pContext: DWORD_PTR | 0n): DWORD {
+  public static WinHttpGetProxyForUrlEx2(
+    hResolver: HINTERNET,
+    pcwszUrl: PCWSTR,
+    pAutoProxyOptions: PWINHTTP_AUTOPROXY_OPTIONS,
+    cbInterfaceSelectionContext: DWORD,
+    pInterfaceSelectionContext: OPTIONAL<PBYTE>,
+    pContext: OPTIONAL<DWORD_PTR>,
+  ): DWORD {
     return Winhttp.Load('WinHttpGetProxyForUrlEx2')(hResolver, pcwszUrl, pAutoProxyOptions, cbInterfaceSelectionContext, pInterfaceSelectionContext, pContext);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winhttp/nf-winhttp-winhttpgetproxyresult
-  public static WinHttpGetProxyResult(hResolver: HINTERNET, pProxyResult: PWINHTTP_PROXY_RESULT): DWORD {
-    return Winhttp.Load('WinHttpGetProxyResult')(hResolver, pProxyResult);
+  public static WinHttpGetProxyResult(hResolver: HINTERNET, pProxyResult_out: PWINHTTP_PROXY_RESULT): DWORD {
+    return Winhttp.Load('WinHttpGetProxyResult')(hResolver, pProxyResult_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winhttp/nf-winhttp-winhttpgetproxyresultex
-  public static WinHttpGetProxyResultEx(hResolver: HINTERNET, pProxyResultEx: PWINHTTP_PROXY_RESULT_EX): DWORD {
-    return Winhttp.Load('WinHttpGetProxyResultEx')(hResolver, pProxyResultEx);
+  public static WinHttpGetProxyResultEx(hResolver: HINTERNET, pProxyResultEx_out: PWINHTTP_PROXY_RESULT_EX): DWORD {
+    return Winhttp.Load('WinHttpGetProxyResultEx')(hResolver, pProxyResultEx_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winhttp/nf-winhttp-winhttpgetproxysettingsversion
-  public static WinHttpGetProxySettingsVersion(hSession: HINTERNET, pdwProxySettingsVersion: PDWORD): DWORD {
-    return Winhttp.Load('WinHttpGetProxySettingsVersion')(hSession, pdwProxySettingsVersion);
+  public static WinHttpGetProxySettingsVersion(hSession: HINTERNET, pdwProxySettingsVersion_out: PDWORD): DWORD {
+    return Winhttp.Load('WinHttpGetProxySettingsVersion')(hSession, pdwProxySettingsVersion_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winhttp/nf-winhttp-winhttpishostinproxybypasslist
-  public static WinHttpIsHostInProxyBypassList(pProxyInfo: PWINHTTP_PROXY_INFO, pwszHost: PCWSTR, tScheme: INTERNET_SCHEME, nPort: INTERNET_PORT, pfIsInBypassList: LPBOOL): DWORD {
-    return Winhttp.Load('WinHttpIsHostInProxyBypassList')(pProxyInfo, pwszHost, tScheme, nPort, pfIsInBypassList);
+  public static WinHttpIsHostInProxyBypassList(pProxyInfo: PWINHTTP_PROXY_INFO, pwszHost: PCWSTR, tScheme: INTERNET_SCHEME, nPort: INTERNET_PORT, pfIsInBypassList_out: LPBOOL): DWORD {
+    return Winhttp.Load('WinHttpIsHostInProxyBypassList')(pProxyInfo, pwszHost, tScheme, nPort, pfIsInBypassList_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winhttp/nf-winhttp-winhttpopen
-  public static WinHttpOpen(pszAgentW: LPCWSTR | NULL, dwAccessType: DWORD, pszProxyW: LPCWSTR | NULL, pszProxyBypassW: LPCWSTR | NULL, dwFlags: DWORD): HINTERNET {
+  public static WinHttpOpen(pszAgentW: OPTIONAL<LPCWSTR>, dwAccessType: DWORD, pszProxyW: OPTIONAL<LPCWSTR>, pszProxyBypassW: OPTIONAL<LPCWSTR>, dwFlags: DWORD): HINTERNET {
     return Winhttp.Load('WinHttpOpen')(pszAgentW, dwAccessType, pszProxyW, pszProxyBypassW, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winhttp/nf-winhttp-winhttpopenrequest
-  public static WinHttpOpenRequest(hConnect: HINTERNET, pwszVerb: LPCWSTR | NULL, pwszObjectName: LPCWSTR | NULL, pwszVersion: LPCWSTR | NULL, pwszReferrer: LPCWSTR | NULL, ppwszAcceptTypes: LPVOID | NULL, dwFlags: DWORD): HINTERNET {
+  public static WinHttpOpenRequest(hConnect: HINTERNET, pwszVerb: NULLABLE<LPCWSTR>, pwszObjectName: LPCWSTR, pwszVersion: NULLABLE<LPCWSTR>, pwszReferrer: OPTIONAL<LPCWSTR>, ppwszAcceptTypes: OPTIONAL<LPVOID>, dwFlags: DWORD): HINTERNET {
     return Winhttp.Load('WinHttpOpenRequest')(hConnect, pwszVerb, pwszObjectName, pwszVersion, pwszReferrer, ppwszAcceptTypes, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winhttp/nf-winhttp-winhttpqueryauthparams
-  public static WinHttpQueryAuthParams(hRequest: HINTERNET, AuthScheme: DWORD, pAuthParams: LPVOID): BOOL {
-    return Winhttp.Load('WinHttpQueryAuthParams')(hRequest, AuthScheme, pAuthParams);
+  public static WinHttpQueryAuthParams(hRequest: HINTERNET, AuthScheme: DWORD, pAuthParams_out: LPVOID): BOOL {
+    return Winhttp.Load('WinHttpQueryAuthParams')(hRequest, AuthScheme, pAuthParams_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winhttp/nf-winhttp-winhttpqueryauthschemes
-  public static WinHttpQueryAuthSchemes(hRequest: HINTERNET, lpdwSupportedSchemes: LPDWORD, lpdwFirstScheme: LPDWORD, pdwAuthTarget: LPDWORD): BOOL {
-    return Winhttp.Load('WinHttpQueryAuthSchemes')(hRequest, lpdwSupportedSchemes, lpdwFirstScheme, pdwAuthTarget);
+  public static WinHttpQueryAuthSchemes(hRequest: HINTERNET, lpdwSupportedSchemes_out: LPDWORD, lpdwFirstScheme_out: LPDWORD, pdwAuthTarget_out: LPDWORD): BOOL {
+    return Winhttp.Load('WinHttpQueryAuthSchemes')(hRequest, lpdwSupportedSchemes_out, lpdwFirstScheme_out, pdwAuthTarget_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winhttp/nf-winhttp-winhttpqueryconnectiongroup
-  public static WinHttpQueryConnectionGroup(hInternet: HINTERNET, pGuidConnection: LPCVOID | NULL, ullFlags: ULONGLONG, ppResult: LPVOID): DWORD {
-    return Winhttp.Load('WinHttpQueryConnectionGroup')(hInternet, pGuidConnection, ullFlags, ppResult);
+  public static WinHttpQueryConnectionGroup(hInternet: HINTERNET, pGuidConnection: OPTIONAL<LPCVOID>, ullFlags: ULONGLONG, ppResult_in_out: LPVOID): DWORD {
+    return Winhttp.Load('WinHttpQueryConnectionGroup')(hInternet, pGuidConnection, ullFlags, ppResult_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winhttp/nf-winhttp-winhttpquerydataavailable
-  public static WinHttpQueryDataAvailable(hRequest: HINTERNET, lpdwNumberOfBytesAvailable: LPDWORD | NULL): BOOL {
-    return Winhttp.Load('WinHttpQueryDataAvailable')(hRequest, lpdwNumberOfBytesAvailable);
+  public static WinHttpQueryDataAvailable(hRequest: HINTERNET, lpdwNumberOfBytesAvailable_out: NULLABLE<LPDWORD>): BOOL {
+    return Winhttp.Load('WinHttpQueryDataAvailable')(hRequest, lpdwNumberOfBytesAvailable_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winhttp/nf-winhttp-winhttpqueryheaders
-  public static WinHttpQueryHeaders(hRequest: HINTERNET, dwInfoLevel: DWORD, pwszName: LPCWSTR | NULL, lpBuffer: LPVOID | NULL, lpdwBufferLength: LPDWORD, lpdwIndex: LPDWORD | NULL): BOOL {
-    return Winhttp.Load('WinHttpQueryHeaders')(hRequest, dwInfoLevel, pwszName, lpBuffer, lpdwBufferLength, lpdwIndex);
+  public static WinHttpQueryHeaders(hRequest: HINTERNET, dwInfoLevel: DWORD, pwszName: OPTIONAL<LPCWSTR>, lpBuffer_out: OPTIONAL<LPVOID>, lpdwBufferLength_in_out: LPDWORD, lpdwIndex_in_out: OPTIONAL<LPDWORD>): BOOL {
+    return Winhttp.Load('WinHttpQueryHeaders')(hRequest, dwInfoLevel, pwszName, lpBuffer_out, lpdwBufferLength_in_out, lpdwIndex_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winhttp/nf-winhttp-winhttpqueryheadersex
@@ -278,42 +287,42 @@ class Winhttp extends Win32 {
     dwInfoLevel: DWORD,
     ullFlags: ULONGLONG,
     uiCodePage: UINT,
-    pdwIndex: PDWORD | NULL,
-    pHeaderName: PWINHTTP_HEADER_NAME | NULL,
-    pBuffer: PVOID | NULL,
-    pdwBufferLength: PDWORD,
-    ppHeaders: LPVOID | NULL,
-    pdwHeadersCount: PDWORD,
+    pdwIndex_in_out: OPTIONAL<PDWORD>,
+    pHeaderName: OPTIONAL<PWINHTTP_HEADER_NAME>,
+    pBuffer_out: OPTIONAL<PVOID>,
+    pdwBufferLength_in_out: PDWORD,
+    ppHeaders_out: OPTIONAL<LPVOID>,
+    pdwHeadersCount_out: PDWORD,
   ): DWORD {
-    return Winhttp.Load('WinHttpQueryHeadersEx')(hRequest, dwInfoLevel, ullFlags, uiCodePage, pdwIndex, pHeaderName, pBuffer, pdwBufferLength, ppHeaders, pdwHeadersCount);
+    return Winhttp.Load('WinHttpQueryHeadersEx')(hRequest, dwInfoLevel, ullFlags, uiCodePage, pdwIndex_in_out, pHeaderName, pBuffer_out, pdwBufferLength_in_out, ppHeaders_out, pdwHeadersCount_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winhttp/nf-winhttp-winhttpqueryoption
-  public static WinHttpQueryOption(hInternet: HINTERNET, dwOption: DWORD, lpBuffer: LPVOID | NULL, lpdwBufferLength: LPDWORD): BOOL {
-    return Winhttp.Load('WinHttpQueryOption')(hInternet, dwOption, lpBuffer, lpdwBufferLength);
+  public static WinHttpQueryOption(hInternet: HINTERNET, dwOption: DWORD, lpBuffer_out: OPTIONAL<LPVOID>, lpdwBufferLength_in_out: LPDWORD): BOOL {
+    return Winhttp.Load('WinHttpQueryOption')(hInternet, dwOption, lpBuffer_out, lpdwBufferLength_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winhttp/nf-winhttp-winhttpreaddata
-  public static WinHttpReadData(hRequest: HINTERNET, lpBuffer: LPVOID, dwNumberOfBytesToRead: DWORD, lpdwNumberOfBytesRead: LPDWORD | NULL): BOOL {
-    return Winhttp.Load('WinHttpReadData')(hRequest, lpBuffer, dwNumberOfBytesToRead, lpdwNumberOfBytesRead);
+  public static WinHttpReadData(hRequest: HINTERNET, lpBuffer_out: LPVOID, dwNumberOfBytesToRead: DWORD, lpdwNumberOfBytesRead_out: NULLABLE<LPDWORD>): BOOL {
+    return Winhttp.Load('WinHttpReadData')(hRequest, lpBuffer_out, dwNumberOfBytesToRead, lpdwNumberOfBytesRead_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winhttp/nf-winhttp-winhttpreaddataex
-  public static WinHttpReadDataEx(hRequest: HINTERNET, lpBuffer: LPVOID, dwNumberOfBytesToRead: DWORD, lpdwNumberOfBytesRead: LPDWORD, ullFlags: ULONGLONG, cbProperty: DWORD, pvProperty: PVOID | NULL): DWORD {
-    return Winhttp.Load('WinHttpReadDataEx')(hRequest, lpBuffer, dwNumberOfBytesToRead, lpdwNumberOfBytesRead, ullFlags, cbProperty, pvProperty);
+  public static WinHttpReadDataEx(hRequest: HINTERNET, lpBuffer_out: LPVOID, dwNumberOfBytesToRead: DWORD, lpdwNumberOfBytesRead_out: LPDWORD, ullFlags: ULONGLONG, cbProperty: DWORD, pvProperty: OPTIONAL<PVOID>): DWORD {
+    return Winhttp.Load('WinHttpReadDataEx')(hRequest, lpBuffer_out, dwNumberOfBytesToRead, lpdwNumberOfBytesRead_out, ullFlags, cbProperty, pvProperty);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winhttp/nf-winhttp-winhttpreadproxysettings
   public static WinHttpReadProxySettings(
     hSession: HINTERNET,
-    pcwszConnectionName: PCWSTR | NULL,
+    pcwszConnectionName: OPTIONAL<PCWSTR>,
     fFallBackToDefaultSettings: BOOL,
     fSetAutoDiscoverForDefaultSettings: BOOL,
-    pdwSettingsVersion: PDWORD,
-    pfDefaultSettingsAreReturned: LPBOOL,
-    pWinHttpProxySettings: PWINHTTP_PROXY_SETTINGS,
+    pdwSettingsVersion_out: PDWORD,
+    pfDefaultSettingsAreReturned_out: LPBOOL,
+    pWinHttpProxySettings_out: PWINHTTP_PROXY_SETTINGS,
   ): DWORD {
-    return Winhttp.Load('WinHttpReadProxySettings')(hSession, pcwszConnectionName, fFallBackToDefaultSettings, fSetAutoDiscoverForDefaultSettings, pdwSettingsVersion, pfDefaultSettingsAreReturned, pWinHttpProxySettings);
+    return Winhttp.Load('WinHttpReadProxySettings')(hSession, pcwszConnectionName, fFallBackToDefaultSettings, fSetAutoDiscoverForDefaultSettings, pdwSettingsVersion_out, pfDefaultSettingsAreReturned_out, pWinHttpProxySettings_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winhttp/nf-winhttp-winhttpreceiveresponse
@@ -327,12 +336,12 @@ class Winhttp extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winhttp/nf-winhttp-winhttpsendrequest
-  public static WinHttpSendRequest(hRequest: HINTERNET, lpszHeaders: LPCWSTR | NULL, dwHeadersLength: DWORD, lpOptional: LPVOID | NULL, dwOptionalLength: DWORD, dwTotalLength: DWORD, dwContext: DWORD_PTR): BOOL {
+  public static WinHttpSendRequest(hRequest: HINTERNET, lpszHeaders: OPTIONAL<LPCWSTR>, dwHeadersLength: DWORD, lpOptional: OPTIONAL<LPVOID>, dwOptionalLength: DWORD, dwTotalLength: DWORD, dwContext: DWORD_PTR): BOOL {
     return Winhttp.Load('WinHttpSendRequest')(hRequest, lpszHeaders, dwHeadersLength, lpOptional, dwOptionalLength, dwTotalLength, dwContext);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winhttp/nf-winhttp-winhttpsetcredentials
-  public static WinHttpSetCredentials(hRequest: HINTERNET, AuthTargets: DWORD, AuthScheme: DWORD, pwszUserName: LPCWSTR | NULL, pwszPassword: LPCWSTR | NULL, pAuthParams: LPVOID | NULL): BOOL {
+  public static WinHttpSetCredentials(hRequest: HINTERNET, AuthTargets: DWORD, AuthScheme: DWORD, pwszUserName: NULLABLE<LPCWSTR>, pwszPassword: NULLABLE<LPCWSTR>, pAuthParams: LPVOID | NULL): BOOL {
     return Winhttp.Load('WinHttpSetCredentials')(hRequest, AuthTargets, AuthScheme, pwszUserName, pwszPassword, pAuthParams);
   }
 
@@ -342,7 +351,7 @@ class Winhttp extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winhttp/nf-winhttp-winhttpsetoption
-  public static WinHttpSetOption(hInternet: HINTERNET | 0n, dwOption: DWORD, lpBuffer: LPVOID | NULL, dwBufferLength: DWORD): BOOL {
+  public static WinHttpSetOption(hInternet: OPTIONAL<HINTERNET>, dwOption: DWORD, lpBuffer: NULLABLE<LPVOID>, dwBufferLength: DWORD): BOOL {
     return Winhttp.Load('WinHttpSetOption')(hInternet, dwOption, lpBuffer, dwBufferLength);
   }
 
@@ -352,7 +361,7 @@ class Winhttp extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winhttp/nf-winhttp-winhttpsetstatuscallback
-  public static WinHttpSetStatusCallback(hInternet: HINTERNET, lpfnInternetCallback: WINHTTP_STATUS_CALLBACK | NULL, dwNotificationFlags: DWORD, dwReserved: DWORD_PTR | 0n): WINHTTP_STATUS_CALLBACK | NULL {
+  public static WinHttpSetStatusCallback(hInternet: HINTERNET, lpfnInternetCallback: NULLABLE<WINHTTP_STATUS_CALLBACK>, dwNotificationFlags: DWORD, dwReserved: DWORD_PTR | 0n): WINHTTP_STATUS_CALLBACK | NULL {
     return Winhttp.Load('WinHttpSetStatusCallback')(hInternet, lpfnInternetCallback, dwNotificationFlags, dwReserved);
   }
 
@@ -362,48 +371,48 @@ class Winhttp extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winhttp/nf-winhttp-winhttptimefromsystemtime
-  public static WinHttpTimeFromSystemTime(pst: PSYSTEMTIME, pwszTime: LPWSTR): BOOL {
-    return Winhttp.Load('WinHttpTimeFromSystemTime')(pst, pwszTime);
+  public static WinHttpTimeFromSystemTime(pst: PSYSTEMTIME, pwszTime_out: LPWSTR): BOOL {
+    return Winhttp.Load('WinHttpTimeFromSystemTime')(pst, pwszTime_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winhttp/nf-winhttp-winhttptimetosystemtime
-  public static WinHttpTimeToSystemTime(pwszTime: LPCWSTR, pst: PSYSTEMTIME): BOOL {
-    return Winhttp.Load('WinHttpTimeToSystemTime')(pwszTime, pst);
+  public static WinHttpTimeToSystemTime(pwszTime: LPCWSTR, pst_out: PSYSTEMTIME): BOOL {
+    return Winhttp.Load('WinHttpTimeToSystemTime')(pwszTime, pst_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winhttp/nf-winhttp-winhttpwebsocketclose
-  public static WinHttpWebSocketClose(hWebSocket: HINTERNET, usStatus: USHORT, pvReason: PVOID | NULL, dwReasonLength: DWORD): DWORD {
+  public static WinHttpWebSocketClose(hWebSocket: HINTERNET, usStatus: USHORT, pvReason: OPTIONAL<PVOID>, dwReasonLength: DWORD): DWORD {
     return Winhttp.Load('WinHttpWebSocketClose')(hWebSocket, usStatus, pvReason, dwReasonLength);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winhttp/nf-winhttp-winhttpwebsocketcompleteupgrade
-  public static WinHttpWebSocketCompleteUpgrade(hRequest: HINTERNET, pContext: DWORD_PTR | 0n): HINTERNET {
+  public static WinHttpWebSocketCompleteUpgrade(hRequest: HINTERNET, pContext: OPTIONAL<DWORD_PTR>): HINTERNET {
     return Winhttp.Load('WinHttpWebSocketCompleteUpgrade')(hRequest, pContext);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winhttp/nf-winhttp-winhttpwebsocketqueryclosestatus
-  public static WinHttpWebSocketQueryCloseStatus(hWebSocket: HINTERNET, pusStatus: PVOID, pvReason: PVOID | NULL, dwReasonLength: DWORD, pdwReasonLengthConsumed: PDWORD): DWORD {
-    return Winhttp.Load('WinHttpWebSocketQueryCloseStatus')(hWebSocket, pusStatus, pvReason, dwReasonLength, pdwReasonLengthConsumed);
+  public static WinHttpWebSocketQueryCloseStatus(hWebSocket: HINTERNET, pusStatus_out: PVOID, pvReason_out: OPTIONAL<PVOID>, dwReasonLength: DWORD, pdwReasonLengthConsumed_out: PDWORD): DWORD {
+    return Winhttp.Load('WinHttpWebSocketQueryCloseStatus')(hWebSocket, pusStatus_out, pvReason_out, dwReasonLength, pdwReasonLengthConsumed_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winhttp/nf-winhttp-winhttpwebsocketreceive
-  public static WinHttpWebSocketReceive(hWebSocket: HINTERNET, pvBuffer: PVOID, dwBufferLength: DWORD, pdwBytesRead: PDWORD, peBufferType: PDWORD): DWORD {
-    return Winhttp.Load('WinHttpWebSocketReceive')(hWebSocket, pvBuffer, dwBufferLength, pdwBytesRead, peBufferType);
+  public static WinHttpWebSocketReceive(hWebSocket: HINTERNET, pvBuffer_out: PVOID, dwBufferLength: DWORD, pdwBytesRead_out: PDWORD, peBufferType_out: PDWORD): DWORD {
+    return Winhttp.Load('WinHttpWebSocketReceive')(hWebSocket, pvBuffer_out, dwBufferLength, pdwBytesRead_out, peBufferType_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winhttp/nf-winhttp-winhttpwebsocketsend
-  public static WinHttpWebSocketSend(hWebSocket: HINTERNET, eBufferType: INT, pvBuffer: PVOID | NULL, dwBufferLength: DWORD): DWORD {
+  public static WinHttpWebSocketSend(hWebSocket: HINTERNET, eBufferType: INT, pvBuffer: OPTIONAL<PVOID>, dwBufferLength: DWORD): DWORD {
     return Winhttp.Load('WinHttpWebSocketSend')(hWebSocket, eBufferType, pvBuffer, dwBufferLength);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winhttp/nf-winhttp-winhttpwebsocketshutdown
-  public static WinHttpWebSocketShutdown(hWebSocket: HINTERNET, usStatus: USHORT, pvReason: PVOID | NULL, dwReasonLength: DWORD): DWORD {
+  public static WinHttpWebSocketShutdown(hWebSocket: HINTERNET, usStatus: USHORT, pvReason: OPTIONAL<PVOID>, dwReasonLength: DWORD): DWORD {
     return Winhttp.Load('WinHttpWebSocketShutdown')(hWebSocket, usStatus, pvReason, dwReasonLength);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winhttp/nf-winhttp-winhttpwritedata
-  public static WinHttpWriteData(hRequest: HINTERNET, lpBuffer: LPCVOID | NULL, dwNumberOfBytesToWrite: DWORD, lpdwNumberOfBytesWritten: LPDWORD | NULL): BOOL {
-    return Winhttp.Load('WinHttpWriteData')(hRequest, lpBuffer, dwNumberOfBytesToWrite, lpdwNumberOfBytesWritten);
+  public static WinHttpWriteData(hRequest: HINTERNET, lpBuffer: OPTIONAL<LPCVOID>, dwNumberOfBytesToWrite: DWORD, lpdwNumberOfBytesWritten_out: NULLABLE<LPDWORD>): BOOL {
+    return Winhttp.Load('WinHttpWriteData')(hRequest, lpBuffer, dwNumberOfBytesToWrite, lpdwNumberOfBytesWritten_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winhttp/nf-winhttp-winhttpwriteproxysettings

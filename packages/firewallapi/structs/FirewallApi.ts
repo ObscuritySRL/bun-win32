@@ -8,7 +8,7 @@ import type {
   HANDLE,
   HRESULT,
   LPCWSTR,
-  NULL,
+  OPTIONAL,
   PAC_CHANGES_CALLBACK_FN,
   PDWORD,
   PHANDLE,
@@ -73,8 +73,8 @@ class FirewallApi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/combaseapi/nf-combaseapi-dllgetclassobject
-  public static DllGetClassObject(rclsid: REFCLSID, riid: REFIID, ppv: PPVOID): HRESULT {
-    return FirewallApi.Load('DllGetClassObject')(rclsid, riid, ppv);
+  public static DllGetClassObject(rclsid: REFCLSID, riid: REFIID, ppv_out: PPVOID): HRESULT {
+    return FirewallApi.Load('DllGetClassObject')(rclsid, riid, ppv_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/olectl/nf-olectl-dllregisterserver
@@ -93,13 +93,13 @@ class FirewallApi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/networkisolation/nf-networkisolation-networkisolationdiagnoseconnectfailureandgetinfo
-  public static NetworkIsolationDiagnoseConnectFailureAndGetInfo(wszServerName: LPCWSTR, netIsoError: PNETISO_ERROR_TYPE): DWORD {
-    return FirewallApi.Load('NetworkIsolationDiagnoseConnectFailureAndGetInfo')(wszServerName, netIsoError);
+  public static NetworkIsolationDiagnoseConnectFailureAndGetInfo(wszServerName: LPCWSTR, netIsoError_out: PNETISO_ERROR_TYPE): DWORD {
+    return FirewallApi.Load('NetworkIsolationDiagnoseConnectFailureAndGetInfo')(wszServerName, netIsoError_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/networkisolation/nf-networkisolation-networkisolationenumappcontainers
-  public static NetworkIsolationEnumAppContainers(Flags: DWORD, pdwNumPublicAppCs: PDWORD, ppPublicAppCs: PPINET_FIREWALL_APP_CONTAINER): DWORD {
-    return FirewallApi.Load('NetworkIsolationEnumAppContainers')(Flags, pdwNumPublicAppCs, ppPublicAppCs);
+  public static NetworkIsolationEnumAppContainers(Flags: DWORD, pdwNumPublicAppCs_out: PDWORD, ppPublicAppCs_out: PPINET_FIREWALL_APP_CONTAINER): DWORD {
+    return FirewallApi.Load('NetworkIsolationEnumAppContainers')(Flags, pdwNumPublicAppCs_out, ppPublicAppCs_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/networkisolation/nf-networkisolation-networkisolationfreeappcontainers
@@ -108,13 +108,13 @@ class FirewallApi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/networkisolation/nf-networkisolation-networkisolationgetappcontainerconfig
-  public static NetworkIsolationGetAppContainerConfig(pdwNumPublicAppCs: PDWORD, appContainerSids: PPSID_AND_ATTRIBUTES): DWORD {
-    return FirewallApi.Load('NetworkIsolationGetAppContainerConfig')(pdwNumPublicAppCs, appContainerSids);
+  public static NetworkIsolationGetAppContainerConfig(pdwNumPublicAppCs_out: PDWORD, appContainerSids_out: PPSID_AND_ATTRIBUTES): DWORD {
+    return FirewallApi.Load('NetworkIsolationGetAppContainerConfig')(pdwNumPublicAppCs_out, appContainerSids_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/networkisolation/nf-networkisolation-networkisolationregisterforappcontainerchanges
-  public static NetworkIsolationRegisterForAppContainerChanges(flags: DWORD, callback: PAC_CHANGES_CALLBACK_FN, context: PVOID | NULL, registrationObject: PHANDLE): DWORD {
-    return FirewallApi.Load('NetworkIsolationRegisterForAppContainerChanges')(flags, callback, context, registrationObject);
+  public static NetworkIsolationRegisterForAppContainerChanges(flags: DWORD, callback: PAC_CHANGES_CALLBACK_FN, context: OPTIONAL<PVOID>, registrationObject_out: PHANDLE): DWORD {
+    return FirewallApi.Load('NetworkIsolationRegisterForAppContainerChanges')(flags, callback, context, registrationObject_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/networkisolation/nf-networkisolation-networkisolationsetappcontainerconfig

@@ -32,6 +32,8 @@ export type {
   LPWSTR,
   LRESULT,
   NULL,
+  NULLABLE,
+  OPTIONAL,
   PBYTE,
   PDWORD,
   PHANDLE,

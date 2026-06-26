@@ -16,7 +16,7 @@ import type {
   NCRYPT_PROV_HANDLE,
   NCRYPT_SECRET_HANDLE,
   NCRYPT_STREAM_HANDLE,
-  NULL,
+  OPTIONAL,
   PBYTE,
   PDWORD,
   PHANDLE,
@@ -112,31 +112,31 @@ class Ncrypt extends Win32 {
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ncrypt/nf-ncrypt-ncryptcreateclaim
   public static NCryptCreateClaim(
-    hSubjectKey: NCRYPT_KEY_HANDLE | 0n,
-    hAuthorityKey: NCRYPT_KEY_HANDLE | 0n,
+    hSubjectKey: OPTIONAL<NCRYPT_KEY_HANDLE>,
+    hAuthorityKey: OPTIONAL<NCRYPT_KEY_HANDLE>,
     dwClaimType: DWORD,
-    pParameterList: LPNCryptBufferDesc | NULL,
-    pbClaimBlob: PBYTE | NULL,
+    pParameterList: OPTIONAL<LPNCryptBufferDesc>,
+    pbClaimBlob_out: OPTIONAL<PBYTE>,
     cbClaimBlob: DWORD,
-    pcbResult: PDWORD,
+    pcbResult_out: PDWORD,
     dwFlags: DWORD,
   ): SECURITY_STATUS {
-    return Ncrypt.Load('NCryptCreateClaim')(hSubjectKey, hAuthorityKey, dwClaimType, pParameterList, pbClaimBlob, cbClaimBlob, pcbResult, dwFlags);
+    return Ncrypt.Load('NCryptCreateClaim')(hSubjectKey, hAuthorityKey, dwClaimType, pParameterList, pbClaimBlob_out, cbClaimBlob, pcbResult_out, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ncrypt/nf-ncrypt-ncryptcreatepersistedkey
-  public static NCryptCreatePersistedKey(hProvider: NCRYPT_PROV_HANDLE, phKey: PNCRYPT_KEY_HANDLE, pszAlgId: LPCWSTR, pszKeyName: LPCWSTR | NULL, dwLegacyKeySpec: DWORD, dwFlags: DWORD): SECURITY_STATUS {
-    return Ncrypt.Load('NCryptCreatePersistedKey')(hProvider, phKey, pszAlgId, pszKeyName, dwLegacyKeySpec, dwFlags);
+  public static NCryptCreatePersistedKey(hProvider: NCRYPT_PROV_HANDLE, phKey_out: PNCRYPT_KEY_HANDLE, pszAlgId: LPCWSTR, pszKeyName: OPTIONAL<LPCWSTR>, dwLegacyKeySpec: DWORD, dwFlags: DWORD): SECURITY_STATUS {
+    return Ncrypt.Load('NCryptCreatePersistedKey')(hProvider, phKey_out, pszAlgId, pszKeyName, dwLegacyKeySpec, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ncryptprotect/nf-ncryptprotect-ncryptcreateprotectiondescriptor
-  public static NCryptCreateProtectionDescriptor(pwszDescriptorString: LPCWSTR, dwFlags: DWORD, phDescriptor: PNCRYPT_DESCRIPTOR_HANDLE): SECURITY_STATUS {
-    return Ncrypt.Load('NCryptCreateProtectionDescriptor')(pwszDescriptorString, dwFlags, phDescriptor);
+  public static NCryptCreateProtectionDescriptor(pwszDescriptorString: LPCWSTR, dwFlags: DWORD, phDescriptor_out: PNCRYPT_DESCRIPTOR_HANDLE): SECURITY_STATUS {
+    return Ncrypt.Load('NCryptCreateProtectionDescriptor')(pwszDescriptorString, dwFlags, phDescriptor_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ncrypt/nf-ncrypt-ncryptdecrypt
-  public static NCryptDecrypt(hKey: NCRYPT_KEY_HANDLE, pbInput: PBYTE | NULL, cbInput: DWORD, pPaddingInfo: PVOID | NULL, pbOutput: PBYTE | NULL, cbOutput: DWORD, pcbResult: PDWORD, dwFlags: DWORD): SECURITY_STATUS {
-    return Ncrypt.Load('NCryptDecrypt')(hKey, pbInput, cbInput, pPaddingInfo, pbOutput, cbOutput, pcbResult, dwFlags);
+  public static NCryptDecrypt(hKey: NCRYPT_KEY_HANDLE, pbInput: OPTIONAL<PBYTE>, cbInput: DWORD, pPaddingInfo: OPTIONAL<PVOID>, pbOutput_out: OPTIONAL<PBYTE>, cbOutput: DWORD, pcbResult_out: PDWORD, dwFlags: DWORD): SECURITY_STATUS {
+    return Ncrypt.Load('NCryptDecrypt')(hKey, pbInput, cbInput, pPaddingInfo, pbOutput_out, cbOutput, pcbResult_out, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ncrypt/nf-ncrypt-ncryptdeletekey
@@ -145,42 +145,50 @@ class Ncrypt extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ncrypt/nf-ncrypt-ncryptderivekey
-  public static NCryptDeriveKey(hSharedSecret: NCRYPT_SECRET_HANDLE, pwszKDF: LPCWSTR, pParameterList: LPNCryptBufferDesc | NULL, pbDerivedKey: PBYTE | NULL, cbDerivedKey: DWORD, pcbResult: PDWORD, dwFlags: DWORD): SECURITY_STATUS {
-    return Ncrypt.Load('NCryptDeriveKey')(hSharedSecret, pwszKDF, pParameterList, pbDerivedKey, cbDerivedKey, pcbResult, dwFlags);
+  public static NCryptDeriveKey(
+    hSharedSecret: NCRYPT_SECRET_HANDLE,
+    pwszKDF: LPCWSTR,
+    pParameterList: OPTIONAL<LPNCryptBufferDesc>,
+    pbDerivedKey_out: OPTIONAL<PBYTE>,
+    cbDerivedKey: DWORD,
+    pcbResult_out: PDWORD,
+    dwFlags: DWORD,
+  ): SECURITY_STATUS {
+    return Ncrypt.Load('NCryptDeriveKey')(hSharedSecret, pwszKDF, pParameterList, pbDerivedKey_out, cbDerivedKey, pcbResult_out, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ncrypt/nf-ncrypt-ncryptencrypt
-  public static NCryptEncrypt(hKey: NCRYPT_KEY_HANDLE, pbInput: PBYTE | NULL, cbInput: DWORD, pPaddingInfo: PVOID | NULL, pbOutput: PBYTE | NULL, cbOutput: DWORD, pcbResult: PDWORD, dwFlags: DWORD): SECURITY_STATUS {
-    return Ncrypt.Load('NCryptEncrypt')(hKey, pbInput, cbInput, pPaddingInfo, pbOutput, cbOutput, pcbResult, dwFlags);
+  public static NCryptEncrypt(hKey: NCRYPT_KEY_HANDLE, pbInput: OPTIONAL<PBYTE>, cbInput: DWORD, pPaddingInfo: OPTIONAL<PVOID>, pbOutput_out: OPTIONAL<PBYTE>, cbOutput: DWORD, pcbResult_out: PDWORD, dwFlags: DWORD): SECURITY_STATUS {
+    return Ncrypt.Load('NCryptEncrypt')(hKey, pbInput, cbInput, pPaddingInfo, pbOutput_out, cbOutput, pcbResult_out, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ncrypt/nf-ncrypt-ncryptenumalgorithms
-  public static NCryptEnumAlgorithms(hProvider: NCRYPT_PROV_HANDLE, dwAlgOperations: DWORD, pdwAlgCount: PDWORD, ppAlgList: PPNCryptAlgorithmName, dwFlags: DWORD): SECURITY_STATUS {
-    return Ncrypt.Load('NCryptEnumAlgorithms')(hProvider, dwAlgOperations, pdwAlgCount, ppAlgList, dwFlags);
+  public static NCryptEnumAlgorithms(hProvider: NCRYPT_PROV_HANDLE, dwAlgOperations: DWORD, pdwAlgCount_out: PDWORD, ppAlgList_out: PPNCryptAlgorithmName, dwFlags: DWORD): SECURITY_STATUS {
+    return Ncrypt.Load('NCryptEnumAlgorithms')(hProvider, dwAlgOperations, pdwAlgCount_out, ppAlgList_out, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ncrypt/nf-ncrypt-ncryptenumkeys
-  public static NCryptEnumKeys(hProvider: NCRYPT_PROV_HANDLE, pszScope: LPCWSTR | NULL, ppKeyName: PPNCryptKeyName, ppEnumState: PVOID, dwFlags: DWORD): SECURITY_STATUS {
-    return Ncrypt.Load('NCryptEnumKeys')(hProvider, pszScope, ppKeyName, ppEnumState, dwFlags);
+  public static NCryptEnumKeys(hProvider: NCRYPT_PROV_HANDLE, pszScope: OPTIONAL<LPCWSTR>, ppKeyName_out: PPNCryptKeyName, ppEnumState_in_out: PVOID, dwFlags: DWORD): SECURITY_STATUS {
+    return Ncrypt.Load('NCryptEnumKeys')(hProvider, pszScope, ppKeyName_out, ppEnumState_in_out, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ncrypt/nf-ncrypt-ncryptenumstorageproviders
-  public static NCryptEnumStorageProviders(pdwProviderCount: PDWORD, ppProviderList: PPNCryptProviderName, dwFlags: DWORD): SECURITY_STATUS {
-    return Ncrypt.Load('NCryptEnumStorageProviders')(pdwProviderCount, ppProviderList, dwFlags);
+  public static NCryptEnumStorageProviders(pdwProviderCount_out: PDWORD, ppProviderList_out: PPNCryptProviderName, dwFlags: DWORD): SECURITY_STATUS {
+    return Ncrypt.Load('NCryptEnumStorageProviders')(pdwProviderCount_out, ppProviderList_out, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ncrypt/nf-ncrypt-ncryptexportkey
   public static NCryptExportKey(
     hKey: NCRYPT_KEY_HANDLE,
-    hExportKey: NCRYPT_KEY_HANDLE | 0n,
+    hExportKey: OPTIONAL<NCRYPT_KEY_HANDLE>,
     pszBlobType: LPCWSTR,
-    pParameterList: LPNCryptBufferDesc | NULL,
-    pbOutput: PBYTE | NULL,
+    pParameterList: OPTIONAL<LPNCryptBufferDesc>,
+    pbOutput_out: OPTIONAL<PBYTE>,
     cbOutput: DWORD,
-    pcbResult: PDWORD,
+    pcbResult_out: PDWORD,
     dwFlags: DWORD,
   ): SECURITY_STATUS {
-    return Ncrypt.Load('NCryptExportKey')(hKey, hExportKey, pszBlobType, pParameterList, pbOutput, cbOutput, pcbResult, dwFlags);
+    return Ncrypt.Load('NCryptExportKey')(hKey, hExportKey, pszBlobType, pParameterList, pbOutput_out, cbOutput, pcbResult_out, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ncrypt/nf-ncrypt-ncryptfinalizekey
@@ -199,27 +207,27 @@ class Ncrypt extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ncrypt/nf-ncrypt-ncryptgetproperty
-  public static NCryptGetProperty(hObject: NCRYPT_HANDLE, pszProperty: LPCWSTR, pbOutput: PBYTE | NULL, cbOutput: DWORD, pcbResult: PDWORD, dwFlags: DWORD): SECURITY_STATUS {
-    return Ncrypt.Load('NCryptGetProperty')(hObject, pszProperty, pbOutput, cbOutput, pcbResult, dwFlags);
+  public static NCryptGetProperty(hObject: NCRYPT_HANDLE, pszProperty: LPCWSTR, pbOutput_out: OPTIONAL<PBYTE>, cbOutput: DWORD, pcbResult_out: PDWORD, dwFlags: DWORD): SECURITY_STATUS {
+    return Ncrypt.Load('NCryptGetProperty')(hObject, pszProperty, pbOutput_out, cbOutput, pcbResult_out, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ncryptprotect/nf-ncryptprotect-ncryptgetprotectiondescriptorinfo
-  public static NCryptGetProtectionDescriptorInfo(hDescriptor: NCRYPT_DESCRIPTOR_HANDLE, pMemPara: PNCRYPT_ALLOC_PARA | NULL, dwInfoType: DWORD, ppvInfo: PVOID): SECURITY_STATUS {
-    return Ncrypt.Load('NCryptGetProtectionDescriptorInfo')(hDescriptor, pMemPara, dwInfoType, ppvInfo);
+  public static NCryptGetProtectionDescriptorInfo(hDescriptor: NCRYPT_DESCRIPTOR_HANDLE, pMemPara: OPTIONAL<PNCRYPT_ALLOC_PARA>, dwInfoType: DWORD, ppvInfo_out: PVOID): SECURITY_STATUS {
+    return Ncrypt.Load('NCryptGetProtectionDescriptorInfo')(hDescriptor, pMemPara, dwInfoType, ppvInfo_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ncrypt/nf-ncrypt-ncryptimportkey
   public static NCryptImportKey(
     hProvider: NCRYPT_PROV_HANDLE,
-    hImportKey: NCRYPT_KEY_HANDLE | 0n,
+    hImportKey: OPTIONAL<NCRYPT_KEY_HANDLE>,
     pszBlobType: LPCWSTR,
-    pParameterList: LPNCryptBufferDesc | NULL,
-    phKey: PNCRYPT_KEY_HANDLE,
+    pParameterList: OPTIONAL<LPNCryptBufferDesc>,
+    phKey_out: PNCRYPT_KEY_HANDLE,
     pbData: PBYTE,
     cbData: DWORD,
     dwFlags: DWORD,
   ): SECURITY_STATUS {
-    return Ncrypt.Load('NCryptImportKey')(hProvider, hImportKey, pszBlobType, pParameterList, phKey, pbData, cbData, dwFlags);
+    return Ncrypt.Load('NCryptImportKey')(hProvider, hImportKey, pszBlobType, pParameterList, phKey_out, pbData, cbData, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ncrypt/nf-ncrypt-ncryptisalgsupported
@@ -233,23 +241,23 @@ class Ncrypt extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ncrypt/nf-ncrypt-ncryptkeyderivation
-  public static NCryptKeyDerivation(hKey: NCRYPT_KEY_HANDLE, pParameterList: LPNCryptBufferDesc | NULL, pbDerivedKey: PBYTE, cbDerivedKey: DWORD, pcbResult: PDWORD, dwFlags: DWORD): SECURITY_STATUS {
-    return Ncrypt.Load('NCryptKeyDerivation')(hKey, pParameterList, pbDerivedKey, cbDerivedKey, pcbResult, dwFlags);
+  public static NCryptKeyDerivation(hKey: NCRYPT_KEY_HANDLE, pParameterList: OPTIONAL<LPNCryptBufferDesc>, pbDerivedKey_out: PBYTE, cbDerivedKey: DWORD, pcbResult_out: PDWORD, dwFlags: DWORD): SECURITY_STATUS {
+    return Ncrypt.Load('NCryptKeyDerivation')(hKey, pParameterList, pbDerivedKey_out, cbDerivedKey, pcbResult_out, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ncrypt/nf-ncrypt-ncryptnotifychangekey
-  public static NCryptNotifyChangeKey(hProvider: NCRYPT_PROV_HANDLE, phEvent: PHANDLE, dwFlags: DWORD): SECURITY_STATUS {
-    return Ncrypt.Load('NCryptNotifyChangeKey')(hProvider, phEvent, dwFlags);
+  public static NCryptNotifyChangeKey(hProvider: NCRYPT_PROV_HANDLE, phEvent_in_out: PHANDLE, dwFlags: DWORD): SECURITY_STATUS {
+    return Ncrypt.Load('NCryptNotifyChangeKey')(hProvider, phEvent_in_out, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ncrypt/nf-ncrypt-ncryptopenkey
-  public static NCryptOpenKey(hProvider: NCRYPT_PROV_HANDLE, phKey: PNCRYPT_KEY_HANDLE, pszKeyName: LPCWSTR, dwLegacyKeySpec: DWORD, dwFlags: DWORD): SECURITY_STATUS {
-    return Ncrypt.Load('NCryptOpenKey')(hProvider, phKey, pszKeyName, dwLegacyKeySpec, dwFlags);
+  public static NCryptOpenKey(hProvider: NCRYPT_PROV_HANDLE, phKey_out: PNCRYPT_KEY_HANDLE, pszKeyName: LPCWSTR, dwLegacyKeySpec: DWORD, dwFlags: DWORD): SECURITY_STATUS {
+    return Ncrypt.Load('NCryptOpenKey')(hProvider, phKey_out, pszKeyName, dwLegacyKeySpec, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ncrypt/nf-ncrypt-ncryptopenstorageprovider
-  public static NCryptOpenStorageProvider(phProvider: PNCRYPT_PROV_HANDLE, pszProviderName: LPCWSTR | NULL, dwFlags: DWORD): SECURITY_STATUS {
-    return Ncrypt.Load('NCryptOpenStorageProvider')(phProvider, pszProviderName, dwFlags);
+  public static NCryptOpenStorageProvider(phProvider_out: PNCRYPT_PROV_HANDLE, pszProviderName: OPTIONAL<LPCWSTR>, dwFlags: DWORD): SECURITY_STATUS {
+    return Ncrypt.Load('NCryptOpenStorageProvider')(phProvider_out, pszProviderName, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ncryptprotect/nf-ncryptprotect-ncryptprotectsecret
@@ -258,27 +266,27 @@ class Ncrypt extends Win32 {
     dwFlags: DWORD,
     pbData: PBYTE,
     cbData: DWORD,
-    pMemPara: PNCRYPT_ALLOC_PARA | NULL,
-    hWnd: HWND | 0n,
-    ppbProtectedBlob: PVOID,
-    pcbProtectedBlob: PULONG,
+    pMemPara: OPTIONAL<PNCRYPT_ALLOC_PARA>,
+    hWnd: OPTIONAL<HWND>,
+    ppbProtectedBlob_out: PVOID,
+    pcbProtectedBlob_out: PULONG,
   ): SECURITY_STATUS {
-    return Ncrypt.Load('NCryptProtectSecret')(hDescriptor, dwFlags, pbData, cbData, pMemPara, hWnd, ppbProtectedBlob, pcbProtectedBlob);
+    return Ncrypt.Load('NCryptProtectSecret')(hDescriptor, dwFlags, pbData, cbData, pMemPara, hWnd, ppbProtectedBlob_out, pcbProtectedBlob_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ncryptprotect/nf-ncryptprotect-ncryptqueryprotectiondescriptorname
-  public static NCryptQueryProtectionDescriptorName(pwszName: LPCWSTR, pwszDescriptorString: LPWSTR | NULL, pcDescriptorString: LPSIZE_T, dwFlags: DWORD): SECURITY_STATUS {
-    return Ncrypt.Load('NCryptQueryProtectionDescriptorName')(pwszName, pwszDescriptorString, pcDescriptorString, dwFlags);
+  public static NCryptQueryProtectionDescriptorName(pwszName: LPCWSTR, pwszDescriptorString_out: OPTIONAL<LPWSTR>, pcDescriptorString_in_out: LPSIZE_T, dwFlags: DWORD): SECURITY_STATUS {
+    return Ncrypt.Load('NCryptQueryProtectionDescriptorName')(pwszName, pwszDescriptorString_out, pcDescriptorString_in_out, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ncryptprotect/nf-ncryptprotect-ncryptregisterprotectiondescriptorname
-  public static NCryptRegisterProtectionDescriptorName(pwszName: LPCWSTR, pwszDescriptorString: LPCWSTR | NULL, dwFlags: DWORD): SECURITY_STATUS {
+  public static NCryptRegisterProtectionDescriptorName(pwszName: LPCWSTR, pwszDescriptorString: OPTIONAL<LPCWSTR>, dwFlags: DWORD): SECURITY_STATUS {
     return Ncrypt.Load('NCryptRegisterProtectionDescriptorName')(pwszName, pwszDescriptorString, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ncrypt/nf-ncrypt-ncryptsecretagreement
-  public static NCryptSecretAgreement(hPrivKey: NCRYPT_KEY_HANDLE, hPubKey: NCRYPT_KEY_HANDLE, phAgreedSecret: PNCRYPT_SECRET_HANDLE, dwFlags: DWORD): SECURITY_STATUS {
-    return Ncrypt.Load('NCryptSecretAgreement')(hPrivKey, hPubKey, phAgreedSecret, dwFlags);
+  public static NCryptSecretAgreement(hPrivKey: NCRYPT_KEY_HANDLE, hPubKey: NCRYPT_KEY_HANDLE, phAgreedSecret_out: PNCRYPT_SECRET_HANDLE, dwFlags: DWORD): SECURITY_STATUS {
+    return Ncrypt.Load('NCryptSecretAgreement')(hPrivKey, hPubKey, phAgreedSecret_out, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ncrypt/nf-ncrypt-ncryptsetproperty
@@ -287,8 +295,8 @@ class Ncrypt extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ncrypt/nf-ncrypt-ncryptsignhash
-  public static NCryptSignHash(hKey: NCRYPT_KEY_HANDLE, pPaddingInfo: PVOID | NULL, pbHashValue: PBYTE, cbHashValue: DWORD, pbSignature: PBYTE | NULL, cbSignature: DWORD, pcbResult: PDWORD, dwFlags: DWORD): SECURITY_STATUS {
-    return Ncrypt.Load('NCryptSignHash')(hKey, pPaddingInfo, pbHashValue, cbHashValue, pbSignature, cbSignature, pcbResult, dwFlags);
+  public static NCryptSignHash(hKey: NCRYPT_KEY_HANDLE, pPaddingInfo: OPTIONAL<PVOID>, pbHashValue: PBYTE, cbHashValue: DWORD, pbSignature_out: OPTIONAL<PBYTE>, cbSignature: DWORD, pcbResult_out: PDWORD, dwFlags: DWORD): SECURITY_STATUS {
+    return Ncrypt.Load('NCryptSignHash')(hKey, pPaddingInfo, pbHashValue, cbHashValue, pbSignature_out, cbSignature, pcbResult_out, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ncryptprotect/nf-ncryptprotect-ncryptstreamclose
@@ -297,18 +305,18 @@ class Ncrypt extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ncryptprotect/nf-ncryptprotect-ncryptstreamopentoprotect
-  public static NCryptStreamOpenToProtect(hDescriptor: NCRYPT_DESCRIPTOR_HANDLE, dwFlags: DWORD, hWnd: HWND | 0n, pStreamInfo: PVOID, phStream: PNCRYPT_STREAM_HANDLE): SECURITY_STATUS {
-    return Ncrypt.Load('NCryptStreamOpenToProtect')(hDescriptor, dwFlags, hWnd, pStreamInfo, phStream);
+  public static NCryptStreamOpenToProtect(hDescriptor: NCRYPT_DESCRIPTOR_HANDLE, dwFlags: DWORD, hWnd: OPTIONAL<HWND>, pStreamInfo: PVOID, phStream_out: PNCRYPT_STREAM_HANDLE): SECURITY_STATUS {
+    return Ncrypt.Load('NCryptStreamOpenToProtect')(hDescriptor, dwFlags, hWnd, pStreamInfo, phStream_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ncryptprotect/nf-ncryptprotect-ncryptstreamopentounprotect
-  public static NCryptStreamOpenToUnprotect(pStreamInfo: PVOID, dwFlags: DWORD, hWnd: HWND | 0n, phStream: PNCRYPT_STREAM_HANDLE): SECURITY_STATUS {
-    return Ncrypt.Load('NCryptStreamOpenToUnprotect')(pStreamInfo, dwFlags, hWnd, phStream);
+  public static NCryptStreamOpenToUnprotect(pStreamInfo: PVOID, dwFlags: DWORD, hWnd: OPTIONAL<HWND>, phStream_out: PNCRYPT_STREAM_HANDLE): SECURITY_STATUS {
+    return Ncrypt.Load('NCryptStreamOpenToUnprotect')(pStreamInfo, dwFlags, hWnd, phStream_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ncryptprotect/nf-ncryptprotect-ncryptstreamopentounprotectex
-  public static NCryptStreamOpenToUnprotectEx(pStreamInfo: PVOID, dwFlags: DWORD, hWnd: HWND | 0n, phStream: PNCRYPT_STREAM_HANDLE): SECURITY_STATUS {
-    return Ncrypt.Load('NCryptStreamOpenToUnprotectEx')(pStreamInfo, dwFlags, hWnd, phStream);
+  public static NCryptStreamOpenToUnprotectEx(pStreamInfo: PVOID, dwFlags: DWORD, hWnd: OPTIONAL<HWND>, phStream_out: PNCRYPT_STREAM_HANDLE): SECURITY_STATUS {
+    return Ncrypt.Load('NCryptStreamOpenToUnprotectEx')(pStreamInfo, dwFlags, hWnd, phStream_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ncryptprotect/nf-ncryptprotect-ncryptstreamupdate
@@ -317,40 +325,40 @@ class Ncrypt extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ncrypt/nf-ncrypt-ncrypttranslatehandle
-  public static NCryptTranslateHandle(phProvider: PNCRYPT_PROV_HANDLE | NULL, phKey: PNCRYPT_KEY_HANDLE, hLegacyProv: HCRYPTPROV, hLegacyKey: HCRYPTKEY | 0n, dwLegacyKeySpec: DWORD, dwFlags: DWORD): SECURITY_STATUS {
-    return Ncrypt.Load('NCryptTranslateHandle')(phProvider, phKey, hLegacyProv, hLegacyKey, dwLegacyKeySpec, dwFlags);
+  public static NCryptTranslateHandle(phProvider_out: OPTIONAL<PNCRYPT_PROV_HANDLE>, phKey_out: PNCRYPT_KEY_HANDLE, hLegacyProv: HCRYPTPROV, hLegacyKey: OPTIONAL<HCRYPTKEY>, dwLegacyKeySpec: DWORD, dwFlags: DWORD): SECURITY_STATUS {
+    return Ncrypt.Load('NCryptTranslateHandle')(phProvider_out, phKey_out, hLegacyProv, hLegacyKey, dwLegacyKeySpec, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ncryptprotect/nf-ncryptprotect-ncryptunprotectsecret
   public static NCryptUnprotectSecret(
-    phDescriptor: PNCRYPT_DESCRIPTOR_HANDLE | NULL,
+    phDescriptor_out: OPTIONAL<PNCRYPT_DESCRIPTOR_HANDLE>,
     dwFlags: DWORD,
     pbProtectedBlob: PBYTE,
     cbProtectedBlob: DWORD,
-    pMemPara: PNCRYPT_ALLOC_PARA | NULL,
-    hWnd: HWND | 0n,
-    ppbData: PVOID,
-    pcbData: PULONG,
+    pMemPara: OPTIONAL<PNCRYPT_ALLOC_PARA>,
+    hWnd: OPTIONAL<HWND>,
+    ppbData_out: PVOID,
+    pcbData_out: PULONG,
   ): SECURITY_STATUS {
-    return Ncrypt.Load('NCryptUnprotectSecret')(phDescriptor, dwFlags, pbProtectedBlob, cbProtectedBlob, pMemPara, hWnd, ppbData, pcbData);
+    return Ncrypt.Load('NCryptUnprotectSecret')(phDescriptor_out, dwFlags, pbProtectedBlob, cbProtectedBlob, pMemPara, hWnd, ppbData_out, pcbData_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ncrypt/nf-ncrypt-ncryptverifyclaim
   public static NCryptVerifyClaim(
     hSubjectKey: NCRYPT_KEY_HANDLE,
-    hAuthorityKey: NCRYPT_KEY_HANDLE | 0n,
+    hAuthorityKey: OPTIONAL<NCRYPT_KEY_HANDLE>,
     dwClaimType: DWORD,
-    pParameterList: LPNCryptBufferDesc | NULL,
+    pParameterList: OPTIONAL<LPNCryptBufferDesc>,
     pbClaimBlob: PBYTE,
     cbClaimBlob: DWORD,
-    pOutput: LPNCryptBufferDesc,
+    pOutput_out: LPNCryptBufferDesc,
     dwFlags: DWORD,
   ): SECURITY_STATUS {
-    return Ncrypt.Load('NCryptVerifyClaim')(hSubjectKey, hAuthorityKey, dwClaimType, pParameterList, pbClaimBlob, cbClaimBlob, pOutput, dwFlags);
+    return Ncrypt.Load('NCryptVerifyClaim')(hSubjectKey, hAuthorityKey, dwClaimType, pParameterList, pbClaimBlob, cbClaimBlob, pOutput_out, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ncrypt/nf-ncrypt-ncryptverifysignature
-  public static NCryptVerifySignature(hKey: NCRYPT_KEY_HANDLE, pPaddingInfo: PVOID | NULL, pbHashValue: PBYTE, cbHashValue: DWORD, pbSignature: PBYTE, cbSignature: DWORD, dwFlags: DWORD): SECURITY_STATUS {
+  public static NCryptVerifySignature(hKey: NCRYPT_KEY_HANDLE, pPaddingInfo: OPTIONAL<PVOID>, pbHashValue: PBYTE, cbHashValue: DWORD, pbSignature: PBYTE, cbSignature: DWORD, dwFlags: DWORD): SECURITY_STATUS {
     return Ncrypt.Load('NCryptVerifySignature')(hKey, pPaddingInfo, pbHashValue, cbHashValue, pbSignature, cbSignature, dwFlags);
   }
 }

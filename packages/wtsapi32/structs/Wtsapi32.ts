@@ -13,6 +13,7 @@ import type {
   LPSTR,
   LPWSTR,
   NULL,
+  OPTIONAL,
   PBOOL,
   PBYTE,
   PCHAR,
@@ -143,12 +144,12 @@ class Wtsapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wtsapi32/nf-wtsapi32-wtscreatelistenera
-  public static WTSCreateListenerA(hServer: HANDLE, pReserved: PVOID | NULL, Reserved: DWORD, pListenerName: LPSTR, pBuffer: PWTSLISTENERCONFIGA, flag: DWORD): BOOL {
+  public static WTSCreateListenerA(hServer: HANDLE, pReserved: NULL, Reserved: DWORD, pListenerName: LPSTR, pBuffer: PWTSLISTENERCONFIGA, flag: DWORD): BOOL {
     return Wtsapi32.Load('WTSCreateListenerA')(hServer, pReserved, Reserved, pListenerName, pBuffer, flag);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wtsapi32/nf-wtsapi32-wtscreatelistenerw
-  public static WTSCreateListenerW(hServer: HANDLE, pReserved: PVOID | NULL, Reserved: DWORD, pListenerName: LPWSTR, pBuffer: PWTSLISTENERCONFIGW, flag: DWORD): BOOL {
+  public static WTSCreateListenerW(hServer: HANDLE, pReserved: NULL, Reserved: DWORD, pListenerName: LPWSTR, pBuffer: PWTSLISTENERCONFIGW, flag: DWORD): BOOL {
     return Wtsapi32.Load('WTSCreateListenerW')(hServer, pReserved, Reserved, pListenerName, pBuffer, flag);
   }
 
@@ -163,63 +164,63 @@ class Wtsapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wtsapi32/nf-wtsapi32-wtsenumeratelistenersa
-  public static WTSEnumerateListenersA(hServer: HANDLE, pReserved: PVOID | NULL, Reserved: DWORD, pListeners: PWTSLISTENERNAMEA | NULL, pCount: LPDWORD): BOOL {
-    return Wtsapi32.Load('WTSEnumerateListenersA')(hServer, pReserved, Reserved, pListeners, pCount);
+  public static WTSEnumerateListenersA(hServer: HANDLE, pReserved: NULL, Reserved: DWORD, pListeners_out: OPTIONAL<PWTSLISTENERNAMEA>, pCount_in_out: LPDWORD): BOOL {
+    return Wtsapi32.Load('WTSEnumerateListenersA')(hServer, pReserved, Reserved, pListeners_out, pCount_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wtsapi32/nf-wtsapi32-wtsenumeratelistenersw
-  public static WTSEnumerateListenersW(hServer: HANDLE, pReserved: PVOID | NULL, Reserved: DWORD, pListeners: PWTSLISTENERNAMEW | NULL, pCount: LPDWORD): BOOL {
-    return Wtsapi32.Load('WTSEnumerateListenersW')(hServer, pReserved, Reserved, pListeners, pCount);
+  public static WTSEnumerateListenersW(hServer: HANDLE, pReserved: NULL, Reserved: DWORD, pListeners_out: OPTIONAL<PWTSLISTENERNAMEW>, pCount_in_out: LPDWORD): BOOL {
+    return Wtsapi32.Load('WTSEnumerateListenersW')(hServer, pReserved, Reserved, pListeners_out, pCount_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wtsapi32/nf-wtsapi32-wtsenumerateprocessesa
-  public static WTSEnumerateProcessesA(hServer: HANDLE, Reserved: DWORD, Version: DWORD, ppProcessInfo: PVOID, pCount: LPDWORD): BOOL {
-    return Wtsapi32.Load('WTSEnumerateProcessesA')(hServer, Reserved, Version, ppProcessInfo, pCount);
+  public static WTSEnumerateProcessesA(hServer: HANDLE, Reserved: DWORD, Version: DWORD, ppProcessInfo_out: PVOID, pCount_out: LPDWORD): BOOL {
+    return Wtsapi32.Load('WTSEnumerateProcessesA')(hServer, Reserved, Version, ppProcessInfo_out, pCount_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wtsapi32/nf-wtsapi32-wtsenumerateprocessesexa
-  public static WTSEnumerateProcessesExA(hServer: HANDLE, pLevel: LPDWORD, SessionId: DWORD, ppProcessInfo: PVOID, pCount: LPDWORD): BOOL {
-    return Wtsapi32.Load('WTSEnumerateProcessesExA')(hServer, pLevel, SessionId, ppProcessInfo, pCount);
+  public static WTSEnumerateProcessesExA(hServer: HANDLE, pLevel_in_out: LPDWORD, SessionId: DWORD, ppProcessInfo_out: PVOID, pCount_out: LPDWORD): BOOL {
+    return Wtsapi32.Load('WTSEnumerateProcessesExA')(hServer, pLevel_in_out, SessionId, ppProcessInfo_out, pCount_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wtsapi32/nf-wtsapi32-wtsenumerateprocessesexw
-  public static WTSEnumerateProcessesExW(hServer: HANDLE, pLevel: LPDWORD, SessionId: DWORD, ppProcessInfo: PVOID, pCount: LPDWORD): BOOL {
-    return Wtsapi32.Load('WTSEnumerateProcessesExW')(hServer, pLevel, SessionId, ppProcessInfo, pCount);
+  public static WTSEnumerateProcessesExW(hServer: HANDLE, pLevel_in_out: LPDWORD, SessionId: DWORD, ppProcessInfo_out: PVOID, pCount_out: LPDWORD): BOOL {
+    return Wtsapi32.Load('WTSEnumerateProcessesExW')(hServer, pLevel_in_out, SessionId, ppProcessInfo_out, pCount_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wtsapi32/nf-wtsapi32-wtsenumerateprocessesw
-  public static WTSEnumerateProcessesW(hServer: HANDLE, Reserved: DWORD, Version: DWORD, ppProcessInfo: PVOID, pCount: LPDWORD): BOOL {
-    return Wtsapi32.Load('WTSEnumerateProcessesW')(hServer, Reserved, Version, ppProcessInfo, pCount);
+  public static WTSEnumerateProcessesW(hServer: HANDLE, Reserved: DWORD, Version: DWORD, ppProcessInfo_out: PVOID, pCount_out: LPDWORD): BOOL {
+    return Wtsapi32.Load('WTSEnumerateProcessesW')(hServer, Reserved, Version, ppProcessInfo_out, pCount_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wtsapi32/nf-wtsapi32-wtsenumerateserversa
-  public static WTSEnumerateServersA(pDomainName: LPSTR | NULL, Reserved: DWORD, Version: DWORD, ppServerInfo: PVOID, pCount: LPDWORD): BOOL {
-    return Wtsapi32.Load('WTSEnumerateServersA')(pDomainName, Reserved, Version, ppServerInfo, pCount);
+  public static WTSEnumerateServersA(pDomainName: NULL, Reserved: DWORD, Version: DWORD, ppServerInfo_out: PVOID, pCount_out: LPDWORD): BOOL {
+    return Wtsapi32.Load('WTSEnumerateServersA')(pDomainName, Reserved, Version, ppServerInfo_out, pCount_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wtsapi32/nf-wtsapi32-wtsenumerateserversw
-  public static WTSEnumerateServersW(pDomainName: LPWSTR | NULL, Reserved: DWORD, Version: DWORD, ppServerInfo: PVOID, pCount: LPDWORD): BOOL {
-    return Wtsapi32.Load('WTSEnumerateServersW')(pDomainName, Reserved, Version, ppServerInfo, pCount);
+  public static WTSEnumerateServersW(pDomainName: NULL, Reserved: DWORD, Version: DWORD, ppServerInfo_out: PVOID, pCount_out: LPDWORD): BOOL {
+    return Wtsapi32.Load('WTSEnumerateServersW')(pDomainName, Reserved, Version, ppServerInfo_out, pCount_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wtsapi32/nf-wtsapi32-wtsenumeratesessionsa
-  public static WTSEnumerateSessionsA(hServer: HANDLE, Reserved: DWORD, Version: DWORD, ppSessionInfo: PVOID, pCount: LPDWORD): BOOL {
-    return Wtsapi32.Load('WTSEnumerateSessionsA')(hServer, Reserved, Version, ppSessionInfo, pCount);
+  public static WTSEnumerateSessionsA(hServer: HANDLE, Reserved: DWORD, Version: DWORD, ppSessionInfo_out: PVOID, pCount_out: LPDWORD): BOOL {
+    return Wtsapi32.Load('WTSEnumerateSessionsA')(hServer, Reserved, Version, ppSessionInfo_out, pCount_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wtsapi32/nf-wtsapi32-wtsenumeratesessionsexa
-  public static WTSEnumerateSessionsExA(hServer: HANDLE, pLevel: LPDWORD, Filter: DWORD, ppSessionInfo: PVOID, pCount: LPDWORD): BOOL {
-    return Wtsapi32.Load('WTSEnumerateSessionsExA')(hServer, pLevel, Filter, ppSessionInfo, pCount);
+  public static WTSEnumerateSessionsExA(hServer: HANDLE, pLevel_in_out: LPDWORD, Filter: DWORD, ppSessionInfo_out: PVOID, pCount_out: LPDWORD): BOOL {
+    return Wtsapi32.Load('WTSEnumerateSessionsExA')(hServer, pLevel_in_out, Filter, ppSessionInfo_out, pCount_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wtsapi32/nf-wtsapi32-wtsenumeratesessionsexw
-  public static WTSEnumerateSessionsExW(hServer: HANDLE, pLevel: LPDWORD, Filter: DWORD, ppSessionInfo: PVOID, pCount: LPDWORD): BOOL {
-    return Wtsapi32.Load('WTSEnumerateSessionsExW')(hServer, pLevel, Filter, ppSessionInfo, pCount);
+  public static WTSEnumerateSessionsExW(hServer: HANDLE, pLevel_in_out: LPDWORD, Filter: DWORD, ppSessionInfo_out: PVOID, pCount_out: LPDWORD): BOOL {
+    return Wtsapi32.Load('WTSEnumerateSessionsExW')(hServer, pLevel_in_out, Filter, ppSessionInfo_out, pCount_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wtsapi32/nf-wtsapi32-wtsenumeratesessionsw
-  public static WTSEnumerateSessionsW(hServer: HANDLE, Reserved: DWORD, Version: DWORD, ppSessionInfo: PVOID, pCount: LPDWORD): BOOL {
-    return Wtsapi32.Load('WTSEnumerateSessionsW')(hServer, Reserved, Version, ppSessionInfo, pCount);
+  public static WTSEnumerateSessionsW(hServer: HANDLE, Reserved: DWORD, Version: DWORD, ppSessionInfo_out: PVOID, pCount_out: LPDWORD): BOOL {
+    return Wtsapi32.Load('WTSEnumerateSessionsW')(hServer, Reserved, Version, ppSessionInfo_out, pCount_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wtsapi32/nf-wtsapi32-wtsfreememory
@@ -238,41 +239,41 @@ class Wtsapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wtsapi32/nf-wtsapi32-wtsgetchildsessionid
-  public static WTSGetChildSessionId(pSessionId: PULONG): BOOL {
-    return Wtsapi32.Load('WTSGetChildSessionId')(pSessionId);
+  public static WTSGetChildSessionId(pSessionId_out: PULONG): BOOL {
+    return Wtsapi32.Load('WTSGetChildSessionId')(pSessionId_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wtsapi32/nf-wtsapi32-wtsgetlistenersecuritya
   public static WTSGetListenerSecurityA(
     hServer: HANDLE,
-    pReserved: PVOID | NULL,
+    pReserved: NULL,
     Reserved: DWORD,
     pListenerName: LPSTR,
     SecurityInformation: SECURITY_INFORMATION,
-    pSecurityDescriptor: PSECURITY_DESCRIPTOR | NULL,
+    pSecurityDescriptor_out: OPTIONAL<PSECURITY_DESCRIPTOR>,
     nLength: DWORD,
-    lpnLengthNeeded: LPDWORD,
+    lpnLengthNeeded_out: LPDWORD,
   ): BOOL {
-    return Wtsapi32.Load('WTSGetListenerSecurityA')(hServer, pReserved, Reserved, pListenerName, SecurityInformation, pSecurityDescriptor, nLength, lpnLengthNeeded);
+    return Wtsapi32.Load('WTSGetListenerSecurityA')(hServer, pReserved, Reserved, pListenerName, SecurityInformation, pSecurityDescriptor_out, nLength, lpnLengthNeeded_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wtsapi32/nf-wtsapi32-wtsgetlistenersecurityw
   public static WTSGetListenerSecurityW(
     hServer: HANDLE,
-    pReserved: PVOID | NULL,
+    pReserved: NULL,
     Reserved: DWORD,
     pListenerName: LPWSTR,
     SecurityInformation: SECURITY_INFORMATION,
-    pSecurityDescriptor: PSECURITY_DESCRIPTOR | NULL,
+    pSecurityDescriptor_out: OPTIONAL<PSECURITY_DESCRIPTOR>,
     nLength: DWORD,
-    lpnLengthNeeded: LPDWORD,
+    lpnLengthNeeded_out: LPDWORD,
   ): BOOL {
-    return Wtsapi32.Load('WTSGetListenerSecurityW')(hServer, pReserved, Reserved, pListenerName, SecurityInformation, pSecurityDescriptor, nLength, lpnLengthNeeded);
+    return Wtsapi32.Load('WTSGetListenerSecurityW')(hServer, pReserved, Reserved, pListenerName, SecurityInformation, pSecurityDescriptor_out, nLength, lpnLengthNeeded_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wtsapi32/nf-wtsapi32-wtsischildsessionsenabled
-  public static WTSIsChildSessionsEnabled(pbEnabled: PBOOL): BOOL {
-    return Wtsapi32.Load('WTSIsChildSessionsEnabled')(pbEnabled);
+  public static WTSIsChildSessionsEnabled(pbEnabled_out: PBOOL): BOOL {
+    return Wtsapi32.Load('WTSIsChildSessionsEnabled')(pbEnabled_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wtsapi32/nf-wtsapi32-wtslogoffsession
@@ -301,38 +302,38 @@ class Wtsapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wtsapi32/nf-wtsapi32-wtsquerylistenerconfiga
-  public static WTSQueryListenerConfigA(hServer: HANDLE, pReserved: PVOID | NULL, Reserved: DWORD, pListenerName: LPSTR, pBuffer: PWTSLISTENERCONFIGA): BOOL {
-    return Wtsapi32.Load('WTSQueryListenerConfigA')(hServer, pReserved, Reserved, pListenerName, pBuffer);
+  public static WTSQueryListenerConfigA(hServer: HANDLE, pReserved: NULL, Reserved: DWORD, pListenerName: LPSTR, pBuffer_out: PWTSLISTENERCONFIGA): BOOL {
+    return Wtsapi32.Load('WTSQueryListenerConfigA')(hServer, pReserved, Reserved, pListenerName, pBuffer_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wtsapi32/nf-wtsapi32-wtsquerylistenerconfigw
-  public static WTSQueryListenerConfigW(hServer: HANDLE, pReserved: PVOID | NULL, Reserved: DWORD, pListenerName: LPWSTR, pBuffer: PWTSLISTENERCONFIGW): BOOL {
-    return Wtsapi32.Load('WTSQueryListenerConfigW')(hServer, pReserved, Reserved, pListenerName, pBuffer);
+  public static WTSQueryListenerConfigW(hServer: HANDLE, pReserved: NULL, Reserved: DWORD, pListenerName: LPWSTR, pBuffer_out: PWTSLISTENERCONFIGW): BOOL {
+    return Wtsapi32.Load('WTSQueryListenerConfigW')(hServer, pReserved, Reserved, pListenerName, pBuffer_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wtsapi32/nf-wtsapi32-wtsquerysessioninformationa
-  public static WTSQuerySessionInformationA(hServer: HANDLE, SessionId: DWORD, WTSInfoClass: WTS_INFO_CLASS, ppBuffer: PVOID, pBytesReturned: LPDWORD): BOOL {
-    return Wtsapi32.Load('WTSQuerySessionInformationA')(hServer, SessionId, WTSInfoClass, ppBuffer, pBytesReturned);
+  public static WTSQuerySessionInformationA(hServer: HANDLE, SessionId: DWORD, WTSInfoClass: WTS_INFO_CLASS, ppBuffer_out: PVOID, pBytesReturned_out: LPDWORD): BOOL {
+    return Wtsapi32.Load('WTSQuerySessionInformationA')(hServer, SessionId, WTSInfoClass, ppBuffer_out, pBytesReturned_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wtsapi32/nf-wtsapi32-wtsquerysessioninformationw
-  public static WTSQuerySessionInformationW(hServer: HANDLE, SessionId: DWORD, WTSInfoClass: WTS_INFO_CLASS, ppBuffer: PVOID, pBytesReturned: LPDWORD): BOOL {
-    return Wtsapi32.Load('WTSQuerySessionInformationW')(hServer, SessionId, WTSInfoClass, ppBuffer, pBytesReturned);
+  public static WTSQuerySessionInformationW(hServer: HANDLE, SessionId: DWORD, WTSInfoClass: WTS_INFO_CLASS, ppBuffer_out: PVOID, pBytesReturned_out: LPDWORD): BOOL {
+    return Wtsapi32.Load('WTSQuerySessionInformationW')(hServer, SessionId, WTSInfoClass, ppBuffer_out, pBytesReturned_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wtsapi32/nf-wtsapi32-wtsqueryuserconfiga
-  public static WTSQueryUserConfigA(pServerName: LPSTR, pUserName: LPSTR, WTSConfigClass: WTS_CONFIG_CLASS, ppBuffer: PVOID, pBytesReturned: LPDWORD): BOOL {
-    return Wtsapi32.Load('WTSQueryUserConfigA')(pServerName, pUserName, WTSConfigClass, ppBuffer, pBytesReturned);
+  public static WTSQueryUserConfigA(pServerName: NULL, pUserName: LPSTR, WTSConfigClass: WTS_CONFIG_CLASS, ppBuffer_out: PVOID, pBytesReturned_out: LPDWORD): BOOL {
+    return Wtsapi32.Load('WTSQueryUserConfigA')(pServerName, pUserName, WTSConfigClass, ppBuffer_out, pBytesReturned_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wtsapi32/nf-wtsapi32-wtsqueryuserconfigw
-  public static WTSQueryUserConfigW(pServerName: LPWSTR, pUserName: LPWSTR, WTSConfigClass: WTS_CONFIG_CLASS, ppBuffer: PVOID, pBytesReturned: LPDWORD): BOOL {
-    return Wtsapi32.Load('WTSQueryUserConfigW')(pServerName, pUserName, WTSConfigClass, ppBuffer, pBytesReturned);
+  public static WTSQueryUserConfigW(pServerName: NULL, pUserName: LPWSTR, WTSConfigClass: WTS_CONFIG_CLASS, ppBuffer_out: PVOID, pBytesReturned_out: LPDWORD): BOOL {
+    return Wtsapi32.Load('WTSQueryUserConfigW')(pServerName, pUserName, WTSConfigClass, ppBuffer_out, pBytesReturned_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wtsapi32/nf-wtsapi32-wtsqueryusertoken
-  public static WTSQueryUserToken(SessionId: ULONG, phToken: PHANDLE): BOOL {
-    return Wtsapi32.Load('WTSQueryUserToken')(SessionId, phToken);
+  public static WTSQueryUserToken(SessionId: ULONG, phToken_out: PHANDLE): BOOL {
+    return Wtsapi32.Load('WTSQueryUserToken')(SessionId, phToken_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wtsapi32/nf-wtsapi32-wtsregistersessionnotification
@@ -346,28 +347,28 @@ class Wtsapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wtsapi32/nf-wtsapi32-wtssendmessagea
-  public static WTSSendMessageA(hServer: HANDLE, SessionId: DWORD, pTitle: LPSTR, TitleLength: DWORD, pMessage: LPSTR, MessageLength: DWORD, Style: DWORD, Timeout: DWORD, pResponse: LPDWORD, bWait: BOOL): BOOL {
-    return Wtsapi32.Load('WTSSendMessageA')(hServer, SessionId, pTitle, TitleLength, pMessage, MessageLength, Style, Timeout, pResponse, bWait);
+  public static WTSSendMessageA(hServer: HANDLE, SessionId: DWORD, pTitle: LPSTR, TitleLength: DWORD, pMessage: LPSTR, MessageLength: DWORD, Style: DWORD, Timeout: DWORD, pResponse_out: LPDWORD, bWait: BOOL): BOOL {
+    return Wtsapi32.Load('WTSSendMessageA')(hServer, SessionId, pTitle, TitleLength, pMessage, MessageLength, Style, Timeout, pResponse_out, bWait);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wtsapi32/nf-wtsapi32-wtssendmessagew
-  public static WTSSendMessageW(hServer: HANDLE, SessionId: DWORD, pTitle: LPWSTR, TitleLength: DWORD, pMessage: LPWSTR, MessageLength: DWORD, Style: DWORD, Timeout: DWORD, pResponse: LPDWORD, bWait: BOOL): BOOL {
-    return Wtsapi32.Load('WTSSendMessageW')(hServer, SessionId, pTitle, TitleLength, pMessage, MessageLength, Style, Timeout, pResponse, bWait);
+  public static WTSSendMessageW(hServer: HANDLE, SessionId: DWORD, pTitle: LPWSTR, TitleLength: DWORD, pMessage: LPWSTR, MessageLength: DWORD, Style: DWORD, Timeout: DWORD, pResponse_out: LPDWORD, bWait: BOOL): BOOL {
+    return Wtsapi32.Load('WTSSendMessageW')(hServer, SessionId, pTitle, TitleLength, pMessage, MessageLength, Style, Timeout, pResponse_out, bWait);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wtsapi32/nf-wtsapi32-wtssetlistenersecuritya
-  public static WTSSetListenerSecurityA(hServer: HANDLE, pReserved: PVOID | NULL, Reserved: DWORD, pListenerName: LPSTR, SecurityInformation: SECURITY_INFORMATION, pSecurityDescriptor: PSECURITY_DESCRIPTOR): BOOL {
+  public static WTSSetListenerSecurityA(hServer: HANDLE, pReserved: NULL, Reserved: DWORD, pListenerName: LPSTR, SecurityInformation: SECURITY_INFORMATION, pSecurityDescriptor: PSECURITY_DESCRIPTOR): BOOL {
     return Wtsapi32.Load('WTSSetListenerSecurityA')(hServer, pReserved, Reserved, pListenerName, SecurityInformation, pSecurityDescriptor);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wtsapi32/nf-wtsapi32-wtssetlistenersecurityw
-  public static WTSSetListenerSecurityW(hServer: HANDLE, pReserved: PVOID | NULL, Reserved: DWORD, pListenerName: LPWSTR, SecurityInformation: SECURITY_INFORMATION, pSecurityDescriptor: PSECURITY_DESCRIPTOR): BOOL {
+  public static WTSSetListenerSecurityW(hServer: HANDLE, pReserved: NULL, Reserved: DWORD, pListenerName: LPWSTR, SecurityInformation: SECURITY_INFORMATION, pSecurityDescriptor: PSECURITY_DESCRIPTOR): BOOL {
     return Wtsapi32.Load('WTSSetListenerSecurityW')(hServer, pReserved, Reserved, pListenerName, SecurityInformation, pSecurityDescriptor);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wtshintapi/nf-wtshintapi-wtssetrenderhint
-  public static WTSSetRenderHint(pRenderHintID: PVOID, hwndOwner: HWND, renderHintType: DWORD, cbHintDataLength: DWORD, pHintData: PBYTE | NULL): HRESULT {
-    return Wtsapi32.Load('WTSSetRenderHint')(pRenderHintID, hwndOwner, renderHintType, cbHintDataLength, pHintData);
+  public static WTSSetRenderHint(pRenderHintID_in_out: PVOID, hwndOwner: HWND, renderHintType: DWORD, cbHintDataLength: DWORD, pHintData: OPTIONAL<PBYTE>): HRESULT {
+    return Wtsapi32.Load('WTSSetRenderHint')(pRenderHintID_in_out, hwndOwner, renderHintType, cbHintDataLength, pHintData);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wtsapi32/nf-wtsapi32-wtssetsessioninformationa
@@ -381,12 +382,12 @@ class Wtsapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wtsapi32/nf-wtsapi32-wtssetuserconfiga
-  public static WTSSetUserConfigA(pServerName: LPSTR, pUserName: LPSTR, WTSConfigClass: WTS_CONFIG_CLASS, pBuffer: LPSTR, DataLength: DWORD): BOOL {
+  public static WTSSetUserConfigA(pServerName: NULL, pUserName: LPSTR, WTSConfigClass: WTS_CONFIG_CLASS, pBuffer: LPSTR, DataLength: DWORD): BOOL {
     return Wtsapi32.Load('WTSSetUserConfigA')(pServerName, pUserName, WTSConfigClass, pBuffer, DataLength);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wtsapi32/nf-wtsapi32-wtssetuserconfigw
-  public static WTSSetUserConfigW(pServerName: LPWSTR, pUserName: LPWSTR, WTSConfigClass: WTS_CONFIG_CLASS, pBuffer: LPWSTR, DataLength: DWORD): BOOL {
+  public static WTSSetUserConfigW(pServerName: NULL, pUserName: LPWSTR, WTSConfigClass: WTS_CONFIG_CLASS, pBuffer: LPWSTR, DataLength: DWORD): BOOL {
     return Wtsapi32.Load('WTSSetUserConfigW')(pServerName, pUserName, WTSConfigClass, pBuffer, DataLength);
   }
 
@@ -451,23 +452,23 @@ class Wtsapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wtsapi32/nf-wtsapi32-wtsvirtualchannelquery
-  public static WTSVirtualChannelQuery(hChannelHandle: HANDLE, WTSVirtualClass: WTS_VIRTUAL_CLASS, ppBuffer: PVOID, pBytesReturned: LPDWORD): BOOL {
-    return Wtsapi32.Load('WTSVirtualChannelQuery')(hChannelHandle, WTSVirtualClass, ppBuffer, pBytesReturned);
+  public static WTSVirtualChannelQuery(hChannelHandle: HANDLE, WTSVirtualClass: WTS_VIRTUAL_CLASS, ppBuffer_out: PVOID, pBytesReturned_out: LPDWORD): BOOL {
+    return Wtsapi32.Load('WTSVirtualChannelQuery')(hChannelHandle, WTSVirtualClass, ppBuffer_out, pBytesReturned_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wtsapi32/nf-wtsapi32-wtsvirtualchannelread
-  public static WTSVirtualChannelRead(hChannelHandle: HANDLE, TimeOut: ULONG, Buffer: PCHAR, BufferSize: ULONG, pBytesRead: PULONG): BOOL {
-    return Wtsapi32.Load('WTSVirtualChannelRead')(hChannelHandle, TimeOut, Buffer, BufferSize, pBytesRead);
+  public static WTSVirtualChannelRead(hChannelHandle: HANDLE, TimeOut: ULONG, Buffer_out: PCHAR, BufferSize: ULONG, pBytesRead_out: PULONG): BOOL {
+    return Wtsapi32.Load('WTSVirtualChannelRead')(hChannelHandle, TimeOut, Buffer_out, BufferSize, pBytesRead_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wtsapi32/nf-wtsapi32-wtsvirtualchannelwrite
-  public static WTSVirtualChannelWrite(hChannelHandle: HANDLE, Buffer: PCHAR, Length: ULONG, pBytesWritten: PULONG): BOOL {
-    return Wtsapi32.Load('WTSVirtualChannelWrite')(hChannelHandle, Buffer, Length, pBytesWritten);
+  public static WTSVirtualChannelWrite(hChannelHandle: HANDLE, Buffer: PCHAR, Length: ULONG, pBytesWritten_out: PULONG): BOOL {
+    return Wtsapi32.Load('WTSVirtualChannelWrite')(hChannelHandle, Buffer, Length, pBytesWritten_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wtsapi32/nf-wtsapi32-wtswaitsystemevent
-  public static WTSWaitSystemEvent(hServer: HANDLE, EventMask: DWORD, pEventFlags: LPDWORD): BOOL {
-    return Wtsapi32.Load('WTSWaitSystemEvent')(hServer, EventMask, pEventFlags);
+  public static WTSWaitSystemEvent(hServer: HANDLE, EventMask: DWORD, pEventFlags_out: LPDWORD): BOOL {
+    return Wtsapi32.Load('WTSWaitSystemEvent')(hServer, EventMask, pEventFlags_out);
   }
 }
 

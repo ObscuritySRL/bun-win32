@@ -46,7 +46,7 @@ import type {
   LPVOID,
   LPWSTR,
   LRESULT,
-  NULL,
+  OPTIONAL,
   PACKED_POINT,
   PFNDACOMPARE,
   PFNDAENUMCALLBACK,
@@ -201,7 +201,7 @@ class Comctl32 extends Win32 {
   } as const satisfies Record<string, FFIFunction>;
 
   // https://learn.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-createmappedbitmap
-  public static CreateMappedBitmap(hInstance: HINSTANCE, idBitmap: INT_PTR, wFlags: UINT, lpColorMap: LPCOLORMAP | NULL, iNumMaps: INT): HBITMAP {
+  public static CreateMappedBitmap(hInstance: HINSTANCE, idBitmap: INT_PTR, wFlags: UINT, lpColorMap: OPTIONAL<LPCOLORMAP>, iNumMaps: INT): HBITMAP {
     return Comctl32.Load('CreateMappedBitmap')(hInstance, idBitmap, wFlags, lpColorMap, iNumMaps);
   }
 
@@ -260,8 +260,8 @@ class Comctl32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dpa_dsa/nf-dpa_dsa-dpa_clone
-  public static DPA_Clone(hdpa: HDPA, hdpaNew: HDPA | 0n): HDPA {
-    return Comctl32.Load('DPA_Clone')(hdpa, hdpaNew);
+  public static DPA_Clone(hdpa: HDPA, hdpaNew_in_out: OPTIONAL<HDPA>): HDPA {
+    return Comctl32.Load('DPA_Clone')(hdpa, hdpaNew_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dpa_dsa/nf-dpa_dsa-dpa_create
@@ -270,7 +270,7 @@ class Comctl32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dpa_dsa/nf-dpa_dsa-dpa_createex
-  public static DPA_CreateEx(cpGrow: INT, hheap: HANDLE | 0n): HDPA {
+  public static DPA_CreateEx(cpGrow: INT, hheap: OPTIONAL<HANDLE>): HDPA {
     return Comctl32.Load('DPA_CreateEx')(cpGrow, hheap);
   }
 
@@ -285,17 +285,17 @@ class Comctl32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dpa_dsa/nf-dpa_dsa-dpa_destroy
-  public static DPA_Destroy(hdpa: HDPA | 0n): BOOL {
-    return Comctl32.Load('DPA_Destroy')(hdpa);
+  public static DPA_Destroy(hdpa_in_out: OPTIONAL<HDPA>): BOOL {
+    return Comctl32.Load('DPA_Destroy')(hdpa_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dpa_dsa/nf-dpa_dsa-dpa_destroycallback
-  public static DPA_DestroyCallback(hdpa: HDPA | 0n, pfnCB: PFNDAENUMCALLBACK, pData: LPVOID | NULL): VOID {
-    return Comctl32.Load('DPA_DestroyCallback')(hdpa, pfnCB, pData);
+  public static DPA_DestroyCallback(hdpa_in_out: OPTIONAL<HDPA>, pfnCB: PFNDAENUMCALLBACK, pData: OPTIONAL<LPVOID>): VOID {
+    return Comctl32.Load('DPA_DestroyCallback')(hdpa_in_out, pfnCB, pData);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dpa_dsa/nf-dpa_dsa-dpa_enumcallback
-  public static DPA_EnumCallback(hdpa: HDPA | 0n, pfnCB: PFNDAENUMCALLBACK | NULL, pData: LPVOID | NULL): VOID {
+  public static DPA_EnumCallback(hdpa: OPTIONAL<HDPA>, pfnCB: OPTIONAL<PFNDAENUMCALLBACK>, pData: OPTIONAL<LPVOID>): VOID {
     return Comctl32.Load('DPA_EnumCallback')(hdpa, pfnCB, pData);
   }
 
@@ -305,7 +305,7 @@ class Comctl32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dpa_dsa/nf-dpa_dsa-dpa_getptrindex
-  public static DPA_GetPtrIndex(hdpa: HDPA, p: LPCVOID | NULL): INT {
+  public static DPA_GetPtrIndex(hdpa: HDPA, p: OPTIONAL<LPCVOID>): INT {
     return Comctl32.Load('DPA_GetPtrIndex')(hdpa, p);
   }
 
@@ -315,13 +315,13 @@ class Comctl32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dpa_dsa/nf-dpa_dsa-dpa_insertptr
-  public static DPA_InsertPtr(hdpa: HDPA, i: INT, p: LPVOID | NULL): INT {
-    return Comctl32.Load('DPA_InsertPtr')(hdpa, i, p);
+  public static DPA_InsertPtr(hdpa_in_out: HDPA, i: INT, p: OPTIONAL<LPVOID>): INT {
+    return Comctl32.Load('DPA_InsertPtr')(hdpa_in_out, i, p);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dpa_dsa/nf-dpa_dsa-dpa_loadstream
-  public static DPA_LoadStream(phdpa: LPVOID, pfn: PFNDPASTREAM, pstream: PSTREAM, pvInstData: LPVOID | NULL): HRESULT {
-    return Comctl32.Load('DPA_LoadStream')(phdpa, pfn, pstream, pvInstData);
+  public static DPA_LoadStream(phdpa_out: LPVOID, pfn: PFNDPASTREAM, pstream: PSTREAM, pvInstData: OPTIONAL<LPVOID>): HRESULT {
+    return Comctl32.Load('DPA_LoadStream')(phdpa_out, pfn, pstream, pvInstData);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dpa_dsa/nf-dpa_dsa-dpa_merge
@@ -330,18 +330,18 @@ class Comctl32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dpa_dsa/nf-dpa_dsa-dpa_savestream
-  public static DPA_SaveStream(hdpa: HDPA, pfn: PFNDPASTREAM, pstream: PSTREAM, pvInstData: LPVOID | NULL): HRESULT {
+  public static DPA_SaveStream(hdpa: HDPA, pfn: PFNDPASTREAM, pstream: PSTREAM, pvInstData: OPTIONAL<LPVOID>): HRESULT {
     return Comctl32.Load('DPA_SaveStream')(hdpa, pfn, pstream, pvInstData);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dpa_dsa/nf-dpa_dsa-dpa_search
-  public static DPA_Search(hdpa: HDPA, pFind: LPVOID | NULL, iStart: INT, pfnCompare: PFNDACOMPARE, lParam: LPARAM, options: UINT): INT {
+  public static DPA_Search(hdpa: HDPA, pFind: OPTIONAL<LPVOID>, iStart: INT, pfnCompare: PFNDACOMPARE, lParam: LPARAM, options: UINT): INT {
     return Comctl32.Load('DPA_Search')(hdpa, pFind, iStart, pfnCompare, lParam, options);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dpa_dsa/nf-dpa_dsa-dpa_setptr
-  public static DPA_SetPtr(hdpa: HDPA, i: INT, p: LPVOID | NULL): BOOL {
-    return Comctl32.Load('DPA_SetPtr')(hdpa, i, p);
+  public static DPA_SetPtr(hdpa_in_out: HDPA, i: INT, p: OPTIONAL<LPVOID>): BOOL {
+    return Comctl32.Load('DPA_SetPtr')(hdpa_in_out, i, p);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dpa_dsa/nf-dpa_dsa-dpa_sort
@@ -365,23 +365,23 @@ class Comctl32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dpa_dsa/nf-dpa_dsa-dsa_destroy
-  public static DSA_Destroy(hdsa: HDSA | 0n): BOOL {
-    return Comctl32.Load('DSA_Destroy')(hdsa);
+  public static DSA_Destroy(hdsa_in_out: OPTIONAL<HDSA>): BOOL {
+    return Comctl32.Load('DSA_Destroy')(hdsa_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dpa_dsa/nf-dpa_dsa-dsa_destroycallback
-  public static DSA_DestroyCallback(hdsa: HDSA | 0n, pfnCB: PFNDAENUMCALLBACK, pData: LPVOID | NULL): VOID {
-    return Comctl32.Load('DSA_DestroyCallback')(hdsa, pfnCB, pData);
+  public static DSA_DestroyCallback(hdsa_in_out: OPTIONAL<HDSA>, pfnCB: PFNDAENUMCALLBACK, pData: OPTIONAL<LPVOID>): VOID {
+    return Comctl32.Load('DSA_DestroyCallback')(hdsa_in_out, pfnCB, pData);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dpa_dsa/nf-dpa_dsa-dsa_enumcallback
-  public static DSA_EnumCallback(hdsa: HDSA, pfnCB: PFNDAENUMCALLBACK, pData: LPVOID | NULL): VOID {
+  public static DSA_EnumCallback(hdsa: HDSA, pfnCB: PFNDAENUMCALLBACK, pData: OPTIONAL<LPVOID>): VOID {
     return Comctl32.Load('DSA_EnumCallback')(hdsa, pfnCB, pData);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dpa_dsa/nf-dpa_dsa-dsa_getitem
-  public static DSA_GetItem(hdsa: HDSA, i: INT, pitem: LPVOID): BOOL {
-    return Comctl32.Load('DSA_GetItem')(hdsa, i, pitem);
+  public static DSA_GetItem(hdsa: HDSA, i: INT, pitem_out: LPVOID): BOOL {
+    return Comctl32.Load('DSA_GetItem')(hdsa, i, pitem_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dpa_dsa/nf-dpa_dsa-dsa_getitemptr
@@ -390,13 +390,13 @@ class Comctl32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dpa_dsa/nf-dpa_dsa-dsa_insertitem
-  public static DSA_InsertItem(hdsa: HDSA, i: INT, pitem: LPCVOID): INT {
-    return Comctl32.Load('DSA_InsertItem')(hdsa, i, pitem);
+  public static DSA_InsertItem(hdsa_in_out: HDSA, i: INT, pitem: LPCVOID): INT {
+    return Comctl32.Load('DSA_InsertItem')(hdsa_in_out, i, pitem);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dpa_dsa/nf-dpa_dsa-dsa_setitem
-  public static DSA_SetItem(hdsa: HDSA, i: INT, pitem: LPCVOID): BOOL {
-    return Comctl32.Load('DSA_SetItem')(hdsa, i, pitem);
+  public static DSA_SetItem(hdsa_in_out: HDSA, i: INT, pitem: LPCVOID): BOOL {
+    return Comctl32.Load('DSA_SetItem')(hdsa_in_out, i, pitem);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-defsubclassproc
@@ -410,8 +410,8 @@ class Comctl32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nc-shlwapi-dllgetversionproc
-  public static DllGetVersion(pdvi: LPDLLVERSIONINFO): HRESULT {
-    return Comctl32.Load('DllGetVersion')(pdvi);
+  public static DllGetVersion(pdvi_in_out: LPDLLVERSIONINFO): HRESULT {
+    return Comctl32.Load('DllGetVersion')(pdvi_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-drawinsert
@@ -440,8 +440,8 @@ class Comctl32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-flatsb_getscrollinfo
-  public static FlatSB_GetScrollInfo(hWnd: HWND, code: INT, lpsi: LPSCROLLINFO): BOOL {
-    return Comctl32.Load('FlatSB_GetScrollInfo')(hWnd, code, lpsi);
+  public static FlatSB_GetScrollInfo(hWnd: HWND, code: INT, lpsi_in_out: LPSCROLLINFO): BOOL {
+    return Comctl32.Load('FlatSB_GetScrollInfo')(hWnd, code, lpsi_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-flatsb_getscrollpos
@@ -450,18 +450,18 @@ class Comctl32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-flatsb_getscrollprop
-  public static FlatSB_GetScrollProp(hWnd: HWND, propIndex: INT, pValue: LPINT): BOOL {
-    return Comctl32.Load('FlatSB_GetScrollProp')(hWnd, propIndex, pValue);
+  public static FlatSB_GetScrollProp(hWnd: HWND, propIndex: INT, pValue_out: LPINT): BOOL {
+    return Comctl32.Load('FlatSB_GetScrollProp')(hWnd, propIndex, pValue_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-flatsb_getscrollprop
-  public static FlatSB_GetScrollPropPtr(hWnd: HWND, propIndex: INT, pValue: PINT_PTR): BOOL {
-    return Comctl32.Load('FlatSB_GetScrollPropPtr')(hWnd, propIndex, pValue);
+  public static FlatSB_GetScrollPropPtr(hWnd: HWND, propIndex: INT, pValue_out: PINT_PTR): BOOL {
+    return Comctl32.Load('FlatSB_GetScrollPropPtr')(hWnd, propIndex, pValue_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-flatsb_getscrollrange
-  public static FlatSB_GetScrollRange(hWnd: HWND, code: INT, lpMinPos: LPINT, lpMaxPos: LPINT): BOOL {
-    return Comctl32.Load('FlatSB_GetScrollRange')(hWnd, code, lpMinPos, lpMaxPos);
+  public static FlatSB_GetScrollRange(hWnd: HWND, code: INT, lpMinPos_out: LPINT, lpMaxPos_out: LPINT): BOOL {
+    return Comctl32.Load('FlatSB_GetScrollRange')(hWnd, code, lpMinPos_out, lpMaxPos_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-flatsb_setscrollinfo
@@ -490,8 +490,8 @@ class Comctl32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-geteffectiveclientrect
-  public static GetEffectiveClientRect(hWnd: HWND, lprc: LPRECT, lpInfo: LPINT): VOID {
-    return Comctl32.Load('GetEffectiveClientRect')(hWnd, lprc, lpInfo);
+  public static GetEffectiveClientRect(hWnd: HWND, lprc_out: LPRECT, lpInfo: LPINT): VOID {
+    return Comctl32.Load('GetEffectiveClientRect')(hWnd, lprc_out, lpInfo);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-getmuilanguage
@@ -500,7 +500,7 @@ class Comctl32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-imagelist_add
-  public static ImageList_Add(himl: HIMAGELIST, hbmImage: HBITMAP, hbmMask: HBITMAP | 0n): INT {
+  public static ImageList_Add(himl: HIMAGELIST, hbmImage: HBITMAP, hbmMask: OPTIONAL<HBITMAP>): INT {
     return Comctl32.Load('ImageList_Add')(himl, hbmImage, hbmMask);
   }
 
@@ -530,7 +530,7 @@ class Comctl32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-imagelist_destroy
-  public static ImageList_Destroy(himl: HIMAGELIST | 0n): BOOL {
+  public static ImageList_Destroy(himl: OPTIONAL<HIMAGELIST>): BOOL {
     return Comctl32.Load('ImageList_Destroy')(himl);
   }
 
@@ -585,8 +585,8 @@ class Comctl32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-imagelist_getdragimage
-  public static ImageList_GetDragImage(ppt: LPPOINT | NULL, pptHotspot: LPPOINT | NULL): HIMAGELIST {
-    return Comctl32.Load('ImageList_GetDragImage')(ppt, pptHotspot);
+  public static ImageList_GetDragImage(ppt_out: OPTIONAL<LPPOINT>, pptHotspot_out: OPTIONAL<LPPOINT>): HIMAGELIST {
+    return Comctl32.Load('ImageList_GetDragImage')(ppt_out, pptHotspot_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-imagelist_geticon
@@ -595,8 +595,8 @@ class Comctl32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-imagelist_geticonsize
-  public static ImageList_GetIconSize(himl: HIMAGELIST, cx: LPINT | NULL, cy: LPINT | NULL): BOOL {
-    return Comctl32.Load('ImageList_GetIconSize')(himl, cx, cy);
+  public static ImageList_GetIconSize(himl: HIMAGELIST, cx_out: OPTIONAL<LPINT>, cy_out: OPTIONAL<LPINT>): BOOL {
+    return Comctl32.Load('ImageList_GetIconSize')(himl, cx_out, cy_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-imagelist_getimagecount
@@ -605,8 +605,8 @@ class Comctl32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-imagelist_getimageinfo
-  public static ImageList_GetImageInfo(himl: HIMAGELIST, i: INT, pImageInfo: LPIMAGEINFO): BOOL {
-    return Comctl32.Load('ImageList_GetImageInfo')(himl, i, pImageInfo);
+  public static ImageList_GetImageInfo(himl: HIMAGELIST, i: INT, pImageInfo_out: LPIMAGEINFO): BOOL {
+    return Comctl32.Load('ImageList_GetImageInfo')(himl, i, pImageInfo_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-imagelist_loadimagea
@@ -640,7 +640,7 @@ class Comctl32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-imagelist_replace
-  public static ImageList_Replace(himl: HIMAGELIST, i: INT, hbmImage: HBITMAP, hbmMask: HBITMAP | 0n): BOOL {
+  public static ImageList_Replace(himl: HIMAGELIST, i: INT, hbmImage: HBITMAP, hbmMask: OPTIONAL<HBITMAP>): BOOL {
     return Comctl32.Load('ImageList_Replace')(himl, i, hbmImage, hbmMask);
   }
 
@@ -745,8 +745,8 @@ class Comctl32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dpa_dsa/nf-dpa_dsa-str_setptrw
-  public static Str_SetPtrW(ppsz: PLPWSTR, psz: LPCWSTR | NULL): BOOL {
-    return Comctl32.Load('Str_SetPtrW')(ppsz, psz);
+  public static Str_SetPtrW(ppsz_in_out: PLPWSTR, psz: OPTIONAL<LPCWSTR>): BOOL {
+    return Comctl32.Load('Str_SetPtrW')(ppsz_in_out, psz);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-uninitializeflatsb
@@ -755,8 +755,8 @@ class Comctl32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-_trackmouseevent
-  public static _TrackMouseEvent(lpEventTrack: LPTRACKMOUSEEVENT): BOOL {
-    return Comctl32.Load('_TrackMouseEvent')(lpEventTrack);
+  public static _TrackMouseEvent(lpEventTrack_in_out: LPTRACKMOUSEEVENT): BOOL {
+    return Comctl32.Load('_TrackMouseEvent')(lpEventTrack_in_out);
   }
 }
 

@@ -490,8 +490,8 @@ class Fveapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/secprov/win32-encryptablevolume
-  public static FveFindFirstVolume(ppVolumeName: LPVOID, phSearch: PFVE_HANDLE): DWORD {
-    return Fveapi.Load('FveFindFirstVolume')(ppVolumeName, phSearch);
+  public static FveFindFirstVolume(ppVolumeName: LPVOID, phSearch_out: PFVE_HANDLE): DWORD {
+    return Fveapi.Load('FveFindFirstVolume')(ppVolumeName, phSearch_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/secprov/win32-encryptablevolume
@@ -755,18 +755,18 @@ class Fveapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/secprov/win32-encryptablevolume
-  public static FveOpenVolumeByHandle(hRawVolume: HANDLE, dwAccess: DWORD, phVolume: PFVE_HANDLE): DWORD {
-    return Fveapi.Load('FveOpenVolumeByHandle')(hRawVolume, dwAccess, phVolume);
+  public static FveOpenVolumeByHandle(hRawVolume: HANDLE, dwAccess: DWORD, phVolume_out: PFVE_HANDLE): DWORD {
+    return Fveapi.Load('FveOpenVolumeByHandle')(hRawVolume, dwAccess, phVolume_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/secprov/win32-encryptablevolume
-  public static FveOpenVolumeExW(pszVolume: LPCWSTR, dwAccess: DWORD, phVolume: PFVE_HANDLE): DWORD {
-    return Fveapi.Load('FveOpenVolumeExW')(pszVolume, dwAccess, phVolume);
+  public static FveOpenVolumeExW(pszVolume: LPCWSTR, dwAccess: DWORD, phVolume_out: PFVE_HANDLE): DWORD {
+    return Fveapi.Load('FveOpenVolumeExW')(pszVolume, dwAccess, phVolume_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/secprov/win32-encryptablevolume
-  public static FveOpenVolumeW(pszVolume: LPCWSTR, dwAccess: DWORD, phVolume: PFVE_HANDLE): DWORD {
-    return Fveapi.Load('FveOpenVolumeW')(pszVolume, dwAccess, phVolume);
+  public static FveOpenVolumeW(pszVolume: LPCWSTR, dwAccess: DWORD, phVolume_out: PFVE_HANDLE): DWORD {
+    return Fveapi.Load('FveOpenVolumeW')(pszVolume, dwAccess, phVolume_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/secprov/win32-encryptablevolume
@@ -890,8 +890,8 @@ class Fveapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/secprov/win32-encryptablevolume
-  public static FveSysOpenVolumeW(pszVolume: LPCWSTR, dwAccess: DWORD, phVolume: PFVE_HANDLE): DWORD {
-    return Fveapi.Load('FveSysOpenVolumeW')(pszVolume, dwAccess, phVolume);
+  public static FveSysOpenVolumeW(pszVolume: LPCWSTR, dwAccess: DWORD, phVolume_out: PFVE_HANDLE): DWORD {
+    return Fveapi.Load('FveSysOpenVolumeW')(pszVolume, dwAccess, phVolume_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/secprov/win32-encryptablevolume

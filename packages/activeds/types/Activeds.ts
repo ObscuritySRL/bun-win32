@@ -1,6 +1,6 @@
 import type { Pointer } from 'bun:ffi';
 
-export type { DWORD, HRESULT, LPCWSTR, LPDWORD, LPWSTR, NULL, PDWORD, ULONG } from '@bun-win32/core';
+export type { DWORD, HRESULT, LPCWSTR, LPDWORD, LPWSTR, NULL, NULLABLE, PDWORD, ULONG } from '@bun-win32/core';
 
 export enum ADS_AUTHENTICATION_ENUM {
   ADS_AUTH_RESERVED = 0x8000_0000,

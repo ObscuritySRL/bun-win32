@@ -1,6 +1,6 @@
 import type { Pointer } from 'bun:ffi';
 
-export type { DWORD, HANDLE, INT, LPCWSTR, LPVOID, NULL, PHANDLE, PULONG, PVOID, ULONG } from '@bun-win32/core';
+export type { DWORD, HANDLE, INT, LPCWSTR, LPVOID, NULL, OPTIONAL, PHANDLE, PULONG, PVOID, ULONG } from '@bun-win32/core';
 
 export const FWPM_FILTER_FLAG_BOOTTIME = 0x0000_0002;
 export const FWPM_FILTER_FLAG_NONE = 0x0000_0000;

@@ -17,6 +17,8 @@ import type {
   LPVOID,
   LPWSTR,
   NULL,
+  NULLABLE,
+  OPTIONAL,
   PBYTE,
   PCATALOG_INFO,
   PCCERT_STRONG_SIGN_PARA,
@@ -107,33 +109,33 @@ class Wintrust extends Win32 {
   } as const satisfies Record<string, FFIFunction>;
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mscat/nf-mscat-cryptcatadminacquirecontext
-  public static CryptCATAdminAcquireContext(phCatAdmin: PHCATINFO, pgSubsystem: LPVOID | NULL, dwFlags: DWORD): BOOL {
-    return Wintrust.Load('CryptCATAdminAcquireContext')(phCatAdmin, pgSubsystem, dwFlags);
+  public static CryptCATAdminAcquireContext(phCatAdmin_out: PHCATINFO, pgSubsystem: OPTIONAL<LPVOID>, dwFlags: DWORD): BOOL {
+    return Wintrust.Load('CryptCATAdminAcquireContext')(phCatAdmin_out, pgSubsystem, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mscat/nf-mscat-cryptcatadminacquirecontext2
-  public static CryptCATAdminAcquireContext2(phCatAdmin: PHCATINFO, pgSubsystem: LPVOID | NULL, pwszHashAlgorithm: PCWSTR | NULL, pStrongHashPolicy: PCCERT_STRONG_SIGN_PARA | NULL, dwFlags: DWORD): BOOL {
-    return Wintrust.Load('CryptCATAdminAcquireContext2')(phCatAdmin, pgSubsystem, pwszHashAlgorithm, pStrongHashPolicy, dwFlags);
+  public static CryptCATAdminAcquireContext2(phCatAdmin_out: PHCATINFO, pgSubsystem: OPTIONAL<LPVOID>, pwszHashAlgorithm: OPTIONAL<PCWSTR>, pStrongHashPolicy: OPTIONAL<PCCERT_STRONG_SIGN_PARA>, dwFlags: DWORD): BOOL {
+    return Wintrust.Load('CryptCATAdminAcquireContext2')(phCatAdmin_out, pgSubsystem, pwszHashAlgorithm, pStrongHashPolicy, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mscat/nf-mscat-cryptcatadminaddcatalog
-  public static CryptCATAdminAddCatalog(hCatAdmin: HCATADMIN, pwszCatalogFile: PWSTR, pwszSelectBaseName: PWSTR | NULL, dwFlags: DWORD): HCATINFO {
+  public static CryptCATAdminAddCatalog(hCatAdmin: HCATADMIN, pwszCatalogFile: PWSTR, pwszSelectBaseName: OPTIONAL<PWSTR>, dwFlags: DWORD): HCATINFO {
     return Wintrust.Load('CryptCATAdminAddCatalog')(hCatAdmin, pwszCatalogFile, pwszSelectBaseName, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mscat/nf-mscat-cryptcatadmincalchashfromfilehandle
-  public static CryptCATAdminCalcHashFromFileHandle(hFile: HANDLE, pcbHash: PDWORD, pbHash: PBYTE | NULL, dwFlags: DWORD): BOOL {
-    return Wintrust.Load('CryptCATAdminCalcHashFromFileHandle')(hFile, pcbHash, pbHash, dwFlags);
+  public static CryptCATAdminCalcHashFromFileHandle(hFile: HANDLE, pcbHash_in_out: PDWORD, pbHash_out: OPTIONAL<PBYTE>, dwFlags: DWORD): BOOL {
+    return Wintrust.Load('CryptCATAdminCalcHashFromFileHandle')(hFile, pcbHash_in_out, pbHash_out, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mscat/nf-mscat-cryptcatadmincalchashfromfilehandle2
-  public static CryptCATAdminCalcHashFromFileHandle2(hCatAdmin: HCATADMIN, hFile: HANDLE, pcbHash: PDWORD, pbHash: PBYTE | NULL, dwFlags: DWORD): BOOL {
-    return Wintrust.Load('CryptCATAdminCalcHashFromFileHandle2')(hCatAdmin, hFile, pcbHash, pbHash, dwFlags);
+  public static CryptCATAdminCalcHashFromFileHandle2(hCatAdmin: HCATADMIN, hFile: HANDLE, pcbHash_in_out: PDWORD, pbHash_out: OPTIONAL<PBYTE>, dwFlags: DWORD): BOOL {
+    return Wintrust.Load('CryptCATAdminCalcHashFromFileHandle2')(hCatAdmin, hFile, pcbHash_in_out, pbHash_out, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mscat/nf-mscat-cryptcatadminenumcatalogfromhash
-  public static CryptCATAdminEnumCatalogFromHash(hCatAdmin: HCATADMIN, pbHash: PBYTE, cbHash: DWORD, dwFlags: DWORD, phPrevCatInfo: PHCATINFO | NULL): HCATINFO {
-    return Wintrust.Load('CryptCATAdminEnumCatalogFromHash')(hCatAdmin, pbHash, cbHash, dwFlags, phPrevCatInfo);
+  public static CryptCATAdminEnumCatalogFromHash(hCatAdmin: HCATADMIN, pbHash: PBYTE, cbHash: DWORD, dwFlags: DWORD, phPrevCatInfo_in_out: OPTIONAL<PHCATINFO>): HCATINFO {
+    return Wintrust.Load('CryptCATAdminEnumCatalogFromHash')(hCatAdmin, pbHash, cbHash, dwFlags, phPrevCatInfo_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mscat/nf-mscat-cryptcatadminreleasecatalogcontext
@@ -152,13 +154,13 @@ class Wintrust extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mscat/nf-mscat-cryptcatadminresolvecatalogpath
-  public static CryptCATAdminResolveCatalogPath(hCatAdmin: HCATADMIN, pwszCatalogFile: PWSTR, psCatInfo: PCATALOG_INFO, dwFlags: DWORD): BOOL {
-    return Wintrust.Load('CryptCATAdminResolveCatalogPath')(hCatAdmin, pwszCatalogFile, psCatInfo, dwFlags);
+  public static CryptCATAdminResolveCatalogPath(hCatAdmin: HCATADMIN, pwszCatalogFile: PWSTR, psCatInfo_in_out: PCATALOG_INFO, dwFlags: DWORD): BOOL {
+    return Wintrust.Load('CryptCATAdminResolveCatalogPath')(hCatAdmin, pwszCatalogFile, psCatInfo_in_out, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mscat/nf-mscat-cryptcatcataloginfofromcontext
-  public static CryptCATCatalogInfoFromContext(hCatInfo: HCATINFO, psCatInfo: PCATALOG_INFO, dwFlags: DWORD): BOOL {
-    return Wintrust.Load('CryptCATCatalogInfoFromContext')(hCatInfo, psCatInfo, dwFlags);
+  public static CryptCATCatalogInfoFromContext(hCatInfo: HCATINFO, psCatInfo_in_out: PCATALOG_INFO, dwFlags: DWORD): BOOL {
+    return Wintrust.Load('CryptCATCatalogInfoFromContext')(hCatInfo, psCatInfo_in_out, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mscat/nf-mscat-cryptcatclose
@@ -167,12 +169,12 @@ class Wintrust extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mscat/nf-mscat-cryptcatenumerateattr
-  public static CryptCATEnumerateAttr(hCatalog: HANDLE, pCatMember: PCRYPTCATMEMBER, pPrevAttr: PCRYPTCATATTRIBUTE | NULL): PCRYPTCATATTRIBUTE | NULL {
+  public static CryptCATEnumerateAttr(hCatalog: HANDLE, pCatMember: PCRYPTCATMEMBER, pPrevAttr: NULLABLE<PCRYPTCATATTRIBUTE>): PCRYPTCATATTRIBUTE | NULL {
     return Wintrust.Load('CryptCATEnumerateAttr')(hCatalog, pCatMember, pPrevAttr);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mscat/nf-mscat-cryptcatenumeratemember
-  public static CryptCATEnumerateMember(hCatalog: HANDLE, pPrevMember: PCRYPTCATMEMBER | NULL): PCRYPTCATMEMBER | NULL {
+  public static CryptCATEnumerateMember(hCatalog: HANDLE, pPrevMember: NULLABLE<PCRYPTCATMEMBER>): PCRYPTCATMEMBER | NULL {
     return Wintrust.Load('CryptCATEnumerateMember')(hCatalog, pPrevMember);
   }
 
@@ -187,23 +189,23 @@ class Wintrust extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mscat/nf-mscat-cryptcatopen
-  public static CryptCATOpen(pwszFileName: LPWSTR, fdwOpenFlags: DWORD, hProv: HCRYPTPROV | 0n, dwPublicVersion: DWORD, dwEncodingType: DWORD): HANDLE {
+  public static CryptCATOpen(pwszFileName: LPWSTR, fdwOpenFlags: DWORD, hProv: OPTIONAL<HCRYPTPROV>, dwPublicVersion: DWORD, dwEncodingType: DWORD): HANDLE {
     return Wintrust.Load('CryptCATOpen')(pwszFileName, fdwOpenFlags, hProv, dwPublicVersion, dwEncodingType);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mssip/nf-mssip-cryptsipcreateindirectdata
-  public static CryptSIPCreateIndirectData(pSubjectInfo: PSIP_SUBJECTINFO, pcbIndirectData: PDWORD, pIndirectData: PSIP_INDIRECT_DATA | NULL): BOOL {
-    return Wintrust.Load('CryptSIPCreateIndirectData')(pSubjectInfo, pcbIndirectData, pIndirectData);
+  public static CryptSIPCreateIndirectData(pSubjectInfo: PSIP_SUBJECTINFO, pcbIndirectData_in_out: PDWORD, pIndirectData_out: NULLABLE<PSIP_INDIRECT_DATA>): BOOL {
+    return Wintrust.Load('CryptSIPCreateIndirectData')(pSubjectInfo, pcbIndirectData_in_out, pIndirectData_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mssip/nf-mssip-cryptsipgetsigneddatamsg
-  public static CryptSIPGetSignedDataMsg(pSubjectInfo: PSIP_SUBJECTINFO, pdwEncodingType: PDWORD, dwIndex: DWORD, pcbSignedDataMsg: PDWORD, pbSignedDataMsg: PBYTE | NULL): BOOL {
-    return Wintrust.Load('CryptSIPGetSignedDataMsg')(pSubjectInfo, pdwEncodingType, dwIndex, pcbSignedDataMsg, pbSignedDataMsg);
+  public static CryptSIPGetSignedDataMsg(pSubjectInfo: PSIP_SUBJECTINFO, pdwEncodingType_out: PDWORD, dwIndex: DWORD, pcbSignedDataMsg_in_out: PDWORD, pbSignedDataMsg_out: NULLABLE<PBYTE>): BOOL {
+    return Wintrust.Load('CryptSIPGetSignedDataMsg')(pSubjectInfo, pdwEncodingType_out, dwIndex, pcbSignedDataMsg_in_out, pbSignedDataMsg_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mssip/nf-mssip-cryptsipputsigneddatamsg
-  public static CryptSIPPutSignedDataMsg(pSubjectInfo: PSIP_SUBJECTINFO, dwEncodingType: DWORD, pdwIndex: PDWORD, cbSignedDataMsg: DWORD, pbSignedDataMsg: PBYTE): BOOL {
-    return Wintrust.Load('CryptSIPPutSignedDataMsg')(pSubjectInfo, dwEncodingType, pdwIndex, cbSignedDataMsg, pbSignedDataMsg);
+  public static CryptSIPPutSignedDataMsg(pSubjectInfo: PSIP_SUBJECTINFO, dwEncodingType: DWORD, pdwIndex_out: PDWORD, cbSignedDataMsg: DWORD, pbSignedDataMsg: PBYTE): BOOL {
+    return Wintrust.Load('CryptSIPPutSignedDataMsg')(pSubjectInfo, dwEncodingType, pdwIndex_out, cbSignedDataMsg, pbSignedDataMsg);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mssip/nf-mssip-cryptsipremovesigneddatamsg
@@ -217,18 +219,18 @@ class Wintrust extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mscat/nf-mscat-iscatalogfile
-  public static IsCatalogFile(hFile: HANDLE | 0n, pwszFileName: LPWSTR | NULL): BOOL {
+  public static IsCatalogFile(hFile: OPTIONAL<HANDLE>, pwszFileName: OPTIONAL<LPWSTR>): BOOL {
     return Wintrust.Load('IsCatalogFile')(hFile, pwszFileName);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wintrust/nf-wintrust-openpersonaltrustdbdialog
-  public static OpenPersonalTrustDBDialog(hwndParent: HWND | 0n): BOOL {
+  public static OpenPersonalTrustDBDialog(hwndParent: OPTIONAL<HWND>): BOOL {
     return Wintrust.Load('OpenPersonalTrustDBDialog')(hwndParent);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wintrust/nf-wintrust-openpersonaltrustdbdialogex
-  public static OpenPersonalTrustDBDialogEx(hwndParent: HWND | 0n, dwFlags: DWORD, pvReserved: LPVOID | NULL): BOOL {
-    return Wintrust.Load('OpenPersonalTrustDBDialogEx')(hwndParent, dwFlags, pvReserved);
+  public static OpenPersonalTrustDBDialogEx(hwndParent: OPTIONAL<HWND>, dwFlags: DWORD, pvReserved_in_out: OPTIONAL<LPVOID>): BOOL {
+    return Wintrust.Load('OpenPersonalTrustDBDialogEx')(hwndParent, dwFlags, pvReserved_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wintrust/nf-wintrust-wthelpercertcheckvalidsignature
@@ -252,12 +254,12 @@ class Wintrust extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wintrust/nf-wintrust-winverifytrust
-  public static WinVerifyTrust(hwnd: HWND | 0n, pgActionID: LPVOID, pWVTData: LPVOID): LONG {
+  public static WinVerifyTrust(hwnd: NULLABLE<HWND>, pgActionID: LPVOID, pWVTData: LPVOID): LONG {
     return Wintrust.Load('WinVerifyTrust')(hwnd, pgActionID, pWVTData);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wintrust/nf-wintrust-winverifytrustex
-  public static WinVerifyTrustEx(hwnd: HWND | 0n, pgActionID: LPVOID, pWinTrustData: LPVOID): LONG {
+  public static WinVerifyTrustEx(hwnd: NULLABLE<HWND>, pgActionID: LPVOID, pWinTrustData: LPVOID): LONG {
     return Wintrust.Load('WinVerifyTrustEx')(hwnd, pgActionID, pWinTrustData);
   }
 
@@ -272,18 +274,18 @@ class Wintrust extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wintrust/nf-wintrust-wintrustgetdefaultforusage
-  public static WintrustGetDefaultForUsage(dwAction: DWORD, pszUsageOID: LPCSTR, psUsage: PCRYPT_PROVIDER_DEFUSAGE): BOOL {
-    return Wintrust.Load('WintrustGetDefaultForUsage')(dwAction, pszUsageOID, psUsage);
+  public static WintrustGetDefaultForUsage(dwAction: DWORD, pszUsageOID: LPCSTR, psUsage_in_out: PCRYPT_PROVIDER_DEFUSAGE): BOOL {
+    return Wintrust.Load('WintrustGetDefaultForUsage')(dwAction, pszUsageOID, psUsage_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wintrust/nf-wintrust-wintrustgetregpolicyflags
-  public static WintrustGetRegPolicyFlags(pdwPolicyFlags: PDWORD): void {
-    return Wintrust.Load('WintrustGetRegPolicyFlags')(pdwPolicyFlags);
+  public static WintrustGetRegPolicyFlags(pdwPolicyFlags_out: PDWORD): void {
+    return Wintrust.Load('WintrustGetRegPolicyFlags')(pdwPolicyFlags_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wintrust/nf-wintrust-wintrustloadfunctionpointers
-  public static WintrustLoadFunctionPointers(pgActionID: LPVOID, pPfns: PCRYPT_PROVIDER_FUNCTIONS): BOOL {
-    return Wintrust.Load('WintrustLoadFunctionPointers')(pgActionID, pPfns);
+  public static WintrustLoadFunctionPointers(pgActionID: LPVOID, pPfns_out: PCRYPT_PROVIDER_FUNCTIONS): BOOL {
+    return Wintrust.Load('WintrustLoadFunctionPointers')(pgActionID, pPfns_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wintrust/nf-wintrust-wintrustremoveactionid

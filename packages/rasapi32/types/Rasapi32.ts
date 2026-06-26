@@ -1,6 +1,6 @@
 import type { Pointer } from 'bun:ffi';
 
-export type { BOOL, DWORD, HANDLE, HWND, LPBOOL, LPBYTE, LPCSTR, LPCWSTR, LPDWORD, LPSTR, LPVOID, LPWSTR, NULL, UINT, VOID } from '@bun-win32/core';
+export type { BOOL, DWORD, HANDLE, HWND, LPBOOL, LPBYTE, LPCSTR, LPCWSTR, LPDWORD, LPSTR, LPVOID, LPWSTR, NULL, OPTIONAL, UINT, VOID } from '@bun-win32/core';
 
 export enum RASPROJECTION {
   RASP_Amb = 0x0001_0000,

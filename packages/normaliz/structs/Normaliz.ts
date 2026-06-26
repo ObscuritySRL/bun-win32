@@ -2,7 +2,7 @@ import { type FFIFunction, FFIType } from 'bun:ffi';
 
 import { Win32 } from '@bun-win32/core';
 
-import type { BOOL, DWORD, INT, LPCWSTR, LPWSTR, NULL } from '../types/Normaliz';
+import type { BOOL, DWORD, INT, LPCWSTR, LPWSTR, OPTIONAL } from '../types/Normaliz';
 import type { IdnFlags, NormalizationForm } from '../types/Normaliz';
 
 /**
@@ -45,18 +45,18 @@ class Normaliz extends Win32 {
   } as const satisfies Record<string, FFIFunction>;
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winnls/nf-winnls-idntoascii
-  public static IdnToAscii(dwFlags: IdnFlags | DWORD, lpUnicodeCharStr: LPCWSTR, cchUnicodeChar: INT, lpASCIICharStr: LPWSTR | NULL, cchASCIIChar: INT): INT {
-    return Normaliz.Load('IdnToAscii')(dwFlags, lpUnicodeCharStr, cchUnicodeChar, lpASCIICharStr, cchASCIIChar);
+  public static IdnToAscii(dwFlags: IdnFlags | DWORD, lpUnicodeCharStr: LPCWSTR, cchUnicodeChar: INT, lpASCIICharStr_out: OPTIONAL<LPWSTR>, cchASCIIChar: INT): INT {
+    return Normaliz.Load('IdnToAscii')(dwFlags, lpUnicodeCharStr, cchUnicodeChar, lpASCIICharStr_out, cchASCIIChar);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winnls/nf-winnls-idntonameprepunicode
-  public static IdnToNameprepUnicode(dwFlags: IdnFlags | DWORD, lpUnicodeCharStr: LPCWSTR, cchUnicodeChar: INT, lpNameprepCharStr: LPWSTR | NULL, cchNameprepChar: INT): INT {
-    return Normaliz.Load('IdnToNameprepUnicode')(dwFlags, lpUnicodeCharStr, cchUnicodeChar, lpNameprepCharStr, cchNameprepChar);
+  public static IdnToNameprepUnicode(dwFlags: IdnFlags | DWORD, lpUnicodeCharStr: LPCWSTR, cchUnicodeChar: INT, lpNameprepCharStr_out: OPTIONAL<LPWSTR>, cchNameprepChar: INT): INT {
+    return Normaliz.Load('IdnToNameprepUnicode')(dwFlags, lpUnicodeCharStr, cchUnicodeChar, lpNameprepCharStr_out, cchNameprepChar);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winnls/nf-winnls-idntounicode
-  public static IdnToUnicode(dwFlags: IdnFlags | DWORD, lpASCIICharStr: LPCWSTR, cchASCIIChar: INT, lpUnicodeCharStr: LPWSTR | NULL, cchUnicodeChar: INT): INT {
-    return Normaliz.Load('IdnToUnicode')(dwFlags, lpASCIICharStr, cchASCIIChar, lpUnicodeCharStr, cchUnicodeChar);
+  public static IdnToUnicode(dwFlags: IdnFlags | DWORD, lpASCIICharStr: LPCWSTR, cchASCIIChar: INT, lpUnicodeCharStr_out: OPTIONAL<LPWSTR>, cchUnicodeChar: INT): INT {
+    return Normaliz.Load('IdnToUnicode')(dwFlags, lpASCIICharStr, cchASCIIChar, lpUnicodeCharStr_out, cchUnicodeChar);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winnls/nf-winnls-isnormalizedstring
@@ -65,8 +65,8 @@ class Normaliz extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winnls/nf-winnls-normalizestring
-  public static NormalizeString(NormForm: NormalizationForm, lpSrcString: LPCWSTR, cwSrcLength: INT, lpDstString: LPWSTR | NULL, cwDstLength: INT): INT {
-    return Normaliz.Load('NormalizeString')(NormForm, lpSrcString, cwSrcLength, lpDstString, cwDstLength);
+  public static NormalizeString(NormForm: NormalizationForm, lpSrcString: LPCWSTR, cwSrcLength: INT, lpDstString_out: OPTIONAL<LPWSTR>, cwDstLength: INT): INT {
+    return Normaliz.Load('NormalizeString')(NormForm, lpSrcString, cwSrcLength, lpDstString_out, cwDstLength);
   }
 }
 

@@ -27,7 +27,7 @@ import type {
   LPRECT,
   LPVOID,
   LPWSTR,
-  NULL,
+  OPTIONAL,
   PACKED_POINT,
   PBP_ANIMATIONPARAMS,
   PBP_PAINTPARAMS,
@@ -165,13 +165,22 @@ class Uxtheme extends Win32 {
   } as const satisfies Record<string, FFIFunction>;
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uxtheme/nf-uxtheme-beginbufferedanimation
-  public static BeginBufferedAnimation(hwnd: HWND, hdcTarget: HDC, prcTarget: LPCRECT, dwFormat: BP_BUFFERFORMAT, pPaintParams: PBP_PAINTPARAMS | NULL, pAnimationParams: PBP_ANIMATIONPARAMS, phdcFrom: PHDC, phdcTo: PHDC): HANIMATIONBUFFER {
-    return Uxtheme.Load('BeginBufferedAnimation')(hwnd, hdcTarget, prcTarget, dwFormat, pPaintParams, pAnimationParams, phdcFrom, phdcTo);
+  public static BeginBufferedAnimation(
+    hwnd: HWND,
+    hdcTarget: HDC,
+    prcTarget: LPCRECT,
+    dwFormat: BP_BUFFERFORMAT,
+    pPaintParams: OPTIONAL<PBP_PAINTPARAMS>,
+    pAnimationParams: PBP_ANIMATIONPARAMS,
+    phdcFrom_out: PHDC,
+    phdcTo_out: PHDC,
+  ): HANIMATIONBUFFER {
+    return Uxtheme.Load('BeginBufferedAnimation')(hwnd, hdcTarget, prcTarget, dwFormat, pPaintParams, pAnimationParams, phdcFrom_out, phdcTo_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uxtheme/nf-uxtheme-beginbufferedpaint
-  public static BeginBufferedPaint(hdcTarget: HDC, prcTarget: LPCRECT, dwFormat: BP_BUFFERFORMAT, pPaintParams: PBP_PAINTPARAMS | NULL, phdc: PHDC): HPAINTBUFFER {
-    return Uxtheme.Load('BeginBufferedPaint')(hdcTarget, prcTarget, dwFormat, pPaintParams, phdc);
+  public static BeginBufferedPaint(hdcTarget: HDC, prcTarget: LPCRECT, dwFormat: BP_BUFFERFORMAT, pPaintParams: OPTIONAL<PBP_PAINTPARAMS>, phdc_out: PHDC): HPAINTBUFFER {
+    return Uxtheme.Load('BeginBufferedPaint')(hdcTarget, prcTarget, dwFormat, pPaintParams, phdc_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uxtheme/nf-uxtheme-beginpanningfeedback
@@ -180,7 +189,7 @@ class Uxtheme extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uxtheme/nf-uxtheme-bufferedpaintclear
-  public static BufferedPaintClear(hBufferedPaint: HPAINTBUFFER, prc: LPCRECT | NULL): HRESULT {
+  public static BufferedPaintClear(hBufferedPaint: HPAINTBUFFER, prc: OPTIONAL<LPCRECT>): HRESULT {
     return Uxtheme.Load('BufferedPaintClear')(hBufferedPaint, prc);
   }
 
@@ -195,7 +204,7 @@ class Uxtheme extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uxtheme/nf-uxtheme-bufferedpaintsetalpha
-  public static BufferedPaintSetAlpha(hBufferedPaint: HPAINTBUFFER, prc: LPCRECT | NULL, alpha: BYTE): HRESULT {
+  public static BufferedPaintSetAlpha(hBufferedPaint: HPAINTBUFFER, prc: OPTIONAL<LPCRECT>, alpha: BYTE): HRESULT {
     return Uxtheme.Load('BufferedPaintSetAlpha')(hBufferedPaint, prc, alpha);
   }
 
@@ -215,18 +224,18 @@ class Uxtheme extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uxtheme/nf-uxtheme-drawthemebackground
-  public static DrawThemeBackground(hTheme: HTHEME, hdc: HDC, iPartId: INT, iStateId: INT, pRect: LPCRECT, pClipRect: LPCRECT | NULL): HRESULT {
+  public static DrawThemeBackground(hTheme: HTHEME, hdc: HDC, iPartId: INT, iStateId: INT, pRect: LPCRECT, pClipRect: OPTIONAL<LPCRECT>): HRESULT {
     return Uxtheme.Load('DrawThemeBackground')(hTheme, hdc, iPartId, iStateId, pRect, pClipRect);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uxtheme/nf-uxtheme-drawthemebackgroundex
-  public static DrawThemeBackgroundEx(hTheme: HTHEME, hdc: HDC, iPartId: INT, iStateId: INT, pRect: LPCRECT, pOptions: PDTBGOPTS | NULL): HRESULT {
+  public static DrawThemeBackgroundEx(hTheme: HTHEME, hdc: HDC, iPartId: INT, iStateId: INT, pRect: LPCRECT, pOptions: OPTIONAL<PDTBGOPTS>): HRESULT {
     return Uxtheme.Load('DrawThemeBackgroundEx')(hTheme, hdc, iPartId, iStateId, pRect, pOptions);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uxtheme/nf-uxtheme-drawthemeedge
-  public static DrawThemeEdge(hTheme: HTHEME, hdc: HDC, iPartId: INT, iStateId: INT, pDestRect: LPCRECT, uEdge: UINT, uFlags: UINT, pContentRect: LPRECT | NULL): HRESULT {
-    return Uxtheme.Load('DrawThemeEdge')(hTheme, hdc, iPartId, iStateId, pDestRect, uEdge, uFlags, pContentRect);
+  public static DrawThemeEdge(hTheme: HTHEME, hdc: HDC, iPartId: INT, iStateId: INT, pDestRect: LPCRECT, uEdge: UINT, uFlags: UINT, pContentRect_out: OPTIONAL<LPRECT>): HRESULT {
+    return Uxtheme.Load('DrawThemeEdge')(hTheme, hdc, iPartId, iStateId, pDestRect, uEdge, uFlags, pContentRect_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uxtheme/nf-uxtheme-drawthemeicon
@@ -235,12 +244,12 @@ class Uxtheme extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uxtheme/nf-uxtheme-drawthemeparentbackground
-  public static DrawThemeParentBackground(hwnd: HWND, hdc: HDC, prc: LPCRECT | NULL): HRESULT {
+  public static DrawThemeParentBackground(hwnd: HWND, hdc: HDC, prc: OPTIONAL<LPCRECT>): HRESULT {
     return Uxtheme.Load('DrawThemeParentBackground')(hwnd, hdc, prc);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uxtheme/nf-uxtheme-drawthemeparentbackgroundex
-  public static DrawThemeParentBackgroundEx(hwnd: HWND, hdc: HDC, dwFlags: DWORD, prc: LPCRECT | NULL): HRESULT {
+  public static DrawThemeParentBackgroundEx(hwnd: HWND, hdc: HDC, dwFlags: DWORD, prc: OPTIONAL<LPCRECT>): HRESULT {
     return Uxtheme.Load('DrawThemeParentBackgroundEx')(hwnd, hdc, dwFlags, prc);
   }
 
@@ -250,8 +259,8 @@ class Uxtheme extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uxtheme/nf-uxtheme-drawthemetextex
-  public static DrawThemeTextEx(hTheme: HTHEME, hdc: HDC, iPartId: INT, iStateId: INT, pszText: LPCWSTR, cchText: INT, dwTextFlags: DWORD, pRect: LPRECT, pOptions: PDTTOPTS | NULL): HRESULT {
-    return Uxtheme.Load('DrawThemeTextEx')(hTheme, hdc, iPartId, iStateId, pszText, cchText, dwTextFlags, pRect, pOptions);
+  public static DrawThemeTextEx(hTheme: HTHEME, hdc: HDC, iPartId: INT, iStateId: INT, pszText: LPCWSTR, cchText: INT, dwTextFlags: DWORD, pRect_in_out: LPRECT, pOptions: OPTIONAL<PDTTOPTS>): HRESULT {
+    return Uxtheme.Load('DrawThemeTextEx')(hTheme, hdc, iPartId, iStateId, pszText, cchText, dwTextFlags, pRect_in_out, pOptions);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uxtheme/nf-uxtheme-enablethemedialogtexture
@@ -280,8 +289,8 @@ class Uxtheme extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uxtheme/nf-uxtheme-getbufferedpaintbits
-  public static GetBufferedPaintBits(hBufferedPaint: HPAINTBUFFER, ppbBuffer: PPRGBQUAD, pcxRow: PINT): HRESULT {
-    return Uxtheme.Load('GetBufferedPaintBits')(hBufferedPaint, ppbBuffer, pcxRow);
+  public static GetBufferedPaintBits(hBufferedPaint: HPAINTBUFFER, ppbBuffer_out: PPRGBQUAD, pcxRow_out: PINT): HRESULT {
+    return Uxtheme.Load('GetBufferedPaintBits')(hBufferedPaint, ppbBuffer_out, pcxRow_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uxtheme/nf-uxtheme-getbufferedpaintdc
@@ -295,23 +304,23 @@ class Uxtheme extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uxtheme/nf-uxtheme-getbufferedpainttargetrect
-  public static GetBufferedPaintTargetRect(hBufferedPaint: HPAINTBUFFER, prc: LPRECT): HRESULT {
-    return Uxtheme.Load('GetBufferedPaintTargetRect')(hBufferedPaint, prc);
+  public static GetBufferedPaintTargetRect(hBufferedPaint: HPAINTBUFFER, prc_out: LPRECT): HRESULT {
+    return Uxtheme.Load('GetBufferedPaintTargetRect')(hBufferedPaint, prc_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uxtheme/nf-uxtheme-getcurrentthemename
-  public static GetCurrentThemeName(pszThemeFileName: LPWSTR, cchMaxNameChars: INT, pszColorBuff: LPWSTR | NULL, cchMaxColorChars: INT, pszSizeBuff: LPWSTR | NULL, cchMaxSizeChars: INT): HRESULT {
-    return Uxtheme.Load('GetCurrentThemeName')(pszThemeFileName, cchMaxNameChars, pszColorBuff, cchMaxColorChars, pszSizeBuff, cchMaxSizeChars);
+  public static GetCurrentThemeName(pszThemeFileName_out: LPWSTR, cchMaxNameChars: INT, pszColorBuff_out: OPTIONAL<LPWSTR>, cchMaxColorChars: INT, pszSizeBuff_out: OPTIONAL<LPWSTR>, cchMaxSizeChars: INT): HRESULT {
+    return Uxtheme.Load('GetCurrentThemeName')(pszThemeFileName_out, cchMaxNameChars, pszColorBuff_out, cchMaxColorChars, pszSizeBuff_out, cchMaxSizeChars);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uxtheme/nf-uxtheme-getthemeanimationproperty
-  public static GetThemeAnimationProperty(hTheme: HTHEME, iStoryboardId: INT, iTargetId: INT, eProperty: TA_PROPERTY, pvProperty: LPVOID | NULL, cbSize: DWORD, pcbSizeOut: LPDWORD): HRESULT {
-    return Uxtheme.Load('GetThemeAnimationProperty')(hTheme, iStoryboardId, iTargetId, eProperty, pvProperty, cbSize, pcbSizeOut);
+  public static GetThemeAnimationProperty(hTheme: HTHEME, iStoryboardId: INT, iTargetId: INT, eProperty: TA_PROPERTY, pvProperty_out: OPTIONAL<LPVOID>, cbSize: DWORD, pcbSizeOut_out: LPDWORD): HRESULT {
+    return Uxtheme.Load('GetThemeAnimationProperty')(hTheme, iStoryboardId, iTargetId, eProperty, pvProperty_out, cbSize, pcbSizeOut_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uxtheme/nf-uxtheme-getthemeanimationtransform
-  public static GetThemeAnimationTransform(hTheme: HTHEME, iStoryboardId: INT, iTargetId: INT, dwTransformIndex: DWORD, pTransform: PTA_TRANSFORM | NULL, cbSize: DWORD, pcbSizeOut: LPDWORD): HRESULT {
-    return Uxtheme.Load('GetThemeAnimationTransform')(hTheme, iStoryboardId, iTargetId, dwTransformIndex, pTransform, cbSize, pcbSizeOut);
+  public static GetThemeAnimationTransform(hTheme: HTHEME, iStoryboardId: INT, iTargetId: INT, dwTransformIndex: DWORD, pTransform_out: OPTIONAL<PTA_TRANSFORM>, cbSize: DWORD, pcbSizeOut_out: LPDWORD): HRESULT {
+    return Uxtheme.Load('GetThemeAnimationTransform')(hTheme, iStoryboardId, iTargetId, dwTransformIndex, pTransform_out, cbSize, pcbSizeOut_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uxtheme/nf-uxtheme-getthemeappproperties
@@ -320,158 +329,158 @@ class Uxtheme extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uxtheme/nf-uxtheme-getthemebackgroundcontentrect
-  public static GetThemeBackgroundContentRect(hTheme: HTHEME, hdc: HDC | 0n, iPartId: INT, iStateId: INT, pBoundingRect: LPCRECT, pContentRect: LPRECT): HRESULT {
-    return Uxtheme.Load('GetThemeBackgroundContentRect')(hTheme, hdc, iPartId, iStateId, pBoundingRect, pContentRect);
+  public static GetThemeBackgroundContentRect(hTheme: HTHEME, hdc: OPTIONAL<HDC>, iPartId: INT, iStateId: INT, pBoundingRect: LPCRECT, pContentRect_out: LPRECT): HRESULT {
+    return Uxtheme.Load('GetThemeBackgroundContentRect')(hTheme, hdc, iPartId, iStateId, pBoundingRect, pContentRect_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uxtheme/nf-uxtheme-getthemebackgroundextent
-  public static GetThemeBackgroundExtent(hTheme: HTHEME, hdc: HDC | 0n, iPartId: INT, iStateId: INT, pContentRect: LPCRECT, pExtentRect: LPRECT): HRESULT {
-    return Uxtheme.Load('GetThemeBackgroundExtent')(hTheme, hdc, iPartId, iStateId, pContentRect, pExtentRect);
+  public static GetThemeBackgroundExtent(hTheme: HTHEME, hdc: OPTIONAL<HDC>, iPartId: INT, iStateId: INT, pContentRect: LPCRECT, pExtentRect_out: LPRECT): HRESULT {
+    return Uxtheme.Load('GetThemeBackgroundExtent')(hTheme, hdc, iPartId, iStateId, pContentRect, pExtentRect_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uxtheme/nf-uxtheme-getthemebackgroundregion
-  public static GetThemeBackgroundRegion(hTheme: HTHEME, hdc: HDC | 0n, iPartId: INT, iStateId: INT, pRect: LPCRECT, pRegion: PHRGN): HRESULT {
-    return Uxtheme.Load('GetThemeBackgroundRegion')(hTheme, hdc, iPartId, iStateId, pRect, pRegion);
+  public static GetThemeBackgroundRegion(hTheme: HTHEME, hdc: OPTIONAL<HDC>, iPartId: INT, iStateId: INT, pRect: LPCRECT, pRegion_out: PHRGN): HRESULT {
+    return Uxtheme.Load('GetThemeBackgroundRegion')(hTheme, hdc, iPartId, iStateId, pRect, pRegion_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uxtheme/nf-uxtheme-getthemebitmap
-  public static GetThemeBitmap(hTheme: HTHEME, iPartId: INT, iStateId: INT, iPropId: INT, dwFlags: ULONG, phBitmap: PHBITMAP): HRESULT {
-    return Uxtheme.Load('GetThemeBitmap')(hTheme, iPartId, iStateId, iPropId, dwFlags, phBitmap);
+  public static GetThemeBitmap(hTheme: HTHEME, iPartId: INT, iStateId: INT, iPropId: INT, dwFlags: ULONG, phBitmap_out: PHBITMAP): HRESULT {
+    return Uxtheme.Load('GetThemeBitmap')(hTheme, iPartId, iStateId, iPropId, dwFlags, phBitmap_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uxtheme/nf-uxtheme-getthemebool
-  public static GetThemeBool(hTheme: HTHEME, iPartId: INT, iStateId: INT, iPropId: INT, pfVal: LPVOID): HRESULT {
-    return Uxtheme.Load('GetThemeBool')(hTheme, iPartId, iStateId, iPropId, pfVal);
+  public static GetThemeBool(hTheme: HTHEME, iPartId: INT, iStateId: INT, iPropId: INT, pfVal_out: LPVOID): HRESULT {
+    return Uxtheme.Load('GetThemeBool')(hTheme, iPartId, iStateId, iPropId, pfVal_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uxtheme/nf-uxtheme-getthemecolor
-  public static GetThemeColor(hTheme: HTHEME, iPartId: INT, iStateId: INT, iPropId: INT, pColor: PCOLORREF): HRESULT {
-    return Uxtheme.Load('GetThemeColor')(hTheme, iPartId, iStateId, iPropId, pColor);
+  public static GetThemeColor(hTheme: HTHEME, iPartId: INT, iStateId: INT, iPropId: INT, pColor_out: PCOLORREF): HRESULT {
+    return Uxtheme.Load('GetThemeColor')(hTheme, iPartId, iStateId, iPropId, pColor_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uxtheme/nf-uxtheme-getthemedocumentationproperty
-  public static GetThemeDocumentationProperty(pszThemeName: LPCWSTR, pszPropertyName: LPCWSTR, pszValueBuff: LPWSTR, cchMaxValChars: INT): HRESULT {
-    return Uxtheme.Load('GetThemeDocumentationProperty')(pszThemeName, pszPropertyName, pszValueBuff, cchMaxValChars);
+  public static GetThemeDocumentationProperty(pszThemeName: LPCWSTR, pszPropertyName: LPCWSTR, pszValueBuff_out: LPWSTR, cchMaxValChars: INT): HRESULT {
+    return Uxtheme.Load('GetThemeDocumentationProperty')(pszThemeName, pszPropertyName, pszValueBuff_out, cchMaxValChars);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uxtheme/nf-uxtheme-getthemeenumvalue
-  public static GetThemeEnumValue(hTheme: HTHEME, iPartId: INT, iStateId: INT, iPropId: INT, piVal: PINT): HRESULT {
-    return Uxtheme.Load('GetThemeEnumValue')(hTheme, iPartId, iStateId, iPropId, piVal);
+  public static GetThemeEnumValue(hTheme: HTHEME, iPartId: INT, iStateId: INT, iPropId: INT, piVal_out: PINT): HRESULT {
+    return Uxtheme.Load('GetThemeEnumValue')(hTheme, iPartId, iStateId, iPropId, piVal_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uxtheme/nf-uxtheme-getthemefilename
-  public static GetThemeFilename(hTheme: HTHEME, iPartId: INT, iStateId: INT, iPropId: INT, pszThemeFileName: LPWSTR, cchMaxBuffChars: INT): HRESULT {
-    return Uxtheme.Load('GetThemeFilename')(hTheme, iPartId, iStateId, iPropId, pszThemeFileName, cchMaxBuffChars);
+  public static GetThemeFilename(hTheme: HTHEME, iPartId: INT, iStateId: INT, iPropId: INT, pszThemeFileName_out: LPWSTR, cchMaxBuffChars: INT): HRESULT {
+    return Uxtheme.Load('GetThemeFilename')(hTheme, iPartId, iStateId, iPropId, pszThemeFileName_out, cchMaxBuffChars);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uxtheme/nf-uxtheme-getthemefont
-  public static GetThemeFont(hTheme: HTHEME, hdc: HDC | 0n, iPartId: INT, iStateId: INT, iPropId: INT, pFont: PLOGFONTW): HRESULT {
-    return Uxtheme.Load('GetThemeFont')(hTheme, hdc, iPartId, iStateId, iPropId, pFont);
+  public static GetThemeFont(hTheme: HTHEME, hdc: OPTIONAL<HDC>, iPartId: INT, iStateId: INT, iPropId: INT, pFont_out: PLOGFONTW): HRESULT {
+    return Uxtheme.Load('GetThemeFont')(hTheme, hdc, iPartId, iStateId, iPropId, pFont_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uxtheme/nf-uxtheme-getthemeint
-  public static GetThemeInt(hTheme: HTHEME, iPartId: INT, iStateId: INT, iPropId: INT, piVal: PINT): HRESULT {
-    return Uxtheme.Load('GetThemeInt')(hTheme, iPartId, iStateId, iPropId, piVal);
+  public static GetThemeInt(hTheme: HTHEME, iPartId: INT, iStateId: INT, iPropId: INT, piVal_out: PINT): HRESULT {
+    return Uxtheme.Load('GetThemeInt')(hTheme, iPartId, iStateId, iPropId, piVal_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uxtheme/nf-uxtheme-getthemeintlist
-  public static GetThemeIntList(hTheme: HTHEME, iPartId: INT, iStateId: INT, iPropId: INT, pIntList: PINTLIST): HRESULT {
-    return Uxtheme.Load('GetThemeIntList')(hTheme, iPartId, iStateId, iPropId, pIntList);
+  public static GetThemeIntList(hTheme: HTHEME, iPartId: INT, iStateId: INT, iPropId: INT, pIntList_out: PINTLIST): HRESULT {
+    return Uxtheme.Load('GetThemeIntList')(hTheme, iPartId, iStateId, iPropId, pIntList_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uxtheme/nf-uxtheme-getthememargins
-  public static GetThemeMargins(hTheme: HTHEME, hdc: HDC | 0n, iPartId: INT, iStateId: INT, iPropId: INT, prc: LPCRECT | NULL, pMargins: PMARGINS): HRESULT {
-    return Uxtheme.Load('GetThemeMargins')(hTheme, hdc, iPartId, iStateId, iPropId, prc, pMargins);
+  public static GetThemeMargins(hTheme: HTHEME, hdc: OPTIONAL<HDC>, iPartId: INT, iStateId: INT, iPropId: INT, prc: OPTIONAL<LPCRECT>, pMargins_out: PMARGINS): HRESULT {
+    return Uxtheme.Load('GetThemeMargins')(hTheme, hdc, iPartId, iStateId, iPropId, prc, pMargins_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uxtheme/nf-uxtheme-getthememetric
-  public static GetThemeMetric(hTheme: HTHEME, hdc: HDC | 0n, iPartId: INT, iStateId: INT, iPropId: INT, piVal: PINT): HRESULT {
-    return Uxtheme.Load('GetThemeMetric')(hTheme, hdc, iPartId, iStateId, iPropId, piVal);
+  public static GetThemeMetric(hTheme: HTHEME, hdc: OPTIONAL<HDC>, iPartId: INT, iStateId: INT, iPropId: INT, piVal_out: PINT): HRESULT {
+    return Uxtheme.Load('GetThemeMetric')(hTheme, hdc, iPartId, iStateId, iPropId, piVal_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uxtheme/nf-uxtheme-getthemepartsize
-  public static GetThemePartSize(hTheme: HTHEME, hdc: HDC | 0n, iPartId: INT, iStateId: INT, prc: LPCRECT | NULL, eSize: THEMESIZE, psz: PSIZE): HRESULT {
-    return Uxtheme.Load('GetThemePartSize')(hTheme, hdc, iPartId, iStateId, prc, eSize, psz);
+  public static GetThemePartSize(hTheme: HTHEME, hdc: OPTIONAL<HDC>, iPartId: INT, iStateId: INT, prc: OPTIONAL<LPCRECT>, eSize: THEMESIZE, psz_out: PSIZE): HRESULT {
+    return Uxtheme.Load('GetThemePartSize')(hTheme, hdc, iPartId, iStateId, prc, eSize, psz_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uxtheme/nf-uxtheme-getthemeposition
-  public static GetThemePosition(hTheme: HTHEME, iPartId: INT, iStateId: INT, iPropId: INT, pPoint: PPOINT): HRESULT {
-    return Uxtheme.Load('GetThemePosition')(hTheme, iPartId, iStateId, iPropId, pPoint);
+  public static GetThemePosition(hTheme: HTHEME, iPartId: INT, iStateId: INT, iPropId: INT, pPoint_out: PPOINT): HRESULT {
+    return Uxtheme.Load('GetThemePosition')(hTheme, iPartId, iStateId, iPropId, pPoint_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uxtheme/nf-uxtheme-getthemepropertyorigin
-  public static GetThemePropertyOrigin(hTheme: HTHEME, iPartId: INT, iStateId: INT, iPropId: INT, pOrigin: PPROPERTYORIGIN): HRESULT {
-    return Uxtheme.Load('GetThemePropertyOrigin')(hTheme, iPartId, iStateId, iPropId, pOrigin);
+  public static GetThemePropertyOrigin(hTheme: HTHEME, iPartId: INT, iStateId: INT, iPropId: INT, pOrigin_out: PPROPERTYORIGIN): HRESULT {
+    return Uxtheme.Load('GetThemePropertyOrigin')(hTheme, iPartId, iStateId, iPropId, pOrigin_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uxtheme/nf-uxtheme-getthemerect
-  public static GetThemeRect(hTheme: HTHEME, iPartId: INT, iStateId: INT, iPropId: INT, pRect: LPRECT): HRESULT {
-    return Uxtheme.Load('GetThemeRect')(hTheme, iPartId, iStateId, iPropId, pRect);
+  public static GetThemeRect(hTheme: HTHEME, iPartId: INT, iStateId: INT, iPropId: INT, pRect_out: LPRECT): HRESULT {
+    return Uxtheme.Load('GetThemeRect')(hTheme, iPartId, iStateId, iPropId, pRect_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uxtheme/nf-uxtheme-getthemestream
-  public static GetThemeStream(hTheme: HTHEME, iPartId: INT, iStateId: INT, iPropId: INT, ppvStream: PPVOID, pcbStream: LPDWORD | NULL, hInst: HINSTANCE | 0n): HRESULT {
-    return Uxtheme.Load('GetThemeStream')(hTheme, iPartId, iStateId, iPropId, ppvStream, pcbStream, hInst);
+  public static GetThemeStream(hTheme: HTHEME, iPartId: INT, iStateId: INT, iPropId: INT, ppvStream_out: PPVOID, pcbStream_out: OPTIONAL<LPDWORD>, hInst: OPTIONAL<HINSTANCE>): HRESULT {
+    return Uxtheme.Load('GetThemeStream')(hTheme, iPartId, iStateId, iPropId, ppvStream_out, pcbStream_out, hInst);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uxtheme/nf-uxtheme-getthemestring
-  public static GetThemeString(hTheme: HTHEME, iPartId: INT, iStateId: INT, iPropId: INT, pszBuff: LPWSTR, cchMaxBuffChars: INT): HRESULT {
-    return Uxtheme.Load('GetThemeString')(hTheme, iPartId, iStateId, iPropId, pszBuff, cchMaxBuffChars);
+  public static GetThemeString(hTheme: HTHEME, iPartId: INT, iStateId: INT, iPropId: INT, pszBuff_out: LPWSTR, cchMaxBuffChars: INT): HRESULT {
+    return Uxtheme.Load('GetThemeString')(hTheme, iPartId, iStateId, iPropId, pszBuff_out, cchMaxBuffChars);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uxtheme/nf-uxtheme-getthemesysbool
-  public static GetThemeSysBool(hTheme: HTHEME | 0n, iBoolId: INT): BOOL {
+  public static GetThemeSysBool(hTheme: OPTIONAL<HTHEME>, iBoolId: INT): BOOL {
     return Uxtheme.Load('GetThemeSysBool')(hTheme, iBoolId);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uxtheme/nf-uxtheme-getthemesyscolor
-  public static GetThemeSysColor(hTheme: HTHEME | 0n, iColorId: INT): COLORREF {
+  public static GetThemeSysColor(hTheme: OPTIONAL<HTHEME>, iColorId: INT): COLORREF {
     return Uxtheme.Load('GetThemeSysColor')(hTheme, iColorId);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uxtheme/nf-uxtheme-getthemesyscolorbrush
-  public static GetThemeSysColorBrush(hTheme: HTHEME | 0n, iColorId: INT): HBRUSH {
+  public static GetThemeSysColorBrush(hTheme: OPTIONAL<HTHEME>, iColorId: INT): HBRUSH {
     return Uxtheme.Load('GetThemeSysColorBrush')(hTheme, iColorId);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uxtheme/nf-uxtheme-getthemesysfont
-  public static GetThemeSysFont(hTheme: HTHEME | 0n, iFontId: INT, plf: PLOGFONTW): HRESULT {
-    return Uxtheme.Load('GetThemeSysFont')(hTheme, iFontId, plf);
+  public static GetThemeSysFont(hTheme: OPTIONAL<HTHEME>, iFontId: INT, plf_out: PLOGFONTW): HRESULT {
+    return Uxtheme.Load('GetThemeSysFont')(hTheme, iFontId, plf_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uxtheme/nf-uxtheme-getthemesysint
-  public static GetThemeSysInt(hTheme: HTHEME, iIntId: INT, piValue: PINT): HRESULT {
-    return Uxtheme.Load('GetThemeSysInt')(hTheme, iIntId, piValue);
+  public static GetThemeSysInt(hTheme: HTHEME, iIntId: INT, piValue_out: PINT): HRESULT {
+    return Uxtheme.Load('GetThemeSysInt')(hTheme, iIntId, piValue_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uxtheme/nf-uxtheme-getthemesyssize
-  public static GetThemeSysSize(hTheme: HTHEME | 0n, iSizeId: INT): INT {
+  public static GetThemeSysSize(hTheme: OPTIONAL<HTHEME>, iSizeId: INT): INT {
     return Uxtheme.Load('GetThemeSysSize')(hTheme, iSizeId);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uxtheme/nf-uxtheme-getthemesysstring
-  public static GetThemeSysString(hTheme: HTHEME, iStringId: INT, pszStringBuff: LPWSTR, cchMaxStringChars: INT): HRESULT {
-    return Uxtheme.Load('GetThemeSysString')(hTheme, iStringId, pszStringBuff, cchMaxStringChars);
+  public static GetThemeSysString(hTheme: HTHEME, iStringId: INT, pszStringBuff_out: LPWSTR, cchMaxStringChars: INT): HRESULT {
+    return Uxtheme.Load('GetThemeSysString')(hTheme, iStringId, pszStringBuff_out, cchMaxStringChars);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uxtheme/nf-uxtheme-getthemetextextent
-  public static GetThemeTextExtent(hTheme: HTHEME, hdc: HDC, iPartId: INT, iStateId: INT, pszText: LPCWSTR, cchCharCount: INT, dwTextFlags: DWORD, pBoundingRect: LPCRECT | NULL, pExtentRect: LPRECT): HRESULT {
-    return Uxtheme.Load('GetThemeTextExtent')(hTheme, hdc, iPartId, iStateId, pszText, cchCharCount, dwTextFlags, pBoundingRect, pExtentRect);
+  public static GetThemeTextExtent(hTheme: HTHEME, hdc: HDC, iPartId: INT, iStateId: INT, pszText: LPCWSTR, cchCharCount: INT, dwTextFlags: DWORD, pBoundingRect: OPTIONAL<LPCRECT>, pExtentRect_out: LPRECT): HRESULT {
+    return Uxtheme.Load('GetThemeTextExtent')(hTheme, hdc, iPartId, iStateId, pszText, cchCharCount, dwTextFlags, pBoundingRect, pExtentRect_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uxtheme/nf-uxtheme-getthemetextmetrics
-  public static GetThemeTextMetrics(hTheme: HTHEME, hdc: HDC, iPartId: INT, iStateId: INT, ptm: PTEXTMETRICW): HRESULT {
-    return Uxtheme.Load('GetThemeTextMetrics')(hTheme, hdc, iPartId, iStateId, ptm);
+  public static GetThemeTextMetrics(hTheme: HTHEME, hdc: HDC, iPartId: INT, iStateId: INT, ptm_out: PTEXTMETRICW): HRESULT {
+    return Uxtheme.Load('GetThemeTextMetrics')(hTheme, hdc, iPartId, iStateId, ptm_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uxtheme/nf-uxtheme-getthemetimingfunction
-  public static GetThemeTimingFunction(hTheme: HTHEME, iTimingFunctionId: INT, pTimingFunction: PTA_TIMINGFUNCTION | NULL, cbSize: DWORD, pcbSizeOut: LPDWORD): HRESULT {
-    return Uxtheme.Load('GetThemeTimingFunction')(hTheme, iTimingFunctionId, pTimingFunction, cbSize, pcbSizeOut);
+  public static GetThemeTimingFunction(hTheme: HTHEME, iTimingFunctionId: INT, pTimingFunction_out: OPTIONAL<PTA_TIMINGFUNCTION>, cbSize: DWORD, pcbSizeOut_out: LPDWORD): HRESULT {
+    return Uxtheme.Load('GetThemeTimingFunction')(hTheme, iTimingFunctionId, pTimingFunction_out, cbSize, pcbSizeOut_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uxtheme/nf-uxtheme-getthemetransitionduration
-  public static GetThemeTransitionDuration(hTheme: HTHEME, iPartId: INT, iStateIdFrom: INT, iStateIdTo: INT, iPropId: INT, pdwDuration: LPDWORD): HRESULT {
-    return Uxtheme.Load('GetThemeTransitionDuration')(hTheme, iPartId, iStateIdFrom, iStateIdTo, iPropId, pdwDuration);
+  public static GetThemeTransitionDuration(hTheme: HTHEME, iPartId: INT, iStateIdFrom: INT, iStateIdTo: INT, iPropId: INT, pdwDuration_out: LPDWORD): HRESULT {
+    return Uxtheme.Load('GetThemeTransitionDuration')(hTheme, iPartId, iStateIdFrom, iStateIdTo, iPropId, pdwDuration_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uxtheme/nf-uxtheme-getwindowtheme
@@ -480,8 +489,8 @@ class Uxtheme extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uxtheme/nf-uxtheme-hittestthemebackground
-  public static HitTestThemeBackground(hTheme: HTHEME, hdc: HDC | 0n, iPartId: INT, iStateId: INT, dwOptions: DWORD, pRect: LPCRECT, hrgn: HRGN | 0n, ptTest: PACKED_POINT, pwHitTestCode: PWORD): HRESULT {
-    return Uxtheme.Load('HitTestThemeBackground')(hTheme, hdc, iPartId, iStateId, dwOptions, pRect, hrgn, ptTest, pwHitTestCode);
+  public static HitTestThemeBackground(hTheme: HTHEME, hdc: OPTIONAL<HDC>, iPartId: INT, iStateId: INT, dwOptions: DWORD, pRect: LPCRECT, hrgn: OPTIONAL<HRGN>, ptTest: PACKED_POINT, pwHitTestCode_out: PWORD): HRESULT {
+    return Uxtheme.Load('HitTestThemeBackground')(hTheme, hdc, iPartId, iStateId, dwOptions, pRect, hrgn, ptTest, pwHitTestCode_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uxtheme/nf-uxtheme-isappthemed
@@ -515,17 +524,17 @@ class Uxtheme extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uxtheme/nf-uxtheme-openthemedata
-  public static OpenThemeData(hwnd: HWND | 0n, pszClassList: LPCWSTR): HTHEME {
+  public static OpenThemeData(hwnd: OPTIONAL<HWND>, pszClassList: LPCWSTR): HTHEME {
     return Uxtheme.Load('OpenThemeData')(hwnd, pszClassList);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uxtheme/nf-uxtheme-openthemedataex
-  public static OpenThemeDataEx(hwnd: HWND | 0n, pszClassList: LPCWSTR, dwFlags: DWORD): HTHEME {
+  public static OpenThemeDataEx(hwnd: OPTIONAL<HWND>, pszClassList: LPCWSTR, dwFlags: DWORD): HTHEME {
     return Uxtheme.Load('OpenThemeDataEx')(hwnd, pszClassList, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uxtheme/nf-uxtheme-openthemedatafordpi
-  public static OpenThemeDataForDpi(hwnd: HWND | 0n, pszClassList: LPCWSTR, dpi: UINT): HTHEME {
+  public static OpenThemeDataForDpi(hwnd: OPTIONAL<HWND>, pszClassList: LPCWSTR, dpi: UINT): HTHEME {
     return Uxtheme.Load('OpenThemeDataForDpi')(hwnd, pszClassList, dpi);
   }
 
@@ -535,7 +544,7 @@ class Uxtheme extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/uxtheme/nf-uxtheme-setwindowtheme
-  public static SetWindowTheme(hwnd: HWND, pszSubAppName: LPCWSTR | NULL, pszSubIdList: LPCWSTR | NULL): HRESULT {
+  public static SetWindowTheme(hwnd: HWND, pszSubAppName: OPTIONAL<LPCWSTR>, pszSubIdList: OPTIONAL<LPCWSTR>): HRESULT {
     return Uxtheme.Load('SetWindowTheme')(hwnd, pszSubAppName, pszSubIdList);
   }
 

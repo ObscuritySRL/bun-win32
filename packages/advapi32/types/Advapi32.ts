@@ -31,6 +31,8 @@ export type {
   LPWSTR,
   LRESULT,
   NULL,
+  NULLABLE,
+  OPTIONAL,
   PBYTE,
   PDWORD,
   PHANDLE,
@@ -510,6 +512,7 @@ export type PVALENTA = Pointer;
 export type PVALENTW = Pointer;
 export type REGSAM = number;
 export type SC_HANDLE = bigint;
+export type SC_LOCK = Pointer;
 export type SECURITY_IMPERSONATION_LEVEL = number;
 export type SECURITY_INFORMATION = number;
 export type SERVICE_STATUS_HANDLE = bigint;

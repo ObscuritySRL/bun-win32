@@ -1,7 +1,7 @@
 import type { Pointer } from 'bun:ffi';
 
 import type { DWORD, HANDLE } from '@bun-win32/core';
-export type { BOOL, DWORD, HANDLE, LPCWSTR, LPWSTR, NULL, PDWORD, PVOID } from '@bun-win32/core';
+export type { BOOL, DWORD, HANDLE, LPCWSTR, LPWSTR, NULL, NULLABLE, OPTIONAL, PDWORD, PVOID } from '@bun-win32/core';
 
 export const EVT_ALL_ACCESS = 0x0000_0007;
 export const EVT_CLEAR_ACCESS = 0x0000_0004;

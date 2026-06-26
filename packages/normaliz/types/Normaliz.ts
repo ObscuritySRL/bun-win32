@@ -1,4 +1,4 @@
-export type { BOOL, DWORD, INT, LPCWSTR, LPWSTR, NULL } from '@bun-win32/core';
+export type { BOOL, DWORD, INT, LPCWSTR, LPWSTR, NULL, OPTIONAL } from '@bun-win32/core';
 
 export enum IdnFlags {
   IDN_ALLOW_UNASSIGNED = 0x0000_0001,

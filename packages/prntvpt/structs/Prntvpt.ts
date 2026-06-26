@@ -10,7 +10,8 @@ import type {
   HRESULT,
   IStream,
   LPCWSTR,
-  NULL,
+  NULLABLE,
+  OPTIONAL,
   PBSTR,
   PCWSTR,
   PDEVMODE,
@@ -18,8 +19,8 @@ import type {
   PHPTPROVIDER,
   PPDEVMODE,
   PPVOID,
-  PTBUFFER,
   PULONG,
+  PVOID,
   REFCLSID,
   REFIID,
   ULONG,
@@ -75,8 +76,8 @@ class Prntvpt extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/combaseapi/nf-combaseapi-dllgetclassobject
-  public static DllGetClassObject(rclsid: REFCLSID, riid: REFIID, ppv: PPVOID): HRESULT {
-    return Prntvpt.Load('DllGetClassObject')(rclsid, riid, ppv);
+  public static DllGetClassObject(rclsid: REFCLSID, riid: REFIID, ppv_out: PPVOID): HRESULT {
+    return Prntvpt.Load('DllGetClassObject')(rclsid, riid, ppv_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/olectl/nf-olectl-dllregisterserver
@@ -95,8 +96,8 @@ class Prntvpt extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/prntvpt/nf-prntvpt-ptconvertdevmodetoprintticket
-  public static PTConvertDevModeToPrintTicket(hProvider: HPTPROVIDER, cbDevmode: ULONG, pDevmode: PDEVMODE, scope: EPrintTicketScope, pPrintTicket: IStream): HRESULT {
-    return Prntvpt.Load('PTConvertDevModeToPrintTicket')(hProvider, cbDevmode, pDevmode, scope, pPrintTicket);
+  public static PTConvertDevModeToPrintTicket(hProvider: HPTPROVIDER, cbDevmode: ULONG, pDevmode: PDEVMODE, scope: EPrintTicketScope, pPrintTicket_in_out: IStream): HRESULT {
+    return Prntvpt.Load('PTConvertDevModeToPrintTicket')(hProvider, cbDevmode, pDevmode, scope, pPrintTicket_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/prntvpt/nf-prntvpt-ptconvertprinttickettodevmode
@@ -105,50 +106,50 @@ class Prntvpt extends Win32 {
     pPrintTicket: IStream,
     baseDevmodeType: EDefaultDevmodeType,
     scope: EPrintTicketScope,
-    pcbDevmode: PULONG,
-    ppDevmode: PPDEVMODE,
-    pbstrErrorMessage: PBSTR | NULL,
+    pcbDevmode_out: PULONG,
+    ppDevmode_out: PPDEVMODE,
+    pbstrErrorMessage_out: OPTIONAL<PBSTR>,
   ): HRESULT {
-    return Prntvpt.Load('PTConvertPrintTicketToDevMode')(hProvider, pPrintTicket, baseDevmodeType, scope, pcbDevmode, ppDevmode, pbstrErrorMessage);
+    return Prntvpt.Load('PTConvertPrintTicketToDevMode')(hProvider, pPrintTicket, baseDevmodeType, scope, pcbDevmode_out, ppDevmode_out, pbstrErrorMessage_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/prntvpt/nf-prntvpt-ptgetprintcapabilities
-  public static PTGetPrintCapabilities(hProvider: HPTPROVIDER, pPrintTicket: IStream | 0n, pCapabilities: IStream, pbstrErrorMessage: PBSTR | NULL): HRESULT {
-    return Prntvpt.Load('PTGetPrintCapabilities')(hProvider, pPrintTicket, pCapabilities, pbstrErrorMessage);
+  public static PTGetPrintCapabilities(hProvider: HPTPROVIDER, pPrintTicket: OPTIONAL<IStream>, pCapabilities_in_out: IStream, pbstrErrorMessage_out: OPTIONAL<PBSTR>): HRESULT {
+    return Prntvpt.Load('PTGetPrintCapabilities')(hProvider, pPrintTicket, pCapabilities_in_out, pbstrErrorMessage_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/prntvpt/nf-prntvpt-ptgetprintdevicecapabilities
-  public static PTGetPrintDeviceCapabilities(hProvider: HPTPROVIDER, pPrintTicket: IStream | 0n, pDeviceCapabilities: IStream, pbstrErrorMessage: PBSTR | NULL): HRESULT {
-    return Prntvpt.Load('PTGetPrintDeviceCapabilities')(hProvider, pPrintTicket, pDeviceCapabilities, pbstrErrorMessage);
+  public static PTGetPrintDeviceCapabilities(hProvider: HPTPROVIDER, pPrintTicket: OPTIONAL<IStream>, pDeviceCapabilities_in_out: IStream, pbstrErrorMessage_out: OPTIONAL<PBSTR>): HRESULT {
+    return Prntvpt.Load('PTGetPrintDeviceCapabilities')(hProvider, pPrintTicket, pDeviceCapabilities_in_out, pbstrErrorMessage_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/prntvpt/nf-prntvpt-ptgetprintdeviceresources
-  public static PTGetPrintDeviceResources(hProvider: HPTPROVIDER, pszLocaleName: LPCWSTR | NULL, pPrintTicket: IStream | 0n, pDeviceResources: IStream, pbstrErrorMessage: PBSTR | NULL): HRESULT {
-    return Prntvpt.Load('PTGetPrintDeviceResources')(hProvider, pszLocaleName, pPrintTicket, pDeviceResources, pbstrErrorMessage);
+  public static PTGetPrintDeviceResources(hProvider: HPTPROVIDER, pszLocaleName: NULLABLE<LPCWSTR>, pPrintTicket: OPTIONAL<IStream>, pDeviceResources_in_out: IStream, pbstrErrorMessage_out: OPTIONAL<PBSTR>): HRESULT {
+    return Prntvpt.Load('PTGetPrintDeviceResources')(hProvider, pszLocaleName, pPrintTicket, pDeviceResources_in_out, pbstrErrorMessage_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/prntvpt/nf-prntvpt-ptmergeandvalidateprintticket
-  public static PTMergeAndValidatePrintTicket(hProvider: HPTPROVIDER, pBaseTicket: IStream, pDeltaTicket: IStream | 0n, scope: EPrintTicketScope, pResultTicket: IStream, pbstrErrorMessage: PBSTR | NULL): HRESULT {
-    return Prntvpt.Load('PTMergeAndValidatePrintTicket')(hProvider, pBaseTicket, pDeltaTicket, scope, pResultTicket, pbstrErrorMessage);
+  public static PTMergeAndValidatePrintTicket(hProvider: HPTPROVIDER, pBaseTicket: IStream, pDeltaTicket: OPTIONAL<IStream>, scope: EPrintTicketScope, pResultTicket_in_out: IStream, pbstrErrorMessage_out: OPTIONAL<PBSTR>): HRESULT {
+    return Prntvpt.Load('PTMergeAndValidatePrintTicket')(hProvider, pBaseTicket, pDeltaTicket, scope, pResultTicket_in_out, pbstrErrorMessage_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/prntvpt/nf-prntvpt-ptopenprovider
-  public static PTOpenProvider(pszPrinterName: PCWSTR, dwVersion: DWORD, phProvider: PHPTPROVIDER): HRESULT {
-    return Prntvpt.Load('PTOpenProvider')(pszPrinterName, dwVersion, phProvider);
+  public static PTOpenProvider(pszPrinterName: PCWSTR, dwVersion: DWORD, phProvider_out: PHPTPROVIDER): HRESULT {
+    return Prntvpt.Load('PTOpenProvider')(pszPrinterName, dwVersion, phProvider_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/prntvpt/nf-prntvpt-ptopenproviderex
-  public static PTOpenProviderEx(pszPrinterName: PCWSTR, dwMaxVersion: DWORD, dwPrefVersion: DWORD, phProvider: PHPTPROVIDER, pUsedVersion: PDWORD): HRESULT {
-    return Prntvpt.Load('PTOpenProviderEx')(pszPrinterName, dwMaxVersion, dwPrefVersion, phProvider, pUsedVersion);
+  public static PTOpenProviderEx(pszPrinterName: PCWSTR, dwMaxVersion: DWORD, dwPrefVersion: DWORD, phProvider_out: PHPTPROVIDER, pUsedVersion_out: PDWORD): HRESULT {
+    return Prntvpt.Load('PTOpenProviderEx')(pszPrinterName, dwMaxVersion, dwPrefVersion, phProvider_out, pUsedVersion_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/prntvpt/nf-prntvpt-ptqueryschemaversionsupport
-  public static PTQuerySchemaVersionSupport(pszPrinterName: PCWSTR, pMaxVersion: PDWORD): HRESULT {
-    return Prntvpt.Load('PTQuerySchemaVersionSupport')(pszPrinterName, pMaxVersion);
+  public static PTQuerySchemaVersionSupport(pszPrinterName: PCWSTR, pMaxVersion_out: PDWORD): HRESULT {
+    return Prntvpt.Load('PTQuerySchemaVersionSupport')(pszPrinterName, pMaxVersion_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/prntvpt/nf-prntvpt-ptreleasememory
-  public static PTReleaseMemory(pBuffer: PTBUFFER): HRESULT {
+  public static PTReleaseMemory(pBuffer: PVOID<bigint>): HRESULT {
     return Prntvpt.Load('PTReleaseMemory')(pBuffer);
   }
 }

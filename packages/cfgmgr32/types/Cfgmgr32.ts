@@ -1,6 +1,6 @@
 import type { Pointer } from 'bun:ffi';
 
-export type { BOOL, DWORD, HRESULT, LPCSTR, LPCWSTR, LPSTR, LPWSTR, NULL, PBYTE, PDWORD, PULONG, PVOID, ULONG, WORD } from '@bun-win32/core';
+export type { BOOL, DWORD, HRESULT, LPCSTR, LPCWSTR, LPSTR, LPWSTR, NULL, OPTIONAL, PBYTE, PDWORD, PULONG, PVOID, ULONG, WORD } from '@bun-win32/core';
 
 export enum CR {
   ACCESS_DENIED = 0x0000_0033,

@@ -2,7 +2,7 @@ import { type FFIFunction, FFIType } from 'bun:ffi';
 
 import { Win32 } from '@bun-win32/core';
 
-import type { HAMSICONTEXT, HAMSISESSION, HRESULT, LPCWSTR, NULL, PAMSI_RESULT, PHAMSICONTEXT, PHAMSISESSION, PPVOID, PVOID, REFCLSID, REFIID, ULONG, VOID } from '../types/Amsi';
+import type { HAMSICONTEXT, HAMSISESSION, HRESULT, LPCWSTR, OPTIONAL, PAMSI_RESULT, PHAMSICONTEXT, PHAMSISESSION, PPVOID, PVOID, REFCLSID, REFIID, ULONG, VOID } from '../types/Amsi';
 
 /**
  * Thin, lazy-loaded FFI bindings for `amsi.dll`.
@@ -51,28 +51,28 @@ class Amsi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/amsi/nf-amsi-amsiinitialize
-  public static AmsiInitialize(appName: LPCWSTR, amsiContext: PHAMSICONTEXT): HRESULT {
-    return Amsi.Load('AmsiInitialize')(appName, amsiContext);
+  public static AmsiInitialize(appName: LPCWSTR, amsiContext_out: PHAMSICONTEXT): HRESULT {
+    return Amsi.Load('AmsiInitialize')(appName, amsiContext_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/amsi/nf-amsi-amsinotifyoperation
-  public static AmsiNotifyOperation(amsiContext: HAMSICONTEXT, buffer: PVOID, length: ULONG, contentName: LPCWSTR | NULL, result: PAMSI_RESULT): HRESULT {
-    return Amsi.Load('AmsiNotifyOperation')(amsiContext, buffer, length, contentName, result);
+  public static AmsiNotifyOperation(amsiContext: HAMSICONTEXT, buffer: PVOID, length: ULONG, contentName: OPTIONAL<LPCWSTR>, result_out: PAMSI_RESULT): HRESULT {
+    return Amsi.Load('AmsiNotifyOperation')(amsiContext, buffer, length, contentName, result_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/amsi/nf-amsi-amsiopensession
-  public static AmsiOpenSession(amsiContext: HAMSICONTEXT, amsiSession: PHAMSISESSION): HRESULT {
-    return Amsi.Load('AmsiOpenSession')(amsiContext, amsiSession);
+  public static AmsiOpenSession(amsiContext: HAMSICONTEXT, amsiSession_out: PHAMSISESSION): HRESULT {
+    return Amsi.Load('AmsiOpenSession')(amsiContext, amsiSession_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/amsi/nf-amsi-amsiscanbuffer
-  public static AmsiScanBuffer(amsiContext: HAMSICONTEXT, buffer: PVOID, length: ULONG, contentName: LPCWSTR | NULL, amsiSession: HAMSISESSION | 0n, result: PAMSI_RESULT): HRESULT {
-    return Amsi.Load('AmsiScanBuffer')(amsiContext, buffer, length, contentName, amsiSession, result);
+  public static AmsiScanBuffer(amsiContext: HAMSICONTEXT, buffer: PVOID, length: ULONG, contentName: OPTIONAL<LPCWSTR>, amsiSession: OPTIONAL<HAMSISESSION>, result_out: PAMSI_RESULT): HRESULT {
+    return Amsi.Load('AmsiScanBuffer')(amsiContext, buffer, length, contentName, amsiSession, result_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/amsi/nf-amsi-amsiscanstring
-  public static AmsiScanString(amsiContext: HAMSICONTEXT, string: LPCWSTR, contentName: LPCWSTR | NULL, amsiSession: HAMSISESSION | 0n, result: PAMSI_RESULT): HRESULT {
-    return Amsi.Load('AmsiScanString')(amsiContext, string, contentName, amsiSession, result);
+  public static AmsiScanString(amsiContext: HAMSICONTEXT, string: LPCWSTR, contentName: OPTIONAL<LPCWSTR>, amsiSession: OPTIONAL<HAMSISESSION>, result_out: PAMSI_RESULT): HRESULT {
+    return Amsi.Load('AmsiScanString')(amsiContext, string, contentName, amsiSession, result_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/amsi/nf-amsi-amsiuninitialize
@@ -86,8 +86,8 @@ class Amsi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/combaseapi/nf-combaseapi-dllgetclassobject
-  public static DllGetClassObject(rclsid: REFCLSID, riid: REFIID, ppv: PPVOID): HRESULT {
-    return Amsi.Load('DllGetClassObject')(rclsid, riid, ppv);
+  public static DllGetClassObject(rclsid: REFCLSID, riid: REFIID, ppv_out: PPVOID): HRESULT {
+    return Amsi.Load('DllGetClassObject')(rclsid, riid, ppv_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/olectl/nf-olectl-dllregisterserver

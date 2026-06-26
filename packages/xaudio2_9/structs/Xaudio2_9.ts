@@ -2,7 +2,7 @@ import { type FFIFunction, FFIType } from 'bun:ffi';
 
 import { Win32 } from '@bun-win32/core';
 
-import type { FLOAT32, HRESULT, LPCVOID, LPCX3DAUDIO_EMITTER, LPCX3DAUDIO_LISTENER, LPLPVOID, LPX3DAUDIO_DSP_SETTINGS, NULL, REFCLSID, UINT32, VOID, X3DAUDIO_HANDLE, XAUDIO2_PROCESSOR } from '../types/Xaudio2_9';
+import type { FLOAT32, HRESULT, LPCVOID, LPCX3DAUDIO_EMITTER, LPCX3DAUDIO_LISTENER, LPLPVOID, LPX3DAUDIO_DSP_SETTINGS, OPTIONAL, REFCLSID, UINT32, VOID, X3DAUDIO_HANDLE, XAUDIO2_PROCESSOR } from '../types/Xaudio2_9';
 
 /**
  * Thin, lazy-loaded FFI bindings for `xaudio2_9.dll`.
@@ -41,33 +41,33 @@ class Xaudio2_9 extends Win32 {
   } as const satisfies Record<string, FFIFunction>;
 
   // https://learn.microsoft.com/en-us/windows/win32/api/xaudio2fx/nf-xaudio2fx-createaudioreverb
-  public static CreateAudioReverb(ppApo: LPLPVOID): HRESULT {
-    return Xaudio2_9.Load('CreateAudioReverb')(ppApo);
+  public static CreateAudioReverb(ppApo_out: LPLPVOID): HRESULT {
+    return Xaudio2_9.Load('CreateAudioReverb')(ppApo_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/xaudio2fx/nf-xaudio2fx-createaudiovolumemeter
-  public static CreateAudioVolumeMeter(ppApo: LPLPVOID): HRESULT {
-    return Xaudio2_9.Load('CreateAudioVolumeMeter')(ppApo);
+  public static CreateAudioVolumeMeter(ppApo_out: LPLPVOID): HRESULT {
+    return Xaudio2_9.Load('CreateAudioVolumeMeter')(ppApo_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/xapofx/nf-xapofx-createfx
-  public static CreateFX(clsid: REFCLSID, pEffect: LPLPVOID, pInitData: LPCVOID | NULL, InitDataByteSize: UINT32): HRESULT {
-    return Xaudio2_9.Load('CreateFX')(clsid, pEffect, pInitData, InitDataByteSize);
+  public static CreateFX(clsid: REFCLSID, pEffect_out: LPLPVOID, pInitData: OPTIONAL<LPCVOID>, InitDataByteSize: UINT32): HRESULT {
+    return Xaudio2_9.Load('CreateFX')(clsid, pEffect_out, pInitData, InitDataByteSize);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/x3daudio/nf-x3daudio-x3daudiocalculate
-  public static X3DAudioCalculate(Instance: X3DAUDIO_HANDLE, pListener: LPCX3DAUDIO_LISTENER, pEmitter: LPCX3DAUDIO_EMITTER, Flags: UINT32, pDSPSettings: LPX3DAUDIO_DSP_SETTINGS): VOID {
-    return Xaudio2_9.Load('X3DAudioCalculate')(Instance, pListener, pEmitter, Flags, pDSPSettings);
+  public static X3DAudioCalculate(Instance: X3DAUDIO_HANDLE, pListener: LPCX3DAUDIO_LISTENER, pEmitter: LPCX3DAUDIO_EMITTER, Flags: UINT32, pDSPSettings_in_out: LPX3DAUDIO_DSP_SETTINGS): VOID {
+    return Xaudio2_9.Load('X3DAudioCalculate')(Instance, pListener, pEmitter, Flags, pDSPSettings_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/x3daudio/nf-x3daudio-x3daudioinitialize
-  public static X3DAudioInitialize(SpeakerChannelMask: UINT32, SpeedOfSound: FLOAT32, Instance: X3DAUDIO_HANDLE): HRESULT {
-    return Xaudio2_9.Load('X3DAudioInitialize')(SpeakerChannelMask, SpeedOfSound, Instance);
+  public static X3DAudioInitialize(SpeakerChannelMask: UINT32, SpeedOfSound: FLOAT32, Instance_out: X3DAUDIO_HANDLE): HRESULT {
+    return Xaudio2_9.Load('X3DAudioInitialize')(SpeakerChannelMask, SpeedOfSound, Instance_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/xaudio2/nf-xaudio2-xaudio2create
-  public static XAudio2Create(ppXAudio2: LPLPVOID, Flags: UINT32, XAudio2Processor: XAUDIO2_PROCESSOR): HRESULT {
-    return Xaudio2_9.Load('XAudio2Create')(ppXAudio2, Flags, XAudio2Processor);
+  public static XAudio2Create(ppXAudio2_out: LPLPVOID, Flags: UINT32, XAudio2Processor: XAUDIO2_PROCESSOR): HRESULT {
+    return Xaudio2_9.Load('XAudio2Create')(ppXAudio2_out, Flags, XAudio2Processor);
   }
 }
 

@@ -2,7 +2,7 @@ import type { Pointer } from 'bun:ffi';
 
 import type { DWORD } from '@bun-win32/core';
 
-export type { BOOL, DWORD, HANDLE, HRESULT, LPCSTR, LPCWSTR, LPDWORD, LPBOOL, LPBYTE, LPSTR, LPVOID, LPWSTR, NULL, PBYTE, PDWORD, PHANDLE, PULONG, PVOID, ULONG, VOID } from '@bun-win32/core';
+export type { BOOL, DWORD, HANDLE, HRESULT, LPCSTR, LPCWSTR, LPDWORD, LPBOOL, LPBYTE, LPSTR, LPVOID, LPWSTR, NULL, NULLABLE, OPTIONAL, PBYTE, PDWORD, PHANDLE, PULONG, PVOID, ULONG, VOID } from '@bun-win32/core';
 
 export const MAX_PREFERRED_LENGTH = 0xffff_ffff as DWORD;
 export const NERR_Success = 0x0000_0000 as DWORD;

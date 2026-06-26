@@ -41,18 +41,18 @@ class Dxgi extends Win32 {
   } as const satisfies Record<string, FFIFunction>;
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dxgi/nf-dxgi-createdxgifactory
-  public static CreateDXGIFactory(riid: REFIID, ppFactory: LPLPVOID): HRESULT {
-    return Dxgi.Load('CreateDXGIFactory')(riid, ppFactory);
+  public static CreateDXGIFactory(riid: REFIID, ppFactory_out: LPLPVOID): HRESULT {
+    return Dxgi.Load('CreateDXGIFactory')(riid, ppFactory_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dxgi/nf-dxgi-createdxgifactory1
-  public static CreateDXGIFactory1(riid: REFIID, ppFactory: LPLPVOID): HRESULT {
-    return Dxgi.Load('CreateDXGIFactory1')(riid, ppFactory);
+  public static CreateDXGIFactory1(riid: REFIID, ppFactory_out: LPLPVOID): HRESULT {
+    return Dxgi.Load('CreateDXGIFactory1')(riid, ppFactory_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dxgi1_3/nf-dxgi1_3-createdxgifactory2
-  public static CreateDXGIFactory2(Flags: UINT, riid: REFIID, ppFactory: LPLPVOID): HRESULT {
-    return Dxgi.Load('CreateDXGIFactory2')(Flags, riid, ppFactory);
+  public static CreateDXGIFactory2(Flags: UINT, riid: REFIID, ppFactory_out: LPLPVOID): HRESULT {
+    return Dxgi.Load('CreateDXGIFactory2')(Flags, riid, ppFactory_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dxgi1_6/nf-dxgi1_6-dxgideclareadapterremovalsupport
@@ -61,8 +61,8 @@ class Dxgi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dxgi1_3/nf-dxgi1_3-dxgigetdebuginterface1
-  public static DXGIGetDebugInterface1(Flags: UINT, riid: REFIID, pDebug: LPLPVOID): HRESULT {
-    return Dxgi.Load('DXGIGetDebugInterface1')(Flags, riid, pDebug);
+  public static DXGIGetDebugInterface1(Flags: UINT, riid: REFIID, pDebug_out: LPLPVOID): HRESULT {
+    return Dxgi.Load('DXGIGetDebugInterface1')(Flags, riid, pDebug_out);
   }
 }
 

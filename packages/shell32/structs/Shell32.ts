@@ -50,7 +50,8 @@ import type {
   LPWORD,
   LPWSTR,
   LRESULT,
-  NULL,
+  NULLABLE,
+  OPTIONAL,
   PACKED_POINT,
   PAPPBARDATA,
   PCABINETSTATE,
@@ -366,38 +367,38 @@ class Shell32 extends Win32 {
   } as const satisfies Record<string, FFIFunction>;
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-assoccreateforclasses
-  public static AssocCreateForClasses(rgClasses: LPVOID, cClasses: ULONG, riid: LPVOID, ppv: LPVOID): HRESULT {
-    return Shell32.Load('AssocCreateForClasses')(rgClasses, cClasses, riid, ppv);
+  public static AssocCreateForClasses(rgClasses: LPVOID, cClasses: ULONG, riid: LPVOID, ppv_out: LPVOID): HRESULT {
+    return Shell32.Load('AssocCreateForClasses')(rgClasses, cClasses, riid, ppv_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-assocgetdetailsofpropkey
-  public static AssocGetDetailsOfPropKey(psf: LPVOID, pidl: PCUITEMID_CHILD, pkey: LPVOID, pv: LPVOID, pfFoundPropKey: LPVOID | NULL): HRESULT {
-    return Shell32.Load('AssocGetDetailsOfPropKey')(psf, pidl, pkey, pv, pfFoundPropKey);
+  public static AssocGetDetailsOfPropKey(psf: LPVOID, pidl: PCUITEMID_CHILD, pkey: LPVOID, pv_out: LPVOID, pfFoundPropKey_out: OPTIONAL<LPVOID>): HRESULT {
+    return Shell32.Load('AssocGetDetailsOfPropKey')(psf, pidl, pkey, pv_out, pfFoundPropKey_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-cdeffoldeMenu_create2
   public static CDefFolderMenu_Create2(
-    pidlFolder: PCIDLIST_ABSOLUTE | NULL,
-    hwnd: HWND | 0n,
+    pidlFolder: OPTIONAL<PCIDLIST_ABSOLUTE>,
+    hwnd: OPTIONAL<HWND>,
     cidl: UINT,
-    apidl: PCUITEMID_CHILD_ARRAY,
-    psf: LPVOID | NULL,
-    pfn: LPFNDFMCALLBACK | NULL,
+    apidl: OPTIONAL<PCUITEMID_CHILD_ARRAY>,
+    psf: OPTIONAL<LPVOID>,
+    pfn: OPTIONAL<LPFNDFMCALLBACK>,
     nKeys: UINT,
-    ahkeys: LPVOID | NULL,
-    ppcm: LPVOID,
+    ahkeys: OPTIONAL<LPVOID>,
+    ppcm_out: LPVOID,
   ): HRESULT {
-    return Shell32.Load('CDefFolderMenu_Create2')(pidlFolder, hwnd, cidl, apidl, psf, pfn, nKeys, ahkeys, ppcm);
+    return Shell32.Load('CDefFolderMenu_Create2')(pidlFolder, hwnd, cidl, apidl, psf, pfn, nKeys, ahkeys, ppcm_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj/nf-shlobj-cidldata_createfromidarray
-  public static CIDLData_CreateFromIDArray(pidlFolder: PCIDLIST_ABSOLUTE, cidl: UINT, apidl: PCUIDLIST_RELATIVE_ARRAY | NULL, ppdtobj: LPVOID): HRESULT {
-    return Shell32.Load('CIDLData_CreateFromIDArray')(pidlFolder, cidl, apidl, ppdtobj);
+  public static CIDLData_CreateFromIDArray(pidlFolder: PCIDLIST_ABSOLUTE, cidl: UINT, apidl: OPTIONAL<PCUIDLIST_RELATIVE_ARRAY>, ppdtobj_out: LPVOID): HRESULT {
+    return Shell32.Load('CIDLData_CreateFromIDArray')(pidlFolder, cidl, apidl, ppdtobj_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-commandlinetoargvw
-  public static CommandLineToArgvW(lpCmdLine: LPCWSTR, pNumArgs: LPVOID): LPWSTR {
-    return Shell32.Load('CommandLineToArgvW')(lpCmdLine, pNumArgs);
+  public static CommandLineToArgvW(lpCmdLine: LPCWSTR, pNumArgs_out: LPVOID): LPWSTR {
+    return Shell32.Load('CommandLineToArgvW')(lpCmdLine, pNumArgs_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-dad_autoscroll
@@ -411,7 +412,7 @@ class Shell32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-dad_dragenterex2
-  public static DAD_DragEnterEx2(hwndTarget: HWND, ptStart: PACKED_POINT, pdtObject: LPVOID | NULL): BOOL {
+  public static DAD_DragEnterEx2(hwndTarget: HWND, ptStart: PACKED_POINT, pdtObject: OPTIONAL<LPVOID>): BOOL {
     return Shell32.Load('DAD_DragEnterEx2')(hwndTarget, ptStart, pdtObject);
   }
 
@@ -426,7 +427,7 @@ class Shell32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-dad_setdragimage
-  public static DAD_SetDragImage(him: HIMAGELIST, pptOffset: LPPOINT | NULL): BOOL {
+  public static DAD_SetDragImage(him: HIMAGELIST, pptOffset: NULLABLE<LPPOINT>): BOOL {
     return Shell32.Load('DAD_SetDragImage')(him, pptOffset);
   }
 
@@ -436,18 +437,18 @@ class Shell32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-dllgetversion
-  public static DllGetVersion(pdvi: PDLLVERSIONINFO): HRESULT {
-    return Shell32.Load('DllGetVersion')(pdvi);
+  public static DllGetVersion(pdvi_in_out: PDLLVERSIONINFO): HRESULT {
+    return Shell32.Load('DllGetVersion')(pdvi_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-doenvironmentsubsta
-  public static DoEnvironmentSubstA(pszSrc: LPSTR, cchSrc: UINT): DWORD {
-    return Shell32.Load('DoEnvironmentSubstA')(pszSrc, cchSrc);
+  public static DoEnvironmentSubstA(pszSrc_in_out: LPSTR, cchSrc: UINT): DWORD {
+    return Shell32.Load('DoEnvironmentSubstA')(pszSrc_in_out, cchSrc);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-doenvironmentsubstw
-  public static DoEnvironmentSubstW(pszSrc: LPWSTR, cchSrc: UINT): DWORD {
-    return Shell32.Load('DoEnvironmentSubstW')(pszSrc, cchSrc);
+  public static DoEnvironmentSubstW(pszSrc_in_out: LPWSTR, cchSrc: UINT): DWORD {
+    return Shell32.Load('DoEnvironmentSubstW')(pszSrc_in_out, cchSrc);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-dragacceptfiles
@@ -461,92 +462,92 @@ class Shell32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-dragqueryfilea
-  public static DragQueryFile(hDrop: HDROP, iFile: UINT, lpszFile: LPSTR | NULL, cch: UINT): UINT {
-    return Shell32.Load('DragQueryFile')(hDrop, iFile, lpszFile, cch);
+  public static DragQueryFile(hDrop: HDROP, iFile: UINT, lpszFile_out: OPTIONAL<LPSTR>, cch: UINT): UINT {
+    return Shell32.Load('DragQueryFile')(hDrop, iFile, lpszFile_out, cch);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-dragqueryfilea
-  public static DragQueryFileA(hDrop: HDROP, iFile: UINT, lpszFile: LPSTR | NULL, cch: UINT): UINT {
-    return Shell32.Load('DragQueryFileA')(hDrop, iFile, lpszFile, cch);
+  public static DragQueryFileA(hDrop: HDROP, iFile: UINT, lpszFile_out: OPTIONAL<LPSTR>, cch: UINT): UINT {
+    return Shell32.Load('DragQueryFileA')(hDrop, iFile, lpszFile_out, cch);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-dragqueryfilew
-  public static DragQueryFileW(hDrop: HDROP, iFile: UINT, lpszFile: LPWSTR | NULL, cch: UINT): UINT {
-    return Shell32.Load('DragQueryFileW')(hDrop, iFile, lpszFile, cch);
+  public static DragQueryFileW(hDrop: HDROP, iFile: UINT, lpszFile_out: OPTIONAL<LPWSTR>, cch: UINT): UINT {
+    return Shell32.Load('DragQueryFileW')(hDrop, iFile, lpszFile_out, cch);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-dragquerypoint
-  public static DragQueryPoint(hDrop: HDROP, lppt: LPPOINT): BOOL {
-    return Shell32.Load('DragQueryPoint')(hDrop, lppt);
+  public static DragQueryPoint(hDrop: HDROP, lppt_out: LPPOINT): BOOL {
+    return Shell32.Load('DragQueryPoint')(hDrop, lppt_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-duplicateicon
-  public static DuplicateIcon(hInst: HINSTANCE | 0n, hIcon: HICON): HICON {
+  public static DuplicateIcon(hInst: OPTIONAL<HINSTANCE>, hIcon: HICON): HICON {
     return Shell32.Load('DuplicateIcon')(hInst, hIcon);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-extractassociatedicona
-  public static ExtractAssociatedIconA(hInst: HINSTANCE | 0n, pszIconPath: LPSTR, piIcon: LPWORD): HICON {
-    return Shell32.Load('ExtractAssociatedIconA')(hInst, pszIconPath, piIcon);
+  public static ExtractAssociatedIconA(hInst: OPTIONAL<HINSTANCE>, pszIconPath_in_out: LPSTR, piIcon_in_out: LPWORD): HICON {
+    return Shell32.Load('ExtractAssociatedIconA')(hInst, pszIconPath_in_out, piIcon_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-extractassociatediconexa
-  public static ExtractAssociatedIconExA(hInst: HINSTANCE | 0n, pszIconPath: LPSTR, piIconIndex: LPWORD, piIconId: LPWORD): HICON {
-    return Shell32.Load('ExtractAssociatedIconExA')(hInst, pszIconPath, piIconIndex, piIconId);
+  public static ExtractAssociatedIconExA(hInst: OPTIONAL<HINSTANCE>, pszIconPath_in_out: LPSTR, piIconIndex_in_out: LPWORD, piIconId_in_out: LPWORD): HICON {
+    return Shell32.Load('ExtractAssociatedIconExA')(hInst, pszIconPath_in_out, piIconIndex_in_out, piIconId_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-extractassociatediconexw
-  public static ExtractAssociatedIconExW(hInst: HINSTANCE | 0n, pszIconPath: LPWSTR, piIconIndex: LPWORD, piIconId: LPWORD): HICON {
-    return Shell32.Load('ExtractAssociatedIconExW')(hInst, pszIconPath, piIconIndex, piIconId);
+  public static ExtractAssociatedIconExW(hInst: OPTIONAL<HINSTANCE>, pszIconPath_in_out: LPWSTR, piIconIndex_in_out: LPWORD, piIconId_in_out: LPWORD): HICON {
+    return Shell32.Load('ExtractAssociatedIconExW')(hInst, pszIconPath_in_out, piIconIndex_in_out, piIconId_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-extractassociatediconw
-  public static ExtractAssociatedIconW(hInst: HINSTANCE | 0n, pszIconPath: LPWSTR, piIcon: LPWORD): HICON {
-    return Shell32.Load('ExtractAssociatedIconW')(hInst, pszIconPath, piIcon);
+  public static ExtractAssociatedIconW(hInst: OPTIONAL<HINSTANCE>, pszIconPath_in_out: LPWSTR, piIcon_in_out: LPWORD): HICON {
+    return Shell32.Load('ExtractAssociatedIconW')(hInst, pszIconPath_in_out, piIcon_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-extracticona
-  public static ExtractIconA(hInst: HINSTANCE | 0n, pszExeFileName: LPCSTR, nIconIndex: UINT): HICON {
+  public static ExtractIconA(hInst: OPTIONAL<HINSTANCE>, pszExeFileName: LPCSTR, nIconIndex: UINT): HICON {
     return Shell32.Load('ExtractIconA')(hInst, pszExeFileName, nIconIndex);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-extracticonexa
-  public static ExtractIconEx(lpszFile: LPCSTR, nIconIndex: INT, phiconLarge: LPVOID | NULL, phiconSmall: LPVOID | NULL, nIcons: UINT): UINT {
-    return Shell32.Load('ExtractIconEx')(lpszFile, nIconIndex, phiconLarge, phiconSmall, nIcons);
+  public static ExtractIconEx(lpszFile: LPCSTR, nIconIndex: INT, phiconLarge_out: OPTIONAL<LPVOID>, phiconSmall_out: OPTIONAL<LPVOID>, nIcons: UINT): UINT {
+    return Shell32.Load('ExtractIconEx')(lpszFile, nIconIndex, phiconLarge_out, phiconSmall_out, nIcons);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-extracticonexa
-  public static ExtractIconExA(lpszFile: LPCSTR, nIconIndex: INT, phiconLarge: LPVOID | NULL, phiconSmall: LPVOID | NULL, nIcons: UINT): UINT {
-    return Shell32.Load('ExtractIconExA')(lpszFile, nIconIndex, phiconLarge, phiconSmall, nIcons);
+  public static ExtractIconExA(lpszFile: LPCSTR, nIconIndex: INT, phiconLarge_out: OPTIONAL<LPVOID>, phiconSmall_out: OPTIONAL<LPVOID>, nIcons: UINT): UINT {
+    return Shell32.Load('ExtractIconExA')(lpszFile, nIconIndex, phiconLarge_out, phiconSmall_out, nIcons);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-extracticonexw
-  public static ExtractIconExW(lpszFile: LPCWSTR, nIconIndex: INT, phiconLarge: LPVOID | NULL, phiconSmall: LPVOID | NULL, nIcons: UINT): UINT {
-    return Shell32.Load('ExtractIconExW')(lpszFile, nIconIndex, phiconLarge, phiconSmall, nIcons);
+  public static ExtractIconExW(lpszFile: LPCWSTR, nIconIndex: INT, phiconLarge_out: OPTIONAL<LPVOID>, phiconSmall_out: OPTIONAL<LPVOID>, nIcons: UINT): UINT {
+    return Shell32.Load('ExtractIconExW')(lpszFile, nIconIndex, phiconLarge_out, phiconSmall_out, nIcons);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-extracticonw
-  public static ExtractIconW(hInst: HINSTANCE | 0n, pszExeFileName: LPCWSTR, nIconIndex: UINT): HICON {
+  public static ExtractIconW(hInst: OPTIONAL<HINSTANCE>, pszExeFileName: LPCWSTR, nIconIndex: UINT): HICON {
     return Shell32.Load('ExtractIconW')(hInst, pszExeFileName, nIconIndex);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-findexecutablea
-  public static FindExecutableA(lpFile: LPCSTR, lpDirectory: LPCSTR | NULL, lpResult: LPSTR): HINSTANCE {
-    return Shell32.Load('FindExecutableA')(lpFile, lpDirectory, lpResult);
+  public static FindExecutableA(lpFile: LPCSTR, lpDirectory: OPTIONAL<LPCSTR>, lpResult_out: LPSTR): HINSTANCE {
+    return Shell32.Load('FindExecutableA')(lpFile, lpDirectory, lpResult_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-findexecutablew
-  public static FindExecutableW(lpFile: LPCWSTR, lpDirectory: LPCWSTR | NULL, lpResult: LPWSTR): HINSTANCE {
-    return Shell32.Load('FindExecutableW')(lpFile, lpDirectory, lpResult);
+  public static FindExecutableW(lpFile: LPCWSTR, lpDirectory: OPTIONAL<LPCWSTR>, lpResult_out: LPWSTR): HINSTANCE {
+    return Shell32.Load('FindExecutableW')(lpFile, lpDirectory, lpResult_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-getcurrentprocessexplicitappusermodelid
-  public static GetCurrentProcessExplicitAppUserModelID(AppID: LPVOID): HRESULT {
-    return Shell32.Load('GetCurrentProcessExplicitAppUserModelID')(AppID);
+  public static GetCurrentProcessExplicitAppUserModelID(AppID_out: LPVOID): HRESULT {
+    return Shell32.Load('GetCurrentProcessExplicitAppUserModelID')(AppID_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-ilappendid
-  public static ILAppendID(pidl: PIDLIST_RELATIVE | NULL, pmkid: LPCSHITEMID, fAppend: BOOL): PIDLIST_RELATIVE {
+  public static ILAppendID(pidl: OPTIONAL<PIDLIST_RELATIVE>, pmkid: LPCSHITEMID, fAppend: BOOL): PIDLIST_RELATIVE {
     return Shell32.Load('ILAppendID')(pidl, pmkid, fAppend);
   }
 
@@ -561,7 +562,7 @@ class Shell32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-ilcombine
-  public static ILCombine(pidl1: PCIDLIST_ABSOLUTE | NULL, pidl2: PCUIDLIST_RELATIVE | NULL): PIDLIST_ABSOLUTE {
+  public static ILCombine(pidl1: OPTIONAL<PCIDLIST_ABSOLUTE>, pidl2: OPTIONAL<PCUIDLIST_RELATIVE>): PIDLIST_ABSOLUTE {
     return Shell32.Load('ILCombine')(pidl1, pidl2);
   }
 
@@ -591,17 +592,17 @@ class Shell32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-ilfree
-  public static ILFree(pidl: PIDLIST_RELATIVE | NULL): void {
+  public static ILFree(pidl: OPTIONAL<PIDLIST_RELATIVE>): void {
     return Shell32.Load('ILFree')(pidl);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-ilgetnext
-  public static ILGetNext(pidl: PCUIDLIST_RELATIVE | NULL): PUIDLIST_RELATIVE {
+  public static ILGetNext(pidl: OPTIONAL<PCUIDLIST_RELATIVE>): PUIDLIST_RELATIVE {
     return Shell32.Load('ILGetNext')(pidl);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-ilgetsize
-  public static ILGetSize(pidl: PCIDLIST_ABSOLUTE | NULL): UINT {
+  public static ILGetSize(pidl: OPTIONAL<PCIDLIST_ABSOLUTE>): UINT {
     return Shell32.Load('ILGetSize')(pidl);
   }
 
@@ -616,13 +617,13 @@ class Shell32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-illoadfromstreamex
-  public static ILLoadFromStreamEx(pstm: LPVOID, ppidl: LPVOID): HRESULT {
-    return Shell32.Load('ILLoadFromStreamEx')(pstm, ppidl);
+  public static ILLoadFromStreamEx(pstm: LPVOID, ppidl_out: LPVOID): HRESULT {
+    return Shell32.Load('ILLoadFromStreamEx')(pstm, ppidl_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-ilremovelastid
-  public static ILRemoveLastID(pidl: PUIDLIST_RELATIVE | NULL): BOOL {
-    return Shell32.Load('ILRemoveLastID')(pidl);
+  public static ILRemoveLastID(pidl_in_out: OPTIONAL<PUIDLIST_RELATIVE>): BOOL {
+    return Shell32.Load('ILRemoveLastID')(pidl_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-ilsavetostream
@@ -641,8 +642,8 @@ class Shell32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-pathcleanupspec
-  public static PathCleanupSpec(pszDir: LPCWSTR | NULL, pszSpec: LPWSTR): INT {
-    return Shell32.Load('PathCleanupSpec')(pszDir, pszSpec);
+  public static PathCleanupSpec(pszDir: OPTIONAL<LPCWSTR>, pszSpec_in_out: LPWSTR): INT {
+    return Shell32.Load('PathCleanupSpec')(pszDir, pszSpec_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-pathisslowa
@@ -656,37 +657,37 @@ class Shell32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-pathmakeuniquename
-  public static PathMakeUniqueName(pszUniqueName: LPWSTR, cchMax: UINT, pszTemplate: LPCWSTR | NULL, pszLongPlate: LPCWSTR | NULL, pszDir: LPCWSTR | NULL): BOOL {
-    return Shell32.Load('PathMakeUniqueName')(pszUniqueName, cchMax, pszTemplate, pszLongPlate, pszDir);
+  public static PathMakeUniqueName(pszUniqueName_out: LPWSTR, cchMax: UINT, pszTemplate: LPCWSTR, pszLongPlate: OPTIONAL<LPCWSTR>, pszDir: OPTIONAL<LPCWSTR>): BOOL {
+    return Shell32.Load('PathMakeUniqueName')(pszUniqueName_out, cchMax, pszTemplate, pszLongPlate, pszDir);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-pathresolve
-  public static PathResolve(pszPath: LPWSTR, dirs: LPVOID | NULL, fFlags: UINT): INT {
-    return Shell32.Load('PathResolve')(pszPath, dirs, fFlags);
+  public static PathResolve(pszPath_in_out: LPWSTR, dirs: OPTIONAL<LPVOID>, fFlags: UINT): INT {
+    return Shell32.Load('PathResolve')(pszPath_in_out, dirs, fFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-pathyetanothermakeuniquename
-  public static PathYetAnotherMakeUniqueName(pszUniqueName: LPWSTR, pszPath: LPCWSTR, pszShort: LPCWSTR | NULL, pszFileSpec: LPCWSTR | NULL): BOOL {
-    return Shell32.Load('PathYetAnotherMakeUniqueName')(pszUniqueName, pszPath, pszShort, pszFileSpec);
+  public static PathYetAnotherMakeUniqueName(pszUniqueName_out: LPWSTR, pszPath: LPCWSTR, pszShort: OPTIONAL<LPCWSTR>, pszFileSpec: OPTIONAL<LPCWSTR>): BOOL {
+    return Shell32.Load('PathYetAnotherMakeUniqueName')(pszUniqueName_out, pszPath, pszShort, pszFileSpec);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-pickicondlg
-  public static PickIconDlg(hwnd: HWND | 0n, pszIconPath: LPWSTR, cchIconPath: UINT, piIconIndex: LPVOID | NULL): INT {
-    return Shell32.Load('PickIconDlg')(hwnd, pszIconPath, cchIconPath, piIconIndex);
+  public static PickIconDlg(hwnd: OPTIONAL<HWND>, pszIconPath_in_out: LPWSTR, cchIconPath: UINT, piIconIndex_in_out: OPTIONAL<LPVOID>): INT {
+    return Shell32.Load('PickIconDlg')(hwnd, pszIconPath_in_out, cchIconPath, piIconIndex_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-readcabinetstate
-  public static ReadCabinetState(pcs: PCABINETSTATE, cLength: INT): BOOL {
-    return Shell32.Load('ReadCabinetState')(pcs, cLength);
+  public static ReadCabinetState(pcs_out: PCABINETSTATE, cLength: INT): BOOL {
+    return Shell32.Load('ReadCabinetState')(pcs_out, cLength);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-restartdialog
-  public static RestartDialog(hwnd: HWND | 0n, pszPrompt: LPCWSTR | NULL, dwReturn: DWORD): INT {
+  public static RestartDialog(hwnd: OPTIONAL<HWND>, pszPrompt: OPTIONAL<LPCWSTR>, dwReturn: DWORD): INT {
     return Shell32.Load('RestartDialog')(hwnd, pszPrompt, dwReturn);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-restartdialogex
-  public static RestartDialogEx(hwnd: HWND | 0n, pszPrompt: LPCWSTR | NULL, dwReturn: DWORD, dwReasonCode: DWORD): INT {
+  public static RestartDialogEx(hwnd: OPTIONAL<HWND>, pszPrompt: OPTIONAL<LPCWSTR>, dwReturn: DWORD, dwReasonCode: DWORD): INT {
     return Shell32.Load('RestartDialogEx')(hwnd, pszPrompt, dwReturn, dwReasonCode);
   }
 
@@ -701,7 +702,7 @@ class Shell32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-shaddtorecentdocs
-  public static SHAddToRecentDocs(uFlags: UINT, pv: LPCVOID | NULL): void {
+  public static SHAddToRecentDocs(uFlags: UINT, pv: OPTIONAL<LPCVOID>): void {
     return Shell32.Load('SHAddToRecentDocs')(uFlags, pv);
   }
 
@@ -711,38 +712,38 @@ class Shell32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-shappbarmessage
-  public static SHAppBarMessage(dwMessage: DWORD, pData: PAPPBARDATA): UINT_PTR {
-    return Shell32.Load('SHAppBarMessage')(dwMessage, pData);
+  public static SHAppBarMessage(dwMessage: DWORD, pData_in_out: PAPPBARDATA): UINT_PTR {
+    return Shell32.Load('SHAppBarMessage')(dwMessage, pData_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-shassocenumhandlers
-  public static SHAssocEnumHandlers(pszExtra: LPCWSTR, afFilter: ASSOC_FILTER, ppEnumHandler: LPVOID): HRESULT {
-    return Shell32.Load('SHAssocEnumHandlers')(pszExtra, afFilter, ppEnumHandler);
+  public static SHAssocEnumHandlers(pszExtra: LPCWSTR, afFilter: ASSOC_FILTER, ppEnumHandler_out: LPVOID): HRESULT {
+    return Shell32.Load('SHAssocEnumHandlers')(pszExtra, afFilter, ppEnumHandler_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-shassocenumhandlersforprotocolbyapplication
-  public static SHAssocEnumHandlersForProtocolByApplication(pszProtocol: LPCWSTR, riid: LPVOID, enumHandlers: LPVOID): HRESULT {
-    return Shell32.Load('SHAssocEnumHandlersForProtocolByApplication')(pszProtocol, riid, enumHandlers);
+  public static SHAssocEnumHandlersForProtocolByApplication(pszProtocol: LPCWSTR, riid: LPVOID, enumHandlers_out: LPVOID): HRESULT {
+    return Shell32.Load('SHAssocEnumHandlersForProtocolByApplication')(pszProtocol, riid, enumHandlers_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-shbindtofolderidlistparent
-  public static SHBindToFolderIDListParent(psfRoot: LPVOID | NULL, pidl: PCUIDLIST_RELATIVE, riid: LPVOID, ppv: LPVOID, ppidlLast: LPVOID | NULL): HRESULT {
-    return Shell32.Load('SHBindToFolderIDListParent')(psfRoot, pidl, riid, ppv, ppidlLast);
+  public static SHBindToFolderIDListParent(psfRoot: OPTIONAL<LPVOID>, pidl: PCUIDLIST_RELATIVE, riid: LPVOID, ppv_out: LPVOID, ppidlLast_out: OPTIONAL<LPVOID>): HRESULT {
+    return Shell32.Load('SHBindToFolderIDListParent')(psfRoot, pidl, riid, ppv_out, ppidlLast_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-shbindtofolderidlistparentex
-  public static SHBindToFolderIDListParentEx(psfRoot: LPVOID | NULL, pidl: PCUIDLIST_RELATIVE, ppbc: LPVOID | NULL, riid: LPVOID, ppv: LPVOID, ppidlLast: LPVOID | NULL): HRESULT {
-    return Shell32.Load('SHBindToFolderIDListParentEx')(psfRoot, pidl, ppbc, riid, ppv, ppidlLast);
+  public static SHBindToFolderIDListParentEx(psfRoot: OPTIONAL<LPVOID>, pidl: PCUIDLIST_RELATIVE, ppbc: OPTIONAL<LPVOID>, riid: LPVOID, ppv_out: LPVOID, ppidlLast_out: OPTIONAL<LPVOID>): HRESULT {
+    return Shell32.Load('SHBindToFolderIDListParentEx')(psfRoot, pidl, ppbc, riid, ppv_out, ppidlLast_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-shbindtoobject
-  public static SHBindToObject(psf: LPVOID | NULL, pidl: PCUIDLIST_RELATIVE, pbc: LPVOID | NULL, riid: LPVOID, ppv: LPVOID): HRESULT {
-    return Shell32.Load('SHBindToObject')(psf, pidl, pbc, riid, ppv);
+  public static SHBindToObject(psf: OPTIONAL<LPVOID>, pidl: PCUIDLIST_RELATIVE, pbc: OPTIONAL<LPVOID>, riid: LPVOID, ppv_out: LPVOID): HRESULT {
+    return Shell32.Load('SHBindToObject')(psf, pidl, pbc, riid, ppv_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-shbindtoparent
-  public static SHBindToParent(pidl: PCIDLIST_ABSOLUTE, riid: LPVOID, ppv: LPVOID, ppidlLast: LPVOID | NULL): HRESULT {
-    return Shell32.Load('SHBindToParent')(pidl, riid, ppv, ppidlLast);
+  public static SHBindToParent(pidl: PCIDLIST_ABSOLUTE, riid: LPVOID, ppv_out: LPVOID, ppidlLast_out: OPTIONAL<LPVOID>): HRESULT {
+    return Shell32.Load('SHBindToParent')(pidl, riid, ppv_out, ppidlLast_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-shbrowseforfoldera
@@ -761,8 +762,8 @@ class Shell32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-shchangenotification_lock
-  public static SHChangeNotification_Lock(hChange: HANDLE, dwProcId: DWORD, pppidl: LPVOID | NULL, plEvent: LPVOID | NULL): HANDLE {
-    return Shell32.Load('SHChangeNotification_Lock')(hChange, dwProcId, pppidl, plEvent);
+  public static SHChangeNotification_Lock(hChange: HANDLE, dwProcId: DWORD, pppidl_out: OPTIONAL<LPVOID>, plEvent_out: OPTIONAL<LPVOID>): HANDLE {
+    return Shell32.Load('SHChangeNotification_Lock')(hChange, dwProcId, pppidl_out, plEvent_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-shchangenotification_unlock
@@ -771,7 +772,7 @@ class Shell32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-shchangenotify
-  public static SHChangeNotify(wEventId: LONG, uFlags: UINT, dwItem1: LPCVOID | NULL, dwItem2: LPCVOID | NULL): void {
+  public static SHChangeNotify(wEventId: LONG, uFlags: UINT, dwItem1: OPTIONAL<LPCVOID>, dwItem2: OPTIONAL<LPCVOID>): void {
     return Shell32.Load('SHChangeNotify')(wEventId, uFlags, dwItem1, dwItem2);
   }
 
@@ -786,138 +787,138 @@ class Shell32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-shcreateassociationregistration
-  public static SHCreateAssociationRegistration(riid: LPVOID, ppv: LPVOID): HRESULT {
-    return Shell32.Load('SHCreateAssociationRegistration')(riid, ppv);
+  public static SHCreateAssociationRegistration(riid: LPVOID, ppv_out: LPVOID): HRESULT {
+    return Shell32.Load('SHCreateAssociationRegistration')(riid, ppv_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-shcreatedataobject
-  public static SHCreateDataObject(pidlFolder: PCIDLIST_ABSOLUTE | NULL, cidl: UINT, apidl: PCUITEMID_CHILD_ARRAY | NULL, pdtInner: LPVOID | NULL, riid: LPVOID, ppv: LPVOID): HRESULT {
-    return Shell32.Load('SHCreateDataObject')(pidlFolder, cidl, apidl, pdtInner, riid, ppv);
+  public static SHCreateDataObject(pidlFolder: OPTIONAL<PCIDLIST_ABSOLUTE>, cidl: UINT, apidl: OPTIONAL<PCUITEMID_CHILD_ARRAY>, pdtInner: OPTIONAL<LPVOID>, riid: LPVOID, ppv_out: LPVOID): HRESULT {
+    return Shell32.Load('SHCreateDataObject')(pidlFolder, cidl, apidl, pdtInner, riid, ppv_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-shcreatedefaultcontextmenu
-  public static SHCreateDefaultContextMenu(pdcm: PCDEFCONTEXTMENU, riid: LPVOID, ppv: LPVOID): HRESULT {
-    return Shell32.Load('SHCreateDefaultContextMenu')(pdcm, riid, ppv);
+  public static SHCreateDefaultContextMenu(pdcm: PCDEFCONTEXTMENU, riid: LPVOID, ppv_out: LPVOID): HRESULT {
+    return Shell32.Load('SHCreateDefaultContextMenu')(pdcm, riid, ppv_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-shcreatedefaultextracticon
-  public static SHCreateDefaultExtractIcon(riid: LPVOID, ppv: LPVOID): HRESULT {
-    return Shell32.Load('SHCreateDefaultExtractIcon')(riid, ppv);
+  public static SHCreateDefaultExtractIcon(riid: LPVOID, ppv_out: LPVOID): HRESULT {
+    return Shell32.Load('SHCreateDefaultExtractIcon')(riid, ppv_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shobjidl/nf-shobjidl-shcreatedefaultpropertiesop
-  public static SHCreateDefaultPropertiesOp(psi: LPVOID, ppFileOp: LPVOID): HRESULT {
-    return Shell32.Load('SHCreateDefaultPropertiesOp')(psi, ppFileOp);
+  public static SHCreateDefaultPropertiesOp(psi: LPVOID, ppFileOp_out: LPVOID): HRESULT {
+    return Shell32.Load('SHCreateDefaultPropertiesOp')(psi, ppFileOp_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-shcreatedirectory
-  public static SHCreateDirectory(hwnd: HWND | 0n, pszPath: LPCWSTR): INT {
+  public static SHCreateDirectory(hwnd: OPTIONAL<HWND>, pszPath: LPCWSTR): INT {
     return Shell32.Load('SHCreateDirectory')(hwnd, pszPath);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-shcreatedirectoryexa
-  public static SHCreateDirectoryExA(hwnd: HWND | 0n, pszPath: LPCSTR, psa: LPSECURITY_ATTRIBUTES | NULL): INT {
+  public static SHCreateDirectoryExA(hwnd: OPTIONAL<HWND>, pszPath: LPCSTR, psa: OPTIONAL<LPSECURITY_ATTRIBUTES>): INT {
     return Shell32.Load('SHCreateDirectoryExA')(hwnd, pszPath, psa);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-shcreatedirectoryexw
-  public static SHCreateDirectoryExW(hwnd: HWND | 0n, pszPath: LPCWSTR, psa: LPSECURITY_ATTRIBUTES | NULL): INT {
+  public static SHCreateDirectoryExW(hwnd: OPTIONAL<HWND>, pszPath: LPCWSTR, psa: OPTIONAL<LPSECURITY_ATTRIBUTES>): INT {
     return Shell32.Load('SHCreateDirectoryExW')(hwnd, pszPath, psa);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-shcreatefileextracticonw
-  public static SHCreateFileExtractIconW(pszFile: LPCWSTR, dwFileAttributes: DWORD, riid: LPVOID, ppv: LPVOID): HRESULT {
-    return Shell32.Load('SHCreateFileExtractIconW')(pszFile, dwFileAttributes, riid, ppv);
+  public static SHCreateFileExtractIconW(pszFile: LPCWSTR, dwFileAttributes: DWORD, riid: LPVOID, ppv_out: LPVOID): HRESULT {
+    return Shell32.Load('SHCreateFileExtractIconW')(pszFile, dwFileAttributes, riid, ppv_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-shcreateitemfromidlist
-  public static SHCreateItemFromIDList(pidl: PCIDLIST_ABSOLUTE, riid: LPVOID, ppv: LPVOID): HRESULT {
-    return Shell32.Load('SHCreateItemFromIDList')(pidl, riid, ppv);
+  public static SHCreateItemFromIDList(pidl: PCIDLIST_ABSOLUTE, riid: LPVOID, ppv_out: LPVOID): HRESULT {
+    return Shell32.Load('SHCreateItemFromIDList')(pidl, riid, ppv_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-shcreateitemfromparsingname
-  public static SHCreateItemFromParsingName(pszPath: LPCWSTR, pbc: LPVOID | NULL, riid: LPVOID, ppv: LPVOID): HRESULT {
-    return Shell32.Load('SHCreateItemFromParsingName')(pszPath, pbc, riid, ppv);
+  public static SHCreateItemFromParsingName(pszPath: LPCWSTR, pbc: OPTIONAL<LPVOID>, riid: LPVOID, ppv_out: LPVOID): HRESULT {
+    return Shell32.Load('SHCreateItemFromParsingName')(pszPath, pbc, riid, ppv_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-shcreateitemfromrelativename
-  public static SHCreateItemFromRelativeName(psiParent: LPVOID, pszName: LPCWSTR, pbc: LPVOID | NULL, riid: LPVOID, ppv: LPVOID): HRESULT {
-    return Shell32.Load('SHCreateItemFromRelativeName')(psiParent, pszName, pbc, riid, ppv);
+  public static SHCreateItemFromRelativeName(psiParent: LPVOID, pszName: LPCWSTR, pbc: OPTIONAL<LPVOID>, riid: LPVOID, ppv_out: LPVOID): HRESULT {
+    return Shell32.Load('SHCreateItemFromRelativeName')(psiParent, pszName, pbc, riid, ppv_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-shcreateiteminknownfolder
-  public static SHCreateItemInKnownFolder(kfid: LPVOID, dwKFFlags: DWORD, pszItem: LPCWSTR | NULL, riid: LPVOID, ppv: LPVOID): HRESULT {
-    return Shell32.Load('SHCreateItemInKnownFolder')(kfid, dwKFFlags, pszItem, riid, ppv);
+  public static SHCreateItemInKnownFolder(kfid: LPVOID, dwKFFlags: DWORD, pszItem: OPTIONAL<LPCWSTR>, riid: LPVOID, ppv_out: LPVOID): HRESULT {
+    return Shell32.Load('SHCreateItemInKnownFolder')(kfid, dwKFFlags, pszItem, riid, ppv_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-shcreateitemwithparent
-  public static SHCreateItemWithParent(pidlParent: PCIDLIST_ABSOLUTE | NULL, psfParent: LPVOID | NULL, pidl: PCUITEMID_CHILD, riid: LPVOID, ppv: LPVOID): HRESULT {
-    return Shell32.Load('SHCreateItemWithParent')(pidlParent, psfParent, pidl, riid, ppv);
+  public static SHCreateItemWithParent(pidlParent: OPTIONAL<PCIDLIST_ABSOLUTE>, psfParent: OPTIONAL<LPVOID>, pidl: PCUITEMID_CHILD, riid: LPVOID, ppv_out: LPVOID): HRESULT {
+    return Shell32.Load('SHCreateItemWithParent')(pidlParent, psfParent, pidl, riid, ppv_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-shcreateprocessasuserw
-  public static SHCreateProcessAsUserW(pscpi: LPSHCREATEPROCESSINFOW): BOOL {
-    return Shell32.Load('SHCreateProcessAsUserW')(pscpi);
+  public static SHCreateProcessAsUserW(pscpi_in_out: LPSHCREATEPROCESSINFOW): BOOL {
+    return Shell32.Load('SHCreateProcessAsUserW')(pscpi_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj/nf-shlobj-shcreatepropsheetextarray
-  public static SHCreatePropSheetExtArray(hKey: HKEY, pszSubKey: LPCWSTR | NULL, max_iface: UINT): HPSXA {
+  public static SHCreatePropSheetExtArray(hKey: HKEY, pszSubKey: OPTIONAL<LPCWSTR>, max_iface: UINT): HPSXA {
     return Shell32.Load('SHCreatePropSheetExtArray')(hKey, pszSubKey, max_iface);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-shcreatequerycancelautoplaymoniker
-  public static SHCreateQueryCancelAutoPlayMoniker(ppmoniker: LPVOID): HRESULT {
-    return Shell32.Load('SHCreateQueryCancelAutoPlayMoniker')(ppmoniker);
+  public static SHCreateQueryCancelAutoPlayMoniker(ppmoniker_out: LPVOID): HRESULT {
+    return Shell32.Load('SHCreateQueryCancelAutoPlayMoniker')(ppmoniker_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-shcreateshellfolderview
-  public static SHCreateShellFolderView(pcsfv: PSFV_CREATE, ppsv: LPVOID): HRESULT {
-    return Shell32.Load('SHCreateShellFolderView')(pcsfv, ppsv);
+  public static SHCreateShellFolderView(pcsfv: PSFV_CREATE, ppsv_out: LPVOID): HRESULT {
+    return Shell32.Load('SHCreateShellFolderView')(pcsfv, ppsv_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-shcreateshellfolderviewex
-  public static SHCreateShellFolderViewEx(pcsfv: LPVOID, ppsv: LPVOID): HRESULT {
-    return Shell32.Load('SHCreateShellFolderViewEx')(pcsfv, ppsv);
+  public static SHCreateShellFolderViewEx(pcsfv: LPVOID, ppsv_out: LPVOID): HRESULT {
+    return Shell32.Load('SHCreateShellFolderViewEx')(pcsfv, ppsv_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-shcreateshellitem
-  public static SHCreateShellItem(pidlParent: PCIDLIST_ABSOLUTE | NULL, psfParent: LPVOID | NULL, pidl: PCUITEMID_CHILD, ppsi: LPVOID): HRESULT {
-    return Shell32.Load('SHCreateShellItem')(pidlParent, psfParent, pidl, ppsi);
+  public static SHCreateShellItem(pidlParent: OPTIONAL<PCIDLIST_ABSOLUTE>, psfParent: OPTIONAL<LPVOID>, pidl: PCUITEMID_CHILD, ppsi_out: LPVOID): HRESULT {
+    return Shell32.Load('SHCreateShellItem')(pidlParent, psfParent, pidl, ppsi_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-shcreateshellitemarray
-  public static SHCreateShellItemArray(pidlParent: PCIDLIST_ABSOLUTE | NULL, psf: LPVOID | NULL, cidl: UINT, ppidl: PCUITEMID_CHILD_ARRAY | NULL, ppsiItemArray: LPVOID): HRESULT {
-    return Shell32.Load('SHCreateShellItemArray')(pidlParent, psf, cidl, ppidl, ppsiItemArray);
+  public static SHCreateShellItemArray(pidlParent: OPTIONAL<PCIDLIST_ABSOLUTE>, psf: OPTIONAL<LPVOID>, cidl: UINT, ppidl: OPTIONAL<PCUITEMID_CHILD_ARRAY>, ppsiItemArray_out: LPVOID): HRESULT {
+    return Shell32.Load('SHCreateShellItemArray')(pidlParent, psf, cidl, ppidl, ppsiItemArray_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-shcreateshellitemarrayfromdataobject
-  public static SHCreateShellItemArrayFromDataObject(pdo: LPVOID, riid: LPVOID, ppv: LPVOID): HRESULT {
-    return Shell32.Load('SHCreateShellItemArrayFromDataObject')(pdo, riid, ppv);
+  public static SHCreateShellItemArrayFromDataObject(pdo: LPVOID, riid: LPVOID, ppv_out: LPVOID): HRESULT {
+    return Shell32.Load('SHCreateShellItemArrayFromDataObject')(pdo, riid, ppv_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-shcreateshellitemarrayfromidlists
-  public static SHCreateShellItemArrayFromIDLists(cidl: UINT, rgpidl: LPVOID, ppsiItemArray: LPVOID): HRESULT {
-    return Shell32.Load('SHCreateShellItemArrayFromIDLists')(cidl, rgpidl, ppsiItemArray);
+  public static SHCreateShellItemArrayFromIDLists(cidl: UINT, rgpidl: LPVOID, ppsiItemArray_out: LPVOID): HRESULT {
+    return Shell32.Load('SHCreateShellItemArrayFromIDLists')(cidl, rgpidl, ppsiItemArray_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-shcreateshellitemarrayfromshellitem
-  public static SHCreateShellItemArrayFromShellItem(psi: LPVOID, riid: LPVOID, ppv: LPVOID): HRESULT {
-    return Shell32.Load('SHCreateShellItemArrayFromShellItem')(psi, riid, ppv);
+  public static SHCreateShellItemArrayFromShellItem(psi: LPVOID, riid: LPVOID, ppv_out: LPVOID): HRESULT {
+    return Shell32.Load('SHCreateShellItemArrayFromShellItem')(psi, riid, ppv_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-shcreatestdenumfmtetc
-  public static SHCreateStdEnumFmtEtc(cfmt: UINT, afmt: LPVOID, ppenumFormatEtc: LPVOID): HRESULT {
-    return Shell32.Load('SHCreateStdEnumFmtEtc')(cfmt, afmt, ppenumFormatEtc);
+  public static SHCreateStdEnumFmtEtc(cfmt: UINT, afmt: LPVOID, ppenumFormatEtc_out: LPVOID): HRESULT {
+    return Shell32.Load('SHCreateStdEnumFmtEtc')(cfmt, afmt, ppenumFormatEtc_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-shdefextracticona
-  public static SHDefExtractIconA(pszIconFile: LPCSTR, iIndex: INT, uFlags: UINT, phiconLarge: LPVOID | NULL, phiconSmall: LPVOID | NULL, nIconSize: UINT): HRESULT {
-    return Shell32.Load('SHDefExtractIconA')(pszIconFile, iIndex, uFlags, phiconLarge, phiconSmall, nIconSize);
+  public static SHDefExtractIconA(pszIconFile: LPCSTR, iIndex: INT, uFlags: UINT, phiconLarge_out: OPTIONAL<LPVOID>, phiconSmall_out: OPTIONAL<LPVOID>, nIconSize: UINT): HRESULT {
+    return Shell32.Load('SHDefExtractIconA')(pszIconFile, iIndex, uFlags, phiconLarge_out, phiconSmall_out, nIconSize);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-shdefextracticonw
-  public static SHDefExtractIconW(pszIconFile: LPCWSTR, iIndex: INT, uFlags: UINT, phiconLarge: LPVOID | NULL, phiconSmall: LPVOID | NULL, nIconSize: UINT): HRESULT {
-    return Shell32.Load('SHDefExtractIconW')(pszIconFile, iIndex, uFlags, phiconLarge, phiconSmall, nIconSize);
+  public static SHDefExtractIconW(pszIconFile: LPCWSTR, iIndex: INT, uFlags: UINT, phiconLarge_out: OPTIONAL<LPVOID>, phiconSmall_out: OPTIONAL<LPVOID>, nIconSize: UINT): HRESULT {
+    return Shell32.Load('SHDefExtractIconW')(pszIconFile, iIndex, uFlags, phiconLarge_out, phiconSmall_out, nIconSize);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj/nf-shlobj-shdestroypropsheetextarray
@@ -926,48 +927,48 @@ class Shell32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-shdodragdrop
-  public static SHDoDragDrop(hwnd: HWND | 0n, pdata: LPVOID, pdsrc: LPVOID | NULL, dwEffect: DWORD, pdwEffect: LPDWORD): HRESULT {
-    return Shell32.Load('SHDoDragDrop')(hwnd, pdata, pdsrc, dwEffect, pdwEffect);
+  public static SHDoDragDrop(hwnd: OPTIONAL<HWND>, pdata: LPVOID, pdsrc: OPTIONAL<LPVOID>, dwEffect: DWORD, pdwEffect_out: LPDWORD): HRESULT {
+    return Shell32.Load('SHDoDragDrop')(hwnd, pdata, pdsrc, dwEffect, pdwEffect_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-shemptyrecyclebina
-  public static SHEmptyRecycleBinA(hwnd: HWND | 0n, pszRootPath: LPCSTR | NULL, dwFlags: DWORD): HRESULT {
+  public static SHEmptyRecycleBinA(hwnd: OPTIONAL<HWND>, pszRootPath: OPTIONAL<LPCSTR>, dwFlags: DWORD): HRESULT {
     return Shell32.Load('SHEmptyRecycleBinA')(hwnd, pszRootPath, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-shemptyrecyclebinw
-  public static SHEmptyRecycleBinW(hwnd: HWND | 0n, pszRootPath: LPCWSTR | NULL, dwFlags: DWORD): HRESULT {
+  public static SHEmptyRecycleBinW(hwnd: OPTIONAL<HWND>, pszRootPath: OPTIONAL<LPCWSTR>, dwFlags: DWORD): HRESULT {
     return Shell32.Load('SHEmptyRecycleBinW')(hwnd, pszRootPath, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-shenumerateunreadmailaccountsw
-  public static SHEnumerateUnreadMailAccountsW(hKeyUser: HKEY | 0n, dwIndex: DWORD, pszMailAddress: LPWSTR, cchMailAddress: INT): HRESULT {
-    return Shell32.Load('SHEnumerateUnreadMailAccountsW')(hKeyUser, dwIndex, pszMailAddress, cchMailAddress);
+  public static SHEnumerateUnreadMailAccountsW(hKeyUser: OPTIONAL<HKEY>, dwIndex: DWORD, pszMailAddress_out: LPWSTR, cchMailAddress: INT): HRESULT {
+    return Shell32.Load('SHEnumerateUnreadMailAccountsW')(hKeyUser, dwIndex, pszMailAddress_out, cchMailAddress);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-shevaluatesystemcommandtemplate
-  public static SHEvaluateSystemCommandTemplate(pszCmdTemplate: LPCWSTR, ppszApplication: LPVOID, ppszCommandLine: LPVOID | NULL, ppszParameters: LPVOID | NULL): HRESULT {
-    return Shell32.Load('SHEvaluateSystemCommandTemplate')(pszCmdTemplate, ppszApplication, ppszCommandLine, ppszParameters);
+  public static SHEvaluateSystemCommandTemplate(pszCmdTemplate: LPCWSTR, ppszApplication_out: LPVOID, ppszCommandLine_out: OPTIONAL<LPVOID>, ppszParameters_out: OPTIONAL<LPVOID>): HRESULT {
+    return Shell32.Load('SHEvaluateSystemCommandTemplate')(pszCmdTemplate, ppszApplication_out, ppszCommandLine_out, ppszParameters_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-shextracticonsw
-  public static SHExtractIconsW(pszFileName: LPCWSTR, nIconIndex: INT, cxIcon: INT, cyIcon: INT, phicon: LPVOID, piconid: LPVOID | NULL, nIcons: UINT, flags: UINT): UINT {
-    return Shell32.Load('SHExtractIconsW')(pszFileName, nIconIndex, cxIcon, cyIcon, phicon, piconid, nIcons, flags);
+  public static SHExtractIconsW(pszFileName: LPCWSTR, nIconIndex: INT, cxIcon: INT, cyIcon: INT, phicon_out: LPVOID, piconid_out: OPTIONAL<LPVOID>, nIcons: UINT, flags: UINT): UINT {
+    return Shell32.Load('SHExtractIconsW')(pszFileName, nIconIndex, cxIcon, cyIcon, phicon_out, piconid_out, nIcons, flags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-shfileoperationa
-  public static SHFileOperation(lpFileOp: LPSHFILEOPSTRUCTA): INT {
-    return Shell32.Load('SHFileOperation')(lpFileOp);
+  public static SHFileOperation(lpFileOp_in_out: LPSHFILEOPSTRUCTA): INT {
+    return Shell32.Load('SHFileOperation')(lpFileOp_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-shfileoperationa
-  public static SHFileOperationA(lpFileOp: LPSHFILEOPSTRUCTA): INT {
-    return Shell32.Load('SHFileOperationA')(lpFileOp);
+  public static SHFileOperationA(lpFileOp_in_out: LPSHFILEOPSTRUCTA): INT {
+    return Shell32.Load('SHFileOperationA')(lpFileOp_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-shfileoperationw
-  public static SHFileOperationW(lpFileOp: LPSHFILEOPSTRUCTW): INT {
-    return Shell32.Load('SHFileOperationW')(lpFileOp);
+  public static SHFileOperationW(lpFileOp_in_out: LPSHFILEOPSTRUCTW): INT {
+    return Shell32.Load('SHFileOperationW')(lpFileOp_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-shformatdrive
@@ -976,263 +977,270 @@ class Shell32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-shfree
-  public static SHFree(pv: LPVOID | NULL): void {
+  public static SHFree(pv: OPTIONAL<LPVOID>): void {
     return Shell32.Load('SHFree')(pv);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-shfreenamemappings
-  public static SHFreeNameMappings(hNameMappings: HANDLE | 0n): void {
+  public static SHFreeNameMappings(hNameMappings: OPTIONAL<HANDLE>): void {
     return Shell32.Load('SHFreeNameMappings')(hNameMappings);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-shgetattributesfromdataobject
-  public static SHGetAttributesFromDataObject(pdo: LPVOID | NULL, dwAttributeMask: DWORD, pdwAttributes: LPDWORD | NULL, pcItems: LPVOID | NULL): HRESULT {
-    return Shell32.Load('SHGetAttributesFromDataObject')(pdo, dwAttributeMask, pdwAttributes, pcItems);
+  public static SHGetAttributesFromDataObject(pdo: OPTIONAL<LPVOID>, dwAttributeMask: DWORD, pdwAttributes_out: OPTIONAL<LPDWORD>, pcItems_out: OPTIONAL<LPVOID>): HRESULT {
+    return Shell32.Load('SHGetAttributesFromDataObject')(pdo, dwAttributeMask, pdwAttributes_out, pcItems_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-shgetdatafromidlista
-  public static SHGetDataFromIDListA(psf: LPVOID, pidl: PCUITEMID_CHILD, nFormat: INT, pv: LPVOID, cb: INT): HRESULT {
-    return Shell32.Load('SHGetDataFromIDListA')(psf, pidl, nFormat, pv, cb);
+  public static SHGetDataFromIDListA(psf: LPVOID, pidl: PCUITEMID_CHILD, nFormat: INT, pv_out: LPVOID, cb: INT): HRESULT {
+    return Shell32.Load('SHGetDataFromIDListA')(psf, pidl, nFormat, pv_out, cb);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-shgetdatafromidlistw
-  public static SHGetDataFromIDListW(psf: LPVOID, pidl: PCUITEMID_CHILD, nFormat: INT, pv: LPVOID, cb: INT): HRESULT {
-    return Shell32.Load('SHGetDataFromIDListW')(psf, pidl, nFormat, pv, cb);
+  public static SHGetDataFromIDListW(psf: LPVOID, pidl: PCUITEMID_CHILD, nFormat: INT, pv_out: LPVOID, cb: INT): HRESULT {
+    return Shell32.Load('SHGetDataFromIDListW')(psf, pidl, nFormat, pv_out, cb);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-shgetdesktopfolder
-  public static SHGetDesktopFolder(ppshf: LPVOID): HRESULT {
-    return Shell32.Load('SHGetDesktopFolder')(ppshf);
+  public static SHGetDesktopFolder(ppshf_out: LPVOID): HRESULT {
+    return Shell32.Load('SHGetDesktopFolder')(ppshf_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-shgetdiskfreespaceexa
-  public static SHGetDiskFreeSpaceA(pszDirectoryName: LPCSTR, pFreeBytesAvailableToCaller: LPVOID | NULL, pTotalNumberOfBytes: LPVOID | NULL, pTotalNumberOfFreeBytes: LPVOID | NULL): BOOL {
-    return Shell32.Load('SHGetDiskFreeSpaceA')(pszDirectoryName, pFreeBytesAvailableToCaller, pTotalNumberOfBytes, pTotalNumberOfFreeBytes);
+  public static SHGetDiskFreeSpaceA(pszDirectoryName: LPCSTR, pFreeBytesAvailableToCaller_out: OPTIONAL<LPVOID>, pTotalNumberOfBytes_out: OPTIONAL<LPVOID>, pTotalNumberOfFreeBytes_out: OPTIONAL<LPVOID>): BOOL {
+    return Shell32.Load('SHGetDiskFreeSpaceA')(pszDirectoryName, pFreeBytesAvailableToCaller_out, pTotalNumberOfBytes_out, pTotalNumberOfFreeBytes_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-shgetdiskfreespaceexa
-  public static SHGetDiskFreeSpaceExA(pszDirectoryName: LPCSTR, pFreeBytesAvailableToCaller: LPVOID | NULL, pTotalNumberOfBytes: LPVOID | NULL, pTotalNumberOfFreeBytes: LPVOID | NULL): BOOL {
-    return Shell32.Load('SHGetDiskFreeSpaceExA')(pszDirectoryName, pFreeBytesAvailableToCaller, pTotalNumberOfBytes, pTotalNumberOfFreeBytes);
+  public static SHGetDiskFreeSpaceExA(pszDirectoryName: LPCSTR, pFreeBytesAvailableToCaller_out: OPTIONAL<LPVOID>, pTotalNumberOfBytes_out: OPTIONAL<LPVOID>, pTotalNumberOfFreeBytes_out: OPTIONAL<LPVOID>): BOOL {
+    return Shell32.Load('SHGetDiskFreeSpaceExA')(pszDirectoryName, pFreeBytesAvailableToCaller_out, pTotalNumberOfBytes_out, pTotalNumberOfFreeBytes_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-shgetdiskfreespaceexw
-  public static SHGetDiskFreeSpaceExW(pszDirectoryName: LPCWSTR, pFreeBytesAvailableToCaller: LPVOID | NULL, pTotalNumberOfBytes: LPVOID | NULL, pTotalNumberOfFreeBytes: LPVOID | NULL): BOOL {
-    return Shell32.Load('SHGetDiskFreeSpaceExW')(pszDirectoryName, pFreeBytesAvailableToCaller, pTotalNumberOfBytes, pTotalNumberOfFreeBytes);
+  public static SHGetDiskFreeSpaceExW(pszDirectoryName: LPCWSTR, pFreeBytesAvailableToCaller_out: OPTIONAL<LPVOID>, pTotalNumberOfBytes_out: OPTIONAL<LPVOID>, pTotalNumberOfFreeBytes_out: OPTIONAL<LPVOID>): BOOL {
+    return Shell32.Load('SHGetDiskFreeSpaceExW')(pszDirectoryName, pFreeBytesAvailableToCaller_out, pTotalNumberOfBytes_out, pTotalNumberOfFreeBytes_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-shgetdrivemedia
-  public static SHGetDriveMedia(pszDrive: LPCWSTR, pdwMediaContent: LPDWORD): HRESULT {
-    return Shell32.Load('SHGetDriveMedia')(pszDrive, pdwMediaContent);
+  public static SHGetDriveMedia(pszDrive: LPCWSTR, pdwMediaContent_out: LPDWORD): HRESULT {
+    return Shell32.Load('SHGetDriveMedia')(pszDrive, pdwMediaContent_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-shgetfileinfoa
-  public static SHGetFileInfo(pszPath: LPCSTR, dwFileAttributes: DWORD, psfi: LPSHFILEINFOA, cbFileInfo: UINT, uFlags: UINT): DWORD_PTR {
-    return Shell32.Load('SHGetFileInfo')(pszPath, dwFileAttributes, psfi, cbFileInfo, uFlags);
+  public static SHGetFileInfo(pszPath: LPCSTR, dwFileAttributes: DWORD, psfi_in_out: OPTIONAL<LPSHFILEINFOA>, cbFileInfo: UINT, uFlags: UINT): DWORD_PTR {
+    return Shell32.Load('SHGetFileInfo')(pszPath, dwFileAttributes, psfi_in_out, cbFileInfo, uFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-shgetfileinfoa
-  public static SHGetFileInfoA(pszPath: LPCSTR, dwFileAttributes: DWORD, psfi: LPSHFILEINFOA | NULL, cbFileInfo: UINT, uFlags: UINT): DWORD_PTR {
-    return Shell32.Load('SHGetFileInfoA')(pszPath, dwFileAttributes, psfi, cbFileInfo, uFlags);
+  public static SHGetFileInfoA(pszPath: LPCSTR, dwFileAttributes: DWORD, psfi_in_out: OPTIONAL<LPSHFILEINFOA>, cbFileInfo: UINT, uFlags: UINT): DWORD_PTR {
+    return Shell32.Load('SHGetFileInfoA')(pszPath, dwFileAttributes, psfi_in_out, cbFileInfo, uFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-shgetfileinfow
-  public static SHGetFileInfoW(pszPath: LPCWSTR, dwFileAttributes: DWORD, psfi: LPSHFILEINFOW | NULL, cbFileInfo: UINT, uFlags: UINT): DWORD_PTR {
-    return Shell32.Load('SHGetFileInfoW')(pszPath, dwFileAttributes, psfi, cbFileInfo, uFlags);
+  public static SHGetFileInfoW(pszPath: LPCWSTR, dwFileAttributes: DWORD, psfi_in_out: OPTIONAL<LPSHFILEINFOW>, cbFileInfo: UINT, uFlags: UINT): DWORD_PTR {
+    return Shell32.Load('SHGetFileInfoW')(pszPath, dwFileAttributes, psfi_in_out, cbFileInfo, uFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-shgetfolderlocation
-  public static SHGetFolderLocation(hwnd: HWND | 0n, csidl: INT, hToken: HANDLE | 0n, dwFlags: DWORD, ppidl: LPVOID): HRESULT {
-    return Shell32.Load('SHGetFolderLocation')(hwnd, csidl, hToken, dwFlags, ppidl);
+  public static SHGetFolderLocation(hwnd: OPTIONAL<HWND>, csidl: INT, hToken: OPTIONAL<HANDLE>, dwFlags: DWORD, ppidl_out: LPVOID): HRESULT {
+    return Shell32.Load('SHGetFolderLocation')(hwnd, csidl, hToken, dwFlags, ppidl_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-shgetfolderpatha
-  public static SHGetFolderPathA(hwnd: HWND | 0n, csidl: INT, hToken: HANDLE | 0n, dwFlags: DWORD, pszPath: LPSTR): HRESULT {
-    return Shell32.Load('SHGetFolderPathA')(hwnd, csidl, hToken, dwFlags, pszPath);
+  public static SHGetFolderPathA(hwnd: OPTIONAL<HWND>, csidl: INT, hToken: OPTIONAL<HANDLE>, dwFlags: DWORD, pszPath_out: LPSTR): HRESULT {
+    return Shell32.Load('SHGetFolderPathA')(hwnd, csidl, hToken, dwFlags, pszPath_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-shgetfolderpathandsubdira
-  public static SHGetFolderPathAndSubDirA(hwnd: HWND | 0n, csidl: INT, hToken: HANDLE | 0n, dwFlags: DWORD, pszSubDir: LPCSTR | NULL, pszPath: LPSTR): HRESULT {
-    return Shell32.Load('SHGetFolderPathAndSubDirA')(hwnd, csidl, hToken, dwFlags, pszSubDir, pszPath);
+  public static SHGetFolderPathAndSubDirA(hwnd: OPTIONAL<HWND>, csidl: INT, hToken: OPTIONAL<HANDLE>, dwFlags: DWORD, pszSubDir: OPTIONAL<LPCSTR>, pszPath_out: LPSTR): HRESULT {
+    return Shell32.Load('SHGetFolderPathAndSubDirA')(hwnd, csidl, hToken, dwFlags, pszSubDir, pszPath_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-shgetfolderpathandsubdirw
-  public static SHGetFolderPathAndSubDirW(hwnd: HWND | 0n, csidl: INT, hToken: HANDLE | 0n, dwFlags: DWORD, pszSubDir: LPCWSTR | NULL, pszPath: LPWSTR): HRESULT {
-    return Shell32.Load('SHGetFolderPathAndSubDirW')(hwnd, csidl, hToken, dwFlags, pszSubDir, pszPath);
+  public static SHGetFolderPathAndSubDirW(hwnd: OPTIONAL<HWND>, csidl: INT, hToken: OPTIONAL<HANDLE>, dwFlags: DWORD, pszSubDir: OPTIONAL<LPCWSTR>, pszPath_out: LPWSTR): HRESULT {
+    return Shell32.Load('SHGetFolderPathAndSubDirW')(hwnd, csidl, hToken, dwFlags, pszSubDir, pszPath_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-shgetfolderpathex
-  public static SHGetFolderPathEx(rfid: LPVOID, dwFlags: DWORD, hToken: HANDLE | 0n, pszPath: LPWSTR, cchPath: UINT): HRESULT {
-    return Shell32.Load('SHGetFolderPathEx')(rfid, dwFlags, hToken, pszPath, cchPath);
+  public static SHGetFolderPathEx(rfid: LPVOID, dwFlags: DWORD, hToken: OPTIONAL<HANDLE>, pszPath_out: LPWSTR, cchPath: UINT): HRESULT {
+    return Shell32.Load('SHGetFolderPathEx')(rfid, dwFlags, hToken, pszPath_out, cchPath);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-shgetfolderpathw
-  public static SHGetFolderPathW(hwnd: HWND | 0n, csidl: INT, hToken: HANDLE | 0n, dwFlags: DWORD, pszPath: LPWSTR): HRESULT {
-    return Shell32.Load('SHGetFolderPathW')(hwnd, csidl, hToken, dwFlags, pszPath);
+  public static SHGetFolderPathW(hwnd: OPTIONAL<HWND>, csidl: INT, hToken: OPTIONAL<HANDLE>, dwFlags: DWORD, pszPath_out: LPWSTR): HRESULT {
+    return Shell32.Load('SHGetFolderPathW')(hwnd, csidl, hToken, dwFlags, pszPath_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-shgetidlistfromobject
-  public static SHGetIDListFromObject(punk: LPVOID, ppidl: LPVOID): HRESULT {
-    return Shell32.Load('SHGetIDListFromObject')(punk, ppidl);
+  public static SHGetIDListFromObject(punk: LPVOID, ppidl_out: LPVOID): HRESULT {
+    return Shell32.Load('SHGetIDListFromObject')(punk, ppidl_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-shgeticonoverlayindexa
-  public static SHGetIconOverlayIndexA(pszIconPath: LPCSTR | NULL, iIconIndex: INT): INT {
+  public static SHGetIconOverlayIndexA(pszIconPath: OPTIONAL<LPCSTR>, iIconIndex: INT): INT {
     return Shell32.Load('SHGetIconOverlayIndexA')(pszIconPath, iIconIndex);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-shgeticonoverlayindexw
-  public static SHGetIconOverlayIndexW(pszIconPath: LPCWSTR | NULL, iIconIndex: INT): INT {
+  public static SHGetIconOverlayIndexW(pszIconPath: OPTIONAL<LPCWSTR>, iIconIndex: INT): INT {
     return Shell32.Load('SHGetIconOverlayIndexW')(pszIconPath, iIconIndex);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-shgetimagelist
-  public static SHGetImageList(iImageList: INT, riid: LPVOID, ppvObj: LPVOID): HRESULT {
-    return Shell32.Load('SHGetImageList')(iImageList, riid, ppvObj);
+  public static SHGetImageList(iImageList: INT, riid: LPVOID, ppvObj_out: LPVOID): HRESULT {
+    return Shell32.Load('SHGetImageList')(iImageList, riid, ppvObj_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-shgetinstanceexplorer
-  public static SHGetInstanceExplorer(ppunk: LPVOID): HRESULT {
-    return Shell32.Load('SHGetInstanceExplorer')(ppunk);
+  public static SHGetInstanceExplorer(ppunk_out: LPVOID): HRESULT {
+    return Shell32.Load('SHGetInstanceExplorer')(ppunk_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-shgetitemfromdataobject
-  public static SHGetItemFromDataObject(pdtobj: LPVOID, dwFlags: DWORD, riid: LPVOID, ppv: LPVOID): HRESULT {
-    return Shell32.Load('SHGetItemFromDataObject')(pdtobj, dwFlags, riid, ppv);
+  public static SHGetItemFromDataObject(pdtobj: LPVOID, dwFlags: DWORD, riid: LPVOID, ppv_out: LPVOID): HRESULT {
+    return Shell32.Load('SHGetItemFromDataObject')(pdtobj, dwFlags, riid, ppv_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-shgetitemfromobject
-  public static SHGetItemFromObject(punk: LPVOID, riid: LPVOID, ppv: LPVOID): HRESULT {
-    return Shell32.Load('SHGetItemFromObject')(punk, riid, ppv);
+  public static SHGetItemFromObject(punk: LPVOID, riid: LPVOID, ppv_out: LPVOID): HRESULT {
+    return Shell32.Load('SHGetItemFromObject')(punk, riid, ppv_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-shgetknownfolderidlist
-  public static SHGetKnownFolderIDList(rfid: LPVOID, dwFlags: DWORD, hToken: HANDLE | 0n, ppidl: LPVOID): HRESULT {
-    return Shell32.Load('SHGetKnownFolderIDList')(rfid, dwFlags, hToken, ppidl);
+  public static SHGetKnownFolderIDList(rfid: LPVOID, dwFlags: DWORD, hToken: OPTIONAL<HANDLE>, ppidl_out: LPVOID): HRESULT {
+    return Shell32.Load('SHGetKnownFolderIDList')(rfid, dwFlags, hToken, ppidl_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-shgetknownfolderitem
-  public static SHGetKnownFolderItem(rfid: LPVOID, flags: DWORD, hToken: HANDLE | 0n, riid: LPVOID, ppv: LPVOID): HRESULT {
-    return Shell32.Load('SHGetKnownFolderItem')(rfid, flags, hToken, riid, ppv);
+  public static SHGetKnownFolderItem(rfid: LPVOID, flags: DWORD, hToken: OPTIONAL<HANDLE>, riid: LPVOID, ppv_out: LPVOID): HRESULT {
+    return Shell32.Load('SHGetKnownFolderItem')(rfid, flags, hToken, riid, ppv_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-shgetknownfolderpath
-  public static SHGetKnownFolderPath(rfid: LPVOID, dwFlags: DWORD, hToken: HANDLE | 0n, ppszPath: LPVOID): HRESULT {
-    return Shell32.Load('SHGetKnownFolderPath')(rfid, dwFlags, hToken, ppszPath);
+  public static SHGetKnownFolderPath(rfid: LPVOID, dwFlags: DWORD, hToken: OPTIONAL<HANDLE>, ppszPath_out: LPVOID): HRESULT {
+    return Shell32.Load('SHGetKnownFolderPath')(rfid, dwFlags, hToken, ppszPath_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-shgetlocalizedname
-  public static SHGetLocalizedName(pszPath: LPCWSTR, pszResModule: LPWSTR, cch: UINT, pidsRes: LPVOID): HRESULT {
-    return Shell32.Load('SHGetLocalizedName')(pszPath, pszResModule, cch, pidsRes);
+  public static SHGetLocalizedName(pszPath: LPCWSTR, pszResModule_out: LPWSTR, cch: UINT, pidsRes_out: LPVOID): HRESULT {
+    return Shell32.Load('SHGetLocalizedName')(pszPath, pszResModule_out, cch, pidsRes_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-shgetmalloc
-  public static SHGetMalloc(ppMalloc: LPVOID): HRESULT {
-    return Shell32.Load('SHGetMalloc')(ppMalloc);
+  public static SHGetMalloc(ppMalloc_out: LPVOID): HRESULT {
+    return Shell32.Load('SHGetMalloc')(ppMalloc_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-shgetnamefromidlist
-  public static SHGetNameFromIDList(pidl: PCIDLIST_ABSOLUTE, sigdnName: SIGDN, ppszName: LPVOID): HRESULT {
-    return Shell32.Load('SHGetNameFromIDList')(pidl, sigdnName, ppszName);
+  public static SHGetNameFromIDList(pidl: PCIDLIST_ABSOLUTE, sigdnName: SIGDN, ppszName_out: LPVOID): HRESULT {
+    return Shell32.Load('SHGetNameFromIDList')(pidl, sigdnName, ppszName_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-shgetnewlinkinfoa
-  public static SHGetNewLinkInfo(pszLinkTo: LPCSTR, pszDir: LPCSTR, pszName: LPSTR, pfMustCopy: LPVOID, uFlags: UINT): BOOL {
-    return Shell32.Load('SHGetNewLinkInfo')(pszLinkTo, pszDir, pszName, pfMustCopy, uFlags);
+  public static SHGetNewLinkInfo(pszLinkTo: LPCSTR, pszDir: LPCSTR, pszName_out: LPSTR, pfMustCopy_out: LPVOID, uFlags: UINT): BOOL {
+    return Shell32.Load('SHGetNewLinkInfo')(pszLinkTo, pszDir, pszName_out, pfMustCopy_out, uFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-shgetnewlinkinfoa
-  public static SHGetNewLinkInfoA(pszLinkTo: LPCSTR, pszDir: LPCSTR, pszName: LPSTR, pfMustCopy: LPVOID, uFlags: UINT): BOOL {
-    return Shell32.Load('SHGetNewLinkInfoA')(pszLinkTo, pszDir, pszName, pfMustCopy, uFlags);
+  public static SHGetNewLinkInfoA(pszLinkTo: LPCSTR, pszDir: LPCSTR, pszName_out: LPSTR, pfMustCopy_out: LPVOID, uFlags: UINT): BOOL {
+    return Shell32.Load('SHGetNewLinkInfoA')(pszLinkTo, pszDir, pszName_out, pfMustCopy_out, uFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-shgetnewlinkinfow
-  public static SHGetNewLinkInfoW(pszLinkTo: LPCWSTR, pszDir: LPCWSTR, pszName: LPWSTR, pfMustCopy: LPVOID, uFlags: UINT): BOOL {
-    return Shell32.Load('SHGetNewLinkInfoW')(pszLinkTo, pszDir, pszName, pfMustCopy, uFlags);
+  public static SHGetNewLinkInfoW(pszLinkTo: LPCWSTR, pszDir: LPCWSTR, pszName_out: LPWSTR, pfMustCopy_out: LPVOID, uFlags: UINT): BOOL {
+    return Shell32.Load('SHGetNewLinkInfoW')(pszLinkTo, pszDir, pszName_out, pfMustCopy_out, uFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-shgetpathfromidlista
-  public static SHGetPathFromIDList(pidl: PCIDLIST_ABSOLUTE, pszPath: LPSTR): BOOL {
-    return Shell32.Load('SHGetPathFromIDList')(pidl, pszPath);
+  public static SHGetPathFromIDList(pidl: PCIDLIST_ABSOLUTE, pszPath_out: LPSTR): BOOL {
+    return Shell32.Load('SHGetPathFromIDList')(pidl, pszPath_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-shgetpathfromidlista
-  public static SHGetPathFromIDListA(pidl: PCIDLIST_ABSOLUTE, pszPath: LPSTR): BOOL {
-    return Shell32.Load('SHGetPathFromIDListA')(pidl, pszPath);
+  public static SHGetPathFromIDListA(pidl: PCIDLIST_ABSOLUTE, pszPath_out: LPSTR): BOOL {
+    return Shell32.Load('SHGetPathFromIDListA')(pidl, pszPath_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-shgetpathfromidlistex
-  public static SHGetPathFromIDListEx(pidl: PCIDLIST_ABSOLUTE, pszPath: LPWSTR, cchPath: DWORD, uOpts: DWORD): BOOL {
-    return Shell32.Load('SHGetPathFromIDListEx')(pidl, pszPath, cchPath, uOpts);
+  public static SHGetPathFromIDListEx(pidl: PCIDLIST_ABSOLUTE, pszPath_out: LPWSTR, cchPath: DWORD, uOpts: DWORD): BOOL {
+    return Shell32.Load('SHGetPathFromIDListEx')(pidl, pszPath_out, cchPath, uOpts);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-shgetpathfromidlistw
-  public static SHGetPathFromIDListW(pidl: PCIDLIST_ABSOLUTE, pszPath: LPWSTR): BOOL {
-    return Shell32.Load('SHGetPathFromIDListW')(pidl, pszPath);
+  public static SHGetPathFromIDListW(pidl: PCIDLIST_ABSOLUTE, pszPath_out: LPWSTR): BOOL {
+    return Shell32.Load('SHGetPathFromIDListW')(pidl, pszPath_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-shgetpropertystoreforwindow
-  public static SHGetPropertyStoreForWindow(hwnd: HWND, riid: LPVOID, ppv: LPVOID): HRESULT {
-    return Shell32.Load('SHGetPropertyStoreForWindow')(hwnd, riid, ppv);
+  public static SHGetPropertyStoreForWindow(hwnd: HWND, riid: LPVOID, ppv_out: LPVOID): HRESULT {
+    return Shell32.Load('SHGetPropertyStoreForWindow')(hwnd, riid, ppv_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-shgetpropertystorefromidlist
-  public static SHGetPropertyStoreFromIDList(pidl: PCIDLIST_ABSOLUTE, flags: GETPROPERTYSTOREFLAGS, riid: LPVOID, ppv: LPVOID): HRESULT {
-    return Shell32.Load('SHGetPropertyStoreFromIDList')(pidl, flags, riid, ppv);
+  public static SHGetPropertyStoreFromIDList(pidl: PCIDLIST_ABSOLUTE, flags: GETPROPERTYSTOREFLAGS, riid: LPVOID, ppv_out: LPVOID): HRESULT {
+    return Shell32.Load('SHGetPropertyStoreFromIDList')(pidl, flags, riid, ppv_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-shgetpropertystorefromparsingname
-  public static SHGetPropertyStoreFromParsingName(pszPath: LPCWSTR, pbc: LPVOID | NULL, flags: GETPROPERTYSTOREFLAGS, riid: LPVOID, ppv: LPVOID): HRESULT {
-    return Shell32.Load('SHGetPropertyStoreFromParsingName')(pszPath, pbc, flags, riid, ppv);
+  public static SHGetPropertyStoreFromParsingName(pszPath: LPCWSTR, pbc: OPTIONAL<LPVOID>, flags: GETPROPERTYSTOREFLAGS, riid: LPVOID, ppv_out: LPVOID): HRESULT {
+    return Shell32.Load('SHGetPropertyStoreFromParsingName')(pszPath, pbc, flags, riid, ppv_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-shgetrealidl
-  public static SHGetRealIDL(psf: LPVOID, pidlSimple: PCUITEMID_CHILD, ppidlReal: LPVOID): HRESULT {
-    return Shell32.Load('SHGetRealIDL')(psf, pidlSimple, ppidlReal);
+  public static SHGetRealIDL(psf: LPVOID, pidlSimple: PCUITEMID_CHILD, ppidlReal_out: LPVOID): HRESULT {
+    return Shell32.Load('SHGetRealIDL')(psf, pidlSimple, ppidlReal_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj/nf-shlobj-shgetsetfoldercustomsettings
-  public static SHGetSetFolderCustomSettings(pfcs: LPSHFOLDERCUSTOMSETTINGS, pszPath: LPCWSTR, dwReadWrite: DWORD): HRESULT {
-    return Shell32.Load('SHGetSetFolderCustomSettings')(pfcs, pszPath, dwReadWrite);
+  public static SHGetSetFolderCustomSettings(pfcs_in_out: LPSHFOLDERCUSTOMSETTINGS, pszPath: LPCWSTR, dwReadWrite: DWORD): HRESULT {
+    return Shell32.Load('SHGetSetFolderCustomSettings')(pfcs_in_out, pszPath, dwReadWrite);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-shgetsetsettings
-  public static SHGetSetSettings(lpss: LPSHELLSTATE | NULL, dwMask: DWORD, bSet: BOOL): void {
-    return Shell32.Load('SHGetSetSettings')(lpss, dwMask, bSet);
+  public static SHGetSetSettings(lpss_in_out: OPTIONAL<LPSHELLSTATE>, dwMask: DWORD, bSet: BOOL): void {
+    return Shell32.Load('SHGetSetSettings')(lpss_in_out, dwMask, bSet);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-shgetsettings
-  public static SHGetSettings(lpsfs: LPSHELLFLAGSTATE, dwMask: DWORD): void {
-    return Shell32.Load('SHGetSettings')(lpsfs, dwMask);
+  public static SHGetSettings(lpsfs_out: LPSHELLFLAGSTATE, dwMask: DWORD): void {
+    return Shell32.Load('SHGetSettings')(lpsfs_out, dwMask);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-shgetspecialfolderlocation
-  public static SHGetSpecialFolderLocation(hwnd: HWND | 0n, csidl: INT, ppidl: LPVOID): HRESULT {
-    return Shell32.Load('SHGetSpecialFolderLocation')(hwnd, csidl, ppidl);
+  public static SHGetSpecialFolderLocation(hwnd: OPTIONAL<HWND>, csidl: INT, ppidl_out: LPVOID): HRESULT {
+    return Shell32.Load('SHGetSpecialFolderLocation')(hwnd, csidl, ppidl_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-shgetspecialfolderpatha
-  public static SHGetSpecialFolderPathA(hwnd: HWND | 0n, pszPath: LPSTR, csidl: INT, fCreate: BOOL): BOOL {
-    return Shell32.Load('SHGetSpecialFolderPathA')(hwnd, pszPath, csidl, fCreate);
+  public static SHGetSpecialFolderPathA(hwnd: OPTIONAL<HWND>, pszPath_out: LPSTR, csidl: INT, fCreate: BOOL): BOOL {
+    return Shell32.Load('SHGetSpecialFolderPathA')(hwnd, pszPath_out, csidl, fCreate);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-shgetspecialfolderpathw
-  public static SHGetSpecialFolderPathW(hwnd: HWND | 0n, pszPath: LPWSTR, csidl: INT, fCreate: BOOL): BOOL {
-    return Shell32.Load('SHGetSpecialFolderPathW')(hwnd, pszPath, csidl, fCreate);
+  public static SHGetSpecialFolderPathW(hwnd: OPTIONAL<HWND>, pszPath_out: LPWSTR, csidl: INT, fCreate: BOOL): BOOL {
+    return Shell32.Load('SHGetSpecialFolderPathW')(hwnd, pszPath_out, csidl, fCreate);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-shgetstockiconinfo
-  public static SHGetStockIconInfo(siid: UINT, uFlags: UINT, psii: LPSHSTOCKICONINFO): HRESULT {
-    return Shell32.Load('SHGetStockIconInfo')(siid, uFlags, psii);
+  public static SHGetStockIconInfo(siid: UINT, uFlags: UINT, psii_in_out: LPSHSTOCKICONINFO): HRESULT {
+    return Shell32.Load('SHGetStockIconInfo')(siid, uFlags, psii_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-shgettemporarypropertyforitem
-  public static SHGetTemporaryPropertyForItem(psi: LPVOID, propkey: LPVOID, ppropvar: LPVOID): HRESULT {
-    return Shell32.Load('SHGetTemporaryPropertyForItem')(psi, propkey, ppropvar);
+  public static SHGetTemporaryPropertyForItem(psi: LPVOID, propkey: LPVOID, ppropvar_out: LPVOID): HRESULT {
+    return Shell32.Load('SHGetTemporaryPropertyForItem')(psi, propkey, ppropvar_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-shgetunreadmailcountw
-  public static SHGetUnreadMailCountW(hKeyUser: HKEY | 0n, pszMailAddress: LPCWSTR | NULL, pdwCount: LPDWORD | NULL, pFileTime: LPVOID | NULL, pszShellExecuteCommand: LPWSTR | NULL, cchShellExecuteCommand: INT): HRESULT {
-    return Shell32.Load('SHGetUnreadMailCountW')(hKeyUser, pszMailAddress, pdwCount, pFileTime, pszShellExecuteCommand, cchShellExecuteCommand);
+  public static SHGetUnreadMailCountW(
+    hKeyUser: OPTIONAL<HKEY>,
+    pszMailAddress: OPTIONAL<LPCWSTR>,
+    pdwCount_out: OPTIONAL<LPDWORD>,
+    pFileTime_out: OPTIONAL<LPVOID>,
+    pszShellExecuteCommand_out: OPTIONAL<LPWSTR>,
+    cchShellExecuteCommand: INT,
+  ): HRESULT {
+    return Shell32.Load('SHGetUnreadMailCountW')(hKeyUser, pszMailAddress, pdwCount_out, pFileTime_out, pszShellExecuteCommand_out, cchShellExecuteCommand);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-shhandleupdateimage
@@ -1241,23 +1249,23 @@ class Shell32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-shilcreatefrompath
-  public static SHILCreateFromPath(pszPath: LPCWSTR, ppidl: LPVOID, rgfInOut: LPDWORD | NULL): HRESULT {
-    return Shell32.Load('SHILCreateFromPath')(pszPath, ppidl, rgfInOut);
+  public static SHILCreateFromPath(pszPath: LPCWSTR, ppidl_out: LPVOID, rgfInOut_in_out: OPTIONAL<LPDWORD>): HRESULT {
+    return Shell32.Load('SHILCreateFromPath')(pszPath, ppidl_out, rgfInOut_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-shinvokeprintercommanda
-  public static SHInvokePrinterCommandA(hwnd: HWND | 0n, uAction: UINT, lpBuf1: LPCSTR, lpBuf2: LPCSTR | NULL, fModal: BOOL): BOOL {
+  public static SHInvokePrinterCommandA(hwnd: OPTIONAL<HWND>, uAction: UINT, lpBuf1: LPCSTR, lpBuf2: OPTIONAL<LPCSTR>, fModal: BOOL): BOOL {
     return Shell32.Load('SHInvokePrinterCommandA')(hwnd, uAction, lpBuf1, lpBuf2, fModal);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-shinvokeprintercommandw
-  public static SHInvokePrinterCommandW(hwnd: HWND | 0n, uAction: UINT, lpBuf1: LPCWSTR, lpBuf2: LPCWSTR | NULL, fModal: BOOL): BOOL {
+  public static SHInvokePrinterCommandW(hwnd: OPTIONAL<HWND>, uAction: UINT, lpBuf1: LPCWSTR, lpBuf2: OPTIONAL<LPCWSTR>, fModal: BOOL): BOOL {
     return Shell32.Load('SHInvokePrinterCommandW')(hwnd, uAction, lpBuf1, lpBuf2, fModal);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-shisfileavailableoffline
-  public static SHIsFileAvailableOffline(pwszPath: LPCWSTR, pdwStatus: LPDWORD | NULL): HRESULT {
-    return Shell32.Load('SHIsFileAvailableOffline')(pwszPath, pdwStatus);
+  public static SHIsFileAvailableOffline(pwszPath: LPCWSTR, pdwStatus_out: OPTIONAL<LPDWORD>): HRESULT {
+    return Shell32.Load('SHIsFileAvailableOffline')(pwszPath, pdwStatus_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-shlimitinputedit
@@ -1276,8 +1284,8 @@ class Shell32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-shmappidltosystemiconlistindex
-  public static SHMapPIDLToSystemImageListIndex(pshf: LPVOID, pidl: PCUITEMID_CHILD, piIndexSel: LPVOID | NULL): INT {
-    return Shell32.Load('SHMapPIDLToSystemImageListIndex')(pshf, pidl, piIndexSel);
+  public static SHMapPIDLToSystemImageListIndex(pshf: LPVOID, pidl: PCUITEMID_CHILD, piIndexSel_out: OPTIONAL<LPVOID>): INT {
+    return Shell32.Load('SHMapPIDLToSystemImageListIndex')(pshf, pidl, piIndexSel_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj/nf-shlobj-shmultifileproperties
@@ -1286,68 +1294,68 @@ class Shell32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-shobjectproperties
-  public static SHObjectProperties(hwnd: HWND | 0n, shopObjectType: DWORD, pszObjectName: LPCWSTR, pszPropertyPage: LPCWSTR | NULL): BOOL {
+  public static SHObjectProperties(hwnd: OPTIONAL<HWND>, shopObjectType: DWORD, pszObjectName: LPCWSTR, pszPropertyPage: OPTIONAL<LPCWSTR>): BOOL {
     return Shell32.Load('SHObjectProperties')(hwnd, shopObjectType, pszObjectName, pszPropertyPage);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-shopenfolderandselectitems
-  public static SHOpenFolderAndSelectItems(pidlFolder: PCIDLIST_ABSOLUTE, cidl: UINT, apidl: PCUITEMID_CHILD_ARRAY | NULL, dwFlags: DWORD): HRESULT {
+  public static SHOpenFolderAndSelectItems(pidlFolder: PCIDLIST_ABSOLUTE, cidl: UINT, apidl: OPTIONAL<PCUITEMID_CHILD_ARRAY>, dwFlags: DWORD): HRESULT {
     return Shell32.Load('SHOpenFolderAndSelectItems')(pidlFolder, cidl, apidl, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj/nf-shlobj-shopenpropsheetw
-  public static SHOpenPropSheetW(pszCaption: LPCWSTR | NULL, ahkeys: LPVOID | NULL, ckeys: UINT, pclsidDefault: LPVOID | NULL, pdtobj: LPVOID, psb: LPVOID | NULL, pszStartPage: LPCWSTR | NULL): BOOL {
+  public static SHOpenPropSheetW(pszCaption: OPTIONAL<LPCWSTR>, ahkeys: OPTIONAL<LPVOID>, ckeys: UINT, pclsidDefault: OPTIONAL<LPVOID>, pdtobj: LPVOID, psb: OPTIONAL<LPVOID>, pszStartPage: OPTIONAL<LPCWSTR>): BOOL {
     return Shell32.Load('SHOpenPropSheetW')(pszCaption, ahkeys, ckeys, pclsidDefault, pdtobj, psb, pszStartPage);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-shopenwithdialog
-  public static SHOpenWithDialog(hwndParent: HWND | 0n, poainfo: POPENASINFO): HRESULT {
+  public static SHOpenWithDialog(hwndParent: OPTIONAL<HWND>, poainfo: POPENASINFO): HRESULT {
     return Shell32.Load('SHOpenWithDialog')(hwndParent, poainfo);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-shparsedisplayname
-  public static SHParseDisplayName(pszName: LPCWSTR, pbc: LPVOID | NULL, ppidl: LPVOID, sfgaoIn: SFGAOF, psfgaoOut: LPVOID | NULL): HRESULT {
-    return Shell32.Load('SHParseDisplayName')(pszName, pbc, ppidl, sfgaoIn, psfgaoOut);
+  public static SHParseDisplayName(pszName: LPCWSTR, pbc: OPTIONAL<LPVOID>, ppidl_out: LPVOID, sfgaoIn: SFGAOF, psfgaoOut_out: OPTIONAL<LPVOID>): HRESULT {
+    return Shell32.Load('SHParseDisplayName')(pszName, pbc, ppidl_out, sfgaoIn, psfgaoOut_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-shpathprepareforwritea
-  public static SHPathPrepareForWriteA(hwnd: HWND | 0n, punkEnableModless: LPVOID | NULL, pszPath: LPCSTR, dwFlags: DWORD): HRESULT {
+  public static SHPathPrepareForWriteA(hwnd: OPTIONAL<HWND>, punkEnableModless: OPTIONAL<LPVOID>, pszPath: LPCSTR, dwFlags: DWORD): HRESULT {
     return Shell32.Load('SHPathPrepareForWriteA')(hwnd, punkEnableModless, pszPath, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-shpathprepareforwritew
-  public static SHPathPrepareForWriteW(hwnd: HWND | 0n, punkEnableModless: LPVOID | NULL, pszPath: LPCWSTR, dwFlags: DWORD): HRESULT {
+  public static SHPathPrepareForWriteW(hwnd: OPTIONAL<HWND>, punkEnableModless: OPTIONAL<LPVOID>, pszPath: LPCWSTR, dwFlags: DWORD): HRESULT {
     return Shell32.Load('SHPathPrepareForWriteW')(hwnd, punkEnableModless, pszPath, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-shpropstgcreate
-  public static SHPropStgCreate(psstg: LPVOID, fmtid: LPVOID, pclsid: LPVOID | NULL, grfFlags: DWORD, grfMode: DWORD, dwDisposition: DWORD, ppstg: LPVOID, puCodePage: LPVOID | NULL): HRESULT {
-    return Shell32.Load('SHPropStgCreate')(psstg, fmtid, pclsid, grfFlags, grfMode, dwDisposition, ppstg, puCodePage);
+  public static SHPropStgCreate(psstg: LPVOID, fmtid: LPVOID, pclsid: OPTIONAL<LPVOID>, grfFlags: DWORD, grfMode: DWORD, dwDisposition: DWORD, ppstg_out: LPVOID, puCodePage_out: OPTIONAL<LPVOID>): HRESULT {
+    return Shell32.Load('SHPropStgCreate')(psstg, fmtid, pclsid, grfFlags, grfMode, dwDisposition, ppstg_out, puCodePage_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-shpropstgreadmultiple
-  public static SHPropStgReadMultiple(pps: LPVOID, uCodePage: UINT, cpspec: ULONG, rgpspec: LPVOID, rgvar: LPVOID): HRESULT {
-    return Shell32.Load('SHPropStgReadMultiple')(pps, uCodePage, cpspec, rgpspec, rgvar);
+  public static SHPropStgReadMultiple(pps: LPVOID, uCodePage: UINT, cpspec: ULONG, rgpspec: LPVOID, rgvar_out: LPVOID): HRESULT {
+    return Shell32.Load('SHPropStgReadMultiple')(pps, uCodePage, cpspec, rgpspec, rgvar_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-shpropstgwritemultiple
-  public static SHPropStgWriteMultiple(pps: LPVOID, puCodePage: LPVOID | NULL, cpspec: ULONG, rgpspec: LPVOID, rgvar: LPVOID, propidNameFirst: UINT): HRESULT {
-    return Shell32.Load('SHPropStgWriteMultiple')(pps, puCodePage, cpspec, rgpspec, rgvar, propidNameFirst);
+  public static SHPropStgWriteMultiple(pps: LPVOID, puCodePage_in_out: OPTIONAL<LPVOID>, cpspec: ULONG, rgpspec: LPVOID, rgvar_in_out: LPVOID, propidNameFirst: UINT): HRESULT {
+    return Shell32.Load('SHPropStgWriteMultiple')(pps, puCodePage_in_out, cpspec, rgpspec, rgvar_in_out, propidNameFirst);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-shqueryrecyclebina
-  public static SHQueryRecycleBinA(pszRootPath: LPCSTR | NULL, pSHQueryRBInfo: PSHQUERYRBINFO): HRESULT {
-    return Shell32.Load('SHQueryRecycleBinA')(pszRootPath, pSHQueryRBInfo);
+  public static SHQueryRecycleBinA(pszRootPath: OPTIONAL<LPCSTR>, pSHQueryRBInfo_in_out: PSHQUERYRBINFO): HRESULT {
+    return Shell32.Load('SHQueryRecycleBinA')(pszRootPath, pSHQueryRBInfo_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-shqueryrecyclebinw
-  public static SHQueryRecycleBinW(pszRootPath: LPCWSTR | NULL, pSHQueryRBInfo: PSHQUERYRBINFO): HRESULT {
-    return Shell32.Load('SHQueryRecycleBinW')(pszRootPath, pSHQueryRBInfo);
+  public static SHQueryRecycleBinW(pszRootPath: OPTIONAL<LPCWSTR>, pSHQueryRBInfo_in_out: PSHQUERYRBINFO): HRESULT {
+    return Shell32.Load('SHQueryRecycleBinW')(pszRootPath, pSHQueryRBInfo_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-shqueryusernotificationstate
-  public static SHQueryUserNotificationState(pquns: LPVOID): HRESULT {
-    return Shell32.Load('SHQueryUserNotificationState')(pquns);
+  public static SHQueryUserNotificationState(pquns_out: LPVOID): HRESULT {
+    return Shell32.Load('SHQueryUserNotificationState')(pquns_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-shremovelocalizedname
@@ -1371,27 +1379,27 @@ class Shell32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shobjidl/nf-shobjidl-shsetdefaultproperties
-  public static SHSetDefaultProperties(hwnd: HWND | 0n, psi: LPVOID, dwFileOpFlags: DWORD, pfops: LPVOID | NULL): HRESULT {
+  public static SHSetDefaultProperties(hwnd: OPTIONAL<HWND>, psi: LPVOID, dwFileOpFlags: DWORD, pfops: OPTIONAL<LPVOID>): HRESULT {
     return Shell32.Load('SHSetDefaultProperties')(hwnd, psi, dwFileOpFlags, pfops);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-shsetfolderpatha
-  public static SHSetFolderPathA(csidl: INT, hToken: HANDLE | 0n, dwFlags: DWORD, pszPath: LPCSTR): HRESULT {
+  public static SHSetFolderPathA(csidl: INT, hToken: OPTIONAL<HANDLE>, dwFlags: DWORD, pszPath: LPCSTR): HRESULT {
     return Shell32.Load('SHSetFolderPathA')(csidl, hToken, dwFlags, pszPath);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-shsetfolderpathw
-  public static SHSetFolderPathW(csidl: INT, hToken: HANDLE | 0n, dwFlags: DWORD, pszPath: LPCWSTR): HRESULT {
+  public static SHSetFolderPathW(csidl: INT, hToken: OPTIONAL<HANDLE>, dwFlags: DWORD, pszPath: LPCWSTR): HRESULT {
     return Shell32.Load('SHSetFolderPathW')(csidl, hToken, dwFlags, pszPath);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-shsetinstanceexplorer
-  public static SHSetInstanceExplorer(punk: LPVOID | NULL): void {
+  public static SHSetInstanceExplorer(punk: OPTIONAL<LPVOID>): void {
     return Shell32.Load('SHSetInstanceExplorer')(punk);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-shsetknownfolderpath
-  public static SHSetKnownFolderPath(rfid: LPVOID, dwFlags: DWORD, hToken: HANDLE | 0n, pszPath: LPCWSTR): HRESULT {
+  public static SHSetKnownFolderPath(rfid: LPVOID, dwFlags: DWORD, hToken: OPTIONAL<HANDLE>, pszPath: LPCWSTR): HRESULT {
     return Shell32.Load('SHSetKnownFolderPath')(rfid, dwFlags, hToken, pszPath);
   }
 
@@ -1416,7 +1424,7 @@ class Shell32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shobjidl/nf-shobjidl-shshowmanagelibraryui
-  public static SHShowManageLibraryUI(psiLibrary: LPVOID, hwndOwner: HWND | 0n, pszTitle: LPCWSTR | NULL, pszInstruction: LPCWSTR | NULL, lmdOptions: DWORD): HRESULT {
+  public static SHShowManageLibraryUI(psiLibrary: LPVOID, hwndOwner: HWND, pszTitle: OPTIONAL<LPCWSTR>, pszInstruction: OPTIONAL<LPCWSTR>, lmdOptions: DWORD): HRESULT {
     return Shell32.Load('SHShowManageLibraryUI')(psiLibrary, hwndOwner, pszTitle, pszInstruction, lmdOptions);
   }
 
@@ -1426,12 +1434,12 @@ class Shell32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-shstartnetconnectiondialogw
-  public static SHStartNetConnectionDialogW(hwnd: HWND | 0n, pszRemoteName: LPCWSTR | NULL, dwType: DWORD): HRESULT {
+  public static SHStartNetConnectionDialogW(hwnd: OPTIONAL<HWND>, pszRemoteName: OPTIONAL<LPCWSTR>, dwType: DWORD): HRESULT {
     return Shell32.Load('SHStartNetConnectionDialogW')(hwnd, pszRemoteName, dwType);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj/nf-shlobj-shtesttokenmembership
-  public static SHTestTokenMembership(hToken: HANDLE | 0n, ulRID: ULONG): BOOL {
+  public static SHTestTokenMembership(hToken: OPTIONAL<HANDLE>, ulRID: ULONG): BOOL {
     return Shell32.Load('SHTestTokenMembership')(hToken, ulRID);
   }
 
@@ -1451,8 +1459,8 @@ class Shell32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-shvalidateunc
-  public static SHValidateUNC(hwndOwner: HWND | 0n, pszFile: LPWSTR, fConnect: UINT): BOOL {
-    return Shell32.Load('SHValidateUNC')(hwndOwner, pszFile, fConnect);
+  public static SHValidateUNC(hwndOwner: OPTIONAL<HWND>, pszFile_in_out: LPWSTR, fConnect: UINT): BOOL {
+    return Shell32.Load('SHValidateUNC')(hwndOwner, pszFile_in_out, fConnect);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-setcurrentprocessexplicitappusermodelid
@@ -1461,17 +1469,17 @@ class Shell32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-shellobouta
-  public static ShellAboutA(hWnd: HWND | 0n, szApp: LPCSTR, szOtherStuff: LPCSTR | NULL, hIcon: HICON | 0n): INT_PTR {
+  public static ShellAboutA(hWnd: OPTIONAL<HWND>, szApp: LPCSTR, szOtherStuff: OPTIONAL<LPCSTR>, hIcon: OPTIONAL<HICON>): INT_PTR {
     return Shell32.Load('ShellAboutA')(hWnd, szApp, szOtherStuff, hIcon);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-shelloboutw
-  public static ShellAboutW(hWnd: HWND | 0n, szApp: LPCWSTR, szOtherStuff: LPCWSTR | NULL, hIcon: HICON | 0n): INT_PTR {
+  public static ShellAboutW(hWnd: OPTIONAL<HWND>, szApp: LPCWSTR, szOtherStuff: OPTIONAL<LPCWSTR>, hIcon: OPTIONAL<HICON>): INT_PTR {
     return Shell32.Load('ShellAboutW')(hWnd, szApp, szOtherStuff, hIcon);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-shellexecutea
-  public static ShellExecuteA(hwnd: HWND | 0n, lpOperation: LPCSTR | NULL, lpFile: LPCSTR, lpParameters: LPCSTR | NULL, lpDirectory: LPCSTR | NULL, nShowCmd: INT): HINSTANCE {
+  public static ShellExecuteA(hwnd: OPTIONAL<HWND>, lpOperation: OPTIONAL<LPCSTR>, lpFile: LPCSTR, lpParameters: OPTIONAL<LPCSTR>, lpDirectory: OPTIONAL<LPCSTR>, nShowCmd: INT): HINSTANCE {
     return Shell32.Load('ShellExecuteA')(hwnd, lpOperation, lpFile, lpParameters, lpDirectory, nShowCmd);
   }
 
@@ -1481,23 +1489,23 @@ class Shell32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-shellexecuteexa
-  public static ShellExecuteExA(pExecInfo: LPSHELLEXECUTEINFOA): BOOL {
-    return Shell32.Load('ShellExecuteExA')(pExecInfo);
+  public static ShellExecuteExA(pExecInfo_in_out: LPSHELLEXECUTEINFOA): BOOL {
+    return Shell32.Load('ShellExecuteExA')(pExecInfo_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-shellexecuteexw
-  public static ShellExecuteExW(pExecInfo: LPSHELLEXECUTEINFOW): BOOL {
-    return Shell32.Load('ShellExecuteExW')(pExecInfo);
+  public static ShellExecuteExW(pExecInfo_in_out: LPSHELLEXECUTEINFOW): BOOL {
+    return Shell32.Load('ShellExecuteExW')(pExecInfo_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-shellexecutew
-  public static ShellExecuteW(hwnd: HWND | 0n, lpOperation: LPCWSTR | NULL, lpFile: LPCWSTR, lpParameters: LPCWSTR | NULL, lpDirectory: LPCWSTR | NULL, nShowCmd: INT): HINSTANCE {
+  public static ShellExecuteW(hwnd: OPTIONAL<HWND>, lpOperation: OPTIONAL<LPCWSTR>, lpFile: LPCWSTR, lpParameters: OPTIONAL<LPCWSTR>, lpDirectory: OPTIONAL<LPCWSTR>, nShowCmd: INT): HINSTANCE {
     return Shell32.Load('ShellExecuteW')(hwnd, lpOperation, lpFile, lpParameters, lpDirectory, nShowCmd);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-shell_getimagelists
-  public static Shell_GetImageLists(phiml: LPVOID | NULL, phimlSmall: LPVOID | NULL): BOOL {
-    return Shell32.Load('Shell_GetImageLists')(phiml, phimlSmall);
+  public static Shell_GetImageLists(phiml_out: OPTIONAL<LPVOID>, phimlSmall_out: OPTIONAL<LPVOID>): BOOL {
+    return Shell32.Load('Shell_GetImageLists')(phiml_out, phimlSmall_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-shell_mergemenus
@@ -1516,8 +1524,8 @@ class Shell32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-shell_notifyicongetrect
-  public static Shell_NotifyIconGetRect(identifier: PNOTIFYICONIDENTIFIER, iconLocation: LPRECT): HRESULT {
-    return Shell32.Load('Shell_NotifyIconGetRect')(identifier, iconLocation);
+  public static Shell_NotifyIconGetRect(identifier: PNOTIFYICONIDENTIFIER, iconLocation_out: LPRECT): HRESULT {
+    return Shell32.Load('Shell_NotifyIconGetRect')(identifier, iconLocation_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-shell_notifyiconw
@@ -1531,8 +1539,8 @@ class Shell32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shobjidl/nf-shobjidl-stgmakeuniquename
-  public static StgMakeUniqueName(pstgParent: LPVOID, pszFileSpec: LPCWSTR, grfMode: DWORD, riid: LPVOID, ppv: LPVOID): HRESULT {
-    return Shell32.Load('StgMakeUniqueName')(pstgParent, pszFileSpec, grfMode, riid, ppv);
+  public static StgMakeUniqueName(pstgParent: LPVOID, pszFileSpec: LPCWSTR, grfMode: DWORD, riid: LPVOID, ppv_out: LPVOID): HRESULT {
+    return Shell32.Load('StgMakeUniqueName')(pstgParent, pszFileSpec, grfMode, riid, ppv_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-strchra
@@ -1576,32 +1584,32 @@ class Shell32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-strrchra
-  public static StrRChrA(pszStart: LPCSTR, pszEnd: LPCSTR | NULL, wMatch: WORD): LPSTR {
+  public static StrRChrA(pszStart: LPCSTR, pszEnd: OPTIONAL<LPCSTR>, wMatch: WORD): LPSTR {
     return Shell32.Load('StrRChrA')(pszStart, pszEnd, wMatch);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-strrchria
-  public static StrRChrIA(pszStart: LPCSTR, pszEnd: LPCSTR | NULL, wMatch: WORD): LPSTR {
+  public static StrRChrIA(pszStart: LPCSTR, pszEnd: OPTIONAL<LPCSTR>, wMatch: WORD): LPSTR {
     return Shell32.Load('StrRChrIA')(pszStart, pszEnd, wMatch);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-strrchriw
-  public static StrRChrIW(pszStart: LPCWSTR, pszEnd: LPCWSTR | NULL, wMatch: WORD): LPWSTR {
+  public static StrRChrIW(pszStart: LPCWSTR, pszEnd: OPTIONAL<LPCWSTR>, wMatch: WORD): LPWSTR {
     return Shell32.Load('StrRChrIW')(pszStart, pszEnd, wMatch);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-strrchrw
-  public static StrRChrW(pszStart: LPCWSTR, pszEnd: LPCWSTR | NULL, wMatch: WORD): LPWSTR {
+  public static StrRChrW(pszStart: LPCWSTR, pszEnd: OPTIONAL<LPCWSTR>, wMatch: WORD): LPWSTR {
     return Shell32.Load('StrRChrW')(pszStart, pszEnd, wMatch);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-strrstria
-  public static StrRStrIA(pszSource: LPCSTR, pszLast: LPCSTR | NULL, pszSrch: LPCSTR): LPSTR {
+  public static StrRStrIA(pszSource: LPCSTR, pszLast: OPTIONAL<LPCSTR>, pszSrch: LPCSTR): LPSTR {
     return Shell32.Load('StrRStrIA')(pszSource, pszLast, pszSrch);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-strrstriw
-  public static StrRStrIW(pszSource: LPCWSTR, pszLast: LPCWSTR | NULL, pszSrch: LPCWSTR): LPWSTR {
+  public static StrRStrIW(pszSource: LPCWSTR, pszLast: OPTIONAL<LPCWSTR>, pszSrch: LPCWSTR): LPWSTR {
     return Shell32.Load('StrRStrIW')(pszSource, pszLast, pszSrch);
   }
 
@@ -1626,7 +1634,7 @@ class Shell32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-wowshellexecute
-  public static WOWShellExecute(hwnd: HWND | 0n, lpOperation: LPCSTR | NULL, lpFile: LPCSTR, lpParameters: LPCSTR | NULL, lpDirectory: LPCSTR | NULL, nShowCmd: INT, lpfnCBWinExec: LPVOID): HINSTANCE {
+  public static WOWShellExecute(hwnd: OPTIONAL<HWND>, lpOperation: OPTIONAL<LPCSTR>, lpFile: LPCSTR, lpParameters: OPTIONAL<LPCSTR>, lpDirectory: OPTIONAL<LPCSTR>, nShowCmd: INT, lpfnCBWinExec: LPVOID): HINSTANCE {
     return Shell32.Load('WOWShellExecute')(hwnd, lpOperation, lpFile, lpParameters, lpDirectory, nShowCmd, lpfnCBWinExec);
   }
 

@@ -1,5 +1,5 @@
 import type { Pointer } from 'bun:ffi';
-export type { BOOL, DWORD, HANDLE, HMODULE, LPCSTR, LPCWSTR, LPDWORD, LPSTR, LPVOID, LPWSTR, PDWORD, PVOID } from '@bun-win32/core';
+export type { BOOL, DWORD, HANDLE, HMODULE, LPCSTR, LPCWSTR, LPDWORD, LPSTR, LPVOID, LPWSTR, NULLABLE, OPTIONAL, PDWORD, PVOID } from '@bun-win32/core';
 
 export enum ListModulesFilterFlag {
   LIST_MODULES_32BIT = 0x01,

@@ -1,6 +1,6 @@
 import type { Pointer } from 'bun:ffi';
 
-export type { DWORD, HRESULT, HWND, LPVOID, NULL } from '@bun-win32/core';
+export type { DWORD, HRESULT, HWND, LPVOID, NULL, OPTIONAL } from '@bun-win32/core';
 
 export const DS_OK = 0;
 

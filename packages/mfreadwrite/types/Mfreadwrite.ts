@@ -1,6 +1,6 @@
 import type { Pointer } from 'bun:ffi';
 
-export type { HRESULT, LPCWSTR, NULL } from '@bun-win32/core';
+export type { HRESULT, LPCWSTR, NULL, OPTIONAL } from '@bun-win32/core';
 
 export type IMFAttributes = Pointer;
 export type IMFByteStream = Pointer;

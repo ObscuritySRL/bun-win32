@@ -32,7 +32,7 @@ import type {
   LPCVOID,
   LPCWSTR,
   LPOVERLAPPED,
-  NULL,
+  OPTIONAL,
   PCF_CALLBACK_REGISTRATION,
   PCF_CONNECTION_KEY,
   PCF_FILE_RANGE,
@@ -126,18 +126,18 @@ class Cldapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfapi/nf-cfapi-cfconnectsyncroot
-  public static CfConnectSyncRoot(SyncRootPath: LPCWSTR, CallbackTable: PCF_CALLBACK_REGISTRATION, CallbackContext: LPCVOID | NULL, ConnectFlags: CF_CONNECT_FLAGS, ConnectionKey: PCF_CONNECTION_KEY): HRESULT {
-    return Cldapi.Load('CfConnectSyncRoot')(SyncRootPath, CallbackTable, CallbackContext, ConnectFlags, ConnectionKey);
+  public static CfConnectSyncRoot(SyncRootPath: LPCWSTR, CallbackTable: PCF_CALLBACK_REGISTRATION, CallbackContext: OPTIONAL<LPCVOID>, ConnectFlags: CF_CONNECT_FLAGS, ConnectionKey_out: PCF_CONNECTION_KEY): HRESULT {
+    return Cldapi.Load('CfConnectSyncRoot')(SyncRootPath, CallbackTable, CallbackContext, ConnectFlags, ConnectionKey_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfapi/nf-cfapi-cfconverttoplaceholder
-  public static CfConvertToPlaceholder(FileHandle: HANDLE, FileIdentity: LPCVOID | NULL, FileIdentityLength: DWORD, ConvertFlags: CF_CONVERT_FLAGS, ConvertUsn: PUSN | NULL, Overlapped: LPOVERLAPPED | NULL): HRESULT {
-    return Cldapi.Load('CfConvertToPlaceholder')(FileHandle, FileIdentity, FileIdentityLength, ConvertFlags, ConvertUsn, Overlapped);
+  public static CfConvertToPlaceholder(FileHandle: HANDLE, FileIdentity: OPTIONAL<LPCVOID>, FileIdentityLength: DWORD, ConvertFlags: CF_CONVERT_FLAGS, ConvertUsn_out: OPTIONAL<PUSN>, Overlapped_in_out: OPTIONAL<LPOVERLAPPED>): HRESULT {
+    return Cldapi.Load('CfConvertToPlaceholder')(FileHandle, FileIdentity, FileIdentityLength, ConvertFlags, ConvertUsn_out, Overlapped_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfapi/nf-cfapi-cfcreateplaceholders
-  public static CfCreatePlaceholders(BaseDirectoryPath: LPCWSTR, PlaceholderArray: PCF_PLACEHOLDER_CREATE_INFO, PlaceholderCount: DWORD, CreateFlags: CF_CREATE_FLAGS, EntriesProcessed: PDWORD | NULL): HRESULT {
-    return Cldapi.Load('CfCreatePlaceholders')(BaseDirectoryPath, PlaceholderArray, PlaceholderCount, CreateFlags, EntriesProcessed);
+  public static CfCreatePlaceholders(BaseDirectoryPath: LPCWSTR, PlaceholderArray_in_out: PCF_PLACEHOLDER_CREATE_INFO, PlaceholderCount: DWORD, CreateFlags: CF_CREATE_FLAGS, EntriesProcessed_out: OPTIONAL<PDWORD>): HRESULT {
+    return Cldapi.Load('CfCreatePlaceholders')(BaseDirectoryPath, PlaceholderArray_in_out, PlaceholderCount, CreateFlags, EntriesProcessed_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfapi/nf-cfapi-cfdisconnectsyncroot
@@ -146,18 +146,18 @@ class Cldapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfapi/nf-cfapi-cfexecute
-  public static CfExecute(OpInfo: PCF_OPERATION_INFO, OpParams: PCF_OPERATION_PARAMETERS): HRESULT {
-    return Cldapi.Load('CfExecute')(OpInfo, OpParams);
+  public static CfExecute(OpInfo: PCF_OPERATION_INFO, OpParams_in_out: PCF_OPERATION_PARAMETERS): HRESULT {
+    return Cldapi.Load('CfExecute')(OpInfo, OpParams_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfapi/nf-cfapi-cfgetcorrelationvector
-  public static CfGetCorrelationVector(FileHandle: HANDLE, CorrelationVector: PCORRELATION_VECTOR): HRESULT {
-    return Cldapi.Load('CfGetCorrelationVector')(FileHandle, CorrelationVector);
+  public static CfGetCorrelationVector(FileHandle: HANDLE, CorrelationVector_out: PCORRELATION_VECTOR): HRESULT {
+    return Cldapi.Load('CfGetCorrelationVector')(FileHandle, CorrelationVector_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfapi/nf-cfapi-cfgetplaceholderinfo
-  public static CfGetPlaceholderInfo(FileHandle: HANDLE, InfoClass: CF_PLACEHOLDER_INFO_CLASS, InfoBuffer: PVOID, InfoBufferLength: DWORD, ReturnedLength: PDWORD | NULL): HRESULT {
-    return Cldapi.Load('CfGetPlaceholderInfo')(FileHandle, InfoClass, InfoBuffer, InfoBufferLength, ReturnedLength);
+  public static CfGetPlaceholderInfo(FileHandle: HANDLE, InfoClass: CF_PLACEHOLDER_INFO_CLASS, InfoBuffer_out: PVOID, InfoBufferLength: DWORD, ReturnedLength_out: OPTIONAL<PDWORD>): HRESULT {
+    return Cldapi.Load('CfGetPlaceholderInfo')(FileHandle, InfoClass, InfoBuffer_out, InfoBufferLength, ReturnedLength_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfapi/nf-cfapi-cfgetplaceholderrangeinfo
@@ -166,11 +166,11 @@ class Cldapi extends Win32 {
     InfoClass: CF_PLACEHOLDER_RANGE_INFO_CLASS,
     StartingOffset: LARGE_INTEGER,
     Length: LARGE_INTEGER,
-    InfoBuffer: PVOID,
+    InfoBuffer_out: PVOID,
     InfoBufferLength: DWORD,
-    ReturnedLength: PDWORD | NULL,
+    ReturnedLength_out: OPTIONAL<PDWORD>,
   ): HRESULT {
-    return Cldapi.Load('CfGetPlaceholderRangeInfo')(FileHandle, InfoClass, StartingOffset, Length, InfoBuffer, InfoBufferLength, ReturnedLength);
+    return Cldapi.Load('CfGetPlaceholderRangeInfo')(FileHandle, InfoClass, StartingOffset, Length, InfoBuffer_out, InfoBufferLength, ReturnedLength_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfapi/nf-cfapi-cfgetplaceholderrangeinfoforhydration
@@ -181,11 +181,11 @@ class Cldapi extends Win32 {
     InfoClass: CF_PLACEHOLDER_RANGE_INFO_CLASS,
     StartingOffset: LARGE_INTEGER,
     RangeLength: LARGE_INTEGER,
-    InfoBuffer: PVOID,
+    InfoBuffer_out: PVOID,
     InfoBufferSize: DWORD,
-    InfoBufferWritten: PDWORD | NULL,
+    InfoBufferWritten_out: OPTIONAL<PDWORD>,
   ): HRESULT {
-    return Cldapi.Load('CfGetPlaceholderRangeInfoForHydration')(ConnectionKey, TransferKey, FileId, InfoClass, StartingOffset, RangeLength, InfoBuffer, InfoBufferSize, InfoBufferWritten);
+    return Cldapi.Load('CfGetPlaceholderRangeInfoForHydration')(ConnectionKey, TransferKey, FileId, InfoClass, StartingOffset, RangeLength, InfoBuffer_out, InfoBufferSize, InfoBufferWritten_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfapi/nf-cfapi-cfgetplaceholderstatefromattributetag
@@ -204,23 +204,23 @@ class Cldapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfapi/nf-cfapi-cfgetplatforminfo
-  public static CfGetPlatformInfo(PlatformVersion: PCF_PLATFORM_INFO): HRESULT {
-    return Cldapi.Load('CfGetPlatformInfo')(PlatformVersion);
+  public static CfGetPlatformInfo(PlatformVersion_out: PCF_PLATFORM_INFO): HRESULT {
+    return Cldapi.Load('CfGetPlatformInfo')(PlatformVersion_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfapi/nf-cfapi-cfgetsyncrootinfobyhandle
-  public static CfGetSyncRootInfoByHandle(FileHandle: HANDLE, InfoClass: CF_SYNC_ROOT_INFO_CLASS, InfoBuffer: PVOID, InfoBufferLength: DWORD, ReturnedLength: PDWORD | NULL): HRESULT {
-    return Cldapi.Load('CfGetSyncRootInfoByHandle')(FileHandle, InfoClass, InfoBuffer, InfoBufferLength, ReturnedLength);
+  public static CfGetSyncRootInfoByHandle(FileHandle: HANDLE, InfoClass: CF_SYNC_ROOT_INFO_CLASS, InfoBuffer_out: PVOID, InfoBufferLength: DWORD, ReturnedLength_out: OPTIONAL<PDWORD>): HRESULT {
+    return Cldapi.Load('CfGetSyncRootInfoByHandle')(FileHandle, InfoClass, InfoBuffer_out, InfoBufferLength, ReturnedLength_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfapi/nf-cfapi-cfgetsyncrootinfobypath
-  public static CfGetSyncRootInfoByPath(FilePath: LPCWSTR, InfoClass: CF_SYNC_ROOT_INFO_CLASS, InfoBuffer: PVOID, InfoBufferLength: DWORD, ReturnedLength: PDWORD | NULL): HRESULT {
-    return Cldapi.Load('CfGetSyncRootInfoByPath')(FilePath, InfoClass, InfoBuffer, InfoBufferLength, ReturnedLength);
+  public static CfGetSyncRootInfoByPath(FilePath: LPCWSTR, InfoClass: CF_SYNC_ROOT_INFO_CLASS, InfoBuffer_out: PVOID, InfoBufferLength: DWORD, ReturnedLength_out: OPTIONAL<PDWORD>): HRESULT {
+    return Cldapi.Load('CfGetSyncRootInfoByPath')(FilePath, InfoClass, InfoBuffer_out, InfoBufferLength, ReturnedLength_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfapi/nf-cfapi-cfgettransferkey
-  public static CfGetTransferKey(FileHandle: HANDLE, TransferKey: PCF_TRANSFER_KEY): HRESULT {
-    return Cldapi.Load('CfGetTransferKey')(FileHandle, TransferKey);
+  public static CfGetTransferKey(FileHandle: HANDLE, TransferKey_out: PCF_TRANSFER_KEY): HRESULT {
+    return Cldapi.Load('CfGetTransferKey')(FileHandle, TransferKey_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfapi/nf-cfapi-cfgetwin32handlefromprotectedhandle
@@ -229,18 +229,18 @@ class Cldapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfapi/nf-cfapi-cfhydrateplaceholder
-  public static CfHydratePlaceholder(FileHandle: HANDLE, StartingOffset: LARGE_INTEGER, Length: LARGE_INTEGER, HydrateFlags: CF_HYDRATE_FLAGS, Overlapped: LPOVERLAPPED | NULL): HRESULT {
-    return Cldapi.Load('CfHydratePlaceholder')(FileHandle, StartingOffset, Length, HydrateFlags, Overlapped);
+  public static CfHydratePlaceholder(FileHandle: HANDLE, StartingOffset: LARGE_INTEGER, Length: LARGE_INTEGER, HydrateFlags: CF_HYDRATE_FLAGS, Overlapped_in_out: OPTIONAL<LPOVERLAPPED>): HRESULT {
+    return Cldapi.Load('CfHydratePlaceholder')(FileHandle, StartingOffset, Length, HydrateFlags, Overlapped_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfapi/nf-cfapi-cfopenfilewithoplock
-  public static CfOpenFileWithOplock(FilePath: LPCWSTR, Flags: CF_OPEN_FILE_FLAGS, ProtectedHandle: PHANDLE): HRESULT {
-    return Cldapi.Load('CfOpenFileWithOplock')(FilePath, Flags, ProtectedHandle);
+  public static CfOpenFileWithOplock(FilePath: LPCWSTR, Flags: CF_OPEN_FILE_FLAGS, ProtectedHandle_out: PHANDLE): HRESULT {
+    return Cldapi.Load('CfOpenFileWithOplock')(FilePath, Flags, ProtectedHandle_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfapi/nf-cfapi-cfquerysyncproviderstatus
-  public static CfQuerySyncProviderStatus(ConnectionKey: CF_CONNECTION_KEY, ProviderStatus: PCF_SYNC_PROVIDER_STATUS): HRESULT {
-    return Cldapi.Load('CfQuerySyncProviderStatus')(ConnectionKey, ProviderStatus);
+  public static CfQuerySyncProviderStatus(ConnectionKey: CF_CONNECTION_KEY, ProviderStatus_out: PCF_SYNC_PROVIDER_STATUS): HRESULT {
+    return Cldapi.Load('CfQuerySyncProviderStatus')(ConnectionKey, ProviderStatus_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfapi/nf-cfapi-cfreferenceprotectedhandle
@@ -259,8 +259,8 @@ class Cldapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfapi/nf-cfapi-cfreleasetransferkey
-  public static CfReleaseTransferKey(FileHandle: HANDLE, TransferKey: PCF_TRANSFER_KEY): VOID {
-    return Cldapi.Load('CfReleaseTransferKey')(FileHandle, TransferKey);
+  public static CfReleaseTransferKey(FileHandle: HANDLE, TransferKey_out: PCF_TRANSFER_KEY): VOID {
+    return Cldapi.Load('CfReleaseTransferKey')(FileHandle, TransferKey_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfapi/nf-cfapi-cfreportproviderprogress
@@ -281,13 +281,13 @@ class Cldapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfapi/nf-cfapi-cfreportsyncstatus
-  public static CfReportSyncStatus(SyncRootPath: LPCWSTR, SyncStatus: PCF_SYNC_STATUS | NULL): HRESULT {
+  public static CfReportSyncStatus(SyncRootPath: LPCWSTR, SyncStatus: OPTIONAL<PCF_SYNC_STATUS>): HRESULT {
     return Cldapi.Load('CfReportSyncStatus')(SyncRootPath, SyncStatus);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfapi/nf-cfapi-cfrevertplaceholder
-  public static CfRevertPlaceholder(FileHandle: HANDLE, RevertFlags: CF_REVERT_FLAGS, Overlapped: LPOVERLAPPED | NULL): HRESULT {
-    return Cldapi.Load('CfRevertPlaceholder')(FileHandle, RevertFlags, Overlapped);
+  public static CfRevertPlaceholder(FileHandle: HANDLE, RevertFlags: CF_REVERT_FLAGS, Overlapped_in_out: OPTIONAL<LPOVERLAPPED>): HRESULT {
+    return Cldapi.Load('CfRevertPlaceholder')(FileHandle, RevertFlags, Overlapped_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfapi/nf-cfapi-cfsetcorrelationvector
@@ -296,13 +296,13 @@ class Cldapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfapi/nf-cfapi-cfsetinsyncstate
-  public static CfSetInSyncState(FileHandle: HANDLE, InSyncState: CF_IN_SYNC_STATE, InSyncFlags: CF_SET_IN_SYNC_FLAGS, InSyncUsn: PUSN | NULL): HRESULT {
-    return Cldapi.Load('CfSetInSyncState')(FileHandle, InSyncState, InSyncFlags, InSyncUsn);
+  public static CfSetInSyncState(FileHandle: HANDLE, InSyncState: CF_IN_SYNC_STATE, InSyncFlags: CF_SET_IN_SYNC_FLAGS, InSyncUsn_in_out: OPTIONAL<PUSN>): HRESULT {
+    return Cldapi.Load('CfSetInSyncState')(FileHandle, InSyncState, InSyncFlags, InSyncUsn_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfapi/nf-cfapi-cfsetpinstate
-  public static CfSetPinState(FileHandle: HANDLE, PinState: CF_PIN_STATE, PinFlags: CF_SET_PIN_FLAGS, Overlapped: LPOVERLAPPED | NULL): HRESULT {
-    return Cldapi.Load('CfSetPinState')(FileHandle, PinState, PinFlags, Overlapped);
+  public static CfSetPinState(FileHandle: HANDLE, PinState: CF_PIN_STATE, PinFlags: CF_SET_PIN_FLAGS, Overlapped_in_out: OPTIONAL<LPOVERLAPPED>): HRESULT {
+    return Cldapi.Load('CfSetPinState')(FileHandle, PinState, PinFlags, Overlapped_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfapi/nf-cfapi-cfunregistersyncroot
@@ -313,16 +313,16 @@ class Cldapi extends Win32 {
   // https://learn.microsoft.com/en-us/windows/win32/api/cfapi/nf-cfapi-cfupdateplaceholder
   public static CfUpdatePlaceholder(
     FileHandle: HANDLE,
-    FsMetadata: PCF_FS_METADATA | NULL,
-    FileIdentity: LPCVOID | NULL,
+    FsMetadata: OPTIONAL<PCF_FS_METADATA>,
+    FileIdentity: OPTIONAL<LPCVOID>,
     FileIdentityLength: DWORD,
-    DehydrateRangeArray: PCF_FILE_RANGE | NULL,
+    DehydrateRangeArray: OPTIONAL<PCF_FILE_RANGE>,
     DehydrateRangeCount: DWORD,
     UpdateFlags: CF_UPDATE_FLAGS,
-    UpdateUsn: PUSN | NULL,
-    Overlapped: LPOVERLAPPED | NULL,
+    UpdateUsn_in_out: OPTIONAL<PUSN>,
+    Overlapped_in_out: OPTIONAL<LPOVERLAPPED>,
   ): HRESULT {
-    return Cldapi.Load('CfUpdatePlaceholder')(FileHandle, FsMetadata, FileIdentity, FileIdentityLength, DehydrateRangeArray, DehydrateRangeCount, UpdateFlags, UpdateUsn, Overlapped);
+    return Cldapi.Load('CfUpdatePlaceholder')(FileHandle, FsMetadata, FileIdentity, FileIdentityLength, DehydrateRangeArray, DehydrateRangeCount, UpdateFlags, UpdateUsn_in_out, Overlapped_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfapi/nf-cfapi-cfupdatesyncproviderstatus

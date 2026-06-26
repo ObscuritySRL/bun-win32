@@ -44,13 +44,13 @@ class Vssapi extends Win32 {
   } as const satisfies Record<string, FFIFunction>;
 
   // https://learn.microsoft.com/en-us/windows/win32/api/vsbackup/nf-vsbackup-createvssbackupcomponents
-  public static CreateVssBackupComponentsInternal(ppBackup: PPIVSSBACKUPCOMPONENTS): HRESULT {
-    return Vssapi.Load('CreateVssBackupComponentsInternal')(ppBackup);
+  public static CreateVssBackupComponentsInternal(ppBackup_out: PPIVSSBACKUPCOMPONENTS): HRESULT {
+    return Vssapi.Load('CreateVssBackupComponentsInternal')(ppBackup_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/vsbackup/nf-vsbackup-createvssexaminewritermetadata
-  public static CreateVssExamineWriterMetadataInternal(bstrXML: BSTR, ppMetadata: PPIVSSEXAMINEWRITERMETADATA): HRESULT {
-    return Vssapi.Load('CreateVssExamineWriterMetadataInternal')(bstrXML, ppMetadata);
+  public static CreateVssExamineWriterMetadataInternal(bstrXML: BSTR, ppMetadata_out: PPIVSSEXAMINEWRITERMETADATA): HRESULT {
+    return Vssapi.Load('CreateVssExamineWriterMetadataInternal')(bstrXML, ppMetadata_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/combaseapi/nf-combaseapi-dllcanunloadnow
@@ -59,28 +59,28 @@ class Vssapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/combaseapi/nf-combaseapi-dllgetclassobject
-  public static DllGetClassObject(rclsid: REFCLSID, riid: REFIID, ppv: PPVOID): HRESULT {
-    return Vssapi.Load('DllGetClassObject')(rclsid, riid, ppv);
+  public static DllGetClassObject(rclsid: REFCLSID, riid: REFIID, ppv_out: PPVOID): HRESULT {
+    return Vssapi.Load('DllGetClassObject')(rclsid, riid, ppv_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/vsbackup/nf-vsbackup-isvolumesnapshotted
-  public static IsVolumeSnapshotted(pwszVolumeName: VSS_PWSZ, pbSnapshotsPresent: PBOOL, plSnapshotCapability: PLONG): HRESULT {
-    return Vssapi.Load('IsVolumeSnapshotted')(pwszVolumeName, pbSnapshotsPresent, plSnapshotCapability);
+  public static IsVolumeSnapshotted(pwszVolumeName: VSS_PWSZ, pbSnapshotsPresent_out: PBOOL, plSnapshotCapability_out: PLONG): HRESULT {
+    return Vssapi.Load('IsVolumeSnapshotted')(pwszVolumeName, pbSnapshotsPresent_out, plSnapshotCapability_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/vsbackup/nf-vsbackup-isvolumesnapshotted
-  public static IsVolumeSnapshottedInternal(pwszVolumeName: VSS_PWSZ, pbSnapshotsPresent: PBOOL, plSnapshotCapability: PLONG): HRESULT {
-    return Vssapi.Load('IsVolumeSnapshottedInternal')(pwszVolumeName, pbSnapshotsPresent, plSnapshotCapability);
+  public static IsVolumeSnapshottedInternal(pwszVolumeName: VSS_PWSZ, pbSnapshotsPresent_out: PBOOL, plSnapshotCapability_out: PLONG): HRESULT {
+    return Vssapi.Load('IsVolumeSnapshottedInternal')(pwszVolumeName, pbSnapshotsPresent_out, plSnapshotCapability_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/vsbackup/nf-vsbackup-shouldblockrevert
-  public static ShouldBlockRevert(wszVolumeName: LPCWSTR, pbBlock: PBOOL): HRESULT {
-    return Vssapi.Load('ShouldBlockRevert')(wszVolumeName, pbBlock);
+  public static ShouldBlockRevert(wszVolumeName: LPCWSTR, pbBlock_out: PBOOL): HRESULT {
+    return Vssapi.Load('ShouldBlockRevert')(wszVolumeName, pbBlock_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/vsbackup/nf-vsbackup-shouldblockrevert
-  public static ShouldBlockRevertInternal(wszVolumeName: LPCWSTR, pbBlock: PBOOL): HRESULT {
-    return Vssapi.Load('ShouldBlockRevertInternal')(wszVolumeName, pbBlock);
+  public static ShouldBlockRevertInternal(wszVolumeName: LPCWSTR, pbBlock_out: PBOOL): HRESULT {
+    return Vssapi.Load('ShouldBlockRevertInternal')(wszVolumeName, pbBlock_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/vsbackup/nf-vsbackup-vssfreesnapshotproperties

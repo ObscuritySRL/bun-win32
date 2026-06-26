@@ -2,7 +2,7 @@ import { type FFIFunction, FFIType } from 'bun:ffi';
 
 import { Win32 } from '@bun-win32/core';
 
-import type { AVRT_PRIORITY, BOOL, HANDLE, LPCSTR, LPCWSTR, LPDWORD, LPGUID, NULL, PHANDLE, PLARGE_INTEGER, PULONG } from '../types/Avrt';
+import type { AVRT_PRIORITY, BOOL, HANDLE, LPCSTR, LPCWSTR, LPDWORD, LPGUID, OPTIONAL, PHANDLE, PLARGE_INTEGER, PULONG } from '../types/Avrt';
 
 /**
  * Thin, lazy-loaded FFI bindings for `avrt.dll`.
@@ -49,8 +49,8 @@ class Avrt extends Win32 {
   } as const satisfies Record<string, FFIFunction>;
 
   // https://learn.microsoft.com/en-us/windows/win32/api/avrt/nf-avrt-avquerysystemresponsiveness
-  public static AvQuerySystemResponsiveness(AvrtHandle: HANDLE, SystemResponsivenessValue: PULONG): BOOL {
-    return Avrt.Load('AvQuerySystemResponsiveness')(AvrtHandle, SystemResponsivenessValue);
+  public static AvQuerySystemResponsiveness(AvrtHandle: HANDLE, SystemResponsivenessValue_out: PULONG): BOOL {
+    return Avrt.Load('AvQuerySystemResponsiveness')(AvrtHandle, SystemResponsivenessValue_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/avrt/nf-avrt-avrevertmmthreadcharacteristics
@@ -59,18 +59,18 @@ class Avrt extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/avrt/nf-avrt-avrtcreatethreadorderinggroup
-  public static AvRtCreateThreadOrderingGroup(Context: PHANDLE, Period: PLARGE_INTEGER, ThreadOrderingGuid: LPGUID, Timeout: PLARGE_INTEGER | NULL): BOOL {
-    return Avrt.Load('AvRtCreateThreadOrderingGroup')(Context, Period, ThreadOrderingGuid, Timeout);
+  public static AvRtCreateThreadOrderingGroup(Context_out: PHANDLE, Period: PLARGE_INTEGER, ThreadOrderingGuid_in_out: LPGUID, Timeout: OPTIONAL<PLARGE_INTEGER>): BOOL {
+    return Avrt.Load('AvRtCreateThreadOrderingGroup')(Context_out, Period, ThreadOrderingGuid_in_out, Timeout);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/avrt/nf-avrt-avrtcreatethreadorderinggroupexa
-  public static AvRtCreateThreadOrderingGroupExA(Context: PHANDLE, Period: PLARGE_INTEGER, ThreadOrderingGuid: LPGUID, Timeout: PLARGE_INTEGER | NULL, TaskName: LPCSTR): BOOL {
-    return Avrt.Load('AvRtCreateThreadOrderingGroupExA')(Context, Period, ThreadOrderingGuid, Timeout, TaskName);
+  public static AvRtCreateThreadOrderingGroupExA(Context_out: PHANDLE, Period: PLARGE_INTEGER, ThreadOrderingGuid_in_out: LPGUID, Timeout: OPTIONAL<PLARGE_INTEGER>, TaskName: LPCSTR): BOOL {
+    return Avrt.Load('AvRtCreateThreadOrderingGroupExA')(Context_out, Period, ThreadOrderingGuid_in_out, Timeout, TaskName);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/avrt/nf-avrt-avrtcreatethreadorderinggroupexw
-  public static AvRtCreateThreadOrderingGroupExW(Context: PHANDLE, Period: PLARGE_INTEGER, ThreadOrderingGuid: LPGUID, Timeout: PLARGE_INTEGER | NULL, TaskName: LPCWSTR): BOOL {
-    return Avrt.Load('AvRtCreateThreadOrderingGroupExW')(Context, Period, ThreadOrderingGuid, Timeout, TaskName);
+  public static AvRtCreateThreadOrderingGroupExW(Context_out: PHANDLE, Period: PLARGE_INTEGER, ThreadOrderingGuid_in_out: LPGUID, Timeout: OPTIONAL<PLARGE_INTEGER>, TaskName: LPCWSTR): BOOL {
+    return Avrt.Load('AvRtCreateThreadOrderingGroupExW')(Context_out, Period, ThreadOrderingGuid_in_out, Timeout, TaskName);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/avrt/nf-avrt-avrtdeletethreadorderinggroup
@@ -79,8 +79,8 @@ class Avrt extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/avrt/nf-avrt-avrtjointhreadorderinggroup
-  public static AvRtJoinThreadOrderingGroup(Context: PHANDLE, ThreadOrderingGuid: LPGUID, Before: BOOL): BOOL {
-    return Avrt.Load('AvRtJoinThreadOrderingGroup')(Context, ThreadOrderingGuid, Before);
+  public static AvRtJoinThreadOrderingGroup(Context_out: PHANDLE, ThreadOrderingGuid: LPGUID, Before: BOOL): BOOL {
+    return Avrt.Load('AvRtJoinThreadOrderingGroup')(Context_out, ThreadOrderingGuid, Before);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/avrt/nf-avrt-avrtleavethreadorderinggroup
@@ -94,23 +94,23 @@ class Avrt extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/avrt/nf-avrt-avsetmmmaxthreadcharacteristicsa
-  public static AvSetMmMaxThreadCharacteristicsA(FirstTask: LPCSTR, SecondTask: LPCSTR, TaskIndex: LPDWORD): HANDLE {
-    return Avrt.Load('AvSetMmMaxThreadCharacteristicsA')(FirstTask, SecondTask, TaskIndex);
+  public static AvSetMmMaxThreadCharacteristicsA(FirstTask: LPCSTR, SecondTask: LPCSTR, TaskIndex_in_out: LPDWORD): HANDLE {
+    return Avrt.Load('AvSetMmMaxThreadCharacteristicsA')(FirstTask, SecondTask, TaskIndex_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/avrt/nf-avrt-avsetmmmaxthreadcharacteristicsw
-  public static AvSetMmMaxThreadCharacteristicsW(FirstTask: LPCWSTR, SecondTask: LPCWSTR, TaskIndex: LPDWORD): HANDLE {
-    return Avrt.Load('AvSetMmMaxThreadCharacteristicsW')(FirstTask, SecondTask, TaskIndex);
+  public static AvSetMmMaxThreadCharacteristicsW(FirstTask: LPCWSTR, SecondTask: LPCWSTR, TaskIndex_in_out: LPDWORD): HANDLE {
+    return Avrt.Load('AvSetMmMaxThreadCharacteristicsW')(FirstTask, SecondTask, TaskIndex_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/avrt/nf-avrt-avsetmmthreadcharacteristicsa
-  public static AvSetMmThreadCharacteristicsA(TaskName: LPCSTR, TaskIndex: LPDWORD): HANDLE {
-    return Avrt.Load('AvSetMmThreadCharacteristicsA')(TaskName, TaskIndex);
+  public static AvSetMmThreadCharacteristicsA(TaskName: LPCSTR, TaskIndex_in_out: LPDWORD): HANDLE {
+    return Avrt.Load('AvSetMmThreadCharacteristicsA')(TaskName, TaskIndex_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/avrt/nf-avrt-avsetmmthreadcharacteristicsw
-  public static AvSetMmThreadCharacteristicsW(TaskName: LPCWSTR, TaskIndex: LPDWORD): HANDLE {
-    return Avrt.Load('AvSetMmThreadCharacteristicsW')(TaskName, TaskIndex);
+  public static AvSetMmThreadCharacteristicsW(TaskName: LPCWSTR, TaskIndex_in_out: LPDWORD): HANDLE {
+    return Avrt.Load('AvSetMmThreadCharacteristicsW')(TaskName, TaskIndex_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/avrt/nf-avrt-avsetmmthreadpriority

@@ -47,13 +47,13 @@ class GameInput extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/combaseapi/nf-combaseapi-dllgetclassobject
-  public static DllGetClassObject(rclsid: REFCLSID, riid: REFIID, ppv: PPVOID): HRESULT {
-    return GameInput.Load('DllGetClassObject')(rclsid, riid, ppv);
+  public static DllGetClassObject(rclsid: REFCLSID, riid: REFIID, ppv_out: PPVOID): HRESULT {
+    return GameInput.Load('DllGetClassObject')(rclsid, riid, ppv_out);
   }
 
   // https://learn.microsoft.com/en-us/gaming/gdk/_content/gc/reference/input/gameinput/functions/gameinputcreate
-  public static GameInputCreate(gameInput: PIGameInput): HRESULT {
-    return GameInput.Load('GameInputCreate')(gameInput);
+  public static GameInputCreate(gameInput_out: PIGameInput): HRESULT {
+    return GameInput.Load('GameInputCreate')(gameInput_out);
   }
 }
 

@@ -2,7 +2,7 @@ import { type FFIFunction, FFIType } from 'bun:ffi';
 
 import { Win32 } from '@bun-win32/core';
 
-import type { DWORD, HANDLE, HRESULT, LPTHREAD_START_ROUTINE, LPVOID, NULL, PHANDLE, PLPWSTR, PPVOID, PVOID, PWSC_SECURITY_PROVIDER_HEALTH, REFCLSID, REFIID } from '../types/Wscapi';
+import type { DWORD, HANDLE, HRESULT, LPTHREAD_START_ROUTINE, NULL, PHANDLE, PLPWSTR, PPVOID, PVOID, PWSC_SECURITY_PROVIDER_HEALTH, REFCLSID, REFIID } from '../types/Wscapi';
 
 /**
  * Thin, lazy-loaded FFI bindings for `wscapi.dll`.
@@ -48,18 +48,18 @@ class Wscapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/combaseapi/nf-combaseapi-dllgetclassobject
-  public static DllGetClassObject(rclsid: REFCLSID, riid: REFIID, ppv: PPVOID): HRESULT {
-    return Wscapi.Load('DllGetClassObject')(rclsid, riid, ppv);
+  public static DllGetClassObject(rclsid: REFCLSID, riid: REFIID, ppv_out: PPVOID): HRESULT {
+    return Wscapi.Load('DllGetClassObject')(rclsid, riid, ppv_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wscapi/nf-wscapi-wscgetantimalwareuri
-  public static WscGetAntiMalwareUri(ppszUri: PLPWSTR): HRESULT {
-    return Wscapi.Load('WscGetAntiMalwareUri')(ppszUri);
+  public static WscGetAntiMalwareUri(ppszUri_out: PLPWSTR): HRESULT {
+    return Wscapi.Load('WscGetAntiMalwareUri')(ppszUri_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wscapi/nf-wscapi-wscgetsecurityproviderhealth
-  public static WscGetSecurityProviderHealth(Providers: DWORD, pHealth: PWSC_SECURITY_PROVIDER_HEALTH): HRESULT {
-    return Wscapi.Load('WscGetSecurityProviderHealth')(Providers, pHealth);
+  public static WscGetSecurityProviderHealth(Providers: DWORD, pHealth_out: PWSC_SECURITY_PROVIDER_HEALTH): HRESULT {
+    return Wscapi.Load('WscGetSecurityProviderHealth')(Providers, pHealth_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wscapi/nf-wscapi-wscqueryantimalwareuri
@@ -68,8 +68,8 @@ class Wscapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wscapi/nf-wscapi-wscregisterforchanges
-  public static WscRegisterForChanges(Reserved: LPVOID | NULL, phCallbackRegistration: PHANDLE, lpCallbackAddress: LPTHREAD_START_ROUTINE, pContext: PVOID): HRESULT {
-    return Wscapi.Load('WscRegisterForChanges')(Reserved, phCallbackRegistration, lpCallbackAddress, pContext);
+  public static WscRegisterForChanges(Reserved: NULL, phCallbackRegistration_out: PHANDLE, lpCallbackAddress: LPTHREAD_START_ROUTINE, pContext: PVOID): HRESULT {
+    return Wscapi.Load('WscRegisterForChanges')(Reserved, phCallbackRegistration_out, lpCallbackAddress, pContext);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wscapi/nf-wscapi-wscregisterforusernotifications

@@ -19,7 +19,7 @@ import type {
   LPSECURITY_ATTRIBUTES,
   LPVOID,
   LPWSTR,
-  NULL,
+  OPTIONAL,
   PFILTER_MESSAGE_HEADER,
   PFILTER_REPLY_HEADER,
   PHANDLE,
@@ -90,13 +90,13 @@ class Fltlib extends Win32 {
   } as const satisfies Record<string, FFIFunction>;
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fltuser/nf-fltuser-filterattach
-  public static FilterAttach(lpFilterName: LPCWSTR, lpVolumeName: LPCWSTR, lpInstanceName: LPCWSTR | NULL, dwCreatedInstanceNameLength: DWORD, lpCreatedInstanceName: LPWSTR | NULL): HRESULT {
-    return Fltlib.Load('FilterAttach')(lpFilterName, lpVolumeName, lpInstanceName, dwCreatedInstanceNameLength, lpCreatedInstanceName);
+  public static FilterAttach(lpFilterName: LPCWSTR, lpVolumeName: LPCWSTR, lpInstanceName: OPTIONAL<LPCWSTR>, dwCreatedInstanceNameLength: DWORD, lpCreatedInstanceName_out: OPTIONAL<LPWSTR>): HRESULT {
+    return Fltlib.Load('FilterAttach')(lpFilterName, lpVolumeName, lpInstanceName, dwCreatedInstanceNameLength, lpCreatedInstanceName_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fltuser/nf-fltuser-filterattachataltitude
-  public static FilterAttachAtAltitude(lpFilterName: LPCWSTR, lpVolumeName: LPCWSTR, lpAltitude: LPCWSTR, lpInstanceName: LPCWSTR | NULL, dwCreatedInstanceNameLength: DWORD, lpCreatedInstanceName: LPWSTR | NULL): HRESULT {
-    return Fltlib.Load('FilterAttachAtAltitude')(lpFilterName, lpVolumeName, lpAltitude, lpInstanceName, dwCreatedInstanceNameLength, lpCreatedInstanceName);
+  public static FilterAttachAtAltitude(lpFilterName: LPCWSTR, lpVolumeName: LPCWSTR, lpAltitude: LPCWSTR, lpInstanceName: OPTIONAL<LPCWSTR>, dwCreatedInstanceNameLength: DWORD, lpCreatedInstanceName_out: OPTIONAL<LPWSTR>): HRESULT {
+    return Fltlib.Load('FilterAttachAtAltitude')(lpFilterName, lpVolumeName, lpAltitude, lpInstanceName, dwCreatedInstanceNameLength, lpCreatedInstanceName_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fltuser/nf-fltuser-filterclose
@@ -105,17 +105,17 @@ class Fltlib extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fltuser/nf-fltuser-filterconnectcommunicationport
-  public static FilterConnectCommunicationPort(lpPortName: LPCWSTR, dwOptions: DWORD, lpContext: LPCVOID | NULL, wSizeOfContext: WORD, lpSecurityAttributes: LPSECURITY_ATTRIBUTES | NULL, hPort: PHANDLE): HRESULT {
-    return Fltlib.Load('FilterConnectCommunicationPort')(lpPortName, dwOptions, lpContext, wSizeOfContext, lpSecurityAttributes, hPort);
+  public static FilterConnectCommunicationPort(lpPortName: LPCWSTR, dwOptions: DWORD, lpContext: OPTIONAL<LPCVOID>, wSizeOfContext: WORD, lpSecurityAttributes: OPTIONAL<LPSECURITY_ATTRIBUTES>, hPort_out: PHANDLE): HRESULT {
+    return Fltlib.Load('FilterConnectCommunicationPort')(lpPortName, dwOptions, lpContext, wSizeOfContext, lpSecurityAttributes, hPort_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fltuser/nf-fltuser-filtercreate
-  public static FilterCreate(lpFilterName: LPCWSTR, hFilter: PHFILTER): HRESULT {
-    return Fltlib.Load('FilterCreate')(lpFilterName, hFilter);
+  public static FilterCreate(lpFilterName: LPCWSTR, hFilter_out: PHFILTER): HRESULT {
+    return Fltlib.Load('FilterCreate')(lpFilterName, hFilter_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fltuser/nf-fltuser-filterdetach
-  public static FilterDetach(lpFilterName: LPCWSTR, lpVolumeName: LPCWSTR, lpInstanceName: LPCWSTR | NULL): HRESULT {
+  public static FilterDetach(lpFilterName: LPCWSTR, lpVolumeName: LPCWSTR, lpInstanceName: OPTIONAL<LPCWSTR>): HRESULT {
     return Fltlib.Load('FilterDetach')(lpFilterName, lpVolumeName, lpInstanceName);
   }
 
@@ -125,28 +125,28 @@ class Fltlib extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fltuser/nf-fltuser-filterfindfirst
-  public static FilterFindFirst(dwInformationClass: FILTER_INFORMATION_CLASS, lpBuffer: LPVOID, dwBufferSize: DWORD, lpBytesReturned: LPDWORD, lpFilterFind: LPHANDLE): HRESULT {
-    return Fltlib.Load('FilterFindFirst')(dwInformationClass, lpBuffer, dwBufferSize, lpBytesReturned, lpFilterFind);
+  public static FilterFindFirst(dwInformationClass: FILTER_INFORMATION_CLASS, lpBuffer_out: LPVOID, dwBufferSize: DWORD, lpBytesReturned_out: LPDWORD, lpFilterFind_out: LPHANDLE): HRESULT {
+    return Fltlib.Load('FilterFindFirst')(dwInformationClass, lpBuffer_out, dwBufferSize, lpBytesReturned_out, lpFilterFind_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fltuser/nf-fltuser-filterfindnext
-  public static FilterFindNext(hFilterFind: HANDLE, dwInformationClass: FILTER_INFORMATION_CLASS, lpBuffer: LPVOID, dwBufferSize: DWORD, lpBytesReturned: LPDWORD): HRESULT {
-    return Fltlib.Load('FilterFindNext')(hFilterFind, dwInformationClass, lpBuffer, dwBufferSize, lpBytesReturned);
+  public static FilterFindNext(hFilterFind: HANDLE, dwInformationClass: FILTER_INFORMATION_CLASS, lpBuffer_out: LPVOID, dwBufferSize: DWORD, lpBytesReturned_out: LPDWORD): HRESULT {
+    return Fltlib.Load('FilterFindNext')(hFilterFind, dwInformationClass, lpBuffer_out, dwBufferSize, lpBytesReturned_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fltuser/nf-fltuser-filtergetdosname
-  public static FilterGetDosName(lpVolumeName: LPCWSTR, lpDosName: LPWSTR, dwDosNameBufferSize: DWORD): HRESULT {
-    return Fltlib.Load('FilterGetDosName')(lpVolumeName, lpDosName, dwDosNameBufferSize);
+  public static FilterGetDosName(lpVolumeName: LPCWSTR, lpDosName_out: LPWSTR, dwDosNameBufferSize: DWORD): HRESULT {
+    return Fltlib.Load('FilterGetDosName')(lpVolumeName, lpDosName_out, dwDosNameBufferSize);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fltuser/nf-fltuser-filtergetinformation
-  public static FilterGetInformation(hFilter: HFILTER, dwInformationClass: FILTER_INFORMATION_CLASS, lpBuffer: LPVOID, dwBufferSize: DWORD, lpBytesReturned: LPDWORD): HRESULT {
-    return Fltlib.Load('FilterGetInformation')(hFilter, dwInformationClass, lpBuffer, dwBufferSize, lpBytesReturned);
+  public static FilterGetInformation(hFilter: HFILTER, dwInformationClass: FILTER_INFORMATION_CLASS, lpBuffer_out: LPVOID, dwBufferSize: DWORD, lpBytesReturned_out: LPDWORD): HRESULT {
+    return Fltlib.Load('FilterGetInformation')(hFilter, dwInformationClass, lpBuffer_out, dwBufferSize, lpBytesReturned_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fltuser/nf-fltuser-filtergetmessage
-  public static FilterGetMessage(hPort: HANDLE, lpMessageBuffer: PFILTER_MESSAGE_HEADER, dwMessageBufferSize: DWORD, lpOverlapped: LPOVERLAPPED | NULL): HRESULT {
-    return Fltlib.Load('FilterGetMessage')(hPort, lpMessageBuffer, dwMessageBufferSize, lpOverlapped);
+  public static FilterGetMessage(hPort: HANDLE, lpMessageBuffer_out: PFILTER_MESSAGE_HEADER, dwMessageBufferSize: DWORD, lpOverlapped_in_out: OPTIONAL<LPOVERLAPPED>): HRESULT {
+    return Fltlib.Load('FilterGetMessage')(hPort, lpMessageBuffer_out, dwMessageBufferSize, lpOverlapped_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fltuser/nf-fltuser-filterinstanceclose
@@ -155,8 +155,8 @@ class Fltlib extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fltuser/nf-fltuser-filterinstancecreate
-  public static FilterInstanceCreate(lpFilterName: LPCWSTR, lpVolumeName: LPCWSTR, lpInstanceName: LPCWSTR | NULL, hInstance: PHFILTER_INSTANCE): HRESULT {
-    return Fltlib.Load('FilterInstanceCreate')(lpFilterName, lpVolumeName, lpInstanceName, hInstance);
+  public static FilterInstanceCreate(lpFilterName: LPCWSTR, lpVolumeName: LPCWSTR, lpInstanceName: OPTIONAL<LPCWSTR>, hInstance_out: PHFILTER_INSTANCE): HRESULT {
+    return Fltlib.Load('FilterInstanceCreate')(lpFilterName, lpVolumeName, lpInstanceName, hInstance_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fltuser/nf-fltuser-filterinstancefindclose
@@ -165,18 +165,18 @@ class Fltlib extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fltuser/nf-fltuser-filterinstancefindfirst
-  public static FilterInstanceFindFirst(lpFilterName: LPCWSTR, dwInformationClass: INSTANCE_INFORMATION_CLASS, lpBuffer: LPVOID, dwBufferSize: DWORD, lpBytesReturned: LPDWORD, lpFilterInstanceFind: LPHANDLE): HRESULT {
-    return Fltlib.Load('FilterInstanceFindFirst')(lpFilterName, dwInformationClass, lpBuffer, dwBufferSize, lpBytesReturned, lpFilterInstanceFind);
+  public static FilterInstanceFindFirst(lpFilterName: LPCWSTR, dwInformationClass: INSTANCE_INFORMATION_CLASS, lpBuffer_out: LPVOID, dwBufferSize: DWORD, lpBytesReturned_out: LPDWORD, lpFilterInstanceFind_out: LPHANDLE): HRESULT {
+    return Fltlib.Load('FilterInstanceFindFirst')(lpFilterName, dwInformationClass, lpBuffer_out, dwBufferSize, lpBytesReturned_out, lpFilterInstanceFind_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fltuser/nf-fltuser-filterinstancefindnext
-  public static FilterInstanceFindNext(hFilterInstanceFind: HANDLE, dwInformationClass: INSTANCE_INFORMATION_CLASS, lpBuffer: LPVOID, dwBufferSize: DWORD, lpBytesReturned: LPDWORD): HRESULT {
-    return Fltlib.Load('FilterInstanceFindNext')(hFilterInstanceFind, dwInformationClass, lpBuffer, dwBufferSize, lpBytesReturned);
+  public static FilterInstanceFindNext(hFilterInstanceFind: HANDLE, dwInformationClass: INSTANCE_INFORMATION_CLASS, lpBuffer_out: LPVOID, dwBufferSize: DWORD, lpBytesReturned_out: LPDWORD): HRESULT {
+    return Fltlib.Load('FilterInstanceFindNext')(hFilterInstanceFind, dwInformationClass, lpBuffer_out, dwBufferSize, lpBytesReturned_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fltuser/nf-fltuser-filterinstancegetinformation
-  public static FilterInstanceGetInformation(hInstance: HFILTER_INSTANCE, dwInformationClass: INSTANCE_INFORMATION_CLASS, lpBuffer: LPVOID, dwBufferSize: DWORD, lpBytesReturned: LPDWORD): HRESULT {
-    return Fltlib.Load('FilterInstanceGetInformation')(hInstance, dwInformationClass, lpBuffer, dwBufferSize, lpBytesReturned);
+  public static FilterInstanceGetInformation(hInstance: HFILTER_INSTANCE, dwInformationClass: INSTANCE_INFORMATION_CLASS, lpBuffer_out: LPVOID, dwBufferSize: DWORD, lpBytesReturned_out: LPDWORD): HRESULT {
+    return Fltlib.Load('FilterInstanceGetInformation')(hInstance, dwInformationClass, lpBuffer_out, dwBufferSize, lpBytesReturned_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fltuser/nf-fltuser-filterload
@@ -190,8 +190,8 @@ class Fltlib extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fltuser/nf-fltuser-filtersendmessage
-  public static FilterSendMessage(hPort: HANDLE, lpInBuffer: LPVOID | NULL, dwInBufferSize: DWORD, lpOutBuffer: LPVOID | NULL, dwOutBufferSize: DWORD, lpBytesReturned: LPDWORD): HRESULT {
-    return Fltlib.Load('FilterSendMessage')(hPort, lpInBuffer, dwInBufferSize, lpOutBuffer, dwOutBufferSize, lpBytesReturned);
+  public static FilterSendMessage(hPort: HANDLE, lpInBuffer: LPVOID, dwInBufferSize: DWORD, lpOutBuffer_out: OPTIONAL<LPVOID>, dwOutBufferSize: DWORD, lpBytesReturned_out: LPDWORD): HRESULT {
+    return Fltlib.Load('FilterSendMessage')(hPort, lpInBuffer, dwInBufferSize, lpOutBuffer_out, dwOutBufferSize, lpBytesReturned_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fltuser/nf-fltuser-filterunload
@@ -205,13 +205,13 @@ class Fltlib extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fltuser/nf-fltuser-filtervolumefindfirst
-  public static FilterVolumeFindFirst(dwInformationClass: FILTER_VOLUME_INFORMATION_CLASS, lpBuffer: LPVOID, dwBufferSize: DWORD, lpBytesReturned: LPDWORD, lpVolumeFind: PHANDLE): HRESULT {
-    return Fltlib.Load('FilterVolumeFindFirst')(dwInformationClass, lpBuffer, dwBufferSize, lpBytesReturned, lpVolumeFind);
+  public static FilterVolumeFindFirst(dwInformationClass: FILTER_VOLUME_INFORMATION_CLASS, lpBuffer_out: LPVOID, dwBufferSize: DWORD, lpBytesReturned_out: LPDWORD, lpVolumeFind_out: PHANDLE): HRESULT {
+    return Fltlib.Load('FilterVolumeFindFirst')(dwInformationClass, lpBuffer_out, dwBufferSize, lpBytesReturned_out, lpVolumeFind_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fltuser/nf-fltuser-filtervolumefindnext
-  public static FilterVolumeFindNext(hVolumeFind: HANDLE, dwInformationClass: FILTER_VOLUME_INFORMATION_CLASS, lpBuffer: LPVOID, dwBufferSize: DWORD, lpBytesReturned: LPDWORD): HRESULT {
-    return Fltlib.Load('FilterVolumeFindNext')(hVolumeFind, dwInformationClass, lpBuffer, dwBufferSize, lpBytesReturned);
+  public static FilterVolumeFindNext(hVolumeFind: HANDLE, dwInformationClass: FILTER_VOLUME_INFORMATION_CLASS, lpBuffer_out: LPVOID, dwBufferSize: DWORD, lpBytesReturned_out: LPDWORD): HRESULT {
+    return Fltlib.Load('FilterVolumeFindNext')(hVolumeFind, dwInformationClass, lpBuffer_out, dwBufferSize, lpBytesReturned_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fltuser/nf-fltuser-filtervolumeinstancefindclose
@@ -220,13 +220,13 @@ class Fltlib extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fltuser/nf-fltuser-filtervolumeinstancefindfirst
-  public static FilterVolumeInstanceFindFirst(lpVolumeName: LPCWSTR, dwInformationClass: INSTANCE_INFORMATION_CLASS, lpBuffer: LPVOID, dwBufferSize: DWORD, lpBytesReturned: LPDWORD, lpVolumeInstanceFind: LPHANDLE): HRESULT {
-    return Fltlib.Load('FilterVolumeInstanceFindFirst')(lpVolumeName, dwInformationClass, lpBuffer, dwBufferSize, lpBytesReturned, lpVolumeInstanceFind);
+  public static FilterVolumeInstanceFindFirst(lpVolumeName: LPCWSTR, dwInformationClass: INSTANCE_INFORMATION_CLASS, lpBuffer_out: LPVOID, dwBufferSize: DWORD, lpBytesReturned_out: LPDWORD, lpVolumeInstanceFind_out: LPHANDLE): HRESULT {
+    return Fltlib.Load('FilterVolumeInstanceFindFirst')(lpVolumeName, dwInformationClass, lpBuffer_out, dwBufferSize, lpBytesReturned_out, lpVolumeInstanceFind_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fltuser/nf-fltuser-filtervolumeinstancefindnext
-  public static FilterVolumeInstanceFindNext(hVolumeInstanceFind: HANDLE, dwInformationClass: INSTANCE_INFORMATION_CLASS, lpBuffer: LPVOID, dwBufferSize: DWORD, lpBytesReturned: LPDWORD): HRESULT {
-    return Fltlib.Load('FilterVolumeInstanceFindNext')(hVolumeInstanceFind, dwInformationClass, lpBuffer, dwBufferSize, lpBytesReturned);
+  public static FilterVolumeInstanceFindNext(hVolumeInstanceFind: HANDLE, dwInformationClass: INSTANCE_INFORMATION_CLASS, lpBuffer_out: LPVOID, dwBufferSize: DWORD, lpBytesReturned_out: LPDWORD): HRESULT {
+    return Fltlib.Load('FilterVolumeInstanceFindNext')(hVolumeInstanceFind, dwInformationClass, lpBuffer_out, dwBufferSize, lpBytesReturned_out);
   }
 }
 

@@ -1,6 +1,6 @@
 import type { Pointer } from 'bun:ffi';
 
-export type { BOOL, DWORD, HANDLE, HRESULT, LPCWSTR, LPWSTR, NULL, UINT, ULONG, ULONG_PTR } from '@bun-win32/core';
+export type { BOOL, DWORD, HANDLE, HRESULT, LPCWSTR, LPWSTR, NULL, OPTIONAL, UINT, ULONG, ULONG_PTR } from '@bun-win32/core';
 
 export const WINCODEC_SDK_VERSION = 0x0237;
 

@@ -9,7 +9,7 @@ import type {
   LPCGUID,
   LPCVOID,
   LPGUID,
-  NULL,
+  OPTIONAL,
   PBOOLEAN,
   PBYTE,
   PCEVENT_DESCRIPTOR,
@@ -95,13 +95,13 @@ class Tdh extends Win32 {
   } as const satisfies Record<string, FFIFunction>;
 
   // https://learn.microsoft.com/en-us/windows/win32/api/tdh/nf-tdh-tdhaggregatepayloadfilters
-  public static TdhAggregatePayloadFilters(PayloadFilterCount: ULONG, PayloadFilterPtrs: PPVOID, EventMatchALLFlags: PBOOLEAN | NULL, EventFilterDescriptor: PEVENT_FILTER_DESCRIPTOR): TDHSTATUS {
-    return Tdh.Load('TdhAggregatePayloadFilters')(PayloadFilterCount, PayloadFilterPtrs, EventMatchALLFlags, EventFilterDescriptor);
+  public static TdhAggregatePayloadFilters(PayloadFilterCount: ULONG, PayloadFilterPtrs: PPVOID, EventMatchALLFlags: OPTIONAL<PBOOLEAN>, EventFilterDescriptor_out: PEVENT_FILTER_DESCRIPTOR): TDHSTATUS {
+    return Tdh.Load('TdhAggregatePayloadFilters')(PayloadFilterCount, PayloadFilterPtrs, EventMatchALLFlags, EventFilterDescriptor_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/tdh/nf-tdh-tdhcleanuppayloadeventfilterdescriptor
-  public static TdhCleanupPayloadEventFilterDescriptor(EventFilterDescriptor: PEVENT_FILTER_DESCRIPTOR): TDHSTATUS {
-    return Tdh.Load('TdhCleanupPayloadEventFilterDescriptor')(EventFilterDescriptor);
+  public static TdhCleanupPayloadEventFilterDescriptor(EventFilterDescriptor_in_out: PEVENT_FILTER_DESCRIPTOR): TDHSTATUS {
+    return Tdh.Load('TdhCleanupPayloadEventFilterDescriptor')(EventFilterDescriptor_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/tdh/nf-tdh-tdhclosedecodinghandle
@@ -110,95 +110,95 @@ class Tdh extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/tdh/nf-tdh-tdhcreatepayloadfilter
-  public static TdhCreatePayloadFilter(ProviderGuid: LPCGUID, EventDescriptor: PCEVENT_DESCRIPTOR, EventMatchANY: BOOLEAN, PayloadPredicateCount: ULONG, PayloadPredicates: PPAYLOAD_FILTER_PREDICATE, PayloadFilter: PPVOID): TDHSTATUS {
-    return Tdh.Load('TdhCreatePayloadFilter')(ProviderGuid, EventDescriptor, EventMatchANY, PayloadPredicateCount, PayloadPredicates, PayloadFilter);
+  public static TdhCreatePayloadFilter(ProviderGuid: LPCGUID, EventDescriptor: PCEVENT_DESCRIPTOR, EventMatchANY: BOOLEAN, PayloadPredicateCount: ULONG, PayloadPredicates: PPAYLOAD_FILTER_PREDICATE, PayloadFilter_out: PPVOID): TDHSTATUS {
+    return Tdh.Load('TdhCreatePayloadFilter')(ProviderGuid, EventDescriptor, EventMatchANY, PayloadPredicateCount, PayloadPredicates, PayloadFilter_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/tdh/nf-tdh-tdhdeletepayloadfilter
-  public static TdhDeletePayloadFilter(PayloadFilter: PPVOID): TDHSTATUS {
-    return Tdh.Load('TdhDeletePayloadFilter')(PayloadFilter);
+  public static TdhDeletePayloadFilter(PayloadFilter_in_out: PPVOID): TDHSTATUS {
+    return Tdh.Load('TdhDeletePayloadFilter')(PayloadFilter_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/tdh/nf-tdh-tdhenumeratemanifestproviderevents
-  public static TdhEnumerateManifestProviderEvents(ProviderGuid: LPGUID, Buffer: PPROVIDER_EVENT_INFO | NULL, BufferSize: PULONG): TDHSTATUS {
-    return Tdh.Load('TdhEnumerateManifestProviderEvents')(ProviderGuid, Buffer, BufferSize);
+  public static TdhEnumerateManifestProviderEvents(ProviderGuid: LPGUID, Buffer_out: OPTIONAL<PPROVIDER_EVENT_INFO>, BufferSize_in_out: PULONG): TDHSTATUS {
+    return Tdh.Load('TdhEnumerateManifestProviderEvents')(ProviderGuid, Buffer_out, BufferSize_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/tdh/nf-tdh-tdhenumerateproviderfieldinformation
-  public static TdhEnumerateProviderFieldInformation(pGuid: LPGUID, EventFieldType: EVENT_FIELD_TYPE, pBuffer: PPROVIDER_FIELD_INFOARRAY | NULL, pBufferSize: PULONG): TDHSTATUS {
-    return Tdh.Load('TdhEnumerateProviderFieldInformation')(pGuid, EventFieldType, pBuffer, pBufferSize);
+  public static TdhEnumerateProviderFieldInformation(pGuid: LPGUID, EventFieldType: EVENT_FIELD_TYPE, pBuffer_out: OPTIONAL<PPROVIDER_FIELD_INFOARRAY>, pBufferSize_in_out: PULONG): TDHSTATUS {
+    return Tdh.Load('TdhEnumerateProviderFieldInformation')(pGuid, EventFieldType, pBuffer_out, pBufferSize_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/tdh/nf-tdh-tdhenumerateproviderfilters
-  public static TdhEnumerateProviderFilters(Guid: LPGUID, TdhContextCount: ULONG, TdhContext: PTDH_CONTEXT | NULL, FilterCount: PULONG, Buffer: PPPROVIDER_FILTER_INFO | NULL, BufferSize: PULONG): TDHSTATUS {
-    return Tdh.Load('TdhEnumerateProviderFilters')(Guid, TdhContextCount, TdhContext, FilterCount, Buffer, BufferSize);
+  public static TdhEnumerateProviderFilters(Guid: LPGUID, TdhContextCount: ULONG, TdhContext: OPTIONAL<PTDH_CONTEXT>, FilterCount_out: PULONG, Buffer_out: OPTIONAL<PPPROVIDER_FILTER_INFO>, BufferSize_in_out: PULONG): TDHSTATUS {
+    return Tdh.Load('TdhEnumerateProviderFilters')(Guid, TdhContextCount, TdhContext, FilterCount_out, Buffer_out, BufferSize_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/tdh/nf-tdh-tdhenumerateproviders
-  public static TdhEnumerateProviders(pBuffer: PPROVIDER_ENUMERATION_INFO | NULL, pBufferSize: PULONG): TDHSTATUS {
-    return Tdh.Load('TdhEnumerateProviders')(pBuffer, pBufferSize);
+  public static TdhEnumerateProviders(pBuffer_out: OPTIONAL<PPROVIDER_ENUMERATION_INFO>, pBufferSize_in_out: PULONG): TDHSTATUS {
+    return Tdh.Load('TdhEnumerateProviders')(pBuffer_out, pBufferSize_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/tdh/nf-tdh-tdhenumerateprovidersfordecodingsource
-  public static TdhEnumerateProvidersForDecodingSource(filter: DECODING_SOURCE, buffer: PPROVIDER_ENUMERATION_INFO | NULL, bufferSize: ULONG, bufferRequired: PULONG): TDHSTATUS {
-    return Tdh.Load('TdhEnumerateProvidersForDecodingSource')(filter, buffer, bufferSize, bufferRequired);
+  public static TdhEnumerateProvidersForDecodingSource(filter: DECODING_SOURCE, buffer_out: OPTIONAL<PPROVIDER_ENUMERATION_INFO>, bufferSize: ULONG, bufferRequired_out: PULONG): TDHSTATUS {
+    return Tdh.Load('TdhEnumerateProvidersForDecodingSource')(filter, buffer_out, bufferSize, bufferRequired_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/tdh/nf-tdh-tdhformatproperty
   public static TdhFormatProperty(
     EventInfo: PTRACE_EVENT_INFO,
-    MapInfo: PEVENT_MAP_INFO | NULL,
+    MapInfo: OPTIONAL<PEVENT_MAP_INFO>,
     PointerSize: ULONG,
     PropertyInType: USHORT,
     PropertyOutType: USHORT,
     PropertyLength: USHORT,
     UserDataLength: USHORT,
     UserData: PBYTE,
-    BufferSize: PULONG,
-    Buffer: PWCHAR | NULL,
-    UserDataConsumed: PUSHORT,
+    BufferSize_in_out: PULONG,
+    Buffer_out: OPTIONAL<PWCHAR>,
+    UserDataConsumed_out: PUSHORT,
   ): TDHSTATUS {
-    return Tdh.Load('TdhFormatProperty')(EventInfo, MapInfo, PointerSize, PropertyInType, PropertyOutType, PropertyLength, UserDataLength, UserData, BufferSize, Buffer, UserDataConsumed);
+    return Tdh.Load('TdhFormatProperty')(EventInfo, MapInfo, PointerSize, PropertyInType, PropertyOutType, PropertyLength, UserDataLength, UserData, BufferSize_in_out, Buffer_out, UserDataConsumed_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/tdh/nf-tdh-tdhgetdecodingparameter
-  public static TdhGetDecodingParameter(Handle: TDH_HANDLE, TdhContext: PTDH_CONTEXT): TDHSTATUS {
-    return Tdh.Load('TdhGetDecodingParameter')(Handle, TdhContext);
+  public static TdhGetDecodingParameter(Handle: TDH_HANDLE, TdhContext_in_out: PTDH_CONTEXT): TDHSTATUS {
+    return Tdh.Load('TdhGetDecodingParameter')(Handle, TdhContext_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/tdh/nf-tdh-tdhgeteventinformation
-  public static TdhGetEventInformation(Event: PEVENT_RECORD, TdhContextCount: ULONG, TdhContext: PTDH_CONTEXT | NULL, Buffer: PTRACE_EVENT_INFO | NULL, BufferSize: PULONG): TDHSTATUS {
-    return Tdh.Load('TdhGetEventInformation')(Event, TdhContextCount, TdhContext, Buffer, BufferSize);
+  public static TdhGetEventInformation(Event: PEVENT_RECORD, TdhContextCount: ULONG, TdhContext: OPTIONAL<PTDH_CONTEXT>, Buffer_out: OPTIONAL<PTRACE_EVENT_INFO>, BufferSize_in_out: PULONG): TDHSTATUS {
+    return Tdh.Load('TdhGetEventInformation')(Event, TdhContextCount, TdhContext, Buffer_out, BufferSize_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/tdh/nf-tdh-tdhgeteventmapinformation
-  public static TdhGetEventMapInformation(pEvent: PEVENT_RECORD, pMapName: PWSTR, pBuffer: PEVENT_MAP_INFO | NULL, pBufferSize: PULONG): TDHSTATUS {
-    return Tdh.Load('TdhGetEventMapInformation')(pEvent, pMapName, pBuffer, pBufferSize);
+  public static TdhGetEventMapInformation(pEvent: PEVENT_RECORD, pMapName: PWSTR, pBuffer_out: OPTIONAL<PEVENT_MAP_INFO>, pBufferSize_in_out: PULONG): TDHSTATUS {
+    return Tdh.Load('TdhGetEventMapInformation')(pEvent, pMapName, pBuffer_out, pBufferSize_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/tdh/nf-tdh-tdhgetmanifesteventinformation
-  public static TdhGetManifestEventInformation(ProviderGuid: LPGUID, EventDescriptor: PEVENT_DESCRIPTOR, Buffer: PTRACE_EVENT_INFO | NULL, BufferSize: PULONG): TDHSTATUS {
-    return Tdh.Load('TdhGetManifestEventInformation')(ProviderGuid, EventDescriptor, Buffer, BufferSize);
+  public static TdhGetManifestEventInformation(ProviderGuid: LPGUID, EventDescriptor: PEVENT_DESCRIPTOR, Buffer_out: OPTIONAL<PTRACE_EVENT_INFO>, BufferSize_in_out: PULONG): TDHSTATUS {
+    return Tdh.Load('TdhGetManifestEventInformation')(ProviderGuid, EventDescriptor, Buffer_out, BufferSize_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/tdh/nf-tdh-tdhgetproperty
-  public static TdhGetProperty(pEvent: PEVENT_RECORD, TdhContextCount: ULONG, pTdhContext: PTDH_CONTEXT | NULL, PropertyDataCount: ULONG, pPropertyData: PPROPERTY_DATA_DESCRIPTOR, BufferSize: ULONG, pBuffer: PBYTE): TDHSTATUS {
-    return Tdh.Load('TdhGetProperty')(pEvent, TdhContextCount, pTdhContext, PropertyDataCount, pPropertyData, BufferSize, pBuffer);
+  public static TdhGetProperty(pEvent: PEVENT_RECORD, TdhContextCount: ULONG, pTdhContext: OPTIONAL<PTDH_CONTEXT>, PropertyDataCount: ULONG, pPropertyData: PPROPERTY_DATA_DESCRIPTOR, BufferSize: ULONG, pBuffer_out: PBYTE): TDHSTATUS {
+    return Tdh.Load('TdhGetProperty')(pEvent, TdhContextCount, pTdhContext, PropertyDataCount, pPropertyData, BufferSize, pBuffer_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/tdh/nf-tdh-tdhgetpropertysize
-  public static TdhGetPropertySize(pEvent: PEVENT_RECORD, TdhContextCount: ULONG, pTdhContext: PTDH_CONTEXT | NULL, PropertyDataCount: ULONG, pPropertyData: PPROPERTY_DATA_DESCRIPTOR, pPropertySize: PULONG): TDHSTATUS {
-    return Tdh.Load('TdhGetPropertySize')(pEvent, TdhContextCount, pTdhContext, PropertyDataCount, pPropertyData, pPropertySize);
+  public static TdhGetPropertySize(pEvent: PEVENT_RECORD, TdhContextCount: ULONG, pTdhContext: OPTIONAL<PTDH_CONTEXT>, PropertyDataCount: ULONG, pPropertyData: PPROPERTY_DATA_DESCRIPTOR, pPropertySize_out: PULONG): TDHSTATUS {
+    return Tdh.Load('TdhGetPropertySize')(pEvent, TdhContextCount, pTdhContext, PropertyDataCount, pPropertyData, pPropertySize_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/tdh/nf-tdh-tdhgetwppmessage
-  public static TdhGetWppMessage(Handle: TDH_HANDLE, EventRecord: PEVENT_RECORD, BufferSize: PULONG, Buffer: PBYTE): TDHSTATUS {
-    return Tdh.Load('TdhGetWppMessage')(Handle, EventRecord, BufferSize, Buffer);
+  public static TdhGetWppMessage(Handle: TDH_HANDLE, EventRecord: PEVENT_RECORD, BufferSize_in_out: PULONG, Buffer_out: PBYTE): TDHSTATUS {
+    return Tdh.Load('TdhGetWppMessage')(Handle, EventRecord, BufferSize_in_out, Buffer_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/tdh/nf-tdh-tdhgetwppproperty
-  public static TdhGetWppProperty(Handle: TDH_HANDLE, EventRecord: PEVENT_RECORD, PropertyName: PWSTR, BufferSize: PULONG, Buffer: PBYTE): TDHSTATUS {
-    return Tdh.Load('TdhGetWppProperty')(Handle, EventRecord, PropertyName, BufferSize, Buffer);
+  public static TdhGetWppProperty(Handle: TDH_HANDLE, EventRecord: PEVENT_RECORD, PropertyName: PWSTR, BufferSize_in_out: PULONG, Buffer_out: PBYTE): TDHSTATUS {
+    return Tdh.Load('TdhGetWppProperty')(Handle, EventRecord, PropertyName, BufferSize_in_out, Buffer_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/tdh/nf-tdh-tdhloadmanifest
@@ -217,13 +217,13 @@ class Tdh extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/tdh/nf-tdh-tdhopendecodinghandle
-  public static TdhOpenDecodingHandle(Handle: PTDH_HANDLE): TDHSTATUS {
-    return Tdh.Load('TdhOpenDecodingHandle')(Handle);
+  public static TdhOpenDecodingHandle(Handle_out: PTDH_HANDLE): TDHSTATUS {
+    return Tdh.Load('TdhOpenDecodingHandle')(Handle_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/tdh/nf-tdh-tdhqueryproviderfieldinformation
-  public static TdhQueryProviderFieldInformation(pGuid: LPGUID, EventFieldValue: ULONGLONG, EventFieldType: EVENT_FIELD_TYPE, pBuffer: PPROVIDER_FIELD_INFOARRAY | NULL, pBufferSize: PULONG): TDHSTATUS {
-    return Tdh.Load('TdhQueryProviderFieldInformation')(pGuid, EventFieldValue, EventFieldType, pBuffer, pBufferSize);
+  public static TdhQueryProviderFieldInformation(pGuid: LPGUID, EventFieldValue: ULONGLONG, EventFieldType: EVENT_FIELD_TYPE, pBuffer_out: OPTIONAL<PPROVIDER_FIELD_INFOARRAY>, pBufferSize_in_out: PULONG): TDHSTATUS {
+    return Tdh.Load('TdhQueryProviderFieldInformation')(pGuid, EventFieldValue, EventFieldType, pBuffer_out, pBufferSize_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/tdh/nf-tdh-tdhsetdecodingparameter

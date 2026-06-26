@@ -80,6 +80,8 @@ import type {
   MCIERROR,
   MMRESULT,
   NULL,
+  NULLABLE,
+  OPTIONAL,
   UINT,
   UINT_PTR,
   YIELDPROC,
@@ -319,22 +321,22 @@ class Winmm extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmiscapi/nf-mmiscapi-opendriver
-  public static OpenDriver(szDriverName: LPCWSTR, szSectionName: LPCWSTR | NULL, lParam2: LPARAM): HDRVR {
+  public static OpenDriver(szDriverName: LPCWSTR, szSectionName: NULLABLE<LPCWSTR>, lParam2: LPARAM): HDRVR {
     return Winmm.Load('OpenDriver')(szDriverName, szSectionName, lParam2);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/multimedia/the-playsound-function
-  public static PlaySound(pszSound: LPCTSTR | NULL, hmod: HMODULE | 0n, fdwSound: DWORD): BOOL {
+  public static PlaySound(pszSound: NULLABLE<LPCTSTR>, hmod: NULLABLE<HMODULE>, fdwSound: DWORD): BOOL {
     return Winmm.Load('PlaySound')(pszSound, hmod, fdwSound);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/multimedia/the-playsound-function
-  public static PlaySoundA(pszSound: LPCSTR | NULL, hmod: HMODULE | 0n, fdwSound: DWORD): BOOL {
+  public static PlaySoundA(pszSound: OPTIONAL<LPCSTR>, hmod: OPTIONAL<HMODULE>, fdwSound: DWORD): BOOL {
     return Winmm.Load('PlaySoundA')(pszSound, hmod, fdwSound);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/multimedia/the-playsound-function
-  public static PlaySoundW(pszSound: LPCWSTR | NULL, hmod: HMODULE | 0n, fdwSound: DWORD): BOOL {
+  public static PlaySoundW(pszSound: OPTIONAL<LPCWSTR>, hmod: OPTIONAL<HMODULE>, fdwSound: DWORD): BOOL {
     return Winmm.Load('PlaySoundW')(pszSound, hmod, fdwSound);
   }
 
@@ -344,13 +346,13 @@ class Winmm extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-auxgetdevcapsa
-  public static auxGetDevCapsA(uDeviceID: UINT_PTR, pac: LPAUXCAPSA, cbac: UINT): MMRESULT {
-    return Winmm.Load('auxGetDevCapsA')(uDeviceID, pac, cbac);
+  public static auxGetDevCapsA(uDeviceID: UINT_PTR, pac_out: LPAUXCAPSA, cbac: UINT): MMRESULT {
+    return Winmm.Load('auxGetDevCapsA')(uDeviceID, pac_out, cbac);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-auxgetdevcapsw
-  public static auxGetDevCapsW(uDeviceID: UINT_PTR, pac: LPAUXCAPSW, cbac: UINT): MMRESULT {
-    return Winmm.Load('auxGetDevCapsW')(uDeviceID, pac, cbac);
+  public static auxGetDevCapsW(uDeviceID: UINT_PTR, pac_out: LPAUXCAPSW, cbac: UINT): MMRESULT {
+    return Winmm.Load('auxGetDevCapsW')(uDeviceID, pac_out, cbac);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-auxgetnumdevs
@@ -359,8 +361,8 @@ class Winmm extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-auxgetvolume
-  public static auxGetVolume(uDeviceID: UINT, pdwVolume: LPDWORD): MMRESULT {
-    return Winmm.Load('auxGetVolume')(uDeviceID, pdwVolume);
+  public static auxGetVolume(uDeviceID: UINT, pdwVolume_out: LPDWORD): MMRESULT {
+    return Winmm.Load('auxGetVolume')(uDeviceID, pdwVolume_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-auxoutmessage
@@ -379,13 +381,13 @@ class Winmm extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/joystickapi/nf-joystickapi-joygetdevcapsa
-  public static joyGetDevCapsA(uJoyID: UINT_PTR, pjc: LPJOYCAPSA, cbjc: UINT): MMRESULT {
-    return Winmm.Load('joyGetDevCapsA')(uJoyID, pjc, cbjc);
+  public static joyGetDevCapsA(uJoyID: UINT_PTR, pjc_out: LPJOYCAPSA, cbjc: UINT): MMRESULT {
+    return Winmm.Load('joyGetDevCapsA')(uJoyID, pjc_out, cbjc);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/joystickapi/nf-joystickapi-joygetdevcapsw
-  public static joyGetDevCapsW(uJoyID: UINT_PTR, pjc: LPJOYCAPSW, cbjc: UINT): MMRESULT {
-    return Winmm.Load('joyGetDevCapsW')(uJoyID, pjc, cbjc);
+  public static joyGetDevCapsW(uJoyID: UINT_PTR, pjc_out: LPJOYCAPSW, cbjc: UINT): MMRESULT {
+    return Winmm.Load('joyGetDevCapsW')(uJoyID, pjc_out, cbjc);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/joystickapi/nf-joystickapi-joygetnumdevs
@@ -394,18 +396,18 @@ class Winmm extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/joystickapi/nf-joystickapi-joygetpos
-  public static joyGetPos(uJoyID: UINT, pji: LPJOYINFO): MMRESULT {
-    return Winmm.Load('joyGetPos')(uJoyID, pji);
+  public static joyGetPos(uJoyID: UINT, pji_out: LPJOYINFO): MMRESULT {
+    return Winmm.Load('joyGetPos')(uJoyID, pji_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/joystickapi/nf-joystickapi-joygetposex
-  public static joyGetPosEx(uJoyID: UINT, pji: LPJOYINFOEX): MMRESULT {
-    return Winmm.Load('joyGetPosEx')(uJoyID, pji);
+  public static joyGetPosEx(uJoyID: UINT, pji_out: LPJOYINFOEX): MMRESULT {
+    return Winmm.Load('joyGetPosEx')(uJoyID, pji_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/joystickapi/nf-joystickapi-joygetthreshold
-  public static joyGetThreshold(uJoyID: UINT, puThreshold: LPUINT): MMRESULT {
-    return Winmm.Load('joyGetThreshold')(uJoyID, puThreshold);
+  public static joyGetThreshold(uJoyID: UINT, puThreshold_out: LPUINT): MMRESULT {
+    return Winmm.Load('joyGetThreshold')(uJoyID, puThreshold_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/joystickapi/nf-joystickapi-joyreleasecapture
@@ -474,13 +476,13 @@ class Winmm extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/_multimedia/
-  public static mciGetErrorStringA(mcierr: MCIERROR, pszText: LPSTR, cchText: UINT): BOOL {
-    return Winmm.Load('mciGetErrorStringA')(mcierr, pszText, cchText);
+  public static mciGetErrorStringA(mcierr: MCIERROR, pszText_out: LPSTR, cchText: UINT): BOOL {
+    return Winmm.Load('mciGetErrorStringA')(mcierr, pszText_out, cchText);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/_multimedia/
-  public static mciGetErrorStringW(mcierr: MCIERROR, pszText: LPWSTR, cchText: UINT): BOOL {
-    return Winmm.Load('mciGetErrorStringW')(mcierr, pszText, cchText);
+  public static mciGetErrorStringW(mcierr: MCIERROR, pszText_out: LPWSTR, cchText: UINT): BOOL {
+    return Winmm.Load('mciGetErrorStringW')(mcierr, pszText_out, cchText);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/_multimedia/
@@ -504,13 +506,13 @@ class Winmm extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/_multimedia/
-  public static mciSendStringA(lpstrCommand: LPCSTR, lpstrReturnString: LPSTR | NULL, uReturnLength: UINT, hwndCallback: HWND | 0n): MCIERROR {
-    return Winmm.Load('mciSendStringA')(lpstrCommand, lpstrReturnString, uReturnLength, hwndCallback);
+  public static mciSendStringA(lpstrCommand: LPCSTR, lpstrReturnString_out: OPTIONAL<LPSTR>, uReturnLength: UINT, hwndCallback: OPTIONAL<HWND>): MCIERROR {
+    return Winmm.Load('mciSendStringA')(lpstrCommand, lpstrReturnString_out, uReturnLength, hwndCallback);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/_multimedia/
-  public static mciSendStringW(lpstrCommand: LPCWSTR, lpstrReturnString: LPWSTR | NULL, uReturnLength: UINT, hwndCallback: HWND | 0n): MCIERROR {
-    return Winmm.Load('mciSendStringW')(lpstrCommand, lpstrReturnString, uReturnLength, hwndCallback);
+  public static mciSendStringW(lpstrCommand: LPCWSTR, lpstrReturnString_out: OPTIONAL<LPWSTR>, uReturnLength: UINT, hwndCallback: OPTIONAL<HWND>): MCIERROR {
+    return Winmm.Load('mciSendStringW')(lpstrCommand, lpstrReturnString_out, uReturnLength, hwndCallback);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/_multimedia/
@@ -519,7 +521,7 @@ class Winmm extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/_multimedia/
-  public static mciSetYieldProc(mciId: MCIDEVICEID, fpYieldProc: YIELDPROC | NULL, dwYieldData: DWORD): BOOL {
+  public static mciSetYieldProc(mciId: MCIDEVICEID, fpYieldProc: OPTIONAL<YIELDPROC>, dwYieldData: DWORD): BOOL {
     return Winmm.Load('mciSetYieldProc')(mciId, fpYieldProc, dwYieldData);
   }
 
@@ -534,8 +536,8 @@ class Winmm extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-midiinaddbuffer
-  public static midiInAddBuffer(hmi: HMIDIIN, pmh: LPMIDIHDR, cbmh: UINT): MMRESULT {
-    return Winmm.Load('midiInAddBuffer')(hmi, pmh, cbmh);
+  public static midiInAddBuffer(hmi: HMIDIIN, pmh_out: LPMIDIHDR, cbmh: UINT): MMRESULT {
+    return Winmm.Load('midiInAddBuffer')(hmi, pmh_out, cbmh);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-midiinclose
@@ -544,28 +546,28 @@ class Winmm extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-midiingetdevcapsa
-  public static midiInGetDevCapsA(uDeviceID: UINT_PTR, pmic: LPMIDIINCAPSA, cbmic: UINT): MMRESULT {
-    return Winmm.Load('midiInGetDevCapsA')(uDeviceID, pmic, cbmic);
+  public static midiInGetDevCapsA(uDeviceID: UINT_PTR, pmic_out: LPMIDIINCAPSA, cbmic: UINT): MMRESULT {
+    return Winmm.Load('midiInGetDevCapsA')(uDeviceID, pmic_out, cbmic);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-midiingetdevcapsw
-  public static midiInGetDevCapsW(uDeviceID: UINT_PTR, pmic: LPMIDIINCAPSW, cbmic: UINT): MMRESULT {
-    return Winmm.Load('midiInGetDevCapsW')(uDeviceID, pmic, cbmic);
+  public static midiInGetDevCapsW(uDeviceID: UINT_PTR, pmic_out: LPMIDIINCAPSW, cbmic: UINT): MMRESULT {
+    return Winmm.Load('midiInGetDevCapsW')(uDeviceID, pmic_out, cbmic);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-midiingeterrortexta
-  public static midiInGetErrorTextA(mmrError: MMRESULT, pszText: LPSTR, cchText: UINT): MMRESULT {
-    return Winmm.Load('midiInGetErrorTextA')(mmrError, pszText, cchText);
+  public static midiInGetErrorTextA(mmrError: MMRESULT, pszText_out: LPSTR, cchText: UINT): MMRESULT {
+    return Winmm.Load('midiInGetErrorTextA')(mmrError, pszText_out, cchText);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-midiingeterrortextw
-  public static midiInGetErrorTextW(mmrError: MMRESULT, pszText: LPWSTR, cchText: UINT): MMRESULT {
-    return Winmm.Load('midiInGetErrorTextW')(mmrError, pszText, cchText);
+  public static midiInGetErrorTextW(mmrError: MMRESULT, pszText_out: LPWSTR, cchText: UINT): MMRESULT {
+    return Winmm.Load('midiInGetErrorTextW')(mmrError, pszText_out, cchText);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-midiingetid
-  public static midiInGetID(hmi: HMIDIIN, puDeviceID: LPUINT): MMRESULT {
-    return Winmm.Load('midiInGetID')(hmi, puDeviceID);
+  public static midiInGetID(hmi: HMIDIIN, puDeviceID_out: LPUINT): MMRESULT {
+    return Winmm.Load('midiInGetID')(hmi, puDeviceID_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-midiingetnumdevs
@@ -574,18 +576,18 @@ class Winmm extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-midiinmessage
-  public static midiInMessage(hmi: HMIDIIN | 0n, uMsg: UINT, dw1: DWORD_PTR, dw2: DWORD_PTR): MMRESULT {
+  public static midiInMessage(hmi: OPTIONAL<HMIDIIN>, uMsg: UINT, dw1: DWORD_PTR, dw2: DWORD_PTR): MMRESULT {
     return Winmm.Load('midiInMessage')(hmi, uMsg, dw1, dw2);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-midiinopen
-  public static midiInOpen(phmi: LPHMIDIIN, uDeviceID: UINT, dwCallback: DWORD_PTR, dwInstance: DWORD_PTR, fdwOpen: DWORD): MMRESULT {
-    return Winmm.Load('midiInOpen')(phmi, uDeviceID, dwCallback, dwInstance, fdwOpen);
+  public static midiInOpen(phmi_out: LPHMIDIIN, uDeviceID: UINT, dwCallback: DWORD_PTR, dwInstance: DWORD_PTR, fdwOpen: DWORD): MMRESULT {
+    return Winmm.Load('midiInOpen')(phmi_out, uDeviceID, dwCallback, dwInstance, fdwOpen);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-midiinprepareheader
-  public static midiInPrepareHeader(hmi: HMIDIIN, pmh: LPMIDIHDR, cbmh: UINT): MMRESULT {
-    return Winmm.Load('midiInPrepareHeader')(hmi, pmh, cbmh);
+  public static midiInPrepareHeader(hmi: HMIDIIN, pmh_in_out: LPMIDIHDR, cbmh: UINT): MMRESULT {
+    return Winmm.Load('midiInPrepareHeader')(hmi, pmh_in_out, cbmh);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-midiinreset
@@ -604,8 +606,8 @@ class Winmm extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-midiinunprepareheader
-  public static midiInUnprepareHeader(hmi: HMIDIIN, pmh: LPMIDIHDR, cbmh: UINT): MMRESULT {
-    return Winmm.Load('midiInUnprepareHeader')(hmi, pmh, cbmh);
+  public static midiInUnprepareHeader(hmi: HMIDIIN, pmh_in_out: LPMIDIHDR, cbmh: UINT): MMRESULT {
+    return Winmm.Load('midiInUnprepareHeader')(hmi, pmh_in_out, cbmh);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-midioutcachedrumpatches
@@ -624,28 +626,28 @@ class Winmm extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-midioutgetdevcapsa
-  public static midiOutGetDevCapsA(uDeviceID: UINT_PTR, pmoc: LPMIDIOUTCAPSA, cbmoc: UINT): MMRESULT {
-    return Winmm.Load('midiOutGetDevCapsA')(uDeviceID, pmoc, cbmoc);
+  public static midiOutGetDevCapsA(uDeviceID: UINT_PTR, pmoc_out: LPMIDIOUTCAPSA, cbmoc: UINT): MMRESULT {
+    return Winmm.Load('midiOutGetDevCapsA')(uDeviceID, pmoc_out, cbmoc);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-midioutgetdevcapsw
-  public static midiOutGetDevCapsW(uDeviceID: UINT_PTR, pmoc: LPMIDIOUTCAPSW, cbmoc: UINT): MMRESULT {
-    return Winmm.Load('midiOutGetDevCapsW')(uDeviceID, pmoc, cbmoc);
+  public static midiOutGetDevCapsW(uDeviceID: UINT_PTR, pmoc_out: LPMIDIOUTCAPSW, cbmoc: UINT): MMRESULT {
+    return Winmm.Load('midiOutGetDevCapsW')(uDeviceID, pmoc_out, cbmoc);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-midioutgeterrortexta
-  public static midiOutGetErrorTextA(mmrError: MMRESULT, pszText: LPSTR, cchText: UINT): MMRESULT {
-    return Winmm.Load('midiOutGetErrorTextA')(mmrError, pszText, cchText);
+  public static midiOutGetErrorTextA(mmrError: MMRESULT, pszText_out: LPSTR, cchText: UINT): MMRESULT {
+    return Winmm.Load('midiOutGetErrorTextA')(mmrError, pszText_out, cchText);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-midioutgeterrortextw
-  public static midiOutGetErrorTextW(mmrError: MMRESULT, pszText: LPWSTR, cchText: UINT): MMRESULT {
-    return Winmm.Load('midiOutGetErrorTextW')(mmrError, pszText, cchText);
+  public static midiOutGetErrorTextW(mmrError: MMRESULT, pszText_out: LPWSTR, cchText: UINT): MMRESULT {
+    return Winmm.Load('midiOutGetErrorTextW')(mmrError, pszText_out, cchText);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-midioutgetid
-  public static midiOutGetID(hmo: HMIDIOUT, puDeviceID: LPUINT): MMRESULT {
-    return Winmm.Load('midiOutGetID')(hmo, puDeviceID);
+  public static midiOutGetID(hmo: HMIDIOUT, puDeviceID_out: LPUINT): MMRESULT {
+    return Winmm.Load('midiOutGetID')(hmo, puDeviceID_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-midioutgetnumdevs
@@ -654,8 +656,8 @@ class Winmm extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-midioutgetvolume
-  public static midiOutGetVolume(hmo: HMIDIOUT | 0n, pdwVolume: LPDWORD): MMRESULT {
-    return Winmm.Load('midiOutGetVolume')(hmo, pdwVolume);
+  public static midiOutGetVolume(hmo: OPTIONAL<HMIDIOUT>, pdwVolume_out: LPDWORD): MMRESULT {
+    return Winmm.Load('midiOutGetVolume')(hmo, pdwVolume_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-midioutlongmsg
@@ -664,18 +666,18 @@ class Winmm extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-midioutmessage
-  public static midiOutMessage(hmo: HMIDIOUT | 0n, uMsg: UINT, dw1: DWORD_PTR, dw2: DWORD_PTR): MMRESULT {
+  public static midiOutMessage(hmo: OPTIONAL<HMIDIOUT>, uMsg: UINT, dw1: DWORD_PTR, dw2: DWORD_PTR): MMRESULT {
     return Winmm.Load('midiOutMessage')(hmo, uMsg, dw1, dw2);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-midioutopen
-  public static midiOutOpen(phmo: LPHMIDIOUT, uDeviceID: UINT, dwCallback: DWORD_PTR, dwInstance: DWORD_PTR, fdwOpen: DWORD): MMRESULT {
-    return Winmm.Load('midiOutOpen')(phmo, uDeviceID, dwCallback, dwInstance, fdwOpen);
+  public static midiOutOpen(phmo_out: LPHMIDIOUT, uDeviceID: UINT, dwCallback: DWORD_PTR, dwInstance: DWORD_PTR, fdwOpen: DWORD): MMRESULT {
+    return Winmm.Load('midiOutOpen')(phmo_out, uDeviceID, dwCallback, dwInstance, fdwOpen);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-midioutprepareheader
-  public static midiOutPrepareHeader(hmo: HMIDIOUT, pmh: LPMIDIHDR, cbmh: UINT): MMRESULT {
-    return Winmm.Load('midiOutPrepareHeader')(hmo, pmh, cbmh);
+  public static midiOutPrepareHeader(hmo: HMIDIOUT, pmh_in_out: LPMIDIHDR, cbmh: UINT): MMRESULT {
+    return Winmm.Load('midiOutPrepareHeader')(hmo, pmh_in_out, cbmh);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-midioutreset
@@ -684,7 +686,7 @@ class Winmm extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-midioutsetvolume
-  public static midiOutSetVolume(hmo: HMIDIOUT | 0n, dwVolume: DWORD): MMRESULT {
+  public static midiOutSetVolume(hmo: OPTIONAL<HMIDIOUT>, dwVolume: DWORD): MMRESULT {
     return Winmm.Load('midiOutSetVolume')(hmo, dwVolume);
   }
 
@@ -694,8 +696,8 @@ class Winmm extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-midioutunprepareheader
-  public static midiOutUnprepareHeader(hmo: HMIDIOUT, pmh: LPMIDIHDR, cbmh: UINT): MMRESULT {
-    return Winmm.Load('midiOutUnprepareHeader')(hmo, pmh, cbmh);
+  public static midiOutUnprepareHeader(hmo: HMIDIOUT, pmh_in_out: LPMIDIHDR, cbmh: UINT): MMRESULT {
+    return Winmm.Load('midiOutUnprepareHeader')(hmo, pmh_in_out, cbmh);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-midistreamclose
@@ -704,13 +706,13 @@ class Winmm extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-midistreamopen
-  public static midiStreamOpen(phms: LPHMIDISTRM, puDeviceID: LPUINT, cMidi: DWORD, dwCallback: DWORD_PTR, dwInstance: DWORD_PTR, fdwOpen: DWORD): MMRESULT {
-    return Winmm.Load('midiStreamOpen')(phms, puDeviceID, cMidi, dwCallback, dwInstance, fdwOpen);
+  public static midiStreamOpen(phms_out: LPHMIDISTRM, puDeviceID_in_out: LPUINT, cMidi: DWORD, dwCallback: DWORD_PTR, dwInstance: DWORD_PTR, fdwOpen: DWORD): MMRESULT {
+    return Winmm.Load('midiStreamOpen')(phms_out, puDeviceID_in_out, cMidi, dwCallback, dwInstance, fdwOpen);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-midistreamout
-  public static midiStreamOut(hms: HMIDISTRM, pmh: LPMIDIHDR, cbmh: UINT): MMRESULT {
-    return Winmm.Load('midiStreamOut')(hms, pmh, cbmh);
+  public static midiStreamOut(hms: HMIDISTRM, pmh_out: LPMIDIHDR, cbmh: UINT): MMRESULT {
+    return Winmm.Load('midiStreamOut')(hms, pmh_out, cbmh);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-midistreampause
@@ -719,13 +721,13 @@ class Winmm extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-midistreamposition
-  public static midiStreamPosition(hms: HMIDISTRM, lpmmt: LPMMTIME, cbmmt: UINT): MMRESULT {
-    return Winmm.Load('midiStreamPosition')(hms, lpmmt, cbmmt);
+  public static midiStreamPosition(hms: HMIDISTRM, lpmmt_out: LPMMTIME, cbmmt: UINT): MMRESULT {
+    return Winmm.Load('midiStreamPosition')(hms, lpmmt_out, cbmmt);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-midistreamproperty
-  public static midiStreamProperty(hms: HMIDISTRM, lppropdata: LPBYTE, dwProperty: DWORD): MMRESULT {
-    return Winmm.Load('midiStreamProperty')(hms, lppropdata, dwProperty);
+  public static midiStreamProperty(hms: HMIDISTRM, lppropdata_in_out: LPBYTE, dwProperty: DWORD): MMRESULT {
+    return Winmm.Load('midiStreamProperty')(hms, lppropdata_in_out, dwProperty);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-midistreamrestart
@@ -744,48 +746,48 @@ class Winmm extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-mixergetcontroldetailsa
-  public static mixerGetControlDetailsA(hmxobj: HMIXEROBJ | 0n, pmxcd: LPMIXERCONTROLDETAILS, fdwDetails: DWORD): MMRESULT {
-    return Winmm.Load('mixerGetControlDetailsA')(hmxobj, pmxcd, fdwDetails);
+  public static mixerGetControlDetailsA(hmxobj: OPTIONAL<HMIXEROBJ>, pmxcd_in_out: LPMIXERCONTROLDETAILS, fdwDetails: DWORD): MMRESULT {
+    return Winmm.Load('mixerGetControlDetailsA')(hmxobj, pmxcd_in_out, fdwDetails);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-mixergetcontroldetailsw
-  public static mixerGetControlDetailsW(hmxobj: HMIXEROBJ | 0n, pmxcd: LPMIXERCONTROLDETAILS, fdwDetails: DWORD): MMRESULT {
-    return Winmm.Load('mixerGetControlDetailsW')(hmxobj, pmxcd, fdwDetails);
+  public static mixerGetControlDetailsW(hmxobj: OPTIONAL<HMIXEROBJ>, pmxcd_in_out: LPMIXERCONTROLDETAILS, fdwDetails: DWORD): MMRESULT {
+    return Winmm.Load('mixerGetControlDetailsW')(hmxobj, pmxcd_in_out, fdwDetails);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-mixergetdevcapsa
-  public static mixerGetDevCapsA(uMxId: UINT_PTR, pmxcaps: LPMIXERCAPSA, cbmxcaps: UINT): MMRESULT {
-    return Winmm.Load('mixerGetDevCapsA')(uMxId, pmxcaps, cbmxcaps);
+  public static mixerGetDevCapsA(uMxId: UINT_PTR, pmxcaps_out: LPMIXERCAPSA, cbmxcaps: UINT): MMRESULT {
+    return Winmm.Load('mixerGetDevCapsA')(uMxId, pmxcaps_out, cbmxcaps);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-mixergetdevcapsw
-  public static mixerGetDevCapsW(uMxId: UINT_PTR, pmxcaps: LPMIXERCAPSW, cbmxcaps: UINT): MMRESULT {
-    return Winmm.Load('mixerGetDevCapsW')(uMxId, pmxcaps, cbmxcaps);
+  public static mixerGetDevCapsW(uMxId: UINT_PTR, pmxcaps_out: LPMIXERCAPSW, cbmxcaps: UINT): MMRESULT {
+    return Winmm.Load('mixerGetDevCapsW')(uMxId, pmxcaps_out, cbmxcaps);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-mixergetid
-  public static mixerGetID(hmxobj: HMIXEROBJ | 0n, puMxId: LPUINT, fdwId: DWORD): MMRESULT {
-    return Winmm.Load('mixerGetID')(hmxobj, puMxId, fdwId);
+  public static mixerGetID(hmxobj: OPTIONAL<HMIXEROBJ>, puMxId_out: LPUINT, fdwId: DWORD): MMRESULT {
+    return Winmm.Load('mixerGetID')(hmxobj, puMxId_out, fdwId);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-mixergetlinecontrolsa
-  public static mixerGetLineControlsA(hmxobj: HMIXEROBJ | 0n, pmxlc: LPMIXERLINECONTROLSA, fdwControls: DWORD): MMRESULT {
-    return Winmm.Load('mixerGetLineControlsA')(hmxobj, pmxlc, fdwControls);
+  public static mixerGetLineControlsA(hmxobj: OPTIONAL<HMIXEROBJ>, pmxlc_in_out: LPMIXERLINECONTROLSA, fdwControls: DWORD): MMRESULT {
+    return Winmm.Load('mixerGetLineControlsA')(hmxobj, pmxlc_in_out, fdwControls);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-mixergetlinecontrolsw
-  public static mixerGetLineControlsW(hmxobj: HMIXEROBJ | 0n, pmxlc: LPMIXERLINECONTROLSW, fdwControls: DWORD): MMRESULT {
-    return Winmm.Load('mixerGetLineControlsW')(hmxobj, pmxlc, fdwControls);
+  public static mixerGetLineControlsW(hmxobj: OPTIONAL<HMIXEROBJ>, pmxlc_in_out: LPMIXERLINECONTROLSW, fdwControls: DWORD): MMRESULT {
+    return Winmm.Load('mixerGetLineControlsW')(hmxobj, pmxlc_in_out, fdwControls);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-mixergetlineinfoa
-  public static mixerGetLineInfoA(hmxobj: HMIXEROBJ | 0n, pmxl: LPMIXERLINEA, fdwInfo: DWORD): MMRESULT {
-    return Winmm.Load('mixerGetLineInfoA')(hmxobj, pmxl, fdwInfo);
+  public static mixerGetLineInfoA(hmxobj: OPTIONAL<HMIXEROBJ>, pmxl_in_out: LPMIXERLINEA, fdwInfo: DWORD): MMRESULT {
+    return Winmm.Load('mixerGetLineInfoA')(hmxobj, pmxl_in_out, fdwInfo);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-mixergetlineinfow
-  public static mixerGetLineInfoW(hmxobj: HMIXEROBJ | 0n, pmxl: LPMIXERLINEW, fdwInfo: DWORD): MMRESULT {
-    return Winmm.Load('mixerGetLineInfoW')(hmxobj, pmxl, fdwInfo);
+  public static mixerGetLineInfoW(hmxobj: OPTIONAL<HMIXEROBJ>, pmxl_in_out: LPMIXERLINEW, fdwInfo: DWORD): MMRESULT {
+    return Winmm.Load('mixerGetLineInfoW')(hmxobj, pmxl_in_out, fdwInfo);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-mixergetnumdevs
@@ -794,17 +796,17 @@ class Winmm extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-mixermessage
-  public static mixerMessage(hmx: HMIXER | 0n, uMsg: UINT, dwParam1: DWORD_PTR, dwParam2: DWORD_PTR): DWORD {
+  public static mixerMessage(hmx: OPTIONAL<HMIXER>, uMsg: UINT, dwParam1: DWORD_PTR, dwParam2: DWORD_PTR): DWORD {
     return Winmm.Load('mixerMessage')(hmx, uMsg, dwParam1, dwParam2);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-mixeropen
-  public static mixerOpen(phmx: LPHMIXER | NULL, uMxId: UINT, dwCallback: DWORD_PTR, dwInstance: DWORD_PTR, fdwOpen: DWORD): MMRESULT {
-    return Winmm.Load('mixerOpen')(phmx, uMxId, dwCallback, dwInstance, fdwOpen);
+  public static mixerOpen(phmx_out: OPTIONAL<LPHMIXER>, uMxId: UINT, dwCallback: DWORD_PTR, dwInstance: DWORD_PTR, fdwOpen: DWORD): MMRESULT {
+    return Winmm.Load('mixerOpen')(phmx_out, uMxId, dwCallback, dwInstance, fdwOpen);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-mixersetcontroldetails
-  public static mixerSetControlDetails(hmxobj: HMIXEROBJ | 0n, pmxcd: LPMIXERCONTROLDETAILS, fdwDetails: DWORD): MMRESULT {
+  public static mixerSetControlDetails(hmxobj: OPTIONAL<HMIXEROBJ>, pmxcd: LPMIXERCONTROLDETAILS, fdwDetails: DWORD): MMRESULT {
     return Winmm.Load('mixerSetControlDetails')(hmxobj, pmxcd, fdwDetails);
   }
 
@@ -839,7 +841,7 @@ class Winmm extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmiscapi/nf-mmiscapi-mmioadvance
-  public static mmioAdvance(hmmio: HMMIO, pmmioinfo: LPMMIOINFO | NULL, fuAdvance: UINT): MMRESULT {
+  public static mmioAdvance(hmmio: HMMIO, pmmioinfo: OPTIONAL<LPMMIOINFO>, fuAdvance: UINT): MMRESULT {
     return Winmm.Load('mmioAdvance')(hmmio, pmmioinfo, fuAdvance);
   }
 
@@ -859,8 +861,8 @@ class Winmm extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmiscapi/nf-mmiscapi-mmiodescend
-  public static mmioDescend(hmmio: HMMIO, pmmcki: LPMMCKINFO, pmmckiParent: LPCMMCKINFO | NULL, fuDescend: UINT): MMRESULT {
-    return Winmm.Load('mmioDescend')(hmmio, pmmcki, pmmckiParent, fuDescend);
+  public static mmioDescend(hmmio: HMMIO, pmmcki_in_out: LPMMCKINFO, pmmckiParent: OPTIONAL<LPCMMCKINFO>, fuDescend: UINT): MMRESULT {
+    return Winmm.Load('mmioDescend')(hmmio, pmmcki_in_out, pmmckiParent, fuDescend);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmiscapi/nf-mmiscapi-mmioflush
@@ -869,42 +871,42 @@ class Winmm extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmiscapi/nf-mmiscapi-mmiogetinfo
-  public static mmioGetInfo(hmmio: HMMIO, pmmioinfo: LPMMIOINFO, fuInfo: UINT): MMRESULT {
-    return Winmm.Load('mmioGetInfo')(hmmio, pmmioinfo, fuInfo);
+  public static mmioGetInfo(hmmio: HMMIO, pmmioinfo_out: LPMMIOINFO, fuInfo: UINT): MMRESULT {
+    return Winmm.Load('mmioGetInfo')(hmmio, pmmioinfo_out, fuInfo);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmiscapi/nf-mmiscapi-mmioinstallioproca
-  public static mmioInstallIOProcA(fccIOProc: FOURCC, pIOProc: LPMMIOPROC | NULL, dwFlags: DWORD): LPMMIOPROC {
+  public static mmioInstallIOProcA(fccIOProc: FOURCC, pIOProc: OPTIONAL<LPMMIOPROC>, dwFlags: DWORD): LPMMIOPROC {
     return Winmm.Load('mmioInstallIOProcA')(fccIOProc, pIOProc, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmiscapi/nf-mmiscapi-mmioinstallioprocw
-  public static mmioInstallIOProcW(fccIOProc: FOURCC, pIOProc: LPMMIOPROC | NULL, dwFlags: DWORD): LPMMIOPROC {
+  public static mmioInstallIOProcW(fccIOProc: FOURCC, pIOProc: OPTIONAL<LPMMIOPROC>, dwFlags: DWORD): LPMMIOPROC {
     return Winmm.Load('mmioInstallIOProcW')(fccIOProc, pIOProc, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmiscapi/nf-mmiscapi-mmioopena
-  public static mmioOpenA(pszFileName: LPSTR | NULL, pmmioinfo: LPMMIOINFO | NULL, fdwOpen: DWORD): HMMIO {
-    return Winmm.Load('mmioOpenA')(pszFileName, pmmioinfo, fdwOpen);
+  public static mmioOpenA(pszFileName_in_out: OPTIONAL<LPSTR>, pmmioinfo_in_out: OPTIONAL<LPMMIOINFO>, fdwOpen: DWORD): HMMIO {
+    return Winmm.Load('mmioOpenA')(pszFileName_in_out, pmmioinfo_in_out, fdwOpen);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmiscapi/nf-mmiscapi-mmioopenw
-  public static mmioOpenW(pszFileName: LPWSTR | NULL, pmmioinfo: LPMMIOINFO | NULL, fdwOpen: DWORD): HMMIO {
-    return Winmm.Load('mmioOpenW')(pszFileName, pmmioinfo, fdwOpen);
+  public static mmioOpenW(pszFileName_in_out: OPTIONAL<LPWSTR>, pmmioinfo_in_out: OPTIONAL<LPMMIOINFO>, fdwOpen: DWORD): HMMIO {
+    return Winmm.Load('mmioOpenW')(pszFileName_in_out, pmmioinfo_in_out, fdwOpen);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmiscapi/nf-mmiscapi-mmioread
-  public static mmioRead(hmmio: HMMIO, pch: HPSTR, cch: LONG): LONG {
-    return Winmm.Load('mmioRead')(hmmio, pch, cch);
+  public static mmioRead(hmmio: HMMIO, pch_out: HPSTR, cch: LONG): LONG {
+    return Winmm.Load('mmioRead')(hmmio, pch_out, cch);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmiscapi/nf-mmiscapi-mmiorenamea
-  public static mmioRenameA(pszFileName: LPCSTR, pszNewFileName: LPCSTR, pmmioinfo: LPCMMIOINFO | NULL, fdwRename: DWORD): MMRESULT {
+  public static mmioRenameA(pszFileName: LPCSTR, pszNewFileName: LPCSTR, pmmioinfo: OPTIONAL<LPCMMIOINFO>, fdwRename: DWORD): MMRESULT {
     return Winmm.Load('mmioRenameA')(pszFileName, pszNewFileName, pmmioinfo, fdwRename);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmiscapi/nf-mmiscapi-mmiorenamew
-  public static mmioRenameW(pszFileName: LPCWSTR, pszNewFileName: LPCWSTR, pmmioinfo: LPCMMIOINFO | NULL, fdwRename: DWORD): MMRESULT {
+  public static mmioRenameW(pszFileName: LPCWSTR, pszNewFileName: LPCWSTR, pmmioinfo: OPTIONAL<LPCMMIOINFO>, fdwRename: DWORD): MMRESULT {
     return Winmm.Load('mmioRenameW')(pszFileName, pszNewFileName, pmmioinfo, fdwRename);
   }
 
@@ -919,8 +921,8 @@ class Winmm extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmiscapi/nf-mmiscapi-mmiosetbuffer
-  public static mmioSetBuffer(hmmio: HMMIO, pchBuffer: LPSTR | NULL, cchBuffer: LONG, fuBuffer: UINT): MMRESULT {
-    return Winmm.Load('mmioSetBuffer')(hmmio, pchBuffer, cchBuffer, fuBuffer);
+  public static mmioSetBuffer(hmmio: HMMIO, pchBuffer_out: OPTIONAL<LPSTR>, cchBuffer: LONG, fuBuffer: UINT): MMRESULT {
+    return Winmm.Load('mmioSetBuffer')(hmmio, pchBuffer_out, cchBuffer, fuBuffer);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmiscapi/nf-mmiscapi-mmiosetinfo
@@ -949,12 +951,12 @@ class Winmm extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/multimedia/the-playsound-function
-  public static sndPlaySoundA(pszSound: LPCSTR | NULL, fuSound: UINT): BOOL {
+  public static sndPlaySoundA(pszSound: OPTIONAL<LPCSTR>, fuSound: UINT): BOOL {
     return Winmm.Load('sndPlaySoundA')(pszSound, fuSound);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/multimedia/the-playsound-function
-  public static sndPlaySoundW(pszSound: LPCWSTR | NULL, fuSound: UINT): BOOL {
+  public static sndPlaySoundW(pszSound: OPTIONAL<LPCWSTR>, fuSound: UINT): BOOL {
     return Winmm.Load('sndPlaySoundW')(pszSound, fuSound);
   }
 
@@ -969,13 +971,13 @@ class Winmm extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/timeapi/nf-timeapi-timegetdevcaps
-  public static timeGetDevCaps(ptc: LPTIMECAPS, cbtc: UINT): MMRESULT {
-    return Winmm.Load('timeGetDevCaps')(ptc, cbtc);
+  public static timeGetDevCaps(ptc_out: LPTIMECAPS, cbtc: UINT): MMRESULT {
+    return Winmm.Load('timeGetDevCaps')(ptc_out, cbtc);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/timeapi/nf-timeapi-timegetsystemtime
-  public static timeGetSystemTime(pmmt: LPMMTIME, cbmmt: UINT): MMRESULT {
-    return Winmm.Load('timeGetSystemTime')(pmmt, cbmmt);
+  public static timeGetSystemTime(pmmt_out: LPMMTIME, cbmmt: UINT): MMRESULT {
+    return Winmm.Load('timeGetSystemTime')(pmmt_out, cbmmt);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/timeapi/nf-timeapi-timegettime
@@ -994,8 +996,8 @@ class Winmm extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-waveinaddbuffer
-  public static waveInAddBuffer(hwi: HWAVEIN, pwh: LPWAVEHDR, cbwh: UINT): MMRESULT {
-    return Winmm.Load('waveInAddBuffer')(hwi, pwh, cbwh);
+  public static waveInAddBuffer(hwi: HWAVEIN, pwh_in_out: LPWAVEHDR, cbwh: UINT): MMRESULT {
+    return Winmm.Load('waveInAddBuffer')(hwi, pwh_in_out, cbwh);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-waveinclose
@@ -1004,28 +1006,28 @@ class Winmm extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-waveingetdevcapsa
-  public static waveInGetDevCapsA(uDeviceID: UINT_PTR, pwic: LPWAVEINCAPSA, cbwic: UINT): MMRESULT {
-    return Winmm.Load('waveInGetDevCapsA')(uDeviceID, pwic, cbwic);
+  public static waveInGetDevCapsA(uDeviceID: UINT_PTR, pwic_out: LPWAVEINCAPSA, cbwic: UINT): MMRESULT {
+    return Winmm.Load('waveInGetDevCapsA')(uDeviceID, pwic_out, cbwic);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-waveingetdevcapsw
-  public static waveInGetDevCapsW(uDeviceID: UINT_PTR, pwic: LPWAVEINCAPSW, cbwic: UINT): MMRESULT {
-    return Winmm.Load('waveInGetDevCapsW')(uDeviceID, pwic, cbwic);
+  public static waveInGetDevCapsW(uDeviceID: UINT_PTR, pwic_out: LPWAVEINCAPSW, cbwic: UINT): MMRESULT {
+    return Winmm.Load('waveInGetDevCapsW')(uDeviceID, pwic_out, cbwic);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-waveingeterrortexta
-  public static waveInGetErrorTextA(mmrError: MMRESULT, pszText: LPSTR, cchText: UINT): MMRESULT {
-    return Winmm.Load('waveInGetErrorTextA')(mmrError, pszText, cchText);
+  public static waveInGetErrorTextA(mmrError: MMRESULT, pszText_out: LPSTR, cchText: UINT): MMRESULT {
+    return Winmm.Load('waveInGetErrorTextA')(mmrError, pszText_out, cchText);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-waveingeterrortextw
-  public static waveInGetErrorTextW(mmrError: MMRESULT, pszText: LPWSTR, cchText: UINT): MMRESULT {
-    return Winmm.Load('waveInGetErrorTextW')(mmrError, pszText, cchText);
+  public static waveInGetErrorTextW(mmrError: MMRESULT, pszText_out: LPWSTR, cchText: UINT): MMRESULT {
+    return Winmm.Load('waveInGetErrorTextW')(mmrError, pszText_out, cchText);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-waveingetid
-  public static waveInGetID(hwi: HWAVEIN, puDeviceID: LPUINT): MMRESULT {
-    return Winmm.Load('waveInGetID')(hwi, puDeviceID);
+  public static waveInGetID(hwi: HWAVEIN, puDeviceID_out: LPUINT): MMRESULT {
+    return Winmm.Load('waveInGetID')(hwi, puDeviceID_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-waveingetnumdevs
@@ -1034,23 +1036,23 @@ class Winmm extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-waveingetposition
-  public static waveInGetPosition(hwi: HWAVEIN, pmmt: LPMMTIME, cbmmt: UINT): MMRESULT {
-    return Winmm.Load('waveInGetPosition')(hwi, pmmt, cbmmt);
+  public static waveInGetPosition(hwi: HWAVEIN, pmmt_in_out: LPMMTIME, cbmmt: UINT): MMRESULT {
+    return Winmm.Load('waveInGetPosition')(hwi, pmmt_in_out, cbmmt);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-waveinmessage
-  public static waveInMessage(hwi: HWAVEIN | 0n, uMsg: UINT, dw1: DWORD_PTR, dw2: DWORD_PTR): MMRESULT {
+  public static waveInMessage(hwi: OPTIONAL<HWAVEIN>, uMsg: UINT, dw1: DWORD_PTR, dw2: DWORD_PTR): MMRESULT {
     return Winmm.Load('waveInMessage')(hwi, uMsg, dw1, dw2);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-waveinopen
-  public static waveInOpen(phwi: LPHWAVEIN | NULL, uDeviceID: UINT, pwfx: LPCWAVEFORMATEX, dwCallback: DWORD_PTR, dwInstance: DWORD_PTR, fdwOpen: DWORD): MMRESULT {
-    return Winmm.Load('waveInOpen')(phwi, uDeviceID, pwfx, dwCallback, dwInstance, fdwOpen);
+  public static waveInOpen(phwi_out: OPTIONAL<LPHWAVEIN>, uDeviceID: UINT, pwfx: LPCWAVEFORMATEX, dwCallback: DWORD_PTR, dwInstance: DWORD_PTR, fdwOpen: DWORD): MMRESULT {
+    return Winmm.Load('waveInOpen')(phwi_out, uDeviceID, pwfx, dwCallback, dwInstance, fdwOpen);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-waveinprepareheader
-  public static waveInPrepareHeader(hwi: HWAVEIN, pwh: LPWAVEHDR, cbwh: UINT): MMRESULT {
-    return Winmm.Load('waveInPrepareHeader')(hwi, pwh, cbwh);
+  public static waveInPrepareHeader(hwi: HWAVEIN, pwh_in_out: LPWAVEHDR, cbwh: UINT): MMRESULT {
+    return Winmm.Load('waveInPrepareHeader')(hwi, pwh_in_out, cbwh);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-waveinreset
@@ -1069,8 +1071,8 @@ class Winmm extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-waveinunprepareheader
-  public static waveInUnprepareHeader(hwi: HWAVEIN, pwh: LPWAVEHDR, cbwh: UINT): MMRESULT {
-    return Winmm.Load('waveInUnprepareHeader')(hwi, pwh, cbwh);
+  public static waveInUnprepareHeader(hwi: HWAVEIN, pwh_in_out: LPWAVEHDR, cbwh: UINT): MMRESULT {
+    return Winmm.Load('waveInUnprepareHeader')(hwi, pwh_in_out, cbwh);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-waveoutbreakloop
@@ -1084,28 +1086,28 @@ class Winmm extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-waveoutgetdevcapsa
-  public static waveOutGetDevCapsA(uDeviceID: UINT_PTR, pwoc: LPWAVEOUTCAPSA, cbwoc: UINT): MMRESULT {
-    return Winmm.Load('waveOutGetDevCapsA')(uDeviceID, pwoc, cbwoc);
+  public static waveOutGetDevCapsA(uDeviceID: UINT_PTR, pwoc_out: LPWAVEOUTCAPSA, cbwoc: UINT): MMRESULT {
+    return Winmm.Load('waveOutGetDevCapsA')(uDeviceID, pwoc_out, cbwoc);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-waveoutgetdevcapsw
-  public static waveOutGetDevCapsW(uDeviceID: UINT_PTR, pwoc: LPWAVEOUTCAPSW, cbwoc: UINT): MMRESULT {
-    return Winmm.Load('waveOutGetDevCapsW')(uDeviceID, pwoc, cbwoc);
+  public static waveOutGetDevCapsW(uDeviceID: UINT_PTR, pwoc_out: LPWAVEOUTCAPSW, cbwoc: UINT): MMRESULT {
+    return Winmm.Load('waveOutGetDevCapsW')(uDeviceID, pwoc_out, cbwoc);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-waveoutgeterrortexta
-  public static waveOutGetErrorTextA(mmrError: MMRESULT, pszText: LPSTR, cchText: UINT): MMRESULT {
-    return Winmm.Load('waveOutGetErrorTextA')(mmrError, pszText, cchText);
+  public static waveOutGetErrorTextA(mmrError: MMRESULT, pszText_out: LPSTR, cchText: UINT): MMRESULT {
+    return Winmm.Load('waveOutGetErrorTextA')(mmrError, pszText_out, cchText);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-waveoutgeterrortextw
-  public static waveOutGetErrorTextW(mmrError: MMRESULT, pszText: LPWSTR, cchText: UINT): MMRESULT {
-    return Winmm.Load('waveOutGetErrorTextW')(mmrError, pszText, cchText);
+  public static waveOutGetErrorTextW(mmrError: MMRESULT, pszText_out: LPWSTR, cchText: UINT): MMRESULT {
+    return Winmm.Load('waveOutGetErrorTextW')(mmrError, pszText_out, cchText);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-waveoutgetid
-  public static waveOutGetID(hwo: HWAVEOUT, puDeviceID: LPUINT): MMRESULT {
-    return Winmm.Load('waveOutGetID')(hwo, puDeviceID);
+  public static waveOutGetID(hwo: HWAVEOUT, puDeviceID_out: LPUINT): MMRESULT {
+    return Winmm.Load('waveOutGetID')(hwo, puDeviceID_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-waveoutgetnumdevs
@@ -1114,33 +1116,33 @@ class Winmm extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-waveoutgetpitch
-  public static waveOutGetPitch(hwo: HWAVEOUT, pdwPitch: LPDWORD): MMRESULT {
-    return Winmm.Load('waveOutGetPitch')(hwo, pdwPitch);
+  public static waveOutGetPitch(hwo: HWAVEOUT, pdwPitch_out: LPDWORD): MMRESULT {
+    return Winmm.Load('waveOutGetPitch')(hwo, pdwPitch_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-waveoutgetplaybackrate
-  public static waveOutGetPlaybackRate(hwo: HWAVEOUT, pdwRate: LPDWORD): MMRESULT {
-    return Winmm.Load('waveOutGetPlaybackRate')(hwo, pdwRate);
+  public static waveOutGetPlaybackRate(hwo: HWAVEOUT, pdwRate_out: LPDWORD): MMRESULT {
+    return Winmm.Load('waveOutGetPlaybackRate')(hwo, pdwRate_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-waveoutgetposition
-  public static waveOutGetPosition(hwo: HWAVEOUT, pmmt: LPMMTIME, cbmmt: UINT): MMRESULT {
-    return Winmm.Load('waveOutGetPosition')(hwo, pmmt, cbmmt);
+  public static waveOutGetPosition(hwo: HWAVEOUT, pmmt_in_out: LPMMTIME, cbmmt: UINT): MMRESULT {
+    return Winmm.Load('waveOutGetPosition')(hwo, pmmt_in_out, cbmmt);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-waveoutgetvolume
-  public static waveOutGetVolume(hwo: HWAVEOUT | 0n, pdwVolume: LPDWORD): MMRESULT {
-    return Winmm.Load('waveOutGetVolume')(hwo, pdwVolume);
+  public static waveOutGetVolume(hwo: OPTIONAL<HWAVEOUT>, pdwVolume_out: LPDWORD): MMRESULT {
+    return Winmm.Load('waveOutGetVolume')(hwo, pdwVolume_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-waveoutmessage
-  public static waveOutMessage(hwo: HWAVEOUT | 0n, uMsg: UINT, dw1: DWORD_PTR, dw2: DWORD_PTR): MMRESULT {
+  public static waveOutMessage(hwo: OPTIONAL<HWAVEOUT>, uMsg: UINT, dw1: DWORD_PTR, dw2: DWORD_PTR): MMRESULT {
     return Winmm.Load('waveOutMessage')(hwo, uMsg, dw1, dw2);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-waveoutopen
-  public static waveOutOpen(phwo: LPHWAVEOUT | NULL, uDeviceID: UINT, pwfx: LPCWAVEFORMATEX, dwCallback: DWORD_PTR, dwInstance: DWORD_PTR, fdwOpen: DWORD): MMRESULT {
-    return Winmm.Load('waveOutOpen')(phwo, uDeviceID, pwfx, dwCallback, dwInstance, fdwOpen);
+  public static waveOutOpen(phwo_out: OPTIONAL<LPHWAVEOUT>, uDeviceID: UINT, pwfx: LPCWAVEFORMATEX, dwCallback: DWORD_PTR, dwInstance: DWORD_PTR, fdwOpen: DWORD): MMRESULT {
+    return Winmm.Load('waveOutOpen')(phwo_out, uDeviceID, pwfx, dwCallback, dwInstance, fdwOpen);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-waveoutpause
@@ -1149,8 +1151,8 @@ class Winmm extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-waveoutprepareheader
-  public static waveOutPrepareHeader(hwo: HWAVEOUT, pwh: LPWAVEHDR, cbwh: UINT): MMRESULT {
-    return Winmm.Load('waveOutPrepareHeader')(hwo, pwh, cbwh);
+  public static waveOutPrepareHeader(hwo: HWAVEOUT, pwh_in_out: LPWAVEHDR, cbwh: UINT): MMRESULT {
+    return Winmm.Load('waveOutPrepareHeader')(hwo, pwh_in_out, cbwh);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-waveoutreset
@@ -1174,18 +1176,18 @@ class Winmm extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-waveoutsetvolume
-  public static waveOutSetVolume(hwo: HWAVEOUT | 0n, dwVolume: DWORD): MMRESULT {
+  public static waveOutSetVolume(hwo: OPTIONAL<HWAVEOUT>, dwVolume: DWORD): MMRESULT {
     return Winmm.Load('waveOutSetVolume')(hwo, dwVolume);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-waveoutunprepareheader
-  public static waveOutUnprepareHeader(hwo: HWAVEOUT, pwh: LPWAVEHDR, cbwh: UINT): MMRESULT {
-    return Winmm.Load('waveOutUnprepareHeader')(hwo, pwh, cbwh);
+  public static waveOutUnprepareHeader(hwo: HWAVEOUT, pwh_in_out: LPWAVEHDR, cbwh: UINT): MMRESULT {
+    return Winmm.Load('waveOutUnprepareHeader')(hwo, pwh_in_out, cbwh);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-waveoutwrite
-  public static waveOutWrite(hwo: HWAVEOUT, pwh: LPWAVEHDR, cbwh: UINT): MMRESULT {
-    return Winmm.Load('waveOutWrite')(hwo, pwh, cbwh);
+  public static waveOutWrite(hwo: HWAVEOUT, pwh_in_out: LPWAVEHDR, cbwh: UINT): MMRESULT {
+    return Winmm.Load('waveOutWrite')(hwo, pwh_in_out, cbwh);
   }
 }
 

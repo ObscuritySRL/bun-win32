@@ -1,5 +1,5 @@
 import type { Pointer } from 'bun:ffi';
-export type { BOOL, DWORD, HRESULT, HWND, INT, LPCVOID, LPBOOL, LPDWORD, LPARAM, LRESULT, NULL, PVOID, UINT, WPARAM } from '@bun-win32/core';
+export type { BOOL, DWORD, HRESULT, HWND, INT, LPCVOID, LPBOOL, LPDWORD, LPARAM, LRESULT, NULL, NULLABLE, OPTIONAL, PVOID, UINT, WPARAM } from '@bun-win32/core';
 
 export enum BlurBehindFlags {
   DWM_BB_BLURREGION = 0x0000_0002,

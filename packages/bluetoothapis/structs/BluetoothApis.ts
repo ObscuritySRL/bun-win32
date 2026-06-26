@@ -18,7 +18,8 @@ import type {
   LPDWORD,
   LPVOID,
   LPWSTR,
-  NULL,
+  NULLABLE,
+  OPTIONAL,
   PBLUETOOTH_ADDRESS,
   PBLUETOOTH_AUTHENTICATE_RESPONSE,
   PBLUETOOTH_DEVICE_INFO,
@@ -122,18 +123,18 @@ class BluetoothApis extends Win32 {
   } as const satisfies Record<string, FFIFunction>;
 
   // https://learn.microsoft.com/en-us/windows/win32/api/bluetoothapis/nf-bluetoothapis-bluetoothenablediscovery
-  public static BluetoothEnableDiscovery(hRadio: HANDLE | 0n, fEnabled: BOOL): BOOL {
+  public static BluetoothEnableDiscovery(hRadio: OPTIONAL<HANDLE>, fEnabled: BOOL): BOOL {
     return BluetoothApis.Load('BluetoothEnableDiscovery')(hRadio, fEnabled);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/bluetoothapis/nf-bluetoothapis-bluetoothenableincomingconnections
-  public static BluetoothEnableIncomingConnections(hRadio: HANDLE | 0n, fEnabled: BOOL): BOOL {
+  public static BluetoothEnableIncomingConnections(hRadio: OPTIONAL<HANDLE>, fEnabled: BOOL): BOOL {
     return BluetoothApis.Load('BluetoothEnableIncomingConnections')(hRadio, fEnabled);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/bluetoothapis/nf-bluetoothapis-bluetoothenumerateinstalledservices
-  public static BluetoothEnumerateInstalledServices(hRadio: HANDLE | 0n, pbtdi: PBLUETOOTH_DEVICE_INFO, pcServiceInout: LPDWORD, pGuidServices: PGUID | NULL): DWORD {
-    return BluetoothApis.Load('BluetoothEnumerateInstalledServices')(hRadio, pbtdi, pcServiceInout, pGuidServices);
+  public static BluetoothEnumerateInstalledServices(hRadio: OPTIONAL<HANDLE>, pbtdi: PBLUETOOTH_DEVICE_INFO, pcServiceInout_in_out: LPDWORD, pGuidServices_out: OPTIONAL<PGUID>): DWORD {
+    return BluetoothApis.Load('BluetoothEnumerateInstalledServices')(hRadio, pbtdi, pcServiceInout_in_out, pGuidServices_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/bluetoothapis/nf-bluetoothapis-bluetoothfinddeviceclose
@@ -142,23 +143,23 @@ class BluetoothApis extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/bluetoothapis/nf-bluetoothapis-bluetoothfindfirstdevice
-  public static BluetoothFindFirstDevice(pbtsp: PBLUETOOTH_DEVICE_SEARCH_PARAMS, pbtdi: PBLUETOOTH_DEVICE_INFO): HBLUETOOTH_DEVICE_FIND {
-    return BluetoothApis.Load('BluetoothFindFirstDevice')(pbtsp, pbtdi);
+  public static BluetoothFindFirstDevice(pbtsp: PBLUETOOTH_DEVICE_SEARCH_PARAMS, pbtdi_in_out: PBLUETOOTH_DEVICE_INFO): HBLUETOOTH_DEVICE_FIND {
+    return BluetoothApis.Load('BluetoothFindFirstDevice')(pbtsp, pbtdi_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/bluetoothapis/nf-bluetoothapis-bluetoothfindfirstradio
-  public static BluetoothFindFirstRadio(pbtfrp: PBLUETOOTH_FIND_RADIO_PARAMS, phRadio: PHANDLE): HBLUETOOTH_RADIO_FIND {
-    return BluetoothApis.Load('BluetoothFindFirstRadio')(pbtfrp, phRadio);
+  public static BluetoothFindFirstRadio(pbtfrp: PBLUETOOTH_FIND_RADIO_PARAMS, phRadio_out: PHANDLE): HBLUETOOTH_RADIO_FIND {
+    return BluetoothApis.Load('BluetoothFindFirstRadio')(pbtfrp, phRadio_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/bluetoothapis/nf-bluetoothapis-bluetoothfindnextdevice
-  public static BluetoothFindNextDevice(hFind: HBLUETOOTH_DEVICE_FIND, pbtdi: PBLUETOOTH_DEVICE_INFO): BOOL {
-    return BluetoothApis.Load('BluetoothFindNextDevice')(hFind, pbtdi);
+  public static BluetoothFindNextDevice(hFind: HBLUETOOTH_DEVICE_FIND, pbtdi_in_out: PBLUETOOTH_DEVICE_INFO): BOOL {
+    return BluetoothApis.Load('BluetoothFindNextDevice')(hFind, pbtdi_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/bluetoothapis/nf-bluetoothapis-bluetoothfindnextradio
-  public static BluetoothFindNextRadio(hFind: HBLUETOOTH_RADIO_FIND, phRadio: PHANDLE): BOOL {
-    return BluetoothApis.Load('BluetoothFindNextRadio')(hFind, phRadio);
+  public static BluetoothFindNextRadio(hFind: HBLUETOOTH_RADIO_FIND, phRadio_out: PHANDLE): BOOL {
+    return BluetoothApis.Load('BluetoothFindNextRadio')(hFind, phRadio_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/bluetoothapis/nf-bluetoothapis-bluetoothfindradioclose
@@ -172,8 +173,8 @@ class BluetoothApis extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/bluetoothleapis/nf-bluetoothleapis-bluetoothgattbeginreliablewrite
-  public static BluetoothGATTBeginReliableWrite(hDevice: HANDLE, ReliableWriteContext: PBTH_LE_GATT_RELIABLE_WRITE_CONTEXT, Flags: ULONG): HRESULT {
-    return BluetoothApis.Load('BluetoothGATTBeginReliableWrite')(hDevice, ReliableWriteContext, Flags);
+  public static BluetoothGATTBeginReliableWrite(hDevice: HANDLE, ReliableWriteContext_out: PBTH_LE_GATT_RELIABLE_WRITE_CONTEXT, Flags: ULONG): HRESULT {
+    return BluetoothApis.Load('BluetoothGATTBeginReliableWrite')(hDevice, ReliableWriteContext_out, Flags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/bluetoothleapis/nf-bluetoothleapis-bluetoothgattendreliablewrite
@@ -186,23 +187,23 @@ class BluetoothApis extends Win32 {
     hDevice: HANDLE,
     Characteristic: PBTH_LE_GATT_CHARACTERISTIC,
     CharacteristicValueDataSize: ULONG,
-    CharacteristicValue: PBTH_LE_GATT_CHARACTERISTIC_VALUE | NULL,
-    CharacteristicValueSizeRequired: PUSHORT | NULL,
+    CharacteristicValue_out: OPTIONAL<PBTH_LE_GATT_CHARACTERISTIC_VALUE>,
+    CharacteristicValueSizeRequired_out: OPTIONAL<PUSHORT>,
     Flags: ULONG,
   ): HRESULT {
-    return BluetoothApis.Load('BluetoothGATTGetCharacteristicValue')(hDevice, Characteristic, CharacteristicValueDataSize, CharacteristicValue, CharacteristicValueSizeRequired, Flags);
+    return BluetoothApis.Load('BluetoothGATTGetCharacteristicValue')(hDevice, Characteristic, CharacteristicValueDataSize, CharacteristicValue_out, CharacteristicValueSizeRequired_out, Flags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/bluetoothleapis/nf-bluetoothleapis-bluetoothgattgetcharacteristics
   public static BluetoothGATTGetCharacteristics(
     hDevice: HANDLE,
-    Service: PBTH_LE_GATT_SERVICE | NULL,
+    Service: OPTIONAL<PBTH_LE_GATT_SERVICE>,
     CharacteristicsBufferCount: USHORT,
-    CharacteristicsBuffer: PBTH_LE_GATT_CHARACTERISTIC | NULL,
-    CharacteristicsBufferActual: PUSHORT,
+    CharacteristicsBuffer_out: OPTIONAL<PBTH_LE_GATT_CHARACTERISTIC>,
+    CharacteristicsBufferActual_out: PUSHORT,
     Flags: ULONG,
   ): HRESULT {
-    return BluetoothApis.Load('BluetoothGATTGetCharacteristics')(hDevice, Service, CharacteristicsBufferCount, CharacteristicsBuffer, CharacteristicsBufferActual, Flags);
+    return BluetoothApis.Load('BluetoothGATTGetCharacteristics')(hDevice, Service, CharacteristicsBufferCount, CharacteristicsBuffer_out, CharacteristicsBufferActual_out, Flags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/bluetoothleapis/nf-bluetoothleapis-bluetoothgattgetdescriptorvalue
@@ -210,11 +211,11 @@ class BluetoothApis extends Win32 {
     hDevice: HANDLE,
     Descriptor: PBTH_LE_GATT_DESCRIPTOR,
     DescriptorValueDataSize: ULONG,
-    DescriptorValue: PBTH_LE_GATT_DESCRIPTOR_VALUE | NULL,
-    DescriptorValueSizeRequired: PUSHORT | NULL,
+    DescriptorValue_out: OPTIONAL<PBTH_LE_GATT_DESCRIPTOR_VALUE>,
+    DescriptorValueSizeRequired_out: OPTIONAL<PUSHORT>,
     Flags: ULONG,
   ): HRESULT {
-    return BluetoothApis.Load('BluetoothGATTGetDescriptorValue')(hDevice, Descriptor, DescriptorValueDataSize, DescriptorValue, DescriptorValueSizeRequired, Flags);
+    return BluetoothApis.Load('BluetoothGATTGetDescriptorValue')(hDevice, Descriptor, DescriptorValueDataSize, DescriptorValue_out, DescriptorValueSizeRequired_out, Flags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/bluetoothleapis/nf-bluetoothleapis-bluetoothgattgetdescriptors
@@ -222,28 +223,28 @@ class BluetoothApis extends Win32 {
     hDevice: HANDLE,
     Characteristic: PBTH_LE_GATT_CHARACTERISTIC,
     DescriptorsBufferCount: USHORT,
-    DescriptorsBuffer: PBTH_LE_GATT_DESCRIPTOR | NULL,
-    DescriptorsBufferActual: PUSHORT,
+    DescriptorsBuffer_out: OPTIONAL<PBTH_LE_GATT_DESCRIPTOR>,
+    DescriptorsBufferActual_out: PUSHORT,
     Flags: ULONG,
   ): HRESULT {
-    return BluetoothApis.Load('BluetoothGATTGetDescriptors')(hDevice, Characteristic, DescriptorsBufferCount, DescriptorsBuffer, DescriptorsBufferActual, Flags);
+    return BluetoothApis.Load('BluetoothGATTGetDescriptors')(hDevice, Characteristic, DescriptorsBufferCount, DescriptorsBuffer_out, DescriptorsBufferActual_out, Flags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/bluetoothleapis/nf-bluetoothleapis-bluetoothgattgetincludedservices
   public static BluetoothGATTGetIncludedServices(
     hDevice: HANDLE,
-    ParentService: PBTH_LE_GATT_SERVICE | NULL,
+    ParentService: OPTIONAL<PBTH_LE_GATT_SERVICE>,
     IncludedServicesBufferCount: USHORT,
-    IncludedServicesBuffer: PBTH_LE_GATT_SERVICE | NULL,
-    IncludedServicesBufferActual: PUSHORT,
+    IncludedServicesBuffer_out: OPTIONAL<PBTH_LE_GATT_SERVICE>,
+    IncludedServicesBufferActual_out: PUSHORT,
     Flags: ULONG,
   ): HRESULT {
-    return BluetoothApis.Load('BluetoothGATTGetIncludedServices')(hDevice, ParentService, IncludedServicesBufferCount, IncludedServicesBuffer, IncludedServicesBufferActual, Flags);
+    return BluetoothApis.Load('BluetoothGATTGetIncludedServices')(hDevice, ParentService, IncludedServicesBufferCount, IncludedServicesBuffer_out, IncludedServicesBufferActual_out, Flags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/bluetoothleapis/nf-bluetoothleapis-bluetoothgattgetservices
-  public static BluetoothGATTGetServices(hDevice: HANDLE, ServicesBufferCount: USHORT, ServicesBuffer: PBTH_LE_GATT_SERVICE | NULL, ServicesBufferActual: PUSHORT, Flags: ULONG): HRESULT {
-    return BluetoothApis.Load('BluetoothGATTGetServices')(hDevice, ServicesBufferCount, ServicesBuffer, ServicesBufferActual, Flags);
+  public static BluetoothGATTGetServices(hDevice: HANDLE, ServicesBufferCount: USHORT, ServicesBuffer_out: OPTIONAL<PBTH_LE_GATT_SERVICE>, ServicesBufferActual_out: PUSHORT, Flags: ULONG): HRESULT {
+    return BluetoothApis.Load('BluetoothGATTGetServices')(hDevice, ServicesBufferCount, ServicesBuffer_out, ServicesBufferActual_out, Flags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/bluetoothleapis/nf-bluetoothleapis-bluetoothgattregisterevent
@@ -252,11 +253,11 @@ class BluetoothApis extends Win32 {
     EventType: BTH_LE_GATT_EVENT_TYPE,
     EventParameterIn: PVOID,
     Callback: PFNBLUETOOTH_GATT_EVENT_CALLBACK,
-    CallbackContext: PVOID | NULL,
-    pEventHandle: PBLUETOOTH_GATT_EVENT_HANDLE,
+    CallbackContext: OPTIONAL<PVOID>,
+    pEventHandle_out: PBLUETOOTH_GATT_EVENT_HANDLE,
     Flags: ULONG,
   ): HRESULT {
-    return BluetoothApis.Load('BluetoothGATTRegisterEvent')(hService, EventType, EventParameterIn, Callback, CallbackContext, pEventHandle, Flags);
+    return BluetoothApis.Load('BluetoothGATTRegisterEvent')(hService, EventType, EventParameterIn, Callback, CallbackContext, pEventHandle_out, Flags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/bluetoothleapis/nf-bluetoothleapis-bluetoothgattsetcharacteristicvalue
@@ -264,7 +265,7 @@ class BluetoothApis extends Win32 {
     hDevice: HANDLE,
     Characteristic: PBTH_LE_GATT_CHARACTERISTIC,
     CharacteristicValue: PBTH_LE_GATT_CHARACTERISTIC_VALUE,
-    ReliableWriteContext: BTH_LE_GATT_RELIABLE_WRITE_CONTEXT | 0n,
+    ReliableWriteContext: OPTIONAL<BTH_LE_GATT_RELIABLE_WRITE_CONTEXT>,
     Flags: ULONG,
   ): HRESULT {
     return BluetoothApis.Load('BluetoothGATTSetCharacteristicValue')(hDevice, Characteristic, CharacteristicValue, ReliableWriteContext, Flags);
@@ -281,22 +282,22 @@ class BluetoothApis extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/bluetoothapis/nf-bluetoothapis-bluetoothgetdeviceinfo
-  public static BluetoothGetDeviceInfo(hRadio: HANDLE | 0n, pbtdi: PBLUETOOTH_DEVICE_INFO): DWORD {
-    return BluetoothApis.Load('BluetoothGetDeviceInfo')(hRadio, pbtdi);
+  public static BluetoothGetDeviceInfo(hRadio: OPTIONAL<HANDLE>, pbtdi_in_out: PBLUETOOTH_DEVICE_INFO): DWORD {
+    return BluetoothApis.Load('BluetoothGetDeviceInfo')(hRadio, pbtdi_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/bluetoothapis/nf-bluetoothapis-bluetoothgetradioinfo
-  public static BluetoothGetRadioInfo(hRadio: HANDLE, pRadioInfo: PBLUETOOTH_RADIO_INFO): DWORD {
-    return BluetoothApis.Load('BluetoothGetRadioInfo')(hRadio, pRadioInfo);
+  public static BluetoothGetRadioInfo(hRadio: HANDLE, pRadioInfo_in_out: PBLUETOOTH_RADIO_INFO): DWORD {
+    return BluetoothApis.Load('BluetoothGetRadioInfo')(hRadio, pRadioInfo_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/bluetoothapis/nf-bluetoothapis-bluetoothisconnectable
-  public static BluetoothIsConnectable(hRadio: HANDLE | 0n): BOOL {
+  public static BluetoothIsConnectable(hRadio: OPTIONAL<HANDLE>): BOOL {
     return BluetoothApis.Load('BluetoothIsConnectable')(hRadio);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/bluetoothapis/nf-bluetoothapis-bluetoothisdiscoverable
-  public static BluetoothIsDiscoverable(hRadio: HANDLE | 0n): BOOL {
+  public static BluetoothIsDiscoverable(hRadio: OPTIONAL<HANDLE>): BOOL {
     return BluetoothApis.Load('BluetoothIsDiscoverable')(hRadio);
   }
 
@@ -306,13 +307,18 @@ class BluetoothApis extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/bluetoothapis/nf-bluetoothapis-bluetoothregisterforauthentication
-  public static BluetoothRegisterForAuthentication(pbtdi: PBLUETOOTH_DEVICE_INFO | NULL, phRegHandle: PHBLUETOOTH_AUTHENTICATION_REGISTRATION, pfnCallback: PFN_AUTHENTICATION_CALLBACK | NULL, pvParam: PVOID | NULL): DWORD {
-    return BluetoothApis.Load('BluetoothRegisterForAuthentication')(pbtdi, phRegHandle, pfnCallback, pvParam);
+  public static BluetoothRegisterForAuthentication(pbtdi: OPTIONAL<PBLUETOOTH_DEVICE_INFO>, phRegHandle_out: PHBLUETOOTH_AUTHENTICATION_REGISTRATION, pfnCallback: OPTIONAL<PFN_AUTHENTICATION_CALLBACK>, pvParam: OPTIONAL<PVOID>): DWORD {
+    return BluetoothApis.Load('BluetoothRegisterForAuthentication')(pbtdi, phRegHandle_out, pfnCallback, pvParam);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/bluetoothapis/nf-bluetoothapis-bluetoothregisterforauthenticationex
-  public static BluetoothRegisterForAuthenticationEx(pbtdiIn: PBLUETOOTH_DEVICE_INFO | NULL, phRegHandleOut: PHBLUETOOTH_AUTHENTICATION_REGISTRATION, pfnCallbackIn: PFN_AUTHENTICATION_CALLBACK_EX | NULL, pvParam: PVOID | NULL): DWORD {
-    return BluetoothApis.Load('BluetoothRegisterForAuthenticationEx')(pbtdiIn, phRegHandleOut, pfnCallbackIn, pvParam);
+  public static BluetoothRegisterForAuthenticationEx(
+    pbtdiIn: OPTIONAL<PBLUETOOTH_DEVICE_INFO>,
+    phRegHandleOut_out: PHBLUETOOTH_AUTHENTICATION_REGISTRATION,
+    pfnCallbackIn: OPTIONAL<PFN_AUTHENTICATION_CALLBACK_EX>,
+    pvParam: OPTIONAL<PVOID>,
+  ): DWORD {
+    return BluetoothApis.Load('BluetoothRegisterForAuthenticationEx')(pbtdiIn, phRegHandleOut_out, pfnCallbackIn, pvParam);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/bluetoothapis/nf-bluetoothapis-bluetoothremovedevice
@@ -321,47 +327,47 @@ class BluetoothApis extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/bluetoothapis/nf-bluetoothapis-bluetoothsdpenumattributes
-  public static BluetoothSdpEnumAttributes(pSDPStream: LPBYTE, cbStreamSize: ULONG, pfnCallback: PFN_BLUETOOTH_ENUM_ATTRIBUTES_CALLBACK, pvParam: LPVOID | NULL): BOOL {
+  public static BluetoothSdpEnumAttributes(pSDPStream: LPBYTE, cbStreamSize: ULONG, pfnCallback: PFN_BLUETOOTH_ENUM_ATTRIBUTES_CALLBACK, pvParam: LPVOID): BOOL {
     return BluetoothApis.Load('BluetoothSdpEnumAttributes')(pSDPStream, cbStreamSize, pfnCallback, pvParam);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/bluetoothapis/nf-bluetoothapis-bluetoothsdpgetattributevalue
-  public static BluetoothSdpGetAttributeValue(pRecordStream: LPBYTE, cbRecordLength: ULONG, usAttributeId: USHORT, pAttributeData: PSDP_ELEMENT_DATA): DWORD {
-    return BluetoothApis.Load('BluetoothSdpGetAttributeValue')(pRecordStream, cbRecordLength, usAttributeId, pAttributeData);
+  public static BluetoothSdpGetAttributeValue(pRecordStream: LPBYTE, cbRecordLength: ULONG, usAttributeId: USHORT, pAttributeData_out: PSDP_ELEMENT_DATA): DWORD {
+    return BluetoothApis.Load('BluetoothSdpGetAttributeValue')(pRecordStream, cbRecordLength, usAttributeId, pAttributeData_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/bluetoothapis/nf-bluetoothapis-bluetoothsdpgetcontainerelementdata
-  public static BluetoothSdpGetContainerElementData(pContainerStream: LPBYTE, cbContainerLength: ULONG, pElement: PHBLUETOOTH_CONTAINER_ELEMENT, pData: PSDP_ELEMENT_DATA): DWORD {
-    return BluetoothApis.Load('BluetoothSdpGetContainerElementData')(pContainerStream, cbContainerLength, pElement, pData);
+  public static BluetoothSdpGetContainerElementData(pContainerStream: LPBYTE, cbContainerLength: ULONG, pElement_in_out: PHBLUETOOTH_CONTAINER_ELEMENT, pData_out: PSDP_ELEMENT_DATA): DWORD {
+    return BluetoothApis.Load('BluetoothSdpGetContainerElementData')(pContainerStream, cbContainerLength, pElement_in_out, pData_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/bluetoothapis/nf-bluetoothapis-bluetoothsdpgetelementdata
-  public static BluetoothSdpGetElementData(pSdpStream: LPBYTE, cbSdpStreamLength: ULONG, pData: PSDP_ELEMENT_DATA): DWORD {
-    return BluetoothApis.Load('BluetoothSdpGetElementData')(pSdpStream, cbSdpStreamLength, pData);
+  public static BluetoothSdpGetElementData(pSdpStream: LPBYTE, cbSdpStreamLength: ULONG, pData_out: PSDP_ELEMENT_DATA): DWORD {
+    return BluetoothApis.Load('BluetoothSdpGetElementData')(pSdpStream, cbSdpStreamLength, pData_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/bluetoothapis/nf-bluetoothapis-bluetoothsdpgetstring
-  public static BluetoothSdpGetString(pRecordStream: LPBYTE, cbRecordLength: ULONG, pStringData: PSDP_STRING_TYPE_DATA | NULL, usStringOffset: USHORT, pszString: LPWSTR | NULL, pcchStringLength: PULONG): DWORD {
-    return BluetoothApis.Load('BluetoothSdpGetString')(pRecordStream, cbRecordLength, pStringData, usStringOffset, pszString, pcchStringLength);
+  public static BluetoothSdpGetString(pRecordStream: LPBYTE, cbRecordLength: ULONG, pStringData: OPTIONAL<PSDP_STRING_TYPE_DATA>, usStringOffset: USHORT, pszString_out: NULLABLE<LPWSTR>, pcchStringLength_in_out: PULONG): DWORD {
+    return BluetoothApis.Load('BluetoothSdpGetString')(pRecordStream, cbRecordLength, pStringData, usStringOffset, pszString_out, pcchStringLength_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/bluetoothapis/nf-bluetoothapis-bluetoothsendauthenticationresponse
-  public static BluetoothSendAuthenticationResponse(hRadio: HANDLE | 0n, pbtdi: PBLUETOOTH_DEVICE_INFO, pszPasskey: LPCWSTR): DWORD {
+  public static BluetoothSendAuthenticationResponse(hRadio: OPTIONAL<HANDLE>, pbtdi: PBLUETOOTH_DEVICE_INFO, pszPasskey: LPCWSTR): DWORD {
     return BluetoothApis.Load('BluetoothSendAuthenticationResponse')(hRadio, pbtdi, pszPasskey);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/bluetoothapis/nf-bluetoothapis-bluetoothsendauthenticationresponseex
-  public static BluetoothSendAuthenticationResponseEx(hRadioIn: HANDLE | 0n, pauthResponse: PBLUETOOTH_AUTHENTICATE_RESPONSE): DWORD {
+  public static BluetoothSendAuthenticationResponseEx(hRadioIn: OPTIONAL<HANDLE>, pauthResponse: PBLUETOOTH_AUTHENTICATE_RESPONSE): DWORD {
     return BluetoothApis.Load('BluetoothSendAuthenticationResponseEx')(hRadioIn, pauthResponse);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/bluetoothapis/nf-bluetoothapis-bluetoothsetlocalserviceinfo
-  public static BluetoothSetLocalServiceInfo(hRadioIn: HANDLE | 0n, pClassGuid: PGUID, ulInstance: ULONG, pServiceInfoIn: PBLUETOOTH_LOCAL_SERVICE_INFO): DWORD {
+  public static BluetoothSetLocalServiceInfo(hRadioIn: OPTIONAL<HANDLE>, pClassGuid: PGUID, ulInstance: ULONG, pServiceInfoIn: PBLUETOOTH_LOCAL_SERVICE_INFO): DWORD {
     return BluetoothApis.Load('BluetoothSetLocalServiceInfo')(hRadioIn, pClassGuid, ulInstance, pServiceInfoIn);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/bluetoothapis/nf-bluetoothapis-bluetoothsetservicestate
-  public static BluetoothSetServiceState(hRadio: HANDLE | 0n, pbtdi: PBLUETOOTH_DEVICE_INFO, pGuidService: PGUID, dwServiceFlags: DWORD): DWORD {
+  public static BluetoothSetServiceState(hRadio: OPTIONAL<HANDLE>, pbtdi: PBLUETOOTH_DEVICE_INFO, pGuidService: PGUID, dwServiceFlags: DWORD): DWORD {
     return BluetoothApis.Load('BluetoothSetServiceState')(hRadio, pbtdi, pGuidService, dwServiceFlags);
   }
 

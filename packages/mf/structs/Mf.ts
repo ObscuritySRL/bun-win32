@@ -17,7 +17,8 @@ import type {
   IUnknown,
   LPCWSTR,
   LPLPVOID,
-  NULL,
+  NULLABLE,
+  OPTIONAL,
   PBYTE,
   PIMFASFContentInfo,
   PIMFASFIndexer,
@@ -115,168 +116,168 @@ class Mf extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/combaseapi/nf-combaseapi-dllgetclassobject
-  public static DllGetClassObject(rclsid: REFCLSID, riid: REFIID, ppv: LPLPVOID): HRESULT {
-    return Mf.Load('DllGetClassObject')(rclsid, riid, ppv);
+  public static DllGetClassObject(rclsid: REFCLSID, riid: REFIID, ppv_out: LPLPVOID): HRESULT {
+    return Mf.Load('DllGetClassObject')(rclsid, riid, ppv_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mfidl/nf-mfidl-mfcreate3gpmediasink
-  public static MFCreate3GPMediaSink(pIByteStream: IMFByteStream, pVideoMediaType: IMFMediaType | NULL, pAudioMediaType: IMFMediaType | NULL, ppIMediaSink: PIMFMediaSink): HRESULT {
-    return Mf.Load('MFCreate3GPMediaSink')(pIByteStream, pVideoMediaType, pAudioMediaType, ppIMediaSink);
+  public static MFCreate3GPMediaSink(pIByteStream: IMFByteStream, pVideoMediaType: OPTIONAL<IMFMediaType>, pAudioMediaType: OPTIONAL<IMFMediaType>, ppIMediaSink_out: PIMFMediaSink): HRESULT {
+    return Mf.Load('MFCreate3GPMediaSink')(pIByteStream, pVideoMediaType, pAudioMediaType, ppIMediaSink_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mfidl/nf-mfidl-mfcreateac3mediasink
-  public static MFCreateAC3MediaSink(pTargetByteStream: IMFByteStream, pAudioMediaType: IMFMediaType, ppMediaSink: PIMFMediaSink): HRESULT {
-    return Mf.Load('MFCreateAC3MediaSink')(pTargetByteStream, pAudioMediaType, ppMediaSink);
+  public static MFCreateAC3MediaSink(pTargetByteStream: IMFByteStream, pAudioMediaType: IMFMediaType, ppMediaSink_out: PIMFMediaSink): HRESULT {
+    return Mf.Load('MFCreateAC3MediaSink')(pTargetByteStream, pAudioMediaType, ppMediaSink_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mfidl/nf-mfidl-mfcreateadtsmediasink
-  public static MFCreateADTSMediaSink(pTargetByteStream: IMFByteStream, pAudioMediaType: IMFMediaType, ppMediaSink: PIMFMediaSink): HRESULT {
-    return Mf.Load('MFCreateADTSMediaSink')(pTargetByteStream, pAudioMediaType, ppMediaSink);
+  public static MFCreateADTSMediaSink(pTargetByteStream: IMFByteStream, pAudioMediaType: IMFMediaType, ppMediaSink_out: PIMFMediaSink): HRESULT {
+    return Mf.Load('MFCreateADTSMediaSink')(pTargetByteStream, pAudioMediaType, ppMediaSink_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wmcontainer/nf-wmcontainer-mfcreateasfcontentinfo
-  public static MFCreateASFContentInfo(ppIContentInfo: PIMFASFContentInfo): HRESULT {
-    return Mf.Load('MFCreateASFContentInfo')(ppIContentInfo);
+  public static MFCreateASFContentInfo(ppIContentInfo_out: PIMFASFContentInfo): HRESULT {
+    return Mf.Load('MFCreateASFContentInfo')(ppIContentInfo_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wmcontainer/nf-wmcontainer-mfcreateasfindexer
-  public static MFCreateASFIndexer(ppIIndexer: PIMFASFIndexer): HRESULT {
-    return Mf.Load('MFCreateASFIndexer')(ppIIndexer);
+  public static MFCreateASFIndexer(ppIIndexer_out: PIMFASFIndexer): HRESULT {
+    return Mf.Load('MFCreateASFIndexer')(ppIIndexer_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wmcontainer/nf-wmcontainer-mfcreateasfindexerbytestream
-  public static MFCreateASFIndexerByteStream(pIContentByteStream: IMFByteStream, cbIndexStartOffset: QWORD, pIIndexByteStream: PIMFByteStream): HRESULT {
-    return Mf.Load('MFCreateASFIndexerByteStream')(pIContentByteStream, cbIndexStartOffset, pIIndexByteStream);
+  public static MFCreateASFIndexerByteStream(pIContentByteStream: IMFByteStream, cbIndexStartOffset: QWORD, pIIndexByteStream_out: PIMFByteStream): HRESULT {
+    return Mf.Load('MFCreateASFIndexerByteStream')(pIContentByteStream, cbIndexStartOffset, pIIndexByteStream_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wmcontainer/nf-wmcontainer-mfcreateasfmediasink
-  public static MFCreateASFMediaSink(pIByteStream: IMFByteStream, ppIMediaSink: PIMFMediaSink): HRESULT {
-    return Mf.Load('MFCreateASFMediaSink')(pIByteStream, ppIMediaSink);
+  public static MFCreateASFMediaSink(pIByteStream: IMFByteStream, ppIMediaSink_out: PIMFMediaSink): HRESULT {
+    return Mf.Load('MFCreateASFMediaSink')(pIByteStream, ppIMediaSink_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wmcontainer/nf-wmcontainer-mfcreateasfmediasinkactivate
-  public static MFCreateASFMediaSinkActivate(pwszFileName: LPCWSTR, pContentInfo: IMFASFContentInfo, ppIActivate: PIMFActivate): HRESULT {
-    return Mf.Load('MFCreateASFMediaSinkActivate')(pwszFileName, pContentInfo, ppIActivate);
+  public static MFCreateASFMediaSinkActivate(pwszFileName: LPCWSTR, pContentInfo: IMFASFContentInfo, ppIActivate_out: PIMFActivate): HRESULT {
+    return Mf.Load('MFCreateASFMediaSinkActivate')(pwszFileName, pContentInfo, ppIActivate_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wmcontainer/nf-wmcontainer-mfcreateasfmultiplexer
-  public static MFCreateASFMultiplexer(ppIMultiplexer: PIMFASFMultiplexer): HRESULT {
-    return Mf.Load('MFCreateASFMultiplexer')(ppIMultiplexer);
+  public static MFCreateASFMultiplexer(ppIMultiplexer_out: PIMFASFMultiplexer): HRESULT {
+    return Mf.Load('MFCreateASFMultiplexer')(ppIMultiplexer_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wmcontainer/nf-wmcontainer-mfcreateasfprofile
-  public static MFCreateASFProfile(ppIProfile: PIMFASFProfile): HRESULT {
-    return Mf.Load('MFCreateASFProfile')(ppIProfile);
+  public static MFCreateASFProfile(ppIProfile_out: PIMFASFProfile): HRESULT {
+    return Mf.Load('MFCreateASFProfile')(ppIProfile_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wmcontainer/nf-wmcontainer-mfcreateasfprofilefrompresentationdescriptor
-  public static MFCreateASFProfileFromPresentationDescriptor(pIPD: IMFPresentationDescriptor, ppIProfile: PIMFASFProfile): HRESULT {
-    return Mf.Load('MFCreateASFProfileFromPresentationDescriptor')(pIPD, ppIProfile);
+  public static MFCreateASFProfileFromPresentationDescriptor(pIPD: IMFPresentationDescriptor, ppIProfile_out: PIMFASFProfile): HRESULT {
+    return Mf.Load('MFCreateASFProfileFromPresentationDescriptor')(pIPD, ppIProfile_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wmcontainer/nf-wmcontainer-mfcreateasfsplitter
-  public static MFCreateASFSplitter(ppISplitter: PIMFASFSplitter): HRESULT {
-    return Mf.Load('MFCreateASFSplitter')(ppISplitter);
+  public static MFCreateASFSplitter(ppISplitter_out: PIMFASFSplitter): HRESULT {
+    return Mf.Load('MFCreateASFSplitter')(ppISplitter_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wmcontainer/nf-wmcontainer-mfcreateasfstreamselector
-  public static MFCreateASFStreamSelector(pIASFProfile: IMFASFProfile, ppSelector: PIMFASFStreamSelector): HRESULT {
-    return Mf.Load('MFCreateASFStreamSelector')(pIASFProfile, ppSelector);
+  public static MFCreateASFStreamSelector(pIASFProfile: IMFASFProfile, ppSelector_out: PIMFASFStreamSelector): HRESULT {
+    return Mf.Load('MFCreateASFStreamSelector')(pIASFProfile, ppSelector_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wmcontainer/nf-wmcontainer-mfcreateasfstreamingmediasink
-  public static MFCreateASFStreamingMediaSink(pIByteStream: IMFByteStream, ppIMediaSink: PIMFMediaSink): HRESULT {
-    return Mf.Load('MFCreateASFStreamingMediaSink')(pIByteStream, ppIMediaSink);
+  public static MFCreateASFStreamingMediaSink(pIByteStream: IMFByteStream, ppIMediaSink_out: PIMFMediaSink): HRESULT {
+    return Mf.Load('MFCreateASFStreamingMediaSink')(pIByteStream, ppIMediaSink_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wmcontainer/nf-wmcontainer-mfcreateasfstreamingmediasinkactivate
-  public static MFCreateASFStreamingMediaSinkActivate(pByteStreamActivate: IMFActivate, pContentInfo: IMFASFContentInfo, ppIActivate: PIMFActivate): HRESULT {
-    return Mf.Load('MFCreateASFStreamingMediaSinkActivate')(pByteStreamActivate, pContentInfo, ppIActivate);
+  public static MFCreateASFStreamingMediaSinkActivate(pByteStreamActivate: IMFActivate, pContentInfo: IMFASFContentInfo, ppIActivate_out: PIMFActivate): HRESULT {
+    return Mf.Load('MFCreateASFStreamingMediaSinkActivate')(pByteStreamActivate, pContentInfo, ppIActivate_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mfidl/nf-mfidl-mfcreatecredentialcache
-  public static MFCreateCredentialCache(ppCache: PIMFNetCredentialCache): HRESULT {
-    return Mf.Load('MFCreateCredentialCache')(ppCache);
+  public static MFCreateCredentialCache(ppCache_out: PIMFNetCredentialCache): HRESULT {
+    return Mf.Load('MFCreateCredentialCache')(ppCache_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mfidl/nf-mfidl-mfcreatefmpeg4mediasink
-  public static MFCreateFMPEG4MediaSink(pIByteStream: IMFByteStream, pVideoMediaType: IMFMediaType | NULL, pAudioMediaType: IMFMediaType | NULL, ppIMediaSink: PIMFMediaSink): HRESULT {
-    return Mf.Load('MFCreateFMPEG4MediaSink')(pIByteStream, pVideoMediaType, pAudioMediaType, ppIMediaSink);
+  public static MFCreateFMPEG4MediaSink(pIByteStream: IMFByteStream, pVideoMediaType: OPTIONAL<IMFMediaType>, pAudioMediaType: OPTIONAL<IMFMediaType>, ppIMediaSink_out: PIMFMediaSink): HRESULT {
+    return Mf.Load('MFCreateFMPEG4MediaSink')(pIByteStream, pVideoMediaType, pAudioMediaType, ppIMediaSink_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mfidl/nf-mfidl-mfcreatemp3mediasink
-  public static MFCreateMP3MediaSink(pTargetByteStream: IMFByteStream, ppMediaSink: PIMFMediaSink): HRESULT {
-    return Mf.Load('MFCreateMP3MediaSink')(pTargetByteStream, ppMediaSink);
+  public static MFCreateMP3MediaSink(pTargetByteStream: IMFByteStream, ppMediaSink_out: PIMFMediaSink): HRESULT {
+    return Mf.Load('MFCreateMP3MediaSink')(pTargetByteStream, ppMediaSink_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mfidl/nf-mfidl-mfcreatempeg4mediasink
-  public static MFCreateMPEG4MediaSink(pIByteStream: IMFByteStream, pVideoMediaType: IMFMediaType | NULL, pAudioMediaType: IMFMediaType | NULL, ppIMediaSink: PIMFMediaSink): HRESULT {
-    return Mf.Load('MFCreateMPEG4MediaSink')(pIByteStream, pVideoMediaType, pAudioMediaType, ppIMediaSink);
+  public static MFCreateMPEG4MediaSink(pIByteStream: IMFByteStream, pVideoMediaType: OPTIONAL<IMFMediaType>, pAudioMediaType: OPTIONAL<IMFMediaType>, ppIMediaSink_out: PIMFMediaSink): HRESULT {
+    return Mf.Load('MFCreateMPEG4MediaSink')(pIByteStream, pVideoMediaType, pAudioMediaType, ppIMediaSink_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mfidl/nf-mfidl-mfcreatemuxsink
-  public static MFCreateMuxSink(guidOutputSubType: GUID, pOutputAttributes: IMFAttributes | NULL, pOutputByteStream: IMFByteStream | NULL, ppMuxSink: PIMFMediaSink): HRESULT {
-    return Mf.Load('MFCreateMuxSink')(guidOutputSubType, pOutputAttributes, pOutputByteStream, ppMuxSink);
+  public static MFCreateMuxSink(guidOutputSubType: GUID, pOutputAttributes: OPTIONAL<IMFAttributes>, pOutputByteStream: OPTIONAL<IMFByteStream>, ppMuxSink_out: PIMFMediaSink): HRESULT {
+    return Mf.Load('MFCreateMuxSink')(guidOutputSubType, pOutputAttributes, pOutputByteStream, ppMuxSink_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wmcontainer/nf-wmcontainer-mfcreatepresentationdescriptorfromasfprofile
-  public static MFCreatePresentationDescriptorFromASFProfile(pIProfile: IMFASFProfile, ppIPD: PIMFPresentationDescriptor): HRESULT {
-    return Mf.Load('MFCreatePresentationDescriptorFromASFProfile')(pIProfile, ppIPD);
+  public static MFCreatePresentationDescriptorFromASFProfile(pIProfile: IMFASFProfile, ppIPD_out: PIMFPresentationDescriptor): HRESULT {
+    return Mf.Load('MFCreatePresentationDescriptorFromASFProfile')(pIProfile, ppIPD_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mfidl/nf-mfidl-mfcreateprotectedenvironmentaccess
-  public static MFCreateProtectedEnvironmentAccess(ppAccess: PIMFProtectedEnvironmentAccess): HRESULT {
-    return Mf.Load('MFCreateProtectedEnvironmentAccess')(ppAccess);
+  public static MFCreateProtectedEnvironmentAccess(ppAccess_out: PIMFProtectedEnvironmentAccess): HRESULT {
+    return Mf.Load('MFCreateProtectedEnvironmentAccess')(ppAccess_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mfidl/nf-mfidl-mfcreateproxylocator
-  public static MFCreateProxyLocator(pszProtocol: LPCWSTR, pProxyConfig: IPropertyStore, ppProxyLocator: PIMFNetProxyLocator): HRESULT {
-    return Mf.Load('MFCreateProxyLocator')(pszProtocol, pProxyConfig, ppProxyLocator);
+  public static MFCreateProxyLocator(pszProtocol: LPCWSTR, pProxyConfig: IPropertyStore, ppProxyLocator_out: PIMFNetProxyLocator): HRESULT {
+    return Mf.Load('MFCreateProxyLocator')(pszProtocol, pProxyConfig, ppProxyLocator_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mfidl/nf-mfidl-mfcreateremotedesktopplugin
-  public static MFCreateRemoteDesktopPlugin(ppPlugin: PIMFRemoteDesktopPlugin): HRESULT {
-    return Mf.Load('MFCreateRemoteDesktopPlugin')(ppPlugin);
+  public static MFCreateRemoteDesktopPlugin(ppPlugin_out: PIMFRemoteDesktopPlugin): HRESULT {
+    return Mf.Load('MFCreateRemoteDesktopPlugin')(ppPlugin_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mfidl/nf-mfidl-mfcreatesourceresolver
-  public static MFCreateSourceResolver(ppISourceResolver: PIMFSourceResolver): HRESULT {
-    return Mf.Load('MFCreateSourceResolver')(ppISourceResolver);
+  public static MFCreateSourceResolver(ppISourceResolver_out: PIMFSourceResolver): HRESULT {
+    return Mf.Load('MFCreateSourceResolver')(ppISourceResolver_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/evr/nf-evr-mfcreatevideorenderer
-  public static MFCreateVideoRenderer(riidRenderer: REFIID, ppVideoRenderer: LPLPVOID | NULL): HRESULT {
-    return Mf.Load('MFCreateVideoRenderer')(riidRenderer, ppVideoRenderer);
+  public static MFCreateVideoRenderer(riidRenderer: REFIID, ppVideoRenderer_out: LPLPVOID): HRESULT {
+    return Mf.Load('MFCreateVideoRenderer')(riidRenderer, ppVideoRenderer_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mfidl/nf-mfidl-mfcreatevideorendereractivate
-  public static MFCreateVideoRendererActivate(hwndVideo: HWND | 0n, ppActivate: PIMFActivate): HRESULT {
-    return Mf.Load('MFCreateVideoRendererActivate')(hwndVideo, ppActivate);
+  public static MFCreateVideoRendererActivate(hwndVideo: NULLABLE<HWND>, ppActivate_out: PIMFActivate): HRESULT {
+    return Mf.Load('MFCreateVideoRendererActivate')(hwndVideo, ppActivate_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mfidl/nf-mfidl-mfgetlocalid
-  public static MFGetLocalId(verifier: PBYTE, size: UINT32, id: PLPWSTR): HRESULT {
-    return Mf.Load('MFGetLocalId')(verifier, size, id);
+  public static MFGetLocalId(verifier: PBYTE, size: UINT32, id_out: PLPWSTR): HRESULT {
+    return Mf.Load('MFGetLocalId')(verifier, size, id_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mfidl/nf-mfidl-mfgetsupportedmimetypes
-  public static MFGetSupportedMimeTypes(pPropVarMimeTypeArray: PPROPVARIANT): HRESULT {
-    return Mf.Load('MFGetSupportedMimeTypes')(pPropVarMimeTypeArray);
+  public static MFGetSupportedMimeTypes(pPropVarMimeTypeArray_out: PPROPVARIANT): HRESULT {
+    return Mf.Load('MFGetSupportedMimeTypes')(pPropVarMimeTypeArray_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mfidl/nf-mfidl-mfgetsupportedschemes
-  public static MFGetSupportedSchemes(pPropVarSchemeArray: PPROPVARIANT): HRESULT {
-    return Mf.Load('MFGetSupportedSchemes')(pPropVarSchemeArray);
+  public static MFGetSupportedSchemes(pPropVarSchemeArray_out: PPROPVARIANT): HRESULT {
+    return Mf.Load('MFGetSupportedSchemes')(pPropVarSchemeArray_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mfidl/nf-mfidl-mfgetsystemid
-  public static MFGetSystemId(ppId: PIMFSystemId): HRESULT {
-    return Mf.Load('MFGetSystemId')(ppId);
+  public static MFGetSystemId(ppId_out: PIMFSystemId): HRESULT {
+    return Mf.Load('MFGetSystemId')(ppId_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mfidl/nf-mfidl-mfloadsignedlibrary
-  public static MFLoadSignedLibrary(pszName: LPCWSTR, ppLib: PIMFSignedLibrary): HRESULT {
-    return Mf.Load('MFLoadSignedLibrary')(pszName, ppLib);
+  public static MFLoadSignedLibrary(pszName: LPCWSTR, ppLib_out: PIMFSignedLibrary): HRESULT {
+    return Mf.Load('MFLoadSignedLibrary')(pszName, ppLib_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mfidl/nf-mfidl-mfshutdownobject

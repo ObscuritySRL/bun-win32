@@ -1,7 +1,7 @@
 import type { Pointer } from 'bun:ffi';
 import type { HANDLE } from '@bun-win32/core';
 
-export type { ACCESS_MASK, BOOLEAN, DWORD, HANDLE, LONG, NULL, PHANDLE, PULONG, PVOID, SIZE_T, ULONG, ULONG_PTR, USHORT, VOID } from '@bun-win32/core';
+export type { ACCESS_MASK, BOOLEAN, DWORD, HANDLE, LONG, NULL, NULLABLE, OPTIONAL, PHANDLE, PULONG, PVOID, SIZE_T, ULONG, ULONG_PTR, USHORT, VOID } from '@bun-win32/core';
 
 export type NTSTATUS = number;
 
@@ -263,6 +263,7 @@ export enum WaitType {
 
 export type LANGID = number;
 export type LARGE_INTEGER = bigint;
+export type LPTHREAD_START_ROUTINE<T extends Pointer | bigint = Pointer | bigint> = T;
 export type UCHAR = number;
 export type ULONGLONG = bigint;
 

@@ -2,7 +2,7 @@ import { type FFIFunction, FFIType } from 'bun:ffi';
 
 import { Win32 } from '@bun-win32/core';
 
-import type { DWORD, LPCWSTR, MI_Result, NULL, PMI_Application, PPMI_Instance } from '../types/Mi';
+import type { DWORD, LPCWSTR, MI_Result, OPTIONAL, PMI_Application, PPMI_Instance } from '../types/Mi';
 
 /**
  * Thin, lazy-loaded FFI bindings for `mi.dll` (Windows Management Infrastructure bootstrap).
@@ -34,8 +34,8 @@ class Mi extends Win32 {
   } as const satisfies Record<string, FFIFunction>;
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mi/nf-mi-mi_application_initializev1
-  public static MI_Application_InitializeV1(flags: DWORD, applicationID: LPCWSTR | NULL, extendedError: PPMI_Instance | NULL, application: PMI_Application): MI_Result {
-    return Mi.Load('MI_Application_InitializeV1')(flags, applicationID, extendedError, application);
+  public static MI_Application_InitializeV1(flags: DWORD, applicationID: OPTIONAL<LPCWSTR>, extendedError_out: OPTIONAL<PPMI_Instance>, application_out: PMI_Application): MI_Result {
+    return Mi.Load('MI_Application_InitializeV1')(flags, applicationID, extendedError_out, application_out);
   }
 }
 

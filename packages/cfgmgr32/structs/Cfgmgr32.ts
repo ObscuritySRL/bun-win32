@@ -25,7 +25,7 @@ import type {
   LPSTR,
   LPWSTR,
   LOG_CONF,
-  NULL,
+  OPTIONAL,
   PBOOL,
   PBYTE,
   PCONFLICT_DETAILS_A,
@@ -361,13 +361,13 @@ class Cfgmgr32 extends Win32 {
   } as const satisfies Record<string, FFIFunction>;
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_add_empty_log_conf
-  public static CM_Add_Empty_Log_Conf(plcLogConf: PLOG_CONF, dnDevInst: DEVINST, Priority: PRIORITY, ulFlags: ULONG): CONFIGRET {
-    return Cfgmgr32.Load('CM_Add_Empty_Log_Conf')(plcLogConf, dnDevInst, Priority, ulFlags);
+  public static CM_Add_Empty_Log_Conf(plcLogConf_out: PLOG_CONF, dnDevInst: DEVINST, Priority: PRIORITY, ulFlags: ULONG): CONFIGRET {
+    return Cfgmgr32.Load('CM_Add_Empty_Log_Conf')(plcLogConf_out, dnDevInst, Priority, ulFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_add_empty_log_conf_ex
-  public static CM_Add_Empty_Log_Conf_Ex(plcLogConf: PLOG_CONF, dnDevInst: DEVINST, Priority: PRIORITY, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
-    return Cfgmgr32.Load('CM_Add_Empty_Log_Conf_Ex')(plcLogConf, dnDevInst, Priority, ulFlags, hMachine);
+  public static CM_Add_Empty_Log_Conf_Ex(plcLogConf_out: PLOG_CONF, dnDevInst: DEVINST, Priority: PRIORITY, ulFlags: ULONG, hMachine: OPTIONAL<HMACHINE>): CONFIGRET {
+    return Cfgmgr32.Load('CM_Add_Empty_Log_Conf_Ex')(plcLogConf_out, dnDevInst, Priority, ulFlags, hMachine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_add_ida
@@ -381,12 +381,12 @@ class Cfgmgr32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_add_id_exa
-  public static CM_Add_ID_ExA(dnDevInst: DEVINST, pszID: PSTR, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
+  public static CM_Add_ID_ExA(dnDevInst: DEVINST, pszID: PSTR, ulFlags: ULONG, hMachine: OPTIONAL<HMACHINE>): CONFIGRET {
     return Cfgmgr32.Load('CM_Add_ID_ExA')(dnDevInst, pszID, ulFlags, hMachine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_add_id_exw
-  public static CM_Add_ID_ExW(dnDevInst: DEVINST, pszID: PWSTR, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
+  public static CM_Add_ID_ExW(dnDevInst: DEVINST, pszID: PWSTR, ulFlags: ULONG, hMachine: OPTIONAL<HMACHINE>): CONFIGRET {
     return Cfgmgr32.Load('CM_Add_ID_ExW')(dnDevInst, pszID, ulFlags, hMachine);
   }
 
@@ -396,13 +396,13 @@ class Cfgmgr32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_add_res_des
-  public static CM_Add_Res_Des(prdResDes: PRES_DES | NULL, lcLogConf: LOG_CONF, ResourceID: RESOURCEID, ResourceData: PCVOID, ResourceLen: ULONG, ulFlags: ULONG): CONFIGRET {
-    return Cfgmgr32.Load('CM_Add_Res_Des')(prdResDes, lcLogConf, ResourceID, ResourceData, ResourceLen, ulFlags);
+  public static CM_Add_Res_Des(prdResDes_out: OPTIONAL<PRES_DES>, lcLogConf: LOG_CONF, ResourceID: RESOURCEID, ResourceData: PCVOID, ResourceLen: ULONG, ulFlags: ULONG): CONFIGRET {
+    return Cfgmgr32.Load('CM_Add_Res_Des')(prdResDes_out, lcLogConf, ResourceID, ResourceData, ResourceLen, ulFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_add_res_des_ex
-  public static CM_Add_Res_Des_Ex(prdResDes: PRES_DES | NULL, lcLogConf: LOG_CONF, ResourceID: RESOURCEID, ResourceData: PCVOID, ResourceLen: ULONG, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
-    return Cfgmgr32.Load('CM_Add_Res_Des_Ex')(prdResDes, lcLogConf, ResourceID, ResourceData, ResourceLen, ulFlags, hMachine);
+  public static CM_Add_Res_Des_Ex(prdResDes_out: OPTIONAL<PRES_DES>, lcLogConf: LOG_CONF, ResourceID: RESOURCEID, ResourceData: PCVOID, ResourceLen: ULONG, ulFlags: ULONG, hMachine: OPTIONAL<HMACHINE>): CONFIGRET {
+    return Cfgmgr32.Load('CM_Add_Res_Des_Ex')(prdResDes_out, lcLogConf, ResourceID, ResourceData, ResourceLen, ulFlags, hMachine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_apply_powerscheme
@@ -416,38 +416,38 @@ class Cfgmgr32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_connect_machinea
-  public static CM_Connect_MachineA(UNCServerName: PCSTR | NULL, phMachine: PHMACHINE): CONFIGRET {
-    return Cfgmgr32.Load('CM_Connect_MachineA')(UNCServerName, phMachine);
+  public static CM_Connect_MachineA(UNCServerName: OPTIONAL<PCSTR>, phMachine_out: PHMACHINE): CONFIGRET {
+    return Cfgmgr32.Load('CM_Connect_MachineA')(UNCServerName, phMachine_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_connect_machinew
-  public static CM_Connect_MachineW(UNCServerName: PCWSTR | NULL, phMachine: PHMACHINE): CONFIGRET {
-    return Cfgmgr32.Load('CM_Connect_MachineW')(UNCServerName, phMachine);
+  public static CM_Connect_MachineW(UNCServerName: OPTIONAL<PCWSTR>, phMachine_out: PHMACHINE): CONFIGRET {
+    return Cfgmgr32.Load('CM_Connect_MachineW')(UNCServerName, phMachine_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_create_devnodea
-  public static CM_Create_DevNodeA(pdnDevInst: PDEVINST, pDeviceID: DEVINSTID_A, dnParent: DEVINST, ulFlags: ULONG): CONFIGRET {
-    return Cfgmgr32.Load('CM_Create_DevNodeA')(pdnDevInst, pDeviceID, dnParent, ulFlags);
+  public static CM_Create_DevNodeA(pdnDevInst_out: PDEVINST, pDeviceID: DEVINSTID_A, dnParent: DEVINST, ulFlags: ULONG): CONFIGRET {
+    return Cfgmgr32.Load('CM_Create_DevNodeA')(pdnDevInst_out, pDeviceID, dnParent, ulFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_create_devnodew
-  public static CM_Create_DevNodeW(pdnDevInst: PDEVINST, pDeviceID: DEVINSTID_W, dnParent: DEVINST, ulFlags: ULONG): CONFIGRET {
-    return Cfgmgr32.Load('CM_Create_DevNodeW')(pdnDevInst, pDeviceID, dnParent, ulFlags);
+  public static CM_Create_DevNodeW(pdnDevInst_out: PDEVINST, pDeviceID: DEVINSTID_W, dnParent: DEVINST, ulFlags: ULONG): CONFIGRET {
+    return Cfgmgr32.Load('CM_Create_DevNodeW')(pdnDevInst_out, pDeviceID, dnParent, ulFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_create_devnode_exa
-  public static CM_Create_DevNode_ExA(pdnDevInst: PDEVINST, pDeviceID: DEVINSTID_A, dnParent: DEVINST, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
-    return Cfgmgr32.Load('CM_Create_DevNode_ExA')(pdnDevInst, pDeviceID, dnParent, ulFlags, hMachine);
+  public static CM_Create_DevNode_ExA(pdnDevInst_out: PDEVINST, pDeviceID: DEVINSTID_A, dnParent: DEVINST, ulFlags: ULONG, hMachine: OPTIONAL<HMACHINE>): CONFIGRET {
+    return Cfgmgr32.Load('CM_Create_DevNode_ExA')(pdnDevInst_out, pDeviceID, dnParent, ulFlags, hMachine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_create_devnode_exw
-  public static CM_Create_DevNode_ExW(pdnDevInst: PDEVINST, pDeviceID: DEVINSTID_W, dnParent: DEVINST, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
-    return Cfgmgr32.Load('CM_Create_DevNode_ExW')(pdnDevInst, pDeviceID, dnParent, ulFlags, hMachine);
+  public static CM_Create_DevNode_ExW(pdnDevInst_out: PDEVINST, pDeviceID: DEVINSTID_W, dnParent: DEVINST, ulFlags: ULONG, hMachine: OPTIONAL<HMACHINE>): CONFIGRET {
+    return Cfgmgr32.Load('CM_Create_DevNode_ExW')(pdnDevInst_out, pDeviceID, dnParent, ulFlags, hMachine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_create_range_list
-  public static CM_Create_Range_List(prlh: PRANGE_LIST, ulFlags: ULONG): CONFIGRET {
-    return Cfgmgr32.Load('CM_Create_Range_List')(prlh, ulFlags);
+  public static CM_Create_Range_List(prlh_out: PRANGE_LIST, ulFlags: ULONG): CONFIGRET {
+    return Cfgmgr32.Load('CM_Create_Range_List')(prlh_out, ulFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_delete_class_key
@@ -456,7 +456,7 @@ class Cfgmgr32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_delete_class_key_ex
-  public static CM_Delete_Class_Key_Ex(ClassGuid: LPGUID, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
+  public static CM_Delete_Class_Key_Ex(ClassGuid: LPGUID, ulFlags: ULONG, hMachine: OPTIONAL<HMACHINE>): CONFIGRET {
     return Cfgmgr32.Load('CM_Delete_Class_Key_Ex')(ClassGuid, ulFlags, hMachine);
   }
 
@@ -466,7 +466,7 @@ class Cfgmgr32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_delete_devnode_key_ex
-  public static CM_Delete_DevNode_Key_Ex(dnDevNode: DEVNODE, ulHardwareProfile: ULONG, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
+  public static CM_Delete_DevNode_Key_Ex(dnDevNode: DEVNODE, ulHardwareProfile: ULONG, ulFlags: ULONG, hMachine: OPTIONAL<HMACHINE>): CONFIGRET {
     return Cfgmgr32.Load('CM_Delete_DevNode_Key_Ex')(dnDevNode, ulHardwareProfile, ulFlags, hMachine);
   }
 
@@ -481,18 +481,18 @@ class Cfgmgr32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_delete_device_interface_key_exa
-  public static CM_Delete_Device_Interface_Key_ExA(pszDeviceInterface: LPCSTR, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
+  public static CM_Delete_Device_Interface_Key_ExA(pszDeviceInterface: LPCSTR, ulFlags: ULONG, hMachine: OPTIONAL<HMACHINE>): CONFIGRET {
     return Cfgmgr32.Load('CM_Delete_Device_Interface_Key_ExA')(pszDeviceInterface, ulFlags, hMachine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_delete_device_interface_key_exw
-  public static CM_Delete_Device_Interface_Key_ExW(pszDeviceInterface: LPCWSTR, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
+  public static CM_Delete_Device_Interface_Key_ExW(pszDeviceInterface: LPCWSTR, ulFlags: ULONG, hMachine: OPTIONAL<HMACHINE>): CONFIGRET {
     return Cfgmgr32.Load('CM_Delete_Device_Interface_Key_ExW')(pszDeviceInterface, ulFlags, hMachine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_delete_powerscheme
-  public static CM_Delete_PowerScheme(SchemeGuid: LPCGUID, Error: PDWORD): CONFIGRET {
-    return Cfgmgr32.Load('CM_Delete_PowerScheme')(SchemeGuid, Error);
+  public static CM_Delete_PowerScheme(SchemeGuid: LPCGUID, Error_out: PDWORD): CONFIGRET {
+    return Cfgmgr32.Load('CM_Delete_PowerScheme')(SchemeGuid, Error_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_delete_range
@@ -501,13 +501,13 @@ class Cfgmgr32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_detect_resource_conflict
-  public static CM_Detect_Resource_Conflict(dnDevInst: DEVINST, ResourceID: RESOURCEID, ResourceData: PCVOID, ResourceLen: ULONG, pbConflictDetected: PBOOL, ulFlags: ULONG): CONFIGRET {
-    return Cfgmgr32.Load('CM_Detect_Resource_Conflict')(dnDevInst, ResourceID, ResourceData, ResourceLen, pbConflictDetected, ulFlags);
+  public static CM_Detect_Resource_Conflict(dnDevInst: DEVINST, ResourceID: RESOURCEID, ResourceData: PCVOID, ResourceLen: ULONG, pbConflictDetected_out: PBOOL, ulFlags: ULONG): CONFIGRET {
+    return Cfgmgr32.Load('CM_Detect_Resource_Conflict')(dnDevInst, ResourceID, ResourceData, ResourceLen, pbConflictDetected_out, ulFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_detect_resource_conflict_ex
-  public static CM_Detect_Resource_Conflict_Ex(dnDevInst: DEVINST, ResourceID: RESOURCEID, ResourceData: PCVOID, ResourceLen: ULONG, pbConflictDetected: PBOOL, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
-    return Cfgmgr32.Load('CM_Detect_Resource_Conflict_Ex')(dnDevInst, ResourceID, ResourceData, ResourceLen, pbConflictDetected, ulFlags, hMachine);
+  public static CM_Detect_Resource_Conflict_Ex(dnDevInst: DEVINST, ResourceID: RESOURCEID, ResourceData: PCVOID, ResourceLen: ULONG, pbConflictDetected_out: PBOOL, ulFlags: ULONG, hMachine: OPTIONAL<HMACHINE>): CONFIGRET {
+    return Cfgmgr32.Load('CM_Detect_Resource_Conflict_Ex')(dnDevInst, ResourceID, ResourceData, ResourceLen, pbConflictDetected_out, ulFlags, hMachine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_disable_devnode
@@ -516,12 +516,12 @@ class Cfgmgr32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_disable_devnode_ex
-  public static CM_Disable_DevNode_Ex(dnDevInst: DEVINST, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
+  public static CM_Disable_DevNode_Ex(dnDevInst: DEVINST, ulFlags: ULONG, hMachine: OPTIONAL<HMACHINE>): CONFIGRET {
     return Cfgmgr32.Load('CM_Disable_DevNode_Ex')(dnDevInst, ulFlags, hMachine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_disconnect_machine
-  public static CM_Disconnect_Machine(hMachine: HMACHINE | 0n): CONFIGRET {
+  public static CM_Disconnect_Machine(hMachine: OPTIONAL<HMACHINE>): CONFIGRET {
     return Cfgmgr32.Load('CM_Disconnect_Machine')(hMachine);
   }
 
@@ -531,8 +531,8 @@ class Cfgmgr32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_duplicate_powerscheme
-  public static CM_Duplicate_PowerScheme(SourceSchemeGuid: LPCGUID, DestinationSchemeGuid: PVOID, Error: PDWORD): CONFIGRET {
-    return Cfgmgr32.Load('CM_Duplicate_PowerScheme')(SourceSchemeGuid, DestinationSchemeGuid, Error);
+  public static CM_Duplicate_PowerScheme(SourceSchemeGuid: LPCGUID, DestinationSchemeGuid_in_out: PVOID, Error_out: PDWORD): CONFIGRET {
+    return Cfgmgr32.Load('CM_Duplicate_PowerScheme')(SourceSchemeGuid, DestinationSchemeGuid_in_out, Error_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_enable_devnode
@@ -541,48 +541,48 @@ class Cfgmgr32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_enable_devnode_ex
-  public static CM_Enable_DevNode_Ex(dnDevInst: DEVINST, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
+  public static CM_Enable_DevNode_Ex(dnDevInst: DEVINST, ulFlags: ULONG, hMachine: OPTIONAL<HMACHINE>): CONFIGRET {
     return Cfgmgr32.Load('CM_Enable_DevNode_Ex')(dnDevInst, ulFlags, hMachine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_enumerate_classes
-  public static CM_Enumerate_Classes(ulClassIndex: ULONG, ClassGuid: LPGUID, ulFlags: ULONG): CONFIGRET {
-    return Cfgmgr32.Load('CM_Enumerate_Classes')(ulClassIndex, ClassGuid, ulFlags);
+  public static CM_Enumerate_Classes(ulClassIndex: ULONG, ClassGuid_out: LPGUID, ulFlags: ULONG): CONFIGRET {
+    return Cfgmgr32.Load('CM_Enumerate_Classes')(ulClassIndex, ClassGuid_out, ulFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_enumerate_classes_ex
-  public static CM_Enumerate_Classes_Ex(ulClassIndex: ULONG, ClassGuid: LPGUID, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
-    return Cfgmgr32.Load('CM_Enumerate_Classes_Ex')(ulClassIndex, ClassGuid, ulFlags, hMachine);
+  public static CM_Enumerate_Classes_Ex(ulClassIndex: ULONG, ClassGuid_out: LPGUID, ulFlags: ULONG, hMachine: OPTIONAL<HMACHINE>): CONFIGRET {
+    return Cfgmgr32.Load('CM_Enumerate_Classes_Ex')(ulClassIndex, ClassGuid_out, ulFlags, hMachine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_enumerate_enumeratorsa
-  public static CM_Enumerate_EnumeratorsA(ulEnumIndex: ULONG, Buffer: PSTR, pulLength: PULONG, ulFlags: ULONG): CONFIGRET {
-    return Cfgmgr32.Load('CM_Enumerate_EnumeratorsA')(ulEnumIndex, Buffer, pulLength, ulFlags);
+  public static CM_Enumerate_EnumeratorsA(ulEnumIndex: ULONG, Buffer_out: PSTR, pulLength_in_out: PULONG, ulFlags: ULONG): CONFIGRET {
+    return Cfgmgr32.Load('CM_Enumerate_EnumeratorsA')(ulEnumIndex, Buffer_out, pulLength_in_out, ulFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_enumerate_enumeratorsw
-  public static CM_Enumerate_EnumeratorsW(ulEnumIndex: ULONG, Buffer: PWSTR, pulLength: PULONG, ulFlags: ULONG): CONFIGRET {
-    return Cfgmgr32.Load('CM_Enumerate_EnumeratorsW')(ulEnumIndex, Buffer, pulLength, ulFlags);
+  public static CM_Enumerate_EnumeratorsW(ulEnumIndex: ULONG, Buffer_out: PWSTR, pulLength_in_out: PULONG, ulFlags: ULONG): CONFIGRET {
+    return Cfgmgr32.Load('CM_Enumerate_EnumeratorsW')(ulEnumIndex, Buffer_out, pulLength_in_out, ulFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_enumerate_enumerators_exa
-  public static CM_Enumerate_Enumerators_ExA(ulEnumIndex: ULONG, Buffer: PSTR, pulLength: PULONG, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
-    return Cfgmgr32.Load('CM_Enumerate_Enumerators_ExA')(ulEnumIndex, Buffer, pulLength, ulFlags, hMachine);
+  public static CM_Enumerate_Enumerators_ExA(ulEnumIndex: ULONG, Buffer_out: PSTR, pulLength_in_out: PULONG, ulFlags: ULONG, hMachine: OPTIONAL<HMACHINE>): CONFIGRET {
+    return Cfgmgr32.Load('CM_Enumerate_Enumerators_ExA')(ulEnumIndex, Buffer_out, pulLength_in_out, ulFlags, hMachine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_enumerate_enumerators_exw
-  public static CM_Enumerate_Enumerators_ExW(ulEnumIndex: ULONG, Buffer: PWSTR, pulLength: PULONG, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
-    return Cfgmgr32.Load('CM_Enumerate_Enumerators_ExW')(ulEnumIndex, Buffer, pulLength, ulFlags, hMachine);
+  public static CM_Enumerate_Enumerators_ExW(ulEnumIndex: ULONG, Buffer_out: PWSTR, pulLength_in_out: PULONG, ulFlags: ULONG, hMachine: OPTIONAL<HMACHINE>): CONFIGRET {
+    return Cfgmgr32.Load('CM_Enumerate_Enumerators_ExW')(ulEnumIndex, Buffer_out, pulLength_in_out, ulFlags, hMachine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_find_range
-  public static CM_Find_Range(pullStart: PDWORDLONG, ullStart: DWORDLONG, ulLength: ULONG, ullAlignment: DWORDLONG, ullEnd: DWORDLONG, rlh: RANGE_LIST, ulFlags: ULONG): CONFIGRET {
-    return Cfgmgr32.Load('CM_Find_Range')(pullStart, ullStart, ulLength, ullAlignment, ullEnd, rlh, ulFlags);
+  public static CM_Find_Range(pullStart_out: PDWORDLONG, ullStart: DWORDLONG, ulLength: ULONG, ullAlignment: DWORDLONG, ullEnd: DWORDLONG, rlh: RANGE_LIST, ulFlags: ULONG): CONFIGRET {
+    return Cfgmgr32.Load('CM_Find_Range')(pullStart_out, ullStart, ulLength, ullAlignment, ullEnd, rlh, ulFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_first_range
-  public static CM_First_Range(rlh: RANGE_LIST, pullStart: PDWORDLONG, pullEnd: PDWORDLONG, preElement: PRANGE_ELEMENT, ulFlags: ULONG): CONFIGRET {
-    return Cfgmgr32.Load('CM_First_Range')(rlh, pullStart, pullEnd, preElement, ulFlags);
+  public static CM_First_Range(rlh: RANGE_LIST, pullStart_out: PDWORDLONG, pullEnd_out: PDWORDLONG, preElement_out: PRANGE_ELEMENT, ulFlags: ULONG): CONFIGRET {
+    return Cfgmgr32.Load('CM_First_Range')(rlh, pullStart_out, pullEnd_out, preElement_out, ulFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_free_log_conf
@@ -591,7 +591,7 @@ class Cfgmgr32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_free_log_conf_ex
-  public static CM_Free_Log_Conf_Ex(lcLogConfToBeFreed: LOG_CONF, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
+  public static CM_Free_Log_Conf_Ex(lcLogConfToBeFreed: LOG_CONF, ulFlags: ULONG, hMachine: OPTIONAL<HMACHINE>): CONFIGRET {
     return Cfgmgr32.Load('CM_Free_Log_Conf_Ex')(lcLogConfToBeFreed, ulFlags, hMachine);
   }
 
@@ -606,13 +606,13 @@ class Cfgmgr32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_free_res_des
-  public static CM_Free_Res_Des(prdResDes: PRES_DES | NULL, rdResDes: RES_DES, ulFlags: ULONG): CONFIGRET {
-    return Cfgmgr32.Load('CM_Free_Res_Des')(prdResDes, rdResDes, ulFlags);
+  public static CM_Free_Res_Des(prdResDes_out: OPTIONAL<PRES_DES>, rdResDes: RES_DES, ulFlags: ULONG): CONFIGRET {
+    return Cfgmgr32.Load('CM_Free_Res_Des')(prdResDes_out, rdResDes, ulFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_free_res_des_ex
-  public static CM_Free_Res_Des_Ex(prdResDes: PRES_DES | NULL, rdResDes: RES_DES, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
-    return Cfgmgr32.Load('CM_Free_Res_Des_Ex')(prdResDes, rdResDes, ulFlags, hMachine);
+  public static CM_Free_Res_Des_Ex(prdResDes_out: OPTIONAL<PRES_DES>, rdResDes: RES_DES, ulFlags: ULONG, hMachine: OPTIONAL<HMACHINE>): CONFIGRET {
+    return Cfgmgr32.Load('CM_Free_Res_Des_Ex')(prdResDes_out, rdResDes, ulFlags, hMachine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_free_res_des_handle
@@ -626,466 +626,514 @@ class Cfgmgr32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_get_child
-  public static CM_Get_Child(pdnDevInst: PDEVINST, dnDevInst: DEVINST, ulFlags: ULONG): CONFIGRET {
-    return Cfgmgr32.Load('CM_Get_Child')(pdnDevInst, dnDevInst, ulFlags);
+  public static CM_Get_Child(pdnDevInst_out: PDEVINST, dnDevInst: DEVINST, ulFlags: ULONG): CONFIGRET {
+    return Cfgmgr32.Load('CM_Get_Child')(pdnDevInst_out, dnDevInst, ulFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_get_child_ex
-  public static CM_Get_Child_Ex(pdnDevInst: PDEVINST, dnDevInst: DEVINST, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
-    return Cfgmgr32.Load('CM_Get_Child_Ex')(pdnDevInst, dnDevInst, ulFlags, hMachine);
+  public static CM_Get_Child_Ex(pdnDevInst_out: PDEVINST, dnDevInst: DEVINST, ulFlags: ULONG, hMachine: OPTIONAL<HMACHINE>): CONFIGRET {
+    return Cfgmgr32.Load('CM_Get_Child_Ex')(pdnDevInst_out, dnDevInst, ulFlags, hMachine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_get_class_key_namea
-  public static CM_Get_Class_Key_NameA(ClassGuid: LPGUID, pszKeyName: LPSTR | NULL, pulLength: PULONG, ulFlags: ULONG): CONFIGRET {
-    return Cfgmgr32.Load('CM_Get_Class_Key_NameA')(ClassGuid, pszKeyName, pulLength, ulFlags);
+  public static CM_Get_Class_Key_NameA(ClassGuid: LPGUID, pszKeyName_out: OPTIONAL<LPSTR>, pulLength_in_out: PULONG, ulFlags: ULONG): CONFIGRET {
+    return Cfgmgr32.Load('CM_Get_Class_Key_NameA')(ClassGuid, pszKeyName_out, pulLength_in_out, ulFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_get_class_key_namew
-  public static CM_Get_Class_Key_NameW(ClassGuid: LPGUID, pszKeyName: LPWSTR | NULL, pulLength: PULONG, ulFlags: ULONG): CONFIGRET {
-    return Cfgmgr32.Load('CM_Get_Class_Key_NameW')(ClassGuid, pszKeyName, pulLength, ulFlags);
+  public static CM_Get_Class_Key_NameW(ClassGuid: LPGUID, pszKeyName_out: OPTIONAL<LPWSTR>, pulLength_in_out: PULONG, ulFlags: ULONG): CONFIGRET {
+    return Cfgmgr32.Load('CM_Get_Class_Key_NameW')(ClassGuid, pszKeyName_out, pulLength_in_out, ulFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_get_class_key_name_exa
-  public static CM_Get_Class_Key_Name_ExA(ClassGuid: LPGUID, pszKeyName: LPSTR | NULL, pulLength: PULONG, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
-    return Cfgmgr32.Load('CM_Get_Class_Key_Name_ExA')(ClassGuid, pszKeyName, pulLength, ulFlags, hMachine);
+  public static CM_Get_Class_Key_Name_ExA(ClassGuid: LPGUID, pszKeyName_out: OPTIONAL<LPSTR>, pulLength_in_out: PULONG, ulFlags: ULONG, hMachine: OPTIONAL<HMACHINE>): CONFIGRET {
+    return Cfgmgr32.Load('CM_Get_Class_Key_Name_ExA')(ClassGuid, pszKeyName_out, pulLength_in_out, ulFlags, hMachine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_get_class_key_name_exw
-  public static CM_Get_Class_Key_Name_ExW(ClassGuid: LPGUID, pszKeyName: LPWSTR | NULL, pulLength: PULONG, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
-    return Cfgmgr32.Load('CM_Get_Class_Key_Name_ExW')(ClassGuid, pszKeyName, pulLength, ulFlags, hMachine);
+  public static CM_Get_Class_Key_Name_ExW(ClassGuid: LPGUID, pszKeyName_out: OPTIONAL<LPWSTR>, pulLength_in_out: PULONG, ulFlags: ULONG, hMachine: OPTIONAL<HMACHINE>): CONFIGRET {
+    return Cfgmgr32.Load('CM_Get_Class_Key_Name_ExW')(ClassGuid, pszKeyName_out, pulLength_in_out, ulFlags, hMachine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_get_class_namea
-  public static CM_Get_Class_NameA(ClassGuid: LPGUID, Buffer: PSTR | NULL, pulLength: PULONG, ulFlags: ULONG): CONFIGRET {
-    return Cfgmgr32.Load('CM_Get_Class_NameA')(ClassGuid, Buffer, pulLength, ulFlags);
+  public static CM_Get_Class_NameA(ClassGuid: LPGUID, Buffer_out: OPTIONAL<PSTR>, pulLength_in_out: PULONG, ulFlags: ULONG): CONFIGRET {
+    return Cfgmgr32.Load('CM_Get_Class_NameA')(ClassGuid, Buffer_out, pulLength_in_out, ulFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_get_class_namew
-  public static CM_Get_Class_NameW(ClassGuid: LPGUID, Buffer: PWSTR | NULL, pulLength: PULONG, ulFlags: ULONG): CONFIGRET {
-    return Cfgmgr32.Load('CM_Get_Class_NameW')(ClassGuid, Buffer, pulLength, ulFlags);
+  public static CM_Get_Class_NameW(ClassGuid: LPGUID, Buffer_out: OPTIONAL<PWSTR>, pulLength_in_out: PULONG, ulFlags: ULONG): CONFIGRET {
+    return Cfgmgr32.Load('CM_Get_Class_NameW')(ClassGuid, Buffer_out, pulLength_in_out, ulFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_get_class_name_exa
-  public static CM_Get_Class_Name_ExA(ClassGuid: LPGUID, Buffer: PSTR | NULL, pulLength: PULONG, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
-    return Cfgmgr32.Load('CM_Get_Class_Name_ExA')(ClassGuid, Buffer, pulLength, ulFlags, hMachine);
+  public static CM_Get_Class_Name_ExA(ClassGuid: LPGUID, Buffer_out: OPTIONAL<PSTR>, pulLength_in_out: PULONG, ulFlags: ULONG, hMachine: OPTIONAL<HMACHINE>): CONFIGRET {
+    return Cfgmgr32.Load('CM_Get_Class_Name_ExA')(ClassGuid, Buffer_out, pulLength_in_out, ulFlags, hMachine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_get_class_name_exw
-  public static CM_Get_Class_Name_ExW(ClassGuid: LPGUID, Buffer: PWSTR | NULL, pulLength: PULONG, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
-    return Cfgmgr32.Load('CM_Get_Class_Name_ExW')(ClassGuid, Buffer, pulLength, ulFlags, hMachine);
+  public static CM_Get_Class_Name_ExW(ClassGuid: LPGUID, Buffer_out: OPTIONAL<PWSTR>, pulLength_in_out: PULONG, ulFlags: ULONG, hMachine: OPTIONAL<HMACHINE>): CONFIGRET {
+    return Cfgmgr32.Load('CM_Get_Class_Name_ExW')(ClassGuid, Buffer_out, pulLength_in_out, ulFlags, hMachine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_get_class_propertyw
-  public static CM_Get_Class_PropertyW(ClassGUID: LPCGUID, PropertyKey: PDEVPROPKEY, PropertyType: PDEVPROPTYPE, PropertyBuffer: PBYTE | NULL, PropertyBufferSize: PULONG, ulFlags: ULONG): CONFIGRET {
-    return Cfgmgr32.Load('CM_Get_Class_PropertyW')(ClassGUID, PropertyKey, PropertyType, PropertyBuffer, PropertyBufferSize, ulFlags);
+  public static CM_Get_Class_PropertyW(ClassGUID: LPCGUID, PropertyKey: PDEVPROPKEY, PropertyType_out: PDEVPROPTYPE, PropertyBuffer_out: OPTIONAL<PBYTE>, PropertyBufferSize_in_out: PULONG, ulFlags: ULONG): CONFIGRET {
+    return Cfgmgr32.Load('CM_Get_Class_PropertyW')(ClassGUID, PropertyKey, PropertyType_out, PropertyBuffer_out, PropertyBufferSize_in_out, ulFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_get_class_property_exw
-  public static CM_Get_Class_Property_ExW(ClassGUID: LPCGUID, PropertyKey: PDEVPROPKEY, PropertyType: PDEVPROPTYPE, PropertyBuffer: PBYTE | NULL, PropertyBufferSize: PULONG, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
-    return Cfgmgr32.Load('CM_Get_Class_Property_ExW')(ClassGUID, PropertyKey, PropertyType, PropertyBuffer, PropertyBufferSize, ulFlags, hMachine);
+  public static CM_Get_Class_Property_ExW(
+    ClassGUID: LPCGUID,
+    PropertyKey: PDEVPROPKEY,
+    PropertyType_out: PDEVPROPTYPE,
+    PropertyBuffer_out: OPTIONAL<PBYTE>,
+    PropertyBufferSize_in_out: PULONG,
+    ulFlags: ULONG,
+    hMachine: OPTIONAL<HMACHINE>,
+  ): CONFIGRET {
+    return Cfgmgr32.Load('CM_Get_Class_Property_ExW')(ClassGUID, PropertyKey, PropertyType_out, PropertyBuffer_out, PropertyBufferSize_in_out, ulFlags, hMachine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_get_class_property_keys
-  public static CM_Get_Class_Property_Keys(ClassGUID: LPCGUID, PropertyKeyArray: PDEVPROPKEY | NULL, PropertyKeyCount: PULONG, ulFlags: ULONG): CONFIGRET {
-    return Cfgmgr32.Load('CM_Get_Class_Property_Keys')(ClassGUID, PropertyKeyArray, PropertyKeyCount, ulFlags);
+  public static CM_Get_Class_Property_Keys(ClassGUID: LPCGUID, PropertyKeyArray_out: OPTIONAL<PDEVPROPKEY>, PropertyKeyCount_in_out: PULONG, ulFlags: ULONG): CONFIGRET {
+    return Cfgmgr32.Load('CM_Get_Class_Property_Keys')(ClassGUID, PropertyKeyArray_out, PropertyKeyCount_in_out, ulFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_get_class_property_keys_ex
-  public static CM_Get_Class_Property_Keys_Ex(ClassGUID: LPCGUID, PropertyKeyArray: PDEVPROPKEY | NULL, PropertyKeyCount: PULONG, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
-    return Cfgmgr32.Load('CM_Get_Class_Property_Keys_Ex')(ClassGUID, PropertyKeyArray, PropertyKeyCount, ulFlags, hMachine);
+  public static CM_Get_Class_Property_Keys_Ex(ClassGUID: LPCGUID, PropertyKeyArray_out: OPTIONAL<PDEVPROPKEY>, PropertyKeyCount_in_out: PULONG, ulFlags: ULONG, hMachine: OPTIONAL<HMACHINE>): CONFIGRET {
+    return Cfgmgr32.Load('CM_Get_Class_Property_Keys_Ex')(ClassGUID, PropertyKeyArray_out, PropertyKeyCount_in_out, ulFlags, hMachine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_get_class_registry_propertya
-  public static CM_Get_Class_Registry_PropertyA(ClassGuid: LPGUID, ulProperty: ULONG, pulRegDataType: PULONG | NULL, Buffer: PVOID | NULL, pulLength: PULONG, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
-    return Cfgmgr32.Load('CM_Get_Class_Registry_PropertyA')(ClassGuid, ulProperty, pulRegDataType, Buffer, pulLength, ulFlags, hMachine);
+  public static CM_Get_Class_Registry_PropertyA(ClassGuid: LPGUID, ulProperty: ULONG, pulRegDataType_out: OPTIONAL<PULONG>, Buffer_out: OPTIONAL<PVOID>, pulLength_in_out: PULONG, ulFlags: ULONG, hMachine: OPTIONAL<HMACHINE>): CONFIGRET {
+    return Cfgmgr32.Load('CM_Get_Class_Registry_PropertyA')(ClassGuid, ulProperty, pulRegDataType_out, Buffer_out, pulLength_in_out, ulFlags, hMachine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_get_class_registry_propertyw
-  public static CM_Get_Class_Registry_PropertyW(ClassGuid: LPGUID, ulProperty: ULONG, pulRegDataType: PULONG | NULL, Buffer: PVOID | NULL, pulLength: PULONG, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
-    return Cfgmgr32.Load('CM_Get_Class_Registry_PropertyW')(ClassGuid, ulProperty, pulRegDataType, Buffer, pulLength, ulFlags, hMachine);
+  public static CM_Get_Class_Registry_PropertyW(ClassGuid: LPGUID, ulProperty: ULONG, pulRegDataType_out: OPTIONAL<PULONG>, Buffer_out: OPTIONAL<PVOID>, pulLength_in_out: PULONG, ulFlags: ULONG, hMachine: OPTIONAL<HMACHINE>): CONFIGRET {
+    return Cfgmgr32.Load('CM_Get_Class_Registry_PropertyW')(ClassGuid, ulProperty, pulRegDataType_out, Buffer_out, pulLength_in_out, ulFlags, hMachine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_get_depth
-  public static CM_Get_Depth(pulDepth: PULONG, dnDevInst: DEVINST, ulFlags: ULONG): CONFIGRET {
-    return Cfgmgr32.Load('CM_Get_Depth')(pulDepth, dnDevInst, ulFlags);
+  public static CM_Get_Depth(pulDepth_out: PULONG, dnDevInst: DEVINST, ulFlags: ULONG): CONFIGRET {
+    return Cfgmgr32.Load('CM_Get_Depth')(pulDepth_out, dnDevInst, ulFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_get_depth_ex
-  public static CM_Get_Depth_Ex(pulDepth: PULONG, dnDevInst: DEVINST, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
-    return Cfgmgr32.Load('CM_Get_Depth_Ex')(pulDepth, dnDevInst, ulFlags, hMachine);
+  public static CM_Get_Depth_Ex(pulDepth_out: PULONG, dnDevInst: DEVINST, ulFlags: ULONG, hMachine: OPTIONAL<HMACHINE>): CONFIGRET {
+    return Cfgmgr32.Load('CM_Get_Depth_Ex')(pulDepth_out, dnDevInst, ulFlags, hMachine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_get_devnode_custom_propertya
-  public static CM_Get_DevNode_Custom_PropertyA(dnDevInst: DEVINST, pszCustomPropertyName: PCSTR, pulRegDataType: PULONG | NULL, Buffer: PVOID | NULL, pulLength: PULONG, ulFlags: ULONG): CONFIGRET {
-    return Cfgmgr32.Load('CM_Get_DevNode_Custom_PropertyA')(dnDevInst, pszCustomPropertyName, pulRegDataType, Buffer, pulLength, ulFlags);
+  public static CM_Get_DevNode_Custom_PropertyA(dnDevInst: DEVINST, pszCustomPropertyName: PCSTR, pulRegDataType_out: OPTIONAL<PULONG>, Buffer_out: OPTIONAL<PVOID>, pulLength_in_out: PULONG, ulFlags: ULONG): CONFIGRET {
+    return Cfgmgr32.Load('CM_Get_DevNode_Custom_PropertyA')(dnDevInst, pszCustomPropertyName, pulRegDataType_out, Buffer_out, pulLength_in_out, ulFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_get_devnode_custom_propertyw
-  public static CM_Get_DevNode_Custom_PropertyW(dnDevInst: DEVINST, pszCustomPropertyName: PCWSTR, pulRegDataType: PULONG | NULL, Buffer: PVOID | NULL, pulLength: PULONG, ulFlags: ULONG): CONFIGRET {
-    return Cfgmgr32.Load('CM_Get_DevNode_Custom_PropertyW')(dnDevInst, pszCustomPropertyName, pulRegDataType, Buffer, pulLength, ulFlags);
+  public static CM_Get_DevNode_Custom_PropertyW(dnDevInst: DEVINST, pszCustomPropertyName: PCWSTR, pulRegDataType_out: OPTIONAL<PULONG>, Buffer_out: OPTIONAL<PVOID>, pulLength_in_out: PULONG, ulFlags: ULONG): CONFIGRET {
+    return Cfgmgr32.Load('CM_Get_DevNode_Custom_PropertyW')(dnDevInst, pszCustomPropertyName, pulRegDataType_out, Buffer_out, pulLength_in_out, ulFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_get_devnode_custom_property_exa
-  public static CM_Get_DevNode_Custom_Property_ExA(dnDevInst: DEVINST, pszCustomPropertyName: PCSTR, pulRegDataType: PULONG | NULL, Buffer: PVOID | NULL, pulLength: PULONG, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
-    return Cfgmgr32.Load('CM_Get_DevNode_Custom_Property_ExA')(dnDevInst, pszCustomPropertyName, pulRegDataType, Buffer, pulLength, ulFlags, hMachine);
+  public static CM_Get_DevNode_Custom_Property_ExA(
+    dnDevInst: DEVINST,
+    pszCustomPropertyName: PCSTR,
+    pulRegDataType_out: OPTIONAL<PULONG>,
+    Buffer_out: OPTIONAL<PVOID>,
+    pulLength_in_out: PULONG,
+    ulFlags: ULONG,
+    hMachine: OPTIONAL<HMACHINE>,
+  ): CONFIGRET {
+    return Cfgmgr32.Load('CM_Get_DevNode_Custom_Property_ExA')(dnDevInst, pszCustomPropertyName, pulRegDataType_out, Buffer_out, pulLength_in_out, ulFlags, hMachine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_get_devnode_custom_property_exw
-  public static CM_Get_DevNode_Custom_Property_ExW(dnDevInst: DEVINST, pszCustomPropertyName: PCWSTR, pulRegDataType: PULONG | NULL, Buffer: PVOID | NULL, pulLength: PULONG, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
-    return Cfgmgr32.Load('CM_Get_DevNode_Custom_Property_ExW')(dnDevInst, pszCustomPropertyName, pulRegDataType, Buffer, pulLength, ulFlags, hMachine);
+  public static CM_Get_DevNode_Custom_Property_ExW(
+    dnDevInst: DEVINST,
+    pszCustomPropertyName: PCWSTR,
+    pulRegDataType_out: OPTIONAL<PULONG>,
+    Buffer_out: OPTIONAL<PVOID>,
+    pulLength_in_out: PULONG,
+    ulFlags: ULONG,
+    hMachine: OPTIONAL<HMACHINE>,
+  ): CONFIGRET {
+    return Cfgmgr32.Load('CM_Get_DevNode_Custom_Property_ExW')(dnDevInst, pszCustomPropertyName, pulRegDataType_out, Buffer_out, pulLength_in_out, ulFlags, hMachine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_get_devnode_propertyw
-  public static CM_Get_DevNode_PropertyW(dnDevInst: DEVINST, PropertyKey: PDEVPROPKEY, PropertyType: PDEVPROPTYPE, PropertyBuffer: PBYTE | NULL, PropertyBufferSize: PULONG, ulFlags: ULONG): CONFIGRET {
-    return Cfgmgr32.Load('CM_Get_DevNode_PropertyW')(dnDevInst, PropertyKey, PropertyType, PropertyBuffer, PropertyBufferSize, ulFlags);
+  public static CM_Get_DevNode_PropertyW(dnDevInst: DEVINST, PropertyKey: PDEVPROPKEY, PropertyType_out: PDEVPROPTYPE, PropertyBuffer_out: OPTIONAL<PBYTE>, PropertyBufferSize_in_out: PULONG, ulFlags: ULONG): CONFIGRET {
+    return Cfgmgr32.Load('CM_Get_DevNode_PropertyW')(dnDevInst, PropertyKey, PropertyType_out, PropertyBuffer_out, PropertyBufferSize_in_out, ulFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_get_devnode_property_exw
-  public static CM_Get_DevNode_Property_ExW(dnDevInst: DEVINST, PropertyKey: PDEVPROPKEY, PropertyType: PDEVPROPTYPE, PropertyBuffer: PBYTE | NULL, PropertyBufferSize: PULONG, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
-    return Cfgmgr32.Load('CM_Get_DevNode_Property_ExW')(dnDevInst, PropertyKey, PropertyType, PropertyBuffer, PropertyBufferSize, ulFlags, hMachine);
+  public static CM_Get_DevNode_Property_ExW(
+    dnDevInst: DEVINST,
+    PropertyKey: PDEVPROPKEY,
+    PropertyType_out: PDEVPROPTYPE,
+    PropertyBuffer_out: OPTIONAL<PBYTE>,
+    PropertyBufferSize_in_out: PULONG,
+    ulFlags: ULONG,
+    hMachine: OPTIONAL<HMACHINE>,
+  ): CONFIGRET {
+    return Cfgmgr32.Load('CM_Get_DevNode_Property_ExW')(dnDevInst, PropertyKey, PropertyType_out, PropertyBuffer_out, PropertyBufferSize_in_out, ulFlags, hMachine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_get_devnode_property_keys
-  public static CM_Get_DevNode_Property_Keys(dnDevInst: DEVINST, PropertyKeyArray: PDEVPROPKEY | NULL, PropertyKeyCount: PULONG, ulFlags: ULONG): CONFIGRET {
-    return Cfgmgr32.Load('CM_Get_DevNode_Property_Keys')(dnDevInst, PropertyKeyArray, PropertyKeyCount, ulFlags);
+  public static CM_Get_DevNode_Property_Keys(dnDevInst: DEVINST, PropertyKeyArray_out: OPTIONAL<PDEVPROPKEY>, PropertyKeyCount_in_out: PULONG, ulFlags: ULONG): CONFIGRET {
+    return Cfgmgr32.Load('CM_Get_DevNode_Property_Keys')(dnDevInst, PropertyKeyArray_out, PropertyKeyCount_in_out, ulFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_get_devnode_property_keys_ex
-  public static CM_Get_DevNode_Property_Keys_Ex(dnDevInst: DEVINST, PropertyKeyArray: PDEVPROPKEY | NULL, PropertyKeyCount: PULONG, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
-    return Cfgmgr32.Load('CM_Get_DevNode_Property_Keys_Ex')(dnDevInst, PropertyKeyArray, PropertyKeyCount, ulFlags, hMachine);
+  public static CM_Get_DevNode_Property_Keys_Ex(dnDevInst: DEVINST, PropertyKeyArray_out: OPTIONAL<PDEVPROPKEY>, PropertyKeyCount_in_out: PULONG, ulFlags: ULONG, hMachine: OPTIONAL<HMACHINE>): CONFIGRET {
+    return Cfgmgr32.Load('CM_Get_DevNode_Property_Keys_Ex')(dnDevInst, PropertyKeyArray_out, PropertyKeyCount_in_out, ulFlags, hMachine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_get_devnode_registry_propertya
-  public static CM_Get_DevNode_Registry_PropertyA(dnDevInst: DEVINST, ulProperty: ULONG, pulRegDataType: PULONG | NULL, Buffer: PVOID | NULL, pulLength: PULONG, ulFlags: ULONG): CONFIGRET {
-    return Cfgmgr32.Load('CM_Get_DevNode_Registry_PropertyA')(dnDevInst, ulProperty, pulRegDataType, Buffer, pulLength, ulFlags);
+  public static CM_Get_DevNode_Registry_PropertyA(dnDevInst: DEVINST, ulProperty: ULONG, pulRegDataType_out: OPTIONAL<PULONG>, Buffer_out: OPTIONAL<PVOID>, pulLength_in_out: PULONG, ulFlags: ULONG): CONFIGRET {
+    return Cfgmgr32.Load('CM_Get_DevNode_Registry_PropertyA')(dnDevInst, ulProperty, pulRegDataType_out, Buffer_out, pulLength_in_out, ulFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_get_devnode_registry_propertyw
-  public static CM_Get_DevNode_Registry_PropertyW(dnDevInst: DEVINST, ulProperty: ULONG, pulRegDataType: PULONG | NULL, Buffer: PVOID | NULL, pulLength: PULONG, ulFlags: ULONG): CONFIGRET {
-    return Cfgmgr32.Load('CM_Get_DevNode_Registry_PropertyW')(dnDevInst, ulProperty, pulRegDataType, Buffer, pulLength, ulFlags);
+  public static CM_Get_DevNode_Registry_PropertyW(dnDevInst: DEVINST, ulProperty: ULONG, pulRegDataType_out: OPTIONAL<PULONG>, Buffer_out: OPTIONAL<PVOID>, pulLength_in_out: PULONG, ulFlags: ULONG): CONFIGRET {
+    return Cfgmgr32.Load('CM_Get_DevNode_Registry_PropertyW')(dnDevInst, ulProperty, pulRegDataType_out, Buffer_out, pulLength_in_out, ulFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_get_devnode_registry_property_exa
-  public static CM_Get_DevNode_Registry_Property_ExA(dnDevInst: DEVINST, ulProperty: ULONG, pulRegDataType: PULONG | NULL, Buffer: PVOID | NULL, pulLength: PULONG, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
-    return Cfgmgr32.Load('CM_Get_DevNode_Registry_Property_ExA')(dnDevInst, ulProperty, pulRegDataType, Buffer, pulLength, ulFlags, hMachine);
+  public static CM_Get_DevNode_Registry_Property_ExA(
+    dnDevInst: DEVINST,
+    ulProperty: ULONG,
+    pulRegDataType_out: OPTIONAL<PULONG>,
+    Buffer_out: OPTIONAL<PVOID>,
+    pulLength_in_out: PULONG,
+    ulFlags: ULONG,
+    hMachine: OPTIONAL<HMACHINE>,
+  ): CONFIGRET {
+    return Cfgmgr32.Load('CM_Get_DevNode_Registry_Property_ExA')(dnDevInst, ulProperty, pulRegDataType_out, Buffer_out, pulLength_in_out, ulFlags, hMachine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_get_devnode_registry_property_exw
-  public static CM_Get_DevNode_Registry_Property_ExW(dnDevInst: DEVINST, ulProperty: ULONG, pulRegDataType: PULONG | NULL, Buffer: PVOID | NULL, pulLength: PULONG, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
-    return Cfgmgr32.Load('CM_Get_DevNode_Registry_Property_ExW')(dnDevInst, ulProperty, pulRegDataType, Buffer, pulLength, ulFlags, hMachine);
+  public static CM_Get_DevNode_Registry_Property_ExW(
+    dnDevInst: DEVINST,
+    ulProperty: ULONG,
+    pulRegDataType_out: OPTIONAL<PULONG>,
+    Buffer_out: OPTIONAL<PVOID>,
+    pulLength_in_out: PULONG,
+    ulFlags: ULONG,
+    hMachine: OPTIONAL<HMACHINE>,
+  ): CONFIGRET {
+    return Cfgmgr32.Load('CM_Get_DevNode_Registry_Property_ExW')(dnDevInst, ulProperty, pulRegDataType_out, Buffer_out, pulLength_in_out, ulFlags, hMachine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_get_devnode_status
-  public static CM_Get_DevNode_Status(pulStatus: PULONG, pulProblemNumber: PULONG, dnDevInst: DEVINST, ulFlags: ULONG): CONFIGRET {
-    return Cfgmgr32.Load('CM_Get_DevNode_Status')(pulStatus, pulProblemNumber, dnDevInst, ulFlags);
+  public static CM_Get_DevNode_Status(pulStatus_out: PULONG, pulProblemNumber_out: PULONG, dnDevInst: DEVINST, ulFlags: ULONG): CONFIGRET {
+    return Cfgmgr32.Load('CM_Get_DevNode_Status')(pulStatus_out, pulProblemNumber_out, dnDevInst, ulFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_get_devnode_status_ex
-  public static CM_Get_DevNode_Status_Ex(pulStatus: PULONG, pulProblemNumber: PULONG, dnDevInst: DEVINST, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
-    return Cfgmgr32.Load('CM_Get_DevNode_Status_Ex')(pulStatus, pulProblemNumber, dnDevInst, ulFlags, hMachine);
+  public static CM_Get_DevNode_Status_Ex(pulStatus_out: PULONG, pulProblemNumber_out: PULONG, dnDevInst: DEVINST, ulFlags: ULONG, hMachine: OPTIONAL<HMACHINE>): CONFIGRET {
+    return Cfgmgr32.Load('CM_Get_DevNode_Status_Ex')(pulStatus_out, pulProblemNumber_out, dnDevInst, ulFlags, hMachine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_get_device_ida
-  public static CM_Get_Device_IDA(dnDevInst: DEVINST, Buffer: PSTR, BufferLen: ULONG, ulFlags: ULONG): CONFIGRET {
-    return Cfgmgr32.Load('CM_Get_Device_IDA')(dnDevInst, Buffer, BufferLen, ulFlags);
+  public static CM_Get_Device_IDA(dnDevInst: DEVINST, Buffer_out: PSTR, BufferLen: ULONG, ulFlags: ULONG): CONFIGRET {
+    return Cfgmgr32.Load('CM_Get_Device_IDA')(dnDevInst, Buffer_out, BufferLen, ulFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_get_device_idw
-  public static CM_Get_Device_IDW(dnDevInst: DEVINST, Buffer: PWSTR, BufferLen: ULONG, ulFlags: ULONG): CONFIGRET {
-    return Cfgmgr32.Load('CM_Get_Device_IDW')(dnDevInst, Buffer, BufferLen, ulFlags);
+  public static CM_Get_Device_IDW(dnDevInst: DEVINST, Buffer_out: PWSTR, BufferLen: ULONG, ulFlags: ULONG): CONFIGRET {
+    return Cfgmgr32.Load('CM_Get_Device_IDW')(dnDevInst, Buffer_out, BufferLen, ulFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_get_device_id_exa
-  public static CM_Get_Device_ID_ExA(dnDevInst: DEVINST, Buffer: PSTR, BufferLen: ULONG, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
-    return Cfgmgr32.Load('CM_Get_Device_ID_ExA')(dnDevInst, Buffer, BufferLen, ulFlags, hMachine);
+  public static CM_Get_Device_ID_ExA(dnDevInst: DEVINST, Buffer_out: PSTR, BufferLen: ULONG, ulFlags: ULONG, hMachine: OPTIONAL<HMACHINE>): CONFIGRET {
+    return Cfgmgr32.Load('CM_Get_Device_ID_ExA')(dnDevInst, Buffer_out, BufferLen, ulFlags, hMachine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_get_device_id_exw
-  public static CM_Get_Device_ID_ExW(dnDevInst: DEVINST, Buffer: PWSTR, BufferLen: ULONG, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
-    return Cfgmgr32.Load('CM_Get_Device_ID_ExW')(dnDevInst, Buffer, BufferLen, ulFlags, hMachine);
+  public static CM_Get_Device_ID_ExW(dnDevInst: DEVINST, Buffer_out: PWSTR, BufferLen: ULONG, ulFlags: ULONG, hMachine: OPTIONAL<HMACHINE>): CONFIGRET {
+    return Cfgmgr32.Load('CM_Get_Device_ID_ExW')(dnDevInst, Buffer_out, BufferLen, ulFlags, hMachine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_get_device_id_lista
-  public static CM_Get_Device_ID_ListA(pszFilter: PCSTR | NULL, Buffer: PSTR, BufferLen: ULONG, ulFlags: ULONG): CONFIGRET {
-    return Cfgmgr32.Load('CM_Get_Device_ID_ListA')(pszFilter, Buffer, BufferLen, ulFlags);
+  public static CM_Get_Device_ID_ListA(pszFilter: OPTIONAL<PCSTR>, Buffer_out: PSTR, BufferLen: ULONG, ulFlags: ULONG): CONFIGRET {
+    return Cfgmgr32.Load('CM_Get_Device_ID_ListA')(pszFilter, Buffer_out, BufferLen, ulFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_get_device_id_listw
-  public static CM_Get_Device_ID_ListW(pszFilter: PCWSTR | NULL, Buffer: PWSTR, BufferLen: ULONG, ulFlags: ULONG): CONFIGRET {
-    return Cfgmgr32.Load('CM_Get_Device_ID_ListW')(pszFilter, Buffer, BufferLen, ulFlags);
+  public static CM_Get_Device_ID_ListW(pszFilter: OPTIONAL<PCWSTR>, Buffer_out: PWSTR, BufferLen: ULONG, ulFlags: ULONG): CONFIGRET {
+    return Cfgmgr32.Load('CM_Get_Device_ID_ListW')(pszFilter, Buffer_out, BufferLen, ulFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_get_device_id_list_exa
-  public static CM_Get_Device_ID_List_ExA(pszFilter: PCSTR | NULL, Buffer: PSTR, BufferLen: ULONG, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
-    return Cfgmgr32.Load('CM_Get_Device_ID_List_ExA')(pszFilter, Buffer, BufferLen, ulFlags, hMachine);
+  public static CM_Get_Device_ID_List_ExA(pszFilter: OPTIONAL<PCSTR>, Buffer_out: PSTR, BufferLen: ULONG, ulFlags: ULONG, hMachine: OPTIONAL<HMACHINE>): CONFIGRET {
+    return Cfgmgr32.Load('CM_Get_Device_ID_List_ExA')(pszFilter, Buffer_out, BufferLen, ulFlags, hMachine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_get_device_id_list_exw
-  public static CM_Get_Device_ID_List_ExW(pszFilter: PCWSTR | NULL, Buffer: PWSTR, BufferLen: ULONG, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
-    return Cfgmgr32.Load('CM_Get_Device_ID_List_ExW')(pszFilter, Buffer, BufferLen, ulFlags, hMachine);
+  public static CM_Get_Device_ID_List_ExW(pszFilter: OPTIONAL<PCWSTR>, Buffer_out: PWSTR, BufferLen: ULONG, ulFlags: ULONG, hMachine: OPTIONAL<HMACHINE>): CONFIGRET {
+    return Cfgmgr32.Load('CM_Get_Device_ID_List_ExW')(pszFilter, Buffer_out, BufferLen, ulFlags, hMachine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_get_device_id_list_sizea
-  public static CM_Get_Device_ID_List_SizeA(pulLen: PULONG, pszFilter: PCSTR | NULL, ulFlags: ULONG): CONFIGRET {
-    return Cfgmgr32.Load('CM_Get_Device_ID_List_SizeA')(pulLen, pszFilter, ulFlags);
+  public static CM_Get_Device_ID_List_SizeA(pulLen_out: PULONG, pszFilter: OPTIONAL<PCSTR>, ulFlags: ULONG): CONFIGRET {
+    return Cfgmgr32.Load('CM_Get_Device_ID_List_SizeA')(pulLen_out, pszFilter, ulFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_get_device_id_list_sizew
-  public static CM_Get_Device_ID_List_SizeW(pulLen: PULONG, pszFilter: PCWSTR | NULL, ulFlags: ULONG): CONFIGRET {
-    return Cfgmgr32.Load('CM_Get_Device_ID_List_SizeW')(pulLen, pszFilter, ulFlags);
+  public static CM_Get_Device_ID_List_SizeW(pulLen_out: PULONG, pszFilter: OPTIONAL<PCWSTR>, ulFlags: ULONG): CONFIGRET {
+    return Cfgmgr32.Load('CM_Get_Device_ID_List_SizeW')(pulLen_out, pszFilter, ulFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_get_device_id_list_size_exa
-  public static CM_Get_Device_ID_List_Size_ExA(pulLen: PULONG, pszFilter: PCSTR | NULL, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
-    return Cfgmgr32.Load('CM_Get_Device_ID_List_Size_ExA')(pulLen, pszFilter, ulFlags, hMachine);
+  public static CM_Get_Device_ID_List_Size_ExA(pulLen_out: PULONG, pszFilter: OPTIONAL<PCSTR>, ulFlags: ULONG, hMachine: OPTIONAL<HMACHINE>): CONFIGRET {
+    return Cfgmgr32.Load('CM_Get_Device_ID_List_Size_ExA')(pulLen_out, pszFilter, ulFlags, hMachine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_get_device_id_list_size_exw
-  public static CM_Get_Device_ID_List_Size_ExW(pulLen: PULONG, pszFilter: PCWSTR | NULL, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
-    return Cfgmgr32.Load('CM_Get_Device_ID_List_Size_ExW')(pulLen, pszFilter, ulFlags, hMachine);
+  public static CM_Get_Device_ID_List_Size_ExW(pulLen_out: PULONG, pszFilter: OPTIONAL<PCWSTR>, ulFlags: ULONG, hMachine: OPTIONAL<HMACHINE>): CONFIGRET {
+    return Cfgmgr32.Load('CM_Get_Device_ID_List_Size_ExW')(pulLen_out, pszFilter, ulFlags, hMachine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_get_device_id_size
-  public static CM_Get_Device_ID_Size(pulLen: PULONG, dnDevInst: DEVINST, ulFlags: ULONG): CONFIGRET {
-    return Cfgmgr32.Load('CM_Get_Device_ID_Size')(pulLen, dnDevInst, ulFlags);
+  public static CM_Get_Device_ID_Size(pulLen_out: PULONG, dnDevInst: DEVINST, ulFlags: ULONG): CONFIGRET {
+    return Cfgmgr32.Load('CM_Get_Device_ID_Size')(pulLen_out, dnDevInst, ulFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_get_device_id_size_ex
-  public static CM_Get_Device_ID_Size_Ex(pulLen: PULONG, dnDevInst: DEVINST, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
-    return Cfgmgr32.Load('CM_Get_Device_ID_Size_Ex')(pulLen, dnDevInst, ulFlags, hMachine);
+  public static CM_Get_Device_ID_Size_Ex(pulLen_out: PULONG, dnDevInst: DEVINST, ulFlags: ULONG, hMachine: OPTIONAL<HMACHINE>): CONFIGRET {
+    return Cfgmgr32.Load('CM_Get_Device_ID_Size_Ex')(pulLen_out, dnDevInst, ulFlags, hMachine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_get_device_interface_aliasa
-  public static CM_Get_Device_Interface_AliasA(pszDeviceInterface: LPCSTR, AliasInterfaceGuid: LPGUID, pszAliasDeviceInterface: LPSTR, pulLength: PULONG, ulFlags: ULONG): CONFIGRET {
-    return Cfgmgr32.Load('CM_Get_Device_Interface_AliasA')(pszDeviceInterface, AliasInterfaceGuid, pszAliasDeviceInterface, pulLength, ulFlags);
+  public static CM_Get_Device_Interface_AliasA(pszDeviceInterface: LPCSTR, AliasInterfaceGuid: LPGUID, pszAliasDeviceInterface_out: LPSTR, pulLength_in_out: PULONG, ulFlags: ULONG): CONFIGRET {
+    return Cfgmgr32.Load('CM_Get_Device_Interface_AliasA')(pszDeviceInterface, AliasInterfaceGuid, pszAliasDeviceInterface_out, pulLength_in_out, ulFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_get_device_interface_aliasw
-  public static CM_Get_Device_Interface_AliasW(pszDeviceInterface: LPCWSTR, AliasInterfaceGuid: LPGUID, pszAliasDeviceInterface: LPWSTR, pulLength: PULONG, ulFlags: ULONG): CONFIGRET {
-    return Cfgmgr32.Load('CM_Get_Device_Interface_AliasW')(pszDeviceInterface, AliasInterfaceGuid, pszAliasDeviceInterface, pulLength, ulFlags);
+  public static CM_Get_Device_Interface_AliasW(pszDeviceInterface: LPCWSTR, AliasInterfaceGuid: LPGUID, pszAliasDeviceInterface_out: LPWSTR, pulLength_in_out: PULONG, ulFlags: ULONG): CONFIGRET {
+    return Cfgmgr32.Load('CM_Get_Device_Interface_AliasW')(pszDeviceInterface, AliasInterfaceGuid, pszAliasDeviceInterface_out, pulLength_in_out, ulFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_get_device_interface_alias_exa
-  public static CM_Get_Device_Interface_Alias_ExA(pszDeviceInterface: LPCSTR, AliasInterfaceGuid: LPGUID, pszAliasDeviceInterface: LPSTR, pulLength: PULONG, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
-    return Cfgmgr32.Load('CM_Get_Device_Interface_Alias_ExA')(pszDeviceInterface, AliasInterfaceGuid, pszAliasDeviceInterface, pulLength, ulFlags, hMachine);
+  public static CM_Get_Device_Interface_Alias_ExA(pszDeviceInterface: LPCSTR, AliasInterfaceGuid: LPGUID, pszAliasDeviceInterface_out: LPSTR, pulLength_in_out: PULONG, ulFlags: ULONG, hMachine: OPTIONAL<HMACHINE>): CONFIGRET {
+    return Cfgmgr32.Load('CM_Get_Device_Interface_Alias_ExA')(pszDeviceInterface, AliasInterfaceGuid, pszAliasDeviceInterface_out, pulLength_in_out, ulFlags, hMachine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_get_device_interface_alias_exw
-  public static CM_Get_Device_Interface_Alias_ExW(pszDeviceInterface: LPCWSTR, AliasInterfaceGuid: LPGUID, pszAliasDeviceInterface: LPWSTR, pulLength: PULONG, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
-    return Cfgmgr32.Load('CM_Get_Device_Interface_Alias_ExW')(pszDeviceInterface, AliasInterfaceGuid, pszAliasDeviceInterface, pulLength, ulFlags, hMachine);
+  public static CM_Get_Device_Interface_Alias_ExW(pszDeviceInterface: LPCWSTR, AliasInterfaceGuid: LPGUID, pszAliasDeviceInterface_out: LPWSTR, pulLength_in_out: PULONG, ulFlags: ULONG, hMachine: OPTIONAL<HMACHINE>): CONFIGRET {
+    return Cfgmgr32.Load('CM_Get_Device_Interface_Alias_ExW')(pszDeviceInterface, AliasInterfaceGuid, pszAliasDeviceInterface_out, pulLength_in_out, ulFlags, hMachine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_get_device_interface_lista
-  public static CM_Get_Device_Interface_ListA(InterfaceClassGuid: LPGUID, pDeviceID: DEVINSTID_A | NULL, Buffer: PSTR, BufferLen: ULONG, ulFlags: ULONG): CONFIGRET {
-    return Cfgmgr32.Load('CM_Get_Device_Interface_ListA')(InterfaceClassGuid, pDeviceID, Buffer, BufferLen, ulFlags);
+  public static CM_Get_Device_Interface_ListA(InterfaceClassGuid: LPGUID, pDeviceID: OPTIONAL<DEVINSTID_A>, Buffer_out: PSTR, BufferLen: ULONG, ulFlags: ULONG): CONFIGRET {
+    return Cfgmgr32.Load('CM_Get_Device_Interface_ListA')(InterfaceClassGuid, pDeviceID, Buffer_out, BufferLen, ulFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_get_device_interface_listw
-  public static CM_Get_Device_Interface_ListW(InterfaceClassGuid: LPGUID, pDeviceID: DEVINSTID_W | NULL, Buffer: PWSTR, BufferLen: ULONG, ulFlags: ULONG): CONFIGRET {
-    return Cfgmgr32.Load('CM_Get_Device_Interface_ListW')(InterfaceClassGuid, pDeviceID, Buffer, BufferLen, ulFlags);
+  public static CM_Get_Device_Interface_ListW(InterfaceClassGuid: LPGUID, pDeviceID: OPTIONAL<DEVINSTID_W>, Buffer_out: PWSTR, BufferLen: ULONG, ulFlags: ULONG): CONFIGRET {
+    return Cfgmgr32.Load('CM_Get_Device_Interface_ListW')(InterfaceClassGuid, pDeviceID, Buffer_out, BufferLen, ulFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_get_device_interface_list_exa
-  public static CM_Get_Device_Interface_List_ExA(InterfaceClassGuid: LPGUID, pDeviceID: DEVINSTID_A | NULL, Buffer: PSTR, BufferLen: ULONG, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
-    return Cfgmgr32.Load('CM_Get_Device_Interface_List_ExA')(InterfaceClassGuid, pDeviceID, Buffer, BufferLen, ulFlags, hMachine);
+  public static CM_Get_Device_Interface_List_ExA(InterfaceClassGuid: LPGUID, pDeviceID: OPTIONAL<DEVINSTID_A>, Buffer_out: PSTR, BufferLen: ULONG, ulFlags: ULONG, hMachine: OPTIONAL<HMACHINE>): CONFIGRET {
+    return Cfgmgr32.Load('CM_Get_Device_Interface_List_ExA')(InterfaceClassGuid, pDeviceID, Buffer_out, BufferLen, ulFlags, hMachine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_get_device_interface_list_exw
-  public static CM_Get_Device_Interface_List_ExW(InterfaceClassGuid: LPGUID, pDeviceID: DEVINSTID_W | NULL, Buffer: PWSTR, BufferLen: ULONG, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
-    return Cfgmgr32.Load('CM_Get_Device_Interface_List_ExW')(InterfaceClassGuid, pDeviceID, Buffer, BufferLen, ulFlags, hMachine);
+  public static CM_Get_Device_Interface_List_ExW(InterfaceClassGuid: LPGUID, pDeviceID: OPTIONAL<DEVINSTID_W>, Buffer_out: PWSTR, BufferLen: ULONG, ulFlags: ULONG, hMachine: OPTIONAL<HMACHINE>): CONFIGRET {
+    return Cfgmgr32.Load('CM_Get_Device_Interface_List_ExW')(InterfaceClassGuid, pDeviceID, Buffer_out, BufferLen, ulFlags, hMachine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_get_device_interface_list_sizea
-  public static CM_Get_Device_Interface_List_SizeA(pulLen: PULONG, InterfaceClassGuid: LPGUID, pDeviceID: DEVINSTID_A | NULL, ulFlags: ULONG): CONFIGRET {
-    return Cfgmgr32.Load('CM_Get_Device_Interface_List_SizeA')(pulLen, InterfaceClassGuid, pDeviceID, ulFlags);
+  public static CM_Get_Device_Interface_List_SizeA(pulLen_out: PULONG, InterfaceClassGuid: LPGUID, pDeviceID: OPTIONAL<DEVINSTID_A>, ulFlags: ULONG): CONFIGRET {
+    return Cfgmgr32.Load('CM_Get_Device_Interface_List_SizeA')(pulLen_out, InterfaceClassGuid, pDeviceID, ulFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_get_device_interface_list_sizew
-  public static CM_Get_Device_Interface_List_SizeW(pulLen: PULONG, InterfaceClassGuid: LPGUID, pDeviceID: DEVINSTID_W | NULL, ulFlags: ULONG): CONFIGRET {
-    return Cfgmgr32.Load('CM_Get_Device_Interface_List_SizeW')(pulLen, InterfaceClassGuid, pDeviceID, ulFlags);
+  public static CM_Get_Device_Interface_List_SizeW(pulLen_out: PULONG, InterfaceClassGuid: LPGUID, pDeviceID: OPTIONAL<DEVINSTID_W>, ulFlags: ULONG): CONFIGRET {
+    return Cfgmgr32.Load('CM_Get_Device_Interface_List_SizeW')(pulLen_out, InterfaceClassGuid, pDeviceID, ulFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_get_device_interface_list_size_exa
-  public static CM_Get_Device_Interface_List_Size_ExA(pulLen: PULONG, InterfaceClassGuid: LPGUID, pDeviceID: DEVINSTID_A | NULL, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
-    return Cfgmgr32.Load('CM_Get_Device_Interface_List_Size_ExA')(pulLen, InterfaceClassGuid, pDeviceID, ulFlags, hMachine);
+  public static CM_Get_Device_Interface_List_Size_ExA(pulLen_out: PULONG, InterfaceClassGuid: LPGUID, pDeviceID: OPTIONAL<DEVINSTID_A>, ulFlags: ULONG, hMachine: OPTIONAL<HMACHINE>): CONFIGRET {
+    return Cfgmgr32.Load('CM_Get_Device_Interface_List_Size_ExA')(pulLen_out, InterfaceClassGuid, pDeviceID, ulFlags, hMachine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_get_device_interface_list_size_exw
-  public static CM_Get_Device_Interface_List_Size_ExW(pulLen: PULONG, InterfaceClassGuid: LPGUID, pDeviceID: DEVINSTID_W | NULL, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
-    return Cfgmgr32.Load('CM_Get_Device_Interface_List_Size_ExW')(pulLen, InterfaceClassGuid, pDeviceID, ulFlags, hMachine);
+  public static CM_Get_Device_Interface_List_Size_ExW(pulLen_out: PULONG, InterfaceClassGuid: LPGUID, pDeviceID: OPTIONAL<DEVINSTID_W>, ulFlags: ULONG, hMachine: OPTIONAL<HMACHINE>): CONFIGRET {
+    return Cfgmgr32.Load('CM_Get_Device_Interface_List_Size_ExW')(pulLen_out, InterfaceClassGuid, pDeviceID, ulFlags, hMachine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_get_device_interface_propertyw
-  public static CM_Get_Device_Interface_PropertyW(pszDeviceInterface: LPCWSTR, PropertyKey: PDEVPROPKEY, PropertyType: PDEVPROPTYPE, PropertyBuffer: PBYTE | NULL, PropertyBufferSize: PULONG, ulFlags: ULONG): CONFIGRET {
-    return Cfgmgr32.Load('CM_Get_Device_Interface_PropertyW')(pszDeviceInterface, PropertyKey, PropertyType, PropertyBuffer, PropertyBufferSize, ulFlags);
+  public static CM_Get_Device_Interface_PropertyW(pszDeviceInterface: LPCWSTR, PropertyKey: PDEVPROPKEY, PropertyType_out: PDEVPROPTYPE, PropertyBuffer_out: OPTIONAL<PBYTE>, PropertyBufferSize_in_out: PULONG, ulFlags: ULONG): CONFIGRET {
+    return Cfgmgr32.Load('CM_Get_Device_Interface_PropertyW')(pszDeviceInterface, PropertyKey, PropertyType_out, PropertyBuffer_out, PropertyBufferSize_in_out, ulFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_get_device_interface_property_exw
   public static CM_Get_Device_Interface_Property_ExW(
     pszDeviceInterface: LPCWSTR,
     PropertyKey: PDEVPROPKEY,
-    PropertyType: PDEVPROPTYPE,
-    PropertyBuffer: PBYTE | NULL,
-    PropertyBufferSize: PULONG,
+    PropertyType_out: PDEVPROPTYPE,
+    PropertyBuffer_out: OPTIONAL<PBYTE>,
+    PropertyBufferSize_in_out: PULONG,
     ulFlags: ULONG,
-    hMachine: HMACHINE | 0n,
+    hMachine: OPTIONAL<HMACHINE>,
   ): CONFIGRET {
-    return Cfgmgr32.Load('CM_Get_Device_Interface_Property_ExW')(pszDeviceInterface, PropertyKey, PropertyType, PropertyBuffer, PropertyBufferSize, ulFlags, hMachine);
+    return Cfgmgr32.Load('CM_Get_Device_Interface_Property_ExW')(pszDeviceInterface, PropertyKey, PropertyType_out, PropertyBuffer_out, PropertyBufferSize_in_out, ulFlags, hMachine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_get_device_interface_property_keysw
-  public static CM_Get_Device_Interface_Property_KeysW(pszDeviceInterface: LPCWSTR, PropertyKeyArray: PDEVPROPKEY | NULL, PropertyKeyCount: PULONG, ulFlags: ULONG): CONFIGRET {
-    return Cfgmgr32.Load('CM_Get_Device_Interface_Property_KeysW')(pszDeviceInterface, PropertyKeyArray, PropertyKeyCount, ulFlags);
+  public static CM_Get_Device_Interface_Property_KeysW(pszDeviceInterface: LPCWSTR, PropertyKeyArray_out: OPTIONAL<PDEVPROPKEY>, PropertyKeyCount_in_out: PULONG, ulFlags: ULONG): CONFIGRET {
+    return Cfgmgr32.Load('CM_Get_Device_Interface_Property_KeysW')(pszDeviceInterface, PropertyKeyArray_out, PropertyKeyCount_in_out, ulFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_get_device_interface_property_keys_exw
-  public static CM_Get_Device_Interface_Property_Keys_ExW(pszDeviceInterface: LPCWSTR, PropertyKeyArray: PDEVPROPKEY | NULL, PropertyKeyCount: PULONG, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
-    return Cfgmgr32.Load('CM_Get_Device_Interface_Property_Keys_ExW')(pszDeviceInterface, PropertyKeyArray, PropertyKeyCount, ulFlags, hMachine);
+  public static CM_Get_Device_Interface_Property_Keys_ExW(pszDeviceInterface: LPCWSTR, PropertyKeyArray_out: OPTIONAL<PDEVPROPKEY>, PropertyKeyCount_in_out: PULONG, ulFlags: ULONG, hMachine: OPTIONAL<HMACHINE>): CONFIGRET {
+    return Cfgmgr32.Load('CM_Get_Device_Interface_Property_Keys_ExW')(pszDeviceInterface, PropertyKeyArray_out, PropertyKeyCount_in_out, ulFlags, hMachine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_get_first_log_conf
-  public static CM_Get_First_Log_Conf(plcLogConf: PLOG_CONF | NULL, dnDevInst: DEVINST, ulFlags: ULONG): CONFIGRET {
-    return Cfgmgr32.Load('CM_Get_First_Log_Conf')(plcLogConf, dnDevInst, ulFlags);
+  public static CM_Get_First_Log_Conf(plcLogConf_out: OPTIONAL<PLOG_CONF>, dnDevInst: DEVINST, ulFlags: ULONG): CONFIGRET {
+    return Cfgmgr32.Load('CM_Get_First_Log_Conf')(plcLogConf_out, dnDevInst, ulFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_get_first_log_conf_ex
-  public static CM_Get_First_Log_Conf_Ex(plcLogConf: PLOG_CONF | NULL, dnDevInst: DEVINST, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
-    return Cfgmgr32.Load('CM_Get_First_Log_Conf_Ex')(plcLogConf, dnDevInst, ulFlags, hMachine);
+  public static CM_Get_First_Log_Conf_Ex(plcLogConf_out: OPTIONAL<PLOG_CONF>, dnDevInst: DEVINST, ulFlags: ULONG, hMachine: OPTIONAL<HMACHINE>): CONFIGRET {
+    return Cfgmgr32.Load('CM_Get_First_Log_Conf_Ex')(plcLogConf_out, dnDevInst, ulFlags, hMachine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_get_global_state
-  public static CM_Get_Global_State(pulState: PULONG, ulFlags: ULONG): CONFIGRET {
-    return Cfgmgr32.Load('CM_Get_Global_State')(pulState, ulFlags);
+  public static CM_Get_Global_State(pulState_out: PULONG, ulFlags: ULONG): CONFIGRET {
+    return Cfgmgr32.Load('CM_Get_Global_State')(pulState_out, ulFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_get_global_state_ex
-  public static CM_Get_Global_State_Ex(pulState: PULONG, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
-    return Cfgmgr32.Load('CM_Get_Global_State_Ex')(pulState, ulFlags, hMachine);
+  public static CM_Get_Global_State_Ex(pulState_out: PULONG, ulFlags: ULONG, hMachine: OPTIONAL<HMACHINE>): CONFIGRET {
+    return Cfgmgr32.Load('CM_Get_Global_State_Ex')(pulState_out, ulFlags, hMachine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_get_hw_prof_flagsa
-  public static CM_Get_HW_Prof_FlagsA(pDeviceID: DEVINSTID_A, ulHardwareProfile: ULONG, pulValue: PULONG, ulFlags: ULONG): CONFIGRET {
-    return Cfgmgr32.Load('CM_Get_HW_Prof_FlagsA')(pDeviceID, ulHardwareProfile, pulValue, ulFlags);
+  public static CM_Get_HW_Prof_FlagsA(pDeviceID: DEVINSTID_A, ulHardwareProfile: ULONG, pulValue_out: PULONG, ulFlags: ULONG): CONFIGRET {
+    return Cfgmgr32.Load('CM_Get_HW_Prof_FlagsA')(pDeviceID, ulHardwareProfile, pulValue_out, ulFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_get_hw_prof_flagsw
-  public static CM_Get_HW_Prof_FlagsW(pDeviceID: DEVINSTID_W, ulHardwareProfile: ULONG, pulValue: PULONG, ulFlags: ULONG): CONFIGRET {
-    return Cfgmgr32.Load('CM_Get_HW_Prof_FlagsW')(pDeviceID, ulHardwareProfile, pulValue, ulFlags);
+  public static CM_Get_HW_Prof_FlagsW(pDeviceID: DEVINSTID_W, ulHardwareProfile: ULONG, pulValue_out: PULONG, ulFlags: ULONG): CONFIGRET {
+    return Cfgmgr32.Load('CM_Get_HW_Prof_FlagsW')(pDeviceID, ulHardwareProfile, pulValue_out, ulFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_get_hw_prof_flags_exa
-  public static CM_Get_HW_Prof_Flags_ExA(pDeviceID: DEVINSTID_A, ulHardwareProfile: ULONG, pulValue: PULONG, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
-    return Cfgmgr32.Load('CM_Get_HW_Prof_Flags_ExA')(pDeviceID, ulHardwareProfile, pulValue, ulFlags, hMachine);
+  public static CM_Get_HW_Prof_Flags_ExA(pDeviceID: DEVINSTID_A, ulHardwareProfile: ULONG, pulValue_out: PULONG, ulFlags: ULONG, hMachine: OPTIONAL<HMACHINE>): CONFIGRET {
+    return Cfgmgr32.Load('CM_Get_HW_Prof_Flags_ExA')(pDeviceID, ulHardwareProfile, pulValue_out, ulFlags, hMachine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_get_hw_prof_flags_exw
-  public static CM_Get_HW_Prof_Flags_ExW(pDeviceID: DEVINSTID_W, ulHardwareProfile: ULONG, pulValue: PULONG, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
-    return Cfgmgr32.Load('CM_Get_HW_Prof_Flags_ExW')(pDeviceID, ulHardwareProfile, pulValue, ulFlags, hMachine);
+  public static CM_Get_HW_Prof_Flags_ExW(pDeviceID: DEVINSTID_W, ulHardwareProfile: ULONG, pulValue_out: PULONG, ulFlags: ULONG, hMachine: OPTIONAL<HMACHINE>): CONFIGRET {
+    return Cfgmgr32.Load('CM_Get_HW_Prof_Flags_ExW')(pDeviceID, ulHardwareProfile, pulValue_out, ulFlags, hMachine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_get_hardware_profile_infoa
-  public static CM_Get_Hardware_Profile_InfoA(ulIndex: ULONG, pHWProfileInfo: PHWPROFILEINFO_A, ulFlags: ULONG): CONFIGRET {
-    return Cfgmgr32.Load('CM_Get_Hardware_Profile_InfoA')(ulIndex, pHWProfileInfo, ulFlags);
+  public static CM_Get_Hardware_Profile_InfoA(ulIndex: ULONG, pHWProfileInfo_out: PHWPROFILEINFO_A, ulFlags: ULONG): CONFIGRET {
+    return Cfgmgr32.Load('CM_Get_Hardware_Profile_InfoA')(ulIndex, pHWProfileInfo_out, ulFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_get_hardware_profile_infow
-  public static CM_Get_Hardware_Profile_InfoW(ulIndex: ULONG, pHWProfileInfo: PHWPROFILEINFO_W, ulFlags: ULONG): CONFIGRET {
-    return Cfgmgr32.Load('CM_Get_Hardware_Profile_InfoW')(ulIndex, pHWProfileInfo, ulFlags);
+  public static CM_Get_Hardware_Profile_InfoW(ulIndex: ULONG, pHWProfileInfo_out: PHWPROFILEINFO_W, ulFlags: ULONG): CONFIGRET {
+    return Cfgmgr32.Load('CM_Get_Hardware_Profile_InfoW')(ulIndex, pHWProfileInfo_out, ulFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_get_hardware_profile_info_exa
-  public static CM_Get_Hardware_Profile_Info_ExA(ulIndex: ULONG, pHWProfileInfo: PHWPROFILEINFO_A, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
-    return Cfgmgr32.Load('CM_Get_Hardware_Profile_Info_ExA')(ulIndex, pHWProfileInfo, ulFlags, hMachine);
+  public static CM_Get_Hardware_Profile_Info_ExA(ulIndex: ULONG, pHWProfileInfo_out: PHWPROFILEINFO_A, ulFlags: ULONG, hMachine: OPTIONAL<HMACHINE>): CONFIGRET {
+    return Cfgmgr32.Load('CM_Get_Hardware_Profile_Info_ExA')(ulIndex, pHWProfileInfo_out, ulFlags, hMachine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_get_hardware_profile_info_exw
-  public static CM_Get_Hardware_Profile_Info_ExW(ulIndex: ULONG, pHWProfileInfo: PHWPROFILEINFO_W, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
-    return Cfgmgr32.Load('CM_Get_Hardware_Profile_Info_ExW')(ulIndex, pHWProfileInfo, ulFlags, hMachine);
+  public static CM_Get_Hardware_Profile_Info_ExW(ulIndex: ULONG, pHWProfileInfo_out: PHWPROFILEINFO_W, ulFlags: ULONG, hMachine: OPTIONAL<HMACHINE>): CONFIGRET {
+    return Cfgmgr32.Load('CM_Get_Hardware_Profile_Info_ExW')(ulIndex, pHWProfileInfo_out, ulFlags, hMachine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_get_log_conf_priority
-  public static CM_Get_Log_Conf_Priority(lcLogConf: LOG_CONF, pPriority: PPRIORITY, ulFlags: ULONG): CONFIGRET {
-    return Cfgmgr32.Load('CM_Get_Log_Conf_Priority')(lcLogConf, pPriority, ulFlags);
+  public static CM_Get_Log_Conf_Priority(lcLogConf: LOG_CONF, pPriority_out: PPRIORITY, ulFlags: ULONG): CONFIGRET {
+    return Cfgmgr32.Load('CM_Get_Log_Conf_Priority')(lcLogConf, pPriority_out, ulFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_get_log_conf_priority_ex
-  public static CM_Get_Log_Conf_Priority_Ex(lcLogConf: LOG_CONF, pPriority: PPRIORITY, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
-    return Cfgmgr32.Load('CM_Get_Log_Conf_Priority_Ex')(lcLogConf, pPriority, ulFlags, hMachine);
+  public static CM_Get_Log_Conf_Priority_Ex(lcLogConf: LOG_CONF, pPriority_out: PPRIORITY, ulFlags: ULONG, hMachine: OPTIONAL<HMACHINE>): CONFIGRET {
+    return Cfgmgr32.Load('CM_Get_Log_Conf_Priority_Ex')(lcLogConf, pPriority_out, ulFlags, hMachine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_get_next_log_conf
-  public static CM_Get_Next_Log_Conf(plcLogConf: PLOG_CONF | NULL, lcLogConf: LOG_CONF, ulFlags: ULONG): CONFIGRET {
-    return Cfgmgr32.Load('CM_Get_Next_Log_Conf')(plcLogConf, lcLogConf, ulFlags);
+  public static CM_Get_Next_Log_Conf(plcLogConf_out: OPTIONAL<PLOG_CONF>, lcLogConf: LOG_CONF, ulFlags: ULONG): CONFIGRET {
+    return Cfgmgr32.Load('CM_Get_Next_Log_Conf')(plcLogConf_out, lcLogConf, ulFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_get_next_log_conf_ex
-  public static CM_Get_Next_Log_Conf_Ex(plcLogConf: PLOG_CONF | NULL, lcLogConf: LOG_CONF, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
-    return Cfgmgr32.Load('CM_Get_Next_Log_Conf_Ex')(plcLogConf, lcLogConf, ulFlags, hMachine);
+  public static CM_Get_Next_Log_Conf_Ex(plcLogConf_out: OPTIONAL<PLOG_CONF>, lcLogConf: LOG_CONF, ulFlags: ULONG, hMachine: OPTIONAL<HMACHINE>): CONFIGRET {
+    return Cfgmgr32.Load('CM_Get_Next_Log_Conf_Ex')(plcLogConf_out, lcLogConf, ulFlags, hMachine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_get_next_res_des
-  public static CM_Get_Next_Res_Des(prdResDes: PRES_DES, rdResDes: RES_DES, ForResource: RESOURCEID, pResourceID: PRESOURCEID | NULL, ulFlags: ULONG): CONFIGRET {
-    return Cfgmgr32.Load('CM_Get_Next_Res_Des')(prdResDes, rdResDes, ForResource, pResourceID, ulFlags);
+  public static CM_Get_Next_Res_Des(prdResDes_out: PRES_DES, rdResDes: RES_DES, ForResource: RESOURCEID, pResourceID_out: OPTIONAL<PRESOURCEID>, ulFlags: ULONG): CONFIGRET {
+    return Cfgmgr32.Load('CM_Get_Next_Res_Des')(prdResDes_out, rdResDes, ForResource, pResourceID_out, ulFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_get_next_res_des_ex
-  public static CM_Get_Next_Res_Des_Ex(prdResDes: PRES_DES, rdResDes: RES_DES, ForResource: RESOURCEID, pResourceID: PRESOURCEID | NULL, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
-    return Cfgmgr32.Load('CM_Get_Next_Res_Des_Ex')(prdResDes, rdResDes, ForResource, pResourceID, ulFlags, hMachine);
+  public static CM_Get_Next_Res_Des_Ex(prdResDes_out: PRES_DES, rdResDes: RES_DES, ForResource: RESOURCEID, pResourceID_out: OPTIONAL<PRESOURCEID>, ulFlags: ULONG, hMachine: OPTIONAL<HMACHINE>): CONFIGRET {
+    return Cfgmgr32.Load('CM_Get_Next_Res_Des_Ex')(prdResDes_out, rdResDes, ForResource, pResourceID_out, ulFlags, hMachine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_get_parent
-  public static CM_Get_Parent(pdnDevInst: PDEVINST, dnDevInst: DEVINST, ulFlags: ULONG): CONFIGRET {
-    return Cfgmgr32.Load('CM_Get_Parent')(pdnDevInst, dnDevInst, ulFlags);
+  public static CM_Get_Parent(pdnDevInst_out: PDEVINST, dnDevInst: DEVINST, ulFlags: ULONG): CONFIGRET {
+    return Cfgmgr32.Load('CM_Get_Parent')(pdnDevInst_out, dnDevInst, ulFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_get_parent_ex
-  public static CM_Get_Parent_Ex(pdnDevInst: PDEVINST, dnDevInst: DEVINST, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
-    return Cfgmgr32.Load('CM_Get_Parent_Ex')(pdnDevInst, dnDevInst, ulFlags, hMachine);
+  public static CM_Get_Parent_Ex(pdnDevInst_out: PDEVINST, dnDevInst: DEVINST, ulFlags: ULONG, hMachine: OPTIONAL<HMACHINE>): CONFIGRET {
+    return Cfgmgr32.Load('CM_Get_Parent_Ex')(pdnDevInst_out, dnDevInst, ulFlags, hMachine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_get_res_des_data
-  public static CM_Get_Res_Des_Data(rdResDes: RES_DES, Buffer: PVOID, BufferLen: ULONG, ulFlags: ULONG): CONFIGRET {
-    return Cfgmgr32.Load('CM_Get_Res_Des_Data')(rdResDes, Buffer, BufferLen, ulFlags);
+  public static CM_Get_Res_Des_Data(rdResDes: RES_DES, Buffer_out: PVOID, BufferLen: ULONG, ulFlags: ULONG): CONFIGRET {
+    return Cfgmgr32.Load('CM_Get_Res_Des_Data')(rdResDes, Buffer_out, BufferLen, ulFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_get_res_des_data_ex
-  public static CM_Get_Res_Des_Data_Ex(rdResDes: RES_DES, Buffer: PVOID, BufferLen: ULONG, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
-    return Cfgmgr32.Load('CM_Get_Res_Des_Data_Ex')(rdResDes, Buffer, BufferLen, ulFlags, hMachine);
+  public static CM_Get_Res_Des_Data_Ex(rdResDes: RES_DES, Buffer_out: PVOID, BufferLen: ULONG, ulFlags: ULONG, hMachine: OPTIONAL<HMACHINE>): CONFIGRET {
+    return Cfgmgr32.Load('CM_Get_Res_Des_Data_Ex')(rdResDes, Buffer_out, BufferLen, ulFlags, hMachine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_get_res_des_data_size
-  public static CM_Get_Res_Des_Data_Size(pulSize: PULONG, rdResDes: RES_DES, ulFlags: ULONG): CONFIGRET {
-    return Cfgmgr32.Load('CM_Get_Res_Des_Data_Size')(pulSize, rdResDes, ulFlags);
+  public static CM_Get_Res_Des_Data_Size(pulSize_out: PULONG, rdResDes: RES_DES, ulFlags: ULONG): CONFIGRET {
+    return Cfgmgr32.Load('CM_Get_Res_Des_Data_Size')(pulSize_out, rdResDes, ulFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_get_res_des_data_size_ex
-  public static CM_Get_Res_Des_Data_Size_Ex(pulSize: PULONG, rdResDes: RES_DES, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
-    return Cfgmgr32.Load('CM_Get_Res_Des_Data_Size_Ex')(pulSize, rdResDes, ulFlags, hMachine);
+  public static CM_Get_Res_Des_Data_Size_Ex(pulSize_out: PULONG, rdResDes: RES_DES, ulFlags: ULONG, hMachine: OPTIONAL<HMACHINE>): CONFIGRET {
+    return Cfgmgr32.Load('CM_Get_Res_Des_Data_Size_Ex')(pulSize_out, rdResDes, ulFlags, hMachine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_get_resource_conflict_count
-  public static CM_Get_Resource_Conflict_Count(clConflictList: CONFLICT_LIST, pulCount: PULONG): CONFIGRET {
-    return Cfgmgr32.Load('CM_Get_Resource_Conflict_Count')(clConflictList, pulCount);
+  public static CM_Get_Resource_Conflict_Count(clConflictList: CONFLICT_LIST, pulCount_out: PULONG): CONFIGRET {
+    return Cfgmgr32.Load('CM_Get_Resource_Conflict_Count')(clConflictList, pulCount_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_get_resource_conflict_detailsa
-  public static CM_Get_Resource_Conflict_DetailsA(clConflictList: CONFLICT_LIST, ulIndex: ULONG, pConflictDetails: PCONFLICT_DETAILS_A): CONFIGRET {
-    return Cfgmgr32.Load('CM_Get_Resource_Conflict_DetailsA')(clConflictList, ulIndex, pConflictDetails);
+  public static CM_Get_Resource_Conflict_DetailsA(clConflictList: CONFLICT_LIST, ulIndex: ULONG, pConflictDetails_in_out: PCONFLICT_DETAILS_A): CONFIGRET {
+    return Cfgmgr32.Load('CM_Get_Resource_Conflict_DetailsA')(clConflictList, ulIndex, pConflictDetails_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_get_resource_conflict_detailsw
-  public static CM_Get_Resource_Conflict_DetailsW(clConflictList: CONFLICT_LIST, ulIndex: ULONG, pConflictDetails: PCONFLICT_DETAILS_W): CONFIGRET {
-    return Cfgmgr32.Load('CM_Get_Resource_Conflict_DetailsW')(clConflictList, ulIndex, pConflictDetails);
+  public static CM_Get_Resource_Conflict_DetailsW(clConflictList: CONFLICT_LIST, ulIndex: ULONG, pConflictDetails_in_out: PCONFLICT_DETAILS_W): CONFIGRET {
+    return Cfgmgr32.Load('CM_Get_Resource_Conflict_DetailsW')(clConflictList, ulIndex, pConflictDetails_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_get_sibling
-  public static CM_Get_Sibling(pdnDevInst: PDEVINST, dnDevInst: DEVINST, ulFlags: ULONG): CONFIGRET {
-    return Cfgmgr32.Load('CM_Get_Sibling')(pdnDevInst, dnDevInst, ulFlags);
+  public static CM_Get_Sibling(pdnDevInst_out: PDEVINST, dnDevInst: DEVINST, ulFlags: ULONG): CONFIGRET {
+    return Cfgmgr32.Load('CM_Get_Sibling')(pdnDevInst_out, dnDevInst, ulFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_get_sibling_ex
-  public static CM_Get_Sibling_Ex(pdnDevInst: PDEVINST, dnDevInst: DEVINST, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
-    return Cfgmgr32.Load('CM_Get_Sibling_Ex')(pdnDevInst, dnDevInst, ulFlags, hMachine);
+  public static CM_Get_Sibling_Ex(pdnDevInst_out: PDEVINST, dnDevInst: DEVINST, ulFlags: ULONG, hMachine: OPTIONAL<HMACHINE>): CONFIGRET {
+    return Cfgmgr32.Load('CM_Get_Sibling_Ex')(pdnDevInst_out, dnDevInst, ulFlags, hMachine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_get_version
@@ -1094,13 +1142,13 @@ class Cfgmgr32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_get_version_ex
-  public static CM_Get_Version_Ex(hMachine: HMACHINE | 0n): WORD {
+  public static CM_Get_Version_Ex(hMachine: OPTIONAL<HMACHINE>): WORD {
     return Cfgmgr32.Load('CM_Get_Version_Ex')(hMachine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_import_powerscheme
-  public static CM_Import_PowerScheme(ImportFileNamePath: LPCWSTR, DestinationSchemeGuid: PVOID, Error: PDWORD): CONFIGRET {
-    return Cfgmgr32.Load('CM_Import_PowerScheme')(ImportFileNamePath, DestinationSchemeGuid, Error);
+  public static CM_Import_PowerScheme(ImportFileNamePath: LPCWSTR, DestinationSchemeGuid_in_out: PVOID, Error_out: PDWORD): CONFIGRET {
+    return Cfgmgr32.Load('CM_Import_PowerScheme')(ImportFileNamePath, DestinationSchemeGuid_in_out, Error_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_intersect_range_list
@@ -1114,13 +1162,13 @@ class Cfgmgr32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_is_dock_station_present
-  public static CM_Is_Dock_Station_Present(pbPresent: PBOOL): CONFIGRET {
-    return Cfgmgr32.Load('CM_Is_Dock_Station_Present')(pbPresent);
+  public static CM_Is_Dock_Station_Present(pbPresent_out: PBOOL): CONFIGRET {
+    return Cfgmgr32.Load('CM_Is_Dock_Station_Present')(pbPresent_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_is_dock_station_present_ex
-  public static CM_Is_Dock_Station_Present_Ex(pbPresent: PBOOL, hMachine: HMACHINE | 0n): CONFIGRET {
-    return Cfgmgr32.Load('CM_Is_Dock_Station_Present_Ex')(pbPresent, hMachine);
+  public static CM_Is_Dock_Station_Present_Ex(pbPresent_out: PBOOL, hMachine: OPTIONAL<HMACHINE>): CONFIGRET {
+    return Cfgmgr32.Load('CM_Is_Dock_Station_Present_Ex')(pbPresent_out, hMachine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_is_version_available
@@ -1129,28 +1177,28 @@ class Cfgmgr32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_is_version_available_ex
-  public static CM_Is_Version_Available_Ex(wVersion: WORD, hMachine: HMACHINE | 0n): BOOL {
+  public static CM_Is_Version_Available_Ex(wVersion: WORD, hMachine: OPTIONAL<HMACHINE>): BOOL {
     return Cfgmgr32.Load('CM_Is_Version_Available_Ex')(wVersion, hMachine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_locate_devnodea
-  public static CM_Locate_DevNodeA(pdnDevInst: PDEVINST, pDeviceID: DEVINSTID_A | NULL, ulFlags: ULONG): CONFIGRET {
-    return Cfgmgr32.Load('CM_Locate_DevNodeA')(pdnDevInst, pDeviceID, ulFlags);
+  public static CM_Locate_DevNodeA(pdnDevInst_out: PDEVINST, pDeviceID: OPTIONAL<DEVINSTID_A>, ulFlags: ULONG): CONFIGRET {
+    return Cfgmgr32.Load('CM_Locate_DevNodeA')(pdnDevInst_out, pDeviceID, ulFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_locate_devnodew
-  public static CM_Locate_DevNodeW(pdnDevInst: PDEVINST, pDeviceID: DEVINSTID_W | NULL, ulFlags: ULONG): CONFIGRET {
-    return Cfgmgr32.Load('CM_Locate_DevNodeW')(pdnDevInst, pDeviceID, ulFlags);
+  public static CM_Locate_DevNodeW(pdnDevInst_out: PDEVINST, pDeviceID: OPTIONAL<DEVINSTID_W>, ulFlags: ULONG): CONFIGRET {
+    return Cfgmgr32.Load('CM_Locate_DevNodeW')(pdnDevInst_out, pDeviceID, ulFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_locate_devnode_exa
-  public static CM_Locate_DevNode_ExA(pdnDevInst: PDEVINST, pDeviceID: DEVINSTID_A | NULL, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
-    return Cfgmgr32.Load('CM_Locate_DevNode_ExA')(pdnDevInst, pDeviceID, ulFlags, hMachine);
+  public static CM_Locate_DevNode_ExA(pdnDevInst_out: PDEVINST, pDeviceID: OPTIONAL<DEVINSTID_A>, ulFlags: ULONG, hMachine: OPTIONAL<HMACHINE>): CONFIGRET {
+    return Cfgmgr32.Load('CM_Locate_DevNode_ExA')(pdnDevInst_out, pDeviceID, ulFlags, hMachine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_locate_devnode_exw
-  public static CM_Locate_DevNode_ExW(pdnDevInst: PDEVINST, pDeviceID: DEVINSTID_W | NULL, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
-    return Cfgmgr32.Load('CM_Locate_DevNode_ExW')(pdnDevInst, pDeviceID, ulFlags, hMachine);
+  public static CM_Locate_DevNode_ExW(pdnDevInst_out: PDEVINST, pDeviceID: OPTIONAL<DEVINSTID_W>, ulFlags: ULONG, hMachine: OPTIONAL<HMACHINE>): CONFIGRET {
+    return Cfgmgr32.Load('CM_Locate_DevNode_ExW')(pdnDevInst_out, pDeviceID, ulFlags, hMachine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_mapcrtowin32err
@@ -1164,13 +1212,13 @@ class Cfgmgr32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_modify_res_des
-  public static CM_Modify_Res_Des(prdResDes: PRES_DES, rdResDes: RES_DES, ResourceID: RESOURCEID, ResourceData: PCVOID, ResourceLen: ULONG, ulFlags: ULONG): CONFIGRET {
-    return Cfgmgr32.Load('CM_Modify_Res_Des')(prdResDes, rdResDes, ResourceID, ResourceData, ResourceLen, ulFlags);
+  public static CM_Modify_Res_Des(prdResDes_out: PRES_DES, rdResDes: RES_DES, ResourceID: RESOURCEID, ResourceData: PCVOID, ResourceLen: ULONG, ulFlags: ULONG): CONFIGRET {
+    return Cfgmgr32.Load('CM_Modify_Res_Des')(prdResDes_out, rdResDes, ResourceID, ResourceData, ResourceLen, ulFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_modify_res_des_ex
-  public static CM_Modify_Res_Des_Ex(prdResDes: PRES_DES, rdResDes: RES_DES, ResourceID: RESOURCEID, ResourceData: PCVOID, ResourceLen: ULONG, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
-    return Cfgmgr32.Load('CM_Modify_Res_Des_Ex')(prdResDes, rdResDes, ResourceID, ResourceData, ResourceLen, ulFlags, hMachine);
+  public static CM_Modify_Res_Des_Ex(prdResDes_out: PRES_DES, rdResDes: RES_DES, ResourceID: RESOURCEID, ResourceData: PCVOID, ResourceLen: ULONG, ulFlags: ULONG, hMachine: OPTIONAL<HMACHINE>): CONFIGRET {
+    return Cfgmgr32.Load('CM_Modify_Res_Des_Ex')(prdResDes_out, rdResDes, ResourceID, ResourceData, ResourceLen, ulFlags, hMachine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_move_devnode
@@ -1179,103 +1227,103 @@ class Cfgmgr32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_move_devnode_ex
-  public static CM_Move_DevNode_Ex(dnFromDevInst: DEVINST, dnToDevInst: DEVINST, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
+  public static CM_Move_DevNode_Ex(dnFromDevInst: DEVINST, dnToDevInst: DEVINST, ulFlags: ULONG, hMachine: OPTIONAL<HMACHINE>): CONFIGRET {
     return Cfgmgr32.Load('CM_Move_DevNode_Ex')(dnFromDevInst, dnToDevInst, ulFlags, hMachine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_next_range
-  public static CM_Next_Range(preElement: PRANGE_ELEMENT, pullStart: PDWORDLONG, pullEnd: PDWORDLONG, ulFlags: ULONG): CONFIGRET {
-    return Cfgmgr32.Load('CM_Next_Range')(preElement, pullStart, pullEnd, ulFlags);
+  public static CM_Next_Range(preElement_in_out: PRANGE_ELEMENT, pullStart_out: PDWORDLONG, pullEnd_out: PDWORDLONG, ulFlags: ULONG): CONFIGRET {
+    return Cfgmgr32.Load('CM_Next_Range')(preElement_in_out, pullStart_out, pullEnd_out, ulFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_open_class_keya
-  public static CM_Open_Class_KeyA(ClassGuid: LPGUID | NULL, pszClassName: LPCSTR | NULL, samDesired: REGSAM, Disposition: REGDISPOSITION, phkClass: PHKEY, ulFlags: ULONG): CONFIGRET {
-    return Cfgmgr32.Load('CM_Open_Class_KeyA')(ClassGuid, pszClassName, samDesired, Disposition, phkClass, ulFlags);
+  public static CM_Open_Class_KeyA(ClassGuid: OPTIONAL<LPGUID>, pszClassName: OPTIONAL<LPCSTR>, samDesired: REGSAM, Disposition: REGDISPOSITION, phkClass_out: PHKEY, ulFlags: ULONG): CONFIGRET {
+    return Cfgmgr32.Load('CM_Open_Class_KeyA')(ClassGuid, pszClassName, samDesired, Disposition, phkClass_out, ulFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_open_class_keyw
-  public static CM_Open_Class_KeyW(ClassGuid: LPGUID | NULL, pszClassName: LPCWSTR | NULL, samDesired: REGSAM, Disposition: REGDISPOSITION, phkClass: PHKEY, ulFlags: ULONG): CONFIGRET {
-    return Cfgmgr32.Load('CM_Open_Class_KeyW')(ClassGuid, pszClassName, samDesired, Disposition, phkClass, ulFlags);
+  public static CM_Open_Class_KeyW(ClassGuid: OPTIONAL<LPGUID>, pszClassName: OPTIONAL<LPCWSTR>, samDesired: REGSAM, Disposition: REGDISPOSITION, phkClass_out: PHKEY, ulFlags: ULONG): CONFIGRET {
+    return Cfgmgr32.Load('CM_Open_Class_KeyW')(ClassGuid, pszClassName, samDesired, Disposition, phkClass_out, ulFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_open_class_key_exa
-  public static CM_Open_Class_Key_ExA(ClassGuid: LPGUID | NULL, pszClassName: LPCSTR | NULL, samDesired: REGSAM, Disposition: REGDISPOSITION, phkClass: PHKEY, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
-    return Cfgmgr32.Load('CM_Open_Class_Key_ExA')(ClassGuid, pszClassName, samDesired, Disposition, phkClass, ulFlags, hMachine);
+  public static CM_Open_Class_Key_ExA(ClassGuid: OPTIONAL<LPGUID>, pszClassName: OPTIONAL<LPCSTR>, samDesired: REGSAM, Disposition: REGDISPOSITION, phkClass_out: PHKEY, ulFlags: ULONG, hMachine: OPTIONAL<HMACHINE>): CONFIGRET {
+    return Cfgmgr32.Load('CM_Open_Class_Key_ExA')(ClassGuid, pszClassName, samDesired, Disposition, phkClass_out, ulFlags, hMachine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_open_class_key_exw
-  public static CM_Open_Class_Key_ExW(ClassGuid: LPGUID | NULL, pszClassName: LPCWSTR | NULL, samDesired: REGSAM, Disposition: REGDISPOSITION, phkClass: PHKEY, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
-    return Cfgmgr32.Load('CM_Open_Class_Key_ExW')(ClassGuid, pszClassName, samDesired, Disposition, phkClass, ulFlags, hMachine);
+  public static CM_Open_Class_Key_ExW(ClassGuid: OPTIONAL<LPGUID>, pszClassName: OPTIONAL<LPCWSTR>, samDesired: REGSAM, Disposition: REGDISPOSITION, phkClass_out: PHKEY, ulFlags: ULONG, hMachine: OPTIONAL<HMACHINE>): CONFIGRET {
+    return Cfgmgr32.Load('CM_Open_Class_Key_ExW')(ClassGuid, pszClassName, samDesired, Disposition, phkClass_out, ulFlags, hMachine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_open_devnode_key
-  public static CM_Open_DevNode_Key(dnDevNode: DEVNODE, samDesired: REGSAM, ulHardwareProfile: ULONG, Disposition: REGDISPOSITION, phkDevice: PHKEY, ulFlags: ULONG): CONFIGRET {
-    return Cfgmgr32.Load('CM_Open_DevNode_Key')(dnDevNode, samDesired, ulHardwareProfile, Disposition, phkDevice, ulFlags);
+  public static CM_Open_DevNode_Key(dnDevNode: DEVNODE, samDesired: REGSAM, ulHardwareProfile: ULONG, Disposition: REGDISPOSITION, phkDevice_out: PHKEY, ulFlags: ULONG): CONFIGRET {
+    return Cfgmgr32.Load('CM_Open_DevNode_Key')(dnDevNode, samDesired, ulHardwareProfile, Disposition, phkDevice_out, ulFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_open_devnode_key_ex
-  public static CM_Open_DevNode_Key_Ex(dnDevNode: DEVNODE, samDesired: REGSAM, ulHardwareProfile: ULONG, Disposition: REGDISPOSITION, phkDevice: PHKEY, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
-    return Cfgmgr32.Load('CM_Open_DevNode_Key_Ex')(dnDevNode, samDesired, ulHardwareProfile, Disposition, phkDevice, ulFlags, hMachine);
+  public static CM_Open_DevNode_Key_Ex(dnDevNode: DEVNODE, samDesired: REGSAM, ulHardwareProfile: ULONG, Disposition: REGDISPOSITION, phkDevice_out: PHKEY, ulFlags: ULONG, hMachine: OPTIONAL<HMACHINE>): CONFIGRET {
+    return Cfgmgr32.Load('CM_Open_DevNode_Key_Ex')(dnDevNode, samDesired, ulHardwareProfile, Disposition, phkDevice_out, ulFlags, hMachine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_open_device_interface_keya
-  public static CM_Open_Device_Interface_KeyA(pszDeviceInterface: LPCSTR, samDesired: REGSAM, Disposition: REGDISPOSITION, phkDeviceInterface: PHKEY, ulFlags: ULONG): CONFIGRET {
-    return Cfgmgr32.Load('CM_Open_Device_Interface_KeyA')(pszDeviceInterface, samDesired, Disposition, phkDeviceInterface, ulFlags);
+  public static CM_Open_Device_Interface_KeyA(pszDeviceInterface: LPCSTR, samDesired: REGSAM, Disposition: REGDISPOSITION, phkDeviceInterface_out: PHKEY, ulFlags: ULONG): CONFIGRET {
+    return Cfgmgr32.Load('CM_Open_Device_Interface_KeyA')(pszDeviceInterface, samDesired, Disposition, phkDeviceInterface_out, ulFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_open_device_interface_keyw
-  public static CM_Open_Device_Interface_KeyW(pszDeviceInterface: LPCWSTR, samDesired: REGSAM, Disposition: REGDISPOSITION, phkDeviceInterface: PHKEY, ulFlags: ULONG): CONFIGRET {
-    return Cfgmgr32.Load('CM_Open_Device_Interface_KeyW')(pszDeviceInterface, samDesired, Disposition, phkDeviceInterface, ulFlags);
+  public static CM_Open_Device_Interface_KeyW(pszDeviceInterface: LPCWSTR, samDesired: REGSAM, Disposition: REGDISPOSITION, phkDeviceInterface_out: PHKEY, ulFlags: ULONG): CONFIGRET {
+    return Cfgmgr32.Load('CM_Open_Device_Interface_KeyW')(pszDeviceInterface, samDesired, Disposition, phkDeviceInterface_out, ulFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_open_device_interface_key_exa
-  public static CM_Open_Device_Interface_Key_ExA(pszDeviceInterface: LPCSTR, samDesired: REGSAM, Disposition: REGDISPOSITION, phkDeviceInterface: PHKEY, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
-    return Cfgmgr32.Load('CM_Open_Device_Interface_Key_ExA')(pszDeviceInterface, samDesired, Disposition, phkDeviceInterface, ulFlags, hMachine);
+  public static CM_Open_Device_Interface_Key_ExA(pszDeviceInterface: LPCSTR, samDesired: REGSAM, Disposition: REGDISPOSITION, phkDeviceInterface_out: PHKEY, ulFlags: ULONG, hMachine: OPTIONAL<HMACHINE>): CONFIGRET {
+    return Cfgmgr32.Load('CM_Open_Device_Interface_Key_ExA')(pszDeviceInterface, samDesired, Disposition, phkDeviceInterface_out, ulFlags, hMachine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_open_device_interface_key_exw
-  public static CM_Open_Device_Interface_Key_ExW(pszDeviceInterface: LPCWSTR, samDesired: REGSAM, Disposition: REGDISPOSITION, phkDeviceInterface: PHKEY, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
-    return Cfgmgr32.Load('CM_Open_Device_Interface_Key_ExW')(pszDeviceInterface, samDesired, Disposition, phkDeviceInterface, ulFlags, hMachine);
+  public static CM_Open_Device_Interface_Key_ExW(pszDeviceInterface: LPCWSTR, samDesired: REGSAM, Disposition: REGDISPOSITION, phkDeviceInterface_out: PHKEY, ulFlags: ULONG, hMachine: OPTIONAL<HMACHINE>): CONFIGRET {
+    return Cfgmgr32.Load('CM_Open_Device_Interface_Key_ExW')(pszDeviceInterface, samDesired, Disposition, phkDeviceInterface_out, ulFlags, hMachine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_query_and_remove_subtreea
-  public static CM_Query_And_Remove_SubTreeA(dnAncestor: DEVINST, pVetoType: PPNP_VETO_TYPE | NULL, pszVetoName: LPSTR | NULL, ulNameLength: ULONG, ulFlags: ULONG): CONFIGRET {
-    return Cfgmgr32.Load('CM_Query_And_Remove_SubTreeA')(dnAncestor, pVetoType, pszVetoName, ulNameLength, ulFlags);
+  public static CM_Query_And_Remove_SubTreeA(dnAncestor: DEVINST, pVetoType_out: OPTIONAL<PPNP_VETO_TYPE>, pszVetoName_out: OPTIONAL<LPSTR>, ulNameLength: ULONG, ulFlags: ULONG): CONFIGRET {
+    return Cfgmgr32.Load('CM_Query_And_Remove_SubTreeA')(dnAncestor, pVetoType_out, pszVetoName_out, ulNameLength, ulFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_query_and_remove_subtreew
-  public static CM_Query_And_Remove_SubTreeW(dnAncestor: DEVINST, pVetoType: PPNP_VETO_TYPE | NULL, pszVetoName: LPWSTR | NULL, ulNameLength: ULONG, ulFlags: ULONG): CONFIGRET {
-    return Cfgmgr32.Load('CM_Query_And_Remove_SubTreeW')(dnAncestor, pVetoType, pszVetoName, ulNameLength, ulFlags);
+  public static CM_Query_And_Remove_SubTreeW(dnAncestor: DEVINST, pVetoType_out: OPTIONAL<PPNP_VETO_TYPE>, pszVetoName_out: OPTIONAL<LPWSTR>, ulNameLength: ULONG, ulFlags: ULONG): CONFIGRET {
+    return Cfgmgr32.Load('CM_Query_And_Remove_SubTreeW')(dnAncestor, pVetoType_out, pszVetoName_out, ulNameLength, ulFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_query_and_remove_subtree_exa
-  public static CM_Query_And_Remove_SubTree_ExA(dnAncestor: DEVINST, pVetoType: PPNP_VETO_TYPE | NULL, pszVetoName: LPSTR | NULL, ulNameLength: ULONG, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
-    return Cfgmgr32.Load('CM_Query_And_Remove_SubTree_ExA')(dnAncestor, pVetoType, pszVetoName, ulNameLength, ulFlags, hMachine);
+  public static CM_Query_And_Remove_SubTree_ExA(dnAncestor: DEVINST, pVetoType_out: OPTIONAL<PPNP_VETO_TYPE>, pszVetoName_out: OPTIONAL<LPSTR>, ulNameLength: ULONG, ulFlags: ULONG, hMachine: OPTIONAL<HMACHINE>): CONFIGRET {
+    return Cfgmgr32.Load('CM_Query_And_Remove_SubTree_ExA')(dnAncestor, pVetoType_out, pszVetoName_out, ulNameLength, ulFlags, hMachine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_query_and_remove_subtree_exw
-  public static CM_Query_And_Remove_SubTree_ExW(dnAncestor: DEVINST, pVetoType: PPNP_VETO_TYPE | NULL, pszVetoName: LPWSTR | NULL, ulNameLength: ULONG, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
-    return Cfgmgr32.Load('CM_Query_And_Remove_SubTree_ExW')(dnAncestor, pVetoType, pszVetoName, ulNameLength, ulFlags, hMachine);
+  public static CM_Query_And_Remove_SubTree_ExW(dnAncestor: DEVINST, pVetoType_out: OPTIONAL<PPNP_VETO_TYPE>, pszVetoName_out: OPTIONAL<LPWSTR>, ulNameLength: ULONG, ulFlags: ULONG, hMachine: OPTIONAL<HMACHINE>): CONFIGRET {
+    return Cfgmgr32.Load('CM_Query_And_Remove_SubTree_ExW')(dnAncestor, pVetoType_out, pszVetoName_out, ulNameLength, ulFlags, hMachine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_query_arbitrator_free_data
-  public static CM_Query_Arbitrator_Free_Data(pData: PVOID, DataLen: ULONG, dnDevInst: DEVINST, ResourceID: RESOURCEID, ulFlags: ULONG): CONFIGRET {
-    return Cfgmgr32.Load('CM_Query_Arbitrator_Free_Data')(pData, DataLen, dnDevInst, ResourceID, ulFlags);
+  public static CM_Query_Arbitrator_Free_Data(pData_out: PVOID, DataLen: ULONG, dnDevInst: DEVINST, ResourceID: RESOURCEID, ulFlags: ULONG): CONFIGRET {
+    return Cfgmgr32.Load('CM_Query_Arbitrator_Free_Data')(pData_out, DataLen, dnDevInst, ResourceID, ulFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_query_arbitrator_free_data_ex
-  public static CM_Query_Arbitrator_Free_Data_Ex(pData: PVOID, DataLen: ULONG, dnDevInst: DEVINST, ResourceID: RESOURCEID, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
-    return Cfgmgr32.Load('CM_Query_Arbitrator_Free_Data_Ex')(pData, DataLen, dnDevInst, ResourceID, ulFlags, hMachine);
+  public static CM_Query_Arbitrator_Free_Data_Ex(pData_out: PVOID, DataLen: ULONG, dnDevInst: DEVINST, ResourceID: RESOURCEID, ulFlags: ULONG, hMachine: OPTIONAL<HMACHINE>): CONFIGRET {
+    return Cfgmgr32.Load('CM_Query_Arbitrator_Free_Data_Ex')(pData_out, DataLen, dnDevInst, ResourceID, ulFlags, hMachine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_query_arbitrator_free_size
-  public static CM_Query_Arbitrator_Free_Size(pulSize: PULONG, dnDevInst: DEVINST, ResourceID: RESOURCEID, ulFlags: ULONG): CONFIGRET {
-    return Cfgmgr32.Load('CM_Query_Arbitrator_Free_Size')(pulSize, dnDevInst, ResourceID, ulFlags);
+  public static CM_Query_Arbitrator_Free_Size(pulSize_out: PULONG, dnDevInst: DEVINST, ResourceID: RESOURCEID, ulFlags: ULONG): CONFIGRET {
+    return Cfgmgr32.Load('CM_Query_Arbitrator_Free_Size')(pulSize_out, dnDevInst, ResourceID, ulFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_query_arbitrator_free_size_ex
-  public static CM_Query_Arbitrator_Free_Size_Ex(pulSize: PULONG, dnDevInst: DEVINST, ResourceID: RESOURCEID, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
-    return Cfgmgr32.Load('CM_Query_Arbitrator_Free_Size_Ex')(pulSize, dnDevInst, ResourceID, ulFlags, hMachine);
+  public static CM_Query_Arbitrator_Free_Size_Ex(pulSize_out: PULONG, dnDevInst: DEVINST, ResourceID: RESOURCEID, ulFlags: ULONG, hMachine: OPTIONAL<HMACHINE>): CONFIGRET {
+    return Cfgmgr32.Load('CM_Query_Arbitrator_Free_Size_Ex')(pulSize_out, dnDevInst, ResourceID, ulFlags, hMachine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_query_remove_subtree
@@ -1284,13 +1332,13 @@ class Cfgmgr32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_query_remove_subtree_ex
-  public static CM_Query_Remove_SubTree_Ex(dnAncestor: DEVINST, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
+  public static CM_Query_Remove_SubTree_Ex(dnAncestor: DEVINST, ulFlags: ULONG, hMachine: OPTIONAL<HMACHINE>): CONFIGRET {
     return Cfgmgr32.Load('CM_Query_Remove_SubTree_Ex')(dnAncestor, ulFlags, hMachine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_query_resource_conflict_list
-  public static CM_Query_Resource_Conflict_List(pclConflictList: PCONFLICT_LIST, dnDevInst: DEVINST, ResourceID: RESOURCEID, ResourceData: PCVOID, ResourceLen: ULONG, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
-    return Cfgmgr32.Load('CM_Query_Resource_Conflict_List')(pclConflictList, dnDevInst, ResourceID, ResourceData, ResourceLen, ulFlags, hMachine);
+  public static CM_Query_Resource_Conflict_List(pclConflictList_out: PCONFLICT_LIST, dnDevInst: DEVINST, ResourceID: RESOURCEID, ResourceData: PCVOID, ResourceLen: ULONG, ulFlags: ULONG, hMachine: OPTIONAL<HMACHINE>): CONFIGRET {
+    return Cfgmgr32.Load('CM_Query_Resource_Conflict_List')(pclConflictList_out, dnDevInst, ResourceID, ResourceData, ResourceLen, ulFlags, hMachine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_reenumerate_devnode
@@ -1299,7 +1347,7 @@ class Cfgmgr32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_reenumerate_devnode_ex
-  public static CM_Reenumerate_DevNode_Ex(dnDevInst: DEVINST, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
+  public static CM_Reenumerate_DevNode_Ex(dnDevInst: DEVINST, ulFlags: ULONG, hMachine: OPTIONAL<HMACHINE>): CONFIGRET {
     return Cfgmgr32.Load('CM_Reenumerate_DevNode_Ex')(dnDevInst, ulFlags, hMachine);
   }
 
@@ -1309,33 +1357,49 @@ class Cfgmgr32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_register_device_driver_ex
-  public static CM_Register_Device_Driver_Ex(dnDevInst: DEVINST, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
+  public static CM_Register_Device_Driver_Ex(dnDevInst: DEVINST, ulFlags: ULONG, hMachine: OPTIONAL<HMACHINE>): CONFIGRET {
     return Cfgmgr32.Load('CM_Register_Device_Driver_Ex')(dnDevInst, ulFlags, hMachine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_register_device_interfacea
-  public static CM_Register_Device_InterfaceA(dnDevInst: DEVINST, InterfaceClassGuid: LPGUID, pszReference: LPCSTR | NULL, pszDeviceInterface: LPSTR, pulLength: PULONG, ulFlags: ULONG): CONFIGRET {
-    return Cfgmgr32.Load('CM_Register_Device_InterfaceA')(dnDevInst, InterfaceClassGuid, pszReference, pszDeviceInterface, pulLength, ulFlags);
+  public static CM_Register_Device_InterfaceA(dnDevInst: DEVINST, InterfaceClassGuid: LPGUID, pszReference: OPTIONAL<LPCSTR>, pszDeviceInterface_out: LPSTR, pulLength_in_out: PULONG, ulFlags: ULONG): CONFIGRET {
+    return Cfgmgr32.Load('CM_Register_Device_InterfaceA')(dnDevInst, InterfaceClassGuid, pszReference, pszDeviceInterface_out, pulLength_in_out, ulFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_register_device_interfacew
-  public static CM_Register_Device_InterfaceW(dnDevInst: DEVINST, InterfaceClassGuid: LPGUID, pszReference: LPCWSTR | NULL, pszDeviceInterface: LPWSTR, pulLength: PULONG, ulFlags: ULONG): CONFIGRET {
-    return Cfgmgr32.Load('CM_Register_Device_InterfaceW')(dnDevInst, InterfaceClassGuid, pszReference, pszDeviceInterface, pulLength, ulFlags);
+  public static CM_Register_Device_InterfaceW(dnDevInst: DEVINST, InterfaceClassGuid: LPGUID, pszReference: OPTIONAL<LPCWSTR>, pszDeviceInterface_out: LPWSTR, pulLength_in_out: PULONG, ulFlags: ULONG): CONFIGRET {
+    return Cfgmgr32.Load('CM_Register_Device_InterfaceW')(dnDevInst, InterfaceClassGuid, pszReference, pszDeviceInterface_out, pulLength_in_out, ulFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_register_device_interface_exa
-  public static CM_Register_Device_Interface_ExA(dnDevInst: DEVINST, InterfaceClassGuid: LPGUID, pszReference: LPCSTR | NULL, pszDeviceInterface: LPSTR, pulLength: PULONG, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
-    return Cfgmgr32.Load('CM_Register_Device_Interface_ExA')(dnDevInst, InterfaceClassGuid, pszReference, pszDeviceInterface, pulLength, ulFlags, hMachine);
+  public static CM_Register_Device_Interface_ExA(
+    dnDevInst: DEVINST,
+    InterfaceClassGuid: LPGUID,
+    pszReference: OPTIONAL<LPCSTR>,
+    pszDeviceInterface_out: LPSTR,
+    pulLength_in_out: PULONG,
+    ulFlags: ULONG,
+    hMachine: OPTIONAL<HMACHINE>,
+  ): CONFIGRET {
+    return Cfgmgr32.Load('CM_Register_Device_Interface_ExA')(dnDevInst, InterfaceClassGuid, pszReference, pszDeviceInterface_out, pulLength_in_out, ulFlags, hMachine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_register_device_interface_exw
-  public static CM_Register_Device_Interface_ExW(dnDevInst: DEVINST, InterfaceClassGuid: LPGUID, pszReference: LPCWSTR | NULL, pszDeviceInterface: LPWSTR, pulLength: PULONG, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
-    return Cfgmgr32.Load('CM_Register_Device_Interface_ExW')(dnDevInst, InterfaceClassGuid, pszReference, pszDeviceInterface, pulLength, ulFlags, hMachine);
+  public static CM_Register_Device_Interface_ExW(
+    dnDevInst: DEVINST,
+    InterfaceClassGuid: LPGUID,
+    pszReference: OPTIONAL<LPCWSTR>,
+    pszDeviceInterface_out: LPWSTR,
+    pulLength_in_out: PULONG,
+    ulFlags: ULONG,
+    hMachine: OPTIONAL<HMACHINE>,
+  ): CONFIGRET {
+    return Cfgmgr32.Load('CM_Register_Device_Interface_ExW')(dnDevInst, InterfaceClassGuid, pszReference, pszDeviceInterface_out, pulLength_in_out, ulFlags, hMachine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_register_notification
-  public static CM_Register_Notification(pFilter: PVOID, pContext: PVOID | NULL, pCallback: PVOID, pNotifyContext: PHCMNOTIFICATION): CONFIGRET {
-    return Cfgmgr32.Load('CM_Register_Notification')(pFilter, pContext, pCallback, pNotifyContext);
+  public static CM_Register_Notification(pFilter: PVOID, pContext: OPTIONAL<PVOID>, pCallback: PVOID, pNotifyContext_out: PHCMNOTIFICATION): CONFIGRET {
+    return Cfgmgr32.Load('CM_Register_Notification')(pFilter, pContext, pCallback, pNotifyContext_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_remove_subtree
@@ -1344,28 +1408,28 @@ class Cfgmgr32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_remove_subtree_ex
-  public static CM_Remove_SubTree_Ex(dnAncestor: DEVINST, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
+  public static CM_Remove_SubTree_Ex(dnAncestor: DEVINST, ulFlags: ULONG, hMachine: OPTIONAL<HMACHINE>): CONFIGRET {
     return Cfgmgr32.Load('CM_Remove_SubTree_Ex')(dnAncestor, ulFlags, hMachine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_request_device_ejecta
-  public static CM_Request_Device_EjectA(dnDevInst: DEVINST, pVetoType: PPNP_VETO_TYPE | NULL, pszVetoName: LPSTR | NULL, ulNameLength: ULONG, ulFlags: ULONG): CONFIGRET {
-    return Cfgmgr32.Load('CM_Request_Device_EjectA')(dnDevInst, pVetoType, pszVetoName, ulNameLength, ulFlags);
+  public static CM_Request_Device_EjectA(dnDevInst: DEVINST, pVetoType_out: OPTIONAL<PPNP_VETO_TYPE>, pszVetoName_out: OPTIONAL<LPSTR>, ulNameLength: ULONG, ulFlags: ULONG): CONFIGRET {
+    return Cfgmgr32.Load('CM_Request_Device_EjectA')(dnDevInst, pVetoType_out, pszVetoName_out, ulNameLength, ulFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_request_device_ejectw
-  public static CM_Request_Device_EjectW(dnDevInst: DEVINST, pVetoType: PPNP_VETO_TYPE | NULL, pszVetoName: LPWSTR | NULL, ulNameLength: ULONG, ulFlags: ULONG): CONFIGRET {
-    return Cfgmgr32.Load('CM_Request_Device_EjectW')(dnDevInst, pVetoType, pszVetoName, ulNameLength, ulFlags);
+  public static CM_Request_Device_EjectW(dnDevInst: DEVINST, pVetoType_out: OPTIONAL<PPNP_VETO_TYPE>, pszVetoName_out: OPTIONAL<LPWSTR>, ulNameLength: ULONG, ulFlags: ULONG): CONFIGRET {
+    return Cfgmgr32.Load('CM_Request_Device_EjectW')(dnDevInst, pVetoType_out, pszVetoName_out, ulNameLength, ulFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_request_device_eject_exa
-  public static CM_Request_Device_Eject_ExA(dnDevInst: DEVINST, pVetoType: PPNP_VETO_TYPE | NULL, pszVetoName: LPSTR | NULL, ulNameLength: ULONG, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
-    return Cfgmgr32.Load('CM_Request_Device_Eject_ExA')(dnDevInst, pVetoType, pszVetoName, ulNameLength, ulFlags, hMachine);
+  public static CM_Request_Device_Eject_ExA(dnDevInst: DEVINST, pVetoType_out: OPTIONAL<PPNP_VETO_TYPE>, pszVetoName_out: OPTIONAL<LPSTR>, ulNameLength: ULONG, ulFlags: ULONG, hMachine: OPTIONAL<HMACHINE>): CONFIGRET {
+    return Cfgmgr32.Load('CM_Request_Device_Eject_ExA')(dnDevInst, pVetoType_out, pszVetoName_out, ulNameLength, ulFlags, hMachine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_request_device_eject_exw
-  public static CM_Request_Device_Eject_ExW(dnDevInst: DEVINST, pVetoType: PPNP_VETO_TYPE | NULL, pszVetoName: LPWSTR | NULL, ulNameLength: ULONG, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
-    return Cfgmgr32.Load('CM_Request_Device_Eject_ExW')(dnDevInst, pVetoType, pszVetoName, ulNameLength, ulFlags, hMachine);
+  public static CM_Request_Device_Eject_ExW(dnDevInst: DEVINST, pVetoType_out: OPTIONAL<PPNP_VETO_TYPE>, pszVetoName_out: OPTIONAL<LPWSTR>, ulNameLength: ULONG, ulFlags: ULONG, hMachine: OPTIONAL<HMACHINE>): CONFIGRET {
+    return Cfgmgr32.Load('CM_Request_Device_Eject_ExW')(dnDevInst, pVetoType_out, pszVetoName_out, ulNameLength, ulFlags, hMachine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_request_eject_pc
@@ -1374,18 +1438,18 @@ class Cfgmgr32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_request_eject_pc_ex
-  public static CM_Request_Eject_PC_Ex(hMachine: HMACHINE | 0n): CONFIGRET {
+  public static CM_Request_Eject_PC_Ex(hMachine: OPTIONAL<HMACHINE>): CONFIGRET {
     return Cfgmgr32.Load('CM_Request_Eject_PC_Ex')(hMachine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_restoreall_defaultpowerschemes
-  public static CM_RestoreAll_DefaultPowerSchemes(Error: PDWORD): CONFIGRET {
-    return Cfgmgr32.Load('CM_RestoreAll_DefaultPowerSchemes')(Error);
+  public static CM_RestoreAll_DefaultPowerSchemes(Error_out: PDWORD): CONFIGRET {
+    return Cfgmgr32.Load('CM_RestoreAll_DefaultPowerSchemes')(Error_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_restore_defaultpowerscheme
-  public static CM_Restore_DefaultPowerScheme(SchemeGuid: LPCGUID, Error: PDWORD): CONFIGRET {
-    return Cfgmgr32.Load('CM_Restore_DefaultPowerScheme')(SchemeGuid, Error);
+  public static CM_Restore_DefaultPowerScheme(SchemeGuid: LPCGUID, Error_out: PDWORD): CONFIGRET {
+    return Cfgmgr32.Load('CM_Restore_DefaultPowerScheme')(SchemeGuid, Error_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_run_detection
@@ -1394,32 +1458,32 @@ class Cfgmgr32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_run_detection_ex
-  public static CM_Run_Detection_Ex(ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
+  public static CM_Run_Detection_Ex(ulFlags: ULONG, hMachine: OPTIONAL<HMACHINE>): CONFIGRET {
     return Cfgmgr32.Load('CM_Run_Detection_Ex')(ulFlags, hMachine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_set_activescheme
-  public static CM_Set_ActiveScheme(SchemeGuid: LPCGUID, Error: PDWORD): CONFIGRET {
-    return Cfgmgr32.Load('CM_Set_ActiveScheme')(SchemeGuid, Error);
+  public static CM_Set_ActiveScheme(SchemeGuid: LPCGUID, Error_out: PDWORD): CONFIGRET {
+    return Cfgmgr32.Load('CM_Set_ActiveScheme')(SchemeGuid, Error_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_set_class_propertyw
-  public static CM_Set_Class_PropertyW(ClassGUID: LPCGUID, PropertyKey: PDEVPROPKEY, PropertyType: DEVPROPTYPE, PropertyBuffer: PBYTE | NULL, PropertyBufferSize: ULONG, ulFlags: ULONG): CONFIGRET {
+  public static CM_Set_Class_PropertyW(ClassGUID: LPCGUID, PropertyKey: PDEVPROPKEY, PropertyType: DEVPROPTYPE, PropertyBuffer: OPTIONAL<PBYTE>, PropertyBufferSize: ULONG, ulFlags: ULONG): CONFIGRET {
     return Cfgmgr32.Load('CM_Set_Class_PropertyW')(ClassGUID, PropertyKey, PropertyType, PropertyBuffer, PropertyBufferSize, ulFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_set_class_property_exw
-  public static CM_Set_Class_Property_ExW(ClassGUID: LPCGUID, PropertyKey: PDEVPROPKEY, PropertyType: DEVPROPTYPE, PropertyBuffer: PBYTE | NULL, PropertyBufferSize: ULONG, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
+  public static CM_Set_Class_Property_ExW(ClassGUID: LPCGUID, PropertyKey: PDEVPROPKEY, PropertyType: DEVPROPTYPE, PropertyBuffer: OPTIONAL<PBYTE>, PropertyBufferSize: ULONG, ulFlags: ULONG, hMachine: OPTIONAL<HMACHINE>): CONFIGRET {
     return Cfgmgr32.Load('CM_Set_Class_Property_ExW')(ClassGUID, PropertyKey, PropertyType, PropertyBuffer, PropertyBufferSize, ulFlags, hMachine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_set_class_registry_propertya
-  public static CM_Set_Class_Registry_PropertyA(ClassGuid: LPGUID, ulProperty: ULONG, Buffer: PCVOID | NULL, ulLength: ULONG, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
+  public static CM_Set_Class_Registry_PropertyA(ClassGuid: LPGUID, ulProperty: ULONG, Buffer: OPTIONAL<PCVOID>, ulLength: ULONG, ulFlags: ULONG, hMachine: OPTIONAL<HMACHINE>): CONFIGRET {
     return Cfgmgr32.Load('CM_Set_Class_Registry_PropertyA')(ClassGuid, ulProperty, Buffer, ulLength, ulFlags, hMachine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_set_class_registry_propertyw
-  public static CM_Set_Class_Registry_PropertyW(ClassGuid: LPGUID, ulProperty: ULONG, Buffer: PCVOID | NULL, ulLength: ULONG, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
+  public static CM_Set_Class_Registry_PropertyW(ClassGuid: LPGUID, ulProperty: ULONG, Buffer: OPTIONAL<PCVOID>, ulLength: ULONG, ulFlags: ULONG, hMachine: OPTIONAL<HMACHINE>): CONFIGRET {
     return Cfgmgr32.Load('CM_Set_Class_Registry_PropertyW')(ClassGuid, ulProperty, Buffer, ulLength, ulFlags, hMachine);
   }
 
@@ -1429,42 +1493,42 @@ class Cfgmgr32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_set_devnode_problem_ex
-  public static CM_Set_DevNode_Problem_Ex(dnDevInst: DEVINST, ulProblem: ULONG, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
+  public static CM_Set_DevNode_Problem_Ex(dnDevInst: DEVINST, ulProblem: ULONG, ulFlags: ULONG, hMachine: OPTIONAL<HMACHINE>): CONFIGRET {
     return Cfgmgr32.Load('CM_Set_DevNode_Problem_Ex')(dnDevInst, ulProblem, ulFlags, hMachine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_set_devnode_propertyw
-  public static CM_Set_DevNode_PropertyW(dnDevInst: DEVINST, PropertyKey: PDEVPROPKEY, PropertyType: DEVPROPTYPE, PropertyBuffer: PBYTE | NULL, PropertyBufferSize: ULONG, ulFlags: ULONG): CONFIGRET {
+  public static CM_Set_DevNode_PropertyW(dnDevInst: DEVINST, PropertyKey: PDEVPROPKEY, PropertyType: DEVPROPTYPE, PropertyBuffer: OPTIONAL<PBYTE>, PropertyBufferSize: ULONG, ulFlags: ULONG): CONFIGRET {
     return Cfgmgr32.Load('CM_Set_DevNode_PropertyW')(dnDevInst, PropertyKey, PropertyType, PropertyBuffer, PropertyBufferSize, ulFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_set_devnode_property_exw
-  public static CM_Set_DevNode_Property_ExW(dnDevInst: DEVINST, PropertyKey: PDEVPROPKEY, PropertyType: DEVPROPTYPE, PropertyBuffer: PBYTE | NULL, PropertyBufferSize: ULONG, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
+  public static CM_Set_DevNode_Property_ExW(dnDevInst: DEVINST, PropertyKey: PDEVPROPKEY, PropertyType: DEVPROPTYPE, PropertyBuffer: OPTIONAL<PBYTE>, PropertyBufferSize: ULONG, ulFlags: ULONG, hMachine: OPTIONAL<HMACHINE>): CONFIGRET {
     return Cfgmgr32.Load('CM_Set_DevNode_Property_ExW')(dnDevInst, PropertyKey, PropertyType, PropertyBuffer, PropertyBufferSize, ulFlags, hMachine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_set_devnode_registry_propertya
-  public static CM_Set_DevNode_Registry_PropertyA(dnDevInst: DEVINST, ulProperty: ULONG, Buffer: PCVOID | NULL, ulLength: ULONG, ulFlags: ULONG): CONFIGRET {
+  public static CM_Set_DevNode_Registry_PropertyA(dnDevInst: DEVINST, ulProperty: ULONG, Buffer: OPTIONAL<PCVOID>, ulLength: ULONG, ulFlags: ULONG): CONFIGRET {
     return Cfgmgr32.Load('CM_Set_DevNode_Registry_PropertyA')(dnDevInst, ulProperty, Buffer, ulLength, ulFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_set_devnode_registry_propertyw
-  public static CM_Set_DevNode_Registry_PropertyW(dnDevInst: DEVINST, ulProperty: ULONG, Buffer: PCVOID | NULL, ulLength: ULONG, ulFlags: ULONG): CONFIGRET {
+  public static CM_Set_DevNode_Registry_PropertyW(dnDevInst: DEVINST, ulProperty: ULONG, Buffer: OPTIONAL<PCVOID>, ulLength: ULONG, ulFlags: ULONG): CONFIGRET {
     return Cfgmgr32.Load('CM_Set_DevNode_Registry_PropertyW')(dnDevInst, ulProperty, Buffer, ulLength, ulFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_set_devnode_registry_property_exa
-  public static CM_Set_DevNode_Registry_Property_ExA(dnDevInst: DEVINST, ulProperty: ULONG, Buffer: PCVOID | NULL, ulLength: ULONG, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
+  public static CM_Set_DevNode_Registry_Property_ExA(dnDevInst: DEVINST, ulProperty: ULONG, Buffer: OPTIONAL<PCVOID>, ulLength: ULONG, ulFlags: ULONG, hMachine: OPTIONAL<HMACHINE>): CONFIGRET {
     return Cfgmgr32.Load('CM_Set_DevNode_Registry_Property_ExA')(dnDevInst, ulProperty, Buffer, ulLength, ulFlags, hMachine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_set_devnode_registry_property_exw
-  public static CM_Set_DevNode_Registry_Property_ExW(dnDevInst: DEVINST, ulProperty: ULONG, Buffer: PCVOID | NULL, ulLength: ULONG, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
+  public static CM_Set_DevNode_Registry_Property_ExW(dnDevInst: DEVINST, ulProperty: ULONG, Buffer: OPTIONAL<PCVOID>, ulLength: ULONG, ulFlags: ULONG, hMachine: OPTIONAL<HMACHINE>): CONFIGRET {
     return Cfgmgr32.Load('CM_Set_DevNode_Registry_Property_ExW')(dnDevInst, ulProperty, Buffer, ulLength, ulFlags, hMachine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_set_device_interface_propertyw
-  public static CM_Set_Device_Interface_PropertyW(pszDeviceInterface: LPCWSTR, PropertyKey: PDEVPROPKEY, PropertyType: DEVPROPTYPE, PropertyBuffer: PBYTE | NULL, PropertyBufferSize: ULONG, ulFlags: ULONG): CONFIGRET {
+  public static CM_Set_Device_Interface_PropertyW(pszDeviceInterface: LPCWSTR, PropertyKey: PDEVPROPKEY, PropertyType: DEVPROPTYPE, PropertyBuffer: OPTIONAL<PBYTE>, PropertyBufferSize: ULONG, ulFlags: ULONG): CONFIGRET {
     return Cfgmgr32.Load('CM_Set_Device_Interface_PropertyW')(pszDeviceInterface, PropertyKey, PropertyType, PropertyBuffer, PropertyBufferSize, ulFlags);
   }
 
@@ -1473,10 +1537,10 @@ class Cfgmgr32 extends Win32 {
     pszDeviceInterface: LPCWSTR,
     PropertyKey: PDEVPROPKEY,
     PropertyType: DEVPROPTYPE,
-    PropertyBuffer: PBYTE | NULL,
+    PropertyBuffer: OPTIONAL<PBYTE>,
     PropertyBufferSize: ULONG,
     ulFlags: ULONG,
-    hMachine: HMACHINE | 0n,
+    hMachine: OPTIONAL<HMACHINE>,
   ): CONFIGRET {
     return Cfgmgr32.Load('CM_Set_Device_Interface_Property_ExW')(pszDeviceInterface, PropertyKey, PropertyType, PropertyBuffer, PropertyBufferSize, ulFlags, hMachine);
   }
@@ -1487,7 +1551,7 @@ class Cfgmgr32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_set_hw_prof_ex
-  public static CM_Set_HW_Prof_Ex(ulHardwareProfile: ULONG, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
+  public static CM_Set_HW_Prof_Ex(ulHardwareProfile: ULONG, ulFlags: ULONG, hMachine: OPTIONAL<HMACHINE>): CONFIGRET {
     return Cfgmgr32.Load('CM_Set_HW_Prof_Ex')(ulHardwareProfile, ulFlags, hMachine);
   }
 
@@ -1502,12 +1566,12 @@ class Cfgmgr32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_set_hw_prof_flags_exa
-  public static CM_Set_HW_Prof_Flags_ExA(pDeviceID: DEVINSTID_A, ulConfig: ULONG, ulValue: ULONG, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
+  public static CM_Set_HW_Prof_Flags_ExA(pDeviceID: DEVINSTID_A, ulConfig: ULONG, ulValue: ULONG, ulFlags: ULONG, hMachine: OPTIONAL<HMACHINE>): CONFIGRET {
     return Cfgmgr32.Load('CM_Set_HW_Prof_Flags_ExA')(pDeviceID, ulConfig, ulValue, ulFlags, hMachine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_set_hw_prof_flags_exw
-  public static CM_Set_HW_Prof_Flags_ExW(pDeviceID: DEVINSTID_W, ulConfig: ULONG, ulValue: ULONG, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
+  public static CM_Set_HW_Prof_Flags_ExW(pDeviceID: DEVINSTID_W, ulConfig: ULONG, ulValue: ULONG, ulFlags: ULONG, hMachine: OPTIONAL<HMACHINE>): CONFIGRET {
     return Cfgmgr32.Load('CM_Set_HW_Prof_Flags_ExW')(pDeviceID, ulConfig, ulValue, ulFlags, hMachine);
   }
 
@@ -1517,7 +1581,7 @@ class Cfgmgr32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_setup_devnode_ex
-  public static CM_Setup_DevNode_Ex(dnDevInst: DEVINST, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
+  public static CM_Setup_DevNode_Ex(dnDevInst: DEVINST, ulFlags: ULONG, hMachine: OPTIONAL<HMACHINE>): CONFIGRET {
     return Cfgmgr32.Load('CM_Setup_DevNode_Ex')(dnDevInst, ulFlags, hMachine);
   }
 
@@ -1532,7 +1596,7 @@ class Cfgmgr32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_uninstall_devnode_ex
-  public static CM_Uninstall_DevNode_Ex(dnDevInst: DEVNODE, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
+  public static CM_Uninstall_DevNode_Ex(dnDevInst: DEVNODE, ulFlags: ULONG, hMachine: OPTIONAL<HMACHINE>): CONFIGRET {
     return Cfgmgr32.Load('CM_Uninstall_DevNode_Ex')(dnDevInst, ulFlags, hMachine);
   }
 
@@ -1547,12 +1611,12 @@ class Cfgmgr32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_unregister_device_interface_exa
-  public static CM_Unregister_Device_Interface_ExA(pszDeviceInterface: LPCSTR, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
+  public static CM_Unregister_Device_Interface_ExA(pszDeviceInterface: LPCSTR, ulFlags: ULONG, hMachine: OPTIONAL<HMACHINE>): CONFIGRET {
     return Cfgmgr32.Load('CM_Unregister_Device_Interface_ExA')(pszDeviceInterface, ulFlags, hMachine);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_unregister_device_interface_exw
-  public static CM_Unregister_Device_Interface_ExW(pszDeviceInterface: LPCWSTR, ulFlags: ULONG, hMachine: HMACHINE | 0n): CONFIGRET {
+  public static CM_Unregister_Device_Interface_ExW(pszDeviceInterface: LPCWSTR, ulFlags: ULONG, hMachine: OPTIONAL<HMACHINE>): CONFIGRET {
     return Cfgmgr32.Load('CM_Unregister_Device_Interface_ExW')(pszDeviceInterface, ulFlags, hMachine);
   }
 
@@ -1562,8 +1626,17 @@ class Cfgmgr32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_write_userpowerkey
-  public static CM_Write_UserPowerKey(SchemeGuid: LPCGUID | NULL, SubGroupOfPowerSettingsGuid: LPCGUID | NULL, PowerSettingGuid: LPCGUID | NULL, AccessFlags: ULONG, Type: ULONG, Buffer: PBYTE, BufferSize: DWORD, Error: PDWORD): CONFIGRET {
-    return Cfgmgr32.Load('CM_Write_UserPowerKey')(SchemeGuid, SubGroupOfPowerSettingsGuid, PowerSettingGuid, AccessFlags, Type, Buffer, BufferSize, Error);
+  public static CM_Write_UserPowerKey(
+    SchemeGuid: OPTIONAL<LPCGUID>,
+    SubGroupOfPowerSettingsGuid: OPTIONAL<LPCGUID>,
+    PowerSettingGuid: OPTIONAL<LPCGUID>,
+    AccessFlags: ULONG,
+    Type: ULONG,
+    Buffer: PBYTE,
+    BufferSize: DWORD,
+    Error_out: PDWORD,
+  ): CONFIGRET {
+    return Cfgmgr32.Load('CM_Write_UserPowerKey')(SchemeGuid, SubGroupOfPowerSettingsGuid, PowerSettingGuid, AccessFlags, Type, Buffer, BufferSize, Error_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/devquery/nf-devquery-devcloseobjectquery
@@ -1576,14 +1649,14 @@ class Cfgmgr32 extends Win32 {
     ObjectType: ULONG,
     QueryFlags: ULONG,
     cRequestedProperties: ULONG,
-    pRequestedProperties: PVOID | NULL,
+    pRequestedProperties: OPTIONAL<PVOID>,
     cFilterExpressionCount: ULONG,
-    pFilter: PVOID | NULL,
+    pFilter: OPTIONAL<PVOID>,
     pCallback: PVOID,
-    pContext: PVOID | NULL,
-    phDevQuery: PHDEVQUERY,
+    pContext: OPTIONAL<PVOID>,
+    phDevQuery_out: PHDEVQUERY,
   ): HRESULT {
-    return Cfgmgr32.Load('DevCreateObjectQuery')(ObjectType, QueryFlags, cRequestedProperties, pRequestedProperties, cFilterExpressionCount, pFilter, pCallback, pContext, phDevQuery);
+    return Cfgmgr32.Load('DevCreateObjectQuery')(ObjectType, QueryFlags, cRequestedProperties, pRequestedProperties, cFilterExpressionCount, pFilter, pCallback, pContext, phDevQuery_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/devquery/nf-devquery-devcreateobjectqueryex
@@ -1591,16 +1664,16 @@ class Cfgmgr32 extends Win32 {
     ObjectType: ULONG,
     QueryFlags: ULONG,
     cRequestedProperties: ULONG,
-    pRequestedProperties: PVOID | NULL,
+    pRequestedProperties: OPTIONAL<PVOID>,
     cFilterExpressionCount: ULONG,
-    pFilter: PVOID | NULL,
+    pFilter: OPTIONAL<PVOID>,
     cExtendedParameterCount: ULONG,
-    pExtendedParameters: PVOID | NULL,
+    pExtendedParameters: OPTIONAL<PVOID>,
     pCallback: PVOID,
-    pContext: PVOID | NULL,
-    phDevQuery: PHDEVQUERY,
+    pContext: OPTIONAL<PVOID>,
+    phDevQuery_out: PHDEVQUERY,
   ): HRESULT {
-    return Cfgmgr32.Load('DevCreateObjectQueryEx')(ObjectType, QueryFlags, cRequestedProperties, pRequestedProperties, cFilterExpressionCount, pFilter, cExtendedParameterCount, pExtendedParameters, pCallback, pContext, phDevQuery);
+    return Cfgmgr32.Load('DevCreateObjectQueryEx')(ObjectType, QueryFlags, cRequestedProperties, pRequestedProperties, cFilterExpressionCount, pFilter, cExtendedParameterCount, pExtendedParameters, pCallback, pContext, phDevQuery_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/devquery/nf-devquery-devcreateobjectqueryfromid
@@ -1609,14 +1682,14 @@ class Cfgmgr32 extends Win32 {
     pszObjectId: PCWSTR,
     QueryFlags: ULONG,
     cRequestedProperties: ULONG,
-    pRequestedProperties: PVOID | NULL,
+    pRequestedProperties: OPTIONAL<PVOID>,
     cFilterExpressionCount: ULONG,
-    pFilter: PVOID | NULL,
+    pFilter: OPTIONAL<PVOID>,
     pCallback: PVOID,
-    pContext: PVOID | NULL,
-    phDevQuery: PHDEVQUERY,
+    pContext: OPTIONAL<PVOID>,
+    phDevQuery_out: PHDEVQUERY,
   ): HRESULT {
-    return Cfgmgr32.Load('DevCreateObjectQueryFromId')(ObjectType, pszObjectId, QueryFlags, cRequestedProperties, pRequestedProperties, cFilterExpressionCount, pFilter, pCallback, pContext, phDevQuery);
+    return Cfgmgr32.Load('DevCreateObjectQueryFromId')(ObjectType, pszObjectId, QueryFlags, cRequestedProperties, pRequestedProperties, cFilterExpressionCount, pFilter, pCallback, pContext, phDevQuery_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/devquery/nf-devquery-devcreateobjectqueryfromidex
@@ -1625,14 +1698,14 @@ class Cfgmgr32 extends Win32 {
     pszObjectId: PCWSTR,
     QueryFlags: ULONG,
     cRequestedProperties: ULONG,
-    pRequestedProperties: PVOID | NULL,
+    pRequestedProperties: OPTIONAL<PVOID>,
     cFilterExpressionCount: ULONG,
-    pFilter: PVOID | NULL,
+    pFilter: OPTIONAL<PVOID>,
     cExtendedParameterCount: ULONG,
-    pExtendedParameters: PVOID | NULL,
+    pExtendedParameters: OPTIONAL<PVOID>,
     pCallback: PVOID,
-    pContext: PVOID | NULL,
-    phDevQuery: PHDEVQUERY,
+    pContext: OPTIONAL<PVOID>,
+    phDevQuery_out: PHDEVQUERY,
   ): HRESULT {
     return Cfgmgr32.Load('DevCreateObjectQueryFromIdEx')(
       ObjectType,
@@ -1646,7 +1719,7 @@ class Cfgmgr32 extends Win32 {
       pExtendedParameters,
       pCallback,
       pContext,
-      phDevQuery,
+      phDevQuery_out,
     );
   }
 
@@ -1656,14 +1729,14 @@ class Cfgmgr32 extends Win32 {
     pszzObjectIds: PCZZWSTR,
     QueryFlags: ULONG,
     cRequestedProperties: ULONG,
-    pRequestedProperties: PVOID | NULL,
+    pRequestedProperties: OPTIONAL<PVOID>,
     cFilterExpressionCount: ULONG,
-    pFilter: PVOID | NULL,
+    pFilter: OPTIONAL<PVOID>,
     pCallback: PVOID,
-    pContext: PVOID | NULL,
-    phDevQuery: PHDEVQUERY,
+    pContext: OPTIONAL<PVOID>,
+    phDevQuery_out: PHDEVQUERY,
   ): HRESULT {
-    return Cfgmgr32.Load('DevCreateObjectQueryFromIds')(ObjectType, pszzObjectIds, QueryFlags, cRequestedProperties, pRequestedProperties, cFilterExpressionCount, pFilter, pCallback, pContext, phDevQuery);
+    return Cfgmgr32.Load('DevCreateObjectQueryFromIds')(ObjectType, pszzObjectIds, QueryFlags, cRequestedProperties, pRequestedProperties, cFilterExpressionCount, pFilter, pCallback, pContext, phDevQuery_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/devquery/nf-devquery-devcreateobjectqueryfromidsex
@@ -1672,14 +1745,14 @@ class Cfgmgr32 extends Win32 {
     pszzObjectIds: PCZZWSTR,
     QueryFlags: ULONG,
     cRequestedProperties: ULONG,
-    pRequestedProperties: PVOID | NULL,
+    pRequestedProperties: OPTIONAL<PVOID>,
     cFilterExpressionCount: ULONG,
-    pFilter: PVOID | NULL,
+    pFilter: OPTIONAL<PVOID>,
     cExtendedParameterCount: ULONG,
-    pExtendedParameters: PVOID | NULL,
+    pExtendedParameters: OPTIONAL<PVOID>,
     pCallback: PVOID,
-    pContext: PVOID | NULL,
-    phDevQuery: PHDEVQUERY,
+    pContext: OPTIONAL<PVOID>,
+    phDevQuery_out: PHDEVQUERY,
   ): HRESULT {
     return Cfgmgr32.Load('DevCreateObjectQueryFromIdsEx')(
       ObjectType,
@@ -1693,12 +1766,12 @@ class Cfgmgr32 extends Win32 {
       pExtendedParameters,
       pCallback,
       pContext,
-      phDevQuery,
+      phDevQuery_out,
     );
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/devquery/nf-devquery-devfindproperty
-  public static DevFindProperty(pKey: PDEVPROPKEY, Store: ULONG, pszLocaleName: PCWSTR, cProperties: ULONG, pProperties: PVOID | NULL): PVOID {
+  public static DevFindProperty(pKey: PDEVPROPKEY, Store: ULONG, pszLocaleName: PCWSTR, cProperties: ULONG, pProperties: OPTIONAL<PVOID>): PVOID {
     return Cfgmgr32.Load('DevFindProperty')(pKey, Store, pszLocaleName, cProperties, pProperties);
   }
 
@@ -1713,8 +1786,8 @@ class Cfgmgr32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/devquery/nf-devquery-devgetobjectproperties
-  public static DevGetObjectProperties(ObjectType: ULONG, pszObjectId: PCWSTR, QueryFlags: ULONG, cRequestedProperties: ULONG, pRequestedProperties: PVOID, pcPropertyCount: PULONG, ppProperties: PVOID): HRESULT {
-    return Cfgmgr32.Load('DevGetObjectProperties')(ObjectType, pszObjectId, QueryFlags, cRequestedProperties, pRequestedProperties, pcPropertyCount, ppProperties);
+  public static DevGetObjectProperties(ObjectType: ULONG, pszObjectId: PCWSTR, QueryFlags: ULONG, cRequestedProperties: ULONG, pRequestedProperties: PVOID, pcPropertyCount_out: PULONG, ppProperties_out: PVOID): HRESULT {
+    return Cfgmgr32.Load('DevGetObjectProperties')(ObjectType, pszObjectId, QueryFlags, cRequestedProperties, pRequestedProperties, pcPropertyCount_out, ppProperties_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/devquery/nf-devquery-devgetobjectpropertiesex
@@ -1725,16 +1798,25 @@ class Cfgmgr32 extends Win32 {
     cRequestedProperties: ULONG,
     pRequestedProperties: PVOID,
     cExtendedParameterCount: ULONG,
-    pExtendedParameters: PVOID | NULL,
-    pcPropertyCount: PULONG,
-    ppProperties: PVOID,
+    pExtendedParameters: OPTIONAL<PVOID>,
+    pcPropertyCount_out: PULONG,
+    ppProperties_out: PVOID,
   ): HRESULT {
-    return Cfgmgr32.Load('DevGetObjectPropertiesEx')(ObjectType, pszObjectId, QueryFlags, cRequestedProperties, pRequestedProperties, cExtendedParameterCount, pExtendedParameters, pcPropertyCount, ppProperties);
+    return Cfgmgr32.Load('DevGetObjectPropertiesEx')(ObjectType, pszObjectId, QueryFlags, cRequestedProperties, pRequestedProperties, cExtendedParameterCount, pExtendedParameters, pcPropertyCount_out, ppProperties_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/devquery/nf-devquery-devgetobjects
-  public static DevGetObjects(ObjectType: ULONG, QueryFlags: ULONG, cRequestedProperties: ULONG, pRequestedProperties: PVOID | NULL, cFilterExpressionCount: ULONG, pFilter: PVOID | NULL, pcObjectCount: PULONG, ppObjects: PVOID): HRESULT {
-    return Cfgmgr32.Load('DevGetObjects')(ObjectType, QueryFlags, cRequestedProperties, pRequestedProperties, cFilterExpressionCount, pFilter, pcObjectCount, ppObjects);
+  public static DevGetObjects(
+    ObjectType: ULONG,
+    QueryFlags: ULONG,
+    cRequestedProperties: ULONG,
+    pRequestedProperties: OPTIONAL<PVOID>,
+    cFilterExpressionCount: ULONG,
+    pFilter: OPTIONAL<PVOID>,
+    pcObjectCount_out: PULONG,
+    ppObjects_out: PVOID,
+  ): HRESULT {
+    return Cfgmgr32.Load('DevGetObjects')(ObjectType, QueryFlags, cRequestedProperties, pRequestedProperties, cFilterExpressionCount, pFilter, pcObjectCount_out, ppObjects_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/devquery/nf-devquery-devgetobjectsex
@@ -1742,15 +1824,15 @@ class Cfgmgr32 extends Win32 {
     ObjectType: ULONG,
     QueryFlags: ULONG,
     cRequestedProperties: ULONG,
-    pRequestedProperties: PVOID | NULL,
+    pRequestedProperties: OPTIONAL<PVOID>,
     cFilterExpressionCount: ULONG,
-    pFilter: PVOID | NULL,
+    pFilter: OPTIONAL<PVOID>,
     cExtendedParameterCount: ULONG,
-    pExtendedParameters: PVOID | NULL,
-    pcObjectCount: PULONG,
-    ppObjects: PVOID,
+    pExtendedParameters: OPTIONAL<PVOID>,
+    pcObjectCount_out: PULONG,
+    ppObjects_out: PVOID,
   ): HRESULT {
-    return Cfgmgr32.Load('DevGetObjectsEx')(ObjectType, QueryFlags, cRequestedProperties, pRequestedProperties, cFilterExpressionCount, pFilter, cExtendedParameterCount, pExtendedParameters, pcObjectCount, ppObjects);
+    return Cfgmgr32.Load('DevGetObjectsEx')(ObjectType, QueryFlags, cRequestedProperties, pRequestedProperties, cFilterExpressionCount, pFilter, cExtendedParameterCount, pExtendedParameters, pcObjectCount_out, ppObjects_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/swdevice/nf-swdevice-swdeviceclose
@@ -1759,13 +1841,22 @@ class Cfgmgr32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/swdevice/nf-swdevice-swdevicecreate
-  public static SwDeviceCreate(pszEnumeratorName: PCWSTR, pszParentDeviceInstance: PCWSTR, pCreateInfo: PVOID, cPropertyCount: ULONG, pProperties: PVOID | NULL, pCallback: PVOID, pContext: PVOID | NULL, phSwDevice: PHSWDEVICE): HRESULT {
-    return Cfgmgr32.Load('SwDeviceCreate')(pszEnumeratorName, pszParentDeviceInstance, pCreateInfo, cPropertyCount, pProperties, pCallback, pContext, phSwDevice);
+  public static SwDeviceCreate(
+    pszEnumeratorName: PCWSTR,
+    pszParentDeviceInstance: PCWSTR,
+    pCreateInfo: PVOID,
+    cPropertyCount: ULONG,
+    pProperties: OPTIONAL<PVOID>,
+    pCallback: PVOID,
+    pContext: OPTIONAL<PVOID>,
+    phSwDevice_out: PHSWDEVICE,
+  ): HRESULT {
+    return Cfgmgr32.Load('SwDeviceCreate')(pszEnumeratorName, pszParentDeviceInstance, pCreateInfo, cPropertyCount, pProperties, pCallback, pContext, phSwDevice_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/swdevice/nf-swdevice-swdevicegetlifetime
-  public static SwDeviceGetLifetime(hSwDevice: HSWDEVICE, pLifetime: PSW_DEVICE_LIFETIME): HRESULT {
-    return Cfgmgr32.Load('SwDeviceGetLifetime')(hSwDevice, pLifetime);
+  public static SwDeviceGetLifetime(hSwDevice: HSWDEVICE, pLifetime_out: PSW_DEVICE_LIFETIME): HRESULT {
+    return Cfgmgr32.Load('SwDeviceGetLifetime')(hSwDevice, pLifetime_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/swdevice/nf-swdevice-swdeviceinterfacepropertyset
@@ -1774,8 +1865,16 @@ class Cfgmgr32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/swdevice/nf-swdevice-swdeviceinterfaceregister
-  public static SwDeviceInterfaceRegister(hSwDevice: HSWDEVICE, pInterfaceClassGuid: LPGUID, pszReferenceString: PCWSTR | NULL, cPropertyCount: ULONG, pProperties: PVOID | NULL, fEnabled: BOOL, ppszDeviceInterfaceId: PVOID): HRESULT {
-    return Cfgmgr32.Load('SwDeviceInterfaceRegister')(hSwDevice, pInterfaceClassGuid, pszReferenceString, cPropertyCount, pProperties, fEnabled, ppszDeviceInterfaceId);
+  public static SwDeviceInterfaceRegister(
+    hSwDevice: HSWDEVICE,
+    pInterfaceClassGuid: LPGUID,
+    pszReferenceString: OPTIONAL<PCWSTR>,
+    cPropertyCount: ULONG,
+    pProperties: OPTIONAL<PVOID>,
+    fEnabled: BOOL,
+    ppszDeviceInterfaceId_out: PVOID,
+  ): HRESULT {
+    return Cfgmgr32.Load('SwDeviceInterfaceRegister')(hSwDevice, pInterfaceClassGuid, pszReferenceString, cPropertyCount, pProperties, fEnabled, ppszDeviceInterfaceId_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/swdevice/nf-swdevice-swdeviceinterfacesetstate

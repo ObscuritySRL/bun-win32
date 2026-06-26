@@ -2,7 +2,7 @@ import { type FFIFunction, FFIType } from 'bun:ffi';
 
 import { Win32 } from '@bun-win32/core';
 
-import type { BOOL, DWORD, HANDLE, HWND, LPCONNECTDLGSTRUCTW, LPCWSTR, LPDISCDLGSTRUCTW, LPDWORD, LPHANDLE, LPLPWSTR, LPNETCONNECTINFOSTRUCT, LPNETINFOSTRUCT, LPNETRESOURCEW, LPVOID, LPWSTR, NULL, PBYTE, PVOID } from '../types/Mpr';
+import type { BOOL, DWORD, HANDLE, HWND, LPCONNECTDLGSTRUCTW, LPCWSTR, LPDISCDLGSTRUCTW, LPDWORD, LPHANDLE, LPLPWSTR, LPNETCONNECTINFOSTRUCT, LPNETINFOSTRUCT, LPNETRESOURCEW, LPVOID, LPWSTR, OPTIONAL, PBYTE, PVOID } from '../types/Mpr';
 
 class Mpr extends Win32 {
   protected static override name = 'mpr.dll';
@@ -37,27 +37,27 @@ class Mpr extends Win32 {
   } as const satisfies Record<string, FFIFunction>;
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winnetwk/nf-winnetwk-multinetgetconnectionperformancew
-  public static MultinetGetConnectionPerformanceW(lpNetResource: LPNETRESOURCEW, lpNetConnectInfoStruct: LPNETCONNECTINFOSTRUCT): DWORD {
-    return Mpr.Load('MultinetGetConnectionPerformanceW')(lpNetResource, lpNetConnectInfoStruct);
+  public static MultinetGetConnectionPerformanceW(lpNetResource: LPNETRESOURCEW, lpNetConnectInfoStruct_out: LPNETCONNECTINFOSTRUCT): DWORD {
+    return Mpr.Load('MultinetGetConnectionPerformanceW')(lpNetResource, lpNetConnectInfoStruct_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winnetwk/nf-winnetwk-wnetaddconnection2w
-  public static WNetAddConnection2W(lpNetResource: LPNETRESOURCEW, lpPassword: LPCWSTR | NULL, lpUserName: LPCWSTR | NULL, dwFlags: DWORD): DWORD {
+  public static WNetAddConnection2W(lpNetResource: LPNETRESOURCEW, lpPassword: OPTIONAL<LPCWSTR>, lpUserName: OPTIONAL<LPCWSTR>, dwFlags: DWORD): DWORD {
     return Mpr.Load('WNetAddConnection2W')(lpNetResource, lpPassword, lpUserName, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winnetwk/nf-winnetwk-wnetaddconnection3w
-  public static WNetAddConnection3W(hwndOwner: HWND | 0n, lpNetResource: LPNETRESOURCEW, lpPassword: LPCWSTR | NULL, lpUserName: LPCWSTR | NULL, dwFlags: DWORD): DWORD {
+  public static WNetAddConnection3W(hwndOwner: OPTIONAL<HWND>, lpNetResource: LPNETRESOURCEW, lpPassword: OPTIONAL<LPCWSTR>, lpUserName: OPTIONAL<LPCWSTR>, dwFlags: DWORD): DWORD {
     return Mpr.Load('WNetAddConnection3W')(hwndOwner, lpNetResource, lpPassword, lpUserName, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winnetwk/nf-winnetwk-wnetaddconnection4w
-  public static WNetAddConnection4W(hwndOwner: HWND | 0n, lpNetResource: LPNETRESOURCEW, pAuthBuffer: PVOID, cbAuthBuffer: DWORD, dwFlags: DWORD, lpUseOptions: PBYTE, cbUseOptions: DWORD): DWORD {
+  public static WNetAddConnection4W(hwndOwner: OPTIONAL<HWND>, lpNetResource: LPNETRESOURCEW, pAuthBuffer: PVOID, cbAuthBuffer: DWORD, dwFlags: DWORD, lpUseOptions: PBYTE, cbUseOptions: DWORD): DWORD {
     return Mpr.Load('WNetAddConnection4W')(hwndOwner, lpNetResource, pAuthBuffer, cbAuthBuffer, dwFlags, lpUseOptions, cbUseOptions);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winnetwk/nf-winnetwk-wnetaddconnectionw
-  public static WNetAddConnectionW(lpRemoteName: LPCWSTR, lpPassword: LPCWSTR | NULL, lpLocalName: LPCWSTR | NULL): DWORD {
+  public static WNetAddConnectionW(lpRemoteName: LPCWSTR, lpPassword: OPTIONAL<LPCWSTR>, lpLocalName: OPTIONAL<LPCWSTR>): DWORD {
     return Mpr.Load('WNetAddConnectionW')(lpRemoteName, lpPassword, lpLocalName);
   }
 
@@ -82,12 +82,12 @@ class Mpr extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winnetwk/nf-winnetwk-wnetconnectiondialog1w
-  public static WNetConnectionDialog1W(lpConnDlgStruct: LPCONNECTDLGSTRUCTW): DWORD {
-    return Mpr.Load('WNetConnectionDialog1W')(lpConnDlgStruct);
+  public static WNetConnectionDialog1W(lpConnDlgStruct_in_out: LPCONNECTDLGSTRUCTW): DWORD {
+    return Mpr.Load('WNetConnectionDialog1W')(lpConnDlgStruct_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winnetwk/nf-winnetwk-wnetdisconnectdialog
-  public static WNetDisconnectDialog(hwnd: HWND | 0n, dwType: DWORD): DWORD {
+  public static WNetDisconnectDialog(hwnd: OPTIONAL<HWND>, dwType: DWORD): DWORD {
     return Mpr.Load('WNetDisconnectDialog')(hwnd, dwType);
   }
 
@@ -97,88 +97,88 @@ class Mpr extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winnetwk/nf-winnetwk-wnetenumresourcew
-  public static WNetEnumResourceW(hEnum: HANDLE, lpcCount: LPDWORD, lpBuffer: LPVOID, lpBufferSize: LPDWORD): DWORD {
-    return Mpr.Load('WNetEnumResourceW')(hEnum, lpcCount, lpBuffer, lpBufferSize);
+  public static WNetEnumResourceW(hEnum: HANDLE, lpcCount_in_out: LPDWORD, lpBuffer_out: LPVOID, lpBufferSize_in_out: LPDWORD): DWORD {
+    return Mpr.Load('WNetEnumResourceW')(hEnum, lpcCount_in_out, lpBuffer_out, lpBufferSize_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winnetwk/nf-winnetwk-wnetgetconnectionw
-  public static WNetGetConnectionW(lpLocalName: LPCWSTR, lpRemoteName: LPWSTR | NULL, lpnLength: LPDWORD): DWORD {
-    return Mpr.Load('WNetGetConnectionW')(lpLocalName, lpRemoteName, lpnLength);
+  public static WNetGetConnectionW(lpLocalName: LPCWSTR, lpRemoteName_out: OPTIONAL<LPWSTR>, lpnLength_in_out: LPDWORD): DWORD {
+    return Mpr.Load('WNetGetConnectionW')(lpLocalName, lpRemoteName_out, lpnLength_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winnetwk/nf-winnetwk-wnetgetlasterrorw
-  public static WNetGetLastErrorW(lpError: LPDWORD, lpErrorBuf: LPWSTR, nErrorBufSize: DWORD, lpNameBuf: LPWSTR, nNameBufSize: DWORD): DWORD {
-    return Mpr.Load('WNetGetLastErrorW')(lpError, lpErrorBuf, nErrorBufSize, lpNameBuf, nNameBufSize);
+  public static WNetGetLastErrorW(lpError_out: LPDWORD, lpErrorBuf_out: LPWSTR, nErrorBufSize: DWORD, lpNameBuf_out: LPWSTR, nNameBufSize: DWORD): DWORD {
+    return Mpr.Load('WNetGetLastErrorW')(lpError_out, lpErrorBuf_out, nErrorBufSize, lpNameBuf_out, nNameBufSize);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winnetwk/nf-winnetwk-wnetgetnetworkinformationw
-  public static WNetGetNetworkInformationW(lpProvider: LPCWSTR, lpNetInfoStruct: LPNETINFOSTRUCT): DWORD {
-    return Mpr.Load('WNetGetNetworkInformationW')(lpProvider, lpNetInfoStruct);
+  public static WNetGetNetworkInformationW(lpProvider: LPCWSTR, lpNetInfoStruct_out: LPNETINFOSTRUCT): DWORD {
+    return Mpr.Load('WNetGetNetworkInformationW')(lpProvider, lpNetInfoStruct_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winnetwk/nf-winnetwk-wnetgetprovidernamew
-  public static WNetGetProviderNameW(dwNetType: DWORD, lpProviderName: LPWSTR, lpBufferSize: LPDWORD): DWORD {
-    return Mpr.Load('WNetGetProviderNameW')(dwNetType, lpProviderName, lpBufferSize);
+  public static WNetGetProviderNameW(dwNetType: DWORD, lpProviderName_out: LPWSTR, lpBufferSize_in_out: LPDWORD): DWORD {
+    return Mpr.Load('WNetGetProviderNameW')(dwNetType, lpProviderName_out, lpBufferSize_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winnetwk/nf-winnetwk-wnetgetresourceinformationw
-  public static WNetGetResourceInformationW(lpNetResource: LPNETRESOURCEW, lpBuffer: LPVOID, lpcbBuffer: LPDWORD, lplpSystem: LPLPWSTR): DWORD {
-    return Mpr.Load('WNetGetResourceInformationW')(lpNetResource, lpBuffer, lpcbBuffer, lplpSystem);
+  public static WNetGetResourceInformationW(lpNetResource: LPNETRESOURCEW, lpBuffer_out: LPVOID, lpcbBuffer_in_out: LPDWORD, lplpSystem_out: LPLPWSTR): DWORD {
+    return Mpr.Load('WNetGetResourceInformationW')(lpNetResource, lpBuffer_out, lpcbBuffer_in_out, lplpSystem_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winnetwk/nf-winnetwk-wnetgetresourceparentw
-  public static WNetGetResourceParentW(lpNetResource: LPNETRESOURCEW, lpBuffer: LPVOID, lpcbBuffer: LPDWORD): DWORD {
-    return Mpr.Load('WNetGetResourceParentW')(lpNetResource, lpBuffer, lpcbBuffer);
+  public static WNetGetResourceParentW(lpNetResource: LPNETRESOURCEW, lpBuffer_out: LPVOID, lpcbBuffer_in_out: LPDWORD): DWORD {
+    return Mpr.Load('WNetGetResourceParentW')(lpNetResource, lpBuffer_out, lpcbBuffer_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winnetwk/nf-winnetwk-wnetgetuniversalnamew
-  public static WNetGetUniversalNameW(lpLocalPath: LPCWSTR, dwInfoLevel: DWORD, lpBuffer: LPVOID, lpBufferSize: LPDWORD): DWORD {
-    return Mpr.Load('WNetGetUniversalNameW')(lpLocalPath, dwInfoLevel, lpBuffer, lpBufferSize);
+  public static WNetGetUniversalNameW(lpLocalPath: LPCWSTR, dwInfoLevel: DWORD, lpBuffer_out: LPVOID, lpBufferSize_in_out: LPDWORD): DWORD {
+    return Mpr.Load('WNetGetUniversalNameW')(lpLocalPath, dwInfoLevel, lpBuffer_out, lpBufferSize_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winnetwk/nf-winnetwk-wnetgetuserw
-  public static WNetGetUserW(lpName: LPCWSTR | NULL, lpUserName: LPWSTR, lpnLength: LPDWORD): DWORD {
-    return Mpr.Load('WNetGetUserW')(lpName, lpUserName, lpnLength);
+  public static WNetGetUserW(lpName: OPTIONAL<LPCWSTR>, lpUserName_out: LPWSTR, lpnLength_in_out: LPDWORD): DWORD {
+    return Mpr.Load('WNetGetUserW')(lpName, lpUserName_out, lpnLength_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winnetwk/nf-winnetwk-wnetopenenumw
-  public static WNetOpenEnumW(dwScope: DWORD, dwType: DWORD, dwUsage: DWORD, lpNetResource: LPNETRESOURCEW | NULL, lphEnum: LPHANDLE): DWORD {
-    return Mpr.Load('WNetOpenEnumW')(dwScope, dwType, dwUsage, lpNetResource, lphEnum);
+  public static WNetOpenEnumW(dwScope: DWORD, dwType: DWORD, dwUsage: DWORD, lpNetResource: OPTIONAL<LPNETRESOURCEW>, lphEnum_out: LPHANDLE): DWORD {
+    return Mpr.Load('WNetOpenEnumW')(dwScope, dwType, dwUsage, lpNetResource, lphEnum_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winnetwk/nf-winnetwk-wnetrestoresingleconnectionw
-  public static WNetRestoreSingleConnectionW(hwndParent: HWND | 0n, lpDevice: LPCWSTR, fUseUI: BOOL): DWORD {
+  public static WNetRestoreSingleConnectionW(hwndParent: OPTIONAL<HWND>, lpDevice: LPCWSTR, fUseUI: BOOL): DWORD {
     return Mpr.Load('WNetRestoreSingleConnectionW')(hwndParent, lpDevice, fUseUI);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winnetwk/nf-winnetwk-wnetuseconnection4w
   public static WNetUseConnection4W(
-    hwndOwner: HWND | 0n,
+    hwndOwner: OPTIONAL<HWND>,
     lpNetResource: LPNETRESOURCEW,
-    pAuthBuffer: PVOID | NULL,
+    pAuthBuffer: OPTIONAL<PVOID>,
     cbAuthBuffer: DWORD,
     dwFlags: DWORD,
-    lpUseOptions: PBYTE | NULL,
+    lpUseOptions: OPTIONAL<PBYTE>,
     cbUseOptions: DWORD,
-    lpAccessName: LPWSTR | NULL,
-    lpBufferSize: LPDWORD | NULL,
-    lpResult: LPDWORD | NULL,
+    lpAccessName_out: OPTIONAL<LPWSTR>,
+    lpBufferSize_in_out: OPTIONAL<LPDWORD>,
+    lpResult_out: OPTIONAL<LPDWORD>,
   ): DWORD {
-    return Mpr.Load('WNetUseConnection4W')(hwndOwner, lpNetResource, pAuthBuffer, cbAuthBuffer, dwFlags, lpUseOptions, cbUseOptions, lpAccessName, lpBufferSize, lpResult);
+    return Mpr.Load('WNetUseConnection4W')(hwndOwner, lpNetResource, pAuthBuffer, cbAuthBuffer, dwFlags, lpUseOptions, cbUseOptions, lpAccessName_out, lpBufferSize_in_out, lpResult_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winnetwk/nf-winnetwk-wnetuseconnectionw
   public static WNetUseConnectionW(
-    hwndOwner: HWND | 0n,
+    hwndOwner: OPTIONAL<HWND>,
     lpNetResource: LPNETRESOURCEW,
-    lpPassword: LPCWSTR | NULL,
-    lpUserId: LPCWSTR | NULL,
+    lpPassword: OPTIONAL<LPCWSTR>,
+    lpUserId: OPTIONAL<LPCWSTR>,
     dwFlags: DWORD,
-    lpAccessName: LPWSTR | NULL,
-    lpBufferSize: LPDWORD | NULL,
-    lpResult: LPDWORD | NULL,
+    lpAccessName_out: OPTIONAL<LPWSTR>,
+    lpBufferSize_in_out: OPTIONAL<LPDWORD>,
+    lpResult_out: OPTIONAL<LPDWORD>,
   ): DWORD {
-    return Mpr.Load('WNetUseConnectionW')(hwndOwner, lpNetResource, lpPassword, lpUserId, dwFlags, lpAccessName, lpBufferSize, lpResult);
+    return Mpr.Load('WNetUseConnectionW')(hwndOwner, lpNetResource, lpPassword, lpUserId, dwFlags, lpAccessName_out, lpBufferSize_in_out, lpResult_out);
   }
 }
 

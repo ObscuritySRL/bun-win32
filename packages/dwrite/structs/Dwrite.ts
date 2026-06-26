@@ -41,8 +41,8 @@ class Dwrite extends Win32 {
   } as const satisfies Record<string, FFIFunction>;
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dwrite/nf-dwrite-dwritecreatefactory
-  public static DWriteCreateFactory(factoryType: DWRITE_FACTORY_TYPE, iid: REFIID, factory: LPLPVOID): HRESULT {
-    return Dwrite.Load('DWriteCreateFactory')(factoryType, iid, factory);
+  public static DWriteCreateFactory(factoryType: DWRITE_FACTORY_TYPE, iid: REFIID, factory_out: LPLPVOID): HRESULT {
+    return Dwrite.Load('DWriteCreateFactory')(factoryType, iid, factory_out);
   }
 }
 

@@ -17,7 +17,8 @@ import type {
   LPBOOL,
   LPDWORD,
   LPARAM,
-  NULL,
+  NULLABLE,
+  OPTIONAL,
   PACKED_POINT,
   PDWM_BLURBEHIND,
   PDWM_PRESENT_PARAMETERS,
@@ -91,8 +92,8 @@ class Dwmapi extends Win32 {
   } as const satisfies Record<string, FFIFunction>;
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dwmapi/nf-dwmapi-dwmdefwindowproc
-  public static DwmDefWindowProc(hWnd: HWND, msg: UINT, wParam: WPARAM, lParam: LPARAM, plResult: PLRESULT): BOOL {
-    return Dwmapi.Load('DwmDefWindowProc')(hWnd, msg, wParam, lParam, plResult);
+  public static DwmDefWindowProc(hWnd: HWND, msg: UINT, wParam: WPARAM, lParam: LPARAM, plResult_out: PLRESULT): BOOL {
+    return Dwmapi.Load('DwmDefWindowProc')(hWnd, msg, wParam, lParam, plResult_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dwmapi/nf-dwmapi-dwmenableblurbehindwindow
@@ -121,28 +122,28 @@ class Dwmapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dwmapi/nf-dwmapi-dwmgetcolorizationcolor
-  public static DwmGetColorizationColor(pcrColorization: LPDWORD, pfOpaqueBlend: LPBOOL): HRESULT {
-    return Dwmapi.Load('DwmGetColorizationColor')(pcrColorization, pfOpaqueBlend);
+  public static DwmGetColorizationColor(pcrColorization_out: LPDWORD, pfOpaqueBlend_out: LPBOOL): HRESULT {
+    return Dwmapi.Load('DwmGetColorizationColor')(pcrColorization_out, pfOpaqueBlend_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dwmapi/nf-dwmapi-dwmgetcompositiontiminginfo
-  public static DwmGetCompositionTimingInfo(hwnd: HWND | 0n, pTimingInfo: PDWM_TIMING_INFO): HRESULT {
-    return Dwmapi.Load('DwmGetCompositionTimingInfo')(hwnd, pTimingInfo);
+  public static DwmGetCompositionTimingInfo(hwnd: NULLABLE<HWND>, pTimingInfo_out: PDWM_TIMING_INFO): HRESULT {
+    return Dwmapi.Load('DwmGetCompositionTimingInfo')(hwnd, pTimingInfo_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dwmapi/nf-dwmapi-dwmgettransportattributes
-  public static DwmGetTransportAttributes(pfIsRemoting: LPBOOL, pfIsConnected: LPBOOL, pDwGeneration: LPDWORD): HRESULT {
-    return Dwmapi.Load('DwmGetTransportAttributes')(pfIsRemoting, pfIsConnected, pDwGeneration);
+  public static DwmGetTransportAttributes(pfIsRemoting_out: LPBOOL, pfIsConnected_out: LPBOOL, pDwGeneration_out: LPDWORD): HRESULT {
+    return Dwmapi.Load('DwmGetTransportAttributes')(pfIsRemoting_out, pfIsConnected_out, pDwGeneration_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dwmapi/nf-dwmapi-dwmgetunmettabrequirements
-  public static DwmGetUnmetTabRequirements(appWindow: HWND | 0n, value: PDWM_TAB_WINDOW_REQUIREMENTS): HRESULT {
-    return Dwmapi.Load('DwmGetUnmetTabRequirements')(appWindow, value);
+  public static DwmGetUnmetTabRequirements(appWindow: OPTIONAL<HWND>, value_out: PDWM_TAB_WINDOW_REQUIREMENTS): HRESULT {
+    return Dwmapi.Load('DwmGetUnmetTabRequirements')(appWindow, value_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dwmapi/nf-dwmapi-dwmgetwindowattribute
-  public static DwmGetWindowAttribute(hwnd: HWND, dwAttribute: DWORD, pvAttribute: PVOID, cbAttribute: DWORD): HRESULT {
-    return Dwmapi.Load('DwmGetWindowAttribute')(hwnd, dwAttribute, pvAttribute, cbAttribute);
+  public static DwmGetWindowAttribute(hwnd: HWND, dwAttribute: DWORD, pvAttribute_out: PVOID, cbAttribute: DWORD): HRESULT {
+    return Dwmapi.Load('DwmGetWindowAttribute')(hwnd, dwAttribute, pvAttribute_out, cbAttribute);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dwmapi/nf-dwmapi-dwminvalidateiconicbitmaps
@@ -151,8 +152,8 @@ class Dwmapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dwmapi/nf-dwmapi-dwmiscompositionenabled
-  public static DwmIsCompositionEnabled(pfEnabled: LPBOOL): HRESULT {
-    return Dwmapi.Load('DwmIsCompositionEnabled')(pfEnabled);
+  public static DwmIsCompositionEnabled(pfEnabled_out: LPBOOL): HRESULT {
+    return Dwmapi.Load('DwmIsCompositionEnabled')(pfEnabled_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dwmapi/nf-dwmapi-dwmmodifypreviousdxframeduration
@@ -161,13 +162,13 @@ class Dwmapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dwmapi/nf-dwmapi-dwmquerythumbnailsourcesize
-  public static DwmQueryThumbnailSourceSize(hThumbnail: HTHUMBNAIL, pSize: PSIZE): HRESULT {
-    return Dwmapi.Load('DwmQueryThumbnailSourceSize')(hThumbnail, pSize);
+  public static DwmQueryThumbnailSourceSize(hThumbnail: HTHUMBNAIL, pSize_out: PSIZE): HRESULT {
+    return Dwmapi.Load('DwmQueryThumbnailSourceSize')(hThumbnail, pSize_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dwmapi/nf-dwmapi-dwmregisterthumbnail
-  public static DwmRegisterThumbnail(hwndDestination: HWND, hwndSource: HWND, phThumbnailId: PHTHUMBNAIL): HRESULT {
-    return Dwmapi.Load('DwmRegisterThumbnail')(hwndDestination, hwndSource, phThumbnailId);
+  public static DwmRegisterThumbnail(hwndDestination: HWND, hwndSource: HWND, phThumbnailId_out: PHTHUMBNAIL): HRESULT {
+    return Dwmapi.Load('DwmRegisterThumbnail')(hwndDestination, hwndSource, phThumbnailId_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dwmapi/nf-dwmapi-dwmrendergesture
@@ -181,7 +182,7 @@ class Dwmapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dwmapi/nf-dwmapi-dwmseticoniclivepreviewbitmap
-  public static DwmSetIconicLivePreviewBitmap(hwnd: HWND, hbmp: HBITMAP, pptClient: PPOINT | NULL, dwSITFlags: DWORD): HRESULT {
+  public static DwmSetIconicLivePreviewBitmap(hwnd: HWND, hbmp: HBITMAP, pptClient: OPTIONAL<PPOINT>, dwSITFlags: DWORD): HRESULT {
     return Dwmapi.Load('DwmSetIconicLivePreviewBitmap')(hwnd, hbmp, pptClient, dwSITFlags);
   }
 
@@ -191,8 +192,8 @@ class Dwmapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dwmapi/nf-dwmapi-dwmsetpresentparameters
-  public static DwmSetPresentParameters(hwnd: HWND, pPresentParams: PDWM_PRESENT_PARAMETERS): HRESULT {
-    return Dwmapi.Load('DwmSetPresentParameters')(hwnd, pPresentParams);
+  public static DwmSetPresentParameters(hwnd: HWND, pPresentParams_in_out: PDWM_PRESENT_PARAMETERS): HRESULT {
+    return Dwmapi.Load('DwmSetPresentParameters')(hwnd, pPresentParams_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dwmapi/nf-dwmapi-dwmsetwindowattribute

@@ -13,7 +13,7 @@ import type {
   LPPWEBAUTHN_ASSERTION,
   LPPWEBAUTHN_CREDENTIAL_ATTESTATION,
   LPPWEBAUTHN_CREDENTIAL_DETAILS_LIST,
-  NULL,
+  OPTIONAL,
   PCBYTE,
   PCWEBAUTHN_AUTHENTICATOR_GET_ASSERTION_OPTIONS,
   PCWEBAUTHN_AUTHENTICATOR_MAKE_CREDENTIAL_OPTIONS,
@@ -75,10 +75,10 @@ class Webauthn extends Win32 {
     hWnd: HWND,
     pwszRpId: LPCWSTR,
     pWebAuthNClientData: PCWEBAUTHN_CLIENT_DATA,
-    pWebAuthNGetAssertionOptions: PCWEBAUTHN_AUTHENTICATOR_GET_ASSERTION_OPTIONS | NULL,
-    ppWebAuthNAssertion: LPPWEBAUTHN_ASSERTION,
+    pWebAuthNGetAssertionOptions: OPTIONAL<PCWEBAUTHN_AUTHENTICATOR_GET_ASSERTION_OPTIONS>,
+    ppWebAuthNAssertion_out: LPPWEBAUTHN_ASSERTION,
   ): HRESULT {
-    return Webauthn.Load('WebAuthNAuthenticatorGetAssertion')(hWnd, pwszRpId, pWebAuthNClientData, pWebAuthNGetAssertionOptions, ppWebAuthNAssertion);
+    return Webauthn.Load('WebAuthNAuthenticatorGetAssertion')(hWnd, pwszRpId, pWebAuthNClientData, pWebAuthNGetAssertionOptions, ppWebAuthNAssertion_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/webauthn/nf-webauthn-webauthnauthenticatormakecredential
@@ -88,10 +88,10 @@ class Webauthn extends Win32 {
     pUserInformation: PCWEBAUTHN_USER_ENTITY_INFORMATION,
     pPubKeyCredParams: PCWEBAUTHN_COSE_CREDENTIAL_PARAMETERS,
     pWebAuthNClientData: PCWEBAUTHN_CLIENT_DATA,
-    pWebAuthNMakeCredentialOptions: PCWEBAUTHN_AUTHENTICATOR_MAKE_CREDENTIAL_OPTIONS | NULL,
-    ppWebAuthNCredentialAttestation: LPPWEBAUTHN_CREDENTIAL_ATTESTATION,
+    pWebAuthNMakeCredentialOptions: OPTIONAL<PCWEBAUTHN_AUTHENTICATOR_MAKE_CREDENTIAL_OPTIONS>,
+    ppWebAuthNCredentialAttestation_out: LPPWEBAUTHN_CREDENTIAL_ATTESTATION,
   ): HRESULT {
-    return Webauthn.Load('WebAuthNAuthenticatorMakeCredential')(hWnd, pRpInformation, pUserInformation, pPubKeyCredParams, pWebAuthNClientData, pWebAuthNMakeCredentialOptions, ppWebAuthNCredentialAttestation);
+    return Webauthn.Load('WebAuthNAuthenticatorMakeCredential')(hWnd, pRpInformation, pUserInformation, pPubKeyCredParams, pWebAuthNClientData, pWebAuthNMakeCredentialOptions, ppWebAuthNCredentialAttestation_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/webauthn/nf-webauthn-webauthncancelcurrentoperation
@@ -110,7 +110,7 @@ class Webauthn extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/webauthn/nf-webauthn-webauthnfreecredentialattestation
-  public static WebAuthNFreeCredentialAttestation(pWebAuthNCredentialAttestation: PWEBAUTHN_CREDENTIAL_ATTESTATION | 0n): void {
+  public static WebAuthNFreeCredentialAttestation(pWebAuthNCredentialAttestation: OPTIONAL<PWEBAUTHN_CREDENTIAL_ATTESTATION>): void {
     return Webauthn.Load('WebAuthNFreeCredentialAttestation')(pWebAuthNCredentialAttestation);
   }
 
@@ -125,8 +125,8 @@ class Webauthn extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/webauthn/nf-webauthn-webauthngetcancellationid
-  public static WebAuthNGetCancellationId(pCancellationId: LPGUID): HRESULT {
-    return Webauthn.Load('WebAuthNGetCancellationId')(pCancellationId);
+  public static WebAuthNGetCancellationId(pCancellationId_out: LPGUID): HRESULT {
+    return Webauthn.Load('WebAuthNGetCancellationId')(pCancellationId_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/webauthn/nf-webauthn-webauthngeterrorname
@@ -135,8 +135,8 @@ class Webauthn extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/webauthn/nf-webauthn-webauthngetplatformcredentiallist
-  public static WebAuthNGetPlatformCredentialList(pGetCredentialsOptions: PCWEBAUTHN_GET_CREDENTIALS_OPTIONS, ppCredentialDetailsList: LPPWEBAUTHN_CREDENTIAL_DETAILS_LIST): HRESULT {
-    return Webauthn.Load('WebAuthNGetPlatformCredentialList')(pGetCredentialsOptions, ppCredentialDetailsList);
+  public static WebAuthNGetPlatformCredentialList(pGetCredentialsOptions: PCWEBAUTHN_GET_CREDENTIALS_OPTIONS, ppCredentialDetailsList_out: LPPWEBAUTHN_CREDENTIAL_DETAILS_LIST): HRESULT {
+    return Webauthn.Load('WebAuthNGetPlatformCredentialList')(pGetCredentialsOptions, ppCredentialDetailsList_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/webauthn/nf-webauthn-webauthngetw3cexceptiondomerror
@@ -145,8 +145,8 @@ class Webauthn extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/webauthn/nf-webauthn-webauthnisuserverifyingplatformauthenticatoravailable
-  public static WebAuthNIsUserVerifyingPlatformAuthenticatorAvailable(pbIsUserVerifyingPlatformAuthenticatorAvailable: LPBOOL): HRESULT {
-    return Webauthn.Load('WebAuthNIsUserVerifyingPlatformAuthenticatorAvailable')(pbIsUserVerifyingPlatformAuthenticatorAvailable);
+  public static WebAuthNIsUserVerifyingPlatformAuthenticatorAvailable(pbIsUserVerifyingPlatformAuthenticatorAvailable_out: LPBOOL): HRESULT {
+    return Webauthn.Load('WebAuthNIsUserVerifyingPlatformAuthenticatorAvailable')(pbIsUserVerifyingPlatformAuthenticatorAvailable_out);
   }
 }
 
