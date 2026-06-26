@@ -91,7 +91,6 @@
     "@bun-win32/tbs": "workspace:*",
     "@bun-win32/tdh": "workspace:*",
     "@bun-win32/terminal": "workspace:*",
-    "@bun-win32/uia": "workspace:*",
     "@bun-win32/uiautomationcore": "workspace:*",
     "@bun-win32/user32": "workspace:*",
     "@bun-win32/userenv": "workspace:*",
@@ -171,7 +170,6 @@
     "sound-bloom": "bun run example/sound-bloom.ts",
     "sph3d": "bun run example/sph3d.ts",
     "tpm-oracle": "bun run example/tpm-oracle.ts",
-    "uia-automation": "bun run example/uia-automation.ts",
     "vocoder": "bun run example/vocoder.ts",
     "voxelscape": "bun run example/voxelscape.ts",
     "webcam": "bun run example/webcam.ts"
@@ -190,7 +188,7 @@
     "directory": "packages/all"
   },
   "type": "module",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "main": "./index.ts",
   "keywords": [
     "bun",
