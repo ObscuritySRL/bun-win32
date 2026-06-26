@@ -14,7 +14,7 @@
     },
     "packages/activeds": {
       "name": "@bun-win32/activeds",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -27,7 +27,7 @@
     },
     "packages/advapi32": {
       "name": "@bun-win32/advapi32",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -41,7 +41,7 @@
     },
     "packages/all": {
       "name": "@bun-win32/all",
-      "version": "2.0.1",
+      "version": "2.0.2",
       "dependencies": {
         "@bun-win32/activeds": "workspace:*",
         "@bun-win32/advapi32": "workspace:*",
@@ -170,7 +170,7 @@
     },
     "packages/amsi": {
       "name": "@bun-win32/amsi",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -184,7 +184,7 @@
     },
     "packages/avifil32": {
       "name": "@bun-win32/avifil32",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -198,7 +198,7 @@
     },
     "packages/avrt": {
       "name": "@bun-win32/avrt",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -212,7 +212,7 @@
     },
     "packages/bcrypt": {
       "name": "@bun-win32/bcrypt",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -225,7 +225,7 @@
     },
     "packages/bluetoothapis": {
       "name": "@bun-win32/bluetoothapis",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -238,7 +238,7 @@
     },
     "packages/bun-gpu": {
       "name": "bun-gpu",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/gpu": "workspace:*",
       },
@@ -251,7 +251,7 @@
     },
     "packages/bun-netdiag": {
       "name": "bun-netdiag",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/netdiag": "workspace:*",
       },
@@ -264,7 +264,7 @@
     },
     "packages/bun-sysmon": {
       "name": "bun-sysmon",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/sysmon": "workspace:*",
       },
@@ -277,7 +277,7 @@
     },
     "packages/bun-terminal": {
       "name": "bun-terminal",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/terminal": "workspace:*",
       },
@@ -290,7 +290,7 @@
     },
     "packages/bun-win32": {
       "name": "bun-win32",
-      "version": "2.0.1",
+      "version": "2.0.2",
       "dependencies": {
         "@bun-win32/all": "workspace:*",
       },
@@ -303,7 +303,7 @@
     },
     "packages/cabinet": {
       "name": "@bun-win32/cabinet",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -317,7 +317,7 @@
     },
     "packages/cfgmgr32": {
       "name": "@bun-win32/cfgmgr32",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -330,7 +330,7 @@
     },
     "packages/cldapi": {
       "name": "@bun-win32/cldapi",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -344,7 +344,7 @@
     },
     "packages/clfsw32": {
       "name": "@bun-win32/clfsw32",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -357,7 +357,7 @@
     },
     "packages/clusapi": {
       "name": "@bun-win32/clusapi",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -371,7 +371,7 @@
     },
     "packages/combase": {
       "name": "@bun-win32/combase",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -384,7 +384,7 @@
     },
     "packages/comctl32": {
       "name": "@bun-win32/comctl32",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -397,7 +397,7 @@
     },
     "packages/comdlg32": {
       "name": "@bun-win32/comdlg32",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -412,7 +412,7 @@
     },
     "packages/core": {
       "name": "@bun-win32/core",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "devDependencies": {
         "@types/bun": "latest",
       },
@@ -422,7 +422,7 @@
     },
     "packages/credui": {
       "name": "@bun-win32/credui",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -437,7 +437,7 @@
     },
     "packages/crypt32": {
       "name": "@bun-win32/crypt32",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -451,7 +451,7 @@
     },
     "packages/d2d1": {
       "name": "@bun-win32/d2d1",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -464,7 +464,7 @@
     },
     "packages/d3d11": {
       "name": "@bun-win32/d3d11",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -477,7 +477,7 @@
     },
     "packages/d3d12": {
       "name": "@bun-win32/d3d12",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -490,7 +490,7 @@
     },
     "packages/d3dcompiler_47": {
       "name": "@bun-win32/d3dcompiler_47",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -503,7 +503,7 @@
     },
     "packages/dbghelp": {
       "name": "@bun-win32/dbghelp",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -516,7 +516,7 @@
     },
     "packages/dcomp": {
       "name": "@bun-win32/dcomp",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -529,7 +529,7 @@
     },
     "packages/dinput8": {
       "name": "@bun-win32/dinput8",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -543,7 +543,7 @@
     },
     "packages/directml": {
       "name": "@bun-win32/directml",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -557,7 +557,7 @@
     },
     "packages/dismapi": {
       "name": "@bun-win32/dismapi",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -571,7 +571,7 @@
     },
     "packages/dnsapi": {
       "name": "@bun-win32/dnsapi",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -584,7 +584,7 @@
     },
     "packages/dsound": {
       "name": "@bun-win32/dsound",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -598,7 +598,7 @@
     },
     "packages/dwmapi": {
       "name": "@bun-win32/dwmapi",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -613,7 +613,7 @@
     },
     "packages/dwrite": {
       "name": "@bun-win32/dwrite",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -626,7 +626,7 @@
     },
     "packages/dxcore": {
       "name": "@bun-win32/dxcore",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -639,7 +639,7 @@
     },
     "packages/dxgi": {
       "name": "@bun-win32/dxgi",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -653,7 +653,7 @@
     },
     "packages/dxva2": {
       "name": "@bun-win32/dxva2",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -667,7 +667,7 @@
     },
     "packages/firewallapi": {
       "name": "@bun-win32/firewallapi",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -680,7 +680,7 @@
     },
     "packages/fltlib": {
       "name": "@bun-win32/fltlib",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -693,7 +693,7 @@
     },
     "packages/fveapi": {
       "name": "@bun-win32/fveapi",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -707,7 +707,7 @@
     },
     "packages/fwpuclnt": {
       "name": "@bun-win32/fwpuclnt",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -720,7 +720,7 @@
     },
     "packages/gameinput": {
       "name": "@bun-win32/gameinput",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -733,7 +733,7 @@
     },
     "packages/gdi32": {
       "name": "@bun-win32/gdi32",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -748,7 +748,7 @@
     },
     "packages/gdiplus": {
       "name": "@bun-win32/gdiplus",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -761,7 +761,7 @@
     },
     "packages/glu32": {
       "name": "@bun-win32/glu32",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -778,7 +778,7 @@
     },
     "packages/gpu": {
       "name": "@bun-win32/gpu",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
         "@bun-win32/d3d11": "workspace:*",
@@ -795,7 +795,7 @@
     },
     "packages/hid": {
       "name": "@bun-win32/hid",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -809,7 +809,7 @@
     },
     "packages/httpapi": {
       "name": "@bun-win32/httpapi",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -822,7 +822,7 @@
     },
     "packages/iphlpapi": {
       "name": "@bun-win32/iphlpapi",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -835,7 +835,7 @@
     },
     "packages/kernel32": {
       "name": "@bun-win32/kernel32",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -848,7 +848,7 @@
     },
     "packages/ktmw32": {
       "name": "@bun-win32/ktmw32",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -862,7 +862,7 @@
     },
     "packages/magnification": {
       "name": "@bun-win32/magnification",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -877,7 +877,7 @@
     },
     "packages/mf": {
       "name": "@bun-win32/mf",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -890,7 +890,7 @@
     },
     "packages/mfplat": {
       "name": "@bun-win32/mfplat",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -903,7 +903,7 @@
     },
     "packages/mfreadwrite": {
       "name": "@bun-win32/mfreadwrite",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -916,7 +916,7 @@
     },
     "packages/mi": {
       "name": "@bun-win32/mi",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -930,7 +930,7 @@
     },
     "packages/mmdevapi": {
       "name": "@bun-win32/mmdevapi",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -943,7 +943,7 @@
     },
     "packages/mpr": {
       "name": "@bun-win32/mpr",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -957,7 +957,7 @@
     },
     "packages/mscms": {
       "name": "@bun-win32/mscms",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -970,7 +970,7 @@
     },
     "packages/msi": {
       "name": "@bun-win32/msi",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -983,7 +983,7 @@
     },
     "packages/ncrypt": {
       "name": "@bun-win32/ncrypt",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -996,7 +996,7 @@
     },
     "packages/netapi32": {
       "name": "@bun-win32/netapi32",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -1009,7 +1009,7 @@
     },
     "packages/netdiag": {
       "name": "@bun-win32/netdiag",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
         "@bun-win32/dnsapi": "workspace:*",
@@ -1027,7 +1027,7 @@
     },
     "packages/normaliz": {
       "name": "@bun-win32/normaliz",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -1040,7 +1040,7 @@
     },
     "packages/ntdll": {
       "name": "@bun-win32/ntdll",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -1054,7 +1054,7 @@
     },
     "packages/ntdsapi": {
       "name": "@bun-win32/ntdsapi",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -1068,7 +1068,7 @@
     },
     "packages/ole32": {
       "name": "@bun-win32/ole32",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -1081,7 +1081,7 @@
     },
     "packages/oleacc": {
       "name": "@bun-win32/oleacc",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -1094,7 +1094,7 @@
     },
     "packages/oleaut32": {
       "name": "@bun-win32/oleaut32",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -1108,7 +1108,7 @@
     },
     "packages/opengl32": {
       "name": "@bun-win32/opengl32",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -1124,7 +1124,7 @@
     },
     "packages/pdh": {
       "name": "@bun-win32/pdh",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -1137,7 +1137,7 @@
     },
     "packages/powrprof": {
       "name": "@bun-win32/powrprof",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -1151,7 +1151,7 @@
     },
     "packages/prntvpt": {
       "name": "@bun-win32/prntvpt",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -1164,7 +1164,7 @@
     },
     "packages/propsys": {
       "name": "@bun-win32/propsys",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -1177,7 +1177,7 @@
     },
     "packages/psapi": {
       "name": "@bun-win32/psapi",
-      "version": "3.0.0",
+      "version": "3.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -1191,7 +1191,7 @@
     },
     "packages/quartz": {
       "name": "@bun-win32/quartz",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -1204,7 +1204,7 @@
     },
     "packages/rasapi32": {
       "name": "@bun-win32/rasapi32",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -1218,7 +1218,7 @@
     },
     "packages/rpcrt4": {
       "name": "@bun-win32/rpcrt4",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -1231,7 +1231,7 @@
     },
     "packages/rstrtmgr": {
       "name": "@bun-win32/rstrtmgr",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -1245,7 +1245,7 @@
     },
     "packages/secur32": {
       "name": "@bun-win32/secur32",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -1258,7 +1258,7 @@
     },
     "packages/sensapi": {
       "name": "@bun-win32/sensapi",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -1272,7 +1272,7 @@
     },
     "packages/setupapi": {
       "name": "@bun-win32/setupapi",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -1286,7 +1286,7 @@
     },
     "packages/shcore": {
       "name": "@bun-win32/shcore",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -1299,7 +1299,7 @@
     },
     "packages/shell32": {
       "name": "@bun-win32/shell32",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -1313,7 +1313,7 @@
     },
     "packages/shlwapi": {
       "name": "@bun-win32/shlwapi",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -1326,7 +1326,7 @@
     },
     "packages/srclient": {
       "name": "@bun-win32/srclient",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -1341,7 +1341,7 @@
     },
     "packages/sspicli": {
       "name": "@bun-win32/sspicli",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -1355,7 +1355,7 @@
     },
     "packages/sysmon": {
       "name": "@bun-win32/sysmon",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/advapi32": "workspace:*",
         "@bun-win32/core": "workspace:*",
@@ -1380,7 +1380,7 @@
     },
     "packages/taskschd": {
       "name": "@bun-win32/taskschd",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -1393,7 +1393,7 @@
     },
     "packages/tbs": {
       "name": "@bun-win32/tbs",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -1407,7 +1407,7 @@
     },
     "packages/tdh": {
       "name": "@bun-win32/tdh",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -1422,7 +1422,7 @@
     },
     "packages/template": {
       "name": "@bun-win32/{name}",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -1435,7 +1435,7 @@
     },
     "packages/terminal": {
       "name": "@bun-win32/terminal",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
         "@bun-win32/kernel32": "workspace:*",
@@ -1449,7 +1449,7 @@
     },
     "packages/uiautomationcore": {
       "name": "@bun-win32/uiautomationcore",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -1463,7 +1463,7 @@
     },
     "packages/user32": {
       "name": "@bun-win32/user32",
-      "version": "4.0.0",
+      "version": "4.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -1476,7 +1476,7 @@
     },
     "packages/userenv": {
       "name": "@bun-win32/userenv",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -1490,7 +1490,7 @@
     },
     "packages/uxtheme": {
       "name": "@bun-win32/uxtheme",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -1503,7 +1503,7 @@
     },
     "packages/version": {
       "name": "@bun-win32/version",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -1517,7 +1517,7 @@
     },
     "packages/virtdisk": {
       "name": "@bun-win32/virtdisk",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
         "@bun-win32/kernel32": "workspace:*",
@@ -1531,7 +1531,7 @@
     },
     "packages/vssapi": {
       "name": "@bun-win32/vssapi",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -1544,7 +1544,7 @@
     },
     "packages/webauthn": {
       "name": "@bun-win32/webauthn",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -1557,7 +1557,7 @@
     },
     "packages/wer": {
       "name": "@bun-win32/wer",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -1570,7 +1570,7 @@
     },
     "packages/wevtapi": {
       "name": "@bun-win32/wevtapi",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -1584,7 +1584,7 @@
     },
     "packages/wimgapi": {
       "name": "@bun-win32/wimgapi",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -1597,7 +1597,7 @@
     },
     "packages/windowsaccessbridge-64": {
       "name": "@bun-win32/windowsaccessbridge-64",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -1610,7 +1610,7 @@
     },
     "packages/windowscodecs": {
       "name": "@bun-win32/windowscodecs",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -1624,7 +1624,7 @@
     },
     "packages/winhttp": {
       "name": "@bun-win32/winhttp",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -1637,7 +1637,7 @@
     },
     "packages/wininet": {
       "name": "@bun-win32/wininet",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -1650,7 +1650,7 @@
     },
     "packages/winmm": {
       "name": "@bun-win32/winmm",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -1663,7 +1663,7 @@
     },
     "packages/winscard": {
       "name": "@bun-win32/winscard",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -1676,7 +1676,7 @@
     },
     "packages/winspool": {
       "name": "@bun-win32/winspool",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -1689,7 +1689,7 @@
     },
     "packages/wintrust": {
       "name": "@bun-win32/wintrust",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -1703,7 +1703,7 @@
     },
     "packages/winusb": {
       "name": "@bun-win32/winusb",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -1717,7 +1717,7 @@
     },
     "packages/wlanapi": {
       "name": "@bun-win32/wlanapi",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -1730,7 +1730,7 @@
     },
     "packages/wldap32": {
       "name": "@bun-win32/wldap32",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -1743,7 +1743,7 @@
     },
     "packages/ws2_32": {
       "name": "@bun-win32/ws2_32",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -1756,7 +1756,7 @@
     },
     "packages/wscapi": {
       "name": "@bun-win32/wscapi",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -1770,7 +1770,7 @@
     },
     "packages/wtsapi32": {
       "name": "@bun-win32/wtsapi32",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -1783,7 +1783,7 @@
     },
     "packages/wuapi": {
       "name": "@bun-win32/wuapi",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -1796,7 +1796,7 @@
     },
     "packages/xaudio2_9": {
       "name": "@bun-win32/xaudio2_9",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -1810,7 +1810,7 @@
     },
     "packages/xinput1_4": {
       "name": "@bun-win32/xinput1_4",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -1823,7 +1823,7 @@
     },
     "packages/xinput9_1_0": {
       "name": "@bun-win32/xinput9_1_0",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },

@@ -27,7 +27,7 @@
     "directory": "packages/user32"
   },
   "type": "module",
-  "version": "4.0.0",
+  "version": "4.0.1",
   "main": "./index.ts",
   "keywords": [
     "bun",
