@@ -37,7 +37,7 @@ bunfig.toml      pins linker = "hoisted"
 tsconfig.json    strict; shared by every package
 ```
 
-There are 117 packages. Class names are PascalCase; a few preserve native DLL casing — `OpenGL32`, `GLU32`, `Ws2_32`, `Xaudio2_9`, `Xinput1_4`, `Xinput9_1_0` — and `opengl32`/`glu32` keep native function names (`glBegin`, `gluSphere`).
+Class names are PascalCase; a few preserve native DLL casing — `OpenGL32`, `GLU32`, `Ws2_32`, `Xaudio2_9`, `Xinput1_4`, `Xinput9_1_0` — and `opengl32`/`glu32` keep native function names (`glBegin`, `gluSphere`).
 
 ### Per-package file layout
 
