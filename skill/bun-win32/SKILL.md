@@ -3,9 +3,10 @@ name: bun-win32
 description: >
   Win32 FFI binding lifecycle for @bun-win32/* packages (Win32 DLL bindings
   via bun:ffi on Windows). Use when generating a new package from a DLL,
-  auditing FFI↔TS↔header consistency, fixing nullability (| NULL / | 0n),
-  or understanding the bootstrap→catalog→stub→audit→nullcheck pipeline.
-  Covers 117 packages; strict TypeScript; Bun runtime; Biome formatting.
+  auditing FFI↔TS↔header consistency, applying the SAL vocabulary
+  (Optional<T> / Nullable<T>, name_out / name_in_out), or understanding the
+  bootstrap→catalog→stub→audit→nullcheck pipeline.
+  Strict TypeScript; Bun runtime; Biome formatting.
 engines:
   - claude-code
   - opencode
@@ -19,7 +20,7 @@ Win32 FFI binding development lifecycle for the `bun-win32` monorepo.
 
 ```
 WORKING_DIR (repo root)
-  packages/       117 @bun-win32/* binding packages
+  packages/       one @bun-win32/* package per system DLL
   scripts/        repo automation scripts
   PROMPT.md       authoritative playbook (FFI rules, nullability, audits)
   AGENTS.md       operating rules — read before touching bindings
@@ -31,16 +32,17 @@ WORKING_DIR (repo root)
 ## Lifecycle Commands
 
 ```bash
-# 1. Check prerequisites (platform Windows, Bun ≥1.3.0, ripgrep, SDK, dumpbin)
+# 1. Check prerequisites (platform Windows, Bun ≥1.1, ripgrep, SDK, dumpbin)
 bun run scripts/doctor.ts
 
 # 2. Full pipeline: doctor → scaffold → install → catalog → ffi-runtime → stub
-bun run scripts/bootstrap.ts {name} [--class=ClassName] [--rg=<path>] [--dll=<path>]
+bun run scripts/bootstrap.ts {name} [--skip-doctor] [--skip-install] [--rg=<path>] [--dll=<path>]
 
 # 3. Individual steps
-bun run scripts/catalog.ts {name} --json        # DLL∩SDK symbols
-bun run scripts/ffi-runtime.ts {name}            # FFI return shapes
-bun run scripts/stub.ts {name} [--class=C]      # paste-ready stubs
+bun run scripts/scaffold.ts {name}               # template → packages/{name}
+bun run scripts/catalog.ts {name} --json         # DLL∩SDK symbols
+bun run scripts/ffi-runtime.ts                   # FFI return shapes
+bun run scripts/stub.ts {name} [--class=C]       # paste-ready stubs
 
 # 4. Auditing (run after writing bindings)
 bun run scripts/audit.ts {name}                  # FFI↔TS↔header consistency (--all, --fix)
@@ -83,15 +85,47 @@ cd packages/{name} && bun publish --access public --otp <code>
 | Win32 type | FFI | TS |
 |---|---|---|
 | `HANDLE`, `HWND`, `HKEY`, `HMODULE`… | `FFIType.u64` | `bigint` |
-| `SIZE_T`, `*_PTR`, `LPARAM`, `LRESULT`, `WPARAM` | `FFIType.u64` | `bigint` |
-| `LARGE_INTEGER`, `ULARGE_INTEGER` | `FFIType.i64` / `u64` | `bigint` |
+| `SIZE_T`, `*_PTR`, `LPARAM`, `LRESULT`, `WPARAM`, `LARGE_INTEGER` | `FFIType.u64` | `bigint` |
 | `DWORD`, `UINT`, `BOOL`, `HRESULT`, `INT`, `LONG`, `WORD`, `BYTE` | `FFIType.u32` / `i32` | `number` |
-| `LPVOID`, `LPCWSTR`, `LPSTR`, `LPDWORD`, `LPBYTE`… | `FFIType.ptr` | `Pointer` |
+| `LPCWSTR`, `LPSTR`, `LPDWORD`, `LPBYTE`, `PLARGE_INTEGER`… | `FFIType.ptr` | `Pointer` |
 | `void` | `FFIType.void` | `void` |
 
-**Decision rule:** Does the caller pass `.ptr` from a `Buffer`/`TypedArray` they allocated? Yes → `ptr`. No → `u64`.
+**Decision rule:** Does the caller pass `.ptr` from a `Buffer`/`TypedArray` they allocated? Yes → `ptr`. No → `u64`. A name containing `PTR` does **not** make it a pointer.
 
 **NULL:** `u64 → 0n`, `ptr → null`, `u32 → 0`.
+
+**Dual-representation types.** When one Microsoft type arrives as a *local* `Pointer` in some exports and a *remote / by-value 64-bit address* in others, make the alias generic and pin it per call site — the FFI slot differs per use:
+
+```ts
+export type LPTHREAD_START_ROUTINE<T extends Pointer | bigint = Pointer | bigint> = T;
+// CreateThread       → LPTHREAD_START_ROUTINE<Pointer> + FFIType.ptr
+// CreateRemoteThread → LPTHREAD_START_ROUTINE<bigint>  + FFIType.u64
+```
+
+This applies to `LPVOID` / `LPCVOID` / `PVOID`: a genuine local buffer (`lpBuffer`) is `<Pointer>` + `ptr`, while an **address** (`lpAddress`, `lpBaseAddress`, alloc/map return values) is `<bigint>` + `u64`. Do not reach for it when a type is always one representation.
+
+## SAL Conventions
+
+Nullability is a value-contract fact → it lives in the **type**. Direction is usage metadata → it lives in the **name**. Neither ever touches the FFI `Symbols` map, the base Microsoft type, or the return type; they compose independently. Both markers come from `@bun-win32/core` and resolve their own null sentinel from `T` (`0n` for bigint-based types, `null` for `Pointer`-based buffers):
+
+| SAL / docs | Encoding |
+|---|---|
+| `_In_opt_`, `_Out_opt_`, `[in, optional]`, `[out, optional]` | `Optional<T>` |
+| plain `[in]` / `[out]` + docs say "can be NULL" / "Specify NULL to …" | `Nullable<T>` |
+| required param | bare (`HANDLE`, `LPDWORD`) |
+| `_Reserved_`, documented "must be NULL/zero" | `NULL` |
+| by-value scalar (`DWORD`, `BOOL`, `UINT`…) marked `_*opt_` | **bare** — "optional" means pass 0, there is no null |
+| `_Out_` / `[out]` | name suffix `name_out` |
+| `_Inout_` / `[in, out]` | name suffix `name_in_out` |
+| `_In_` | bare name (mark the exceptions, not the norm) |
+
+```ts
+public static GetModuleBaseNameW(hProcess: HANDLE, hModule: Optional<HMODULE>, lpBaseName_out: LPWSTR, nSize: DWORD): DWORD
+public static EnumPageFilesW(pCallBackRoutine: PENUM_PAGE_FILE_CALLBACKW, pContext: Nullable<LPVOID>): BOOL
+public static QueryWorkingSetEx(hProcess: HANDLE, pv_in_out: PVOID, cb: DWORD): BOOL
+```
+
+When SAL and prose disagree, the **SAL annotation governs** optional-vs-required; "can be NULL" prose on a non-`_opt_` param is what makes it `Nullable` rather than `Optional`. Reference implementation: `packages/psapi/structs/Psapi.ts`. Audit with `nullcheck.ts`.
 
 ## Prohibited
 
@@ -99,4 +133,5 @@ cd packages/{name} && bun publish --access public --otp <code>
 - Guess types/nullability — always verify vs SDK header + MS Learn
 - Use `as any` / forced casts — fix the FFI mapping instead
 - Reformat untouched files
-- Ship without running `audit.ts --all` and `nullcheck.ts --all` (zero findings required)
+- Mutate a shipped binding to silence an audit hint — `audit.ts` / `nullcheck.ts` emit accepted-convention notices (`SPURIOUS`, SDK suggestions) that are usually correct per MSDN; verify, don't blindly "fix"
+- Ship without a clean `bunx tsc --noEmit` and a reviewed `audit.ts --all` / `nullcheck.ts --all`
