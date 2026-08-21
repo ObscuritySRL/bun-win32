@@ -137,11 +137,13 @@
     "claude-usage-taskbar": "bun run example/claude-usage-taskbar.ts",
     "cloth": "bun run example/cloth.ts",
     "clouds": "bun run example/clouds.ts",
+    "codex-usage-taskbar": "bun run example/codex-usage-taskbar.ts",
     "core-scope": "bun run example/core-scope.ts",
     "crypto-forge": "bun run example/crypto-forge.ts",
     "ddc-monitor": "bun run example/ddc-monitor.ts",
     "desktop-shader": "bun run example/desktop-shader.ts",
     "digit-oracle": "bun run example/digit-oracle.ts",
+    "dualsense-taskbar": "bun run example/dualsense-taskbar.ts",
     "etw-firehose": "bun run example/etw-firehose.ts",
     "event-horizon": "bun run example/event-horizon.ts",
     "firmware-inventory": "bun run example/firmware-inventory.ts",
@@ -172,7 +174,8 @@
     "tpm-oracle": "bun run example/tpm-oracle.ts",
     "vocoder": "bun run example/vocoder.ts",
     "voxelscape": "bun run example/voxelscape.ts",
-    "webcam": "bun run example/webcam.ts"
+    "webcam": "bun run example/webcam.ts",
+    "xinput-hotkey-stick": "bun run example/xinput-hotkey-stick.ts"
   },
   "license": "MIT",
   "module": "index.ts",

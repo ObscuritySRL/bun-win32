@@ -6,8 +6,8 @@
  * sitting on the taskbar, right of the Windows weather widget in the bottom-left
  * corner. Zero configuration: it authenticates by reading the OAuth access token
  * Claude Code already keeps at ~/.claude/.credentials.json and polling the same
- * usage endpoint Claude Code's /usage screen uses. No API key, no login. The
- * background color is sampled from the taskbar itself so the widget blends in.
+ * usage endpoint Claude Code's /usage screen uses. No API key, no login. A sampled
+ * taskbar color is keyed away so the meters float on a transparent surface.
  * Left-click refreshes immediately; right-click quits. If the token has expired
  * (Claude Code not opened for many hours) the widget shows a stale marker until
  * Claude Code refreshes the token on its next run — it deliberately never uses
@@ -18,8 +18,8 @@
  *   RegisterClassExW + CreateWindowExW for a layered tool window, then
  *   SetWindowLongPtrW(GWL_STYLE → WS_CHILD) + SetParent + MoveWindow to reparent
  *   it INSIDE Shell_TrayWnd — so the taskbar can never raise itself over the
- *   widget — with ShowWindow + SetLayeredWindowAttributes, a PeekMessageW/
- *   TranslateMessage/DispatchMessageW message pump, FillRect, GetDC/ReleaseDC,
+ *   widget — with ShowWindow + color-key transparency, a PeekMessageW/
+ *   TranslateMessage/DispatchMessageW message pump, GetDC/ReleaseDC,
  *   and SetWindowPos HWND_TOP reassertion each poll)
  * - gdi32 (GetPixel taskbar color sampling, SetDIBitsToDevice single-blit software
  *   compositing — antialiased rounded bars, gradients, gloss — CreateFontW +
@@ -87,7 +87,8 @@ const WM_PAINT = 0x000f;
 const WM_LBUTTONDOWN = 0x0201;
 const WM_RBUTTONDOWN = 0x0204;
 const PM_REMOVE = 0x0001;
-const LWA_ALPHA = 0x0000_0002;
+const LWA_COLORKEY = 0x0000_0001;
+const CAPTUREBLT = 0x4000_0000;
 const SRCCOPY = 0x00cc_0020;
 const SWP_NOSIZE_NOMOVE_NOACTIVATE = 0x0000_0013;
 
@@ -212,13 +213,11 @@ const widgetWidth = Number(Bun.env.CLAUDE_USAGE_WIDTH ?? Math.round(236 * scale)
 const widgetX = taskbarLeft + Number(Bun.env.CLAUDE_USAGE_X ?? Math.round(218 * scale));
 const widgetY = taskbarTop;
 
-const screenSampleDC = User32.GetDC(0n);
-const sampledColor = GDI32.GetPixel(screenSampleDC, widgetX + widgetWidth + Math.round(24 * scale), widgetY + (taskbarHeight >> 1));
-void User32.ReleaseDC(0n, screenSampleDC);
-const backgroundColor = sampledColor === 0xffff_ffff ? 0x0026_1820 : sampledColor;
+const taskbarSampleDC = User32.GetDC(0n);
+const sampledTaskbarColor = GDI32.GetPixel(taskbarSampleDC, taskbarLeft + Math.round(2 * scale), widgetY + (taskbarHeight >> 1));
+void User32.ReleaseDC(0n, taskbarSampleDC);
+const backgroundColor = sampledTaskbarColor === 0xffff_ffff ? 0x0026_1820 : sampledTaskbarColor;
 const backgroundTint: Tint = { blue: (backgroundColor >> 16) & 0xff, green: (backgroundColor >> 8) & 0xff, red: backgroundColor & 0xff };
-const cardTint = mixTint(backgroundTint, WHITE_TINT, 0.055);
-const cardBorderTint = mixTint(backgroundTint, WHITE_TINT, 0.22);
 const trackTint = mixTint(backgroundTint, WHITE_TINT, 0.13);
 const colorrefOf = (tint: Tint): number => (Math.round(tint.blue) << 16) | (Math.round(tint.green) << 8) | Math.round(tint.red);
 const textColor = 0x00ff_ffff;
@@ -274,7 +273,7 @@ if (!parentedToTaskbar) {
   console.error('SetParent(Shell_TrayWnd) failed — falling back to a plain topmost overlay (the taskbar can cover it when activated).');
   void User32.SetWindowLongPtrW(hwnd, -16 /* GWL_STYLE */, BigInt(WindowStyles.WS_POPUP | WindowStyles.WS_VISIBLE));
 }
-if (User32.SetLayeredWindowAttributes(hwnd, 0, 0xff, LWA_ALPHA) === 0) console.error('SetLayeredWindowAttributes failed — widget may stay invisible.');
+if (User32.SetLayeredWindowAttributes(hwnd, backgroundColor, 0xff, LWA_COLORKEY) === 0) console.error('SetLayeredWindowAttributes failed — transparent background may be unavailable.');
 User32.MoveWindow(hwnd, parentedToTaskbar ? widgetX - taskbarLeft : widgetX, parentedToTaskbar ? 0 : widgetY, widgetWidth, widgetHeight, 1);
 User32.ShowWindow(hwnd, ShowWindowCommand.SW_SHOWNOACTIVATE);
 const zOrderAnchor = parentedToTaskbar ? 0n /* HWND_TOP */ : 0xffff_ffff_ffff_ffffn; /* HWND_TOPMOST */
@@ -371,7 +370,6 @@ const draw = (): void => {
     frame[index + 1] = backgroundTint.green;
     frame[index + 2] = backgroundTint.red;
   }
-  drawRoundedRect(1.5, 2, widgetWidth - 1.5, widgetHeight - 2, 9 * scale, () => cardTint, 1, cardBorderTint, 0.55);
   drawRoundedRect(5 * scale, 9 * scale, 7.5 * scale, widgetHeight - 9 * scale, 1.25 * scale, () => CLAY_TINT, 1);
   if (haveData) {
     composeBar(textY1, fiveHour);
@@ -433,7 +431,7 @@ const captureTaskbarRegion = async (path: string): Promise<void> => {
   const memoryDC = GDI32.CreateCompatibleDC(screenDC);
   const bitmap = GDI32.CreateCompatibleBitmap(screenDC, captureWidth, taskbarHeight);
   GDI32.SelectObject(memoryDC, bitmap);
-  void GDI32.BitBlt(memoryDC, 0, 0, captureWidth, taskbarHeight, screenDC, captureX, widgetY, SRCCOPY);
+  void GDI32.BitBlt(memoryDC, 0, 0, captureWidth, taskbarHeight, screenDC, captureX, widgetY, SRCCOPY | CAPTUREBLT);
   const bitmapInfo = Buffer.alloc(40);
   bitmapInfo.writeUInt32LE(40, 0);
   bitmapInfo.writeInt32LE(captureWidth, 4);
