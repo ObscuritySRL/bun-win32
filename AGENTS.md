@@ -29,6 +29,8 @@ packages/
                                          PascalCase class; home of the flagship example/ demos
   bun-win32/     bun-win32            — unscoped alias; `export * from '@bun-win32/all'`
   terminal/      @bun-win32/terminal  — high-performance terminal rendering engine (binds kernel32)
+  overlay/       @bun-win32/overlay   — anti-aliased GPU overlay renderer (gdi32, kernel32, opengl32, user32)
+  bun-overlay/   bun-overlay          — unscoped alias; `export * from '@bun-win32/overlay'`
   {name}/        @bun-win32/{name}    — one package per system DLL (advapi32, kernel32, user32, …)
 scripts/         repo automation (see Commands) — run with `bun run scripts/{name}.ts`
 PROMPT.md        the package-generation playbook
