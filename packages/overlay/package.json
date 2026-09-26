@@ -1,0 +1,73 @@
+{
+  "author": "Stev Peifer <stev.p@outlook.com>",
+  "bugs": {
+    "url": "https://github.com/ObscuritySRL/bun-win32/issues"
+  },
+  "dependencies": {
+    "@bun-win32/core": "workspace:*",
+    "@bun-win32/gdi32": "workspace:*",
+    "@bun-win32/kernel32": "workspace:*",
+    "@bun-win32/opengl32": "workspace:*",
+    "@bun-win32/user32": "workspace:*"
+  },
+  "description": "Anti-aliased, GPU-batched overlays for Bun on Windows — gradients, soft shadows, text, paths, images and 3D markers on a transparent, click-through window that redraws only what changed.",
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "engines": {
+    "bun": ">=1.1.0"
+  },
+  "exports": {
+    ".": "./index.ts"
+  },
+  "files": [
+    "AI.md",
+    "README.md",
+    "constants.ts",
+    "index.ts",
+    "overlay.ts",
+    "paint.ts",
+    "types.ts"
+  ],
+  "homepage": "https://github.com/ObscuritySRL/bun-win32#readme",
+  "keywords": [
+    "anti-aliasing",
+    "bun",
+    "canvas",
+    "ffi",
+    "gradient",
+    "graphics",
+    "hud",
+    "layered-window",
+    "opengl",
+    "overlay",
+    "transparent",
+    "typescript",
+    "win32",
+    "windows"
+  ],
+  "license": "MIT",
+  "main": "./index.ts",
+  "module": "index.ts",
+  "name": "@bun-win32/overlay",
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "private": false,
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "directory": "packages/overlay",
+    "type": "git",
+    "url": "git://github.com/ObscuritySRL/bun-win32.git"
+  },
+  "scripts": {
+    "example:colorkey": "bun ./example/colorkey.ts",
+    "example:showcase": "bun ./example/showcase.ts",
+    "example:test-card": "bun ./example/test-card.ts"
+  },
+  "sideEffects": false,
+  "type": "module",
+  "version": "1.0.0"
+}
