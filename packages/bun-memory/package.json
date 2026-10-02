@@ -1,0 +1,39 @@
+{
+  "author": "Stev Peifer <stev@bell.net>",
+  "bugs": {
+    "url": "https://github.com/ObscuritySRL/bun-win32/issues"
+  },
+  "dependencies": {
+    "@bun-win32/memory": "workspace:*"
+  },
+  "description": "Windows process memory manipulation and typed remote function calls for Bun. Alias for @bun-win32/memory.",
+  "engines": {
+    "bun": ">=1.1.0"
+  },
+  "exports": {
+    ".": "./index.ts"
+  },
+  "files": [
+    "README.md",
+    "index.ts"
+  ],
+  "homepage": "https://github.com/ObscuritySRL/bun-win32#readme",
+  "license": "MIT",
+  "main": "./index.ts",
+  "module": "index.ts",
+  "name": "bun-memory",
+  "peerDependencies": {
+    "typescript": "^5.9.2"
+  },
+  "private": false,
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "directory": "packages/bun-memory",
+    "type": "git",
+    "url": "git://github.com/ObscuritySRL/bun-win32.git"
+  },
+  "type": "module",
+  "version": "2.1.0"
+}

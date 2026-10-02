@@ -1,0 +1,61 @@
+{
+  "author": "Stev Peifer <stev@bell.net>",
+  "bugs": {
+    "url": "https://github.com/ObscuritySRL/bun-win32/issues"
+  },
+  "dependencies": {
+    "@bun-win32/kernel32": "workspace:*"
+  },
+  "description": "Windows process memory manipulation and typed remote function calls for Bun.",
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "engines": {
+    "bun": ">=1.1.0"
+  },
+  "exports": {
+    ".": "./index.ts"
+  },
+  "files": [
+    "AI.md",
+    "LICENSE",
+    "README.md",
+    "index.ts",
+    "runtime/*.ts",
+    "structs/*.ts",
+    "types/*.ts"
+  ],
+  "homepage": "https://github.com/ObscuritySRL/bun-win32#readme",
+  "keywords": [
+    "bun",
+    "ffi",
+    "memory",
+    "process",
+    "typescript",
+    "win32",
+    "windows"
+  ],
+  "license": "MIT",
+  "main": "./index.ts",
+  "module": "index.ts",
+  "name": "@bun-win32/memory",
+  "peerDependencies": {
+    "typescript": "^5.9.2"
+  },
+  "private": false,
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "directory": "packages/memory",
+    "type": "git",
+    "url": "git://github.com/ObscuritySRL/bun-win32.git"
+  },
+  "scripts": {
+    "benchmark": "bun run ./example/performance.bench.ts",
+    "test": "bun test ./example/self-process.integration.ts ./example/wow64.integration.ts ./example/remote-call.integration.ts",
+    "test:wow64": "bun test ./example/wow64.integration.ts"
+  },
+  "type": "module",
+  "version": "2.1.0"
+}

@@ -771,9 +771,14 @@ function auditPackage(pkgName: string, skipSdk: boolean = false): Mismatch[] {
   const className = structFiles[0].replace('.ts', '');
 
   const structsSource = readFileSync(join(structsDir, `${className}.ts`), 'utf-8');
-  const typesSource = readFileSync(join(typesDir, `${className}.ts`), 'utf-8');
-
   const symbols = parseSymbols(structsSource);
+
+  if (symbols.length === 0) {
+    console.error(`  Skipping ${pkgName}: no FFI symbols`);
+    return [];
+  }
+
+  const typesSource = readFileSync(join(typesDir, `${className}.ts`), 'utf-8');
   const methods = parseMethods(structsSource);
   const typeMap = parsePackageTypes(typesSource);
 
