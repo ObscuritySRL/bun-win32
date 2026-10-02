@@ -382,7 +382,7 @@ class User32 extends Win32 {
     FrameRect: { args: [FFIType.u64, FFIType.ptr, FFIType.u64], returns: FFIType.i32 },
     FreeDDElParam: { args: [FFIType.u32, FFIType.i64], returns: FFIType.i32 },
     GetActiveWindow: { args: [], returns: FFIType.u64 },
-    GetAltTabInfoW: { args: [FFIType.u64, FFIType.i32, FFIType.ptr, FFIType.ptr, FFIType.i32], returns: FFIType.i32 },
+    GetAltTabInfoW: { args: [FFIType.u64, FFIType.i32, FFIType.ptr, FFIType.ptr, FFIType.u32], returns: FFIType.i32 },
     GetAncestor: { args: [FFIType.u64, FFIType.u32], returns: FFIType.u64 },
     GetAsyncKeyState: { args: [FFIType.i32], returns: FFIType.i16 },
     GetAutoRotationState: { args: [FFIType.ptr], returns: FFIType.i32 },
@@ -449,7 +449,7 @@ class User32 extends Win32 {
     GetMenuBarInfo: { args: [FFIType.u64, FFIType.i32, FFIType.i32, FFIType.ptr], returns: FFIType.i32 },
     GetMenuCheckMarkDimensions: { args: [], returns: FFIType.i32 },
     GetMenuContextHelpId: { args: [FFIType.u64], returns: FFIType.u32 },
-    GetMenuDefaultItem: { args: [FFIType.u64, FFIType.u32, FFIType.u32], returns: FFIType.i32 },
+    GetMenuDefaultItem: { args: [FFIType.u64, FFIType.u32, FFIType.u32], returns: FFIType.u32 },
     GetMenuInfo: { args: [FFIType.u64, FFIType.ptr], returns: FFIType.i32 },
     GetMenuItemCount: { args: [FFIType.u64], returns: FFIType.i32 },
     GetMenuItemID: { args: [FFIType.u64, FFIType.i32], returns: FFIType.u32 },
@@ -532,7 +532,7 @@ class User32 extends Win32 {
     GetWindowDisplayAffinity: { args: [FFIType.u64, FFIType.ptr], returns: FFIType.i32 },
     GetWindowDpiAwarenessContext: { args: [FFIType.u64], returns: FFIType.ptr },
     GetWindowDpiHostingBehavior: { args: [FFIType.u64], returns: FFIType.i32 },
-    GetWindowFeedbackSetting: { args: [FFIType.u64, FFIType.u32, FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
+    GetWindowFeedbackSetting: { args: [FFIType.u64, FFIType.u32, FFIType.u32, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
     GetWindowInfo: { args: [FFIType.u64, FFIType.ptr], returns: FFIType.i32 },
     GetWindowLongPtrW: { args: [FFIType.u64, FFIType.i32], returns: FFIType.i64 },
     GetWindowLongW: { args: [FFIType.u64, FFIType.i32], returns: FFIType.i32 },
@@ -2404,7 +2404,7 @@ class User32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getwindowfeedbacksetting
-  public static GetWindowFeedbackSetting(hwnd: HWND, feedback: FEEDBACK_TYPE, dwFlags: LPVOID, pSize_in_out: PUINT, config_out: Optional<PVOID>): BOOL {
+  public static GetWindowFeedbackSetting(hwnd: HWND, feedback: FEEDBACK_TYPE, dwFlags: DWORD, pSize_in_out: PUINT, config_out: Optional<PVOID>): BOOL {
     return User32.Load('GetWindowFeedbackSetting')(hwnd, feedback, dwFlags, pSize_in_out, config_out);
   }
 

@@ -97,14 +97,16 @@ for (const p of pkgs) {
 }
 
 // SERVER_INFO drift: packages/uia mcp.ts must report its own package.json version.
-try {
-  const mcp = readFileSync(join(PACKAGES, 'uia', 'mcp.ts'), 'utf-8');
-  const uiaVersion = workspaceVersion.get('@bun-win32/uia');
-  const m = /SERVER_INFO\s*=\s*\{[^}]*version:\s*'([^']+)'/.exec(mcp);
-  if (m === null) problems.push('packages/uia/mcp.ts: SERVER_INFO version literal not found');
-  else if (uiaVersion !== undefined && m[1] !== uiaVersion) problems.push(`packages/uia/mcp.ts SERVER_INFO.version='${m[1]}' but package.json='${uiaVersion}' — bump the SERVER_INFO literal to match.`);
-} catch {
-  problems.push('packages/uia/mcp.ts not readable for SERVER_INFO check');
+if (workspaceVersion.has('@bun-win32/uia') && (scope.size === 0 || scope.has('@bun-win32/uia') || scope.has('bun-uia'))) {
+  try {
+    const mcp = readFileSync(join(PACKAGES, 'uia', 'mcp.ts'), 'utf-8');
+    const uiaVersion = workspaceVersion.get('@bun-win32/uia');
+    const m = /SERVER_INFO\s*=\s*\{[^}]*version:\s*'([^']+)'/.exec(mcp);
+    if (m === null) problems.push('packages/uia/mcp.ts: SERVER_INFO version literal not found');
+    else if (uiaVersion !== undefined && m[1] !== uiaVersion) problems.push(`packages/uia/mcp.ts SERVER_INFO.version='${m[1]}' but package.json='${uiaVersion}' — bump the SERVER_INFO literal to match.`);
+  } catch {
+    problems.push('packages/uia/mcp.ts not readable for SERVER_INFO check');
+  }
 }
 
 if (problems.length > 0) {
@@ -114,5 +116,5 @@ if (problems.length > 0) {
   process.exit(1);
 }
 
-console.log('✓ Every workspace:* pin resolves to a published npm version; uia SERVER_INFO matches package.json.');
+console.log('✓ Every selected workspace:* pin is published or included in this release.');
 process.exit(0);

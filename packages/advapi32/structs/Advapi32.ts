@@ -6,8 +6,10 @@ import type {
   ALG_ID,
   AUDIT_EVENT_TYPE,
   BOOL,
+  BOOLEAN,
   BYTE,
   DWORD,
+  DWORD_PTR,
   HANDLE,
   HCRYPTHASH,
   HCRYPTKEY,
@@ -23,12 +25,12 @@ import type {
   LPCWSTR,
   LPDWORD,
   LPSTR,
-  NULL,
   LPVOID,
   LPWSTR,
   LSA_HANDLE,
   LSTATUS,
   NTSTATUS,
+  NULL,
   Optional,
   PACL,
   PBOOL,
@@ -44,11 +46,11 @@ import type {
   PGENERIC_MAPPING,
   PHANDLE,
   PHKEY,
+  PLONG,
   PLSA_HANDLE,
   PLSA_OBJECT_ATTRIBUTES,
   PLSA_TRUST_INFORMATION,
   PLSA_UNICODE_STRING,
-  PLONG,
   POBJECT_TYPE_LIST,
   PPRIVILEGE_SET,
   PSECURITY_DESCRIPTOR,
@@ -60,9 +62,9 @@ import type {
   PTRUSTEE,
   PUCHAR,
   PULONG,
-  PVOID,
   PVALENTA,
   PVALENTW,
+  PVOID,
   REGSAM,
   SC_HANDLE,
   SC_LOCK,
@@ -272,28 +274,28 @@ class Advapi32 extends Win32 {
     AllocateLocallyUniqueId: { args: [FFIType.ptr], returns: FFIType.i32 },
     AreAllAccessesGranted: { args: [FFIType.u32, FFIType.u32], returns: FFIType.i32 },
     AreAnyAccessesGranted: { args: [FFIType.u32, FFIType.u32], returns: FFIType.i32 },
-    AuditComputeEffectivePolicyBySid: { args: [FFIType.ptr, FFIType.ptr, FFIType.u32, FFIType.ptr], returns: FFIType.i32 },
-    AuditComputeEffectivePolicyByToken: { args: [FFIType.u64, FFIType.ptr, FFIType.u32, FFIType.ptr], returns: FFIType.i32 },
-    AuditEnumerateCategories: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
-    AuditEnumeratePerUserPolicy: { args: [FFIType.ptr], returns: FFIType.i32 },
-    AuditEnumerateSubCategories: { args: [FFIType.ptr, FFIType.i32, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
+    AuditComputeEffectivePolicyBySid: { args: [FFIType.ptr, FFIType.ptr, FFIType.u32, FFIType.ptr], returns: FFIType.u8 },
+    AuditComputeEffectivePolicyByToken: { args: [FFIType.u64, FFIType.ptr, FFIType.u32, FFIType.ptr], returns: FFIType.u8 },
+    AuditEnumerateCategories: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.u8 },
+    AuditEnumeratePerUserPolicy: { args: [FFIType.ptr], returns: FFIType.u8 },
+    AuditEnumerateSubCategories: { args: [FFIType.ptr, FFIType.u8, FFIType.ptr, FFIType.ptr], returns: FFIType.u8 },
     AuditFree: { args: [FFIType.ptr], returns: FFIType.void },
-    AuditLookupCategoryGuidFromCategoryId: { args: [FFIType.u32, FFIType.ptr], returns: FFIType.i32 },
-    AuditLookupCategoryIdFromCategoryGuid: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
-    AuditLookupCategoryNameA: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
-    AuditLookupCategoryNameW: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
-    AuditLookupSubCategoryNameA: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
-    AuditLookupSubCategoryNameW: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
-    AuditQueryGlobalSaclA: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
-    AuditQueryGlobalSaclW: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
-    AuditQueryPerUserPolicy: { args: [FFIType.ptr, FFIType.ptr, FFIType.u32, FFIType.ptr], returns: FFIType.i32 },
-    AuditQuerySecurity: { args: [FFIType.u32, FFIType.ptr], returns: FFIType.i32 },
-    AuditQuerySystemPolicy: { args: [FFIType.ptr, FFIType.u32, FFIType.ptr], returns: FFIType.i32 },
-    AuditSetGlobalSaclA: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
-    AuditSetGlobalSaclW: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
-    AuditSetPerUserPolicy: { args: [FFIType.ptr, FFIType.ptr, FFIType.u32], returns: FFIType.i32 },
-    AuditSetSecurity: { args: [FFIType.u32, FFIType.ptr], returns: FFIType.i32 },
-    AuditSetSystemPolicy: { args: [FFIType.ptr, FFIType.u32], returns: FFIType.i32 },
+    AuditLookupCategoryGuidFromCategoryId: { args: [FFIType.u32, FFIType.ptr], returns: FFIType.u8 },
+    AuditLookupCategoryIdFromCategoryGuid: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.u8 },
+    AuditLookupCategoryNameA: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.u8 },
+    AuditLookupCategoryNameW: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.u8 },
+    AuditLookupSubCategoryNameA: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.u8 },
+    AuditLookupSubCategoryNameW: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.u8 },
+    AuditQueryGlobalSaclA: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.u8 },
+    AuditQueryGlobalSaclW: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.u8 },
+    AuditQueryPerUserPolicy: { args: [FFIType.ptr, FFIType.ptr, FFIType.u32, FFIType.ptr], returns: FFIType.u8 },
+    AuditQuerySecurity: { args: [FFIType.u32, FFIType.ptr], returns: FFIType.u8 },
+    AuditQuerySystemPolicy: { args: [FFIType.ptr, FFIType.u32, FFIType.ptr], returns: FFIType.u8 },
+    AuditSetGlobalSaclA: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.u8 },
+    AuditSetGlobalSaclW: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.u8 },
+    AuditSetPerUserPolicy: { args: [FFIType.ptr, FFIType.ptr, FFIType.u32], returns: FFIType.u8 },
+    AuditSetSecurity: { args: [FFIType.u32, FFIType.ptr], returns: FFIType.u8 },
+    AuditSetSystemPolicy: { args: [FFIType.ptr, FFIType.u32], returns: FFIType.u8 },
     BackupEventLogA: { args: [FFIType.u64, FFIType.ptr], returns: FFIType.i32 },
     BackupEventLogW: { args: [FFIType.u64, FFIType.ptr], returns: FFIType.i32 },
     BaseRegCloseKey: { args: [FFIType.ptr], returns: FFIType.i32 },
@@ -330,7 +332,7 @@ class Advapi32 extends Win32 {
     ChangeServiceConfig2W: { args: [FFIType.u64, FFIType.u32, FFIType.ptr], returns: FFIType.i32 },
     ChangeServiceConfigA: { args: [FFIType.u64, FFIType.u32, FFIType.u32, FFIType.u32, FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
     ChangeServiceConfigW: { args: [FFIType.u64, FFIType.u32, FFIType.u32, FFIType.u32, FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
-    CheckForHiberboot: { args: [FFIType.ptr, FFIType.i32], returns: FFIType.u32 },
+    CheckForHiberboot: { args: [FFIType.ptr, FFIType.u8], returns: FFIType.u32 },
     CheckTokenMembership: { args: [FFIType.u64, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
     ClearEventLogA: { args: [FFIType.u64, FFIType.ptr], returns: FFIType.i32 },
     ClearEventLogW: { args: [FFIType.u64, FFIType.ptr], returns: FFIType.i32 },
@@ -343,8 +345,8 @@ class Advapi32 extends Win32 {
     CommandLineFromMsiDescriptor: { args: [FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.u32 },
     ComputeAccessTokenFromCodeAuthzLevel: { args: [FFIType.u64, FFIType.u64, FFIType.ptr, FFIType.u32, FFIType.ptr], returns: FFIType.i32 },
     ControlService: { args: [FFIType.u64, FFIType.u32, FFIType.ptr], returns: FFIType.i32 },
-    ControlServiceExA: { args: [FFIType.u64, FFIType.u32, FFIType.u32, FFIType.ptr], returns: FFIType.u32 },
-    ControlServiceExW: { args: [FFIType.u64, FFIType.u32, FFIType.u32, FFIType.ptr], returns: FFIType.u32 },
+    ControlServiceExA: { args: [FFIType.u64, FFIType.u32, FFIType.u32, FFIType.ptr], returns: FFIType.i32 },
+    ControlServiceExW: { args: [FFIType.u64, FFIType.u32, FFIType.u32, FFIType.ptr], returns: FFIType.i32 },
     ControlTraceA: { args: [FFIType.u64, FFIType.ptr, FFIType.ptr, FFIType.u32], returns: FFIType.u32 },
     ControlTraceW: { args: [FFIType.u64, FFIType.ptr, FFIType.ptr, FFIType.u32], returns: FFIType.u32 },
     ConvertAccessToSecurityDescriptorA: { args: [FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.u32 },
@@ -568,7 +570,7 @@ class Advapi32 extends Win32 {
     GetSidSubAuthority: { args: [FFIType.ptr, FFIType.u32], returns: FFIType.ptr },
     GetSidSubAuthorityCount: { args: [FFIType.ptr], returns: FFIType.ptr },
     GetStringConditionFromBinary: { args: [FFIType.ptr, FFIType.u32, FFIType.u32, FFIType.ptr], returns: FFIType.u32 },
-    GetThreadWaitChain: { args: [FFIType.u64, FFIType.ptr, FFIType.u32, FFIType.u32, FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
+    GetThreadWaitChain: { args: [FFIType.u64, FFIType.u64, FFIType.u32, FFIType.u32, FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
     GetTokenInformation: { args: [FFIType.u64, FFIType.i32, FFIType.ptr, FFIType.u32, FFIType.ptr], returns: FFIType.i32 },
     GetTrusteeFormA: { args: [FFIType.ptr], returns: FFIType.u32 },
     GetTrusteeFormW: { args: [FFIType.ptr], returns: FFIType.u32 },
@@ -687,13 +689,13 @@ class Advapi32 extends Win32 {
     LsaQuerySecurityObject: { args: [FFIType.u64, FFIType.u32, FFIType.ptr], returns: FFIType.i32 },
     LsaQueryTrustedDomainInfo: { args: [FFIType.u64, FFIType.ptr, FFIType.u32, FFIType.ptr], returns: FFIType.i32 },
     LsaQueryTrustedDomainInfoByName: { args: [FFIType.u64, FFIType.ptr, FFIType.u32, FFIType.ptr], returns: FFIType.i32 },
-    LsaRemoveAccountRights: { args: [FFIType.u64, FFIType.ptr, FFIType.i32, FFIType.ptr, FFIType.u32], returns: FFIType.i32 },
-    LsaRemovePrivilegesFromAccount: { args: [FFIType.u64, FFIType.i32, FFIType.ptr], returns: FFIType.i32 },
+    LsaRemoveAccountRights: { args: [FFIType.u64, FFIType.ptr, FFIType.u8, FFIType.ptr, FFIType.u32], returns: FFIType.i32 },
+    LsaRemovePrivilegesFromAccount: { args: [FFIType.u64, FFIType.u8, FFIType.ptr], returns: FFIType.i32 },
     LsaRetrievePrivateData: { args: [FFIType.u64, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
     LsaSetCAPs: { args: [FFIType.ptr, FFIType.u32, FFIType.u32], returns: FFIType.i32 },
     LsaSetDomainInformationPolicy: { args: [FFIType.u64, FFIType.u32, FFIType.ptr], returns: FFIType.i32 },
-    LsaSetForestTrustInformation: { args: [FFIType.u64, FFIType.ptr, FFIType.ptr, FFIType.i32, FFIType.ptr], returns: FFIType.i32 },
-    LsaSetForestTrustInformation2: { args: [FFIType.u64, FFIType.ptr, FFIType.u32, FFIType.ptr, FFIType.i32, FFIType.ptr], returns: FFIType.i32 },
+    LsaSetForestTrustInformation: { args: [FFIType.u64, FFIType.ptr, FFIType.ptr, FFIType.u8, FFIType.ptr], returns: FFIType.i32 },
+    LsaSetForestTrustInformation2: { args: [FFIType.u64, FFIType.ptr, FFIType.u32, FFIType.ptr, FFIType.u8, FFIType.ptr], returns: FFIType.i32 },
     LsaSetInformationPolicy: { args: [FFIType.u64, FFIType.u32, FFIType.ptr], returns: FFIType.i32 },
     LsaSetInformationTrustedDomain: { args: [FFIType.u64, FFIType.u32, FFIType.ptr], returns: FFIType.i32 },
     LsaSetLocalSystemAccess: { args: [FFIType.u64, FFIType.u32], returns: FFIType.i32 },
@@ -901,7 +903,7 @@ class Advapi32 extends Win32 {
     SaferiChangeRegistryScope: { args: [FFIType.ptr, FFIType.u32], returns: FFIType.i32 },
     SaferiCompareTokenLevels: { args: [FFIType.u64, FFIType.u64, FFIType.ptr], returns: FFIType.i32 },
     SaferiIsDllAllowed: { args: [FFIType.ptr, FFIType.u64, FFIType.ptr], returns: FFIType.i32 },
-    SaferiIsExecutableFileType: { args: [FFIType.ptr, FFIType.i32], returns: FFIType.i32 },
+    SaferiIsExecutableFileType: { args: [FFIType.ptr, FFIType.u8], returns: FFIType.i32 },
     SaferiPopulateDefaultsInRegistry: { args: [FFIType.u64, FFIType.ptr], returns: FFIType.i32 },
     SaferiRecordEventLogEntry: { args: [FFIType.u64, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
     SaferiSearchMatchingHashRules: { args: [FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.u32 },
@@ -1494,27 +1496,27 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntsecapi/nf-ntsecapi-auditcomputeeffectivepolicybysid
-  public static AuditComputeEffectivePolicyBySid(pSid: PSID, pSubCategoryGuids: PVOID, dwPolicyCount: ULONG, ppAuditPolicy_out: PVOID): BOOL {
+  public static AuditComputeEffectivePolicyBySid(pSid: PSID, pSubCategoryGuids: PVOID, dwPolicyCount: ULONG, ppAuditPolicy_out: PVOID): BOOLEAN {
     return Advapi32.Load('AuditComputeEffectivePolicyBySid')(pSid, pSubCategoryGuids, dwPolicyCount, ppAuditPolicy_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntsecapi/nf-ntsecapi-auditcomputeeffectivepolicybytoken
-  public static AuditComputeEffectivePolicyByToken(hTokenHandle: HANDLE, pSubCategoryGuids: PVOID, dwPolicyCount: ULONG, ppAuditPolicy_out: PVOID): BOOL {
+  public static AuditComputeEffectivePolicyByToken(hTokenHandle: HANDLE, pSubCategoryGuids: PVOID, dwPolicyCount: ULONG, ppAuditPolicy_out: PVOID): BOOLEAN {
     return Advapi32.Load('AuditComputeEffectivePolicyByToken')(hTokenHandle, pSubCategoryGuids, dwPolicyCount, ppAuditPolicy_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntsecapi/nf-ntsecapi-auditenumeratecategories
-  public static AuditEnumerateCategories(ppAuditCategoriesArray_out: PVOID, pdwCountReturned_out: PDWORD): BOOL {
+  public static AuditEnumerateCategories(ppAuditCategoriesArray_out: PVOID, pdwCountReturned_out: PDWORD): BOOLEAN {
     return Advapi32.Load('AuditEnumerateCategories')(ppAuditCategoriesArray_out, pdwCountReturned_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntsecapi/nf-ntsecapi-auditenumerateperuserpolicy
-  public static AuditEnumeratePerUserPolicy(ppAuditSidArray_out: PVOID): BOOL {
+  public static AuditEnumeratePerUserPolicy(ppAuditSidArray_out: PVOID): BOOLEAN {
     return Advapi32.Load('AuditEnumeratePerUserPolicy')(ppAuditSidArray_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntsecapi/nf-ntsecapi-auditenumeratesubcategories
-  public static AuditEnumerateSubCategories(pAuditCategoryGuid: Optional<PVOID>, bRetrieveAllSubCategories: BOOL, ppAuditSubCategoriesArray_out: PVOID, pdwCountReturned_out: PDWORD): BOOL {
+  public static AuditEnumerateSubCategories(pAuditCategoryGuid: Optional<PVOID>, bRetrieveAllSubCategories: BOOLEAN, ppAuditSubCategoriesArray_out: PVOID, pdwCountReturned_out: PDWORD): BOOLEAN {
     return Advapi32.Load('AuditEnumerateSubCategories')(pAuditCategoryGuid, bRetrieveAllSubCategories, ppAuditSubCategoriesArray_out, pdwCountReturned_out);
   }
 
@@ -1524,82 +1526,82 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntsecapi/nf-ntsecapi-auditlookupcategoryguidfromcategoryid
-  public static AuditLookupCategoryGuidFromCategoryId(AuditCategoryId: DWORD, pAuditCategoryGuid_out: PVOID): BOOL {
+  public static AuditLookupCategoryGuidFromCategoryId(AuditCategoryId: DWORD, pAuditCategoryGuid_out: PVOID): BOOLEAN {
     return Advapi32.Load('AuditLookupCategoryGuidFromCategoryId')(AuditCategoryId, pAuditCategoryGuid_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntsecapi/nf-ntsecapi-auditlookupcategoryidfromcategoryguid
-  public static AuditLookupCategoryIdFromCategoryGuid(pAuditCategoryGuid: PVOID, pAuditCategoryId_out: PVOID): BOOL {
+  public static AuditLookupCategoryIdFromCategoryGuid(pAuditCategoryGuid: PVOID, pAuditCategoryId_out: PVOID): BOOLEAN {
     return Advapi32.Load('AuditLookupCategoryIdFromCategoryGuid')(pAuditCategoryGuid, pAuditCategoryId_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntsecapi/nf-ntsecapi-auditlookupcategorynamea
-  public static AuditLookupCategoryNameA(pAuditCategoryGuid: PVOID, ppszCategoryName_out: PVOID): BOOL {
+  public static AuditLookupCategoryNameA(pAuditCategoryGuid: PVOID, ppszCategoryName_out: PVOID): BOOLEAN {
     return Advapi32.Load('AuditLookupCategoryNameA')(pAuditCategoryGuid, ppszCategoryName_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntsecapi/nf-ntsecapi-auditlookupcategorynamew
-  public static AuditLookupCategoryNameW(pAuditCategoryGuid: PVOID, ppszCategoryName_out: PVOID): BOOL {
+  public static AuditLookupCategoryNameW(pAuditCategoryGuid: PVOID, ppszCategoryName_out: PVOID): BOOLEAN {
     return Advapi32.Load('AuditLookupCategoryNameW')(pAuditCategoryGuid, ppszCategoryName_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntsecapi/nf-ntsecapi-auditlookupsubcategorynamea
-  public static AuditLookupSubCategoryNameA(pAuditSubCategoryGuid: PVOID, ppszSubCategoryName_out: PVOID): BOOL {
+  public static AuditLookupSubCategoryNameA(pAuditSubCategoryGuid: PVOID, ppszSubCategoryName_out: PVOID): BOOLEAN {
     return Advapi32.Load('AuditLookupSubCategoryNameA')(pAuditSubCategoryGuid, ppszSubCategoryName_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntsecapi/nf-ntsecapi-auditlookupsubcategorynamew
-  public static AuditLookupSubCategoryNameW(pAuditSubCategoryGuid: PVOID, ppszSubCategoryName_out: PVOID): BOOL {
+  public static AuditLookupSubCategoryNameW(pAuditSubCategoryGuid: PVOID, ppszSubCategoryName_out: PVOID): BOOLEAN {
     return Advapi32.Load('AuditLookupSubCategoryNameW')(pAuditSubCategoryGuid, ppszSubCategoryName_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntsecapi/nf-ntsecapi-auditqueryglobalsacla
-  public static AuditQueryGlobalSaclA(ObjectTypeName: LPCSTR, Acl_out: PVOID): BOOL {
+  public static AuditQueryGlobalSaclA(ObjectTypeName: LPCSTR, Acl_out: PVOID): BOOLEAN {
     return Advapi32.Load('AuditQueryGlobalSaclA')(ObjectTypeName, Acl_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntsecapi/nf-ntsecapi-auditqueryglobalsaclw
-  public static AuditQueryGlobalSaclW(ObjectTypeName: LPCWSTR, Acl_out: PVOID): BOOL {
+  public static AuditQueryGlobalSaclW(ObjectTypeName: LPCWSTR, Acl_out: PVOID): BOOLEAN {
     return Advapi32.Load('AuditQueryGlobalSaclW')(ObjectTypeName, Acl_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntsecapi/nf-ntsecapi-auditqueryperuserpolicy
-  public static AuditQueryPerUserPolicy(pSid: PSID, pSubCategoryGuids: PVOID, dwPolicyCount: ULONG, ppAuditPolicy_out: PVOID): BOOL {
+  public static AuditQueryPerUserPolicy(pSid: PSID, pSubCategoryGuids: PVOID, dwPolicyCount: ULONG, ppAuditPolicy_out: PVOID): BOOLEAN {
     return Advapi32.Load('AuditQueryPerUserPolicy')(pSid, pSubCategoryGuids, dwPolicyCount, ppAuditPolicy_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntsecapi/nf-ntsecapi-auditquerysecurity
-  public static AuditQuerySecurity(SecurityInformation: SECURITY_INFORMATION, ppSecurityDescriptor_out: PVOID): BOOL {
+  public static AuditQuerySecurity(SecurityInformation: SECURITY_INFORMATION, ppSecurityDescriptor_out: PVOID): BOOLEAN {
     return Advapi32.Load('AuditQuerySecurity')(SecurityInformation, ppSecurityDescriptor_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntsecapi/nf-ntsecapi-auditquerysystempolicy
-  public static AuditQuerySystemPolicy(pSubCategoryGuids: PVOID, dwPolicyCount: ULONG, ppAuditPolicy_out: PVOID): BOOL {
+  public static AuditQuerySystemPolicy(pSubCategoryGuids: PVOID, dwPolicyCount: ULONG, ppAuditPolicy_out: PVOID): BOOLEAN {
     return Advapi32.Load('AuditQuerySystemPolicy')(pSubCategoryGuids, dwPolicyCount, ppAuditPolicy_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntsecapi/nf-ntsecapi-auditsetglobalsacla
-  public static AuditSetGlobalSaclA(ObjectTypeName: LPCSTR, Acl: Optional<PACL>): BOOL {
+  public static AuditSetGlobalSaclA(ObjectTypeName: LPCSTR, Acl: Optional<PACL>): BOOLEAN {
     return Advapi32.Load('AuditSetGlobalSaclA')(ObjectTypeName, Acl);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntsecapi/nf-ntsecapi-auditsetglobalsaclw
-  public static AuditSetGlobalSaclW(ObjectTypeName: LPCWSTR, Acl: Optional<PACL>): BOOL {
+  public static AuditSetGlobalSaclW(ObjectTypeName: LPCWSTR, Acl: Optional<PACL>): BOOLEAN {
     return Advapi32.Load('AuditSetGlobalSaclW')(ObjectTypeName, Acl);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntsecapi/nf-ntsecapi-auditsetperuserpolicy
-  public static AuditSetPerUserPolicy(pSid: PSID, pAuditPolicy: PVOID, dwPolicyCount: ULONG): BOOL {
+  public static AuditSetPerUserPolicy(pSid: PSID, pAuditPolicy: PVOID, dwPolicyCount: ULONG): BOOLEAN {
     return Advapi32.Load('AuditSetPerUserPolicy')(pSid, pAuditPolicy, dwPolicyCount);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntsecapi/nf-ntsecapi-auditsetsecurity
-  public static AuditSetSecurity(SecurityInformation: SECURITY_INFORMATION, pSecurityDescriptor: PSECURITY_DESCRIPTOR): BOOL {
+  public static AuditSetSecurity(SecurityInformation: SECURITY_INFORMATION, pSecurityDescriptor: PSECURITY_DESCRIPTOR): BOOLEAN {
     return Advapi32.Load('AuditSetSecurity')(SecurityInformation, pSecurityDescriptor);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntsecapi/nf-ntsecapi-auditsetsystempolicy
-  public static AuditSetSystemPolicy(pAuditPolicy: PVOID, dwPolicyCount: ULONG): BOOL {
+  public static AuditSetSystemPolicy(pAuditPolicy: PVOID, dwPolicyCount: ULONG): BOOLEAN {
     return Advapi32.Load('AuditSetSystemPolicy')(pAuditPolicy, dwPolicyCount);
   }
 
@@ -1839,7 +1841,7 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-checkforhiberboot
-  public static CheckForHiberboot(pHiberboot_in_out: PBOOL, bClearFlag: BOOL): DWORD {
+  public static CheckForHiberboot(pHiberboot_in_out: PBOOL, bClearFlag: BOOLEAN): DWORD {
     return Advapi32.Load('CheckForHiberboot')(pHiberboot_in_out, bClearFlag);
   }
 
@@ -1904,12 +1906,12 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsvc/nf-winsvc-controlserviceexa
-  public static ControlServiceExA(hService: SC_HANDLE, dwControl: DWORD, dwInfoLevel: DWORD, pControlParams_in_out: PVOID): DWORD {
+  public static ControlServiceExA(hService: SC_HANDLE, dwControl: DWORD, dwInfoLevel: DWORD, pControlParams_in_out: PVOID): BOOL {
     return Advapi32.Load('ControlServiceExA')(hService, dwControl, dwInfoLevel, pControlParams_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsvc/nf-winsvc-controlserviceexw
-  public static ControlServiceExW(hService: SC_HANDLE, dwControl: DWORD, dwInfoLevel: DWORD, pControlParams_in_out: PVOID): DWORD {
+  public static ControlServiceExW(hService: SC_HANDLE, dwControl: DWORD, dwInfoLevel: DWORD, pControlParams_in_out: PVOID): BOOL {
     return Advapi32.Load('ControlServiceExW')(hService, dwControl, dwInfoLevel, pControlParams_in_out);
   }
 
@@ -3390,7 +3392,7 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wct/nf-wct-getthreadwaitchain
-  public static GetThreadWaitChain(WctHandle: HWCT, Context: Optional<PVOID>, Flags: ULONG, ThreadId: DWORD, NodeCount_in_out: LPDWORD, NodeInfoArray_out: PVOID, IsCycle_out: LPBOOL): BOOL {
+  public static GetThreadWaitChain(WctHandle: HWCT, Context: Optional<DWORD_PTR>, Flags: ULONG, ThreadId: DWORD, NodeCount_in_out: LPDWORD, NodeInfoArray_out: PVOID, IsCycle_out: LPBOOL): BOOL {
     return Advapi32.Load('GetThreadWaitChain')(WctHandle, Context, Flags, ThreadId, NodeCount_in_out, NodeInfoArray_out, IsCycle_out);
   }
 
@@ -4067,12 +4069,12 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntsecapi/nf-ntsecapi-lsaremoveaccountrights
-  public static LsaRemoveAccountRights(PolicyHandle: LSA_HANDLE, AccountSid: PSID, AllRights: BOOL, UserRights: Optional<PLSA_UNICODE_STRING>, CountOfRights: ULONG): NTSTATUS {
+  public static LsaRemoveAccountRights(PolicyHandle: LSA_HANDLE, AccountSid: PSID, AllRights: BOOLEAN, UserRights: Optional<PLSA_UNICODE_STRING>, CountOfRights: ULONG): NTSTATUS {
     return Advapi32.Load('LsaRemoveAccountRights')(PolicyHandle, AccountSid, AllRights, UserRights, CountOfRights);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntlsa/nf-ntlsa-lsaremoveprivilegesfromaccount
-  public static LsaRemovePrivilegesFromAccount(AccountHandle: LSA_HANDLE, AllPrivileges: BOOL, Privileges: Optional<PVOID>): NTSTATUS {
+  public static LsaRemovePrivilegesFromAccount(AccountHandle: LSA_HANDLE, AllPrivileges: BOOLEAN, Privileges: Optional<PVOID>): NTSTATUS {
     return Advapi32.Load('LsaRemovePrivilegesFromAccount')(AccountHandle, AllPrivileges, Privileges);
   }
 
@@ -4092,12 +4094,12 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntsecapi/nf-ntsecapi-lsasetforesttrustinformation
-  public static LsaSetForestTrustInformation(PolicyHandle: LSA_HANDLE, TrustedDomainName: PLSA_UNICODE_STRING, ForestTrustInfo: PVOID, CheckOnly: BOOL, CollisionInfo_out: PVOID): NTSTATUS {
+  public static LsaSetForestTrustInformation(PolicyHandle: LSA_HANDLE, TrustedDomainName: PLSA_UNICODE_STRING, ForestTrustInfo: PVOID, CheckOnly: BOOLEAN, CollisionInfo_out: PVOID): NTSTATUS {
     return Advapi32.Load('LsaSetForestTrustInformation')(PolicyHandle, TrustedDomainName, ForestTrustInfo, CheckOnly, CollisionInfo_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntsecapi/nf-ntsecapi-lsasetforesttrustinformation2
-  public static LsaSetForestTrustInformation2(PolicyHandle: LSA_HANDLE, TrustedDomainName: PLSA_UNICODE_STRING, HighestRecordType: DWORD, ForestTrustInfo: PVOID, CheckOnly: BOOL, CollisionInfo_out: PVOID): NTSTATUS {
+  public static LsaSetForestTrustInformation2(PolicyHandle: LSA_HANDLE, TrustedDomainName: PLSA_UNICODE_STRING, HighestRecordType: DWORD, ForestTrustInfo: PVOID, CheckOnly: BOOLEAN, CollisionInfo_out: PVOID): NTSTATUS {
     return Advapi32.Load('LsaSetForestTrustInformation2')(PolicyHandle, TrustedDomainName, HighestRecordType, ForestTrustInfo, CheckOnly, CollisionInfo_out);
   }
 
@@ -5353,7 +5355,7 @@ class Advapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winsafer/nf-winsafer-saferiisexecutablefiletype
-  public static SaferiIsExecutableFileType(szFullPathname: LPCWSTR, bFromShellExecute: BOOL): BOOL {
+  public static SaferiIsExecutableFileType(szFullPathname: LPCWSTR, bFromShellExecute: BOOLEAN): BOOL {
     return Advapi32.Load('SaferiIsExecutableFileType')(szFullPathname, bFromShellExecute);
   }
 

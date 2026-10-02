@@ -328,8 +328,8 @@ class Shell32 extends Win32 {
     SHUpdateRecycleBinIcon: { args: [], returns: FFIType.void },
     SHValidateUNC: { args: [FFIType.u64, FFIType.ptr, FFIType.u32], returns: FFIType.i32 },
     SetCurrentProcessExplicitAppUserModelID: { args: [FFIType.ptr], returns: FFIType.i32 },
-    ShellAboutA: { args: [FFIType.u64, FFIType.ptr, FFIType.ptr, FFIType.u64], returns: FFIType.i64 },
-    ShellAboutW: { args: [FFIType.u64, FFIType.ptr, FFIType.ptr, FFIType.u64], returns: FFIType.i64 },
+    ShellAboutA: { args: [FFIType.u64, FFIType.ptr, FFIType.ptr, FFIType.u64], returns: FFIType.i32 },
+    ShellAboutW: { args: [FFIType.u64, FFIType.ptr, FFIType.ptr, FFIType.u64], returns: FFIType.i32 },
     ShellExecuteA: { args: [FFIType.u64, FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.i32], returns: FFIType.u64 },
     ShellExecuteEx: { args: [FFIType.ptr], returns: FFIType.i32 },
     ShellExecuteExA: { args: [FFIType.ptr], returns: FFIType.i32 },
@@ -1469,12 +1469,12 @@ class Shell32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-shellobouta
-  public static ShellAboutA(hWnd: Optional<HWND>, szApp: LPCSTR, szOtherStuff: Optional<LPCSTR>, hIcon: Optional<HICON>): INT_PTR {
+  public static ShellAboutA(hWnd: Optional<HWND>, szApp: LPCSTR, szOtherStuff: Optional<LPCSTR>, hIcon: Optional<HICON>): INT {
     return Shell32.Load('ShellAboutA')(hWnd, szApp, szOtherStuff, hIcon);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-shelloboutw
-  public static ShellAboutW(hWnd: Optional<HWND>, szApp: LPCWSTR, szOtherStuff: Optional<LPCWSTR>, hIcon: Optional<HICON>): INT_PTR {
+  public static ShellAboutW(hWnd: Optional<HWND>, szApp: LPCWSTR, szOtherStuff: Optional<LPCWSTR>, hIcon: Optional<HICON>): INT {
     return Shell32.Load('ShellAboutW')(hWnd, szApp, szOtherStuff, hIcon);
   }
 

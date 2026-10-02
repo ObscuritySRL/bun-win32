@@ -13,6 +13,8 @@
  *   bun run scripts/audit.ts kernel32 --fix    # emit fix suggestions
  */
 
+import assert from 'node:assert/strict';
+
 import { readFileSync, readdirSync, existsSync } from 'fs';
 import { join } from 'path';
 import { execFileSync, execSync } from 'child_process';
@@ -437,7 +439,8 @@ function parseSymbols(source: string): SymbolEntry[] {
   // Match entries that may span multiple lines
   const entryRe = /(\w+)\s*:\s*\{\s*args\s*:\s*\[([\s\S]*?)\]\s*,\s*returns\s*:\s*(FFIType\.\w+)\s*\}/g;
   let m;
-  while ((m = entryRe.exec(symbolsBlock[1])) !== null) {
+  const declarations = symbolsBlock[1].replace(/\/\/[^\n]*|\/\*[\s\S]*?\*\//g, '');
+  while ((m = entryRe.exec(declarations)) !== null) {
     const name = m[1];
     const argsStr = m[2].replace(/\s+/g, ' ').trim();
     const args = argsStr
@@ -457,6 +460,7 @@ function parseMethods(source: string): MethodEntry[] {
 
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
+    if (isCommentLikeLine(line)) continue;
     const m = line.match(/public\s+static\s+(\w+)\s*\(([\s\S]*?)\)\s*:\s*([\w|. ]+?)\s*\{/);
     if (!m) continue;
 
@@ -548,7 +552,23 @@ function resolveType(tsType: string, typeMap: Record<string, string>): string {
     .replace(/\s*\|\s*0n\b/g, '')
     .trim();
   if (base === 'void') return 'void';
+  const marker = base.match(/^(?:Nullable|Optional)<(.+)>$/);
+  if (marker) return resolveType(marker[1], typeMap);
+  const representation = base.match(/^\w+<(Pointer|bigint)>$/);
+  if (representation) return representation[1];
   return typeMap[base] || CORE_TYPES[base] || '???';
+}
+
+function isCompatibleFfiType(ffiType: string, sdkType: string): boolean {
+  const normalized = sdkType.replace(/\s*\*/g, '*');
+  const expected = C_TYPE_TO_FFI[normalized] ?? (normalized.endsWith('*') ? 'FFIType.ptr' : undefined);
+  if (!expected || expected === ffiType) return true;
+
+  // Opaque native pointers may be represented as a local Pointer or a bigint token.
+  if ((ffiType === 'FFIType.ptr' || ffiType === 'FFIType.u64') && (normalized === 'PCCERT_CONTEXT' || /^I[A-Z]\w*\*$/.test(normalized) || /^(?:VOID|void)\*$/.test(normalized))) return true;
+
+  // Pointer-sized integers use bigint bit patterns in this repository.
+  return /^(?:INT_PTR|LONG_PTR|LPARAM|LRESULT)$/.test(normalized) && (ffiType === 'FFIType.i64' || ffiType === 'FFIType.u64');
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -575,8 +595,10 @@ function buildSdkIndex(functionNames: string[]): Map<string, SdkProto> {
 
   // Write function names as grep patterns: ^FunctionName(
   const patternFile = join(ROOT, '.sdk-audit-patterns.tmp');
-  const patterns = functionNames.map((n) => `\\b${n}\\(`).join('\n');
+  const patterns = functionNames.map((n) => `\\b${n}\\s*\\(`).join('\n');
   require('fs').writeFileSync(patternFile, patterns);
+  const functionSet = new Set(functionNames);
+  const headerFuncs = new Map<string, Set<string>>();
 
   const searchDirs = [SDK_INCLUDE];
   const sharedDir = join(SDK_INCLUDE, '..', 'shared');
@@ -597,28 +619,11 @@ function buildSdkIndex(functionNames: string[]): Map<string, SdkProto> {
 
       const matchFile = matchM[1];
       const matchLine = matchM[3];
-      const funcMatch = matchLine.match(/\b(\w+)\s*\(/);
-      if (!funcMatch) continue;
-
-      const funcName = funcMatch[1];
-      const headerName = matchFile.split(/[/\\]/).pop() || '';
-
-      if (!sdkIndex.has(funcName)) {
-        sdkIndex.set(funcName, { returnType: '', params: [], header: headerName });
-      }
-    }
-
-    // Second pass: read parameter info for matched functions from their headers
-    const headerFuncs = new Map<string, string[]>();
-    for (const [funcName, proto] of sdkIndex) {
-      // Find the full header path
-      for (const dir of searchDirs) {
-        const path = join(dir, proto.header);
-        if (existsSync(path)) {
-          if (!headerFuncs.has(path)) headerFuncs.set(path, []);
-          headerFuncs.get(path)!.push(funcName);
-          break;
-        }
+      for (const funcMatch of matchLine.matchAll(/\b(\w+)\s*\(/g)) {
+        const funcName = funcMatch[1];
+        if (!functionSet.has(funcName)) continue;
+        if (!headerFuncs.has(matchFile)) headerFuncs.set(matchFile, new Set());
+        headerFuncs.get(matchFile)!.add(funcName);
       }
     }
 
@@ -627,63 +632,40 @@ function buildSdkIndex(functionNames: string[]): Map<string, SdkProto> {
       const hLines = content.split('\n');
 
       for (const funcName of funcs) {
+        if (sdkIndex.has(funcName)) continue;
+        const functionPattern = new RegExp(`\\b${funcName}\\s*\\(`);
+        const declarationPattern = new RegExp(`^(.*?)\\b${funcName}\\s*\\(`);
         // Find function declaration line
         for (let i = 0; i < hLines.length; i++) {
-          if (!hLines[i].match(new RegExp(`\\b${funcName}\\s*\\(`))) continue;
+          if (!functionPattern.test(hLines[i])) continue;
           if (isCommentLikeLine(hLines[i])) continue;
 
-          const proto = sdkIndex!.get(funcName)!;
+          const nameMatch = hLines[i].match(declarationPattern);
+          if (!nameMatch) continue;
+          const prefix = hLines.slice(Math.max(0, i - 8), i).join('\n') + '\n' + nameMatch[1];
+          const declaration = prefix.slice(Math.max(prefix.lastIndexOf(';'), prefix.lastIndexOf('{'), prefix.lastIndexOf('}')) + 1);
 
-          if (!proto.returnType) {
-            // Case 1: return type sits on the same line as the function name
-            // (e.g. winber.h `WINBERAPI INT BERAPI ber_printf( ... )`).
-            const sameLineMatch = hLines[i].match(new RegExp(`^(.*?)\\b${funcName}\\s*\\(`));
-            if (sameLineMatch && sameLineMatch[1].trim()) {
-              const sameLineReturnType = sameLineMatch[1]
-                .replace(
-                  /\b(?:WINBERAPI|WINLDAPAPI|WINBASEAPI|WINUSERAPI|WINNORMALIZEAPI|WINADVAPI|NTSYSAPI|WINSOCK_API_LINKAGE|NET_API_FUNCTION|WSPAPI|IMAGEAPI|INTERNETAPI|BOOLAPI|DECLSPEC_IMPORT|WINAPI|LDAPAPI|BERAPI|APIENTRY|NTAPI|CALLBACK|STDAPI|STDAPICALLTYPE|extern|"C")\b/g,
-                  '',
-                )
-                .replace(/\s+/g, ' ')
-                .replace(/\s*\*/g, '*')
-                .trim();
-              if (sameLineReturnType) proto.returnType = sameLineReturnType;
-            }
-          }
+          // Flat exports must carry native linkage, not a COM method or a call expression.
+          if (/\b(?:virtual|STDMETHODCALLTYPE|STDMETHOD|STDMETHOD_)\b/.test(declaration)) continue;
+          if (!/\b(?:WINAPI|WINAPIV|APIENTRY|NTAPI|LDAPAPI|BERAPI|RPC_ENTRY|STDAPI_?|LWSTDAPI_?|SHSTDAPI_?|WINOLEAPI_?|BOOLAPI|NET_API_FUNCTION|WSPAPI|IMAGEAPI|SNMPAPI_CALL|SNMPAPI|GDIPAPI|NTSYSAPI)\b/.test(declaration)) continue;
 
-          if (!proto.returnType) {
-            for (let j = i - 1; j >= Math.max(0, i - 10); j--) {
-              const candidateLine = hLines[j].trim();
-              if (!candidateLine) continue;
-              if (candidateLine === 'WINAPI' || candidateLine === 'APIENTRY' || candidateLine === 'NTAPI' || candidateLine === 'CALLBACK') continue;
-              if (
-                candidateLine.startsWith('WINBASEAPI') ||
-                candidateLine.startsWith('WINUSERAPI') ||
-                candidateLine.startsWith('WINNORMALIZEAPI') ||
-                candidateLine.startsWith('WINADVAPI') ||
-                candidateLine.startsWith('NTSYSAPI') ||
-                candidateLine.startsWith('WINSOCK_API_LINKAGE') ||
-                candidateLine.startsWith('NET_API_FUNCTION') ||
-                candidateLine.startsWith('WSPAPI') ||
-                candidateLine.startsWith('IMAGEAPI') ||
-                candidateLine.startsWith('SNMPAPI_') ||
-                candidateLine.startsWith('INTERNETAPI') ||
-                candidateLine.startsWith('BOOLAPI') ||
-                candidateLine.startsWith('#') ||
-                candidateLine.startsWith('_') ||
-                candidateLine === '{' ||
-                candidateLine === '*/'
-              ) {
-                if (candidateLine === 'BOOLAPI') {
-                  proto.returnType = 'BOOL';
-                  break;
-                }
-                continue;
-              }
-              proto.returnType = candidateLine.replace(/\s+/g, ' ').trim();
-              break;
-            }
+          const proto: SdkProto = { returnType: '', params: [], header: headerPath.split(/[/\\]/).pop() || '' };
+          const returnMacro = declaration.match(/\b(?:STDAPI|LWSTDAPI|SHSTDAPI|WINOLEAPI)_\(([^)]+)\)/);
+          if (returnMacro) proto.returnType = returnMacro[1].trim();
+          else if (/\bBOOLAPI\b/.test(declaration)) proto.returnType = 'BOOL';
+          else if (/\b(?:STDAPI|LWSTDAPI|SHSTDAPI|WINOLEAPI)\b/.test(declaration)) proto.returnType = 'HRESULT';
+          else {
+            const returnDeclaration = declaration
+              .replace(/\/\*[\s\S]*?\*\//g, '')
+              .replace(/\b_(?=[A-Za-z]*[a-z])[A-Za-z_]+(?:\([^)]*\))?\s*/g, '')
+              .replace(
+                /\b(?:WINBERAPI|WINLDAPAPI|WINBASEAPI|WINUSERAPI|WINNORMALIZEAPI|WINADVAPI|NTSYSAPI|WINGDIAPI|WINSOCK_API_LINKAGE|NET_API_FUNCTION|WSPAPI|IMAGEAPI|INTERNETAPI|DECLSPEC_IMPORT|WINAPI|WINAPIV|LDAPAPI|BERAPI|APIENTRY|NTAPI|RPC_ENTRY|CALLBACK|SNMPAPI_CALL|GDIPAPI|__cdecl|__stdcall|extern|const)\b/g,
+                '',
+              )
+              .trim();
+            proto.returnType = returnDeclaration.match(/([A-Za-z_]\w*(?:\s*\*)*)\s*$/)?.[1].replace(/\s*\*/g, '*') || '';
           }
+          if (!proto.returnType) continue;
 
           // Parse parameters
           const params: { type: string; name: string }[] = [];
@@ -696,13 +678,26 @@ function buildSdkIndex(functionNames: string[]): Map<string, SdkProto> {
             if (depth <= 0) break;
           }
 
-          const paramContent = paramBlock.match(/\(([\s\S]*)\)/);
+          const functionStart = paramBlock.search(functionPattern);
+          const paramContent = paramBlock.slice(paramBlock.indexOf('(', functionStart)).match(/^\(([\s\S]*)\)/);
           if (paramContent) {
-            const rawParams = paramContent[1]
-              .replace(/_(?=[A-Za-z]*[a-z])[A-Za-z_]+(?:\([^)]*\))?\s*/g, '')
+            let rawParams = paramContent[1].replace(/\/\*[\s\S]*?\*\//g, '');
+            for (const annotation of [...rawParams.matchAll(/\b_(?=[A-Za-z]*[a-z])[A-Za-z0-9_]+\s*\(/g)].reverse()) {
+              const start = annotation.index;
+              const opening = rawParams.indexOf('(', start);
+              let annotationDepth = 1;
+              let ending = opening + 1;
+              for (; ending < rawParams.length && annotationDepth > 0; ending++) {
+                if (rawParams[ending] === '(') annotationDepth++;
+                else if (rawParams[ending] === ')') annotationDepth--;
+              }
+              rawParams = rawParams.slice(0, start) + rawParams.slice(ending);
+            }
+            rawParams = rawParams
+              .replace(/\/\*[\s\S]*?\*\//g, '')
+              .replace(/\b_(?=[A-Za-z]*[a-z])[A-Za-z_]+(?:\([^)]*\))?\s*/g, '')
               .replace(/\bGDIPCONST\b\s*/g, '')
-              .replace(/CONST\s+/g, '')
-              .replace(/const\s+/g, '')
+              .replace(/\bconst\b\s*/gi, '')
               .replace(/\b(?:IN|OUT|INOUT|OPTIONAL)\s+/g, '');
             const paramParts = rawParams
               .split(',')
@@ -710,12 +705,13 @@ function buildSdkIndex(functionNames: string[]): Map<string, SdkProto> {
               .filter(Boolean);
             for (const pl of paramParts) {
               const cleaned = pl.trim().replace(/\s+/g, ' ');
-              const normalized = cleaned.replace(/\s*\[\s*\]\s*$/, '');
+              const isArray = /\[[^\]]*\]\s*$/.test(cleaned);
+              const normalized = cleaned.replace(/\s*\[[^\]]*\]\s*$/, '');
               const paramMatch = normalized.match(/^(.*?)([A-Za-z_]\w*)$/);
               if (!paramMatch) continue;
 
               const paramName = paramMatch[2];
-              const paramType = paramMatch[1].trim().replace(/\s+\*/g, '*');
+              const paramType = paramMatch[1].trim().replace(/\s*\*/g, '*') + (isArray ? '*' : '');
 
               if (paramName !== 'VOID' && paramName !== 'void') {
                 params.push({ type: paramType, name: paramName });
@@ -724,16 +720,17 @@ function buildSdkIndex(functionNames: string[]): Map<string, SdkProto> {
           }
 
           proto.params = params;
+          sdkIndex.set(funcName, proto);
           break;
         }
       }
     }
-  } catch (e) {
-    // grep returns exit code 1 if no matches found
+  } catch (error) {
+    if (!(error instanceof Error && 'status' in error && error.status === 1)) throw error;
   } finally {
-    try {
+    if (existsSync(patternFile)) {
       require('fs').unlinkSync(patternFile);
-    } catch {}
+    }
   }
 
   return sdkIndex;
@@ -823,7 +820,7 @@ function auditPackage(pkgName: string, skipSdk: boolean = false): Mismatch[] {
     // ── Check return type even if JS types match — SDK might say it's wrong ──
     if (sdkProto?.returnType && expectedReturnJs === actualReturnJs) {
       const expectedFfi = C_TYPE_TO_FFI[sdkProto.returnType] ?? (sdkProto.returnType.endsWith('*') ? 'FFIType.ptr' : C_TYPE_TO_FFI[sdkProto.returnType]);
-      if (expectedFfi && expectedFfi !== symbol.returns) {
+      if (expectedFfi && !isCompatibleFfiType(symbol.returns, sdkProto.returnType)) {
         mismatches.push({
           functionName: method.name,
           position: 'return (FFI symbol wrong)',
@@ -874,7 +871,7 @@ function auditPackage(pkgName: string, skipSdk: boolean = false): Mismatch[] {
       if (sdkAligned && sdkProto?.params[pi] && expectedParamJs === actualParamJs) {
         const sdkParamType = sdkProto.params[pi].type;
         const expectedFfi = C_TYPE_TO_FFI[sdkParamType] ?? (sdkParamType.endsWith('*') ? 'FFIType.ptr' : C_TYPE_TO_FFI[sdkParamType]);
-        if (expectedFfi && expectedFfi !== ffiArg) {
+        if (expectedFfi && !isCompatibleFfiType(ffiArg, sdkParamType)) {
           mismatches.push({
             functionName: method.name,
             position: `param[${pi}] (${param.name}) (FFI symbol wrong)`,
@@ -1068,6 +1065,29 @@ function escapeRegex(s: string): string {
 // ═══════════════════════════════════════════════════════════════════════════
 
 const args = process.argv.slice(2);
+if (args.includes('--self-test')) {
+  const declarations = buildSdkIndex(['AuditEnumerateCategories', 'CreateBitmap', 'CreateIoCompletionPort', 'FormatMessageW', 'GetKeyState', 'RtlAddFunctionTable', 'SHOpenPropSheetW', 'SHUnlockShared']);
+  assert.equal(declarations.get('AuditEnumerateCategories')?.returnType, 'BOOLEAN');
+  assert.equal(declarations.get('AuditEnumerateCategories')?.params[0]?.type, 'GUID**');
+  assert.equal(declarations.get('CreateBitmap')?.returnType, 'HBITMAP');
+  assert.equal(declarations.get('CreateIoCompletionPort')?.params[2]?.type, 'ULONG_PTR');
+  assert.equal(declarations.get('FormatMessageW')?.returnType, 'DWORD');
+  assert.equal(declarations.get('GetKeyState')?.params[0]?.type, 'int');
+  assert.equal(declarations.get('RtlAddFunctionTable')?.returnType, 'BOOLEAN');
+  assert.equal(declarations.get('SHOpenPropSheetW')?.params[1]?.type, 'HKEY*');
+  assert.equal(declarations.get('SHUnlockShared')?.params[0]?.type, 'void*');
+  assert.equal(isCompatibleFfiType('FFIType.ptr', 'PCCERT_CONTEXT'), true);
+  assert.equal(isCompatibleFfiType('FFIType.u64', 'IUnknown*'), true);
+  assert.equal(isCompatibleFfiType('FFIType.ptr', 'SIZE_T'), false);
+  assert.equal(isCompatibleFfiType('FFIType.u32', 'HRESULT'), false);
+  assert.equal(isCompatibleFfiType('FFIType.i32', 'BOOLEAN'), false);
+  assert.equal(resolveType('Optional<LPVOID>', {}), 'Pointer');
+  assert.equal(resolveType('PVOID<bigint>', {}), 'bigint');
+  assert.equal(parseMethods('// public static Disabled(): DWORD {').length, 0);
+  assert.equal(parseSymbols('Symbols = { // Disabled: { args: [], returns: FFIType.u32 }\n Enabled: { args: [], returns: FFIType.i32 } } as const')[0]?.name, 'Enabled');
+  console.log('SDK audit regression checks passed.');
+  process.exit(0);
+}
 const doAll = args.includes('--all');
 const noSdk = args.includes('--no-sdk');
 const doFix = args.includes('--fix');

@@ -27,7 +27,7 @@
     },
     "packages/advapi32": {
       "name": "@bun-win32/advapi32",
-      "version": "2.0.1",
+      "version": "2.0.2",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -460,7 +460,7 @@
     },
     "packages/crypt32": {
       "name": "@bun-win32/crypt32",
-      "version": "2.0.1",
+      "version": "2.0.2",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -756,7 +756,7 @@
     },
     "packages/gdi32": {
       "name": "@bun-win32/gdi32",
-      "version": "2.0.1",
+      "version": "2.0.2",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -858,7 +858,7 @@
     },
     "packages/kernel32": {
       "name": "@bun-win32/kernel32",
-      "version": "2.0.1",
+      "version": "2.0.2",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -1352,7 +1352,7 @@
     },
     "packages/shell32": {
       "name": "@bun-win32/shell32",
-      "version": "2.0.1",
+      "version": "2.0.2",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -1516,7 +1516,7 @@
     },
     "packages/user32": {
       "name": "@bun-win32/user32",
-      "version": "4.0.1",
+      "version": "4.0.2",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },
@@ -1690,7 +1690,7 @@
     },
     "packages/wininet": {
       "name": "@bun-win32/wininet",
-      "version": "2.0.1",
+      "version": "2.0.2",
       "dependencies": {
         "@bun-win32/core": "workspace:*",
       },

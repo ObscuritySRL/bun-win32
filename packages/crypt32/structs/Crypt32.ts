@@ -8,9 +8,9 @@ import type {
   BOOL,
   DWORD,
   HANDLE,
-  HCERT_SERVER_OCSP_RESPONSE,
   HCERTCHAINENGINE,
   HCERTSTORE,
+  HCERT_SERVER_OCSP_RESPONSE,
   HCRYPTASYNC,
   HCRYPTDEFAULTCONTEXT,
   HCRYPTMSG,
@@ -19,14 +19,15 @@ import type {
   HCRYPTPROV,
   HCRYPTPROV_OR_NCRYPT_KEY_HANDLE,
   HMODULE,
+  LONG,
   LPCSTR,
   LPCWSTR,
   LPDWORD,
-  LONG,
   LPFILETIME,
   LPSTR,
   LPVOID,
   LPWSTR,
+  NULL,
   Nullable,
   Optional,
   PBYTE,
@@ -35,8 +36,8 @@ import type {
   PCCERT_SELECT_CRITERIA,
   PCCERT_SERVER_OCSP_RESPONSE_CONTEXT,
   PCCRL_CONTEXT,
-  PCCTL_CONTEXT,
   PCCRYPT_OID_INFO,
+  PCCTL_CONTEXT,
   PCERT_CHAIN_ENGINE_CONFIG,
   PCERT_CHAIN_PARA,
   PCERT_CHAIN_POLICY_PARA,
@@ -60,6 +61,7 @@ import type {
   PCMSG_SIGNER_ENCODE_INFO,
   PCMSG_STREAM_INFO,
   PCRL_INFO,
+  PCRYPTPROTECT_PROMPTSTRUCT,
   PCRYPT_ALGORITHM_IDENTIFIER,
   PCRYPT_ATTRIBUTE,
   PCRYPT_DATA_BLOB,
@@ -78,7 +80,6 @@ import type {
   PCRYPT_TIMESTAMP_CONTEXT,
   PCRYPT_TIMESTAMP_PARA,
   PCRYPT_VERIFY_MESSAGE_PARA,
-  PCRYPTPROTECT_PROMPTSTRUCT,
   PCTL_ENTRY,
   PCTL_INFO,
   PCTL_USAGE,
@@ -223,7 +224,7 @@ class Crypt32 extends Win32 {
     CertOpenSystemStoreW: { args: [FFIType.u64, FFIType.ptr], returns: FFIType.u64 },
     CertRDNValueToStrA: { args: [FFIType.u32, FFIType.ptr, FFIType.ptr, FFIType.u32], returns: FFIType.u32 },
     CertRDNValueToStrW: { args: [FFIType.u32, FFIType.ptr, FFIType.ptr, FFIType.u32], returns: FFIType.u32 },
-    CertRegisterPhysicalStore: { args: [FFIType.ptr, FFIType.u32, FFIType.ptr, FFIType.ptr, FFIType.u32], returns: FFIType.i32 },
+    CertRegisterPhysicalStore: { args: [FFIType.ptr, FFIType.u32, FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
     CertRegisterSystemStore: { args: [FFIType.ptr, FFIType.u32, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
     CertRemoveEnhancedKeyUsageIdentifier: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
     CertRemoveStoreFromCollection: { args: [FFIType.u64, FFIType.u64], returns: FFIType.void },
@@ -870,7 +871,7 @@ class Crypt32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincrypt/nf-wincrypt-certregisterphysicalstore
-  public static CertRegisterPhysicalStore(pvSystemStore: PVOID, dwFlags: DWORD, pwszStoreName: LPCWSTR, pStoreInfo: PVOID, pvReserved: DWORD): BOOL {
+  public static CertRegisterPhysicalStore(pvSystemStore: PVOID, dwFlags: DWORD, pwszStoreName: LPCWSTR, pStoreInfo: PVOID, pvReserved: NULL): BOOL {
     return Crypt32.Load('CertRegisterPhysicalStore')(pvSystemStore, dwFlags, pwszStoreName, pStoreInfo, pvReserved);
   }
 

@@ -212,16 +212,16 @@ class GDI32 extends Win32 {
     EndPage: { args: [FFIType.u64], returns: FFIType.i32 },
     EndPath: { args: [FFIType.u64], returns: FFIType.i32 },
     EnumEnhMetaFile: { args: [FFIType.u64, FFIType.u64, FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
-    EnumFontFamiliesA: { args: [FFIType.u64, FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
-    EnumFontFamiliesExA: { args: [FFIType.u64, FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.u32], returns: FFIType.i32 },
-    EnumFontFamiliesExW: { args: [FFIType.u64, FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.u32], returns: FFIType.i32 },
-    EnumFontFamiliesW: { args: [FFIType.u64, FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
-    EnumFontsA: { args: [FFIType.u64, FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
-    EnumFontsW: { args: [FFIType.u64, FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
-    EnumICMProfilesA: { args: [FFIType.u64, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
-    EnumICMProfilesW: { args: [FFIType.u64, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
-    EnumMetaFile: { args: [FFIType.u64, FFIType.u64, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
-    EnumObjects: { args: [FFIType.u64, FFIType.i32, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
+    EnumFontFamiliesA: { args: [FFIType.u64, FFIType.ptr, FFIType.ptr, FFIType.u64], returns: FFIType.i32 },
+    EnumFontFamiliesExA: { args: [FFIType.u64, FFIType.ptr, FFIType.ptr, FFIType.u64, FFIType.u32], returns: FFIType.i32 },
+    EnumFontFamiliesExW: { args: [FFIType.u64, FFIType.ptr, FFIType.ptr, FFIType.u64, FFIType.u32], returns: FFIType.i32 },
+    EnumFontFamiliesW: { args: [FFIType.u64, FFIType.ptr, FFIType.ptr, FFIType.u64], returns: FFIType.i32 },
+    EnumFontsA: { args: [FFIType.u64, FFIType.ptr, FFIType.ptr, FFIType.u64], returns: FFIType.i32 },
+    EnumFontsW: { args: [FFIType.u64, FFIType.ptr, FFIType.ptr, FFIType.u64], returns: FFIType.i32 },
+    EnumICMProfilesA: { args: [FFIType.u64, FFIType.ptr, FFIType.u64], returns: FFIType.i32 },
+    EnumICMProfilesW: { args: [FFIType.u64, FFIType.ptr, FFIType.u64], returns: FFIType.i32 },
+    EnumMetaFile: { args: [FFIType.u64, FFIType.u64, FFIType.ptr, FFIType.u64], returns: FFIType.i32 },
+    EnumObjects: { args: [FFIType.u64, FFIType.i32, FFIType.ptr, FFIType.u64], returns: FFIType.i32 },
     EqualRgn: { args: [FFIType.u64, FFIType.u64], returns: FFIType.i32 },
     Escape: { args: [FFIType.u64, FFIType.i32, FFIType.i32, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
     ExcludeClipRect: { args: [FFIType.u64, FFIType.i32, FFIType.i32, FFIType.i32, FFIType.i32], returns: FFIType.i32 },
@@ -341,7 +341,7 @@ class GDI32 extends Win32 {
     GetWorldTransform: { args: [FFIType.u64, FFIType.ptr], returns: FFIType.i32 },
     IntersectClipRect: { args: [FFIType.u64, FFIType.i32, FFIType.i32, FFIType.i32, FFIType.i32], returns: FFIType.i32 },
     InvertRgn: { args: [FFIType.u64, FFIType.u64], returns: FFIType.i32 },
-    LineDDA: { args: [FFIType.i32, FFIType.i32, FFIType.i32, FFIType.i32, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
+    LineDDA: { args: [FFIType.i32, FFIType.i32, FFIType.i32, FFIType.i32, FFIType.ptr, FFIType.u64], returns: FFIType.i32 },
     LineTo: { args: [FFIType.u64, FFIType.i32, FFIType.i32], returns: FFIType.i32 },
     LPtoDP: { args: [FFIType.u64, FFIType.ptr, FFIType.i32], returns: FFIType.i32 },
     MaskBlt: { args: [FFIType.u64, FFIType.i32, FFIType.i32, FFIType.i32, FFIType.i32, FFIType.u64, FFIType.i32, FFIType.i32, FFIType.u64, FFIType.i32, FFIType.i32, FFIType.u32], returns: FFIType.i32 },
@@ -903,52 +903,52 @@ class GDI32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-enumfontfamiliesa
-  public static EnumFontFamiliesA(hdc: HDC, lpLogfont: Optional<LPCSTR>, lpProc: FONTENUMPROCA, lParam: LPVOID): int {
+  public static EnumFontFamiliesA(hdc: HDC, lpLogfont: Optional<LPCSTR>, lpProc: FONTENUMPROCA, lParam: LPARAM): int {
     return GDI32.Load('EnumFontFamiliesA')(hdc, lpLogfont, lpProc, lParam);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-enumfontfamiliesexa
-  public static EnumFontFamiliesExA(hdc: HDC, lpLogfont: LPLOGFONTA, lpProc: FONTENUMPROCA, lParam: LPVOID, dwFlags: DWORD): int {
+  public static EnumFontFamiliesExA(hdc: HDC, lpLogfont: LPLOGFONTA, lpProc: FONTENUMPROCA, lParam: LPARAM, dwFlags: DWORD): int {
     return GDI32.Load('EnumFontFamiliesExA')(hdc, lpLogfont, lpProc, lParam, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-enumfontfamiliesexw
-  public static EnumFontFamiliesExW(hdc: HDC, lpLogfont: LPLOGFONTW, lpProc: FONTENUMPROCW, lParam: LPVOID, dwFlags: DWORD): int {
+  public static EnumFontFamiliesExW(hdc: HDC, lpLogfont: LPLOGFONTW, lpProc: FONTENUMPROCW, lParam: LPARAM, dwFlags: DWORD): int {
     return GDI32.Load('EnumFontFamiliesExW')(hdc, lpLogfont, lpProc, lParam, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-enumfontfamiliesw
-  public static EnumFontFamiliesW(hdc: HDC, lpLogfont: Optional<LPCWSTR>, lpProc: FONTENUMPROCW, lParam: LPVOID): int {
+  public static EnumFontFamiliesW(hdc: HDC, lpLogfont: Optional<LPCWSTR>, lpProc: FONTENUMPROCW, lParam: LPARAM): int {
     return GDI32.Load('EnumFontFamiliesW')(hdc, lpLogfont, lpProc, lParam);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-enumfontsa
-  public static EnumFontsA(hdc: HDC, lpLogfont: Optional<LPCSTR>, lpProc: FONTENUMPROCA, lParam: LPVOID): int {
+  public static EnumFontsA(hdc: HDC, lpLogfont: Optional<LPCSTR>, lpProc: FONTENUMPROCA, lParam: LPARAM): int {
     return GDI32.Load('EnumFontsA')(hdc, lpLogfont, lpProc, lParam);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-enumfontsw
-  public static EnumFontsW(hdc: HDC, lpLogfont: Optional<LPCWSTR>, lpProc: FONTENUMPROCW, lParam: LPVOID): int {
+  public static EnumFontsW(hdc: HDC, lpLogfont: Optional<LPCWSTR>, lpProc: FONTENUMPROCW, lParam: LPARAM): int {
     return GDI32.Load('EnumFontsW')(hdc, lpLogfont, lpProc, lParam);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-enumicmprofilesa
-  public static EnumICMProfilesA(hdc: HDC, proc: ICMENUMPROCA, param: Optional<LPVOID>): int {
+  public static EnumICMProfilesA(hdc: HDC, proc: ICMENUMPROCA, param: Optional<LPARAM>): int {
     return GDI32.Load('EnumICMProfilesA')(hdc, proc, param);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-enumicmprofilesw
-  public static EnumICMProfilesW(hdc: HDC, proc: ICMENUMPROCW, param: Optional<LPVOID>): int {
+  public static EnumICMProfilesW(hdc: HDC, proc: ICMENUMPROCW, param: Optional<LPARAM>): int {
     return GDI32.Load('EnumICMProfilesW')(hdc, proc, param);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-enummetafile
-  public static EnumMetaFile(hdc: HDC, hmf: HMETAFILE, proc: MFENUMPROC, param: Optional<LPVOID>): BOOL {
+  public static EnumMetaFile(hdc: HDC, hmf: HMETAFILE, proc: MFENUMPROC, param: Optional<LPARAM>): BOOL {
     return GDI32.Load('EnumMetaFile')(hdc, hmf, proc, param);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-enumobjects
-  public static EnumObjects(hdc: HDC, nType: int, lpFunc: GOBJENUMPROC, lParam: LPVOID): int {
+  public static EnumObjects(hdc: HDC, nType: int, lpFunc: GOBJENUMPROC, lParam: LPARAM): int {
     return GDI32.Load('EnumObjects')(hdc, nType, lpFunc, lParam);
   }
 
@@ -1548,7 +1548,7 @@ class GDI32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-linedda
-  public static LineDDA(xStart: int, yStart: int, xEnd: int, yEnd: int, lpProc: LINEDDAPROC, data: Optional<LPVOID>): BOOL {
+  public static LineDDA(xStart: int, yStart: int, xEnd: int, yEnd: int, lpProc: LINEDDAPROC, data: Optional<LPARAM>): BOOL {
     return GDI32.Load('LineDDA')(xStart, yStart, xEnd, yEnd, lpProc, data);
   }
 

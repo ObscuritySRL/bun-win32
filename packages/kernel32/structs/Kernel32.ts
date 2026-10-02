@@ -6,8 +6,10 @@ import type {
   BOOL,
   BOOLEAN,
   BYTE,
+  CHAR,
   CODEPAGE_ENUMPROC,
   DWORD,
+  DWORD_PTR,
   ENUMRESLANGPROCA,
   ENUMRESLANGPROCW,
   ENUMRESNAMEPROCA,
@@ -25,9 +27,9 @@ import type {
   HRSRC,
   HWND,
   INT,
-  LARGE_INTEGER,
   LANGUAGEGROUP_ENUMPROCA,
   LANGUAGEGROUP_ENUMPROCW,
+  LARGE_INTEGER,
   LCID,
   LOCALE_ENUMPROCA,
   LOCALE_ENUMPROCEX,
@@ -48,8 +50,8 @@ import type {
   LPDWORD,
   LPHANDLE,
   LPNLSVERSIONINFO,
-  LPPROC_THREAD_ATTRIBUTE_LIST,
   LPPROCESS_INFORMATION,
+  LPPROC_THREAD_ATTRIBUTE_LIST,
   LPSECURITY_ATTRIBUTES,
   LPSTARTUPINFOA,
   LPSTARTUPINFOW,
@@ -80,6 +82,7 @@ import type {
   UILANGUAGE_ENUMPROCA,
   UILANGUAGE_ENUMPROCW,
   UINT,
+  UINT_PTR,
   ULONGLONG,
   ULONG_PTR,
   USHORT,
@@ -125,7 +128,7 @@ class Kernel32 extends Win32 {
     AcquireSRWLockExclusive: { args: [FFIType.ptr], returns: FFIType.void },
     AcquireSRWLockShared: { args: [FFIType.ptr], returns: FFIType.void },
     ActivateActCtx: { args: [FFIType.u64, FFIType.ptr], returns: FFIType.i32 },
-    ActivatePackageVirtualizationContext: { args: [FFIType.u64, FFIType.ptr], returns: FFIType.u32 },
+    ActivatePackageVirtualizationContext: { args: [FFIType.u64, FFIType.ptr], returns: FFIType.i32 },
     AddAtomA: { args: [FFIType.ptr], returns: FFIType.u16 },
     AddAtomW: { args: [FFIType.ptr], returns: FFIType.u16 },
     AddConsoleAliasA: { args: [FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
@@ -145,15 +148,15 @@ class Kernel32 extends Win32 {
     AllocConsole: { args: [], returns: FFIType.i32 },
     AllocConsoleWithOptions: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.u32 },
     ApplicationRecoveryFinished: { args: [FFIType.i32], returns: FFIType.void },
-    ApplicationRecoveryInProgress: { args: [FFIType.ptr], returns: FFIType.u32 },
-    AppPolicyGetClrCompat: { args: [FFIType.u64, FFIType.ptr], returns: FFIType.u32 },
-    AppPolicyGetCreateFileAccess: { args: [FFIType.u64, FFIType.ptr], returns: FFIType.u32 },
-    AppPolicyGetLifecycleManagement: { args: [FFIType.u64, FFIType.ptr], returns: FFIType.u32 },
-    AppPolicyGetMediaFoundationCodecLoading: { args: [FFIType.u64, FFIType.ptr], returns: FFIType.u32 },
-    AppPolicyGetProcessTerminationMethod: { args: [FFIType.u64, FFIType.ptr], returns: FFIType.u32 },
-    AppPolicyGetShowDeveloperDiagnostic: { args: [FFIType.u64, FFIType.ptr], returns: FFIType.u32 },
-    AppPolicyGetThreadInitializationType: { args: [FFIType.u64, FFIType.ptr], returns: FFIType.u32 },
-    AppPolicyGetWindowingModel: { args: [FFIType.u64, FFIType.ptr], returns: FFIType.u32 },
+    ApplicationRecoveryInProgress: { args: [FFIType.ptr], returns: FFIType.i32 },
+    AppPolicyGetClrCompat: { args: [FFIType.u64, FFIType.ptr], returns: FFIType.i32 },
+    AppPolicyGetCreateFileAccess: { args: [FFIType.u64, FFIType.ptr], returns: FFIType.i32 },
+    AppPolicyGetLifecycleManagement: { args: [FFIType.u64, FFIType.ptr], returns: FFIType.i32 },
+    AppPolicyGetMediaFoundationCodecLoading: { args: [FFIType.u64, FFIType.ptr], returns: FFIType.i32 },
+    AppPolicyGetProcessTerminationMethod: { args: [FFIType.u64, FFIType.ptr], returns: FFIType.i32 },
+    AppPolicyGetShowDeveloperDiagnostic: { args: [FFIType.u64, FFIType.ptr], returns: FFIType.i32 },
+    AppPolicyGetThreadInitializationType: { args: [FFIType.u64, FFIType.ptr], returns: FFIType.i32 },
+    AppPolicyGetWindowingModel: { args: [FFIType.u64, FFIType.ptr], returns: FFIType.i32 },
     AreFileApisANSI: { args: [], returns: FFIType.i32 },
     AreShortNamesEnabled: { args: [FFIType.u64, FFIType.ptr], returns: FFIType.i32 },
     AssignProcessToJobObject: { args: [FFIType.u64, FFIType.u64], returns: FFIType.i32 },
@@ -195,8 +198,8 @@ class Kernel32 extends Win32 {
     ClearCommError: { args: [FFIType.u64, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
     CloseConsoleHandle: { args: [FFIType.u64], returns: FFIType.i32 },
     CloseHandle: { args: [FFIType.u64], returns: FFIType.i32 },
-    ClosePackageInfo: { args: [FFIType.ptr], returns: FFIType.u32 },
-    ClosePrivateNamespace: { args: [FFIType.u64, FFIType.u32], returns: FFIType.u32 },
+    ClosePackageInfo: { args: [FFIType.ptr], returns: FFIType.i32 },
+    ClosePrivateNamespace: { args: [FFIType.u64, FFIType.u32], returns: FFIType.u8 },
     ClosePseudoConsole: { args: [FFIType.u64], returns: FFIType.void },
     CloseThreadpool: { args: [FFIType.ptr], returns: FFIType.void },
     CloseThreadpoolCleanupGroup: { args: [FFIType.ptr], returns: FFIType.void },
@@ -209,7 +212,7 @@ class Kernel32 extends Win32 {
     CommConfigDialogW: { args: [FFIType.ptr, FFIType.u64, FFIType.ptr], returns: FFIType.i32 },
     CompareFileTime: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
     CompareStringA: { args: [FFIType.u32, FFIType.u32, FFIType.ptr, FFIType.i32, FFIType.ptr, FFIType.i32], returns: FFIType.u32 },
-    CompareStringEx: { args: [FFIType.ptr, FFIType.u32, FFIType.ptr, FFIType.i32, FFIType.ptr, FFIType.i32, FFIType.ptr, FFIType.ptr, FFIType.u32], returns: FFIType.u32 },
+    CompareStringEx: { args: [FFIType.ptr, FFIType.u32, FFIType.ptr, FFIType.i32, FFIType.ptr, FFIType.i32, FFIType.ptr, FFIType.ptr, FFIType.u64], returns: FFIType.u32 },
     CompareStringOrdinal: { args: [FFIType.ptr, FFIType.i32, FFIType.ptr, FFIType.i32, FFIType.i32], returns: FFIType.u32 },
     CompareStringW: { args: [FFIType.u32, FFIType.u32, FFIType.ptr, FFIType.i32, FFIType.ptr, FFIType.i32], returns: FFIType.u32 },
     ConnectNamedPipe: { args: [FFIType.u64, FFIType.ptr], returns: FFIType.i32 },
@@ -222,7 +225,7 @@ class Kernel32 extends Win32 {
     ConvertThreadToFiber: { args: [FFIType.ptr], returns: FFIType.u64 },
     ConvertThreadToFiberEx: { args: [FFIType.ptr, FFIType.u32], returns: FFIType.u64 },
     CopyContext: { args: [FFIType.ptr, FFIType.u32, FFIType.ptr], returns: FFIType.i32 },
-    CopyFile2: { args: [FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.u32 },
+    CopyFile2: { args: [FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
     CopyFileA: { args: [FFIType.ptr, FFIType.ptr, FFIType.i32], returns: FFIType.i32 },
     CopyFileExA: { args: [FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.u32], returns: FFIType.i32 },
     CopyFileExW: { args: [FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.u32], returns: FFIType.i32 },
@@ -265,7 +268,7 @@ class Kernel32 extends Win32 {
     CreateHardLinkTransactedA: { args: [FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.u64], returns: FFIType.i32 },
     CreateHardLinkTransactedW: { args: [FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.u64], returns: FFIType.i32 },
     CreateHardLinkW: { args: [FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
-    CreateIoCompletionPort: { args: [FFIType.u64, FFIType.u64, FFIType.ptr, FFIType.u32], returns: FFIType.u64 },
+    CreateIoCompletionPort: { args: [FFIType.u64, FFIType.u64, FFIType.u64, FFIType.u32], returns: FFIType.u64 },
     CreateJobObjectA: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.u64 },
     CreateJobObjectW: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.u64 },
     CreateJobSet: { args: [FFIType.u32, FFIType.ptr, FFIType.u32], returns: FFIType.i32 },
@@ -278,23 +281,23 @@ class Kernel32 extends Win32 {
     CreateMutexW: { args: [FFIType.ptr, FFIType.i32, FFIType.ptr], returns: FFIType.u64 },
     CreateNamedPipeA: { args: [FFIType.ptr, FFIType.u32, FFIType.u32, FFIType.u32, FFIType.u32, FFIType.u32, FFIType.u32, FFIType.ptr], returns: FFIType.u64 },
     CreateNamedPipeW: { args: [FFIType.ptr, FFIType.u32, FFIType.u32, FFIType.u32, FFIType.u32, FFIType.u32, FFIType.u32, FFIType.ptr], returns: FFIType.u64 },
-    CreatePackageVirtualizationContext: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.u32 },
+    CreatePackageVirtualizationContext: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
     CreatePipe: { args: [FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.u32], returns: FFIType.i32 },
     CreatePrivateNamespaceA: { args: [FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.u64 },
     CreatePrivateNamespaceW: { args: [FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.u64 },
     CreateProcessA: { args: [FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.i32, FFIType.u32, FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
     CreateProcessW: { args: [FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.i32, FFIType.u32, FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
-    CreatePseudoConsole: { args: [FFIType.u32, FFIType.u64, FFIType.u64, FFIType.u32, FFIType.ptr], returns: FFIType.u32 },
+    CreatePseudoConsole: { args: [FFIType.u32, FFIType.u64, FFIType.u64, FFIType.u32, FFIType.ptr], returns: FFIType.i32 },
     CreateRemoteThread: { args: [FFIType.u64, FFIType.ptr, FFIType.u64, FFIType.u64, FFIType.u64, FFIType.u32, FFIType.ptr], returns: FFIType.u64 },
     CreateRemoteThreadEx: { args: [FFIType.u64, FFIType.ptr, FFIType.u64, FFIType.u64, FFIType.u64, FFIType.u32, FFIType.u32, FFIType.ptr], returns: FFIType.u64 },
     CreateSemaphoreA: { args: [FFIType.ptr, FFIType.i32, FFIType.i32, FFIType.ptr], returns: FFIType.u64 },
     CreateSemaphoreExA: { args: [FFIType.ptr, FFIType.i32, FFIType.i32, FFIType.ptr, FFIType.u32, FFIType.u32], returns: FFIType.u64 },
     CreateSemaphoreExW: { args: [FFIType.ptr, FFIType.i32, FFIType.i32, FFIType.ptr, FFIType.u32, FFIType.u32], returns: FFIType.u64 },
     CreateSemaphoreW: { args: [FFIType.ptr, FFIType.i32, FFIType.i32, FFIType.ptr], returns: FFIType.u64 },
-    CreateSymbolicLinkA: { args: [FFIType.ptr, FFIType.ptr, FFIType.u32], returns: FFIType.u32 },
-    CreateSymbolicLinkTransactedA: { args: [FFIType.ptr, FFIType.ptr, FFIType.u32, FFIType.u64], returns: FFIType.u32 },
-    CreateSymbolicLinkTransactedW: { args: [FFIType.ptr, FFIType.ptr, FFIType.u32, FFIType.u64], returns: FFIType.u32 },
-    CreateSymbolicLinkW: { args: [FFIType.ptr, FFIType.ptr, FFIType.u32], returns: FFIType.u32 },
+    CreateSymbolicLinkA: { args: [FFIType.ptr, FFIType.ptr, FFIType.u32], returns: FFIType.u8 },
+    CreateSymbolicLinkTransactedA: { args: [FFIType.ptr, FFIType.ptr, FFIType.u32, FFIType.u64], returns: FFIType.u8 },
+    CreateSymbolicLinkTransactedW: { args: [FFIType.ptr, FFIType.ptr, FFIType.u32, FFIType.u64], returns: FFIType.u8 },
+    CreateSymbolicLinkW: { args: [FFIType.ptr, FFIType.ptr, FFIType.u32], returns: FFIType.u8 },
     CreateTapePartition: { args: [FFIType.u64, FFIType.u32, FFIType.u32, FFIType.u32], returns: FFIType.u32 },
     CreateThread: { args: [FFIType.ptr, FFIType.u64, FFIType.ptr, FFIType.ptr, FFIType.u32, FFIType.ptr], returns: FFIType.u64 },
     CreateThreadpool: { args: [FFIType.ptr], returns: FFIType.ptr },
@@ -313,7 +316,7 @@ class Kernel32 extends Win32 {
     CreateWaitableTimerExW: { args: [FFIType.ptr, FFIType.ptr, FFIType.u32, FFIType.u32], returns: FFIType.u64 },
     CreateWaitableTimerW: { args: [FFIType.ptr, FFIType.i32, FFIType.ptr], returns: FFIType.u64 },
     DeactivateActCtx: { args: [FFIType.u32, FFIType.u64], returns: FFIType.i32 },
-    DeactivatePackageVirtualizationContext: { args: [FFIType.ptr], returns: FFIType.void },
+    DeactivatePackageVirtualizationContext: { args: [FFIType.u64], returns: FFIType.void },
     DebugActiveProcess: { args: [FFIType.u32], returns: FFIType.i32 },
     DebugActiveProcessStop: { args: [FFIType.u32], returns: FFIType.i32 },
     DebugBreak: { args: [], returns: FFIType.void },
@@ -355,7 +358,7 @@ class Kernel32 extends Win32 {
     DosDateTimeToFileTime: { args: [FFIType.u16, FFIType.u16, FFIType.ptr], returns: FFIType.i32 },
     DuplicateConsoleHandle: { args: [FFIType.u64, FFIType.u32, FFIType.i32, FFIType.u32], returns: FFIType.u64 },
     DuplicateHandle: { args: [FFIType.u64, FFIType.u64, FFIType.u64, FFIType.ptr, FFIType.u32, FFIType.i32, FFIType.u32], returns: FFIType.i32 },
-    DuplicatePackageVirtualizationContext: { args: [FFIType.u64, FFIType.ptr], returns: FFIType.u32 },
+    DuplicatePackageVirtualizationContext: { args: [FFIType.u64, FFIType.ptr], returns: FFIType.i32 },
     EnableProcessOptionalXStateFeatures: { args: [FFIType.u64], returns: FFIType.i32 },
     EnableThreadProfiling: { args: [FFIType.u64, FFIType.u32, FFIType.u64, FFIType.ptr], returns: FFIType.u32 },
     EncodePointer: { args: [FFIType.ptr], returns: FFIType.ptr },
@@ -377,18 +380,18 @@ class Kernel32 extends Win32 {
     EnumDateFormatsW: { args: [FFIType.ptr, FFIType.u32, FFIType.u32], returns: FFIType.i32 },
     EnumLanguageGroupLocalesA: { args: [FFIType.ptr, FFIType.u32, FFIType.u32, FFIType.u64], returns: FFIType.i32 },
     EnumLanguageGroupLocalesW: { args: [FFIType.ptr, FFIType.u32, FFIType.u32, FFIType.u64], returns: FFIType.i32 },
-    EnumResourceLanguagesA: { args: [FFIType.u64, FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
+    EnumResourceLanguagesA: { args: [FFIType.u64, FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.u64], returns: FFIType.i32 },
     EnumResourceLanguagesExA: { args: [FFIType.u64, FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.i64, FFIType.u32, FFIType.u16], returns: FFIType.i32 },
     EnumResourceLanguagesExW: { args: [FFIType.u64, FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.i64, FFIType.u32, FFIType.u16], returns: FFIType.i32 },
-    EnumResourceLanguagesW: { args: [FFIType.u64, FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
-    EnumResourceNamesA: { args: [FFIType.u64, FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
+    EnumResourceLanguagesW: { args: [FFIType.u64, FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.u64], returns: FFIType.i32 },
+    EnumResourceNamesA: { args: [FFIType.u64, FFIType.ptr, FFIType.ptr, FFIType.u64], returns: FFIType.i32 },
     EnumResourceNamesExA: { args: [FFIType.u64, FFIType.ptr, FFIType.ptr, FFIType.i64, FFIType.u32, FFIType.u16], returns: FFIType.i32 },
     EnumResourceNamesExW: { args: [FFIType.u64, FFIType.ptr, FFIType.ptr, FFIType.i64, FFIType.u32, FFIType.u16], returns: FFIType.i32 },
-    EnumResourceNamesW: { args: [FFIType.u64, FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
-    EnumResourceTypesA: { args: [FFIType.u64, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
+    EnumResourceNamesW: { args: [FFIType.u64, FFIType.ptr, FFIType.ptr, FFIType.u64], returns: FFIType.i32 },
+    EnumResourceTypesA: { args: [FFIType.u64, FFIType.ptr, FFIType.u64], returns: FFIType.i32 },
     EnumResourceTypesExA: { args: [FFIType.u64, FFIType.ptr, FFIType.i64, FFIType.u32, FFIType.u16], returns: FFIType.i32 },
     EnumResourceTypesExW: { args: [FFIType.u64, FFIType.ptr, FFIType.i64, FFIType.u32, FFIType.u16], returns: FFIType.i32 },
-    EnumResourceTypesW: { args: [FFIType.u64, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
+    EnumResourceTypesW: { args: [FFIType.u64, FFIType.ptr, FFIType.u64], returns: FFIType.i32 },
     EnumSystemCodePagesA: { args: [FFIType.ptr, FFIType.u32], returns: FFIType.i32 },
     EnumSystemCodePagesW: { args: [FFIType.ptr, FFIType.u32], returns: FFIType.i32 },
     EnumSystemFirmwareTables: { args: [FFIType.u32, FFIType.ptr, FFIType.u32], returns: FFIType.u32 },
@@ -420,7 +423,7 @@ class Kernel32 extends Win32 {
     FileTimeToLocalFileTime: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
     FileTimeToSystemTime: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
     FillConsoleOutputAttribute: { args: [FFIType.u64, FFIType.u16, FFIType.u32, FFIType.u32, FFIType.ptr], returns: FFIType.i32 },
-    FillConsoleOutputCharacterA: { args: [FFIType.u64, FFIType.u32, FFIType.u32, FFIType.u32, FFIType.ptr], returns: FFIType.i32 },
+    FillConsoleOutputCharacterA: { args: [FFIType.u64, FFIType.u8, FFIType.u32, FFIType.u32, FFIType.ptr], returns: FFIType.i32 },
     FillConsoleOutputCharacterW: { args: [FFIType.u64, FFIType.u16, FFIType.u32, FFIType.u32, FFIType.ptr], returns: FFIType.i32 },
     FindActCtxSectionGuid: { args: [FFIType.u32, FFIType.ptr, FFIType.u32, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
     FindActCtxSectionStringA: { args: [FFIType.u32, FFIType.ptr, FFIType.u32, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
@@ -475,7 +478,7 @@ class Kernel32 extends Win32 {
     FlushViewOfFile: { args: [FFIType.u64, FFIType.u64], returns: FFIType.i32 },
     FoldStringA: { args: [FFIType.u32, FFIType.ptr, FFIType.i32, FFIType.ptr, FFIType.i32], returns: FFIType.i32 },
     FoldStringW: { args: [FFIType.u32, FFIType.ptr, FFIType.i32, FFIType.ptr, FFIType.i32], returns: FFIType.i32 },
-    FormatApplicationUserModelId: { args: [FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.u32 },
+    FormatApplicationUserModelId: { args: [FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
     FormatMessageA: { args: [FFIType.u32, FFIType.ptr, FFIType.u32, FFIType.u32, FFIType.ptr, FFIType.u32, FFIType.ptr], returns: FFIType.u32 },
     FormatMessageW: { args: [FFIType.u32, FFIType.ptr, FFIType.u32, FFIType.u32, FFIType.ptr, FFIType.u32, FFIType.ptr], returns: FFIType.u32 },
     FreeConsole: { args: [], returns: FFIType.i32 },
@@ -493,9 +496,9 @@ class Kernel32 extends Win32 {
     GetActiveProcessorGroupCount: { args: [], returns: FFIType.u16 },
     GetAppContainerAce: { args: [FFIType.ptr, FFIType.u32, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
     GetAppContainerNamedObjectPath: { args: [FFIType.u64, FFIType.u32, FFIType.u32, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
-    GetApplicationRecoveryCallback: { args: [FFIType.u64, FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.u32 },
-    GetApplicationRestartSettings: { args: [FFIType.u64, FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.u32 },
-    GetApplicationUserModelId: { args: [FFIType.u64, FFIType.ptr, FFIType.ptr], returns: FFIType.u32 },
+    GetApplicationRecoveryCallback: { args: [FFIType.u64, FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
+    GetApplicationRestartSettings: { args: [FFIType.u64, FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
+    GetApplicationUserModelId: { args: [FFIType.u64, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
     GetAtomNameA: { args: [FFIType.u16, FFIType.ptr, FFIType.i32], returns: FFIType.u32 },
     GetAtomNameW: { args: [FFIType.u16, FFIType.ptr, FFIType.i32], returns: FFIType.u32 },
     GetBinaryTypeA: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
@@ -567,17 +570,17 @@ class Kernel32 extends Win32 {
     GetCurrencyFormatEx: { args: [FFIType.ptr, FFIType.u32, FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.i32], returns: FFIType.i32 },
     GetCurrencyFormatW: { args: [FFIType.u32, FFIType.u32, FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.i32], returns: FFIType.i32 },
     GetCurrentActCtx: { args: [FFIType.ptr], returns: FFIType.i32 },
-    GetCurrentApplicationUserModelId: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.u32 },
+    GetCurrentApplicationUserModelId: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
     GetCurrentConsoleFont: { args: [FFIType.u64, FFIType.i32, FFIType.ptr], returns: FFIType.i32 },
     GetCurrentConsoleFontEx: { args: [FFIType.u64, FFIType.i32, FFIType.ptr], returns: FFIType.i32 },
     GetCurrentDirectoryA: { args: [FFIType.u32, FFIType.ptr], returns: FFIType.u32 },
     GetCurrentDirectoryW: { args: [FFIType.u32, FFIType.ptr], returns: FFIType.u32 },
-    GetCurrentPackageFamilyName: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.u32 },
-    GetCurrentPackageFullName: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.u32 },
-    GetCurrentPackageId: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.u32 },
-    GetCurrentPackageInfo: { args: [FFIType.u32, FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.u32 },
+    GetCurrentPackageFamilyName: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
+    GetCurrentPackageFullName: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
+    GetCurrentPackageId: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
+    GetCurrentPackageInfo: { args: [FFIType.u32, FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
     // GetCurrentPackageInfo3: { args: [FFIType.u32, FFIType.u32, FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.u32 },
-    GetCurrentPackagePath: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.u32 },
+    GetCurrentPackagePath: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
     GetCurrentPackageVirtualizationContext: { args: [], returns: FFIType.u32 },
     GetCurrentProcess: { args: [], returns: FFIType.u64 },
     GetCurrentProcessId: { args: [], returns: FFIType.u32 },
@@ -597,8 +600,8 @@ class Kernel32 extends Win32 {
     GetDiskFreeSpaceExA: { args: [FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
     GetDiskFreeSpaceExW: { args: [FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
     GetDiskFreeSpaceW: { args: [FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
-    GetDiskSpaceInformationA: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.u32 },
-    GetDiskSpaceInformationW: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.u32 },
+    GetDiskSpaceInformationA: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
+    GetDiskSpaceInformationW: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
     GetDllDirectoryA: { args: [FFIType.u32, FFIType.ptr], returns: FFIType.u32 },
     GetDllDirectoryW: { args: [FFIType.u32, FFIType.ptr], returns: FFIType.u32 },
     GetDriveTypeA: { args: [FFIType.ptr], returns: FFIType.u32 },
@@ -663,7 +666,7 @@ class Kernel32 extends Win32 {
     GetLongPathNameTransactedA: { args: [FFIType.ptr, FFIType.ptr, FFIType.u32, FFIType.u64], returns: FFIType.u32 },
     GetLongPathNameTransactedW: { args: [FFIType.ptr, FFIType.ptr, FFIType.u32, FFIType.u64], returns: FFIType.u32 },
     GetLongPathNameW: { args: [FFIType.ptr, FFIType.ptr, FFIType.u32], returns: FFIType.u32 },
-    GetMachineTypeAttributes: { args: [FFIType.u16, FFIType.ptr], returns: FFIType.u32 },
+    GetMachineTypeAttributes: { args: [FFIType.u16, FFIType.ptr], returns: FFIType.i32 },
     GetMailslotInfo: { args: [FFIType.u64, FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
     GetMaximumProcessorCount: { args: [FFIType.u16], returns: FFIType.u32 },
     GetMaximumProcessorGroupCount: { args: [], returns: FFIType.u16 },
@@ -687,14 +690,14 @@ class Kernel32 extends Win32 {
     GetNextUmsListItem: { args: [FFIType.ptr], returns: FFIType.ptr },
     GetNLSVersion: { args: [FFIType.u32, FFIType.u32, FFIType.ptr], returns: FFIType.i32 },
     GetNLSVersionEx: { args: [FFIType.u32, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
-    GetNumaAvailableMemoryNode: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
+    GetNumaAvailableMemoryNode: { args: [FFIType.u8, FFIType.ptr], returns: FFIType.i32 },
     GetNumaAvailableMemoryNodeEx: { args: [FFIType.u16, FFIType.ptr], returns: FFIType.i32 },
     GetNumaHighestNodeNumber: { args: [FFIType.ptr], returns: FFIType.i32 },
     GetNumaNodeNumberFromHandle: { args: [FFIType.u64, FFIType.ptr], returns: FFIType.i32 },
-    GetNumaNodeProcessorMask: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
+    GetNumaNodeProcessorMask: { args: [FFIType.u8, FFIType.ptr], returns: FFIType.i32 },
     GetNumaNodeProcessorMask2: { args: [FFIType.u16, FFIType.ptr, FFIType.u16, FFIType.ptr], returns: FFIType.i32 },
     GetNumaNodeProcessorMaskEx: { args: [FFIType.u16, FFIType.ptr], returns: FFIType.i32 },
-    GetNumaProcessorNode: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
+    GetNumaProcessorNode: { args: [FFIType.u8, FFIType.ptr], returns: FFIType.i32 },
     GetNumaProcessorNodeEx: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
     GetNumaProximityNode: { args: [FFIType.u32, FFIType.ptr], returns: FFIType.i32 },
     GetNumaProximityNodeEx: { args: [FFIType.u32, FFIType.ptr], returns: FFIType.i32 },
@@ -707,14 +710,14 @@ class Kernel32 extends Win32 {
     GetOEMCP: { args: [], returns: FFIType.u32 },
     GetOverlappedResult: { args: [FFIType.u64, FFIType.ptr, FFIType.ptr, FFIType.i32], returns: FFIType.i32 },
     GetOverlappedResultEx: { args: [FFIType.u64, FFIType.ptr, FFIType.ptr, FFIType.u32, FFIType.i32], returns: FFIType.i32 },
-    GetPackageApplicationIds: { args: [FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.u32 },
-    GetPackageFamilyName: { args: [FFIType.u64, FFIType.ptr, FFIType.ptr], returns: FFIType.u32 },
-    GetPackageFullName: { args: [FFIType.u64, FFIType.ptr, FFIType.ptr], returns: FFIType.u32 },
-    GetPackageId: { args: [FFIType.u64, FFIType.ptr, FFIType.ptr], returns: FFIType.u32 },
-    GetPackageInfo: { args: [FFIType.ptr, FFIType.u32, FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.u32 },
-    GetPackagePath: { args: [FFIType.ptr, FFIType.u32, FFIType.ptr, FFIType.ptr], returns: FFIType.u32 },
-    GetPackagePathByFullName: { args: [FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.u32 },
-    GetPackagesByPackageFamily: { args: [FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.u32 },
+    GetPackageApplicationIds: { args: [FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
+    GetPackageFamilyName: { args: [FFIType.u64, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
+    GetPackageFullName: { args: [FFIType.u64, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
+    GetPackageId: { args: [FFIType.u64, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
+    GetPackageInfo: { args: [FFIType.ptr, FFIType.u32, FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
+    GetPackagePath: { args: [FFIType.ptr, FFIType.u32, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
+    GetPackagePathByFullName: { args: [FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
+    GetPackagesByPackageFamily: { args: [FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
     GetPhysicallyInstalledSystemMemory: { args: [FFIType.ptr], returns: FFIType.i32 },
     GetPriorityClass: { args: [FFIType.u64], returns: FFIType.u32 },
     GetPrivateProfileIntA: { args: [FFIType.ptr, FFIType.ptr, FFIType.i32, FFIType.ptr], returns: FFIType.u32 },
@@ -732,7 +735,7 @@ class Kernel32 extends Win32 {
     GetProcessDefaultCpuSetMasks: { args: [FFIType.u64, FFIType.ptr, FFIType.u16, FFIType.ptr], returns: FFIType.i32 },
     GetProcessDefaultCpuSets: { args: [FFIType.u64, FFIType.ptr, FFIType.u32, FFIType.ptr], returns: FFIType.i32 },
     GetProcessDEPPolicy: { args: [FFIType.u64, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
-    GetProcessesInVirtualizationContext: { args: [FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.u32 },
+    GetProcessesInVirtualizationContext: { args: [FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
     GetProcessGroupAffinity: { args: [FFIType.u64, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
     GetProcessHandleCount: { args: [FFIType.u64, FFIType.ptr], returns: FFIType.i32 },
     GetProcessHeap: { args: [], returns: FFIType.u64 },
@@ -761,7 +764,7 @@ class Kernel32 extends Win32 {
     GetQueuedCompletionStatusEx: { args: [FFIType.u64, FFIType.ptr, FFIType.u32, FFIType.ptr, FFIType.u32, FFIType.i32], returns: FFIType.i32 },
     GetShortPathNameA: { args: [FFIType.ptr, FFIType.ptr, FFIType.u32], returns: FFIType.u32 },
     GetShortPathNameW: { args: [FFIType.ptr, FFIType.ptr, FFIType.u32], returns: FFIType.u32 },
-    GetStagedPackagePathByFullName: { args: [FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.u32 },
+    GetStagedPackagePathByFullName: { args: [FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
     GetStartupInfoA: { args: [FFIType.ptr], returns: FFIType.void },
     GetStartupInfoW: { args: [FFIType.ptr], returns: FFIType.void },
     GetStdHandle: { args: [FFIType.u32], returns: FFIType.u64 },
@@ -804,7 +807,7 @@ class Kernel32 extends Win32 {
     GetTempPathA: { args: [FFIType.u32, FFIType.ptr], returns: FFIType.u32 },
     GetTempPathW: { args: [FFIType.u32, FFIType.ptr], returns: FFIType.u32 },
     GetThreadContext: { args: [FFIType.u64, FFIType.ptr], returns: FFIType.i32 },
-    GetThreadDescription: { args: [FFIType.u64, FFIType.ptr], returns: FFIType.u32 },
+    GetThreadDescription: { args: [FFIType.u64, FFIType.ptr], returns: FFIType.i32 },
     GetThreadEnabledXStateFeatures: { args: [], returns: FFIType.u64 },
     GetThreadErrorMode: { args: [], returns: FFIType.u32 },
     GetThreadGroupAffinity: { args: [FFIType.u64, FFIType.ptr], returns: FFIType.i32 },
@@ -859,7 +862,7 @@ class Kernel32 extends Win32 {
     GlobalAddAtomExW: { args: [FFIType.ptr, FFIType.u32], returns: FFIType.u16 },
     GlobalAddAtomW: { args: [FFIType.ptr], returns: FFIType.u16 },
     GlobalAlloc: { args: [FFIType.u32, FFIType.u64], returns: FFIType.u64 },
-    GlobalCompact: { args: [FFIType.u32], returns: FFIType.ptr },
+    GlobalCompact: { args: [FFIType.u32], returns: FFIType.u64 },
     GlobalDeleteAtom: { args: [FFIType.u16], returns: FFIType.u16 },
     GlobalFindAtomA: { args: [FFIType.ptr], returns: FFIType.u16 },
     GlobalFindAtomW: { args: [FFIType.ptr], returns: FFIType.u16 },
@@ -883,7 +886,7 @@ class Kernel32 extends Win32 {
     Heap32ListNext: { args: [FFIType.u64, FFIType.ptr], returns: FFIType.i32 },
     Heap32Next: { args: [FFIType.ptr], returns: FFIType.i32 },
     HeapAlloc: { args: [FFIType.u64, FFIType.u32, FFIType.u64], returns: FFIType.ptr },
-    HeapCompact: { args: [FFIType.u64, FFIType.u32], returns: FFIType.ptr },
+    HeapCompact: { args: [FFIType.u64, FFIType.u32], returns: FFIType.u64 },
     HeapCreate: { args: [FFIType.u32, FFIType.u64, FFIType.u64], returns: FFIType.u64 },
     HeapDestroy: { args: [FFIType.u64], returns: FFIType.i32 },
     HeapFree: { args: [FFIType.u64, FFIType.u32, FFIType.ptr], returns: FFIType.i32 },
@@ -920,12 +923,12 @@ class Kernel32 extends Win32 {
     InterlockedPushListSListEx: { args: [FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.u32], returns: FFIType.ptr },
     InvalidateConsoleDIBits: { args: [FFIType.u64, FFIType.ptr], returns: FFIType.i32 },
     IsBadCodePtr: { args: [FFIType.ptr], returns: FFIType.i32 },
-    IsBadHugeReadPtr: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
-    IsBadHugeWritePtr: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
-    IsBadReadPtr: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
+    IsBadHugeReadPtr: { args: [FFIType.ptr, FFIType.u64], returns: FFIType.i32 },
+    IsBadHugeWritePtr: { args: [FFIType.ptr, FFIType.u64], returns: FFIType.i32 },
+    IsBadReadPtr: { args: [FFIType.ptr, FFIType.u64], returns: FFIType.i32 },
     IsBadStringPtrA: { args: [FFIType.ptr, FFIType.u64], returns: FFIType.i32 },
     IsBadStringPtrW: { args: [FFIType.ptr, FFIType.u64], returns: FFIType.i32 },
-    IsBadWritePtr: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
+    IsBadWritePtr: { args: [FFIType.ptr, FFIType.u64], returns: FFIType.i32 },
     IsCalendarLeapYear: { args: [FFIType.u32, FFIType.u32, FFIType.u32], returns: FFIType.i32 },
     IsDBCSLeadByte: { args: [FFIType.u8], returns: FFIType.i32 },
     IsDBCSLeadByteEx: { args: [FFIType.u32, FFIType.u8], returns: FFIType.i32 },
@@ -946,7 +949,7 @@ class Kernel32 extends Win32 {
     IsValidLocale: { args: [FFIType.u32, FFIType.u32], returns: FFIType.i32 },
     IsValidLocaleName: { args: [FFIType.ptr], returns: FFIType.i32 },
     IsValidNLSVersion: { args: [FFIType.u32, FFIType.ptr, FFIType.ptr], returns: FFIType.u32 },
-    IsWow64GuestMachineSupported: { args: [FFIType.u32, FFIType.ptr], returns: FFIType.u32 },
+    IsWow64GuestMachineSupported: { args: [FFIType.u16, FFIType.ptr], returns: FFIType.i32 },
     IsWow64Process: { args: [FFIType.u64, FFIType.ptr], returns: FFIType.i32 },
     IsWow64Process2: { args: [FFIType.u64, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
     K32EmptyWorkingSet: { args: [FFIType.u64], returns: FFIType.i32 },
@@ -991,7 +994,7 @@ class Kernel32 extends Win32 {
     LoadPackagedLibrary: { args: [FFIType.ptr, FFIType.u32], returns: FFIType.u64 },
     LoadResource: { args: [FFIType.u64, FFIType.u64], returns: FFIType.u64 },
     LocalAlloc: { args: [FFIType.u32, FFIType.u64], returns: FFIType.u64 },
-    LocalCompact: { args: [FFIType.u32], returns: FFIType.ptr },
+    LocalCompact: { args: [FFIType.u32], returns: FFIType.u64 },
     LocaleNameToLCID: { args: [FFIType.ptr, FFIType.u32], returns: FFIType.u32 },
     LocalFileTimeToFileTime: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
     LocalFileTimeToLocalSystemTime: { args: [FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
@@ -1012,8 +1015,8 @@ class Kernel32 extends Win32 {
     LZCopy: { args: [FFIType.i32, FFIType.i32], returns: FFIType.i32 },
     LZDone: { args: [], returns: FFIType.void },
     LZInit: { args: [FFIType.i32], returns: FFIType.i32 },
-    LZOpenFileA: { args: [FFIType.ptr, FFIType.ptr, FFIType.u32], returns: FFIType.i32 },
-    LZOpenFileW: { args: [FFIType.ptr, FFIType.ptr, FFIType.u32], returns: FFIType.i32 },
+    LZOpenFileA: { args: [FFIType.ptr, FFIType.ptr, FFIType.u16], returns: FFIType.i32 },
+    LZOpenFileW: { args: [FFIType.ptr, FFIType.ptr, FFIType.u16], returns: FFIType.i32 },
     LZRead: { args: [FFIType.i32, FFIType.ptr, FFIType.i32], returns: FFIType.i32 },
     LZSeek: { args: [FFIType.i32, FFIType.i32, FFIType.i32], returns: FFIType.i32 },
     LZStart: { args: [], returns: FFIType.i32 },
@@ -1054,7 +1057,7 @@ class Kernel32 extends Win32 {
     OpenJobObjectW: { args: [FFIType.u32, FFIType.i32, FFIType.ptr], returns: FFIType.u64 },
     OpenMutexA: { args: [FFIType.u32, FFIType.i32, FFIType.ptr], returns: FFIType.u64 },
     OpenMutexW: { args: [FFIType.u32, FFIType.i32, FFIType.ptr], returns: FFIType.u64 },
-    OpenPackageInfoByFullName: { args: [FFIType.ptr, FFIType.u32, FFIType.ptr], returns: FFIType.u32 },
+    OpenPackageInfoByFullName: { args: [FFIType.ptr, FFIType.u32, FFIType.ptr], returns: FFIType.i32 },
     OpenPrivateNamespaceA: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.u64 },
     OpenPrivateNamespaceW: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.u64 },
     OpenProcess: { args: [FFIType.u32, FFIType.i32, FFIType.u32], returns: FFIType.u64 },
@@ -1065,16 +1068,16 @@ class Kernel32 extends Win32 {
     OpenWaitableTimerW: { args: [FFIType.u32, FFIType.i32, FFIType.ptr], returns: FFIType.u64 },
     OutputDebugStringA: { args: [FFIType.ptr], returns: FFIType.void },
     OutputDebugStringW: { args: [FFIType.ptr], returns: FFIType.void },
-    PackageFamilyNameFromFullName: { args: [FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.u32 },
-    PackageFamilyNameFromId: { args: [FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.u32 },
-    PackageFullNameFromId: { args: [FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.u32 },
-    PackageIdFromFullName: { args: [FFIType.ptr, FFIType.u32, FFIType.ptr, FFIType.ptr], returns: FFIType.u32 },
+    PackageFamilyNameFromFullName: { args: [FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
+    PackageFamilyNameFromId: { args: [FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
+    PackageFullNameFromId: { args: [FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
+    PackageIdFromFullName: { args: [FFIType.ptr, FFIType.u32, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
     PackageNameAndPublisherIdFromFamilyName: { args: [FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.u32 },
     ParseApplicationUserModelId: { args: [FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.u32 },
     PeekConsoleInputA: { args: [FFIType.u64, FFIType.ptr, FFIType.u32, FFIType.ptr], returns: FFIType.i32 },
     PeekConsoleInputW: { args: [FFIType.u64, FFIType.ptr, FFIType.u32, FFIType.ptr], returns: FFIType.i32 },
     PeekNamedPipe: { args: [FFIType.u64, FFIType.ptr, FFIType.u32, FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
-    PostQueuedCompletionStatus: { args: [FFIType.u64, FFIType.u32, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
+    PostQueuedCompletionStatus: { args: [FFIType.u64, FFIType.u32, FFIType.u64, FFIType.ptr], returns: FFIType.i32 },
     PowerClearRequest: { args: [FFIType.u64, FFIType.u32], returns: FFIType.i32 },
     PowerCreateRequest: { args: [FFIType.ptr], returns: FFIType.u64 },
     PowerSetRequest: { args: [FFIType.u64, FFIType.u32], returns: FFIType.i32 },
@@ -1093,12 +1096,12 @@ class Kernel32 extends Win32 {
     PssWalkMarkerFree: { args: [FFIType.u64], returns: FFIType.u32 },
     PssWalkMarkerGetPosition: { args: [FFIType.u64, FFIType.ptr], returns: FFIType.u32 },
     PssWalkMarkerSeekToBeginning: { args: [FFIType.u64], returns: FFIType.u32 },
-    PssWalkMarkerSetPosition: { args: [FFIType.u64, FFIType.ptr], returns: FFIType.u32 },
+    PssWalkMarkerSetPosition: { args: [FFIType.u64, FFIType.u64], returns: FFIType.u32 },
     PssWalkSnapshot: { args: [FFIType.u64, FFIType.u32, FFIType.u64, FFIType.ptr, FFIType.u32], returns: FFIType.u32 },
     PulseEvent: { args: [FFIType.u64], returns: FFIType.i32 },
     PurgeComm: { args: [FFIType.u64, FFIType.u32], returns: FFIType.i32 },
-    QueryActCtxSettingsW: { args: [FFIType.u32, FFIType.u64, FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
-    QueryActCtxW: { args: [FFIType.u32, FFIType.u64, FFIType.ptr, FFIType.u32, FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
+    QueryActCtxSettingsW: { args: [FFIType.u32, FFIType.u64, FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.u64, FFIType.ptr], returns: FFIType.i32 },
+    QueryActCtxW: { args: [FFIType.u32, FFIType.u64, FFIType.ptr, FFIType.u32, FFIType.ptr, FFIType.u64, FFIType.ptr], returns: FFIType.i32 },
     QueryDepthSList: { args: [FFIType.ptr], returns: FFIType.u16 },
     QueryDosDeviceA: { args: [FFIType.ptr, FFIType.ptr, FFIType.u32], returns: FFIType.u32 },
     QueryDosDeviceW: { args: [FFIType.ptr, FFIType.ptr, FFIType.u32], returns: FFIType.u32 },
@@ -1143,8 +1146,8 @@ class Kernel32 extends Win32 {
     ReadProcessMemory: { args: [FFIType.u64, FFIType.u64, FFIType.ptr, FFIType.u64, FFIType.ptr], returns: FFIType.i32 },
     ReadThreadProfilingData: { args: [FFIType.u64, FFIType.u32, FFIType.ptr], returns: FFIType.u32 },
     ReclaimVirtualMemory: { args: [FFIType.u64, FFIType.u64], returns: FFIType.u32 },
-    RegisterApplicationRecoveryCallback: { args: [FFIType.ptr, FFIType.ptr, FFIType.u32, FFIType.u32], returns: FFIType.u32 },
-    RegisterApplicationRestart: { args: [FFIType.ptr, FFIType.u32], returns: FFIType.u32 },
+    RegisterApplicationRecoveryCallback: { args: [FFIType.ptr, FFIType.ptr, FFIType.u32, FFIType.u32], returns: FFIType.i32 },
+    RegisterApplicationRestart: { args: [FFIType.ptr, FFIType.u32], returns: FFIType.i32 },
     RegisterBadMemoryNotification: { args: [FFIType.ptr], returns: FFIType.u64 },
     RegisterConsoleIME: { args: [FFIType.u64, FFIType.ptr], returns: FFIType.i32 },
     RegisterConsoleOS2: { args: [FFIType.i32], returns: FFIType.i32 },
@@ -1178,17 +1181,17 @@ class Kernel32 extends Win32 {
     RequestWakeupLatency: { args: [FFIType.u32], returns: FFIType.i32 },
     ResetEvent: { args: [FFIType.u64], returns: FFIType.i32 },
     ResetWriteWatch: { args: [FFIType.u64, FFIType.u64], returns: FFIType.u32 },
-    ResizePseudoConsole: { args: [FFIType.u64, FFIType.u32], returns: FFIType.u32 },
+    ResizePseudoConsole: { args: [FFIType.u64, FFIType.u32], returns: FFIType.i32 },
     ResolveLocaleName: { args: [FFIType.ptr, FFIType.ptr, FFIType.i32], returns: FFIType.i32 },
     // RestoreThreadPreferredUILanguages: { args: [FFIType.u32], returns: FFIType.void },
     ResumeThread: { args: [FFIType.u64], returns: FFIType.u32 },
-    RtlAddFunctionTable: { args: [FFIType.ptr, FFIType.u32, FFIType.u64], returns: FFIType.u32 },
+    RtlAddFunctionTable: { args: [FFIType.ptr, FFIType.u32, FFIType.u64], returns: FFIType.u8 },
     RtlCaptureContext: { args: [FFIType.ptr], returns: FFIType.void },
     // RtlCaptureContext2: { args: [FFIType.ptr], returns: FFIType.void },
     RtlCaptureStackBackTrace: { args: [FFIType.u32, FFIType.u32, FFIType.ptr, FFIType.ptr], returns: FFIType.u16 },
-    RtlCompareMemory: { args: [FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.ptr },
-    RtlDeleteFunctionTable: { args: [FFIType.ptr], returns: FFIType.u32 },
-    RtlInstallFunctionTableCallback: { args: [FFIType.u64, FFIType.u64, FFIType.u32, FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.u32 },
+    RtlCompareMemory: { args: [FFIType.ptr, FFIType.ptr, FFIType.u64], returns: FFIType.u64 },
+    RtlDeleteFunctionTable: { args: [FFIType.ptr], returns: FFIType.u8 },
+    RtlInstallFunctionTableCallback: { args: [FFIType.u64, FFIType.u64, FFIType.u32, FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.u8 },
     RtlLookupFunctionEntry: { args: [FFIType.u64, FFIType.ptr, FFIType.ptr], returns: FFIType.ptr },
     RtlPcToFileHeader: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.ptr },
     RtlRaiseException: { args: [FFIType.ptr], returns: FFIType.void },
@@ -1239,7 +1242,7 @@ class Kernel32 extends Win32 {
     SetConsolePalette: { args: [FFIType.u64, FFIType.u32, FFIType.u32], returns: FFIType.i32 },
     SetConsoleScreenBufferInfoEx: { args: [FFIType.u64, FFIType.ptr], returns: FFIType.i32 },
     SetConsoleScreenBufferSize: { args: [FFIType.u64, FFIType.u32], returns: FFIType.i32 },
-    SetConsoleTextAttribute: { args: [FFIType.u64, FFIType.u32], returns: FFIType.i32 },
+    SetConsoleTextAttribute: { args: [FFIType.u64, FFIType.u16], returns: FFIType.i32 },
     SetConsoleTitleA: { args: [FFIType.ptr], returns: FFIType.i32 },
     SetConsoleTitleW: { args: [FFIType.ptr], returns: FFIType.i32 },
     SetConsoleWindowInfo: { args: [FFIType.u64, FFIType.i32, FFIType.ptr], returns: FFIType.i32 },
@@ -1268,7 +1271,7 @@ class Kernel32 extends Win32 {
     SetFileAttributesTransactedW: { args: [FFIType.ptr, FFIType.u32, FFIType.u64], returns: FFIType.i32 },
     SetFileAttributesW: { args: [FFIType.ptr, FFIType.u32], returns: FFIType.i32 },
     SetFileBandwidthReservation: { args: [FFIType.u64, FFIType.u32, FFIType.u32, FFIType.i32, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
-    SetFileCompletionNotificationModes: { args: [FFIType.u64, FFIType.ptr], returns: FFIType.i32 },
+    SetFileCompletionNotificationModes: { args: [FFIType.u64, FFIType.u8], returns: FFIType.i32 },
     SetFileInformationByHandle: { args: [FFIType.u64, FFIType.u32, FFIType.ptr, FFIType.u32], returns: FFIType.i32 },
     SetFileIoOverlappedRange: { args: [FFIType.u64, FFIType.ptr, FFIType.u32], returns: FFIType.i32 },
     SetFilePointer: { args: [FFIType.u64, FFIType.i32, FFIType.ptr, FFIType.u32], returns: FFIType.u32 },
@@ -1294,7 +1297,7 @@ class Kernel32 extends Win32 {
     SetMessageWaitingIndicator: { args: [FFIType.u64, FFIType.u32], returns: FFIType.i32 },
     SetNamedPipeHandleState: { args: [FFIType.u64, FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
     SetPriorityClass: { args: [FFIType.u64, FFIType.u32], returns: FFIType.i32 },
-    SetProcessAffinityMask: { args: [FFIType.u64, FFIType.ptr], returns: FFIType.i32 },
+    SetProcessAffinityMask: { args: [FFIType.u64, FFIType.u64], returns: FFIType.i32 },
     SetProcessAffinityUpdateMode: { args: [FFIType.u64, FFIType.u32], returns: FFIType.i32 },
     SetProcessDefaultCpuSetMasks: { args: [FFIType.u64, FFIType.ptr, FFIType.u16], returns: FFIType.i32 },
     SetProcessDefaultCpuSets: { args: [FFIType.u64, FFIType.ptr, FFIType.u32], returns: FFIType.i32 },
@@ -1302,25 +1305,25 @@ class Kernel32 extends Win32 {
     SetProcessDynamicEHContinuationTargets: { args: [FFIType.u64, FFIType.u16, FFIType.ptr], returns: FFIType.i32 },
     SetProcessDynamicEnforcedCetCompatibleRanges: { args: [FFIType.u64, FFIType.u16, FFIType.ptr], returns: FFIType.i32 },
     SetProcessInformation: { args: [FFIType.u64, FFIType.u32, FFIType.ptr, FFIType.u32], returns: FFIType.i32 },
-    SetProcessMitigationPolicy: { args: [FFIType.u32, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
+    SetProcessMitigationPolicy: { args: [FFIType.u32, FFIType.ptr, FFIType.u64], returns: FFIType.i32 },
     SetProcessPreferredUILanguages: { args: [FFIType.u32, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
     SetProcessPriorityBoost: { args: [FFIType.u64, FFIType.i32], returns: FFIType.i32 },
     SetProcessShutdownParameters: { args: [FFIType.u32, FFIType.u32], returns: FFIType.i32 },
-    SetProcessWorkingSetSize: { args: [FFIType.u64, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
-    SetProcessWorkingSetSizeEx: { args: [FFIType.u64, FFIType.ptr, FFIType.ptr, FFIType.u32], returns: FFIType.i32 },
-    SetProtectedPolicy: { args: [FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
+    SetProcessWorkingSetSize: { args: [FFIType.u64, FFIType.u64, FFIType.u64], returns: FFIType.i32 },
+    SetProcessWorkingSetSizeEx: { args: [FFIType.u64, FFIType.u64, FFIType.u64, FFIType.u32], returns: FFIType.i32 },
+    SetProtectedPolicy: { args: [FFIType.ptr, FFIType.u64, FFIType.ptr], returns: FFIType.i32 },
     SetSearchPathMode: { args: [FFIType.u32], returns: FFIType.i32 },
     SetStdHandle: { args: [FFIType.u32, FFIType.u64], returns: FFIType.i32 },
     SetStdHandleEx: { args: [FFIType.u32, FFIType.u64, FFIType.ptr], returns: FFIType.i32 },
-    SetSystemFileCacheSize: { args: [FFIType.ptr, FFIType.ptr, FFIType.u32], returns: FFIType.i32 },
+    SetSystemFileCacheSize: { args: [FFIType.u64, FFIType.u64, FFIType.u32], returns: FFIType.i32 },
     SetSystemPowerState: { args: [FFIType.i32, FFIType.i32], returns: FFIType.i32 },
     SetSystemTime: { args: [FFIType.ptr], returns: FFIType.i32 },
     SetSystemTimeAdjustment: { args: [FFIType.u32, FFIType.i32], returns: FFIType.i32 },
     SetTapeParameters: { args: [FFIType.u64, FFIType.u32, FFIType.ptr], returns: FFIType.u32 },
     SetTapePosition: { args: [FFIType.u64, FFIType.u32, FFIType.u32, FFIType.u32, FFIType.u32, FFIType.i32], returns: FFIType.u32 },
-    SetThreadAffinityMask: { args: [FFIType.u64, FFIType.ptr], returns: FFIType.ptr },
+    SetThreadAffinityMask: { args: [FFIType.u64, FFIType.u64], returns: FFIType.u64 },
     SetThreadContext: { args: [FFIType.u64, FFIType.ptr], returns: FFIType.i32 },
-    SetThreadDescription: { args: [FFIType.u64, FFIType.ptr], returns: FFIType.u32 },
+    SetThreadDescription: { args: [FFIType.u64, FFIType.ptr], returns: FFIType.i32 },
     SetThreadErrorMode: { args: [FFIType.u32, FFIType.ptr], returns: FFIType.i32 },
     SetThreadExecutionState: { args: [FFIType.u32], returns: FFIType.u32 },
     SetThreadGroupAffinity: { args: [FFIType.u64, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
@@ -1385,8 +1388,8 @@ class Kernel32 extends Win32 {
     Toolhelp32ReadProcessMemory: { args: [FFIType.u32, FFIType.u64, FFIType.ptr, FFIType.u64, FFIType.ptr], returns: FFIType.i32 },
     TransactNamedPipe: { args: [FFIType.u64, FFIType.ptr, FFIType.u32, FFIType.ptr, FFIType.u32, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
     TransmitCommChar: { args: [FFIType.u64, FFIType.u32], returns: FFIType.i32 },
-    TryAcquireSRWLockExclusive: { args: [FFIType.ptr], returns: FFIType.u32 },
-    TryAcquireSRWLockShared: { args: [FFIType.ptr], returns: FFIType.u32 },
+    TryAcquireSRWLockExclusive: { args: [FFIType.ptr], returns: FFIType.u8 },
+    TryAcquireSRWLockShared: { args: [FFIType.ptr], returns: FFIType.u8 },
     TryEnterCriticalSection: { args: [FFIType.ptr], returns: FFIType.i32 },
     TrySubmitThreadpoolCallback: { args: [FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
     TzSpecificLocalTimeToSystemTime: { args: [FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
@@ -1397,8 +1400,8 @@ class Kernel32 extends Win32 {
     UnlockFileEx: { args: [FFIType.u64, FFIType.u32, FFIType.u32, FFIType.u32, FFIType.ptr], returns: FFIType.i32 },
     UnmapViewOfFile: { args: [FFIType.u64], returns: FFIType.i32 },
     UnmapViewOfFileEx: { args: [FFIType.u64, FFIType.u32], returns: FFIType.i32 },
-    UnregisterApplicationRecoveryCallback: { args: [], returns: FFIType.u32 },
-    UnregisterApplicationRestart: { args: [], returns: FFIType.u32 },
+    UnregisterApplicationRecoveryCallback: { args: [], returns: FFIType.i32 },
+    UnregisterApplicationRestart: { args: [], returns: FFIType.i32 },
     UnregisterBadMemoryNotification: { args: [FFIType.ptr], returns: FFIType.i32 },
     UnregisterConsoleIME: { args: [], returns: FFIType.i32 },
     UnregisterWait: { args: [FFIType.u64], returns: FFIType.i32 },
@@ -1442,26 +1445,26 @@ class Kernel32 extends Win32 {
     WaitNamedPipeW: { args: [FFIType.ptr, FFIType.u32], returns: FFIType.i32 },
     WakeAllConditionVariable: { args: [FFIType.ptr], returns: FFIType.void },
     WakeConditionVariable: { args: [FFIType.ptr], returns: FFIType.void },
-    WerGetFlags: { args: [FFIType.u64, FFIType.ptr], returns: FFIType.u32 },
-    WerRegisterAdditionalProcess: { args: [FFIType.u32, FFIType.u32], returns: FFIType.u32 },
-    WerRegisterAppLocalDump: { args: [FFIType.ptr], returns: FFIType.u32 },
-    WerRegisterCustomMetadata: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.u32 },
-    WerRegisterExcludedMemoryBlock: { args: [FFIType.ptr, FFIType.u32], returns: FFIType.u32 },
-    WerRegisterFile: { args: [FFIType.ptr, FFIType.u32, FFIType.u32], returns: FFIType.u32 },
-    WerRegisterMemoryBlock: { args: [FFIType.ptr, FFIType.u32], returns: FFIType.u32 },
-    WerRegisterRuntimeExceptionModule: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.u32 },
-    WerSetFlags: { args: [FFIType.u32], returns: FFIType.u32 },
-    WerUnregisterAdditionalProcess: { args: [FFIType.u32], returns: FFIType.u32 },
-    WerUnregisterAppLocalDump: { args: [], returns: FFIType.u32 },
-    WerUnregisterCustomMetadata: { args: [FFIType.ptr], returns: FFIType.u32 },
-    WerUnregisterExcludedMemoryBlock: { args: [FFIType.ptr], returns: FFIType.u32 },
-    WerUnregisterFile: { args: [FFIType.ptr], returns: FFIType.u32 },
-    WerUnregisterMemoryBlock: { args: [FFIType.ptr], returns: FFIType.u32 },
-    WerUnregisterRuntimeExceptionModule: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.u32 },
+    WerGetFlags: { args: [FFIType.u64, FFIType.ptr], returns: FFIType.i32 },
+    WerRegisterAdditionalProcess: { args: [FFIType.u32, FFIType.u32], returns: FFIType.i32 },
+    WerRegisterAppLocalDump: { args: [FFIType.ptr], returns: FFIType.i32 },
+    WerRegisterCustomMetadata: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
+    WerRegisterExcludedMemoryBlock: { args: [FFIType.ptr, FFIType.u32], returns: FFIType.i32 },
+    WerRegisterFile: { args: [FFIType.ptr, FFIType.u32, FFIType.u32], returns: FFIType.i32 },
+    WerRegisterMemoryBlock: { args: [FFIType.ptr, FFIType.u32], returns: FFIType.i32 },
+    WerRegisterRuntimeExceptionModule: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
+    WerSetFlags: { args: [FFIType.u32], returns: FFIType.i32 },
+    WerUnregisterAdditionalProcess: { args: [FFIType.u32], returns: FFIType.i32 },
+    WerUnregisterAppLocalDump: { args: [], returns: FFIType.i32 },
+    WerUnregisterCustomMetadata: { args: [FFIType.ptr], returns: FFIType.i32 },
+    WerUnregisterExcludedMemoryBlock: { args: [FFIType.ptr], returns: FFIType.i32 },
+    WerUnregisterFile: { args: [FFIType.ptr], returns: FFIType.i32 },
+    WerUnregisterMemoryBlock: { args: [FFIType.ptr], returns: FFIType.i32 },
+    WerUnregisterRuntimeExceptionModule: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
     WideCharToMultiByte: { args: [FFIType.u32, FFIType.u32, FFIType.ptr, FFIType.i32, FFIType.ptr, FFIType.i32, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
     WinExec: { args: [FFIType.ptr, FFIType.u32], returns: FFIType.u32 },
     Wow64DisableWow64FsRedirection: { args: [FFIType.ptr], returns: FFIType.i32 },
-    Wow64EnableWow64FsRedirection: { args: [FFIType.u32], returns: FFIType.u32 },
+    Wow64EnableWow64FsRedirection: { args: [FFIType.u8], returns: FFIType.u8 },
     Wow64GetThreadContext: { args: [FFIType.u64, FFIType.ptr], returns: FFIType.i32 },
     Wow64GetThreadSelectorEntry: { args: [FFIType.u64, FFIType.u32, FFIType.ptr], returns: FFIType.i32 },
     Wow64RevertWow64FsRedirection: { args: [FFIType.ptr], returns: FFIType.i32 },
@@ -1573,7 +1576,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-activatepackagevirtualizationcontext
-  public static ActivatePackageVirtualizationContext(context: HANDLE, cookie_out: LPVOID): DWORD {
+  public static ActivatePackageVirtualizationContext(context: HANDLE, cookie_out: LPVOID): HRESULT {
     return Kernel32.Load('ActivatePackageVirtualizationContext')(context, cookie_out);
   }
 
@@ -1672,47 +1675,47 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-applicationrecoveryinprogress
-  public static ApplicationRecoveryInProgress(pbCancelled_out: LPVOID): DWORD {
+  public static ApplicationRecoveryInProgress(pbCancelled_out: LPVOID): HRESULT {
     return Kernel32.Load('ApplicationRecoveryInProgress')(pbCancelled_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/appmodel/nf-appmodel-apppolicygetclrcompat
-  public static AppPolicyGetClrCompat(processToken: HANDLE, policy_out: LPVOID): DWORD {
+  public static AppPolicyGetClrCompat(processToken: HANDLE, policy_out: LPVOID): LONG {
     return Kernel32.Load('AppPolicyGetClrCompat')(processToken, policy_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/appmodel/nf-appmodel-apppolicygetcreatefileaccess
-  public static AppPolicyGetCreateFileAccess(processToken: HANDLE, policy_out: LPVOID): DWORD {
+  public static AppPolicyGetCreateFileAccess(processToken: HANDLE, policy_out: LPVOID): LONG {
     return Kernel32.Load('AppPolicyGetCreateFileAccess')(processToken, policy_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/appmodel/nf-appmodel-apppolicygetlifecyclemanagement
-  public static AppPolicyGetLifecycleManagement(processToken: HANDLE, policy_out: LPVOID): DWORD {
+  public static AppPolicyGetLifecycleManagement(processToken: HANDLE, policy_out: LPVOID): LONG {
     return Kernel32.Load('AppPolicyGetLifecycleManagement')(processToken, policy_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/appmodel/nf-appmodel-apppolicygetmediafoundationcodecloading
-  public static AppPolicyGetMediaFoundationCodecLoading(processToken: HANDLE, policy_out: LPVOID): DWORD {
+  public static AppPolicyGetMediaFoundationCodecLoading(processToken: HANDLE, policy_out: LPVOID): LONG {
     return Kernel32.Load('AppPolicyGetMediaFoundationCodecLoading')(processToken, policy_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/appmodel/nf-appmodel-apppolicygetprocessterminationmethod
-  public static AppPolicyGetProcessTerminationMethod(processToken: HANDLE, policy_out: LPVOID): DWORD {
+  public static AppPolicyGetProcessTerminationMethod(processToken: HANDLE, policy_out: LPVOID): LONG {
     return Kernel32.Load('AppPolicyGetProcessTerminationMethod')(processToken, policy_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/appmodel/nf-appmodel-apppolicygetshowdeveloperdiagnostic
-  public static AppPolicyGetShowDeveloperDiagnostic(processToken: HANDLE, policy_out: LPVOID): DWORD {
+  public static AppPolicyGetShowDeveloperDiagnostic(processToken: HANDLE, policy_out: LPVOID): LONG {
     return Kernel32.Load('AppPolicyGetShowDeveloperDiagnostic')(processToken, policy_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/appmodel/nf-appmodel-apppolicygetthreadinitializationtype
-  public static AppPolicyGetThreadInitializationType(processToken: HANDLE, policy_out: LPVOID): DWORD {
+  public static AppPolicyGetThreadInitializationType(processToken: HANDLE, policy_out: LPVOID): LONG {
     return Kernel32.Load('AppPolicyGetThreadInitializationType')(processToken, policy_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/appmodel/nf-appmodel-apppolicygetwindowingmodel
-  public static AppPolicyGetWindowingModel(processToken: HANDLE, policy_out: LPVOID): DWORD {
+  public static AppPolicyGetWindowingModel(processToken: HANDLE, policy_out: LPVOID): LONG {
     return Kernel32.Load('AppPolicyGetWindowingModel')(processToken, policy_out);
   }
 
@@ -1921,12 +1924,12 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/appmodel/nf-appmodel-closepackageinfo
-  public static ClosePackageInfo(packageInfoReference: LPVOID): DWORD {
+  public static ClosePackageInfo(packageInfoReference: LPVOID): LONG {
     return Kernel32.Load('ClosePackageInfo')(packageInfoReference);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-closeprivatenamespace
-  public static ClosePrivateNamespace(Handle: HANDLE, Flags: DWORD): DWORD {
+  public static ClosePrivateNamespace(Handle: HANDLE, Flags: DWORD): BOOLEAN {
     return Kernel32.Load('ClosePrivateNamespace')(Handle, Flags);
   }
 
@@ -1991,7 +1994,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winnls/nf-winnls-comparestringex
-  public static CompareStringEx(lpLocaleName: Optional<LPCWSTR>, dwCmpFlags: DWORD, lpString1: LPCWSTR, cchCount1: INT, lpString2: LPCWSTR, cchCount2: INT, lpVersionInformation: NULL, lpReserved: NULL, lParam: DWORD): INT {
+  public static CompareStringEx(lpLocaleName: Optional<LPCWSTR>, dwCmpFlags: DWORD, lpString1: LPCWSTR, cchCount1: INT, lpString2: LPCWSTR, cchCount2: INT, lpVersionInformation: NULL, lpReserved: NULL, lParam: LPARAM): INT {
     return Kernel32.Load('CompareStringEx')(lpLocaleName, dwCmpFlags, lpString1, cchCount1, lpString2, cchCount2, lpVersionInformation, lpReserved, lParam);
   }
 
@@ -2056,7 +2059,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-copyfile2
-  public static CopyFile2(pwszExistingFileName: LPWSTR, pwszNewFileName: LPWSTR, pExtendedParameters: Optional<LPVOID>): DWORD {
+  public static CopyFile2(pwszExistingFileName: LPWSTR, pwszNewFileName: LPWSTR, pExtendedParameters: Optional<LPVOID>): HRESULT {
     return Kernel32.Load('CopyFile2')(pwszExistingFileName, pwszNewFileName, pExtendedParameters);
   }
 
@@ -2300,7 +2303,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ioapiset/nf-ioapiset-createiocompletionport
-  public static CreateIoCompletionPort(FileHandle: HANDLE, ExistingCompletionPort: Optional<HANDLE>, CompletionKey: LPVOID, NumberOfConcurrentThreads: DWORD): HANDLE {
+  public static CreateIoCompletionPort(FileHandle: HANDLE, ExistingCompletionPort: Optional<HANDLE>, CompletionKey: ULONG_PTR, NumberOfConcurrentThreads: DWORD): HANDLE {
     return Kernel32.Load('CreateIoCompletionPort')(FileHandle, ExistingCompletionPort, CompletionKey, NumberOfConcurrentThreads);
   }
 
@@ -2383,7 +2386,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-createpackagevirtualizationcontext
-  public static CreatePackageVirtualizationContext(packageFamilyName: Optional<LPWSTR>, context_out: LPVOID): DWORD {
+  public static CreatePackageVirtualizationContext(packageFamilyName: Optional<LPWSTR>, context_out: LPVOID): HRESULT {
     return Kernel32.Load('CreatePackageVirtualizationContext')(packageFamilyName, context_out);
   }
 
@@ -2604,7 +2607,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-deactivatepackagevirtualizationcontext
-  public static DeactivatePackageVirtualizationContext(cookie: LPVOID): VOID {
+  public static DeactivatePackageVirtualizationContext(cookie: ULONG_PTR): VOID {
     return Kernel32.Load('DeactivatePackageVirtualizationContext')(cookie);
   }
 
@@ -2823,7 +2826,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-duplicatepackagevirtualizationcontext
-  public static DuplicatePackageVirtualizationContext(sourceContext: HANDLE, destContext_out: LPVOID): DWORD {
+  public static DuplicatePackageVirtualizationContext(sourceContext: HANDLE, destContext_out: LPVOID): HRESULT {
     return Kernel32.Load('DuplicatePackageVirtualizationContext')(sourceContext, destContext_out);
   }
 
@@ -2933,7 +2936,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-enumresourcelanguagesa
-  public static EnumResourceLanguagesA(hModule: Optional<HMODULE>, lpType: LPCSTR, lpName: LPCSTR, lpEnumFunc: ENUMRESLANGPROCA, lParam: LPVOID): BOOL {
+  public static EnumResourceLanguagesA(hModule: Optional<HMODULE>, lpType: LPCSTR, lpName: LPCSTR, lpEnumFunc: ENUMRESLANGPROCA, lParam: LONG_PTR): BOOL {
     return Kernel32.Load('EnumResourceLanguagesA')(hModule, lpType, lpName, lpEnumFunc, lParam);
   }
 
@@ -2948,12 +2951,12 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-enumresourcelanguagesw
-  public static EnumResourceLanguagesW(hModule: Optional<HMODULE>, lpType: LPCWSTR, lpName: LPCWSTR, lpEnumFunc: ENUMRESLANGPROCW, lParam: LPVOID): BOOL {
+  public static EnumResourceLanguagesW(hModule: Optional<HMODULE>, lpType: LPCWSTR, lpName: LPCWSTR, lpEnumFunc: ENUMRESLANGPROCW, lParam: LONG_PTR): BOOL {
     return Kernel32.Load('EnumResourceLanguagesW')(hModule, lpType, lpName, lpEnumFunc, lParam);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-enumresourcenamesa
-  public static EnumResourceNamesA(hModule: Optional<HMODULE>, lpType: LPCSTR, lpEnumFunc: ENUMRESNAMEPROCA, lParam: LPVOID): BOOL {
+  public static EnumResourceNamesA(hModule: Optional<HMODULE>, lpType: LPCSTR, lpEnumFunc: ENUMRESNAMEPROCA, lParam: LONG_PTR): BOOL {
     return Kernel32.Load('EnumResourceNamesA')(hModule, lpType, lpEnumFunc, lParam);
   }
 
@@ -2968,12 +2971,12 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-enumresourcenamesw
-  public static EnumResourceNamesW(hModule: Optional<HMODULE>, lpType: LPCWSTR, lpEnumFunc: ENUMRESNAMEPROCW, lParam: LPVOID): BOOL {
+  public static EnumResourceNamesW(hModule: Optional<HMODULE>, lpType: LPCWSTR, lpEnumFunc: ENUMRESNAMEPROCW, lParam: LONG_PTR): BOOL {
     return Kernel32.Load('EnumResourceNamesW')(hModule, lpType, lpEnumFunc, lParam);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-enumresourcetypesa
-  public static EnumResourceTypesA(hModule: Optional<HMODULE>, lpEnumFunc: ENUMRESTYPEPROCA, lParam: LPVOID): BOOL {
+  public static EnumResourceTypesA(hModule: Optional<HMODULE>, lpEnumFunc: ENUMRESTYPEPROCA, lParam: LONG_PTR): BOOL {
     return Kernel32.Load('EnumResourceTypesA')(hModule, lpEnumFunc, lParam);
   }
 
@@ -2988,7 +2991,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-enumresourcetypesw
-  public static EnumResourceTypesW(hModule: Optional<HMODULE>, lpEnumFunc: ENUMRESTYPEPROCW, lParam: LPVOID): BOOL {
+  public static EnumResourceTypesW(hModule: Optional<HMODULE>, lpEnumFunc: ENUMRESTYPEPROCW, lParam: LONG_PTR): BOOL {
     return Kernel32.Load('EnumResourceTypesW')(hModule, lpEnumFunc, lParam);
   }
 
@@ -3148,7 +3151,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/console/fillconsoleoutputcharacter
-  public static FillConsoleOutputCharacterA(hConsoleOutput: HANDLE, cCharacter: DWORD, nLength: DWORD, dwWriteCoord: DWORD, lpNumberOfCharsWritten_out: LPVOID): BOOL {
+  public static FillConsoleOutputCharacterA(hConsoleOutput: HANDLE, cCharacter: CHAR, nLength: DWORD, dwWriteCoord: DWORD, lpNumberOfCharsWritten_out: LPVOID): BOOL {
     return Kernel32.Load('FillConsoleOutputCharacterA')(hConsoleOutput, cCharacter, nLength, dwWriteCoord, lpNumberOfCharsWritten_out);
   }
 
@@ -3442,7 +3445,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-formatapplicationusermodelid
-  public static FormatApplicationUserModelId(packageFamilyName: LPWSTR, packageRelativeApplicationId: LPWSTR, applicationUserModelIdLength_in_out: LPVOID, applicationUserModelId_out: Optional<LPWSTR>): DWORD {
+  public static FormatApplicationUserModelId(packageFamilyName: LPWSTR, packageRelativeApplicationId: LPWSTR, applicationUserModelIdLength_in_out: LPVOID, applicationUserModelId_out: Optional<LPWSTR>): LONG {
     return Kernel32.Load('FormatApplicationUserModelId')(packageFamilyName, packageRelativeApplicationId, applicationUserModelIdLength_in_out, applicationUserModelId_out);
   }
 
@@ -3532,17 +3535,17 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-getapplicationrecoverycallback
-  public static GetApplicationRecoveryCallback(hProcess: HANDLE, pRecoveryCallback_out: LPVOID, ppvParameter_out: Optional<LPVOID>, pdwPingInterval_out: Optional<LPVOID>, pdwFlags_out: Optional<LPVOID>): DWORD {
+  public static GetApplicationRecoveryCallback(hProcess: HANDLE, pRecoveryCallback_out: LPVOID, ppvParameter_out: Optional<LPVOID>, pdwPingInterval_out: Optional<LPVOID>, pdwFlags_out: Optional<LPVOID>): HRESULT {
     return Kernel32.Load('GetApplicationRecoveryCallback')(hProcess, pRecoveryCallback_out, ppvParameter_out, pdwPingInterval_out, pdwFlags_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-getapplicationrestartsettings
-  public static GetApplicationRestartSettings(hProcess: HANDLE, pwzCommandline_out: Optional<LPWSTR>, pcchSize_in_out: LPVOID, pdwFlags_out: Optional<LPVOID>): DWORD {
+  public static GetApplicationRestartSettings(hProcess: HANDLE, pwzCommandline_out: Optional<LPWSTR>, pcchSize_in_out: LPVOID, pdwFlags_out: Optional<LPVOID>): HRESULT {
     return Kernel32.Load('GetApplicationRestartSettings')(hProcess, pwzCommandline_out, pcchSize_in_out, pdwFlags_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-getapplicationusermodelid
-  public static GetApplicationUserModelId(hProcess: HANDLE, applicationUserModelIdLength_in_out: LPVOID, applicationUserModelId_out: Optional<LPWSTR>): DWORD {
+  public static GetApplicationUserModelId(hProcess: HANDLE, applicationUserModelIdLength_in_out: LPVOID, applicationUserModelId_out: Optional<LPWSTR>): LONG {
     return Kernel32.Load('GetApplicationUserModelId')(hProcess, applicationUserModelIdLength_in_out, applicationUserModelId_out);
   }
 
@@ -3902,7 +3905,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-getcurrentapplicationusermodelid
-  public static GetCurrentApplicationUserModelId(applicationUserModelIdLength_in_out: PULONG, applicationUserModelId_out: Optional<LPWSTR>): DWORD {
+  public static GetCurrentApplicationUserModelId(applicationUserModelIdLength_in_out: PULONG, applicationUserModelId_out: Optional<LPWSTR>): LONG {
     return Kernel32.Load('GetCurrentApplicationUserModelId')(applicationUserModelIdLength_in_out, applicationUserModelId_out);
   }
 
@@ -3927,22 +3930,22 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-getcurrentpackagefamilyname
-  public static GetCurrentPackageFamilyName(packageFamilyNameLength_in_out: PULONG, packageFamilyName_out: Optional<LPWSTR>): DWORD {
+  public static GetCurrentPackageFamilyName(packageFamilyNameLength_in_out: PULONG, packageFamilyName_out: Optional<LPWSTR>): LONG {
     return Kernel32.Load('GetCurrentPackageFamilyName')(packageFamilyNameLength_in_out, packageFamilyName_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-getcurrentpackagefullname
-  public static GetCurrentPackageFullName(packageFullNameLength_in_out: PULONG, packageFullName_out: Optional<LPWSTR>): DWORD {
+  public static GetCurrentPackageFullName(packageFullNameLength_in_out: PULONG, packageFullName_out: Optional<LPWSTR>): LONG {
     return Kernel32.Load('GetCurrentPackageFullName')(packageFullNameLength_in_out, packageFullName_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-getcurrentpackageid
-  public static GetCurrentPackageId(bufferLength_in_out: PULONG, buffer_out: Optional<LPBYTE>): DWORD {
+  public static GetCurrentPackageId(bufferLength_in_out: PULONG, buffer_out: Optional<LPBYTE>): LONG {
     return Kernel32.Load('GetCurrentPackageId')(bufferLength_in_out, buffer_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-getcurrentpackageinfo
-  public static GetCurrentPackageInfo(flags: DWORD, bufferLength_in_out: PULONG, buffer_out: Optional<LPBYTE>, count_out: Optional<PULONG>): DWORD {
+  public static GetCurrentPackageInfo(flags: DWORD, bufferLength_in_out: PULONG, buffer_out: Optional<LPBYTE>, count_out: Optional<PULONG>): LONG {
     return Kernel32.Load('GetCurrentPackageInfo')(flags, bufferLength_in_out, buffer_out, count_out);
   }
 
@@ -3951,7 +3954,7 @@ class Kernel32 extends Win32 {
   // }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-getcurrentpackagepath
-  public static GetCurrentPackagePath(pathLength_in_out: LPVOID, path_out: Optional<LPWSTR>): DWORD {
+  public static GetCurrentPackagePath(pathLength_in_out: LPVOID, path_out: Optional<LPWSTR>): LONG {
     return Kernel32.Load('GetCurrentPackagePath')(pathLength_in_out, path_out);
   }
 
@@ -4063,12 +4066,12 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-getdiskspaceinformationa
-  public static GetDiskSpaceInformationA(rootPath: Optional<LPSTR>, diskSpaceInfo_out: LPVOID): DWORD {
+  public static GetDiskSpaceInformationA(rootPath: Optional<LPSTR>, diskSpaceInfo_out: LPVOID): HRESULT {
     return Kernel32.Load('GetDiskSpaceInformationA')(rootPath, diskSpaceInfo_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-getdiskspaceinformationw
-  public static GetDiskSpaceInformationW(rootPath: Optional<LPWSTR>, diskSpaceInfo_out: LPVOID): DWORD {
+  public static GetDiskSpaceInformationW(rootPath: Optional<LPWSTR>, diskSpaceInfo_out: LPVOID): HRESULT {
     return Kernel32.Load('GetDiskSpaceInformationW')(rootPath, diskSpaceInfo_out);
   }
 
@@ -4400,7 +4403,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-getmachinetypeattributes
-  public static GetMachineTypeAttributes(Machine: USHORT, MachineTypeAttributes_out: LPVOID): DWORD {
+  public static GetMachineTypeAttributes(Machine: USHORT, MachineTypeAttributes_out: LPVOID): HRESULT {
     return Kernel32.Load('GetMachineTypeAttributes')(Machine, MachineTypeAttributes_out);
   }
 
@@ -4536,7 +4539,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-getnumaavailablememorynode
-  public static GetNumaAvailableMemoryNode(Node: LPVOID, AvailableBytes_out: LPVOID): BOOL {
+  public static GetNumaAvailableMemoryNode(Node: BYTE, AvailableBytes_out: LPVOID): BOOL {
     return Kernel32.Load('GetNumaAvailableMemoryNode')(Node, AvailableBytes_out);
   }
 
@@ -4556,7 +4559,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-getnumanodeprocessormask
-  public static GetNumaNodeProcessorMask(Node: LPVOID, ProcessorMask_out: LPVOID): BOOL {
+  public static GetNumaNodeProcessorMask(Node: BYTE, ProcessorMask_out: LPVOID): BOOL {
     return Kernel32.Load('GetNumaNodeProcessorMask')(Node, ProcessorMask_out);
   }
 
@@ -4571,7 +4574,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-getnumaprocessornode
-  public static GetNumaProcessorNode(Processor: LPVOID, NodeNumber_out: LPVOID): BOOL {
+  public static GetNumaProcessorNode(Processor: BYTE, NodeNumber_out: LPVOID): BOOL {
     return Kernel32.Load('GetNumaProcessorNode')(Processor, NodeNumber_out);
   }
 
@@ -4636,42 +4639,42 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/appmodel/nf-appmodel-getpackageapplicationids
-  public static GetPackageApplicationIds(packageInfoReference: LPVOID, bufferLength_in_out: LPVOID, buffer_out: Optional<LPVOID>, count_out: Optional<LPVOID>): DWORD {
+  public static GetPackageApplicationIds(packageInfoReference: LPVOID, bufferLength_in_out: LPVOID, buffer_out: Optional<LPVOID>, count_out: Optional<LPVOID>): LONG {
     return Kernel32.Load('GetPackageApplicationIds')(packageInfoReference, bufferLength_in_out, buffer_out, count_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/appmodel/nf-appmodel-getpackagefamilyname
-  public static GetPackageFamilyName(hProcess: HANDLE, packageFamilyNameLength_in_out: LPVOID, packageFamilyName_out: Optional<LPWSTR>): DWORD {
+  public static GetPackageFamilyName(hProcess: HANDLE, packageFamilyNameLength_in_out: LPVOID, packageFamilyName_out: Optional<LPWSTR>): LONG {
     return Kernel32.Load('GetPackageFamilyName')(hProcess, packageFamilyNameLength_in_out, packageFamilyName_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/appmodel/nf-appmodel-getpackagefullname
-  public static GetPackageFullName(hProcess: HANDLE, packageFullNameLength_in_out: LPVOID, packageFullName_out: Optional<LPWSTR>): DWORD {
+  public static GetPackageFullName(hProcess: HANDLE, packageFullNameLength_in_out: LPVOID, packageFullName_out: Optional<LPWSTR>): LONG {
     return Kernel32.Load('GetPackageFullName')(hProcess, packageFullNameLength_in_out, packageFullName_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/appmodel/nf-appmodel-getpackageid
-  public static GetPackageId(hProcess: HANDLE, bufferLength_in_out: LPVOID, buffer_out: Optional<LPVOID>): DWORD {
+  public static GetPackageId(hProcess: HANDLE, bufferLength_in_out: LPVOID, buffer_out: Optional<LPVOID>): LONG {
     return Kernel32.Load('GetPackageId')(hProcess, bufferLength_in_out, buffer_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/appmodel/nf-appmodel-getpackageinfo
-  public static GetPackageInfo(packageInfoReference: LPVOID, flags: DWORD, bufferLength_in_out: LPVOID, buffer_out: Optional<LPVOID>, count_out: Optional<LPVOID>): DWORD {
+  public static GetPackageInfo(packageInfoReference: LPVOID, flags: DWORD, bufferLength_in_out: LPVOID, buffer_out: Optional<LPVOID>, count_out: Optional<LPVOID>): LONG {
     return Kernel32.Load('GetPackageInfo')(packageInfoReference, flags, bufferLength_in_out, buffer_out, count_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/appmodel/nf-appmodel-getpackagepath
-  public static GetPackagePath(packageId: LPVOID, reserved: DWORD, pathLength_in_out: LPVOID, path_out: Optional<LPWSTR>): DWORD {
+  public static GetPackagePath(packageId: LPVOID, reserved: DWORD, pathLength_in_out: LPVOID, path_out: Optional<LPWSTR>): LONG {
     return Kernel32.Load('GetPackagePath')(packageId, reserved, pathLength_in_out, path_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/appmodel/nf-appmodel-getpackagepathbyfullname
-  public static GetPackagePathByFullName(packageFullName: LPWSTR, pathLength_in_out: LPVOID, path_out: Optional<LPWSTR>): DWORD {
+  public static GetPackagePathByFullName(packageFullName: LPWSTR, pathLength_in_out: LPVOID, path_out: Optional<LPWSTR>): LONG {
     return Kernel32.Load('GetPackagePathByFullName')(packageFullName, pathLength_in_out, path_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/appmodel/nf-appmodel-getpackagesbypackagefamily
-  public static GetPackagesByPackageFamily(packageFamilyName: LPWSTR, count_in_out: LPVOID, packageFullNames_out: Optional<LPVOID>, bufferLength_in_out: LPVOID, buffer_out: Optional<LPWSTR>): DWORD {
+  public static GetPackagesByPackageFamily(packageFamilyName: LPWSTR, count_in_out: LPVOID, packageFullNames_out: Optional<LPVOID>, bufferLength_in_out: LPVOID, buffer_out: Optional<LPWSTR>): LONG {
     return Kernel32.Load('GetPackagesByPackageFamily')(packageFamilyName, count_in_out, packageFullNames_out, bufferLength_in_out, buffer_out);
   }
 
@@ -4761,7 +4764,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-getprocessesinvirtualizationcontext
-  public static GetProcessesInVirtualizationContext(packageFamilyName: LPWSTR, count_out: LPVOID, processes_out: LPVOID): DWORD {
+  public static GetProcessesInVirtualizationContext(packageFamilyName: LPWSTR, count_out: LPVOID, processes_out: LPVOID): HRESULT {
     return Kernel32.Load('GetProcessesInVirtualizationContext')(packageFamilyName, count_out, processes_out);
   }
 
@@ -4906,7 +4909,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-getstagedpackagepathbyfullname
-  public static GetStagedPackagePathByFullName(packageFullName: LPWSTR, pathLength_in_out: LPVOID, path_out: Optional<LPWSTR>): DWORD {
+  public static GetStagedPackagePathByFullName(packageFullName: LPWSTR, pathLength_in_out: LPVOID, path_out: Optional<LPWSTR>): LONG {
     return Kernel32.Load('GetStagedPackagePathByFullName')(packageFullName, pathLength_in_out, path_out);
   }
 
@@ -5120,7 +5123,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-getthreaddescription
-  public static GetThreadDescription(hThread: HANDLE, ppszThreadDescription_out: LPVOID): DWORD {
+  public static GetThreadDescription(hThread: HANDLE, ppszThreadDescription_out: LPVOID): HRESULT {
     return Kernel32.Load('GetThreadDescription')(hThread, ppszThreadDescription_out);
   }
 
@@ -5422,7 +5425,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-globalcompact
-  public static GlobalCompact(dwMinFree: DWORD): LPVOID {
+  public static GlobalCompact(dwMinFree: DWORD): SIZE_T {
     return Kernel32.Load('GlobalCompact')(dwMinFree);
   }
 
@@ -5542,7 +5545,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapcompact
-  public static HeapCompact(hHeap: HANDLE, dwFlags: DWORD): LPVOID {
+  public static HeapCompact(hHeap: HANDLE, dwFlags: DWORD): SIZE_T {
     return Kernel32.Load('HeapCompact')(hHeap, dwFlags);
   }
 
@@ -5727,17 +5730,17 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-isbadhugereadptr
-  public static IsBadHugeReadPtr(lp: Optional<LPVOID>, ucb: LPVOID): BOOL {
+  public static IsBadHugeReadPtr(lp: Optional<LPVOID>, ucb: UINT_PTR): BOOL {
     return Kernel32.Load('IsBadHugeReadPtr')(lp, ucb);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-isbadhugewriteptr
-  public static IsBadHugeWritePtr(lp: Optional<LPVOID>, ucb: LPVOID): BOOL {
+  public static IsBadHugeWritePtr(lp: Optional<LPVOID>, ucb: UINT_PTR): BOOL {
     return Kernel32.Load('IsBadHugeWritePtr')(lp, ucb);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-isbadreadptr
-  public static IsBadReadPtr(lp: Optional<LPVOID>, ucb: LPVOID): BOOL {
+  public static IsBadReadPtr(lp: Optional<LPVOID>, ucb: UINT_PTR): BOOL {
     return Kernel32.Load('IsBadReadPtr')(lp, ucb);
   }
 
@@ -5752,7 +5755,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-isbadwriteptr
-  public static IsBadWritePtr(lp: Optional<LPVOID>, ucb: LPVOID): BOOL {
+  public static IsBadWritePtr(lp: Optional<LPVOID>, ucb: UINT_PTR): BOOL {
     return Kernel32.Load('IsBadWritePtr')(lp, ucb);
   }
 
@@ -5857,7 +5860,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-iswow64guestmachinesupported
-  public static IsWow64GuestMachineSupported(WowGuestMachine: DWORD, MachineIsSupported_out: LPVOID): DWORD {
+  public static IsWow64GuestMachineSupported(WowGuestMachine: USHORT, MachineIsSupported_out: LPVOID): HRESULT {
     return Kernel32.Load('IsWow64GuestMachineSupported')(WowGuestMachine, MachineIsSupported_out);
   }
 
@@ -6102,7 +6105,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-localcompact
-  public static LocalCompact(uMinFree: DWORD): LPVOID {
+  public static LocalCompact(uMinFree: DWORD): SIZE_T {
     return Kernel32.Load('LocalCompact')(uMinFree);
   }
 
@@ -6207,12 +6210,12 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/lzexpand/nf-lzexpand-lzopenfilea
-  public static LZOpenFileA(lpFileName: LPSTR, lpReOpenBuf_in_out: LPVOID, wStyle: DWORD): INT {
+  public static LZOpenFileA(lpFileName: LPSTR, lpReOpenBuf_in_out: LPVOID, wStyle: WORD): INT {
     return Kernel32.Load('LZOpenFileA')(lpFileName, lpReOpenBuf_in_out, wStyle);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/lzexpand/nf-lzexpand-lzopenfilew
-  public static LZOpenFileW(lpFileName: LPWSTR, lpReOpenBuf_in_out: LPVOID, wStyle: DWORD): INT {
+  public static LZOpenFileW(lpFileName: LPWSTR, lpReOpenBuf_in_out: LPVOID, wStyle: WORD): INT {
     return Kernel32.Load('LZOpenFileW')(lpFileName, lpReOpenBuf_in_out, wStyle);
   }
 
@@ -6424,7 +6427,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/appmodel/nf-appmodel-openpackageinfobyfullname
-  public static OpenPackageInfoByFullName(packageFullName: LPWSTR, reserved: DWORD, packageInfoReference_out: LPVOID): DWORD {
+  public static OpenPackageInfoByFullName(packageFullName: LPWSTR, reserved: DWORD, packageInfoReference_out: LPVOID): LONG {
     return Kernel32.Load('OpenPackageInfoByFullName')(packageFullName, reserved, packageInfoReference_out);
   }
 
@@ -6479,22 +6482,22 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-packagefamilynamefromfullname
-  public static PackageFamilyNameFromFullName(packageFullName: LPWSTR, packageFamilyNameLength_in_out: LPVOID, packageFamilyName_out: Optional<LPWSTR>): DWORD {
+  public static PackageFamilyNameFromFullName(packageFullName: LPWSTR, packageFamilyNameLength_in_out: LPVOID, packageFamilyName_out: Optional<LPWSTR>): LONG {
     return Kernel32.Load('PackageFamilyNameFromFullName')(packageFullName, packageFamilyNameLength_in_out, packageFamilyName_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-packagefamilynamefromid
-  public static PackageFamilyNameFromId(packageId: LPVOID, packageFamilyNameLength_in_out: LPVOID, packageFamilyName_out: Optional<LPWSTR>): DWORD {
+  public static PackageFamilyNameFromId(packageId: LPVOID, packageFamilyNameLength_in_out: LPVOID, packageFamilyName_out: Optional<LPWSTR>): LONG {
     return Kernel32.Load('PackageFamilyNameFromId')(packageId, packageFamilyNameLength_in_out, packageFamilyName_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-packagefullnamefromid
-  public static PackageFullNameFromId(packageId: LPVOID, packageFullNameLength_in_out: LPVOID, packageFullName_out: Optional<LPWSTR>): DWORD {
+  public static PackageFullNameFromId(packageId: LPVOID, packageFullNameLength_in_out: LPVOID, packageFullName_out: Optional<LPWSTR>): LONG {
     return Kernel32.Load('PackageFullNameFromId')(packageId, packageFullNameLength_in_out, packageFullName_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/appmodel/nf-appmodel-packageidfromfullname
-  public static PackageIdFromFullName(packageFullName: LPWSTR, flags: DWORD, bufferLength_in_out: LPVOID, buffer_out: Optional<LPVOID>): DWORD {
+  public static PackageIdFromFullName(packageFullName: LPWSTR, flags: DWORD, bufferLength_in_out: LPVOID, buffer_out: Optional<LPVOID>): LONG {
     return Kernel32.Load('PackageIdFromFullName')(packageFullName, flags, bufferLength_in_out, buffer_out);
   }
 
@@ -6536,7 +6539,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ioapiset/nf-ioapiset-postqueuedcompletionstatus
-  public static PostQueuedCompletionStatus(CompletionPort: HANDLE, dwNumberOfBytesTransferred: DWORD, dwCompletionKey: LPVOID, lpOverlapped: Optional<LPVOID>): BOOL {
+  public static PostQueuedCompletionStatus(CompletionPort: HANDLE, dwNumberOfBytesTransferred: DWORD, dwCompletionKey: ULONG_PTR, lpOverlapped: Optional<LPVOID>): BOOL {
     return Kernel32.Load('PostQueuedCompletionStatus')(CompletionPort, dwNumberOfBytesTransferred, dwCompletionKey, lpOverlapped);
   }
 
@@ -6631,7 +6634,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-psswalkmarkersetposition
-  public static PssWalkMarkerSetPosition(WalkMarkerHandle: HANDLE, Position: LPVOID): DWORD {
+  public static PssWalkMarkerSetPosition(WalkMarkerHandle: HANDLE, Position: ULONG_PTR): DWORD {
     return Kernel32.Load('PssWalkMarkerSetPosition')(WalkMarkerHandle, Position);
   }
 
@@ -6651,12 +6654,12 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-queryactctxsettingsw
-  public static QueryActCtxSettingsW(dwFlags: DWORD, hActCtx: Optional<HANDLE>, settingsNameSpace: Optional<LPWSTR>, settingName: LPWSTR, pvBuffer_out: Optional<LPWSTR>, dwBuffer: LPVOID, pdwWrittenOrRequired_out: Optional<LPVOID>): BOOL {
+  public static QueryActCtxSettingsW(dwFlags: DWORD, hActCtx: Optional<HANDLE>, settingsNameSpace: Optional<LPWSTR>, settingName: LPWSTR, pvBuffer_out: Optional<LPWSTR>, dwBuffer: SIZE_T, pdwWrittenOrRequired_out: Optional<LPVOID>): BOOL {
     return Kernel32.Load('QueryActCtxSettingsW')(dwFlags, hActCtx, settingsNameSpace, settingName, pvBuffer_out, dwBuffer, pdwWrittenOrRequired_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-queryactctxw
-  public static QueryActCtxW(dwFlags: DWORD, hActCtx: HANDLE, pvSubInstance: Optional<LPVOID>, ulInfoClass: DWORD, pvBuffer_out: Optional<LPVOID>, cbBuffer: LPVOID, pcbWrittenOrRequired_out: Optional<LPVOID>): BOOL {
+  public static QueryActCtxW(dwFlags: DWORD, hActCtx: HANDLE, pvSubInstance: Optional<LPVOID>, ulInfoClass: DWORD, pvBuffer_out: Optional<LPVOID>, cbBuffer: SIZE_T, pcbWrittenOrRequired_out: Optional<LPVOID>): BOOL {
     return Kernel32.Load('QueryActCtxW')(dwFlags, hActCtx, pvSubInstance, ulInfoClass, pvBuffer_out, cbBuffer, pcbWrittenOrRequired_out);
   }
 
@@ -6900,12 +6903,12 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-registerapplicationrecoverycallback
-  public static RegisterApplicationRecoveryCallback(pRecoveyCallback: PVOID, pvParameter: Optional<LPVOID>, dwPingInterval: DWORD, dwFlags: DWORD): DWORD {
+  public static RegisterApplicationRecoveryCallback(pRecoveyCallback: PVOID, pvParameter: Optional<LPVOID>, dwPingInterval: DWORD, dwFlags: DWORD): HRESULT {
     return Kernel32.Load('RegisterApplicationRecoveryCallback')(pRecoveyCallback, pvParameter, dwPingInterval, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-registerapplicationrestart
-  public static RegisterApplicationRestart(pwzCommandline: Optional<LPWSTR>, dwFlags: DWORD): DWORD {
+  public static RegisterApplicationRestart(pwzCommandline: Optional<LPWSTR>, dwFlags: DWORD): HRESULT {
     return Kernel32.Load('RegisterApplicationRestart')(pwzCommandline, dwFlags);
   }
 
@@ -7085,7 +7088,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/console/resizepseudoconsole
-  public static ResizePseudoConsole(hPC: HANDLE, size: DWORD): DWORD {
+  public static ResizePseudoConsole(hPC: HANDLE, size: DWORD): HRESULT {
     return Kernel32.Load('ResizePseudoConsole')(hPC, size);
   }
 
@@ -7104,7 +7107,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-rtladdfunctiontable
-  public static RtlAddFunctionTable(FunctionTable: LPVOID, EntryCount: DWORD, BaseAddress: ULONGLONG): DWORD {
+  public static RtlAddFunctionTable(FunctionTable: LPVOID, EntryCount: DWORD, BaseAddress: ULONGLONG): BOOLEAN {
     return Kernel32.Load('RtlAddFunctionTable')(FunctionTable, EntryCount, BaseAddress);
   }
 
@@ -7123,17 +7126,17 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-rtlcomparememory
-  public static RtlCompareMemory(Source1: LPVOID, Source2: LPVOID, Length: LPVOID): LPVOID {
+  public static RtlCompareMemory(Source1: LPVOID, Source2: LPVOID, Length: SIZE_T): SIZE_T {
     return Kernel32.Load('RtlCompareMemory')(Source1, Source2, Length);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-rtldeletefunctiontable
-  public static RtlDeleteFunctionTable(FunctionTable: LPVOID): DWORD {
+  public static RtlDeleteFunctionTable(FunctionTable: LPVOID): BOOLEAN {
     return Kernel32.Load('RtlDeleteFunctionTable')(FunctionTable);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-rtlinstallfunctiontablecallback
-  public static RtlInstallFunctionTableCallback(TableIdentifier: ULONGLONG, BaseAddress: ULONGLONG, Length: DWORD, Callback: PVOID, Context: Optional<LPVOID>, OutOfProcessCallbackDll: Optional<LPWSTR>): DWORD {
+  public static RtlInstallFunctionTableCallback(TableIdentifier: ULONGLONG, BaseAddress: ULONGLONG, Length: DWORD, Callback: PVOID, Context: Optional<LPVOID>, OutOfProcessCallbackDll: Optional<LPWSTR>): BOOLEAN {
     return Kernel32.Load('RtlInstallFunctionTableCallback')(TableIdentifier, BaseAddress, Length, Callback, Context, OutOfProcessCallbackDll);
   }
 
@@ -7397,7 +7400,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/console/setconsoletextattribute
-  public static SetConsoleTextAttribute(hConsoleOutput: HANDLE, wAttributes: DWORD): BOOL {
+  public static SetConsoleTextAttribute(hConsoleOutput: HANDLE, wAttributes: WORD): BOOL {
     return Kernel32.Load('SetConsoleTextAttribute')(hConsoleOutput, wAttributes);
   }
 
@@ -7542,7 +7545,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-setfilecompletionnotificationmodes
-  public static SetFileCompletionNotificationModes(FileHandle: HANDLE, Flags: LPVOID): BOOL {
+  public static SetFileCompletionNotificationModes(FileHandle: HANDLE, Flags: BYTE): BOOL {
     return Kernel32.Load('SetFileCompletionNotificationModes')(FileHandle, Flags);
   }
 
@@ -7672,7 +7675,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-setprocessaffinitymask
-  public static SetProcessAffinityMask(hProcess: HANDLE, dwProcessAffinityMask: LPVOID): BOOL {
+  public static SetProcessAffinityMask(hProcess: HANDLE, dwProcessAffinityMask: DWORD_PTR): BOOL {
     return Kernel32.Load('SetProcessAffinityMask')(hProcess, dwProcessAffinityMask);
   }
 
@@ -7712,7 +7715,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-setprocessmitigationpolicy
-  public static SetProcessMitigationPolicy(MitigationPolicy: DWORD, lpBuffer: LPVOID, dwLength: LPVOID): BOOL {
+  public static SetProcessMitigationPolicy(MitigationPolicy: DWORD, lpBuffer: LPVOID, dwLength: SIZE_T): BOOL {
     return Kernel32.Load('SetProcessMitigationPolicy')(MitigationPolicy, lpBuffer, dwLength);
   }
 
@@ -7732,17 +7735,17 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-setprocessworkingsetsize
-  public static SetProcessWorkingSetSize(hProcess: HANDLE, dwMinimumWorkingSetSize: LPVOID, dwMaximumWorkingSetSize: LPVOID): BOOL {
+  public static SetProcessWorkingSetSize(hProcess: HANDLE, dwMinimumWorkingSetSize: SIZE_T, dwMaximumWorkingSetSize: SIZE_T): BOOL {
     return Kernel32.Load('SetProcessWorkingSetSize')(hProcess, dwMinimumWorkingSetSize, dwMaximumWorkingSetSize);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-setprocessworkingsetsizeex
-  public static SetProcessWorkingSetSizeEx(hProcess: HANDLE, dwMinimumWorkingSetSize: LPVOID, dwMaximumWorkingSetSize: LPVOID, Flags: DWORD): BOOL {
+  public static SetProcessWorkingSetSizeEx(hProcess: HANDLE, dwMinimumWorkingSetSize: SIZE_T, dwMaximumWorkingSetSize: SIZE_T, Flags: DWORD): BOOL {
     return Kernel32.Load('SetProcessWorkingSetSizeEx')(hProcess, dwMinimumWorkingSetSize, dwMaximumWorkingSetSize, Flags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-setprotectedpolicy
-  public static SetProtectedPolicy(PolicyGuid: LPVOID, PolicyValue: LPVOID, OldPolicyValue_out: Optional<LPVOID>): BOOL {
+  public static SetProtectedPolicy(PolicyGuid: LPVOID, PolicyValue: ULONG_PTR, OldPolicyValue_out: Optional<LPVOID>): BOOL {
     return Kernel32.Load('SetProtectedPolicy')(PolicyGuid, PolicyValue, OldPolicyValue_out);
   }
 
@@ -7762,7 +7765,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/memoryapi/nf-memoryapi-setsystemfilecachesize
-  public static SetSystemFileCacheSize(MinimumFileCacheSize: LPVOID, MaximumFileCacheSize: LPVOID, Flags: DWORD): BOOL {
+  public static SetSystemFileCacheSize(MinimumFileCacheSize: SIZE_T, MaximumFileCacheSize: SIZE_T, Flags: DWORD): BOOL {
     return Kernel32.Load('SetSystemFileCacheSize')(MinimumFileCacheSize, MaximumFileCacheSize, Flags);
   }
 
@@ -7792,7 +7795,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-setthreadaffinitymask
-  public static SetThreadAffinityMask(hThread: HANDLE, dwThreadAffinityMask: LPVOID): LPVOID {
+  public static SetThreadAffinityMask(hThread: HANDLE, dwThreadAffinityMask: DWORD_PTR): DWORD_PTR {
     return Kernel32.Load('SetThreadAffinityMask')(hThread, dwThreadAffinityMask);
   }
 
@@ -7802,7 +7805,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-setthreaddescription
-  public static SetThreadDescription(hThread: HANDLE, lpThreadDescription: LPWSTR): DWORD {
+  public static SetThreadDescription(hThread: HANDLE, lpThreadDescription: LPWSTR): HRESULT {
     return Kernel32.Load('SetThreadDescription')(hThread, lpThreadDescription);
   }
 
@@ -8126,12 +8129,12 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-tryacquiresrwlockexclusive
-  public static TryAcquireSRWLockExclusive(SRWLock_in_out: LPVOID): DWORD {
+  public static TryAcquireSRWLockExclusive(SRWLock_in_out: LPVOID): BOOLEAN {
     return Kernel32.Load('TryAcquireSRWLockExclusive')(SRWLock_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-tryacquiresrwlockshared
-  public static TryAcquireSRWLockShared(SRWLock_in_out: LPVOID): DWORD {
+  public static TryAcquireSRWLockShared(SRWLock_in_out: LPVOID): BOOLEAN {
     return Kernel32.Load('TryAcquireSRWLockShared')(SRWLock_in_out);
   }
 
@@ -8186,12 +8189,12 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-unregisterapplicationrecoverycallback
-  public static UnregisterApplicationRecoveryCallback(): DWORD {
+  public static UnregisterApplicationRecoveryCallback(): HRESULT {
     return Kernel32.Load('UnregisterApplicationRecoveryCallback')();
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-unregisterapplicationrestart
-  public static UnregisterApplicationRestart(): DWORD {
+  public static UnregisterApplicationRestart(): HRESULT {
     return Kernel32.Load('UnregisterApplicationRestart')();
   }
 
@@ -8418,82 +8421,82 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-wergetflags
-  public static WerGetFlags(hProcess: HANDLE, pdwFlags_out: LPVOID): DWORD {
+  public static WerGetFlags(hProcess: HANDLE, pdwFlags_out: LPVOID): HRESULT {
     return Kernel32.Load('WerGetFlags')(hProcess, pdwFlags_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-werregisteradditionalprocess
-  public static WerRegisterAdditionalProcess(processId: DWORD, captureExtraInfoForThreadId: DWORD): DWORD {
+  public static WerRegisterAdditionalProcess(processId: DWORD, captureExtraInfoForThreadId: DWORD): HRESULT {
     return Kernel32.Load('WerRegisterAdditionalProcess')(processId, captureExtraInfoForThreadId);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-werregisterapplocaldump
-  public static WerRegisterAppLocalDump(localAppDataRelativePath: LPWSTR): DWORD {
+  public static WerRegisterAppLocalDump(localAppDataRelativePath: LPWSTR): HRESULT {
     return Kernel32.Load('WerRegisterAppLocalDump')(localAppDataRelativePath);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-werregistercustommetadata
-  public static WerRegisterCustomMetadata(key: LPWSTR, value: LPWSTR): DWORD {
+  public static WerRegisterCustomMetadata(key: LPWSTR, value: LPWSTR): HRESULT {
     return Kernel32.Load('WerRegisterCustomMetadata')(key, value);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-werregisterexcludedmemoryblock
-  public static WerRegisterExcludedMemoryBlock(address: LPVOID, size: DWORD): DWORD {
+  public static WerRegisterExcludedMemoryBlock(address: LPVOID, size: DWORD): HRESULT {
     return Kernel32.Load('WerRegisterExcludedMemoryBlock')(address, size);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-werregisterfile
-  public static WerRegisterFile(pwzFile: LPWSTR, regFileType: DWORD, dwFlags: DWORD): DWORD {
+  public static WerRegisterFile(pwzFile: LPWSTR, regFileType: DWORD, dwFlags: DWORD): HRESULT {
     return Kernel32.Load('WerRegisterFile')(pwzFile, regFileType, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-werregistermemoryblock
-  public static WerRegisterMemoryBlock(pvAddress: LPVOID, dwSize: DWORD): DWORD {
+  public static WerRegisterMemoryBlock(pvAddress: LPVOID, dwSize: DWORD): HRESULT {
     return Kernel32.Load('WerRegisterMemoryBlock')(pvAddress, dwSize);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-werregisterruntimeexceptionmodule
-  public static WerRegisterRuntimeExceptionModule(pwszOutOfProcessCallbackDll: LPWSTR, pContext: LPVOID): DWORD {
+  public static WerRegisterRuntimeExceptionModule(pwszOutOfProcessCallbackDll: LPWSTR, pContext: LPVOID): HRESULT {
     return Kernel32.Load('WerRegisterRuntimeExceptionModule')(pwszOutOfProcessCallbackDll, pContext);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-wersetflags
-  public static WerSetFlags(dwFlags: DWORD): DWORD {
+  public static WerSetFlags(dwFlags: DWORD): HRESULT {
     return Kernel32.Load('WerSetFlags')(dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-werunregisteradditionalprocess
-  public static WerUnregisterAdditionalProcess(processId: DWORD): DWORD {
+  public static WerUnregisterAdditionalProcess(processId: DWORD): HRESULT {
     return Kernel32.Load('WerUnregisterAdditionalProcess')(processId);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-werunregisterapplocaldump
-  public static WerUnregisterAppLocalDump(): DWORD {
+  public static WerUnregisterAppLocalDump(): HRESULT {
     return Kernel32.Load('WerUnregisterAppLocalDump')();
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-werunregistercustommetadata
-  public static WerUnregisterCustomMetadata(key: LPWSTR): DWORD {
+  public static WerUnregisterCustomMetadata(key: LPWSTR): HRESULT {
     return Kernel32.Load('WerUnregisterCustomMetadata')(key);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-werunregisterexcludedmemoryblock
-  public static WerUnregisterExcludedMemoryBlock(address: LPVOID): DWORD {
+  public static WerUnregisterExcludedMemoryBlock(address: LPVOID): HRESULT {
     return Kernel32.Load('WerUnregisterExcludedMemoryBlock')(address);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-werunregisterfile
-  public static WerUnregisterFile(pwzFilePath: LPWSTR): DWORD {
+  public static WerUnregisterFile(pwzFilePath: LPWSTR): HRESULT {
     return Kernel32.Load('WerUnregisterFile')(pwzFilePath);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-werunregistermemoryblock
-  public static WerUnregisterMemoryBlock(pvAddress: LPVOID): DWORD {
+  public static WerUnregisterMemoryBlock(pvAddress: LPVOID): HRESULT {
     return Kernel32.Load('WerUnregisterMemoryBlock')(pvAddress);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-werunregisterruntimeexceptionmodule
-  public static WerUnregisterRuntimeExceptionModule(pwszOutOfProcessCallbackDll: LPWSTR, pContext: LPVOID): DWORD {
+  public static WerUnregisterRuntimeExceptionModule(pwszOutOfProcessCallbackDll: LPWSTR, pContext: LPVOID): HRESULT {
     return Kernel32.Load('WerUnregisterRuntimeExceptionModule')(pwszOutOfProcessCallbackDll, pContext);
   }
 
@@ -8522,7 +8525,7 @@ class Kernel32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wow64apiset/nf-wow64apiset-wow64enablewow64fsredirection
-  public static Wow64EnableWow64FsRedirection(Wow64FsEnableRedirection: DWORD): DWORD {
+  public static Wow64EnableWow64FsRedirection(Wow64FsEnableRedirection: BOOLEAN): BOOLEAN {
     return Kernel32.Load('Wow64EnableWow64FsRedirection')(Wow64FsEnableRedirection);
   }
 

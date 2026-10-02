@@ -217,9 +217,9 @@ class Wininet extends Win32 {
     InternetSetCookieExA: { args: [FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.u32, FFIType.u64], returns: FFIType.u32 },
     InternetSetCookieExW: { args: [FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.u32, FFIType.u64], returns: FFIType.u32 },
     InternetSetCookieW: { args: [FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
-    InternetSetDialState: { args: [FFIType.ptr, FFIType.u32, FFIType.u32], returns: FFIType.u32 },
-    InternetSetDialStateA: { args: [FFIType.ptr, FFIType.u32, FFIType.u32], returns: FFIType.u32 },
-    InternetSetDialStateW: { args: [FFIType.ptr, FFIType.u32, FFIType.u32], returns: FFIType.u32 },
+    InternetSetDialState: { args: [FFIType.ptr, FFIType.u32, FFIType.u32], returns: FFIType.i32 },
+    InternetSetDialStateA: { args: [FFIType.ptr, FFIType.u32, FFIType.u32], returns: FFIType.i32 },
+    InternetSetDialStateW: { args: [FFIType.ptr, FFIType.u32, FFIType.u32], returns: FFIType.i32 },
     InternetSetFilePointer: { args: [FFIType.u64, FFIType.i32, FFIType.ptr, FFIType.u32, FFIType.u64], returns: FFIType.u32 },
     InternetSetOptionA: { args: [FFIType.u64, FFIType.u32, FFIType.ptr, FFIType.u32], returns: FFIType.i32 },
     InternetSetOptionExA: { args: [FFIType.u64, FFIType.u32, FFIType.ptr, FFIType.u32, FFIType.u32], returns: FFIType.i32 },
@@ -1068,17 +1068,17 @@ class Wininet extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-internetsetdialstate
-  public static InternetSetDialState(lpszConnectoid: Optional<LPCSTR>, dwState: DWORD, dwReserved: DWORD): DWORD {
+  public static InternetSetDialState(lpszConnectoid: Optional<LPCSTR>, dwState: DWORD, dwReserved: DWORD): BOOL {
     return Wininet.Load('InternetSetDialState')(lpszConnectoid, dwState, dwReserved);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-internetsetdialstatea
-  public static InternetSetDialStateA(lpszConnectoid: Optional<LPCSTR>, dwState: DWORD, dwReserved: DWORD): DWORD {
+  public static InternetSetDialStateA(lpszConnectoid: Optional<LPCSTR>, dwState: DWORD, dwReserved: DWORD): BOOL {
     return Wininet.Load('InternetSetDialStateA')(lpszConnectoid, dwState, dwReserved);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-internetsetdialstatew
-  public static InternetSetDialStateW(lpszConnectoid: Optional<LPCWSTR>, dwState: DWORD, dwReserved: DWORD): DWORD {
+  public static InternetSetDialStateW(lpszConnectoid: Optional<LPCWSTR>, dwState: DWORD, dwReserved: DWORD): BOOL {
     return Wininet.Load('InternetSetDialStateW')(lpszConnectoid, dwState, dwReserved);
   }
 
