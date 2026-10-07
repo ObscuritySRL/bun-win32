@@ -10,13 +10,24 @@
 
 Press **Alt+`** and every open window lifts off your desktop into a living gallery. The cards are not screenshots: video keeps playing, terminals keep scrolling, the aurora in the corner keeps dancing. Start typing and Iris searches the titles, the apps, **and the words inside every window** — minimized ones included — lighting up each match on the live card itself. Choose one and it flies back to exactly where it lives, already focused.
 
-Iris is a spatial window switcher for Windows 11, and it is about 5,000 lines of TypeScript running on [Bun](https://bun.sh). There is no C++, no native addon, no Electron, and no build step: it talks to Direct3D 11, DirectComposition, Windows.Graphics.Capture, Windows.Media.Ocr, UI Automation, DirectWrite, Direct2D, WIC and DWM directly through `bun:ffi` and the [`@bun-win32`](https://github.com/ObscuritySRL/bun-win32) bindings.
+Iris is a spatial window switcher for Windows 11, and it is about 5,000 lines of TypeScript running on [Bun](https://bun.sh). There is no C++, no native addon and no Electron: it talks to Direct3D 11, DirectComposition, Windows.Graphics.Capture, Windows.Media.Ocr, UI Automation, DirectWrite, Direct2D, WIC and DWM directly through `bun:ffi` and the [`@bun-win32`](https://github.com/ObscuritySRL/bun-win32) bindings.
+
+## Get it
+
+**Download [`iris.exe`](https://github.com/ObscuritySRL/bun-win32/releases?q=iris) from the latest Iris release** and run it. It is one self-contained file (the Bun runtime is embedded), so there is nothing to install.
+
+- Iris opens immediately, then lives in the notification area. **Alt+`** summons it; click the tray icon to open it, right-click it to quit.
+- The executable is not code-signed yet, so Windows SmartScreen may warn on first run: choose **More info → Run anyway**.
+- To start it with Windows, put a shortcut to `iris.exe` in `shell:startup`.
+
+Or run it from source (no build step):
 
 ```bash
+git clone https://github.com/ObscuritySRL/bun-win32 && cd bun-win32 && bun install
 bun run packages/iris/index.ts
 ```
 
-It opens immediately, then stays resident: **Alt+`** summons it, **Ctrl+C** in its console quits.
+Build the executable yourself with `bun run packages/iris/build.ts`, which writes `packages/iris/dist/iris.exe`.
 
 | Key | |
 | --- | --- |

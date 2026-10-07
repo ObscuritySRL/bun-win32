@@ -6,8 +6,6 @@
 // Close:   every card flies home, the chosen one on top; once all are home the backdrop is gone, the overlay hides,
 //          and the real windows are already where the cards were.
 
-import { readFileSync } from 'node:fs';
-
 import Shcore from '@bun-win32/shcore';
 import User32 from '@bun-win32/user32';
 
@@ -22,13 +20,17 @@ import type { Recorder } from './recorder';
 import { type BackdropStyle, type CardStyle, cameraDistance, type PanelStyle, Renderer } from './renderer';
 import { type IndexedText, search, type SearchResult, tokenize } from './search';
 import { TextAtlas, type TextEmphasis, type TextEntry } from './text';
+import { sourceStatistics } from './stats' with { type: 'macro' };
 import { ThumbnailHost } from './thumbnails';
+import type { Tray } from './tray';
 import { accentColor, type Rgb, tinted, type Typography, typography, white } from './theme';
 import { loadWallpaper, type Wallpaper } from './wallpaper';
 import { activateWindow, closeWindow, enumerateWindows, isWindowAlive, type WindowInfo } from './windows';
 import { type InputEvent, OverlayWindow } from './window';
 
 const HOTKEY_SUMMON = 1;
+const WM_LBUTTONUP = 0x0202;
+const WM_RBUTTONUP = 0x0205;
 const MOD_ALT = 0x0001;
 const MOD_NOREPEAT = 0x4000;
 const VK_OEM_3 = 0xc0;
@@ -36,6 +38,7 @@ const VK = { back: 0x08, down: 0x28, end: 0x23, enter: 0x0d, escape: 0x1b, f1: 0
 const MONITOR_DEFAULTTONEAREST = 2;
 const FULL_UV: readonly [number, number, number, number] = [0, 0, 1, 1];
 const COLOPHON_WIDTH = 560;
+const SOURCE = sourceStatistics();
 
 type State = 'closing' | 'hidden' | 'open';
 
@@ -118,8 +121,8 @@ export class Iris {
   #frameCost = 0;
   #cpuCursor = 0;
   #figures = { cpu: '—', fps: '—', frame: '', gpu: '—', updatedAt: -1 };
-  #sourceLines = 0;
-  #sourceFiles = 0;
+  #sourceLines = SOURCE.lines;
+  #sourceFiles = SOURCE.files;
   #frameCursor = 0;
   #layout: LayoutName = 'grid';
   #layoutResult: LayoutResult = { floorY: 0, targets: [] };
@@ -146,6 +149,10 @@ export class Iris {
   #scratch = new Float32Array(16);
   bootMilliseconds = 0;
   running = true;
+  /** False when another app (or another Iris) already owns Alt+`. */
+  hotkeyAvailable = false;
+  /** The notification-area icon of a resident Iris (null for scripted runs). */
+  tray: Tray | null = null;
 
   constructor(options: IrisOptions) {
     this.#options = options;
@@ -158,12 +165,9 @@ export class Iris {
     this.text = new TextAtlas(this.renderer);
     this.icons = new IconAtlas(this.renderer);
     initializeCapture(this.device);
-    if (User32.RegisterHotKey(this.window.hwnd, HOTKEY_SUMMON, MOD_ALT | MOD_NOREPEAT, VK_OEM_3) === 0) console.warn('[iris] Alt+` is taken by another app — summon Iris by re-running it.');
+    this.hotkeyAvailable = User32.RegisterHotKey(this.window.hwnd, HOTKEY_SUMMON, MOD_ALT | MOD_NOREPEAT, VK_OEM_3) !== 0;
+    if (!this.hotkeyAvailable) console.warn('[iris] Alt+` is taken by another app (another Iris?) — use the tray icon instead.');
     options.indexer?.onUpdate((update) => this.#applyIndex(update));
-    for (const file of new Bun.Glob('*.ts').scanSync(import.meta.dir)) {
-      this.#sourceFiles += 1;
-      for (const line of readFileSync(`${import.meta.dir}/${file}`, 'utf8').split('\n')) if (line.trim().length > 0) this.#sourceLines += 1;
-    }
   }
 
   get state(): State {
@@ -480,6 +484,15 @@ export class Iris {
   }
 
   handle(event: InputEvent): void {
+    if (event.kind === 'tray') {
+      if (event.message === WM_LBUTTONUP && this.#state === 'hidden') this.open();
+      else if (event.message === WM_RBUTTONUP && this.tray !== null) {
+        const choice = this.tray.menu();
+        if (choice === 'open' && this.#state === 'hidden') this.open();
+        else if (choice === 'quit') this.running = false;
+      }
+      return;
+    }
     if (event.kind === 'hotkey') {
       if (event.id !== HOTKEY_SUMMON) return;
       if (this.#state === 'open') this.close(null);
@@ -1109,7 +1122,10 @@ export class Iris {
         'THREADS',
         'Rendering and input on the main thread at the display’s refresh rate. OCR and accessibility reading on a Bun worker with its own COM apartment and GPU device. WinRT async work is polled — native code never calls back into JavaScript.',
       ],
-      ['THE CODE', `${this.#sourceLines.toLocaleString('en-US')} lines of strict TypeScript in ${this.#sourceFiles} files · zero dependencies beyond the bindings · no build step · cold boot ${Math.round(this.bootMilliseconds)} ms`],
+      [
+        'THE CODE',
+        `${this.#sourceLines.toLocaleString('en-US')} lines of strict TypeScript in ${this.#sourceFiles} files · zero dependencies beyond the bindings · runs from source with no build step · cold boot ${Math.round(this.bootMilliseconds)} ms`,
+      ],
     ];
     let sectionY = baseline + 32;
     for (const [label, body] of sections) {

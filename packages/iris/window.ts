@@ -7,6 +7,7 @@ import { JSCallback } from 'bun:ffi';
 import User32 from '@bun-win32/user32';
 
 import { Cursor } from './native';
+import { WM_TRAY } from './tray';
 
 const CS_DBLCLKS = 0x0008;
 const IDC_ARROW = 32_512n;
@@ -42,6 +43,7 @@ export type InputEvent =
   | { kind: 'character'; text: string }
   | { kind: 'deactivate' }
   | { kind: 'hotkey'; id: number }
+  | { kind: 'tray'; message: number }
   | { kind: 'key'; alt: boolean; control: boolean; shift: boolean; virtualKey: number }
   | { kind: 'pointer-down'; button: 'left' | 'middle' | 'right'; x: number; y: number }
   | { kind: 'pointer-move'; x: number; y: number }
@@ -102,6 +104,9 @@ export class OverlayWindow {
         return 0n;
       }
       case WM_CLOSE:
+        return 0n;
+      case WM_TRAY:
+        this.events.push({ kind: 'tray', message: Number(lParam & 0xffffn) });
         return 0n;
       case WM_HOTKEY:
         this.events.push({ kind: 'hotkey', id: Number(wParam) });

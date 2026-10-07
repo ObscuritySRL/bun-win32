@@ -20,6 +20,7 @@ import Shcore from '@bun-win32/shcore';
 import { Iris } from './app';
 import { Indexer } from './indexer';
 import { Recorder } from './recorder';
+import { Tray } from './tray';
 import type { InputEvent } from './window';
 
 const bootStarted = performance.now();
@@ -175,6 +176,11 @@ if (scripted) {
   await recorder?.writeManifest({ adapter: iris.device.adapterName, bootMilliseconds: iris.bootMilliseconds, indexLog: indexer?.log ?? [], script });
 } else {
   banner();
+  iris.tray = new Tray(iris.window.hwnd, 'Iris — every window, every word (Alt+`)');
+  iris.tray.notify(
+    'Iris is running',
+    iris.hotkeyAvailable ? 'Press Alt+` anytime to see every window. Right-click this icon to quit.' : 'Alt+` is already taken (is another Iris running?) — click this icon to open Iris, right-click to quit.',
+  );
   iris.open();
   const deadline = Bun.env.DEMO_DURATION_MS ? performance.now() + Number(Bun.env.DEMO_DURATION_MS) : Infinity;
   while (iris.running && performance.now() < deadline) {
@@ -191,6 +197,7 @@ if (scripted) {
   }
 }
 
+iris.tray?.remove();
 indexer?.terminate();
 recorder?.release();
 process.exit(0);
