@@ -1,0 +1,51 @@
+{
+  "author": "Stev Peifer <stev.p@outlook.com>",
+  "bugs": {
+    "url": "https://github.com/ObscuritySRL/bun-win32/issues"
+  },
+  "dependencies": {
+    "@bun-win32/combase": "workspace:*",
+    "@bun-win32/core": "workspace:*",
+    "@bun-win32/d2d1": "workspace:*",
+    "@bun-win32/d3d11": "workspace:*",
+    "@bun-win32/dwmapi": "workspace:*",
+    "@bun-win32/dwrite": "workspace:*",
+    "@bun-win32/gdi32": "workspace:*",
+    "@bun-win32/gpu": "workspace:*",
+    "@bun-win32/kernel32": "workspace:*",
+    "@bun-win32/oleaut32": "workspace:*",
+    "@bun-win32/shcore": "workspace:*",
+    "@bun-win32/shell32": "workspace:*",
+    "@bun-win32/user32": "workspace:*",
+    "@bun-win32/version": "workspace:*"
+  },
+  "description": "Iris — every window, every word. A spatial window switcher for Windows 11 that renders your live windows in 3D and searches the words inside them. Pure TypeScript on Bun: Direct3D 11, DirectComposition, Windows.Graphics.Capture, Windows.Media.Ocr and UI Automation over bun:ffi.",
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "exports": {
+    ".": "./index.ts"
+  },
+  "license": "MIT",
+  "module": "index.ts",
+  "name": "@bun-win32/iris",
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "private": true,
+  "homepage": "https://github.com/ObscuritySRL/bun-win32#readme",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/ObscuritySRL/bun-win32.git",
+    "directory": "packages/iris"
+  },
+  "type": "module",
+  "version": "1.0.0",
+  "main": "./index.ts",
+  "engines": {
+    "bun": ">=1.1.0"
+  },
+  "scripts": {
+    "start": "bun ./index.ts"
+  }
+}
