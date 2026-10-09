@@ -2,6 +2,8 @@
 // friendly application name, and restore bounds when minimized. Plus the two verbs Iris performs on a window:
 // bring it home (activate) and close it.
 
+import { toArrayBuffer } from 'bun:ffi';
+
 import Dwmapi from '@bun-win32/dwmapi';
 import Kernel32 from '@bun-win32/kernel32';
 import User32 from '@bun-win32/user32';
@@ -9,6 +11,7 @@ import Version from '@bun-win32/version';
 
 import type { Rect } from './geometry';
 
+const CF_UNICODETEXT = 13;
 const DWMWA_CLOAKED = 14;
 const DWMWA_EXTENDED_FRAME_BOUNDS = 9;
 const GA_ROOTOWNER = 3;
@@ -206,13 +209,30 @@ export function enumerateWindows(excluded: ReadonlySet<bigint>): WindowInfo[] {
 
 /** Restore (if minimized) and bring a window to the foreground. Iris owns the foreground, so Windows allows the hand-off. */
 export function activateWindow(hwnd: bigint): void {
-  if (User32.IsIconic(hwnd) !== 0) User32.ShowWindow(hwnd, SW_RESTORE);
+  // Async: a synchronous cross-process restore waits on the target's message loop (12 ms+ measured) mid-animation.
+  if (User32.IsIconic(hwnd) !== 0) User32.ShowWindowAsync(hwnd, SW_RESTORE);
   User32.SetForegroundWindow(hwnd);
 }
 
 /** Ask a window to close (it may prompt to save — exactly like clicking its ×). */
 export function closeWindow(hwnd: bigint): void {
   User32.PostMessageW(hwnd, WM_CLOSE, 0n, 0n);
+}
+
+/** The clipboard's Unicode text ('' when there is none or another app holds the clipboard). */
+export function readClipboardText(owner: bigint): string {
+  if (User32.OpenClipboard(owner) === 0) return '';
+  try {
+    const handle = User32.GetClipboardData(CF_UNICODETEXT);
+    if (handle === 0n) return '';
+    const data = Kernel32.GlobalLock(handle);
+    if (data === null) return '';
+    const text = Buffer.from(toArrayBuffer(data, 0, Number(Kernel32.GlobalSize(handle)))).toString('utf16le');
+    Kernel32.GlobalUnlock(handle);
+    return text.split('\0')[0] ?? '';
+  } finally {
+    User32.CloseClipboard();
+  }
 }
 
 export function isWindowAlive(hwnd: bigint): boolean {

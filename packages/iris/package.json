@@ -8,6 +8,7 @@
     "@bun-win32/core": "workspace:*",
     "@bun-win32/d2d1": "workspace:*",
     "@bun-win32/d3d11": "workspace:*",
+    "@bun-win32/dcomp": "workspace:*",
     "@bun-win32/dwmapi": "workspace:*",
     "@bun-win32/dwrite": "workspace:*",
     "@bun-win32/gdi32": "workspace:*",
@@ -40,7 +41,7 @@
     "directory": "packages/iris"
   },
   "type": "module",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "main": "./index.ts",
   "engines": {
     "bun": ">=1.1.0"

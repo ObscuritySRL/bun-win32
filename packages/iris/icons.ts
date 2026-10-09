@@ -36,7 +36,12 @@ export class IconAtlas {
     return this.texture.srv;
   }
 
-  /** The icon for an executable (cached; null when the shell has none). */
+  /** An icon only if it is already extracted — the draw path never pays for shell extraction (8–60 ms per app). */
+  peek(executablePath: string): IconEntry | null {
+    return this.#entries.get(executablePath) ?? null;
+  }
+
+  /** The icon for an executable, extracting it on first request (cached; null when the shell has none). */
   get(executablePath: string): IconEntry | null {
     if (executablePath.length === 0) return null;
     const cached = this.#entries.get(executablePath);

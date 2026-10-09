@@ -1,6 +1,7 @@
 // Search over three fields per window — title, application, and the text Iris has read from the window itself
 // (OCR of its pixels, or its UI Automation tree when it is minimized). Titles and apps are matched fuzzily (substring
-// first, then an fzf-style subsequence with word-boundary bonuses); content is matched by word prefix/substring, and
+// first, then an fzf-style subsequence with word-boundary bonuses); content is matched by word prefix/substring, then
+// tolerantly of OCR misreads (confusable characters folded, then one edit away), and
 // every hit carries its rectangle so the card can light up the exact words on the live window.
 
 export type TextSource = 'accessibility' | 'ocr';
@@ -93,7 +94,7 @@ function buildSnippet(hit: IndexedText, terms: readonly string[], maximum = 72):
     const at = lower.indexOf(term);
     if (at >= 0) first = Math.min(first, at);
   }
-  if (first === lower.length) first = 0;
+  if (first === lower.length) first = Math.max(0, lower.indexOf(hit.lower));
   let start = Math.max(0, first - Math.floor(maximum * 0.3));
   if (lower.length - start < maximum) start = Math.max(0, lower.length - maximum);
   const end = Math.min(line.length, start + maximum);
@@ -109,7 +110,66 @@ function buildSnippet(hit: IndexedText, terms: readonly string[], maximum = 72):
       at = textLower.indexOf(term, at + term.length);
     }
   }
+  // A tolerant hit (the query matched a misread word): light up the word as it was read.
+  if (ranges.length === 0) {
+    const at = textLower.indexOf(hit.lower);
+    if (at >= 0) ranges.push([at, hit.lower.length]);
+  }
   return { ranges: mergeRanges(ranges), source: hit.source, text };
+}
+
+const foldedEntries = new WeakMap<IndexedText, string>();
+
+/** Collapse the characters OCR confuses most (l/I/1/|, O/0, rn/m, vv/w, 5/s) so a typed word and its misread compare
+ *  equal: "roblox" finds a window that OCR read as "robiox". */
+export function foldConfusables(text: string): string {
+  return text
+    .toLowerCase()
+    .replace(/rn/g, 'm')
+    .replace(/vv/g, 'w')
+    .replace(/[il1|!]/g, 'i')
+    .replace(/0/g, 'o')
+    .replace(/5/g, 's');
+}
+
+function folded(entry: IndexedText): string {
+  let value = foldedEntries.get(entry);
+  if (value === undefined) {
+    value = foldConfusables(entry.text);
+    foldedEntries.set(entry, value);
+  }
+  return value;
+}
+
+/** Per-character bitmasks of the pattern being matched (bit i: pattern[i] is this character), cleared after each use. */
+const characterMasks = new Int32Array(0x1_0000);
+
+/** Which entries contain `pattern` with at most one insertion, deletion, or substitution — Wu–Manber bit-parallel
+ *  matching: two 32-bit state words per character of text (exact, and one edit), whatever the pattern length. */
+function nearlyContaining(entries: readonly IndexedText[], pattern: string): IndexedText[] {
+  const length = Math.min(pattern.length, 31);
+  for (let index = 0; index < length; index += 1) characterMasks[pattern.charCodeAt(index)]! |= 1 << index;
+  const goal = 1 << (length - 1);
+  const hits: IndexedText[] = [];
+  for (const entry of entries) {
+    const text = folded(entry);
+    if (text.length < length - 1) continue;
+    let exact = 0;
+    let oneEdit = 1;
+    for (let position = 0; position < text.length; position += 1) {
+      const mask = characterMasks[text.charCodeAt(position)]!;
+      const previousExact = exact;
+      exact = ((exact << 1) | 1) & mask;
+      // match | substitution | insertion | deletion
+      oneEdit = (((oneEdit << 1) | 1) & mask) | (previousExact << 1) | 1 | previousExact | (exact << 1);
+      if ((oneEdit & goal) !== 0) {
+        hits.push(entry);
+        break;
+      }
+    }
+  }
+  for (let index = 0; index < length; index += 1) characterMasks[pattern.charCodeAt(index)] = 0;
+  return hits;
 }
 
 export function tokenize(query: string): string[] {
@@ -147,6 +207,20 @@ export function search(terms: readonly string[], document: SearchDocument): Sear
         if (at < 0) continue;
         contentHits.push(entry);
         contentScore = Math.max(contentScore, (at === 0 ? 70 : 45) + (entry.lower.length === term.length ? 20 : 0));
+      }
+      // No exact hit: OCR may have misread the word. Try the confusion-folded form, then one edit away (long terms only).
+      if (contentScore === 0 && term.length >= 3) {
+        const foldedTerm = foldConfusables(term);
+        for (const entry of document.content) {
+          if (!folded(entry).includes(foldedTerm)) continue;
+          contentHits.push(entry);
+          contentScore = 38;
+        }
+        if (contentScore === 0 && foldedTerm.length >= 5) {
+          const near = nearlyContaining(document.content, foldedTerm);
+          contentHits.push(...near);
+          if (near.length > 0) contentScore = 30;
+        }
       }
       if (contentScore > 0) best = Math.max(best, contentScore + Math.min(contentHits.length, 20));
     }

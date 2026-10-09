@@ -5,6 +5,8 @@
 import { FFIType } from 'bun:ffi';
 
 import D3d11 from '@bun-win32/d3d11';
+import Dcomp from '@bun-win32/dcomp';
+import Dwmapi from '@bun-win32/dwmapi';
 import Kernel32 from '@bun-win32/kernel32';
 import { CTX_CLEAR_RENDER_TARGET_VIEW, DEV_CREATE_RENDER_TARGET_VIEW, SWAP_GET_BUFFER, SWAP_PRESENT } from '@bun-win32/gpu';
 
@@ -43,6 +45,8 @@ const DXGI_OBJECT_GET_PARENT = 6;
 const SWAP_CHAIN_RESIZE_BUFFERS = 13;
 const SWAP_CHAIN2_GET_FRAME_LATENCY_WAITABLE_OBJECT = 33;
 const SWAP_CHAIN2_SET_MAXIMUM_FRAME_LATENCY = 31;
+
+let compositorClock = true;
 
 export interface Device {
   adapterName: string;
@@ -184,8 +188,18 @@ export class CompositionSurface {
     this.#acquireBackBuffer();
   }
 
-  /** Block until the compositor is ready for the next frame (frame-latency 1 — the lowest-latency pacing DXGI offers). */
+  /** Block until the compositor's next frame. A composition swap chain retires presents immediately, so neither Present
+   *  nor the frame-latency waitable paces the loop on its own (measured: ~2,000 unpaced frames per second). The DWM
+   *  compositor clock (Windows 11; DwmFlush before that) ticks exactly once per displayed frame. */
   waitForFrame(timeoutMilliseconds = 100): void {
+    if (compositorClock) {
+      try {
+        Dcomp.DCompositionWaitForCompositorClock(0, null, timeoutMilliseconds);
+      } catch {
+        compositorClock = false;
+      }
+    }
+    if (!compositorClock) Dwmapi.DwmFlush();
     if (this.#waitable !== 0n) Kernel32.WaitForSingleObjectEx(this.#waitable, timeoutMilliseconds, 1);
   }
 

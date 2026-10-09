@@ -25,7 +25,7 @@ import { ThumbnailHost } from './thumbnails';
 import type { Tray } from './tray';
 import { accentColor, type Rgb, tinted, type Typography, typography, white } from './theme';
 import { loadWallpaper, type Wallpaper } from './wallpaper';
-import { activateWindow, closeWindow, enumerateWindows, isWindowAlive, type WindowInfo } from './windows';
+import { activateWindow, closeWindow, enumerateWindows, isWindowAlive, readClipboardText, type WindowInfo } from './windows';
 import { type InputEvent, OverlayWindow } from './window';
 
 const HOTKEY_SUMMON = 1;
@@ -34,7 +34,7 @@ const WM_RBUTTONUP = 0x0205;
 const MOD_ALT = 0x0001;
 const MOD_NOREPEAT = 0x4000;
 const VK_OEM_3 = 0xc0;
-const VK = { back: 0x08, down: 0x28, end: 0x23, enter: 0x0d, escape: 0x1b, f1: 0x70, home: 0x24, left: 0x25, right: 0x27, tab: 0x09, up: 0x26, w: 0x57 } as const;
+const VK = { a: 0x41, back: 0x08, down: 0x28, end: 0x23, enter: 0x0d, escape: 0x1b, f1: 0x70, home: 0x24, left: 0x25, right: 0x27, tab: 0x09, up: 0x26, v: 0x56, w: 0x57 } as const;
 const MONITOR_DEFAULTTONEAREST = 2;
 const FULL_UV: readonly [number, number, number, number] = [0, 0, 1, 1];
 const COLOPHON_WIDTH = 560;
@@ -137,11 +137,15 @@ export class Iris {
   #pointerDirty = false;
   #query = '';
   #queryChangedAt = 0;
+  /** Ctrl+A: the whole query is selected — the next character replaces it, Backspace clears it. */
+  #querySelected = false;
   #selected: Card | null = null;
   #state: State = 'hidden';
   #stats = { indexedWindows: 0, indexedWords: 0, indexing: '' };
   #time = 0;
   #index = new Map<bigint, IndexedText[]>();
+  /** Capture frame count when each window was last read: new frames since then mean its text may have changed. */
+  #framesAtRead = new Map<bigint, number>();
   #visibleOrder: Card[] = [];
   #wallpaper: Wallpaper | null = null;
   #thumbnails = new ThumbnailHost();
@@ -164,6 +168,9 @@ export class Iris {
     this.surface = new CompositionSurface(this.device, this.window.hwnd, 64, 64);
     this.text = new TextAtlas(this.renderer);
     this.icons = new IconAtlas(this.renderer);
+    // DirectWrite loads each font face on first use (tens of ms); pay that at boot, not when the first labels land.
+    for (const style of Object.values(this.type)) this.text.get('Iris · 0123456789 — every window', style);
+    this.text.flush();
     initializeCapture(this.device);
     this.hotkeyAvailable = User32.RegisterHotKey(this.window.hwnd, HOTKEY_SUMMON, MOD_ALT | MOD_NOREPEAT, VK_OEM_3) !== 0;
     if (!this.hotkeyAvailable) console.warn('[iris] Alt+` is taken by another app (another Iris?) — use the tray icon instead.');
@@ -201,6 +208,7 @@ export class Iris {
       let card = this.#cards.get(window.hwnd);
       if (card === undefined) {
         card = new Card(window, this.#homeFor(window), this.accent);
+        this.icons.get(window.executablePath);
         card.capture = WindowCapture.create(window.hwnd, this.device, this.renderer);
         this.#cards.set(window.hwnd, card);
         this.#options.indexer?.request(window, 'new');
@@ -217,6 +225,7 @@ export class Iris {
       card.capture?.release();
       this.#cards.delete(hwnd);
       this.#index.delete(hwnd);
+      this.#framesAtRead.delete(hwnd);
       this.#options.indexer?.forget(hwnd);
       if (this.#selected === card) this.#selected = null;
     }
@@ -254,7 +263,8 @@ export class Iris {
   #applyIndex(update: IndexUpdate): void {
     const card = this.#cards.get(update.hwnd);
     if (update.kind === 'scanning') {
-      if (card !== undefined) {
+      // No sweep for a hidden re-read: it would replay the next time Iris opens.
+      if (card !== undefined && (this.#state !== 'hidden' || !this.#index.has(update.hwnd))) {
         if (card.scan < 0) card.scan = 0;
         card.scanning = true;
       }
@@ -263,6 +273,7 @@ export class Iris {
     }
     this.#stats.indexing = '';
     if (card !== undefined) card.scanning = false;
+    this.#framesAtRead.set(update.hwnd, card?.capture?.frames ?? 0);
     if (update.entries !== null) {
       this.#index.set(update.hwnd, update.entries);
       this.#stats.indexedWindows = this.#index.size;
@@ -334,6 +345,7 @@ export class Iris {
       card.launched = false;
     }
     this.#query = '';
+    this.#querySelected = false;
     this.#runSearch();
     this.#flowFocus.snap(0);
     this.#backdrop.snap(0);
@@ -502,7 +514,8 @@ export class Iris {
     if (this.#state !== 'open') return;
     switch (event.kind) {
       case 'character':
-        this.#query += event.text;
+        this.#query = this.#querySelected ? event.text : this.#query + event.text;
+        this.#querySelected = false;
         this.#queryChangedAt = this.#time;
         this.#runSearch(true);
         return;
@@ -533,6 +546,21 @@ export class Iris {
   }
 
   #handleKey(virtualKey: number, control: boolean, shift: boolean): void {
+    if (control && virtualKey === VK.a) {
+      this.#querySelected = this.#query.length > 0;
+      return;
+    }
+    if (control && virtualKey === VK.v) {
+      const pasted = readClipboardText(this.window.hwnd).split(/\r?\n/)[0]!.trim().slice(0, 200);
+      if (pasted.length === 0) return;
+      this.#query = this.#querySelected ? pasted : this.#query + pasted;
+      this.#querySelected = false;
+      this.#queryChangedAt = this.#time;
+      this.#runSearch(true);
+      return;
+    }
+    const selected = this.#querySelected;
+    this.#querySelected = false;
     switch (virtualKey) {
       case VK.escape:
         if (this.#query.length > 0) {
@@ -545,7 +573,8 @@ export class Iris {
         return;
       case VK.back:
         if (this.#query.length === 0) return;
-        this.#query = control ? this.#query.replace(/\S+\s*$/, '') : Array.from(this.#query).slice(0, -1).join('');
+        if (selected) this.#query = '';
+        else this.#query = control ? this.#query.replace(/\S+\s*$/, '') : Array.from(this.#query).slice(0, -1).join('');
         this.#queryChangedAt = this.#time;
         this.#runSearch(true);
         return;
@@ -630,6 +659,7 @@ export class Iris {
     if (this.#state === 'open' && now - this.#lastEnumeration > 1000) {
       const before = this.#order.map((card) => `${card.window.hwnd}:${card.window.title}`).join('|');
       this.refreshWindows();
+      this.#refreshStaleIndex();
       if (this.#order.map((card) => `${card.window.hwnd}:${card.window.title}`).join('|') !== before) this.#runSearch();
     }
     this.pollCaptures();
@@ -719,10 +749,31 @@ export class Iris {
     this.#closeChosen = null;
   }
 
-  /** The resident loop's idle work: keep window textures warm (~5 Hz) and the window list current (~1 Hz). */
+  /** When the reader is idle, re-read the stalest window whose pixels changed since its last read (each at most every
+   *  30 s), so what is on screen now is what search finds — one window per tick, on the worker. */
+  #refreshStaleIndex(): void {
+    const indexer = this.#options.indexer;
+    if (indexer === null || indexer.pending > 0) return;
+    let stalest: Card | null = null;
+    let stalestAge = 30_000;
+    for (const card of this.#order) {
+      if ((card.capture?.frames ?? 0) === this.#framesAtRead.get(card.window.hwnd)) continue;
+      const age = indexer.age(card.window.hwnd);
+      if (age < stalestAge) continue;
+      stalest = card;
+      stalestAge = age;
+    }
+    if (stalest !== null) indexer.request(stalest.window, 'new');
+  }
+
+  /** The resident loop's idle work: keep window textures warm (~5 Hz), the window list current and stale text re-read
+   *  (~1 Hz). */
   backgroundTick(): void {
     const now = performance.now();
-    if (now - this.#lastEnumeration > 1000) this.refreshWindows();
+    if (now - this.#lastEnumeration > 1000) {
+      this.refreshWindows();
+      this.#refreshStaleIndex();
+    }
     if (now - this.#lastBackgroundPoll > 200) {
       this.pollCaptures();
       this.#lastBackgroundPoll = now;
@@ -834,7 +885,7 @@ export class Iris {
     const inverse = 1 / settledScale;
     const unit = ui * inverse;
     const pad = 22 * unit;
-    const icon = this.icons.get(card.window.executablePath);
+    const icon = this.icons.peek(card.window.executablePath);
     let cursorY = -halfHeight + pad;
     if (icon !== null) {
       const size = 40;
@@ -891,7 +942,7 @@ export class Iris {
       const settledWidth = (card.window.bounds.width * card.target.scale) / ui;
       const maxWidth = Math.max(60, Math.round((settledWidth - 34) / 8) * 8);
       const title = this.text.get(card.window.title, this.type.title, maxWidth, this.#emphasis(result?.titleRanges ?? []));
-      const icon = this.icons.get(card.window.executablePath);
+      const icon = this.icons.peek(card.window.executablePath);
       const iconSize = 20;
       const total = title.inkWidth + (icon === null ? 0 : iconSize + 8);
       const left = -total / 2;
@@ -997,10 +1048,17 @@ export class Iris {
     }
     const query = this.text.get(this.#query.length === 0 ? ' ' : this.#query, type.query, textWidth);
     const queryWidth = this.#query.length === 0 ? 0 : query.inkWidth;
+    const selected = this.#querySelected && this.#query.length > 0;
+    if (selected) {
+      const selection: PanelStyle = { border: [0, 0, 0, 0], fill: tinted(this.accent, 0.38), frost: 0, frostBrightness: 0, opacity: chrome, radius: 5, shadow: 0, shadowSigma: 0, sheen: 0 };
+      renderer.panel(textX - 4, bar.y + 13, queryWidth + 8, bar.height - 26, selection, uv);
+    }
     if (this.#query.length > 0) renderer.text(textX - query.padding, bar.y + (bar.height - query.inkHeight) / 2 - query.padding, query.width, query.height, this.text.view, query.uv, [1, 1, 1, 1], chrome);
-    const blink = 0.5 + 0.5 * Math.cos((this.#time - this.#queryChangedAt) * Math.PI * 2 * 0.9);
-    const caret: PanelStyle = { border: [0, 0, 0, 0], fill: tinted(this.accent, 1), frost: 0, frostBrightness: 0, opacity: chrome * (0.25 + 0.75 * blink), radius: 1, shadow: 0, shadowSigma: 0, sheen: 0 };
-    renderer.panel(textX + queryWidth + (this.#query.length === 0 ? -5 : 2), bar.y + 15, 2, bar.height - 30, caret, uv);
+    if (!selected) {
+      const blink = 0.5 + 0.5 * Math.cos((this.#time - this.#queryChangedAt) * Math.PI * 2 * 0.9);
+      const caret: PanelStyle = { border: [0, 0, 0, 0], fill: tinted(this.accent, 1), frost: 0, frostBrightness: 0, opacity: chrome * (0.25 + 0.75 * blink), radius: 1, shadow: 0, shadowSigma: 0, sheen: 0 };
+      renderer.panel(textX + queryWidth + (this.#query.length === 0 ? -5 : 2), bar.y + 15, 2, bar.height - 30, caret, uv);
+    }
 
     const matching = this.#visibleOrder.length;
     const countLabel = this.#query.length > 0 ? `${matching} of ${this.#order.length}` : this.#stats.indexing.length > 0 ? 'reading…' : `${this.#stats.indexedWords.toLocaleString('en-US')} words`;

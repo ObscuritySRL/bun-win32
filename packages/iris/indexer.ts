@@ -69,6 +69,12 @@ export class Indexer {
     this.#pump();
   }
 
+  /** Milliseconds since `hwnd` was last read (Infinity if never). */
+  age(hwnd: bigint): number {
+    const read = this.#lastRead.get(hwnd);
+    return read === undefined ? Infinity : performance.now() - read;
+  }
+
   /** A window is gone: drop its bookkeeping and any queued read. */
   forget(hwnd: bigint): void {
     this.#lastRead.delete(hwnd);

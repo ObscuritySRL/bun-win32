@@ -111,9 +111,11 @@ async function runScript(): Promise<void> {
           await advance(0.09);
         }
         break;
-      case 'key':
-        inject({ alt: false, control: argument.startsWith('ctrl+'), kind: 'key', shift: argument.startsWith('shift+'), virtualKey: virtualKeys[argument.replace(/^(ctrl|shift)\+/, '')] ?? argument.toUpperCase().charCodeAt(0) });
+      case 'key': {
+        const name = argument.replace(/^(ctrl|shift)\+/, '');
+        inject({ alt: false, control: argument.startsWith('ctrl+'), kind: 'key', shift: argument.startsWith('shift+'), virtualKey: virtualKeys[name] ?? name.toUpperCase().charCodeAt(0) });
         break;
+      }
       case 'move': {
         const [x = '0', y = '0'] = argument.split(/\s+/);
         inject({ kind: 'pointer-move', x: Number(x), y: Number(y) });
