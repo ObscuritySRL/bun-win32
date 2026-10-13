@@ -27,6 +27,8 @@ export const sceneLayout = cbufferLayout({
   counts: 'float4',
   tertiary: 'float4',
   shadowStyle: 'float4',
+  highlight: 'float4',
+  highlightStyle: 'float4',
 });
 
 export const fullscreenVertexShader = `struct Varyings { float4 position : SV_Position; };
@@ -58,6 +60,8 @@ export const scenePixelShader = `cbuffer Scene : register(b0) {
   float4 counts;       // bin count, mark count, bar pitch (px), unused
   float4 tertiary;
   float4 shadowStyle;  // ambient blur, ambient opacity, key blur, key offset (all px / opacity)
+  float4 highlight;    // a found word: left, top, right, bottom (moment px)
+  float4 highlightStyle; // opacity, pulse (0..1)
 };
 
 Texture2D<float4> momentTexture : register(t0);
@@ -132,6 +136,17 @@ float4 main(float4 position : SV_Position) : SV_Target {
       picture = lerp(picture, accent.rgb, saturate(border + glow) * regionOpacity);
     }
 
+    if (highlightStyle.x > 0.0) {
+      // A found word: a soft accent halo around exactly where it was.
+      float pixelsPerMoment = (card.z - card.x) / moment.x;
+      float2 wordCenter = (highlight.xy + highlight.zw) * 0.5;
+      float2 wordHalf = (highlight.zw - highlight.xy) * 0.5 + 3.0 / pixelsPerMoment;
+      float wordDistance = roundedBox(momentPixel - wordCenter, wordHalf, 4.0 / pixelsPerMoment) * pixelsPerMoment;
+      float ring = saturate(1.8 - abs(wordDistance)) + exp(-max(wordDistance, 0.0) / (7.0 * viewport.z)) * (0.35 + 0.25 * highlightStyle.y);
+      picture = lerp(picture, accent.rgb, saturate(ring) * highlightStyle.x);
+      picture += accentGlow.rgb * 0.10 * highlightStyle.x * step(wordDistance, 0.0);
+    }
+
     if (cursor.z > 0.0) {
       float pixelsPerMoment = (card.z - card.x) / moment.x;
       float ring = abs(length((momentPixel - cursor.xy) * pixelsPerMoment) - cursor.w);
@@ -153,7 +168,7 @@ float4 main(float4 position : SV_Position) : SV_Target {
       float hairline = saturate(1.0 - abs(shelfDistance + 0.5)) * smoothstep(shelfCenter.y, shelf.y, pixel.y);
       panel = lerp(panel, float3(1.0, 1.0, 1.0), hairline * 0.09);
 
-      if (pixel.x >= track.x && pixel.x <= track.z && pixel.y >= track.y - 10.0 && pixel.y <= track.w + 10.0) {
+      if (pixel.x >= track.x - 6.0 * viewport.z && pixel.x <= track.z + 6.0 * viewport.z && pixel.y >= track.y - 10.0 * viewport.z && pixel.y <= track.w + 12.0 * viewport.z) {
         float trackWidth = track.z - track.x;
         float pitch = counts.z;
         float barIndex = floor((pixel.x - track.x) / pitch);
@@ -170,7 +185,13 @@ float4 main(float4 position : SV_Position) : SV_Target {
 
         [loop] for (uint index = 0; index < (uint)counts.y; index++) {
           float4 mark = marks[index];
-          if (mark.z > 0.5) {
+          if (mark.z > 1.5) {
+            // A found word: an accent dot under the track (larger when selected).
+            float radius = (mark.z > 2.5 ? 3.4 : 2.2) * viewport.z;
+            float matchDistance = length(pixel - float2(mark.x, track.w + 6.0 * viewport.z));
+            panel = lerp(panel, accent.rgb, saturate(radius - matchDistance));
+            if (mark.z > 2.5) panel += accentGlow.rgb * exp(-matchDistance / (5.0 * viewport.z)) * 0.3;
+          } else if (mark.z > 0.5) {
             if (pixel.x >= mark.x && pixel.x <= mark.y) {
               float stripe = step(0.5, frac((pixel.x + pixel.y) / (6.0 * viewport.z)));
               panel = lerp(panel, tertiary.rgb, 0.22 * stripe);

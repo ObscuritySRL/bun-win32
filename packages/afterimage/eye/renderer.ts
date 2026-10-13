@@ -55,8 +55,8 @@ export interface Surface {
 }
 
 export interface Mark {
-  /** 0 for a moment (dot at `from`), 1 for a gap (hatched span from–to). */
-  kind: 0 | 1;
+  /** 0 a moment (dot at `from`), 1 a gap (hatched span from–to), 2 a found word, 3 the selected found word. */
+  kind: 0 | 1 | 2 | 3;
   from: number;
   to: number;
 }

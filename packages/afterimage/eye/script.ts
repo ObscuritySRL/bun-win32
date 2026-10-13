@@ -272,6 +272,9 @@ export async function runScript(options: ScriptOptions): Promise<void> {
         console.log(`[script] clip ${name}.mp4 (${frames} frames)`);
         break;
       }
+      case 'read':
+        await eye.read();
+        break;
       case 'pause':
       case 'resume':
         eye.send({ type: command });

@@ -17,7 +17,8 @@ export class GpuFence {
   readonly #fence: bigint;
   #value = 0n;
 
-  private constructor(context4: bigint, fence: bigint, event: bigint) {
+  /** Use `create()`, which returns null where the platform lacks the feature. */
+  constructor(context4: bigint, fence: bigint, event: bigint) {
     this.#context4 = context4;
     this.#fence = fence;
     this.#event = event;

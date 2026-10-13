@@ -5,12 +5,13 @@
 // quarter of the resolution, in their own dedup keyspace; when they settle, their final state is
 // recorded crisp. Video becomes a flipbook; words stay pixel-perfect.
 
-import type { Gap } from '../shared/protocol';
+import type { Gap, TileRegion } from '../shared/protocol';
 import { Composer } from './composer';
 import type { FrameSource } from './duplication';
 import { Fingerprinter, tileSize } from './fingerprint';
 import { Journal } from './journal';
 import { reduce } from './resample';
+import { type ReadWord, TextIndex } from './textindex';
 import type { TileStore } from './store';
 
 const heatCeiling = 16;
@@ -20,6 +21,10 @@ const hotInterval = 500;
 const hotThreshold = 4;
 const reducedKeyspace = 0x5a5a_5a5a;
 const reopenInterval = 1_000;
+/** Pixels must hold still this long before they are read: what flickers past isn't text anyone read either. */
+const settleTime = 800;
+/** OCR needs context: a region read only where pixels changed cuts lines and words at its edges. */
+const readingPadding = { across: 6, down: 1 } as const;
 
 export interface RecorderTotals {
   changedTiles: number;
@@ -33,6 +38,18 @@ export interface RecorderTotals {
 
 export type CaptureOutcome = 'frame' | 'idle' | 'lost' | 'recovered';
 
+/** A region of settled pixels to read, and the frames that frame its reading. */
+export interface ReadingJob {
+  /** Each tile's latest change when the read began — a word appeared when the tiles under it last changed. */
+  changedAt: Map<number, number>;
+  /** The frame whose pixels are read. */
+  frame: number;
+  region: TileRegion;
+  /** The frame the region's content appeared (its latest change). */
+  since: number;
+  tiles: number[];
+}
+
 export class Recorder {
   readonly composer: Composer;
   readonly fingerprinter: Fingerprinter;
@@ -40,11 +57,15 @@ export class Recorder {
   /** Newest frame already sent to the eye while it is open. */
   sentThrough = -1;
   readonly source: FrameSource;
+  /** Every word read from this display, with the frames it was visible. */
+  readonly text: TextIndex;
   readonly #clock: () => number;
   #cursorX = -1;
   #cursorY = -1;
   #gapKind: Gap['kind'] | null = null;
   #gapStart = 0;
+  readonly #changedEpoch: Float64Array;
+  readonly #changedFrame: Int32Array;
   readonly #heat: Uint8Array;
   #lastCapture = -Infinity;
   #lastHot = 0;
@@ -55,6 +76,7 @@ export class Recorder {
   readonly #recordedReduced: Uint8Array;
   readonly #store: TileStore;
   readonly #totals: RecorderTotals;
+  readonly #unread: Uint8Array;
 
   /** `clock` gives epoch milliseconds: Date.now for the desktop, the stage's virtual clock for tests. */
   constructor(source: FrameSource, store: TileStore, totals: RecorderTotals, clock: () => number) {
@@ -66,8 +88,12 @@ export class Recorder {
     this.fingerprinter = new Fingerprinter(width, height);
     this.journal = new Journal(this.fingerprinter.tileCount);
     this.composer = new Composer(width, height, this.fingerprinter.tilesAcross, this.journal, store);
+    this.text = new TextIndex(this.fingerprinter.tilesAcross);
     const tiles = this.fingerprinter.tileCount;
+    this.#changedEpoch = new Float64Array(tiles);
+    this.#changedFrame = new Int32Array(tiles).fill(-1);
     this.#heat = new Uint8Array(tiles);
+    this.#unread = new Uint8Array(tiles);
     this.#pending = new Uint8Array(tiles);
     this.#recordedHigh = new Uint32Array(tiles);
     this.#recordedLow = new Uint32Array(tiles);
@@ -200,6 +226,12 @@ export class Recorder {
       journal.record(recordTiles[index]!, frame, blob);
     }
     this.#totals.changedTiles += recordTiles.length;
+    for (const tile of recordTiles) {
+      this.#changedEpoch[tile] = epoch;
+      this.#changedFrame[tile] = frame;
+      this.#unread[tile] = this.#recordedReduced[tile] === 1 ? 0 : 1;
+    }
+    this.text.close(recordTiles, frame);
     return 'frame';
   }
 
@@ -215,8 +247,77 @@ export class Recorder {
     this.#gapKind = null;
   }
 
+  /**
+   * Words OCR found in a region read at `job.frame`: visible since the region settled, and already
+   * over for any tile that has changed since the read began.
+   */
+  indexWords(words: readonly ReadWord[], job: ReadingJob): void {
+    const offsetX = job.region.left * tileSize;
+    const offsetY = job.region.top * tileSize;
+    const { tilesAcross } = this.fingerprinter;
+    for (const word of words) {
+      const rect: [number, number, number, number] = [word.rect[0] + offsetX, word.rect[1] + offsetY, word.rect[2] + offsetX, word.rect[3] + offsetY];
+      let since = this.journal.firstFrame;
+      for (let y = Math.floor(rect[1] / tileSize); y <= Math.floor((rect[3] - 1) / tileSize); y += 1) {
+        for (let x = Math.floor(rect[0] / tileSize); x <= Math.floor((rect[2] - 1) / tileSize); x += 1) since = Math.max(since, job.changedAt.get(y * tilesAcross + x) ?? job.since);
+      }
+      this.text.add([{ line: word.line, rect, text: word.text }], since);
+    }
+    for (const tile of job.tiles) if (this.#changedFrame[tile]! > job.frame) this.text.close([tile], this.#changedFrame[tile]!);
+  }
+
+  /**
+   * The next region worth reading: unread tiles (not photographic) that have held still for
+   * `settleTime` (or any unread tiles when `settle` is set), grouped by connectivity.
+   */
+  nextReading(now: number, settle: boolean): ReadingJob | null {
+    const { tilesAcross, tilesDown } = this.fingerprinter;
+    const ready = (tile: number): boolean => this.#unread[tile] === 1 && (settle || now - this.#changedEpoch[tile]! >= settleTime);
+    for (let start = 0; start < this.#unread.length; start += 1) {
+      if (!ready(start)) continue;
+      const tiles: number[] = [];
+      const queue = [start];
+      this.#unread[start] = 0;
+      let [left, top, right, bottom] = [tilesAcross, tilesDown, 0, 0];
+      let since = -1;
+      while (queue.length > 0) {
+        const tile = queue.pop()!;
+        tiles.push(tile);
+        const x = tile % tilesAcross;
+        const y = Math.floor(tile / tilesAcross);
+        left = Math.min(left, x);
+        top = Math.min(top, y);
+        right = Math.max(right, x + 1);
+        bottom = Math.max(bottom, y + 1);
+        since = Math.max(since, this.#changedFrame[tile]!);
+        for (const [neighbourX, neighbourY] of [
+          [x - 1, y],
+          [x + 1, y],
+          [x, y - 1],
+          [x, y + 1],
+        ] as const) {
+          if (neighbourX < 0 || neighbourY < 0 || neighbourX >= tilesAcross || neighbourY >= tilesDown) continue;
+          const neighbour = neighbourY * tilesAcross + neighbourX;
+          if (!ready(neighbour)) continue;
+          this.#unread[neighbour] = 0;
+          queue.push(neighbour);
+        }
+      }
+      left = Math.max(0, left - readingPadding.across);
+      right = Math.min(tilesAcross, right + readingPadding.across);
+      top = Math.max(0, top - readingPadding.down);
+      bottom = Math.min(tilesDown, bottom + readingPadding.down);
+      const changedAt = new Map<number, number>();
+      for (let y = top; y < bottom; y += 1) for (let x = left; x < right; x += 1) changedAt.set(y * tilesAcross + x, this.#changedFrame[y * tilesAcross + x]!);
+      return { changedAt, frame: this.journal.lastFrame, region: { bottom, left, right, top }, since: Math.max(since, this.journal.firstFrame), tiles };
+    }
+    return null;
+  }
+
   /** Forget everything this display remembers. */
   forget(): void {
+    this.text.clear();
+    this.#unread.fill(0);
     this.journal.clear((blob) => this.#store.release(blob));
     this.composer.forgetAll();
     this.fingerprinter.invalidate();

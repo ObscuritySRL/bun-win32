@@ -11,6 +11,7 @@ import Shell32 from '@bun-win32/shell32';
 
 import type { DisplayInfo, EyeMessage, MemoryMessage, MemoryStats, TileRegion, WorkerOptions } from '../shared/protocol';
 import { Duplication, type FrameSource, findOutputs } from './duplication';
+import { OcrReader } from './reader';
 import { Recorder, type RecorderTotals } from './recorder';
 import { Stage } from './stage';
 import { TileStore } from './store';
@@ -37,6 +38,9 @@ let openRecorder: Recorder | null = null;
 let paused = false;
 let pendingSeek: { frame: number; request: number } | null = null;
 let quitting = false;
+let reader: OcrReader | null = null;
+let reading = false;
+const readWaiters: (() => void)[] = [];
 let seekQueued = false;
 let stage: Stage | null = null;
 
@@ -73,8 +77,10 @@ async function boot(options: WorkerOptions): Promise<void> {
   }
   const clock = stage === null ? Date.now : (): number => options.stageEpoch + stage!.time;
   for (const source of sources) recorders.push(new Recorder(source, store, totals, clock));
+  readerClock = clock;
+  reader = OcrReader.create();
   await captureAll();
-  post({ adapter, bootMilliseconds: performance.now() - startedAt, displays: recorders.map(describe), type: 'ready' });
+  post({ adapter, bootMilliseconds: performance.now() - startedAt, displays: recorders.map(describe), reading: reader !== null, type: 'ready' });
   if (stage === null) scheduleCapture();
 }
 
@@ -89,6 +95,46 @@ async function captureAll(): Promise<void> {
   }
   enforceBudget();
   postStats();
+  scheduleReading();
+}
+
+let readerClock: () => number = Date.now;
+
+/**
+ * Read one settled region at a time. Decoding its pixels from the journal happens here, in the
+ * serial queue; the OCR itself runs on Windows' thread pool while captures carry on, and its words
+ * are indexed back inside the queue.
+ */
+function scheduleReading(): void {
+  // Someone is waiting for the backlog: read everything unread, settled or not.
+  const settle = readWaiters.length > 0;
+  if (reading) return;
+  if (reader === null || paused || locked) {
+    for (const resolve of readWaiters.splice(0)) resolve();
+    return;
+  }
+  for (const recorder of recorders) {
+    const job = recorder.nextReading(readerClock(), settle);
+    if (job === null) continue;
+    reading = true;
+    const { bitmap, height, width } = recorder.composer.export(job.frame, job.region);
+    const ocr = reader;
+    void ocr
+      .read(bitmap, width, height)
+      .then((words) =>
+        serial(() => {
+          recorder.indexWords(words, job);
+          reading = false;
+          scheduleReading();
+        }),
+      )
+      .catch(() => {
+        reading = false;
+        scheduleReading();
+      });
+    return;
+  }
+  for (const resolve of readWaiters.splice(0)) resolve();
 }
 
 function describe(recorder: Recorder): DisplayInfo {
@@ -123,6 +169,7 @@ function enforceBudget(): void {
     journal.evictBefore(journal.firstFrame + Math.max(1, Math.ceil((journal.frameCount * evictionPercent) / 100)), release);
   }
   if (freed.size > 0) for (const recorder of recorders) recorder.composer.forget(freed);
+  for (const recorder of recorders) if (recorder.journal.frameCount > 0) recorder.text.evictBefore(recorder.journal.firstFrame);
 }
 
 async function exportFrame(frame: number, region: TileRegion | null, request: number, target: 'clipboard' | 'png'): Promise<void> {
@@ -211,7 +258,7 @@ function scheduleSeek(): void {
 }
 
 function usedBytes(): number {
-  return store.bytes + recorders.reduce((sum, recorder) => sum + recorder.journal.bytes, 0);
+  return store.bytes + recorders.reduce((sum, recorder) => sum + recorder.journal.bytes + recorder.text.bytes, 0);
 }
 
 self.onmessage = (event: MessageEvent<EyeMessage>) => {
@@ -279,6 +326,11 @@ self.onmessage = (event: MessageEvent<EyeMessage>) => {
         process.exit(0);
       });
       break;
+    case 'read':
+      // Never block the serial queue on reading: each job's words are indexed through that queue.
+      readWaiters.push(() => post({ type: 'read' }));
+      serial(scheduleReading);
+      break;
     case 'regionStep':
       serial(() => {
         if (openRecorder === null) return;
@@ -300,6 +352,19 @@ self.onmessage = (event: MessageEvent<EyeMessage>) => {
         post({ reason: null, state: 'recording', type: 'recording' });
       });
       break;
+    case 'search': {
+      const recorder = openRecorder ?? recorders[0];
+      if (recorder === undefined) break;
+      const matches = recorder.text.search(message.query, recorder.journal.lastFrame).filter((found) => found.lastFrame >= recorder.journal.firstFrame);
+      post({
+        matches: matches.map(({ firstFrame, lastFrame, line, rect, text }) => ({ firstFrame: Math.max(firstFrame, recorder.journal.firstFrame), lastFrame, line, rect, text })),
+        query: message.query,
+        reading: reader !== null,
+        request: message.request,
+        type: 'found',
+      });
+      break;
+    }
     case 'seek':
       pendingSeek = { frame: message.frame, request: message.request };
       scheduleSeek();

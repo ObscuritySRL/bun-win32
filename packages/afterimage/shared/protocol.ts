@@ -22,6 +22,16 @@ export interface DisplayInfo {
   width: number;
 }
 
+/** A word the past contained: where it was and the frames it was visible. */
+export interface Match {
+  firstFrame: number;
+  lastFrame: number;
+  line: string;
+  /** Screen pixels: left, top, right, bottom. */
+  rect: [number, number, number, number];
+  text: string;
+}
+
 /** Tile-space rectangle, inclusive of `left/top`, exclusive of `right/bottom`. */
 export interface TileRegion {
   bottom: number;
@@ -80,9 +90,11 @@ export type EyeMessage =
   | { type: 'lock' }
   | { type: 'pause' }
   | { type: 'quit' }
+  | { type: 'read' }
   | { type: 'regionStep'; direction: -1 | 1; frame: number; region: TileRegion; request: number }
   | { type: 'release'; view: 0 | 1 }
   | { type: 'resume' }
+  | { query: string; request: number; type: 'search' }
   | { type: 'seek'; frame: number; request: number }
   | { type: 'stage'; milliseconds: number }
   | { type: 'unlock' };
@@ -92,8 +104,10 @@ export type MemoryMessage =
   | { type: 'error'; message: string }
   | { type: 'exported'; bitmap: Uint8Array<ArrayBuffer> | null; height: number; path: string | null; request: number; width: number }
   | { type: 'forgotten' }
+  | { matches: Match[]; query: string; reading: boolean; request: number; type: 'found' }
   | { type: 'opened'; display: number; frame: number; slice: TimelineSlice; view: 0 | 1 }
-  | { type: 'ready'; adapter: number; bootMilliseconds: number; displays: DisplayInfo[] }
+  | { type: 'read' }
+  | { type: 'ready'; adapter: number; bootMilliseconds: number; displays: DisplayInfo[]; reading: boolean }
   | { type: 'recording'; reason: string | null; state: 'paused' | 'recording' | 'unavailable' }
   | { type: 'shown'; changedTiles: Uint32Array<ArrayBuffer>; composeMilliseconds: number; frame: number; request: number; view: 0 | 1 }
   | { type: 'staged'; milliseconds: number }

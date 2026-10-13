@@ -4,7 +4,7 @@
 // desktop and frame-by-frame on a virtual clock in headless mode.
 
 import type { Color, Painter } from '../shared/painter';
-import type { DisplayInfo, Gap, MemoryStats, TileRegion, TimelineSlice } from '../shared/protocol';
+import type { DisplayInfo, Gap, Match, MemoryStats, TileRegion, TimelineSlice } from '../shared/protocol';
 import { copy, formatBytes, formatSpan } from './copy';
 import { layout, palette, radius, shadow, shimmer, space, type } from './design';
 import { EditableText, parseGoTo } from './goto';
@@ -23,6 +23,8 @@ const keys = {
   end: 0x23,
   enter: 0x0d,
   escape: 0x1b,
+  f: 0x46,
+  f3: 0x72,
   home: 0x24,
   left: 0x25,
   p: 0x50,
@@ -40,10 +42,10 @@ const wheelStep = 0.04;
 
 export interface ViewHost {
   clipboardText(): string;
-  closed(): void;
   export(frame: number, region: TileRegion | null, target: 'clipboard' | 'png'): void;
   forget(): void;
   regionStep(frame: number, direction: -1 | 1, region: TileRegion): void;
+  search(query: string): void;
   seek(frame: number): void;
   togglePause(): void;
 }
@@ -87,10 +89,17 @@ export class View {
   #followLive = true;
   #forgetArmedAt = -Infinity;
   #frame = -1;
-  readonly #goTo = new EditableText();
-  #goToError = false;
-  #goToOpen = false;
-  readonly #goToSpring: Spring;
+  readonly #canRead: boolean;
+  readonly #field = new EditableText();
+  #fieldMessage: string | null = null;
+  #fieldOpen = false;
+  readonly #fieldSpring: Spring;
+  readonly #highlight: Spring;
+  /** Every visibility of the searched words, most recent first. */
+  #matches: Match[] = [];
+  #matchesQuery = '';
+  #searchDue = Infinity;
+  #selected = 0;
   readonly #history: History;
   readonly #host: ViewHost;
   readonly #hover: Spring;
@@ -114,7 +123,8 @@ export class View {
   readonly #tint: Spring;
   #toast: { at: number; text: string } | null = null;
 
-  constructor(host: ViewHost, renderer: Renderer, display: DisplayInfo, scale: number, diagnostics: Diagnostics, epochNow: () => number, now: number) {
+  constructor(host: ViewHost, renderer: Renderer, display: DisplayInfo, scale: number, diagnostics: Diagnostics, epochNow: () => number, now: number, canRead = true) {
+    this.#canRead = canRead;
     this.#host = host;
     this.#renderer = renderer;
     this.display = display;
@@ -133,7 +143,8 @@ export class View {
     this.#regionOpacity = new Spring(Characters.fade, 0, now);
     this.#regionEdges = [new Spring(Characters.glide, 0, now), new Spring(Characters.glide, 0, now), new Spring(Characters.glide, 0, now), new Spring(Characters.glide, 0, now)];
     this.#details = new Spring(Characters.fade, 0, now);
-    this.#goToSpring = new Spring(Characters.rise, 0, now);
+    this.#fieldSpring = new Spring(Characters.rise, 0, now);
+    this.#highlight = new Spring(Characters.fade, 0, now);
   }
 
   /** On the way out (until the exit finishes or the hotkey turns it around). */
@@ -152,10 +163,11 @@ export class View {
 
   /** Is anything still moving (or about to)? Idle frames are skipped entirely. */
   animating(now: number): boolean {
-    const springs = [this.#lift, this.#backdrop, this.#shelf, this.#pill, this.#inspect, this.#playhead, this.#hover, this.#tint, this.#regionOpacity, this.#details, this.#goToSpring, ...this.#regionEdges];
+    const springs = [this.#lift, this.#backdrop, this.#shelf, this.#pill, this.#inspect, this.#playhead, this.#hover, this.#tint, this.#regionOpacity, this.#details, this.#fieldSpring, this.#highlight, ...this.#regionEdges];
     if (springs.some((spring) => !spring.settled(now, 0.000_2))) return true;
     if (now - this.#shimmerStart < shimmer.duration) return true;
     if (this.#toast !== null && now - this.#toast.at < toastDuration + 400) return true;
+    if (this.#fieldOpen || this.#searchDue !== Infinity || this.#matches.length > 0) return true;
     return this.#closeRequested;
   }
 
@@ -181,8 +193,9 @@ export class View {
   close(now: number): void {
     if (this.#closeRequested) return;
     this.#closeRequested = true;
-    this.#goToOpen = false;
-    this.#goToSpring.retarget(0, now);
+    this.#fieldOpen = false;
+    this.#fieldSpring.retarget(0, now);
+    this.#matches = [];
     this.#details.retarget(0, now);
     this.#drag = null;
     this.#followLive = true;
@@ -201,6 +214,16 @@ export class View {
   /** True once the exit choreography has finished and the window may disappear. */
   finished(now: number): boolean {
     return this.#closeRequested && this.#lift.target === 0 && this.#lift.settled(now, 0.001) && this.#backdrop.settled(now, 0.001);
+  }
+
+  /** The memory answered a search. Typing previews the most recent match straight away. */
+  found(matches: readonly Match[], query: string, now: number): void {
+    if (query !== this.#field.text.trim() || this.#closeRequested) return;
+    this.#matches = [...matches];
+    this.#matchesQuery = query;
+    this.#selected = 0;
+    this.#lastMarksVersion = '';
+    if (this.#matches.length > 0) this.#showMatch();
   }
 
   handle(events: readonly InputEvent[], now: number): void {
@@ -262,6 +285,19 @@ export class View {
     const [cursorX, cursorY] = this.#history.count > 0 ? this.#history.cursor(this.#shownFrame) : [-1, -1];
     const regionValues = this.#regionEdges.map((edge) => edge.value(now));
     const shimmerIntensity = Math.max(0, 1 - (now - this.#shimmerStart) / shimmer.duration) ** 2;
+    if (now >= this.#searchDue) {
+      this.#searchDue = Infinity;
+      const query = this.#field.text.trim();
+      if (query.length >= 2) this.#host.search(query);
+      else {
+        this.#matches = [];
+        this.#lastMarksVersion = '';
+      }
+    }
+    const match = this.#matches[this.#selected];
+    const lit = match !== undefined && this.#shownFrame >= match.firstFrame && this.#shownFrame <= match.lastFrame;
+    this.#highlight.retarget(lit ? 1 : 0, now);
+    const pulse = 0.5 + 0.5 * Math.sin(now / 260);
     return {
       accent: [...palette.accent],
       accentGlow: [...palette.accentGlow],
@@ -270,6 +306,8 @@ export class View {
       counts: [this.#binCount(), this.#renderer.markCount, 3 * scale, 0],
       cursor: [cursorX, cursorY, cursorX >= 0 && !live ? this.#tint.value(now) * 0.9 : 0, 9 * scale],
       glass: [...palette.glass],
+      highlight: match === undefined ? [0, 0, 0, 0] : [...match.rect],
+      highlightStyle: [Math.max(0, this.#highlight.value(now)), pulse, 0, 0],
       ink: [...palette.ink],
       moment: [width, height, this.display.tilesAcross, this.display.tilesDown],
       now: [...palette.now],
@@ -366,7 +404,7 @@ export class View {
       const screenWidth = this.display.width / scale;
       this.#drawPill(painter, screenWidth / 2, 0, screenWidth, layout.topMargin - (1 - inspect) * space(3), Math.min(1, inspect) * Math.min(1, Math.max(0, this.#pill.value(now))));
     }
-    this.#drawGoTo(painter, now);
+    this.#drawFind(painter, now);
     this.#drawDetails(painter, now);
     this.#drawToast(painter, now, geometry);
   }
@@ -424,11 +462,12 @@ export class View {
     this.#regionEdges.forEach((edge, index) => edge.retarget(snapped[index]!, now));
   }
 
+  /** Typing anywhere opens Find (a word to search, or a time to go to); ? toggles the details. */
   #character(text: string, now: number): void {
     if (this.#closeRequested || text < ' ') return;
-    if (this.#goToOpen) {
-      this.#goTo.insert(text);
-      this.#goToError = false;
+    if (this.#fieldOpen) {
+      this.#field.insert(text);
+      this.#queryChanged(now);
       return;
     }
     if (text === '?') {
@@ -436,13 +475,10 @@ export class View {
       this.#details.retarget(this.#detailsOpen ? 1 : 0, now);
       return;
     }
-    if (/[0-9:]/.test(text)) {
-      this.#goToOpen = true;
-      this.#goTo.clear();
-      this.#goTo.insert(text);
-      this.#goToError = false;
-      this.#goToSpring.retarget(1, now);
-    }
+    if (text === ' ') return;
+    this.#openField(now);
+    this.#field.insert(text);
+    this.#queryChanged(now);
   }
 
   #clearRegion(now: number): void {
@@ -485,17 +521,18 @@ export class View {
     });
   }
 
-  #drawGoTo(painter: Painter, now: number): void {
-    const opacity = Math.max(0, Math.min(1, this.#goToSpring.value(now)));
+  #drawFind(painter: Painter, now: number): void {
+    const opacity = Math.max(0, Math.min(1, this.#fieldSpring.value(now)));
     if (opacity < 0.01) return;
-    const width = 420;
-    const height = 112;
+    const width = 520;
+    const height = 136;
     const left = (this.display.width / this.#scale - width) / 2;
-    const top = this.display.height / this.#scale / 2 - height / 2 + space(4) * (1 - opacity);
+    // Near the top of the card, like a command palette, so the words it finds stay in view.
+    const top = this.#geometry(now).card.top / this.#scale + space(8) + space(4) * (1 - opacity);
     painter.fillRoundedRectangle(left, top, width, height, radius.shelf, [palette.glass[0], palette.glass[1], palette.glass[2], 0.97 * opacity]);
     painter.strokeRoundedRectangle(left + 0.5, top + 0.5, width - 1, height - 1, radius.shelf, 1 / this.#scale, [1, 1, 1, 0.1 * opacity]);
-    painter.text(copy.goTo, type.caption, left + space(5), top + space(4), width, space(4), [palette.textTertiary[0], palette.textTertiary[1], palette.textTertiary[2], opacity]);
-    const field = this.#goTo;
+    painter.text(copy.find, type.caption, left + space(5), top + space(4), width, space(4), [palette.textTertiary[0], palette.textTertiary[1], palette.textTertiary[2], opacity]);
+    const field = this.#field;
     const [selectionStart, selectionEnd] = field.selection;
     const before = field.text.slice(0, selectionStart);
     const [beforeWidth] = painter.measure(before, type.display);
@@ -507,15 +544,32 @@ export class View {
     const [caretOffset] = painter.measure(field.text.slice(0, field.caret), type.display);
     const caretVisible = Math.floor(now / 530) % 2 === 0;
     if (caretVisible) painter.fillRectangle(textLeft + caretOffset + 1, textTop + 4, 2 / this.#scale + 1, 28, [palette.accent[0], palette.accent[1], palette.accent[2], opacity]);
-    painter.text(
-      this.#goToError ? copy.goToUnknown : copy.goToHint,
-      type.caption,
-      left + space(5),
-      top + height - space(7),
-      width,
-      space(4),
-      this.#goToError ? [palette.accent[0], palette.accent[1], palette.accent[2], opacity] : [palette.textTertiary[0], palette.textTertiary[1], palette.textTertiary[2], opacity],
-    );
+    const [status, snippet] = this.#findStatus();
+    painter.text(status, type.caption, left + space(5), top + height - space(12), width - space(10), space(4), [palette.textSecondary[0], palette.textSecondary[1], palette.textSecondary[2], opacity]);
+    if (snippet !== '') painter.text(snippet, type.caption, left + space(5), top + height - space(7), width - space(10), space(4), [palette.accent[0], palette.accent[1], palette.accent[2], opacity]);
+  }
+
+  #clearMatches(): void {
+    this.#matches = [];
+    this.#matchesQuery = '';
+    this.#lastMarksVersion = '';
+  }
+
+  /** What the Find panel says under the field, and the line the selected match came from. */
+  #findStatus(): [string, string] {
+    if (this.#fieldMessage !== null) return [this.#fieldMessage, ''];
+    const query = this.#field.text.trim();
+    const match = this.#matches[this.#selected];
+    if (match !== undefined && this.#matchesQuery === query) {
+      const age = formatAge(Math.max(0, this.#epochNow() - this.#history.epoch(match.lastFrame)));
+      const line = match.line.length > 64 ? `${match.line.slice(0, 63)}…` : match.line;
+      return [copy.findCount(this.#matches.length), `“${line}” · ${age}`];
+    }
+    const epoch = parseGoTo(query, this.#epochNow());
+    if (epoch !== null) return [copy.findGoTo(formatClock(epoch)), ''];
+    if (!this.#canRead) return [copy.findUnavailable, ''];
+    if (query.length >= 2 && this.#matchesQuery === query && this.#searchDue === Infinity) return [copy.findNone(formatSpan(this.#span())), ''];
+    return [copy.findHint, ''];
   }
 
   /** The time pill, centred on `anchor` (DIPs) within [minimum, maximum]: above the shelf at the playhead, or top-centre at full size. */
@@ -580,29 +634,39 @@ export class View {
     return { card, lift, shelf, shelfOpacity: Math.max(0, Math.min(1, shelfVisibility)), track };
   }
 
-  #goToKey(key: number, control: boolean, shift: boolean, now: number): void {
-    const field = this.#goTo;
+  /** Keys while Find is open: text editing, ↑ ↓ through matches, Enter to stay or go, Esc to leave. */
+  #fieldKey(key: number, control: boolean, shift: boolean, now: number): void {
+    const field = this.#field;
     switch (key) {
       case keys.escape:
-        this.#goToOpen = false;
-        this.#goToSpring.retarget(0, now);
+        this.#fieldOpen = false;
+        this.#fieldSpring.retarget(0, now);
+        this.#clearMatches();
         return;
       case keys.enter: {
-        const epoch = parseGoTo(field.text, this.#epochNow());
-        if (epoch === null) {
-          this.#goToError = true;
+        if (this.#matches.length > 0) {
+          this.#fieldOpen = false;
+          this.#fieldSpring.retarget(0, now);
           return;
         }
-        this.#goToOpen = false;
-        this.#goToSpring.retarget(0, now);
+        const epoch = parseGoTo(field.text, this.#epochNow());
+        if (epoch === null) return;
+        this.#fieldOpen = false;
+        this.#fieldSpring.retarget(0, now);
         this.#seekEpoch(epoch);
         return;
       }
+      case keys.up:
+      case keys.down:
+        this.#stepMatch(key === keys.up ? 1 : -1, now);
+        return;
       case keys.backspace:
         field.backspace(control);
+        this.#queryChanged(now);
         return;
       case keys.delete:
         field.deleteForward();
+        this.#queryChanged(now);
         return;
       case keys.left:
       case keys.right:
@@ -618,7 +682,9 @@ export class View {
         if (control) field.selectAll();
         return;
       case keys.v:
-        if (control) field.paste(this.#host.clipboardText());
+        if (!control) return;
+        field.paste(this.#host.clipboardText());
+        this.#queryChanged(now);
         return;
     }
   }
@@ -634,13 +700,14 @@ export class View {
   #key(key: number, control: boolean, shift: boolean, repeat: boolean, now: number): void {
     if (this.#closeRequested) return;
     this.#repeats = repeat ? this.#repeats + 1 : 0;
-    if (this.#goToOpen) {
-      this.#goToKey(key, control, shift, now);
+    if (this.#fieldOpen) {
+      this.#fieldKey(key, control, shift, now);
       return;
     }
     switch (key) {
       case keys.escape:
-        if (this.#region !== null) this.#clearRegion(now);
+        if (this.#matches.length > 0) this.#clearMatches();
+        else if (this.#region !== null) this.#clearRegion(now);
         else if (this.#detailsOpen) {
           this.#detailsOpen = false;
           this.#details.retarget(0, now);
@@ -657,7 +724,14 @@ export class View {
       }
       case keys.up:
       case keys.down:
-        this.#stepMoment(key === keys.up ? -1 : 1);
+        if (this.#matches.length > 0) this.#stepMatch(key === keys.up ? 1 : -1, now);
+        else this.#stepMoment(key === keys.up ? -1 : 1);
+        return;
+      case keys.f:
+        if (control) this.#openField(now);
+        return;
+      case keys.f3:
+        this.#stepMatch(shift ? -1 : 1, now);
         return;
       case keys.home:
         this.#followLive = false;
@@ -737,6 +811,13 @@ export class View {
     this.#playhead.retarget(position, now);
   }
 
+  #openField(now: number): void {
+    this.#fieldOpen = true;
+    this.#field.selectAll();
+    this.#fieldMessage = null;
+    this.#fieldSpring.retarget(1, now);
+  }
+
   #pointer(x: number, y: number, now: number): void {
     const geometry = this.#geometry(now);
     const overTrack = x >= geometry.track.left && x <= geometry.track.right && y >= geometry.shelf.top && y <= geometry.shelf.bottom;
@@ -755,6 +836,12 @@ export class View {
     const edges = [Math.min(startX, endX), Math.min(startY, endY), Math.max(startX, endX), Math.max(startY, endY)];
     this.#regionEdges.forEach((edge, index) => edge.set(edges[index]!, now));
     this.#regionOpacity.retarget(1, now);
+  }
+
+  /** The field changed: search shortly (typing pauses are short), and forget a stale message. */
+  #queryChanged(now: number): void {
+    this.#fieldMessage = null;
+    this.#searchDue = now + 90;
   }
 
   #rightStatus(): string {
@@ -795,9 +882,25 @@ export class View {
     return copy.hints;
   }
 
+  /** Show the selected match: the last frame its word was on screen. */
+  #showMatch(): void {
+    const match = this.#matches[this.#selected];
+    if (match === undefined) return;
+    this.#followLive = match.lastFrame >= this.#history.lastFrame;
+    this.#seek(match.lastFrame);
+    this.#lastMarksVersion = '';
+  }
+
   #stepFrames(delta: number): void {
     this.#followLive = this.#frame + delta >= this.#history.lastFrame;
     this.#seek(this.#frame + delta);
+  }
+
+  /** Older (+1) or newer (-1) match, wrapping around. */
+  #stepMatch(direction: -1 | 1, now: number): void {
+    if (this.#matches.length === 0) return;
+    this.#selected = (this.#selected + direction + this.#matches.length) % this.#matches.length;
+    this.#showMatch();
   }
 
   #stepMoment(direction: -1 | 1): void {
@@ -834,7 +937,7 @@ export class View {
 
   #uploadMarks(track: Rectangle, span: number): void {
     const epochNow = this.#epochNow();
-    const version = `${this.#history.count}|${this.#history.gaps.length}|${Math.floor(epochNow / 500)}|${track.left}|${track.right}`;
+    const version = `${this.#history.count}|${this.#history.gaps.length}|${Math.floor(epochNow / 500)}|${track.left}|${track.right}|${this.#matches.length}|${this.#selected}|${this.#matchesQuery}`;
     if (version === this.#lastMarksVersion) return;
     this.#lastMarksVersion = version;
     const width = track.right - track.left;
@@ -845,6 +948,7 @@ export class View {
       marks.push({ from: Math.min(from, to), kind: 1, to: Math.max(from, to) });
     }
     for (const moment of this.#history.moments) marks.push({ from: track.right - positionOfAge(epochNow - this.#history.epoch(moment), span) * width, kind: 0, to: 0 });
-    this.#renderer.setMarks(marks.slice(-256));
+    const found = this.#matches.slice(0, 96).map((match, index): Mark => ({ from: track.right - positionOfAge(epochNow - this.#history.epoch(match.lastFrame), span) * width, kind: index === this.#selected ? 3 : 2, to: 0 }));
+    this.#renderer.setMarks([...marks.slice(-(256 - found.length)), ...found]);
   }
 }

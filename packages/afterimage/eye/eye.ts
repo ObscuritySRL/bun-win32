@@ -75,12 +75,15 @@ export class Eye {
   #paused = false;
   #pendingExports = 0;
   #pendingRelease: 0 | 1 | null = null;
+  #pendingSearches = 0;
   #pendingSteps = 0;
+  #reading = false;
   readonly #presenter: Presenter;
   #query = 0n;
   #ready: Promise<void>;
   #renderer: Renderer | null = null;
   #request = 0;
+  readonly #readWaiters: (() => void)[] = [];
   readonly #stageWaiters: (() => void)[] = [];
   #textures: [bigint, bigint][] = [];
   #view: View | null = null;
@@ -94,6 +97,7 @@ export class Eye {
     this.#ready = new Promise((resolve) => {
       worker.onmessage = (event: MessageEvent<MemoryMessage>) => {
         if (event.data.type === 'ready') {
+          this.#reading = event.data.reading;
           this.#boot(event.data.adapter, event.data.displays, event.data.bootMilliseconds);
           resolve();
         } else this.#receive(event.data);
@@ -106,7 +110,7 @@ export class Eye {
 
   /** Waiting on the memory for something (an open, a seek, a step, an export, a stage advance). */
   get busy(): boolean {
-    return this.#opening !== null || (this.#view !== null && this.#latestShown < this.#latestSeek) || this.#pendingSteps > 0 || this.#pendingExports > 0 || this.#stageWaiters.length > 0;
+    return this.#opening !== null || (this.#view !== null && this.#latestShown < this.#latestSeek) || this.#pendingSteps > 0 || this.#pendingExports > 0 || this.#pendingSearches > 0 || this.#stageWaiters.length > 0;
   }
 
   get displays(): readonly DisplayInfo[] {
@@ -145,6 +149,14 @@ export class Eye {
   /** Forward a raw protocol message (pause, budget, quit…). */
   send(message: EyeMessage): void {
     this.#send(message);
+  }
+
+  /** Let the memory finish reading every settled region (tests and media scripts). */
+  read(): Promise<void> {
+    return new Promise((resolve) => {
+      this.#readWaiters.push(resolve);
+      this.#send({ type: 'read' });
+    });
   }
 
   /** Advance the stage's virtual clock and let the memory record it. */
@@ -240,7 +252,10 @@ export class Eye {
   #host(): ViewHost {
     return {
       clipboardText: () => this.#callbacks.readClipboardText(),
-      closed: () => {},
+      search: (query: string) => {
+        this.#pendingSearches += 1;
+        this.#send({ query, request: ++this.#request, type: 'search' });
+      },
       export: (frame: number, region: TileRegion | null, target: 'clipboard' | 'png') => {
         this.#pendingExports += 1;
         this.#send({ frame, region, request: ++this.#request, target, type: 'export' });
@@ -276,7 +291,7 @@ export class Eye {
     const renderer = this.#renderer!;
     const { scale } = this.#presenter.surface(display);
     const now = this.#clock.now();
-    const view = new View(this.#host(), renderer, display, scale, this.diagnostics, () => this.#clock.epoch(), now);
+    const view = new View(this.#host(), renderer, display, scale, this.diagnostics, () => this.#clock.epoch(), now, this.#reading);
     this.#currentView = viewIndex;
     this.#pendingRelease = null;
     renderer.setMoment(this.#textures[displayIndex]![viewIndex]);
@@ -320,6 +335,14 @@ export class Eye {
           this.#callbacks.copyImage(message.bitmap);
           this.#view?.toast(copy.copied, now);
         } else this.#view?.toast(copy.saved, now);
+        break;
+      case 'found':
+        this.#pendingSearches = Math.max(0, this.#pendingSearches - 1);
+        this.#view?.found(message.matches, message.query, now);
+        this.#dirty = true;
+        break;
+      case 'read':
+        this.#readWaiters.shift()?.();
         break;
       case 'forgotten':
         this.#view?.toast(copy.forgotten, now);
