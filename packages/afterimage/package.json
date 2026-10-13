@@ -1,0 +1,52 @@
+{
+  "author": "Stev Peifer <stev.p@outlook.com>",
+  "bugs": {
+    "url": "https://github.com/ObscuritySRL/bun-win32/issues"
+  },
+  "dependencies": {
+    "@bun-win32/advapi32": "workspace:*",
+    "@bun-win32/core": "workspace:*",
+    "@bun-win32/d2d1": "workspace:*",
+    "@bun-win32/dwmapi": "workspace:*",
+    "@bun-win32/dwrite": "workspace:*",
+    "@bun-win32/gdi32": "workspace:*",
+    "@bun-win32/gpu": "workspace:*",
+    "@bun-win32/kernel32": "workspace:*",
+    "@bun-win32/shcore": "workspace:*",
+    "@bun-win32/shell32": "workspace:*",
+    "@bun-win32/user32": "workspace:*"
+  },
+  "description": "Afterimage — press a key and scrub your screen back in time. Every changed pixel of the last hour, kept only in memory: DXGI desktop duplication, GPU tile fingerprinting, a content-addressed zstd journal and a capture-excluded Direct3D 11 overlay, all TypeScript on Bun.",
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "engines": {
+    "bun": ">=1.4.0"
+  },
+  "exports": {
+    ".": "./index.ts"
+  },
+  "files": ["DESIGN.md", "README.md", "build.ts", "eye/*.ts", "index.ts", "memory/*.ts", "shared/*.ts", "!**/*.test.ts"],
+  "homepage": "https://github.com/ObscuritySRL/bun-win32#readme",
+  "keywords": ["bun", "d3d11", "desktop-duplication", "dxgi", "ffi", "history", "rewind", "screen", "time-travel", "typescript", "win32", "windows"],
+  "license": "MIT",
+  "main": "./index.ts",
+  "module": "index.ts",
+  "name": "@bun-win32/afterimage",
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "private": false,
+  "repository": {
+    "directory": "packages/afterimage",
+    "type": "git",
+    "url": "git://github.com/ObscuritySRL/bun-win32.git"
+  },
+  "scripts": {
+    "build": "bun run build.ts",
+    "start": "bun run index.ts",
+    "test": "bun test"
+  },
+  "type": "module",
+  "version": "1.0.0"
+}
