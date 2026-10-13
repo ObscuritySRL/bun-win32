@@ -33,6 +33,12 @@ export const D2D1SolidColorBrush = { SetColor: 0x08, SetOpacity: 0x04 } as const
 
 export const D3D11Device = { OpenSharedResource: 0x1c } as const;
 
+export const D3D11Device5 = { CreateFence: 0x44 } as const;
+
+export const D3D11DeviceContext4 = { Signal: 0x93, Wait: 0x94 } as const;
+
+export const D3D11Fence = { GetCompletedValue: 0x08, SetEventOnCompletion: 0x09 } as const;
+
 export const DWriteFactory = { CreateTextFormat: 0x0f, CreateTextLayout: 0x12, GetSystemFontCollection: 0x03 } as const;
 
 export const DWriteFontCollection = { FindFamilyName: 0x05 } as const;
@@ -61,6 +67,9 @@ export const DXGISwapChain2 = { GetFrameLatencyWaitableObject: 0x21, SetMaximumF
 
 export const IID = {
   ID2D1Factory1: 'bb12d362-daee-4b9a-aa1d-14ba401cfa1f',
+  ID3D11Device5: '8ffde202-a0e7-45df-9e01-e837801b5ea0',
+  ID3D11DeviceContext4: '917600da-f58c-4c33-98d8-3e15b390fa24',
+  ID3D11Fence: 'affde9d1-1df7-4bb7-8a34-0f46251dab80',
   IDWriteFactory: 'b859ee5a-d838-4b5b-a2e8-1adc7d93db48',
   IDWriteTextLayout1: '9064d822-80a7-465c-a986-df65f78b8feb',
   IDXGIFactory2: '50c83a1c-e072-4c48-87b0-3630fa36a6d0',

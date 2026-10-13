@@ -59,6 +59,8 @@ export interface EyeCallbacks {
 export class Eye {
   readonly diagnostics: Diagnostics = { bootMilliseconds: 0, composeMilliseconds: 0, frameMedian: 0, frameWorst: 0, openMilliseconds: 0, refreshHertz: 0, stats: null };
   readonly frames = new FrameMeter();
+  /** Every open's hotkey-to-visible time, for honest reporting. */
+  readonly openSamples: number[] = [];
   readonly #callbacks: EyeCallbacks;
   readonly #clock: Clock;
   #currentView: 0 | 1 = 0;
@@ -286,6 +288,7 @@ export class Eye {
     this.#presenter.present();
     this.#presenter.reveal();
     this.diagnostics.openMilliseconds = this.#clock.now() - opening.at;
+    this.openSamples.push(this.diagnostics.openMilliseconds);
     view.exhale(this.#clock.now());
     this.#view = view;
     this.frames.rest();

@@ -175,7 +175,9 @@ export async function runShell(): Promise<void> {
       return { action, at: Number(at) };
     });
   const startedAt = performance.now();
-  const cpuStart = process.cpuUsage();
+  let cpuStart = process.cpuUsage();
+  let markedAt = startedAt;
+  let storedAtMark = 0;
   let lastTooltip = 0;
   while (running) {
     window.pump();
@@ -200,7 +202,11 @@ export async function runShell(): Promise<void> {
       if (verb === 'open') eye.open(displayUnderPointer(eye.displays));
       else if (verb === 'quit') running = false;
       else if (verb === 'relaunch') restartAt = performance.now();
-      else if (verb === 'snap') presenter.snapshot = `${Bun.env.AFTERIMAGE_SHOTS ?? '.'}/${argument}.png`;
+      else if (verb === 'mark') {
+        cpuStart = process.cpuUsage();
+        markedAt = performance.now();
+        storedAtMark = eye.diagnostics.stats?.storedBytes ?? 0;
+      } else if (verb === 'snap') presenter.snapshot = `${Bun.env.AFTERIMAGE_SHOTS ?? '.'}/${argument}.png`;
       else if (verb === 'wheel') forView.push({ delta: Number(argument), horizontal: false, type: 'wheel' });
       else if (verb === 'key') {
         const key = { Escape: 0x1b, Left: 0x25, Right: 0x27, Space: 0x20 }[argument ?? ''] ?? 0;
@@ -231,6 +237,13 @@ export async function runShell(): Promise<void> {
   }
   if (autopilot.length > 0 || Bun.env.AFTERIMAGE_AUTOPILOT !== undefined) {
     const cpu = process.cpuUsage(cpuStart);
+    const seconds = (performance.now() - markedAt) / 1_000;
+    console.log(
+      JSON.stringify({
+        openSamples: eye.openSamples,
+        sinceMark: { cpuPercent: ((cpu.user + cpu.system) / 1_000 / (seconds * 1_000)) * 100, megabytesPerMinute: (((eye.diagnostics.stats?.storedBytes ?? 0) - storedAtMark) / 0x10_0000 / seconds) * 60, seconds },
+      }),
+    );
     const { diagnostics, frames } = eye;
     console.log(
       JSON.stringify({

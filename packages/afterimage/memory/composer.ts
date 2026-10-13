@@ -45,6 +45,7 @@ import {
 import { callOut, queryInterface } from '../shared/com';
 import type { TileRegion } from '../shared/protocol';
 import { DXGIResource, IID } from '../shared/slots';
+import { GpuFence } from './fence';
 import { tileSize } from './fingerprint';
 import type { Journal } from './journal';
 import { isReduced, restore } from './resample';
@@ -96,6 +97,7 @@ export class Composer {
   readonly handles: [bigint, bigint];
   readonly #atlas: TextureResult;
   readonly #available: [boolean, boolean] = [true, true];
+  readonly #gpuFence = GpuFence.create();
   readonly #height: number;
   readonly #journal: Journal;
   readonly #pixelShader: bigint;
@@ -213,6 +215,7 @@ export class Composer {
   }
 
   dispose(): void {
+    this.#gpuFence?.dispose();
     comRelease(this.#query);
     for (const renderTarget of this.#renderTargets) comRelease(renderTarget);
     for (const texture of this.#textures) comRelease(texture);
@@ -309,8 +312,12 @@ export class Composer {
     setRenderTargets([]);
   }
 
-  /** Wait (without blocking the event loop) until the GPU has executed everything issued so far. */
+  /** Wait until the GPU has executed everything issued so far (a real fence where available). */
   async #fence(): Promise<void> {
+    if (this.#gpuFence !== null) {
+      this.#gpuFence.wait();
+      return;
+    }
     const { context } = requireGpu();
     const done = new Int32Array(new ArrayBuffer(4));
     vcall(context, CTX_END, [FFIType.u64], [this.#query], FFIType.void);

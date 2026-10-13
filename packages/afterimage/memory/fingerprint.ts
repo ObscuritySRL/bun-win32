@@ -35,6 +35,7 @@ import {
 import Kernel32 from '@bun-win32/kernel32';
 
 import { callOut, check } from '../shared/com';
+import { GpuFence } from './fence';
 
 export const tileSize = 64;
 const stripAcross = 32;
@@ -94,10 +95,14 @@ void main(uint3 group : SV_GroupID, uint3 local : SV_GroupThreadID, uint flat : 
   if (flat == 0) tiles[group.y * tilesAcross + group.x] = uint4(sharedChanged, sharedHashHigh, sharedHashLow, sharedRuns);
 }`;
 
-/** Poll a staging resource until the GPU is done with it; returns (address, rowPitch). The event loop stays live. */
-export async function mapWhenReady(resource: bigint): Promise<[bigint, number]> {
+/**
+ * Map a staging resource once the GPU is done with it; returns (address, rowPitch). With a fence the
+ * worker sleeps exactly until completion; without one it polls, keeping the event loop live.
+ */
+export async function mapWhenReady(resource: bigint, fence: GpuFence | null): Promise<[bigint, number]> {
   const { context } = requireGpu();
   const mapped = new DataView(new ArrayBuffer(16));
+  fence?.wait();
   for (;;) {
     const result = vcall(context, CTX_MAP, [FFIType.u64, FFIType.u32, FFIType.u32, FFIType.u32, FFIType.ptr], [resource, 0, D3D11_MAP_READ, D3D11_MAP_FLAG_DO_NOT_WAIT, ptr(mapped)]);
     if (result >>> 0 === DXGI_ERROR_WAS_STILL_DRAWING) {
@@ -129,6 +134,7 @@ export class Fingerprinter {
   readonly tilesDown: number;
   readonly width: number;
   #currentIndex = 1;
+  readonly #fence = GpuFence.create();
   readonly #frames: [TextureResult, TextureResult];
   #fresh = true;
   readonly #parameters: bigint;
@@ -210,7 +216,7 @@ export class Fingerprinter {
         );
       }
       vcall(context, CTX_FLUSH, [], [], FFIType.void);
-      const [address, rowPitch] = await mapWhenReady(this.#strip.tex);
+      const [address, rowPitch] = await mapWhenReady(this.#strip.tex, this.#fence);
       const rowsUsed = Math.ceil(count / stripAcross) * tileSize;
       if (rowPitch * rowsUsed > this.#stripBytes.length) this.#stripBytes = new Uint8Array(new ArrayBuffer(rowPitch * stripDown * tileSize));
       copyFromAddress(address, this.#stripBytes, rowPitch * rowsUsed);
@@ -232,6 +238,7 @@ export class Fingerprinter {
   }
 
   release(): void {
+    this.#fence?.dispose();
     for (const frame of this.#frames) comRelease(frame.tex);
     comRelease(this.#strip.tex);
     comRelease(this.#tileInfo.buffer);
@@ -242,7 +249,7 @@ export class Fingerprinter {
 
   /** Per tile: [changed, hashHigh, hashLow, runs]. Valid until the next call. */
   async tiles(): Promise<Uint32Array> {
-    const [address] = await mapWhenReady(this.#tileStaging);
+    const [address] = await mapWhenReady(this.#tileStaging, this.#fence);
     copyFromAddress(address, new Uint8Array(this.#tileWords.buffer), this.tileCount * 16);
     unmap(this.#tileStaging);
     if (this.#fresh) {
