@@ -43,12 +43,12 @@ class Vssapi extends Win32 {
     VssFreeSnapshotPropertiesInternal: { args: [FFIType.ptr], returns: FFIType.void },
   } as const satisfies Record<string, FFIFunction>;
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/vsbackup/nf-vsbackup-createvssbackupcomponents
+  // https://learn.microsoft.com/en-us/windows/win32/api/vsbackup/nf-vsbackup-createvssbackupcomponentsinternal
   public static CreateVssBackupComponentsInternal(ppBackup_out: PPIVSSBACKUPCOMPONENTS): HRESULT {
     return Vssapi.Load('CreateVssBackupComponentsInternal')(ppBackup_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/vsbackup/nf-vsbackup-createvssexaminewritermetadata
+  // https://learn.microsoft.com/en-us/windows/win32/api/vsbackup/nf-vsbackup-createvssexaminewritermetadatainternal
   public static CreateVssExamineWriterMetadataInternal(bstrXML: BSTR, ppMetadata_out: PPIVSSEXAMINEWRITERMETADATA): HRESULT {
     return Vssapi.Load('CreateVssExamineWriterMetadataInternal')(bstrXML, ppMetadata_out);
   }
@@ -68,7 +68,7 @@ class Vssapi extends Win32 {
     return Vssapi.Load('IsVolumeSnapshotted')(pwszVolumeName, pbSnapshotsPresent_out, plSnapshotCapability_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/vsbackup/nf-vsbackup-isvolumesnapshotted
+  // https://learn.microsoft.com/en-us/windows/win32/api/vsbackup/nf-vsbackup-isvolumesnapshottedinternal
   public static IsVolumeSnapshottedInternal(pwszVolumeName: VSS_PWSZ, pbSnapshotsPresent_out: PBOOL, plSnapshotCapability_out: PLONG): HRESULT {
     return Vssapi.Load('IsVolumeSnapshottedInternal')(pwszVolumeName, pbSnapshotsPresent_out, plSnapshotCapability_out);
   }
@@ -78,7 +78,7 @@ class Vssapi extends Win32 {
     return Vssapi.Load('ShouldBlockRevert')(wszVolumeName, pbBlock_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/vsbackup/nf-vsbackup-shouldblockrevert
+  // Undocumented export (no Microsoft Learn page).
   public static ShouldBlockRevertInternal(wszVolumeName: LPCWSTR, pbBlock_out: PBOOL): HRESULT {
     return Vssapi.Load('ShouldBlockRevertInternal')(wszVolumeName, pbBlock_out);
   }
@@ -88,7 +88,7 @@ class Vssapi extends Win32 {
     return Vssapi.Load('VssFreeSnapshotProperties')(pProp);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/vsbackup/nf-vsbackup-vssfreesnapshotproperties
+  // https://learn.microsoft.com/en-us/windows/win32/api/vsbackup/nf-vsbackup-vssfreesnapshotpropertiesinternal
   public static VssFreeSnapshotPropertiesInternal(pProp: PVSS_SNAPSHOT_PROP): void {
     return Vssapi.Load('VssFreeSnapshotPropertiesInternal')(pProp);
   }

@@ -202,8 +202,8 @@ class Dwmapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dwmapi/nf-dwmapi-dwmshowcontact
-  public static DwmShowContact(dwPointerID: DWORD, showContact: DWM_SHOWCONTACT): HRESULT {
-    return Dwmapi.Load('DwmShowContact')(dwPointerID, showContact);
+  public static DwmShowContact(dwPointerID: DWORD, eShowContact: DWM_SHOWCONTACT): HRESULT {
+    return Dwmapi.Load('DwmShowContact')(dwPointerID, eShowContact);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dwmapi/nf-dwmapi-dwmtethercontact

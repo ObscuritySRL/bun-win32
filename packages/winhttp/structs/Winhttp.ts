@@ -9,7 +9,6 @@ import type {
   HINTERNET,
   INT,
   INTERNET_PORT,
-  INTERNET_SCHEME,
   LPBOOL,
   LPCVOID,
   LPCWSTR,
@@ -95,10 +94,8 @@ class Winhttp extends Win32 {
     WinHttpGetProxyResult: { args: [FFIType.u64, FFIType.ptr], returns: FFIType.u32 },
     WinHttpGetProxyResultEx: { args: [FFIType.u64, FFIType.ptr], returns: FFIType.u32 },
     WinHttpGetProxySettingsVersion: { args: [FFIType.u64, FFIType.ptr], returns: FFIType.u32 },
-    WinHttpIsHostInProxyBypassList: { args: [FFIType.ptr, FFIType.ptr, FFIType.i32, FFIType.u16, FFIType.ptr], returns: FFIType.u32 },
     WinHttpOpen: { args: [FFIType.ptr, FFIType.u32, FFIType.ptr, FFIType.ptr, FFIType.u32], returns: FFIType.u64 },
     WinHttpOpenRequest: { args: [FFIType.u64, FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.u32], returns: FFIType.u64 },
-    WinHttpQueryAuthParams: { args: [FFIType.u64, FFIType.u32, FFIType.ptr], returns: FFIType.i32 },
     WinHttpQueryAuthSchemes: { args: [FFIType.u64, FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
     WinHttpQueryConnectionGroup: { args: [FFIType.u64, FFIType.ptr, FFIType.u64, FFIType.ptr], returns: FFIType.u32 },
     WinHttpQueryDataAvailable: { args: [FFIType.u64, FFIType.ptr], returns: FFIType.i32 },
@@ -160,8 +157,8 @@ class Winhttp extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winhttp/nf-winhttp-winhttpcreateproxyresolver
-  public static WinHttpCreateProxyResolver(hSession: HINTERNET, phResolver: LPHINTERNET): DWORD {
-    return Winhttp.Load('WinHttpCreateProxyResolver')(hSession, phResolver);
+  public static WinHttpCreateProxyResolver(hSession: HINTERNET, phResolver_out: LPHINTERNET): DWORD {
+    return Winhttp.Load('WinHttpCreateProxyResolver')(hSession, phResolver_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winhttp/nf-winhttp-winhttpcreateurl
@@ -179,12 +176,12 @@ class Winhttp extends Win32 {
     return Winhttp.Load('WinHttpFreeProxyResult')(pProxyResult_in_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/winhttp/nf-winhttp-winhttpfreeproxyresultex
+  // Undocumented export (no Microsoft Learn page).
   public static WinHttpFreeProxyResultEx(pProxyResultEx_in_out: PWINHTTP_PROXY_RESULT_EX): void {
     return Winhttp.Load('WinHttpFreeProxyResultEx')(pProxyResultEx_in_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/winhttp/nf-winhttp-winhttpfreeproxysettings
+  // Undocumented export (no Microsoft Learn page).
   public static WinHttpFreeProxySettings(pWinHttpProxySettings: PWINHTTP_PROXY_SETTINGS): void {
     return Winhttp.Load('WinHttpFreeProxySettings')(pWinHttpProxySettings);
   }
@@ -210,19 +207,12 @@ class Winhttp extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winhttp/nf-winhttp-winhttpgetproxyforurlex
-  public static WinHttpGetProxyForUrlEx(hResolver: HINTERNET, pcwszUrl: PCWSTR, pAutoProxyOptions: PWINHTTP_AUTOPROXY_OPTIONS, pContext: Optional<DWORD_PTR>): DWORD {
+  public static WinHttpGetProxyForUrlEx(hResolver: HINTERNET, pcwszUrl: PCWSTR, pAutoProxyOptions: PWINHTTP_AUTOPROXY_OPTIONS, pContext: DWORD_PTR): DWORD {
     return Winhttp.Load('WinHttpGetProxyForUrlEx')(hResolver, pcwszUrl, pAutoProxyOptions, pContext);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/winhttp/nf-winhttp-winhttpgetproxyforurlex2
-  public static WinHttpGetProxyForUrlEx2(
-    hResolver: HINTERNET,
-    pcwszUrl: PCWSTR,
-    pAutoProxyOptions: PWINHTTP_AUTOPROXY_OPTIONS,
-    cbInterfaceSelectionContext: DWORD,
-    pInterfaceSelectionContext: Optional<PBYTE>,
-    pContext: Optional<DWORD_PTR>,
-  ): DWORD {
+  // Undocumented export (no Microsoft Learn page).
+  public static WinHttpGetProxyForUrlEx2(hResolver: HINTERNET, pcwszUrl: PCWSTR, pAutoProxyOptions: PWINHTTP_AUTOPROXY_OPTIONS, cbInterfaceSelectionContext: DWORD, pInterfaceSelectionContext: Optional<PBYTE>, pContext: DWORD_PTR): DWORD {
     return Winhttp.Load('WinHttpGetProxyForUrlEx2')(hResolver, pcwszUrl, pAutoProxyOptions, cbInterfaceSelectionContext, pInterfaceSelectionContext, pContext);
   }
 
@@ -231,19 +221,14 @@ class Winhttp extends Win32 {
     return Winhttp.Load('WinHttpGetProxyResult')(hResolver, pProxyResult_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/winhttp/nf-winhttp-winhttpgetproxyresultex
+  // Undocumented export (no Microsoft Learn page).
   public static WinHttpGetProxyResultEx(hResolver: HINTERNET, pProxyResultEx_out: PWINHTTP_PROXY_RESULT_EX): DWORD {
     return Winhttp.Load('WinHttpGetProxyResultEx')(hResolver, pProxyResultEx_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/winhttp/nf-winhttp-winhttpgetproxysettingsversion
+  // Undocumented export (no Microsoft Learn page).
   public static WinHttpGetProxySettingsVersion(hSession: HINTERNET, pdwProxySettingsVersion_out: PDWORD): DWORD {
     return Winhttp.Load('WinHttpGetProxySettingsVersion')(hSession, pdwProxySettingsVersion_out);
-  }
-
-  // https://learn.microsoft.com/en-us/windows/win32/api/winhttp/nf-winhttp-winhttpishostinproxybypasslist
-  public static WinHttpIsHostInProxyBypassList(pProxyInfo: PWINHTTP_PROXY_INFO, pwszHost: PCWSTR, tScheme: INTERNET_SCHEME, nPort: INTERNET_PORT, pfIsInBypassList_out: LPBOOL): DWORD {
-    return Winhttp.Load('WinHttpIsHostInProxyBypassList')(pProxyInfo, pwszHost, tScheme, nPort, pfIsInBypassList_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winhttp/nf-winhttp-winhttpopen
@@ -254,11 +239,6 @@ class Winhttp extends Win32 {
   // https://learn.microsoft.com/en-us/windows/win32/api/winhttp/nf-winhttp-winhttpopenrequest
   public static WinHttpOpenRequest(hConnect: HINTERNET, pwszVerb: Nullable<LPCWSTR>, pwszObjectName: LPCWSTR, pwszVersion: Nullable<LPCWSTR>, pwszReferrer: Optional<LPCWSTR>, ppwszAcceptTypes: Optional<LPVOID>, dwFlags: DWORD): HINTERNET {
     return Winhttp.Load('WinHttpOpenRequest')(hConnect, pwszVerb, pwszObjectName, pwszVersion, pwszReferrer, ppwszAcceptTypes, dwFlags);
-  }
-
-  // https://learn.microsoft.com/en-us/windows/win32/api/winhttp/nf-winhttp-winhttpqueryauthparams
-  public static WinHttpQueryAuthParams(hRequest: HINTERNET, AuthScheme: DWORD, pAuthParams_out: LPVOID): BOOL {
-    return Winhttp.Load('WinHttpQueryAuthParams')(hRequest, AuthScheme, pAuthParams_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winhttp/nf-winhttp-winhttpqueryauthschemes
@@ -312,7 +292,7 @@ class Winhttp extends Win32 {
     return Winhttp.Load('WinHttpReadDataEx')(hRequest, lpBuffer_out, dwNumberOfBytesToRead, lpdwNumberOfBytesRead_out, ullFlags, cbProperty, pvProperty);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/winhttp/nf-winhttp-winhttpreadproxysettings
+  // Undocumented export (no Microsoft Learn page).
   public static WinHttpReadProxySettings(
     hSession: HINTERNET,
     pcwszConnectionName: Optional<PCWSTR>,
@@ -326,7 +306,7 @@ class Winhttp extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winhttp/nf-winhttp-winhttpreceiveresponse
-  public static WinHttpReceiveResponse(hRequest: HINTERNET, lpReserved: LPVOID | NULL): BOOL {
+  public static WinHttpReceiveResponse(hRequest: HINTERNET, lpReserved: NULL): BOOL {
     return Winhttp.Load('WinHttpReceiveResponse')(hRequest, lpReserved);
   }
 
@@ -341,7 +321,7 @@ class Winhttp extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winhttp/nf-winhttp-winhttpsetcredentials
-  public static WinHttpSetCredentials(hRequest: HINTERNET, AuthTargets: DWORD, AuthScheme: DWORD, pwszUserName: Nullable<LPCWSTR>, pwszPassword: Nullable<LPCWSTR>, pAuthParams: LPVOID | NULL): BOOL {
+  public static WinHttpSetCredentials(hRequest: HINTERNET, AuthTargets: DWORD, AuthScheme: DWORD, pwszUserName: Nullable<LPCWSTR>, pwszPassword: Nullable<LPCWSTR>, pAuthParams: NULL): BOOL {
     return Winhttp.Load('WinHttpSetCredentials')(hRequest, AuthTargets, AuthScheme, pwszUserName, pwszPassword, pAuthParams);
   }
 
@@ -355,13 +335,13 @@ class Winhttp extends Win32 {
     return Winhttp.Load('WinHttpSetOption')(hInternet, dwOption, lpBuffer, dwBufferLength);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/winhttp/nf-winhttp-winhttpsetproxysettingsperuser
+  // Undocumented export (no Microsoft Learn page).
   public static WinHttpSetProxySettingsPerUser(fProxySettingsPerUser: BOOL): DWORD {
     return Winhttp.Load('WinHttpSetProxySettingsPerUser')(fProxySettingsPerUser);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winhttp/nf-winhttp-winhttpsetstatuscallback
-  public static WinHttpSetStatusCallback(hInternet: HINTERNET, lpfnInternetCallback: Nullable<WINHTTP_STATUS_CALLBACK>, dwNotificationFlags: DWORD, dwReserved: DWORD_PTR | 0n): WINHTTP_STATUS_CALLBACK | NULL {
+  public static WinHttpSetStatusCallback(hInternet: HINTERNET, lpfnInternetCallback: Nullable<WINHTTP_STATUS_CALLBACK>, dwNotificationFlags: DWORD, dwReserved: DWORD_PTR): WINHTTP_STATUS_CALLBACK | NULL {
     return Winhttp.Load('WinHttpSetStatusCallback')(hInternet, lpfnInternetCallback, dwNotificationFlags, dwReserved);
   }
 
@@ -386,7 +366,7 @@ class Winhttp extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winhttp/nf-winhttp-winhttpwebsocketcompleteupgrade
-  public static WinHttpWebSocketCompleteUpgrade(hRequest: HINTERNET, pContext: Optional<DWORD_PTR>): HINTERNET {
+  public static WinHttpWebSocketCompleteUpgrade(hRequest: HINTERNET, pContext: DWORD_PTR): HINTERNET {
     return Winhttp.Load('WinHttpWebSocketCompleteUpgrade')(hRequest, pContext);
   }
 
@@ -415,7 +395,7 @@ class Winhttp extends Win32 {
     return Winhttp.Load('WinHttpWriteData')(hRequest, lpBuffer, dwNumberOfBytesToWrite, lpdwNumberOfBytesWritten_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/winhttp/nf-winhttp-winhttpwriteproxysettings
+  // Undocumented export (no Microsoft Learn page).
   public static WinHttpWriteProxySettings(hSession: HINTERNET, fForceUpdate: BOOL, pWinHttpProxySettings: PWINHTTP_PROXY_SETTINGS): DWORD {
     return Winhttp.Load('WinHttpWriteProxySettings')(hSession, fForceUpdate, pWinHttpProxySettings);
   }

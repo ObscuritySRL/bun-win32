@@ -216,7 +216,7 @@ class Ktmw32 extends Win32 {
     return Ktmw32.Load('PrePrepareComplete')(EnlistmentHandle, TmVirtualClock);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/ktmw32/nf-ktmw32-prepreparenlistment
+  // https://learn.microsoft.com/en-us/windows/win32/api/ktmw32/nf-ktmw32-preprepareenlistment
   public static PrePrepareEnlistment(EnlistmentHandle: HANDLE, TmVirtualClock: PLARGE_INTEGER): BOOL {
     return Ktmw32.Load('PrePrepareEnlistment')(EnlistmentHandle, TmVirtualClock);
   }

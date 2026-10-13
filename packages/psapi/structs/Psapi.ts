@@ -116,8 +116,8 @@ class Psapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/psapi/nf-psapi-getdevicedriverbasenamea
-  public static GetDeviceDriverBaseNameA(ImageBase: LPVOID<bigint>, lpBaseName_out: LPSTR, nSize: DWORD): DWORD {
-    return Psapi.Load('GetDeviceDriverBaseNameA')(ImageBase, lpBaseName_out, nSize);
+  public static GetDeviceDriverBaseNameA(ImageBase: LPVOID<bigint>, lpFilename_out: LPSTR, nSize: DWORD): DWORD {
+    return Psapi.Load('GetDeviceDriverBaseNameA')(ImageBase, lpFilename_out, nSize);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/psapi/nf-psapi-getdevicedriverbasenamew

@@ -3,6 +3,7 @@ import { type FFIFunction, FFIType } from 'bun:ffi';
 import { Win32 } from '@bun-win32/core';
 
 import type {
+  DWORD,
   GUID,
   HRESULT,
   HWND,
@@ -28,6 +29,7 @@ import type {
   PIMFASFStreamSelector,
   PIMFActivate,
   PIMFByteStream,
+  PIMFCollection,
   PIMFMediaSink,
   PIMFNetCredentialCache,
   PIMFNetProxyLocator,
@@ -41,6 +43,7 @@ import type {
   PPROPVARIANT,
   QWORD,
   REFCLSID,
+  REFGUID,
   REFIID,
   UINT32,
 } from '../types/Mf';
@@ -108,6 +111,7 @@ class Mf extends Win32 {
     MFGetSystemId: { args: [FFIType.ptr], returns: FFIType.i32 },
     MFLoadSignedLibrary: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
     MFShutdownObject: { args: [FFIType.ptr], returns: FFIType.i32 },
+    MFTranscodeGetAudioOutputAvailableTypes: { args: [FFIType.ptr, FFIType.u32, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
   } as const satisfies Record<string, FFIFunction>;
 
   // https://learn.microsoft.com/en-us/windows/win32/api/combaseapi/nf-combaseapi-dllcanunloadnow
@@ -245,7 +249,7 @@ class Mf extends Win32 {
     return Mf.Load('MFCreateSourceResolver')(ppISourceResolver_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/evr/nf-evr-mfcreatevideorenderer
+  // https://learn.microsoft.com/en-us/windows/win32/api/evr/nc-evr-mfcreatevideorenderer
   public static MFCreateVideoRenderer(riidRenderer: REFIID, ppVideoRenderer_out: LPLPVOID): HRESULT {
     return Mf.Load('MFCreateVideoRenderer')(riidRenderer, ppVideoRenderer_out);
   }
@@ -283,6 +287,11 @@ class Mf extends Win32 {
   // https://learn.microsoft.com/en-us/windows/win32/api/mfidl/nf-mfidl-mfshutdownobject
   public static MFShutdownObject(pUnk: IUnknown): HRESULT {
     return Mf.Load('MFShutdownObject')(pUnk);
+  }
+
+  // https://learn.microsoft.com/en-us/windows/win32/api/mfidl/nf-mfidl-mftranscodegetaudiooutputavailabletypes
+  public static MFTranscodeGetAudioOutputAvailableTypes(guidSubType: REFGUID, dwMFTFlags: DWORD, pCodecConfig: Optional<IMFAttributes>, ppAvailableTypes_out: PIMFCollection): HRESULT {
+    return Mf.Load('MFTranscodeGetAudioOutputAvailableTypes')(guidSubType, dwMFTFlags, pCodecConfig, ppAvailableTypes_out);
   }
 }
 

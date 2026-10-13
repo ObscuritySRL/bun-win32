@@ -314,16 +314,16 @@ class Dbghelp extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dbghelp/nf-dbghelp-findexecutableimageexw
-  public static FindExecutableImageExW(FileName: LPCWSTR, SymbolPath: LPCWSTR, ImageFilePath_out: LPWSTR, Callback: Optional<PFIND_EXE_FILE_CALLBACKW>, CallerData: PVOID): HANDLE {
+  public static FindExecutableImageExW(FileName: LPCWSTR, SymbolPath: LPCWSTR, ImageFilePath_out: LPWSTR, Callback: Optional<PFIND_EXE_FILE_CALLBACKW>, CallerData: Optional<PVOID>): HANDLE {
     return Dbghelp.Load('FindExecutableImageExW')(FileName, SymbolPath, ImageFilePath_out, Callback, CallerData);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/dbghelp/nf-dbghelp-findfileinpath
+  // Undocumented export (no Microsoft Learn page).
   public static FindFileInPath(hprocess: HANDLE, SearchPath: LPCSTR, FileName: LPCSTR, id: PVOID, two: DWORD, three: DWORD, flags: DWORD, FilePath_out: LPSTR): BOOL {
     return Dbghelp.Load('FindFileInPath')(hprocess, SearchPath, FileName, id, two, three, flags, FilePath_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/dbghelp/nf-dbghelp-findfileinsearchpath
+  // Undocumented export (no Microsoft Learn page).
   public static FindFileInSearchPath(hprocess: HANDLE, SearchPath: LPCSTR, FileName: LPCSTR, one: DWORD, two: DWORD, three: DWORD, FilePath_out: LPSTR): BOOL {
     return Dbghelp.Load('FindFileInSearchPath')(hprocess, SearchPath, FileName, one, two, three, FilePath_out);
   }
@@ -354,8 +354,8 @@ class Dbghelp extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dbghelp/nf-dbghelp-imagervatova
-  public static ImageRvaToVa(NtHeaders: PIMAGE_NT_HEADERS, Base: PVOID, Rva: ULONG, LastRvaSection_in_out: Optional<PVOID>): PVOID {
-    return Dbghelp.Load('ImageRvaToVa')(NtHeaders, Base, Rva, LastRvaSection_in_out);
+  public static ImageRvaToVa(NtHeaders: PIMAGE_NT_HEADERS, Base: PVOID, Rva: ULONG, LastRvaSection: Optional<PVOID>): PVOID {
+    return Dbghelp.Load('ImageRvaToVa')(NtHeaders, Base, Rva, LastRvaSection);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dbghelp/nf-dbghelp-imagehlpapiversion
@@ -839,7 +839,7 @@ class Dbghelp extends Win32 {
     return Dbghelp.Load('SymGetTypeInfoEx')(hProcess, ModBase, Params_in_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/dbghelp/nf-dbghelp-symgetunwindinfo
+  // Undocumented export (no Microsoft Learn page).
   public static SymGetUnwindInfo(hProcess: HANDLE, Address: DWORD64, Buffer_out: Optional<PVOID>, Size_in_out: PULONG): BOOL {
     return Dbghelp.Load('SymGetUnwindInfo')(hProcess, Address, Buffer_out, Size_in_out);
   }
@@ -941,7 +941,7 @@ class Dbghelp extends Win32 {
     Index: DWORD,
     SymTag: DWORD,
     Mask: Optional<LPCSTR>,
-    Address: Optional<DWORD64>,
+    Address: DWORD64,
     EnumSymbolsCallback: PSYM_ENUMERATESYMBOLS_CALLBACK,
     UserContext: Optional<PVOID>,
     Options: DWORD,
@@ -956,7 +956,7 @@ class Dbghelp extends Win32 {
     Index: DWORD,
     SymTag: DWORD,
     Mask: Optional<LPCWSTR>,
-    Address: Optional<DWORD64>,
+    Address: DWORD64,
     EnumSymbolsCallback: PSYM_ENUMERATESYMBOLS_CALLBACKW,
     UserContext: Optional<PVOID>,
     Options: DWORD,
@@ -1074,7 +1074,7 @@ class Dbghelp extends Win32 {
     return Dbghelp.Load('SymSrvIsStore')(hProcess, path);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/dbghelp/nf-dbghelp-symsrvisstoresw
+  // https://learn.microsoft.com/en-us/windows/win32/api/dbghelp/nf-dbghelp-symsrvisstorew
   public static SymSrvIsStoreW(hProcess: Optional<HANDLE>, path: LPCWSTR): BOOL {
     return Dbghelp.Load('SymSrvIsStoreW')(hProcess, path);
   }

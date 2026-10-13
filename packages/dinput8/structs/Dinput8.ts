@@ -66,7 +66,7 @@ class Dinput8 extends Win32 {
     return Dinput8.Load('DllUnregisterServer')();
   }
 
-  // https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee416593(v=vs.85)
+  // Undocumented export (no Microsoft Learn page).
   public static GetdfDIJoystick(): LPCDIDATAFORMAT {
     return Dinput8.Load('GetdfDIJoystick')();
   }

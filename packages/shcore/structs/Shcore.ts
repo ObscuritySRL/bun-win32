@@ -350,8 +350,8 @@ class Shcore extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-shcreatethreadref
-  public static SHCreateThreadRef(pcRef_in_out: LPVOID, ppunk_out: LPVOID): HRESULT {
-    return Shcore.Load('SHCreateThreadRef')(pcRef_in_out, ppunk_out);
+  public static SHCreateThreadRef(pcRef: LPVOID, ppunk_out: LPVOID): HRESULT {
+    return Shcore.Load('SHCreateThreadRef')(pcRef, ppunk_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-shcreatethreadwithhandle
@@ -493,8 +493,8 @@ class Shcore extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-shreggetvaluea
-  public static SHRegGetValueA(hkey: HKEY, pszSubKey: Optional<LPCSTR>, pszValue: Optional<LPCSTR>, srrfFlags: DWORD, pdwType_out: Optional<LPDWORD>, pvData_out: Optional<LPVOID>, pcbData_in_out: Optional<LPDWORD>): LSTATUS {
-    return Shcore.Load('SHRegGetValueA')(hkey, pszSubKey, pszValue, srrfFlags, pdwType_out, pvData_out, pcbData_in_out);
+  public static SHRegGetValueA(hkey: HKEY, pszSubKey: Optional<LPCSTR>, pszValue: Optional<LPCSTR>, srrfFlags: DWORD, pdwType_in_out: Optional<LPDWORD>, pvData_out: Optional<LPVOID>, pcbData_in_out: Optional<LPDWORD>): LSTATUS {
+    return Shcore.Load('SHRegGetValueA')(hkey, pszSubKey, pszValue, srrfFlags, pdwType_in_out, pvData_out, pcbData_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-shreggetvaluefromhkcuhklm
@@ -503,8 +503,8 @@ class Shcore extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-shreggetvaluew
-  public static SHRegGetValueW(hkey: HKEY, pszSubKey: Optional<LPCWSTR>, pszValue: Optional<LPCWSTR>, srrfFlags: DWORD, pdwType_out: Optional<LPDWORD>, pvData_out: Optional<LPVOID>, pcbData_in_out: Optional<LPDWORD>): LSTATUS {
-    return Shcore.Load('SHRegGetValueW')(hkey, pszSubKey, pszValue, srrfFlags, pdwType_out, pvData_out, pcbData_in_out);
+  public static SHRegGetValueW(hkey: HKEY, pszSubKey: Optional<LPCWSTR>, pszValue: Optional<LPCWSTR>, srrfFlags: DWORD, pdwType_in_out: Optional<LPDWORD>, pvData_out: Optional<LPVOID>, pcbData_in_out: Optional<LPDWORD>): LSTATUS {
+    return Shcore.Load('SHRegGetValueW')(hkey, pszSubKey, pszValue, srrfFlags, pdwType_in_out, pvData_out, pcbData_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-shregsetpatha

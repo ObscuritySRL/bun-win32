@@ -49,7 +49,7 @@ class DSound extends Win32 {
     GetDeviceID: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
   } as const satisfies Record<string, FFIFunction>;
 
-  // https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee416362(v=vs.85)
+  // https://learn.microsoft.com/en-us/previous-versions/windows/embedded/ms897742(v=msdn.10)
   public static DirectSoundCaptureCreate(pcGuidDevice: Optional<LPCGUID>, ppDSC_out: LPLPVOID, pUnkOuter: NULL): HRESULT {
     return DSound.Load('DirectSoundCaptureCreate')(pcGuidDevice, ppDSC_out, pUnkOuter);
   }

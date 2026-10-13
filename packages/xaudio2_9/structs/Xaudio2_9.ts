@@ -40,12 +40,12 @@ class Xaudio2_9 extends Win32 {
     XAudio2Create: { args: [FFIType.ptr, FFIType.u32, FFIType.u32], returns: FFIType.i32 },
   } as const satisfies Record<string, FFIFunction>;
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/xaudio2fx/nf-xaudio2fx-createaudioreverb
+  // Undocumented export (no Microsoft Learn page).
   public static CreateAudioReverb(ppApo_out: LPLPVOID): HRESULT {
     return Xaudio2_9.Load('CreateAudioReverb')(ppApo_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/xaudio2fx/nf-xaudio2fx-createaudiovolumemeter
+  // Undocumented export (no Microsoft Learn page).
   public static CreateAudioVolumeMeter(ppApo_out: LPLPVOID): HRESULT {
     return Xaudio2_9.Load('CreateAudioVolumeMeter')(ppApo_out);
   }

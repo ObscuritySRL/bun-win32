@@ -1,6 +1,6 @@
 import type { Pointer } from 'bun:ffi';
 
-export type { HRESULT, HWND, LPCWSTR, LPVOID, LPWSTR, NULL, Nullable, Optional } from '@bun-win32/core';
+export type { DWORD, HRESULT, HWND, LPCWSTR, LPVOID, LPWSTR, NULL, Nullable, Optional } from '@bun-win32/core';
 
 export type GUID = Pointer;
 export type IMFASFContentInfo = Pointer;
@@ -23,6 +23,7 @@ export type PIMFASFSplitter = Pointer;
 export type PIMFASFStreamSelector = Pointer;
 export type PIMFActivate = Pointer;
 export type PIMFByteStream = Pointer;
+export type PIMFCollection = Pointer;
 export type PIMFMediaSink = Pointer;
 export type PIMFNetCredentialCache = Pointer;
 export type PIMFNetProxyLocator = Pointer;
@@ -36,5 +37,6 @@ export type PLPWSTR = Pointer;
 export type PPROPVARIANT = Pointer;
 export type QWORD = bigint;
 export type REFCLSID = Pointer;
+export type REFGUID = Pointer;
 export type REFIID = Pointer;
 export type UINT32 = number;

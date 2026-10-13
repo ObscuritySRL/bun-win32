@@ -80,22 +80,22 @@ class Comdlg32 extends Win32 {
     ReplaceTextW: { args: [FFIType.ptr], returns: FFIType.u64 },
   } as const satisfies Record<string, FFIFunction>;
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/commdlg/nf-commdlg-choosecolora
+  // https://learn.microsoft.com/en-us/windows/win32/api/commdlg/nc-commdlg-choosecolora
   public static ChooseColorA(lpcc_in_out: LPCHOOSECOLORA): BOOL {
     return Comdlg32.Load('ChooseColorA')(lpcc_in_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/commdlg/nf-commdlg-choosecolorw
+  // https://learn.microsoft.com/en-us/windows/win32/api/commdlg/nc-commdlg-choosecolorw
   public static ChooseColorW(lpcc_in_out: LPCHOOSECOLORW): BOOL {
     return Comdlg32.Load('ChooseColorW')(lpcc_in_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/commdlg/nf-commdlg-choosefonta
+  // https://learn.microsoft.com/en-us/windows/win32/api/commdlg/nc-commdlg-choosefonta
   public static ChooseFontA(lpcf_in_out: LPCHOOSEFONTA): BOOL {
     return Comdlg32.Load('ChooseFontA')(lpcf_in_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/commdlg/nf-commdlg-choosefontw
+  // https://learn.microsoft.com/en-us/windows/win32/api/commdlg/nc-commdlg-choosefontw
   public static ChooseFontW(lpcf_in_out: LPCHOOSEFONTW): BOOL {
     return Comdlg32.Load('ChooseFontW')(lpcf_in_out);
   }
@@ -106,13 +106,13 @@ class Comdlg32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/commdlg/nf-commdlg-findtexta
-  public static FindTextA(lpfr_in_out: LPFINDREPLACEA): HWND {
-    return Comdlg32.Load('FindTextA')(lpfr_in_out);
+  public static FindTextA(lpfr: LPFINDREPLACEA): HWND {
+    return Comdlg32.Load('FindTextA')(lpfr);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/commdlg/nf-commdlg-findtextw
-  public static FindTextW(lpfr_in_out: LPFINDREPLACEW): HWND {
-    return Comdlg32.Load('FindTextW')(lpfr_in_out);
+  public static FindTextW(lpfr: LPFINDREPLACEW): HWND {
+    return Comdlg32.Load('FindTextW')(lpfr);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/commdlg/nf-commdlg-getfiletitlea
@@ -145,32 +145,32 @@ class Comdlg32 extends Win32 {
     return Comdlg32.Load('GetSaveFileNameW')(lpofn_in_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/commdlg/nf-commdlg-pagesetupdlga
+  // https://learn.microsoft.com/en-us/windows/win32/api/commdlg/nc-commdlg-pagesetupdlga
   public static PageSetupDlgA(lppsd_in_out: LPPAGESETUPDLGA): BOOL {
     return Comdlg32.Load('PageSetupDlgA')(lppsd_in_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/commdlg/nf-commdlg-pagesetupdlgw
+  // https://learn.microsoft.com/en-us/windows/win32/api/commdlg/nc-commdlg-pagesetupdlgw
   public static PageSetupDlgW(lppsd_in_out: LPPAGESETUPDLGW): BOOL {
     return Comdlg32.Load('PageSetupDlgW')(lppsd_in_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/commdlg/nf-commdlg-printdlga
+  // https://learn.microsoft.com/en-us/windows/win32/api/commdlg/nc-commdlg-printdlga
   public static PrintDlgA(pPD_in_out: LPPRINTDLGA): BOOL {
     return Comdlg32.Load('PrintDlgA')(pPD_in_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/commdlg/nf-commdlg-printdlgexa
+  // https://learn.microsoft.com/en-us/windows/win32/api/commdlg/nc-commdlg-printdlgexa
   public static PrintDlgExA(pPD_in_out: LPPRINTDLGEXA): HRESULT {
     return Comdlg32.Load('PrintDlgExA')(pPD_in_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/commdlg/nf-commdlg-printdlgexw
+  // https://learn.microsoft.com/en-us/windows/win32/api/commdlg/nc-commdlg-printdlgexw
   public static PrintDlgExW(pPD_in_out: LPPRINTDLGEXW): HRESULT {
     return Comdlg32.Load('PrintDlgExW')(pPD_in_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/commdlg/nf-commdlg-printdlgw
+  // https://learn.microsoft.com/en-us/windows/win32/api/commdlg/nc-commdlg-printdlgw
   public static PrintDlgW(pPD_in_out: LPPRINTDLGW): BOOL {
     return Comdlg32.Load('PrintDlgW')(pPD_in_out);
   }

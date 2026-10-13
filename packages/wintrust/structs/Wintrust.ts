@@ -134,8 +134,8 @@ class Wintrust extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mscat/nf-mscat-cryptcatadminenumcatalogfromhash
-  public static CryptCATAdminEnumCatalogFromHash(hCatAdmin: HCATADMIN, pbHash: PBYTE, cbHash: DWORD, dwFlags: DWORD, phPrevCatInfo_in_out: Optional<PHCATINFO>): HCATINFO {
-    return Wintrust.Load('CryptCATAdminEnumCatalogFromHash')(hCatAdmin, pbHash, cbHash, dwFlags, phPrevCatInfo_in_out);
+  public static CryptCATAdminEnumCatalogFromHash(hCatAdmin: HCATADMIN, pbHash: PBYTE, cbHash: DWORD, dwFlags: DWORD, phPrevCatInfo: Optional<PHCATINFO>): HCATINFO {
+    return Wintrust.Load('CryptCATAdminEnumCatalogFromHash')(hCatAdmin, pbHash, cbHash, dwFlags, phPrevCatInfo);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mscat/nf-mscat-cryptcatadminreleasecatalogcontext

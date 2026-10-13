@@ -52,7 +52,7 @@ class Wscapi extends Win32 {
     return Wscapi.Load('DllGetClassObject')(rclsid, riid, ppv_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/wscapi/nf-wscapi-wscgetantimalwareuri
+  // Undocumented export (no Microsoft Learn page).
   public static WscGetAntiMalwareUri(ppszUri_out: PLPWSTR): HRESULT {
     return Wscapi.Load('WscGetAntiMalwareUri')(ppszUri_out);
   }
@@ -62,7 +62,7 @@ class Wscapi extends Win32 {
     return Wscapi.Load('WscGetSecurityProviderHealth')(Providers, pHealth_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/wscapi/nf-wscapi-wscqueryantimalwareuri
+  // Undocumented export (no Microsoft Learn page).
   public static WscQueryAntiMalwareUri(): HRESULT {
     return Wscapi.Load('WscQueryAntiMalwareUri')();
   }
@@ -72,7 +72,7 @@ class Wscapi extends Win32 {
     return Wscapi.Load('WscRegisterForChanges')(Reserved, phCallbackRegistration_out, lpCallbackAddress, pContext);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/wscapi/nf-wscapi-wscregisterforusernotifications
+  // Undocumented export (no Microsoft Learn page).
   public static WscRegisterForUserNotifications(): HRESULT {
     return Wscapi.Load('WscRegisterForUserNotifications')();
   }

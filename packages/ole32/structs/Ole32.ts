@@ -229,7 +229,9 @@ class Ole32 extends Win32 {
     ReadClassStg: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
     ReadClassStm: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
     ReadFmtUserTypeStg: { args: [FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
+    RegisterDragDrop: { args: [FFIType.u64, FFIType.ptr], returns: FFIType.i32 },
     ReleaseStgMedium: { args: [FFIType.ptr], returns: FFIType.void },
+    RevokeDragDrop: { args: [FFIType.u64], returns: FFIType.i32 },
     SetConvertStg: { args: [FFIType.ptr, FFIType.i32], returns: FFIType.i32 },
     StgConvertPropertyToVariant: { args: [FFIType.ptr, FFIType.u16, FFIType.ptr, FFIType.ptr], returns: FFIType.u8 },
     StgConvertVariantToProperty: { args: [FFIType.ptr, FFIType.u16, FFIType.ptr, FFIType.ptr, FFIType.u32, FFIType.u8, FFIType.ptr], returns: FFIType.ptr },
@@ -264,7 +266,7 @@ class Ole32 extends Win32 {
     return Ole32.Load('CoAllowSetForegroundWindow')(pUnk, lpvReserved);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/objbase/nf-objbase-cobuildversion
+  // Undocumented export (no Microsoft Learn page).
   public static CoBuildVersion(): DWORD {
     return Ole32.Load('CoBuildVersion')();
   }
@@ -592,12 +594,12 @@ class Ole32 extends Win32 {
     rgAdvf: LPDWORD,
     rgFormatEtc: LPFORMATETC,
     lpAdviseSink: IAdviseSink,
-    rgdwConnection_out: LPDWORD,
+    rgdwConnection_in_out: LPDWORD,
     pClientSite: Nullable<LPOLECLIENTSITE>,
     pStg: LPSTORAGE,
     ppvObj_out: LPLPVOID,
   ): HRESULT {
-    return Ole32.Load('OleCreateLinkFromDataEx')(pSrcDataObj, riid, dwFlags, renderopt, cFormats, rgAdvf, rgFormatEtc, lpAdviseSink, rgdwConnection_out, pClientSite, pStg, ppvObj_out);
+    return Ole32.Load('OleCreateLinkFromDataEx')(pSrcDataObj, riid, dwFlags, renderopt, cFormats, rgAdvf, rgFormatEtc, lpAdviseSink, rgdwConnection_in_out, pClientSite, pStg, ppvObj_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ole2/nf-ole2-olecreatelinktofile
@@ -887,12 +889,12 @@ class Ole32 extends Win32 {
     grfMode: DWORD,
     stgfmt: DWORD,
     grfAttrs: DWORD,
-    pStgOptions_in_out: Optional<STGOPTIONS>,
+    pStgOptions: Optional<STGOPTIONS>,
     pSecurityDescriptor: Optional<PSECURITY_DESCRIPTOR>,
     riid: REFIID,
     ppObjectOpen_out: PPVOID,
   ): HRESULT {
-    return Ole32.Load('StgCreateStorageEx')(pwcsName, grfMode, stgfmt, grfAttrs, pStgOptions_in_out, pSecurityDescriptor, riid, ppObjectOpen_out);
+    return Ole32.Load('StgCreateStorageEx')(pwcsName, grfMode, stgfmt, grfAttrs, pStgOptions, pSecurityDescriptor, riid, ppObjectOpen_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/objbase/nf-objbase-stggetifilllockbytesonfile

@@ -180,7 +180,7 @@ class GLU32 extends Win32 {
     return GLU32.Load('gluErrorString')(errCode);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/opengl/gluerrorunicodestringext
+  // Undocumented export (no Microsoft Learn page).
   public static gluErrorUnicodeStringEXT(errCode: GLenum): GLWChar_ {
     return GLU32.Load('gluErrorUnicodeStringEXT')(errCode);
   }
@@ -230,7 +230,7 @@ class GLU32 extends Win32 {
     return GLU32.Load('gluNextContour')(tess, type);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/opengl/glunurbscallback
+  // https://learn.microsoft.com/en-us/windows/win32/opengl/glunurbs
   public static gluNurbsCallback(nobj: GLUnurbs, which: GLenum, fn: Nullable<GLUnurbsErrorProc>): void {
     return GLU32.Load('gluNurbsCallback')(nobj, which, fn);
   }
@@ -280,29 +280,29 @@ class GLU32 extends Win32 {
     return GLU32.Load('gluPwlCurve')(nobj, count, array, stride, type);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/opengl/gluquadriccallback
+  // https://learn.microsoft.com/en-us/windows/win32/opengl/gluquadric
   public static gluQuadricCallback(qobj: GLUquadric, which: GLenum, fn: Nullable<GLUquadricErrorProc>): void {
     return GLU32.Load('gluQuadricCallback')(qobj, which, fn);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/opengl/gluquadricdrawstyle
-  public static gluQuadricDrawStyle(qobj: GLUquadric, drawStyle: GLenum): void {
-    return GLU32.Load('gluQuadricDrawStyle')(qobj, drawStyle);
+  public static gluQuadricDrawStyle(quadObject: GLUquadric, drawStyle: GLenum): void {
+    return GLU32.Load('gluQuadricDrawStyle')(quadObject, drawStyle);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/opengl/gluquadricnormals
-  public static gluQuadricNormals(qobj: GLUquadric, normals: GLenum): void {
-    return GLU32.Load('gluQuadricNormals')(qobj, normals);
+  public static gluQuadricNormals(quadObject: GLUquadric, normals: GLenum): void {
+    return GLU32.Load('gluQuadricNormals')(quadObject, normals);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/opengl/gluquadricorientation
-  public static gluQuadricOrientation(qobj: GLUquadric, orientation: GLenum): void {
-    return GLU32.Load('gluQuadricOrientation')(qobj, orientation);
+  public static gluQuadricOrientation(quadObject: GLUquadric, orientation: GLenum): void {
+    return GLU32.Load('gluQuadricOrientation')(quadObject, orientation);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/opengl/gluquadrictexture
-  public static gluQuadricTexture(qobj: GLUquadric, textureCoords: GLboolean): void {
-    return GLU32.Load('gluQuadricTexture')(qobj, textureCoords);
+  public static gluQuadricTexture(quadObject: GLUquadric, textureCoords: GLboolean): void {
+    return GLU32.Load('gluQuadricTexture')(quadObject, textureCoords);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/opengl/gluscaleimage
@@ -325,7 +325,7 @@ class GLU32 extends Win32 {
     return GLU32.Load('gluTessBeginPolygon')(tess, polygon_data);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/opengl/glutesscallback
+  // https://learn.microsoft.com/en-us/windows/win32/opengl/glutess
   public static gluTessCallback(tess: GLUtesselator, which: GLenum, fn: Nullable<GLUtessCallbackProc>): void {
     return GLU32.Load('gluTessCallback')(tess, which, fn);
   }

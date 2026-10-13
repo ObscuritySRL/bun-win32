@@ -594,9 +594,9 @@ class Clusapi extends Win32 {
     nInBufferSize: DWORD,
     lpOutBuffer_out: Optional<LPVOID>,
     nOutBufferSize: DWORD,
-    lpBytesReturned_out: Optional<LPDWORD>,
+    lpBytesReturned_in_out: Optional<LPDWORD>,
   ): DWORD {
-    return Clusapi.Load('ClusterNetworkControl')(hNetwork, hHostNode, dwControlCode, lpInBuffer, nInBufferSize, lpOutBuffer_out, nOutBufferSize, lpBytesReturned_out);
+    return Clusapi.Load('ClusterNetworkControl')(hNetwork, hHostNode, dwControlCode, lpInBuffer, nInBufferSize, lpOutBuffer_out, nOutBufferSize, lpBytesReturned_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/clusapi/nf-clusapi-clusternetworkenum
@@ -803,7 +803,7 @@ class Clusapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/clusapi/nf-clusapi-clusterregreadbatchaddcommand
-  public static ClusterRegReadBatchAddCommand(hRegReadBatch: HREGREADBATCH, wzSubkeyName: LPCWSTR, wzValueName: LPCWSTR): LONG {
+  public static ClusterRegReadBatchAddCommand(hRegReadBatch: HREGREADBATCH, wzSubkeyName: Optional<LPCWSTR>, wzValueName: Optional<LPCWSTR>): LONG {
     return Clusapi.Load('ClusterRegReadBatchAddCommand')(hRegReadBatch, wzSubkeyName, wzValueName);
   }
 

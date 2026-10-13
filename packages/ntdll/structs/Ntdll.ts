@@ -3,6 +3,7 @@ import { Win32 } from '@bun-win32/core';
 
 import type {
   ACCESS_MASK,
+  BOOL,
   BOOLEAN,
   DWORD,
   HANDLE,
@@ -53,7 +54,6 @@ import type {
   PRTL_HEAP_PARAMETERS,
   PRTL_OSVERSIONINFOEXW,
   PRTL_OSVERSIONINFOW,
-  PRTL_RELATIVE_NAME_U,
   PRTL_SRWLOCK,
   PRTL_USER_PROCESS_PARAMETERS,
   PRUNTIME_FUNCTION,
@@ -423,7 +423,7 @@ class Ntdll extends Win32 {
     RtlTestBit: { args: [FFIType.ptr, FFIType.u32], returns: FFIType.u8 },
     RtlTryAcquireSRWLockExclusive: { args: [FFIType.ptr], returns: FFIType.u8 },
     RtlTryAcquireSRWLockShared: { args: [FFIType.ptr], returns: FFIType.u8 },
-    RtlTryEnterCriticalSection: { args: [FFIType.ptr], returns: FFIType.u8 },
+    RtlTryEnterCriticalSection: { args: [FFIType.ptr], returns: FFIType.i32 },
     RtlUnicodeStringToAnsiString: { args: [FFIType.ptr, FFIType.ptr, FFIType.u8], returns: FFIType.i32 },
     RtlUnicodeStringToInteger: { args: [FFIType.ptr, FFIType.u32, FFIType.ptr], returns: FFIType.i32 },
     RtlUniform: { args: [FFIType.ptr], returns: FFIType.u32 },
@@ -449,7 +449,7 @@ class Ntdll extends Win32 {
     return Ntdll.Load('DbgBreakPoint')();
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-zwAccessCheckandauditalarm (NtAccessCheck)
+  // Undocumented export (no Microsoft Learn page).
   public static NtAccessCheck(
     SecurityDescriptor: PSECURITY_DESCRIPTOR,
     ClientToken: HANDLE,
@@ -463,12 +463,12 @@ class Ntdll extends Win32 {
     return Ntdll.Load('NtAccessCheck')(SecurityDescriptor, ClientToken, DesiredAccess, GenericMapping, PrivilegeSet_in_out, PrivilegeSetLength_in_out, GrantedAccess_out, AccessStatus_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntadjustgroupstoken
+  // Undocumented export (no Microsoft Learn page).
   public static NtAdjustGroupsToken(TokenHandle: HANDLE, ResetToDefault: BOOLEAN, NewState: Optional<PTOKEN_GROUPS>, BufferLength: ULONG, PreviousState_out: Optional<PTOKEN_GROUPS>, ReturnLength_out: Optional<PULONG>): NTSTATUS {
     return Ntdll.Load('NtAdjustGroupsToken')(TokenHandle, ResetToDefault, NewState, BufferLength, PreviousState_out, ReturnLength_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntadjustprivilegestoken
+  // Undocumented export (no Microsoft Learn page).
   public static NtAdjustPrivilegesToken(
     TokenHandle: HANDLE,
     DisableAllPrivileges: BOOLEAN,
@@ -480,17 +480,17 @@ class Ntdll extends Win32 {
     return Ntdll.Load('NtAdjustPrivilegesToken')(TokenHandle, DisableAllPrivileges, NewState, BufferLength, PreviousState_out, ReturnLength_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/winternl/nf-winternl-ntalertresumethread
+  // Undocumented export (no Microsoft Learn page).
   public static NtAlertResumeThread(ThreadHandle: HANDLE, PreviousSuspendCount_out: Optional<PULONG>): NTSTATUS {
     return Ntdll.Load('NtAlertResumeThread')(ThreadHandle, PreviousSuspendCount_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/winternl/nf-winternl-ntalertthread
+  // Undocumented export (no Microsoft Learn page).
   public static NtAlertThread(ThreadHandle: HANDLE): NTSTATUS {
     return Ntdll.Load('NtAlertThread')(ThreadHandle);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntallocatelocallyuniqueid
+  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntddk/nf-ntddk-zwallocatelocallyuniqueid
   public static NtAllocateLocallyUniqueId(Luid_out: PLUID): NTSTATUS {
     return Ntdll.Load('NtAllocateLocallyUniqueId')(Luid_out);
   }
@@ -500,32 +500,32 @@ class Ntdll extends Win32 {
     return Ntdll.Load('NtAllocateVirtualMemory')(ProcessHandle, BaseAddress_in_out, ZeroBits, RegionSize_in_out, AllocationType, Protect);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-zwassignprocesstojobobject
+  // Undocumented export (no Microsoft Learn page).
   public static NtAssignProcessToJobObject(JobHandle: HANDLE, ProcessHandle: HANDLE): NTSTATUS {
     return Ntdll.Load('NtAssignProcessToJobObject')(JobHandle, ProcessHandle);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntcanceliofile
+  // Undocumented export (no Microsoft Learn page).
   public static NtCancelIoFile(FileHandle: HANDLE, IoStatusBlock_out: PIO_STATUS_BLOCK): NTSTATUS {
     return Ntdll.Load('NtCancelIoFile')(FileHandle, IoStatusBlock_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntcanceliofileex
+  // Undocumented export (no Microsoft Learn page).
   public static NtCancelIoFileEx(FileHandle: HANDLE, IoRequestToCancel: Optional<PIO_STATUS_BLOCK>, IoStatusBlock_out: PIO_STATUS_BLOCK): NTSTATUS {
     return Ntdll.Load('NtCancelIoFileEx')(FileHandle, IoRequestToCancel, IoStatusBlock_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntcancelsynchronousiofile
+  // Undocumented export (no Microsoft Learn page).
   public static NtCancelSynchronousIoFile(ThreadHandle: HANDLE, IoRequestToCancel: Optional<PIO_STATUS_BLOCK>, IoStatusBlock_out: PIO_STATUS_BLOCK): NTSTATUS {
     return Ntdll.Load('NtCancelSynchronousIoFile')(ThreadHandle, IoRequestToCancel, IoStatusBlock_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-zwcanceltimer
+  // Undocumented export (no Microsoft Learn page).
   public static NtCancelTimer(TimerHandle: HANDLE, CurrentState_out: Optional<PBOOLEAN>): NTSTATUS {
     return Ntdll.Load('NtCancelTimer')(TimerHandle, CurrentState_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntclearevent
+  // Undocumented export (no Microsoft Learn page).
   public static NtClearEvent(EventHandle: HANDLE): NTSTATUS {
     return Ntdll.Load('NtClearEvent')(EventHandle);
   }
@@ -535,22 +535,22 @@ class Ntdll extends Win32 {
     return Ntdll.Load('NtClose')(Handle);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntcompactkeys
+  // Undocumented export (no Microsoft Learn page).
   public static NtCompactKeys(Count: ULONG, KeyArray: PHANDLE): NTSTATUS {
     return Ntdll.Load('NtCompactKeys')(Count, KeyArray);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntcompareobjects
+  // Undocumented export (no Microsoft Learn page).
   public static NtCompareObjects(FirstObjectHandle: HANDLE, SecondObjectHandle: HANDLE): NTSTATUS {
     return Ntdll.Load('NtCompareObjects')(FirstObjectHandle, SecondObjectHandle);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntcompresskey
+  // Undocumented export (no Microsoft Learn page).
   public static NtCompressKey(Key: HANDLE): NTSTATUS {
     return Ntdll.Load('NtCompressKey')(Key);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntcreatedebugobject
+  // Undocumented export (no Microsoft Learn page).
   public static NtCreateDebugObject(DebugObjectHandle_out: PHANDLE, DesiredAccess: ACCESS_MASK, ObjectAttributes: Optional<POBJECT_ATTRIBUTES>, Flags: ULONG): NTSTATUS {
     return Ntdll.Load('NtCreateDebugObject')(DebugObjectHandle_out, DesiredAccess, ObjectAttributes, Flags);
   }
@@ -582,12 +582,12 @@ class Ntdll extends Win32 {
     return Ntdll.Load('NtCreateFile')(FileHandle_out, DesiredAccess, ObjectAttributes, IoStatusBlock_out, AllocationSize, FileAttributes, ShareAccess, CreateDisposition, CreateOptions, EaBuffer, EaLength);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-zwcreateiocompletion
+  // Undocumented export (no Microsoft Learn page).
   public static NtCreateIoCompletion(IoCompletionHandle_out: PHANDLE, DesiredAccess: ACCESS_MASK, ObjectAttributes: Optional<POBJECT_ATTRIBUTES>, Count: ULONG): NTSTATUS {
     return Ntdll.Load('NtCreateIoCompletion')(IoCompletionHandle_out, DesiredAccess, ObjectAttributes, Count);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-zwcreatejobobject
+  // Undocumented export (no Microsoft Learn page).
   public static NtCreateJobObject(JobHandle_out: PHANDLE, DesiredAccess: ACCESS_MASK, ObjectAttributes: Optional<POBJECT_ATTRIBUTES>): NTSTATUS {
     return Ntdll.Load('NtCreateJobObject')(JobHandle_out, DesiredAccess, ObjectAttributes);
   }
@@ -597,7 +597,7 @@ class Ntdll extends Win32 {
     return Ntdll.Load('NtCreateKey')(KeyHandle_out, DesiredAccess, ObjectAttributes, TitleIndex, Class, CreateOptions, Disposition_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntcreatemailslotfile
+  // Undocumented export (no Microsoft Learn page).
   public static NtCreateMailslotFile(
     FileHandle_out: PHANDLE,
     DesiredAccess: ULONG,
@@ -611,12 +611,12 @@ class Ntdll extends Win32 {
     return Ntdll.Load('NtCreateMailslotFile')(FileHandle_out, DesiredAccess, ObjectAttributes, IoStatusBlock_out, CreateOptions, MailslotQuota, MaximumMessageSize, ReadTimeout);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-zwcreatemutant
+  // Undocumented export (no Microsoft Learn page).
   public static NtCreateMutant(MutantHandle_out: PHANDLE, DesiredAccess: ACCESS_MASK, ObjectAttributes: Optional<POBJECT_ATTRIBUTES>, InitialOwner: BOOLEAN): NTSTATUS {
     return Ntdll.Load('NtCreateMutant')(MutantHandle_out, DesiredAccess, ObjectAttributes, InitialOwner);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntcreatenamedpipefile
+  // Undocumented export (no Microsoft Learn page).
   public static NtCreateNamedPipeFile(
     FileHandle_out: PHANDLE,
     DesiredAccess: ULONG,
@@ -664,23 +664,23 @@ class Ntdll extends Win32 {
     return Ntdll.Load('NtCreateSection')(SectionHandle_out, DesiredAccess, ObjectAttributes, MaximumSize, SectionPageProtection, AllocationAttributes, FileHandle);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-zwcreatesemaphore
+  // Undocumented export (no Microsoft Learn page).
   public static NtCreateSemaphore(SemaphoreHandle_out: PHANDLE, DesiredAccess: ACCESS_MASK, ObjectAttributes: Optional<POBJECT_ATTRIBUTES>, InitialCount: LONG, MaximumCount: LONG): NTSTATUS {
     return Ntdll.Load('NtCreateSemaphore')(SemaphoreHandle_out, DesiredAccess, ObjectAttributes, InitialCount, MaximumCount);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-zwcreatesymboliclinkobject
+  // Undocumented export (no Microsoft Learn page).
   public static NtCreateSymbolicLinkObject(LinkHandle_out: PHANDLE, DesiredAccess: ACCESS_MASK, ObjectAttributes: POBJECT_ATTRIBUTES, LinkTarget: PUNICODE_STRING): NTSTATUS {
     return Ntdll.Load('NtCreateSymbolicLinkObject')(LinkHandle_out, DesiredAccess, ObjectAttributes, LinkTarget);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/winternl/nf-winternl-ntcreatethreadex
+  // Undocumented export (no Microsoft Learn page).
   public static NtCreateThreadEx(
     ThreadHandle_out: PHANDLE,
     DesiredAccess: ACCESS_MASK,
     ObjectAttributes: Optional<POBJECT_ATTRIBUTES>,
     ProcessHandle: HANDLE,
-    StartRoutine: LPTHREAD_START_ROUTINE,
+    StartRoutine: LPTHREAD_START_ROUTINE<bigint>,
     Argument: Optional<PVOID<bigint>>,
     CreateFlags: ULONG,
     ZeroBits: SIZE_T,
@@ -691,27 +691,27 @@ class Ntdll extends Win32 {
     return Ntdll.Load('NtCreateThreadEx')(ThreadHandle_out, DesiredAccess, ObjectAttributes, ProcessHandle, StartRoutine, Argument, CreateFlags, ZeroBits, StackSize, MaximumStackSize, AttributeList);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-zwcreatetimer
+  // Undocumented export (no Microsoft Learn page).
   public static NtCreateTimer(TimerHandle_out: PHANDLE, DesiredAccess: ACCESS_MASK, ObjectAttributes: Optional<POBJECT_ATTRIBUTES>, TimerType: ULONG): NTSTATUS {
     return Ntdll.Load('NtCreateTimer')(TimerHandle_out, DesiredAccess, ObjectAttributes, TimerType);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntdebugactiveprocess
+  // Undocumented export (no Microsoft Learn page).
   public static NtDebugActiveProcess(ProcessHandle: HANDLE, DebugObjectHandle: HANDLE): NTSTATUS {
     return Ntdll.Load('NtDebugActiveProcess')(ProcessHandle, DebugObjectHandle);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntdebugcontinue
+  // Undocumented export (no Microsoft Learn page).
   public static NtDebugContinue(DebugObjectHandle: HANDLE, ClientId: PCLIENT_ID, ContinueStatus: NTSTATUS): NTSTATUS {
     return Ntdll.Load('NtDebugContinue')(DebugObjectHandle, ClientId, ContinueStatus);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/winternl/nf-winternl-ntdelayexecution
+  // Undocumented export (no Microsoft Learn page).
   public static NtDelayExecution(Alertable: BOOLEAN, DelayInterval: PLARGE_INTEGER): NTSTATUS {
     return Ntdll.Load('NtDelayExecution')(Alertable, DelayInterval);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntdeletefile
+  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-zwdeletefile
   public static NtDeleteFile(ObjectAttributes: POBJECT_ATTRIBUTES): NTSTATUS {
     return Ntdll.Load('NtDeleteFile')(ObjectAttributes);
   }
@@ -742,7 +742,7 @@ class Ntdll extends Win32 {
     return Ntdll.Load('NtDeviceIoControlFile')(FileHandle, Event, ApcRoutine, ApcContext, IoStatusBlock_out, IoControlCode, InputBuffer, InputBufferLength, OutputBuffer_out, OutputBufferLength);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntduplicateobject
+  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-zwduplicateobject
   public static NtDuplicateObject(
     SourceProcessHandle: HANDLE,
     SourceHandle: HANDLE,
@@ -761,21 +761,21 @@ class Ntdll extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-zwenumeratekey
-  public static NtEnumerateKey(KeyHandle: HANDLE, Index: ULONG, KeyInformationClass: ULONG, KeyInformation_out: PVOID, Length: ULONG, ResultLength_out: PULONG): NTSTATUS {
+  public static NtEnumerateKey(KeyHandle: HANDLE, Index: ULONG, KeyInformationClass: ULONG, KeyInformation_out: Optional<PVOID>, Length: ULONG, ResultLength_out: PULONG): NTSTATUS {
     return Ntdll.Load('NtEnumerateKey')(KeyHandle, Index, KeyInformationClass, KeyInformation_out, Length, ResultLength_out);
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-zwenumeratevaluekey
-  public static NtEnumerateValueKey(KeyHandle: HANDLE, Index: ULONG, KeyValueInformationClass: ULONG, KeyValueInformation_out: PVOID, Length: ULONG, ResultLength_out: PULONG): NTSTATUS {
+  public static NtEnumerateValueKey(KeyHandle: HANDLE, Index: ULONG, KeyValueInformationClass: ULONG, KeyValueInformation_out: Optional<PVOID>, Length: ULONG, ResultLength_out: PULONG): NTSTATUS {
     return Ntdll.Load('NtEnumerateValueKey')(KeyHandle, Index, KeyValueInformationClass, KeyValueInformation_out, Length, ResultLength_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntextendsection
+  // Undocumented export (no Microsoft Learn page).
   public static NtExtendSection(SectionHandle: HANDLE, NewSectionSize_in_out: PLARGE_INTEGER): NTSTATUS {
     return Ntdll.Load('NtExtendSection')(SectionHandle, NewSectionSize_in_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntfiltertoken
+  // Undocumented export (no Microsoft Learn page).
   public static NtFilterToken(
     ExistingTokenHandle: HANDLE,
     Flags: ULONG,
@@ -787,7 +787,7 @@ class Ntdll extends Win32 {
     return Ntdll.Load('NtFilterToken')(ExistingTokenHandle, Flags, SidsToDisable, PrivilegesToDelete, RestrictedSids, NewTokenHandle_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntflushbuffersfile
+  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-zwflushbuffersfile
   public static NtFlushBuffersFile(FileHandle: HANDLE, IoStatusBlock_out: PIO_STATUS_BLOCK): NTSTATUS {
     return Ntdll.Load('NtFlushBuffersFile')(FileHandle, IoStatusBlock_out);
   }
@@ -797,7 +797,7 @@ class Ntdll extends Win32 {
     return Ntdll.Load('NtFlushBuffersFileEx')(FileHandle, Flags, Parameters, ParametersSize, IoStatusBlock_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntflushinstructioncache
+  // Undocumented export (no Microsoft Learn page).
   public static NtFlushInstructionCache(ProcessHandle: HANDLE, BaseAddress: Optional<PVOID<bigint>>, Length: SIZE_T): NTSTATUS {
     return Ntdll.Load('NtFlushInstructionCache')(ProcessHandle, BaseAddress, Length);
   }
@@ -807,7 +807,7 @@ class Ntdll extends Win32 {
     return Ntdll.Load('NtFlushKey')(KeyHandle);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntflushvirtualmemory
+  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-zwflushvirtualmemory
   public static NtFlushVirtualMemory(ProcessHandle: HANDLE, BaseAddress_in_out: PVOID, RegionSize_in_out: PSIZE_T, IoStatus_out: PIO_STATUS_BLOCK): NTSTATUS {
     return Ntdll.Load('NtFlushVirtualMemory')(ProcessHandle, BaseAddress_in_out, RegionSize_in_out, IoStatus_out);
   }
@@ -833,42 +833,42 @@ class Ntdll extends Win32 {
     return Ntdll.Load('NtFsControlFile')(FileHandle, Event, ApcRoutine, ApcContext, IoStatusBlock_out, FsControlCode, InputBuffer, InputBufferLength, OutputBuffer_out, OutputBufferLength);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntgetcontextthread
+  // Undocumented export (no Microsoft Learn page).
   public static NtGetContextThread(ThreadHandle: HANDLE, ThreadContext_in_out: PCONTEXT): NTSTATUS {
     return Ntdll.Load('NtGetContextThread')(ThreadHandle, ThreadContext_in_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/winternl/nf-winternl-ntgetcurrentprocessornumber
+  // https://learn.microsoft.com/en-us/windows/win32/procthread/ntgetcurrentprocessornumber
   public static NtGetCurrentProcessorNumber(): ULONG {
     return Ntdll.Load('NtGetCurrentProcessorNumber')();
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntgetnextprocess
-  public static NtGetNextProcess(ProcessHandle: HANDLE, DesiredAccess: ACCESS_MASK, HandleAttributes: ULONG, Flags: ULONG, NewProcessHandle_out: PHANDLE): NTSTATUS {
+  // Undocumented export (no Microsoft Learn page).
+  public static NtGetNextProcess(ProcessHandle: Optional<HANDLE>, DesiredAccess: ACCESS_MASK, HandleAttributes: ULONG, Flags: ULONG, NewProcessHandle_out: PHANDLE): NTSTATUS {
     return Ntdll.Load('NtGetNextProcess')(ProcessHandle, DesiredAccess, HandleAttributes, Flags, NewProcessHandle_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntgetnextthread
-  public static NtGetNextThread(ProcessHandle: HANDLE, ThreadHandle: HANDLE, DesiredAccess: ACCESS_MASK, HandleAttributes: ULONG, Flags: ULONG, NewThreadHandle_out: PHANDLE): NTSTATUS {
+  // Undocumented export (no Microsoft Learn page).
+  public static NtGetNextThread(ProcessHandle: HANDLE, ThreadHandle: Optional<HANDLE>, DesiredAccess: ACCESS_MASK, HandleAttributes: ULONG, Flags: ULONG, NewThreadHandle_out: PHANDLE): NTSTATUS {
     return Ntdll.Load('NtGetNextThread')(ProcessHandle, ThreadHandle, DesiredAccess, HandleAttributes, Flags, NewThreadHandle_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntimpersonateanonymoustoken
+  // Undocumented export (no Microsoft Learn page).
   public static NtImpersonateAnonymousToken(ThreadHandle: HANDLE): NTSTATUS {
     return Ntdll.Load('NtImpersonateAnonymousToken')(ThreadHandle);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntimpersonatethread
+  // Undocumented export (no Microsoft Learn page).
   public static NtImpersonateThread(ServerThreadHandle: HANDLE, ClientThreadHandle: HANDLE, SecurityQos: PSECURITY_QUALITY_OF_SERVICE): NTSTATUS {
     return Ntdll.Load('NtImpersonateThread')(ServerThreadHandle, ClientThreadHandle, SecurityQos);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-zwisprocessinjob
+  // Undocumented export (no Microsoft Learn page).
   public static NtIsProcessInJob(ProcessHandle: HANDLE, JobHandle: Optional<HANDLE>): NTSTATUS {
     return Ntdll.Load('NtIsProcessInJob')(ProcessHandle, JobHandle);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-zwloadkey
+  // Undocumented export (no Microsoft Learn page).
   public static NtLoadKey(TargetKey: POBJECT_ATTRIBUTES, SourceFile: POBJECT_ATTRIBUTES): NTSTATUS {
     return Ntdll.Load('NtLoadKey')(TargetKey, SourceFile);
   }
@@ -889,12 +889,12 @@ class Ntdll extends Win32 {
     return Ntdll.Load('NtLockFile')(FileHandle, Event, ApcRoutine, ApcContext, IoStatusBlock_out, ByteOffset, Length, Key, FailImmediately, ExclusiveLock);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntlockvirtualmemory
+  // Undocumented export (no Microsoft Learn page).
   public static NtLockVirtualMemory(ProcessHandle: HANDLE, BaseAddress_in_out: PVOID, RegionSize_in_out: PSIZE_T, MapType: ULONG): NTSTATUS {
     return Ntdll.Load('NtLockVirtualMemory')(ProcessHandle, BaseAddress_in_out, RegionSize_in_out, MapType);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-zwmakepermanentobject
+  // Undocumented export (no Microsoft Learn page).
   public static NtMakePermanentObject(Handle: HANDLE): NTSTATUS {
     return Ntdll.Load('NtMakePermanentObject')(Handle);
   }
@@ -920,7 +920,7 @@ class Ntdll extends Win32 {
     return Ntdll.Load('NtMapViewOfSection')(SectionHandle, ProcessHandle, BaseAddress_in_out, ZeroBits, CommitSize, SectionOffset_in_out, ViewSize_in_out, InheritDisposition, AllocationType, Win32Protect);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntnotifychangedirectoryfile
+  // Undocumented export (no Microsoft Learn page).
   public static NtNotifyChangeDirectoryFile(
     FileHandle: HANDLE,
     Event: Optional<HANDLE>,
@@ -935,7 +935,7 @@ class Ntdll extends Win32 {
     return Ntdll.Load('NtNotifyChangeDirectoryFile')(FileHandle, Event, ApcRoutine, ApcContext, IoStatusBlock_out, Buffer_out, Length, CompletionFilter, WatchTree);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntnotifychangekey
+  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-zwnotifychangekey
   public static NtNotifyChangeKey(
     KeyHandle: HANDLE,
     Event: Optional<HANDLE>,
@@ -951,7 +951,7 @@ class Ntdll extends Win32 {
     return Ntdll.Load('NtNotifyChangeKey')(KeyHandle, Event, ApcRoutine, ApcContext, IoStatusBlock_out, CompletionFilter, WatchTree, Buffer_out, BufferSize, Asynchronous);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntnotifychangemultiplekeys
+  // https://learn.microsoft.com/en-us/windows/win32/api/winternl/nf-winternl-ntnotifychangemultiplekeys
   public static NtNotifyChangeMultipleKeys(
     MasterKeyHandle: HANDLE,
     Count: ULONG,
@@ -969,7 +969,7 @@ class Ntdll extends Win32 {
     return Ntdll.Load('NtNotifyChangeMultipleKeys')(MasterKeyHandle, Count, SubordinateObjects, Event, ApcRoutine, ApcContext, IoStatusBlock_out, CompletionFilter, WatchTree, Buffer_out, BufferSize, Asynchronous);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-zwopenDirectoryobject
+  // https://learn.microsoft.com/en-us/windows/win32/devnotes/ntopendirectoryobject
   public static NtOpenDirectoryObject(DirectoryHandle_out: PHANDLE, DesiredAccess: ACCESS_MASK, ObjectAttributes: POBJECT_ATTRIBUTES): NTSTATUS {
     return Ntdll.Load('NtOpenDirectoryObject')(DirectoryHandle_out, DesiredAccess, ObjectAttributes);
   }
@@ -984,12 +984,12 @@ class Ntdll extends Win32 {
     return Ntdll.Load('NtOpenFile')(FileHandle_out, DesiredAccess, ObjectAttributes, IoStatusBlock_out, ShareAccess, OpenOptions);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-zwopeniocompletion
+  // Undocumented export (no Microsoft Learn page).
   public static NtOpenIoCompletion(IoCompletionHandle_out: PHANDLE, DesiredAccess: ACCESS_MASK, ObjectAttributes: POBJECT_ATTRIBUTES): NTSTATUS {
     return Ntdll.Load('NtOpenIoCompletion')(IoCompletionHandle_out, DesiredAccess, ObjectAttributes);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-zwopenjobobject
+  // Undocumented export (no Microsoft Learn page).
   public static NtOpenJobObject(JobHandle_out: PHANDLE, DesiredAccess: ACCESS_MASK, ObjectAttributes: POBJECT_ATTRIBUTES): NTSTATUS {
     return Ntdll.Load('NtOpenJobObject')(JobHandle_out, DesiredAccess, ObjectAttributes);
   }
@@ -1004,12 +1004,12 @@ class Ntdll extends Win32 {
     return Ntdll.Load('NtOpenKeyEx')(KeyHandle_out, DesiredAccess, ObjectAttributes, OpenOptions);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-zwopenmutant
+  // Undocumented export (no Microsoft Learn page).
   public static NtOpenMutant(MutantHandle_out: PHANDLE, DesiredAccess: ACCESS_MASK, ObjectAttributes: POBJECT_ATTRIBUTES): NTSTATUS {
     return Ntdll.Load('NtOpenMutant')(MutantHandle_out, DesiredAccess, ObjectAttributes);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntopenprocess
+  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntddk/nf-ntddk-ntopenprocess
   public static NtOpenProcess(ProcessHandle_out: PHANDLE, DesiredAccess: ACCESS_MASK, ObjectAttributes: POBJECT_ATTRIBUTES, ClientId: Optional<PCLIENT_ID>): NTSTATUS {
     return Ntdll.Load('NtOpenProcess')(ProcessHandle_out, DesiredAccess, ObjectAttributes, ClientId);
   }
@@ -1029,7 +1029,7 @@ class Ntdll extends Win32 {
     return Ntdll.Load('NtOpenSection')(SectionHandle_out, DesiredAccess, ObjectAttributes);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-zwopensemaphore
+  // Undocumented export (no Microsoft Learn page).
   public static NtOpenSemaphore(SemaphoreHandle_out: PHANDLE, DesiredAccess: ACCESS_MASK, ObjectAttributes: POBJECT_ATTRIBUTES): NTSTATUS {
     return Ntdll.Load('NtOpenSemaphore')(SemaphoreHandle_out, DesiredAccess, ObjectAttributes);
   }
@@ -1039,8 +1039,8 @@ class Ntdll extends Win32 {
     return Ntdll.Load('NtOpenSymbolicLinkObject')(LinkHandle_out, DesiredAccess, ObjectAttributes);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntopenthread
-  public static NtOpenThread(ThreadHandle_out: PHANDLE, DesiredAccess: ACCESS_MASK, ObjectAttributes: POBJECT_ATTRIBUTES, ClientId: Optional<PCLIENT_ID>): NTSTATUS {
+  // https://learn.microsoft.com/en-us/windows/win32/devnotes/ntopenthread
+  public static NtOpenThread(ThreadHandle_out: PHANDLE, DesiredAccess: ACCESS_MASK, ObjectAttributes: POBJECT_ATTRIBUTES, ClientId: PCLIENT_ID): NTSTATUS {
     return Ntdll.Load('NtOpenThread')(ThreadHandle_out, DesiredAccess, ObjectAttributes, ClientId);
   }
 
@@ -1054,12 +1054,12 @@ class Ntdll extends Win32 {
     return Ntdll.Load('NtOpenThreadTokenEx')(ThreadHandle, DesiredAccess, OpenAsSelf, HandleAttributes, TokenHandle_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-zwopentimer
+  // Undocumented export (no Microsoft Learn page).
   public static NtOpenTimer(TimerHandle_out: PHANDLE, DesiredAccess: ACCESS_MASK, ObjectAttributes: POBJECT_ATTRIBUTES): NTSTATUS {
     return Ntdll.Load('NtOpenTimer')(TimerHandle_out, DesiredAccess, ObjectAttributes);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-zwpowerinformation
+  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-ntpowerinformation
   public static NtPowerInformation(InformationLevel: ULONG, InputBuffer: Optional<PVOID>, InputBufferLength: ULONG, OutputBuffer_out: Optional<PVOID>, OutputBufferLength: ULONG): NTSTATUS {
     return Ntdll.Load('NtPowerInformation')(InformationLevel, InputBuffer, InputBufferLength, OutputBuffer_out, OutputBufferLength);
   }
@@ -1069,27 +1069,27 @@ class Ntdll extends Win32 {
     return Ntdll.Load('NtPrivilegeCheck')(ClientToken, RequiredPrivileges_in_out, Result_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntprotectvirtualmemory
+  // Undocumented export (no Microsoft Learn page).
   public static NtProtectVirtualMemory(ProcessHandle: HANDLE, BaseAddress_in_out: PVOID, RegionSize_in_out: PSIZE_T, NewProtect: ULONG, OldProtect_out: PULONG): NTSTATUS {
     return Ntdll.Load('NtProtectVirtualMemory')(ProcessHandle, BaseAddress_in_out, RegionSize_in_out, NewProtect, OldProtect_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntpulseevent
+  // Undocumented export (no Microsoft Learn page).
   public static NtPulseEvent(EventHandle: HANDLE, PreviousState_out: Optional<PULONG>): NTSTATUS {
     return Ntdll.Load('NtPulseEvent')(EventHandle, PreviousState_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-zwqueryattributesfile
+  // https://learn.microsoft.com/en-us/windows/win32/devnotes/ntqueryattributesfile
   public static NtQueryAttributesFile(ObjectAttributes: POBJECT_ATTRIBUTES, FileInformation_out: PFILE_BASIC_INFORMATION): NTSTATUS {
     return Ntdll.Load('NtQueryAttributesFile')(ObjectAttributes, FileInformation_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntquerydefaultlocale
+  // Undocumented export (no Microsoft Learn page).
   public static NtQueryDefaultLocale(UserProfile: BOOLEAN, DefaultLocaleId_out: PLCID): NTSTATUS {
     return Ntdll.Load('NtQueryDefaultLocale')(UserProfile, DefaultLocaleId_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntquerydefaultuilanguage
+  // Undocumented export (no Microsoft Learn page).
   public static NtQueryDefaultUILanguage(DefaultUILanguageId_out: PVOID): NTSTATUS {
     return Ntdll.Load('NtQueryDefaultUILanguage')(DefaultUILanguageId_out);
   }
@@ -1111,12 +1111,12 @@ class Ntdll extends Win32 {
     return Ntdll.Load('NtQueryDirectoryFile')(FileHandle, Event, ApcRoutine, ApcContext, IoStatusBlock_out, FileInformation_out, Length, FileInformationClass, ReturnSingleEntry, FileName, RestartScan);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntquerydirectoryobject
-  public static NtQueryDirectoryObject(DirectoryHandle: HANDLE, Buffer_out: PVOID, Length: ULONG, ReturnSingleEntry: BOOLEAN, RestartScan: BOOLEAN, Context_in_out: PULONG, ReturnLength_out: Optional<PULONG>): NTSTATUS {
+  // https://learn.microsoft.com/en-us/windows/win32/devnotes/ntquerydirectoryobject
+  public static NtQueryDirectoryObject(DirectoryHandle: HANDLE, Buffer_out: Optional<PVOID>, Length: ULONG, ReturnSingleEntry: BOOLEAN, RestartScan: BOOLEAN, Context_in_out: PULONG, ReturnLength_out: Optional<PULONG>): NTSTATUS {
     return Ntdll.Load('NtQueryDirectoryObject')(DirectoryHandle, Buffer_out, Length, ReturnSingleEntry, RestartScan, Context_in_out, ReturnLength_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntqueryeafile
+  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-zwqueryeafile
   public static NtQueryEaFile(
     FileHandle: HANDLE,
     IoStatusBlock_out: PIO_STATUS_BLOCK,
@@ -1131,7 +1131,7 @@ class Ntdll extends Win32 {
     return Ntdll.Load('NtQueryEaFile')(FileHandle, IoStatusBlock_out, Buffer_out, Length, ReturnSingleEntry, EaList, EaListLength, EaIndex, RestartScan);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntqueryevent
+  // Undocumented export (no Microsoft Learn page).
   public static NtQueryEvent(EventHandle: HANDLE, EventInformationClass: ULONG, EventInformation_out: PVOID, EventInformationLength: ULONG, ReturnLength_out: Optional<PULONG>): NTSTATUS {
     return Ntdll.Load('NtQueryEvent')(EventHandle, EventInformationClass, EventInformation_out, EventInformationLength, ReturnLength_out);
   }
@@ -1141,13 +1141,13 @@ class Ntdll extends Win32 {
     return Ntdll.Load('NtQueryFullAttributesFile')(ObjectAttributes, FileInformation_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/winternl/nf-winternl-ntqueryinformationfile
+  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntqueryinformationfile
   public static NtQueryInformationFile(FileHandle: HANDLE, IoStatusBlock_out: PIO_STATUS_BLOCK, FileInformation_out: PVOID, Length: ULONG, FileInformationClass: ULONG): NTSTATUS {
     return Ntdll.Load('NtQueryInformationFile')(FileHandle, IoStatusBlock_out, FileInformation_out, Length, FileInformationClass);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-zwqueryinformationjobobject
-  public static NtQueryInformationJobObject(JobHandle: HANDLE, JobObjectInformationClass: ULONG, JobObjectInformation_out: PVOID, JobObjectInformationLength: ULONG, ReturnLength_out: Optional<PULONG>): NTSTATUS {
+  // Undocumented export (no Microsoft Learn page).
+  public static NtQueryInformationJobObject(JobHandle: Optional<HANDLE>, JobObjectInformationClass: ULONG, JobObjectInformation_out: PVOID, JobObjectInformationLength: ULONG, ReturnLength_out: Optional<PULONG>): NTSTATUS {
     return Ntdll.Load('NtQueryInformationJobObject')(JobHandle, JobObjectInformationClass, JobObjectInformation_out, JobObjectInformationLength, ReturnLength_out);
   }
 
@@ -1157,8 +1157,8 @@ class Ntdll extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winternl/nf-winternl-ntqueryinformationthread
-  public static NtQueryInformationThread(ThreadHandle: HANDLE, ThreadInformationClass: ULONG, ThreadInformation_out: PVOID, ThreadInformationLength: ULONG, ReturnLength_out: Optional<PULONG>): NTSTATUS {
-    return Ntdll.Load('NtQueryInformationThread')(ThreadHandle, ThreadInformationClass, ThreadInformation_out, ThreadInformationLength, ReturnLength_out);
+  public static NtQueryInformationThread(ThreadHandle: HANDLE, ThreadInformationClass: ULONG, ThreadInformation_in_out: PVOID, ThreadInformationLength: ULONG, ReturnLength_out: Optional<PULONG>): NTSTATUS {
+    return Ntdll.Load('NtQueryInformationThread')(ThreadHandle, ThreadInformationClass, ThreadInformation_in_out, ThreadInformationLength, ReturnLength_out);
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntqueryinformationtoken
@@ -1166,27 +1166,27 @@ class Ntdll extends Win32 {
     return Ntdll.Load('NtQueryInformationToken')(TokenHandle, TokenInformationClass, TokenInformation_out, TokenInformationLength, ReturnLength_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntqueryinstalluilanguage
+  // Undocumented export (no Microsoft Learn page).
   public static NtQueryInstallUILanguage(InstallUILanguageId_out: PVOID): NTSTATUS {
     return Ntdll.Load('NtQueryInstallUILanguage')(InstallUILanguageId_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-zwqueryiocompletion
+  // Undocumented export (no Microsoft Learn page).
   public static NtQueryIoCompletion(IoCompletionHandle: HANDLE, IoCompletionInformationClass: ULONG, IoCompletionInformation_out: PVOID, IoCompletionInformationLength: ULONG, ReturnLength_out: Optional<PULONG>): NTSTATUS {
     return Ntdll.Load('NtQueryIoCompletion')(IoCompletionHandle, IoCompletionInformationClass, IoCompletionInformation_out, IoCompletionInformationLength, ReturnLength_out);
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-zwquerykey
-  public static NtQueryKey(KeyHandle: HANDLE, KeyInformationClass: ULONG, KeyInformation_out: PVOID, Length: ULONG, ResultLength_out: PULONG): NTSTATUS {
+  public static NtQueryKey(KeyHandle: HANDLE, KeyInformationClass: ULONG, KeyInformation_out: Optional<PVOID>, Length: ULONG, ResultLength_out: PULONG): NTSTATUS {
     return Ntdll.Load('NtQueryKey')(KeyHandle, KeyInformationClass, KeyInformation_out, Length, ResultLength_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-zwquerymultiplevaluekey
+  // https://learn.microsoft.com/en-us/windows/win32/api/winternl/nf-winternl-ntquerymultiplevaluekey
   public static NtQueryMultipleValueKey(KeyHandle: HANDLE, ValueEntries_in_out: PKEY_VALUE_ENTRY, EntryCount: ULONG, ValueBuffer_out: PVOID, BufferLength_in_out: PULONG, RequiredBufferLength_out: Optional<PULONG>): NTSTATUS {
     return Ntdll.Load('NtQueryMultipleValueKey')(KeyHandle, ValueEntries_in_out, EntryCount, ValueBuffer_out, BufferLength_in_out, RequiredBufferLength_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntquerymutant
+  // Undocumented export (no Microsoft Learn page).
   public static NtQueryMutant(MutantHandle: HANDLE, MutantInformationClass: ULONG, MutantInformation_out: PVOID, MutantInformationLength: ULONG, ReturnLength_out: Optional<PULONG>): NTSTATUS {
     return Ntdll.Load('NtQueryMutant')(MutantHandle, MutantInformationClass, MutantInformation_out, MutantInformationLength, ReturnLength_out);
   }
@@ -1196,12 +1196,12 @@ class Ntdll extends Win32 {
     return Ntdll.Load('NtQueryObject')(Handle, ObjectInformationClass, ObjectInformation_out, ObjectInformationLength, ReturnLength_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntqueryperformancecounter
+  // https://learn.microsoft.com/en-us/windows/win32/devnotes/ntqueryperformancecounter
   public static NtQueryPerformanceCounter(PerformanceCounter_out: PLARGE_INTEGER, PerformanceFrequency_out: Optional<PLARGE_INTEGER>): NTSTATUS {
     return Ntdll.Load('NtQueryPerformanceCounter')(PerformanceCounter_out, PerformanceFrequency_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntquerysection
+  // https://learn.microsoft.com/en-us/windows/win32/devnotes/ntquerysection
   public static NtQuerySection(SectionHandle: HANDLE, SectionInformationClass: ULONG, SectionInformation_out: PVOID, SectionInformationLength: SIZE_T, ReturnLength_out: Optional<PSIZE_T>): NTSTATUS {
     return Ntdll.Load('NtQuerySection')(SectionHandle, SectionInformationClass, SectionInformation_out, SectionInformationLength, ReturnLength_out);
   }
@@ -1211,7 +1211,7 @@ class Ntdll extends Win32 {
     return Ntdll.Load('NtQuerySecurityObject')(Handle, SecurityInformation, SecurityDescriptor_out, Length, LengthNeeded_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntquerysemaphore
+  // Undocumented export (no Microsoft Learn page).
   public static NtQuerySemaphore(SemaphoreHandle: HANDLE, SemaphoreInformationClass: ULONG, SemaphoreInformation_out: PVOID, SemaphoreInformationLength: ULONG, ReturnLength_out: Optional<PULONG>): NTSTATUS {
     return Ntdll.Load('NtQuerySemaphore')(SemaphoreHandle, SemaphoreInformationClass, SemaphoreInformation_out, SemaphoreInformationLength, ReturnLength_out);
   }
@@ -1222,12 +1222,12 @@ class Ntdll extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winternl/nf-winternl-ntquerysysteminformation
-  public static NtQuerySystemInformation(SystemInformationClass: ULONG, SystemInformation_out: PVOID, SystemInformationLength: ULONG, ReturnLength_out: Optional<PULONG>): NTSTATUS {
-    return Ntdll.Load('NtQuerySystemInformation')(SystemInformationClass, SystemInformation_out, SystemInformationLength, ReturnLength_out);
+  public static NtQuerySystemInformation(SystemInformationClass: ULONG, SystemInformation_in_out: PVOID, SystemInformationLength: ULONG, ReturnLength_out: Optional<PULONG>): NTSTATUS {
+    return Ntdll.Load('NtQuerySystemInformation')(SystemInformationClass, SystemInformation_in_out, SystemInformationLength, ReturnLength_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/winternl/nf-winternl-ntquerysysteminformationex
-  public static NtQuerySystemInformationEx(SystemInformationClass: ULONG, InputBuffer: PVOID, InputBufferLength: ULONG, SystemInformation_out: PVOID, SystemInformationLength: ULONG, ReturnLength_out: Optional<PULONG>): NTSTATUS {
+  // Undocumented export (no Microsoft Learn page).
+  public static NtQuerySystemInformationEx(SystemInformationClass: ULONG, InputBuffer: PVOID, InputBufferLength: ULONG, SystemInformation_out: Optional<PVOID>, SystemInformationLength: ULONG, ReturnLength_out: Optional<PULONG>): NTSTATUS {
     return Ntdll.Load('NtQuerySystemInformationEx')(SystemInformationClass, InputBuffer, InputBufferLength, SystemInformation_out, SystemInformationLength, ReturnLength_out);
   }
 
@@ -1236,42 +1236,42 @@ class Ntdll extends Win32 {
     return Ntdll.Load('NtQuerySystemTime')(SystemTime_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-zwquerytimer
+  // Undocumented export (no Microsoft Learn page).
   public static NtQueryTimer(TimerHandle: HANDLE, TimerInformationClass: ULONG, TimerInformation_out: PVOID, TimerInformationLength: ULONG, ReturnLength_out: Optional<PULONG>): NTSTATUS {
     return Ntdll.Load('NtQueryTimer')(TimerHandle, TimerInformationClass, TimerInformation_out, TimerInformationLength, ReturnLength_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntquerytimerresolution
+  // Undocumented export (no Microsoft Learn page).
   public static NtQueryTimerResolution(MaximumTime_out: PULONG, MinimumTime_out: PULONG, CurrentTime_out: PULONG): NTSTATUS {
     return Ntdll.Load('NtQueryTimerResolution')(MaximumTime_out, MinimumTime_out, CurrentTime_out);
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-zwqueryvaluekey
-  public static NtQueryValueKey(KeyHandle: HANDLE, ValueName: PUNICODE_STRING, KeyValueInformationClass: ULONG, KeyValueInformation_out: PVOID, Length: ULONG, ResultLength_out: PULONG): NTSTATUS {
+  public static NtQueryValueKey(KeyHandle: HANDLE, ValueName: PUNICODE_STRING, KeyValueInformationClass: ULONG, KeyValueInformation_out: Optional<PVOID>, Length: ULONG, ResultLength_out: PULONG): NTSTATUS {
     return Ntdll.Load('NtQueryValueKey')(KeyHandle, ValueName, KeyValueInformationClass, KeyValueInformation_out, Length, ResultLength_out);
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntqueryvirtualmemory
-  public static NtQueryVirtualMemory(ProcessHandle: HANDLE, BaseAddress: PVOID<bigint>, MemoryInformationClass: ULONG, MemoryInformation_out: PVOID, MemoryInformationLength: SIZE_T, ReturnLength_out: Optional<PSIZE_T>): NTSTATUS {
+  public static NtQueryVirtualMemory(ProcessHandle: HANDLE, BaseAddress: Optional<PVOID<bigint>>, MemoryInformationClass: ULONG, MemoryInformation_out: PVOID, MemoryInformationLength: SIZE_T, ReturnLength_out: Optional<PSIZE_T>): NTSTATUS {
     return Ntdll.Load('NtQueryVirtualMemory')(ProcessHandle, BaseAddress, MemoryInformationClass, MemoryInformation_out, MemoryInformationLength, ReturnLength_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/winternl/nf-winternl-ntqueryvolumeinformationfile
+  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntqueryvolumeinformationfile
   public static NtQueryVolumeInformationFile(FileHandle: HANDLE, IoStatusBlock_out: PIO_STATUS_BLOCK, FsInformation_out: PVOID, Length: ULONG, FsInformationClass: ULONG): NTSTATUS {
     return Ntdll.Load('NtQueryVolumeInformationFile')(FileHandle, IoStatusBlock_out, FsInformation_out, Length, FsInformationClass);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntqueueapcthread
+  // Undocumented export (no Microsoft Learn page).
   public static NtQueueApcThread(ThreadHandle: HANDLE, ApcRoutine: PPS_APC_ROUTINE, ApcArgument1: Optional<PVOID>, ApcArgument2: Optional<PVOID>, ApcArgument3: Optional<PVOID>): NTSTATUS {
     return Ntdll.Load('NtQueueApcThread')(ThreadHandle, ApcRoutine, ApcArgument1, ApcArgument2, ApcArgument3);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntqueueapcthreadex
+  // Undocumented export (no Microsoft Learn page).
   public static NtQueueApcThreadEx(ThreadHandle: HANDLE, ReserveHandle: Optional<HANDLE>, ApcRoutine: PPS_APC_ROUTINE, ApcArgument1: Optional<PVOID>, ApcArgument2: Optional<PVOID>, ApcArgument3: Optional<PVOID>): NTSTATUS {
     return Ntdll.Load('NtQueueApcThreadEx')(ThreadHandle, ReserveHandle, ApcRoutine, ApcArgument1, ApcArgument2, ApcArgument3);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntraiseharderror
+  // Undocumented export (no Microsoft Learn page).
   public static NtRaiseHardError(ErrorStatus: NTSTATUS, NumberOfParameters: ULONG, UnicodeStringParameterMask: ULONG, Parameters: PULONG_PTR, ValidResponseOptions: ULONG, Response_out: PULONG): NTSTATUS {
     return Ntdll.Load('NtRaiseHardError')(ErrorStatus, NumberOfParameters, UnicodeStringParameterMask, Parameters, ValidResponseOptions, Response_out);
   }
@@ -1291,7 +1291,7 @@ class Ntdll extends Win32 {
     return Ntdll.Load('NtReadFile')(FileHandle, Event, ApcRoutine, ApcContext, IoStatusBlock_out, Buffer_out, Length, ByteOffset, Key);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntreadfilescatter
+  // Undocumented export (no Microsoft Learn page).
   public static NtReadFileScatter(
     FileHandle: HANDLE,
     Event: Optional<HANDLE>,
@@ -1306,117 +1306,117 @@ class Ntdll extends Win32 {
     return Ntdll.Load('NtReadFileScatter')(FileHandle, Event, ApcRoutine, ApcContext, IoStatusBlock_out, SegmentArray, Length, ByteOffset, Key);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntreadvirtualmemory
-  public static NtReadVirtualMemory(ProcessHandle: HANDLE, BaseAddress: PVOID<bigint>, Buffer_out: PVOID, BufferSize: SIZE_T, NumberOfBytesRead_out: Optional<PSIZE_T>): NTSTATUS {
+  // Undocumented export (no Microsoft Learn page).
+  public static NtReadVirtualMemory(ProcessHandle: HANDLE, BaseAddress: Optional<PVOID<bigint>>, Buffer_out: PVOID, BufferSize: SIZE_T, NumberOfBytesRead_out: Optional<PSIZE_T>): NTSTATUS {
     return Ntdll.Load('NtReadVirtualMemory')(ProcessHandle, BaseAddress, Buffer_out, BufferSize, NumberOfBytesRead_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-zwreleasemutant
+  // Undocumented export (no Microsoft Learn page).
   public static NtReleaseMutant(MutantHandle: HANDLE, PreviousCount_out: Optional<PULONG>): NTSTATUS {
     return Ntdll.Load('NtReleaseMutant')(MutantHandle, PreviousCount_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-zwreleasesemaphore
+  // Undocumented export (no Microsoft Learn page).
   public static NtReleaseSemaphore(SemaphoreHandle: HANDLE, ReleaseCount: LONG, PreviousCount_out: Optional<PULONG>): NTSTATUS {
     return Ntdll.Load('NtReleaseSemaphore')(SemaphoreHandle, ReleaseCount, PreviousCount_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-zwremoveiocompletion
+  // https://learn.microsoft.com/en-us/windows/win32/devnotes/ntremoveiocompletion
   public static NtRemoveIoCompletion(IoCompletionHandle: HANDLE, KeyContext_out: PVOID, ApcContext_out: PVOID, IoStatusBlock_out: PIO_STATUS_BLOCK, Timeout: Optional<PLARGE_INTEGER>): NTSTATUS {
     return Ntdll.Load('NtRemoveIoCompletion')(IoCompletionHandle, KeyContext_out, ApcContext_out, IoStatusBlock_out, Timeout);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-zwremoveiocompletionex
+  // Undocumented export (no Microsoft Learn page).
   public static NtRemoveIoCompletionEx(IoCompletionHandle: HANDLE, IoCompletionInformation_out: PFILE_IO_COMPLETION_INFORMATION, Count: ULONG, NumEntriesRemoved_out: PULONG, Timeout: Optional<PLARGE_INTEGER>, Alertable: BOOLEAN): NTSTATUS {
     return Ntdll.Load('NtRemoveIoCompletionEx')(IoCompletionHandle, IoCompletionInformation_out, Count, NumEntriesRemoved_out, Timeout, Alertable);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntremoveprocessdebug
+  // Undocumented export (no Microsoft Learn page).
   public static NtRemoveProcessDebug(ProcessHandle: HANDLE, DebugObjectHandle: HANDLE): NTSTATUS {
     return Ntdll.Load('NtRemoveProcessDebug')(ProcessHandle, DebugObjectHandle);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntrenamekey
+  // https://learn.microsoft.com/en-us/windows/win32/api/winternl/nf-winternl-ntrenamekey
   public static NtRenameKey(KeyHandle: HANDLE, NewName: PUNICODE_STRING): NTSTATUS {
     return Ntdll.Load('NtRenameKey')(KeyHandle, NewName);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntresetevent
+  // Undocumented export (no Microsoft Learn page).
   public static NtResetEvent(EventHandle: HANDLE, PreviousState_out: Optional<PULONG>): NTSTATUS {
     return Ntdll.Load('NtResetEvent')(EventHandle, PreviousState_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntrestorekey
+  // Undocumented export (no Microsoft Learn page).
   public static NtRestoreKey(KeyHandle: HANDLE, FileHandle: HANDLE, Flags: ULONG): NTSTATUS {
     return Ntdll.Load('NtRestoreKey')(KeyHandle, FileHandle, Flags);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntresumeprocess
+  // Undocumented export (no Microsoft Learn page).
   public static NtResumeProcess(ProcessHandle: HANDLE): NTSTATUS {
     return Ntdll.Load('NtResumeProcess')(ProcessHandle);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntresumethread
+  // Undocumented export (no Microsoft Learn page).
   public static NtResumeThread(ThreadHandle: HANDLE, PreviousSuspendCount_out: Optional<PULONG>): NTSTATUS {
     return Ntdll.Load('NtResumeThread')(ThreadHandle, PreviousSuspendCount_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntsavekey
+  // Undocumented export (no Microsoft Learn page).
   public static NtSaveKey(KeyHandle: HANDLE, FileHandle: HANDLE): NTSTATUS {
     return Ntdll.Load('NtSaveKey')(KeyHandle, FileHandle);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntsavekeyex
+  // Undocumented export (no Microsoft Learn page).
   public static NtSaveKeyEx(KeyHandle: HANDLE, FileHandle: HANDLE, Format: ULONG): NTSTATUS {
     return Ntdll.Load('NtSaveKeyEx')(KeyHandle, FileHandle, Format);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntsetcontextthread
+  // Undocumented export (no Microsoft Learn page).
   public static NtSetContextThread(ThreadHandle: HANDLE, ThreadContext: PCONTEXT): NTSTATUS {
     return Ntdll.Load('NtSetContextThread')(ThreadHandle, ThreadContext);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntsetdefaultlocale
+  // Undocumented export (no Microsoft Learn page).
   public static NtSetDefaultLocale(UserProfile: BOOLEAN, DefaultLocaleId: ULONG): NTSTATUS {
     return Ntdll.Load('NtSetDefaultLocale')(UserProfile, DefaultLocaleId);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntsetdefaultuilanguage
+  // Undocumented export (no Microsoft Learn page).
   public static NtSetDefaultUILanguage(DefaultUILanguageId: LANGID): NTSTATUS {
     return Ntdll.Load('NtSetDefaultUILanguage')(DefaultUILanguageId);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntseteafile
+  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-zwseteafile
   public static NtSetEaFile(FileHandle: HANDLE, IoStatusBlock_out: PIO_STATUS_BLOCK, Buffer: PVOID, Length: ULONG): NTSTATUS {
     return Ntdll.Load('NtSetEaFile')(FileHandle, IoStatusBlock_out, Buffer, Length);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntsetevent
+  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-zwsetevent
   public static NtSetEvent(EventHandle: HANDLE, PreviousState_out: Optional<PULONG>): NTSTATUS {
     return Ntdll.Load('NtSetEvent')(EventHandle, PreviousState_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/winternl/nf-winternl-ntsetinformationfile
+  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntsetinformationfile
   public static NtSetInformationFile(FileHandle: HANDLE, IoStatusBlock_out: PIO_STATUS_BLOCK, FileInformation: PVOID, Length: ULONG, FileInformationClass: ULONG): NTSTATUS {
     return Ntdll.Load('NtSetInformationFile')(FileHandle, IoStatusBlock_out, FileInformation, Length, FileInformationClass);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-zwsetinformationjobobject
+  // Undocumented export (no Microsoft Learn page).
   public static NtSetInformationJobObject(JobHandle: HANDLE, JobObjectInformationClass: ULONG, JobObjectInformation: PVOID, JobObjectInformationLength: ULONG): NTSTATUS {
     return Ntdll.Load('NtSetInformationJobObject')(JobHandle, JobObjectInformationClass, JobObjectInformation, JobObjectInformationLength);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntsetinformationobject
+  // Undocumented export (no Microsoft Learn page).
   public static NtSetInformationObject(Handle: HANDLE, ObjectInformationClass: ULONG, ObjectInformation: PVOID, ObjectInformationLength: ULONG): NTSTATUS {
     return Ntdll.Load('NtSetInformationObject')(Handle, ObjectInformationClass, ObjectInformation, ObjectInformationLength);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntsetinformationprocess
+  // Undocumented export (no Microsoft Learn page).
   public static NtSetInformationProcess(ProcessHandle: HANDLE, ProcessInformationClass: ULONG, ProcessInformation: PVOID, ProcessInformationLength: ULONG): NTSTATUS {
     return Ntdll.Load('NtSetInformationProcess')(ProcessHandle, ProcessInformationClass, ProcessInformation, ProcessInformationLength);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/winternl/nf-winternl-ntsetinformationthread
+  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntsetinformationthread
   public static NtSetInformationThread(ThreadHandle: HANDLE, ThreadInformationClass: ULONG, ThreadInformation: PVOID, ThreadInformationLength: ULONG): NTSTATUS {
     return Ntdll.Load('NtSetInformationThread')(ThreadHandle, ThreadInformationClass, ThreadInformation, ThreadInformationLength);
   }
@@ -1426,8 +1426,8 @@ class Ntdll extends Win32 {
     return Ntdll.Load('NtSetInformationToken')(TokenHandle, TokenInformationClass, TokenInformation, TokenInformationLength);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-zwsetiocompletion
-  public static NtSetIoCompletion(IoCompletionHandle: HANDLE, KeyContext: PVOID, ApcContext: PVOID, IoStatus: NTSTATUS, IoStatusInformation: ULONG_PTR): NTSTATUS {
+  // Undocumented export (no Microsoft Learn page).
+  public static NtSetIoCompletion(IoCompletionHandle: HANDLE, KeyContext: Optional<PVOID>, ApcContext: Optional<PVOID>, IoStatus: NTSTATUS, IoStatusInformation: ULONG_PTR): NTSTATUS {
     return Ntdll.Load('NtSetIoCompletion')(IoCompletionHandle, KeyContext, ApcContext, IoStatus, IoStatusInformation);
   }
 
@@ -1436,72 +1436,72 @@ class Ntdll extends Win32 {
     return Ntdll.Load('NtSetSecurityObject')(Handle, SecurityInformation, SecurityDescriptor);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-zwsetsysteminformation
-  public static NtSetSystemInformation(SystemInformationClass: ULONG, SystemInformation: PVOID, SystemInformationLength: ULONG): NTSTATUS {
+  // https://learn.microsoft.com/en-us/windows/win32/sysinfo/ntsetsysteminformation
+  public static NtSetSystemInformation(SystemInformationClass: ULONG, SystemInformation: Optional<PVOID>, SystemInformationLength: ULONG): NTSTATUS {
     return Ntdll.Load('NtSetSystemInformation')(SystemInformationClass, SystemInformation, SystemInformationLength);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-zwsettimer
+  // Undocumented export (no Microsoft Learn page).
   public static NtSetTimer(TimerHandle: HANDLE, DueTime: PLARGE_INTEGER, TimerApcRoutine: Optional<PTIMER_APC_ROUTINE>, TimerContext: Optional<PVOID>, ResumeTimer: BOOLEAN, Period: LONG, PreviousState_out: Optional<PBOOLEAN>): NTSTATUS {
     return Ntdll.Load('NtSetTimer')(TimerHandle, DueTime, TimerApcRoutine, TimerContext, ResumeTimer, Period, PreviousState_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntsettimerresolution
+  // Undocumented export (no Microsoft Learn page).
   public static NtSetTimerResolution(DesiredTime: ULONG, SetResolution: BOOLEAN, ActualTime_out: Optional<PULONG>): NTSTATUS {
     return Ntdll.Load('NtSetTimerResolution')(DesiredTime, SetResolution, ActualTime_out);
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-zwsetvaluekey
-  public static NtSetValueKey(KeyHandle: HANDLE, ValueName: PUNICODE_STRING, TitleIndex: ULONG, Type: ULONG, Data: PVOID, DataSize: ULONG): NTSTATUS {
+  public static NtSetValueKey(KeyHandle: HANDLE, ValueName: PUNICODE_STRING, TitleIndex: ULONG, Type: ULONG, Data: Optional<PVOID>, DataSize: ULONG): NTSTATUS {
     return Ntdll.Load('NtSetValueKey')(KeyHandle, ValueName, TitleIndex, Type, Data, DataSize);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntsetvolumeinformationfile
+  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-zwsetvolumeinformationfile
   public static NtSetVolumeInformationFile(FileHandle: HANDLE, IoStatusBlock_out: PIO_STATUS_BLOCK, FsInformation: PVOID, Length: ULONG, FsInformationClass: ULONG): NTSTATUS {
     return Ntdll.Load('NtSetVolumeInformationFile')(FileHandle, IoStatusBlock_out, FsInformation, Length, FsInformationClass);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntshutdownsystem
+  // Undocumented export (no Microsoft Learn page).
   public static NtShutdownSystem(Action: ULONG): NTSTATUS {
     return Ntdll.Load('NtShutdownSystem')(Action);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntsignalandwaitforsingleobject
+  // Undocumented export (no Microsoft Learn page).
   public static NtSignalAndWaitForSingleObject(SignalHandle: HANDLE, WaitHandle: HANDLE, Alertable: BOOLEAN, Timeout: Optional<PLARGE_INTEGER>): NTSTATUS {
     return Ntdll.Load('NtSignalAndWaitForSingleObject')(SignalHandle, WaitHandle, Alertable, Timeout);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntsuspendprocess
+  // Undocumented export (no Microsoft Learn page).
   public static NtSuspendProcess(ProcessHandle: HANDLE): NTSTATUS {
     return Ntdll.Load('NtSuspendProcess')(ProcessHandle);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntsuspendthread
+  // Undocumented export (no Microsoft Learn page).
   public static NtSuspendThread(ThreadHandle: HANDLE, PreviousSuspendCount_out: Optional<PULONG>): NTSTATUS {
     return Ntdll.Load('NtSuspendThread')(ThreadHandle, PreviousSuspendCount_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-zwterminatejobobject
+  // Undocumented export (no Microsoft Learn page).
   public static NtTerminateJobObject(JobHandle: HANDLE, ExitStatus: NTSTATUS): NTSTATUS {
     return Ntdll.Load('NtTerminateJobObject')(JobHandle, ExitStatus);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntterminateprocess
+  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntddk/nf-ntddk-zwterminateprocess
   public static NtTerminateProcess(ProcessHandle: Optional<HANDLE>, ExitStatus: NTSTATUS): NTSTATUS {
     return Ntdll.Load('NtTerminateProcess')(ProcessHandle, ExitStatus);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntterminatethread
+  // Undocumented export (no Microsoft Learn page).
   public static NtTerminateThread(ThreadHandle: Optional<HANDLE>, ExitStatus: NTSTATUS): NTSTATUS {
     return Ntdll.Load('NtTerminateThread')(ThreadHandle, ExitStatus);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-nttestalert
+  // Undocumented export (no Microsoft Learn page).
   public static NtTestAlert(): NTSTATUS {
     return Ntdll.Load('NtTestAlert')();
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-zwunloadkey
+  // Undocumented export (no Microsoft Learn page).
   public static NtUnloadKey(TargetKey: POBJECT_ATTRIBUTES): NTSTATUS {
     return Ntdll.Load('NtUnloadKey')(TargetKey);
   }
@@ -1511,27 +1511,27 @@ class Ntdll extends Win32 {
     return Ntdll.Load('NtUnlockFile')(FileHandle, IoStatusBlock_out, ByteOffset, Length, Key);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntunlockvirtualmemory
+  // Undocumented export (no Microsoft Learn page).
   public static NtUnlockVirtualMemory(ProcessHandle: HANDLE, BaseAddress_in_out: PVOID, RegionSize_in_out: PSIZE_T, MapType: ULONG): NTSTATUS {
     return Ntdll.Load('NtUnlockVirtualMemory')(ProcessHandle, BaseAddress_in_out, RegionSize_in_out, MapType);
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-zwunmapviewofsection
-  public static NtUnmapViewOfSection(ProcessHandle: HANDLE, BaseAddress: PVOID<bigint>): NTSTATUS {
+  public static NtUnmapViewOfSection(ProcessHandle: HANDLE, BaseAddress: Optional<PVOID<bigint>>): NTSTATUS {
     return Ntdll.Load('NtUnmapViewOfSection')(ProcessHandle, BaseAddress);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-zwunmapviewofsectionex
-  public static NtUnmapViewOfSectionEx(ProcessHandle: HANDLE, BaseAddress: PVOID<bigint>, Flags: ULONG): NTSTATUS {
+  // Undocumented export (no Microsoft Learn page).
+  public static NtUnmapViewOfSectionEx(ProcessHandle: HANDLE, BaseAddress: Optional<PVOID<bigint>>, Flags: ULONG): NTSTATUS {
     return Ntdll.Load('NtUnmapViewOfSectionEx')(ProcessHandle, BaseAddress, Flags);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntwaitfordebugevent
+  // Undocumented export (no Microsoft Learn page).
   public static NtWaitForDebugEvent(DebugObjectHandle: HANDLE, Alertable: BOOLEAN, Timeout: Optional<PLARGE_INTEGER>, WaitStateChange_out: PDBGUI_WAIT_STATE_CHANGE): NTSTATUS {
     return Ntdll.Load('NtWaitForDebugEvent')(DebugObjectHandle, Alertable, Timeout, WaitStateChange_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntwaitformultipleobjects
+  // Undocumented export (no Microsoft Learn page).
   public static NtWaitForMultipleObjects(Count: ULONG, Handles: PHANDLE, WaitType: ULONG, Alertable: BOOLEAN, Timeout: Optional<PLARGE_INTEGER>): NTSTATUS {
     return Ntdll.Load('NtWaitForMultipleObjects')(Count, Handles, WaitType, Alertable, Timeout);
   }
@@ -1556,7 +1556,7 @@ class Ntdll extends Win32 {
     return Ntdll.Load('NtWriteFile')(FileHandle, Event, ApcRoutine, ApcContext, IoStatusBlock_out, Buffer, Length, ByteOffset, Key);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntwritefilegather
+  // Undocumented export (no Microsoft Learn page).
   public static NtWriteFileGather(
     FileHandle: HANDLE,
     Event: Optional<HANDLE>,
@@ -1571,12 +1571,12 @@ class Ntdll extends Win32 {
     return Ntdll.Load('NtWriteFileGather')(FileHandle, Event, ApcRoutine, ApcContext, IoStatusBlock_out, SegmentArray, Length, ByteOffset, Key);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntwritevirtualmemory
-  public static NtWriteVirtualMemory(ProcessHandle: HANDLE, BaseAddress: PVOID<bigint>, Buffer: PVOID, BufferSize: SIZE_T, NumberOfBytesWritten_out: Optional<PSIZE_T>): NTSTATUS {
+  // Undocumented export (no Microsoft Learn page).
+  public static NtWriteVirtualMemory(ProcessHandle: HANDLE, BaseAddress: Optional<PVOID<bigint>>, Buffer: PVOID, BufferSize: SIZE_T, NumberOfBytesWritten_out: Optional<PSIZE_T>): NTSTATUS {
     return Ntdll.Load('NtWriteVirtualMemory')(ProcessHandle, BaseAddress, Buffer, BufferSize, NumberOfBytesWritten_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntyieldexecution
+  // Undocumented export (no Microsoft Learn page).
   public static NtYieldExecution(): NTSTATUS {
     return Ntdll.Load('NtYieldExecution')();
   }
@@ -1586,12 +1586,12 @@ class Ntdll extends Win32 {
     return Ntdll.Load('RtlAbsoluteToSelfRelativeSD')(AbsoluteSecurityDescriptor, SelfRelativeSecurityDescriptor_out, BufferLength_in_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-rtlacquiresrwlockexclusive
+  // Undocumented export (no Microsoft Learn page).
   public static RtlAcquireSRWLockExclusive(SRWLock_in_out: PRTL_SRWLOCK): VOID {
     return Ntdll.Load('RtlAcquireSRWLockExclusive')(SRWLock_in_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-rtlacquiresrwlockshared
+  // Undocumented export (no Microsoft Learn page).
   public static RtlAcquireSRWLockShared(SRWLock_in_out: PRTL_SRWLOCK): VOID {
     return Ntdll.Load('RtlAcquireSRWLockShared')(SRWLock_in_out);
   }
@@ -1606,12 +1606,12 @@ class Ntdll extends Win32 {
     return Ntdll.Load('RtlAddAccessAllowedAceEx')(Acl_in_out, AceRevision, AceFlags, AccessMask, Sid);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-rtladdaccessdeniedace
+  // Undocumented export (no Microsoft Learn page).
   public static RtlAddAccessDeniedAce(Acl_in_out: PACL, AceRevision: ULONG, AccessMask: ACCESS_MASK, Sid: PSID): NTSTATUS {
     return Ntdll.Load('RtlAddAccessDeniedAce')(Acl_in_out, AceRevision, AccessMask, Sid);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-rtladdaccessdeniedaceex
+  // Undocumented export (no Microsoft Learn page).
   public static RtlAddAccessDeniedAceEx(Acl_in_out: PACL, AceRevision: ULONG, AceFlags: ULONG, AccessMask: ACCESS_MASK, Sid: PSID): NTSTATUS {
     return Ntdll.Load('RtlAddAccessDeniedAceEx')(Acl_in_out, AceRevision, AceFlags, AccessMask, Sid);
   }
@@ -1626,17 +1626,17 @@ class Ntdll extends Win32 {
     return Ntdll.Load('RtlAddFunctionTable')(FunctionTable, EntryCount, BaseAddress);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/errhandlingapi/nf-errhandlingapi-addvectoredcontinuehandler
+  // Undocumented export (no Microsoft Learn page).
   public static RtlAddVectoredContinueHandler(First: ULONG, Handler: PVECTORED_EXCEPTION_HANDLER): PVOID {
     return Ntdll.Load('RtlAddVectoredContinueHandler')(First, Handler);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/errhandlingapi/nf-errhandlingapi-addvectoredexceptionhandler
+  // Undocumented export (no Microsoft Learn page).
   public static RtlAddVectoredExceptionHandler(First: ULONG, Handler: PVECTORED_EXCEPTION_HANDLER): PVOID {
     return Ntdll.Load('RtlAddVectoredExceptionHandler')(First, Handler);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-rtladjustprivilege
+  // Undocumented export (no Microsoft Learn page).
   public static RtlAdjustPrivilege(Privilege: ULONG, Enable: BOOLEAN, Client: BOOLEAN, WasEnabled_out: PBOOLEAN): NTSTATUS {
     return Ntdll.Load('RtlAdjustPrivilege')(Privilege, Enable, Client, WasEnabled_out);
   }
@@ -1664,8 +1664,8 @@ class Ntdll extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winternl/nf-winternl-rtlansistringtounicodestring
-  public static RtlAnsiStringToUnicodeString(DestinationString_out: PUNICODE_STRING, SourceString: PCANSI_STRING, AllocateDestinationString: BOOLEAN): NTSTATUS {
-    return Ntdll.Load('RtlAnsiStringToUnicodeString')(DestinationString_out, SourceString, AllocateDestinationString);
+  public static RtlAnsiStringToUnicodeString(DestinationString_in_out: PUNICODE_STRING, SourceString: PCANSI_STRING, AllocateDestinationString: BOOLEAN): NTSTATUS {
+    return Ntdll.Load('RtlAnsiStringToUnicodeString')(DestinationString_in_out, SourceString, AllocateDestinationString);
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-rtlappendunicodestringtostring
@@ -1674,7 +1674,7 @@ class Ntdll extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-rtlappendunicodetostring
-  public static RtlAppendUnicodeToString(Destination_in_out: PUNICODE_STRING, Source: PCWSTR): NTSTATUS {
+  public static RtlAppendUnicodeToString(Destination_in_out: PUNICODE_STRING, Source: Optional<PCWSTR>): NTSTATUS {
     return Ntdll.Load('RtlAppendUnicodeToString')(Destination_in_out, Source);
   }
 
@@ -1728,7 +1728,7 @@ class Ntdll extends Win32 {
     return Ntdll.Load('RtlCompareUnicodeString')(String1, String2, CaseInSensitive);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-rtlcomputecrc32
+  // Undocumented export (no Microsoft Learn page).
   public static RtlComputeCrc32(PartialCrc: ULONG, Buffer: PVOID, Length: ULONG): ULONG {
     return Ntdll.Load('RtlComputeCrc32')(PartialCrc, Buffer, Length);
   }
@@ -1744,8 +1744,8 @@ class Ntdll extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-rtlcopysid
-  public static RtlCopySid(DestinationSidLength: ULONG, DestinationSid_out: PSID, SourceSid: PSID): NTSTATUS {
-    return Ntdll.Load('RtlCopySid')(DestinationSidLength, DestinationSid_out, SourceSid);
+  public static RtlCopySid(DestinationSidLength: ULONG, DestinationSid: PSID, SourceSid: PSID): NTSTATUS {
+    return Ntdll.Load('RtlCopySid')(DestinationSidLength, DestinationSid, SourceSid);
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-rtlcopyunicodestring
@@ -1758,7 +1758,7 @@ class Ntdll extends Win32 {
     return Ntdll.Load('RtlCreateAcl')(Acl_out, AclLength, AclRevision);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-rtlcreateenvironment
+  // Undocumented export (no Microsoft Learn page).
   public static RtlCreateEnvironment(CloneCurrentEnvironment: BOOLEAN, Environment_out: PVOID): NTSTATUS {
     return Ntdll.Load('RtlCreateEnvironment')(CloneCurrentEnvironment, Environment_out);
   }
@@ -1768,7 +1768,7 @@ class Ntdll extends Win32 {
     return Ntdll.Load('RtlCreateHeap')(Flags, HeapBase, ReserveSize, CommitSize, Lock, Parameters);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-rtlcreateprocessparametersex
+  // Undocumented export (no Microsoft Learn page).
   public static RtlCreateProcessParametersEx(
     pProcessParameters_out: PVOID,
     ImagePathName: PUNICODE_STRING,
@@ -1790,12 +1790,12 @@ class Ntdll extends Win32 {
     return Ntdll.Load('RtlCreateSecurityDescriptor')(SecurityDescriptor_out, Revision);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/threadpoolapiset/nf-threadpoolapiset-createtimerqueuetimer
+  // Undocumented export (no Microsoft Learn page).
   public static RtlCreateTimer(TimerQueueHandle: HANDLE, Handle_out: PHANDLE, Function: WAITORTIMERCALLBACKFUNC, Context: Optional<PVOID>, DueTime: ULONG, Period: ULONG, Flags: ULONG): NTSTATUS {
     return Ntdll.Load('RtlCreateTimer')(TimerQueueHandle, Handle_out, Function, Context, DueTime, Period, Flags);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/threadpoolapiset/nf-threadpoolapiset-createtimerqueue
+  // Undocumented export (no Microsoft Learn page).
   public static RtlCreateTimerQueue(TimerQueueHandle_out: PHANDLE): NTSTATUS {
     return Ntdll.Load('RtlCreateTimerQueue')(TimerQueueHandle_out);
   }
@@ -1805,7 +1805,7 @@ class Ntdll extends Win32 {
     return Ntdll.Load('RtlDeleteAce')(Acl_in_out, AceIndex);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-rtldeletecriticalsection
+  // Undocumented export (no Microsoft Learn page).
   public static RtlDeleteCriticalSection(CriticalSection_in_out: PRTL_CRITICAL_SECTION): NTSTATUS {
     return Ntdll.Load('RtlDeleteCriticalSection')(CriticalSection_in_out);
   }
@@ -1815,32 +1815,32 @@ class Ntdll extends Win32 {
     return Ntdll.Load('RtlDeleteFunctionTable')(FunctionTable);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/threadpoolapiset/nf-threadpoolapiset-deletetimerqueuetimer
+  // Undocumented export (no Microsoft Learn page).
   public static RtlDeleteTimer(TimerQueueHandle: HANDLE, TimerToCancel: HANDLE, CompletionEvent: Optional<HANDLE>): NTSTATUS {
     return Ntdll.Load('RtlDeleteTimer')(TimerQueueHandle, TimerToCancel, CompletionEvent);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/threadpoolapiset/nf-threadpoolapiset-deletetimerqueue
+  // Undocumented export (no Microsoft Learn page).
   public static RtlDeleteTimerQueue(TimerQueueHandle: HANDLE): NTSTATUS {
     return Ntdll.Load('RtlDeleteTimerQueue')(TimerQueueHandle);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/threadpoolapiset/nf-threadpoolapiset-deletetimerqueueex
+  // Undocumented export (no Microsoft Learn page).
   public static RtlDeleteTimerQueueEx(TimerQueueHandle: HANDLE, CompletionEvent: Optional<HANDLE>): NTSTATUS {
     return Ntdll.Load('RtlDeleteTimerQueueEx')(TimerQueueHandle, CompletionEvent);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/threadpoolapiset/nf-threadpoolapiset-unregisterwait
+  // Undocumented export (no Microsoft Learn page).
   public static RtlDeregisterWait(WaitHandle: HANDLE): NTSTATUS {
     return Ntdll.Load('RtlDeregisterWait')(WaitHandle);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/threadpoolapiset/nf-threadpoolapiset-unregisterwaitex
+  // Undocumented export (no Microsoft Learn page).
   public static RtlDeregisterWaitEx(WaitHandle: HANDLE, CompletionEvent: Optional<HANDLE>): NTSTATUS {
     return Ntdll.Load('RtlDeregisterWaitEx')(WaitHandle, CompletionEvent);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-rtldestroyenvironment
+  // Undocumented export (no Microsoft Learn page).
   public static RtlDestroyEnvironment(Environment: PVOID): NTSTATUS {
     return Ntdll.Load('RtlDestroyEnvironment')(Environment);
   }
@@ -1850,14 +1850,14 @@ class Ntdll extends Win32 {
     return Ntdll.Load('RtlDestroyHeap')(HeapHandle);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-rtldestroyprocessparameters
+  // Undocumented export (no Microsoft Learn page).
   public static RtlDestroyProcessParameters(ProcessParameters: PRTL_USER_PROCESS_PARAMETERS): NTSTATUS {
     return Ntdll.Load('RtlDestroyProcessParameters')(ProcessParameters);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-rtldospathnametontpathname_u_withstatus
-  public static RtlDosPathNameToNtPathName_U_WithStatus(DosFileName: PCWSTR, NtFileName_out: PUNICODE_STRING, FilePart_out: Optional<PVOID>, RelativeName_out: Optional<PRTL_RELATIVE_NAME_U>): NTSTATUS {
-    return Ntdll.Load('RtlDosPathNameToNtPathName_U_WithStatus')(DosFileName, NtFileName_out, FilePart_out, RelativeName_out);
+  // https://learn.microsoft.com/en-us/windows/win32/devnotes/rtldospathnametontpathname_u_withstatus
+  public static RtlDosPathNameToNtPathName_U_WithStatus(DosFileName: PCWSTR, NtFileName_out: PUNICODE_STRING, FilePart_out: Optional<PVOID>, Reserved: NULL): NTSTATUS {
+    return Ntdll.Load('RtlDosPathNameToNtPathName_U_WithStatus')(DosFileName, NtFileName_out, FilePart_out, Reserved);
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-rtldowncaseunicodestring
@@ -1865,12 +1865,12 @@ class Ntdll extends Win32 {
     return Ntdll.Load('RtlDowncaseUnicodeString')(DestinationString_out, SourceString, AllocateDestinationString);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-rtlduplicateunicodestring
-  public static RtlDuplicateUnicodeString(Flags: ULONG, SourceString: PCUNICODE_STRING, DestinationString_out: PUNICODE_STRING): NTSTATUS {
-    return Ntdll.Load('RtlDuplicateUnicodeString')(Flags, SourceString, DestinationString_out);
+  // Undocumented export (no Microsoft Learn page).
+  public static RtlDuplicateUnicodeString(Flags: ULONG, StringIn: PCUNICODE_STRING, StringOut_out: PUNICODE_STRING): NTSTATUS {
+    return Ntdll.Load('RtlDuplicateUnicodeString')(Flags, StringIn, StringOut_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-rtlentercriticalsection
+  // Undocumented export (no Microsoft Learn page).
   public static RtlEnterCriticalSection(CriticalSection_in_out: PRTL_CRITICAL_SECTION): NTSTATUS {
     return Ntdll.Load('RtlEnterCriticalSection')(CriticalSection_in_out);
   }
@@ -1885,7 +1885,7 @@ class Ntdll extends Win32 {
     return Ntdll.Load('RtlEqualUnicodeString')(String1, String2, CaseInSensitive);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-rtlexpandenvironmentstrings_u
+  // Undocumented export (no Microsoft Learn page).
   public static RtlExpandEnvironmentStrings_U(Environment: Optional<PVOID>, Source: PUNICODE_STRING, Destination_out: PUNICODE_STRING, ReturnedLength_out: Optional<PULONG>): NTSTATUS {
     return Ntdll.Load('RtlExpandEnvironmentStrings_U')(Environment, Source, Destination_out, ReturnedLength_out);
   }
@@ -1915,14 +1915,14 @@ class Ntdll extends Win32 {
     return Ntdll.Load('RtlFindSetBitsAndClear')(BitMapHeader, NumberToFind, HintIndex);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-rtlfirstentryslist
+  // https://learn.microsoft.com/en-us/windows/win32/api/winnt/nf-winnt-rtlfirstentryslist
   public static RtlFirstEntrySList(ListHead: PSLIST_HEADER): PSLIST_ENTRY {
     return Ntdll.Load('RtlFirstEntrySList')(ListHead);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winternl/nf-winternl-rtlfreeansistring
-  public static RtlFreeAnsiString(AnsiString_in_out: PANSI_STRING): VOID {
-    return Ntdll.Load('RtlFreeAnsiString')(AnsiString_in_out);
+  public static RtlFreeAnsiString(AnsiString: PANSI_STRING): VOID {
+    return Ntdll.Load('RtlFreeAnsiString')(AnsiString);
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-rtlfreeheap
@@ -1950,27 +1950,27 @@ class Ntdll extends Win32 {
     return Ntdll.Load('RtlGetAce')(Acl, AceIndex, Ace_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-rtlgetcurrentdirectory_u
+  // Undocumented export (no Microsoft Learn page).
   public static RtlGetCurrentDirectory_U(BufferLength: ULONG, Buffer_out: PWSTR): ULONG {
     return Ntdll.Load('RtlGetCurrentDirectory_U')(BufferLength, Buffer_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-rtlgetcurrentpeb
+  // Undocumented export (no Microsoft Learn page).
   public static RtlGetCurrentPeb(): PPEB {
     return Ntdll.Load('RtlGetCurrentPeb')();
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-rtlgetfullpathname_u
+  // Undocumented export (no Microsoft Learn page).
   public static RtlGetFullPathName_U(FileName: PCWSTR, BufferLength: ULONG, Buffer_out: PWSTR, FilePart_out: Optional<PVOID>): ULONG {
     return Ntdll.Load('RtlGetFullPathName_U')(FileName, BufferLength, Buffer_out, FilePart_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-rtlgetntversionumbers
-  public static RtlGetNtVersionNumbers(MajorVersion_out: PULONG, MinorVersion_out: PULONG, BuildNumber_out: PULONG): VOID {
+  // Undocumented export (no Microsoft Learn page).
+  public static RtlGetNtVersionNumbers(MajorVersion_out: Optional<PULONG>, MinorVersion_out: Optional<PULONG>, BuildNumber_out: Optional<PULONG>): VOID {
     return Ntdll.Load('RtlGetNtVersionNumbers')(MajorVersion_out, MinorVersion_out, BuildNumber_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-rtlgetprocessheaps
+  // Undocumented export (no Microsoft Learn page).
   public static RtlGetProcessHeaps(NumberOfHeaps: ULONG, ProcessHeaps_out: PVOID): ULONG {
     return Ntdll.Load('RtlGetProcessHeaps')(NumberOfHeaps, ProcessHeaps_out);
   }
@@ -1985,14 +1985,14 @@ class Ntdll extends Win32 {
     return Ntdll.Load('RtlHashUnicodeString')(String, CaseInSensitive, HashAlgorithm, HashValue_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/winternl/nf-winternl-rtlinitansistring
+  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-rtlinitansistring
   public static RtlInitAnsiString(DestinationString_out: PANSI_STRING, SourceString: Optional<PVOID>): VOID {
     return Ntdll.Load('RtlInitAnsiString')(DestinationString_out, SourceString);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winternl/nf-winternl-rtlinitstring
-  public static RtlInitString(DestinationString_out: PSTRING, SourceString: Optional<PVOID>): VOID {
-    return Ntdll.Load('RtlInitString')(DestinationString_out, SourceString);
+  public static RtlInitString(DestinationString_in_out: PSTRING, SourceString: Nullable<PVOID>): VOID {
+    return Ntdll.Load('RtlInitString')(DestinationString_in_out, SourceString);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winternl/nf-winternl-rtlinitunicodestring
@@ -2005,32 +2005,32 @@ class Ntdll extends Win32 {
     return Ntdll.Load('RtlInitializeBitMap')(BitMapHeader_out, BitMapBuffer, SizeOfBitMap);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-rtlinitializeconditionvariable
+  // Undocumented export (no Microsoft Learn page).
   public static RtlInitializeConditionVariable(ConditionVariable_out: PRTL_CONDITION_VARIABLE): VOID {
     return Ntdll.Load('RtlInitializeConditionVariable')(ConditionVariable_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-rtlinitializecriticalsection
+  // Undocumented export (no Microsoft Learn page).
   public static RtlInitializeCriticalSection(CriticalSection_out: PRTL_CRITICAL_SECTION): NTSTATUS {
     return Ntdll.Load('RtlInitializeCriticalSection')(CriticalSection_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-rtlinitializecriticalsectionandspincount
+  // Undocumented export (no Microsoft Learn page).
   public static RtlInitializeCriticalSectionAndSpinCount(CriticalSection_out: PRTL_CRITICAL_SECTION, SpinCount: ULONG): NTSTATUS {
     return Ntdll.Load('RtlInitializeCriticalSectionAndSpinCount')(CriticalSection_out, SpinCount);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-rtlinitializecriticalsectionex
+  // Undocumented export (no Microsoft Learn page).
   public static RtlInitializeCriticalSectionEx(CriticalSection_out: PRTL_CRITICAL_SECTION, SpinCount: ULONG, Flags: ULONG): NTSTATUS {
     return Ntdll.Load('RtlInitializeCriticalSectionEx')(CriticalSection_out, SpinCount, Flags);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-rtlinitializeslisthead
-  public static RtlInitializeSListHead(ListHead_out: PSLIST_HEADER): VOID {
-    return Ntdll.Load('RtlInitializeSListHead')(ListHead_out);
+  // https://learn.microsoft.com/en-us/windows/win32/api/winnt/nf-winnt-rtlinitializeslisthead
+  public static RtlInitializeSListHead(ListHead: PSLIST_HEADER): VOID {
+    return Ntdll.Load('RtlInitializeSListHead')(ListHead);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-rtlinitializesrwlock
+  // Undocumented export (no Microsoft Learn page).
   public static RtlInitializeSRWLock(SRWLock_out: PRTL_SRWLOCK): VOID {
     return Ntdll.Load('RtlInitializeSRWLock')(SRWLock_out);
   }
@@ -2050,27 +2050,27 @@ class Ntdll extends Win32 {
     return Ntdll.Load('RtlIntegerToUnicodeString')(Value, Base, String_in_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-rtlinterlockedflushslist
-  public static RtlInterlockedFlushSList(ListHead_in_out: PSLIST_HEADER): PSLIST_ENTRY {
-    return Ntdll.Load('RtlInterlockedFlushSList')(ListHead_in_out);
+  // https://learn.microsoft.com/en-us/windows/win32/api/winnt/nf-winnt-rtlinterlockedflushslist
+  public static RtlInterlockedFlushSList(ListHead: PSLIST_HEADER): PSLIST_ENTRY {
+    return Ntdll.Load('RtlInterlockedFlushSList')(ListHead);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-rtlinterlockedpopentryslist
-  public static RtlInterlockedPopEntrySList(ListHead_in_out: PSLIST_HEADER): PSLIST_ENTRY {
-    return Ntdll.Load('RtlInterlockedPopEntrySList')(ListHead_in_out);
+  // https://learn.microsoft.com/en-us/windows/win32/api/winnt/nf-winnt-rtlinterlockedpopentryslist
+  public static RtlInterlockedPopEntrySList(ListHead: PSLIST_HEADER): PSLIST_ENTRY {
+    return Ntdll.Load('RtlInterlockedPopEntrySList')(ListHead);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-rtlinterlockedpushentryslist
-  public static RtlInterlockedPushEntrySList(ListHead_in_out: PSLIST_HEADER, ListEntry_in_out: PSLIST_ENTRY): PSLIST_ENTRY {
-    return Ntdll.Load('RtlInterlockedPushEntrySList')(ListHead_in_out, ListEntry_in_out);
+  // https://learn.microsoft.com/en-us/windows/win32/api/winnt/nf-winnt-rtlinterlockedpushentryslist
+  public static RtlInterlockedPushEntrySList(ListHead: PSLIST_HEADER, ListEntry: PSLIST_ENTRY): PSLIST_ENTRY {
+    return Ntdll.Load('RtlInterlockedPushEntrySList')(ListHead, ListEntry);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-rtlleavecriticalsection
+  // Undocumented export (no Microsoft Learn page).
   public static RtlLeaveCriticalSection(CriticalSection_in_out: PRTL_CRITICAL_SECTION): NTSTATUS {
     return Ntdll.Load('RtlLeaveCriticalSection')(CriticalSection_in_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-rtllengthsecuritydescriptor
+  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-rtllengthsecuritydescriptor
   public static RtlLengthSecurityDescriptor(SecurityDescriptor: PSECURITY_DESCRIPTOR): ULONG {
     return Ntdll.Load('RtlLengthSecurityDescriptor')(SecurityDescriptor);
   }
@@ -2080,14 +2080,14 @@ class Ntdll extends Win32 {
     return Ntdll.Load('RtlLengthSid')(Sid);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-rtllockheap
+  // Undocumented export (no Microsoft Learn page).
   public static RtlLockHeap(HeapHandle: PVOID): BOOLEAN {
     return Ntdll.Load('RtlLockHeap')(HeapHandle);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winnt/nf-winnt-rtllookupfunctionentry
-  public static RtlLookupFunctionEntry(ControlPc: ULONG_PTR, ImageBase_out: PULONG_PTR, HistoryTable_in_out: Optional<PUNWIND_HISTORY_TABLE>): PRUNTIME_FUNCTION {
-    return Ntdll.Load('RtlLookupFunctionEntry')(ControlPc, ImageBase_out, HistoryTable_in_out);
+  public static RtlLookupFunctionEntry(ControlPc: ULONG_PTR, ImageBase_out: PULONG_PTR, HistoryTable_out: Optional<PUNWIND_HISTORY_TABLE>): PRUNTIME_FUNCTION {
+    return Ntdll.Load('RtlLookupFunctionEntry')(ControlPc, ImageBase_out, HistoryTable_out);
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-rtlmovememory
@@ -2110,27 +2110,27 @@ class Ntdll extends Win32 {
     return Ntdll.Load('RtlNumberOfSetBits')(BitMapHeader);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-rtlquerydepthslist
+  // https://learn.microsoft.com/en-us/windows/win32/api/winnt/nf-winnt-rtlquerydepthslist
   public static RtlQueryDepthSList(ListHead: PSLIST_HEADER): USHORT {
     return Ntdll.Load('RtlQueryDepthSList')(ListHead);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-rtlqueryenvironmentvariable_u
+  // Undocumented export (no Microsoft Learn page).
   public static RtlQueryEnvironmentVariable_U(Environment: Optional<PVOID>, Name: PUNICODE_STRING, Value_out: PUNICODE_STRING): NTSTATUS {
     return Ntdll.Load('RtlQueryEnvironmentVariable_U')(Environment, Name, Value_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/threadpoolapiset/nf-threadpoolapiset-queueuserworkitem
+  // Undocumented export (no Microsoft Learn page).
   public static RtlQueueWorkItem(Function: WORKERCALLBACKFUNC, Context: Nullable<PVOID>, Flags: ULONG): NTSTATUS {
     return Ntdll.Load('RtlQueueWorkItem')(Function, Context, Flags);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/winnt/nf-winnt-rtlraiseexception
+  // https://learn.microsoft.com/en-us/windows/win32/api/rtlsupportapi/nf-rtlsupportapi-rtlraiseexception
   public static RtlRaiseException(ExceptionRecord: PEXCEPTION_RECORD): VOID {
     return Ntdll.Load('RtlRaiseException')(ExceptionRecord);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-rtlraisestatus
+  // Undocumented export (no Microsoft Learn page).
   public static RtlRaiseStatus(Status: NTSTATUS): VOID {
     return Ntdll.Load('RtlRaiseStatus')(Status);
   }
@@ -2145,32 +2145,32 @@ class Ntdll extends Win32 {
     return Ntdll.Load('RtlRandomEx')(Seed_in_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-rtlreallocateheap
-  public static RtlReAllocateHeap(HeapHandle: PVOID, Flags: ULONG, BaseAddress: PVOID, Size: SIZE_T): PVOID {
+  // Undocumented export (no Microsoft Learn page).
+  public static RtlReAllocateHeap(HeapHandle: PVOID, Flags: ULONG, BaseAddress: Optional<PVOID>, Size: SIZE_T): PVOID {
     return Ntdll.Load('RtlReAllocateHeap')(HeapHandle, Flags, BaseAddress, Size);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/threadpoolapiset/nf-threadpoolapiset-registerwaitforsingleobject
+  // Undocumented export (no Microsoft Learn page).
   public static RtlRegisterWait(WaitHandle_out: PHANDLE, ObjectHandle: HANDLE, Callback: WAITORTIMERCALLBACKFUNC, Context: Nullable<PVOID>, Milliseconds: ULONG, Flags: ULONG): NTSTATUS {
     return Ntdll.Load('RtlRegisterWait')(WaitHandle_out, ObjectHandle, Callback, Context, Milliseconds, Flags);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-rtlreleasesrwlockexclusive
+  // Undocumented export (no Microsoft Learn page).
   public static RtlReleaseSRWLockExclusive(SRWLock_in_out: PRTL_SRWLOCK): VOID {
     return Ntdll.Load('RtlReleaseSRWLockExclusive')(SRWLock_in_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-rtlreleasesrwlockshared
+  // Undocumented export (no Microsoft Learn page).
   public static RtlReleaseSRWLockShared(SRWLock_in_out: PRTL_SRWLOCK): VOID {
     return Ntdll.Load('RtlReleaseSRWLockShared')(SRWLock_in_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/errhandlingapi/nf-errhandlingapi-removevectoredcontinuehandler
+  // Undocumented export (no Microsoft Learn page).
   public static RtlRemoveVectoredContinueHandler(Handle: PVOID): ULONG {
     return Ntdll.Load('RtlRemoveVectoredContinueHandler')(Handle);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/errhandlingapi/nf-errhandlingapi-removevectoredexceptionhandler
+  // Undocumented export (no Microsoft Learn page).
   public static RtlRemoveVectoredExceptionHandler(Handle: PVOID): ULONG {
     return Ntdll.Load('RtlRemoveVectoredExceptionHandler')(Handle);
   }
@@ -2195,7 +2195,7 @@ class Ntdll extends Win32 {
     return Ntdll.Load('RtlSetBits')(BitMapHeader, StartingIndex, NumberToSet);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-rtlsetcurrentdirectory_u
+  // Undocumented export (no Microsoft Learn page).
   public static RtlSetCurrentDirectory_U(PathName: PUNICODE_STRING): NTSTATUS {
     return Ntdll.Load('RtlSetCurrentDirectory_U')(PathName);
   }
@@ -2205,27 +2205,27 @@ class Ntdll extends Win32 {
     return Ntdll.Load('RtlSetDaclSecurityDescriptor')(SecurityDescriptor_in_out, DaclPresent, Dacl, DaclDefaulted);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-rtlsetenvironmentvariable
-  public static RtlSetEnvironmentVariable(Environment_in_out: PVOID, Name: PUNICODE_STRING, Value: Optional<PUNICODE_STRING>): NTSTATUS {
+  // Undocumented export (no Microsoft Learn page).
+  public static RtlSetEnvironmentVariable(Environment_in_out: Optional<PVOID>, Name: PUNICODE_STRING, Value: Optional<PUNICODE_STRING>): NTSTATUS {
     return Ntdll.Load('RtlSetEnvironmentVariable')(Environment_in_out, Name, Value);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/ioapiset/nf-ioapiset-bindiocompletioncallback
+  // Undocumented export (no Microsoft Learn page).
   public static RtlSetIoCompletionCallback(FileHandle: HANDLE, Function: PIO_APC_ROUTINE, Flags: ULONG): NTSTATUS {
     return Ntdll.Load('RtlSetIoCompletionCallback')(FileHandle, Function, Flags);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-rtlsizeheap
+  // Undocumented export (no Microsoft Learn page).
   public static RtlSizeHeap(HeapHandle: PVOID, Flags: ULONG, BaseAddress: PVOID): SIZE_T {
     return Ntdll.Load('RtlSizeHeap')(HeapHandle, Flags, BaseAddress);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-rtlsleepconditionvariablecs
+  // Undocumented export (no Microsoft Learn page).
   public static RtlSleepConditionVariableCS(ConditionVariable_in_out: PRTL_CONDITION_VARIABLE, CriticalSection_in_out: PRTL_CRITICAL_SECTION, Timeout: Optional<PLARGE_INTEGER>): NTSTATUS {
     return Ntdll.Load('RtlSleepConditionVariableCS')(ConditionVariable_in_out, CriticalSection_in_out, Timeout);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-rtlsleepconditionvariablesrw
+  // Undocumented export (no Microsoft Learn page).
   public static RtlSleepConditionVariableSRW(ConditionVariable_in_out: PRTL_CONDITION_VARIABLE, SRWLock_in_out: PRTL_SRWLOCK, Timeout: Optional<PLARGE_INTEGER>, Flags: ULONG): NTSTATUS {
     return Ntdll.Load('RtlSleepConditionVariableSRW')(ConditionVariable_in_out, SRWLock_in_out, Timeout, Flags);
   }
@@ -2235,24 +2235,24 @@ class Ntdll extends Win32 {
     return Ntdll.Load('RtlTestBit')(BitMapHeader, BitNumber);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-rtltryacquiresrwlockexclusive
+  // Undocumented export (no Microsoft Learn page).
   public static RtlTryAcquireSRWLockExclusive(SRWLock_in_out: PRTL_SRWLOCK): BOOLEAN {
     return Ntdll.Load('RtlTryAcquireSRWLockExclusive')(SRWLock_in_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-rtltryacquiresrwlockshared
+  // Undocumented export (no Microsoft Learn page).
   public static RtlTryAcquireSRWLockShared(SRWLock_in_out: PRTL_SRWLOCK): BOOLEAN {
     return Ntdll.Load('RtlTryAcquireSRWLockShared')(SRWLock_in_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-rtltryentercriticalsection
-  public static RtlTryEnterCriticalSection(CriticalSection_in_out: PRTL_CRITICAL_SECTION): BOOLEAN {
+  // Undocumented export (no Microsoft Learn page).
+  public static RtlTryEnterCriticalSection(CriticalSection_in_out: PRTL_CRITICAL_SECTION): BOOL {
     return Ntdll.Load('RtlTryEnterCriticalSection')(CriticalSection_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winternl/nf-winternl-rtlunicodestringtoansistring
-  public static RtlUnicodeStringToAnsiString(DestinationString_out: PANSI_STRING, SourceString: PCUNICODE_STRING, AllocateDestinationString: BOOLEAN): NTSTATUS {
-    return Ntdll.Load('RtlUnicodeStringToAnsiString')(DestinationString_out, SourceString, AllocateDestinationString);
+  public static RtlUnicodeStringToAnsiString(DestinationString_in_out: PANSI_STRING, SourceString: PCUNICODE_STRING, AllocateDestinationString: BOOLEAN): NTSTATUS {
+    return Ntdll.Load('RtlUnicodeStringToAnsiString')(DestinationString_in_out, SourceString, AllocateDestinationString);
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-rtlunicodestringtointeger
@@ -2260,12 +2260,12 @@ class Ntdll extends Win32 {
     return Ntdll.Load('RtlUnicodeStringToInteger')(String, Base, Value_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-rtluniform
+  // https://learn.microsoft.com/en-us/windows/win32/api/winternl/nf-winternl-rtluniform
   public static RtlUniform(Seed_in_out: PULONG): ULONG {
     return Ntdll.Load('RtlUniform')(Seed_in_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-rtlunlockheap
+  // Undocumented export (no Microsoft Learn page).
   public static RtlUnlockHeap(HeapHandle: PVOID): BOOLEAN {
     return Ntdll.Load('RtlUnlockHeap')(HeapHandle);
   }
@@ -2280,17 +2280,17 @@ class Ntdll extends Win32 {
     return Ntdll.Load('RtlUnwindEx')(TargetFrame, TargetIp, ExceptionRecord, ReturnValue, ContextRecord, HistoryTable);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-rtlupcaseunicodestring
-  public static RtlUpcaseUnicodeString(DestinationString_out: PUNICODE_STRING, SourceString: PCUNICODE_STRING, AllocateDestinationString: BOOLEAN): NTSTATUS {
-    return Ntdll.Load('RtlUpcaseUnicodeString')(DestinationString_out, SourceString, AllocateDestinationString);
+  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntddk/nf-ntddk-rtlupcaseunicodestring
+  public static RtlUpcaseUnicodeString(DestinationString_in_out: PUNICODE_STRING, SourceString: PCUNICODE_STRING, AllocateDestinationString: BOOLEAN): NTSTATUS {
+    return Ntdll.Load('RtlUpcaseUnicodeString')(DestinationString_in_out, SourceString, AllocateDestinationString);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/threadpoolapiset/nf-threadpoolapiset-changetimerqueuetimer
+  // Undocumented export (no Microsoft Learn page).
   public static RtlUpdateTimer(TimerQueueHandle: HANDLE, TimerHandle: HANDLE, DueTime: ULONG, Period: ULONG): NTSTATUS {
     return Ntdll.Load('RtlUpdateTimer')(TimerQueueHandle, TimerHandle, DueTime, Period);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-rtlvalidacl
+  // Undocumented export (no Microsoft Learn page).
   public static RtlValidAcl(Acl: PACL): BOOLEAN {
     return Ntdll.Load('RtlValidAcl')(Acl);
   }
@@ -2305,8 +2305,8 @@ class Ntdll extends Win32 {
     return Ntdll.Load('RtlValidSid')(Sid);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-rtlvalidateheap
-  public static RtlValidateHeap(HeapHandle: PVOID, Flags: ULONG, BaseAddress: Optional<PVOID>): BOOLEAN {
+  // Undocumented export (no Microsoft Learn page).
+  public static RtlValidateHeap(HeapHandle: Optional<PVOID>, Flags: ULONG, BaseAddress: Optional<PVOID>): BOOLEAN {
     return Ntdll.Load('RtlValidateHeap')(HeapHandle, Flags, BaseAddress);
   }
 
@@ -2329,12 +2329,12 @@ class Ntdll extends Win32 {
     return Ntdll.Load('RtlVirtualUnwind')(HandlerType, ImageBase, ControlPc, FunctionEntry, ContextRecord_in_out, HandlerData_out, EstablisherFrame_out, ContextPointers_in_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-rtlwakeallconditionvariable
+  // Undocumented export (no Microsoft Learn page).
   public static RtlWakeAllConditionVariable(ConditionVariable_in_out: PRTL_CONDITION_VARIABLE): VOID {
     return Ntdll.Load('RtlWakeAllConditionVariable')(ConditionVariable_in_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-rtlwakeconditionvariable
+  // Undocumented export (no Microsoft Learn page).
   public static RtlWakeConditionVariable(ConditionVariable_in_out: PRTL_CONDITION_VARIABLE): VOID {
     return Ntdll.Load('RtlWakeConditionVariable')(ConditionVariable_in_out);
   }

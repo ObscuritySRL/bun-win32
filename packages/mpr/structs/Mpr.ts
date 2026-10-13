@@ -146,12 +146,12 @@ class Mpr extends Win32 {
     return Mpr.Load('WNetOpenEnumW')(dwScope, dwType, dwUsage, lpNetResource, lphEnum_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/winnetwk/nf-winnetwk-wnetrestoresingleconnectionw
+  // Undocumented export (no Microsoft Learn page).
   public static WNetRestoreSingleConnectionW(hwndParent: Optional<HWND>, lpDevice: LPCWSTR, fUseUI: BOOL): DWORD {
     return Mpr.Load('WNetRestoreSingleConnectionW')(hwndParent, lpDevice, fUseUI);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/winnetwk/nf-winnetwk-wnetuseconnection4w
+  // Undocumented export (no Microsoft Learn page).
   public static WNetUseConnection4W(
     hwndOwner: Optional<HWND>,
     lpNetResource: LPNETRESOURCEW,

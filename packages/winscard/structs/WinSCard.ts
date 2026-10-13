@@ -480,7 +480,7 @@ class WinSCard extends Win32 {
     return WinSCard.Load('SCardSetCardTypeProviderNameW')(hContext, szCardName, dwProviderId, szProvider);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/winscard/nf-winscard-scardstate
+  // Undocumented export (no Microsoft Learn page).
   public static SCardState(hCard: SCARDHANDLE, pdwState_out: LPDWORD, pdwProtocol_out: LPDWORD, pbAtr_out: LPBYTE, pcbAtrLen_in_out: LPDWORD): LONG {
     return WinSCard.Load('SCardState')(hCard, pdwState_out, pdwProtocol_out, pbAtr_out, pcbAtrLen_in_out);
   }

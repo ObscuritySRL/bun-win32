@@ -405,12 +405,12 @@ class Cfgmgr32 extends Win32 {
     return Cfgmgr32.Load('CM_Add_Res_Des_Ex')(prdResDes_out, lcLogConf, ResourceID, ResourceData, ResourceLen, ulFlags, hMachine);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_apply_powerscheme
+  // Undocumented export (no Microsoft Learn page).
   public static CM_Apply_PowerScheme(): CONFIGRET {
     return Cfgmgr32.Load('CM_Apply_PowerScheme')();
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cmp_waitnopendinginstallevents
+  // Undocumented export (no Microsoft Learn page).
   public static CMP_WaitNoPendingInstallEvents(dwTimeout: DWORD): DWORD {
     return Cfgmgr32.Load('CMP_WaitNoPendingInstallEvents')(dwTimeout);
   }
@@ -490,7 +490,7 @@ class Cfgmgr32 extends Win32 {
     return Cfgmgr32.Load('CM_Delete_Device_Interface_Key_ExW')(pszDeviceInterface, ulFlags, hMachine);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_delete_powerscheme
+  // Undocumented export (no Microsoft Learn page).
   public static CM_Delete_PowerScheme(SchemeGuid: LPCGUID, Error_out: PDWORD): CONFIGRET {
     return Cfgmgr32.Load('CM_Delete_PowerScheme')(SchemeGuid, Error_out);
   }
@@ -530,7 +530,7 @@ class Cfgmgr32 extends Win32 {
     return Cfgmgr32.Load('CM_Dup_Range_List')(rlhOld, rlhNew, ulFlags);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_duplicate_powerscheme
+  // Undocumented export (no Microsoft Learn page).
   public static CM_Duplicate_PowerScheme(SourceSchemeGuid: LPCGUID, DestinationSchemeGuid_in_out: PVOID, Error_out: PDWORD): CONFIGRET {
     return Cfgmgr32.Load('CM_Duplicate_PowerScheme')(SourceSchemeGuid, DestinationSchemeGuid_in_out, Error_out);
   }
@@ -1146,7 +1146,7 @@ class Cfgmgr32 extends Win32 {
     return Cfgmgr32.Load('CM_Get_Version_Ex')(hMachine);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_import_powerscheme
+  // Undocumented export (no Microsoft Learn page).
   public static CM_Import_PowerScheme(ImportFileNamePath: LPCWSTR, DestinationSchemeGuid_in_out: PVOID, Error_out: PDWORD): CONFIGRET {
     return Cfgmgr32.Load('CM_Import_PowerScheme')(ImportFileNamePath, DestinationSchemeGuid_in_out, Error_out);
   }
@@ -1442,12 +1442,12 @@ class Cfgmgr32 extends Win32 {
     return Cfgmgr32.Load('CM_Request_Eject_PC_Ex')(hMachine);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_restoreall_defaultpowerschemes
+  // Undocumented export (no Microsoft Learn page).
   public static CM_RestoreAll_DefaultPowerSchemes(Error_out: PDWORD): CONFIGRET {
     return Cfgmgr32.Load('CM_RestoreAll_DefaultPowerSchemes')(Error_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_restore_defaultpowerscheme
+  // Undocumented export (no Microsoft Learn page).
   public static CM_Restore_DefaultPowerScheme(SchemeGuid: LPCGUID, Error_out: PDWORD): CONFIGRET {
     return Cfgmgr32.Load('CM_Restore_DefaultPowerScheme')(SchemeGuid, Error_out);
   }
@@ -1462,7 +1462,7 @@ class Cfgmgr32 extends Win32 {
     return Cfgmgr32.Load('CM_Run_Detection_Ex')(ulFlags, hMachine);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_set_activescheme
+  // Undocumented export (no Microsoft Learn page).
   public static CM_Set_ActiveScheme(SchemeGuid: LPCGUID, Error_out: PDWORD): CONFIGRET {
     return Cfgmgr32.Load('CM_Set_ActiveScheme')(SchemeGuid, Error_out);
   }
@@ -1625,7 +1625,7 @@ class Cfgmgr32 extends Win32 {
     return Cfgmgr32.Load('CM_Unregister_Notification')(NotifyContext);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_write_userpowerkey
+  // Undocumented export (no Microsoft Learn page).
   public static CM_Write_UserPowerKey(
     SchemeGuid: Optional<LPCGUID>,
     SubGroupOfPowerSettingsGuid: Optional<LPCGUID>,
@@ -1771,7 +1771,7 @@ class Cfgmgr32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/devquery/nf-devquery-devfindproperty
-  public static DevFindProperty(pKey: PDEVPROPKEY, Store: ULONG, pszLocaleName: PCWSTR, cProperties: ULONG, pProperties: Optional<PVOID>): PVOID {
+  public static DevFindProperty(pKey: PDEVPROPKEY, Store: ULONG, pszLocaleName: Optional<PCWSTR>, cProperties: ULONG, pProperties: Optional<PVOID>): PVOID {
     return Cfgmgr32.Load('DevFindProperty')(pKey, Store, pszLocaleName, cProperties, pProperties);
   }
 
@@ -1872,7 +1872,7 @@ class Cfgmgr32 extends Win32 {
     cPropertyCount: ULONG,
     pProperties: Optional<PVOID>,
     fEnabled: BOOL,
-    ppszDeviceInterfaceId_out: PVOID,
+    ppszDeviceInterfaceId_out: Optional<PVOID>,
   ): HRESULT {
     return Cfgmgr32.Load('SwDeviceInterfaceRegister')(hSwDevice, pInterfaceClassGuid, pszReferenceString, cPropertyCount, pProperties, fEnabled, ppszDeviceInterfaceId_out);
   }

@@ -325,17 +325,17 @@ class Winmm extends Win32 {
     return Winmm.Load('OpenDriver')(szDriverName, szSectionName, lParam2);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/multimedia/the-playsound-function
+  // https://learn.microsoft.com/en-us/previous-versions/dd743680(v=vs.85)
   public static PlaySound(pszSound: Nullable<LPCTSTR>, hmod: Nullable<HMODULE>, fdwSound: DWORD): BOOL {
     return Winmm.Load('PlaySound')(pszSound, hmod, fdwSound);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/multimedia/the-playsound-function
+  // https://learn.microsoft.com/en-us/previous-versions/dd743680(v=vs.85)
   public static PlaySoundA(pszSound: Optional<LPCSTR>, hmod: Optional<HMODULE>, fdwSound: DWORD): BOOL {
     return Winmm.Load('PlaySoundA')(pszSound, hmod, fdwSound);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/multimedia/the-playsound-function
+  // https://learn.microsoft.com/en-us/previous-versions/dd743680(v=vs.85)
   public static PlaySoundW(pszSound: Optional<LPCWSTR>, hmod: Optional<HMODULE>, fdwSound: DWORD): BOOL {
     return Winmm.Load('PlaySoundW')(pszSound, hmod, fdwSound);
   }
@@ -425,102 +425,102 @@ class Winmm extends Win32 {
     return Winmm.Load('joySetThreshold')(uJoyID, uThreshold);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/_multimedia/
+  // Undocumented export (no Microsoft Learn page).
   public static mciDriverNotify(hwndCallback: HANDLE, wDeviceID: MCIDEVICEID, uStatus: UINT): BOOL {
     return Winmm.Load('mciDriverNotify')(hwndCallback, wDeviceID, uStatus);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/_multimedia/
+  // Undocumented export (no Microsoft Learn page).
   public static mciDriverYield(wDeviceID: MCIDEVICEID): UINT {
     return Winmm.Load('mciDriverYield')(wDeviceID);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/_multimedia/
+  // https://learn.microsoft.com/en-us/previous-versions/dd757154(v=vs.85)
   public static mciExecute(pszCommand: LPCSTR): BOOL {
     return Winmm.Load('mciExecute')(pszCommand);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/_multimedia/
+  // Undocumented export (no Microsoft Learn page).
   public static mciFreeCommandResource(wTable: UINT): BOOL {
     return Winmm.Load('mciFreeCommandResource')(wTable);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/_multimedia/
+  // https://learn.microsoft.com/en-us/previous-versions/dd757155(v=vs.85)
   public static mciGetCreatorTask(mciId: MCIDEVICEID): HTASK {
     return Winmm.Load('mciGetCreatorTask')(mciId);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/_multimedia/
+  // https://learn.microsoft.com/en-us/previous-versions/dd757156(v=vs.85)
   public static mciGetDeviceIDA(pszDevice: LPCSTR): MCIDEVICEID {
     return Winmm.Load('mciGetDeviceIDA')(pszDevice);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/_multimedia/
+  // https://learn.microsoft.com/en-us/previous-versions/dd757157(v=vs.85)
   public static mciGetDeviceIDFromElementIDA(dwElementID: DWORD, lpstrType: LPCSTR): MCIDEVICEID {
     return Winmm.Load('mciGetDeviceIDFromElementIDA')(dwElementID, lpstrType);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/_multimedia/
+  // https://learn.microsoft.com/en-us/previous-versions/dd757157(v=vs.85)
   public static mciGetDeviceIDFromElementIDW(dwElementID: DWORD, lpstrType: LPCWSTR): MCIDEVICEID {
     return Winmm.Load('mciGetDeviceIDFromElementIDW')(dwElementID, lpstrType);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/_multimedia/
+  // https://learn.microsoft.com/en-us/previous-versions/dd757156(v=vs.85)
   public static mciGetDeviceIDW(pszDevice: LPCWSTR): MCIDEVICEID {
     return Winmm.Load('mciGetDeviceIDW')(pszDevice);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/_multimedia/
+  // Undocumented export (no Microsoft Learn page).
   public static mciGetDriverData(wDeviceID: MCIDEVICEID): DWORD_PTR {
     return Winmm.Load('mciGetDriverData')(wDeviceID);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/_multimedia/
+  // https://learn.microsoft.com/en-us/previous-versions/dd757158(v=vs.85)
   public static mciGetErrorStringA(mcierr: MCIERROR, pszText_out: LPSTR, cchText: UINT): BOOL {
     return Winmm.Load('mciGetErrorStringA')(mcierr, pszText_out, cchText);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/_multimedia/
+  // https://learn.microsoft.com/en-us/previous-versions/dd757158(v=vs.85)
   public static mciGetErrorStringW(mcierr: MCIERROR, pszText_out: LPWSTR, cchText: UINT): BOOL {
     return Winmm.Load('mciGetErrorStringW')(mcierr, pszText_out, cchText);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/_multimedia/
+  // https://learn.microsoft.com/en-us/previous-versions/dd757159(v=vs.85)
   public static mciGetYieldProc(mciId: MCIDEVICEID, pdwYieldData: LPDWORD): YIELDPROC {
     return Winmm.Load('mciGetYieldProc')(mciId, pdwYieldData);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/_multimedia/
+  // Undocumented export (no Microsoft Learn page).
   public static mciLoadCommandResource(hInstance: HANDLE, lpResName: LPCWSTR, wType: UINT): UINT {
     return Winmm.Load('mciLoadCommandResource')(hInstance, lpResName, wType);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/_multimedia/
+  // https://learn.microsoft.com/en-us/previous-versions/dd757160(v=vs.85)
   public static mciSendCommandA(mciId: MCIDEVICEID, uMsg: UINT, dwParam1: DWORD_PTR, dwParam2: DWORD_PTR): MCIERROR {
     return Winmm.Load('mciSendCommandA')(mciId, uMsg, dwParam1, dwParam2);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/_multimedia/
+  // https://learn.microsoft.com/en-us/previous-versions/dd757160(v=vs.85)
   public static mciSendCommandW(mciId: MCIDEVICEID, uMsg: UINT, dwParam1: DWORD_PTR, dwParam2: DWORD_PTR): MCIERROR {
     return Winmm.Load('mciSendCommandW')(mciId, uMsg, dwParam1, dwParam2);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/_multimedia/
+  // https://learn.microsoft.com/en-us/previous-versions/dd757161(v=vs.85)
   public static mciSendStringA(lpstrCommand: LPCSTR, lpstrReturnString_out: Optional<LPSTR>, uReturnLength: UINT, hwndCallback: Optional<HWND>): MCIERROR {
     return Winmm.Load('mciSendStringA')(lpstrCommand, lpstrReturnString_out, uReturnLength, hwndCallback);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/_multimedia/
+  // https://learn.microsoft.com/en-us/previous-versions/dd757161(v=vs.85)
   public static mciSendStringW(lpstrCommand: LPCWSTR, lpstrReturnString_out: Optional<LPWSTR>, uReturnLength: UINT, hwndCallback: Optional<HWND>): MCIERROR {
     return Winmm.Load('mciSendStringW')(lpstrCommand, lpstrReturnString_out, uReturnLength, hwndCallback);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/_multimedia/
+  // Undocumented export (no Microsoft Learn page).
   public static mciSetDriverData(wDeviceID: MCIDEVICEID, dwData: DWORD_PTR): BOOL {
     return Winmm.Load('mciSetDriverData')(wDeviceID, dwData);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/_multimedia/
+  // https://learn.microsoft.com/en-us/previous-versions/dd757163(v=vs.85)
   public static mciSetYieldProc(mciId: MCIDEVICEID, fpYieldProc: Optional<YIELDPROC>, dwYieldData: DWORD): BOOL {
     return Winmm.Load('mciSetYieldProc')(mciId, fpYieldProc, dwYieldData);
   }
@@ -810,32 +810,32 @@ class Winmm extends Win32 {
     return Winmm.Load('mixerSetControlDetails')(hmxobj, pmxcd, fdwDetails);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/_multimedia/
+  // Undocumented export (no Microsoft Learn page).
   public static mmDrvInstall(hDriver: HDRVR, wszDrvEntry: LPCWSTR, drvMessage: DRIVERMSGPROC, wFlags: UINT): UINT {
     return Winmm.Load('mmDrvInstall')(hDriver, wszDrvEntry, drvMessage, wFlags);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/_multimedia/
+  // https://learn.microsoft.com/en-us/windows/win32/api/mmddk/nf-mmddk-mmgetcurrenttask
   public static mmGetCurrentTask(): DWORD {
     return Winmm.Load('mmGetCurrentTask')();
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/_multimedia/
+  // https://learn.microsoft.com/en-us/windows/win32/api/mmddk/nf-mmddk-mmtaskblock
   public static mmTaskBlock(h: DWORD): void {
     return Winmm.Load('mmTaskBlock')(h);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/_multimedia/
+  // https://learn.microsoft.com/en-us/windows/win32/api/mmddk/nf-mmddk-mmtaskcreate
   public static mmTaskCreate(lpfn: LPTASKCALLBACK, lph: LPHANDLE, dwInst: DWORD_PTR): UINT {
     return Winmm.Load('mmTaskCreate')(lpfn, lph, dwInst);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/_multimedia/
+  // https://learn.microsoft.com/en-us/windows/win32/api/mmddk/nf-mmddk-mmtasksignal
   public static mmTaskSignal(h: DWORD): BOOL {
     return Winmm.Load('mmTaskSignal')(h);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/_multimedia/
+  // https://learn.microsoft.com/en-us/windows/win32/api/mmddk/nf-mmddk-mmtaskyield
   public static mmTaskYield(): void {
     return Winmm.Load('mmTaskYield')();
   }
@@ -950,12 +950,12 @@ class Winmm extends Win32 {
     return Winmm.Load('mmsystemGetVersion')();
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/multimedia/the-playsound-function
+  // https://learn.microsoft.com/en-us/previous-versions/dd798676(v=vs.85)
   public static sndPlaySoundA(pszSound: Optional<LPCSTR>, fuSound: UINT): BOOL {
     return Winmm.Load('sndPlaySoundA')(pszSound, fuSound);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/multimedia/the-playsound-function
+  // https://learn.microsoft.com/en-us/previous-versions/dd798676(v=vs.85)
   public static sndPlaySoundW(pszSound: Optional<LPCWSTR>, fuSound: UINT): BOOL {
     return Winmm.Load('sndPlaySoundW')(pszSound, fuSound);
   }
@@ -985,12 +985,12 @@ class Winmm extends Win32 {
     return Winmm.Load('timeGetTime')();
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/multimedia/timer-operations
+  // https://learn.microsoft.com/en-us/previous-versions/dd757630(v=vs.85)
   public static timeKillEvent(uTimerID: UINT): MMRESULT {
     return Winmm.Load('timeKillEvent')(uTimerID);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/multimedia/timer-operations
+  // https://learn.microsoft.com/en-us/previous-versions/dd757634(v=vs.85)
   public static timeSetEvent(uDelay: UINT, uResolution: UINT, fptc: LPTIMECALLBACK, dwUser: DWORD_PTR, fuEvent: UINT): MMRESULT {
     return Winmm.Load('timeSetEvent')(uDelay, uResolution, fptc, dwUser, fuEvent);
   }
@@ -1015,19 +1015,19 @@ class Winmm extends Win32 {
     return Winmm.Load('waveInGetDevCapsW')(uDeviceID, pwic_out, cbwic);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-waveingeterrortexta
+  // https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-waveingeterrortext
   public static waveInGetErrorTextA(mmrError: MMRESULT, pszText_out: LPSTR, cchText: UINT): MMRESULT {
     return Winmm.Load('waveInGetErrorTextA')(mmrError, pszText_out, cchText);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-waveingeterrortextw
+  // https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-waveingeterrortext
   public static waveInGetErrorTextW(mmrError: MMRESULT, pszText_out: LPWSTR, cchText: UINT): MMRESULT {
     return Winmm.Load('waveInGetErrorTextW')(mmrError, pszText_out, cchText);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-waveingetid
-  public static waveInGetID(hwi: HWAVEIN, puDeviceID_out: LPUINT): MMRESULT {
-    return Winmm.Load('waveInGetID')(hwi, puDeviceID_out);
+  public static waveInGetID(hwi: HWAVEIN, puDeviceID: LPUINT): MMRESULT {
+    return Winmm.Load('waveInGetID')(hwi, puDeviceID);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-waveingetnumdevs
@@ -1095,12 +1095,12 @@ class Winmm extends Win32 {
     return Winmm.Load('waveOutGetDevCapsW')(uDeviceID, pwoc_out, cbwoc);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-waveoutgeterrortexta
+  // https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-waveoutgeterrortext
   public static waveOutGetErrorTextA(mmrError: MMRESULT, pszText_out: LPSTR, cchText: UINT): MMRESULT {
     return Winmm.Load('waveOutGetErrorTextA')(mmrError, pszText_out, cchText);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-waveoutgeterrortextw
+  // https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-waveoutgeterrortext
   public static waveOutGetErrorTextW(mmrError: MMRESULT, pszText_out: LPWSTR, cchText: UINT): MMRESULT {
     return Winmm.Load('waveOutGetErrorTextW')(mmrError, pszText_out, cchText);
   }

@@ -228,8 +228,8 @@ class Pdh extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/pdh/nf-pdh-pdhclosequery
-  public static PdhCloseQuery(hQuery_in_out: PDH_HQUERY): PDH_STATUS {
-    return Pdh.Load('PdhCloseQuery')(hQuery_in_out);
+  public static PdhCloseQuery(hQuery: PDH_HQUERY): PDH_STATUS {
+    return Pdh.Load('PdhCloseQuery')(hQuery);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/pdh/nf-pdh-pdhcollectquerydata
@@ -423,18 +423,18 @@ class Pdh extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/pdh/nf-pdh-pdhgetdatasourcetimerangea
-  public static PdhGetDataSourceTimeRangeA(szDataSource: Optional<LPCSTR>, pdwNumEntries_out: LPDWORD, pInfo_out: PPDH_TIME_INFO, pdwBufferSize_in_out: LPDWORD): PDH_STATUS {
-    return Pdh.Load('PdhGetDataSourceTimeRangeA')(szDataSource, pdwNumEntries_out, pInfo_out, pdwBufferSize_in_out);
+  public static PdhGetDataSourceTimeRangeA(szDataSource: Optional<LPCSTR>, pdwNumEntries_out: LPDWORD, pInfo_out: PPDH_TIME_INFO, pdwBufferSize: LPDWORD): PDH_STATUS {
+    return Pdh.Load('PdhGetDataSourceTimeRangeA')(szDataSource, pdwNumEntries_out, pInfo_out, pdwBufferSize);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/pdh/nf-pdh-pdhgetdatasourcetimerangeh
-  public static PdhGetDataSourceTimeRangeH(hDataSource_in_out: Optional<PDH_HLOG>, pdwNumEntries_out: LPDWORD, pInfo_out: PPDH_TIME_INFO, pdwBufferSize_in_out: LPDWORD): PDH_STATUS {
-    return Pdh.Load('PdhGetDataSourceTimeRangeH')(hDataSource_in_out, pdwNumEntries_out, pInfo_out, pdwBufferSize_in_out);
+  public static PdhGetDataSourceTimeRangeH(hDataSource: Optional<PDH_HLOG>, pdwNumEntries_out: LPDWORD, pInfo_out: PPDH_TIME_INFO, pdwBufferSize: LPDWORD): PDH_STATUS {
+    return Pdh.Load('PdhGetDataSourceTimeRangeH')(hDataSource, pdwNumEntries_out, pInfo_out, pdwBufferSize);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/pdh/nf-pdh-pdhgetdatasourcetimerangew
-  public static PdhGetDataSourceTimeRangeW(szDataSource: Optional<LPCWSTR>, pdwNumEntries_out: LPDWORD, pInfo_out: PPDH_TIME_INFO, pdwBufferSize_in_out: LPDWORD): PDH_STATUS {
-    return Pdh.Load('PdhGetDataSourceTimeRangeW')(szDataSource, pdwNumEntries_out, pInfo_out, pdwBufferSize_in_out);
+  public static PdhGetDataSourceTimeRangeW(szDataSource: Optional<LPCWSTR>, pdwNumEntries_out: LPDWORD, pInfo_out: PPDH_TIME_INFO, pdwBufferSize: LPDWORD): PDH_STATUS {
+    return Pdh.Load('PdhGetDataSourceTimeRangeW')(szDataSource, pdwNumEntries_out, pInfo_out, pdwBufferSize);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/pdh/nf-pdh-pdhgetdefaultperfcountera
@@ -553,13 +553,13 @@ class Pdh extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/pdh/nf-pdh-pdhopenloga
-  public static PdhOpenLogA(szLogFileName: LPCSTR, dwAccessFlags: DWORD, lpdwLogType_in_out: LPDWORD, hQuery: Optional<PDH_HQUERY>, dwMaxSize: DWORD, szUserCaption: Optional<LPCSTR>, phLog_out: PPDH_HLOG): PDH_STATUS {
-    return Pdh.Load('PdhOpenLogA')(szLogFileName, dwAccessFlags, lpdwLogType_in_out, hQuery, dwMaxSize, szUserCaption, phLog_out);
+  public static PdhOpenLogA(szLogFileName: LPCSTR, dwAccessFlags: DWORD, lpdwLogType: LPDWORD, hQuery: Optional<PDH_HQUERY>, dwMaxSize: DWORD, szUserCaption: Optional<LPCSTR>, phLog_out: PPDH_HLOG): PDH_STATUS {
+    return Pdh.Load('PdhOpenLogA')(szLogFileName, dwAccessFlags, lpdwLogType, hQuery, dwMaxSize, szUserCaption, phLog_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/pdh/nf-pdh-pdhopenlogw
-  public static PdhOpenLogW(szLogFileName: LPCWSTR, dwAccessFlags: DWORD, lpdwLogType_in_out: LPDWORD, hQuery: Optional<PDH_HQUERY>, dwMaxSize: DWORD, szUserCaption: Optional<LPCWSTR>, phLog_out: PPDH_HLOG): PDH_STATUS {
-    return Pdh.Load('PdhOpenLogW')(szLogFileName, dwAccessFlags, lpdwLogType_in_out, hQuery, dwMaxSize, szUserCaption, phLog_out);
+  public static PdhOpenLogW(szLogFileName: LPCWSTR, dwAccessFlags: DWORD, lpdwLogType: LPDWORD, hQuery: Optional<PDH_HQUERY>, dwMaxSize: DWORD, szUserCaption: Optional<LPCWSTR>, phLog_out: PPDH_HLOG): PDH_STATUS {
+    return Pdh.Load('PdhOpenLogW')(szLogFileName, dwAccessFlags, lpdwLogType, hQuery, dwMaxSize, szUserCaption, phLog_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/pdh/nf-pdh-pdhopenqueryw
@@ -627,18 +627,18 @@ class Pdh extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/pdh/nf-pdh-pdhselectdatasourcea
-  public static PdhSelectDataSourceA(hWndOwner: Nullable<HWND>, dwFlags: DWORD, szDataSource_in_out: LPSTR, pcchBufferLength_in_out: LPDWORD): PDH_STATUS {
-    return Pdh.Load('PdhSelectDataSourceA')(hWndOwner, dwFlags, szDataSource_in_out, pcchBufferLength_in_out);
+  public static PdhSelectDataSourceA(hWndOwner: Nullable<HWND>, dwFlags: DWORD, szDataSource_out: LPSTR, pcchBufferLength_in_out: LPDWORD): PDH_STATUS {
+    return Pdh.Load('PdhSelectDataSourceA')(hWndOwner, dwFlags, szDataSource_out, pcchBufferLength_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/pdh/nf-pdh-pdhselectdatasourcew
-  public static PdhSelectDataSourceW(hWndOwner: Nullable<HWND>, dwFlags: DWORD, szDataSource_in_out: LPWSTR, pcchBufferLength_in_out: LPDWORD): PDH_STATUS {
-    return Pdh.Load('PdhSelectDataSourceW')(hWndOwner, dwFlags, szDataSource_in_out, pcchBufferLength_in_out);
+  public static PdhSelectDataSourceW(hWndOwner: Nullable<HWND>, dwFlags: DWORD, szDataSource_out: LPWSTR, pcchBufferLength_in_out: LPDWORD): PDH_STATUS {
+    return Pdh.Load('PdhSelectDataSourceW')(hWndOwner, dwFlags, szDataSource_out, pcchBufferLength_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/pdh/nf-pdh-pdhsetcounterscalefactor
-  public static PdhSetCounterScaleFactor(hCounter_in_out: PDH_HCOUNTER, lFactor: LONG): PDH_STATUS {
-    return Pdh.Load('PdhSetCounterScaleFactor')(hCounter_in_out, lFactor);
+  public static PdhSetCounterScaleFactor(hCounter: PDH_HCOUNTER, lFactor: LONG): PDH_STATUS {
+    return Pdh.Load('PdhSetCounterScaleFactor')(hCounter, lFactor);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/pdh/nf-pdh-pdhsetdefaultrealtimedatasource

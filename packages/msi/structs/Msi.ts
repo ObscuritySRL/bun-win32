@@ -114,8 +114,8 @@ class Msi extends Win32 {
     MsiDatabaseCommit: { args: [FFIType.u32], returns: FFIType.u32 },
     MsiDatabaseExportA: { args: [FFIType.u32, FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.u32 },
     MsiDatabaseExportW: { args: [FFIType.u32, FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.u32 },
-    MsiDatabaseGenerateTransformA: { args: [FFIType.u32, FFIType.u32, FFIType.ptr], returns: FFIType.u32 },
-    MsiDatabaseGenerateTransformW: { args: [FFIType.u32, FFIType.u32, FFIType.ptr], returns: FFIType.u32 },
+    MsiDatabaseGenerateTransformA: { args: [FFIType.u32, FFIType.u32, FFIType.ptr, FFIType.i32, FFIType.i32], returns: FFIType.u32 },
+    MsiDatabaseGenerateTransformW: { args: [FFIType.u32, FFIType.u32, FFIType.ptr, FFIType.i32, FFIType.i32], returns: FFIType.u32 },
     MsiDatabaseGetPrimaryKeysA: { args: [FFIType.u32, FFIType.ptr, FFIType.ptr], returns: FFIType.u32 },
     MsiDatabaseGetPrimaryKeysW: { args: [FFIType.u32, FFIType.ptr, FFIType.ptr], returns: FFIType.u32 },
     MsiDatabaseImportA: { args: [FFIType.u32, FFIType.ptr, FFIType.ptr], returns: FFIType.u32 },
@@ -261,8 +261,8 @@ class Msi extends Win32 {
     MsiProvideComponentFromDescriptorW: { args: [FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.u32 },
     MsiProvideComponentW: { args: [FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.u32, FFIType.ptr, FFIType.ptr], returns: FFIType.u32 },
     MsiProvideQualifiedComponentA: { args: [FFIType.ptr, FFIType.ptr, FFIType.u32, FFIType.ptr, FFIType.ptr], returns: FFIType.u32 },
-    MsiProvideQualifiedComponentExA: { args: [FFIType.ptr, FFIType.ptr, FFIType.u32, FFIType.ptr, FFIType.u32, FFIType.ptr, FFIType.ptr], returns: FFIType.u32 },
-    MsiProvideQualifiedComponentExW: { args: [FFIType.ptr, FFIType.ptr, FFIType.u32, FFIType.ptr, FFIType.u32, FFIType.ptr, FFIType.ptr], returns: FFIType.u32 },
+    MsiProvideQualifiedComponentExA: { args: [FFIType.ptr, FFIType.ptr, FFIType.u32, FFIType.ptr, FFIType.u32, FFIType.u32, FFIType.ptr, FFIType.ptr], returns: FFIType.u32 },
+    MsiProvideQualifiedComponentExW: { args: [FFIType.ptr, FFIType.ptr, FFIType.u32, FFIType.ptr, FFIType.u32, FFIType.u32, FFIType.ptr, FFIType.ptr], returns: FFIType.u32 },
     MsiProvideQualifiedComponentW: { args: [FFIType.ptr, FFIType.ptr, FFIType.u32, FFIType.ptr, FFIType.ptr], returns: FFIType.u32 },
     MsiQueryComponentStateA: { args: [FFIType.ptr, FFIType.ptr, FFIType.u32, FFIType.ptr, FFIType.ptr], returns: FFIType.u32 },
     MsiQueryComponentStateW: { args: [FFIType.ptr, FFIType.ptr, FFIType.u32, FFIType.ptr, FFIType.ptr], returns: FFIType.u32 },
@@ -412,13 +412,13 @@ class Msi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/msi/nf-msi-msibegintransactiona
-  public static MsiBeginTransactionA(szName: LPCSTR, dwTransactionAttributes: DWORD, hTransactionHandle_out: PMSIHANDLE, hChangeOfOwnerEvent_out: LPHANDLE): UINT {
-    return Msi.Load('MsiBeginTransactionA')(szName, dwTransactionAttributes, hTransactionHandle_out, hChangeOfOwnerEvent_out);
+  public static MsiBeginTransactionA(szName: LPCSTR, dwTransactionAttributes: DWORD, phTransactionHandle_out: PMSIHANDLE, phChangeOfOwnerEvent_out: LPHANDLE): UINT {
+    return Msi.Load('MsiBeginTransactionA')(szName, dwTransactionAttributes, phTransactionHandle_out, phChangeOfOwnerEvent_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/msi/nf-msi-msibegintransactionw
-  public static MsiBeginTransactionW(szName: LPCWSTR, dwTransactionAttributes: DWORD, hTransactionHandle_out: PMSIHANDLE, hChangeOfOwnerEvent_out: LPHANDLE): UINT {
-    return Msi.Load('MsiBeginTransactionW')(szName, dwTransactionAttributes, hTransactionHandle_out, hChangeOfOwnerEvent_out);
+  public static MsiBeginTransactionW(szName: LPCWSTR, dwTransactionAttributes: DWORD, phTransactionHandle_out: PMSIHANDLE, phChangeOfOwnerEvent_out: LPHANDLE): UINT {
+    return Msi.Load('MsiBeginTransactionW')(szName, dwTransactionAttributes, phTransactionHandle_out, phChangeOfOwnerEvent_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/msi/nf-msi-msicloseallhandles
@@ -446,12 +446,12 @@ class Msi extends Win32 {
     return Msi.Load('MsiConfigureFeatureA')(szProduct, szFeature, eInstallState);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/msi/nf-msi-msiconfigurefeaturefromdescriptora
+  // Undocumented export (no Microsoft Learn page).
   public static MsiConfigureFeatureFromDescriptorA(szDescriptor: LPCSTR, eInstallState: INSTALLSTATE): UINT {
     return Msi.Load('MsiConfigureFeatureFromDescriptorA')(szDescriptor, eInstallState);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/msi/nf-msi-msiconfigurefeaturefromdescriptorw
+  // Undocumented export (no Microsoft Learn page).
   public static MsiConfigureFeatureFromDescriptorW(szDescriptor: LPCWSTR, eInstallState: INSTALLSTATE): UINT {
     return Msi.Load('MsiConfigureFeatureFromDescriptorW')(szDescriptor, eInstallState);
   }
@@ -481,7 +481,7 @@ class Msi extends Win32 {
     return Msi.Load('MsiConfigureProductW')(szProduct, iInstallLevel, eInstallState);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/msi/nf-msi-msicreateandverifyinstallerdirectory
+  // Undocumented export (no Microsoft Learn page).
   public static MsiCreateAndVerifyInstallerDirectory(dwReserved: DWORD): UINT {
     return Msi.Load('MsiCreateAndVerifyInstallerDirectory')(dwReserved);
   }
@@ -527,13 +527,13 @@ class Msi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/msiquery/nf-msiquery-msidatabasegeneratetransforma
-  public static MsiDatabaseGenerateTransformA(hDatabase: MSIHANDLE, hDatabaseReference: MSIHANDLE, szTransformFile: Nullable<LPCSTR>): UINT {
-    return Msi.Load('MsiDatabaseGenerateTransformA')(hDatabase, hDatabaseReference, szTransformFile);
+  public static MsiDatabaseGenerateTransformA(hDatabase: MSIHANDLE, hDatabaseReference: MSIHANDLE, szTransformFile: Nullable<LPCSTR>, iReserved1: INT, iReserved2: INT): UINT {
+    return Msi.Load('MsiDatabaseGenerateTransformA')(hDatabase, hDatabaseReference, szTransformFile, iReserved1, iReserved2);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/msiquery/nf-msiquery-msidatabasegeneratetransformw
-  public static MsiDatabaseGenerateTransformW(hDatabase: MSIHANDLE, hDatabaseReference: MSIHANDLE, szTransformFile: Nullable<LPCWSTR>): UINT {
-    return Msi.Load('MsiDatabaseGenerateTransformW')(hDatabase, hDatabaseReference, szTransformFile);
+  public static MsiDatabaseGenerateTransformW(hDatabase: MSIHANDLE, hDatabaseReference: MSIHANDLE, szTransformFile: Nullable<LPCWSTR>, iReserved1: INT, iReserved2: INT): UINT {
+    return Msi.Load('MsiDatabaseGenerateTransformW')(hDatabase, hDatabaseReference, szTransformFile, iReserved1, iReserved2);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/msiquery/nf-msiquery-msidatabasegetprimarykeysa
@@ -586,34 +586,34 @@ class Msi extends Win32 {
     return Msi.Load('MsiDatabaseOpenViewW')(hDatabase, szQuery, phView_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/msi/nf-msi-msidecomposedescriptora
+  // Undocumented export (no Microsoft Learn page).
   public static MsiDecomposeDescriptorA(szDescriptor: LPCSTR, szProductCode_out: Optional<LPSTR>, szFeatureId_out: Optional<LPSTR>, szComponentCode_out: Optional<LPSTR>, pcchArgsOffset_out: Optional<LPDWORD>): UINT {
     return Msi.Load('MsiDecomposeDescriptorA')(szDescriptor, szProductCode_out, szFeatureId_out, szComponentCode_out, pcchArgsOffset_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/msi/nf-msi-msidecomposedescriptorw
+  // Undocumented export (no Microsoft Learn page).
   public static MsiDecomposeDescriptorW(szDescriptor: LPCWSTR, szProductCode_out: Optional<LPWSTR>, szFeatureId_out: Optional<LPWSTR>, szComponentCode_out: Optional<LPWSTR>, pcchArgsOffset_out: Optional<LPDWORD>): UINT {
     return Msi.Load('MsiDecomposeDescriptorW')(szDescriptor, szProductCode_out, szFeatureId_out, szComponentCode_out, pcchArgsOffset_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/msi/nf-msi-msidetermineapplicablepatchesa
-  public static MsiDetermineApplicablePatchesA(szProductPackagePath: LPCSTR, cPatchInfo: DWORD, pPatchInfo_in_out: PMSIPATCHSEQUENCEINFOA): UINT {
-    return Msi.Load('MsiDetermineApplicablePatchesA')(szProductPackagePath, cPatchInfo, pPatchInfo_in_out);
+  public static MsiDetermineApplicablePatchesA(szProductPackagePath: LPCSTR, cPatchInfo: DWORD, pPatchInfo: PMSIPATCHSEQUENCEINFOA): UINT {
+    return Msi.Load('MsiDetermineApplicablePatchesA')(szProductPackagePath, cPatchInfo, pPatchInfo);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/msi/nf-msi-msidetermineapplicablepatchesw
-  public static MsiDetermineApplicablePatchesW(szProductPackagePath: LPCWSTR, cPatchInfo: DWORD, pPatchInfo_in_out: PMSIPATCHSEQUENCEINFOW): UINT {
-    return Msi.Load('MsiDetermineApplicablePatchesW')(szProductPackagePath, cPatchInfo, pPatchInfo_in_out);
+  public static MsiDetermineApplicablePatchesW(szProductPackagePath: LPCWSTR, cPatchInfo: DWORD, pPatchInfo: PMSIPATCHSEQUENCEINFOW): UINT {
+    return Msi.Load('MsiDetermineApplicablePatchesW')(szProductPackagePath, cPatchInfo, pPatchInfo);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/msi/nf-msi-msideterminepatchsequencea
-  public static MsiDeterminePatchSequenceA(szProductCode: LPCSTR, szUserSid: Optional<LPCSTR>, dwContext: DWORD, cPatchInfo: DWORD, pPatchInfo_in_out: PMSIPATCHSEQUENCEINFOA): UINT {
-    return Msi.Load('MsiDeterminePatchSequenceA')(szProductCode, szUserSid, dwContext, cPatchInfo, pPatchInfo_in_out);
+  public static MsiDeterminePatchSequenceA(szProductCode: LPCSTR, szUserSid: Optional<LPCSTR>, dwContext: DWORD, cPatchInfo: DWORD, pPatchInfo: PMSIPATCHSEQUENCEINFOA): UINT {
+    return Msi.Load('MsiDeterminePatchSequenceA')(szProductCode, szUserSid, dwContext, cPatchInfo, pPatchInfo);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/msi/nf-msi-msideterminepatchsequencew
-  public static MsiDeterminePatchSequenceW(szProductCode: LPCWSTR, szUserSid: Optional<LPCWSTR>, dwContext: DWORD, cPatchInfo: DWORD, pPatchInfo_in_out: PMSIPATCHSEQUENCEINFOW): UINT {
-    return Msi.Load('MsiDeterminePatchSequenceW')(szProductCode, szUserSid, dwContext, cPatchInfo, pPatchInfo_in_out);
+  public static MsiDeterminePatchSequenceW(szProductCode: LPCWSTR, szUserSid: Optional<LPCWSTR>, dwContext: DWORD, cPatchInfo: DWORD, pPatchInfo: PMSIPATCHSEQUENCEINFOW): UINT {
+    return Msi.Load('MsiDeterminePatchSequenceW')(szProductCode, szUserSid, dwContext, cPatchInfo, pPatchInfo);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/msiquery/nf-msiquery-msidoactiona
@@ -755,13 +755,13 @@ class Msi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/msi/nf-msi-msienumfeaturesa
-  public static MsiEnumFeaturesA(szProduct: LPCSTR, iFeatureIndex: DWORD, szFeature_out: LPSTR, szParent_out: Optional<LPSTR>): UINT {
-    return Msi.Load('MsiEnumFeaturesA')(szProduct, iFeatureIndex, szFeature_out, szParent_out);
+  public static MsiEnumFeaturesA(szProduct: LPCSTR, iFeatureIndex: DWORD, lpFeatureBuf_out: LPSTR, lpParentBuf_out: Optional<LPSTR>): UINT {
+    return Msi.Load('MsiEnumFeaturesA')(szProduct, iFeatureIndex, lpFeatureBuf_out, lpParentBuf_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/msi/nf-msi-msienumfeaturesw
-  public static MsiEnumFeaturesW(szProduct: LPCWSTR, iFeatureIndex: DWORD, szFeature_out: LPWSTR, szParent_out: Optional<LPWSTR>): UINT {
-    return Msi.Load('MsiEnumFeaturesW')(szProduct, iFeatureIndex, szFeature_out, szParent_out);
+  public static MsiEnumFeaturesW(szProduct: LPCWSTR, iFeatureIndex: DWORD, lpFeatureBuf_out: LPWSTR, lpParentBuf_out: Optional<LPWSTR>): UINT {
+    return Msi.Load('MsiEnumFeaturesW')(szProduct, iFeatureIndex, lpFeatureBuf_out, lpParentBuf_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/msi/nf-msi-msienumpatchesa
@@ -925,13 +925,13 @@ class Msi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/msiquery/nf-msiquery-msigetfeaturecosta
-  public static MsiGetFeatureCostA(hInstall: MSIHANDLE, szFeature: LPCSTR, iCostTree: MSICOSTTREE, iState: INSTALLSTATE, piCost: LPINT): UINT {
-    return Msi.Load('MsiGetFeatureCostA')(hInstall, szFeature, iCostTree, iState, piCost);
+  public static MsiGetFeatureCostA(hInstall: MSIHANDLE, szFeature: LPCSTR, iCostTree: MSICOSTTREE, iState: INSTALLSTATE, piCost_out: LPINT): UINT {
+    return Msi.Load('MsiGetFeatureCostA')(hInstall, szFeature, iCostTree, iState, piCost_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/msiquery/nf-msiquery-msigetfeaturecostw
-  public static MsiGetFeatureCostW(hInstall: MSIHANDLE, szFeature: LPCWSTR, iCostTree: MSICOSTTREE, iState: INSTALLSTATE, piCost: LPINT): UINT {
-    return Msi.Load('MsiGetFeatureCostW')(hInstall, szFeature, iCostTree, iState, piCost);
+  public static MsiGetFeatureCostW(hInstall: MSIHANDLE, szFeature: LPCWSTR, iCostTree: MSICOSTTREE, iState: INSTALLSTATE, piCost_out: LPINT): UINT {
+    return Msi.Load('MsiGetFeatureCostW')(hInstall, szFeature, iCostTree, iState, piCost_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/msi/nf-msi-msigetfeatureinfoa
@@ -981,23 +981,23 @@ class Msi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/msiquery/nf-msiquery-msigetfeaturevalidstatesa
-  public static MsiGetFeatureValidStatesA(hInstall: MSIHANDLE, szFeature: LPCSTR, dwInstallStates_out: LPDWORD): UINT {
-    return Msi.Load('MsiGetFeatureValidStatesA')(hInstall, szFeature, dwInstallStates_out);
+  public static MsiGetFeatureValidStatesA(hInstall: MSIHANDLE, szFeature: LPCSTR, lpInstallStates_out: LPDWORD): UINT {
+    return Msi.Load('MsiGetFeatureValidStatesA')(hInstall, szFeature, lpInstallStates_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/msiquery/nf-msiquery-msigetfeaturevalidstatesw
-  public static MsiGetFeatureValidStatesW(hInstall: MSIHANDLE, szFeature: LPCWSTR, dwInstallStates_out: LPDWORD): UINT {
-    return Msi.Load('MsiGetFeatureValidStatesW')(hInstall, szFeature, dwInstallStates_out);
+  public static MsiGetFeatureValidStatesW(hInstall: MSIHANDLE, szFeature: LPCWSTR, lpInstallStates_out: LPDWORD): UINT {
+    return Msi.Load('MsiGetFeatureValidStatesW')(hInstall, szFeature, lpInstallStates_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/msi/nf-msi-msigetfilehasha
-  public static MsiGetFileHashA(szFilePath: LPCSTR, dwOptions: DWORD, pHash_in_out: PMSIFILEHASHINFO): UINT {
-    return Msi.Load('MsiGetFileHashA')(szFilePath, dwOptions, pHash_in_out);
+  public static MsiGetFileHashA(szFilePath: LPCSTR, dwOptions: DWORD, pHash_out: PMSIFILEHASHINFO): UINT {
+    return Msi.Load('MsiGetFileHashA')(szFilePath, dwOptions, pHash_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/msi/nf-msi-msigetfilehashw
-  public static MsiGetFileHashW(szFilePath: LPCWSTR, dwOptions: DWORD, pHash_in_out: PMSIFILEHASHINFO): UINT {
-    return Msi.Load('MsiGetFileHashW')(szFilePath, dwOptions, pHash_in_out);
+  public static MsiGetFileHashW(szFilePath: LPCWSTR, dwOptions: DWORD, pHash_out: PMSIFILEHASHINFO): UINT {
+    return Msi.Load('MsiGetFileHashW')(szFilePath, dwOptions, pHash_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/msi/nf-msi-msigetfilesignatureinformationa
@@ -1036,13 +1036,13 @@ class Msi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/msi/nf-msi-msigetpatchfilelista
-  public static MsiGetPatchFileListA(szProductCode: LPCSTR, szPatchPackages: LPCSTR, pcFiles_out: LPDWORD, pphFileRecords_out: PPMSIHANDLE): UINT {
-    return Msi.Load('MsiGetPatchFileListA')(szProductCode, szPatchPackages, pcFiles_out, pphFileRecords_out);
+  public static MsiGetPatchFileListA(szProductCode: LPCSTR, szPatchPackages: LPCSTR, pcFiles_in_out: LPDWORD, pphFileRecords_in_out: PPMSIHANDLE): UINT {
+    return Msi.Load('MsiGetPatchFileListA')(szProductCode, szPatchPackages, pcFiles_in_out, pphFileRecords_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/msi/nf-msi-msigetpatchfilelistw
-  public static MsiGetPatchFileListW(szProductCode: LPCWSTR, szPatchPackages: LPCWSTR, pcFiles_out: LPDWORD, pphFileRecords_out: PPMSIHANDLE): UINT {
-    return Msi.Load('MsiGetPatchFileListW')(szProductCode, szPatchPackages, pcFiles_out, pphFileRecords_out);
+  public static MsiGetPatchFileListW(szProductCode: LPCWSTR, szPatchPackages: LPCWSTR, pcFiles_in_out: LPDWORD, pphFileRecords_in_out: PPMSIHANDLE): UINT {
+    return Msi.Load('MsiGetPatchFileListW')(szProductCode, szPatchPackages, pcFiles_in_out, pphFileRecords_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/msi/nf-msi-msigetpatchinfoa
@@ -1070,12 +1070,12 @@ class Msi extends Win32 {
     return Msi.Load('MsiGetProductCodeA')(szComponent, lpBuf39_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/msi/nf-msi-msigetproductcodefrompackagecodea
+  // Undocumented export (no Microsoft Learn page).
   public static MsiGetProductCodeFromPackageCodeA(szPackageCode: LPCSTR, lpProductCode39_out: LPSTR): UINT {
     return Msi.Load('MsiGetProductCodeFromPackageCodeA')(szPackageCode, lpProductCode39_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/msi/nf-msi-msigetproductcodefrompackagecodew
+  // Undocumented export (no Microsoft Learn page).
   public static MsiGetProductCodeFromPackageCodeW(szPackageCode: LPCWSTR, lpProductCode39_out: LPWSTR): UINT {
     return Msi.Load('MsiGetProductCodeFromPackageCodeW')(szPackageCode, lpProductCode39_out);
   }
@@ -1133,12 +1133,12 @@ class Msi extends Win32 {
     return Msi.Load('MsiGetProductInfoW')(szProduct, szAttribute, lpValueBuf_out, pcchValueBuf_in_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/msiquery/nf-msiquery-msigetproductpropertya
+  // https://learn.microsoft.com/en-us/windows/win32/api/msi/nf-msi-msigetproductpropertya
   public static MsiGetProductPropertyA(hProduct: MSIHANDLE, szProperty: LPCSTR, lpValueBuf_out: Optional<LPSTR>, pcchValueBuf_in_out: Optional<LPDWORD>): UINT {
     return Msi.Load('MsiGetProductPropertyA')(hProduct, szProperty, lpValueBuf_out, pcchValueBuf_in_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/msiquery/nf-msiquery-msigetproductpropertyw
+  // https://learn.microsoft.com/en-us/windows/win32/api/msi/nf-msi-msigetproductpropertyw
   public static MsiGetProductPropertyW(hProduct: MSIHANDLE, szProperty: LPCWSTR, lpValueBuf_out: Optional<LPWSTR>, pcchValueBuf_in_out: Optional<LPDWORD>): UINT {
     return Msi.Load('MsiGetProductPropertyW')(hProduct, szProperty, lpValueBuf_out, pcchValueBuf_in_out);
   }
@@ -1249,7 +1249,7 @@ class Msi extends Win32 {
     return Msi.Load('MsiInstallProductW')(szPackagePath, szCommandLine);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/msi/nf-msi-msiinvalidatefeaturecache
+  // Undocumented export (no Microsoft Learn page).
   public static MsiInvalidateFeatureCache(): void {
     return Msi.Load('MsiInvalidateFeatureCache')();
   }
@@ -1265,8 +1265,8 @@ class Msi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/msi/nf-msi-msijointransaction
-  public static MsiJoinTransaction(hTransactionHandle: MSIHANDLE, dwTransactionAttributes: DWORD, hChangeOfOwnerEvent_out: LPHANDLE): UINT {
-    return Msi.Load('MsiJoinTransaction')(hTransactionHandle, dwTransactionAttributes, hChangeOfOwnerEvent_out);
+  public static MsiJoinTransaction(hTransactionHandle: MSIHANDLE, dwTransactionAttributes: DWORD, phChangeOfOwnerEvent_out: LPHANDLE): UINT {
+    return Msi.Load('MsiJoinTransaction')(hTransactionHandle, dwTransactionAttributes, phChangeOfOwnerEvent_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/msi/nf-msi-msilocatecomponenta
@@ -1379,12 +1379,12 @@ class Msi extends Win32 {
     return Msi.Load('MsiProvideComponentA')(szProduct, szFeature, szComponent, dwInstallMode, lpPathBuf_out, pcchPathBuf_in_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/msi/nf-msi-msiprovidecomponentfromdescriptora
+  // Undocumented export (no Microsoft Learn page).
   public static MsiProvideComponentFromDescriptorA(szDescriptor: LPCSTR, lpPathBuf_out: Optional<LPSTR>, pcchPathBuf_in_out: Optional<LPDWORD>, pcchArgsOffset_out: Optional<LPDWORD>): UINT {
     return Msi.Load('MsiProvideComponentFromDescriptorA')(szDescriptor, lpPathBuf_out, pcchPathBuf_in_out, pcchArgsOffset_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/msi/nf-msi-msiprovidecomponentfromdescriptorw
+  // Undocumented export (no Microsoft Learn page).
   public static MsiProvideComponentFromDescriptorW(szDescriptor: LPCWSTR, lpPathBuf_out: Optional<LPWSTR>, pcchPathBuf_in_out: Optional<LPDWORD>, pcchArgsOffset_out: Optional<LPDWORD>): UINT {
     return Msi.Load('MsiProvideComponentFromDescriptorW')(szDescriptor, lpPathBuf_out, pcchPathBuf_in_out, pcchArgsOffset_out);
   }
@@ -1400,13 +1400,31 @@ class Msi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/msi/nf-msi-msiprovidequalifiedcomponentexa
-  public static MsiProvideQualifiedComponentExA(szCategory: LPCSTR, szQualifier: LPCSTR, dwInstallMode: DWORD, szProduct: Optional<LPCSTR>, dwUnused: DWORD, lpPathBuf_out: Optional<LPSTR>, pcchPathBuf_in_out: Optional<LPDWORD>): UINT {
-    return Msi.Load('MsiProvideQualifiedComponentExA')(szCategory, szQualifier, dwInstallMode, szProduct, dwUnused, lpPathBuf_out, pcchPathBuf_in_out);
+  public static MsiProvideQualifiedComponentExA(
+    szCategory: LPCSTR,
+    szQualifier: LPCSTR,
+    dwInstallMode: DWORD,
+    szProduct: Optional<LPCSTR>,
+    dwUnused1: DWORD,
+    dwUnused2: DWORD,
+    lpPathBuf_out: Optional<LPSTR>,
+    pcchPathBuf_in_out: Optional<LPDWORD>,
+  ): UINT {
+    return Msi.Load('MsiProvideQualifiedComponentExA')(szCategory, szQualifier, dwInstallMode, szProduct, dwUnused1, dwUnused2, lpPathBuf_out, pcchPathBuf_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/msi/nf-msi-msiprovidequalifiedcomponentexw
-  public static MsiProvideQualifiedComponentExW(szCategory: LPCWSTR, szQualifier: LPCWSTR, dwInstallMode: DWORD, szProduct: Optional<LPCWSTR>, dwUnused: DWORD, lpPathBuf_out: Optional<LPWSTR>, pcchPathBuf_in_out: Optional<LPDWORD>): UINT {
-    return Msi.Load('MsiProvideQualifiedComponentExW')(szCategory, szQualifier, dwInstallMode, szProduct, dwUnused, lpPathBuf_out, pcchPathBuf_in_out);
+  public static MsiProvideQualifiedComponentExW(
+    szCategory: LPCWSTR,
+    szQualifier: LPCWSTR,
+    dwInstallMode: DWORD,
+    szProduct: Optional<LPCWSTR>,
+    dwUnused1: DWORD,
+    dwUnused2: DWORD,
+    lpPathBuf_out: Optional<LPWSTR>,
+    pcchPathBuf_in_out: Optional<LPDWORD>,
+  ): UINT {
+    return Msi.Load('MsiProvideQualifiedComponentExW')(szCategory, szQualifier, dwInstallMode, szProduct, dwUnused1, dwUnused2, lpPathBuf_out, pcchPathBuf_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/msi/nf-msi-msiprovidequalifiedcomponentw
@@ -1439,12 +1457,12 @@ class Msi extends Win32 {
     return Msi.Load('MsiQueryFeatureStateExW')(szProductCode, szUserSid, dwContext, szFeature, pdwState_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/msi/nf-msi-msiqueryfeaturestatefromdescriptora
+  // Undocumented export (no Microsoft Learn page).
   public static MsiQueryFeatureStateFromDescriptorA(szDescriptor: LPCSTR): INSTALLSTATE {
     return Msi.Load('MsiQueryFeatureStateFromDescriptorA')(szDescriptor);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/msi/nf-msi-msiqueryfeaturestatefromdescriptorw
+  // Undocumented export (no Microsoft Learn page).
   public static MsiQueryFeatureStateFromDescriptorW(szDescriptor: LPCWSTR): INSTALLSTATE {
     return Msi.Load('MsiQueryFeatureStateFromDescriptorW')(szDescriptor);
   }
@@ -1534,12 +1552,12 @@ class Msi extends Win32 {
     return Msi.Load('MsiReinstallFeatureA')(szProduct, szFeature, dwReinstallMode);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/msi/nf-msi-msireinstallfeaturefromdescriptora
+  // Undocumented export (no Microsoft Learn page).
   public static MsiReinstallFeatureFromDescriptorA(szDescriptor: LPCSTR, dwReinstallMode: DWORD): UINT {
     return Msi.Load('MsiReinstallFeatureFromDescriptorA')(szDescriptor, dwReinstallMode);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/msi/nf-msi-msireinstallfeaturefromdescriptorw
+  // Undocumented export (no Microsoft Learn page).
   public static MsiReinstallFeatureFromDescriptorW(szDescriptor: LPCWSTR, dwReinstallMode: DWORD): UINT {
     return Msi.Load('MsiReinstallFeatureFromDescriptorW')(szDescriptor, dwReinstallMode);
   }
@@ -1550,13 +1568,13 @@ class Msi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/msi/nf-msi-msireinstallproducta
-  public static MsiReinstallProductA(szProduct: LPCSTR, dwReinstallMode: DWORD): UINT {
-    return Msi.Load('MsiReinstallProductA')(szProduct, dwReinstallMode);
+  public static MsiReinstallProductA(szProduct: LPCSTR, szReinstallMode: DWORD): UINT {
+    return Msi.Load('MsiReinstallProductA')(szProduct, szReinstallMode);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/msi/nf-msi-msireinstallproductw
-  public static MsiReinstallProductW(szProduct: LPCWSTR, dwReinstallMode: DWORD): UINT {
-    return Msi.Load('MsiReinstallProductW')(szProduct, dwReinstallMode);
+  public static MsiReinstallProductW(szProduct: LPCWSTR, szReinstallMode: DWORD): UINT {
+    return Msi.Load('MsiReinstallProductW')(szProduct, szReinstallMode);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/msi/nf-msi-msiremovepatchesa
@@ -1877,7 +1895,7 @@ class Msi extends Win32 {
     return Msi.Load('MsiUseFeatureW')(szProduct, szFeature);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/msiquery/nf-msiquery-msiverifydicspace
+  // https://learn.microsoft.com/en-us/windows/win32/api/msiquery/nf-msiquery-msiverifydiskspace
   public static MsiVerifyDiskSpace(hInstall: MSIHANDLE): UINT {
     return Msi.Load('MsiVerifyDiskSpace')(hInstall);
   }

@@ -223,8 +223,8 @@ class Bcrypt extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/bcrypt/nf-bcrypt-bcryptdestroysecret
-  public static BCryptDestroySecret(hSecret_in_out: BCRYPT_SECRET_HANDLE): NTSTATUS {
-    return Bcrypt.Load('BCryptDestroySecret')(hSecret_in_out);
+  public static BCryptDestroySecret(hSecret: BCRYPT_SECRET_HANDLE): NTSTATUS {
+    return Bcrypt.Load('BCryptDestroySecret')(hSecret);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/bcrypt/nf-bcrypt-bcryptduplicatehash
@@ -304,8 +304,8 @@ class Bcrypt extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/bcrypt/nf-bcrypt-bcryptgenrandom
-  public static BCryptGenRandom(hAlgorithm: Optional<BCRYPT_ALG_HANDLE>, pbBuffer_out: PUCHAR, cbBuffer: ULONG, dwFlags: ULONG): NTSTATUS {
-    return Bcrypt.Load('BCryptGenRandom')(hAlgorithm, pbBuffer_out, cbBuffer, dwFlags);
+  public static BCryptGenRandom(hAlgorithm: Optional<BCRYPT_ALG_HANDLE>, pbBuffer_in_out: PUCHAR, cbBuffer: ULONG, dwFlags: ULONG): NTSTATUS {
+    return Bcrypt.Load('BCryptGenRandom')(hAlgorithm, pbBuffer_in_out, cbBuffer, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/bcrypt/nf-bcrypt-bcryptgeneratekeypair
@@ -394,8 +394,8 @@ class Bcrypt extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/bcrypt/nf-bcrypt-bcryptregisterconfigchangenotify
-  public static BCryptRegisterConfigChangeNotify(phEvent_out: PHANDLE): NTSTATUS {
-    return Bcrypt.Load('BCryptRegisterConfigChangeNotify')(phEvent_out);
+  public static BCryptRegisterConfigChangeNotify(pEvent_out: PHANDLE): NTSTATUS {
+    return Bcrypt.Load('BCryptRegisterConfigChangeNotify')(pEvent_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/bcrypt/nf-bcrypt-bcryptremovecontextfunction
@@ -433,17 +433,17 @@ class Bcrypt extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/bcrypt/nf-bcrypt-bcryptsignhash
-  public static BCryptSignHash(hKey: BCRYPT_KEY_HANDLE, pPaddingInfo: Optional<PVOID>, pbInput: PUCHAR, cbInput: ULONG, pbOutput_out: Optional<PUCHAR>, cbOutput: ULONG, pcbResult_out: PULONG, dwFlags: ULONG): NTSTATUS {
+  public static BCryptSignHash(hKey: BCRYPT_KEY_HANDLE, pPaddingInfo: Optional<PVOID>, pbInput: Optional<PUCHAR>, cbInput: ULONG, pbOutput_out: Optional<PUCHAR>, cbOutput: ULONG, pcbResult_out: PULONG, dwFlags: ULONG): NTSTATUS {
     return Bcrypt.Load('BCryptSignHash')(hKey, pPaddingInfo, pbInput, cbInput, pbOutput_out, cbOutput, pcbResult_out, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/bcrypt/nf-bcrypt-bcryptunregisterconfigchangenotify
-  public static BCryptUnregisterConfigChangeNotify(hEvent: HANDLE): NTSTATUS {
-    return Bcrypt.Load('BCryptUnregisterConfigChangeNotify')(hEvent);
+  public static BCryptUnregisterConfigChangeNotify(pEvent: HANDLE): NTSTATUS {
+    return Bcrypt.Load('BCryptUnregisterConfigChangeNotify')(pEvent);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/bcrypt/nf-bcrypt-bcryptverifysignature
-  public static BCryptVerifySignature(hKey: BCRYPT_KEY_HANDLE, pPaddingInfo: Optional<PVOID>, pbHash: PUCHAR, cbHash: ULONG, pbSignature: PUCHAR, cbSignature: ULONG, dwFlags: ULONG): NTSTATUS {
+  public static BCryptVerifySignature(hKey: BCRYPT_KEY_HANDLE, pPaddingInfo: Optional<PVOID>, pbHash: Optional<PUCHAR>, cbHash: ULONG, pbSignature: PUCHAR, cbSignature: ULONG, dwFlags: ULONG): NTSTATUS {
     return Bcrypt.Load('BCryptVerifySignature')(hKey, pPaddingInfo, pbHash, cbHash, pbSignature, cbSignature, dwFlags);
   }
 }

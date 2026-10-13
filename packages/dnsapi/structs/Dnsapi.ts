@@ -2,7 +2,7 @@ import { type FFIFunction, FFIType } from 'bun:ffi';
 
 import { Win32 } from '@bun-win32/core';
 
-import type { BOOL, DWORD, HANDLE, LPCWSTR, Nullable, Optional, PDWORD, PHANDLE, PVOID, WORD } from '../types/Dnsapi';
+import type { BOOL, DWORD, HANDLE, LPBOOL, LPCWSTR, Nullable, Optional, PDWORD, PHANDLE, PVOID, WORD } from '../types/Dnsapi';
 import type {
   DNS_STATUS,
   DnsCharSet,
@@ -32,6 +32,7 @@ import type {
   PMDNS_QUERY_REQUEST,
   PSOCKADDR,
   PWSTR,
+  ULONG64,
 } from '../types/Dnsapi';
 
 /**
@@ -77,7 +78,7 @@ class Dnsapi extends Win32 {
     DnsFreeProxyName: { args: [FFIType.ptr], returns: FFIType.void },
     DnsGetApplicationSettings: { args: [FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.u32 },
     DnsGetProxyInformation: { args: [FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.u32 },
-    DnsIsFlatRecord: { args: [FFIType.ptr], returns: FFIType.i32 },
+    DnsIsFlatRecord: { args: [FFIType.ptr, FFIType.u64, FFIType.ptr], returns: FFIType.i32 },
     DnsIsZtEnabled: { args: [], returns: FFIType.i32 },
     DnsModifyRecordsInSet_A: { args: [FFIType.ptr, FFIType.ptr, FFIType.u32, FFIType.u64, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
     DnsModifyRecordsInSet_UTF8: { args: [FFIType.ptr, FFIType.ptr, FFIType.u32, FFIType.u64, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
@@ -153,8 +154,8 @@ class Dnsapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/windns/nf-windns-dnsfree
-  public static DnsFree(pData: Optional<PVOID>, FreeType: DnsFreeType): void {
-    return Dnsapi.Load('DnsFree')(pData, FreeType);
+  public static DnsFree(pData_in_out: Optional<PVOID>, FreeType: DnsFreeType): void {
+    return Dnsapi.Load('DnsFree')(pData_in_out, FreeType);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/windns/nf-windns-dnsfreecustomservers
@@ -163,8 +164,8 @@ class Dnsapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/windns/nf-windns-dnsfreeproxyname
-  public static DnsFreeProxyName(proxyName: Optional<PWSTR>): void {
-    return Dnsapi.Load('DnsFreeProxyName')(proxyName);
+  public static DnsFreeProxyName(proxyName_in_out: Optional<PWSTR>): void {
+    return Dnsapi.Load('DnsFreeProxyName')(proxyName_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/windns/nf-windns-dnsgetapplicationsettings
@@ -184,8 +185,8 @@ class Dnsapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/windns/nf-windns-dnsisflatrecord
-  public static DnsIsFlatRecord(pRecord: PDNS_RECORD): BOOL {
-    return Dnsapi.Load('DnsIsFlatRecord')(pRecord);
+  public static DnsIsFlatRecord(pRecord: PDNS_RECORD, ullFlags: ULONG64, pfFlat_out: LPBOOL): DNS_STATUS {
+    return Dnsapi.Load('DnsIsFlatRecord')(pRecord, ullFlags, pfFlat_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/windns/nf-windns-dnsisztenabled
@@ -260,17 +261,17 @@ class Dnsapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/windns/nf-windns-dnsquery_a
-  public static DnsQuery_A(pszName: PCSTR, wType: WORD, Options: DWORD, pExtra_in_out: Optional<PVOID>, ppQueryResults_out: PVOID, pReserved_out: Optional<PVOID>): DNS_STATUS {
+  public static DnsQuery_A(pszName: PCSTR, wType: WORD, Options: DWORD, pExtra_in_out: Optional<PVOID>, ppQueryResults_out: Optional<PVOID>, pReserved_out: Optional<PVOID>): DNS_STATUS {
     return Dnsapi.Load('DnsQuery_A')(pszName, wType, Options, pExtra_in_out, ppQueryResults_out, pReserved_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/windns/nf-windns-dnsquery_utf8
-  public static DnsQuery_UTF8(pszName: PCSTR, wType: WORD, Options: DWORD, pExtra_in_out: Optional<PVOID>, ppQueryResults_out: PVOID, pReserved_out: Optional<PVOID>): DNS_STATUS {
+  public static DnsQuery_UTF8(pszName: PCSTR, wType: WORD, Options: DWORD, pExtra_in_out: Optional<PVOID>, ppQueryResults_out: Optional<PVOID>, pReserved_out: Optional<PVOID>): DNS_STATUS {
     return Dnsapi.Load('DnsQuery_UTF8')(pszName, wType, Options, pExtra_in_out, ppQueryResults_out, pReserved_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/windns/nf-windns-dnsquery_w
-  public static DnsQuery_W(pszName: PCWSTR, wType: WORD, Options: DWORD, pExtra_in_out: Optional<PVOID>, ppQueryResults_out: PVOID, pReserved_out: Optional<PVOID>): DNS_STATUS {
+  public static DnsQuery_W(pszName: PCWSTR, wType: WORD, Options: DWORD, pExtra_in_out: Optional<PVOID>, ppQueryResults_out: Optional<PVOID>, pReserved_out: Optional<PVOID>): DNS_STATUS {
     return Dnsapi.Load('DnsQuery_W')(pszName, wType, Options, pExtra_in_out, ppQueryResults_out, pReserved_out);
   }
 

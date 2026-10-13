@@ -59,6 +59,8 @@ import type {
   LPDWORD,
   LPENHMETAHEADER,
   LPFONTSIGNATURE,
+  LPGCP_RESULTSA,
+  LPGCP_RESULTSW,
   LPGLYPHMETRICS,
   LPGLYPHSET,
   LPHANDLETABLE,
@@ -238,7 +240,7 @@ class GDI32 extends Win32 {
     FlattenPath: { args: [FFIType.u64], returns: FFIType.i32 },
     FloodFill: { args: [FFIType.u64, FFIType.i32, FFIType.i32, FFIType.u32], returns: FFIType.i32 },
     FrameRgn: { args: [FFIType.u64, FFIType.u64, FFIType.u64, FFIType.i32, FFIType.i32], returns: FFIType.i32 },
-    GdiAlphaBlend: { args: [FFIType.u64, FFIType.i32, FFIType.i32, FFIType.i32, FFIType.i32, FFIType.u64, FFIType.i32, FFIType.i32, FFIType.i32, FFIType.i32, FFIType.ptr], returns: FFIType.i32 },
+    GdiAlphaBlend: { args: [FFIType.u64, FFIType.i32, FFIType.i32, FFIType.i32, FFIType.i32, FFIType.u64, FFIType.i32, FFIType.i32, FFIType.i32, FFIType.i32, FFIType.u32], returns: FFIType.i32 },
     GdiComment: { args: [FFIType.u64, FFIType.u32, FFIType.ptr], returns: FFIType.i32 },
     GdiFlush: { args: [], returns: FFIType.i32 },
     GdiGetBatchLimit: { args: [], returns: FFIType.u32 },
@@ -254,8 +256,8 @@ class GDI32 extends Win32 {
     GetBoundsRect: { args: [FFIType.u64, FFIType.ptr, FFIType.u32], returns: FFIType.u32 },
     GetBrushOrgEx: { args: [FFIType.u64, FFIType.ptr], returns: FFIType.i32 },
     GetCharABCWidthsI: { args: [FFIType.u64, FFIType.u32, FFIType.u32, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
-    GetCharacterPlacementA: { args: [FFIType.u64, FFIType.ptr, FFIType.i32, FFIType.i32, FFIType.u32], returns: FFIType.u32 },
-    GetCharacterPlacementW: { args: [FFIType.u64, FFIType.ptr, FFIType.i32, FFIType.i32, FFIType.u32], returns: FFIType.u32 },
+    GetCharacterPlacementA: { args: [FFIType.u64, FFIType.ptr, FFIType.i32, FFIType.i32, FFIType.ptr, FFIType.u32], returns: FFIType.u32 },
+    GetCharacterPlacementW: { args: [FFIType.u64, FFIType.ptr, FFIType.i32, FFIType.i32, FFIType.ptr, FFIType.u32], returns: FFIType.u32 },
     GetCharWidth32A: { args: [FFIType.u64, FFIType.u32, FFIType.u32, FFIType.ptr], returns: FFIType.i32 },
     GetCharWidth32W: { args: [FFIType.u64, FFIType.u32, FFIType.u32, FFIType.ptr], returns: FFIType.i32 },
     GetCharWidthA: { args: [FFIType.u64, FFIType.u32, FFIType.u32, FFIType.ptr], returns: FFIType.i32 },
@@ -933,17 +935,17 @@ class GDI32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-enumicmprofilesa
-  public static EnumICMProfilesA(hdc: HDC, proc: ICMENUMPROCA, param: Optional<LPARAM>): int {
+  public static EnumICMProfilesA(hdc: HDC, proc: ICMENUMPROCA, param: LPARAM): int {
     return GDI32.Load('EnumICMProfilesA')(hdc, proc, param);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-enumicmprofilesw
-  public static EnumICMProfilesW(hdc: HDC, proc: ICMENUMPROCW, param: Optional<LPARAM>): int {
+  public static EnumICMProfilesW(hdc: HDC, proc: ICMENUMPROCW, param: LPARAM): int {
     return GDI32.Load('EnumICMProfilesW')(hdc, proc, param);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-enummetafile
-  public static EnumMetaFile(hdc: HDC, hmf: HMETAFILE, proc: MFENUMPROC, param: Optional<LPARAM>): BOOL {
+  public static EnumMetaFile(hdc: HDC, hmf: HMETAFILE, proc: MFENUMPROC, param: LPARAM): BOOL {
     return GDI32.Load('EnumMetaFile')(hdc, hmf, proc, param);
   }
 
@@ -1012,7 +1014,7 @@ class GDI32 extends Win32 {
     return GDI32.Load('FillRgn')(hdc, hrgn, hbr);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-fixbrushorgex
+  // Undocumented export (no Microsoft Learn page).
   public static FixBrushOrgEx(hdc: HDC, x: int, y: int, ptl: Optional<LPPOINT>): BOOL {
     return GDI32.Load('FixBrushOrgEx')(hdc, x, y, ptl);
   }
@@ -1113,13 +1115,13 @@ class GDI32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getcharacterplacementa
-  public static GetCharacterPlacementA(hdc: HDC, lpString: LPCSTR, nCount: int, nMexExtent: int, dwFlags: DWORD): DWORD {
-    return GDI32.Load('GetCharacterPlacementA')(hdc, lpString, nCount, nMexExtent, dwFlags);
+  public static GetCharacterPlacementA(hdc: HDC, lpString: LPCSTR, nCount: int, nMexExtent: int, lpResults_in_out: LPGCP_RESULTSA, dwFlags: DWORD): DWORD {
+    return GDI32.Load('GetCharacterPlacementA')(hdc, lpString, nCount, nMexExtent, lpResults_in_out, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getcharacterplacementw
-  public static GetCharacterPlacementW(hdc: HDC, lpString: LPCWSTR, nCount: int, nMexExtent: int, dwFlags: DWORD): DWORD {
-    return GDI32.Load('GetCharacterPlacementW')(hdc, lpString, nCount, nMexExtent, dwFlags);
+  public static GetCharacterPlacementW(hdc: HDC, lpString: LPCWSTR, nCount: int, nMexExtent: int, lpResults_in_out: LPGCP_RESULTSW, dwFlags: DWORD): DWORD {
+    return GDI32.Load('GetCharacterPlacementW')(hdc, lpString, nCount, nMexExtent, lpResults_in_out, dwFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getcharwidth32a
@@ -1368,8 +1370,8 @@ class GDI32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getobjecta
-  public static GetObjectA(h: HANDLE, c: int, pv_out: Optional<LPVOID>): int {
-    return GDI32.Load('GetObjectA')(h, c, pv_out);
+  public static GetObjectA(hgdiobj: HANDLE, cbBuffer: int, lpvObject_out: Optional<LPVOID>): int {
+    return GDI32.Load('GetObjectA')(hgdiobj, cbBuffer, lpvObject_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getobjecttype
@@ -1378,8 +1380,8 @@ class GDI32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getobjectw
-  public static GetObjectW(h: HANDLE, c: int, pv_out: Optional<LPVOID>): int {
-    return GDI32.Load('GetObjectW')(h, c, pv_out);
+  public static GetObjectW(hgdiobj: HANDLE, cbBuffer: int, lpvObject_out: Optional<LPVOID>): int {
+    return GDI32.Load('GetObjectW')(hgdiobj, cbBuffer, lpvObject_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getpaletteentries
@@ -1548,7 +1550,7 @@ class GDI32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-linedda
-  public static LineDDA(xStart: int, yStart: int, xEnd: int, yEnd: int, lpProc: LINEDDAPROC, data: Optional<LPARAM>): BOOL {
+  public static LineDDA(xStart: int, yStart: int, xEnd: int, yEnd: int, lpProc: LINEDDAPROC, data: LPARAM): BOOL {
     return GDI32.Load('LineDDA')(xStart, yStart, xEnd, yEnd, lpProc, data);
   }
 
@@ -2093,8 +2095,8 @@ class GDI32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-unrealizeobject
-  public static UnrealizeObject(h: HGDIOBJ): BOOL {
-    return GDI32.Load('UnrealizeObject')(h);
+  public static UnrealizeObject(hgdiobj: HGDIOBJ): BOOL {
+    return GDI32.Load('UnrealizeObject')(hgdiobj);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-updatecolors

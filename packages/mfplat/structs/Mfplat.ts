@@ -13,6 +13,7 @@ import type {
   IMFAsyncResult,
   IMFAttributes,
   IMFByteStream,
+  IMFCollection,
   IMFContentProtectionDevice,
   IMFDXGIDeviceManager,
   IMFMediaBuffer,
@@ -66,7 +67,6 @@ import type {
   PIMFSourceResolver,
   PIMFStreamDescriptor,
   PIMFVideoMediaType,
-  PIPropertyStore,
   PIStream,
   PIUnknown,
   PMFVIDEOFORMAT,
@@ -159,16 +159,16 @@ class Mfplat extends Win32 {
     MFCreateMediaTypeFromProperties: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
     MFCreateMediaTypeFromRepresentation: { args: [FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
     MFCreateMemoryBuffer: { args: [FFIType.u32, FFIType.ptr], returns: FFIType.i32 },
-    MFCreateMuxStreamAttributes: { args: [FFIType.ptr], returns: FFIType.i32 },
+    MFCreateMuxStreamAttributes: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
     MFCreateMuxStreamMediaType: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
-    MFCreateMuxStreamSample: { args: [FFIType.ptr], returns: FFIType.i32 },
+    MFCreateMuxStreamSample: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
     MFCreatePresentationDescriptor: { args: [FFIType.u32, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
-    MFCreatePropertiesFromMediaType: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
+    MFCreatePropertiesFromMediaType: { args: [FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
     MFCreateSample: { args: [FFIType.ptr], returns: FFIType.i32 },
     MFCreateSourceResolver: { args: [FFIType.ptr], returns: FFIType.i32 },
     MFCreateStreamDescriptor: { args: [FFIType.u32, FFIType.u32, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
     MFCreateStreamOnMFByteStream: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
-    MFCreateStreamOnMFByteStreamEx: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
+    MFCreateStreamOnMFByteStreamEx: { args: [FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
     MFCreateSystemTimeSource: { args: [FFIType.ptr], returns: FFIType.i32 },
     MFCreateTempFile: { args: [FFIType.u32, FFIType.u32, FFIType.u32, FFIType.ptr], returns: FFIType.i32 },
     MFCreateTrackedSample: { args: [FFIType.ptr], returns: FFIType.i32 },
@@ -248,7 +248,6 @@ class Mfplat extends Win32 {
     MFTUnregister: { args: [FFIType.ptr], returns: FFIType.i32 },
     MFTUnregisterLocal: { args: [FFIType.ptr], returns: FFIType.i32 },
     MFTUnregisterLocalByCLSID: { args: [FFIType.ptr], returns: FFIType.i32 },
-    MFTranscodeGetAudioOutputAvailableTypes: { args: [FFIType.ptr, FFIType.u32, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
     MFUnlockDXGIDeviceManager: { args: [], returns: FFIType.i32 },
     MFUnlockPlatform: { args: [], returns: FFIType.i32 },
     MFUnlockWorkQueue: { args: [FFIType.u32], returns: FFIType.i32 },
@@ -352,18 +351,18 @@ class Mfplat extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mfapi/nf-mfapi-mfconvertfromfp16array
-  public static MFConvertFromFP16Array(pDest_out: LPVOID, pSrc: LPCVOID, dwCount: DWORD): HRESULT {
-    return Mfplat.Load('MFConvertFromFP16Array')(pDest_out, pSrc, dwCount);
+  public static MFConvertFromFP16Array(pDest: LPVOID, pSrc: LPCVOID, dwCount: DWORD): HRESULT {
+    return Mfplat.Load('MFConvertFromFP16Array')(pDest, pSrc, dwCount);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mfapi/nf-mfapi-mfconverttofp16array
-  public static MFConvertToFP16Array(pDest_out: LPVOID, pSrc: LPCVOID, dwCount: DWORD): HRESULT {
-    return Mfplat.Load('MFConvertToFP16Array')(pDest_out, pSrc, dwCount);
+  public static MFConvertToFP16Array(pDest: LPVOID, pSrc: LPCVOID, dwCount: DWORD): HRESULT {
+    return Mfplat.Load('MFConvertToFP16Array')(pDest, pSrc, dwCount);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mfapi/nf-mfapi-mfcopyimage
-  public static MFCopyImage(pDest_out: LPVOID, lDestStride: LONG, pSrc: LPCVOID, lSrcStride: LONG, dwWidthInBytes: DWORD, dwLines: DWORD): HRESULT {
-    return Mfplat.Load('MFCopyImage')(pDest_out, lDestStride, pSrc, lSrcStride, dwWidthInBytes, dwLines);
+  public static MFCopyImage(pDest: LPVOID, lDestStride: LONG, pSrc: LPCVOID, lSrcStride: LONG, dwWidthInBytes: DWORD, dwLines: DWORD): HRESULT {
+    return Mfplat.Load('MFCopyImage')(pDest, lDestStride, pSrc, lSrcStride, dwWidthInBytes, dwLines);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mfapi/nf-mfapi-mfcreate2dmediabuffer
@@ -377,8 +376,8 @@ class Mfplat extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mfapi/nf-mfapi-mfcreatealignedmemorybuffer
-  public static MFCreateAlignedMemoryBuffer(cbMaxLength: DWORD, cbAlignment: DWORD, ppBuffer_out: PIMFMediaBuffer): HRESULT {
-    return Mfplat.Load('MFCreateAlignedMemoryBuffer')(cbMaxLength, cbAlignment, ppBuffer_out);
+  public static MFCreateAlignedMemoryBuffer(cbMaxLength: DWORD, cbAligment: DWORD, ppBuffer_out: PIMFMediaBuffer): HRESULT {
+    return Mfplat.Load('MFCreateAlignedMemoryBuffer')(cbMaxLength, cbAligment, ppBuffer_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mfapi/nf-mfapi-mfcreateasyncresult
@@ -396,12 +395,12 @@ class Mfplat extends Win32 {
     return Mfplat.Load('MFCreateAudioMediaType')(pAudioFormat, ppIAudioMediaType_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/mfobjects/nf-mfobjects-mfcreatecollection
+  // https://learn.microsoft.com/en-us/windows/win32/api/mfapi/nf-mfapi-mfcreatecollection
   public static MFCreateCollection(ppIMFCollection_out: PIMFCollection): HRESULT {
     return Mfplat.Load('MFCreateCollection')(ppIMFCollection_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/mfapi/nf-mfapi-mfcreatecontentdecryptorcontext
+  // https://learn.microsoft.com/en-us/windows/win32/api/mfidl/nf-mfidl-mfcreatecontentdecryptorcontext
   public static MFCreateContentDecryptorContext(
     guidMediaProtectionSystemId: REFGUID,
     pD3DManager: Optional<IMFDXGIDeviceManager>,
@@ -411,7 +410,7 @@ class Mfplat extends Win32 {
     return Mfplat.Load('MFCreateContentDecryptorContext')(guidMediaProtectionSystemId, pD3DManager, pContentProtectionDevice, ppContentDecryptorContext_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/mfapi/nf-mfapi-mfcreatecontentprotectiondevice
+  // https://learn.microsoft.com/en-us/windows/win32/api/mfidl/nf-mfidl-mfcreatecontentprotectiondevice
   public static MFCreateContentProtectionDevice(ProtectionSystemId: REFGUID, ContentProtectionDevice_out: PIMFContentProtectionDevice): HRESULT {
     return Mfplat.Load('MFCreateContentProtectionDevice')(ProtectionSystemId, ContentProtectionDevice_out);
   }
@@ -431,7 +430,7 @@ class Mfplat extends Win32 {
     return Mfplat.Load('MFCreateDXSurfaceBuffer')(riid, punkSurface, fBottomUpWhenLinear, ppBuffer_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/mfobjects/nf-mfobjects-mfcreateeventqueue
+  // https://learn.microsoft.com/en-us/windows/win32/api/mfapi/nf-mfapi-mfcreateeventqueue
   public static MFCreateEventQueue(ppMediaEventQueue_out: PIMFMediaEventQueue): HRESULT {
     return Mfplat.Load('MFCreateEventQueue')(ppMediaEventQueue_out);
   }
@@ -446,14 +445,14 @@ class Mfplat extends Win32 {
     return Mfplat.Load('MFCreateLegacyMediaBufferOnMFMediaBuffer')(pSample, pMFMediaBuffer, cbOffset, ppMediaBuffer_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/mfapi/nf-mfapi-mfcreatemfbytestreamonstream
+  // https://learn.microsoft.com/en-us/windows/win32/api/mfidl/nf-mfidl-mfcreatemfbytestreamonstream
   public static MFCreateMFByteStreamOnStream(pStream: IStream, ppByteStream_out: PIMFByteStream): HRESULT {
     return Mfplat.Load('MFCreateMFByteStreamOnStream')(pStream, ppByteStream_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/mfapi/nf-mfapi-mfcreatemfbytestreamonstreamex
-  public static MFCreateMFByteStreamOnStreamEx(pStream: IUnknown, ppByteStream_out: PIMFByteStream): HRESULT {
-    return Mfplat.Load('MFCreateMFByteStreamOnStreamEx')(pStream, ppByteStream_out);
+  // https://learn.microsoft.com/en-us/windows/win32/api/mfidl/nf-mfidl-mfcreatemfbytestreamonstreamex
+  public static MFCreateMFByteStreamOnStreamEx(punkStream: IUnknown, ppByteStream_out: PIMFByteStream): HRESULT {
+    return Mfplat.Load('MFCreateMFByteStreamOnStreamEx')(punkStream, ppByteStream_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mfapi/nf-mfapi-mfcreatemfbytestreamwrapper
@@ -476,7 +475,7 @@ class Mfplat extends Win32 {
     return Mfplat.Load('MFCreateMediaBufferWrapper')(pBuffer, cbOffset, dwLength, ppBuffer_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/mfobjects/nf-mfobjects-mfcreatemediaevent
+  // https://learn.microsoft.com/en-us/windows/win32/api/mfapi/nf-mfapi-mfcreatemediaevent
   public static MFCreateMediaEvent(met: MediaEventType, guidExtendedType: REFGUID, hrStatus: HRESULT, pvValue: Optional<LPPROPVARIANT>, ppEvent_out: PIMFMediaEvent): HRESULT {
     return Mfplat.Load('MFCreateMediaEvent')(met, guidExtendedType, hrStatus, pvValue, ppEvent_out);
   }
@@ -491,9 +490,9 @@ class Mfplat extends Win32 {
     return Mfplat.Load('MFCreateMediaType')(ppMFType_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/mfapi/nf-mfapi-mfcreatemediatypefromproperties
-  public static MFCreateMediaTypeFromProperties(pPropStore: IPropertyStore, ppMediaType_out: PIMFMediaType): HRESULT {
-    return Mfplat.Load('MFCreateMediaTypeFromProperties')(pPropStore, ppMediaType_out);
+  // https://learn.microsoft.com/en-us/windows/win32/api/mfidl/nf-mfidl-mfcreatemediatypefromproperties
+  public static MFCreateMediaTypeFromProperties(punkStream: IPropertyStore, ppMediaType_out: PIMFMediaType): HRESULT {
+    return Mfplat.Load('MFCreateMediaTypeFromProperties')(punkStream, ppMediaType_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mfapi/nf-mfapi-mfcreatemediatypefromrepresentation
@@ -507,18 +506,18 @@ class Mfplat extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mfapi/nf-mfapi-mfcreatemuxstreamattributes
-  public static MFCreateMuxStreamAttributes(ppMuxStreamAttributes_out: PIMFAttributes): HRESULT {
-    return Mfplat.Load('MFCreateMuxStreamAttributes')(ppMuxStreamAttributes_out);
+  public static MFCreateMuxStreamAttributes(pAttributesToMux: IMFCollection, ppMuxAttribs_out: PIMFAttributes): HRESULT {
+    return Mfplat.Load('MFCreateMuxStreamAttributes')(pAttributesToMux, ppMuxAttribs_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mfapi/nf-mfapi-mfcreatemuxstreammediatype
-  public static MFCreateMuxStreamMediaType(pAttributes: IMFAttributes, ppMediaType_out: PIMFMediaType): HRESULT {
-    return Mfplat.Load('MFCreateMuxStreamMediaType')(pAttributes, ppMediaType_out);
+  public static MFCreateMuxStreamMediaType(pMediaTypesToMux: IMFCollection, ppMuxMediaType_out: PIMFMediaType): HRESULT {
+    return Mfplat.Load('MFCreateMuxStreamMediaType')(pMediaTypesToMux, ppMuxMediaType_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mfapi/nf-mfapi-mfcreatemuxstreamsample
-  public static MFCreateMuxStreamSample(ppSample_out: PIMFSample): HRESULT {
-    return Mfplat.Load('MFCreateMuxStreamSample')(ppSample_out);
+  public static MFCreateMuxStreamSample(pSamplesToMux: IMFCollection, ppMuxSample_out: PIMFSample): HRESULT {
+    return Mfplat.Load('MFCreateMuxStreamSample')(pSamplesToMux, ppMuxSample_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mfidl/nf-mfidl-mfcreatepresentationdescriptor
@@ -526,9 +525,9 @@ class Mfplat extends Win32 {
     return Mfplat.Load('MFCreatePresentationDescriptor')(cStreamDescriptors, apStreamDescriptors, ppPresentationDescriptor_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/mfapi/nf-mfapi-mfcreatepropertiesfrommediatype
-  public static MFCreatePropertiesFromMediaType(pMediaType: IMFMediaType, ppPropStore_out: PIPropertyStore): HRESULT {
-    return Mfplat.Load('MFCreatePropertiesFromMediaType')(pMediaType, ppPropStore_out);
+  // https://learn.microsoft.com/en-us/windows/win32/api/mfidl/nf-mfidl-mfcreatepropertiesfrommediatype
+  public static MFCreatePropertiesFromMediaType(pMediaType: IMFMediaType, riid: REFIID, ppv_out: LPLPVOID): HRESULT {
+    return Mfplat.Load('MFCreatePropertiesFromMediaType')(pMediaType, riid, ppv_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mfapi/nf-mfapi-mfcreatesample
@@ -546,14 +545,14 @@ class Mfplat extends Win32 {
     return Mfplat.Load('MFCreateStreamDescriptor')(dwStreamIdentifier, cMediaTypes, apMediaTypes, ppDescriptor_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/mfapi/nf-mfapi-mfcreatestreamonmfbytestream
+  // https://learn.microsoft.com/en-us/windows/win32/api/mfidl/nf-mfidl-mfcreatestreamonmfbytestream
   public static MFCreateStreamOnMFByteStream(pByteStream: IMFByteStream, ppStream_out: PIStream): HRESULT {
     return Mfplat.Load('MFCreateStreamOnMFByteStream')(pByteStream, ppStream_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/mfapi/nf-mfapi-mfcreatestreamonmfbytestreamex
-  public static MFCreateStreamOnMFByteStreamEx(pByteStream: IMFByteStream, ppStream_out: PIUnknown): HRESULT {
-    return Mfplat.Load('MFCreateStreamOnMFByteStreamEx')(pByteStream, ppStream_out);
+  // https://learn.microsoft.com/en-us/windows/win32/api/mfidl/nf-mfidl-mfcreatestreamonmfbytestreamex
+  public static MFCreateStreamOnMFByteStreamEx(pByteStream: IMFByteStream, riid: REFIID, ppv_out: LPLPVOID): HRESULT {
+    return Mfplat.Load('MFCreateStreamOnMFByteStreamEx')(pByteStream, riid, ppv_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mfidl/nf-mfidl-mfcreatesystemtimesource
@@ -566,12 +565,12 @@ class Mfplat extends Win32 {
     return Mfplat.Load('MFCreateTempFile')(AccessMode, OpenMode, fFlags, ppIByteStream_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/mfapi/nf-mfapi-mfcreatetrackedsample
-  public static MFCreateTrackedSample(ppSample_out: PIMFSample): HRESULT {
-    return Mfplat.Load('MFCreateTrackedSample')(ppSample_out);
+  // https://learn.microsoft.com/en-us/windows/win32/api/mfidl/nf-mfidl-mfcreatetrackedsample
+  public static MFCreateTrackedSample(ppMFSample_out: PIMFSample): HRESULT {
+    return Mfplat.Load('MFCreateTrackedSample')(ppMFSample_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/mfapi/nf-mfapi-mfcreatetransformactivate
+  // https://learn.microsoft.com/en-us/windows/win32/api/mftransform/nf-mftransform-mfcreatetransformactivate
   public static MFCreateTransformActivate(ppActivate_out: PIMFActivate): HRESULT {
     return Mfplat.Load('MFCreateTransformActivate')(ppActivate_out);
   }
@@ -672,7 +671,7 @@ class Mfplat extends Win32 {
     return Mfplat.Load('MFCreateWaveFormatExFromMFMediaType')(pMFType, ppWF_out, pcbSize_out, Flags);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/mfapi/nf-mfapi-mfdeserializeattributesfromstream
+  // https://learn.microsoft.com/en-us/windows/win32/api/mfobjects/nf-mfobjects-mfdeserializeattributesfromstream
   public static MFDeserializeAttributesFromStream(pAttr: IMFAttributes, dwOptions: DWORD, pStm: IStream): HRESULT {
     return Mfplat.Load('MFDeserializeAttributesFromStream')(pAttr, dwOptions, pStm);
   }
@@ -688,8 +687,8 @@ class Mfplat extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mfapi/nf-mfapi-mfendregisterworkqueuewithmmcss
-  public static MFEndRegisterWorkQueueWithMMCSS(pResult: IMFAsyncResult, pdwTaskId_out: LPDWORD): HRESULT {
-    return Mfplat.Load('MFEndRegisterWorkQueueWithMMCSS')(pResult, pdwTaskId_out);
+  public static MFEndRegisterWorkQueueWithMMCSS(pResult: IMFAsyncResult, pdwTaskId: LPDWORD): HRESULT {
+    return Mfplat.Load('MFEndRegisterWorkQueueWithMMCSS')(pResult, pdwTaskId);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mfapi/nf-mfapi-mfendunregisterworkqueuewithmmcss
@@ -747,7 +746,7 @@ class Mfplat extends Win32 {
     return Mfplat.Load('MFGetSupportedSchemes')(pPropVarSchemeArray_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/mfapi/nf-mfapi-mfgetsystemtime
+  // https://learn.microsoft.com/en-us/windows/win32/api/mfidl/nf-mfidl-mfgetsystemtime
   public static MFGetSystemTime(): MFTIME {
     return Mfplat.Load('MFGetSystemTime')();
   }
@@ -823,8 +822,8 @@ class Mfplat extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mfapi/nf-mfapi-mfinitvideoformat
-  public static MFInitVideoFormat(pVideoFormat: PMFVIDEOFORMAT, type: MFStandardVideoFormat): HRESULT {
-    return Mfplat.Load('MFInitVideoFormat')(pVideoFormat, type);
+  public static MFInitVideoFormat(pVideoFormat_out: PMFVIDEOFORMAT, type: MFStandardVideoFormat): HRESULT {
+    return Mfplat.Load('MFInitVideoFormat')(pVideoFormat_out, type);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mfapi/nf-mfapi-mfinitvideoformat_rgb
@@ -837,7 +836,7 @@ class Mfplat extends Win32 {
     return Mfplat.Load('MFInvokeCallback')(pAsyncResult);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/mfapi/nf-mfapi-mfiscontentprotectiondevicesupported
+  // https://learn.microsoft.com/en-us/windows/win32/api/mfidl/nf-mfidl-mfiscontentprotectiondevicesupported
   public static MFIsContentProtectionDeviceSupported(ProtectionSystemId: REFGUID, isSupported_out: LPVOID): HRESULT {
     return Mfplat.Load('MFIsContentProtectionDeviceSupported')(ProtectionSystemId, isSupported_out);
   }
@@ -927,7 +926,7 @@ class Mfplat extends Win32 {
     return Mfplat.Load('MFScheduleWorkItemEx')(pResult, Timeout, pKey_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/mfapi/nf-mfapi-mfserializeattributestostream
+  // https://learn.microsoft.com/en-us/windows/win32/api/mfobjects/nf-mfobjects-mfserializeattributestostream
   public static MFSerializeAttributesToStream(pAttr: IMFAttributes, dwOptions: DWORD, pStm: IStream): HRESULT {
     return Mfplat.Load('MFSerializeAttributesToStream')(pAttr, dwOptions, pStm);
   }
@@ -1001,8 +1000,8 @@ class Mfplat extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mfapi/nf-mfapi-mftregisterlocalbyclsid
-  public static MFTRegisterLocalByCLSID(clsidMFT: REFCLSID, guidCategory: REFGUID, pszName: LPCWSTR, Flags: UINT32, cInputTypes: UINT32, pInputTypes: Optional<LPCVOID>, cOutputTypes: UINT32, pOutputTypes: Optional<LPCVOID>): HRESULT {
-    return Mfplat.Load('MFTRegisterLocalByCLSID')(clsidMFT, guidCategory, pszName, Flags, cInputTypes, pInputTypes, cOutputTypes, pOutputTypes);
+  public static MFTRegisterLocalByCLSID(clisdMFT: REFCLSID, guidCategory: REFGUID, pszName: LPCWSTR, Flags: UINT32, cInputTypes: UINT32, pInputTypes: Optional<LPCVOID>, cOutputTypes: UINT32, pOutputTypes: Optional<LPCVOID>): HRESULT {
+    return Mfplat.Load('MFTRegisterLocalByCLSID')(clisdMFT, guidCategory, pszName, Flags, cInputTypes, pInputTypes, cOutputTypes, pOutputTypes);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mfapi/nf-mfapi-mftunregister
@@ -1018,11 +1017,6 @@ class Mfplat extends Win32 {
   // https://learn.microsoft.com/en-us/windows/win32/api/mfapi/nf-mfapi-mftunregisterlocalbyclsid
   public static MFTUnregisterLocalByCLSID(clsidMFT: REFCLSID): HRESULT {
     return Mfplat.Load('MFTUnregisterLocalByCLSID')(clsidMFT);
-  }
-
-  // https://learn.microsoft.com/en-us/windows/win32/api/mfapi/nf-mfapi-mftranscodegetaudiooutputavailabletypes
-  public static MFTranscodeGetAudioOutputAvailableTypes(guidSubType: REFGUID, dwMFTFlags: DWORD, pCodecConfig: Optional<IMFAttributes>, ppAvailableTypes_out: PIMFCollection): HRESULT {
-    return Mfplat.Load('MFTranscodeGetAudioOutputAvailableTypes')(guidSubType, dwMFTFlags, pCodecConfig, ppAvailableTypes_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mfapi/nf-mfapi-mfunlockdxgidevicemanager

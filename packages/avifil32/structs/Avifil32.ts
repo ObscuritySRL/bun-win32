@@ -137,7 +137,7 @@ class Avifil32 extends Win32 {
     EditStreamSetNameW: { args: [FFIType.u64, FFIType.ptr], returns: FFIType.i32 },
   } as const satisfies Record<string, FFIFunction>;
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/vfw/nf-vfw-avibuildfilter
+  // https://learn.microsoft.com/en-us/windows/win32/api/vfw/nf-vfw-avibuildfiltera
   public static AVIBuildFilter(lpszFilter_out: LPTSTR, cbFilter: LONG, fSaving: BOOL): HRESULT {
     return Avifil32.Load('AVIBuildFilter')(lpszFilter_out, cbFilter, fSaving);
   }
@@ -267,7 +267,7 @@ class Avifil32 extends Win32 {
     return Avifil32.Load('AVIPutFileOnClipboard')(pf);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/vfw/nf-vfw-avisave
+  // https://learn.microsoft.com/en-us/windows/win32/api/vfw/nf-vfw-avisavea
   public static AVISave(szFile: LPCTSTR, pclsidHandler: Optional<LPCLSID>, lpfnCallback: Nullable<AVISAVECALLBACK>, nStreams: INT, pfile: PAVISTREAM, lpOptions: Nullable<LPAVICOMPRESSOPTIONS>): HRESULT {
     return Avifil32.Load('AVISave')(szFile, pclsidHandler, lpfnCallback, nStreams, pfile, lpOptions);
   }
@@ -287,7 +287,7 @@ class Avifil32 extends Win32 {
     return Avifil32.Load('AVISaveOptionsFree')(nStreams, plpOptions);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/vfw/nf-vfw-avisavev
+  // https://learn.microsoft.com/en-us/windows/win32/api/vfw/nf-vfw-avisaveva
   public static AVISaveV(szFile: LPCTSTR, pclsidHandler: Optional<LPCLSID>, lpfnCallback: Nullable<AVISAVECALLBACK>, nStreams: INT, ppavi: Pointer, plpOptions: Nullable<Pointer>): HRESULT {
     return Avifil32.Load('AVISaveV')(szFile, pclsidHandler, lpfnCallback, nStreams, ppavi, plpOptions);
   }
@@ -347,7 +347,7 @@ class Avifil32 extends Win32 {
     return Avifil32.Load('AVIStreamGetFrameOpen')(pavi, lpbiWanted);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/vfw/nf-vfw-avistreaminfo
+  // https://learn.microsoft.com/en-us/windows/win32/api/vfw/nf-vfw-avistreaminfoa
   public static AVIStreamInfo(pavi: PAVISTREAM, psi_out: LPAVISTREAMINFO, lSize: LONG): HRESULT {
     return Avifil32.Load('AVIStreamInfo')(pavi, psi_out, lSize);
   }
@@ -367,7 +367,7 @@ class Avifil32 extends Win32 {
     return Avifil32.Load('AVIStreamLength')(pavi);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/vfw/nf-vfw-avistreamopenfromfile
+  // https://learn.microsoft.com/en-us/windows/win32/api/vfw/nf-vfw-avistreamopenfromfilea
   public static AVIStreamOpenFromFile(ppavi_out: Pointer, szFile: LPCTSTR, fccType: DWORD, lParam: LONG, mode: UINT, pclsidHandler: Optional<LPCLSID>): HRESULT {
     return Avifil32.Load('AVIStreamOpenFromFile')(ppavi_out, szFile, fccType, lParam, mode, pclsidHandler);
   }
@@ -457,7 +457,7 @@ class Avifil32 extends Win32 {
     return Avifil32.Load('EditStreamPaste')(pavi, plPos_in_out, plLength_in_out, pstream, lStart, lEnd);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/vfw/nf-vfw-editstreamsetinfo
+  // https://learn.microsoft.com/en-us/windows/win32/api/vfw/nf-vfw-editstreamsetinfoa
   public static EditStreamSetInfo(pavi: PAVISTREAM, lpInfo: LPAVISTREAMINFO, cbInfo: LONG): HRESULT {
     return Avifil32.Load('EditStreamSetInfo')(pavi, lpInfo, cbInfo);
   }
@@ -472,7 +472,7 @@ class Avifil32 extends Win32 {
     return Avifil32.Load('EditStreamSetInfoW')(pavi, lpInfo, cbInfo);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/vfw/nf-vfw-editstreamsetname
+  // https://learn.microsoft.com/en-us/windows/win32/api/vfw/nf-vfw-editstreamsetnamea
   public static EditStreamSetName(pavi: PAVISTREAM, lpszName: LPCTSTR): HRESULT {
     return Avifil32.Load('EditStreamSetName')(pavi, lpszName);
   }

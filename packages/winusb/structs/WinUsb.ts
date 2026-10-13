@@ -174,7 +174,7 @@ class WinUsb extends Win32 {
     return WinUsb.Load('WinUsb_Initialize')(DeviceHandle, InterfaceHandle_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/winusb/nf-winusb-winusb_parseconfigurationdescriptor
+  // Undocumented export (no Microsoft Learn page).
   public static WinUsb_ParseConfigurationDescriptor(
     ConfigurationDescriptor: PUSB_CONFIGURATION_DESCRIPTOR,
     StartPosition: PVOID,
@@ -187,7 +187,7 @@ class WinUsb extends Win32 {
     return WinUsb.Load('WinUsb_ParseConfigurationDescriptor')(ConfigurationDescriptor, StartPosition, InterfaceNumber, AlternateSetting, InterfaceClass, InterfaceSubClass, InterfaceProtocol);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/winusb/nf-winusb-winusb_parsedescriptors
+  // Undocumented export (no Microsoft Learn page).
   public static WinUsb_ParseDescriptors(DescriptorBuffer: PVOID, TotalLength: ULONG, StartPosition: PVOID, DescriptorType: LONG): PUSB_COMMON_DESCRIPTOR | NULL {
     return WinUsb.Load('WinUsb_ParseDescriptors')(DescriptorBuffer, TotalLength, StartPosition, DescriptorType);
   }
@@ -244,8 +244,8 @@ class WinUsb extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winusb/nf-winusb-winusb_registerisochbuffer
-  public static WinUsb_RegisterIsochBuffer(InterfaceHandle: WINUSB_INTERFACE_HANDLE, PipeID: UCHAR, Buffer_in_out: PUCHAR, BufferLength: ULONG, IsochBufferHandle_out: PWINUSB_ISOCH_BUFFER_HANDLE): BOOL {
-    return WinUsb.Load('WinUsb_RegisterIsochBuffer')(InterfaceHandle, PipeID, Buffer_in_out, BufferLength, IsochBufferHandle_out);
+  public static WinUsb_RegisterIsochBuffer(InterfaceHandle: WINUSB_INTERFACE_HANDLE, PipeID: UCHAR, Buffer: PUCHAR, BufferLength: ULONG, IsochBufferHandle_out: PWINUSB_ISOCH_BUFFER_HANDLE): BOOL {
+    return WinUsb.Load('WinUsb_RegisterIsochBuffer')(InterfaceHandle, PipeID, Buffer, BufferLength, IsochBufferHandle_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winusb/nf-winusb-winusb_resetpipe

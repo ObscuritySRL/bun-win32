@@ -275,13 +275,13 @@ class Comctl32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dpa_dsa/nf-dpa_dsa-dpa_deleteallptrs
-  public static DPA_DeleteAllPtrs(hdpa: HDPA): BOOL {
-    return Comctl32.Load('DPA_DeleteAllPtrs')(hdpa);
+  public static DPA_DeleteAllPtrs(hdpa_in_out: HDPA): BOOL {
+    return Comctl32.Load('DPA_DeleteAllPtrs')(hdpa_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dpa_dsa/nf-dpa_dsa-dpa_deleteptr
-  public static DPA_DeletePtr(hdpa: HDPA, i: INT): LPVOID {
-    return Comctl32.Load('DPA_DeletePtr')(hdpa, i);
+  public static DPA_DeletePtr(hdpa_in_out: HDPA, i: INT): LPVOID {
+    return Comctl32.Load('DPA_DeletePtr')(hdpa_in_out, i);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dpa_dsa/nf-dpa_dsa-dpa_destroy
@@ -325,8 +325,8 @@ class Comctl32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dpa_dsa/nf-dpa_dsa-dpa_merge
-  public static DPA_Merge(hdpaDest: HDPA, hdpaSrc: HDPA, dwFlags: DWORD, pfnCompare: PFNDACOMPARE, pfnMerge: PFNDPAMERGE, lParam: LPARAM): BOOL {
-    return Comctl32.Load('DPA_Merge')(hdpaDest, hdpaSrc, dwFlags, pfnCompare, pfnMerge, lParam);
+  public static DPA_Merge(hdpaDest_in_out: HDPA, hdpaSrc: HDPA, dwFlags: DWORD, pfnCompare: PFNDACOMPARE, pfnMerge: PFNDPAMERGE, lParam: LPARAM): BOOL {
+    return Comctl32.Load('DPA_Merge')(hdpaDest_in_out, hdpaSrc, dwFlags, pfnCompare, pfnMerge, lParam);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dpa_dsa/nf-dpa_dsa-dpa_savestream
@@ -345,8 +345,8 @@ class Comctl32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dpa_dsa/nf-dpa_dsa-dpa_sort
-  public static DPA_Sort(hdpa: HDPA, pfnCompare: PFNDACOMPARE, lParam: LPARAM): BOOL {
-    return Comctl32.Load('DPA_Sort')(hdpa, pfnCompare, lParam);
+  public static DPA_Sort(hdpa_in_out: HDPA, pfnCompare: PFNDACOMPARE, lParam: LPARAM): BOOL {
+    return Comctl32.Load('DPA_Sort')(hdpa_in_out, pfnCompare, lParam);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dpa_dsa/nf-dpa_dsa-dsa_create
@@ -365,13 +365,13 @@ class Comctl32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dpa_dsa/nf-dpa_dsa-dsa_destroy
-  public static DSA_Destroy(hdsa_in_out: Optional<HDSA>): BOOL {
-    return Comctl32.Load('DSA_Destroy')(hdsa_in_out);
+  public static DSA_Destroy(hdsa: Optional<HDSA>): BOOL {
+    return Comctl32.Load('DSA_Destroy')(hdsa);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dpa_dsa/nf-dpa_dsa-dsa_destroycallback
-  public static DSA_DestroyCallback(hdsa_in_out: Optional<HDSA>, pfnCB: PFNDAENUMCALLBACK, pData: Optional<LPVOID>): VOID {
-    return Comctl32.Load('DSA_DestroyCallback')(hdsa_in_out, pfnCB, pData);
+  public static DSA_DestroyCallback(hdsa: Optional<HDSA>, pfnCB: PFNDAENUMCALLBACK, pData: Optional<LPVOID>): VOID {
+    return Comctl32.Load('DSA_DestroyCallback')(hdsa, pfnCB, pData);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dpa_dsa/nf-dpa_dsa-dsa_enumcallback
@@ -390,13 +390,13 @@ class Comctl32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dpa_dsa/nf-dpa_dsa-dsa_insertitem
-  public static DSA_InsertItem(hdsa_in_out: HDSA, i: INT, pitem: LPCVOID): INT {
-    return Comctl32.Load('DSA_InsertItem')(hdsa_in_out, i, pitem);
+  public static DSA_InsertItem(hdsa: HDSA, i: INT, pitem: LPCVOID): INT {
+    return Comctl32.Load('DSA_InsertItem')(hdsa, i, pitem);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/dpa_dsa/nf-dpa_dsa-dsa_setitem
-  public static DSA_SetItem(hdsa_in_out: HDSA, i: INT, pitem: LPCVOID): BOOL {
-    return Comctl32.Load('DSA_SetItem')(hdsa_in_out, i, pitem);
+  public static DSA_SetItem(hdsa: HDSA, i: INT, pitem: LPCVOID): BOOL {
+    return Comctl32.Load('DSA_SetItem')(hdsa, i, pitem);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-defsubclassproc
@@ -454,7 +454,7 @@ class Comctl32 extends Win32 {
     return Comctl32.Load('FlatSB_GetScrollProp')(hWnd, propIndex, pValue_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-flatsb_getscrollprop
+  // https://learn.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-flatsb_getscrollpropptr
   public static FlatSB_GetScrollPropPtr(hWnd: HWND, propIndex: INT, pValue_out: PINT_PTR): BOOL {
     return Comctl32.Load('FlatSB_GetScrollPropPtr')(hWnd, propIndex, pValue_out);
   }

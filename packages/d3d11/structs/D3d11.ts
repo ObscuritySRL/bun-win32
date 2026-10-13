@@ -64,8 +64,8 @@ class D3d11 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/windows.graphics.directx.direct3d11.interop/nf-windows-graphics-directx-direct3d11-interop-createdirect3d11surfacefromdxgisurface
-  public static CreateDirect3D11SurfaceFromDXGISurface(dgxiSurface: IDXGISurface, graphicsSurface_out: PIInspectable): HRESULT {
-    return D3d11.Load('CreateDirect3D11SurfaceFromDXGISurface')(dgxiSurface, graphicsSurface_out);
+  public static CreateDirect3D11SurfaceFromDXGISurface(dxgiSurface: IDXGISurface, graphicsSurface_out: PIInspectable): HRESULT {
+    return D3d11.Load('CreateDirect3D11SurfaceFromDXGISurface')(dxgiSurface, graphicsSurface_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/d3d11/nf-d3d11-d3d11createdevice

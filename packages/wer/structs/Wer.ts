@@ -100,7 +100,7 @@ class Wer extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wct/nf-wct-getthreadwaitchain
-  public static GetThreadWaitChain(WctHandle: HWCT, Context: Optional<DWORD_PTR>, Flags: DWORD, ThreadId: DWORD, NodeCount_in_out: LPDWORD, NodeInfoArray_out: PWAITCHAIN_NODE_INFO, IsCycle_out: LPBOOL): BOOL {
+  public static GetThreadWaitChain(WctHandle: HWCT, Context: DWORD_PTR, Flags: DWORD, ThreadId: DWORD, NodeCount_in_out: LPDWORD, NodeInfoArray_out: PWAITCHAIN_NODE_INFO, IsCycle_out: LPBOOL): BOOL {
     return Wer.Load('GetThreadWaitChain')(WctHandle, Context, Flags, ThreadId, NodeCount_in_out, NodeInfoArray_out, IsCycle_out);
   }
 

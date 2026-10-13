@@ -71,8 +71,8 @@ class Xinput1_4 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/xinput/nf-xinput-xinputsetstate
-  public static XInputSetState(dwUserIndex: DWORD, pVibration_in_out: PXINPUT_VIBRATION): DWORD {
-    return Xinput1_4.Load('XInputSetState')(dwUserIndex, pVibration_in_out);
+  public static XInputSetState(dwUserIndex: DWORD, pVibration: PXINPUT_VIBRATION): DWORD {
+    return Xinput1_4.Load('XInputSetState')(dwUserIndex, pVibration);
   }
 }
 

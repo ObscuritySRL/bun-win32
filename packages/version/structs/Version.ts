@@ -74,12 +74,12 @@ class Version extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winver/nf-winver-getfileversioninfosizeexa
-  public static GetFileVersionInfoSizeExA(dwFlags: DWORD, lpwstrFilename: LPCSTR, lpdwHandle_out: LPDWORD): DWORD {
+  public static GetFileVersionInfoSizeExA(dwFlags: DWORD, lpwstrFilename: LPCSTR, lpdwHandle_out: Optional<LPDWORD>): DWORD {
     return Version.Load('GetFileVersionInfoSizeExA')(dwFlags, lpwstrFilename, lpdwHandle_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winver/nf-winver-getfileversioninfosizeexw
-  public static GetFileVersionInfoSizeExW(dwFlags: DWORD, lpwstrFilename: LPCWSTR, lpdwHandle_out: LPDWORD): DWORD {
+  public static GetFileVersionInfoSizeExW(dwFlags: DWORD, lpwstrFilename: LPCWSTR, lpdwHandle_out: Optional<LPDWORD>): DWORD {
     return Version.Load('GetFileVersionInfoSizeExW')(dwFlags, lpwstrFilename, lpdwHandle_out);
   }
 

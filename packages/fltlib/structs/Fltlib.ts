@@ -190,7 +190,7 @@ class Fltlib extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fltuser/nf-fltuser-filtersendmessage
-  public static FilterSendMessage(hPort: HANDLE, lpInBuffer: LPVOID, dwInBufferSize: DWORD, lpOutBuffer_out: Optional<LPVOID>, dwOutBufferSize: DWORD, lpBytesReturned_out: LPDWORD): HRESULT {
+  public static FilterSendMessage(hPort: HANDLE, lpInBuffer: Optional<LPVOID>, dwInBufferSize: DWORD, lpOutBuffer_out: Optional<LPVOID>, dwOutBufferSize: DWORD, lpBytesReturned_out: LPDWORD): HRESULT {
     return Fltlib.Load('FilterSendMessage')(hPort, lpInBuffer, dwInBufferSize, lpOutBuffer_out, dwOutBufferSize, lpBytesReturned_out);
   }
 

@@ -452,7 +452,6 @@ export enum WinHttpWebSocketOperation {
 
 export type HINTERNET = bigint;
 export type INTERNET_PORT = number;
-export type INTERNET_SCHEME = number;
 export type LPHINTERNET = Pointer;
 export type LPINTERNET_PORT = Pointer;
 export type LPINTERNET_SCHEME = Pointer;

@@ -329,13 +329,13 @@ class Ntdsapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntdsapi/nf-ntdsapi-dsfreespnarraya
-  public static DsFreeSpnArrayA(cSpn: DWORD, rpszSpn_in_out: LPVOID): void {
-    return Ntdsapi.Load('DsFreeSpnArrayA')(cSpn, rpszSpn_in_out);
+  public static DsFreeSpnArrayA(cSpn: DWORD, rpszSpn: LPVOID): void {
+    return Ntdsapi.Load('DsFreeSpnArrayA')(cSpn, rpszSpn);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntdsapi/nf-ntdsapi-dsfreespnarrayw
-  public static DsFreeSpnArrayW(cSpn: DWORD, rpszSpn_in_out: LPVOID): void {
-    return Ntdsapi.Load('DsFreeSpnArrayW')(cSpn, rpszSpn_in_out);
+  public static DsFreeSpnArrayW(cSpn: DWORD, rpszSpn: LPVOID): void {
+    return Ntdsapi.Load('DsFreeSpnArrayW')(cSpn, rpszSpn);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ntdsapi/nf-ntdsapi-dsgetdomaincontrollerinfoa

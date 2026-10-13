@@ -371,12 +371,12 @@ class Wtsapi32 extends Win32 {
     return Wtsapi32.Load('WTSSetRenderHint')(pRenderHintID_in_out, hwndOwner, renderHintType, cbHintDataLength, pHintData);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/wtsapi32/nf-wtsapi32-wtssetsessioninformationa
+  // Undocumented export (no Microsoft Learn page).
   public static WTSSetSessionInformationA(hServer: HANDLE, SessionId: DWORD, WTSInfoClass: WTS_INFO_CLASS, pBuffer: LPSTR, DataLength: DWORD): BOOL {
     return Wtsapi32.Load('WTSSetSessionInformationA')(hServer, SessionId, WTSInfoClass, pBuffer, DataLength);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/wtsapi32/nf-wtsapi32-wtssetsessioninformationw
+  // Undocumented export (no Microsoft Learn page).
   public static WTSSetSessionInformationW(hServer: HANDLE, SessionId: DWORD, WTSInfoClass: WTS_INFO_CLASS, pBuffer: LPWSTR, DataLength: DWORD): BOOL {
     return Wtsapi32.Load('WTSSetSessionInformationW')(hServer, SessionId, WTSInfoClass, pBuffer, DataLength);
   }

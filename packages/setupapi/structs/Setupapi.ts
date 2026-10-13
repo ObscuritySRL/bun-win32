@@ -27,6 +27,7 @@ import type {
   LPPROPSHEETHEADERA,
   LPPROPSHEETHEADERW,
   LogSeverity,
+  Nullable,
   Optional,
   PBOOL,
   PBYTE,
@@ -548,11 +549,11 @@ class Setupapi extends Win32 {
     TargetPathFile: Optional<PCSTR>,
     Win32ErrorCode: UINT,
     Style: DWORD,
-    PathBuffer_out: Optional<PSTR>,
+    PathBuffer_in_out: Optional<PSTR>,
     PathBufferSize: DWORD,
-    PathRequiredSize_out: Optional<PDWORD>,
+    PathRequiredSize_in_out: Optional<PDWORD>,
   ): UINT {
-    return Setupapi.Load('SetupCopyErrorA')(hwndParent, DialogTitle, DiskName, PathToSource, SourceFile, TargetPathFile, Win32ErrorCode, Style, PathBuffer_out, PathBufferSize, PathRequiredSize_out);
+    return Setupapi.Load('SetupCopyErrorA')(hwndParent, DialogTitle, DiskName, PathToSource, SourceFile, TargetPathFile, Win32ErrorCode, Style, PathBuffer_in_out, PathBufferSize, PathRequiredSize_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupcopyerrorw
@@ -565,11 +566,11 @@ class Setupapi extends Win32 {
     TargetPathFile: Optional<PCWSTR>,
     Win32ErrorCode: UINT,
     Style: DWORD,
-    PathBuffer_out: Optional<PWSTR>,
+    PathBuffer_in_out: Optional<PWSTR>,
     PathBufferSize: DWORD,
-    PathRequiredSize_out: Optional<PDWORD>,
+    PathRequiredSize_in_out: Optional<PDWORD>,
   ): UINT {
-    return Setupapi.Load('SetupCopyErrorW')(hwndParent, DialogTitle, DiskName, PathToSource, SourceFile, TargetPathFile, Win32ErrorCode, Style, PathBuffer_out, PathBufferSize, PathRequiredSize_out);
+    return Setupapi.Load('SetupCopyErrorW')(hwndParent, DialogTitle, DiskName, PathToSource, SourceFile, TargetPathFile, Win32ErrorCode, Style, PathBuffer_in_out, PathBufferSize, PathRequiredSize_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupcopyoeminfa
@@ -1197,12 +1198,12 @@ class Setupapi extends Win32 {
   public static SetupDiGetDeviceInterfaceDetailA(
     DeviceInfoSet: HDEVINFO,
     DeviceInterfaceData: PSP_DEVICE_INTERFACE_DATA,
-    DeviceInterfaceDetailData_in_out: Optional<PSP_DEVICE_INTERFACE_DETAIL_DATA_A>,
+    DeviceInterfaceDetailData_out: Optional<PSP_DEVICE_INTERFACE_DETAIL_DATA_A>,
     DeviceInterfaceDetailDataSize: DWORD,
     RequiredSize_out: Optional<PDWORD>,
     DeviceInfoData_out: Optional<PSP_DEVINFO_DATA>,
   ): BOOL {
-    return Setupapi.Load('SetupDiGetDeviceInterfaceDetailA')(DeviceInfoSet, DeviceInterfaceData, DeviceInterfaceDetailData_in_out, DeviceInterfaceDetailDataSize, RequiredSize_out, DeviceInfoData_out);
+    return Setupapi.Load('SetupDiGetDeviceInterfaceDetailA')(DeviceInfoSet, DeviceInterfaceData, DeviceInterfaceDetailData_out, DeviceInterfaceDetailDataSize, RequiredSize_out, DeviceInfoData_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdigetdeviceinterfacedetailw
@@ -1389,7 +1390,7 @@ class Setupapi extends Win32 {
     return Setupapi.Load('SetupDiGetSelectedDriverW')(DeviceInfoSet, DeviceInfoData, DriverInfoData_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdigetwizardpage
+  // Undocumented export (no Microsoft Learn page).
   public static SetupDiGetWizardPage(DeviceInfoSet: HDEVINFO, DeviceInfoData: Optional<PSP_DEVINFO_DATA>, InstallWizardData: PSP_INSTALLWIZARD_DATA, PageType: DWORD, Flags: DWORD): HPROPSHEETPAGE {
     return Setupapi.Load('SetupDiGetWizardPage')(DeviceInfoSet, DeviceInfoData, InstallWizardData, PageType, Flags);
   }
@@ -1680,13 +1681,13 @@ class Setupapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupfindfirstlinea
-  public static SetupFindFirstLineA(InfHandle: HINF, Section: PCSTR, Key: Optional<PCSTR>, Context_out: PINFCONTEXT): BOOL {
-    return Setupapi.Load('SetupFindFirstLineA')(InfHandle, Section, Key, Context_out);
+  public static SetupFindFirstLineA(InfHandle: HINF, Section: PCSTR, Key: Optional<PCSTR>, Context_in_out: PINFCONTEXT): BOOL {
+    return Setupapi.Load('SetupFindFirstLineA')(InfHandle, Section, Key, Context_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupfindfirstlinew
-  public static SetupFindFirstLineW(InfHandle: HINF, Section: PCWSTR, Key: Optional<PCWSTR>, Context_out: PINFCONTEXT): BOOL {
-    return Setupapi.Load('SetupFindFirstLineW')(InfHandle, Section, Key, Context_out);
+  public static SetupFindFirstLineW(InfHandle: HINF, Section: PCWSTR, Key: Optional<PCWSTR>, Context_in_out: PINFCONTEXT): BOOL {
+    return Setupapi.Load('SetupFindFirstLineW')(InfHandle, Section, Key, Context_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupfindnextline
@@ -1695,13 +1696,13 @@ class Setupapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupfindnextmatchlinea
-  public static SetupFindNextMatchLineA(ContextIn: PINFCONTEXT, Key: Optional<PCSTR>, ContextOut_out: PINFCONTEXT): BOOL {
-    return Setupapi.Load('SetupFindNextMatchLineA')(ContextIn, Key, ContextOut_out);
+  public static SetupFindNextMatchLineA(ContextIn: PINFCONTEXT, Key: Optional<PCSTR>, ContextOut_in_out: PINFCONTEXT): BOOL {
+    return Setupapi.Load('SetupFindNextMatchLineA')(ContextIn, Key, ContextOut_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupfindnextmatchlinew
-  public static SetupFindNextMatchLineW(ContextIn: PINFCONTEXT, Key: Optional<PCWSTR>, ContextOut_out: PINFCONTEXT): BOOL {
-    return Setupapi.Load('SetupFindNextMatchLineW')(ContextIn, Key, ContextOut_out);
+  public static SetupFindNextMatchLineW(ContextIn: PINFCONTEXT, Key: Optional<PCWSTR>, ContextOut_in_out: PINFCONTEXT): BOOL {
+    return Setupapi.Load('SetupFindNextMatchLineW')(ContextIn, Key, ContextOut_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupfreesourcelista
@@ -1714,19 +1715,19 @@ class Setupapi extends Win32 {
     return Setupapi.Load('SetupFreeSourceListW')(List_in_out, Count);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupgetbackupinformationa
+  // Undocumented export (no Microsoft Learn page).
   public static SetupGetBackupInformationA(QueueHandle: HSPFILEQ, BackupParams_in_out: PSP_BACKUP_QUEUE_PARAMS_A): BOOL {
     return Setupapi.Load('SetupGetBackupInformationA')(QueueHandle, BackupParams_in_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupgetbackupinformationw
+  // Undocumented export (no Microsoft Learn page).
   public static SetupGetBackupInformationW(QueueHandle: HSPFILEQ, BackupParams_in_out: PSP_BACKUP_QUEUE_PARAMS_W): BOOL {
     return Setupapi.Load('SetupGetBackupInformationW')(QueueHandle, BackupParams_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupgetbinaryfield
-  public static SetupGetBinaryField(Context: PINFCONTEXT, FieldIndex: DWORD, ReturnBuffer_out: Optional<PBYTE>, ReturnBufferSize: DWORD, RequiredSize_out: Optional<LPDWORD>): BOOL {
-    return Setupapi.Load('SetupGetBinaryField')(Context, FieldIndex, ReturnBuffer_out, ReturnBufferSize, RequiredSize_out);
+  public static SetupGetBinaryField(Context: PINFCONTEXT, FieldIndex: DWORD, ReturnBuffer_in_out: Optional<PBYTE>, ReturnBufferSize: DWORD, RequiredSize_in_out: Optional<LPDWORD>): BOOL {
+    return Setupapi.Load('SetupGetBinaryField')(Context, FieldIndex, ReturnBuffer_in_out, ReturnBufferSize, RequiredSize_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupgetfieldcount
@@ -1735,39 +1736,39 @@ class Setupapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupgetfilecompressioninfoa
-  public static SetupGetFileCompressionInfoA(SourceFileName: PCSTR, ActualSourceFileName_out: PPSTR, SourceFileSize_out: PDWORD, TargetFileSize_out: PDWORD, CompressionType_out: PUINT): DWORD {
-    return Setupapi.Load('SetupGetFileCompressionInfoA')(SourceFileName, ActualSourceFileName_out, SourceFileSize_out, TargetFileSize_out, CompressionType_out);
+  public static SetupGetFileCompressionInfoA(SourceFileName: PCSTR, ActualSourceFileName_in_out: PPSTR, SourceFileSize_in_out: PDWORD, TargetFileSize_in_out: PDWORD, CompressionType_in_out: PUINT): DWORD {
+    return Setupapi.Load('SetupGetFileCompressionInfoA')(SourceFileName, ActualSourceFileName_in_out, SourceFileSize_in_out, TargetFileSize_in_out, CompressionType_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupgetfilecompressioninfoexa
   public static SetupGetFileCompressionInfoExA(
     SourceFileName: PCSTR,
-    ActualSourceFileNameBuffer: Optional<PSTR>,
+    ActualSourceFileNameBuffer_in_out: Optional<PSTR>,
     ActualSourceFileNameBufferLen: DWORD,
     RequiredBufferLen_out: Optional<PDWORD>,
     SourceFileSize_out: PDWORD,
     TargetFileSize_out: PDWORD,
     CompressionType_out: PUINT,
   ): BOOL {
-    return Setupapi.Load('SetupGetFileCompressionInfoExA')(SourceFileName, ActualSourceFileNameBuffer, ActualSourceFileNameBufferLen, RequiredBufferLen_out, SourceFileSize_out, TargetFileSize_out, CompressionType_out);
+    return Setupapi.Load('SetupGetFileCompressionInfoExA')(SourceFileName, ActualSourceFileNameBuffer_in_out, ActualSourceFileNameBufferLen, RequiredBufferLen_out, SourceFileSize_out, TargetFileSize_out, CompressionType_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupgetfilecompressioninfoexw
   public static SetupGetFileCompressionInfoExW(
     SourceFileName: PCWSTR,
-    ActualSourceFileNameBuffer: Optional<PWSTR>,
+    ActualSourceFileNameBuffer_in_out: Optional<PWSTR>,
     ActualSourceFileNameBufferLen: DWORD,
     RequiredBufferLen_out: Optional<PDWORD>,
     SourceFileSize_out: PDWORD,
     TargetFileSize_out: PDWORD,
     CompressionType_out: PUINT,
   ): BOOL {
-    return Setupapi.Load('SetupGetFileCompressionInfoExW')(SourceFileName, ActualSourceFileNameBuffer, ActualSourceFileNameBufferLen, RequiredBufferLen_out, SourceFileSize_out, TargetFileSize_out, CompressionType_out);
+    return Setupapi.Load('SetupGetFileCompressionInfoExW')(SourceFileName, ActualSourceFileNameBuffer_in_out, ActualSourceFileNameBufferLen, RequiredBufferLen_out, SourceFileSize_out, TargetFileSize_out, CompressionType_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupgetfilecompressioninfow
-  public static SetupGetFileCompressionInfoW(SourceFileName: PCWSTR, ActualSourceFileName_out: PPWSTR, SourceFileSize_out: PDWORD, TargetFileSize_out: PDWORD, CompressionType_out: PUINT): DWORD {
-    return Setupapi.Load('SetupGetFileCompressionInfoW')(SourceFileName, ActualSourceFileName_out, SourceFileSize_out, TargetFileSize_out, CompressionType_out);
+  public static SetupGetFileCompressionInfoW(SourceFileName: PCWSTR, ActualSourceFileName_in_out: PPWSTR, SourceFileSize_in_out: PDWORD, TargetFileSize_in_out: PDWORD, CompressionType_in_out: PUINT): DWORD {
+    return Setupapi.Load('SetupGetFileCompressionInfoW')(SourceFileName, ActualSourceFileName_in_out, SourceFileSize_in_out, TargetFileSize_in_out, CompressionType_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupgetfilequeuecount
@@ -1805,23 +1806,23 @@ class Setupapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupgetinffilelista
-  public static SetupGetInfFileListA(DirectoryPath: Optional<PCSTR>, InfStyle: DWORD, ReturnBuffer_out: Optional<PSTR>, ReturnBufferSize: DWORD, RequiredSize_out: Optional<PDWORD>): BOOL {
-    return Setupapi.Load('SetupGetInfFileListA')(DirectoryPath, InfStyle, ReturnBuffer_out, ReturnBufferSize, RequiredSize_out);
+  public static SetupGetInfFileListA(DirectoryPath: Optional<PCSTR>, InfStyle: DWORD, ReturnBuffer_in_out: Optional<PSTR>, ReturnBufferSize: DWORD, RequiredSize_in_out: Optional<PDWORD>): BOOL {
+    return Setupapi.Load('SetupGetInfFileListA')(DirectoryPath, InfStyle, ReturnBuffer_in_out, ReturnBufferSize, RequiredSize_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupgetinffilelistw
-  public static SetupGetInfFileListW(DirectoryPath: Optional<PCWSTR>, InfStyle: DWORD, ReturnBuffer_out: PWSTR, ReturnBufferSize: DWORD, RequiredSize_out: Optional<PDWORD>): BOOL {
-    return Setupapi.Load('SetupGetInfFileListW')(DirectoryPath, InfStyle, ReturnBuffer_out, ReturnBufferSize, RequiredSize_out);
+  public static SetupGetInfFileListW(DirectoryPath: Optional<PCWSTR>, InfStyle: DWORD, ReturnBuffer_in_out: Nullable<PWSTR>, ReturnBufferSize: DWORD, RequiredSize_in_out: Optional<PDWORD>): BOOL {
+    return Setupapi.Load('SetupGetInfFileListW')(DirectoryPath, InfStyle, ReturnBuffer_in_out, ReturnBufferSize, RequiredSize_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupgetinfinformationa
-  public static SetupGetInfInformationA(InfSpec: LPCVOID, SearchControl: DWORD, ReturnBuffer_out: Optional<PSP_INF_INFORMATION>, ReturnBufferSize: DWORD, RequiredSize_out: Optional<PDWORD>): BOOL {
-    return Setupapi.Load('SetupGetInfInformationA')(InfSpec, SearchControl, ReturnBuffer_out, ReturnBufferSize, RequiredSize_out);
+  public static SetupGetInfInformationA(InfSpec: LPCVOID, SearchControl: DWORD, ReturnBuffer_in_out: Optional<PSP_INF_INFORMATION>, ReturnBufferSize: DWORD, RequiredSize_in_out: Optional<PDWORD>): BOOL {
+    return Setupapi.Load('SetupGetInfInformationA')(InfSpec, SearchControl, ReturnBuffer_in_out, ReturnBufferSize, RequiredSize_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupgetinfinformationw
-  public static SetupGetInfInformationW(InfSpec: LPCVOID, SearchControl: DWORD, ReturnBuffer_out: Optional<PSP_INF_INFORMATION>, ReturnBufferSize: DWORD, RequiredSize_out: Optional<PDWORD>): BOOL {
-    return Setupapi.Load('SetupGetInfInformationW')(InfSpec, SearchControl, ReturnBuffer_out, ReturnBufferSize, RequiredSize_out);
+  public static SetupGetInfInformationW(InfSpec: LPCVOID, SearchControl: DWORD, ReturnBuffer_in_out: Optional<PSP_INF_INFORMATION>, ReturnBufferSize: DWORD, RequiredSize_in_out: Optional<PDWORD>): BOOL {
+    return Setupapi.Load('SetupGetInfInformationW')(InfSpec, SearchControl, ReturnBuffer_in_out, ReturnBufferSize, RequiredSize_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupgetinfpublishednamea
@@ -1840,13 +1841,13 @@ class Setupapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupgetlinebyindexa
-  public static SetupGetLineByIndexA(InfHandle: HINF, Section: PCSTR, Index: DWORD, Context_out: PINFCONTEXT): BOOL {
-    return Setupapi.Load('SetupGetLineByIndexA')(InfHandle, Section, Index, Context_out);
+  public static SetupGetLineByIndexA(InfHandle: HINF, Section: PCSTR, Index: DWORD, Context_in_out: PINFCONTEXT): BOOL {
+    return Setupapi.Load('SetupGetLineByIndexA')(InfHandle, Section, Index, Context_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupgetlinebyindexw
-  public static SetupGetLineByIndexW(InfHandle: HINF, Section: PCWSTR, Index: DWORD, Context_out: PINFCONTEXT): BOOL {
-    return Setupapi.Load('SetupGetLineByIndexW')(InfHandle, Section, Index, Context_out);
+  public static SetupGetLineByIndexW(InfHandle: HINF, Section: PCWSTR, Index: DWORD, Context_in_out: PINFCONTEXT): BOOL {
+    return Setupapi.Load('SetupGetLineByIndexW')(InfHandle, Section, Index, Context_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupgetlinecounta
@@ -1865,11 +1866,11 @@ class Setupapi extends Win32 {
     InfHandle: Optional<HINF>,
     Section: Optional<PCSTR>,
     Key: Optional<PCSTR>,
-    ReturnBuffer_out: Optional<PSTR>,
+    ReturnBuffer_in_out: Optional<PSTR>,
     ReturnBufferSize: DWORD,
-    RequiredSize_out: Optional<PDWORD>,
+    RequiredSize_in_out: Optional<PDWORD>,
   ): BOOL {
-    return Setupapi.Load('SetupGetLineTextA')(Context, InfHandle, Section, Key, ReturnBuffer_out, ReturnBufferSize, RequiredSize_out);
+    return Setupapi.Load('SetupGetLineTextA')(Context, InfHandle, Section, Key, ReturnBuffer_in_out, ReturnBufferSize, RequiredSize_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupgetlinetextw
@@ -1878,21 +1879,21 @@ class Setupapi extends Win32 {
     InfHandle: Optional<HINF>,
     Section: Optional<PCWSTR>,
     Key: Optional<PCWSTR>,
-    ReturnBuffer_out: Optional<PWSTR>,
+    ReturnBuffer_in_out: Optional<PWSTR>,
     ReturnBufferSize: DWORD,
-    RequiredSize_out: Optional<PDWORD>,
+    RequiredSize_in_out: Optional<PDWORD>,
   ): BOOL {
-    return Setupapi.Load('SetupGetLineTextW')(Context, InfHandle, Section, Key, ReturnBuffer_out, ReturnBufferSize, RequiredSize_out);
+    return Setupapi.Load('SetupGetLineTextW')(Context, InfHandle, Section, Key, ReturnBuffer_in_out, ReturnBufferSize, RequiredSize_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupgetmultiszfielda
-  public static SetupGetMultiSzFieldA(Context: PINFCONTEXT, FieldIndex: DWORD, ReturnBuffer_out: Optional<PSTR>, ReturnBufferSize: DWORD, RequiredSize_out: Optional<LPDWORD>): BOOL {
-    return Setupapi.Load('SetupGetMultiSzFieldA')(Context, FieldIndex, ReturnBuffer_out, ReturnBufferSize, RequiredSize_out);
+  public static SetupGetMultiSzFieldA(Context: PINFCONTEXT, FieldIndex: DWORD, ReturnBuffer_in_out: Optional<PSTR>, ReturnBufferSize: DWORD, RequiredSize_out: Optional<LPDWORD>): BOOL {
+    return Setupapi.Load('SetupGetMultiSzFieldA')(Context, FieldIndex, ReturnBuffer_in_out, ReturnBufferSize, RequiredSize_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupgetmultiszfieldw
-  public static SetupGetMultiSzFieldW(Context: PINFCONTEXT, FieldIndex: DWORD, ReturnBuffer_out: Optional<PWSTR>, ReturnBufferSize: DWORD, RequiredSize_out: Optional<LPDWORD>): BOOL {
-    return Setupapi.Load('SetupGetMultiSzFieldW')(Context, FieldIndex, ReturnBuffer_out, ReturnBufferSize, RequiredSize_out);
+  public static SetupGetMultiSzFieldW(Context: PINFCONTEXT, FieldIndex: DWORD, ReturnBuffer_in_out: Optional<PWSTR>, ReturnBufferSize: DWORD, RequiredSize_out: Optional<LPDWORD>): BOOL {
+    return Setupapi.Load('SetupGetMultiSzFieldW')(Context, FieldIndex, ReturnBuffer_in_out, ReturnBufferSize, RequiredSize_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupgetnoninteractivemode
@@ -1905,12 +1906,12 @@ class Setupapi extends Win32 {
     InfHandle: HINF,
     InfContext: Optional<PINFCONTEXT>,
     FileName: Optional<PCSTR>,
-    SourceId_out: PUINT,
-    ReturnBuffer_out: Optional<PSTR>,
+    SourceId_in_out: PUINT,
+    ReturnBuffer_in_out: Optional<PSTR>,
     ReturnBufferSize: DWORD,
-    RequiredSize_out: Optional<PDWORD>,
+    RequiredSize_in_out: Optional<PDWORD>,
   ): BOOL {
-    return Setupapi.Load('SetupGetSourceFileLocationA')(InfHandle, InfContext, FileName, SourceId_out, ReturnBuffer_out, ReturnBufferSize, RequiredSize_out);
+    return Setupapi.Load('SetupGetSourceFileLocationA')(InfHandle, InfContext, FileName, SourceId_in_out, ReturnBuffer_in_out, ReturnBufferSize, RequiredSize_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupgetsourcefilelocationw
@@ -1918,52 +1919,52 @@ class Setupapi extends Win32 {
     InfHandle: HINF,
     InfContext: Optional<PINFCONTEXT>,
     FileName: Optional<PCWSTR>,
-    SourceId_out: PUINT,
-    ReturnBuffer_out: Optional<PWSTR>,
+    SourceId_in_out: PUINT,
+    ReturnBuffer_in_out: Optional<PWSTR>,
     ReturnBufferSize: DWORD,
-    RequiredSize_out: Optional<PDWORD>,
+    RequiredSize_in_out: Optional<PDWORD>,
   ): BOOL {
-    return Setupapi.Load('SetupGetSourceFileLocationW')(InfHandle, InfContext, FileName, SourceId_out, ReturnBuffer_out, ReturnBufferSize, RequiredSize_out);
+    return Setupapi.Load('SetupGetSourceFileLocationW')(InfHandle, InfContext, FileName, SourceId_in_out, ReturnBuffer_in_out, ReturnBufferSize, RequiredSize_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupgetsourcefilesizea
-  public static SetupGetSourceFileSizeA(InfHandle: HINF, InfContext: Optional<PINFCONTEXT>, FileName: Optional<PCSTR>, Section: Optional<PCSTR>, FileSize_out: PDWORD, RoundingFactor: UINT): BOOL {
-    return Setupapi.Load('SetupGetSourceFileSizeA')(InfHandle, InfContext, FileName, Section, FileSize_out, RoundingFactor);
+  public static SetupGetSourceFileSizeA(InfHandle: HINF, InfContext: Optional<PINFCONTEXT>, FileName: Optional<PCSTR>, Section: Optional<PCSTR>, FileSize_in_out: PDWORD, RoundingFactor: UINT): BOOL {
+    return Setupapi.Load('SetupGetSourceFileSizeA')(InfHandle, InfContext, FileName, Section, FileSize_in_out, RoundingFactor);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupgetsourcefilesizew
-  public static SetupGetSourceFileSizeW(InfHandle: HINF, InfContext: Optional<PINFCONTEXT>, FileName: Optional<PCWSTR>, Section: Optional<PCWSTR>, FileSize_out: PDWORD, RoundingFactor: UINT): BOOL {
-    return Setupapi.Load('SetupGetSourceFileSizeW')(InfHandle, InfContext, FileName, Section, FileSize_out, RoundingFactor);
+  public static SetupGetSourceFileSizeW(InfHandle: HINF, InfContext: Optional<PINFCONTEXT>, FileName: Optional<PCWSTR>, Section: Optional<PCWSTR>, FileSize_in_out: PDWORD, RoundingFactor: UINT): BOOL {
+    return Setupapi.Load('SetupGetSourceFileSizeW')(InfHandle, InfContext, FileName, Section, FileSize_in_out, RoundingFactor);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupgetsourceinfoa
-  public static SetupGetSourceInfoA(InfHandle: HINF, SourceId: UINT, InfoDesired: UINT, ReturnBuffer_out: Optional<PSTR>, ReturnBufferSize: DWORD, RequiredSize_out: Optional<PDWORD>): BOOL {
-    return Setupapi.Load('SetupGetSourceInfoA')(InfHandle, SourceId, InfoDesired, ReturnBuffer_out, ReturnBufferSize, RequiredSize_out);
+  public static SetupGetSourceInfoA(InfHandle: HINF, SourceId: UINT, InfoDesired: UINT, ReturnBuffer_in_out: Optional<PSTR>, ReturnBufferSize: DWORD, RequiredSize_in_out: Optional<PDWORD>): BOOL {
+    return Setupapi.Load('SetupGetSourceInfoA')(InfHandle, SourceId, InfoDesired, ReturnBuffer_in_out, ReturnBufferSize, RequiredSize_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupgetsourceinfow
-  public static SetupGetSourceInfoW(InfHandle: HINF, SourceId: UINT, InfoDesired: UINT, ReturnBuffer_out: Optional<PWSTR>, ReturnBufferSize: DWORD, RequiredSize_out: Optional<PDWORD>): BOOL {
-    return Setupapi.Load('SetupGetSourceInfoW')(InfHandle, SourceId, InfoDesired, ReturnBuffer_out, ReturnBufferSize, RequiredSize_out);
+  public static SetupGetSourceInfoW(InfHandle: HINF, SourceId: UINT, InfoDesired: UINT, ReturnBuffer_in_out: Optional<PWSTR>, ReturnBufferSize: DWORD, RequiredSize_in_out: Optional<PDWORD>): BOOL {
+    return Setupapi.Load('SetupGetSourceInfoW')(InfHandle, SourceId, InfoDesired, ReturnBuffer_in_out, ReturnBufferSize, RequiredSize_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupgetstringfielda
-  public static SetupGetStringFieldA(Context: PINFCONTEXT, FieldIndex: DWORD, ReturnBuffer_out: Optional<PSTR>, ReturnBufferSize: DWORD, RequiredSize_out: Optional<PDWORD>): BOOL {
-    return Setupapi.Load('SetupGetStringFieldA')(Context, FieldIndex, ReturnBuffer_out, ReturnBufferSize, RequiredSize_out);
+  public static SetupGetStringFieldA(Context: PINFCONTEXT, FieldIndex: DWORD, ReturnBuffer_in_out: Optional<PSTR>, ReturnBufferSize: DWORD, RequiredSize_out: Optional<PDWORD>): BOOL {
+    return Setupapi.Load('SetupGetStringFieldA')(Context, FieldIndex, ReturnBuffer_in_out, ReturnBufferSize, RequiredSize_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupgetstringfieldw
-  public static SetupGetStringFieldW(Context: PINFCONTEXT, FieldIndex: DWORD, ReturnBuffer_out: Optional<PWSTR>, ReturnBufferSize: DWORD, RequiredSize_out: Optional<PDWORD>): BOOL {
-    return Setupapi.Load('SetupGetStringFieldW')(Context, FieldIndex, ReturnBuffer_out, ReturnBufferSize, RequiredSize_out);
+  public static SetupGetStringFieldW(Context: PINFCONTEXT, FieldIndex: DWORD, ReturnBuffer_in_out: Optional<PWSTR>, ReturnBufferSize: DWORD, RequiredSize_out: Optional<PDWORD>): BOOL {
+    return Setupapi.Load('SetupGetStringFieldW')(Context, FieldIndex, ReturnBuffer_in_out, ReturnBufferSize, RequiredSize_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupgettargetpatha
-  public static SetupGetTargetPathA(InfHandle: HINF, InfContext: Optional<PINFCONTEXT>, Section: Optional<PCSTR>, ReturnBuffer_out: Optional<PSTR>, ReturnBufferSize: DWORD, RequiredSize_out: Optional<PDWORD>): BOOL {
-    return Setupapi.Load('SetupGetTargetPathA')(InfHandle, InfContext, Section, ReturnBuffer_out, ReturnBufferSize, RequiredSize_out);
+  public static SetupGetTargetPathA(InfHandle: HINF, InfContext: Optional<PINFCONTEXT>, Section: Optional<PCSTR>, ReturnBuffer_in_out: Optional<PSTR>, ReturnBufferSize: DWORD, RequiredSize_in_out: Optional<PDWORD>): BOOL {
+    return Setupapi.Load('SetupGetTargetPathA')(InfHandle, InfContext, Section, ReturnBuffer_in_out, ReturnBufferSize, RequiredSize_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupgettargetpathw
-  public static SetupGetTargetPathW(InfHandle: HINF, InfContext: Optional<PINFCONTEXT>, Section: Optional<PCWSTR>, ReturnBuffer_out: Optional<PWSTR>, ReturnBufferSize: DWORD, RequiredSize_out: Optional<PDWORD>): BOOL {
-    return Setupapi.Load('SetupGetTargetPathW')(InfHandle, InfContext, Section, ReturnBuffer_out, ReturnBufferSize, RequiredSize_out);
+  public static SetupGetTargetPathW(InfHandle: HINF, InfContext: Optional<PINFCONTEXT>, Section: Optional<PCWSTR>, ReturnBuffer_in_out: Optional<PWSTR>, ReturnBufferSize: DWORD, RequiredSize_in_out: Optional<PDWORD>): BOOL {
+    return Setupapi.Load('SetupGetTargetPathW')(InfHandle, InfContext, Section, ReturnBuffer_in_out, ReturnBufferSize, RequiredSize_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupinitdefaultqueuecallback
@@ -2175,13 +2176,13 @@ class Setupapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupopenappendinffilea
-  public static SetupOpenAppendInfFileA(FileName: Optional<PCSTR>, InfHandle: HINF, ErrorLine_out: Optional<PUINT>): BOOL {
-    return Setupapi.Load('SetupOpenAppendInfFileA')(FileName, InfHandle, ErrorLine_out);
+  public static SetupOpenAppendInfFileA(FileName: Optional<PCSTR>, InfHandle: HINF, ErrorLine_in_out: Optional<PUINT>): BOOL {
+    return Setupapi.Load('SetupOpenAppendInfFileA')(FileName, InfHandle, ErrorLine_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupopenappendinffilew
-  public static SetupOpenAppendInfFileW(FileName: Optional<PCWSTR>, InfHandle: HINF, ErrorLine_out: Optional<PUINT>): BOOL {
-    return Setupapi.Load('SetupOpenAppendInfFileW')(FileName, InfHandle, ErrorLine_out);
+  public static SetupOpenAppendInfFileW(FileName: Optional<PCWSTR>, InfHandle: HINF, ErrorLine_in_out: Optional<PUINT>): BOOL {
+    return Setupapi.Load('SetupOpenAppendInfFileW')(FileName, InfHandle, ErrorLine_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupopenfilequeue
@@ -2209,12 +2210,12 @@ class Setupapi extends Win32 {
     return Setupapi.Load('SetupOpenMasterInf')();
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setuppreparequeueforrestorea
+  // Undocumented export (no Microsoft Learn page).
   public static SetupPrepareQueueForRestoreA(QueueHandle: HSPFILEQ, BackupPath: PCSTR, RestoreFlags: DWORD): BOOL {
     return Setupapi.Load('SetupPrepareQueueForRestoreA')(QueueHandle, BackupPath, RestoreFlags);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setuppreparequeueforrestorew
+  // Undocumented export (no Microsoft Learn page).
   public static SetupPrepareQueueForRestoreW(QueueHandle: HSPFILEQ, BackupPath: PCWSTR, RestoreFlags: DWORD): BOOL {
     return Setupapi.Load('SetupPrepareQueueForRestoreW')(QueueHandle, BackupPath, RestoreFlags);
   }
@@ -2228,11 +2229,11 @@ class Setupapi extends Win32 {
     FileSought: PCSTR,
     TagFile: Optional<PCSTR>,
     DiskPromptStyle: DWORD,
-    PathBuffer_out: Optional<PSTR>,
+    PathBuffer_in_out: Optional<PSTR>,
     PathBufferSize: DWORD,
-    PathRequiredSize_out: Optional<PDWORD>,
+    PathRequiredSize_in_out: Optional<PDWORD>,
   ): UINT {
-    return Setupapi.Load('SetupPromptForDiskA')(hwndParent, DialogTitle, DiskName, PathToSource, FileSought, TagFile, DiskPromptStyle, PathBuffer_out, PathBufferSize, PathRequiredSize_out);
+    return Setupapi.Load('SetupPromptForDiskA')(hwndParent, DialogTitle, DiskName, PathToSource, FileSought, TagFile, DiskPromptStyle, PathBuffer_in_out, PathBufferSize, PathRequiredSize_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setuppromptfordiskw
@@ -2244,11 +2245,11 @@ class Setupapi extends Win32 {
     FileSought: PCWSTR,
     TagFile: Optional<PCWSTR>,
     DiskPromptStyle: DWORD,
-    PathBuffer_out: Optional<PWSTR>,
+    PathBuffer_in_out: Optional<PWSTR>,
     PathBufferSize: DWORD,
-    PathRequiredSize_out: Optional<PDWORD>,
+    PathRequiredSize_in_out: Optional<PDWORD>,
   ): UINT {
-    return Setupapi.Load('SetupPromptForDiskW')(hwndParent, DialogTitle, DiskName, PathToSource, FileSought, TagFile, DiskPromptStyle, PathBuffer_out, PathBufferSize, PathRequiredSize_out);
+    return Setupapi.Load('SetupPromptForDiskW')(hwndParent, DialogTitle, DiskName, PathToSource, FileSought, TagFile, DiskPromptStyle, PathBuffer_in_out, PathBufferSize, PathRequiredSize_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setuppromptreboot
@@ -2257,13 +2258,13 @@ class Setupapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupquerydrivesindiskspacelista
-  public static SetupQueryDrivesInDiskSpaceListA(DiskSpace: HDSKSPC, ReturnBuffer_out: Optional<PSTR>, ReturnBufferSize: DWORD, RequiredSize_out: Optional<PDWORD>): BOOL {
-    return Setupapi.Load('SetupQueryDrivesInDiskSpaceListA')(DiskSpace, ReturnBuffer_out, ReturnBufferSize, RequiredSize_out);
+  public static SetupQueryDrivesInDiskSpaceListA(DiskSpace: HDSKSPC, ReturnBuffer_in_out: Optional<PSTR>, ReturnBufferSize: DWORD, RequiredSize_in_out: Optional<PDWORD>): BOOL {
+    return Setupapi.Load('SetupQueryDrivesInDiskSpaceListA')(DiskSpace, ReturnBuffer_in_out, ReturnBufferSize, RequiredSize_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupquerydrivesindiskspacelistw
-  public static SetupQueryDrivesInDiskSpaceListW(DiskSpace: HDSKSPC, ReturnBuffer_out: Optional<PWSTR>, ReturnBufferSize: DWORD, RequiredSize_out: Optional<PDWORD>): BOOL {
-    return Setupapi.Load('SetupQueryDrivesInDiskSpaceListW')(DiskSpace, ReturnBuffer_out, ReturnBufferSize, RequiredSize_out);
+  public static SetupQueryDrivesInDiskSpaceListW(DiskSpace: HDSKSPC, ReturnBuffer_in_out: Optional<PWSTR>, ReturnBufferSize: DWORD, RequiredSize_in_out: Optional<PDWORD>): BOOL {
+    return Setupapi.Load('SetupQueryDrivesInDiskSpaceListW')(DiskSpace, ReturnBuffer_in_out, ReturnBufferSize, RequiredSize_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupqueryfileloga
@@ -2272,11 +2273,11 @@ class Setupapi extends Win32 {
     LogSectionName: Optional<PCSTR>,
     TargetFilename: PCSTR,
     DesiredInfo: SetupFileLogInfo,
-    DataOut_out: Optional<PSTR>,
+    DataOut_in_out: Optional<PSTR>,
     ReturnBufferSize: DWORD,
-    RequiredSize_out: Optional<PDWORD>,
+    RequiredSize_in_out: Optional<PDWORD>,
   ): BOOL {
-    return Setupapi.Load('SetupQueryFileLogA')(FileLogHandle, LogSectionName, TargetFilename, DesiredInfo, DataOut_out, ReturnBufferSize, RequiredSize_out);
+    return Setupapi.Load('SetupQueryFileLogA')(FileLogHandle, LogSectionName, TargetFilename, DesiredInfo, DataOut_in_out, ReturnBufferSize, RequiredSize_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupqueryfilelogw
@@ -2285,21 +2286,21 @@ class Setupapi extends Win32 {
     LogSectionName: Optional<PCWSTR>,
     TargetFilename: PCWSTR,
     DesiredInfo: SetupFileLogInfo,
-    DataOut_out: Optional<PWSTR>,
+    DataOut_in_out: Optional<PWSTR>,
     ReturnBufferSize: DWORD,
-    RequiredSize_out: Optional<PDWORD>,
+    RequiredSize_in_out: Optional<PDWORD>,
   ): BOOL {
-    return Setupapi.Load('SetupQueryFileLogW')(FileLogHandle, LogSectionName, TargetFilename, DesiredInfo, DataOut_out, ReturnBufferSize, RequiredSize_out);
+    return Setupapi.Load('SetupQueryFileLogW')(FileLogHandle, LogSectionName, TargetFilename, DesiredInfo, DataOut_in_out, ReturnBufferSize, RequiredSize_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupqueryinffileinformationa
-  public static SetupQueryInfFileInformationA(InfInformation: PSP_INF_INFORMATION, InfIndex: UINT, ReturnBuffer_out: Optional<PSTR>, ReturnBufferSize: DWORD, RequiredSize_out: Optional<PDWORD>): BOOL {
-    return Setupapi.Load('SetupQueryInfFileInformationA')(InfInformation, InfIndex, ReturnBuffer_out, ReturnBufferSize, RequiredSize_out);
+  public static SetupQueryInfFileInformationA(InfInformation: PSP_INF_INFORMATION, InfIndex: UINT, ReturnBuffer_in_out: Optional<PSTR>, ReturnBufferSize: DWORD, RequiredSize_in_out: Optional<PDWORD>): BOOL {
+    return Setupapi.Load('SetupQueryInfFileInformationA')(InfInformation, InfIndex, ReturnBuffer_in_out, ReturnBufferSize, RequiredSize_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupqueryinffileinformationw
-  public static SetupQueryInfFileInformationW(InfInformation: PSP_INF_INFORMATION, InfIndex: UINT, ReturnBuffer_out: Optional<PWSTR>, ReturnBufferSize: DWORD, RequiredSize_out: Optional<PDWORD>): BOOL {
-    return Setupapi.Load('SetupQueryInfFileInformationW')(InfInformation, InfIndex, ReturnBuffer_out, ReturnBufferSize, RequiredSize_out);
+  public static SetupQueryInfFileInformationW(InfInformation: PSP_INF_INFORMATION, InfIndex: UINT, ReturnBuffer_in_out: Optional<PWSTR>, ReturnBufferSize: DWORD, RequiredSize_in_out: Optional<PDWORD>): BOOL {
+    return Setupapi.Load('SetupQueryInfFileInformationW')(InfInformation, InfIndex, ReturnBuffer_in_out, ReturnBufferSize, RequiredSize_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupqueryinforiginalfileinformationa
@@ -2313,23 +2314,23 @@ class Setupapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupqueryinfversioninformationa
-  public static SetupQueryInfVersionInformationA(InfInformation: PSP_INF_INFORMATION, InfIndex: UINT, Key: Optional<PCSTR>, ReturnBuffer_out: Optional<PSTR>, ReturnBufferSize: DWORD, RequiredSize_out: Optional<PDWORD>): BOOL {
-    return Setupapi.Load('SetupQueryInfVersionInformationA')(InfInformation, InfIndex, Key, ReturnBuffer_out, ReturnBufferSize, RequiredSize_out);
+  public static SetupQueryInfVersionInformationA(InfInformation: PSP_INF_INFORMATION, InfIndex: UINT, Key: Optional<PCSTR>, ReturnBuffer_in_out: Optional<PSTR>, ReturnBufferSize: DWORD, RequiredSize_in_out: Optional<PDWORD>): BOOL {
+    return Setupapi.Load('SetupQueryInfVersionInformationA')(InfInformation, InfIndex, Key, ReturnBuffer_in_out, ReturnBufferSize, RequiredSize_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupqueryinfversioninformationw
-  public static SetupQueryInfVersionInformationW(InfInformation: PSP_INF_INFORMATION, InfIndex: UINT, Key: Optional<PCWSTR>, ReturnBuffer_out: Optional<PWSTR>, ReturnBufferSize: DWORD, RequiredSize_out: Optional<PDWORD>): BOOL {
-    return Setupapi.Load('SetupQueryInfVersionInformationW')(InfInformation, InfIndex, Key, ReturnBuffer_out, ReturnBufferSize, RequiredSize_out);
+  public static SetupQueryInfVersionInformationW(InfInformation: PSP_INF_INFORMATION, InfIndex: UINT, Key: Optional<PCWSTR>, ReturnBuffer_in_out: Optional<PWSTR>, ReturnBufferSize: DWORD, RequiredSize_in_out: Optional<PDWORD>): BOOL {
+    return Setupapi.Load('SetupQueryInfVersionInformationW')(InfInformation, InfIndex, Key, ReturnBuffer_in_out, ReturnBufferSize, RequiredSize_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupquerysourcelista
-  public static SetupQuerySourceListA(Flags: DWORD, List_out: PPCSTR, Count_out: PUINT): BOOL {
-    return Setupapi.Load('SetupQuerySourceListA')(Flags, List_out, Count_out);
+  public static SetupQuerySourceListA(Flags: DWORD, List_in_out: PPCSTR, Count_in_out: PUINT): BOOL {
+    return Setupapi.Load('SetupQuerySourceListA')(Flags, List_in_out, Count_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupquerysourcelistw
-  public static SetupQuerySourceListW(Flags: DWORD, List_out: PPCWSTR, Count_out: PUINT): BOOL {
-    return Setupapi.Load('SetupQuerySourceListW')(Flags, List_out, Count_out);
+  public static SetupQuerySourceListW(Flags: DWORD, List_in_out: PPCWSTR, Count_in_out: PUINT): BOOL {
+    return Setupapi.Load('SetupQuerySourceListW')(Flags, List_in_out, Count_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupqueryspacerequiredondrivea
@@ -2598,13 +2599,13 @@ class Setupapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupverifyinffilea
-  public static SetupVerifyInfFileA(InfName: PCSTR, AltPlatformInfo: Optional<PSP_ALTPLATFORM_INFO>, InfSignerInfo_in_out: PSP_INF_SIGNER_INFO_A): BOOL {
-    return Setupapi.Load('SetupVerifyInfFileA')(InfName, AltPlatformInfo, InfSignerInfo_in_out);
+  public static SetupVerifyInfFileA(InfName: PCSTR, AltPlatformInfo: Optional<PSP_ALTPLATFORM_INFO>, InfSignerInfo_out: PSP_INF_SIGNER_INFO_A): BOOL {
+    return Setupapi.Load('SetupVerifyInfFileA')(InfName, AltPlatformInfo, InfSignerInfo_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupverifyinffilew
-  public static SetupVerifyInfFileW(InfName: PCWSTR, AltPlatformInfo: Optional<PSP_ALTPLATFORM_INFO>, InfSignerInfo_in_out: PSP_INF_SIGNER_INFO_W): BOOL {
-    return Setupapi.Load('SetupVerifyInfFileW')(InfName, AltPlatformInfo, InfSignerInfo_in_out);
+  public static SetupVerifyInfFileW(InfName: PCWSTR, AltPlatformInfo: Optional<PSP_ALTPLATFORM_INFO>, InfSignerInfo_out: PSP_INF_SIGNER_INFO_W): BOOL {
+    return Setupapi.Load('SetupVerifyInfFileW')(InfName, AltPlatformInfo, InfSignerInfo_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupwritetextloginfline

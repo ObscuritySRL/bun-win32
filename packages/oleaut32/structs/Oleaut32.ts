@@ -520,42 +520,42 @@ class Oleaut32 extends Win32 {
     VectorFromBstr: { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
   } as const satisfies Record<string, FFIFunction>;
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-bstr_userfree
+  // https://learn.microsoft.com/en-us/windows/win32/api/oaidl/nf-oaidl-bstr_userfree
   public static BSTR_UserFree(pFlags: PULONG, pBstr: LPBSTR): void {
     return Oleaut32.Load('BSTR_UserFree')(pFlags, pBstr);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-bstr_userfree64
+  // https://learn.microsoft.com/en-us/windows/win32/api/oaidl/nf-oaidl-bstr_userfree64
   public static BSTR_UserFree64(pFlags: PULONG, pBstr: LPBSTR): void {
     return Oleaut32.Load('BSTR_UserFree64')(pFlags, pBstr);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-bstr_usermarshal
+  // https://learn.microsoft.com/en-us/windows/win32/api/oaidl/nf-oaidl-bstr_usermarshal
   public static BSTR_UserMarshal(pFlags: PULONG, pBuffer_in_out: Pointer, pBstr: LPBSTR): Pointer {
     return Oleaut32.Load('BSTR_UserMarshal')(pFlags, pBuffer_in_out, pBstr);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-bstr_usermarshal64
+  // https://learn.microsoft.com/en-us/windows/win32/api/oaidl/nf-oaidl-bstr_usermarshal64
   public static BSTR_UserMarshal64(pFlags: PULONG, pBuffer_in_out: Pointer, pBstr: LPBSTR): Pointer {
     return Oleaut32.Load('BSTR_UserMarshal64')(pFlags, pBuffer_in_out, pBstr);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-bstr_usersize
+  // https://learn.microsoft.com/en-us/windows/win32/api/oaidl/nf-oaidl-bstr_usersize
   public static BSTR_UserSize(pFlags: PULONG, StartingSize: ULONG, pBstr: LPBSTR): ULONG {
     return Oleaut32.Load('BSTR_UserSize')(pFlags, StartingSize, pBstr);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-bstr_usersize64
+  // https://learn.microsoft.com/en-us/windows/win32/api/oaidl/nf-oaidl-bstr_usersize64
   public static BSTR_UserSize64(pFlags: PULONG, StartingSize: ULONG, pBstr: LPBSTR): ULONG {
     return Oleaut32.Load('BSTR_UserSize64')(pFlags, StartingSize, pBstr);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-bstr_userunmarshal
+  // https://learn.microsoft.com/en-us/windows/win32/api/oaidl/nf-oaidl-bstr_userunmarshal
   public static BSTR_UserUnmarshal(pFlags: PULONG, pBuffer: Pointer, pBstr_out: LPBSTR): Pointer {
     return Oleaut32.Load('BSTR_UserUnmarshal')(pFlags, pBuffer, pBstr_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-bstr_userunmarshal64
+  // https://learn.microsoft.com/en-us/windows/win32/api/oaidl/nf-oaidl-bstr_userunmarshal64
   public static BSTR_UserUnmarshal64(pFlags: PULONG, pBuffer: Pointer, pBstr_out: LPBSTR): Pointer {
     return Oleaut32.Load('BSTR_UserUnmarshal64')(pFlags, pBuffer, pBstr_out);
   }
@@ -665,7 +665,7 @@ class Oleaut32 extends Win32 {
     return Oleaut32.Load('GetRecordInfoFromTypeInfo')(pTypeInfo, ppRecInfo_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-getvarconversionlocalesetting
+  // Undocumented export (no Microsoft Learn page).
   public static GetVarConversionLocaleSetting(pcid: Pointer): HRESULT {
     return Oleaut32.Load('GetVarConversionLocaleSetting')(pcid);
   }
@@ -695,59 +695,59 @@ class Oleaut32 extends Win32 {
     return Oleaut32.Load('LoadTypeLibEx')(szFile, regkind, pptlib_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-lpsafearray_marshal
+  // Undocumented export (no Microsoft Learn page).
   public static LPSAFEARRAY_Marshal(pBuffer: Pointer, ppSA: LPLPSAFEARRAY): Pointer {
     return Oleaut32.Load('LPSAFEARRAY_Marshal')(pBuffer, ppSA);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-lpsafearray_size
+  // Undocumented export (no Microsoft Learn page).
   public static LPSAFEARRAY_Size(StartingSize: ULONG, ppSA: LPLPSAFEARRAY): ULONG {
     return Oleaut32.Load('LPSAFEARRAY_Size')(StartingSize, ppSA);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-lpsafearray_unmarshal
+  // Undocumented export (no Microsoft Learn page).
   public static LPSAFEARRAY_Unmarshal(pBuffer: Pointer, ppSA: LPLPSAFEARRAY): Pointer {
     return Oleaut32.Load('LPSAFEARRAY_Unmarshal')(pBuffer, ppSA);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-lpsafearray_userfree
+  // https://learn.microsoft.com/en-us/windows/win32/api/wia_xp/nf-wia_xp-lpsafearray_userfree
   public static LPSAFEARRAY_UserFree(pFlags: PULONG, ppSA: LPLPSAFEARRAY): void {
     return Oleaut32.Load('LPSAFEARRAY_UserFree')(pFlags, ppSA);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-lpsafearray_userfree64
+  // https://learn.microsoft.com/en-us/windows/win32/api/wia_xp/nf-wia_xp-lpsafearray_userfree64
   public static LPSAFEARRAY_UserFree64(pFlags: PULONG, ppSA: LPLPSAFEARRAY): void {
     return Oleaut32.Load('LPSAFEARRAY_UserFree64')(pFlags, ppSA);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-lpsafearray_usermarshal
+  // https://learn.microsoft.com/en-us/windows/win32/api/wia_xp/nf-wia_xp-lpsafearray_usermarshal
   public static LPSAFEARRAY_UserMarshal(pFlags: PULONG, pBuffer_in_out: Pointer, ppSA: LPLPSAFEARRAY): Pointer {
     return Oleaut32.Load('LPSAFEARRAY_UserMarshal')(pFlags, pBuffer_in_out, ppSA);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-lpsafearray_usermarshal64
+  // https://learn.microsoft.com/en-us/windows/win32/api/wia_xp/nf-wia_xp-lpsafearray_usermarshal64
   public static LPSAFEARRAY_UserMarshal64(pFlags: PULONG, pBuffer_in_out: Pointer, ppSA: LPLPSAFEARRAY): Pointer {
     return Oleaut32.Load('LPSAFEARRAY_UserMarshal64')(pFlags, pBuffer_in_out, ppSA);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-lpsafearray_usersize
+  // https://learn.microsoft.com/en-us/windows/win32/api/wia_xp/nf-wia_xp-lpsafearray_usersize
   public static LPSAFEARRAY_UserSize(pFlags: PULONG, StartingSize: ULONG, ppSA: LPLPSAFEARRAY): ULONG {
     return Oleaut32.Load('LPSAFEARRAY_UserSize')(pFlags, StartingSize, ppSA);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-lpsafearray_usersize64
+  // https://learn.microsoft.com/en-us/windows/win32/api/wia_xp/nf-wia_xp-lpsafearray_usersize64
   public static LPSAFEARRAY_UserSize64(pFlags: PULONG, StartingSize: ULONG, ppSA: LPLPSAFEARRAY): ULONG {
     return Oleaut32.Load('LPSAFEARRAY_UserSize64')(pFlags, StartingSize, ppSA);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-lpsafearray_userunmarshal
-  public static LPSAFEARRAY_UserUnmarshal(pFlags: PULONG, pBuffer: Pointer, ppSA_out: LPLPSAFEARRAY): Pointer {
-    return Oleaut32.Load('LPSAFEARRAY_UserUnmarshal')(pFlags, pBuffer, ppSA_out);
+  // https://learn.microsoft.com/en-us/windows/win32/api/wia_xp/nf-wia_xp-lpsafearray_userunmarshal
+  public static LPSAFEARRAY_UserUnmarshal(pFlags: PULONG, pBuffer_in_out: Pointer, ppSA_out: LPLPSAFEARRAY): Pointer {
+    return Oleaut32.Load('LPSAFEARRAY_UserUnmarshal')(pFlags, pBuffer_in_out, ppSA_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-lpsafearray_userunmarshal64
-  public static LPSAFEARRAY_UserUnmarshal64(pFlags: PULONG, pBuffer: Pointer, ppSA_out: LPLPSAFEARRAY): Pointer {
-    return Oleaut32.Load('LPSAFEARRAY_UserUnmarshal64')(pFlags, pBuffer, ppSA_out);
+  // https://learn.microsoft.com/en-us/windows/win32/api/wia_xp/nf-wia_xp-lpsafearray_userunmarshal64
+  public static LPSAFEARRAY_UserUnmarshal64(pFlags: PULONG, pBuffer_in_out: Pointer, ppSA_out: LPLPSAFEARRAY): Pointer {
+    return Oleaut32.Load('LPSAFEARRAY_UserUnmarshal64')(pFlags, pBuffer_in_out, ppSA_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-oabuildversion
@@ -755,12 +755,12 @@ class Oleaut32 extends Win32 {
     return Oleaut32.Load('OaBuildVersion')();
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-oacleanup
+  // Undocumented export (no Microsoft Learn page).
   public static OACleanup(): void {
     return Oleaut32.Load('OACleanup')();
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-createtypelib2
+  // Undocumented export (no Microsoft Learn page).
   public static OACreateTypeLib2(syskind: SysKind, szFile: LPCOLESTR, ppctlib: Pointer): HRESULT {
     return Oleaut32.Load('OACreateTypeLib2')(syskind, szFile, ppctlib);
   }
@@ -791,8 +791,8 @@ class Oleaut32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/olectl/nf-olectl-oleicontocursor
-  public static OleIconToCursor(hinstExe: HANDLE, hIconIn: HANDLE): HANDLE {
-    return Oleaut32.Load('OleIconToCursor')(hinstExe, hIconIn);
+  public static OleIconToCursor(hinstExe: HANDLE, hIcon: HANDLE): HANDLE {
+    return Oleaut32.Load('OleIconToCursor')(hinstExe, hIcon);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/olectl/nf-olectl-oleloadpicture
@@ -826,8 +826,8 @@ class Oleaut32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/olectl/nf-olectl-oletranslatecolor
-  public static OleTranslateColor(clr: DWORD, hpal: Nullable<HANDLE>, pcolorref_out: Nullable<PCOLORREF>): HRESULT {
-    return Oleaut32.Load('OleTranslateColor')(clr, hpal, pcolorref_out);
+  public static OleTranslateColor(clr: DWORD, hpal: Nullable<HANDLE>, lpcolorref_out: Nullable<PCOLORREF>): HRESULT {
+    return Oleaut32.Load('OleTranslateColor')(clr, hpal, lpcolorref_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-querypathofregtypelib
@@ -861,8 +861,8 @@ class Oleaut32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-safearrayaddref
-  public static SafeArrayAddRef(psa: LPSAFEARRAY, pulRefCount_out: PULONG): HRESULT {
-    return Oleaut32.Load('SafeArrayAddRef')(psa, pulRefCount_out);
+  public static SafeArrayAddRef(psa: LPSAFEARRAY, ppDataToRelease_out: LPLPVOID): HRESULT {
+    return Oleaut32.Load('SafeArrayAddRef')(psa, ppDataToRelease_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-safearrayallocdata
@@ -1020,19 +1020,19 @@ class Oleaut32 extends Win32 {
     return Oleaut32.Load('SetErrorInfo')(dwReserved, perrinfo);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-setoanocache
+  // Undocumented export (no Microsoft Learn page).
   public static SetOaNoCache(): void {
     return Oleaut32.Load('SetOaNoCache')();
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-setvarconversionlocalesetting
+  // Undocumented export (no Microsoft Learn page).
   public static SetVarConversionLocaleSetting(lcid: LCID): HRESULT {
     return Oleaut32.Load('SetVarConversionLocaleSetting')(lcid);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-sysaddrefstring
-  public static SysAddRefString(pszStrPtr: BSTR): HRESULT {
-    return Oleaut32.Load('SysAddRefString')(pszStrPtr);
+  public static SysAddRefString(bstrString: BSTR): HRESULT {
+    return Oleaut32.Load('SysAddRefString')(bstrString);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-sysallocstring
@@ -1091,8 +1091,8 @@ class Oleaut32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-unregistertypelibforuser
-  public static UnRegisterTypeLibForUser(libID: REFGUID, wVerMajor: WORD, wVerMinor: WORD, lcid: LCID, syskind: SysKind): HRESULT {
-    return Oleaut32.Load('UnRegisterTypeLibForUser')(libID, wVerMajor, wVerMinor, lcid, syskind);
+  public static UnRegisterTypeLibForUser(libID: REFGUID, wMajorVerNum: WORD, wMinorVerNum: WORD, lcid: LCID, syskind: SysKind): HRESULT {
+    return Oleaut32.Load('UnRegisterTypeLibForUser')(libID, wMajorVerNum, wMinorVerNum, lcid, syskind);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-varabs
@@ -1181,8 +1181,8 @@ class Oleaut32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-varboolfromui8
-  public static VarBoolFromUI8(ui64In: ULONG64, pboolOut_out: Pointer): HRESULT {
-    return Oleaut32.Load('VarBoolFromUI8')(ui64In, pboolOut_out);
+  public static VarBoolFromUI8(i64In: ULONG64, pboolOut_out: Pointer): HRESULT {
+    return Oleaut32.Load('VarBoolFromUI8')(i64In, pboolOut_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-varbstrcat
@@ -1226,8 +1226,8 @@ class Oleaut32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-varbstrfromi2
-  public static VarBstrFromI2(sIn: SHORT, lcid: LCID, dwFlags: ULONG, pbstrOut_out: LPBSTR): HRESULT {
-    return Oleaut32.Load('VarBstrFromI2')(sIn, lcid, dwFlags, pbstrOut_out);
+  public static VarBstrFromI2(iVal: SHORT, lcid: LCID, dwFlags: ULONG, pbstrOut_out: LPBSTR): HRESULT {
+    return Oleaut32.Load('VarBstrFromI2')(iVal, lcid, dwFlags, pbstrOut_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-varbstrfromi4
@@ -1251,8 +1251,8 @@ class Oleaut32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-varbstrfromui1
-  public static VarBstrFromUI1(bIn: BYTE, lcid: LCID, dwFlags: ULONG, pbstrOut_out: LPBSTR): HRESULT {
-    return Oleaut32.Load('VarBstrFromUI1')(bIn, lcid, dwFlags, pbstrOut_out);
+  public static VarBstrFromUI1(bVal: BYTE, lcid: LCID, dwFlags: ULONG, pbstrOut_out: LPBSTR): HRESULT {
+    return Oleaut32.Load('VarBstrFromUI1')(bVal, lcid, dwFlags, pbstrOut_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-varbstrfromui2
@@ -1556,8 +1556,8 @@ class Oleaut32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-vardecfromi2
-  public static VarDecFromI2(sIn: SHORT, pdecOut_out: LPDECIMAL): HRESULT {
-    return Oleaut32.Load('VarDecFromI2')(sIn, pdecOut_out);
+  public static VarDecFromI2(uiIn: SHORT, pdecOut_out: LPDECIMAL): HRESULT {
+    return Oleaut32.Load('VarDecFromI2')(uiIn, pdecOut_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-vardecfromi4
@@ -1701,8 +1701,8 @@ class Oleaut32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-vari1fromi2
-  public static VarI1FromI2(sIn: SHORT, pcOut_out: Pointer): HRESULT {
-    return Oleaut32.Load('VarI1FromI2')(sIn, pcOut_out);
+  public static VarI1FromI2(uiIn: SHORT, pcOut_out: Pointer): HRESULT {
+    return Oleaut32.Load('VarI1FromI2')(uiIn, pcOut_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-vari1fromi4
@@ -1746,8 +1746,8 @@ class Oleaut32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-vari1fromui8
-  public static VarI1FromUI8(ui64In: ULONG64, pcOut_out: Pointer): HRESULT {
-    return Oleaut32.Load('VarI1FromUI8')(ui64In, pcOut_out);
+  public static VarI1FromUI8(i64In: ULONG64, pcOut_out: Pointer): HRESULT {
+    return Oleaut32.Load('VarI1FromUI8')(i64In, pcOut_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-vari2frombool
@@ -1970,54 +1970,54 @@ class Oleaut32 extends Win32 {
     return Oleaut32.Load('VarI8FromUI8')(ui64In, pi64Out_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-variant_userfree
+  // https://learn.microsoft.com/en-us/windows/win32/api/oaidl/nf-oaidl-variant_userfree
   public static VARIANT_UserFree(pFlags: PULONG, pvar: LPVARIANT): void {
     return Oleaut32.Load('VARIANT_UserFree')(pFlags, pvar);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-variant_userfree64
+  // https://learn.microsoft.com/en-us/windows/win32/api/oaidl/nf-oaidl-variant_userfree64
   public static VARIANT_UserFree64(pFlags: PULONG, pvar: LPVARIANT): void {
     return Oleaut32.Load('VARIANT_UserFree64')(pFlags, pvar);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-variant_usermarshal
+  // https://learn.microsoft.com/en-us/windows/win32/api/oaidl/nf-oaidl-variant_usermarshal
   public static VARIANT_UserMarshal(pFlags: PULONG, pBuffer_in_out: Pointer, pvar: LPVARIANT): Pointer {
     return Oleaut32.Load('VARIANT_UserMarshal')(pFlags, pBuffer_in_out, pvar);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-variant_usermarshal64
+  // https://learn.microsoft.com/en-us/windows/win32/api/oaidl/nf-oaidl-variant_usermarshal64
   public static VARIANT_UserMarshal64(pFlags: PULONG, pBuffer_in_out: Pointer, pvar: LPVARIANT): Pointer {
     return Oleaut32.Load('VARIANT_UserMarshal64')(pFlags, pBuffer_in_out, pvar);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-variant_usersize
+  // https://learn.microsoft.com/en-us/windows/win32/api/oaidl/nf-oaidl-variant_usersize
   public static VARIANT_UserSize(pFlags: PULONG, StartingSize: ULONG, pvar: LPVARIANT): ULONG {
     return Oleaut32.Load('VARIANT_UserSize')(pFlags, StartingSize, pvar);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-variant_usersize64
+  // https://learn.microsoft.com/en-us/windows/win32/api/oaidl/nf-oaidl-variant_usersize64
   public static VARIANT_UserSize64(pFlags: PULONG, StartingSize: ULONG, pvar: LPVARIANT): ULONG {
     return Oleaut32.Load('VARIANT_UserSize64')(pFlags, StartingSize, pvar);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-variant_userunmarshal
+  // https://learn.microsoft.com/en-us/windows/win32/api/oaidl/nf-oaidl-variant_userunmarshal
   public static VARIANT_UserUnmarshal(pFlags: PULONG, pBuffer: Pointer, pvar_out: LPVARIANT): Pointer {
     return Oleaut32.Load('VARIANT_UserUnmarshal')(pFlags, pBuffer, pvar_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-variant_userunmarshal64
+  // https://learn.microsoft.com/en-us/windows/win32/api/oaidl/nf-oaidl-variant_userunmarshal64
   public static VARIANT_UserUnmarshal64(pFlags: PULONG, pBuffer: Pointer, pvar_out: LPVARIANT): Pointer {
     return Oleaut32.Load('VARIANT_UserUnmarshal64')(pFlags, pBuffer, pvar_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-variantchangetype
-  public static VariantChangeType(pvargDest_in_out: LPVARIANTARG, pvarSrc: LPVARIANTARG, wFlags: USHORT, vt: VARTYPE): HRESULT {
-    return Oleaut32.Load('VariantChangeType')(pvargDest_in_out, pvarSrc, wFlags, vt);
+  public static VariantChangeType(pvargDest_out: LPVARIANTARG, pvarSrc: LPVARIANTARG, wFlags: USHORT, vt: VARTYPE): HRESULT {
+    return Oleaut32.Load('VariantChangeType')(pvargDest_out, pvarSrc, wFlags, vt);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-variantchangetypeex
-  public static VariantChangeTypeEx(pvargDest_in_out: LPVARIANTARG, pvarSrc: LPVARIANTARG, lcid: LCID, wFlags: USHORT, vt: VARTYPE): HRESULT {
-    return Oleaut32.Load('VariantChangeTypeEx')(pvargDest_in_out, pvarSrc, lcid, wFlags, vt);
+  public static VariantChangeTypeEx(pvargDest_out: LPVARIANTARG, pvarSrc: LPVARIANTARG, lcid: LCID, wFlags: USHORT, vt: VARTYPE): HRESULT {
+    return Oleaut32.Load('VariantChangeTypeEx')(pvargDest_out, pvarSrc, lcid, wFlags, vt);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-variantclear
@@ -2026,13 +2026,13 @@ class Oleaut32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-variantcopy
-  public static VariantCopy(pvargDest_in_out: LPVARIANTARG, pvargSrc: LPVARIANTARG): HRESULT {
-    return Oleaut32.Load('VariantCopy')(pvargDest_in_out, pvargSrc);
+  public static VariantCopy(pvargDest_out: LPVARIANTARG, pvargSrc: LPVARIANTARG): HRESULT {
+    return Oleaut32.Load('VariantCopy')(pvargDest_out, pvargSrc);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-variantcopyind
-  public static VariantCopyInd(pvarDest_in_out: LPVARIANT, pvargSrc: LPVARIANTARG): HRESULT {
-    return Oleaut32.Load('VariantCopyInd')(pvarDest_in_out, pvargSrc);
+  public static VariantCopyInd(pvarDest_out: LPVARIANT, pvargSrc: LPVARIANTARG): HRESULT {
+    return Oleaut32.Load('VariantCopyInd')(pvarDest_out, pvargSrc);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-variantinit
@@ -2101,8 +2101,8 @@ class Oleaut32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-varparsenumfromstr
-  public static VarParseNumFromStr(strIn: LPCOLESTR, lcid: LCID, dwFlags: ULONG, pnumprs_in_out: LPNUMPARSE, rgbDig_out: Pointer): HRESULT {
-    return Oleaut32.Load('VarParseNumFromStr')(strIn, lcid, dwFlags, pnumprs_in_out, rgbDig_out);
+  public static VarParseNumFromStr(strIn: LPCOLESTR, lcid: LCID, dwFlags: ULONG, pnumprs_out: LPNUMPARSE, rgbDig_out: Pointer): HRESULT {
+    return Oleaut32.Load('VarParseNumFromStr')(strIn, lcid, dwFlags, pnumprs_out, rgbDig_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-varpow
@@ -2286,8 +2286,8 @@ class Oleaut32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-vartokenizeformatstring
-  public static VarTokenizeFormatString(pstrFormat: Optional<LPOLESTR>, rgbTok_in_out: Pointer, cbTok: INT, iFirstDay: INT, iFirstWeek: INT, lcid: LCID, pcbActual_out: Optional<Pointer>): HRESULT {
-    return Oleaut32.Load('VarTokenizeFormatString')(pstrFormat, rgbTok_in_out, cbTok, iFirstDay, iFirstWeek, lcid, pcbActual_out);
+  public static VarTokenizeFormatString(pstrFormat: Optional<LPOLESTR>, rgbTok_in_out: Pointer, cbTok: INT, iFirstDay: INT, iFirstWeek: INT, lcid: LCID, pcbActual: Optional<Pointer>): HRESULT {
+    return Oleaut32.Load('VarTokenizeFormatString')(pstrFormat, rgbTok_in_out, cbTok, iFirstDay, iFirstWeek, lcid, pcbActual);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-varudatefromdate
@@ -2401,8 +2401,8 @@ class Oleaut32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-varui2fromi2
-  public static VarUI2FromI2(sIn: SHORT, puiOut_out: Pointer): HRESULT {
-    return Oleaut32.Load('VarUI2FromI2')(sIn, puiOut_out);
+  public static VarUI2FromI2(uiIn: SHORT, puiOut_out: Pointer): HRESULT {
+    return Oleaut32.Load('VarUI2FromI2')(uiIn, puiOut_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-varui2fromi4
@@ -2441,8 +2441,8 @@ class Oleaut32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-varui2fromui8
-  public static VarUI2FromUI8(ui64In: ULONG64, puiOut_out: Pointer): HRESULT {
-    return Oleaut32.Load('VarUI2FromUI8')(ui64In, puiOut_out);
+  public static VarUI2FromUI8(i64In: ULONG64, puiOut_out: Pointer): HRESULT {
+    return Oleaut32.Load('VarUI2FromUI8')(i64In, puiOut_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-varui4frombool
@@ -2476,8 +2476,8 @@ class Oleaut32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-varui4fromi2
-  public static VarUI4FromI2(sIn: SHORT, pulOut_out: Pointer): HRESULT {
-    return Oleaut32.Load('VarUI4FromI2')(sIn, pulOut_out);
+  public static VarUI4FromI2(uiIn: SHORT, pulOut_out: Pointer): HRESULT {
+    return Oleaut32.Load('VarUI4FromI2')(uiIn, pulOut_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-varui4fromi4
@@ -2486,8 +2486,8 @@ class Oleaut32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-varui4fromi8
-  public static VarUI4FromI8(i64In: LONG64, pulOut_out: Pointer): HRESULT {
-    return Oleaut32.Load('VarUI4FromI8')(i64In, pulOut_out);
+  public static VarUI4FromI8(i64In: LONG64, plOut_out: Pointer): HRESULT {
+    return Oleaut32.Load('VarUI4FromI8')(i64In, plOut_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-varui4fromr4
@@ -2516,78 +2516,78 @@ class Oleaut32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-varui4fromui8
-  public static VarUI4FromUI8(ui64In: ULONG64, pulOut_out: Pointer): HRESULT {
-    return Oleaut32.Load('VarUI4FromUI8')(ui64In, pulOut_out);
+  public static VarUI4FromUI8(ui64In: ULONG64, plOut_out: Pointer): HRESULT {
+    return Oleaut32.Load('VarUI4FromUI8')(ui64In, plOut_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-varui8frombool
-  public static VarUI8FromBool(boolIn: VARIANT_BOOL, pui64Out_out: Pointer): HRESULT {
-    return Oleaut32.Load('VarUI8FromBool')(boolIn, pui64Out_out);
+  public static VarUI8FromBool(boolIn: VARIANT_BOOL, pi64Out_out: Pointer): HRESULT {
+    return Oleaut32.Load('VarUI8FromBool')(boolIn, pi64Out_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-varui8fromcy
-  public static VarUI8FromCy(cyIn: CY, pui64Out_out: Pointer): HRESULT {
-    return Oleaut32.Load('VarUI8FromCy')(cyIn, pui64Out_out);
+  public static VarUI8FromCy(cyIn: CY, pi64Out_out: Pointer): HRESULT {
+    return Oleaut32.Load('VarUI8FromCy')(cyIn, pi64Out_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-varui8fromdate
-  public static VarUI8FromDate(dateIn: DATE, pui64Out_out: Pointer): HRESULT {
-    return Oleaut32.Load('VarUI8FromDate')(dateIn, pui64Out_out);
+  public static VarUI8FromDate(dateIn: DATE, pi64Out_out: Pointer): HRESULT {
+    return Oleaut32.Load('VarUI8FromDate')(dateIn, pi64Out_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-varui8fromdec
-  public static VarUI8FromDec(pdecIn: LPDECIMAL, pui64Out_out: Pointer): HRESULT {
-    return Oleaut32.Load('VarUI8FromDec')(pdecIn, pui64Out_out);
+  public static VarUI8FromDec(pdecIn: LPDECIMAL, pi64Out_out: Pointer): HRESULT {
+    return Oleaut32.Load('VarUI8FromDec')(pdecIn, pi64Out_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-varui8fromdisp
-  public static VarUI8FromDisp(pdispIn: IDispatch, lcid: LCID, pui64Out_out: Pointer): HRESULT {
-    return Oleaut32.Load('VarUI8FromDisp')(pdispIn, lcid, pui64Out_out);
+  public static VarUI8FromDisp(pdispIn: IDispatch, lcid: LCID, pi64Out_out: Pointer): HRESULT {
+    return Oleaut32.Load('VarUI8FromDisp')(pdispIn, lcid, pi64Out_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-varui8fromi1
-  public static VarUI8FromI1(cIn: CHAR, pui64Out_out: Pointer): HRESULT {
-    return Oleaut32.Load('VarUI8FromI1')(cIn, pui64Out_out);
+  public static VarUI8FromI1(cIn: CHAR, pi64Out_out: Pointer): HRESULT {
+    return Oleaut32.Load('VarUI8FromI1')(cIn, pi64Out_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-varui8fromi2
-  public static VarUI8FromI2(sIn: SHORT, pui64Out_out: Pointer): HRESULT {
-    return Oleaut32.Load('VarUI8FromI2')(sIn, pui64Out_out);
+  public static VarUI8FromI2(sIn: SHORT, pi64Out_out: Pointer): HRESULT {
+    return Oleaut32.Load('VarUI8FromI2')(sIn, pi64Out_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-varui8fromi8
-  public static VarUI8FromI8(i64In: LONG64, pui64Out_out: Pointer): HRESULT {
-    return Oleaut32.Load('VarUI8FromI8')(i64In, pui64Out_out);
+  public static VarUI8FromI8(ui64In: LONG64, pi64Out_out: Pointer): HRESULT {
+    return Oleaut32.Load('VarUI8FromI8')(ui64In, pi64Out_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-varui8fromr4
-  public static VarUI8FromR4(fltIn: FLOAT, pui64Out_out: Pointer): HRESULT {
-    return Oleaut32.Load('VarUI8FromR4')(fltIn, pui64Out_out);
+  public static VarUI8FromR4(fltIn: FLOAT, pi64Out_out: Pointer): HRESULT {
+    return Oleaut32.Load('VarUI8FromR4')(fltIn, pi64Out_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-varui8fromr8
-  public static VarUI8FromR8(dblIn: DOUBLE, pui64Out_out: Pointer): HRESULT {
-    return Oleaut32.Load('VarUI8FromR8')(dblIn, pui64Out_out);
+  public static VarUI8FromR8(dblIn: DOUBLE, pi64Out_out: Pointer): HRESULT {
+    return Oleaut32.Load('VarUI8FromR8')(dblIn, pi64Out_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-varui8fromstr
-  public static VarUI8FromStr(strIn: LPCOLESTR, lcid: LCID, dwFlags: ULONG, pui64Out_out: Pointer): HRESULT {
-    return Oleaut32.Load('VarUI8FromStr')(strIn, lcid, dwFlags, pui64Out_out);
+  public static VarUI8FromStr(strIn: LPCOLESTR, lcid: LCID, dwFlags: ULONG, pi64Out_out: Pointer): HRESULT {
+    return Oleaut32.Load('VarUI8FromStr')(strIn, lcid, dwFlags, pi64Out_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-varui8fromui1
-  public static VarUI8FromUI1(bIn: BYTE, pui64Out_out: Pointer): HRESULT {
-    return Oleaut32.Load('VarUI8FromUI1')(bIn, pui64Out_out);
+  public static VarUI8FromUI1(bIn: BYTE, pi64Out_out: Pointer): HRESULT {
+    return Oleaut32.Load('VarUI8FromUI1')(bIn, pi64Out_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-varui8fromui2
-  public static VarUI8FromUI2(uiIn: USHORT, pui64Out_out: Pointer): HRESULT {
-    return Oleaut32.Load('VarUI8FromUI2')(uiIn, pui64Out_out);
+  public static VarUI8FromUI2(uiIn: USHORT, pi64Out_out: Pointer): HRESULT {
+    return Oleaut32.Load('VarUI8FromUI2')(uiIn, pi64Out_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-varui8fromui4
-  public static VarUI8FromUI4(ulIn: ULONG, pui64Out_out: Pointer): HRESULT {
-    return Oleaut32.Load('VarUI8FromUI4')(ulIn, pui64Out_out);
+  public static VarUI8FromUI4(ulIn: ULONG, pi64Out_out: Pointer): HRESULT {
+    return Oleaut32.Load('VarUI8FromUI4')(ulIn, pi64Out_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-varweekdayname

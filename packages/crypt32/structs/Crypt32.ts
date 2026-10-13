@@ -212,7 +212,7 @@ class Crypt32 extends Win32 {
     CertGetSubjectCertificateFromStore: { args: [FFIType.u64, FFIType.u32, FFIType.ptr], returns: FFIType.ptr },
     CertGetValidUsages: { args: [FFIType.u32, FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
     CertIsRDNAttrsInCertificateName: { args: [FFIType.u32, FFIType.u32, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
-    CertIsStrongHashToSign: { args: [FFIType.ptr, FFIType.ptr, FFIType.u64], returns: FFIType.i32 },
+    CertIsStrongHashToSign: { args: [FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
     CertIsWeakHash: { args: [FFIType.u32, FFIType.ptr, FFIType.u32, FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
     CertIsValidCRLForCertificate: { args: [FFIType.ptr, FFIType.ptr, FFIType.u32, FFIType.ptr], returns: FFIType.i32 },
     CertNameToStrA: { args: [FFIType.u32, FFIType.ptr, FFIType.u32, FFIType.ptr, FFIType.u32], returns: FFIType.u32 },
@@ -292,7 +292,7 @@ class Crypt32 extends Win32 {
     CryptHashMessage: { args: [FFIType.ptr, FFIType.i32, FFIType.u32, FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
     CryptHashPublicKeyInfo: { args: [FFIType.u64, FFIType.u32, FFIType.u32, FFIType.u32, FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
     CryptHashToBeSigned: { args: [FFIType.u64, FFIType.u32, FFIType.ptr, FFIType.u32, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
-    CryptImportPKCS8: { args: [FFIType.ptr, FFIType.u32, FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
+    CryptImportPKCS8: { args: [FFIType.ptr, FFIType.u32, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
     CryptImportPublicKeyInfo: { args: [FFIType.u64, FFIType.u32, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
     CryptImportPublicKeyInfoEx: { args: [FFIType.u64, FFIType.u32, FFIType.ptr, FFIType.u32, FFIType.u32, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
     CryptImportPublicKeyInfoEx2: { args: [FFIType.u32, FFIType.ptr, FFIType.u32, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
@@ -617,8 +617,8 @@ class Crypt32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincrypt/nf-wincrypt-certenumphysicalstore
-  public static CertEnumPhysicalStore(pvSystemStore: PVOID, dwFlags: DWORD, pvArg_in_out: Optional<PVOID>, pfnEnum: PFN_CERT_ENUM_PHYSICAL_STORE): BOOL {
-    return Crypt32.Load('CertEnumPhysicalStore')(pvSystemStore, dwFlags, pvArg_in_out, pfnEnum);
+  public static CertEnumPhysicalStore(pvSystemStore: PVOID, dwFlags: DWORD, pvArg: Optional<PVOID>, pfnEnum: PFN_CERT_ENUM_PHYSICAL_STORE): BOOL {
+    return Crypt32.Load('CertEnumPhysicalStore')(pvSystemStore, dwFlags, pvArg, pfnEnum);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincrypt/nf-wincrypt-certenumsubjectinsortedctl
@@ -627,13 +627,13 @@ class Crypt32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincrypt/nf-wincrypt-certenumsystemstore
-  public static CertEnumSystemStore(dwFlags: DWORD, pvSystemStoreLocationPara: Optional<PVOID>, pvArg_in_out: Optional<PVOID>, pfnEnum: PFN_CERT_ENUM_SYSTEM_STORE): BOOL {
-    return Crypt32.Load('CertEnumSystemStore')(dwFlags, pvSystemStoreLocationPara, pvArg_in_out, pfnEnum);
+  public static CertEnumSystemStore(dwFlags: DWORD, pvSystemStoreLocationPara: Optional<PVOID>, pvArg: Optional<PVOID>, pfnEnum: PFN_CERT_ENUM_SYSTEM_STORE): BOOL {
+    return Crypt32.Load('CertEnumSystemStore')(dwFlags, pvSystemStoreLocationPara, pvArg, pfnEnum);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincrypt/nf-wincrypt-certenumsystemstorelocation
-  public static CertEnumSystemStoreLocation(dwFlags: DWORD, pvArg_in_out: Optional<PVOID>, pfnEnum: PFN_CERT_ENUM_SYSTEM_STORE_LOCATION): BOOL {
-    return Crypt32.Load('CertEnumSystemStoreLocation')(dwFlags, pvArg_in_out, pfnEnum);
+  public static CertEnumSystemStoreLocation(dwFlags: DWORD, pvArg: Optional<PVOID>, pfnEnum: PFN_CERT_ENUM_SYSTEM_STORE_LOCATION): BOOL {
+    return Crypt32.Load('CertEnumSystemStoreLocation')(dwFlags, pvArg, pfnEnum);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincrypt/nf-wincrypt-certfindattribute
@@ -811,11 +811,11 @@ class Crypt32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincrypt/nf-wincrypt-certisstronghashtosign
-  public static CertIsStrongHashToSign(pStrongSignPara: PCERT_STRONG_SIGN_PARA, pwszCNGHashAlgid: LPCWSTR, hKey: Optional<HCRYPTPROV_OR_NCRYPT_KEY_HANDLE>): BOOL {
-    return Crypt32.Load('CertIsStrongHashToSign')(pStrongSignPara, pwszCNGHashAlgid, hKey);
+  public static CertIsStrongHashToSign(pStrongSignPara: PCERT_STRONG_SIGN_PARA, pwszCNGHashAlgid: LPCWSTR, pSigningCert: Optional<PCCERT_CONTEXT>): BOOL {
+    return Crypt32.Load('CertIsStrongHashToSign')(pStrongSignPara, pwszCNGHashAlgid, pSigningCert);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/wincrypt/nf-wincrypt-certisweakhash
+  // Undocumented export (no Microsoft Learn page).
   public static CertIsWeakHash(dwHashUseType: DWORD, pwszCNGHashAlgid: LPCWSTR, dwChainFlags: DWORD, pSignerChainContext: Optional<PCCERT_CHAIN_CONTEXT>, pTimeStamp: Optional<LPFILETIME>, pwszFileName: Optional<LPCWSTR>): BOOL {
     return Crypt32.Load('CertIsWeakHash')(dwHashUseType, pwszCNGHashAlgid, dwChainFlags, pSignerChainContext, pTimeStamp, pwszFileName);
   }
@@ -841,8 +841,8 @@ class Crypt32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincrypt/nf-wincrypt-certopenserverocspresponse
-  public static CertOpenServerOcspResponse(pServerCertContext: PCCERT_CONTEXT, dwFlags: DWORD, pOpenPara: Optional<PCERT_SERVER_OCSP_RESPONSE_OPEN_PARA>): HCERT_SERVER_OCSP_RESPONSE {
-    return Crypt32.Load('CertOpenServerOcspResponse')(pServerCertContext, dwFlags, pOpenPara);
+  public static CertOpenServerOcspResponse(pChainContext: PCCERT_CHAIN_CONTEXT, dwFlags: DWORD, pOpenPara: Optional<PCERT_SERVER_OCSP_RESPONSE_OPEN_PARA>): HCERT_SERVER_OCSP_RESPONSE {
+    return Crypt32.Load('CertOpenServerOcspResponse')(pChainContext, dwFlags, pOpenPara);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincrypt/nf-wincrypt-certopenstore
@@ -1190,20 +1190,20 @@ class Crypt32 extends Win32 {
     dwFlags: DWORD,
     pwszComputerName: Optional<LPCWSTR>,
     pvReserved: Optional<PVOID>,
-    pvArg_in_out: Optional<PVOID>,
+    pvArg: Optional<PVOID>,
     pfnEnum: PFN_CRYPT_ENUM_KEYID_PROP,
   ): BOOL {
-    return Crypt32.Load('CryptEnumKeyIdentifierProperties')(pKeyIdentifier, dwPropId, dwFlags, pwszComputerName, pvReserved, pvArg_in_out, pfnEnum);
+    return Crypt32.Load('CryptEnumKeyIdentifierProperties')(pKeyIdentifier, dwPropId, dwFlags, pwszComputerName, pvReserved, pvArg, pfnEnum);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincrypt/nf-wincrypt-cryptenumoidfunction
-  public static CryptEnumOIDFunction(dwEncodingType: DWORD, pszFuncName: Optional<LPCSTR>, pszOID: Optional<LPCSTR>, dwFlags: DWORD, pvArg_in_out: Optional<PVOID>, pfnEnumOIDFunc: PFN_CRYPT_ENUM_OID_FUNC): BOOL {
-    return Crypt32.Load('CryptEnumOIDFunction')(dwEncodingType, pszFuncName, pszOID, dwFlags, pvArg_in_out, pfnEnumOIDFunc);
+  public static CryptEnumOIDFunction(dwEncodingType: DWORD, pszFuncName: Optional<LPCSTR>, pszOID: Optional<LPCSTR>, dwFlags: DWORD, pvArg: Optional<PVOID>, pfnEnumOIDFunc: PFN_CRYPT_ENUM_OID_FUNC): BOOL {
+    return Crypt32.Load('CryptEnumOIDFunction')(dwEncodingType, pszFuncName, pszOID, dwFlags, pvArg, pfnEnumOIDFunc);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincrypt/nf-wincrypt-cryptenumoidinfo
-  public static CryptEnumOIDInfo(dwGroupId: DWORD, dwFlags: DWORD, pvArg_in_out: Optional<PVOID>, pfnEnumOIDInfo: PFN_CRYPT_ENUM_OID_INFO): BOOL {
-    return Crypt32.Load('CryptEnumOIDInfo')(dwGroupId, dwFlags, pvArg_in_out, pfnEnumOIDInfo);
+  public static CryptEnumOIDInfo(dwGroupId: DWORD, dwFlags: DWORD, pvArg: Optional<PVOID>, pfnEnumOIDInfo: PFN_CRYPT_ENUM_OID_INFO): BOOL {
+    return Crypt32.Load('CryptEnumOIDInfo')(dwGroupId, dwFlags, pvArg, pfnEnumOIDInfo);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincrypt/nf-wincrypt-cryptexportpkcs8
@@ -1362,8 +1362,8 @@ class Crypt32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincrypt/nf-wincrypt-cryptimportpkcs8
-  public static CryptImportPKCS8(sPrivateKeyAndParams: PVOID, dwFlags: DWORD, phCryptProv_out: Optional<PVOID>, pvAuxInfo: Optional<PVOID>, pvReserved: Optional<PVOID>): BOOL {
-    return Crypt32.Load('CryptImportPKCS8')(sPrivateKeyAndParams, dwFlags, phCryptProv_out, pvAuxInfo, pvReserved);
+  public static CryptImportPKCS8(sPrivateKeyAndParams: PVOID, dwFlags: DWORD, phCryptProv_out: Optional<PVOID>, pvAuxInfo: Optional<PVOID>): BOOL {
+    return Crypt32.Load('CryptImportPKCS8')(sPrivateKeyAndParams, dwFlags, phCryptProv_out, pvAuxInfo);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincrypt/nf-wincrypt-cryptimportpublickeyinfo
@@ -1580,7 +1580,7 @@ class Crypt32 extends Win32 {
     pbData: PBYTE,
     cbData: DWORD,
     ppTsContext_out: PVOID,
-    ppTsSigner_out: Nullable<PVOID>,
+    ppTsSigner_out: Optional<PVOID>,
     phStore_out: Optional<PVOID>,
   ): BOOL {
     return Crypt32.Load('CryptRetrieveTimeStamp')(wszUrl, dwRetrievalFlags, dwTimeout, pszHashId, pPara, pbData, cbData, ppTsContext_out, ppTsSigner_out, phStore_out);
@@ -1601,7 +1601,7 @@ class Crypt32 extends Win32 {
     return Crypt32.Load('CryptSIPGetCaps')(pSubjInfo, pCaps_in_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/mssip/nf-mssip-cryptsipgetsealeddigest
+  // Undocumented export (no Microsoft Learn page).
   public static CryptSIPGetSealedDigest(pSubjectInfo: PSIP_SUBJECTINFO, pSig: Optional<PBYTE>, dwSig: DWORD, pbDigest_out: Optional<PBYTE>, pcbDigest_in_out: PDWORD): BOOL {
     return Crypt32.Load('CryptSIPGetSealedDigest')(pSubjectInfo, pSig, dwSig, pbDigest_out, pcbDigest_in_out);
   }
@@ -1632,13 +1632,13 @@ class Crypt32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mssip/nf-mssip-cryptsipretrievesubjectguid
-  public static CryptSIPRetrieveSubjectGuid(wszFileName: LPCWSTR, hFileIn: Optional<HANDLE>, pgSubject_out: PVOID): BOOL {
-    return Crypt32.Load('CryptSIPRetrieveSubjectGuid')(wszFileName, hFileIn, pgSubject_out);
+  public static CryptSIPRetrieveSubjectGuid(FileName: LPCWSTR, hFileIn: Optional<HANDLE>, pgSubject_out: PVOID): BOOL {
+    return Crypt32.Load('CryptSIPRetrieveSubjectGuid')(FileName, hFileIn, pgSubject_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mssip/nf-mssip-cryptsipretrievesubjectguidforcatalogfile
-  public static CryptSIPRetrieveSubjectGuidForCatalogFile(wszFileName: LPCWSTR, hFileIn: Optional<HANDLE>, pgSubject_out: PVOID): BOOL {
-    return Crypt32.Load('CryptSIPRetrieveSubjectGuidForCatalogFile')(wszFileName, hFileIn, pgSubject_out);
+  public static CryptSIPRetrieveSubjectGuidForCatalogFile(FileName: LPCWSTR, hFileIn: Optional<HANDLE>, pgSubject_out: PVOID): BOOL {
+    return Crypt32.Load('CryptSIPRetrieveSubjectGuidForCatalogFile')(FileName, hFileIn, pgSubject_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/mssip/nf-mssip-cryptsipverifyindirectdata
@@ -1663,7 +1663,7 @@ class Crypt32 extends Win32 {
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincrypt/nf-wincrypt-cryptsignandencodecertificate
   public static CryptSignAndEncodeCertificate(
-    hCryptProvOrNCryptKey: Optional<HCRYPTPROV_OR_NCRYPT_KEY_HANDLE>,
+    hBCryptKey: Optional<HCRYPTPROV_OR_NCRYPT_KEY_HANDLE>,
     dwKeySpec: DWORD,
     dwCertEncodingType: DWORD,
     lpszStructType: LPCSTR,
@@ -1673,7 +1673,7 @@ class Crypt32 extends Win32 {
     pbEncoded_out: Optional<PBYTE>,
     pcbEncoded_in_out: PDWORD,
   ): BOOL {
-    return Crypt32.Load('CryptSignAndEncodeCertificate')(hCryptProvOrNCryptKey, dwKeySpec, dwCertEncodingType, lpszStructType, pvStructInfo, pSignatureAlgorithm, pvHashAuxInfo, pbEncoded_out, pcbEncoded_in_out);
+    return Crypt32.Load('CryptSignAndEncodeCertificate')(hBCryptKey, dwKeySpec, dwCertEncodingType, lpszStructType, pvStructInfo, pSignatureAlgorithm, pvHashAuxInfo, pbEncoded_out, pcbEncoded_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincrypt/nf-wincrypt-cryptsignandencryptmessage
@@ -1692,7 +1692,7 @@ class Crypt32 extends Win32 {
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincrypt/nf-wincrypt-cryptsigncertificate
   public static CryptSignCertificate(
-    hCryptProvOrNCryptKey: Optional<HCRYPTPROV_OR_NCRYPT_KEY_HANDLE>,
+    hBCryptKey: Optional<HCRYPTPROV_OR_NCRYPT_KEY_HANDLE>,
     dwKeySpec: DWORD,
     dwCertEncodingType: DWORD,
     pbEncodedToBeSigned: PBYTE,
@@ -1702,7 +1702,7 @@ class Crypt32 extends Win32 {
     pbSignature_out: Optional<PBYTE>,
     pcbSignature_in_out: PDWORD,
   ): BOOL {
-    return Crypt32.Load('CryptSignCertificate')(hCryptProvOrNCryptKey, dwKeySpec, dwCertEncodingType, pbEncodedToBeSigned, cbEncodedToBeSigned, pSignatureAlgorithm, pvHashAuxInfo, pbSignature_out, pcbSignature_in_out);
+    return Crypt32.Load('CryptSignCertificate')(hBCryptKey, dwKeySpec, dwCertEncodingType, pbEncodedToBeSigned, cbEncodedToBeSigned, pSignatureAlgorithm, pvHashAuxInfo, pbSignature_out, pcbSignature_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/wincrypt/nf-wincrypt-cryptsignmessage
@@ -1859,7 +1859,7 @@ class Crypt32 extends Win32 {
     cbData: DWORD,
     hAdditionalStore: Optional<HCERTSTORE>,
     ppTsContext_out: PVOID,
-    ppTsSigner_out: Nullable<PVOID>,
+    ppTsSigner_out: Optional<PVOID>,
     phStore_out: Optional<PVOID>,
   ): BOOL {
     return Crypt32.Load('CryptVerifyTimeStampSignature')(pbTSContentInfo, cbTSContentInfo, pbData, cbData, hAdditionalStore, ppTsContext_out, ppTsSigner_out, phStore_out);

@@ -225,8 +225,8 @@ class Wevtapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winevt/nf-winevt-evtnext
-  public static EvtNext(ResultSet: EVT_HANDLE, EventsSize: DWORD, Events_out: PEVT_HANDLE, Timeout: DWORD, Flags: DWORD, Returned_out: PDWORD): BOOL {
-    return Wevtapi.Load('EvtNext')(ResultSet, EventsSize, Events_out, Timeout, Flags, Returned_out);
+  public static EvtNext(ResultSet: EVT_HANDLE, EventsSize: DWORD, Events: PEVT_HANDLE, Timeout: DWORD, Flags: DWORD, Returned_out: PDWORD): BOOL {
+    return Wevtapi.Load('EvtNext')(ResultSet, EventsSize, Events, Timeout, Flags, Returned_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winevt/nf-winevt-evtnextchannelpath

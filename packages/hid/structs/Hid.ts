@@ -125,7 +125,7 @@ class Hid extends Win32 {
     return Hid.Load('HidD_GetAttributes')(HidDeviceObject, Attributes_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/hidsdi/nf-hidsdi-hidd_getconfiguration
+  // Undocumented export (no Microsoft Learn page).
   public static HidD_GetConfiguration(HidDeviceObject: HANDLE, Configuration_out: PHIDD_CONFIGURATION, ConfigurationLength: ULONG): BOOLEAN {
     return Hid.Load('HidD_GetConfiguration')(HidDeviceObject, Configuration_out, ConfigurationLength);
   }
@@ -180,7 +180,7 @@ class Hid extends Win32 {
     return Hid.Load('HidD_GetSerialNumberString')(HidDeviceObject, Buffer_out, BufferLength);
   }
 
-  // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/hidsdi/nf-hidsdi-hidd_setconfiguration
+  // Undocumented export (no Microsoft Learn page).
   public static HidD_SetConfiguration(HidDeviceObject: HANDLE, Configuration: PHIDD_CONFIGURATION, ConfigurationLength: ULONG): BOOLEAN {
     return Hid.Load('HidD_SetConfiguration')(HidDeviceObject, Configuration, ConfigurationLength);
   }
@@ -226,8 +226,8 @@ class Hid extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/hidpi/nf-hidpi-hidp_getdata
-  public static HidP_GetData(ReportType: HIDP_REPORT_TYPE, DataList_out: PHIDP_DATA, DataLength_in_out: PULONG, PreparsedData: PHIDP_PREPARSED_DATA, Report_out: PCHAR, ReportLength: ULONG): NTSTATUS {
-    return Hid.Load('HidP_GetData')(ReportType, DataList_out, DataLength_in_out, PreparsedData, Report_out, ReportLength);
+  public static HidP_GetData(ReportType: HIDP_REPORT_TYPE, DataList_out: PHIDP_DATA, DataLength_in_out: PULONG, PreparsedData: PHIDP_PREPARSED_DATA, Report: PCHAR, ReportLength: ULONG): NTSTATUS {
+    return Hid.Load('HidP_GetData')(ReportType, DataList_out, DataLength_in_out, PreparsedData, Report, ReportLength);
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/hidpi/nf-hidpi-hidp_getextendedattributes

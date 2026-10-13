@@ -188,8 +188,8 @@ class Dismapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/manufacture/desktop/dism/dismgetcapabilityinfo?view=windows-11
-  public static DismGetCapabilityInfo(Session: DismSession, Name: PCWSTR, Info_out: PDismCapabilityInfo): HRESULT {
-    return Dismapi.Load('DismGetCapabilityInfo')(Session, Name, Info_out);
+  public static DismGetCapabilityInfo(Session: DismSession, Name: PCWSTR, Info: PDismCapabilityInfo): HRESULT {
+    return Dismapi.Load('DismGetCapabilityInfo')(Session, Name, Info);
   }
 
   // https://learn.microsoft.com/en-us/windows-hardware/manufacture/desktop/dism/dismgetdriverinfo-function?view=windows-11

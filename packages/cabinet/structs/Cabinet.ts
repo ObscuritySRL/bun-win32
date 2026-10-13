@@ -156,7 +156,7 @@ class Cabinet extends Win32 {
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fci/nf-fci-fcicreate
   public static FCICreate(
-    perf: PERF,
+    perf_in_out: PERF,
     pfnfcifp: PFNFCIFILEPLACED,
     pfna: PFNFCIALLOC,
     pfnf: PFNFCIFREE,
@@ -170,7 +170,7 @@ class Cabinet extends Win32 {
     pccab: PCCAB,
     pv: Optional<LPVOID>,
   ): HFCI {
-    return Cabinet.Load('FCICreate')(perf, pfnfcifp, pfna, pfnf, pfnopen, pfnread, pfnwrite, pfnclose, pfnseek, pfndelete, pfnfcigtf, pccab, pv);
+    return Cabinet.Load('FCICreate')(perf_in_out, pfnfcifp, pfna, pfnf, pfnopen, pfnread, pfnwrite, pfnclose, pfnseek, pfndelete, pfnfcigtf, pccab, pv);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fci/nf-fci-fcidestroy
@@ -204,8 +204,8 @@ class Cabinet extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fdi/nf-fdi-fdiiscabinet
-  public static FDIIsCabinet(hfdi: HFDI, hf: INT_PTR, pfdici_out: Optional<PFDICABINETINFO>): BOOL {
-    return Cabinet.Load('FDIIsCabinet')(hfdi, hf, pfdici_out);
+  public static FDIIsCabinet(hfdi: HFDI, hf: INT_PTR, pfdici_in_out: Optional<PFDICABINETINFO>): BOOL {
+    return Cabinet.Load('FDIIsCabinet')(hfdi, hf, pfdici_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/fdi/nf-fdi-fditruncatecabinet

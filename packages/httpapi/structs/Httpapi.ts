@@ -203,8 +203,8 @@ class Httpapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/http/nf-http-httpinitialize
-  public static HttpInitialize(Version: HTTPAPI_VERSION, Flags: ULONG, pReserved_in_out: NULL): ULONG {
-    return Httpapi.Load('HttpInitialize')(Version, Flags, pReserved_in_out);
+  public static HttpInitialize(Version: HTTPAPI_VERSION, Flags: ULONG, pReserved: NULL): ULONG {
+    return Httpapi.Load('HttpInitialize')(Version, Flags, pReserved);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/http/nf-http-httpisfeaturesupported
@@ -241,12 +241,12 @@ class Httpapi extends Win32 {
     ConfigId: HTTP_SERVICE_CONFIG_ID,
     pInput: Optional<PVOID>,
     InputLength: ULONG,
-    pOutput_out: Optional<PVOID>,
+    pOutput_in_out: Optional<PVOID>,
     OutputLength: ULONG,
     pReturnLength_out: Optional<PULONG>,
     pOverlapped: NULL,
   ): ULONG {
-    return Httpapi.Load('HttpQueryServiceConfiguration')(ServiceHandle, ConfigId, pInput, InputLength, pOutput_out, OutputLength, pReturnLength_out, pOverlapped);
+    return Httpapi.Load('HttpQueryServiceConfiguration')(ServiceHandle, ConfigId, pInput, InputLength, pOutput_in_out, OutputLength, pReturnLength_out, pOverlapped);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/http/nf-http-httpqueryurlgroupproperty

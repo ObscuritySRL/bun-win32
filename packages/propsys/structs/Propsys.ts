@@ -334,13 +334,13 @@ class Propsys extends Win32 {
   } as const satisfies Record<string, FFIFunction>;
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-clearpropvariantarray
-  public static ClearPropVariantArray(rgPropVar_in_out: LPPROPVARIANT, cVars: UINT): void {
-    return Propsys.Load('ClearPropVariantArray')(rgPropVar_in_out, cVars);
+  public static ClearPropVariantArray(rgPropVar: LPPROPVARIANT, cVars: UINT): void {
+    return Propsys.Load('ClearPropVariantArray')(rgPropVar, cVars);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-clearvariantarray
-  public static ClearVariantArray(pvars_in_out: LPVARIANT, cvars: UINT): void {
-    return Propsys.Load('ClearVariantArray')(pvars_in_out, cvars);
+  public static ClearVariantArray(pvars: LPVARIANT, cvars: UINT): void {
+    return Propsys.Load('ClearVariantArray')(pvars, cvars);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/propvarutil/nf-propvarutil-initpropvariantfrombooleanvector

@@ -444,7 +444,7 @@ class Clfsw32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/clfsw32/nf-clfsw32-setendoflog
-  public static SetEndOfLog(hLog: HANDLE, plsnEnd: PCLFS_LSN, lpOverlapped_in_out: Nullable<LPOVERLAPPED>): BOOL {
+  public static SetEndOfLog(hLog: HANDLE, plsnEnd: PCLFS_LSN, lpOverlapped_in_out: Optional<LPOVERLAPPED>): BOOL {
     return Clfsw32.Load('SetEndOfLog')(hLog, plsnEnd, lpOverlapped_in_out);
   }
 

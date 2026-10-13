@@ -227,7 +227,7 @@ class Gdiplus extends Win32 {
     GdipCreateFromHWNDICM: { args: [FFIType.u64, FFIType.ptr], returns: FFIType.i32 },
     GdipCreateHBITMAPFromBitmap: { args: [FFIType.u64, FFIType.ptr, FFIType.u32], returns: FFIType.i32 },
     GdipCreateHICONFromBitmap: { args: [FFIType.u64, FFIType.ptr], returns: FFIType.i32 },
-    GdipCreateHalftonePalette: { args: [], returns: FFIType.i32 },
+    GdipCreateHalftonePalette: { args: [], returns: FFIType.u64 },
     GdipCreateHatchBrush: { args: [FFIType.i32, FFIType.u32, FFIType.u32, FFIType.ptr], returns: FFIType.i32 },
     GdipCreateImageAttributes: { args: [FFIType.ptr], returns: FFIType.i32 },
     GdipCreateLineBrush: { args: [FFIType.ptr, FFIType.ptr, FFIType.u32, FFIType.u32, FFIType.i32, FFIType.ptr], returns: FFIType.i32 },
@@ -766,912 +766,912 @@ class Gdiplus extends Win32 {
     GdiplusStartup: { args: [FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.i32 },
   } as const satisfies Record<string, FFIFunction>;
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipaddpatharc
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphicspath-flat
   public static GdipAddPathArc(path: GpPath, x: REAL, y: REAL, width: REAL, height: REAL, startAngle: REAL, sweepAngle: REAL): Status {
     return Gdiplus.Load('GdipAddPathArc')(path, x, y, width, height, startAngle, sweepAngle);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipaddpatharci
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphicspath-flat
   public static GdipAddPathArcI(path: GpPath, x: INT, y: INT, width: INT, height: INT, startAngle: REAL, sweepAngle: REAL): Status {
     return Gdiplus.Load('GdipAddPathArcI')(path, x, y, width, height, startAngle, sweepAngle);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipaddpathbezier
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphicspath-flat
   public static GdipAddPathBezier(path: GpPath, x1: REAL, y1: REAL, x2: REAL, y2: REAL, x3: REAL, y3: REAL, x4: REAL, y4: REAL): Status {
     return Gdiplus.Load('GdipAddPathBezier')(path, x1, y1, x2, y2, x3, y3, x4, y4);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipaddpathbezieri
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphicspath-flat
   public static GdipAddPathBezierI(path: GpPath, x1: INT, y1: INT, x2: INT, y2: INT, x3: INT, y3: INT, x4: INT, y4: INT): Status {
     return Gdiplus.Load('GdipAddPathBezierI')(path, x1, y1, x2, y2, x3, y3, x4, y4);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipaddpathbeziers
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphicspath-flat
   public static GdipAddPathBeziers(path: GpPath, points: Pointer, count: INT): Status {
     return Gdiplus.Load('GdipAddPathBeziers')(path, points, count);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipaddpathbeziersi
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphicspath-flat
   public static GdipAddPathBeziersI(path: GpPath, points: Pointer, count: INT): Status {
     return Gdiplus.Load('GdipAddPathBeziersI')(path, points, count);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipaddpathclosedcurve
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphicspath-flat
   public static GdipAddPathClosedCurve(path: GpPath, points: Pointer, count: INT): Status {
     return Gdiplus.Load('GdipAddPathClosedCurve')(path, points, count);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipaddpathclosedcurve2
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphicspath-flat
   public static GdipAddPathClosedCurve2(path: GpPath, points: Pointer, count: INT, tension: REAL): Status {
     return Gdiplus.Load('GdipAddPathClosedCurve2')(path, points, count, tension);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipaddpathclosedcurve2i
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphicspath-flat
   public static GdipAddPathClosedCurve2I(path: GpPath, points: Pointer, count: INT, tension: REAL): Status {
     return Gdiplus.Load('GdipAddPathClosedCurve2I')(path, points, count, tension);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipaddpathclosedcurvei
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphicspath-flat
   public static GdipAddPathClosedCurveI(path: GpPath, points: Pointer, count: INT): Status {
     return Gdiplus.Load('GdipAddPathClosedCurveI')(path, points, count);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipaddpathcurve
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphicspath-flat
   public static GdipAddPathCurve(path: GpPath, points: Pointer, count: INT): Status {
     return Gdiplus.Load('GdipAddPathCurve')(path, points, count);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipaddpathcurve2
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphicspath-flat
   public static GdipAddPathCurve2(path: GpPath, points: Pointer, count: INT, tension: REAL): Status {
     return Gdiplus.Load('GdipAddPathCurve2')(path, points, count, tension);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipaddpathcurve2i
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphicspath-flat
   public static GdipAddPathCurve2I(path: GpPath, points: Pointer, count: INT, tension: REAL): Status {
     return Gdiplus.Load('GdipAddPathCurve2I')(path, points, count, tension);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipaddpathcurve3
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphicspath-flat
   public static GdipAddPathCurve3(path: GpPath, points: Pointer, count: INT, offset: INT, numberOfSegments: INT, tension: REAL): Status {
     return Gdiplus.Load('GdipAddPathCurve3')(path, points, count, offset, numberOfSegments, tension);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipaddpathcurve3i
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphicspath-flat
   public static GdipAddPathCurve3I(path: GpPath, points: Pointer, count: INT, offset: INT, numberOfSegments: INT, tension: REAL): Status {
     return Gdiplus.Load('GdipAddPathCurve3I')(path, points, count, offset, numberOfSegments, tension);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipaddpathcurvei
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphicspath-flat
   public static GdipAddPathCurveI(path: GpPath, points: Pointer, count: INT): Status {
     return Gdiplus.Load('GdipAddPathCurveI')(path, points, count);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipaddpathellipse
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphicspath-flat
   public static GdipAddPathEllipse(path: GpPath, x: REAL, y: REAL, width: REAL, height: REAL): Status {
     return Gdiplus.Load('GdipAddPathEllipse')(path, x, y, width, height);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipaddpathellipsei
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphicspath-flat
   public static GdipAddPathEllipseI(path: GpPath, x: INT, y: INT, width: INT, height: INT): Status {
     return Gdiplus.Load('GdipAddPathEllipseI')(path, x, y, width, height);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipaddpathline
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphicspath-flat
   public static GdipAddPathLine(path: GpPath, x1: REAL, y1: REAL, x2: REAL, y2: REAL): Status {
     return Gdiplus.Load('GdipAddPathLine')(path, x1, y1, x2, y2);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipaddpathline2
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphicspath-flat
   public static GdipAddPathLine2(path: GpPath, points: Pointer, count: INT): Status {
     return Gdiplus.Load('GdipAddPathLine2')(path, points, count);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipaddpathline2i
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphicspath-flat
   public static GdipAddPathLine2I(path: GpPath, points: Pointer, count: INT): Status {
     return Gdiplus.Load('GdipAddPathLine2I')(path, points, count);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipaddpathlinei
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphicspath-flat
   public static GdipAddPathLineI(path: GpPath, x1: INT, y1: INT, x2: INT, y2: INT): Status {
     return Gdiplus.Load('GdipAddPathLineI')(path, x1, y1, x2, y2);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipaddpathpath
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphicspath-flat
   public static GdipAddPathPath(path: GpPath, addingPath: GpPath, connect: BOOL): Status {
     return Gdiplus.Load('GdipAddPathPath')(path, addingPath, connect);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipaddpathpie
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphicspath-flat
   public static GdipAddPathPie(path: GpPath, x: REAL, y: REAL, width: REAL, height: REAL, startAngle: REAL, sweepAngle: REAL): Status {
     return Gdiplus.Load('GdipAddPathPie')(path, x, y, width, height, startAngle, sweepAngle);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipaddpathpiei
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphicspath-flat
   public static GdipAddPathPieI(path: GpPath, x: INT, y: INT, width: INT, height: INT, startAngle: REAL, sweepAngle: REAL): Status {
     return Gdiplus.Load('GdipAddPathPieI')(path, x, y, width, height, startAngle, sweepAngle);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipaddpathpolygon
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphicspath-flat
   public static GdipAddPathPolygon(path: GpPath, points: Pointer, count: INT): Status {
     return Gdiplus.Load('GdipAddPathPolygon')(path, points, count);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipaddpathpolygoni
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphicspath-flat
   public static GdipAddPathPolygonI(path: GpPath, points: Pointer, count: INT): Status {
     return Gdiplus.Load('GdipAddPathPolygonI')(path, points, count);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipaddpathrectangle
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphicspath-flat
   public static GdipAddPathRectangle(path: GpPath, x: REAL, y: REAL, width: REAL, height: REAL): Status {
     return Gdiplus.Load('GdipAddPathRectangle')(path, x, y, width, height);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipaddpathrectanglei
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphicspath-flat
   public static GdipAddPathRectangleI(path: GpPath, x: INT, y: INT, width: INT, height: INT): Status {
     return Gdiplus.Load('GdipAddPathRectangleI')(path, x, y, width, height);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipaddpathrectangles
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphicspath-flat
   public static GdipAddPathRectangles(path: GpPath, rects: Pointer, count: INT): Status {
     return Gdiplus.Load('GdipAddPathRectangles')(path, rects, count);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipaddpathrectanglesi
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphicspath-flat
   public static GdipAddPathRectanglesI(path: GpPath, rects: Pointer, count: INT): Status {
     return Gdiplus.Load('GdipAddPathRectanglesI')(path, rects, count);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipaddpathstring
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphicspath-flat
   public static GdipAddPathString(path: GpPath, string: LPWSTR, length: INT, family: GpFontFamily, style: INT, emSize: REAL, layoutRect: Pointer, format: GpStringFormat): Status {
     return Gdiplus.Load('GdipAddPathString')(path, string, length, family, style, emSize, layoutRect, format);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipaddpathstringi
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphicspath-flat
   public static GdipAddPathStringI(path: GpPath, string: LPWSTR, length: INT, family: GpFontFamily, style: INT, emSize: REAL, layoutRect: Pointer, format: GpStringFormat): Status {
     return Gdiplus.Load('GdipAddPathStringI')(path, string, length, family, style, emSize, layoutRect, format);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipalloc
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-memory-flat
   public static GdipAlloc(size: SIZE_T): LPVOID {
     return Gdiplus.Load('GdipAlloc')(size);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipbegincontainer
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipBeginContainer(graphics: GpGraphics, dstrect: Pointer, srcrect: Pointer, unit: Unit, state_out: Pointer): Status {
     return Gdiplus.Load('GdipBeginContainer')(graphics, dstrect, srcrect, unit, state_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipbegincontainer2
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipBeginContainer2(graphics: GpGraphics, state_out: Pointer): Status {
     return Gdiplus.Load('GdipBeginContainer2')(graphics, state_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipbegincontaineri
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipBeginContainerI(graphics: GpGraphics, dstrect: Pointer, srcrect: Pointer, unit: Unit, state_out: Pointer): Status {
     return Gdiplus.Load('GdipBeginContainerI')(graphics, dstrect, srcrect, unit, state_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipbitmapapplyeffect
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-bitmap-flat
   public static GdipBitmapApplyEffect(bitmap: GpBitmap, effect: CGpEffect, roi: Pointer, useAuxData: BOOL, auxData_out: LPVOID, auxDataSize_out: LPINT): Status {
     return Gdiplus.Load('GdipBitmapApplyEffect')(bitmap, effect, roi, useAuxData, auxData_out, auxDataSize_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipbitmapconvertformat
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-bitmap-flat
   public static GdipBitmapConvertFormat(pInputBitmap: GpBitmap, format: PixelFormat, dithertype: DitherType, palettetype: PaletteType, palette: Pointer, alphaThresholdPercent: REAL): Status {
     return Gdiplus.Load('GdipBitmapConvertFormat')(pInputBitmap, format, dithertype, palettetype, palette, alphaThresholdPercent);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipbitmapcreateapplyeffect
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-bitmap-flat
   public static GdipBitmapCreateApplyEffect(inputBitmaps: Pointer, numInputs: INT, effect: CGpEffect, roi: Pointer, outputRect_out: Pointer, outputBitmap_out: Pointer, useAuxData: BOOL, auxData_out: LPVOID, auxDataSize_out: LPINT): Status {
     return Gdiplus.Load('GdipBitmapCreateApplyEffect')(inputBitmaps, numInputs, effect, roi, outputRect_out, outputBitmap_out, useAuxData, auxData_out, auxDataSize_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipbitmapgethistogram
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-bitmap-flat
   public static GdipBitmapGetHistogram(bitmap: GpBitmap, format: HistogramFormat, NumberOfEntries: UINT, channel0_out: LPVOID, channel1_out: LPVOID, channel2_out: LPVOID, channel3_out: LPVOID): Status {
     return Gdiplus.Load('GdipBitmapGetHistogram')(bitmap, format, NumberOfEntries, channel0_out, channel1_out, channel2_out, channel3_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipbitmapgethistogramsize
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-bitmap-flat
   public static GdipBitmapGetHistogramSize(format: HistogramFormat, NumberOfEntries_out: LPUINT): Status {
     return Gdiplus.Load('GdipBitmapGetHistogramSize')(format, NumberOfEntries_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipbitmapgetpixel
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-bitmap-flat
   public static GdipBitmapGetPixel(bitmap: GpBitmap, x: INT, y: INT, color_out: LPARGB): Status {
     return Gdiplus.Load('GdipBitmapGetPixel')(bitmap, x, y, color_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipbitmaplockbits
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-bitmap-flat
   public static GdipBitmapLockBits(bitmap: GpBitmap, rect: Nullable<Pointer>, flags: UINT, format: PixelFormat, lockedBitmapData_in_out: Pointer): Status {
     return Gdiplus.Load('GdipBitmapLockBits')(bitmap, rect, flags, format, lockedBitmapData_in_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipbitmapsetpixel
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-bitmap-flat
   public static GdipBitmapSetPixel(bitmap: GpBitmap, x: INT, y: INT, color: ARGB): Status {
     return Gdiplus.Load('GdipBitmapSetPixel')(bitmap, x, y, color);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipbitmapsetresolution
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-bitmap-flat
   public static GdipBitmapSetResolution(bitmap: GpBitmap, xdpi: REAL, ydpi: REAL): Status {
     return Gdiplus.Load('GdipBitmapSetResolution')(bitmap, xdpi, ydpi);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipbitmapunlockbits
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-bitmap-flat
   public static GdipBitmapUnlockBits(bitmap: GpBitmap, lockedBitmapData: Pointer): Status {
     return Gdiplus.Load('GdipBitmapUnlockBits')(bitmap, lockedBitmapData);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipclearpathmarkers
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphicspath-flat
   public static GdipClearPathMarkers(path: GpPath): Status {
     return Gdiplus.Load('GdipClearPathMarkers')(path);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipclonebitmaparea
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-bitmap-flat
   public static GdipCloneBitmapArea(x: REAL, y: REAL, width: REAL, height: REAL, format: PixelFormat, srcBitmap: GpBitmap, dstBitmap_out: Pointer): Status {
     return Gdiplus.Load('GdipCloneBitmapArea')(x, y, width, height, format, srcBitmap, dstBitmap_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipclonebitmapareai
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-bitmap-flat
   public static GdipCloneBitmapAreaI(x: INT, y: INT, width: INT, height: INT, format: PixelFormat, srcBitmap: GpBitmap, dstBitmap_out: Pointer): Status {
     return Gdiplus.Load('GdipCloneBitmapAreaI')(x, y, width, height, format, srcBitmap, dstBitmap_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipclonebrush
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-brush-flat
   public static GdipCloneBrush(brush: GpBrush, cloneBrush_out: Pointer): Status {
     return Gdiplus.Load('GdipCloneBrush')(brush, cloneBrush_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipclonecustomlinecap
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-customlinecap-flat
   public static GdipCloneCustomLineCap(customCap: GpCustomLineCap, clonedCap_out: Pointer): Status {
     return Gdiplus.Load('GdipCloneCustomLineCap')(customCap, clonedCap_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipclonefont
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-font-flat
   public static GdipCloneFont(font: GpFont, cloneFont_out: Pointer): Status {
     return Gdiplus.Load('GdipCloneFont')(font, cloneFont_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipclonefontfamily
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-fontfamily-flat
   public static GdipCloneFontFamily(fontFamily: GpFontFamily, clonedFontFamily_out: Pointer): Status {
     return Gdiplus.Load('GdipCloneFontFamily')(fontFamily, clonedFontFamily_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipcloneimage
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-image-flat
   public static GdipCloneImage(image: GpImage, cloneImage_out: Pointer): Status {
     return Gdiplus.Load('GdipCloneImage')(image, cloneImage_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipcloneimageattributes
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-imageattributes-flat
   public static GdipCloneImageAttributes(imageattr: GpImageAttributes, cloneImageattr_out: Pointer): Status {
     return Gdiplus.Load('GdipCloneImageAttributes')(imageattr, cloneImageattr_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipclonematrix
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-flatapi-flat
   public static GdipCloneMatrix(matrix: GpMatrix, cloneMatrix_out: Pointer): Status {
     return Gdiplus.Load('GdipCloneMatrix')(matrix, cloneMatrix_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipclonepath
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphicspath-flat
   public static GdipClonePath(path: GpPath, clonePath_out: Pointer): Status {
     return Gdiplus.Load('GdipClonePath')(path, clonePath_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipclonepen
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-pen-flat
   public static GdipClonePen(pen: GpPen, clonepen_out: Pointer): Status {
     return Gdiplus.Load('GdipClonePen')(pen, clonepen_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipcloneregion
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-region-flat
   public static GdipCloneRegion(region: GpRegion, cloneRegion_out: Pointer): Status {
     return Gdiplus.Load('GdipCloneRegion')(region, cloneRegion_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipclonestringformat
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-stringformat-flat
   public static GdipCloneStringFormat(format: GpStringFormat, newFormat_out: Pointer): Status {
     return Gdiplus.Load('GdipCloneStringFormat')(format, newFormat_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipclosepathfigure
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphicspath-flat
   public static GdipClosePathFigure(path: GpPath): Status {
     return Gdiplus.Load('GdipClosePathFigure')(path);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipclosepathfigures
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphicspath-flat
   public static GdipClosePathFigures(path: GpPath): Status {
     return Gdiplus.Load('GdipClosePathFigures')(path);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipcombineregionpath
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-region-flat
   public static GdipCombineRegionPath(region: GpRegion, path: GpPath, combineMode: CombineMode): Status {
     return Gdiplus.Load('GdipCombineRegionPath')(region, path, combineMode);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipcombineregionrect
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-region-flat
   public static GdipCombineRegionRect(region: GpRegion, rect: Pointer, combineMode: CombineMode): Status {
     return Gdiplus.Load('GdipCombineRegionRect')(region, rect, combineMode);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipcombineregionrecti
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-region-flat
   public static GdipCombineRegionRectI(region: GpRegion, rect: Pointer, combineMode: CombineMode): Status {
     return Gdiplus.Load('GdipCombineRegionRectI')(region, rect, combineMode);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipcombineregionregion
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-region-flat
   public static GdipCombineRegionRegion(region: GpRegion, region2: GpRegion, combineMode: CombineMode): Status {
     return Gdiplus.Load('GdipCombineRegionRegion')(region, region2, combineMode);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipcomment
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipComment(graphics: GpGraphics, sizeData: UINT, data: LPBYTE): Status {
     return Gdiplus.Load('GdipComment')(graphics, sizeData, data);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipconverttoemfplus
-  public static GdipConvertToEmfPlus(refGraphics: GpGraphics, metafile: GpMetafile, conversionFailureFlag_out: LPINT, emfType: EmfType, description: LPWSTR, out_metafile_out: Pointer): Status {
-    return Gdiplus.Load('GdipConvertToEmfPlus')(refGraphics, metafile, conversionFailureFlag_out, emfType, description, out_metafile_out);
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-image-flat
+  public static GdipConvertToEmfPlus(refGraphics: GpGraphics, metafile: GpMetafile, conversionSuccess_out: LPINT, emfType: EmfType, description: LPWSTR, out_metafile_out: Pointer): Status {
+    return Gdiplus.Load('GdipConvertToEmfPlus')(refGraphics, metafile, conversionSuccess_out, emfType, description, out_metafile_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipconverttoemfplustofile
-  public static GdipConvertToEmfPlusToFile(refGraphics: GpGraphics, metafile: GpMetafile, conversionFailureFlag_out: LPINT, filename: LPWSTR, emfType: EmfType, description: LPWSTR, out_metafile_out: Pointer): Status {
-    return Gdiplus.Load('GdipConvertToEmfPlusToFile')(refGraphics, metafile, conversionFailureFlag_out, filename, emfType, description, out_metafile_out);
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-image-flat
+  public static GdipConvertToEmfPlusToFile(refGraphics: GpGraphics, metafile: GpMetafile, conversionSuccess_out: LPINT, filename: LPWSTR, emfType: EmfType, description: LPWSTR, out_metafile_out: Pointer): Status {
+    return Gdiplus.Load('GdipConvertToEmfPlusToFile')(refGraphics, metafile, conversionSuccess_out, filename, emfType, description, out_metafile_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipconverttoemfplustostream
-  public static GdipConvertToEmfPlusToStream(refGraphics: GpGraphics, metafile: GpMetafile, conversionFailureFlag_out: LPINT, stream: IStream, emfType: EmfType, description: LPWSTR, out_metafile_out: Pointer): Status {
-    return Gdiplus.Load('GdipConvertToEmfPlusToStream')(refGraphics, metafile, conversionFailureFlag_out, stream, emfType, description, out_metafile_out);
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-image-flat
+  public static GdipConvertToEmfPlusToStream(refGraphics: GpGraphics, metafile: GpMetafile, conversionSuccess_out: LPINT, stream: IStream, emfType: EmfType, description: LPWSTR, out_metafile_out: Pointer): Status {
+    return Gdiplus.Load('GdipConvertToEmfPlusToStream')(refGraphics, metafile, conversionSuccess_out, stream, emfType, description, out_metafile_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipcreateadjustablearrowcap
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-adjustablearrowcap-flat
   public static GdipCreateAdjustableArrowCap(height: REAL, width: REAL, isFilled: BOOL, cap_out: Pointer): Status {
     return Gdiplus.Load('GdipCreateAdjustableArrowCap')(height, width, isFilled, cap_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipcreatebitmapfromdirectdrawsurface
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-bitmap-flat
   public static GdipCreateBitmapFromDirectDrawSurface(surface: LPVOID, bitmap_out: Pointer): Status {
     return Gdiplus.Load('GdipCreateBitmapFromDirectDrawSurface')(surface, bitmap_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipcreatebitmapfromfile
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-bitmap-flat
   public static GdipCreateBitmapFromFile(filename: LPWSTR, bitmap_out: Pointer): Status {
     return Gdiplus.Load('GdipCreateBitmapFromFile')(filename, bitmap_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipcreatebitmapfromfileicm
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-bitmap-flat
   public static GdipCreateBitmapFromFileICM(filename: LPWSTR, bitmap_out: Pointer): Status {
     return Gdiplus.Load('GdipCreateBitmapFromFileICM')(filename, bitmap_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipcreatebitmapfromgdidib
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-bitmap-flat
   public static GdipCreateBitmapFromGdiDib(gdiBitmapInfo: LPVOID, gdiBitmapData: LPVOID, bitmap_out: Pointer): Status {
     return Gdiplus.Load('GdipCreateBitmapFromGdiDib')(gdiBitmapInfo, gdiBitmapData, bitmap_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipcreatebitmapfromgraphics
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-bitmap-flat
   public static GdipCreateBitmapFromGraphics(width: INT, height: INT, target: GpGraphics, bitmap_out: Pointer): Status {
     return Gdiplus.Load('GdipCreateBitmapFromGraphics')(width, height, target, bitmap_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipcreatebitmapfromhbitmap
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-bitmap-flat
   public static GdipCreateBitmapFromHBITMAP(hbm: HBITMAP, hpal: HPALETTE, bitmap_out: Pointer): Status {
     return Gdiplus.Load('GdipCreateBitmapFromHBITMAP')(hbm, hpal, bitmap_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipcreatebitmapfromhicon
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-bitmap-flat
   public static GdipCreateBitmapFromHICON(hicon: HICON, bitmap_out: Pointer): Status {
     return Gdiplus.Load('GdipCreateBitmapFromHICON')(hicon, bitmap_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipcreatebitmapfromresource
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-bitmap-flat
   public static GdipCreateBitmapFromResource(hInstance: HINSTANCE, lpBitmapName: LPWSTR, bitmap_out: Pointer): Status {
     return Gdiplus.Load('GdipCreateBitmapFromResource')(hInstance, lpBitmapName, bitmap_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipcreatebitmapfromscan0
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-bitmap-flat
   public static GdipCreateBitmapFromScan0(width: INT, height: INT, stride: INT, format: PixelFormat, scan0: Optional<LPVOID>, bitmap_out: Pointer): Status {
     return Gdiplus.Load('GdipCreateBitmapFromScan0')(width, height, stride, format, scan0, bitmap_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipcreatebitmapfromstream
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-bitmap-flat
   public static GdipCreateBitmapFromStream(stream: IStream, bitmap_out: Pointer): Status {
     return Gdiplus.Load('GdipCreateBitmapFromStream')(stream, bitmap_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipcreatebitmapfromstreamicm
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-bitmap-flat
   public static GdipCreateBitmapFromStreamICM(stream: IStream, bitmap_out: Pointer): Status {
     return Gdiplus.Load('GdipCreateBitmapFromStreamICM')(stream, bitmap_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipcreatecachedbitmap
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-cachedbitmap-flat
   public static GdipCreateCachedBitmap(bitmap: GpBitmap, graphics: GpGraphics, cachedBitmap_out: Pointer): Status {
     return Gdiplus.Load('GdipCreateCachedBitmap')(bitmap, graphics, cachedBitmap_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipcreatecustomlinecap
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-customlinecap-flat
   public static GdipCreateCustomLineCap(fillPath: GpPath, strokePath: GpPath, baseCap: LineCap, baseInset: REAL, customCap_out: Pointer): Status {
     return Gdiplus.Load('GdipCreateCustomLineCap')(fillPath, strokePath, baseCap, baseInset, customCap_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipcreateeffect
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-bitmap-flat
   public static GdipCreateEffect(guid: Pointer, effect_out: Pointer): Status {
     return Gdiplus.Load('GdipCreateEffect')(guid, effect_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipcreatefont
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-font-flat
   public static GdipCreateFont(fontFamily: GpFontFamily, emSize: REAL, style: INT, unit: Unit, font_out: Pointer): Status {
     return Gdiplus.Load('GdipCreateFont')(fontFamily, emSize, style, unit, font_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipcreatefontfamilyfromname
-  public static GdipCreateFontFamilyFromName(name: LPWSTR, fontCollection: GpFontCollection, fontFamily_out: Pointer): Status {
-    return Gdiplus.Load('GdipCreateFontFamilyFromName')(name, fontCollection, fontFamily_out);
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-fontfamily-flat
+  public static GdipCreateFontFamilyFromName(name: LPWSTR, fontCollection: GpFontCollection, FontFamily_out: Pointer): Status {
+    return Gdiplus.Load('GdipCreateFontFamilyFromName')(name, fontCollection, FontFamily_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipcreatefontfromdc
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-font-flat
   public static GdipCreateFontFromDC(hdc: HDC, font_out: Pointer): Status {
     return Gdiplus.Load('GdipCreateFontFromDC')(hdc, font_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipcreatefontfromlogfonta
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-font-flat
   public static GdipCreateFontFromLogfontA(hdc: HDC, logfont: Pointer, font_out: Pointer): Status {
     return Gdiplus.Load('GdipCreateFontFromLogfontA')(hdc, logfont, font_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipcreatefontfromlogfontw
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-font-flat
   public static GdipCreateFontFromLogfontW(hdc: HDC, logfont: Pointer, font_out: Pointer): Status {
     return Gdiplus.Load('GdipCreateFontFromLogfontW')(hdc, logfont, font_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipcreatefromhdc
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipCreateFromHDC(hdc: HDC, graphics_out: Pointer): Status {
     return Gdiplus.Load('GdipCreateFromHDC')(hdc, graphics_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipcreatefromhdc2
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipCreateFromHDC2(hdc: HDC, hDevice: HANDLE, graphics_out: Pointer): Status {
     return Gdiplus.Load('GdipCreateFromHDC2')(hdc, hDevice, graphics_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipcreatefromhwnd
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipCreateFromHWND(hwnd: HWND, graphics_out: Pointer): Status {
     return Gdiplus.Load('GdipCreateFromHWND')(hwnd, graphics_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipcreatefromhwndicm
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipCreateFromHWNDICM(hwnd: HWND, graphics_out: Pointer): Status {
     return Gdiplus.Load('GdipCreateFromHWNDICM')(hwnd, graphics_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipcreatehbitmapfrombitmap
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-bitmap-flat
   public static GdipCreateHBITMAPFromBitmap(bitmap: GpBitmap, hbmReturn_out: Pointer, background: ARGB): Status {
     return Gdiplus.Load('GdipCreateHBITMAPFromBitmap')(bitmap, hbmReturn_out, background);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipcreatehiconfrombitmap
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-bitmap-flat
   public static GdipCreateHICONFromBitmap(bitmap: GpBitmap, hbmReturn_out: Pointer): Status {
     return Gdiplus.Load('GdipCreateHICONFromBitmap')(bitmap, hbmReturn_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipcreatehalftonepalette
-  public static GdipCreateHalftonePalette(): Status {
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
+  public static GdipCreateHalftonePalette(): HPALETTE {
     return Gdiplus.Load('GdipCreateHalftonePalette')();
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipcreatehatchbrush
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-hatchbrush-flat
   public static GdipCreateHatchBrush(hatchstyle: HatchStyle, forecol: ARGB, backcol: ARGB, brush_out: Pointer): Status {
     return Gdiplus.Load('GdipCreateHatchBrush')(hatchstyle, forecol, backcol, brush_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipcreateimageattributes
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-imageattributes-flat
   public static GdipCreateImageAttributes(imageattr_out: Pointer): Status {
     return Gdiplus.Load('GdipCreateImageAttributes')(imageattr_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipcreatelinebrush
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-lineargradientbrush-flat
   public static GdipCreateLineBrush(point1: Pointer, point2: Pointer, color1: ARGB, color2: ARGB, wrapMode: WrapMode, lineGradient_out: Pointer): Status {
     return Gdiplus.Load('GdipCreateLineBrush')(point1, point2, color1, color2, wrapMode, lineGradient_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipcreatelinebrushfromrect
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-lineargradientbrush-flat
   public static GdipCreateLineBrushFromRect(rect: Pointer, color1: ARGB, color2: ARGB, mode: LinearGradientMode, wrapMode: WrapMode, lineGradient_out: Pointer): Status {
     return Gdiplus.Load('GdipCreateLineBrushFromRect')(rect, color1, color2, mode, wrapMode, lineGradient_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipcreatelinebrushfromrecti
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-lineargradientbrush-flat
   public static GdipCreateLineBrushFromRectI(rect: Pointer, color1: ARGB, color2: ARGB, mode: LinearGradientMode, wrapMode: WrapMode, lineGradient_out: Pointer): Status {
     return Gdiplus.Load('GdipCreateLineBrushFromRectI')(rect, color1, color2, mode, wrapMode, lineGradient_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipcreatelinebrushfromrectwithangle
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-lineargradientbrush-flat
   public static GdipCreateLineBrushFromRectWithAngle(rect: Pointer, color1: ARGB, color2: ARGB, angle: REAL, isAngleScalable: BOOL, wrapMode: WrapMode, lineGradient_out: Pointer): Status {
     return Gdiplus.Load('GdipCreateLineBrushFromRectWithAngle')(rect, color1, color2, angle, isAngleScalable, wrapMode, lineGradient_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipcreatelinebrushfromrectwithanglei
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-lineargradientbrush-flat
   public static GdipCreateLineBrushFromRectWithAngleI(rect: Pointer, color1: ARGB, color2: ARGB, angle: REAL, isAngleScalable: BOOL, wrapMode: WrapMode, lineGradient_out: Pointer): Status {
     return Gdiplus.Load('GdipCreateLineBrushFromRectWithAngleI')(rect, color1, color2, angle, isAngleScalable, wrapMode, lineGradient_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipcreatelinebrushi
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-lineargradientbrush-flat
   public static GdipCreateLineBrushI(point1: Pointer, point2: Pointer, color1: ARGB, color2: ARGB, wrapMode: WrapMode, lineGradient_out: Pointer): Status {
     return Gdiplus.Load('GdipCreateLineBrushI')(point1, point2, color1, color2, wrapMode, lineGradient_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipcreatematrix
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-flatapi-flat
   public static GdipCreateMatrix(matrix_out: Pointer): Status {
     return Gdiplus.Load('GdipCreateMatrix')(matrix_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipcreatematrix2
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-matrix-flat
   public static GdipCreateMatrix2(m11: REAL, m12: REAL, m21: REAL, m22: REAL, dx: REAL, dy: REAL, matrix_out: Pointer): Status {
     return Gdiplus.Load('GdipCreateMatrix2')(m11, m12, m21, m22, dx, dy, matrix_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipcreatematrix3
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-matrix-flat
   public static GdipCreateMatrix3(rect: Pointer, dstplg: Pointer, matrix_out: Pointer): Status {
     return Gdiplus.Load('GdipCreateMatrix3')(rect, dstplg, matrix_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipcreatematrix3i
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-matrix-flat
   public static GdipCreateMatrix3I(rect: Pointer, dstplg: Pointer, matrix_out: Pointer): Status {
     return Gdiplus.Load('GdipCreateMatrix3I')(rect, dstplg, matrix_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipcreatemetafilefromemf
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipCreateMetafileFromEmf(hEmf: HENHMETAFILE, deleteEmf: BOOL, metafile_out: Pointer): Status {
     return Gdiplus.Load('GdipCreateMetafileFromEmf')(hEmf, deleteEmf, metafile_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipcreatemetafilefromfile
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipCreateMetafileFromFile(file: LPWSTR, metafile_out: Pointer): Status {
     return Gdiplus.Load('GdipCreateMetafileFromFile')(file, metafile_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipcreatemetafilefromstream
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipCreateMetafileFromStream(stream: IStream, metafile_out: Pointer): Status {
     return Gdiplus.Load('GdipCreateMetafileFromStream')(stream, metafile_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipcreatemetafilefromwmf
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipCreateMetafileFromWmf(hWmf: HMETAFILE, deleteWmf: BOOL, wmfPlaceableFileHeader: Pointer, metafile_out: Pointer): Status {
     return Gdiplus.Load('GdipCreateMetafileFromWmf')(hWmf, deleteWmf, wmfPlaceableFileHeader, metafile_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipcreatemetafilefromwmffile
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipCreateMetafileFromWmfFile(file: LPWSTR, wmfPlaceableFileHeader: Pointer, metafile_out: Pointer): Status {
     return Gdiplus.Load('GdipCreateMetafileFromWmfFile')(file, wmfPlaceableFileHeader, metafile_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipcreatepath
-  public static GdipCreatePath(brushMode: FillMode, path_out: Pointer): Status {
-    return Gdiplus.Load('GdipCreatePath')(brushMode, path_out);
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphicspath-flat
+  public static GdipCreatePath(fillMode: FillMode, path_out: Pointer): Status {
+    return Gdiplus.Load('GdipCreatePath')(fillMode, path_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipcreatepath2
-  public static GdipCreatePath2(pointF: Pointer, bYTE: LPBYTE, iNT: INT, fillMode: FillMode, path_out: Pointer): Status {
-    return Gdiplus.Load('GdipCreatePath2')(pointF, bYTE, iNT, fillMode, path_out);
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphicspath-flat
+  public static GdipCreatePath2(points: Pointer, types: LPBYTE, count: INT, fillMode: FillMode, path_out: Pointer): Status {
+    return Gdiplus.Load('GdipCreatePath2')(points, types, count, fillMode, path_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipcreatepath2i
-  public static GdipCreatePath2I(point: Pointer, bYTE: LPBYTE, iNT: INT, fillMode: FillMode, path_out: Pointer): Status {
-    return Gdiplus.Load('GdipCreatePath2I')(point, bYTE, iNT, fillMode, path_out);
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphicspath-flat
+  public static GdipCreatePath2I(points: Pointer, types: LPBYTE, count: INT, fillMode: FillMode, path_out: Pointer): Status {
+    return Gdiplus.Load('GdipCreatePath2I')(points, types, count, fillMode, path_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipcreatepathgradient
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-pathgradientbrush-flat
   public static GdipCreatePathGradient(points: Pointer, count: INT, wrapMode: WrapMode, polyGradient_out: Pointer): Status {
     return Gdiplus.Load('GdipCreatePathGradient')(points, count, wrapMode, polyGradient_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipcreatepathgradientfrompath
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-pathgradientbrush-flat
   public static GdipCreatePathGradientFromPath(path: GpPath, polyGradient_out: Pointer): Status {
     return Gdiplus.Load('GdipCreatePathGradientFromPath')(path, polyGradient_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipcreatepathgradienti
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-pathgradientbrush-flat
   public static GdipCreatePathGradientI(points: Pointer, count: INT, wrapMode: WrapMode, polyGradient_out: Pointer): Status {
     return Gdiplus.Load('GdipCreatePathGradientI')(points, count, wrapMode, polyGradient_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipcreatepathiter
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-pathiterator-flat
   public static GdipCreatePathIter(iterator_out: Pointer, path: GpPath): Status {
     return Gdiplus.Load('GdipCreatePathIter')(iterator_out, path);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipcreatepen1
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-pen-flat
   public static GdipCreatePen1(color: ARGB, width: REAL, unit: Unit, pen_out: Pointer): Status {
     return Gdiplus.Load('GdipCreatePen1')(color, width, unit, pen_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipcreatepen2
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-pen-flat
   public static GdipCreatePen2(brush: GpBrush, width: REAL, unit: Unit, pen_out: Pointer): Status {
     return Gdiplus.Load('GdipCreatePen2')(brush, width, unit, pen_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipcreateregion
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-region-flat
   public static GdipCreateRegion(region_out: Pointer): Status {
     return Gdiplus.Load('GdipCreateRegion')(region_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipcreateregionhrgn
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-region-flat
   public static GdipCreateRegionHrgn(hRgn: HRGN, region_out: Pointer): Status {
     return Gdiplus.Load('GdipCreateRegionHrgn')(hRgn, region_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipcreateregionpath
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-region-flat
   public static GdipCreateRegionPath(path: GpPath, region_out: Pointer): Status {
     return Gdiplus.Load('GdipCreateRegionPath')(path, region_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipcreateregionrect
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-region-flat
   public static GdipCreateRegionRect(rect: Pointer, region_out: Pointer): Status {
     return Gdiplus.Load('GdipCreateRegionRect')(rect, region_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipcreateregionrecti
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-region-flat
   public static GdipCreateRegionRectI(rect: Pointer, region_out: Pointer): Status {
     return Gdiplus.Load('GdipCreateRegionRectI')(rect, region_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipcreateregionrgndata
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-region-flat
   public static GdipCreateRegionRgnData(regionData: LPBYTE, size: INT, region_out: Pointer): Status {
     return Gdiplus.Load('GdipCreateRegionRgnData')(regionData, size, region_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipcreatesolidfill
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-solidbrush-flat
   public static GdipCreateSolidFill(color: ARGB, brush_out: Pointer): Status {
     return Gdiplus.Load('GdipCreateSolidFill')(color, brush_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipcreatestreamonfile
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipCreateStreamOnFile(filename: LPWSTR, access: UINT, stream_out: Pointer): Status {
     return Gdiplus.Load('GdipCreateStreamOnFile')(filename, access, stream_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipcreatestringformat
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-stringformat-flat
   public static GdipCreateStringFormat(formatAttributes: INT, language: LANGID, format_out: Pointer): Status {
     return Gdiplus.Load('GdipCreateStringFormat')(formatAttributes, language, format_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipcreatetexture
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-texturebrush-flat
   public static GdipCreateTexture(image: GpImage, wrapmode: WrapMode, texture_out: Pointer): Status {
     return Gdiplus.Load('GdipCreateTexture')(image, wrapmode, texture_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipcreatetexture2
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-texturebrush-flat
   public static GdipCreateTexture2(image: GpImage, wrapmode: WrapMode, x: REAL, y: REAL, width: REAL, height: REAL, texture_out: Pointer): Status {
     return Gdiplus.Load('GdipCreateTexture2')(image, wrapmode, x, y, width, height, texture_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipcreatetexture2i
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-texturebrush-flat
   public static GdipCreateTexture2I(image: GpImage, wrapmode: WrapMode, x: INT, y: INT, width: INT, height: INT, texture_out: Pointer): Status {
     return Gdiplus.Load('GdipCreateTexture2I')(image, wrapmode, x, y, width, height, texture_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipcreatetextureia
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-texturebrush-flat
   public static GdipCreateTextureIA(image: GpImage, imageAttributes: GpImageAttributes, x: REAL, y: REAL, width: REAL, height: REAL, texture_out: Pointer): Status {
     return Gdiplus.Load('GdipCreateTextureIA')(image, imageAttributes, x, y, width, height, texture_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipcreatetextureiai
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-texturebrush-flat
   public static GdipCreateTextureIAI(image: GpImage, imageAttributes: GpImageAttributes, x: INT, y: INT, width: INT, height: INT, texture_out: Pointer): Status {
     return Gdiplus.Load('GdipCreateTextureIAI')(image, imageAttributes, x, y, width, height, texture_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipdeletebrush
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-brush-flat
   public static GdipDeleteBrush(brush: GpBrush): Status {
     return Gdiplus.Load('GdipDeleteBrush')(brush);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipdeletecachedbitmap
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-cachedbitmap-flat
   public static GdipDeleteCachedBitmap(cachedBitmap: GpCachedBitmap): Status {
     return Gdiplus.Load('GdipDeleteCachedBitmap')(cachedBitmap);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipdeletecustomlinecap
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-customlinecap-flat
   public static GdipDeleteCustomLineCap(customCap: GpCustomLineCap): Status {
     return Gdiplus.Load('GdipDeleteCustomLineCap')(customCap);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipdeleteeffect
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-bitmap-flat
   public static GdipDeleteEffect(effect: CGpEffect): Status {
     return Gdiplus.Load('GdipDeleteEffect')(effect);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipdeletefont
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-font-flat
   public static GdipDeleteFont(font: GpFont): Status {
     return Gdiplus.Load('GdipDeleteFont')(font);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipdeletefontfamily
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-fontfamily-flat
   public static GdipDeleteFontFamily(fontFamily: GpFontFamily): Status {
     return Gdiplus.Load('GdipDeleteFontFamily')(fontFamily);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipdeletegraphics
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipDeleteGraphics(graphics: GpGraphics): Status {
     return Gdiplus.Load('GdipDeleteGraphics')(graphics);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipdeletematrix
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-matrix-flat
   public static GdipDeleteMatrix(matrix: GpMatrix): Status {
     return Gdiplus.Load('GdipDeleteMatrix')(matrix);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipdeletepath
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphicspath-flat
   public static GdipDeletePath(path: GpPath): Status {
     return Gdiplus.Load('GdipDeletePath')(path);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipdeletepathiter
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-pathiterator-flat
   public static GdipDeletePathIter(iterator: GpPathIterator): Status {
     return Gdiplus.Load('GdipDeletePathIter')(iterator);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipdeletepen
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-pen-flat
   public static GdipDeletePen(pen: GpPen): Status {
     return Gdiplus.Load('GdipDeletePen')(pen);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipdeleteprivatefontcollection
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-font-flat
   public static GdipDeletePrivateFontCollection(fontCollection_out: Pointer): Status {
     return Gdiplus.Load('GdipDeletePrivateFontCollection')(fontCollection_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipdeleteregion
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-region-flat
   public static GdipDeleteRegion(region: GpRegion): Status {
     return Gdiplus.Load('GdipDeleteRegion')(region);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipdeletestringformat
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-stringformat-flat
   public static GdipDeleteStringFormat(format: GpStringFormat): Status {
     return Gdiplus.Load('GdipDeleteStringFormat')(format);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipdisposeimage
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-image-flat
   public static GdipDisposeImage(image: GpImage): Status {
     return Gdiplus.Load('GdipDisposeImage')(image);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipdisposeimageattributes
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-imageattributes-flat
   public static GdipDisposeImageAttributes(imageattr: GpImageAttributes): Status {
     return Gdiplus.Load('GdipDisposeImageAttributes')(imageattr);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipdrawarc
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipDrawArc(graphics: GpGraphics, pen: GpPen, x: REAL, y: REAL, width: REAL, height: REAL, startAngle: REAL, sweepAngle: REAL): Status {
     return Gdiplus.Load('GdipDrawArc')(graphics, pen, x, y, width, height, startAngle, sweepAngle);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipdrawarci
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipDrawArcI(graphics: GpGraphics, pen: GpPen, x: INT, y: INT, width: INT, height: INT, startAngle: REAL, sweepAngle: REAL): Status {
     return Gdiplus.Load('GdipDrawArcI')(graphics, pen, x, y, width, height, startAngle, sweepAngle);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipdrawbezier
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipDrawBezier(graphics: GpGraphics, pen: GpPen, x1: REAL, y1: REAL, x2: REAL, y2: REAL, x3: REAL, y3: REAL, x4: REAL, y4: REAL): Status {
     return Gdiplus.Load('GdipDrawBezier')(graphics, pen, x1, y1, x2, y2, x3, y3, x4, y4);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipdrawbezieri
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipDrawBezierI(graphics: GpGraphics, pen: GpPen, x1: INT, y1: INT, x2: INT, y2: INT, x3: INT, y3: INT, x4: INT, y4: INT): Status {
     return Gdiplus.Load('GdipDrawBezierI')(graphics, pen, x1, y1, x2, y2, x3, y3, x4, y4);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipdrawbeziers
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipDrawBeziers(graphics: GpGraphics, pen: GpPen, points: Pointer, count: INT): Status {
     return Gdiplus.Load('GdipDrawBeziers')(graphics, pen, points, count);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipdrawbeziersi
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipDrawBeziersI(graphics: GpGraphics, pen: GpPen, points: Pointer, count: INT): Status {
     return Gdiplus.Load('GdipDrawBeziersI')(graphics, pen, points, count);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipdrawcachedbitmap
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-cachedbitmap-flat
   public static GdipDrawCachedBitmap(graphics: GpGraphics, cachedBitmap: GpCachedBitmap, x: INT, y: INT): Status {
     return Gdiplus.Load('GdipDrawCachedBitmap')(graphics, cachedBitmap, x, y);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipdrawclosedcurve
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipDrawClosedCurve(graphics: GpGraphics, pen: GpPen, points: Pointer, count: INT): Status {
     return Gdiplus.Load('GdipDrawClosedCurve')(graphics, pen, points, count);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipdrawclosedcurve2
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipDrawClosedCurve2(graphics: GpGraphics, pen: GpPen, points: Pointer, count: INT, tension: REAL): Status {
     return Gdiplus.Load('GdipDrawClosedCurve2')(graphics, pen, points, count, tension);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipdrawclosedcurve2i
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipDrawClosedCurve2I(graphics: GpGraphics, pen: GpPen, points: Pointer, count: INT, tension: REAL): Status {
     return Gdiplus.Load('GdipDrawClosedCurve2I')(graphics, pen, points, count, tension);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipdrawclosedcurvei
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipDrawClosedCurveI(graphics: GpGraphics, pen: GpPen, points: Pointer, count: INT): Status {
     return Gdiplus.Load('GdipDrawClosedCurveI')(graphics, pen, points, count);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipdrawcurve
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipDrawCurve(graphics: GpGraphics, pen: GpPen, points: Pointer, count: INT): Status {
     return Gdiplus.Load('GdipDrawCurve')(graphics, pen, points, count);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipdrawcurve2
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipDrawCurve2(graphics: GpGraphics, pen: GpPen, points: Pointer, count: INT, tension: REAL): Status {
     return Gdiplus.Load('GdipDrawCurve2')(graphics, pen, points, count, tension);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipdrawcurve2i
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipDrawCurve2I(graphics: GpGraphics, pen: GpPen, points: Pointer, count: INT, tension: REAL): Status {
     return Gdiplus.Load('GdipDrawCurve2I')(graphics, pen, points, count, tension);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipdrawcurve3
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipDrawCurve3(graphics: GpGraphics, pen: GpPen, points: Pointer, count: INT, offset: INT, numberOfSegments: INT, tension: REAL): Status {
     return Gdiplus.Load('GdipDrawCurve3')(graphics, pen, points, count, offset, numberOfSegments, tension);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipdrawcurve3i
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipDrawCurve3I(graphics: GpGraphics, pen: GpPen, points: Pointer, count: INT, offset: INT, numberOfSegments: INT, tension: REAL): Status {
     return Gdiplus.Load('GdipDrawCurve3I')(graphics, pen, points, count, offset, numberOfSegments, tension);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipdrawcurvei
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipDrawCurveI(graphics: GpGraphics, pen: GpPen, points: Pointer, count: INT): Status {
     return Gdiplus.Load('GdipDrawCurveI')(graphics, pen, points, count);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipdrawdriverstring
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-text-flat
   public static GdipDrawDriverString(graphics: GpGraphics, text: LPUINT16, length: INT, font: GpFont, brush: GpBrush, positions: Pointer, flags: INT, matrix: GpMatrix): Status {
     return Gdiplus.Load('GdipDrawDriverString')(graphics, text, length, font, brush, positions, flags, matrix);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipdrawellipse
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipDrawEllipse(graphics: GpGraphics, pen: GpPen, x: REAL, y: REAL, width: REAL, height: REAL): Status {
     return Gdiplus.Load('GdipDrawEllipse')(graphics, pen, x, y, width, height);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipdrawellipsei
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipDrawEllipseI(graphics: GpGraphics, pen: GpPen, x: INT, y: INT, width: INT, height: INT): Status {
     return Gdiplus.Load('GdipDrawEllipseI')(graphics, pen, x, y, width, height);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipdrawimage
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipDrawImage(graphics: GpGraphics, image: GpImage, x: REAL, y: REAL): Status {
     return Gdiplus.Load('GdipDrawImage')(graphics, image, x, y);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipdrawimagefx
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipDrawImageFX(graphics: GpGraphics, image: GpImage, source: Pointer, xForm: GpMatrix, effect: CGpEffect, imageAttributes: GpImageAttributes, srcUnit: Unit): Status {
     return Gdiplus.Load('GdipDrawImageFX')(graphics, image, source, xForm, effect, imageAttributes, srcUnit);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipdrawimagei
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipDrawImageI(graphics: GpGraphics, image: GpImage, x: INT, y: INT): Status {
     return Gdiplus.Load('GdipDrawImageI')(graphics, image, x, y);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipdrawimagepointrect
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipDrawImagePointRect(graphics: GpGraphics, image: GpImage, x: REAL, y: REAL, srcx: REAL, srcy: REAL, srcwidth: REAL, srcheight: REAL, srcUnit: Unit): Status {
     return Gdiplus.Load('GdipDrawImagePointRect')(graphics, image, x, y, srcx, srcy, srcwidth, srcheight, srcUnit);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipdrawimagepointrecti
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipDrawImagePointRectI(graphics: GpGraphics, image: GpImage, x: INT, y: INT, srcx: INT, srcy: INT, srcwidth: INT, srcheight: INT, srcUnit: Unit): Status {
     return Gdiplus.Load('GdipDrawImagePointRectI')(graphics, image, x, y, srcx, srcy, srcwidth, srcheight, srcUnit);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipdrawimagepoints
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipDrawImagePoints(graphics: GpGraphics, image: GpImage, dstpoints: Pointer, count: INT): Status {
     return Gdiplus.Load('GdipDrawImagePoints')(graphics, image, dstpoints, count);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipdrawimagepointsi
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipDrawImagePointsI(graphics: GpGraphics, image: GpImage, dstpoints: Pointer, count: INT): Status {
     return Gdiplus.Load('GdipDrawImagePointsI')(graphics, image, dstpoints, count);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipdrawimagepointsrect
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipDrawImagePointsRect(
     graphics: GpGraphics,
     image: GpImage,
@@ -1689,7 +1689,7 @@ class Gdiplus extends Win32 {
     return Gdiplus.Load('GdipDrawImagePointsRect')(graphics, image, points, count, srcx, srcy, srcwidth, srcheight, srcUnit, imageAttributes, callback, callbackData);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipdrawimagepointsrecti
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipDrawImagePointsRectI(
     graphics: GpGraphics,
     image: GpImage,
@@ -1707,17 +1707,17 @@ class Gdiplus extends Win32 {
     return Gdiplus.Load('GdipDrawImagePointsRectI')(graphics, image, points, count, srcx, srcy, srcwidth, srcheight, srcUnit, imageAttributes, callback, callbackData);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipdrawimagerect
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipDrawImageRect(graphics: GpGraphics, image: GpImage, x: REAL, y: REAL, width: REAL, height: REAL): Status {
     return Gdiplus.Load('GdipDrawImageRect')(graphics, image, x, y, width, height);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipdrawimagerecti
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipDrawImageRectI(graphics: GpGraphics, image: GpImage, x: INT, y: INT, width: INT, height: INT): Status {
     return Gdiplus.Load('GdipDrawImageRectI')(graphics, image, x, y, width, height);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipdrawimagerectrect
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipDrawImageRectRect(
     graphics: GpGraphics,
     image: GpImage,
@@ -1737,7 +1737,7 @@ class Gdiplus extends Win32 {
     return Gdiplus.Load('GdipDrawImageRectRect')(graphics, image, dstx, dsty, dstwidth, dstheight, srcx, srcy, srcwidth, srcheight, srcUnit, imageAttributes, callback, callbackData);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipdrawimagerectrecti
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipDrawImageRectRectI(
     graphics: GpGraphics,
     image: GpImage,
@@ -1757,127 +1757,127 @@ class Gdiplus extends Win32 {
     return Gdiplus.Load('GdipDrawImageRectRectI')(graphics, image, dstx, dsty, dstwidth, dstheight, srcx, srcy, srcwidth, srcheight, srcUnit, imageAttributes, callback, callbackData);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipdrawline
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipDrawLine(graphics: GpGraphics, pen: GpPen, x1: REAL, y1: REAL, x2: REAL, y2: REAL): Status {
     return Gdiplus.Load('GdipDrawLine')(graphics, pen, x1, y1, x2, y2);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipdrawlinei
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipDrawLineI(graphics: GpGraphics, pen: GpPen, x1: INT, y1: INT, x2: INT, y2: INT): Status {
     return Gdiplus.Load('GdipDrawLineI')(graphics, pen, x1, y1, x2, y2);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipdrawlines
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipDrawLines(graphics: GpGraphics, pen: GpPen, points: Pointer, count: INT): Status {
     return Gdiplus.Load('GdipDrawLines')(graphics, pen, points, count);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipdrawlinesi
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipDrawLinesI(graphics: GpGraphics, pen: GpPen, points: Pointer, count: INT): Status {
     return Gdiplus.Load('GdipDrawLinesI')(graphics, pen, points, count);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipdrawpath
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipDrawPath(graphics: GpGraphics, pen: GpPen, path: GpPath): Status {
     return Gdiplus.Load('GdipDrawPath')(graphics, pen, path);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipdrawpie
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipDrawPie(graphics: GpGraphics, pen: GpPen, x: REAL, y: REAL, width: REAL, height: REAL, startAngle: REAL, sweepAngle: REAL): Status {
     return Gdiplus.Load('GdipDrawPie')(graphics, pen, x, y, width, height, startAngle, sweepAngle);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipdrawpiei
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipDrawPieI(graphics: GpGraphics, pen: GpPen, x: INT, y: INT, width: INT, height: INT, startAngle: REAL, sweepAngle: REAL): Status {
     return Gdiplus.Load('GdipDrawPieI')(graphics, pen, x, y, width, height, startAngle, sweepAngle);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipdrawpolygon
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipDrawPolygon(graphics: GpGraphics, pen: GpPen, points: Pointer, count: INT): Status {
     return Gdiplus.Load('GdipDrawPolygon')(graphics, pen, points, count);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipdrawpolygoni
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipDrawPolygonI(graphics: GpGraphics, pen: GpPen, points: Pointer, count: INT): Status {
     return Gdiplus.Load('GdipDrawPolygonI')(graphics, pen, points, count);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipdrawrectangle
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipDrawRectangle(graphics: GpGraphics, pen: GpPen, x: REAL, y: REAL, width: REAL, height: REAL): Status {
     return Gdiplus.Load('GdipDrawRectangle')(graphics, pen, x, y, width, height);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipdrawrectanglei
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipDrawRectangleI(graphics: GpGraphics, pen: GpPen, x: INT, y: INT, width: INT, height: INT): Status {
     return Gdiplus.Load('GdipDrawRectangleI')(graphics, pen, x, y, width, height);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipdrawrectangles
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipDrawRectangles(graphics: GpGraphics, pen: GpPen, rects: Pointer, count: INT): Status {
     return Gdiplus.Load('GdipDrawRectangles')(graphics, pen, rects, count);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipdrawrectanglesi
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipDrawRectanglesI(graphics: GpGraphics, pen: GpPen, rects: Pointer, count: INT): Status {
     return Gdiplus.Load('GdipDrawRectanglesI')(graphics, pen, rects, count);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipdrawstring
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-text-flat
   public static GdipDrawString(graphics: GpGraphics, string: LPWSTR, length: INT, font: GpFont, layoutRect: Pointer, stringFormat: GpStringFormat, brush: GpBrush): Status {
     return Gdiplus.Load('GdipDrawString')(graphics, string, length, font, layoutRect, stringFormat, brush);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipemftowmfbits
+  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusheaders/nf-gdiplusheaders-metafile-emftowmfbits
   public static GdipEmfToWmfBits(hemf: HENHMETAFILE, cbData16: UINT, pData16_out: Optional<LPBYTE>, iMapMode: INT, eFlags: INT): UINT {
     return Gdiplus.Load('GdipEmfToWmfBits')(hemf, cbData16, pData16_out, iMapMode, eFlags);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipendcontainer
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipEndContainer(graphics: GpGraphics, state: GraphicsContainer): Status {
     return Gdiplus.Load('GdipEndContainer')(graphics, state);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipenumeratemetafiledestpoint
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipEnumerateMetafileDestPoint(graphics: GpGraphics, metafile: GpMetafile, destPoint: Pointer, callback: Pointer, callbackData: LPVOID, imageAttributes: GpImageAttributes): Status {
     return Gdiplus.Load('GdipEnumerateMetafileDestPoint')(graphics, metafile, destPoint, callback, callbackData, imageAttributes);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipenumeratemetafiledestpointi
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipEnumerateMetafileDestPointI(graphics: GpGraphics, metafile: GpMetafile, destPoint: Pointer, callback: Pointer, callbackData: LPVOID, imageAttributes: GpImageAttributes): Status {
     return Gdiplus.Load('GdipEnumerateMetafileDestPointI')(graphics, metafile, destPoint, callback, callbackData, imageAttributes);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipenumeratemetafiledestpoints
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipEnumerateMetafileDestPoints(graphics: GpGraphics, metafile: GpMetafile, destPoints: Pointer, count: INT, callback: Pointer, callbackData: LPVOID, imageAttributes: GpImageAttributes): Status {
     return Gdiplus.Load('GdipEnumerateMetafileDestPoints')(graphics, metafile, destPoints, count, callback, callbackData, imageAttributes);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipenumeratemetafiledestpointsi
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipEnumerateMetafileDestPointsI(graphics: GpGraphics, metafile: GpMetafile, destPoints: Pointer, count: INT, callback: Pointer, callbackData: LPVOID, imageAttributes: GpImageAttributes): Status {
     return Gdiplus.Load('GdipEnumerateMetafileDestPointsI')(graphics, metafile, destPoints, count, callback, callbackData, imageAttributes);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipenumeratemetafiledestrect
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipEnumerateMetafileDestRect(graphics: GpGraphics, metafile: GpMetafile, destRect: Pointer, callback: Pointer, callbackData: LPVOID, imageAttributes: GpImageAttributes): Status {
     return Gdiplus.Load('GdipEnumerateMetafileDestRect')(graphics, metafile, destRect, callback, callbackData, imageAttributes);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipenumeratemetafiledestrecti
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipEnumerateMetafileDestRectI(graphics: GpGraphics, metafile: GpMetafile, destRect: Pointer, callback: Pointer, callbackData: LPVOID, imageAttributes: GpImageAttributes): Status {
     return Gdiplus.Load('GdipEnumerateMetafileDestRectI')(graphics, metafile, destRect, callback, callbackData, imageAttributes);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipenumeratemetafilesrcrectdestpoint
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipEnumerateMetafileSrcRectDestPoint(graphics: GpGraphics, metafile: GpMetafile, destPoint: Pointer, srcRect: Pointer, srcUnit: Unit, callback: Pointer, callbackData: LPVOID, imageAttributes: GpImageAttributes): Status {
     return Gdiplus.Load('GdipEnumerateMetafileSrcRectDestPoint')(graphics, metafile, destPoint, srcRect, srcUnit, callback, callbackData, imageAttributes);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipenumeratemetafilesrcrectdestpointi
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipEnumerateMetafileSrcRectDestPointI(graphics: GpGraphics, metafile: GpMetafile, destPoint: Pointer, srcRect: Pointer, srcUnit: Unit, callback: Pointer, callbackData: LPVOID, imageAttributes: GpImageAttributes): Status {
     return Gdiplus.Load('GdipEnumerateMetafileSrcRectDestPointI')(graphics, metafile, destPoint, srcRect, srcUnit, callback, callbackData, imageAttributes);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipenumeratemetafilesrcrectdestpoints
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipEnumerateMetafileSrcRectDestPoints(
     graphics: GpGraphics,
     metafile: GpMetafile,
@@ -1892,7 +1892,7 @@ class Gdiplus extends Win32 {
     return Gdiplus.Load('GdipEnumerateMetafileSrcRectDestPoints')(graphics, metafile, destPoints, count, srcRect, srcUnit, callback, callbackData, imageAttributes);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipenumeratemetafilesrcrectdestpointsi
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipEnumerateMetafileSrcRectDestPointsI(
     graphics: GpGraphics,
     metafile: GpMetafile,
@@ -1907,2077 +1907,2077 @@ class Gdiplus extends Win32 {
     return Gdiplus.Load('GdipEnumerateMetafileSrcRectDestPointsI')(graphics, metafile, destPoints, count, srcRect, srcUnit, callback, callbackData, imageAttributes);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipenumeratemetafilesrcrectdestrect
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipEnumerateMetafileSrcRectDestRect(graphics: GpGraphics, metafile: GpMetafile, destRect: Pointer, srcRect: Pointer, srcUnit: Unit, callback: Pointer, callbackData: LPVOID, imageAttributes: GpImageAttributes): Status {
     return Gdiplus.Load('GdipEnumerateMetafileSrcRectDestRect')(graphics, metafile, destRect, srcRect, srcUnit, callback, callbackData, imageAttributes);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipenumeratemetafilesrcrectdestrecti
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipEnumerateMetafileSrcRectDestRectI(graphics: GpGraphics, metafile: GpMetafile, destRect: Pointer, srcRect: Pointer, srcUnit: Unit, callback: Pointer, callbackData: LPVOID, imageAttributes: GpImageAttributes): Status {
     return Gdiplus.Load('GdipEnumerateMetafileSrcRectDestRectI')(graphics, metafile, destRect, srcRect, srcUnit, callback, callbackData, imageAttributes);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipfillclosedcurve
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipFillClosedCurve(graphics: GpGraphics, brush: GpBrush, points: Pointer, count: INT): Status {
     return Gdiplus.Load('GdipFillClosedCurve')(graphics, brush, points, count);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipfillclosedcurve2
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipFillClosedCurve2(graphics: GpGraphics, brush: GpBrush, points: Pointer, count: INT, tension: REAL, fillMode: FillMode): Status {
     return Gdiplus.Load('GdipFillClosedCurve2')(graphics, brush, points, count, tension, fillMode);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipfillclosedcurve2i
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipFillClosedCurve2I(graphics: GpGraphics, brush: GpBrush, points: Pointer, count: INT, tension: REAL, fillMode: FillMode): Status {
     return Gdiplus.Load('GdipFillClosedCurve2I')(graphics, brush, points, count, tension, fillMode);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipfillclosedcurvei
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipFillClosedCurveI(graphics: GpGraphics, brush: GpBrush, points: Pointer, count: INT): Status {
     return Gdiplus.Load('GdipFillClosedCurveI')(graphics, brush, points, count);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipfillellipse
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipFillEllipse(graphics: GpGraphics, brush: GpBrush, x: REAL, y: REAL, width: REAL, height: REAL): Status {
     return Gdiplus.Load('GdipFillEllipse')(graphics, brush, x, y, width, height);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipfillellipsei
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipFillEllipseI(graphics: GpGraphics, brush: GpBrush, x: INT, y: INT, width: INT, height: INT): Status {
     return Gdiplus.Load('GdipFillEllipseI')(graphics, brush, x, y, width, height);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipfillpath
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipFillPath(graphics: GpGraphics, brush: GpBrush, path: GpPath): Status {
     return Gdiplus.Load('GdipFillPath')(graphics, brush, path);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipfillpie
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipFillPie(graphics: GpGraphics, brush: GpBrush, x: REAL, y: REAL, width: REAL, height: REAL, startAngle: REAL, sweepAngle: REAL): Status {
     return Gdiplus.Load('GdipFillPie')(graphics, brush, x, y, width, height, startAngle, sweepAngle);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipfillpiei
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipFillPieI(graphics: GpGraphics, brush: GpBrush, x: INT, y: INT, width: INT, height: INT, startAngle: REAL, sweepAngle: REAL): Status {
     return Gdiplus.Load('GdipFillPieI')(graphics, brush, x, y, width, height, startAngle, sweepAngle);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipfillpolygon
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipFillPolygon(graphics: GpGraphics, brush: GpBrush, points: Pointer, count: INT, fillMode: FillMode): Status {
     return Gdiplus.Load('GdipFillPolygon')(graphics, brush, points, count, fillMode);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipfillpolygon2
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipFillPolygon2(graphics: GpGraphics, brush: GpBrush, points: Pointer, count: INT): Status {
     return Gdiplus.Load('GdipFillPolygon2')(graphics, brush, points, count);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipfillpolygon2i
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipFillPolygon2I(graphics: GpGraphics, brush: GpBrush, points: Pointer, count: INT): Status {
     return Gdiplus.Load('GdipFillPolygon2I')(graphics, brush, points, count);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipfillpolygoni
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipFillPolygonI(graphics: GpGraphics, brush: GpBrush, points: Pointer, count: INT, fillMode: FillMode): Status {
     return Gdiplus.Load('GdipFillPolygonI')(graphics, brush, points, count, fillMode);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipfillrectangle
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipFillRectangle(graphics: GpGraphics, brush: GpBrush, x: REAL, y: REAL, width: REAL, height: REAL): Status {
     return Gdiplus.Load('GdipFillRectangle')(graphics, brush, x, y, width, height);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipfillrectanglei
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipFillRectangleI(graphics: GpGraphics, brush: GpBrush, x: INT, y: INT, width: INT, height: INT): Status {
     return Gdiplus.Load('GdipFillRectangleI')(graphics, brush, x, y, width, height);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipfillrectangles
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipFillRectangles(graphics: GpGraphics, brush: GpBrush, rects: Pointer, count: INT): Status {
     return Gdiplus.Load('GdipFillRectangles')(graphics, brush, rects, count);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipfillrectanglesi
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipFillRectanglesI(graphics: GpGraphics, brush: GpBrush, rects: Pointer, count: INT): Status {
     return Gdiplus.Load('GdipFillRectanglesI')(graphics, brush, rects, count);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipfillregion
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipFillRegion(graphics: GpGraphics, brush: GpBrush, region: GpRegion): Status {
     return Gdiplus.Load('GdipFillRegion')(graphics, brush, region);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipfindfirstimageitem
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-image-flat
   public static GdipFindFirstImageItem(image: GpImage, item_out: Pointer): Status {
     return Gdiplus.Load('GdipFindFirstImageItem')(image, item_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipfindnextimageitem
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-image-flat
   public static GdipFindNextImageItem(image: GpImage, item_out: Pointer): Status {
     return Gdiplus.Load('GdipFindNextImageItem')(image, item_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipflattenpath
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphicspath-flat
   public static GdipFlattenPath(path: GpPath, matrix: GpMatrix, flatness: REAL): Status {
     return Gdiplus.Load('GdipFlattenPath')(path, matrix, flatness);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipflush
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipFlush(graphics: GpGraphics, intention: FlushIntention): Status {
     return Gdiplus.Load('GdipFlush')(graphics, intention);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipfree
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-memory-flat
   public static GdipFree(ptr: LPVOID): void {
     return Gdiplus.Load('GdipFree')(ptr);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetadjustablearrowcapfillstate
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-adjustablearrowcap-flat
   public static GdipGetAdjustableArrowCapFillState(cap: GpAdjustableArrowCap, fillState_out: LPBOOL): Status {
     return Gdiplus.Load('GdipGetAdjustableArrowCapFillState')(cap, fillState_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetadjustablearrowcapheight
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-adjustablearrowcap-flat
   public static GdipGetAdjustableArrowCapHeight(cap: GpAdjustableArrowCap, height_out: LPREAL): Status {
     return Gdiplus.Load('GdipGetAdjustableArrowCapHeight')(cap, height_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetadjustablearrowcapmiddleinset
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-adjustablearrowcap-flat
   public static GdipGetAdjustableArrowCapMiddleInset(cap: GpAdjustableArrowCap, middleInset_out: LPREAL): Status {
     return Gdiplus.Load('GdipGetAdjustableArrowCapMiddleInset')(cap, middleInset_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetadjustablearrowcapwidth
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-adjustablearrowcap-flat
   public static GdipGetAdjustableArrowCapWidth(cap: GpAdjustableArrowCap, width_out: LPREAL): Status {
     return Gdiplus.Load('GdipGetAdjustableArrowCapWidth')(cap, width_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetallpropertyitems
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-image-flat
   public static GdipGetAllPropertyItems(image: GpImage, totalBufferSize: UINT, numProperties: UINT, allItems_out: Pointer): Status {
     return Gdiplus.Load('GdipGetAllPropertyItems')(image, totalBufferSize, numProperties, allItems_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetbrushtype
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-brush-flat
   public static GdipGetBrushType(brush: GpBrush, type_out: LPVOID): Status {
     return Gdiplus.Load('GdipGetBrushType')(brush, type_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetcellascent
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-fontfamily-flat
   public static GdipGetCellAscent(family: GpFontFamily, style: INT, CellAscent_out: LPUINT16): Status {
     return Gdiplus.Load('GdipGetCellAscent')(family, style, CellAscent_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetcelldescent
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-fontfamily-flat
   public static GdipGetCellDescent(family: GpFontFamily, style: INT, CellDescent_out: LPUINT16): Status {
     return Gdiplus.Load('GdipGetCellDescent')(family, style, CellDescent_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetclip
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipGetClip(graphics: GpGraphics, region: GpRegion): Status {
     return Gdiplus.Load('GdipGetClip')(graphics, region);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetclipbounds
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipGetClipBounds(graphics: GpGraphics, rect_out: Pointer): Status {
     return Gdiplus.Load('GdipGetClipBounds')(graphics, rect_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetclipboundsi
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipGetClipBoundsI(graphics: GpGraphics, rect_out: Pointer): Status {
     return Gdiplus.Load('GdipGetClipBoundsI')(graphics, rect_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetcompositingmode
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipGetCompositingMode(graphics: GpGraphics, compositingMode_out: Pointer): Status {
     return Gdiplus.Load('GdipGetCompositingMode')(graphics, compositingMode_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetcompositingquality
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipGetCompositingQuality(graphics: GpGraphics, compositingQuality_out: Pointer): Status {
     return Gdiplus.Load('GdipGetCompositingQuality')(graphics, compositingQuality_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetcustomlinecapbasecap
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-customlinecap-flat
   public static GdipGetCustomLineCapBaseCap(customCap: GpCustomLineCap, baseCap_out: Pointer): Status {
     return Gdiplus.Load('GdipGetCustomLineCapBaseCap')(customCap, baseCap_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetcustomlinecapbaseinset
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-customlinecap-flat
   public static GdipGetCustomLineCapBaseInset(customCap: GpCustomLineCap, inset_out: LPREAL): Status {
     return Gdiplus.Load('GdipGetCustomLineCapBaseInset')(customCap, inset_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetcustomlinecapstrokecaps
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-customlinecap-flat
   public static GdipGetCustomLineCapStrokeCaps(customCap: GpCustomLineCap, startCap_out: Pointer, endCap_out: Pointer): Status {
     return Gdiplus.Load('GdipGetCustomLineCapStrokeCaps')(customCap, startCap_out, endCap_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetcustomlinecapstrokejoin
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-customlinecap-flat
   public static GdipGetCustomLineCapStrokeJoin(customCap: GpCustomLineCap, lineJoin_out: Pointer): Status {
     return Gdiplus.Load('GdipGetCustomLineCapStrokeJoin')(customCap, lineJoin_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetcustomlinecaptype
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-customlinecap-flat
   public static GdipGetCustomLineCapType(customCap: GpCustomLineCap, capType_out: Pointer): Status {
     return Gdiplus.Load('GdipGetCustomLineCapType')(customCap, capType_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetcustomlinecapwidthscale
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-customlinecap-flat
   public static GdipGetCustomLineCapWidthScale(customCap: GpCustomLineCap, widthScale_out: LPREAL): Status {
     return Gdiplus.Load('GdipGetCustomLineCapWidthScale')(customCap, widthScale_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetdc
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipGetDC(graphics: GpGraphics, hdc_out: Pointer): Status {
     return Gdiplus.Load('GdipGetDC')(graphics, hdc_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetdpix
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipGetDpiX(graphics: GpGraphics, dpi_out: LPREAL): Status {
     return Gdiplus.Load('GdipGetDpiX')(graphics, dpi_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetdpiy
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipGetDpiY(graphics: GpGraphics, dpi_out: LPREAL): Status {
     return Gdiplus.Load('GdipGetDpiY')(graphics, dpi_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgeteffectparametersize
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-bitmap-flat
   public static GdipGetEffectParameterSize(effect: CGpEffect, size_out: LPUINT): Status {
     return Gdiplus.Load('GdipGetEffectParameterSize')(effect, size_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgeteffectparameters
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-bitmap-flat
   public static GdipGetEffectParameters(effect: CGpEffect, size: LPUINT, params_out: LPVOID): Status {
     return Gdiplus.Load('GdipGetEffectParameters')(effect, size, params_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetemheight
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-fontfamily-flat
   public static GdipGetEmHeight(family: GpFontFamily, style: INT, EmHeight_out: LPUINT16): Status {
     return Gdiplus.Load('GdipGetEmHeight')(family, style, EmHeight_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetencoderparameterlist
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-image-flat
   public static GdipGetEncoderParameterList(image: GpImage, clsidEncoder: Pointer, size: UINT, buffer_out: Pointer): Status {
     return Gdiplus.Load('GdipGetEncoderParameterList')(image, clsidEncoder, size, buffer_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetencoderparameterlistsize
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-image-flat
   public static GdipGetEncoderParameterListSize(image: GpImage, clsidEncoder: Pointer, size_out: LPUINT): Status {
     return Gdiplus.Load('GdipGetEncoderParameterListSize')(image, clsidEncoder, size_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetfamily
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-font-flat
   public static GdipGetFamily(font: GpFont, family_out: Pointer): Status {
     return Gdiplus.Load('GdipGetFamily')(font, family_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetfamilyname
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-fontfamily-flat
   public static GdipGetFamilyName(family: GpFontFamily, name_out: LPWSTR, language: LANGID): Status {
     return Gdiplus.Load('GdipGetFamilyName')(family, name_out, language);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetfontcollectionfamilycount
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-font-flat
   public static GdipGetFontCollectionFamilyCount(fontCollection: GpFontCollection, numFound_out: LPINT): Status {
     return Gdiplus.Load('GdipGetFontCollectionFamilyCount')(fontCollection, numFound_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetfontcollectionfamilylist
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-font-flat
   public static GdipGetFontCollectionFamilyList(fontCollection: GpFontCollection, numSought: INT, gpfamilies_out: GpFontFamily, numFound_out: LPINT): Status {
     return Gdiplus.Load('GdipGetFontCollectionFamilyList')(fontCollection, numSought, gpfamilies_out, numFound_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetfontheight
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-font-flat
   public static GdipGetFontHeight(font: GpFont, graphics: GpGraphics, height_out: LPREAL): Status {
     return Gdiplus.Load('GdipGetFontHeight')(font, graphics, height_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetfontheightgivendpi
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-font-flat
   public static GdipGetFontHeightGivenDPI(font: GpFont, dpi: REAL, height_out: LPREAL): Status {
     return Gdiplus.Load('GdipGetFontHeightGivenDPI')(font, dpi, height_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetfontsize
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-font-flat
   public static GdipGetFontSize(font: GpFont, size_out: LPREAL): Status {
     return Gdiplus.Load('GdipGetFontSize')(font, size_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetfontstyle
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-font-flat
   public static GdipGetFontStyle(font: GpFont, style_out: LPINT): Status {
     return Gdiplus.Load('GdipGetFontStyle')(font, style_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetfontunit
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-font-flat
   public static GdipGetFontUnit(font: GpFont, unit_out: Pointer): Status {
     return Gdiplus.Load('GdipGetFontUnit')(font, unit_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetgenericfontfamilymonospace
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-fontfamily-flat
   public static GdipGetGenericFontFamilyMonospace(nativeFamily_out: Pointer): Status {
     return Gdiplus.Load('GdipGetGenericFontFamilyMonospace')(nativeFamily_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetgenericfontfamilysansserif
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-fontfamily-flat
   public static GdipGetGenericFontFamilySansSerif(nativeFamily_out: Pointer): Status {
     return Gdiplus.Load('GdipGetGenericFontFamilySansSerif')(nativeFamily_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetgenericfontfamilyserif
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-fontfamily-flat
   public static GdipGetGenericFontFamilySerif(nativeFamily_out: Pointer): Status {
     return Gdiplus.Load('GdipGetGenericFontFamilySerif')(nativeFamily_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgethatchbackgroundcolor
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-hatchbrush-flat
   public static GdipGetHatchBackgroundColor(brush: GpHatch, backcol_out: LPARGB): Status {
     return Gdiplus.Load('GdipGetHatchBackgroundColor')(brush, backcol_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgethatchforegroundcolor
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-hatchbrush-flat
   public static GdipGetHatchForegroundColor(brush: GpHatch, forecol_out: LPARGB): Status {
     return Gdiplus.Load('GdipGetHatchForegroundColor')(brush, forecol_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgethatchstyle
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-hatchbrush-flat
   public static GdipGetHatchStyle(brush: GpHatch, hatchstyle_out: Pointer): Status {
     return Gdiplus.Load('GdipGetHatchStyle')(brush, hatchstyle_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgethemffrommetafile
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipGetHemfFromMetafile(metafile: GpMetafile, hEmf_out: Pointer): Status {
     return Gdiplus.Load('GdipGetHemfFromMetafile')(metafile, hEmf_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetimageattributesadjustedpalette
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-imageattributes-flat
   public static GdipGetImageAttributesAdjustedPalette(imageAttr: GpImageAttributes, colorPalette_in_out: Pointer, colorAdjustType: ColorAdjustType): Status {
     return Gdiplus.Load('GdipGetImageAttributesAdjustedPalette')(imageAttr, colorPalette_in_out, colorAdjustType);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetimagebounds
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-image-flat
   public static GdipGetImageBounds(image: GpImage, srcRect_out: Pointer, srcUnit_out: Pointer): Status {
     return Gdiplus.Load('GdipGetImageBounds')(image, srcRect_out, srcUnit_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetimagedecoders
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipGetImageDecoders(numDecoders: UINT, size: UINT, decoders_out: Pointer): Status {
     return Gdiplus.Load('GdipGetImageDecoders')(numDecoders, size, decoders_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetimagedecoderssize
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipGetImageDecodersSize(numDecoders_out: LPUINT, size_out: LPVOID): Status {
     return Gdiplus.Load('GdipGetImageDecodersSize')(numDecoders_out, size_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetimagedimension
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-image-flat
   public static GdipGetImageDimension(image: GpImage, width_out: LPREAL, height_out: LPREAL): Status {
     return Gdiplus.Load('GdipGetImageDimension')(image, width_out, height_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetimageencoders
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipGetImageEncoders(numEncoders: UINT, size: UINT, encoders_out: Pointer): Status {
     return Gdiplus.Load('GdipGetImageEncoders')(numEncoders, size, encoders_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetimageencoderssize
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipGetImageEncodersSize(numEncoders_out: LPUINT, size_out: LPVOID): Status {
     return Gdiplus.Load('GdipGetImageEncodersSize')(numEncoders_out, size_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetimageflags
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-image-flat
   public static GdipGetImageFlags(image: GpImage, flags_out: LPUINT): Status {
     return Gdiplus.Load('GdipGetImageFlags')(image, flags_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetimagegraphicscontext
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-image-flat
   public static GdipGetImageGraphicsContext(image: GpImage, graphics_out: Pointer): Status {
     return Gdiplus.Load('GdipGetImageGraphicsContext')(image, graphics_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetimageheight
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-image-flat
   public static GdipGetImageHeight(image: GpImage, height_out: LPUINT): Status {
     return Gdiplus.Load('GdipGetImageHeight')(image, height_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetimagehorizontalresolution
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-image-flat
   public static GdipGetImageHorizontalResolution(image: GpImage, resolution_out: LPREAL): Status {
     return Gdiplus.Load('GdipGetImageHorizontalResolution')(image, resolution_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetimageitemdata
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-image-flat
   public static GdipGetImageItemData(image: GpImage, item_out: Pointer): Status {
     return Gdiplus.Load('GdipGetImageItemData')(image, item_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetimagepalette
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-image-flat
   public static GdipGetImagePalette(image: GpImage, palette_out: Pointer, size: INT): Status {
     return Gdiplus.Load('GdipGetImagePalette')(image, palette_out, size);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetimagepalettesize
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-image-flat
   public static GdipGetImagePaletteSize(image: GpImage, size_out: LPINT): Status {
     return Gdiplus.Load('GdipGetImagePaletteSize')(image, size_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetimagepixelformat
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-image-flat
   public static GdipGetImagePixelFormat(image: GpImage, format_out: Pointer): Status {
     return Gdiplus.Load('GdipGetImagePixelFormat')(image, format_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetimagerawformat
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-image-flat
   public static GdipGetImageRawFormat(image: GpImage, format_out: Pointer): Status {
     return Gdiplus.Load('GdipGetImageRawFormat')(image, format_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetimagethumbnail
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-image-flat
   public static GdipGetImageThumbnail(image: GpImage, thumbWidth: UINT, thumbHeight: UINT, thumbImage_out: Pointer, callback: Pointer, callbackData: LPVOID): Status {
     return Gdiplus.Load('GdipGetImageThumbnail')(image, thumbWidth, thumbHeight, thumbImage_out, callback, callbackData);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetimagetype
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-image-flat
   public static GdipGetImageType(image: GpImage, type_out: Pointer): Status {
     return Gdiplus.Load('GdipGetImageType')(image, type_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetimageverticalresolution
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-image-flat
   public static GdipGetImageVerticalResolution(image: GpImage, resolution_out: LPREAL): Status {
     return Gdiplus.Load('GdipGetImageVerticalResolution')(image, resolution_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetimagewidth
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-image-flat
   public static GdipGetImageWidth(image: GpImage, width_out: LPUINT): Status {
     return Gdiplus.Load('GdipGetImageWidth')(image, width_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetinterpolationmode
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipGetInterpolationMode(graphics: GpGraphics, interpolationMode_out: Pointer): Status {
     return Gdiplus.Load('GdipGetInterpolationMode')(graphics, interpolationMode_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetlineblend
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-lineargradientbrush-flat
   public static GdipGetLineBlend(brush: GpLineGradient, blend_out: LPREAL, positions_out: LPREAL, count: INT): Status {
     return Gdiplus.Load('GdipGetLineBlend')(brush, blend_out, positions_out, count);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetlineblendcount
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-lineargradientbrush-flat
   public static GdipGetLineBlendCount(brush: GpLineGradient, count_out: LPINT): Status {
     return Gdiplus.Load('GdipGetLineBlendCount')(brush, count_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetlinecolors
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-lineargradientbrush-flat
   public static GdipGetLineColors(brush: GpLineGradient, colors_out: LPARGB): Status {
     return Gdiplus.Load('GdipGetLineColors')(brush, colors_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetlinegammacorrection
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-lineargradientbrush-flat
   public static GdipGetLineGammaCorrection(brush: GpLineGradient, useGammaCorrection_out: LPBOOL): Status {
     return Gdiplus.Load('GdipGetLineGammaCorrection')(brush, useGammaCorrection_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetlinepresetblend
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-lineargradientbrush-flat
   public static GdipGetLinePresetBlend(brush: GpLineGradient, blend_out: LPARGB, positions_out: LPREAL, count: INT): Status {
     return Gdiplus.Load('GdipGetLinePresetBlend')(brush, blend_out, positions_out, count);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetlinepresetblendcount
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-lineargradientbrush-flat
   public static GdipGetLinePresetBlendCount(brush: GpLineGradient, count_out: LPINT): Status {
     return Gdiplus.Load('GdipGetLinePresetBlendCount')(brush, count_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetlinerect
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-lineargradientbrush-flat
   public static GdipGetLineRect(brush: GpLineGradient, rect_out: Pointer): Status {
     return Gdiplus.Load('GdipGetLineRect')(brush, rect_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetlinerecti
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-lineargradientbrush-flat
   public static GdipGetLineRectI(brush: GpLineGradient, rect_out: Pointer): Status {
     return Gdiplus.Load('GdipGetLineRectI')(brush, rect_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetlinespacing
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-fontfamily-flat
   public static GdipGetLineSpacing(family: GpFontFamily, style: INT, LineSpacing_out: LPUINT16): Status {
     return Gdiplus.Load('GdipGetLineSpacing')(family, style, LineSpacing_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetlinetransform
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-lineargradientbrush-flat
   public static GdipGetLineTransform(brush: GpLineGradient, matrix: GpMatrix): Status {
     return Gdiplus.Load('GdipGetLineTransform')(brush, matrix);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetlinewrapmode
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-lineargradientbrush-flat
   public static GdipGetLineWrapMode(brush: GpLineGradient, wrapmode_out: Pointer): Status {
     return Gdiplus.Load('GdipGetLineWrapMode')(brush, wrapmode_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetlogfonta
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-font-flat
   public static GdipGetLogFontA(font: GpFont, graphics: GpGraphics, logfontA_out: Pointer): Status {
     return Gdiplus.Load('GdipGetLogFontA')(font, graphics, logfontA_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetlogfontw
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-font-flat
   public static GdipGetLogFontW(font: GpFont, graphics: GpGraphics, logfontW_out: Pointer): Status {
     return Gdiplus.Load('GdipGetLogFontW')(font, graphics, logfontW_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetmatrixelements
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-matrix-flat
   public static GdipGetMatrixElements(matrix: GpMatrix, matrixOut_out: LPREAL): Status {
     return Gdiplus.Load('GdipGetMatrixElements')(matrix, matrixOut_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetmetafiledownlevelrasterizationlimit
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipGetMetafileDownLevelRasterizationLimit(metafile: GpMetafile, metafileRasterizationLimitDpi_out: LPUINT): Status {
     return Gdiplus.Load('GdipGetMetafileDownLevelRasterizationLimit')(metafile, metafileRasterizationLimitDpi_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetmetafileheaderfromemf
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipGetMetafileHeaderFromEmf(hEmf: HENHMETAFILE, header_out: Pointer): Status {
     return Gdiplus.Load('GdipGetMetafileHeaderFromEmf')(hEmf, header_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetmetafileheaderfromfile
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipGetMetafileHeaderFromFile(filename: LPWSTR, header_out: Pointer): Status {
     return Gdiplus.Load('GdipGetMetafileHeaderFromFile')(filename, header_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetmetafileheaderfrommetafile
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipGetMetafileHeaderFromMetafile(metafile: GpMetafile, header_out: Pointer): Status {
     return Gdiplus.Load('GdipGetMetafileHeaderFromMetafile')(metafile, header_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetmetafileheaderfromstream
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipGetMetafileHeaderFromStream(stream: IStream, header_out: Pointer): Status {
     return Gdiplus.Load('GdipGetMetafileHeaderFromStream')(stream, header_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetmetafileheaderfromwmf
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipGetMetafileHeaderFromWmf(hWmf: HMETAFILE, wmfPlaceableFileHeader: Pointer, header_out: Pointer): Status {
     return Gdiplus.Load('GdipGetMetafileHeaderFromWmf')(hWmf, wmfPlaceableFileHeader, header_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetnearestcolor
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipGetNearestColor(graphics: GpGraphics, argb_out: LPARGB): Status {
     return Gdiplus.Load('GdipGetNearestColor')(graphics, argb_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetpagescale
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipGetPageScale(graphics: GpGraphics, scale_out: LPREAL): Status {
     return Gdiplus.Load('GdipGetPageScale')(graphics, scale_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetpageunit
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipGetPageUnit(graphics: GpGraphics, unit_out: Pointer): Status {
     return Gdiplus.Load('GdipGetPageUnit')(graphics, unit_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetpathdata
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphicspath-flat
   public static GdipGetPathData(path: GpPath, pathData_out: Pointer): Status {
     return Gdiplus.Load('GdipGetPathData')(path, pathData_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetpathfillmode
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphicspath-flat
   public static GdipGetPathFillMode(path: GpPath, fillmode_out: Pointer): Status {
     return Gdiplus.Load('GdipGetPathFillMode')(path, fillmode_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetpathgradientblend
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-pathgradientbrush-flat
   public static GdipGetPathGradientBlend(brush: GpPathGradient, blend_out: LPREAL, positions_out: LPREAL, count: INT): Status {
     return Gdiplus.Load('GdipGetPathGradientBlend')(brush, blend_out, positions_out, count);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetpathgradientblendcount
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-pathgradientbrush-flat
   public static GdipGetPathGradientBlendCount(brush: GpPathGradient, count_out: LPINT): Status {
     return Gdiplus.Load('GdipGetPathGradientBlendCount')(brush, count_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetpathgradientcentercolor
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-pathgradientbrush-flat
   public static GdipGetPathGradientCenterColor(brush: GpPathGradient, colors_out: LPARGB): Status {
     return Gdiplus.Load('GdipGetPathGradientCenterColor')(brush, colors_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetpathgradientcenterpoint
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-pathgradientbrush-flat
   public static GdipGetPathGradientCenterPoint(brush: GpPathGradient, points_out: Pointer): Status {
     return Gdiplus.Load('GdipGetPathGradientCenterPoint')(brush, points_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetpathgradientcenterpointi
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-pathgradientbrush-flat
   public static GdipGetPathGradientCenterPointI(brush: GpPathGradient, points_out: Pointer): Status {
     return Gdiplus.Load('GdipGetPathGradientCenterPointI')(brush, points_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetpathgradientfocusscales
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-pathgradientbrush-flat
   public static GdipGetPathGradientFocusScales(brush: GpPathGradient, xScale_out: LPREAL, yScale_out: LPREAL): Status {
     return Gdiplus.Load('GdipGetPathGradientFocusScales')(brush, xScale_out, yScale_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetpathgradientgammacorrection
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-pathgradientbrush-flat
   public static GdipGetPathGradientGammaCorrection(brush: GpPathGradient, useGammaCorrection_out: LPBOOL): Status {
     return Gdiplus.Load('GdipGetPathGradientGammaCorrection')(brush, useGammaCorrection_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetpathgradientpath
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-pathgradientbrush-flat
   public static GdipGetPathGradientPath(brush: GpPathGradient, path: GpPath): Status {
     return Gdiplus.Load('GdipGetPathGradientPath')(brush, path);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetpathgradientpointcount
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-pathgradientbrush-flat
   public static GdipGetPathGradientPointCount(brush: GpPathGradient, count_out: LPINT): Status {
     return Gdiplus.Load('GdipGetPathGradientPointCount')(brush, count_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetpathgradientpresetblend
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-pathgradientbrush-flat
   public static GdipGetPathGradientPresetBlend(brush: GpPathGradient, blend_out: LPARGB, positions_out: LPREAL, count: INT): Status {
     return Gdiplus.Load('GdipGetPathGradientPresetBlend')(brush, blend_out, positions_out, count);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetpathgradientpresetblendcount
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-pathgradientbrush-flat
   public static GdipGetPathGradientPresetBlendCount(brush: GpPathGradient, count_out: LPINT): Status {
     return Gdiplus.Load('GdipGetPathGradientPresetBlendCount')(brush, count_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetpathgradientrect
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-pathgradientbrush-flat
   public static GdipGetPathGradientRect(brush: GpPathGradient, rect_out: Pointer): Status {
     return Gdiplus.Load('GdipGetPathGradientRect')(brush, rect_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetpathgradientrecti
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-pathgradientbrush-flat
   public static GdipGetPathGradientRectI(brush: GpPathGradient, rect_out: Pointer): Status {
     return Gdiplus.Load('GdipGetPathGradientRectI')(brush, rect_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetpathgradientsurroundcolorcount
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-pathgradientbrush-flat
   public static GdipGetPathGradientSurroundColorCount(brush: GpPathGradient, count_out: LPINT): Status {
     return Gdiplus.Load('GdipGetPathGradientSurroundColorCount')(brush, count_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetpathgradientsurroundcolorswithcount
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-pathgradientbrush-flat
   public static GdipGetPathGradientSurroundColorsWithCount(brush: GpPathGradient, color_out: LPARGB, count_in_out: LPINT): Status {
     return Gdiplus.Load('GdipGetPathGradientSurroundColorsWithCount')(brush, color_out, count_in_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetpathgradienttransform
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-pathgradientbrush-flat
   public static GdipGetPathGradientTransform(brush: GpPathGradient, matrix: GpMatrix): Status {
     return Gdiplus.Load('GdipGetPathGradientTransform')(brush, matrix);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetpathgradientwrapmode
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-pathgradientbrush-flat
   public static GdipGetPathGradientWrapMode(brush: GpPathGradient, wrapmode_out: Pointer): Status {
     return Gdiplus.Load('GdipGetPathGradientWrapMode')(brush, wrapmode_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetpathlastpoint
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphicspath-flat
   public static GdipGetPathLastPoint(path: GpPath, lastPoint_out: Pointer): Status {
     return Gdiplus.Load('GdipGetPathLastPoint')(path, lastPoint_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetpathpoints
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphicspath-flat
   public static GdipGetPathPoints(path: GpPath, points_out: Pointer, count: INT): Status {
     return Gdiplus.Load('GdipGetPathPoints')(path, points_out, count);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetpathpointsi
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphicspath-flat
   public static GdipGetPathPointsI(path: GpPath, points_out: Pointer, count: INT): Status {
     return Gdiplus.Load('GdipGetPathPointsI')(path, points_out, count);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetpathtypes
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphicspath-flat
   public static GdipGetPathTypes(path: GpPath, types_out: LPBYTE, count: INT): Status {
     return Gdiplus.Load('GdipGetPathTypes')(path, types_out, count);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetpathworldbounds
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphicspath-flat
   public static GdipGetPathWorldBounds(path: GpPath, bounds_out: Pointer, matrix: GpMatrix, pen: GpPen): Status {
     return Gdiplus.Load('GdipGetPathWorldBounds')(path, bounds_out, matrix, pen);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetpathworldboundsi
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphicspath-flat
   public static GdipGetPathWorldBoundsI(path: GpPath, bounds_out: Pointer, matrix: GpMatrix, pen: GpPen): Status {
     return Gdiplus.Load('GdipGetPathWorldBoundsI')(path, bounds_out, matrix, pen);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetpenbrushfill
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-pen-flat
   public static GdipGetPenBrushFill(pen: GpPen, brush_out: Pointer): Status {
     return Gdiplus.Load('GdipGetPenBrushFill')(pen, brush_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetpencolor
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-pen-flat
   public static GdipGetPenColor(pen: GpPen, argb_out: LPARGB): Status {
     return Gdiplus.Load('GdipGetPenColor')(pen, argb_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetpencompoundarray
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-pen-flat
   public static GdipGetPenCompoundArray(pen: GpPen, dash_out: LPREAL, count: INT): Status {
     return Gdiplus.Load('GdipGetPenCompoundArray')(pen, dash_out, count);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetpencompoundcount
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-pen-flat
   public static GdipGetPenCompoundCount(pen: GpPen, count_out: LPINT): Status {
     return Gdiplus.Load('GdipGetPenCompoundCount')(pen, count_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetpencustomendcap
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-pen-flat
   public static GdipGetPenCustomEndCap(pen: GpPen, customCap_out: Pointer): Status {
     return Gdiplus.Load('GdipGetPenCustomEndCap')(pen, customCap_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetpencustomstartcap
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-pen-flat
   public static GdipGetPenCustomStartCap(pen: GpPen, customCap_out: Pointer): Status {
     return Gdiplus.Load('GdipGetPenCustomStartCap')(pen, customCap_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetpendasharray
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-pen-flat
   public static GdipGetPenDashArray(pen: GpPen, dash_out: LPREAL, count: INT): Status {
     return Gdiplus.Load('GdipGetPenDashArray')(pen, dash_out, count);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetpendashcap197819
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-pen-flat
   public static GdipGetPenDashCap197819(pen: GpPen, dashCap_out: Pointer): Status {
     return Gdiplus.Load('GdipGetPenDashCap197819')(pen, dashCap_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetpendashcount
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-pen-flat
   public static GdipGetPenDashCount(pen: GpPen, count_out: LPINT): Status {
     return Gdiplus.Load('GdipGetPenDashCount')(pen, count_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetpendashoffset
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-pen-flat
   public static GdipGetPenDashOffset(pen: GpPen, offset_out: LPREAL): Status {
     return Gdiplus.Load('GdipGetPenDashOffset')(pen, offset_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetpendashstyle
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-pen-flat
   public static GdipGetPenDashStyle(pen: GpPen, dashstyle_out: Pointer): Status {
     return Gdiplus.Load('GdipGetPenDashStyle')(pen, dashstyle_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetpenendcap
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-pen-flat
   public static GdipGetPenEndCap(pen: GpPen, endCap_out: Pointer): Status {
     return Gdiplus.Load('GdipGetPenEndCap')(pen, endCap_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetpenfilltype
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-pen-flat
   public static GdipGetPenFillType(pen: GpPen, type_out: Pointer): Status {
     return Gdiplus.Load('GdipGetPenFillType')(pen, type_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetpenlinejoin
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-pen-flat
   public static GdipGetPenLineJoin(pen: GpPen, lineJoin_out: Pointer): Status {
     return Gdiplus.Load('GdipGetPenLineJoin')(pen, lineJoin_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetpenmiterlimit
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-pen-flat
   public static GdipGetPenMiterLimit(pen: GpPen, miterLimit_out: LPREAL): Status {
     return Gdiplus.Load('GdipGetPenMiterLimit')(pen, miterLimit_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetpenmode
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-pen-flat
   public static GdipGetPenMode(pen: GpPen, penMode_out: Pointer): Status {
     return Gdiplus.Load('GdipGetPenMode')(pen, penMode_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetpenstartcap
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-pen-flat
   public static GdipGetPenStartCap(pen: GpPen, startCap_out: Pointer): Status {
     return Gdiplus.Load('GdipGetPenStartCap')(pen, startCap_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetpentransform
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-pen-flat
   public static GdipGetPenTransform(pen: GpPen, matrix: GpMatrix): Status {
     return Gdiplus.Load('GdipGetPenTransform')(pen, matrix);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetpenunit
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-pen-flat
   public static GdipGetPenUnit(pen: GpPen, unit_out: Pointer): Status {
     return Gdiplus.Load('GdipGetPenUnit')(pen, unit_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetpenwidth
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-pen-flat
   public static GdipGetPenWidth(pen: GpPen, width_out: LPREAL): Status {
     return Gdiplus.Load('GdipGetPenWidth')(pen, width_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetpixeloffsetmode
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipGetPixelOffsetMode(graphics: GpGraphics, pixelOffsetMode_out: Pointer): Status {
     return Gdiplus.Load('GdipGetPixelOffsetMode')(graphics, pixelOffsetMode_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetpointcount
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphicspath-flat
   public static GdipGetPointCount(path: GpPath, count_out: LPINT): Status {
     return Gdiplus.Load('GdipGetPointCount')(path, count_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetpropertycount
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-image-flat
   public static GdipGetPropertyCount(image: GpImage, numOfProperty_out: LPUINT): Status {
     return Gdiplus.Load('GdipGetPropertyCount')(image, numOfProperty_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetpropertyidlist
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-image-flat
   public static GdipGetPropertyIdList(image: GpImage, numOfProperty: UINT, list_out: Pointer): Status {
     return Gdiplus.Load('GdipGetPropertyIdList')(image, numOfProperty, list_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetpropertyitem
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-image-flat
   public static GdipGetPropertyItem(image: GpImage, propId: PROPID, propSize: UINT, buffer_out: Pointer): Status {
     return Gdiplus.Load('GdipGetPropertyItem')(image, propId, propSize, buffer_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetpropertyitemsize
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-image-flat
   public static GdipGetPropertyItemSize(image: GpImage, propId: PROPID, size_out: LPUINT): Status {
     return Gdiplus.Load('GdipGetPropertyItemSize')(image, propId, size_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetpropertysize
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-image-flat
   public static GdipGetPropertySize(image: GpImage, totalBufferSize_out: LPUINT, numProperties_out: LPUINT): Status {
     return Gdiplus.Load('GdipGetPropertySize')(image, totalBufferSize_out, numProperties_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetregionbounds
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-region-flat
   public static GdipGetRegionBounds(region: GpRegion, graphics: GpGraphics, rect_out: Pointer): Status {
     return Gdiplus.Load('GdipGetRegionBounds')(region, graphics, rect_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetregionboundsi
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-region-flat
   public static GdipGetRegionBoundsI(region: GpRegion, graphics: GpGraphics, rect_out: Pointer): Status {
     return Gdiplus.Load('GdipGetRegionBoundsI')(region, graphics, rect_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetregiondata
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-region-flat
   public static GdipGetRegionData(region: GpRegion, buffer_out: LPBYTE, bufferSize: UINT, sizeFilled_out: Optional<LPUINT>): Status {
     return Gdiplus.Load('GdipGetRegionData')(region, buffer_out, bufferSize, sizeFilled_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetregiondatasize
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-region-flat
   public static GdipGetRegionDataSize(region: GpRegion, bufferSize_out: LPUINT): Status {
     return Gdiplus.Load('GdipGetRegionDataSize')(region, bufferSize_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetregionhrgn
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-region-flat
   public static GdipGetRegionHRgn(region: GpRegion, graphics: GpGraphics, hRgn_out: Pointer): Status {
     return Gdiplus.Load('GdipGetRegionHRgn')(region, graphics, hRgn_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetregionscans
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-region-flat
   public static GdipGetRegionScans(region: GpRegion, rects_out: Pointer, count_out: LPINT, matrix: GpMatrix): Status {
     return Gdiplus.Load('GdipGetRegionScans')(region, rects_out, count_out, matrix);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetregionscanscount
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-region-flat
   public static GdipGetRegionScansCount(region: GpRegion, count_out: LPUINT, matrix: GpMatrix): Status {
     return Gdiplus.Load('GdipGetRegionScansCount')(region, count_out, matrix);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetregionscansi
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-region-flat
   public static GdipGetRegionScansI(region: GpRegion, rects_out: Pointer, count_out: LPINT, matrix: GpMatrix): Status {
     return Gdiplus.Load('GdipGetRegionScansI')(region, rects_out, count_out, matrix);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetrenderingorigin
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipGetRenderingOrigin(graphics: GpGraphics, x_out: LPINT, y_out: LPINT): Status {
     return Gdiplus.Load('GdipGetRenderingOrigin')(graphics, x_out, y_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetsmoothingmode
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipGetSmoothingMode(graphics: GpGraphics, smoothingMode_out: Pointer): Status {
     return Gdiplus.Load('GdipGetSmoothingMode')(graphics, smoothingMode_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetsolidfillcolor
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-solidbrush-flat
   public static GdipGetSolidFillColor(brush: GpSolidFill, color_out: LPARGB): Status {
     return Gdiplus.Load('GdipGetSolidFillColor')(brush, color_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetstringformatalign
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-stringformat-flat
   public static GdipGetStringFormatAlign(format: GpStringFormat, align_out: Pointer): Status {
     return Gdiplus.Load('GdipGetStringFormatAlign')(format, align_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetstringformatdigitsubstitution
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-stringformat-flat
   public static GdipGetStringFormatDigitSubstitution(format: GpStringFormat, language_out: LPLANGID, substitute_out: Pointer): Status {
     return Gdiplus.Load('GdipGetStringFormatDigitSubstitution')(format, language_out, substitute_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetstringformatflags
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-stringformat-flat
   public static GdipGetStringFormatFlags(format: GpStringFormat, flags_out: LPINT): Status {
     return Gdiplus.Load('GdipGetStringFormatFlags')(format, flags_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetstringformathotkeyprefix
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-stringformat-flat
   public static GdipGetStringFormatHotkeyPrefix(format: GpStringFormat, hotkeyPrefix_out: LPINT): Status {
     return Gdiplus.Load('GdipGetStringFormatHotkeyPrefix')(format, hotkeyPrefix_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetstringformatlinealign
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-stringformat-flat
   public static GdipGetStringFormatLineAlign(format: GpStringFormat, align_out: Pointer): Status {
     return Gdiplus.Load('GdipGetStringFormatLineAlign')(format, align_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetstringformatmeasurablecharacterrangecount
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-stringformat-flat
   public static GdipGetStringFormatMeasurableCharacterRangeCount(format: GpStringFormat, count_out: LPINT): Status {
     return Gdiplus.Load('GdipGetStringFormatMeasurableCharacterRangeCount')(format, count_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetstringformattabstopcount
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-stringformat-flat
   public static GdipGetStringFormatTabStopCount(format: GpStringFormat, count_out: LPINT): Status {
     return Gdiplus.Load('GdipGetStringFormatTabStopCount')(format, count_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetstringformattabstops
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-stringformat-flat
   public static GdipGetStringFormatTabStops(format: GpStringFormat, count: INT, firstTabOffset_out: LPREAL, tabStops_out: LPREAL): Status {
     return Gdiplus.Load('GdipGetStringFormatTabStops')(format, count, firstTabOffset_out, tabStops_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetstringformattrimming
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-stringformat-flat
   public static GdipGetStringFormatTrimming(format: GpStringFormat, trimming_out: Pointer): Status {
     return Gdiplus.Load('GdipGetStringFormatTrimming')(format, trimming_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgettextcontrast
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipGetTextContrast(graphics: GpGraphics, contrast_out: LPUINT): Status {
     return Gdiplus.Load('GdipGetTextContrast')(graphics, contrast_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgettextrenderinghint
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipGetTextRenderingHint(graphics: GpGraphics, mode_out: Pointer): Status {
     return Gdiplus.Load('GdipGetTextRenderingHint')(graphics, mode_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgettextureimage
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-texturebrush-flat
   public static GdipGetTextureImage(brush: GpTexture, image_out: Pointer): Status {
     return Gdiplus.Load('GdipGetTextureImage')(brush, image_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgettexturetransform
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-texturebrush-flat
   public static GdipGetTextureTransform(brush: GpTexture, matrix: GpMatrix): Status {
     return Gdiplus.Load('GdipGetTextureTransform')(brush, matrix);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgettexturewrapmode
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-texturebrush-flat
   public static GdipGetTextureWrapMode(brush: GpTexture, wrapmode_out: Pointer): Status {
     return Gdiplus.Load('GdipGetTextureWrapMode')(brush, wrapmode_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetvisibleclipbounds
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipGetVisibleClipBounds(graphics: GpGraphics, rect_out: Pointer): Status {
     return Gdiplus.Load('GdipGetVisibleClipBounds')(graphics, rect_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetvisibleclipboundsi
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipGetVisibleClipBoundsI(graphics: GpGraphics, rect_out: Pointer): Status {
     return Gdiplus.Load('GdipGetVisibleClipBoundsI')(graphics, rect_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgetworldtransform
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipGetWorldTransform(graphics: GpGraphics, matrix: GpMatrix): Status {
     return Gdiplus.Load('GdipGetWorldTransform')(graphics, matrix);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgraphicsclear
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipGraphicsClear(graphics: GpGraphics, color: ARGB): Status {
     return Gdiplus.Load('GdipGraphicsClear')(graphics, color);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipgraphicssetabort
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipGraphicsSetAbort(pGraphics: GpGraphics, pIAbort: Pointer): Status {
     return Gdiplus.Load('GdipGraphicsSetAbort')(pGraphics, pIAbort);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipimageforcevalidation
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-image-flat
   public static GdipImageForceValidation(image: GpImage): Status {
     return Gdiplus.Load('GdipImageForceValidation')(image);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipimagegetframecount
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-image-flat
   public static GdipImageGetFrameCount(image: GpImage, dimensionID: Pointer, count_out: LPUINT): Status {
     return Gdiplus.Load('GdipImageGetFrameCount')(image, dimensionID, count_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipimagegetframedimensionscount
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-image-flat
   public static GdipImageGetFrameDimensionsCount(image: GpImage, count_out: LPUINT): Status {
     return Gdiplus.Load('GdipImageGetFrameDimensionsCount')(image, count_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipimagegetframedimensionslist
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-image-flat
   public static GdipImageGetFrameDimensionsList(image: GpImage, dimensionIDs_out: Pointer, count: UINT): Status {
     return Gdiplus.Load('GdipImageGetFrameDimensionsList')(image, dimensionIDs_out, count);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipimagerotateflip
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-image-flat
   public static GdipImageRotateFlip(image: GpImage, rfType: RotateFlipType): Status {
     return Gdiplus.Load('GdipImageRotateFlip')(image, rfType);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipimageselectactiveframe
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-image-flat
   public static GdipImageSelectActiveFrame(image: GpImage, dimensionID: Pointer, frameIndex: UINT): Status {
     return Gdiplus.Load('GdipImageSelectActiveFrame')(image, dimensionID, frameIndex);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipimagesetabort
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-image-flat
   public static GdipImageSetAbort(pImage: GpImage, pIAbort: Pointer): Status {
     return Gdiplus.Load('GdipImageSetAbort')(pImage, pIAbort);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipinitializepalette
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-bitmap-flat
   public static GdipInitializePalette(palette_out: Pointer, palettetype: PaletteType, optimalColors: INT, useTransparentColor: BOOL, bitmap: Nullable<GpBitmap>): Status {
     return Gdiplus.Load('GdipInitializePalette')(palette_out, palettetype, optimalColors, useTransparentColor, bitmap);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipinvertmatrix
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-matrix-flat
   public static GdipInvertMatrix(matrix: GpMatrix): Status {
     return Gdiplus.Load('GdipInvertMatrix')(matrix);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipisclipempty
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipIsClipEmpty(graphics: GpGraphics, result_out: LPBOOL): Status {
     return Gdiplus.Load('GdipIsClipEmpty')(graphics, result_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipisemptyregion
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-region-flat
   public static GdipIsEmptyRegion(region: GpRegion, graphics: GpGraphics, result_out: LPBOOL): Status {
     return Gdiplus.Load('GdipIsEmptyRegion')(region, graphics, result_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipisequalregion
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-region-flat
   public static GdipIsEqualRegion(region: GpRegion, region2: GpRegion, graphics: GpGraphics, result_out: LPBOOL): Status {
     return Gdiplus.Load('GdipIsEqualRegion')(region, region2, graphics, result_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipisinfiniteregion
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-region-flat
   public static GdipIsInfiniteRegion(region: GpRegion, graphics: GpGraphics, result_out: LPBOOL): Status {
     return Gdiplus.Load('GdipIsInfiniteRegion')(region, graphics, result_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipismatrixequal
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-matrix-flat
   public static GdipIsMatrixEqual(matrix: GpMatrix, matrix2: GpMatrix, result_out: LPBOOL): Status {
     return Gdiplus.Load('GdipIsMatrixEqual')(matrix, matrix2, result_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipismatrixidentity
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-matrix-flat
   public static GdipIsMatrixIdentity(matrix: GpMatrix, result_out: LPBOOL): Status {
     return Gdiplus.Load('GdipIsMatrixIdentity')(matrix, result_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipismatrixinvertible
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-flatapi-flat
   public static GdipIsMatrixInvertible(matrix: GpMatrix, result_out: LPBOOL): Status {
     return Gdiplus.Load('GdipIsMatrixInvertible')(matrix, result_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipisoutlinevisiblepathpoint
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphicspath-flat
   public static GdipIsOutlineVisiblePathPoint(path: GpPath, x: REAL, y: REAL, pen: GpPen, graphics: GpGraphics, result_out: LPBOOL): Status {
     return Gdiplus.Load('GdipIsOutlineVisiblePathPoint')(path, x, y, pen, graphics, result_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipisoutlinevisiblepathpointi
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphicspath-flat
   public static GdipIsOutlineVisiblePathPointI(path: GpPath, x: INT, y: INT, pen: GpPen, graphics: GpGraphics, result_out: LPBOOL): Status {
     return Gdiplus.Load('GdipIsOutlineVisiblePathPointI')(path, x, y, pen, graphics, result_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipisstyleavailable
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-fontfamily-flat
   public static GdipIsStyleAvailable(family: GpFontFamily, style: INT, IsStyleAvailable_out: LPBOOL): Status {
     return Gdiplus.Load('GdipIsStyleAvailable')(family, style, IsStyleAvailable_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipisvisibleclipempty
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipIsVisibleClipEmpty(graphics: GpGraphics, result_out: LPBOOL): Status {
     return Gdiplus.Load('GdipIsVisibleClipEmpty')(graphics, result_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipisvisiblepathpoint
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphicspath-flat
   public static GdipIsVisiblePathPoint(path: GpPath, x: REAL, y: REAL, graphics: GpGraphics, result_out: LPBOOL): Status {
     return Gdiplus.Load('GdipIsVisiblePathPoint')(path, x, y, graphics, result_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipisvisiblepathpointi
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphicspath-flat
   public static GdipIsVisiblePathPointI(path: GpPath, x: INT, y: INT, graphics: GpGraphics, result_out: LPBOOL): Status {
     return Gdiplus.Load('GdipIsVisiblePathPointI')(path, x, y, graphics, result_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipisvisiblepoint
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipIsVisiblePoint(graphics: GpGraphics, x: REAL, y: REAL, result_out: LPBOOL): Status {
     return Gdiplus.Load('GdipIsVisiblePoint')(graphics, x, y, result_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipisvisiblepointi
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipIsVisiblePointI(graphics: GpGraphics, x: INT, y: INT, result_out: LPBOOL): Status {
     return Gdiplus.Load('GdipIsVisiblePointI')(graphics, x, y, result_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipisvisiblerect
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipIsVisibleRect(graphics: GpGraphics, x: REAL, y: REAL, width: REAL, height: REAL, result_out: LPBOOL): Status {
     return Gdiplus.Load('GdipIsVisibleRect')(graphics, x, y, width, height, result_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipisvisiblerecti
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipIsVisibleRectI(graphics: GpGraphics, x: INT, y: INT, width: INT, height: INT, result_out: LPBOOL): Status {
     return Gdiplus.Load('GdipIsVisibleRectI')(graphics, x, y, width, height, result_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipisvisibleregionpoint
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-region-flat
   public static GdipIsVisibleRegionPoint(region: GpRegion, x: REAL, y: REAL, graphics: GpGraphics, result_out: LPBOOL): Status {
     return Gdiplus.Load('GdipIsVisibleRegionPoint')(region, x, y, graphics, result_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipisvisibleregionpointi
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-region-flat
   public static GdipIsVisibleRegionPointI(region: GpRegion, x: INT, y: INT, graphics: GpGraphics, result_out: LPBOOL): Status {
     return Gdiplus.Load('GdipIsVisibleRegionPointI')(region, x, y, graphics, result_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipisvisibleregionrect
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-region-flat
   public static GdipIsVisibleRegionRect(region: GpRegion, x: REAL, y: REAL, width: REAL, height: REAL, graphics: GpGraphics, result_out: LPBOOL): Status {
     return Gdiplus.Load('GdipIsVisibleRegionRect')(region, x, y, width, height, graphics, result_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipisvisibleregionrecti
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-region-flat
   public static GdipIsVisibleRegionRectI(region: GpRegion, x: INT, y: INT, width: INT, height: INT, graphics: GpGraphics, result_out: LPBOOL): Status {
     return Gdiplus.Load('GdipIsVisibleRegionRectI')(region, x, y, width, height, graphics, result_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdiploadimagefromfile
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-image-flat
   public static GdipLoadImageFromFile(filename: LPWSTR, image_out: Pointer): Status {
     return Gdiplus.Load('GdipLoadImageFromFile')(filename, image_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdiploadimagefromfileicm
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-image-flat
   public static GdipLoadImageFromFileICM(filename: LPWSTR, image_out: Pointer): Status {
     return Gdiplus.Load('GdipLoadImageFromFileICM')(filename, image_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdiploadimagefromstream
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-image-flat
   public static GdipLoadImageFromStream(stream: IStream, image_out: Pointer): Status {
     return Gdiplus.Load('GdipLoadImageFromStream')(stream, image_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdiploadimagefromstreamicm
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-image-flat
   public static GdipLoadImageFromStreamICM(stream: IStream, image_out: Pointer): Status {
     return Gdiplus.Load('GdipLoadImageFromStreamICM')(stream, image_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipmeasurecharacterranges
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-text-flat
   public static GdipMeasureCharacterRanges(graphics: GpGraphics, string: LPWSTR, length: INT, font: GpFont, layoutRect: Pointer, stringFormat: GpStringFormat, regionCount: INT, regions_out: Pointer): Status {
     return Gdiplus.Load('GdipMeasureCharacterRanges')(graphics, string, length, font, layoutRect, stringFormat, regionCount, regions_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipmeasuredriverstring
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-text-flat
   public static GdipMeasureDriverString(graphics: GpGraphics, text: LPUINT16, length: INT, font: GpFont, positions: Pointer, flags: INT, matrix: GpMatrix, boundingBox_out: Pointer): Status {
     return Gdiplus.Load('GdipMeasureDriverString')(graphics, text, length, font, positions, flags, matrix, boundingBox_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipmeasurestring
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-text-flat
   public static GdipMeasureString(graphics: GpGraphics, string: LPWSTR, length: INT, font: GpFont, layoutRect: Pointer, stringFormat: GpStringFormat, boundingBox_out: Pointer, codepointsFitted_out: LPINT, linesFilled_out: LPINT): Status {
     return Gdiplus.Load('GdipMeasureString')(graphics, string, length, font, layoutRect, stringFormat, boundingBox_out, codepointsFitted_out, linesFilled_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipmultiplylinetransform
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-lineargradientbrush-flat
   public static GdipMultiplyLineTransform(brush: GpLineGradient, matrix: GpMatrix, order: MatrixOrder): Status {
     return Gdiplus.Load('GdipMultiplyLineTransform')(brush, matrix, order);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipmultiplymatrix
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-matrix-flat
   public static GdipMultiplyMatrix(matrix: GpMatrix, matrix2: GpMatrix, order: MatrixOrder): Status {
     return Gdiplus.Load('GdipMultiplyMatrix')(matrix, matrix2, order);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipmultiplypathgradienttransform
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-pathgradientbrush-flat
   public static GdipMultiplyPathGradientTransform(brush: GpPathGradient, matrix: GpMatrix, order: MatrixOrder): Status {
     return Gdiplus.Load('GdipMultiplyPathGradientTransform')(brush, matrix, order);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipmultiplypentransform
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-pen-flat
   public static GdipMultiplyPenTransform(pen: GpPen, matrix: GpMatrix, order: MatrixOrder): Status {
     return Gdiplus.Load('GdipMultiplyPenTransform')(pen, matrix, order);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipmultiplytexturetransform
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-texturebrush-flat
   public static GdipMultiplyTextureTransform(brush: GpTexture, matrix: GpMatrix, order: MatrixOrder): Status {
     return Gdiplus.Load('GdipMultiplyTextureTransform')(brush, matrix, order);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipmultiplyworldtransform
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipMultiplyWorldTransform(graphics: GpGraphics, matrix: GpMatrix, order: MatrixOrder): Status {
     return Gdiplus.Load('GdipMultiplyWorldTransform')(graphics, matrix, order);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipnewinstalledfontcollection
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-font-flat
   public static GdipNewInstalledFontCollection(fontCollection_out: Pointer): Status {
     return Gdiplus.Load('GdipNewInstalledFontCollection')(fontCollection_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipnewprivatefontcollection
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-font-flat
   public static GdipNewPrivateFontCollection(fontCollection_out: Pointer): Status {
     return Gdiplus.Load('GdipNewPrivateFontCollection')(fontCollection_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdippathitercopydata
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-pathiterator-flat
   public static GdipPathIterCopyData(iterator: GpPathIterator, resultCount_out: LPINT, points_out: Pointer, types_out: LPBYTE, startIndex: INT, endIndex: INT): Status {
     return Gdiplus.Load('GdipPathIterCopyData')(iterator, resultCount_out, points_out, types_out, startIndex, endIndex);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdippathiterenumerate
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-pathiterator-flat
   public static GdipPathIterEnumerate(iterator: GpPathIterator, resultCount_out: LPINT, points_out: Pointer, types_out: LPBYTE, count: INT): Status {
     return Gdiplus.Load('GdipPathIterEnumerate')(iterator, resultCount_out, points_out, types_out, count);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdippathitergetcount
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-pathiterator-flat
   public static GdipPathIterGetCount(iterator: GpPathIterator, count_out: LPINT): Status {
     return Gdiplus.Load('GdipPathIterGetCount')(iterator, count_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdippathitergetsubpathcount
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-pathiterator-flat
   public static GdipPathIterGetSubpathCount(iterator: GpPathIterator, count_out: LPINT): Status {
     return Gdiplus.Load('GdipPathIterGetSubpathCount')(iterator, count_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdippathiterhascurve
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-pathiterator-flat
   public static GdipPathIterHasCurve(iterator: GpPathIterator, hasCurve_out: LPBOOL): Status {
     return Gdiplus.Load('GdipPathIterHasCurve')(iterator, hasCurve_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdippathiterisvalid
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-pathiterator-flat
   public static GdipPathIterIsValid(iterator: GpPathIterator, valid_out: LPBOOL): Status {
     return Gdiplus.Load('GdipPathIterIsValid')(iterator, valid_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdippathiternextmarker
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-pathiterator-flat
   public static GdipPathIterNextMarker(iterator: GpPathIterator, resultCount_out: LPINT, startIndex_out: LPINT, endIndex_out: LPINT): Status {
     return Gdiplus.Load('GdipPathIterNextMarker')(iterator, resultCount_out, startIndex_out, endIndex_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdippathiternextmarkerpath
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-pathiterator-flat
   public static GdipPathIterNextMarkerPath(iterator: GpPathIterator, resultCount_out: LPINT, path: GpPath): Status {
     return Gdiplus.Load('GdipPathIterNextMarkerPath')(iterator, resultCount_out, path);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdippathiternextpathtype
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-pathiterator-flat
   public static GdipPathIterNextPathType(iterator: GpPathIterator, resultCount_out: LPINT, pathType_out: LPBYTE, startIndex_out: LPINT, endIndex_out: LPINT): Status {
     return Gdiplus.Load('GdipPathIterNextPathType')(iterator, resultCount_out, pathType_out, startIndex_out, endIndex_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdippathiternextsubpath
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-pathiterator-flat
   public static GdipPathIterNextSubpath(iterator: GpPathIterator, resultCount_out: LPINT, startIndex_out: LPINT, endIndex_out: LPINT, isClosed_out: LPBOOL): Status {
     return Gdiplus.Load('GdipPathIterNextSubpath')(iterator, resultCount_out, startIndex_out, endIndex_out, isClosed_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdippathiternextsubpathpath
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-pathiterator-flat
   public static GdipPathIterNextSubpathPath(iterator: GpPathIterator, resultCount_out: LPINT, path: GpPath, isClosed_out: LPBOOL): Status {
     return Gdiplus.Load('GdipPathIterNextSubpathPath')(iterator, resultCount_out, path, isClosed_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdippathiterrewind
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-pathiterator-flat
   public static GdipPathIterRewind(iterator: GpPathIterator): Status {
     return Gdiplus.Load('GdipPathIterRewind')(iterator);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipplaymetafilerecord
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipPlayMetafileRecord(metafile: GpMetafile, recordType: EmfPlusRecordType, flags: UINT, dataSize: UINT, data: LPBYTE): Status {
     return Gdiplus.Load('GdipPlayMetafileRecord')(metafile, recordType, flags, dataSize, data);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipprivateaddfontfile
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-font-flat
   public static GdipPrivateAddFontFile(fontCollection: GpFontCollection, filename: LPWSTR): Status {
     return Gdiplus.Load('GdipPrivateAddFontFile')(fontCollection, filename);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipprivateaddmemoryfont
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-font-flat
   public static GdipPrivateAddMemoryFont(fontCollection: GpFontCollection, memory: LPVOID, length: INT): Status {
     return Gdiplus.Load('GdipPrivateAddMemoryFont')(fontCollection, memory, length);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdiprecordmetafile
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipRecordMetafile(referenceHdc: HDC, type: EmfType, frameRect: Pointer, frameUnit: MetafileFrameUnit, description: LPWSTR, metafile_out: Pointer): Status {
     return Gdiplus.Load('GdipRecordMetafile')(referenceHdc, type, frameRect, frameUnit, description, metafile_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdiprecordmetafilefilename
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipRecordMetafileFileName(fileName: LPWSTR, referenceHdc: HDC, type: EmfType, frameRect: Pointer, frameUnit: MetafileFrameUnit, description: LPWSTR, metafile_out: Pointer): Status {
     return Gdiplus.Load('GdipRecordMetafileFileName')(fileName, referenceHdc, type, frameRect, frameUnit, description, metafile_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdiprecordmetafilefilenamei
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipRecordMetafileFileNameI(fileName: LPWSTR, referenceHdc: HDC, type: EmfType, frameRect: Pointer, frameUnit: MetafileFrameUnit, description: LPWSTR, metafile_out: Pointer): Status {
     return Gdiplus.Load('GdipRecordMetafileFileNameI')(fileName, referenceHdc, type, frameRect, frameUnit, description, metafile_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdiprecordmetafilei
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipRecordMetafileI(referenceHdc: HDC, type: EmfType, frameRect: Pointer, frameUnit: MetafileFrameUnit, description: LPWSTR, metafile_out: Pointer): Status {
     return Gdiplus.Load('GdipRecordMetafileI')(referenceHdc, type, frameRect, frameUnit, description, metafile_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdiprecordmetafilestream
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipRecordMetafileStream(stream: IStream, referenceHdc: HDC, type: EmfType, frameRect: Pointer, frameUnit: MetafileFrameUnit, description: LPWSTR, metafile_out: Pointer): Status {
     return Gdiplus.Load('GdipRecordMetafileStream')(stream, referenceHdc, type, frameRect, frameUnit, description, metafile_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdiprecordmetafilestreami
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipRecordMetafileStreamI(stream: IStream, referenceHdc: HDC, type: EmfType, frameRect: Pointer, frameUnit: MetafileFrameUnit, description: LPWSTR, metafile_out: Pointer): Status {
     return Gdiplus.Load('GdipRecordMetafileStreamI')(stream, referenceHdc, type, frameRect, frameUnit, description, metafile_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipreleasedc
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipReleaseDC(graphics: GpGraphics, hdc: HDC): Status {
     return Gdiplus.Load('GdipReleaseDC')(graphics, hdc);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipremovepropertyitem
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-image-flat
   public static GdipRemovePropertyItem(image: GpImage, propId: PROPID): Status {
     return Gdiplus.Load('GdipRemovePropertyItem')(image, propId);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipresetclip
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipResetClip(graphics: GpGraphics): Status {
     return Gdiplus.Load('GdipResetClip')(graphics);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipresetimageattributes
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-imageattributes-flat
   public static GdipResetImageAttributes(imageattr: GpImageAttributes, type: ColorAdjustType): Status {
     return Gdiplus.Load('GdipResetImageAttributes')(imageattr, type);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipresetlinetransform
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-lineargradientbrush-flat
   public static GdipResetLineTransform(brush: GpLineGradient): Status {
     return Gdiplus.Load('GdipResetLineTransform')(brush);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipresetpagetransform
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipResetPageTransform(graphics: GpGraphics): Status {
     return Gdiplus.Load('GdipResetPageTransform')(graphics);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipresetpath
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphicspath-flat
   public static GdipResetPath(path: GpPath): Status {
     return Gdiplus.Load('GdipResetPath')(path);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipresetpathgradienttransform
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-pathgradientbrush-flat
   public static GdipResetPathGradientTransform(brush: GpPathGradient): Status {
     return Gdiplus.Load('GdipResetPathGradientTransform')(brush);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipresetpentransform
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-pen-flat
   public static GdipResetPenTransform(pen: GpPen): Status {
     return Gdiplus.Load('GdipResetPenTransform')(pen);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipresettexturetransform
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-texturebrush-flat
   public static GdipResetTextureTransform(brush: GpTexture): Status {
     return Gdiplus.Load('GdipResetTextureTransform')(brush);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipresetworldtransform
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipResetWorldTransform(graphics: GpGraphics): Status {
     return Gdiplus.Load('GdipResetWorldTransform')(graphics);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdiprestoregraphics
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipRestoreGraphics(graphics: GpGraphics, state: GraphicsState): Status {
     return Gdiplus.Load('GdipRestoreGraphics')(graphics, state);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipreversepath
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphicspath-flat
   public static GdipReversePath(path: GpPath): Status {
     return Gdiplus.Load('GdipReversePath')(path);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdiprotatelinetransform
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-lineargradientbrush-flat
   public static GdipRotateLineTransform(brush: GpLineGradient, angle: REAL, order: MatrixOrder): Status {
     return Gdiplus.Load('GdipRotateLineTransform')(brush, angle, order);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdiprotatematrix
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-matrix-flat
   public static GdipRotateMatrix(matrix: GpMatrix, angle: REAL, order: MatrixOrder): Status {
     return Gdiplus.Load('GdipRotateMatrix')(matrix, angle, order);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdiprotatepathgradienttransform
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-pathgradientbrush-flat
   public static GdipRotatePathGradientTransform(brush: GpPathGradient, angle: REAL, order: MatrixOrder): Status {
     return Gdiplus.Load('GdipRotatePathGradientTransform')(brush, angle, order);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdiprotatepentransform
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-pen-flat
   public static GdipRotatePenTransform(pen: GpPen, angle: REAL, order: MatrixOrder): Status {
     return Gdiplus.Load('GdipRotatePenTransform')(pen, angle, order);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdiprotatetexturetransform
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-texturebrush-flat
   public static GdipRotateTextureTransform(brush: GpTexture, angle: REAL, order: MatrixOrder): Status {
     return Gdiplus.Load('GdipRotateTextureTransform')(brush, angle, order);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdiprotateworldtransform
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipRotateWorldTransform(graphics: GpGraphics, angle: REAL, order: MatrixOrder): Status {
     return Gdiplus.Load('GdipRotateWorldTransform')(graphics, angle, order);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsaveadd
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-image-flat
   public static GdipSaveAdd(image: GpImage, encoderParams: Pointer): Status {
     return Gdiplus.Load('GdipSaveAdd')(image, encoderParams);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsaveaddimage
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-image-flat
   public static GdipSaveAddImage(image: GpImage, newImage: GpImage, encoderParams: Pointer): Status {
     return Gdiplus.Load('GdipSaveAddImage')(image, newImage, encoderParams);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsavegraphics
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipSaveGraphics(graphics: GpGraphics, state_out: Pointer): Status {
     return Gdiplus.Load('GdipSaveGraphics')(graphics, state_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsaveimagetofile
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-image-flat
   public static GdipSaveImageToFile(image: GpImage, filename: LPWSTR, clsidEncoder: Pointer, encoderParams: Nullable<Pointer>): Status {
     return Gdiplus.Load('GdipSaveImageToFile')(image, filename, clsidEncoder, encoderParams);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsaveimagetostream
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-image-flat
   public static GdipSaveImageToStream(image: GpImage, stream: IStream, clsidEncoder: Pointer, encoderParams: Nullable<Pointer>): Status {
     return Gdiplus.Load('GdipSaveImageToStream')(image, stream, clsidEncoder, encoderParams);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipscalelinetransform
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-lineargradientbrush-flat
   public static GdipScaleLineTransform(brush: GpLineGradient, sx: REAL, sy: REAL, order: MatrixOrder): Status {
     return Gdiplus.Load('GdipScaleLineTransform')(brush, sx, sy, order);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipscalematrix
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-matrix-flat
   public static GdipScaleMatrix(matrix: GpMatrix, scaleX: REAL, scaleY: REAL, order: MatrixOrder): Status {
     return Gdiplus.Load('GdipScaleMatrix')(matrix, scaleX, scaleY, order);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipscalepathgradienttransform
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-pathgradientbrush-flat
   public static GdipScalePathGradientTransform(brush: GpPathGradient, sx: REAL, sy: REAL, order: MatrixOrder): Status {
     return Gdiplus.Load('GdipScalePathGradientTransform')(brush, sx, sy, order);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipscalepentransform
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-pen-flat
   public static GdipScalePenTransform(pen: GpPen, sx: REAL, sy: REAL, order: MatrixOrder): Status {
     return Gdiplus.Load('GdipScalePenTransform')(pen, sx, sy, order);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipscaletexturetransform
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-texturebrush-flat
   public static GdipScaleTextureTransform(brush: GpTexture, sx: REAL, sy: REAL, order: MatrixOrder): Status {
     return Gdiplus.Load('GdipScaleTextureTransform')(brush, sx, sy, order);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipscaleworldtransform
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipScaleWorldTransform(graphics: GpGraphics, sx: REAL, sy: REAL, order: MatrixOrder): Status {
     return Gdiplus.Load('GdipScaleWorldTransform')(graphics, sx, sy, order);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsetadjustablearrowcapfillstate
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-adjustablearrowcap-flat
   public static GdipSetAdjustableArrowCapFillState(cap: GpAdjustableArrowCap, fillState: BOOL): Status {
     return Gdiplus.Load('GdipSetAdjustableArrowCapFillState')(cap, fillState);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsetadjustablearrowcapheight
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-adjustablearrowcap-flat
   public static GdipSetAdjustableArrowCapHeight(cap: GpAdjustableArrowCap, height: REAL): Status {
     return Gdiplus.Load('GdipSetAdjustableArrowCapHeight')(cap, height);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsetadjustablearrowcapmiddleinset
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-adjustablearrowcap-flat
   public static GdipSetAdjustableArrowCapMiddleInset(cap: GpAdjustableArrowCap, middleInset: REAL): Status {
     return Gdiplus.Load('GdipSetAdjustableArrowCapMiddleInset')(cap, middleInset);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsetadjustablearrowcapwidth
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-adjustablearrowcap-flat
   public static GdipSetAdjustableArrowCapWidth(cap: GpAdjustableArrowCap, width: REAL): Status {
     return Gdiplus.Load('GdipSetAdjustableArrowCapWidth')(cap, width);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsetclipgraphics
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipSetClipGraphics(graphics: GpGraphics, srcgraphics: GpGraphics, combineMode: CombineMode): Status {
     return Gdiplus.Load('GdipSetClipGraphics')(graphics, srcgraphics, combineMode);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsetcliphrgn
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipSetClipHrgn(graphics: GpGraphics, hRgn: HRGN, combineMode: CombineMode): Status {
     return Gdiplus.Load('GdipSetClipHrgn')(graphics, hRgn, combineMode);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsetclippath
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipSetClipPath(graphics: GpGraphics, path: GpPath, combineMode: CombineMode): Status {
     return Gdiplus.Load('GdipSetClipPath')(graphics, path, combineMode);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsetcliprect
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipSetClipRect(graphics: GpGraphics, x: REAL, y: REAL, width: REAL, height: REAL, combineMode: CombineMode): Status {
     return Gdiplus.Load('GdipSetClipRect')(graphics, x, y, width, height, combineMode);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsetcliprecti
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipSetClipRectI(graphics: GpGraphics, x: INT, y: INT, width: INT, height: INT, combineMode: CombineMode): Status {
     return Gdiplus.Load('GdipSetClipRectI')(graphics, x, y, width, height, combineMode);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsetclipregion
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipSetClipRegion(graphics: GpGraphics, region: GpRegion, combineMode: CombineMode): Status {
     return Gdiplus.Load('GdipSetClipRegion')(graphics, region, combineMode);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsetcompositingmode
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipSetCompositingMode(graphics: GpGraphics, compositingMode: CompositingMode): Status {
     return Gdiplus.Load('GdipSetCompositingMode')(graphics, compositingMode);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsetcompositingquality
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipSetCompositingQuality(graphics: GpGraphics, compositingQuality: CompositingQuality): Status {
     return Gdiplus.Load('GdipSetCompositingQuality')(graphics, compositingQuality);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsetcustomlinecapbasecap
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-customlinecap-flat
   public static GdipSetCustomLineCapBaseCap(customCap: GpCustomLineCap, baseCap: LineCap): Status {
     return Gdiplus.Load('GdipSetCustomLineCapBaseCap')(customCap, baseCap);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsetcustomlinecapbaseinset
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-customlinecap-flat
   public static GdipSetCustomLineCapBaseInset(customCap: GpCustomLineCap, inset: REAL): Status {
     return Gdiplus.Load('GdipSetCustomLineCapBaseInset')(customCap, inset);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsetcustomlinecapstrokecaps
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-customlinecap-flat
   public static GdipSetCustomLineCapStrokeCaps(customCap: GpCustomLineCap, startCap: LineCap, endCap: LineCap): Status {
     return Gdiplus.Load('GdipSetCustomLineCapStrokeCaps')(customCap, startCap, endCap);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsetcustomlinecapstrokejoin
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-customlinecap-flat
   public static GdipSetCustomLineCapStrokeJoin(customCap: GpCustomLineCap, lineJoin: LineJoin): Status {
     return Gdiplus.Load('GdipSetCustomLineCapStrokeJoin')(customCap, lineJoin);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsetcustomlinecapwidthscale
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-customlinecap-flat
   public static GdipSetCustomLineCapWidthScale(customCap: GpCustomLineCap, widthScale: REAL): Status {
     return Gdiplus.Load('GdipSetCustomLineCapWidthScale')(customCap, widthScale);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipseteffectparameters
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-bitmap-flat
   public static GdipSetEffectParameters(effect: CGpEffect, params: LPVOID, size: UINT): Status {
     return Gdiplus.Load('GdipSetEffectParameters')(effect, params, size);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsetempty
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-region-flat
   public static GdipSetEmpty(region: GpRegion): Status {
     return Gdiplus.Load('GdipSetEmpty')(region);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsetimageattributescachedbackground
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-imageattributes-flat
   public static GdipSetImageAttributesCachedBackground(imageattr: GpImageAttributes, enableFlag: BOOL): Status {
     return Gdiplus.Load('GdipSetImageAttributesCachedBackground')(imageattr, enableFlag);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsetimageattributescolorkeys
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-imageattributes-flat
   public static GdipSetImageAttributesColorKeys(imageattr: GpImageAttributes, type: ColorAdjustType, enableFlag: BOOL, colorLow: ARGB, colorHigh: ARGB): Status {
     return Gdiplus.Load('GdipSetImageAttributesColorKeys')(imageattr, type, enableFlag, colorLow, colorHigh);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsetimageattributescolormatrix
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-imageattributes-flat
   public static GdipSetImageAttributesColorMatrix(imageattr: GpImageAttributes, type: ColorAdjustType, enableFlag: BOOL, colorMatrix: Pointer, grayMatrix: Pointer, flags: ColorMatrixFlags): Status {
     return Gdiplus.Load('GdipSetImageAttributesColorMatrix')(imageattr, type, enableFlag, colorMatrix, grayMatrix, flags);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsetimageattributesgamma
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-imageattributes-flat
   public static GdipSetImageAttributesGamma(imageattr: GpImageAttributes, type: ColorAdjustType, enableFlag: BOOL, gamma: REAL): Status {
     return Gdiplus.Load('GdipSetImageAttributesGamma')(imageattr, type, enableFlag, gamma);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsetimageattributesnoop
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-imageattributes-flat
   public static GdipSetImageAttributesNoOp(imageattr: GpImageAttributes, type: ColorAdjustType, enableFlag: BOOL): Status {
     return Gdiplus.Load('GdipSetImageAttributesNoOp')(imageattr, type, enableFlag);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsetimageattributesoutputchannel
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-imageattributes-flat
   public static GdipSetImageAttributesOutputChannel(imageattr: GpImageAttributes, type: ColorAdjustType, enableFlag: BOOL, channelFlags: ColorChannelFlags): Status {
     return Gdiplus.Load('GdipSetImageAttributesOutputChannel')(imageattr, type, enableFlag, channelFlags);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsetimageattributesoutputchannelcolorprofile
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-imageattributes-flat
   public static GdipSetImageAttributesOutputChannelColorProfile(imageattr: GpImageAttributes, type: ColorAdjustType, enableFlag: BOOL, colorProfileFilename: LPWSTR): Status {
     return Gdiplus.Load('GdipSetImageAttributesOutputChannelColorProfile')(imageattr, type, enableFlag, colorProfileFilename);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsetimageattributesremaptable
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-imageattributes-flat
   public static GdipSetImageAttributesRemapTable(imageattr: GpImageAttributes, type: ColorAdjustType, enableFlag: BOOL, mapSize: UINT, map: Pointer): Status {
     return Gdiplus.Load('GdipSetImageAttributesRemapTable')(imageattr, type, enableFlag, mapSize, map);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsetimageattributesthreshold
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-imageattributes-flat
   public static GdipSetImageAttributesThreshold(imageattr: GpImageAttributes, type: ColorAdjustType, enableFlag: BOOL, threshold: REAL): Status {
     return Gdiplus.Load('GdipSetImageAttributesThreshold')(imageattr, type, enableFlag, threshold);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsetimageattributestoidentity
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-imageattributes-flat
   public static GdipSetImageAttributesToIdentity(imageattr: GpImageAttributes, type: ColorAdjustType): Status {
     return Gdiplus.Load('GdipSetImageAttributesToIdentity')(imageattr, type);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsetimageattributeswrapmode
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-imageattributes-flat
   public static GdipSetImageAttributesWrapMode(imageAttr: GpImageAttributes, wrap: WrapMode, argb: ARGB, clamp: BOOL): Status {
     return Gdiplus.Load('GdipSetImageAttributesWrapMode')(imageAttr, wrap, argb, clamp);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsetimagepalette
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-image-flat
   public static GdipSetImagePalette(image: GpImage, palette: Pointer): Status {
     return Gdiplus.Load('GdipSetImagePalette')(image, palette);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsetinfinite
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-region-flat
   public static GdipSetInfinite(region: GpRegion): Status {
     return Gdiplus.Load('GdipSetInfinite')(region);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsetinterpolationmode
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipSetInterpolationMode(graphics: GpGraphics, interpolationMode: InterpolationMode): Status {
     return Gdiplus.Load('GdipSetInterpolationMode')(graphics, interpolationMode);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsetlineblend
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-lineargradientbrush-flat
   public static GdipSetLineBlend(brush: GpLineGradient, blend: LPREAL, positions: LPREAL, count: INT): Status {
     return Gdiplus.Load('GdipSetLineBlend')(brush, blend, positions, count);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsetlinecolors
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-lineargradientbrush-flat
   public static GdipSetLineColors(brush: GpLineGradient, color1: ARGB, color2: ARGB): Status {
     return Gdiplus.Load('GdipSetLineColors')(brush, color1, color2);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsetlinegammacorrection
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-lineargradientbrush-flat
   public static GdipSetLineGammaCorrection(brush: GpLineGradient, useGammaCorrection: BOOL): Status {
     return Gdiplus.Load('GdipSetLineGammaCorrection')(brush, useGammaCorrection);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsetlinelinearblend
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-lineargradientbrush-flat
   public static GdipSetLineLinearBlend(brush: GpLineGradient, focus: REAL, scale: REAL): Status {
     return Gdiplus.Load('GdipSetLineLinearBlend')(brush, focus, scale);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsetlinepresetblend
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-lineargradientbrush-flat
   public static GdipSetLinePresetBlend(brush: GpLineGradient, blend: LPARGB, positions: LPREAL, count: INT): Status {
     return Gdiplus.Load('GdipSetLinePresetBlend')(brush, blend, positions, count);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsetlinesigmablend
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-lineargradientbrush-flat
   public static GdipSetLineSigmaBlend(brush: GpLineGradient, focus: REAL, scale: REAL): Status {
     return Gdiplus.Load('GdipSetLineSigmaBlend')(brush, focus, scale);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsetlinetransform
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-lineargradientbrush-flat
   public static GdipSetLineTransform(brush: GpLineGradient, matrix: GpMatrix): Status {
     return Gdiplus.Load('GdipSetLineTransform')(brush, matrix);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsetlinewrapmode
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-lineargradientbrush-flat
   public static GdipSetLineWrapMode(brush: GpLineGradient, wrapmode: WrapMode): Status {
     return Gdiplus.Load('GdipSetLineWrapMode')(brush, wrapmode);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsetmatrixelements
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-matrix-flat
   public static GdipSetMatrixElements(matrix: GpMatrix, m11: REAL, m12: REAL, m21: REAL, m22: REAL, dx: REAL, dy: REAL): Status {
     return Gdiplus.Load('GdipSetMatrixElements')(matrix, m11, m12, m21, m22, dx, dy);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsetmetafiledownlevelrasterizationlimit
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipSetMetafileDownLevelRasterizationLimit(metafile: GpMetafile, metafileRasterizationLimitDpi: UINT): Status {
     return Gdiplus.Load('GdipSetMetafileDownLevelRasterizationLimit')(metafile, metafileRasterizationLimitDpi);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsetpagescale
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipSetPageScale(graphics: GpGraphics, scale: REAL): Status {
     return Gdiplus.Load('GdipSetPageScale')(graphics, scale);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsetpageunit
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipSetPageUnit(graphics: GpGraphics, unit: Unit): Status {
     return Gdiplus.Load('GdipSetPageUnit')(graphics, unit);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsetpathfillmode
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphicspath-flat
   public static GdipSetPathFillMode(path: GpPath, fillmode: FillMode): Status {
     return Gdiplus.Load('GdipSetPathFillMode')(path, fillmode);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsetpathgradientblend
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-pathgradientbrush-flat
   public static GdipSetPathGradientBlend(brush: GpPathGradient, blend: LPREAL, positions: LPREAL, count: INT): Status {
     return Gdiplus.Load('GdipSetPathGradientBlend')(brush, blend, positions, count);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsetpathgradientcentercolor
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-pathgradientbrush-flat
   public static GdipSetPathGradientCenterColor(brush: GpPathGradient, colors: ARGB): Status {
     return Gdiplus.Load('GdipSetPathGradientCenterColor')(brush, colors);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsetpathgradientcenterpoint
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-pathgradientbrush-flat
   public static GdipSetPathGradientCenterPoint(brush: GpPathGradient, points: Pointer): Status {
     return Gdiplus.Load('GdipSetPathGradientCenterPoint')(brush, points);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsetpathgradientcenterpointi
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-pathgradientbrush-flat
   public static GdipSetPathGradientCenterPointI(brush: GpPathGradient, points: Pointer): Status {
     return Gdiplus.Load('GdipSetPathGradientCenterPointI')(brush, points);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsetpathgradientfocusscales
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-pathgradientbrush-flat
   public static GdipSetPathGradientFocusScales(brush: GpPathGradient, xScale: REAL, yScale: REAL): Status {
     return Gdiplus.Load('GdipSetPathGradientFocusScales')(brush, xScale, yScale);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsetpathgradientgammacorrection
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-pathgradientbrush-flat
   public static GdipSetPathGradientGammaCorrection(brush: GpPathGradient, useGammaCorrection: BOOL): Status {
     return Gdiplus.Load('GdipSetPathGradientGammaCorrection')(brush, useGammaCorrection);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsetpathgradientlinearblend
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-pathgradientbrush-flat
   public static GdipSetPathGradientLinearBlend(brush: GpPathGradient, focus: REAL, scale: REAL): Status {
     return Gdiplus.Load('GdipSetPathGradientLinearBlend')(brush, focus, scale);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsetpathgradientpath
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-pathgradientbrush-flat
   public static GdipSetPathGradientPath(brush: GpPathGradient, path: GpPath): Status {
     return Gdiplus.Load('GdipSetPathGradientPath')(brush, path);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsetpathgradientpresetblend
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-pathgradientbrush-flat
   public static GdipSetPathGradientPresetBlend(brush: GpPathGradient, blend: LPARGB, positions: LPREAL, count: INT): Status {
     return Gdiplus.Load('GdipSetPathGradientPresetBlend')(brush, blend, positions, count);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsetpathgradientsigmablend
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-pathgradientbrush-flat
   public static GdipSetPathGradientSigmaBlend(brush: GpPathGradient, focus: REAL, scale: REAL): Status {
     return Gdiplus.Load('GdipSetPathGradientSigmaBlend')(brush, focus, scale);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsetpathgradientsurroundcolorswithcount
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-pathgradientbrush-flat
   public static GdipSetPathGradientSurroundColorsWithCount(brush: GpPathGradient, color: LPARGB, count_in_out: LPINT): Status {
     return Gdiplus.Load('GdipSetPathGradientSurroundColorsWithCount')(brush, color, count_in_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsetpathgradienttransform
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-pathgradientbrush-flat
   public static GdipSetPathGradientTransform(brush: GpPathGradient, matrix: GpMatrix): Status {
     return Gdiplus.Load('GdipSetPathGradientTransform')(brush, matrix);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsetpathgradientwrapmode
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-pathgradientbrush-flat
   public static GdipSetPathGradientWrapMode(brush: GpPathGradient, wrapmode: WrapMode): Status {
     return Gdiplus.Load('GdipSetPathGradientWrapMode')(brush, wrapmode);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsetpathmarker
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphicspath-flat
   public static GdipSetPathMarker(path: GpPath): Status {
     return Gdiplus.Load('GdipSetPathMarker')(path);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsetpenbrushfill
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-pen-flat
   public static GdipSetPenBrushFill(pen: GpPen, brush: GpBrush): Status {
     return Gdiplus.Load('GdipSetPenBrushFill')(pen, brush);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsetpencolor
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-flatapi-flat
   public static GdipSetPenColor(pen: GpPen, argb: ARGB): Status {
     return Gdiplus.Load('GdipSetPenColor')(pen, argb);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsetpencompoundarray
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-pen-flat
   public static GdipSetPenCompoundArray(pen: GpPen, dash: LPREAL, count: INT): Status {
     return Gdiplus.Load('GdipSetPenCompoundArray')(pen, dash, count);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsetpencustomendcap
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-pen-flat
   public static GdipSetPenCustomEndCap(pen: GpPen, customCap: GpCustomLineCap): Status {
     return Gdiplus.Load('GdipSetPenCustomEndCap')(pen, customCap);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsetpencustomstartcap
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-pen-flat
   public static GdipSetPenCustomStartCap(pen: GpPen, customCap: GpCustomLineCap): Status {
     return Gdiplus.Load('GdipSetPenCustomStartCap')(pen, customCap);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsetpendasharray
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-pen-flat
   public static GdipSetPenDashArray(pen: GpPen, dash: LPREAL, count: INT): Status {
     return Gdiplus.Load('GdipSetPenDashArray')(pen, dash, count);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsetpendashcap197819
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-pen-flat
   public static GdipSetPenDashCap197819(pen: GpPen, dashCap: DashCap): Status {
     return Gdiplus.Load('GdipSetPenDashCap197819')(pen, dashCap);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsetpendashoffset
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-pen-flat
   public static GdipSetPenDashOffset(pen: GpPen, offset: REAL): Status {
     return Gdiplus.Load('GdipSetPenDashOffset')(pen, offset);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsetpendashstyle
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-pen-flat
   public static GdipSetPenDashStyle(pen: GpPen, dashstyle: DashStyle): Status {
     return Gdiplus.Load('GdipSetPenDashStyle')(pen, dashstyle);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsetpenendcap
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-pen-flat
   public static GdipSetPenEndCap(pen: GpPen, endCap: LineCap): Status {
     return Gdiplus.Load('GdipSetPenEndCap')(pen, endCap);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsetpenlinecap197819
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-pen-flat
   public static GdipSetPenLineCap197819(pen: GpPen, startCap: LineCap, endCap: LineCap, dashCap: DashCap): Status {
     return Gdiplus.Load('GdipSetPenLineCap197819')(pen, startCap, endCap, dashCap);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsetpenlinejoin
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-pen-flat
   public static GdipSetPenLineJoin(pen: GpPen, lineJoin: LineJoin): Status {
     return Gdiplus.Load('GdipSetPenLineJoin')(pen, lineJoin);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsetpenmiterlimit
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-pen-flat
   public static GdipSetPenMiterLimit(pen: GpPen, miterLimit: REAL): Status {
     return Gdiplus.Load('GdipSetPenMiterLimit')(pen, miterLimit);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsetpenmode
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-pen-flat
   public static GdipSetPenMode(pen: GpPen, penMode: PenAlignment): Status {
     return Gdiplus.Load('GdipSetPenMode')(pen, penMode);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsetpenstartcap
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-pen-flat
   public static GdipSetPenStartCap(pen: GpPen, startCap: LineCap): Status {
     return Gdiplus.Load('GdipSetPenStartCap')(pen, startCap);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsetpentransform
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-pen-flat
   public static GdipSetPenTransform(pen: GpPen, matrix: GpMatrix): Status {
     return Gdiplus.Load('GdipSetPenTransform')(pen, matrix);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsetpenunit
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-pen-flat
   public static GdipSetPenUnit(pen: GpPen, unit: Unit): Status {
     return Gdiplus.Load('GdipSetPenUnit')(pen, unit);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsetpenwidth
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-pen-flat
   public static GdipSetPenWidth(pen: GpPen, width: REAL): Status {
     return Gdiplus.Load('GdipSetPenWidth')(pen, width);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsetpixeloffsetmode
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipSetPixelOffsetMode(graphics: GpGraphics, pixelOffsetMode: PixelOffsetMode): Status {
     return Gdiplus.Load('GdipSetPixelOffsetMode')(graphics, pixelOffsetMode);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsetpropertyitem
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-image-flat
   public static GdipSetPropertyItem(image: GpImage, item: Pointer): Status {
     return Gdiplus.Load('GdipSetPropertyItem')(image, item);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsetrenderingorigin
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipSetRenderingOrigin(graphics: GpGraphics, x: INT, y: INT): Status {
     return Gdiplus.Load('GdipSetRenderingOrigin')(graphics, x, y);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsetsmoothingmode
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipSetSmoothingMode(graphics: GpGraphics, smoothingMode: SmoothingMode): Status {
     return Gdiplus.Load('GdipSetSmoothingMode')(graphics, smoothingMode);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsetsolidfillcolor
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-solidbrush-flat
   public static GdipSetSolidFillColor(brush: GpSolidFill, color: ARGB): Status {
     return Gdiplus.Load('GdipSetSolidFillColor')(brush, color);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsetstringformatalign
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-stringformat-flat
   public static GdipSetStringFormatAlign(format: GpStringFormat, align: StringAlignment): Status {
     return Gdiplus.Load('GdipSetStringFormatAlign')(format, align);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsetstringformatdigitsubstitution
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-stringformat-flat
   public static GdipSetStringFormatDigitSubstitution(format: GpStringFormat, language: LANGID, substitute: StringDigitSubstitute): Status {
     return Gdiplus.Load('GdipSetStringFormatDigitSubstitution')(format, language, substitute);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsetstringformatflags
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-stringformat-flat
   public static GdipSetStringFormatFlags(format: GpStringFormat, flags: INT): Status {
     return Gdiplus.Load('GdipSetStringFormatFlags')(format, flags);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsetstringformathotkeyprefix
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-stringformat-flat
   public static GdipSetStringFormatHotkeyPrefix(format: GpStringFormat, hotkeyPrefix: INT): Status {
     return Gdiplus.Load('GdipSetStringFormatHotkeyPrefix')(format, hotkeyPrefix);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsetstringformatlinealign
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-stringformat-flat
   public static GdipSetStringFormatLineAlign(format: GpStringFormat, align: StringAlignment): Status {
     return Gdiplus.Load('GdipSetStringFormatLineAlign')(format, align);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsetstringformatmeasurablecharacterranges
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-stringformat-flat
   public static GdipSetStringFormatMeasurableCharacterRanges(format: GpStringFormat, rangeCount: INT, ranges: Pointer): Status {
     return Gdiplus.Load('GdipSetStringFormatMeasurableCharacterRanges')(format, rangeCount, ranges);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsetstringformattabstops
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-stringformat-flat
   public static GdipSetStringFormatTabStops(format: GpStringFormat, firstTabOffset: REAL, count: INT, tabStops: LPREAL): Status {
     return Gdiplus.Load('GdipSetStringFormatTabStops')(format, firstTabOffset, count, tabStops);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsetstringformattrimming
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-stringformat-flat
   public static GdipSetStringFormatTrimming(format: GpStringFormat, trimming: StringTrimming): Status {
     return Gdiplus.Load('GdipSetStringFormatTrimming')(format, trimming);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsettextcontrast
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipSetTextContrast(graphics: GpGraphics, contrast: UINT): Status {
     return Gdiplus.Load('GdipSetTextContrast')(graphics, contrast);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsettextrenderinghint
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipSetTextRenderingHint(graphics: GpGraphics, mode: TextRenderingHint): Status {
     return Gdiplus.Load('GdipSetTextRenderingHint')(graphics, mode);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsettexturetransform
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-texturebrush-flat
   public static GdipSetTextureTransform(brush: GpTexture, matrix: GpMatrix): Status {
     return Gdiplus.Load('GdipSetTextureTransform')(brush, matrix);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsettexturewrapmode
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-texturebrush-flat
   public static GdipSetTextureWrapMode(brush: GpTexture, wrapmode: WrapMode): Status {
     return Gdiplus.Load('GdipSetTextureWrapMode')(brush, wrapmode);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipsetworldtransform
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipSetWorldTransform(graphics: GpGraphics, matrix: GpMatrix): Status {
     return Gdiplus.Load('GdipSetWorldTransform')(graphics, matrix);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipshearmatrix
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-flatapi-flat
   public static GdipShearMatrix(matrix: GpMatrix, shearX: REAL, shearY: REAL, order: MatrixOrder): Status {
     return Gdiplus.Load('GdipShearMatrix')(matrix, shearX, shearY, order);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipstartpathfigure
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphicspath-flat
   public static GdipStartPathFigure(path: GpPath): Status {
     return Gdiplus.Load('GdipStartPathFigure')(path);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipstringformatgetgenericdefault
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-stringformat-flat
   public static GdipStringFormatGetGenericDefault(format_out: Pointer): Status {
     return Gdiplus.Load('GdipStringFormatGetGenericDefault')(format_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipstringformatgetgenerictypographic
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-stringformat-flat
   public static GdipStringFormatGetGenericTypographic(format_out: Pointer): Status {
     return Gdiplus.Load('GdipStringFormatGetGenericTypographic')(format_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdiptransformmatrixpoints
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-matrix-flat
   public static GdipTransformMatrixPoints(matrix: GpMatrix, pts_in_out: Pointer, count: INT): Status {
     return Gdiplus.Load('GdipTransformMatrixPoints')(matrix, pts_in_out, count);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdiptransformmatrixpointsi
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-matrix-flat
   public static GdipTransformMatrixPointsI(matrix: GpMatrix, pts_in_out: Pointer, count: INT): Status {
     return Gdiplus.Load('GdipTransformMatrixPointsI')(matrix, pts_in_out, count);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdiptransformpath
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphicspath-flat
   public static GdipTransformPath(path: GpPath, matrix: GpMatrix): Status {
     return Gdiplus.Load('GdipTransformPath')(path, matrix);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdiptransformpoints
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipTransformPoints(graphics: GpGraphics, destSpace: CoordinateSpace, srcSpace: CoordinateSpace, points_in_out: Pointer, count: INT): Status {
     return Gdiplus.Load('GdipTransformPoints')(graphics, destSpace, srcSpace, points_in_out, count);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdiptransformpointsi
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipTransformPointsI(graphics: GpGraphics, destSpace: CoordinateSpace, srcSpace: CoordinateSpace, points_in_out: Pointer, count: INT): Status {
     return Gdiplus.Load('GdipTransformPointsI')(graphics, destSpace, srcSpace, points_in_out, count);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdiptransformregion
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-region-flat
   public static GdipTransformRegion(region: GpRegion, matrix: GpMatrix): Status {
     return Gdiplus.Load('GdipTransformRegion')(region, matrix);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdiptranslateclip
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipTranslateClip(graphics: GpGraphics, dx: REAL, dy: REAL): Status {
     return Gdiplus.Load('GdipTranslateClip')(graphics, dx, dy);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdiptranslateclipi
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipTranslateClipI(graphics: GpGraphics, dx: INT, dy: INT): Status {
     return Gdiplus.Load('GdipTranslateClipI')(graphics, dx, dy);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdiptranslatelinetransform
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-lineargradientbrush-flat
   public static GdipTranslateLineTransform(brush: GpLineGradient, dx: REAL, dy: REAL, order: MatrixOrder): Status {
     return Gdiplus.Load('GdipTranslateLineTransform')(brush, dx, dy, order);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdiptranslatematrix
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-matrix-flat
   public static GdipTranslateMatrix(matrix: GpMatrix, offsetX: REAL, offsetY: REAL, order: MatrixOrder): Status {
     return Gdiplus.Load('GdipTranslateMatrix')(matrix, offsetX, offsetY, order);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdiptranslatepathgradienttransform
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-pathgradientbrush-flat
   public static GdipTranslatePathGradientTransform(brush: GpPathGradient, dx: REAL, dy: REAL, order: MatrixOrder): Status {
     return Gdiplus.Load('GdipTranslatePathGradientTransform')(brush, dx, dy, order);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdiptranslatepentransform
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-pen-flat
   public static GdipTranslatePenTransform(pen: GpPen, dx: REAL, dy: REAL, order: MatrixOrder): Status {
     return Gdiplus.Load('GdipTranslatePenTransform')(pen, dx, dy, order);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdiptranslateregion
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-region-flat
   public static GdipTranslateRegion(region: GpRegion, dx: REAL, dy: REAL): Status {
     return Gdiplus.Load('GdipTranslateRegion')(region, dx, dy);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdiptranslateregioni
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-region-flat
   public static GdipTranslateRegionI(region: GpRegion, dx: INT, dy: INT): Status {
     return Gdiplus.Load('GdipTranslateRegionI')(region, dx, dy);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdiptranslatetexturetransform
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-texturebrush-flat
   public static GdipTranslateTextureTransform(brush: GpTexture, dx: REAL, dy: REAL, order: MatrixOrder): Status {
     return Gdiplus.Load('GdipTranslateTextureTransform')(brush, dx, dy, order);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdiptranslateworldtransform
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphics-flat
   public static GdipTranslateWorldTransform(graphics: GpGraphics, dx: REAL, dy: REAL, order: MatrixOrder): Status {
     return Gdiplus.Load('GdipTranslateWorldTransform')(graphics, dx, dy, order);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipvectortransformmatrixpoints
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-matrix-flat
   public static GdipVectorTransformMatrixPoints(matrix: GpMatrix, pts_in_out: Pointer, count: INT): Status {
     return Gdiplus.Load('GdipVectorTransformMatrixPoints')(matrix, pts_in_out, count);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipvectortransformmatrixpointsi
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-matrix-flat
   public static GdipVectorTransformMatrixPointsI(matrix: GpMatrix, pts_in_out: Pointer, count: INT): Status {
     return Gdiplus.Load('GdipVectorTransformMatrixPointsI')(matrix, pts_in_out, count);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipwarppath
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphicspath-flat
   public static GdipWarpPath(path: GpPath, matrix: GpMatrix, points: Pointer, count: INT, srcx: REAL, srcy: REAL, srcwidth: REAL, srcheight: REAL, warpMode: WarpMode, flatness: REAL): Status {
     return Gdiplus.Load('GdipWarpPath')(path, matrix, points, count, srcx, srcy, srcwidth, srcheight, warpMode, flatness);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipwidenpath
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphicspath-flat
   public static GdipWidenPath(nativePath: GpPath, pen: GpPen, matrix: GpMatrix, flatness: REAL): Status {
     return Gdiplus.Load('GdipWidenPath')(nativePath, pen, matrix, flatness);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdipwindingmodeoutline
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-graphicspath-flat
   public static GdipWindingModeOutline(path: GpPath, matrix: GpMatrix, flatness: REAL): Status {
     return Gdiplus.Load('GdipWindingModeOutline')(path, matrix, flatness);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdiplusnotificationhook
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-notification-flat
   public static GdiplusNotificationHook(token_out: LPULONG_PTR): Status {
     return Gdiplus.Load('GdiplusNotificationHook')(token_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdiplusnotificationunhook
+  // https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-notification-flat
   public static GdiplusNotificationUnhook(token: ULONG_PTR): void {
     return Gdiplus.Load('GdiplusNotificationUnhook')(token);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdiplusshutdown
+  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusinit/nf-gdiplusinit-gdiplusshutdown
   public static GdiplusShutdown(token: ULONG_PTR): void {
     return Gdiplus.Load('GdiplusShutdown')(token);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusflat/nf-gdiplusflat-gdiplusstartup
+  // https://learn.microsoft.com/en-us/windows/win32/api/gdiplusinit/nf-gdiplusinit-gdiplusstartup
   public static GdiplusStartup(token_out: LPULONG_PTR, input: Pointer, output_out: Nullable<Pointer>): Status {
     return Gdiplus.Load('GdiplusStartup')(token_out, input, output_out);
   }

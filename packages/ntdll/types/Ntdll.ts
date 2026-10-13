@@ -1,7 +1,7 @@
 import type { Pointer } from 'bun:ffi';
 import type { HANDLE } from '@bun-win32/core';
 
-export type { ACCESS_MASK, BOOLEAN, DWORD, HANDLE, LONG, NULL, Nullable, Optional, PHANDLE, PULONG, PVOID, SIZE_T, ULONG, ULONG_PTR, USHORT, VOID } from '@bun-win32/core';
+export type { ACCESS_MASK, BOOL, BOOLEAN, DWORD, HANDLE, LONG, NULL, Nullable, Optional, PHANDLE, PULONG, PVOID, SIZE_T, ULONG, ULONG_PTR, USHORT, VOID } from '@bun-win32/core';
 
 export type NTSTATUS = number;
 
@@ -305,7 +305,6 @@ export type PRTL_CRITICAL_SECTION = Pointer;
 export type PRTL_HEAP_PARAMETERS = Pointer;
 export type PRTL_OSVERSIONINFOEXW = Pointer;
 export type PRTL_OSVERSIONINFOW = Pointer;
-export type PRTL_RELATIVE_NAME_U = Pointer;
 export type PRTL_SRWLOCK = Pointer;
 export type PRTL_USER_PROCESS_PARAMETERS = Pointer;
 export type PRUNTIME_FUNCTION = Pointer;

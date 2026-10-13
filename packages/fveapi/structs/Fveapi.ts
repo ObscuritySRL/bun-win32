@@ -204,17 +204,17 @@ class Fveapi extends Win32 {
     NgscbIsHostOsOnRoamableDrive: { args: [FFIType.ptr], returns: FFIType.u32 },
   } as const satisfies Record<string, FFIFunction>;
 
-  // https://learn.microsoft.com/en-us/windows/win32/secprov/addkeyprotectorcertificatefile-win32-encryptablevolume
+  // https://learn.microsoft.com/en-us/windows/win32/secprov/win32-encryptablevolume
   public static FveAddAuthMethodInformation(hVolume: FVE_HANDLE, pAuthMethod: LPVOID): DWORD {
     return Fveapi.Load('FveAddAuthMethodInformation')(hVolume, pAuthMethod);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/secprov/addkeyprotectorexternalkey-win32-encryptablevolume
+  // https://learn.microsoft.com/en-us/windows/win32/secprov/protectkeywithadsid-win32-encryptablevolume
   public static FveAddAuthMethodSid(hVolume: FVE_HANDLE, pAuthMethodSid: LPVOID): DWORD {
     return Fveapi.Load('FveAddAuthMethodSid')(hVolume, pAuthMethodSid);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/secprov/addkeyprotectortpm-win32-encryptablevolume
+  // https://learn.microsoft.com/en-us/windows/win32/secprov/protectkeywithtpm-win32-encryptablevolume
   public static FveAddPredictiveTpmProtector(hVolume: FVE_HANDLE, pProtector: LPVOID): DWORD {
     return Fveapi.Load('FveAddPredictiveTpmProtector')(hVolume, pProtector);
   }
@@ -324,7 +324,7 @@ class Fveapi extends Win32 {
     return Fveapi.Load('FveCheckPassphrasePolicy')(hVolume, pResult);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/secprov/istpmcompatible-win32-tpm
+  // https://learn.microsoft.com/en-us/windows/win32/secprov/win32-tpm
   public static FveCheckTpmCapability(hVolume: FVE_HANDLE, pResult: LPVOID): DWORD {
     return Fveapi.Load('FveCheckTpmCapability')(hVolume, pResult);
   }
@@ -634,7 +634,7 @@ class Fveapi extends Win32 {
     return Fveapi.Load('FveGetUserFlags')(hVolume, pUserFlags);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/secprov/getdeviceid-win32-encryptablevolume
+  // https://learn.microsoft.com/en-us/windows/win32/secprov/win32-encryptablevolume
   public static FveGetVolumeNameW(hVolume: FVE_HANDLE, pszVolumeName: LPVOID): DWORD {
     return Fveapi.Load('FveGetVolumeNameW')(hVolume, pszVolumeName);
   }
@@ -839,12 +839,12 @@ class Fveapi extends Win32 {
     return Fveapi.Load('FveSetFipsAllowDisabled')(hVolume, pFipsAllowDisabled);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/secprov/setencryptionmethod-win32-encryptablevolume
+  // https://learn.microsoft.com/en-us/windows/win32/secprov/encrypt-win32-encryptablevolume
   public static FveSetFveMethod(hVolume: FVE_HANDLE, pMethod: LPVOID): DWORD {
     return Fveapi.Load('FveSetFveMethod')(hVolume, pMethod);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/secprov/setencryptionmethod-win32-encryptablevolume
+  // https://learn.microsoft.com/en-us/windows/win32/secprov/encrypt-win32-encryptablevolume
   public static FveSetFveMethodEx(hVolume: FVE_HANDLE, pMethod: LPVOID): DWORD {
     return Fveapi.Load('FveSetFveMethodEx')(hVolume, pMethod);
   }

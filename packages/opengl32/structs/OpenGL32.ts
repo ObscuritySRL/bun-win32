@@ -124,7 +124,7 @@ class OpenGL32 extends Win32 {
    * ```
    */
   public static PreloadExtensions(methods?: (keyof typeof OpenGL32.ExtensionSymbols)[]): void {
-    methods ??= Object.keys(OpenGL32.ExtensionSymbols) as (keyof typeof OpenGL32.ExtensionSymbols)[];
+    methods ??= Object.keys(OpenGL32.ExtensionSymbols).filter((method): method is keyof typeof OpenGL32.ExtensionSymbols => Object.hasOwn(OpenGL32.ExtensionSymbols, method));
 
     for (const method of methods) {
       try {
@@ -666,8 +666,8 @@ class OpenGL32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/opengl/glarrayelement
-  public static glArrayElement(i: GLint): void {
-    return OpenGL32.Load('glArrayElement')(i);
+  public static glArrayElement(index: GLint): void {
+    return OpenGL32.Load('glArrayElement')(index);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/opengl/glbegin
@@ -916,13 +916,13 @@ class OpenGL32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/opengl/glcopyteximage1d
-  public static glCopyTexImage1D(target: GLenum, level: GLint, internalformat: GLenum, x: GLint, y: GLint, width: GLsizei, border: GLint): void {
-    return OpenGL32.Load('glCopyTexImage1D')(target, level, internalformat, x, y, width, border);
+  public static glCopyTexImage1D(target: GLenum, level: GLint, internalFormat: GLenum, x: GLint, y: GLint, width: GLsizei, border: GLint): void {
+    return OpenGL32.Load('glCopyTexImage1D')(target, level, internalFormat, x, y, width, border);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/opengl/glcopyteximage2d
-  public static glCopyTexImage2D(target: GLenum, level: GLint, internalformat: GLenum, x: GLint, y: GLint, width: GLsizei, height: GLsizei, border: GLint): void {
-    return OpenGL32.Load('glCopyTexImage2D')(target, level, internalformat, x, y, width, height, border);
+  public static glCopyTexImage2D(target: GLenum, level: GLint, internalFormat: GLenum, x: GLint, y: GLint, width: GLsizei, height: GLsizei, border: GLint): void {
+    return OpenGL32.Load('glCopyTexImage2D')(target, level, internalFormat, x, y, width, height, border);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/opengl/glcopytexsubimage1d
@@ -1345,12 +1345,12 @@ class OpenGL32 extends Win32 {
     return OpenGL32.Load('glIndexsv')(c);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/opengl/glindexub
+  // Undocumented export (no Microsoft Learn page).
   public static glIndexub(c: GLubyte): void {
     return OpenGL32.Load('glIndexub')(c);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/opengl/glindexubv
+  // Undocumented export (no Microsoft Learn page).
   public static glIndexubv(c: GLubyte_): void {
     return OpenGL32.Load('glIndexubv')(c);
   }
@@ -2330,7 +2330,7 @@ class OpenGL32 extends Win32 {
     return OpenGL32.Load('glViewport')(x, y, width, height);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-wglchoosepixelformat
+  // Undocumented export (no Microsoft Learn page).
   public static wglChoosePixelFormat(hdc: HDC, ppfd: LPPIXELFORMATDESCRIPTOR): INT {
     return OpenGL32.Load('wglChoosePixelFormat')(hdc, ppfd);
   }
@@ -2360,7 +2360,7 @@ class OpenGL32 extends Win32 {
     return OpenGL32.Load('wglDescribeLayerPlane')(hdc, iPixelFormat, iLayerPlane, nBytes, plpd);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-wgldescribepixelformat
+  // Undocumented export (no Microsoft Learn page).
   public static wglDescribePixelFormat(hdc: HDC, iPixelFormat: INT, nBytes: UINT, ppfd: Nullable<LPPIXELFORMATDESCRIPTOR>): INT {
     return OpenGL32.Load('wglDescribePixelFormat')(hdc, iPixelFormat, nBytes, ppfd);
   }
@@ -2400,7 +2400,7 @@ class OpenGL32 extends Win32 {
     return OpenGL32.Load('wglSetLayerPaletteEntries')(hdc, iLayerPlane, iStart, cEntries, pcr);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-wglsetpixelformat
+  // Undocumented export (no Microsoft Learn page).
   public static wglSetPixelFormat(hdc: HDC, iPixelFormat: INT, ppfd: LPPIXELFORMATDESCRIPTOR): BOOL {
     return OpenGL32.Load('wglSetPixelFormat')(hdc, iPixelFormat, ppfd);
   }
@@ -2410,7 +2410,7 @@ class OpenGL32 extends Win32 {
     return OpenGL32.Load('wglShareLists')(hglrc1, hglrc2);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-wglswapbuffers
+  // Undocumented export (no Microsoft Learn page).
   public static wglSwapBuffers(hdc: HDC): BOOL {
     return OpenGL32.Load('wglSwapBuffers')(hdc);
   }
@@ -2440,12 +2440,12 @@ class OpenGL32 extends Win32 {
     return OpenGL32.Load('wglUseFontOutlinesW')(hdc, first, count, listBase, deviation, extrusion, format, lpgmf);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-wglgetdefaultprocaddress
+  // Undocumented export (no Microsoft Learn page).
   public static wglGetDefaultProcAddress(lpszProc: LPCSTR): PROC {
     return OpenGL32.Load('wglGetDefaultProcAddress')(lpszProc);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-wglswapmultiplebuffers
+  // Undocumented export (no Microsoft Learn page).
   public static wglSwapMultipleBuffers(n: UINT, lpBuffers: LPWGLSWAP): DWORD {
     return OpenGL32.Load('wglSwapMultipleBuffers')(n, lpBuffers);
   }
@@ -2454,27 +2454,35 @@ class OpenGL32 extends Win32 {
   // WGL Extensions (lazy-loaded via wglGetProcAddress)
   // ---------------------------------------------------------------------------
 
+  // https://registry.khronos.org/OpenGL/extensions/ARB/WGL_ARB_pixel_format.txt
   public static wglChoosePixelFormatARB(hdc: HDC, piAttribIList: Nullable<GLint_>, pfAttribFList: Nullable<GLfloat_>, nMaxFormats: UINT, piFormats: GLint_, nNumFormats: GLuint_): BOOL {
     return OpenGL32.LoadExtension('wglChoosePixelFormatARB')(hdc, piAttribIList, pfAttribFList, nMaxFormats, piFormats, nNumFormats);
   }
-  public static wglCreateContextAttribsARB(hdc: HDC, hShareContext: Nullable<HGLRC>, attribList: GLint_): HGLRC {
-    return OpenGL32.LoadExtension('wglCreateContextAttribsARB')(hdc, hShareContext, attribList);
+  // https://registry.khronos.org/OpenGL/extensions/ARB/WGL_ARB_create_context.txt
+  public static wglCreateContextAttribsARB(hDC: HDC, hShareContext: Nullable<HGLRC>, attribList: Nullable<GLint_>): HGLRC {
+    return OpenGL32.LoadExtension('wglCreateContextAttribsARB')(hDC, hShareContext, attribList);
   }
+  // https://registry.khronos.org/OpenGL/extensions/ARB/WGL_ARB_extensions_string.txt
   public static wglGetExtensionsStringARB(hdc: HDC): GLchar_ {
     return OpenGL32.LoadExtension('wglGetExtensionsStringARB')(hdc);
   }
+  // https://registry.khronos.org/OpenGL/extensions/EXT/WGL_EXT_extensions_string.txt
   public static wglGetExtensionsStringEXT(): GLchar_ {
     return OpenGL32.LoadExtension('wglGetExtensionsStringEXT')();
   }
+  // https://registry.khronos.org/OpenGL/extensions/ARB/WGL_ARB_pixel_format.txt
   public static wglGetPixelFormatAttribfvARB(hdc: HDC, iPixelFormat: INT, iLayerPlane: INT, nAttributes: UINT, piAttributes: GLint_, pfValues: GLfloat_): BOOL {
     return OpenGL32.LoadExtension('wglGetPixelFormatAttribfvARB')(hdc, iPixelFormat, iLayerPlane, nAttributes, piAttributes, pfValues);
   }
+  // https://registry.khronos.org/OpenGL/extensions/ARB/WGL_ARB_pixel_format.txt
   public static wglGetPixelFormatAttribivARB(hdc: HDC, iPixelFormat: INT, iLayerPlane: INT, nAttributes: UINT, piAttributes: GLint_, piValues: GLint_): BOOL {
     return OpenGL32.LoadExtension('wglGetPixelFormatAttribivARB')(hdc, iPixelFormat, iLayerPlane, nAttributes, piAttributes, piValues);
   }
+  // https://registry.khronos.org/OpenGL/extensions/EXT/WGL_EXT_swap_control.txt
   public static wglGetSwapIntervalEXT(): INT {
     return OpenGL32.LoadExtension('wglGetSwapIntervalEXT')();
   }
+  // https://registry.khronos.org/OpenGL/extensions/EXT/WGL_EXT_swap_control.txt
   public static wglSwapIntervalEXT(interval: INT): BOOL {
     return OpenGL32.LoadExtension('wglSwapIntervalEXT')(interval);
   }
@@ -2483,36 +2491,47 @@ class OpenGL32 extends Win32 {
   // GL Extensions - VBO (lazy-loaded via wglGetProcAddress)
   // ---------------------------------------------------------------------------
 
+  // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glBindBuffer.xhtml
   public static glBindBuffer(target: GLenum, buffer: GLuint): void {
     return OpenGL32.LoadExtension('glBindBuffer')(target, buffer);
   }
+  // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glBufferData.xhtml
   public static glBufferData(target: GLenum, size: GLsizeiptr, data: Nullable<GLvoid_>, usage: GLenum): void {
     return OpenGL32.LoadExtension('glBufferData')(target, size, data, usage);
   }
+  // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glBufferSubData.xhtml
   public static glBufferSubData(target: GLenum, offset: GLintptr, size: GLsizeiptr, data: GLvoid_): void {
     return OpenGL32.LoadExtension('glBufferSubData')(target, offset, size, data);
   }
+  // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glDeleteBuffers.xhtml
   public static glDeleteBuffers(n: GLsizei, buffers: GLuint_): void {
     return OpenGL32.LoadExtension('glDeleteBuffers')(n, buffers);
   }
+  // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glGenBuffers.xhtml
   public static glGenBuffers(n: GLsizei, buffers: GLuint_): void {
     return OpenGL32.LoadExtension('glGenBuffers')(n, buffers);
   }
+  // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glGetBufferParameter.xhtml
   public static glGetBufferParameteriv(target: GLenum, pname: GLenum, params: GLint_): void {
     return OpenGL32.LoadExtension('glGetBufferParameteriv')(target, pname, params);
   }
+  // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glGetBufferPointerv.xhtml
   public static glGetBufferPointerv(target: GLenum, pname: GLenum, params: GLvoid_): void {
     return OpenGL32.LoadExtension('glGetBufferPointerv')(target, pname, params);
   }
+  // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glGetBufferSubData.xhtml
   public static glGetBufferSubData(target: GLenum, offset: GLintptr, size: GLsizeiptr, data: GLvoid_): void {
     return OpenGL32.LoadExtension('glGetBufferSubData')(target, offset, size, data);
   }
+  // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glIsBuffer.xhtml
   public static glIsBuffer(buffer: GLuint): GLboolean {
     return OpenGL32.LoadExtension('glIsBuffer')(buffer);
   }
+  // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glMapBuffer.xhtml
   public static glMapBuffer(target: GLenum, access: GLenum): GLvoid_ {
     return OpenGL32.LoadExtension('glMapBuffer')(target, access);
   }
+  // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glUnmapBuffer.xhtml
   public static glUnmapBuffer(target: GLenum): GLboolean {
     return OpenGL32.LoadExtension('glUnmapBuffer')(target);
   }
@@ -2521,119 +2540,157 @@ class OpenGL32 extends Win32 {
   // GL Extensions - Shaders (lazy-loaded via wglGetProcAddress)
   // ---------------------------------------------------------------------------
 
+  // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glAttachShader.xhtml
   public static glAttachShader(program: GLuint, shader: GLuint): void {
     return OpenGL32.LoadExtension('glAttachShader')(program, shader);
   }
+  // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glCompileShader.xhtml
   public static glCompileShader(shader: GLuint): void {
     return OpenGL32.LoadExtension('glCompileShader')(shader);
   }
+  // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glCreateProgram.xhtml
   public static glCreateProgram(): GLuint {
     return OpenGL32.LoadExtension('glCreateProgram')();
   }
+  // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glCreateShader.xhtml
   public static glCreateShader(type: GLenum): GLuint {
     return OpenGL32.LoadExtension('glCreateShader')(type);
   }
+  // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glDeleteProgram.xhtml
   public static glDeleteProgram(program: GLuint): void {
     return OpenGL32.LoadExtension('glDeleteProgram')(program);
   }
+  // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glDeleteShader.xhtml
   public static glDeleteShader(shader: GLuint): void {
     return OpenGL32.LoadExtension('glDeleteShader')(shader);
   }
+  // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glDetachShader.xhtml
   public static glDetachShader(program: GLuint, shader: GLuint): void {
     return OpenGL32.LoadExtension('glDetachShader')(program, shader);
   }
+  // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glGetProgramInfoLog.xhtml
   public static glGetProgramInfoLog(program: GLuint, bufSize: GLsizei, length: Nullable<GLsizei_>, infoLog: GLchar_): void {
     return OpenGL32.LoadExtension('glGetProgramInfoLog')(program, bufSize, length, infoLog);
   }
+  // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glGetProgram.xhtml
   public static glGetProgramiv(program: GLuint, pname: GLenum, params: GLint_): void {
     return OpenGL32.LoadExtension('glGetProgramiv')(program, pname, params);
   }
+  // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glGetShaderInfoLog.xhtml
   public static glGetShaderInfoLog(shader: GLuint, bufSize: GLsizei, length: Nullable<GLsizei_>, infoLog: GLchar_): void {
     return OpenGL32.LoadExtension('glGetShaderInfoLog')(shader, bufSize, length, infoLog);
   }
+  // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glGetShader.xhtml
   public static glGetShaderiv(shader: GLuint, pname: GLenum, params: GLint_): void {
     return OpenGL32.LoadExtension('glGetShaderiv')(shader, pname, params);
   }
+  // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glGetShaderSource.xhtml
   public static glGetShaderSource(shader: GLuint, bufSize: GLsizei, length: Nullable<GLsizei_>, source: GLchar_): void {
     return OpenGL32.LoadExtension('glGetShaderSource')(shader, bufSize, length, source);
   }
+  // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glGetUniformLocation.xhtml
   public static glGetUniformLocation(program: GLuint, name: GLchar_): GLint {
     return OpenGL32.LoadExtension('glGetUniformLocation')(program, name);
   }
+  // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glIsProgram.xhtml
   public static glIsProgram(program: GLuint): GLboolean {
     return OpenGL32.LoadExtension('glIsProgram')(program);
   }
+  // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glIsShader.xhtml
   public static glIsShader(shader: GLuint): GLboolean {
     return OpenGL32.LoadExtension('glIsShader')(shader);
   }
+  // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glLinkProgram.xhtml
   public static glLinkProgram(program: GLuint): void {
     return OpenGL32.LoadExtension('glLinkProgram')(program);
   }
+  // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glShaderSource.xhtml
   public static glShaderSource(shader: GLuint, count: GLsizei, string: GLchar_, length: Nullable<GLint_>): void {
     return OpenGL32.LoadExtension('glShaderSource')(shader, count, string, length);
   }
+  // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glUseProgram.xhtml
   public static glUseProgram(program: GLuint): void {
     return OpenGL32.LoadExtension('glUseProgram')(program);
   }
+  // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glValidateProgram.xhtml
   public static glValidateProgram(program: GLuint): void {
     return OpenGL32.LoadExtension('glValidateProgram')(program);
   }
 
   // Uniforms
+  // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glUniform.xhtml
   public static glUniform1f(location: GLint, v0: GLfloat): void {
     return OpenGL32.LoadExtension('glUniform1f')(location, v0);
   }
+  // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glUniform.xhtml
   public static glUniform1fv(location: GLint, count: GLsizei, value: GLfloat_): void {
     return OpenGL32.LoadExtension('glUniform1fv')(location, count, value);
   }
+  // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glUniform.xhtml
   public static glUniform1i(location: GLint, v0: GLint): void {
     return OpenGL32.LoadExtension('glUniform1i')(location, v0);
   }
+  // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glUniform.xhtml
   public static glUniform1iv(location: GLint, count: GLsizei, value: GLint_): void {
     return OpenGL32.LoadExtension('glUniform1iv')(location, count, value);
   }
+  // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glUniform.xhtml
   public static glUniform2f(location: GLint, v0: GLfloat, v1: GLfloat): void {
     return OpenGL32.LoadExtension('glUniform2f')(location, v0, v1);
   }
+  // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glUniform.xhtml
   public static glUniform2fv(location: GLint, count: GLsizei, value: GLfloat_): void {
     return OpenGL32.LoadExtension('glUniform2fv')(location, count, value);
   }
+  // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glUniform.xhtml
   public static glUniform2i(location: GLint, v0: GLint, v1: GLint): void {
     return OpenGL32.LoadExtension('glUniform2i')(location, v0, v1);
   }
+  // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glUniform.xhtml
   public static glUniform2iv(location: GLint, count: GLsizei, value: GLint_): void {
     return OpenGL32.LoadExtension('glUniform2iv')(location, count, value);
   }
+  // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glUniform.xhtml
   public static glUniform3f(location: GLint, v0: GLfloat, v1: GLfloat, v2: GLfloat): void {
     return OpenGL32.LoadExtension('glUniform3f')(location, v0, v1, v2);
   }
+  // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glUniform.xhtml
   public static glUniform3fv(location: GLint, count: GLsizei, value: GLfloat_): void {
     return OpenGL32.LoadExtension('glUniform3fv')(location, count, value);
   }
+  // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glUniform.xhtml
   public static glUniform3i(location: GLint, v0: GLint, v1: GLint, v2: GLint): void {
     return OpenGL32.LoadExtension('glUniform3i')(location, v0, v1, v2);
   }
+  // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glUniform.xhtml
   public static glUniform3iv(location: GLint, count: GLsizei, value: GLint_): void {
     return OpenGL32.LoadExtension('glUniform3iv')(location, count, value);
   }
+  // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glUniform.xhtml
   public static glUniform4f(location: GLint, v0: GLfloat, v1: GLfloat, v2: GLfloat, v3: GLfloat): void {
     return OpenGL32.LoadExtension('glUniform4f')(location, v0, v1, v2, v3);
   }
+  // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glUniform.xhtml
   public static glUniform4fv(location: GLint, count: GLsizei, value: GLfloat_): void {
     return OpenGL32.LoadExtension('glUniform4fv')(location, count, value);
   }
+  // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glUniform.xhtml
   public static glUniform4i(location: GLint, v0: GLint, v1: GLint, v2: GLint, v3: GLint): void {
     return OpenGL32.LoadExtension('glUniform4i')(location, v0, v1, v2, v3);
   }
+  // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glUniform.xhtml
   public static glUniform4iv(location: GLint, count: GLsizei, value: GLint_): void {
     return OpenGL32.LoadExtension('glUniform4iv')(location, count, value);
   }
+  // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glUniform.xhtml
   public static glUniformMatrix2fv(location: GLint, count: GLsizei, transpose: GLboolean, value: GLfloat_): void {
     return OpenGL32.LoadExtension('glUniformMatrix2fv')(location, count, transpose, value);
   }
+  // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glUniform.xhtml
   public static glUniformMatrix3fv(location: GLint, count: GLsizei, transpose: GLboolean, value: GLfloat_): void {
     return OpenGL32.LoadExtension('glUniformMatrix3fv')(location, count, transpose, value);
   }
+  // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glUniform.xhtml
   public static glUniformMatrix4fv(location: GLint, count: GLsizei, transpose: GLboolean, value: GLfloat_): void {
     return OpenGL32.LoadExtension('glUniformMatrix4fv')(location, count, transpose, value);
   }
@@ -2642,144 +2699,191 @@ class OpenGL32 extends Win32 {
   // GL Extensions - Vertex Attribs (lazy-loaded via wglGetProcAddress)
   // ---------------------------------------------------------------------------
 
+  // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glBindAttribLocation.xhtml
   public static glBindAttribLocation(program: GLuint, index: GLuint, name: GLchar_): void {
     return OpenGL32.LoadExtension('glBindAttribLocation')(program, index, name);
   }
+  // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glEnableVertexAttribArray.xhtml
   public static glDisableVertexAttribArray(index: GLuint): void {
     return OpenGL32.LoadExtension('glDisableVertexAttribArray')(index);
   }
+  // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glEnableVertexAttribArray.xhtml
   public static glEnableVertexAttribArray(index: GLuint): void {
     return OpenGL32.LoadExtension('glEnableVertexAttribArray')(index);
   }
+  // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glGetActiveAttrib.xhtml
   public static glGetActiveAttrib(program: GLuint, index: GLuint, bufSize: GLsizei, length: Nullable<GLsizei_>, size: GLint_, type: GLenum_, name: GLchar_): void {
     return OpenGL32.LoadExtension('glGetActiveAttrib')(program, index, bufSize, length, size, type, name);
   }
+  // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glGetActiveUniform.xhtml
   public static glGetActiveUniform(program: GLuint, index: GLuint, bufSize: GLsizei, length: Nullable<GLsizei_>, size: GLint_, type: GLenum_, name: GLchar_): void {
     return OpenGL32.LoadExtension('glGetActiveUniform')(program, index, bufSize, length, size, type, name);
   }
+  // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glGetAttribLocation.xhtml
   public static glGetAttribLocation(program: GLuint, name: GLchar_): GLint {
     return OpenGL32.LoadExtension('glGetAttribLocation')(program, name);
   }
+  // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glGetVertexAttrib.xhtml
   public static glGetVertexAttribdv(index: GLuint, pname: GLenum, params: GLdouble_): void {
     return OpenGL32.LoadExtension('glGetVertexAttribdv')(index, pname, params);
   }
+  // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glGetVertexAttrib.xhtml
   public static glGetVertexAttribfv(index: GLuint, pname: GLenum, params: GLfloat_): void {
     return OpenGL32.LoadExtension('glGetVertexAttribfv')(index, pname, params);
   }
+  // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glGetVertexAttrib.xhtml
   public static glGetVertexAttribiv(index: GLuint, pname: GLenum, params: GLint_): void {
     return OpenGL32.LoadExtension('glGetVertexAttribiv')(index, pname, params);
   }
+  // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glGetVertexAttribPointerv.xhtml
   public static glGetVertexAttribPointerv(index: GLuint, pname: GLenum, pointer: GLvoid_): void {
     return OpenGL32.LoadExtension('glGetVertexAttribPointerv')(index, pname, pointer);
   }
+  // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glVertexAttrib.xhtml
   public static glVertexAttrib1d(index: GLuint, x: GLdouble): void {
     return OpenGL32.LoadExtension('glVertexAttrib1d')(index, x);
   }
+  // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glVertexAttrib.xhtml
   public static glVertexAttrib1dv(index: GLuint, v: GLdouble_): void {
     return OpenGL32.LoadExtension('glVertexAttrib1dv')(index, v);
   }
+  // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glVertexAttrib.xhtml
   public static glVertexAttrib1f(index: GLuint, x: GLfloat): void {
     return OpenGL32.LoadExtension('glVertexAttrib1f')(index, x);
   }
+  // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glVertexAttrib.xhtml
   public static glVertexAttrib1fv(index: GLuint, v: GLfloat_): void {
     return OpenGL32.LoadExtension('glVertexAttrib1fv')(index, v);
   }
+  // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glVertexAttrib.xhtml
   public static glVertexAttrib1s(index: GLuint, x: GLshort): void {
     return OpenGL32.LoadExtension('glVertexAttrib1s')(index, x);
   }
+  // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glVertexAttrib.xhtml
   public static glVertexAttrib1sv(index: GLuint, v: GLshort_): void {
     return OpenGL32.LoadExtension('glVertexAttrib1sv')(index, v);
   }
+  // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glVertexAttrib.xhtml
   public static glVertexAttrib2d(index: GLuint, x: GLdouble, y: GLdouble): void {
     return OpenGL32.LoadExtension('glVertexAttrib2d')(index, x, y);
   }
+  // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glVertexAttrib.xhtml
   public static glVertexAttrib2dv(index: GLuint, v: GLdouble_): void {
     return OpenGL32.LoadExtension('glVertexAttrib2dv')(index, v);
   }
+  // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glVertexAttrib.xhtml
   public static glVertexAttrib2f(index: GLuint, x: GLfloat, y: GLfloat): void {
     return OpenGL32.LoadExtension('glVertexAttrib2f')(index, x, y);
   }
+  // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glVertexAttrib.xhtml
   public static glVertexAttrib2fv(index: GLuint, v: GLfloat_): void {
     return OpenGL32.LoadExtension('glVertexAttrib2fv')(index, v);
   }
+  // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glVertexAttrib.xhtml
   public static glVertexAttrib2s(index: GLuint, x: GLshort, y: GLshort): void {
     return OpenGL32.LoadExtension('glVertexAttrib2s')(index, x, y);
   }
+  // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glVertexAttrib.xhtml
   public static glVertexAttrib2sv(index: GLuint, v: GLshort_): void {
     return OpenGL32.LoadExtension('glVertexAttrib2sv')(index, v);
   }
+  // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glVertexAttrib.xhtml
   public static glVertexAttrib3d(index: GLuint, x: GLdouble, y: GLdouble, z: GLdouble): void {
     return OpenGL32.LoadExtension('glVertexAttrib3d')(index, x, y, z);
   }
+  // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glVertexAttrib.xhtml
   public static glVertexAttrib3dv(index: GLuint, v: GLdouble_): void {
     return OpenGL32.LoadExtension('glVertexAttrib3dv')(index, v);
   }
+  // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glVertexAttrib.xhtml
   public static glVertexAttrib3f(index: GLuint, x: GLfloat, y: GLfloat, z: GLfloat): void {
     return OpenGL32.LoadExtension('glVertexAttrib3f')(index, x, y, z);
   }
+  // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glVertexAttrib.xhtml
   public static glVertexAttrib3fv(index: GLuint, v: GLfloat_): void {
     return OpenGL32.LoadExtension('glVertexAttrib3fv')(index, v);
   }
+  // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glVertexAttrib.xhtml
   public static glVertexAttrib3s(index: GLuint, x: GLshort, y: GLshort, z: GLshort): void {
     return OpenGL32.LoadExtension('glVertexAttrib3s')(index, x, y, z);
   }
+  // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glVertexAttrib.xhtml
   public static glVertexAttrib3sv(index: GLuint, v: GLshort_): void {
     return OpenGL32.LoadExtension('glVertexAttrib3sv')(index, v);
   }
+  // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glVertexAttrib.xhtml
   public static glVertexAttrib4bv(index: GLuint, v: GLbyte_): void {
     return OpenGL32.LoadExtension('glVertexAttrib4bv')(index, v);
   }
+  // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glVertexAttrib.xhtml
   public static glVertexAttrib4d(index: GLuint, x: GLdouble, y: GLdouble, z: GLdouble, w: GLdouble): void {
     return OpenGL32.LoadExtension('glVertexAttrib4d')(index, x, y, z, w);
   }
+  // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glVertexAttrib.xhtml
   public static glVertexAttrib4dv(index: GLuint, v: GLdouble_): void {
     return OpenGL32.LoadExtension('glVertexAttrib4dv')(index, v);
   }
+  // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glVertexAttrib.xhtml
   public static glVertexAttrib4f(index: GLuint, x: GLfloat, y: GLfloat, z: GLfloat, w: GLfloat): void {
     return OpenGL32.LoadExtension('glVertexAttrib4f')(index, x, y, z, w);
   }
+  // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glVertexAttrib.xhtml
   public static glVertexAttrib4fv(index: GLuint, v: GLfloat_): void {
     return OpenGL32.LoadExtension('glVertexAttrib4fv')(index, v);
   }
+  // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glVertexAttrib.xhtml
   public static glVertexAttrib4iv(index: GLuint, v: GLint_): void {
     return OpenGL32.LoadExtension('glVertexAttrib4iv')(index, v);
   }
+  // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glVertexAttrib.xhtml
   public static glVertexAttrib4Nbv(index: GLuint, v: GLbyte_): void {
     return OpenGL32.LoadExtension('glVertexAttrib4Nbv')(index, v);
   }
+  // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glVertexAttrib.xhtml
   public static glVertexAttrib4Niv(index: GLuint, v: GLint_): void {
     return OpenGL32.LoadExtension('glVertexAttrib4Niv')(index, v);
   }
+  // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glVertexAttrib.xhtml
   public static glVertexAttrib4Nsv(index: GLuint, v: GLshort_): void {
     return OpenGL32.LoadExtension('glVertexAttrib4Nsv')(index, v);
   }
+  // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glVertexAttrib.xhtml
   public static glVertexAttrib4Nub(index: GLuint, x: GLubyte, y: GLubyte, z: GLubyte, w: GLubyte): void {
     return OpenGL32.LoadExtension('glVertexAttrib4Nub')(index, x, y, z, w);
   }
+  // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glVertexAttrib.xhtml
   public static glVertexAttrib4Nubv(index: GLuint, v: GLubyte_): void {
     return OpenGL32.LoadExtension('glVertexAttrib4Nubv')(index, v);
   }
+  // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glVertexAttrib.xhtml
   public static glVertexAttrib4Nuiv(index: GLuint, v: GLuint_): void {
     return OpenGL32.LoadExtension('glVertexAttrib4Nuiv')(index, v);
   }
+  // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glVertexAttrib.xhtml
   public static glVertexAttrib4Nusv(index: GLuint, v: GLushort_): void {
     return OpenGL32.LoadExtension('glVertexAttrib4Nusv')(index, v);
   }
+  // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glVertexAttrib.xhtml
   public static glVertexAttrib4s(index: GLuint, x: GLshort, y: GLshort, z: GLshort, w: GLshort): void {
     return OpenGL32.LoadExtension('glVertexAttrib4s')(index, x, y, z, w);
   }
+  // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glVertexAttrib.xhtml
   public static glVertexAttrib4sv(index: GLuint, v: GLshort_): void {
     return OpenGL32.LoadExtension('glVertexAttrib4sv')(index, v);
   }
+  // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glVertexAttrib.xhtml
   public static glVertexAttrib4ubv(index: GLuint, v: GLubyte_): void {
     return OpenGL32.LoadExtension('glVertexAttrib4ubv')(index, v);
   }
+  // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glVertexAttrib.xhtml
   public static glVertexAttrib4uiv(index: GLuint, v: GLuint_): void {
     return OpenGL32.LoadExtension('glVertexAttrib4uiv')(index, v);
   }
+  // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glVertexAttrib.xhtml
   public static glVertexAttrib4usv(index: GLuint, v: GLushort_): void {
     return OpenGL32.LoadExtension('glVertexAttrib4usv')(index, v);
   }
+  // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glVertexAttribPointer.xhtml
   public static glVertexAttribPointer(index: GLuint, size: GLint, type: GLenum, normalized: GLboolean, stride: GLsizei, pointer: GLvoid_): void {
     return OpenGL32.LoadExtension('glVertexAttribPointer')(index, size, type, normalized, stride, pointer);
   }
@@ -2788,15 +2892,19 @@ class OpenGL32 extends Win32 {
   // GL Extensions - VAO (lazy-loaded via wglGetProcAddress)
   // ---------------------------------------------------------------------------
 
+  // https://registry.khronos.org/OpenGL/extensions/ARB/ARB_vertex_array_object.txt
   public static glBindVertexArray(array: GLuint): void {
     return OpenGL32.LoadExtension('glBindVertexArray')(array);
   }
+  // https://registry.khronos.org/OpenGL/extensions/ARB/ARB_vertex_array_object.txt
   public static glDeleteVertexArrays(n: GLsizei, arrays: GLuint_): void {
     return OpenGL32.LoadExtension('glDeleteVertexArrays')(n, arrays);
   }
+  // https://registry.khronos.org/OpenGL/extensions/ARB/ARB_vertex_array_object.txt
   public static glGenVertexArrays(n: GLsizei, arrays: GLuint_): void {
     return OpenGL32.LoadExtension('glGenVertexArrays')(n, arrays);
   }
+  // https://registry.khronos.org/OpenGL/extensions/ARB/ARB_vertex_array_object.txt
   public static glIsVertexArray(array: GLuint): GLboolean {
     return OpenGL32.LoadExtension('glIsVertexArray')(array);
   }
@@ -2805,48 +2913,63 @@ class OpenGL32 extends Win32 {
   // GL Extensions - FBO (lazy-loaded via wglGetProcAddress)
   // ---------------------------------------------------------------------------
 
+  // https://registry.khronos.org/OpenGL/extensions/ARB/ARB_framebuffer_object.txt
   public static glBindFramebuffer(target: GLenum, framebuffer: GLuint): void {
     return OpenGL32.LoadExtension('glBindFramebuffer')(target, framebuffer);
   }
+  // https://registry.khronos.org/OpenGL/extensions/ARB/ARB_framebuffer_object.txt
   public static glBindRenderbuffer(target: GLenum, renderbuffer: GLuint): void {
     return OpenGL32.LoadExtension('glBindRenderbuffer')(target, renderbuffer);
   }
+  // https://registry.khronos.org/OpenGL/extensions/ARB/ARB_framebuffer_object.txt
   public static glCheckFramebufferStatus(target: GLenum): GLenum {
     return OpenGL32.LoadExtension('glCheckFramebufferStatus')(target);
   }
+  // https://registry.khronos.org/OpenGL/extensions/ARB/ARB_framebuffer_object.txt
   public static glDeleteFramebuffers(n: GLsizei, framebuffers: GLuint_): void {
     return OpenGL32.LoadExtension('glDeleteFramebuffers')(n, framebuffers);
   }
+  // https://registry.khronos.org/OpenGL/extensions/ARB/ARB_framebuffer_object.txt
   public static glDeleteRenderbuffers(n: GLsizei, renderbuffers: GLuint_): void {
     return OpenGL32.LoadExtension('glDeleteRenderbuffers')(n, renderbuffers);
   }
+  // https://registry.khronos.org/OpenGL/extensions/ARB/ARB_framebuffer_object.txt
   public static glFramebufferRenderbuffer(target: GLenum, attachment: GLenum, renderbuffertarget: GLenum, renderbuffer: GLuint): void {
     return OpenGL32.LoadExtension('glFramebufferRenderbuffer')(target, attachment, renderbuffertarget, renderbuffer);
   }
+  // https://registry.khronos.org/OpenGL/extensions/ARB/ARB_framebuffer_object.txt
   public static glFramebufferTexture2D(target: GLenum, attachment: GLenum, textarget: GLenum, texture: GLuint, level: GLint): void {
     return OpenGL32.LoadExtension('glFramebufferTexture2D')(target, attachment, textarget, texture, level);
   }
+  // https://registry.khronos.org/OpenGL/extensions/ARB/ARB_framebuffer_object.txt
   public static glGenFramebuffers(n: GLsizei, framebuffers: GLuint_): void {
     return OpenGL32.LoadExtension('glGenFramebuffers')(n, framebuffers);
   }
+  // https://registry.khronos.org/OpenGL/extensions/ARB/ARB_framebuffer_object.txt
   public static glGenRenderbuffers(n: GLsizei, renderbuffers: GLuint_): void {
     return OpenGL32.LoadExtension('glGenRenderbuffers')(n, renderbuffers);
   }
+  // https://registry.khronos.org/OpenGL/extensions/ARB/ARB_framebuffer_object.txt
   public static glGenerateMipmap(target: GLenum): void {
     return OpenGL32.LoadExtension('glGenerateMipmap')(target);
   }
+  // https://registry.khronos.org/OpenGL/extensions/ARB/ARB_framebuffer_object.txt
   public static glGetFramebufferAttachmentParameteriv(target: GLenum, attachment: GLenum, pname: GLenum, params: GLint_): void {
     return OpenGL32.LoadExtension('glGetFramebufferAttachmentParameteriv')(target, attachment, pname, params);
   }
+  // https://registry.khronos.org/OpenGL/extensions/ARB/ARB_framebuffer_object.txt
   public static glGetRenderbufferParameteriv(target: GLenum, pname: GLenum, params: GLint_): void {
     return OpenGL32.LoadExtension('glGetRenderbufferParameteriv')(target, pname, params);
   }
+  // https://registry.khronos.org/OpenGL/extensions/ARB/ARB_framebuffer_object.txt
   public static glIsFramebuffer(framebuffer: GLuint): GLboolean {
     return OpenGL32.LoadExtension('glIsFramebuffer')(framebuffer);
   }
+  // https://registry.khronos.org/OpenGL/extensions/ARB/ARB_framebuffer_object.txt
   public static glIsRenderbuffer(renderbuffer: GLuint): GLboolean {
     return OpenGL32.LoadExtension('glIsRenderbuffer')(renderbuffer);
   }
+  // https://registry.khronos.org/OpenGL/extensions/ARB/ARB_framebuffer_object.txt
   public static glRenderbufferStorage(target: GLenum, internalformat: GLenum, width: GLsizei, height: GLsizei): void {
     return OpenGL32.LoadExtension('glRenderbufferStorage')(target, internalformat, width, height);
   }

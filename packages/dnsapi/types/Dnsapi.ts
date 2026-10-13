@@ -1,6 +1,6 @@
 import type { Pointer } from 'bun:ffi';
 
-export type { BOOL, DWORD, HANDLE, LPCWSTR, LPVOID, LPWSTR, NULL, Nullable, Optional, PDWORD, PHANDLE, PVOID, WORD } from '@bun-win32/core';
+export type { BOOL, DWORD, HANDLE, LPBOOL, LPCWSTR, LPVOID, LPWSTR, NULL, Nullable, Optional, PDWORD, PHANDLE, PVOID, WORD } from '@bun-win32/core';
 
 export enum DnsCharSet {
   DnsCharSetAnsi = 3,
@@ -201,3 +201,4 @@ export type PMDNS_QUERY_REQUEST = Pointer;
 export type PSOCKADDR = Pointer;
 export type PSTR = Pointer;
 export type PWSTR = Pointer;
+export type ULONG64 = bigint;

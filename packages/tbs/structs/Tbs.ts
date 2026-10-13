@@ -67,12 +67,12 @@ class Tbs extends Win32 {
     Tbsip_Submit_Command: { args: [FFIType.u64, FFIType.u32, FFIType.u32, FFIType.ptr, FFIType.u32, FFIType.ptr, FFIType.ptr], returns: FFIType.u32 },
   } as const satisfies Record<string, FFIFunction>;
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/tbs/nf-tbs-getdeviceid
+  // Undocumented export (no Microsoft Learn page).
   public static GetDeviceID(pbWindowsAIK_out: Optional<PBYTE>, cbWindowsAIK: UINT32, pcbResult_out: PUINT32, pfProtectedByTPM_out: Optional<LPBOOL>): HRESULT {
     return Tbs.Load('GetDeviceID')(pbWindowsAIK_out, cbWindowsAIK, pcbResult_out, pfProtectedByTPM_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/tbs/nf-tbs-getdeviceidstring
+  // Undocumented export (no Microsoft Learn page).
   public static GetDeviceIDString(pszWindowsAIK_out: Optional<PWSTR>, cchWindowsAIK: UINT32, pcchResult_out: PUINT32, pfProtectedByTPM_out: Optional<LPBOOL>): HRESULT {
     return Tbs.Load('GetDeviceIDString')(pszWindowsAIK_out, cchWindowsAIK, pcchResult_out, pfProtectedByTPM_out);
   }
@@ -82,7 +82,7 @@ class Tbs extends Win32 {
     return Tbs.Load('Tbsi_Context_Create')(pContextParams, phContext_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/tbs/nf-tbs-tbsi_create_windows_key
+  // Undocumented export (no Microsoft Learn page).
   public static Tbsi_Create_Windows_Key(keyHandle: TBS_HANDLE): TBS_RESULT {
     return Tbs.Load('Tbsi_Create_Windows_Key')(keyHandle);
   }
@@ -108,8 +108,8 @@ class Tbs extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/tbs/nf-tbs-tbsi_physical_presence_command
-  public static Tbsi_Physical_Presence_Command(hContext: TBS_HCONTEXT, pabInput: PCBYTE, cbInput: UINT32, pabOutput_out: PBYTE, pcbOutput_out: PUINT32): TBS_RESULT {
-    return Tbs.Load('Tbsi_Physical_Presence_Command')(hContext, pabInput, cbInput, pabOutput_out, pcbOutput_out);
+  public static Tbsi_Physical_Presence_Command(hContext: TBS_HCONTEXT, pabInput: PCBYTE, cbInput: UINT32, pabOutput_out: PBYTE, pcbOutput_in_out: PUINT32): TBS_RESULT {
+    return Tbs.Load('Tbsi_Physical_Presence_Command')(hContext, pabInput, cbInput, pabOutput_out, pcbOutput_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/tbs/nf-tbs-tbsi_revoke_attestation

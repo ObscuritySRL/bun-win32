@@ -441,7 +441,7 @@ class Netapi32 extends Win32 {
     return Netapi32.Load('NetEnumerateServiceAccounts')(ServerName, Flags, AccountsCount_out, Accounts_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/dsgetdc/nf-dsgetdc-netenumeratetrusteddomains
+  // Undocumented export (no Microsoft Learn page).
   public static NetEnumerateTrustedDomains(ServerName: Optional<LPWSTR>, DomainNames_out: LPWSTR): NTSTATUS {
     return Netapi32.Load('NetEnumerateTrustedDomains')(ServerName, DomainNames_out);
   }
@@ -658,7 +658,7 @@ class Netapi32 extends Win32 {
     return Netapi32.Load('NetQueryServiceAccount')(ServerName, AccountName, InfoLevel, Buffer_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/lmjoin/nf-lmjoin-netregisterdomainnamechangenotification
+  // Undocumented export (no Microsoft Learn page).
   public static NetRegisterDomainNameChangeNotification(NotificationEventHandle_out: PHANDLE): NET_API_STATUS {
     return Netapi32.Load('NetRegisterDomainNameChangeNotification')(NotificationEventHandle_out);
   }
@@ -704,8 +704,8 @@ class Netapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/lmat/nf-lmat-netschedulejobenum
-  public static NetScheduleJobEnum(Servername: Optional<LPCWSTR>, PointerToBuffer_out: LPBYTE, PreferredMaximumLength: DWORD, EntriesRead_out: LPDWORD, TotalEntries_out: LPDWORD, ResumeHandle_in_out: Nullable<LPDWORD>): NET_API_STATUS {
-    return Netapi32.Load('NetScheduleJobEnum')(Servername, PointerToBuffer_out, PreferredMaximumLength, EntriesRead_out, TotalEntries_out, ResumeHandle_in_out);
+  public static NetScheduleJobEnum(Servername: Optional<LPCWSTR>, PointerToBuffer_out: LPBYTE, PrefferedMaximumLength: DWORD, EntriesRead_out: LPDWORD, TotalEntries_out: LPDWORD, ResumeHandle_in_out: Nullable<LPDWORD>): NET_API_STATUS {
+    return Netapi32.Load('NetScheduleJobEnum')(Servername, PointerToBuffer_out, PrefferedMaximumLength, EntriesRead_out, TotalEntries_out, ResumeHandle_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/lmat/nf-lmat-netschedulejobgetinfo
@@ -828,7 +828,7 @@ class Netapi32 extends Win32 {
     return Netapi32.Load('NetShareDelEx')(servername, level, buf);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/lmshare/nf-lmshare-netsharedelsticky
+  // Undocumented export (no Microsoft Learn page).
   public static NetShareDelSticky(servername: Optional<LMSTR>, netname: LMSTR, reserved: DWORD): NET_API_STATUS {
     return Netapi32.Load('NetShareDelSticky')(servername, netname, reserved);
   }
@@ -838,7 +838,7 @@ class Netapi32 extends Win32 {
     return Netapi32.Load('NetShareEnum')(servername, level, bufptr_out, prefmaxlen, entriesread_out, totalentries_out, resume_handle_in_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/lmshare/nf-lmshare-netshareenumsticky
+  // Undocumented export (no Microsoft Learn page).
   public static NetShareEnumSticky(servername: Optional<LMSTR>, level: DWORD, bufptr_out: LPBYTE, prefmaxlen: DWORD, entriesread_out: LPDWORD, totalentries_out: LPDWORD, resume_handle_in_out: Optional<LPDWORD>): NET_API_STATUS {
     return Netapi32.Load('NetShareEnumSticky')(servername, level, bufptr_out, prefmaxlen, entriesread_out, totalentries_out, resume_handle_in_out);
   }
@@ -863,19 +863,19 @@ class Netapi32 extends Win32 {
     return Netapi32.Load('NetUnjoinDomain')(lpServer, lpAccount, lpPassword, fUnjoinOptions);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/lmjoin/nf-lmjoin-netunregisterdomainnamechangenotification
+  // Undocumented export (no Microsoft Learn page).
   public static NetUnregisterDomainNameChangeNotification(NotificationEventHandle: HANDLE): NET_API_STATUS {
     return Netapi32.Load('NetUnregisterDomainNameChangeNotification')(NotificationEventHandle);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/lmuse/nf-lmuse-netuseadd
-  public static NetUseAdd(UncServerName: Optional<LMSTR>, Level: DWORD, Buf: LPBYTE, ParmError_out: Optional<LPDWORD>): NET_API_STATUS {
-    return Netapi32.Load('NetUseAdd')(UncServerName, Level, Buf, ParmError_out);
+  public static NetUseAdd(servername: Optional<LMSTR>, LevelFlags: DWORD, buf: LPBYTE, parm_err_out: Optional<LPDWORD>): NET_API_STATUS {
+    return Netapi32.Load('NetUseAdd')(servername, LevelFlags, buf, parm_err_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/lmuse/nf-lmuse-netusedel
-  public static NetUseDel(UncServerName: Optional<LMSTR>, UseName: LMSTR, ForceCond: DWORD): NET_API_STATUS {
-    return Netapi32.Load('NetUseDel')(UncServerName, UseName, ForceCond);
+  public static NetUseDel(UncServerName: Optional<LMSTR>, UseName: LMSTR, ForceLevelFlags: DWORD): NET_API_STATUS {
+    return Netapi32.Load('NetUseDel')(UncServerName, UseName, ForceLevelFlags);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/lmuse/nf-lmuse-netuseenum
@@ -892,8 +892,8 @@ class Netapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/lmuse/nf-lmuse-netusegetinfo
-  public static NetUseGetInfo(UncServerName: Optional<LMSTR>, UseName: LMSTR, LevelFlags: DWORD, BufPtr_out: Optional<LPBYTE>): NET_API_STATUS {
-    return Netapi32.Load('NetUseGetInfo')(UncServerName, UseName, LevelFlags, BufPtr_out);
+  public static NetUseGetInfo(UncServerName: Optional<LMSTR>, UseName: LMSTR, LevelFlags: DWORD, bufptr_out: Optional<LPBYTE>): NET_API_STATUS {
+    return Netapi32.Load('NetUseGetInfo')(UncServerName, UseName, LevelFlags, bufptr_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/lmaccess/nf-lmaccess-netuseradd
@@ -972,8 +972,8 @@ class Netapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/lmwksta/nf-lmwksta-netwkstasetinfo
-  public static NetWkstaSetInfo(servername: Optional<LMSTR>, level: DWORD, buf: LPBYTE, parm_err_out: Optional<LPDWORD>): NET_API_STATUS {
-    return Netapi32.Load('NetWkstaSetInfo')(servername, level, buf, parm_err_out);
+  public static NetWkstaSetInfo(servername: Optional<LMSTR>, level: DWORD, buffer: LPBYTE, parm_err_out: Optional<LPDWORD>): NET_API_STATUS {
+    return Netapi32.Load('NetWkstaSetInfo')(servername, level, buffer, parm_err_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/lmwksta/nf-lmwksta-netwkstatransportadd

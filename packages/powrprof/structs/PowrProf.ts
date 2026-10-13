@@ -267,8 +267,8 @@ class PowrProf extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/powrprof/nf-powrprof-powerduplicatescheme
-  public static PowerDuplicateScheme(RootPowerKey: Optional<HKEY>, SourceSchemeGuid: LPCGUID, DestinationSchemeGuid_in_out: PVOID): DWORD {
-    return PowrProf.Load('PowerDuplicateScheme')(RootPowerKey, SourceSchemeGuid, DestinationSchemeGuid_in_out);
+  public static PowerDuplicateScheme(RootPowerKey: Optional<HKEY>, SourceSchemeGuid: LPCGUID, DestinationSchemeGuid: PVOID): DWORD {
+    return PowrProf.Load('PowerDuplicateScheme')(RootPowerKey, SourceSchemeGuid, DestinationSchemeGuid);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/powrprof/nf-powrprof-powerenumerate
@@ -619,8 +619,8 @@ class PowrProf extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/powrprof/nf-powrprof-readglobalpwrpolicy
-  public static ReadGlobalPwrPolicy(pGlobalPowerPolicy: PGLOBAL_POWER_POLICY): BOOLEAN {
-    return PowrProf.Load('ReadGlobalPwrPolicy')(pGlobalPowerPolicy);
+  public static ReadGlobalPwrPolicy(pGlobalPowerPolicy_out: PGLOBAL_POWER_POLICY): BOOLEAN {
+    return PowrProf.Load('ReadGlobalPwrPolicy')(pGlobalPowerPolicy_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/powrprof/nf-powrprof-readprocessorpwrscheme

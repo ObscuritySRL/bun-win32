@@ -444,11 +444,11 @@ class Rasapi32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ras/nf-ras-rasgetnapstatus
-  public static RasGetNapStatus(hRasconn: HRASCONN, pRasNapState_out: LPRASNAPSTATE): DWORD {
-    return Rasapi32.Load('RasGetNapStatus')(hRasconn, pRasNapState_out);
+  public static RasGetNapStatus(hRasconn: HRASCONN, pRasNapState_in_out: LPRASNAPSTATE): DWORD {
+    return Rasapi32.Load('RasGetNapStatus')(hRasconn, pRasNapState_in_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/ras/nf-ras-rasgetprojectioninfo
+  // https://learn.microsoft.com/en-us/windows/win32/api/ras/nf-ras-rasgetprojectioninfoa
   public static RasGetProjectionInfoA(hrasconn: HRASCONN, rasprojection: RASPROJECTION, lpprojection_out: LPVOID, lpcb_in_out: LPDWORD): DWORD {
     return Rasapi32.Load('RasGetProjectionInfoA')(hrasconn, rasprojection, lpprojection_out, lpcb_in_out);
   }
@@ -458,7 +458,7 @@ class Rasapi32 extends Win32 {
     return Rasapi32.Load('RasGetProjectionInfoEx')(hrasconn, pRasProjection_in_out, lpdwSize_in_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/ras/nf-ras-rasgetprojectioninfo
+  // https://learn.microsoft.com/en-us/windows/win32/api/ras/nf-ras-rasgetprojectioninfow
   public static RasGetProjectionInfoW(hrasconn: HRASCONN, rasprojection: RASPROJECTION, lpprojection_out: LPVOID, lpcb_in_out: LPDWORD): DWORD {
     return Rasapi32.Load('RasGetProjectionInfoW')(hrasconn, rasprojection, lpprojection_out, lpcb_in_out);
   }
@@ -480,10 +480,10 @@ class Rasapi32 extends Win32 {
     dwSubEntry: DWORD,
     lpRasSubEntry_in_out: Optional<LPRASSUBENTRYA>,
     lpdwcb_in_out: Optional<LPDWORD>,
-    lpbDeviceConfig_out: Optional<LPBYTE>,
-    lpdwcbDeviceConfig_in_out: Optional<LPDWORD>,
+    lpbDeviceConfig: Optional<LPBYTE>,
+    lpdwcbDeviceConfig: Optional<LPDWORD>,
   ): DWORD {
-    return Rasapi32.Load('RasGetSubEntryPropertiesA')(lpszPhonebook, lpszEntry, dwSubEntry, lpRasSubEntry_in_out, lpdwcb_in_out, lpbDeviceConfig_out, lpdwcbDeviceConfig_in_out);
+    return Rasapi32.Load('RasGetSubEntryPropertiesA')(lpszPhonebook, lpszEntry, dwSubEntry, lpRasSubEntry_in_out, lpdwcb_in_out, lpbDeviceConfig, lpdwcbDeviceConfig);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ras/nf-ras-rasgetsubentrypropertiesw
@@ -493,10 +493,10 @@ class Rasapi32 extends Win32 {
     dwSubEntry: DWORD,
     lpRasSubEntry_in_out: Optional<LPRASSUBENTRYW>,
     lpdwcb_in_out: Optional<LPDWORD>,
-    lpbDeviceConfig_out: Optional<LPBYTE>,
-    lpdwcbDeviceConfig_in_out: Optional<LPDWORD>,
+    lpbDeviceConfig: Optional<LPBYTE>,
+    lpdwcbDeviceConfig: Optional<LPDWORD>,
   ): DWORD {
-    return Rasapi32.Load('RasGetSubEntryPropertiesW')(lpszPhonebook, lpszEntry, dwSubEntry, lpRasSubEntry_in_out, lpdwcb_in_out, lpbDeviceConfig_out, lpdwcbDeviceConfig_in_out);
+    return Rasapi32.Load('RasGetSubEntryPropertiesW')(lpszPhonebook, lpszEntry, dwSubEntry, lpRasSubEntry_in_out, lpdwcb_in_out, lpbDeviceConfig, lpdwcbDeviceConfig);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/ras/nf-ras-rashangupa

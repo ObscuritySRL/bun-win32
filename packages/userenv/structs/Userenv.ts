@@ -179,7 +179,7 @@ class Userenv extends Win32 {
     return Userenv.Load('FreeGPOListW')(pGPOList);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/userenv/nf-userenv-generategpnotification
+  // Undocumented export (no Microsoft Learn page).
   public static GenerateGPNotification(bMachine: BOOL, lpwszMgmtProduct: LPCWSTR, dwMgmtProductOptions: DWORD): DWORD {
     return Userenv.Load('GenerateGPNotification')(bMachine, lpwszMgmtProduct, dwMgmtProductOptions);
   }

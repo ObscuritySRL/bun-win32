@@ -185,7 +185,7 @@ class Mscms extends Win32 {
     return Mscms.Load('ColorProfileAddDisplayAssociation')(scope, profileName, targetAdapterID, sourceID, setAsDefault, associateAsAdvancedColor);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/icm/nf-icm-colorprofilegetdevicecapabilities
+  // Undocumented export (no Microsoft Learn page).
   public static ColorProfileGetDeviceCapabilities(scope: WCS_PROFILE_MANAGEMENT_SCOPE, targetAdapterID: LUID, sourceID: UINT32, capsType: WCS_DEVICE_CAPABILITIES_TYPE, outputCapabilities_out: PVOID): HRESULT {
     return Mscms.Load('ColorProfileGetDeviceCapabilities')(scope, targetAdapterID, sourceID, capsType, outputCapabilities_out);
   }
@@ -421,8 +421,8 @@ class Mscms extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/icm/nf-icm-setstandardcolorspaceprofilew
-  public static SetStandardColorSpaceProfileW(pMachineName: Optional<PCWSTR>, dwProfileID: DWORD, pProfileName: PCWSTR): BOOL {
-    return Mscms.Load('SetStandardColorSpaceProfileW')(pMachineName, dwProfileID, pProfileName);
+  public static SetStandardColorSpaceProfileW(pMachineName: Optional<PCWSTR>, dwProfileID: DWORD, pProfilename: PCWSTR): BOOL {
+    return Mscms.Load('SetStandardColorSpaceProfileW')(pMachineName, dwProfileID, pProfilename);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/icm/nf-icm-translatebitmapbits

@@ -259,8 +259,8 @@ class Cldapi extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfapi/nf-cfapi-cfreleasetransferkey
-  public static CfReleaseTransferKey(FileHandle: HANDLE, TransferKey_out: PCF_TRANSFER_KEY): VOID {
-    return Cldapi.Load('CfReleaseTransferKey')(FileHandle, TransferKey_out);
+  public static CfReleaseTransferKey(FileHandle: HANDLE, TransferKey: PCF_TRANSFER_KEY): VOID {
+    return Cldapi.Load('CfReleaseTransferKey')(FileHandle, TransferKey);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/cfapi/nf-cfapi-cfreportproviderprogress

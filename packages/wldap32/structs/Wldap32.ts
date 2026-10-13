@@ -386,8 +386,8 @@ class Wldap32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winber/nf-winber-ber_next_element
-  public static ber_next_element(pBerElement: PBerElement, pLen_out: PULONG, opaque: PCHAR): ULONG {
-    return Wldap32.Load('ber_next_element')(pBerElement, pLen_out, opaque);
+  public static ber_next_element(pBerElement: PBerElement, pLen_in_out: PULONG, opaque: PCHAR): ULONG {
+    return Wldap32.Load('ber_next_element')(pBerElement, pLen_in_out, opaque);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winber/nf-winber-ber_peek_tag
@@ -396,13 +396,13 @@ class Wldap32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winber/nf-winber-ber_printf
-  public static ber_printf(pBerElement: PBerElement, fmt: PSTR): INT {
-    return Wldap32.Load('ber_printf')(pBerElement, fmt);
+  public static ber_printf(pBerElement_in_out: PBerElement, fmt: PSTR): INT {
+    return Wldap32.Load('ber_printf')(pBerElement_in_out, fmt);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winber/nf-winber-ber_scanf
-  public static ber_scanf(pBerElement: PBerElement, fmt: PSTR): ULONG {
-    return Wldap32.Load('ber_scanf')(pBerElement, fmt);
+  public static ber_scanf(pBerElement_in_out: PBerElement, fmt: PSTR): ULONG {
+    return Wldap32.Load('ber_scanf')(pBerElement_in_out, fmt);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winber/nf-winber-ber_skip_tag
@@ -786,13 +786,13 @@ class Wldap32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_encode_sort_controla
-  public static ldap_encode_sort_controlA(ExternalHandle: PLDAP, SortKeys: PPLDAPSortKeyA, Control: PLDAPControlA, Criticality: BOOLEAN): ULONG {
-    return Wldap32.Load('ldap_encode_sort_controlA')(ExternalHandle, SortKeys, Control, Criticality);
+  public static ldap_encode_sort_controlA(ExternalHandle: PLDAP, SortKeys: PPLDAPSortKeyA, Control_out: PLDAPControlA, Criticality: BOOLEAN): ULONG {
+    return Wldap32.Load('ldap_encode_sort_controlA')(ExternalHandle, SortKeys, Control_out, Criticality);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_encode_sort_controlw
-  public static ldap_encode_sort_controlW(ExternalHandle: PLDAP, SortKeys: PPLDAPSortKeyW, Control: PLDAPControlW, Criticality: BOOLEAN): ULONG {
-    return Wldap32.Load('ldap_encode_sort_controlW')(ExternalHandle, SortKeys, Control, Criticality);
+  public static ldap_encode_sort_controlW(ExternalHandle: PLDAP, SortKeys: PPLDAPSortKeyW, Control_out: PLDAPControlW, Criticality: BOOLEAN): ULONG {
+    return Wldap32.Load('ldap_encode_sort_controlW')(ExternalHandle, SortKeys, Control_out, Criticality);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_err2string
@@ -951,7 +951,7 @@ class Wldap32 extends Win32 {
     return Wldap32.Load('ldap_get_option')(ld, option, outvalue_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_get_optiona
+  // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_get_option
   public static ldap_get_optionA(ld: PLDAP, option: INT, outvalue_out: LPVOID): ULONG {
     return Wldap32.Load('ldap_get_optionA')(ld, option, outvalue_out);
   }
@@ -962,8 +962,8 @@ class Wldap32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_get_paged_count
-  public static ldap_get_paged_count(ExternalHandle: PLDAP, SearchBlock: PLDAPSearch, TotalCount_out: PULONG, Results: PLDAPMessage): ULONG {
-    return Wldap32.Load('ldap_get_paged_count')(ExternalHandle, SearchBlock, TotalCount_out, Results);
+  public static ldap_get_paged_count(ExternalHandle: PLDAP, SearchBlock: PLDAPSearch, TotalCount_out: PULONG, Results_out: PLDAPMessage): ULONG {
+    return Wldap32.Load('ldap_get_paged_count')(ExternalHandle, SearchBlock, TotalCount_out, Results_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_get_values
@@ -1152,18 +1152,18 @@ class Wldap32 extends Win32 {
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_next_attribute
-  public static ldap_next_attribute(ld: PLDAP, entry: PLDAPMessage, ptr: PBerElement): PCHAR {
-    return Wldap32.Load('ldap_next_attribute')(ld, entry, ptr);
+  public static ldap_next_attribute(ld: PLDAP, entry: PLDAPMessage, ptr_in_out: PBerElement): PCHAR {
+    return Wldap32.Load('ldap_next_attribute')(ld, entry, ptr_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_next_attributea
-  public static ldap_next_attributeA(ld: PLDAP, entry: PLDAPMessage, ptr: PBerElement): PCHAR {
-    return Wldap32.Load('ldap_next_attributeA')(ld, entry, ptr);
+  public static ldap_next_attributeA(ld: PLDAP, entry: PLDAPMessage, ptr_in_out: PBerElement): PCHAR {
+    return Wldap32.Load('ldap_next_attributeA')(ld, entry, ptr_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_next_attributew
-  public static ldap_next_attributeW(ld: PLDAP, entry: PLDAPMessage, ptr: PBerElement): PWCHAR {
-    return Wldap32.Load('ldap_next_attributeW')(ld, entry, ptr);
+  public static ldap_next_attributeW(ld: PLDAP, entry: PLDAPMessage, ptr_in_out: PBerElement): PWCHAR {
+    return Wldap32.Load('ldap_next_attributeW')(ld, entry, ptr_in_out);
   }
 
   // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_next_entry
@@ -1566,12 +1566,12 @@ class Wldap32 extends Win32 {
     return Wldap32.Load('ldap_search_stW')(ld, base, scope, filter, attrs, attrsonly, timeout, res_out);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_set_dbg_flags
+  // Undocumented export (no Microsoft Learn page).
   public static ldap_set_dbg_flags(NewFlags: ULONG): ULONG {
     return Wldap32.Load('ldap_set_dbg_flags')(NewFlags);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_set_dbg_routine
+  // Undocumented export (no Microsoft Learn page).
   public static ldap_set_dbg_routine(DebugPrintRoutine: DBGPRINT): void {
     return Wldap32.Load('ldap_set_dbg_routine')(DebugPrintRoutine);
   }
@@ -1581,7 +1581,7 @@ class Wldap32 extends Win32 {
     return Wldap32.Load('ldap_set_option')(ld, option, invalue);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_set_optiona
+  // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_set_option
   public static ldap_set_optionA(ld: PLDAP, option: INT, invalue: LPVOID): ULONG {
     return Wldap32.Load('ldap_set_optionA')(ld, option, invalue);
   }
@@ -1646,7 +1646,7 @@ class Wldap32 extends Win32 {
     return Wldap32.Load('ldap_start_tls_sW')(ExternalHandle, ServerReturnValue_out, result_out, ServerControls, ClientControls);
   }
 
-  // https://learn.microsoft.com/en-us/windows/win32/api/winldap/nf-winldap-ldap_startup
+  // Undocumented export (no Microsoft Learn page).
   public static ldap_startup(version: PLDAP_VERSION_INFO, Instance_out: PHANDLE): ULONG {
     return Wldap32.Load('ldap_startup')(version, Instance_out);
   }
