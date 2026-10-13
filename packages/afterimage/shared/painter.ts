@@ -130,6 +130,7 @@ export class Painter {
 
   /** Width and height of `text` laid out on one line (cached). */
   measure(text: string, options: TextOptions): [number, number] {
+    if (text.length === 0) return [0, 0];
     const key = `${options.family}|${options.size}|${options.weight ?? 400}|${text}`;
     const cached = this.#measures.get(key);
     if (cached !== undefined) return cached;

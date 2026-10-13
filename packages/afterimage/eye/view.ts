@@ -484,7 +484,7 @@ export class View {
     const height = 112;
     const left = (this.display.width / this.#scale - width) / 2;
     const top = this.display.height / this.#scale / 2 - height / 2 + space(4) * (1 - opacity);
-    painter.fillRoundedRectangle(left, top, width, height, radius.shelf, [palette.glass[0], palette.glass[1], palette.glass[2], 0.94 * opacity]);
+    painter.fillRoundedRectangle(left, top, width, height, radius.shelf, [palette.glass[0], palette.glass[1], palette.glass[2], 0.97 * opacity]);
     painter.strokeRoundedRectangle(left + 0.5, top + 0.5, width - 1, height - 1, radius.shelf, 1 / this.#scale, [1, 1, 1, 0.1 * opacity]);
     painter.text(copy.goTo, type.caption, left + space(5), top + space(4), width, space(4), [palette.textTertiary[0], palette.textTertiary[1], palette.textTertiary[2], opacity]);
     const field = this.#goTo;

@@ -14,7 +14,7 @@ import { join } from 'node:path';
 import { DXGI_FORMAT_B8G8R8A8_UNORM, comRelease, encodePNGFromBGRA, makeTexture, readbackTexture, type TextureResult } from '@bun-win32/gpu';
 
 import type { DisplayInfo, WorkerOptions } from '../shared/protocol';
-import { Eye, type Presenter } from './eye';
+import { Eye, type Presenter, startMemory } from './eye';
 import type { Surface } from './renderer';
 import type { InputEvent } from './window';
 
@@ -104,7 +104,7 @@ export async function runScript(options: ScriptOptions): Promise<void> {
     stageScenario: options.stageScenario,
     stageWidth: options.stageWidth,
   };
-  const worker = new Worker(new URL('../memory/worker.ts', import.meta.url));
+  const worker = startMemory();
   const presenter = new OffscreenPresenter(options.scale);
   const eye = new Eye(worker, workerOptions, presenter, clock, { copyImage: () => {}, readClipboardText: () => '5m', recording: () => {}, unavailable: () => console.log('[script] unavailable') });
   await eye.ready;

@@ -8,17 +8,19 @@ import { DXGI_FORMAT_B8G8R8A8_UNORM, comRelease, encodePNGFromRGBA, makeTexture,
 import Gdi32 from '@bun-win32/gdi32';
 import User32 from '@bun-win32/user32';
 
-import type { Painter } from '../shared/painter';
+import type { Color, Painter } from '../shared/painter';
 import { palette } from './design';
 
-/** Straight-alpha RGBA pixels of the mark at `size`×`size`. */
-export function renderMark(painter: Painter, size: number): Uint8Array {
+/** The executable's icon can't know your accent, so it wears Afterimage's own violet. */
+export const brandAccent: Color = [0.5, 0.45, 0.98, 1];
+
+/** Straight-alpha RGBA pixels of the mark at `size`×`size`, in `accent` (the tray uses yours). */
+export function renderMark(painter: Painter, size: number, accent: Color = palette.accent): Uint8Array {
   const target = makeTexture({ format: DXGI_FORMAT_B8G8R8A8_UNORM, h: size, rtv: true, srv: true, w: size });
   try {
     painter.begin(target.tex, 96);
     painter.clear([0, 0, 0, 0]);
     const unit = size / 16;
-    const accent = palette.accent;
     painter.fillEllipse(4.2 * unit, 8 * unit, 2.6 * unit, 2.6 * unit, [accent[0], accent[1], accent[2], 0.32]);
     painter.fillEllipse(6.8 * unit, 8 * unit, 3.4 * unit, 3.4 * unit, [accent[0], accent[1], accent[2], 0.6]);
     painter.fillEllipse(10.4 * unit, 8 * unit, 4.6 * unit, 4.6 * unit, [accent[0], accent[1], accent[2], 1]);
@@ -64,7 +66,7 @@ export function createIcon(rgba: Uint8Array, size: number): bigint {
 
 /** A multi-resolution .ico (PNG-compressed entries) for the executable. */
 export function encodeIcon(painter: Painter, sizes: readonly number[]): Uint8Array {
-  const images = sizes.map((size) => encodePNGFromRGBA(renderMark(painter, size), size, size));
+  const images = sizes.map((size) => encodePNGFromRGBA(renderMark(painter, size, brandAccent), size, size));
   const header = 6 + sizes.length * 16;
   const total = header + images.reduce((sum, image) => sum + image.length, 0);
   const file = new Uint8Array(total);

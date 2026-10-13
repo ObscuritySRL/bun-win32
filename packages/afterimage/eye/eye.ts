@@ -17,6 +17,16 @@ import { FrameMeter } from './stats';
 import { type Diagnostics, View, type ViewHost } from './view';
 import type { InputEvent } from './window';
 
+/**
+ * Start the memory. From source the worker sits beside us; inside the compiled executable every
+ * module is one bundle on Bun's virtual drive and the worker is a second entry point, addressed
+ * by its path from the bundle root.
+ */
+export function startMemory(): Worker {
+  const compiled = Bun.main.includes('~BUN');
+  return new Worker(compiled ? './memory/worker.ts' : new URL('../memory/worker.ts', import.meta.url));
+}
+
 export interface Clock {
   /** Wall-clock epoch milliseconds (virtual in headless stage mode). */
   epoch(): number;

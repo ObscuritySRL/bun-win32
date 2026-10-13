@@ -12,7 +12,7 @@ import User32 from '@bun-win32/user32';
 import type { DisplayInfo, WorkerOptions } from '../shared/protocol';
 import { copyImage, readText } from './clipboard';
 import { copy, formatSpan } from './copy';
-import { Eye, type Presenter } from './eye';
+import { Eye, type Presenter, startMemory } from './eye';
 import { createIcon, renderMark } from './icon';
 import type { Surface } from './renderer';
 import { loadSettings, saveSettings, setStartWithWindows, startsWithWindows } from './settings';
@@ -102,7 +102,7 @@ export async function runShell(): Promise<void> {
   Shcore.SetProcessDpiAwareness(perMonitorAware);
   const settings = await loadSettings();
   const window = new OverlayWindow();
-  const worker = new Worker(new URL('../memory/worker.ts', import.meta.url));
+  const worker = startMemory();
   const options: WorkerOptions = { budgetBytes: settings.budgetBytes, captureHertz: 20, source: 'screen', stageEpoch: 0, stageHeight: 0, stageScale: 1, stageScenario: '', stageWidth: 0 };
   let tray: Tray | null = null;
   const clock = { epoch: () => Date.now(), now: () => performance.now() };
