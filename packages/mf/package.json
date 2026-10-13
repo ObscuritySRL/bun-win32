@@ -27,7 +27,7 @@
     "directory": "packages/mf"
   },
   "type": "module",
-  "version": "2.0.1",
+  "version": "2.1.0",
   "main": "./index.ts",
   "keywords": [
     "bun",

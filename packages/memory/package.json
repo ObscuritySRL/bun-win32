@@ -57,5 +57,5 @@
     "test:wow64": "bun test ./example/wow64.integration.ts"
   },
   "type": "module",
-  "version": "2.1.0"
+  "version": "2.1.1"
 }
