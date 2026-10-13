@@ -2,12 +2,14 @@
 // chain, the global hotkey, the tray and its menu around the Eye, and runs the render loop —
 // asleep while closed, paced by the display while open.
 
+import { spawn } from 'node:child_process';
 import { ptr } from 'bun:ffi';
 
 import Dwmapi from '@bun-win32/dwmapi';
 import { DXGI_FORMAT_B8G8R8A8_UNORM, encodePNGFromBGRA, readbackTexture } from '@bun-win32/gpu';
 import Shcore from '@bun-win32/shcore';
 import User32 from '@bun-win32/user32';
+import Wtsapi32 from '@bun-win32/wtsapi32';
 
 import type { DisplayInfo, WorkerOptions } from '../shared/protocol';
 import { copyImage, readText } from './clipboard';
@@ -18,7 +20,7 @@ import type { Surface } from './renderer';
 import { loadSettings, saveSettings, setStartWithWindows, startsWithWindows } from './settings';
 import { SwapChain } from './swapchain';
 import { Tray } from './tray';
-import { type InputEvent, OverlayWindow, openMessage } from './window';
+import { type InputEvent, OverlayWindow, openMessage, quitMessage } from './window';
 
 const commands = { budget: 0x40, forget: 0x3, look: 0x1, pause: 0x2, quit: 0x5, startup: 0x4 } as const;
 const budgets = [0x1000_0000, 0x2000_0000, 0x4000_0000, 0x8000_0000];
@@ -96,9 +98,10 @@ function monitorScale(display: DisplayInfo): number {
 export async function runShell(): Promise<void> {
   const existing = User32.FindWindowW(ptr(Buffer.from('AfterimageOverlay\0', 'utf16le')), null);
   if (existing !== 0n) {
-    User32.PostMessageW(existing, openMessage, 0n, 0n);
+    User32.PostMessageW(existing, Bun.argv.includes('--quit') ? quitMessage : openMessage, 0n, 0n);
     return;
   }
+  if (Bun.argv.includes('--quit')) return;
   Shcore.SetProcessDpiAwareness(perMonitorAware);
   const settings = await loadSettings();
   const window = new OverlayWindow();
@@ -113,6 +116,7 @@ export async function runShell(): Promise<void> {
     recording: (state) => tray?.setTooltip(state === 'paused' ? copy.tooltipPaused : state === 'unavailable' ? copy.unavailable : 'Afterimage'),
     unavailable: () => tray?.notify(copy.unavailable, copy.unavailableDetail),
   });
+  Wtsapi32.WTSRegisterSessionNotification(window.hwnd, 0);
   const hotkey = hotkeys.find((candidate) => User32.RegisterHotKey(window.hwnd, 1, candidate.modifiers, 0x5a)) ?? hotkeys[0];
   await eye.ready;
   for (const display of eye.displays) {
@@ -128,6 +132,9 @@ export async function runShell(): Promise<void> {
   }
   const executable = process.execPath;
   const compiled = !/[\\/]bun(\.exe)?$/i.test(executable);
+  let relaunch = false;
+  /** Displays changed: once they settle, start again with a fresh memory sized to them. */
+  let restartAt = Infinity;
   let running = true;
 
   const menu = async (): Promise<void> => {
@@ -181,12 +188,18 @@ export async function runShell(): Promise<void> {
         else if (event.lParam === 0x7b || event.lParam === 0x205) await menu();
       } else if (event.type === 'taskbarCreated') tray.add();
       else if (event.type === 'openRequested') eye.open(displayUnderPointer(eye.displays));
+      else if (event.type === 'quitRequested') running = false;
+      else if (event.type === 'session') {
+        eye.send({ type: event.locked ? 'lock' : 'unlock' });
+        if (event.locked && eye.visible) eye.toggle(0);
+      } else if (event.type === 'displayChanged') restartAt = performance.now() + 2_000;
       else forView.push(event);
     }
     while (autopilot.length > 0 && performance.now() - startedAt >= autopilot[0]!.at) {
       const [verb, argument, count] = autopilot.shift()!.action;
       if (verb === 'open') eye.open(displayUnderPointer(eye.displays));
       else if (verb === 'quit') running = false;
+      else if (verb === 'relaunch') restartAt = performance.now();
       else if (verb === 'snap') presenter.snapshot = `${Bun.env.AFTERIMAGE_SHOTS ?? '.'}/${argument}.png`;
       else if (verb === 'wheel') forView.push({ delta: Number(argument), horizontal: false, type: 'wheel' });
       else if (verb === 'key') {
@@ -196,6 +209,10 @@ export async function runShell(): Promise<void> {
           forView.push({ alt: false, control: false, down: false, key, repeat: false, shift: false, type: 'key' });
         }
       }
+    }
+    if (performance.now() >= restartAt) {
+      relaunch = true;
+      running = false;
     }
     const drew = eye.step(forView);
     const now = performance.now();
@@ -228,8 +245,12 @@ export async function runShell(): Promise<void> {
     );
   }
   tray.remove();
+  Wtsapi32.WTSUnRegisterSessionNotification(window.hwnd);
   User32.UnregisterHotKey(window.hwnd, 1);
   eye.send({ type: 'quit' });
   await Bun.sleep(150);
   window.dispose();
+  // The window is gone, so the new instance won't find it and defer to us.
+  // Bun.spawn children are killed when their parent exits; a detached Node spawn outlives us.
+  if (relaunch) spawn(executable, compiled ? [] : [Bun.main], { detached: true, stdio: 'ignore' }).unref();
 }

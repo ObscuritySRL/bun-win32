@@ -77,13 +77,15 @@ export type EyeMessage =
   | { type: 'forget' }
   | { type: 'init'; options: WorkerOptions }
   | { type: 'open'; display: number }
+  | { type: 'lock' }
   | { type: 'pause' }
   | { type: 'quit' }
   | { type: 'regionStep'; direction: -1 | 1; frame: number; region: TileRegion; request: number }
   | { type: 'release'; view: 0 | 1 }
   | { type: 'resume' }
   | { type: 'seek'; frame: number; request: number }
-  | { type: 'stage'; milliseconds: number };
+  | { type: 'stage'; milliseconds: number }
+  | { type: 'unlock' };
 
 export type MemoryMessage =
   | { type: 'appended'; display: number; slice: TimelineSlice }

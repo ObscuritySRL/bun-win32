@@ -15,7 +15,8 @@
     "@bun-win32/kernel32": "workspace:*",
     "@bun-win32/shcore": "workspace:*",
     "@bun-win32/shell32": "workspace:*",
-    "@bun-win32/user32": "workspace:*"
+    "@bun-win32/user32": "workspace:*",
+    "@bun-win32/wtsapi32": "workspace:*"
   },
   "description": "Afterimage — press a key and scrub your screen back in time. Every changed pixel of the last hour, kept only in memory: DXGI desktop duplication, GPU tile fingerprinting, a content-addressed zstd journal and a capture-excluded Direct3D 11 overlay, all TypeScript on Bun.",
   "devDependencies": {

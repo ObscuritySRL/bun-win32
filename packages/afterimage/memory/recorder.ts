@@ -84,10 +84,11 @@ export class Recorder {
     return this.#lastCapture;
   }
 
+  /** Start a gap — or relabel one: the lock screen first shows up as lost access, then as a lock. */
   beginGap(kind: Gap['kind']): void {
-    if (this.#gapKind !== null) return;
+    if (this.#gapKind !== null && !(kind === 'locked' && this.#gapKind === 'unavailable')) return;
+    if (this.#gapKind === null) this.#gapStart = this.#clock();
     this.#gapKind = kind;
-    this.#gapStart = this.#clock();
   }
 
   async capture(): Promise<CaptureOutcome> {

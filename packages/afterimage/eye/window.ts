@@ -28,6 +28,8 @@ const windowExcludeFromCapture = 0x11;
 export const trayMessage = 0x8001;
 /** A second launch posts this to the running instance: open, then exit. */
 export const openMessage = 0x8002;
+/** `Afterimage --quit` posts this to the running instance. */
+export const quitMessage = 0x8003;
 
 export type InputEvent =
   | { alt: boolean; control: boolean; down: boolean; key: number; repeat: boolean; shift: boolean; type: 'key' }
@@ -40,7 +42,9 @@ export type InputEvent =
   | { text: string; type: 'character' }
   | { type: 'deactivated' }
   | { type: 'displayChanged' }
+  | { locked: boolean; type: 'session' }
   | { type: 'openRequested' }
+  | { type: 'quitRequested' }
   | { type: 'taskbarCreated' }
   | { type: 'pointer'; x: number; y: number };
 
@@ -212,6 +216,9 @@ export class OverlayWindow {
         this.#events.push({ delta: (raw > 0x7fff ? raw - 0x1_0000 : raw) / 120, horizontal: message === 0x020e, type: 'wheel' });
         return 0n;
       }
+      case 0x02b1:
+        if (wParam === 7n || wParam === 8n) this.#events.push({ locked: wParam === 7n, type: 'session' });
+        return 0n;
       case 0x02e0:
         this.#events.push({ dpi: Number(wParam & 0xffffn), type: 'dpi' });
         return 0n;
@@ -223,6 +230,9 @@ export class OverlayWindow {
         return 0n;
       case openMessage:
         this.#events.push({ type: 'openRequested' });
+        return 0n;
+      case quitMessage:
+        this.#events.push({ type: 'quitRequested' });
         return 0n;
     }
     if (message === this.#taskbarCreated && message !== 0) {

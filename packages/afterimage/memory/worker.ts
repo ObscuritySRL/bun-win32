@@ -32,6 +32,7 @@ let chain: Promise<void> = Promise.resolve();
 let lastCpu = process.cpuUsage();
 let lastCpuWall = performance.now();
 let lastStats = 0;
+let locked = false;
 let openRecorder: Recorder | null = null;
 let paused = false;
 let pendingSeek: { frame: number; request: number } | null = null;
@@ -78,7 +79,7 @@ async function boot(options: WorkerOptions): Promise<void> {
 }
 
 async function captureAll(): Promise<void> {
-  if (paused) return;
+  if (paused || locked) return;
   for (const recorder of recorders) {
     const wasUnavailable = recorder.gapKind === 'unavailable';
     const outcome = await recorder.capture();
@@ -257,6 +258,12 @@ self.onmessage = (event: MessageEvent<EyeMessage>) => {
         post({ display: message.display, frame: composition.frame, slice, type: 'opened', view: composition.view }, [slice.epochs.buffer, slice.changed.buffer, slice.cursorX.buffer, slice.cursorY.buffer]);
       });
       break;
+    case 'lock':
+      serial(() => {
+        locked = true;
+        for (const recorder of recorders) recorder.beginGap('locked');
+      });
+      break;
     case 'pause':
       serial(() => {
         paused = true;
@@ -296,6 +303,12 @@ self.onmessage = (event: MessageEvent<EyeMessage>) => {
     case 'seek':
       pendingSeek = { frame: message.frame, request: message.request };
       scheduleSeek();
+      break;
+    case 'unlock':
+      serial(() => {
+        locked = false;
+        for (const recorder of recorders) if (recorder.gapKind === 'locked') recorder.endGap();
+      });
       break;
     case 'stage':
       serial(async () => {
