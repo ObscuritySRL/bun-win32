@@ -49,10 +49,13 @@ export class Recorder {
   readonly #recordedHigh: Uint32Array;
   readonly #recordedLow: Uint32Array;
   readonly #recordedReduced: Uint8Array;
+  readonly #clock: () => number;
   readonly #store: TileStore;
   readonly #totals: RecorderTotals;
 
-  constructor(source: FrameSource, store: TileStore, totals: RecorderTotals) {
+  /** `clock` gives epoch milliseconds: Date.now for the desktop, the stage's virtual clock for tests. */
+  constructor(source: FrameSource, store: TileStore, totals: RecorderTotals, clock: () => number) {
+    this.#clock = clock;
     const { height, width } = source.description;
     this.source = source;
     this.#store = store;
@@ -76,7 +79,7 @@ export class Recorder {
   beginGap(kind: Gap['kind']): void {
     if (this.#gapKind !== null) return;
     this.#gapKind = kind;
-    this.#gapStart = Date.now();
+    this.#gapStart = this.#clock();
   }
 
   async capture(): Promise<CaptureOutcome> {
@@ -112,7 +115,7 @@ export class Recorder {
       }
       if (acquired.imageUpdated || journal.frameCount === 0) texture = acquired.texture;
     }
-    const epoch = Date.now();
+    const epoch = this.#clock();
     const fingerprintStart = performance.now();
     fingerprinter.ingest(texture);
     if (acquired.status === 'frame') source.release();
@@ -195,7 +198,7 @@ export class Recorder {
 
   endGap(): void {
     if (this.#gapKind === null) return;
-    this.journal.markGap({ from: this.#gapStart, kind: this.#gapKind, to: Date.now() });
+    this.journal.markGap({ from: this.#gapStart, kind: this.#gapKind, to: this.#clock() });
     this.#gapKind = null;
   }
 

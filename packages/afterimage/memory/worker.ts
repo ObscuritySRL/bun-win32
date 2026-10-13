@@ -36,6 +36,7 @@ let openRecorder: Recorder | null = null;
 let paused = false;
 let pendingSeek: { frame: number; request: number } | null = null;
 let quitting = false;
+let seekQueued = false;
 let stage: Stage | null = null;
 
 function post(message: MemoryMessage, transfer: ArrayBuffer[] = []): void {
@@ -69,7 +70,8 @@ async function boot(options: WorkerOptions): Promise<void> {
     const { device } = createComputeDevice({ adapter });
     sources = found.outputs.map((output) => new Duplication(device, adapter, output));
   }
-  for (const source of sources) recorders.push(new Recorder(source, store, totals));
+  const clock = stage === null ? Date.now : (): number => options.stageEpoch + stage!.time;
+  for (const source of sources) recorders.push(new Recorder(source, store, totals, clock));
   await captureAll();
   post({ adapter, bootMilliseconds: performance.now() - startedAt, displays: recorders.map(describe), type: 'ready' });
   if (stage === null) scheduleCapture();
@@ -185,6 +187,28 @@ function scheduleCapture(): void {
   });
 }
 
+/**
+ * Compose the latest requested moment once a view is free. A seek never waits inside the serial
+ * queue for the eye to release a view — that would stall captures behind the eye's rendering —
+ * it stays pending until `release` arrives.
+ */
+function scheduleSeek(): void {
+  if (seekQueued || pendingSeek === null || openRecorder === null || !openRecorder.composer.canCompose) return;
+  seekQueued = true;
+  serial(async () => {
+    seekQueued = false;
+    const seek = pendingSeek;
+    if (seek === null || openRecorder === null || openRecorder.journal.frameCount === 0) return;
+    if (!openRecorder.composer.canCompose) return;
+    pendingSeek = null;
+    const { composer, fingerprinter, journal } = openRecorder;
+    const frame = journal.clamp(seek.frame);
+    const composition = await composer.compose(frame, frame === journal.lastFrame ? fingerprinter.current : null);
+    post({ changedTiles: composition.changedTiles, composeMilliseconds: composition.milliseconds, frame, request: seek.request, type: 'shown', view: composition.view }, [composition.changedTiles.buffer]);
+    scheduleSeek();
+  });
+}
+
 function usedBytes(): number {
   return store.bytes + recorders.reduce((sum, recorder) => sum + recorder.journal.bytes, 0);
 }
@@ -259,6 +283,7 @@ self.onmessage = (event: MessageEvent<EyeMessage>) => {
       break;
     case 'release':
       for (const recorder of recorders) recorder.composer.release(message.view);
+      scheduleSeek();
       break;
     case 'resume':
       serial(() => {
@@ -267,21 +292,10 @@ self.onmessage = (event: MessageEvent<EyeMessage>) => {
         post({ reason: null, state: 'recording', type: 'recording' });
       });
       break;
-    case 'seek': {
-      const queued = pendingSeek !== null;
+    case 'seek':
       pendingSeek = { frame: message.frame, request: message.request };
-      if (queued) break;
-      serial(async () => {
-        const seek = pendingSeek;
-        pendingSeek = null;
-        if (seek === null || openRecorder === null || openRecorder.journal.frameCount === 0) return;
-        const { composer, fingerprinter, journal } = openRecorder;
-        const frame = journal.clamp(seek.frame);
-        const composition = await composer.compose(frame, frame === journal.lastFrame ? fingerprinter.current : null);
-        post({ changedTiles: composition.changedTiles, composeMilliseconds: composition.milliseconds, frame, request: seek.request, type: 'shown', view: composition.view }, [composition.changedTiles.buffer]);
-      });
+      scheduleSeek();
       break;
-    }
     case 'stage':
       serial(async () => {
         if (stage === null) return;

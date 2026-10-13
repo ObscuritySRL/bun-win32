@@ -143,6 +143,11 @@ export class Composer {
     this.#sampler = makeSampler();
   }
 
+  /** A view is free to write (the eye is not sampling it). */
+  get canCompose(): boolean {
+    return (this.#shown !== 0 && this.#available[0]) || (this.#shown !== 1 && this.#available[1]);
+  }
+
   /** Recompose `frame` into a released view; `live` copies the newest capture texture whole instead. */
   async compose(frame: number, live: bigint | null): Promise<Composition> {
     const started = performance.now();

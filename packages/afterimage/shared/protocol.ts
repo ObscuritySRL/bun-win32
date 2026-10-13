@@ -61,6 +61,8 @@ export interface WorkerOptions {
   captureHertz: number;
   /** `screen` records the real desktop; `stage` records the synthetic desktop used for tests and media. */
   source: 'screen' | 'stage';
+  /** Epoch the stage's virtual clock starts at. */
+  stageEpoch: number;
   stageHeight: number;
   stageScenario: string;
   stageWidth: number;

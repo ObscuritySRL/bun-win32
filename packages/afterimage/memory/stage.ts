@@ -24,6 +24,11 @@ export class Stage implements FrameSource {
     this.#render();
   }
 
+  /** Virtual milliseconds since the stage began. */
+  get time(): number {
+    return this.#time;
+  }
+
   acquire(): AcquireResult {
     if (!this.#dirty) return { status: 'idle' };
     this.#dirty = false;
