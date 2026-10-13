@@ -1,14 +1,12 @@
 // The main-thread side of the indexer: a priority queue of windows to read, one job in flight, results delivered as
-// updates. Windows are re-read when they appear, when their title or minimized state changes, and when Iris opens
-// (anything older than 20 seconds jumps the queue).
+// updates. Windows are read when they appear and re-read when their title or minimized state changes; the app moves
+// windows whose pixels changed to the front when Iris opens.
 
 import type { IndexJob, IndexReply } from './indexer-worker';
 import type { IndexedText } from './search';
 import type { WindowInfo } from './windows';
 
 export type IndexUpdate = { hwnd: bigint; kind: 'scanning'; title: string } | { entries: IndexedText[] | null; hwnd: bigint; kind: 'done'; milliseconds: number; source: IndexReply['source'] };
-
-const STALE_MILLISECONDS = 20_000;
 
 export class Indexer {
   #busy: WindowInfo | null = null;
@@ -39,10 +37,9 @@ export class Indexer {
     this.#pump();
   }
 
-  /** Move stale or never-read windows to the front, frontmost window first. */
+  /** Read these windows next, in this order (one already being read is not queued twice). */
   prioritize(windows: readonly WindowInfo[]): void {
-    const now = performance.now();
-    const urgent = windows.filter((window) => now - (this.#lastRead.get(window.hwnd) ?? -Infinity) > STALE_MILLISECONDS && this.#busy?.hwnd !== window.hwnd);
+    const urgent = windows.filter((window) => this.#busy?.hwnd !== window.hwnd);
     const urgentSet = new Set(urgent.map((window) => window.hwnd));
     this.#queue = [...urgent, ...this.#queue.filter((window) => !urgentSet.has(window.hwnd))];
     this.#pump();

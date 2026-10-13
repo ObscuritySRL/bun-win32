@@ -1,7 +1,7 @@
 // Search over three fields per window — title, application, and the text Iris has read from the window itself
 // (OCR of its pixels, or its UI Automation tree when it is minimized). Titles and apps are matched fuzzily (substring
-// first, then an fzf-style subsequence with word-boundary bonuses); content is matched by word prefix/substring, then
-// tolerantly of OCR misreads (confusable characters folded, then one edit away), and
+// first, then a subsequence that only skips ahead to word starts); content is matched by word prefix/substring, then
+// with the characters OCR confuses folded together, and
 // every hit carries its rectangle so the card can light up the exact words on the live window.
 
 export type TextSource = 'accessibility' | 'ocr';
@@ -65,9 +65,13 @@ function matchField(text: string, lower: string, term: string): { score: number;
       run += 1;
       score += 6 + run * 2;
     } else {
+      const boundary = isBoundary(text, found);
+      // Letters scattered across a title are noise ("reel" is not R-e…e…L of "Release … ObscuritySRL"): past a short skip
+      // inside a word, the next letter must start a word.
+      if (!boundary && found - position > 2) return null;
       ranges.push([found, 1]);
       run = 0;
-      score += isBoundary(text, found) ? 12 : 1;
+      score += boundary ? 12 : 1;
       score -= Math.min(found - position, 12) * 0.6;
     }
     position = found + 1;
@@ -141,37 +145,6 @@ function folded(entry: IndexedText): string {
   return value;
 }
 
-/** Per-character bitmasks of the pattern being matched (bit i: pattern[i] is this character), cleared after each use. */
-const characterMasks = new Int32Array(0x1_0000);
-
-/** Which entries contain `pattern` with at most one insertion, deletion, or substitution — Wu–Manber bit-parallel
- *  matching: two 32-bit state words per character of text (exact, and one edit), whatever the pattern length. */
-function nearlyContaining(entries: readonly IndexedText[], pattern: string): IndexedText[] {
-  const length = Math.min(pattern.length, 31);
-  for (let index = 0; index < length; index += 1) characterMasks[pattern.charCodeAt(index)]! |= 1 << index;
-  const goal = 1 << (length - 1);
-  const hits: IndexedText[] = [];
-  for (const entry of entries) {
-    const text = folded(entry);
-    if (text.length < length - 1) continue;
-    let exact = 0;
-    let oneEdit = 1;
-    for (let position = 0; position < text.length; position += 1) {
-      const mask = characterMasks[text.charCodeAt(position)]!;
-      const previousExact = exact;
-      exact = ((exact << 1) | 1) & mask;
-      // match | substitution | insertion | deletion
-      oneEdit = (((oneEdit << 1) | 1) & mask) | (previousExact << 1) | 1 | previousExact | (exact << 1);
-      if ((oneEdit & goal) !== 0) {
-        hits.push(entry);
-        break;
-      }
-    }
-  }
-  for (let index = 0; index < length; index += 1) characterMasks[pattern.charCodeAt(index)] = 0;
-  return hits;
-}
-
 export function tokenize(query: string): string[] {
   return query
     .toLowerCase()
@@ -208,18 +181,13 @@ export function search(terms: readonly string[], document: SearchDocument): Sear
         contentHits.push(entry);
         contentScore = Math.max(contentScore, (at === 0 ? 70 : 45) + (entry.lower.length === term.length ? 20 : 0));
       }
-      // No exact hit: OCR may have misread the word. Try the confusion-folded form, then one edit away (long terms only).
+      // No exact hit: OCR may have misread the word ("robiox"). Compare with the confusable characters folded together.
       if (contentScore === 0 && term.length >= 3) {
         const foldedTerm = foldConfusables(term);
         for (const entry of document.content) {
           if (!folded(entry).includes(foldedTerm)) continue;
           contentHits.push(entry);
           contentScore = 38;
-        }
-        if (contentScore === 0 && foldedTerm.length >= 5) {
-          const near = nearlyContaining(document.content, foldedTerm);
-          contentHits.push(...near);
-          if (near.length > 0) contentScore = 30;
         }
       }
       if (contentScore > 0) best = Math.max(best, contentScore + Math.min(contentHits.length, 20));

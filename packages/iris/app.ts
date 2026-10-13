@@ -47,11 +47,16 @@ class Card {
   readonly focus = new Spring(0, SNAPPY);
   home: PlacementTarget;
   readonly hover = new Spring(0, SNAPPY);
+  /** When the read behind the indexed text finished, and the capture frame count when it began. */
+  indexedAt = -Infinity;
+  indexedFrames = -1;
   readonly glare = new Spring(0, SMOOTH);
   launchAt = 0;
   launched = true;
   readonly match = new Spring(0, SMOOTH);
   readonly placement: Placement;
+  /** Capture frame count when the read in flight began. */
+  readFrames = -1;
   result: SearchResult | null = null;
   scan = -1;
   scanning = false;
@@ -72,6 +77,11 @@ class Card {
     this.placement = new Placement(home.x, home.y, SMOOTH);
     this.placement.snap(home);
     this.style = { accent, brightness: 1, focus: 0, glare: 0, glareX: 0.5, glareY: 0.3, opacity: 1, radius: 8, reflection: 0, saturation: 1, scan: -1, shadow: 0, shadowSigma: 24, spotlight: 0 };
+  }
+
+  /** The pixels changed since the read the indexed text came from: words may have moved, appeared, or gone. */
+  get textStale(): boolean {
+    return (this.capture?.frames ?? 0) !== this.indexedFrames;
   }
 
   /** Where this card's pixels come from: its own live capture, or its region of the minimized-window host. */
@@ -129,6 +139,7 @@ export class Iris {
   #lastBackgroundPoll = 0;
   #lastEnumeration = 0;
   #lastFrameAt = 0;
+  #openedAt = 0;
   #monitor: Rect = { height: 1080, width: 1920, x: 0, y: 0 };
   #options: IrisOptions;
   #order: Card[] = [];
@@ -144,8 +155,6 @@ export class Iris {
   #stats = { indexedWindows: 0, indexedWords: 0, indexing: '' };
   #time = 0;
   #index = new Map<bigint, IndexedText[]>();
-  /** Capture frame count when each window was last read: new frames since then mean its text may have changed. */
-  #framesAtRead = new Map<bigint, number>();
   #visibleOrder: Card[] = [];
   #wallpaper: Wallpaper | null = null;
   #thumbnails = new ThumbnailHost();
@@ -225,7 +234,6 @@ export class Iris {
       card.capture?.release();
       this.#cards.delete(hwnd);
       this.#index.delete(hwnd);
-      this.#framesAtRead.delete(hwnd);
       this.#options.indexer?.forget(hwnd);
       if (this.#selected === card) this.#selected = null;
     }
@@ -263,6 +271,7 @@ export class Iris {
   #applyIndex(update: IndexUpdate): void {
     const card = this.#cards.get(update.hwnd);
     if (update.kind === 'scanning') {
+      if (card !== undefined) card.readFrames = card.capture?.frames ?? 0;
       // No sweep for a hidden re-read: it would replay the next time Iris opens.
       if (card !== undefined && (this.#state !== 'hidden' || !this.#index.has(update.hwnd))) {
         if (card.scan < 0) card.scan = 0;
@@ -272,8 +281,11 @@ export class Iris {
       return;
     }
     this.#stats.indexing = '';
-    if (card !== undefined) card.scanning = false;
-    this.#framesAtRead.set(update.hwnd, card?.capture?.frames ?? 0);
+    if (card !== undefined) {
+      card.scanning = false;
+      card.indexedFrames = card.readFrames;
+      card.indexedAt = performance.now();
+    }
     if (update.entries !== null) {
       this.#index.set(update.hwnd, update.entries);
       this.#stats.indexedWindows = this.#index.size;
@@ -356,7 +368,9 @@ export class Iris {
     this.#relayout();
     this.#state = 'open';
     this.#lastFrameAt = 0;
-    this.#options.indexer?.prioritize(this.#order.map((card) => card.window));
+    this.#openedAt = performance.now();
+    // Re-read every window that changed since its last read, frontmost first: what was just on screen is what gets searched.
+    this.#options.indexer?.prioritize(this.#order.filter((card) => card.textStale).map((card) => card.window));
     if (!this.#options.headless) {
       this.#renderFrame(0);
       this.window.show(this.#monitor.x, this.#monitor.y, this.#monitor.width, this.#monitor.height, true);
@@ -757,7 +771,7 @@ export class Iris {
     let stalest: Card | null = null;
     let stalestAge = 30_000;
     for (const card of this.#order) {
-      if ((card.capture?.frames ?? 0) === this.#framesAtRead.get(card.window.hwnd)) continue;
+      if (!card.textStale) continue;
       const age = indexer.age(card.window.hwnd);
       if (age < stalestAge) continue;
       stalest = card;
@@ -845,7 +859,9 @@ export class Iris {
     style.scan = card.scan < 0 ? -1 : card.scan - 0.12;
     style.spotlight = card.match.value * openness;
     const highlights: number[] = [];
-    if (searching && card.result !== null) for (const hit of card.result.contentHits) if (hit.rect !== null && highlights.length < 192) highlights.push(hit.rect[0], hit.rect[1], hit.rect[2], hit.rect[3]);
+    // Word boxes come from a read; once the pixels have moved on, they would frame the wrong words until the re-read lands.
+    const highlightable = !card.textStale || card.indexedAt >= this.#openedAt;
+    if (searching && highlightable && card.result !== null) for (const hit of card.result.contentHits) if (hit.rect !== null && highlights.length < 192) highlights.push(hit.rect[0], hit.rect[1], hit.rect[2], hit.rect[3]);
     const margin = style.shadowSigma * 3;
     if (card.hasPixels) {
       if (this.#layout === 'flow' && this.#state !== 'hidden') {

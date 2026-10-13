@@ -41,7 +41,7 @@
     "directory": "packages/iris"
   },
   "type": "module",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "main": "./index.ts",
   "engines": {
     "bun": ">=1.1.0"
