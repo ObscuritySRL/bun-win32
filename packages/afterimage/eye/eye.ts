@@ -8,6 +8,7 @@ import { FFIType, ptr } from 'bun:ffi';
 import { CTX_END, CTX_GET_DATA, DEV_CREATE_QUERY, IID_ID3D11TEXTURE2D, createComputeDevice, requireGpu, vcall } from '@bun-win32/gpu';
 
 import { callOut, guid } from '../shared/com';
+import type { Painter } from '../shared/painter';
 import type { DisplayInfo, EyeMessage, MemoryMessage, TileRegion, TimelineSlice, WorkerOptions } from '../shared/protocol';
 import { D3D11Device } from '../shared/slots';
 import { copy } from './copy';
@@ -101,6 +102,11 @@ export class Eye {
     return this.#opening !== null || (this.#view !== null && this.#latestShown < this.#latestSeek) || this.#pendingSteps > 0 || this.#pendingExports > 0 || this.#stageWaiters.length > 0;
   }
 
+  /** Direct2D on the eye's device (the tray icon and the swap chain need it). */
+  get painter(): Painter {
+    return this.#renderer!.painter;
+  }
+
   get displays(): readonly DisplayInfo[] {
     return this.#displays;
   }
@@ -174,6 +180,21 @@ export class Eye {
       this.#stageWaiters.push(resolve);
       this.#send({ milliseconds, type: 'stage' });
     });
+  }
+
+  /**
+   * Build everything the first open needs — swap chain, blur chain, Direct2D target, text formats —
+   * by drawing one hidden frame, so the hotkey's first press is as fast as every other.
+   */
+  warm(display: DisplayInfo): void {
+    const renderer = this.#renderer;
+    if (renderer === null) return;
+    const { scale, surface } = this.#presenter.surface(display);
+    renderer.setMoment(this.#textures[display.index]![0]);
+    renderer.prepare(display.tilesAcross, display.tilesDown, 0x100);
+    const now = this.#clock.now();
+    const view = new View(this.#host(), renderer, display, scale, this.diagnostics, () => this.#clock.epoch(), now);
+    renderer.draw(surface, view.scene(now), scale, (painter) => view.text(painter, now));
   }
 
   /** Forward a raw protocol message (pause, budget, quit…). */

@@ -17,7 +17,10 @@ export type Color = readonly [number, number, number, number];
 export interface TextOptions {
   align?: 'center' | 'end' | 'start';
   family: string;
+  italic?: boolean;
   size: number;
+  /** Top-aligned, word-wrapped paragraph instead of one vertically centred line. */
+  wrap?: boolean;
   /** DWRITE_FONT_WEIGHT: 400 regular, 600 semibold. */
   weight?: number;
 }
@@ -200,19 +203,20 @@ export class Painter {
 
   #format(options: TextOptions): bigint {
     const align = options.align ?? 'start';
-    const key = `${options.family}|${options.size}|${options.weight ?? 400}|${align}`;
+    const wrap = options.wrap === true;
+    const key = `${options.family}|${options.size}|${options.weight ?? 400}|${align}|${wrap}|${options.italic === true}`;
     const cached = this.#formats.get(key);
     if (cached !== undefined) return cached;
     const format = callOut(
       this.#writeFactory,
       DWriteFactory.CreateTextFormat,
       [FFIType.ptr, FFIType.u64, FFIType.u32, FFIType.u32, FFIType.u32, FFIType.f32, FFIType.ptr],
-      [ptr(Buffer.from(`${options.family}\0`, 'utf16le')), 0n, options.weight ?? 400, 0, 5, options.size, ptr(Buffer.from('en-us\0', 'utf16le'))],
+      [ptr(Buffer.from(`${options.family}\0`, 'utf16le')), 0n, options.weight ?? 400, options.italic === true ? 2 : 0, 5, options.size, ptr(Buffer.from('en-us\0', 'utf16le'))],
       `CreateTextFormat(${options.family})`,
     );
     vcall(format, DWriteTextFormat.SetTextAlignment, [FFIType.u32], [alignments[align]]);
-    vcall(format, DWriteTextFormat.SetParagraphAlignment, [FFIType.u32], [2]);
-    vcall(format, DWriteTextFormat.SetWordWrapping, [FFIType.u32], [1]);
+    vcall(format, DWriteTextFormat.SetParagraphAlignment, [FFIType.u32], [wrap ? 0 : 2]);
+    vcall(format, DWriteTextFormat.SetWordWrapping, [FFIType.u32], [wrap ? 0 : 1]);
     this.#formats.set(key, format);
     return format;
   }

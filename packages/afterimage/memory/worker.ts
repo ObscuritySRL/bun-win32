@@ -62,7 +62,7 @@ async function boot(options: WorkerOptions): Promise<void> {
   let sources: FrameSource[];
   if (options.source === 'stage') {
     createComputeDevice();
-    stage = new Stage(options.stageWidth, options.stageHeight, options.stageScenario);
+    stage = new Stage(options.stageWidth, options.stageHeight, options.stageScale, options.stageScenario, options.stageEpoch);
     sources = [stage];
   } else {
     const found = findOutputs();
@@ -243,7 +243,8 @@ self.onmessage = (event: MessageEvent<EyeMessage>) => {
       serial(async () => {
         const recorder = recorders[message.display];
         if (recorder === undefined) return;
-        await recorder.capture();
+        // A capture that just finished is fresh enough for frame 0; don't make the hotkey wait for another.
+        if (performance.now() - recorder.lastCapture > 16) await recorder.capture();
         openRecorder = recorder;
         const { composer, fingerprinter, journal } = recorder;
         recorder.sentThrough = journal.lastFrame;

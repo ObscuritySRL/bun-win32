@@ -90,7 +90,9 @@ float4 main(float4 position : SV_Position) : SV_Target {
 
   // Backdrop: frame 0 is the moment itself; it then blurs (mip level) and sinks into ink.
   float3 sharp = momentTexture.SampleLevel(linearClamp, screenUv, 0).rgb;
-  float3 soft = blurred(screenUv, 6.0 * progress);
+  // The blur follows the card, so the light around it comes from the content at its edges.
+  float2 ambientUv = lerp(screenUv, 0.5 + (pixel - (card.xy + card.zw) * 0.5) / (card.zw - card.xy) * 0.92, progress);
+  float3 soft = blurred(ambientUv, 6.0 * progress);
   float3 sunk = lerp(ink.rgb, soft, 0.2);
   float vignette = 1.0 - 0.35 * smoothstep(0.35, 1.25, length((screenUv - 0.5) * float2(1.0, viewport.y / viewport.x) * 2.0));
   float3 color = lerp(sharp, sunk * lerp(1.0, vignette, progress), smoothstep(0.0, 1.0, progress));

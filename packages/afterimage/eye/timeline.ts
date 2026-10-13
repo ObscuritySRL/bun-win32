@@ -32,21 +32,19 @@ export function ageOfPosition(position: number, span: number): number {
 }
 
 /**
- * Waveform bins, oldest (index 0) to now (last). Each bin holds the peak share of tiles that changed
- * in any frame falling inside it, square-rooted for perception and normalized so the tallest is 1.
+ * Waveform bins, oldest (index 0) to now (last). Each bin holds the largest change of any frame
+ * inside it on an absolute log scale — a keystroke is a ripple, a window switch a spike, the
+ * whole screen 1 — so one big frame never flattens everything else.
  */
-export function binActivity(epochs: Float64Array, changed: Uint32Array, count: number, now: number, span: number, bins: Float32Array): void {
+export function binActivity(epochs: Float64Array, changed: Uint32Array, count: number, now: number, span: number, tileCount: number, bins: Float32Array): void {
   bins.fill(0);
   const binCount = bins.length;
   for (let frame = 0; frame < count; frame += 1) {
     const position = positionOfAge(now - epochs[frame]!, span);
     const bin = Math.min(binCount - 1, Math.max(0, Math.floor((1 - position) * binCount)));
-    const level = Math.sqrt(changed[frame]!);
+    const level = Math.log1p(changed[frame]!) / Math.log1p(tileCount);
     if (level > bins[bin]!) bins[bin] = level;
   }
-  let peak = 0;
-  for (let bin = 0; bin < binCount; bin += 1) peak = Math.max(peak, bins[bin]!);
-  if (peak > 0) for (let bin = 0; bin < binCount; bin += 1) bins[bin] = bins[bin]! / peak;
 }
 
 /** Frames where at least 12 % of the screen changed at once, no closer than 1.5 s to the previous moment. */

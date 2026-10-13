@@ -26,6 +26,8 @@ const windowExcludeFromCapture = 0x11;
 
 /** The tray icon reports through this application message. */
 export const trayMessage = 0x8001;
+/** A second launch posts this to the running instance: open, then exit. */
+export const openMessage = 0x8002;
 
 export type InputEvent =
   | { alt: boolean; control: boolean; down: boolean; key: number; repeat: boolean; shift: boolean; type: 'key' }
@@ -38,6 +40,7 @@ export type InputEvent =
   | { text: string; type: 'character' }
   | { type: 'deactivated' }
   | { type: 'displayChanged' }
+  | { type: 'openRequested' }
   | { type: 'taskbarCreated' }
   | { type: 'pointer'; x: number; y: number };
 
@@ -67,7 +70,8 @@ export class OverlayWindow {
     if (this.hwnd === 0n) throw new Error('CreateWindowExW failed');
     this.#setAttribute(transitionsAttribute, 1);
     this.#setAttribute(cloakAttribute, 1);
-    User32.SetWindowDisplayAffinity(this.hwnd, windowExcludeFromCapture);
+    // AFTERIMAGE_CAPTURABLE lets screenshot tools see the overlay while testing; never in normal use.
+    if (Bun.env.AFTERIMAGE_CAPTURABLE !== '1') User32.SetWindowDisplayAffinity(this.hwnd, windowExcludeFromCapture);
     this.#taskbarCreated = User32.RegisterWindowMessageW(ptr(Buffer.from('TaskbarCreated\0', 'utf16le')));
   }
 
@@ -96,12 +100,13 @@ export class OverlayWindow {
     this.#setAttribute(cloakAttribute, 1);
     User32.ShowWindow(this.hwnd, 0);
     if (this.#previousForeground !== 0n) User32.SetForegroundWindow(this.#previousForeground);
+    this.#previousForeground = 0n;
     this.#visible = false;
   }
 
   /** Cover a monitor (physical pixels) and take focus — still cloaked, so nothing is visible yet. */
   prepare(left: number, top: number, width: number, height: number, activate: boolean): void {
-    this.#previousForeground = User32.GetForegroundWindow();
+    this.#previousForeground = activate ? User32.GetForegroundWindow() : 0n;
     this.#cursorReady = false;
     User32.SetWindowPos(this.hwnd, windowTopmost, left, top, width, height, 0x10);
     User32.ShowWindow(this.hwnd, activate ? 5 : 8);
@@ -115,6 +120,15 @@ export class OverlayWindow {
       User32.TranslateMessage(ptr(this.#message));
       User32.DispatchMessageW(ptr(this.#message));
     }
+  }
+
+  /**
+   * Walk the window through show and hide once, cloaked and without activation, so the first real
+   * open doesn't pay the window manager's cold path (measured ~15 ms). Nothing is ever visible.
+   */
+  warm(left: number, top: number, width: number, height: number): void {
+    this.prepare(left, top, width, height, false);
+    this.hide();
   }
 
   /** Uncloak — call once the first frame has been presented and composed. */
@@ -190,6 +204,9 @@ export class OverlayWindow {
         return 0n;
       case trayMessage:
         this.#events.push({ lParam: low, type: 'tray' });
+        return 0n;
+      case openMessage:
+        this.#events.push({ type: 'openRequested' });
         return 0n;
     }
     if (message === this.#taskbarCreated && message !== 0) {

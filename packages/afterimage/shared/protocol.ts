@@ -64,6 +64,8 @@ export interface WorkerOptions {
   /** Epoch the stage's virtual clock starts at. */
   stageEpoch: number;
   stageHeight: number;
+  /** DPI scale the stage's desktop is drawn at (1.25 = 120 DPI). */
+  stageScale: number;
   stageScenario: string;
   stageWidth: number;
 }

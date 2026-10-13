@@ -48,6 +48,7 @@ cbuffer Parameters : register(b0) { uint width; uint height; uint tilesAcross; u
 groupshared uint sharedChanged;
 groupshared uint sharedHashHigh;
 groupshared uint sharedHashLow;
+groupshared uint sharedRuns;
 
 uint mixBits(uint value) {
   value ^= value >> 16; value *= 0x85ebca6bu; value ^= value >> 13; value *= 0xc2b2ae35u; value ^= value >> 16;
@@ -60,12 +61,14 @@ uint packColor(float4 color) {
 }
 
 // One group per 64x64 tile; each thread covers a 4x4 block. Two independent position-keyed lanes
-// summed across the tile give an order-sensitive 64-bit fingerprint.
+// summed across the tile give an order-sensitive 64-bit fingerprint. "Runs" counts pixels equal to
+// their left neighbour: text and UI are full of them, video and photographs almost never are.
 [numthreads(16, 16, 1)]
 void main(uint3 group : SV_GroupID, uint3 local : SV_GroupThreadID, uint flat : SV_GroupIndex) {
-  if (flat == 0) { sharedChanged = 0; sharedHashHigh = 0; sharedHashLow = 0; }
+  if (flat == 0) { sharedChanged = 0; sharedHashHigh = 0; sharedHashLow = 0; sharedRuns = 0; }
   GroupMemoryBarrierWithGroupSync();
   uint changed = 0;
+  uint runs = 0;
   uint hashHigh = 0;
   uint hashLow = 0;
   [unroll] for (uint row = 0; row < 4; row++) {
@@ -74,6 +77,7 @@ void main(uint3 group : SV_GroupID, uint3 local : SV_GroupThreadID, uint flat : 
       uint2 pixel = group.xy * 64 + inTile;
       if (pixel.x < width && pixel.y < height) {
         uint now = packColor(current.Load(int3(pixel, 0)));
+        if (pixel.x > 0 && packColor(current.Load(int3(pixel - uint2(1, 0), 0))) == now) runs++;
         uint before = packColor(previous.Load(int3(pixel, 0)));
         changed |= (now != before) ? 1u : 0u;
         uint position = inTile.y * 64 + inTile.x;
@@ -85,8 +89,9 @@ void main(uint3 group : SV_GroupID, uint3 local : SV_GroupThreadID, uint flat : 
   InterlockedOr(sharedChanged, changed);
   InterlockedAdd(sharedHashHigh, hashHigh);
   InterlockedAdd(sharedHashLow, hashLow);
+  InterlockedAdd(sharedRuns, runs);
   GroupMemoryBarrierWithGroupSync();
-  if (flat == 0) tiles[group.y * tilesAcross + group.x] = uint4(sharedChanged, sharedHashHigh, sharedHashLow, 0);
+  if (flat == 0) tiles[group.y * tilesAcross + group.x] = uint4(sharedChanged, sharedHashHigh, sharedHashLow, sharedRuns);
 }`;
 
 /** Poll a staging resource until the GPU is done with it; returns (address, rowPitch). The event loop stays live. */
@@ -235,7 +240,7 @@ export class Fingerprinter {
     comRelease(this.#shader);
   }
 
-  /** Per tile: [changed, hashHigh, hashLow, 0]. Valid until the next call. */
+  /** Per tile: [changed, hashHigh, hashLow, runs]. Valid until the next call. */
   async tiles(): Promise<Uint32Array> {
     const [address] = await mapWhenReady(this.#tileStaging);
     copyFromAddress(address, new Uint8Array(this.#tileWords.buffer), this.tileCount * 16);

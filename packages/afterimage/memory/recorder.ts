@@ -14,6 +14,8 @@ import { reduce } from './resample';
 import type { TileStore } from './store';
 
 const heatCeiling = 16;
+/** Below this share of pixels equal to their left neighbour, a tile is photographic (video, a game, a photo). */
+const photographicRuns = 0.3;
 const hotInterval = 500;
 const hotThreshold = 4;
 const reducedKeyspace = 0x5a5a_5a5a;
@@ -44,6 +46,7 @@ export class Recorder {
   #gapStart = 0;
   readonly #heat: Uint8Array;
   #lastHot = 0;
+  #lastCapture = -Infinity;
   #lastReopen = 0;
   readonly #pending: Uint8Array;
   readonly #recordedHigh: Uint32Array;
@@ -82,7 +85,13 @@ export class Recorder {
     this.#gapStart = this.#clock();
   }
 
+  /** When the newest capture ran (performance.now). */
+  get lastCapture(): number {
+    return this.#lastCapture;
+  }
+
   async capture(): Promise<CaptureOutcome> {
+    this.#lastCapture = performance.now();
     const { fingerprinter, journal, source } = this;
     let recovered = false;
     if (!source.open) {
@@ -132,7 +141,10 @@ export class Recorder {
     for (let tile = 0; tile < fingerprinter.tileCount; tile += 1) {
       const changed = words[tile * 4] !== 0;
       const heat = this.#heat[tile]!;
-      this.#heat[tile] = changed ? Math.min(heatCeiling, heat + 1) : Math.max(0, heat - 1);
+      // Only photographic tiles heat up: text that changes every capture (typing, a scrolling log)
+      // is exactly what must stay crisp.
+      const photographic = words[tile * 4 + 3]! < this.#tilePixels(tile) * photographicRuns;
+      this.#heat[tile] = changed && photographic ? Math.min(heatCeiling, heat + 1) : changed ? 0 : Math.max(0, heat - 1);
       if (changed) this.#pending[tile] = 1;
       const hot = this.#heat[tile]! >= hotThreshold;
       let reduced: boolean;
@@ -213,6 +225,13 @@ export class Recorder {
     this.#recordedLow.fill(0);
     this.#recordedReduced.fill(0);
     this.sentThrough = this.journal.lastFrame;
+  }
+
+  #tilePixels(tile: number): number {
+    const { fingerprinter } = this;
+    const columns = Math.min(tileSize, fingerprinter.width - (tile % fingerprinter.tilesAcross) * tileSize);
+    const rows = Math.min(tileSize, fingerprinter.height - Math.floor(tile / fingerprinter.tilesAcross) * tileSize);
+    return columns * rows;
   }
 
   /** Some tile was last kept reduced and is still cooling — it needs one more capture to be kept crisp. */

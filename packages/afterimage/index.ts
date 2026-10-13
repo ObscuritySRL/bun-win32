@@ -7,6 +7,7 @@
 import '@bun-win32/core';
 
 import { runScript } from './eye/script';
+import { runShell } from './eye/shell';
 
 const script = Bun.env.AFTERIMAGE_SCRIPT;
 
@@ -24,3 +25,6 @@ if (script !== undefined) {
   });
   process.exit(0);
 }
+
+await runShell();
+process.exit(0);

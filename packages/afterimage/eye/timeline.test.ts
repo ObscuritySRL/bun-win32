@@ -65,7 +65,7 @@ describe('frames', () => {
     const binEpochs = new Float64Array([0, 9_000, 9_990]);
     const changed = new Uint32Array([10, 5, 7]);
     const bins = new Float32Array(16);
-    binActivity(binEpochs, changed, binEpochs.length, now, 10_000, bins);
+    binActivity(binEpochs, changed, binEpochs.length, now, 10_000, 10, bins);
     expect(bins[0]).toBeGreaterThan(0);
     expect(bins[15]).toBeGreaterThan(0);
     expect(Math.max(...bins)).toBeCloseTo(1, 6);

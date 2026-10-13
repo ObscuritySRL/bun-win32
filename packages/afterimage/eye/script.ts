@@ -100,6 +100,7 @@ export async function runScript(options: ScriptOptions): Promise<void> {
     source: options.source,
     stageEpoch,
     stageHeight: options.stageHeight,
+    stageScale: options.scale,
     stageScenario: options.stageScenario,
     stageWidth: options.stageWidth,
   };

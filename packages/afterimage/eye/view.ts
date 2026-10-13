@@ -36,7 +36,7 @@ const keys = {
 } as const;
 const forgetWindow = 3_000;
 const toastDuration = 1_600;
-const wheelStep = 0.025;
+const wheelStep = 0.04;
 
 export interface ViewHost {
   clipboardText(): string;
@@ -240,7 +240,7 @@ export class View {
   shown(frame: number, changedTiles: Uint32Array, now: number): void {
     this.#shownFrame = frame;
     const tiles = this.display.tilesAcross * this.display.tilesDown;
-    if (changedTiles.length > 0 && changedTiles.length <= tiles * shimmer.maximumShare) {
+    if (!this.#followLive && changedTiles.length > 0 && changedTiles.length <= tiles * shimmer.maximumShare) {
       const mask = new Uint8Array(tiles);
       for (const tile of changedTiles) mask[tile] = 255;
       this.#renderer.setShimmer(mask, this.display.tilesAcross, this.display.tilesDown);
@@ -275,7 +275,7 @@ export class View {
     this.#tint.retarget(live ? 0 : 1, now);
     if (now - this.#lastBinsAt > 500) {
       const bins = new Float32Array(this.#binCount());
-      binActivity(this.#history.epochs, this.#history.changedCounts, this.#history.count, this.#epochNow(), span, bins);
+      binActivity(this.#history.epochs, this.#history.changedCounts, this.#history.count, this.#epochNow(), span, this.display.tilesAcross * this.display.tilesDown, bins);
       this.#renderer.setBins(bins);
       this.#lastBinsAt = now;
     }
@@ -359,7 +359,15 @@ export class View {
           painter.text(label, { ...type.caption, align: 'center' }, hoverDip - labelWidth, trackTop - space(5), labelWidth * 2, space(4), fade(palette.textSecondary, this.#hover.value(now) * shelfOpacity));
         }
       }
-      this.#drawPill(painter, now, geometry, shelfOpacity);
+      const pill = Math.max(0, Math.min(1.2, this.#pill.value(now)));
+      const playheadX = (geometry.track.right - this.#playhead.value(now) * (geometry.track.right - geometry.track.left)) / scale;
+      const pillTop = geometry.shelf.top / scale - layout.shelfGap / 2 - 20 + (1 - pill) * space(3);
+      this.#drawPill(painter, playheadX, shelfLeft, shelfRight, pillTop, Math.min(1, pill) * shelfOpacity);
+    }
+    const inspect = this.#inspect.value(now);
+    if (inspect > 0.01) {
+      const screenWidth = this.display.width / scale;
+      this.#drawPill(painter, screenWidth / 2, 0, screenWidth, layout.topMargin - (1 - inspect) * space(3), Math.min(1, inspect) * Math.min(1, Math.max(0, this.#pill.value(now))));
     }
     this.#drawGoTo(painter, now);
     this.#drawDetails(painter, now);
@@ -502,10 +510,9 @@ export class View {
     );
   }
 
-  /** The time pill: floats above the shelf, follows the playhead. */
-  #drawPill(painter: Painter, now: number, geometry: Geometry, shelfOpacity: number): void {
-    const pill = Math.max(0, Math.min(1.2, this.#pill.value(now)));
-    if (pill < 0.01) return;
+  /** The time pill, centred on `anchor` (DIPs) within [minimum, maximum]: above the shelf at the playhead, or top-centre at full size. */
+  #drawPill(painter: Painter, anchor: number, minimum: number, maximum: number, top: number, opacity: number): void {
+    if (opacity < 0.01) return;
     const scale = this.#scale;
     const live = this.#isLive();
     const age = Math.max(0, this.#epochNow() - this.#history.epoch(this.#frame));
@@ -517,12 +524,7 @@ export class View {
     const gap = clock === '' ? 0 : space(2);
     const dot = live ? space(4) : 0;
     const width = space(5) * 2 + titleWidth + gap + clockWidth + dot;
-    const playheadX = (geometry.track.right - this.#playhead.value(now) * (geometry.track.right - geometry.track.left)) / scale;
-    const minimum = geometry.shelf.left / scale;
-    const maximum = geometry.shelf.right / scale - width;
-    const left = Math.min(maximum, Math.max(minimum, playheadX - width / 2));
-    const top = geometry.shelf.top / scale - layout.shelfGap / 2 - height / 2 + (1 - pill) * space(3);
-    const opacity = Math.min(1, pill) * shelfOpacity;
+    const left = Math.min(maximum - width, Math.max(minimum, anchor - width / 2));
     painter.fillRoundedRectangle(left, top, width, height, height / 2, [palette.glass[0], palette.glass[1], palette.glass[2], 0.92 * opacity]);
     painter.strokeRoundedRectangle(left + 0.5, top + 0.5, width - 1, height - 1, height / 2, 1 / scale, [1, 1, 1, 0.09 * opacity]);
     let x = left + space(5);

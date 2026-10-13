@@ -1,11 +1,13 @@
-// A flip-model swap chain for the overlay, paced by its frame-latency waitable object (latency 1):
-// the render loop waits until DXGI wants a frame, so frames land on the display's own cadence with
-// one frame of queue. The back buffer is both a render-target view (for the scene pass) and a
+// A flip-model swap chain for the overlay. Pacing comes from the compositor clock, not from Present
+// or the frame-latency waitable — measured on this machine, both return immediately for a window
+// DWM composes, which spun the loop at thousands of frames per second. Latency stays at one frame. The back buffer is both a render-target view (for the scene pass) and a
 // texture (for Direct2D text).
 
 import { FFIType, ptr } from 'bun:ffi';
 
 import { DXGIDEVICE_GET_ADAPTER, DXGI_FORMAT_B8G8R8A8_UNORM, DEV_CREATE_RENDER_TARGET_VIEW, IID_ID3D11TEXTURE2D, IID_IDXGIDEVICE, comRelease, requireGpu, vcall } from '@bun-win32/gpu';
+import Dcomp from '@bun-win32/dcomp';
+import Dwmapi from '@bun-win32/dwmapi';
 import Kernel32 from '@bun-win32/kernel32';
 
 import { callOut, check, guid, queryInterface } from '../shared/com';
@@ -73,9 +75,10 @@ export class SwapChain implements Surface {
     this.#acquireBuffer();
   }
 
-  /** Block until DXGI is ready for the next frame (at most `timeout` ms). */
-  wait(timeout = 100): void {
-    Kernel32.WaitForSingleObjectEx(this.#waitable, timeout, 1);
+  /** Block until the compositor starts its next frame, so each frame lands on the display's cadence. */
+  wait(): void {
+    Kernel32.WaitForSingleObjectEx(this.#waitable, 100, 1);
+    if (Dcomp.DCompositionWaitForCompositorClock(0, null, 100) === 0xffff_ffff) Dwmapi.DwmFlush();
   }
 
   #acquireBuffer(): void {
