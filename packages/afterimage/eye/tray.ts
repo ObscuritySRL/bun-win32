@@ -31,9 +31,9 @@ export interface MenuItem {
 }
 
 export class Tray {
+  readonly #hwnd: bigint;
   #icon: bigint;
   #tooltip = 'Afterimage';
-  readonly #hwnd: bigint;
 
   constructor(hwnd: bigint, icon: bigint) {
     this.#hwnd = hwnd;

@@ -99,9 +99,9 @@ export class Composer {
   readonly #height: number;
   readonly #journal: Journal;
   readonly #pixelShader: bigint;
-  readonly #query: bigint;
   readonly #quadBytes: Buffer;
   readonly #quads: StructuredBuffer;
+  readonly #query: bigint;
   #releaseWaiters: (() => void)[] = [];
   readonly #renderTargets: [bigint, bigint];
   readonly #sampler: bigint;

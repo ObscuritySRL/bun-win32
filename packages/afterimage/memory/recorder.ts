@@ -37,22 +37,22 @@ export class Recorder {
   readonly composer: Composer;
   readonly fingerprinter: Fingerprinter;
   readonly journal: Journal;
-  readonly source: FrameSource;
   /** Newest frame already sent to the eye while it is open. */
   sentThrough = -1;
+  readonly source: FrameSource;
+  readonly #clock: () => number;
   #cursorX = -1;
   #cursorY = -1;
   #gapKind: Gap['kind'] | null = null;
   #gapStart = 0;
   readonly #heat: Uint8Array;
-  #lastHot = 0;
   #lastCapture = -Infinity;
+  #lastHot = 0;
   #lastReopen = 0;
   readonly #pending: Uint8Array;
   readonly #recordedHigh: Uint32Array;
   readonly #recordedLow: Uint32Array;
   readonly #recordedReduced: Uint8Array;
-  readonly #clock: () => number;
   readonly #store: TileStore;
   readonly #totals: RecorderTotals;
 
@@ -79,15 +79,15 @@ export class Recorder {
     return this.#gapKind;
   }
 
+  /** When the newest capture ran (performance.now). */
+  get lastCapture(): number {
+    return this.#lastCapture;
+  }
+
   beginGap(kind: Gap['kind']): void {
     if (this.#gapKind !== null) return;
     this.#gapKind = kind;
     this.#gapStart = this.#clock();
-  }
-
-  /** When the newest capture ran (performance.now). */
-  get lastCapture(): number {
-    return this.#lastCapture;
   }
 
   async capture(): Promise<CaptureOutcome> {
@@ -227,16 +227,16 @@ export class Recorder {
     this.sentThrough = this.journal.lastFrame;
   }
 
+  /** Some tile was last kept reduced and is still cooling — it needs one more capture to be kept crisp. */
+  #cooling(): boolean {
+    for (let tile = 0; tile < this.#heat.length; tile += 1) if (this.#heat[tile]! > 0 || this.#pending[tile] === 1) return true;
+    return false;
+  }
+
   #tilePixels(tile: number): number {
     const { fingerprinter } = this;
     const columns = Math.min(tileSize, fingerprinter.width - (tile % fingerprinter.tilesAcross) * tileSize);
     const rows = Math.min(tileSize, fingerprinter.height - Math.floor(tile / fingerprinter.tilesAcross) * tileSize);
     return columns * rows;
-  }
-
-  /** Some tile was last kept reduced and is still cooling — it needs one more capture to be kept crisp. */
-  #cooling(): boolean {
-    for (let tile = 0; tile < this.#heat.length; tile += 1) if (this.#heat[tile]! > 0 || this.#pending[tile] === 1) return true;
-    return false;
   }
 }

@@ -68,9 +68,9 @@ export class Renderer {
   #blur: { texture: bigint; view: bigint } | null = null;
   #blurSource = 0n;
   readonly #constants: bigint;
+  readonly #markBytes = Buffer.alloc(markCapacity * 16);
   #markCount = 0;
   readonly #marks: StructuredBuffer;
-  readonly #markBytes = Buffer.alloc(markCapacity * 16);
   #moment = 0n;
   readonly #momentViews = new Map<bigint, bigint>();
   readonly #pixelShader: bigint;
@@ -88,6 +88,10 @@ export class Renderer {
     this.#sampler = makeSampler();
     this.#constants = makeConstantBuffer(sceneLayout.byteSize);
     this.#marks = makeStructuredBuffer({ count: markCapacity, cpuWritable: true, srv: true, stride: 16 });
+  }
+
+  get markCount(): number {
+    return this.#markCount;
   }
 
   dispose(): void {
@@ -120,15 +124,11 @@ export class Renderer {
     this.painter.end();
   }
 
-  get markCount(): number {
-    return this.#markCount;
-  }
-
-  /** A new moment arrived in `texture` (an eye-side handle to one of the worker's shared views). */
-  setMoment(texture: bigint): void {
-    if (!this.#momentViews.has(texture)) this.#momentViews.set(texture, callOut(requireGpu().device, DEV_CREATE_SHADER_RESOURCE_VIEW, [FFIType.u64, FFIType.ptr], [texture, null], 'CreateShaderResourceView(moment)'));
-    this.#moment = texture;
-    this.#blurSource = 0n;
+  /** Initialise empty inputs so the first frame can draw before data arrives. */
+  prepare(tilesAcross: number, tilesDown: number, binCount: number): void {
+    this.setShimmer(new Uint8Array(tilesAcross * tilesDown), tilesAcross, tilesDown);
+    this.setBins(new Float32Array(binCount));
+    this.setMarks([]);
   }
 
   /** Waveform amplitudes, oldest first (0–1). */
@@ -153,6 +153,13 @@ export class Renderer {
       this.#markBytes.writeFloatLE(0, index * 16 + 12);
     }
     updateDynamicBuffer(this.#marks.buffer, this.#markBytes);
+  }
+
+  /** A new moment arrived in `texture` (an eye-side handle to one of the worker's shared views). */
+  setMoment(texture: bigint): void {
+    if (!this.#momentViews.has(texture)) this.#momentViews.set(texture, callOut(requireGpu().device, DEV_CREATE_SHADER_RESOURCE_VIEW, [FFIType.u64, FFIType.ptr], [texture, null], 'CreateShaderResourceView(moment)'));
+    this.#moment = texture;
+    this.#blurSource = 0n;
   }
 
   /** Which tiles just changed (255) — the scene glows them briefly. */
@@ -187,12 +194,5 @@ export class Renderer {
     comRelease(this.#blur.view);
     comRelease(this.#blur.texture);
     this.#blur = null;
-  }
-
-  /** Initialise empty inputs so the first frame can draw before data arrives. */
-  prepare(tilesAcross: number, tilesDown: number, binCount: number): void {
-    this.setShimmer(new Uint8Array(tilesAcross * tilesDown), tilesAcross, tilesDown);
-    this.setBins(new Float32Array(binCount));
-    this.setMarks([]);
   }
 }

@@ -31,8 +31,8 @@ const perMonitorAware = 0x2;
 class WindowPresenter implements Presenter {
   /** Autopilot: write the next presented frame (read from the back buffer) to this PNG path. */
   snapshot: string | null = null;
-  #swapChain: SwapChain | null = null;
   readonly #eye: () => Eye;
+  #swapChain: SwapChain | null = null;
   readonly #window: OverlayWindow;
 
   constructor(window: OverlayWindow, eye: () => Eye) {

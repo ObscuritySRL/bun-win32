@@ -79,8 +79,8 @@ export class View {
   readonly display: DisplayInfo;
   #backdrop: Spring;
   #closeRequested = false;
-  #detailsOpen = false;
   readonly #details: Spring;
+  #detailsOpen = false;
   readonly #diagnostics: Diagnostics;
   #drag: { kind: 'card' | 'track'; startX: number; startY: number; x: number; y: number } | null = null;
   #epochNow: () => number;
@@ -93,8 +93,8 @@ export class View {
   readonly #goToSpring: Spring;
   readonly #history: History;
   readonly #host: ViewHost;
-  #hoverX: number | null = null;
   readonly #hover: Spring;
+  #hoverX: number | null = null;
   readonly #inspect: Spring;
   #lastBinsAt = -Infinity;
   #lastMarksVersion = '';
@@ -150,9 +150,13 @@ export class View {
     return this.#history;
   }
 
-  /** True once the exit choreography has finished and the window may disappear. */
-  finished(now: number): boolean {
-    return this.#closeRequested && this.#lift.target === 0 && this.#lift.settled(now, 0.001) && this.#backdrop.settled(now, 0.001);
+  /** Is anything still moving (or about to)? Idle frames are skipped entirely. */
+  animating(now: number): boolean {
+    const springs = [this.#lift, this.#backdrop, this.#shelf, this.#pill, this.#inspect, this.#playhead, this.#hover, this.#tint, this.#regionOpacity, this.#details, this.#goToSpring, ...this.#regionEdges];
+    if (springs.some((spring) => !spring.settled(now, 0.000_2))) return true;
+    if (now - this.#shimmerStart < shimmer.duration) return true;
+    if (this.#toast !== null && now - this.#toast.at < toastDuration + 400) return true;
+    return this.#closeRequested;
   }
 
   appended(slice: TimelineSlice): void {
@@ -173,23 +177,6 @@ export class View {
     this.#lastBinsAt = -Infinity;
   }
 
-  /** Called right after frame 0 is on screen. */
-  exhale(now: number): void {
-    this.#lift.retarget(1, now);
-    this.#backdrop.retarget(1, now);
-    this.#shelf.retarget(1, now + 60);
-    this.#pill.retarget(1, now + 90);
-  }
-
-  /** Is anything still moving (or about to)? Idle frames are skipped entirely. */
-  animating(now: number): boolean {
-    const springs = [this.#lift, this.#backdrop, this.#shelf, this.#pill, this.#inspect, this.#playhead, this.#hover, this.#tint, this.#regionOpacity, this.#details, this.#goToSpring, ...this.#regionEdges];
-    if (springs.some((spring) => !spring.settled(now, 0.000_2))) return true;
-    if (now - this.#shimmerStart < shimmer.duration) return true;
-    if (this.#toast !== null && now - this.#toast.at < toastDuration + 400) return true;
-    return this.#closeRequested;
-  }
-
   /** Begin the exit: return to now first if in the past, then breathe back in. */
   close(now: number): void {
     if (this.#closeRequested) return;
@@ -203,11 +190,17 @@ export class View {
     else this.#seek(this.#history.lastFrame);
   }
 
-  /** Hotkey pressed while closing: turn around from wherever we are. */
-  reopen(now: number): void {
-    if (!this.#closeRequested) return;
-    this.#closeRequested = false;
-    this.exhale(now);
+  /** Called right after frame 0 is on screen. */
+  exhale(now: number): void {
+    this.#lift.retarget(1, now);
+    this.#backdrop.retarget(1, now);
+    this.#shelf.retarget(1, now + 60);
+    this.#pill.retarget(1, now + 90);
+  }
+
+  /** True once the exit choreography has finished and the window may disappear. */
+  finished(now: number): boolean {
+    return this.#closeRequested && this.#lift.target === 0 && this.#lift.settled(now, 0.001) && this.#backdrop.settled(now, 0.001);
   }
 
   handle(events: readonly InputEvent[], now: number): void {
@@ -236,31 +229,15 @@ export class View {
     }
   }
 
-  /** The worker composed `frame` and the eye now shows it. */
-  shown(frame: number, changedTiles: Uint32Array, now: number): void {
-    this.#shownFrame = frame;
-    const tiles = this.display.tilesAcross * this.display.tilesDown;
-    if (!this.#followLive && changedTiles.length > 0 && changedTiles.length <= tiles * shimmer.maximumShare) {
-      const mask = new Uint8Array(tiles);
-      for (const tile of changedTiles) mask[tile] = 255;
-      this.#renderer.setShimmer(mask, this.display.tilesAcross, this.display.tilesDown);
-      this.#shimmerStart = now;
-    }
-    if (this.#closeRequested && frame === this.#history.lastFrame) this.#breatheIn(now);
-  }
-
   recording(state: 'paused' | 'recording' | 'unavailable'): void {
     this.#recording = state;
   }
 
-  /** The worker answered a region step. */
-  stepped(frame: number): void {
-    this.#followLive = frame >= this.#history.lastFrame;
-    this.#seek(frame);
-  }
-
-  toast(text: string, now: number): void {
-    this.#toast = { at: now, text };
+  /** Hotkey pressed while closing: turn around from wherever we are. */
+  reopen(now: number): void {
+    if (!this.#closeRequested) return;
+    this.#closeRequested = false;
+    this.exhale(now);
   }
 
   /** Upload what the scene samples (bins, marks) when it has changed, and build the scene. */
@@ -307,6 +284,25 @@ export class View {
       track: [geometry.track.left, geometry.track.top, geometry.track.right, geometry.track.bottom],
       viewport: [width, height, scale, 0],
     };
+  }
+
+  /** The worker composed `frame` and the eye now shows it. */
+  shown(frame: number, changedTiles: Uint32Array, now: number): void {
+    this.#shownFrame = frame;
+    const tiles = this.display.tilesAcross * this.display.tilesDown;
+    if (!this.#followLive && changedTiles.length > 0 && changedTiles.length <= tiles * shimmer.maximumShare) {
+      const mask = new Uint8Array(tiles);
+      for (const tile of changedTiles) mask[tile] = 255;
+      this.#renderer.setShimmer(mask, this.display.tilesAcross, this.display.tilesDown);
+      this.#shimmerStart = now;
+    }
+    if (this.#closeRequested && frame === this.#history.lastFrame) this.#breatheIn(now);
+  }
+
+  /** The worker answered a region step. */
+  stepped(frame: number): void {
+    this.#followLive = frame >= this.#history.lastFrame;
+    this.#seek(frame);
   }
 
   /** Words, in DIPs, on top of the scene. */
@@ -375,6 +371,15 @@ export class View {
     this.#drawToast(painter, now, geometry);
   }
 
+  toast(text: string, now: number): void {
+    this.#toast = { at: now, text };
+  }
+
+  #binCount(): number {
+    const geometry = this.#layout();
+    return Math.max(8, Math.floor((geometry.track.right - geometry.track.left) / (3 * this.#scale)));
+  }
+
   /** The exit: everything returns to exactly where the screen is. */
   #breatheIn(now: number): void {
     this.#lift.retarget(0, now);
@@ -383,11 +388,6 @@ export class View {
     this.#pill.retarget(0, now);
     this.#inspect.retarget(0, now);
     this.#regionOpacity.retarget(0, now);
-  }
-
-  #binCount(): number {
-    const geometry = this.#layout();
-    return Math.max(8, Math.floor((geometry.track.right - geometry.track.left) / (3 * this.#scale)));
   }
 
   #button(button: 'left' | 'right', down: boolean, double: boolean, x: number, y: number, now: number): void {
@@ -448,6 +448,13 @@ export class View {
   #clearRegion(now: number): void {
     this.#region = null;
     this.#regionOpacity.retarget(0, now);
+  }
+
+  #currentGap(): Gap | null {
+    if (this.#history.count === 0) return null;
+    const epoch = this.#history.epoch(this.#frame);
+    const next = this.#frame < this.#history.lastFrame ? this.#history.epoch(this.#frame + 1) : this.#epochNow();
+    return this.#history.gaps.find((gap) => gap.from >= epoch && gap.to <= next) ?? null;
   }
 
   #drawDetails(painter: Painter, now: number): void {
@@ -573,6 +580,49 @@ export class View {
     return { card, lift, shelf, shelfOpacity: Math.max(0, Math.min(1, shelfVisibility)), track };
   }
 
+  #goToKey(key: number, control: boolean, shift: boolean, now: number): void {
+    const field = this.#goTo;
+    switch (key) {
+      case keys.escape:
+        this.#goToOpen = false;
+        this.#goToSpring.retarget(0, now);
+        return;
+      case keys.enter: {
+        const epoch = parseGoTo(field.text, this.#epochNow());
+        if (epoch === null) {
+          this.#goToError = true;
+          return;
+        }
+        this.#goToOpen = false;
+        this.#goToSpring.retarget(0, now);
+        this.#seekEpoch(epoch);
+        return;
+      }
+      case keys.backspace:
+        field.backspace(control);
+        return;
+      case keys.delete:
+        field.deleteForward();
+        return;
+      case keys.left:
+      case keys.right:
+        field.moveCaret(key === keys.left ? -1 : 1, shift);
+        return;
+      case keys.home:
+        field.home(shift);
+        return;
+      case keys.end:
+        field.end(shift);
+        return;
+      case keys.a:
+        if (control) field.selectAll();
+        return;
+      case keys.v:
+        if (control) field.paste(this.#host.clipboardText());
+        return;
+    }
+  }
+
   #inside(rectangle: Rectangle, x: number, y: number): boolean {
     return x >= rectangle.left && x <= rectangle.right && y >= rectangle.top && y <= rectangle.bottom;
   }
@@ -646,49 +696,6 @@ export class View {
           this.#forgetArmedAt = now;
           this.toast(copy.forgetArmed, now);
         }
-        return;
-    }
-  }
-
-  #goToKey(key: number, control: boolean, shift: boolean, now: number): void {
-    const field = this.#goTo;
-    switch (key) {
-      case keys.escape:
-        this.#goToOpen = false;
-        this.#goToSpring.retarget(0, now);
-        return;
-      case keys.enter: {
-        const epoch = parseGoTo(field.text, this.#epochNow());
-        if (epoch === null) {
-          this.#goToError = true;
-          return;
-        }
-        this.#goToOpen = false;
-        this.#goToSpring.retarget(0, now);
-        this.#seekEpoch(epoch);
-        return;
-      }
-      case keys.backspace:
-        field.backspace(control);
-        return;
-      case keys.delete:
-        field.deleteForward();
-        return;
-      case keys.left:
-      case keys.right:
-        field.moveCaret(key === keys.left ? -1 : 1, shift);
-        return;
-      case keys.home:
-        field.home(shift);
-        return;
-      case keys.end:
-        field.end(shift);
-        return;
-      case keys.a:
-        if (control) field.selectAll();
-        return;
-      case keys.v:
-        if (control) field.paste(this.#host.clipboardText());
         return;
     }
   }
@@ -786,13 +793,6 @@ export class View {
     const gap = this.#currentGap();
     if (gap !== null) return gap.kind === 'paused' ? copy.gapPaused : gap.kind === 'locked' ? copy.gapLocked : copy.gapUnavailable;
     return copy.hints;
-  }
-
-  #currentGap(): Gap | null {
-    if (this.#history.count === 0) return null;
-    const epoch = this.#history.epoch(this.#frame);
-    const next = this.#frame < this.#history.lastFrame ? this.#history.epoch(this.#frame + 1) : this.#epochNow();
-    return this.#history.gaps.find((gap) => gap.from >= epoch && gap.to <= next) ?? null;
   }
 
   #stepFrames(delta: number): void {

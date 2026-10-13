@@ -54,19 +54,19 @@ export interface ScriptOptions {
 
 class OffscreenPresenter implements Presenter {
   readonly scale: number;
-  #target: TextureResult | null = null;
   #size: [number, number] = [0, 0];
+  #target: TextureResult | null = null;
 
   constructor(scale: number) {
     this.scale = scale;
   }
 
-  get texture(): bigint {
-    return this.#target?.tex ?? 0n;
-  }
-
   get size(): [number, number] {
     return this.#size;
+  }
+
+  get texture(): bigint {
+    return this.#target?.tex ?? 0n;
   }
 
   hide(): void {}

@@ -19,10 +19,10 @@ export class Journal {
   #frameOffset = 0;
   #gaps: Gap[] = [];
   readonly #tapeBlobs: Uint32Array[] = [];
+  #tapeEntries = 0;
   readonly #tapeFrames: Uint32Array[] = [];
   readonly #tapeLength: Uint32Array;
   readonly #tapeStart: Uint32Array;
-  #tapeEntries = 0;
 
   constructor(tileCount: number) {
     this.tileCount = tileCount;
@@ -65,11 +65,6 @@ export class Journal {
     this.#cursorY[slot] = cursorY;
     this.#frameCount += 1;
     return this.lastFrame;
-  }
-
-  /** Correct the changed-tile count once a frame's tiles are known (the frame is appended first). */
-  setChanged(frame: number, changed: number): void {
-    this.#changed[this.#slot(frame)] = changed;
   }
 
   changed(frame: number): number {
@@ -158,6 +153,11 @@ export class Journal {
       const entry = this.#latestAtOrBefore(tile, frame);
       out[tile] = entry < 0 ? -1 : this.#tapeBlobs[tile]![entry]!;
     }
+  }
+
+  /** Correct the changed-tile count once a frame's tiles are known (the frame is appended first). */
+  setChanged(frame: number, changed: number): void {
+    this.#changed[this.#slot(frame)] = changed;
   }
 
   /** Copy of the timeline from `fromFrame` (clamped) to the newest frame. */

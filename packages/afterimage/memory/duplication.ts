@@ -139,6 +139,15 @@ export class Duplication implements FrameSource {
     this.#duplication = 0n;
   }
 
+  /** Hand the frame back to DWM — call as soon as the desktop texture has been copied. */
+  release(): void {
+    if (!this.#held) return;
+    comRelease(this.#texture);
+    this.#texture = 0n;
+    vcall(this.#duplication, DXGIOutputDuplication.ReleaseFrame, [], []);
+    this.#held = false;
+  }
+
   /** (Re)create the duplication. False while the desktop can't be duplicated (secure desktop, too many duplicators). */
   reopen(): boolean {
     this.close();
@@ -164,14 +173,5 @@ export class Duplication implements FrameSource {
       comRelease(adapter);
     }
     return this.#duplication !== 0n && this.description.rotation === identityRotation;
-  }
-
-  /** Hand the frame back to DWM — call as soon as the desktop texture has been copied. */
-  release(): void {
-    if (!this.#held) return;
-    comRelease(this.#texture);
-    this.#texture = 0n;
-    vcall(this.#duplication, DXGIOutputDuplication.ReleaseFrame, [], []);
-    this.#held = false;
   }
 }

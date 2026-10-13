@@ -122,6 +122,11 @@ export class OverlayWindow {
     }
   }
 
+  /** Uncloak — call once the first frame has been presented and composed. */
+  reveal(): void {
+    this.#setAttribute(cloakAttribute, 0);
+  }
+
   /**
    * Walk the window through show and hide once, cloaked and without activation, so the first real
    * open doesn't pay the window manager's cold path (measured ~15 ms). Nothing is ever visible.
@@ -131,9 +136,20 @@ export class OverlayWindow {
     this.hide();
   }
 
-  /** Uncloak — call once the first frame has been presented and composed. */
-  reveal(): void {
-    this.#setAttribute(cloakAttribute, 0);
+  /** The user's own arrow (their cursor scheme), loaded by path so no resource-id cast is needed. */
+  #arrowCursor(): bigint {
+    if (this.#arrow !== 0n) return this.#arrow;
+    const data = new Uint16Array(new ArrayBuffer(0x410));
+    const size = new Uint32Array(new ArrayBuffer(4));
+    size[0] = data.byteLength;
+    const hkeyCurrentUser = 0xffff_ffff_8000_0001n;
+    let path = 'C:\\Windows\\Cursors\\aero_arrow.cur';
+    if (Advapi32.RegGetValueW(hkeyCurrentUser, ptr(Buffer.from('Control Panel\\Cursors\0', 'utf16le')), ptr(Buffer.from('Arrow\0', 'utf16le')), 0xffff, null, ptr(data), ptr(size)) === 0) {
+      const configured = Buffer.from(data.buffer, 0, Math.max(0, size[0]! - 2)).toString('utf16le');
+      if (configured.length > 0) path = configured;
+    }
+    this.#arrow = User32.LoadImageW(0n, ptr(Buffer.from(`${path}\0`, 'utf16le')), 2, 0, 0, 0x50);
+    return this.#arrow;
   }
 
   #handle(hWnd: bigint, message: number, wParam: bigint, lParam: bigint): bigint {
@@ -214,22 +230,6 @@ export class OverlayWindow {
       return 0n;
     }
     return User32.DefWindowProcW(hWnd, message, wParam, lParam);
-  }
-
-  /** The user's own arrow (their cursor scheme), loaded by path so no resource-id cast is needed. */
-  #arrowCursor(): bigint {
-    if (this.#arrow !== 0n) return this.#arrow;
-    const data = new Uint16Array(new ArrayBuffer(0x410));
-    const size = new Uint32Array(new ArrayBuffer(4));
-    size[0] = data.byteLength;
-    const hkeyCurrentUser = 0xffff_ffff_8000_0001n;
-    let path = 'C:\\Windows\\Cursors\\aero_arrow.cur';
-    if (Advapi32.RegGetValueW(hkeyCurrentUser, ptr(Buffer.from('Control Panel\\Cursors\0', 'utf16le')), ptr(Buffer.from('Arrow\0', 'utf16le')), 0xffff, null, ptr(data), ptr(size)) === 0) {
-      const configured = Buffer.from(data.buffer, 0, Math.max(0, size[0]! - 2)).toString('utf16le');
-      if (configured.length > 0) path = configured;
-    }
-    this.#arrow = User32.LoadImageW(0n, ptr(Buffer.from(`${path}\0`, 'utf16le')), 2, 0, 0, 0x50);
-    return this.#arrow;
   }
 
   #setAttribute(attribute: number, value: number): void {

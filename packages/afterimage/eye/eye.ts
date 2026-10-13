@@ -59,6 +59,8 @@ export interface EyeCallbacks {
 export class Eye {
   readonly diagnostics: Diagnostics = { bootMilliseconds: 0, composeMilliseconds: 0, frameMedian: 0, frameWorst: 0, openMilliseconds: 0, refreshHertz: 0, stats: null };
   readonly frames = new FrameMeter();
+  readonly #callbacks: EyeCallbacks;
+  readonly #clock: Clock;
   #currentView: 0 | 1 = 0;
   /** Something the view shows changed outside its springs (a new moment, new frames): draw once more. */
   #dirty = false;
@@ -67,11 +69,12 @@ export class Eye {
   #latestSeek = 0;
   #latestShown = 0;
   #needFence = false;
-  #pendingExports = 0;
-  #pendingSteps = 0;
   #opening: { at: number; display: number } | null = null;
   #paused = false;
+  #pendingExports = 0;
   #pendingRelease: 0 | 1 | null = null;
+  #pendingSteps = 0;
+  readonly #presenter: Presenter;
   #query = 0n;
   #ready: Promise<void>;
   #renderer: Renderer | null = null;
@@ -79,9 +82,6 @@ export class Eye {
   readonly #stageWaiters: (() => void)[] = [];
   #textures: [bigint, bigint][] = [];
   #view: View | null = null;
-  readonly #callbacks: EyeCallbacks;
-  readonly #clock: Clock;
-  readonly #presenter: Presenter;
   readonly #worker: Worker;
 
   constructor(worker: Worker, options: WorkerOptions, presenter: Presenter, clock: Clock, callbacks: EyeCallbacks) {
@@ -102,14 +102,13 @@ export class Eye {
     this.#send({ options, type: 'init' });
   }
 
-  /** Resolves once the memory has captured its first frame and the eye can open. */
-  get ready(): Promise<void> {
-    return this.#ready;
-  }
-
   /** Waiting on the memory for something (an open, a seek, a step, an export, a stage advance). */
   get busy(): boolean {
     return this.#opening !== null || (this.#view !== null && this.#latestShown < this.#latestSeek) || this.#pendingSteps > 0 || this.#pendingExports > 0 || this.#stageWaiters.length > 0;
+  }
+
+  get displays(): readonly DisplayInfo[] {
+    return this.#displays;
   }
 
   /** Direct2D on the eye's device (the tray icon and the swap chain need it). */
@@ -117,30 +116,41 @@ export class Eye {
     return this.#renderer!.painter;
   }
 
-  get displays(): readonly DisplayInfo[] {
-    return this.#displays;
-  }
-
   get paused(): boolean {
     return this.#paused;
   }
 
-  /** Open, or turn around if already on the way out; close if open. */
-  toggle(display: number): void {
-    const now = this.#clock.now();
-    if (this.#view === null) {
-      this.open(display);
-      return;
-    }
-    if (this.#view.finished(now)) return;
-    if (this.#view.closing) this.#view.reopen(now);
-    else this.#view.close(now);
+  /** Resolves once the memory has captured its first frame and the eye can open. */
+  get ready(): Promise<void> {
+    return this.#ready;
+  }
+
+  get visible(): boolean {
+    return this.#view !== null;
   }
 
   open(display: number): void {
     if (this.#view !== null || this.#opening !== null || this.#renderer === null) return;
     this.#opening = { at: this.#clock.now(), display };
     this.#send({ display, type: 'open' });
+  }
+
+  /** Draw the current state again without presenting (headless shots). */
+  redraw(): void {
+    if (this.#view !== null && this.#renderer !== null) this.#draw(this.#view, this.#clock.now());
+  }
+
+  /** Forward a raw protocol message (pause, budget, quit…). */
+  send(message: EyeMessage): void {
+    this.#send(message);
+  }
+
+  /** Advance the stage's virtual clock and let the memory record it. */
+  stage(milliseconds: number): Promise<void> {
+    return new Promise((resolve) => {
+      this.#stageWaiters.push(resolve);
+      this.#send({ milliseconds, type: 'stage' });
+    });
   }
 
   /** One turn of the render loop: input, animation, a frame if anything moved. Returns whether it drew. */
@@ -175,21 +185,16 @@ export class Eye {
     return true;
   }
 
-  get visible(): boolean {
-    return this.#view !== null;
-  }
-
-  /** Draw the current state again without presenting (headless shots). */
-  redraw(): void {
-    if (this.#view !== null && this.#renderer !== null) this.#draw(this.#view, this.#clock.now());
-  }
-
-  /** Advance the stage's virtual clock and let the memory record it. */
-  stage(milliseconds: number): Promise<void> {
-    return new Promise((resolve) => {
-      this.#stageWaiters.push(resolve);
-      this.#send({ milliseconds, type: 'stage' });
-    });
+  /** Open, or turn around if already on the way out; close if open. */
+  toggle(display: number): void {
+    const now = this.#clock.now();
+    if (this.#view === null) {
+      this.open(display);
+      return;
+    }
+    if (this.#view.finished(now)) return;
+    if (this.#view.closing) this.#view.reopen(now);
+    else this.#view.close(now);
   }
 
   /**
@@ -205,11 +210,6 @@ export class Eye {
     const now = this.#clock.now();
     const view = new View(this.#host(), renderer, display, scale, this.diagnostics, () => this.#clock.epoch(), now);
     renderer.draw(surface, view.scene(now), scale, (painter) => view.text(painter, now));
-  }
-
-  /** Forward a raw protocol message (pause, budget, quit…). */
-  send(message: EyeMessage): void {
-    this.#send(message);
   }
 
   #afterPresent(): void {
@@ -258,6 +258,37 @@ export class Eye {
 
   #openShared(handle: bigint): bigint {
     return callOut(requireGpu().device, D3D11Device.OpenSharedResource, [FFIType.u64, FFIType.ptr], [handle, ptr(guid(IID_ID3D11TEXTURE2D))], 'OpenSharedResource');
+  }
+
+  /** The memory composed "now" into a shared texture: show it as frame 0, then exhale. */
+  #opened(displayIndex: number, frame: number, slice: TimelineSlice, viewIndex: 0 | 1): void {
+    const opening = this.#opening;
+    this.#opening = null;
+    const display = this.#displays[displayIndex];
+    if (display === undefined || opening === null) return;
+    if (frame < 0) {
+      this.#send({ type: 'close' });
+      this.#callbacks.unavailable();
+      return;
+    }
+    const renderer = this.#renderer!;
+    const { scale } = this.#presenter.surface(display);
+    const now = this.#clock.now();
+    const view = new View(this.#host(), renderer, display, scale, this.diagnostics, () => this.#clock.epoch(), now);
+    this.#currentView = viewIndex;
+    this.#pendingRelease = null;
+    renderer.setMoment(this.#textures[displayIndex]![viewIndex]);
+    view.begin(frame, slice, now);
+    this.#presenter.prepare(display);
+    this.#draw(view, now);
+    this.#presenter.present();
+    this.#draw(view, now);
+    this.#presenter.present();
+    this.#presenter.reveal();
+    this.diagnostics.openMilliseconds = this.#clock.now() - opening.at;
+    view.exhale(this.#clock.now());
+    this.#view = view;
+    this.frames.rest();
   }
 
   /** Release the previous view once the GPU has finished every frame that sampled it. */
@@ -326,37 +357,6 @@ export class Eye {
         this.#view?.stepped(message.frame);
         break;
     }
-  }
-
-  /** The memory composed "now" into a shared texture: show it as frame 0, then exhale. */
-  #opened(displayIndex: number, frame: number, slice: TimelineSlice, viewIndex: 0 | 1): void {
-    const opening = this.#opening;
-    this.#opening = null;
-    const display = this.#displays[displayIndex];
-    if (display === undefined || opening === null) return;
-    if (frame < 0) {
-      this.#send({ type: 'close' });
-      this.#callbacks.unavailable();
-      return;
-    }
-    const renderer = this.#renderer!;
-    const { scale } = this.#presenter.surface(display);
-    const now = this.#clock.now();
-    const view = new View(this.#host(), renderer, display, scale, this.diagnostics, () => this.#clock.epoch(), now);
-    this.#currentView = viewIndex;
-    this.#pendingRelease = null;
-    renderer.setMoment(this.#textures[displayIndex]![viewIndex]);
-    view.begin(frame, slice, now);
-    this.#presenter.prepare(display);
-    this.#draw(view, now);
-    this.#presenter.present();
-    this.#draw(view, now);
-    this.#presenter.present();
-    this.#presenter.reveal();
-    this.diagnostics.openMilliseconds = this.#clock.now() - opening.at;
-    view.exhale(this.#clock.now());
-    this.#view = view;
-    this.frames.rest();
   }
 
   #send(message: EyeMessage): void {
