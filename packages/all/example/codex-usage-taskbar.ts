@@ -3,9 +3,8 @@
  *
  * Renders the active Codex subscription rate-limit windows, each with its used
  * percent and time until reset, as a compact widget in the bottom-left taskbar.
- * It launches the documented `codex app-server` interface and asks
- * `account/rateLimits/read`, so Codex owns authentication and token refresh; this
- * script never reads, copies, or sends credentials itself. A ChatGPT-backed Codex
+ * It asks the documented `codex app-server` interface for
+ * `account/rateLimits/read`, so Codex owns authentication and token refresh. A ChatGPT-backed Codex
  * login and the `codex` CLI on PATH are required. The widget supports one or two
  * windows and labels them from the server-provided duration. A sampled taskbar
  * color is keyed away so the meters float on a transparent surface. Left-click
@@ -18,22 +17,19 @@
  *   to reparent the widget into the taskbar, ShowWindow + color-key transparency,
  *   PeekMessageW/TranslateMessage/DispatchMessageW, GetDC/ReleaseDC, and SetWindowPos)
  * - gdi32 (GetPixel taskbar color sampling, SetDIBitsToDevice software compositing,
- *   CreateFontW + TextOutW text, BitBlt + CreateCompatibleBitmap + GetDIBits verification)
- * - terminal (encodePNG for CAPTURE_PNG and RENDER_PNG verification images)
+ *   CreateFontW + TextOutW text)
  *
  * Env: CODEX_USAGE_X / CODEX_USAGE_WIDTH (pixel overrides), CODEX_USAGE_POLL_MS
  * (default 60000), CODEX_USAGE_LIMIT_ID (select a model-specific quota bucket),
- * CODEX_USAGE_FAKE=24,67 (offline 5-hour/7-day visual fixture), CODEX_BIN (CLI
- * executable override), CAPTURE_PNG=path (taskbar screenshot), RENDER_PNG=path
- * (widget-only render), DEMO_DURATION_MS (self-exit).
+ * and CODEX_BIN (CLI executable override).
  *
  * Run: bun run example/codex-usage-taskbar.ts
  */
 import { JSCallback } from 'bun:ffi';
 
-import { encodePNG } from '@bun-win32/terminal';
-import { ShowWindowCommand, WindowStyles } from '@bun-win32/user32';
-import { GDI32, User32 } from '../index';
+import GDI32 from '@bun-win32/gdi32';
+import User32, { ShowWindowCommand, WindowStyles } from '@bun-win32/user32';
+import { CodexUsageClient, formatCodexReset, formatCodexWindow, type CodexRateWindow } from './_codex-usage';
 
 User32.Preload([
   'CreateWindowExW',
@@ -57,26 +53,7 @@ User32.Preload([
   'TranslateMessage',
   'UnregisterClassW',
 ]);
-GDI32.Preload([
-  'BitBlt',
-  'CreateCompatibleBitmap',
-  'CreateCompatibleDC',
-  'CreateFontW',
-  'DeleteDC',
-  'DeleteObject',
-  'GetDIBits',
-  'GetPixel',
-  'GetTextMetricsW',
-  'IntersectClipRect',
-  'RestoreDC',
-  'SaveDC',
-  'SelectObject',
-  'SetBkMode',
-  'SetDIBitsToDevice',
-  'SetTextAlign',
-  'SetTextColor',
-  'TextOutW',
-]);
+GDI32.Preload(['CreateFontW', 'DeleteObject', 'GetPixel', 'GetTextMetricsW', 'IntersectClipRect', 'RestoreDC', 'SaveDC', 'SelectObject', 'SetBkMode', 'SetDIBitsToDevice', 'SetTextAlign', 'SetTextColor', 'TextOutW']);
 
 const WM_DESTROY = 0x0002;
 const WM_PAINT = 0x000f;
@@ -84,205 +61,15 @@ const WM_LBUTTONDOWN = 0x0201;
 const WM_RBUTTONDOWN = 0x0204;
 const PM_REMOVE = 0x0001;
 const LWA_COLORKEY = 0x0000_0001;
-const CAPTUREBLT = 0x4000_0000;
-const SRCCOPY = 0x00cc_0020;
 const SWP_NOSIZE_NOMOVE_NOACTIVATE = 0x0000_0013;
 
 const POLL_INTERVAL_MS = Number(Bun.env.CODEX_USAGE_POLL_MS ?? 60_000);
-const REQUEST_TIMEOUT_MS = 15_000;
-const CODEX_BIN = Bun.env.CODEX_BIN ?? 'codex';
 
 const wide = (text: string): Buffer => Buffer.from(`${text}\0`, 'utf16le');
-
-interface RateWindow {
-  resetsAt: number | null;
-  utilization: number;
-  windowDurationMinutes: number;
-}
-
-const rateWindowFrom = (value: unknown): RateWindow | null => {
-  if (typeof value !== 'object' || value === null) return null;
-  const utilization = 'usedPercent' in value && typeof value.usedPercent === 'number' ? value.usedPercent : null;
-  const windowDurationMinutes = 'windowDurationMins' in value && typeof value.windowDurationMins === 'number' ? value.windowDurationMins : null;
-  const resetsAt = 'resetsAt' in value && typeof value.resetsAt === 'number' ? value.resetsAt : null;
-  if (utilization === null || !Number.isFinite(utilization) || windowDurationMinutes === null || !Number.isFinite(windowDurationMinutes) || windowDurationMinutes <= 0) return null;
-  return { resetsAt: resetsAt !== null && Number.isFinite(resetsAt) ? resetsAt : null, utilization: Math.max(0, Math.min(100, utilization)), windowDurationMinutes };
-};
-
-const rateLimitBucketFrom = (value: unknown): unknown => {
-  if (typeof value !== 'object' || value === null) return null;
-  const requestedLimitIdentifier = Bun.env.CODEX_USAGE_LIMIT_ID;
-  const rateLimitsByIdentifier = 'rateLimitsByLimitId' in value ? value.rateLimitsByLimitId : null;
-  if (requestedLimitIdentifier) {
-    if (typeof rateLimitsByIdentifier !== 'object' || rateLimitsByIdentifier === null) return null;
-    return Reflect.get(rateLimitsByIdentifier, requestedLimitIdentifier);
-  }
-  if ('rateLimits' in value && value.rateLimits !== null) return value.rateLimits;
-  if (typeof rateLimitsByIdentifier !== 'object' || rateLimitsByIdentifier === null) return null;
-  const codexRateLimits: unknown = Reflect.get(rateLimitsByIdentifier, 'codex');
-  if (codexRateLimits !== undefined) return codexRateLimits;
-  const firstIdentifier = Object.keys(rateLimitsByIdentifier)[0];
-  return firstIdentifier ? Reflect.get(rateLimitsByIdentifier, firstIdentifier) : null;
-};
-
-const rateWindowsFrom = (value: unknown): RateWindow[] => {
-  const rateLimits = rateLimitBucketFrom(value);
-  if (typeof rateLimits !== 'object' || rateLimits === null) return [];
-  const windows: RateWindow[] = [];
-  if ('primary' in rateLimits) {
-    const primary = rateWindowFrom(rateLimits.primary);
-    if (primary) windows.push(primary);
-  }
-  if ('secondary' in rateLimits) {
-    const secondary = rateWindowFrom(rateLimits.secondary);
-    if (secondary) windows.push(secondary);
-  }
-  return windows.sort((left, right) => left.windowDurationMinutes - right.windowDurationMinutes);
-};
-
-const fakeRateWindows = (): RateWindow[] | null => {
-  const fixture = Bun.env.CODEX_USAGE_FAKE;
-  if (!fixture) return null;
-  const percentages = fixture.split(',').map((value) => Number(value.trim()));
-  if (percentages.length < 1 || percentages.length > 2 || percentages.some((value) => !Number.isFinite(value) || value < 0 || value > 100)) {
-    throw new Error('CODEX_USAGE_FAKE must contain one or two percentages from 0 to 100, for example 24,67.');
-  }
-  const nowSeconds = Math.floor(Date.now() / 1000);
-  const durations = [300, 10_080];
-  return percentages.map((utilization, index) => ({ resetsAt: nowSeconds + durations[index] * 60, utilization, windowDurationMinutes: durations[index] }));
-};
-
-interface PendingRequest {
-  child: CodexProcess;
-  reject: (reason: Error) => void;
-  resolve: (value: unknown) => void;
-  timeout: ReturnType<typeof setTimeout>;
-}
-
-type CodexProcess = Bun.Subprocess<'pipe', 'pipe', 'ignore'>;
-
-const pendingRequests = new Map<number, PendingRequest>();
-let appServer: CodexProcess | null = null;
-let appServerStart: Promise<CodexProcess> | null = null;
-let nextRequestIdentifier = 1;
-
-const protocolErrorMessage = (value: unknown): string => {
-  if (typeof value === 'object' && value !== null && 'message' in value && typeof value.message === 'string') return value.message;
-  return 'Codex app-server returned an unknown error.';
-};
-
-const handleAppServerLine = (line: string): void => {
-  if (!line.trim()) return;
-  let message: unknown;
-  try {
-    message = JSON.parse(line);
-  } catch {
-    return;
-  }
-  if (typeof message !== 'object' || message === null || 'method' in message || !('id' in message) || typeof message.id !== 'number' || (!('result' in message) && !('error' in message))) return;
-  const pending = pendingRequests.get(message.id);
-  if (!pending) return;
-  pendingRequests.delete(message.id);
-  clearTimeout(pending.timeout);
-  if ('error' in message) {
-    pending.reject(new Error(protocolErrorMessage(message.error)));
-    return;
-  }
-  pending.resolve(message.result);
-};
-
-const rejectPendingRequests = (child: CodexProcess, reason: Error): void => {
-  for (const [identifier, pending] of pendingRequests) {
-    if (pending.child !== child) continue;
-    pendingRequests.delete(identifier);
-    clearTimeout(pending.timeout);
-    pending.reject(reason);
-  }
-};
-
-const consumeAppServerOutput = async (child: CodexProcess): Promise<void> => {
-  const reader = child.stdout.getReader();
-  const decoder = new TextDecoder();
-  let buffered = '';
-  try {
-    while (true) {
-      const chunk = await reader.read();
-      if (chunk.done) break;
-      buffered += decoder.decode(chunk.value, { stream: true });
-      let newlineIndex = buffered.indexOf('\n');
-      while (newlineIndex >= 0) {
-        handleAppServerLine(buffered.slice(0, newlineIndex).replace(/\r$/, ''));
-        buffered = buffered.slice(newlineIndex + 1);
-        newlineIndex = buffered.indexOf('\n');
-      }
-    }
-    buffered += decoder.decode();
-    handleAppServerLine(buffered.replace(/\r$/, ''));
-  } catch (error) {
-    if (appServer === child) console.error(`Codex app-server output failed: ${String(error)}`);
-  } finally {
-    if (appServer === child) appServer = null;
-    rejectPendingRequests(child, new Error('Codex app-server exited.'));
-  }
-};
-
-const writeMessage = (child: CodexProcess, message: unknown): void => {
-  child.stdin.write(`${JSON.stringify(message)}\n`);
-  child.stdin.flush();
-};
-
-const requestAppServer = (child: CodexProcess, method: string, params?: unknown): Promise<unknown> => {
-  const id = nextRequestIdentifier++;
-  const response = new Promise<unknown>((resolve, reject) => {
-    const timeout = setTimeout(() => {
-      pendingRequests.delete(id);
-      reject(new Error(`${method} timed out after ${REQUEST_TIMEOUT_MS / 1000}s.`));
-    }, REQUEST_TIMEOUT_MS);
-    pendingRequests.set(id, { child, reject, resolve, timeout });
-  });
-  try {
-    writeMessage(child, params === undefined ? { id, method } : { id, method, params });
-  } catch (error) {
-    const pending = pendingRequests.get(id);
-    if (pending) {
-      pendingRequests.delete(id);
-      clearTimeout(pending.timeout);
-      pending.reject(new Error(`Could not write to Codex app-server: ${String(error)}`));
-    }
-  }
-  return response;
-};
-
-const startAppServer = async (): Promise<CodexProcess> => {
-  const child = Bun.spawn({ cmd: [CODEX_BIN, 'app-server', '-c', 'model_reasoning_effort=xhigh'], stdin: 'pipe', stdout: 'pipe', stderr: 'ignore', windowsHide: true });
-  appServer = child;
-  void consumeAppServerOutput(child);
-  try {
-    await requestAppServer(child, 'initialize', { clientInfo: { name: 'bun_win32_codex_usage_taskbar', title: 'bun-win32 Codex usage taskbar', version: '1.0.0' } });
-    writeMessage(child, { method: 'initialized', params: {} });
-    return child;
-  } catch (error) {
-    if (appServer === child) appServer = null;
-    child.kill();
-    throw error;
-  }
-};
-
-const ensureAppServer = async (): Promise<CodexProcess> => {
-  if (appServerStart) return appServerStart;
-  if (appServer && appServer.exitCode === null) return appServer;
-  appServerStart = startAppServer();
-  try {
-    return await appServerStart;
-  } finally {
-    appServerStart = null;
-  }
-};
-
-const fixtureWindows = fakeRateWindows();
-let rateWindows: RateWindow[] = fixtureWindows ?? [];
-let connectionState: 'error' | 'ok' | 'starting' = fixtureWindows ? 'ok' : 'starting';
-let haveData = rateWindows.length > 0;
+const usageClient = new CodexUsageClient();
+let rateWindows: CodexRateWindow[] = [];
+let connectionState: 'error' | 'ok' | 'starting' = 'starting';
+let haveData = false;
 let consecutiveFailures = 0;
 
 const recordFailure = (reason: string): void => {
@@ -292,21 +79,8 @@ const recordFailure = (reason: string): void => {
 };
 
 const refreshUsage = async (): Promise<void> => {
-  if (fixtureWindows) {
-    rateWindows = fixtureWindows;
-    connectionState = 'ok';
-    haveData = true;
-    return;
-  }
   try {
-    const child = await ensureAppServer();
-    const result = await requestAppServer(child, 'account/rateLimits/read');
-    const nextRateWindows = rateWindowsFrom(result);
-    if (nextRateWindows.length === 0) {
-      const selection = Bun.env.CODEX_USAGE_LIMIT_ID ? ` for limit ID ${Bun.env.CODEX_USAGE_LIMIT_ID}` : '';
-      throw new Error(`No ChatGPT rate-limit windows were returned${selection}. Sign in to Codex with ChatGPT; API-key accounts do not expose subscription limits.`);
-    }
-    rateWindows = nextRateWindows.slice(0, 2);
+    rateWindows = await usageClient.read();
     connectionState = 'ok';
     consecutiveFailures = 0;
     haveData = true;
@@ -316,24 +90,6 @@ const refreshUsage = async (): Promise<void> => {
 };
 
 const formatPercent = (utilization: number): string => `${Math.round(utilization)}%`;
-
-const formatReset = (resetsAt: number | null): string => {
-  if (resetsAt === null) return '';
-  const totalMinutes = Math.ceil((resetsAt * 1000 - Date.now()) / 60_000);
-  if (totalMinutes <= 0) return 'now';
-  const days = Math.floor(totalMinutes / 1440);
-  const hours = Math.floor((totalMinutes % 1440) / 60);
-  const minutes = totalMinutes % 60;
-  if (totalMinutes < 60) return `${minutes}m`;
-  if (totalMinutes < 2880) return `${days * 24 + hours}h ${minutes}m`;
-  return `${days}d ${hours}h`;
-};
-
-const formatWindowDuration = (minutes: number): string => {
-  if (minutes >= 1440 && minutes % 1440 === 0) return `${minutes / 1440}d`;
-  if (minutes >= 60 && minutes % 60 === 0) return `${minutes / 60}h`;
-  return `${minutes}m`;
-};
 
 interface Tint {
   blue: number;
@@ -493,9 +249,9 @@ const percentTextOffsetY = Math.round((barHeight - cellHeightOf(percentFont)) / 
 
 const rowTops = (): number[] => (rateWindows.length === 1 ? [Math.round((widgetHeight - barHeight) / 2)] : [Math.round(6 * scale), Math.round(26 * scale)]);
 
-const fillRightOf = (rateWindow: RateWindow): number => (rateWindow.utilization <= 0 ? barLeft : Math.max(barLeft + barHeight, barLeft + ((barRight - barLeft) * Math.min(100, rateWindow.utilization)) / 100));
+const fillRightOf = (rateWindow: CodexRateWindow): number => (rateWindow.utilization <= 0 ? barLeft : Math.max(barLeft + barHeight, barLeft + ((barRight - barLeft) * Math.min(100, rateWindow.utilization)) / 100));
 
-const composeBar = (rowTop: number, rateWindow: RateWindow): void => {
+const composeBar = (rowTop: number, rateWindow: CodexRateWindow): void => {
   const rowBottom = rowTop + barHeight;
   const pillRadius = barHeight / 2;
   drawRoundedRect(barLeft, rowTop, barRight, rowBottom, pillRadius, () => trackTint, 1);
@@ -515,9 +271,7 @@ const composeBar = (rowTop: number, rateWindow: RateWindow): void => {
   }
 };
 
-let hasDrawn = false;
 const paint = (deviceContext: bigint): void => {
-  hasDrawn = true;
   for (let index = 0; index < frame.length; index += 4) {
     frame[index] = backgroundTint.blue;
     frame[index + 1] = backgroundTint.green;
@@ -545,8 +299,8 @@ const paint = (deviceContext: bigint): void => {
       const rowTop = rows[index];
       const rateWindow = rateWindows[index];
       GDI32.SelectObject(deviceContext, primaryFont);
-      textOut(barLeft - Math.round(6 * scale), rowTop + primaryTextOffsetY, formatWindowDuration(rateWindow.windowDurationMinutes), dimTextColor, 2 /* TA_RIGHT */);
-      textOut(barRight + Math.round(8 * scale), rowTop + primaryTextOffsetY, formatReset(rateWindow.resetsAt), dimTextColor, 0 /* TA_LEFT */);
+      textOut(barLeft - Math.round(6 * scale), rowTop + primaryTextOffsetY, formatCodexWindow(rateWindow.windowDurationMinutes), dimTextColor, 2 /* TA_RIGHT */);
+      textOut(barRight + Math.round(8 * scale), rowTop + primaryTextOffsetY, formatCodexReset(rateWindow.resetsAt), dimTextColor, 0 /* TA_LEFT */);
       GDI32.SelectObject(deviceContext, percentFont);
       const percentText = formatPercent(rateWindow.utilization);
       const percentCenterX = (barLeft + barRight) >> 1;
@@ -583,70 +337,10 @@ const pump = (): void => {
   }
 };
 
-const captureTaskbarRegion = async (path: string): Promise<void> => {
-  const captureX = Math.max(taskbarLeft, widgetX - Math.round(220 * scale));
-  const captureWidth = widgetX - captureX + widgetWidth + Math.round(120 * scale);
-  const screenDC = User32.GetDC(0n);
-  const memoryDC = GDI32.CreateCompatibleDC(screenDC);
-  const bitmap = GDI32.CreateCompatibleBitmap(screenDC, captureWidth, taskbarHeight);
-  GDI32.SelectObject(memoryDC, bitmap);
-  void GDI32.BitBlt(memoryDC, 0, 0, captureWidth, taskbarHeight, screenDC, captureX, widgetY, SRCCOPY | CAPTUREBLT);
-  const bitmapInfo = Buffer.alloc(40);
-  bitmapInfo.writeUInt32LE(40, 0);
-  bitmapInfo.writeInt32LE(captureWidth, 4);
-  bitmapInfo.writeInt32LE(-taskbarHeight, 8);
-  bitmapInfo.writeUInt16LE(1, 12);
-  bitmapInfo.writeUInt16LE(32, 14);
-  const bgraPixels = Buffer.alloc(captureWidth * taskbarHeight * 4);
-  void GDI32.GetDIBits(memoryDC, bitmap, 0, taskbarHeight, bgraPixels.ptr!, bitmapInfo.ptr!, 0);
-  void GDI32.DeleteObject(bitmap);
-  void GDI32.DeleteDC(memoryDC);
-  void User32.ReleaseDC(0n, screenDC);
-  const rgbPixels = new Uint8Array(captureWidth * taskbarHeight * 3);
-  for (let pixelIndex = 0; pixelIndex < captureWidth * taskbarHeight; pixelIndex++) {
-    rgbPixels[pixelIndex * 3] = bgraPixels[pixelIndex * 4 + 2];
-    rgbPixels[pixelIndex * 3 + 1] = bgraPixels[pixelIndex * 4 + 1];
-    rgbPixels[pixelIndex * 3 + 2] = bgraPixels[pixelIndex * 4];
-  }
-  await Bun.write(path, encodePNG(rgbPixels, captureWidth, taskbarHeight));
-  console.log(`[shot] ${path}`);
-};
-
-const renderFramePNG = async (path: string): Promise<void> => {
-  const screenDC = User32.GetDC(0n);
-  const memoryDC = GDI32.CreateCompatibleDC(screenDC);
-  const bitmap = GDI32.CreateCompatibleBitmap(screenDC, widgetWidth, widgetHeight);
-  GDI32.SelectObject(memoryDC, bitmap);
-  paint(memoryDC);
-  const bitmapInfo = Buffer.alloc(40);
-  bitmapInfo.writeUInt32LE(40, 0);
-  bitmapInfo.writeInt32LE(widgetWidth, 4);
-  bitmapInfo.writeInt32LE(-widgetHeight, 8);
-  bitmapInfo.writeUInt16LE(1, 12);
-  bitmapInfo.writeUInt16LE(32, 14);
-  const bgraPixels = Buffer.alloc(widgetWidth * widgetHeight * 4);
-  void GDI32.GetDIBits(memoryDC, bitmap, 0, widgetHeight, bgraPixels.ptr!, bitmapInfo.ptr!, 0);
-  void GDI32.DeleteObject(bitmap);
-  void GDI32.DeleteDC(memoryDC);
-  void User32.ReleaseDC(0n, screenDC);
-  const rgbPixels = new Uint8Array(widgetWidth * widgetHeight * 3);
-  for (let pixelIndex = 0; pixelIndex < widgetWidth * widgetHeight; pixelIndex++) {
-    rgbPixels[pixelIndex * 3] = bgraPixels[pixelIndex * 4 + 2];
-    rgbPixels[pixelIndex * 3 + 1] = bgraPixels[pixelIndex * 4 + 1];
-    rgbPixels[pixelIndex * 3 + 2] = bgraPixels[pixelIndex * 4];
-  }
-  await Bun.write(path, encodePNG(rgbPixels, widgetWidth, widgetHeight));
-  console.log(`[render] ${path}`);
-};
-
 console.log(`Codex usage widget at (${widgetX}, ${widgetY}) ${widgetWidth}×${widgetHeight} — polling every ${POLL_INTERVAL_MS / 1000}s. Left-click = refresh, right-click = quit.`);
 
-const startedAt = Date.now();
-const demoDurationMs = Number(Bun.env.DEMO_DURATION_MS ?? 0);
 let lastFetchAt = 0;
 let fetchInFlight = false;
-let captured = false;
-let rendered = false;
 while (!closing) {
   pump();
   const now = Date.now();
@@ -664,25 +358,10 @@ while (!closing) {
     draw();
     User32.SetWindowPos(hwnd, zOrderAnchor, 0, 0, 0, 0, SWP_NOSIZE_NOMOVE_NOACTIVATE);
   }
-  if (!captured && hasDrawn && haveData && Bun.env.CAPTURE_PNG) {
-    captured = true;
-    await captureTaskbarRegion(Bun.env.CAPTURE_PNG);
-  }
-  if (!rendered && hasDrawn && haveData && Bun.env.RENDER_PNG) {
-    rendered = true;
-    await renderFramePNG(Bun.env.RENDER_PNG);
-  }
-  if (demoDurationMs > 0 && now - startedAt >= demoDurationMs) closing = true;
   await Bun.sleep(100);
 }
 
-const stopAppServer = (): void => {
-  if (!appServer) return;
-  appServer.stdin.end();
-  appServer.kill();
-  appServer = null;
-};
-stopAppServer();
+usageClient.close();
 void GDI32.DeleteObject(percentFont);
 void GDI32.DeleteObject(primaryFont);
 User32.DestroyWindow(hwnd);

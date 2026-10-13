@@ -60,6 +60,8 @@ packages/all/example/.triage-logs/
 # Showcase capture output (local-only) — except the shots hot-linked by package READMEs (gpu, bun-gpu, sysmon, bun-sysmon)
 packages/all/screenshots/*
 !packages/all/screenshots/neural-descent.png
+!packages/all/screenshots/palace-of-intent.png
+!packages/all/screenshots/radio-cathedral.png
 !packages/all/screenshots/raymarch.png
 !packages/all/screenshots/shader-tty.png
 !packages/all/screenshots/taskman.png

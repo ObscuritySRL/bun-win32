@@ -42,26 +42,21 @@
  *   SetWindowPos HWND_TOP reassertion)
  * - gdi32 (GetPixel taskbar color sampling, SetDIBitsToDevice single-blit software
  *   compositing — antialiased rounded pill, gradient fill, lightning-bolt polygon,
- *   charging shimmer — CreateFontW + SetTextAlign + TextOutW ClearType text, BitBlt +
- *   CreateCompatibleBitmap + GetDIBits screenshot verify)
- * - terminal (encodePNG for the CAPTURE_PNG verification screenshot)
+ *   charging shimmer — CreateFontW + SetTextAlign + TextOutW ClearType text)
  *
  * Env: DUALSENSE_X / DUALSENSE_WIDTH (pixel overrides), DUALSENSE_POLL_MS
- * (device poll interval, default 2000), DUALSENSE_FAKE=level:state (inject a battery
- * state for headless capture with no hardware — e.g. 75:charging, 20:discharging,
- * 100:full, 10:error), XM5_FAKE=level (inject a headset battery level for headless
- * capture, e.g. 100), XM5_NAME (override the headset friendly-name match, default
- * "WH-1000XM5"), CAPTURE_PNG=path (write a taskbar screenshot after first draw),
- * RENDER_PNG=path (dump the widget's own composited frame — screen-independent, works
- * even with the display locked), DEMO_DURATION_MS (self-exit for headless runs).
+ * (device poll interval, default 2000), XM5_NAME (override the headset friendly-name
+ * match, default "WH-1000XM5").
  *
  * Run: bun run example/dualsense-taskbar.ts
  */
 import { JSCallback } from 'bun:ffi';
 
-import { ShowWindowCommand, WindowStyles } from '@bun-win32/user32';
-import { encodePNG } from '@bun-win32/terminal';
-import { GDI32, Hid, Kernel32, Setupapi, User32 } from '../index';
+import GDI32 from '@bun-win32/gdi32';
+import Hid from '@bun-win32/hid';
+import Kernel32 from '@bun-win32/kernel32';
+import Setupapi from '@bun-win32/setupapi';
+import User32, { ShowWindowCommand, WindowStyles } from '@bun-win32/user32';
 
 User32.Preload([
   'CreateWindowExW',
@@ -85,26 +80,7 @@ User32.Preload([
   'TranslateMessage',
   'UnregisterClassW',
 ]);
-GDI32.Preload([
-  'BitBlt',
-  'CreateCompatibleBitmap',
-  'CreateCompatibleDC',
-  'CreateFontW',
-  'DeleteDC',
-  'DeleteObject',
-  'GetDIBits',
-  'GetPixel',
-  'GetTextMetricsW',
-  'IntersectClipRect',
-  'RestoreDC',
-  'SaveDC',
-  'SelectObject',
-  'SetBkMode',
-  'SetDIBitsToDevice',
-  'SetTextAlign',
-  'SetTextColor',
-  'TextOutW',
-]);
+GDI32.Preload(['CreateFontW', 'DeleteObject', 'GetPixel', 'GetTextMetricsW', 'IntersectClipRect', 'RestoreDC', 'SaveDC', 'SelectObject', 'SetBkMode', 'SetDIBitsToDevice', 'SetTextAlign', 'SetTextColor', 'TextOutW']);
 Hid.Preload(['HidD_GetAttributes', 'HidD_GetHidGuid', 'HidD_GetInputReport', 'HidD_GetProductString']);
 Kernel32.Preload(['CloseHandle', 'CreateFileW']);
 Setupapi.Preload(['SetupDiDestroyDeviceInfoList', 'SetupDiEnumDeviceInfo', 'SetupDiEnumDeviceInterfaces', 'SetupDiGetClassDevsW', 'SetupDiGetDeviceInterfaceDetailW', 'SetupDiGetDevicePropertyW']);
@@ -115,8 +91,6 @@ const WM_LBUTTONDOWN = 0x0201;
 const WM_RBUTTONDOWN = 0x0204;
 const PM_REMOVE = 0x0001;
 const LWA_COLORKEY = 0x0000_0001;
-const CAPTUREBLT = 0x4000_0000;
-const SRCCOPY = 0x00cc_0020;
 const SWP_NOSIZE_NOMOVE_NOACTIVATE = 0x0000_0013;
 
 const DIGCF_PRESENT = 0x0000_0002;
@@ -302,21 +276,6 @@ const readHeadsetBattery = (): Battery | null => {
   return found;
 };
 
-const parseFakeBattery = (): Battery | null => {
-  const raw = Bun.env.DUALSENSE_FAKE;
-  if (!raw) return null;
-  const [levelText, stateText] = raw.split(':');
-  const percent = Math.max(0, Math.min(100, Number(levelText) || 0));
-  const chargeState: ChargeState = stateText === 'charging' || stateText === 'error' ? stateText : 'discharging';
-  return { chargeState, percent };
-};
-
-const parseFakeHeadset = (): Battery | null => {
-  const raw = Bun.env.XM5_FAKE;
-  if (!raw) return null;
-  return { chargeState: 'discharging', percent: Math.max(0, Math.min(100, Number(raw) || 0)) };
-};
-
 interface Tint {
   blue: number;
   green: number;
@@ -362,9 +321,9 @@ const colorrefOf = (tint: Tint): number => (Math.round(tint.blue) << 16) | (Math
 const textColor = 0x00ff_ffff;
 const dimTextColor = colorrefOf(mixTint(backgroundTint, WHITE_TINT, 0.66));
 
-let battery: Battery | null = parseFakeBattery();
-let headset: Battery | null = parseFakeHeadset();
-let connected = battery !== null || headset !== null;
+let battery: Battery | null = null;
+let headset: Battery | null = null;
+let connected = false;
 
 let closing = false;
 let refreshRequested = false;
@@ -483,6 +442,7 @@ const activeRows = (): DeviceRow[] => {
   if (headset) rows.push({ battery: headset, glyph: HEADSET_GLYPH });
   return rows;
 };
+const controllerIsCharging = (): boolean => battery?.chargeState === 'charging';
 
 const cellHeightOf = (font: bigint): number => {
   const metricsDC = User32.GetDC(0n);
@@ -525,7 +485,6 @@ const composeRow = (rowBattery: Battery, rowTop: number, barHeight: number): voi
   }
 };
 
-let hasDrawn = false;
 const paint = (deviceContext: bigint): void => {
   for (let index = 0; index < frame.length; index += 4) {
     frame[index] = backgroundTint.blue;
@@ -572,7 +531,6 @@ const paint = (deviceContext: bigint): void => {
 const draw = (): void => {
   const deviceContext = User32.GetDC(hwnd);
   if (deviceContext === 0n) return;
-  hasDrawn = true;
   paint(deviceContext);
   void User32.ReleaseDC(hwnd, deviceContext);
 };
@@ -593,79 +551,12 @@ const setVisible = (next: boolean): void => {
   if (next) User32.SetWindowPos(hwnd, zOrderAnchor, 0, 0, 0, 0, SWP_NOSIZE_NOMOVE_NOACTIVATE);
 };
 
-const captureTaskbarRegion = async (path: string): Promise<void> => {
-  const captureX = Math.max(taskbarLeft, widgetX - Math.round(220 * scale));
-  const captureWidth = widgetX - captureX + widgetWidth + Math.round(120 * scale);
-  const screenDC = User32.GetDC(0n);
-  const memoryDC = GDI32.CreateCompatibleDC(screenDC);
-  const bitmap = GDI32.CreateCompatibleBitmap(screenDC, captureWidth, taskbarHeight);
-  GDI32.SelectObject(memoryDC, bitmap);
-  void GDI32.BitBlt(memoryDC, 0, 0, captureWidth, taskbarHeight, screenDC, captureX, widgetY, SRCCOPY | CAPTUREBLT);
-  const bitmapInfo = Buffer.alloc(40);
-  bitmapInfo.writeUInt32LE(40, 0);
-  bitmapInfo.writeInt32LE(captureWidth, 4);
-  bitmapInfo.writeInt32LE(-taskbarHeight, 8);
-  bitmapInfo.writeUInt16LE(1, 12);
-  bitmapInfo.writeUInt16LE(32, 14);
-  const bgraPixels = Buffer.alloc(captureWidth * taskbarHeight * 4);
-  void GDI32.GetDIBits(memoryDC, bitmap, 0, taskbarHeight, bgraPixels.ptr!, bitmapInfo.ptr!, 0);
-  void GDI32.DeleteObject(bitmap);
-  void GDI32.DeleteDC(memoryDC);
-  void User32.ReleaseDC(0n, screenDC);
-  const rgbPixels = new Uint8Array(captureWidth * taskbarHeight * 3);
-  for (let pixelIndex = 0; pixelIndex < captureWidth * taskbarHeight; pixelIndex++) {
-    rgbPixels[pixelIndex * 3] = bgraPixels[pixelIndex * 4 + 2];
-    rgbPixels[pixelIndex * 3 + 1] = bgraPixels[pixelIndex * 4 + 1];
-    rgbPixels[pixelIndex * 3 + 2] = bgraPixels[pixelIndex * 4];
-  }
-  await Bun.write(path, encodePNG(rgbPixels, captureWidth, taskbarHeight));
-  console.log(`[shot] ${path}`);
-};
-
-// Dump the widget's own composited BGRA frame straight to PNG — screen-independent
-// (unlike the BitBlt screenshot, this works even when the display is locked or off).
-const renderFramePNG = async (path: string): Promise<void> => {
-  const screenDC = User32.GetDC(0n);
-  const memoryDC = GDI32.CreateCompatibleDC(screenDC);
-  const bitmap = GDI32.CreateCompatibleBitmap(screenDC, widgetWidth, widgetHeight);
-  GDI32.SelectObject(memoryDC, bitmap);
-  paint(memoryDC);
-  const bitmapInfo = Buffer.alloc(40);
-  bitmapInfo.writeUInt32LE(40, 0);
-  bitmapInfo.writeInt32LE(widgetWidth, 4);
-  bitmapInfo.writeInt32LE(-widgetHeight, 8);
-  bitmapInfo.writeUInt16LE(1, 12);
-  bitmapInfo.writeUInt16LE(32, 14);
-  const bgraPixels = Buffer.alloc(widgetWidth * widgetHeight * 4);
-  void GDI32.GetDIBits(memoryDC, bitmap, 0, widgetHeight, bgraPixels.ptr!, bitmapInfo.ptr!, 0);
-  void GDI32.DeleteObject(bitmap);
-  void GDI32.DeleteDC(memoryDC);
-  void User32.ReleaseDC(0n, screenDC);
-  const rgbPixels = new Uint8Array(widgetWidth * widgetHeight * 3);
-  for (let pixelIndex = 0; pixelIndex < widgetWidth * widgetHeight; pixelIndex++) {
-    rgbPixels[pixelIndex * 3] = bgraPixels[pixelIndex * 4 + 2];
-    rgbPixels[pixelIndex * 3 + 1] = bgraPixels[pixelIndex * 4 + 1];
-    rgbPixels[pixelIndex * 3 + 2] = bgraPixels[pixelIndex * 4];
-  }
-  await Bun.write(path, encodePNG(rgbPixels, widgetWidth, widgetHeight));
-  console.log(`[render] ${path}`);
-};
-
-const fakeMode = parseFakeBattery() !== null || parseFakeHeadset() !== null;
 console.log(`DualSense + headset battery widget at (${widgetX}, ${widgetY}) ${widgetWidth}×${widgetHeight} — polling every ${POLL_INTERVAL_MS / 1000}s. Left-click = refresh, right-click = quit.`);
 
-const startedAt = Date.now();
-const demoDurationMs = Number(Bun.env.DEMO_DURATION_MS ?? 0);
 let cachedDevice: DualSense | null = null;
 let lastPollAt = 0;
-let captured = false;
-let rendered = false;
 
 const poll = (): void => {
-  if (fakeMode) {
-    connected = battery !== null || headset !== null;
-    return;
-  }
   if (!cachedDevice) cachedDevice = findDualSense();
   if (cachedDevice) {
     const reading = readBattery(cachedDevice);
@@ -691,7 +582,7 @@ while (!closing) {
     poll();
     repaintRequested = true;
   }
-  const animating = connected && battery?.chargeState === 'charging';
+  const animating = connected && controllerIsCharging();
   if (animating) {
     shimmerPhase += 0.08;
     repaintRequested = true;
@@ -702,15 +593,6 @@ while (!closing) {
     draw();
     User32.SetWindowPos(hwnd, zOrderAnchor, 0, 0, 0, 0, SWP_NOSIZE_NOMOVE_NOACTIVATE);
   }
-  if (!captured && hasDrawn && Bun.env.CAPTURE_PNG) {
-    captured = true;
-    await captureTaskbarRegion(Bun.env.CAPTURE_PNG);
-  }
-  if (!rendered && hasDrawn && Bun.env.RENDER_PNG) {
-    rendered = true;
-    await renderFramePNG(Bun.env.RENDER_PNG);
-  }
-  if (demoDurationMs > 0 && now - startedAt >= demoDurationMs) closing = true;
   await Bun.sleep(animating ? 80 : 100);
 }
 
