@@ -272,6 +272,11 @@ export async function runScript(options: ScriptOptions): Promise<void> {
         console.log(`[script] clip ${name}.mp4 (${frames} frames)`);
         break;
       }
+      case 'pause':
+      case 'resume':
+        eye.send({ type: command });
+        await frame(null, 0);
+        break;
       case 'quit':
         eye.send({ type: 'quit' });
         await Bun.sleep(200);

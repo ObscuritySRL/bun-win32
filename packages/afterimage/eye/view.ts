@@ -270,8 +270,9 @@ export class View {
     const geometry = this.#geometry(now);
     const span = this.#span();
     const age = this.#epochNow() - this.#history.epoch(this.#frame);
-    this.#playhead.retarget(positionOfAge(Math.max(0, age), span), now);
     const live = this.#isLive();
+    // Live is the screen as it is now: the now edge, however long ago its last change was.
+    this.#playhead.retarget(live ? 0 : positionOfAge(Math.max(0, age), span), now);
     this.#tint.retarget(live ? 0 : 1, now);
     if (now - this.#lastBinsAt > 500) {
       const bins = new Float32Array(this.#binCount());

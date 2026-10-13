@@ -100,6 +100,7 @@ export function drawWorkday(painter: Painter, time: number, width: number, heigh
   drawTerminal(painter, terminal, time);
   drawWindow(painter, chat, 'Messages', true);
   drawChat(painter, chat, time);
+  drawPhoto(painter, time, width, height - taskbar);
   drawToast(painter, time, width, height - taskbar);
   drawTaskbar(painter, width, height, taskbar, epoch);
 }
@@ -162,6 +163,29 @@ function drawNotes(painter: Painter, frame: Rectangle, time: number): void {
   const typed = Math.max(0, Math.min(noteText.length, Math.floor((time - 1_000) / 70)));
   const text = noteText.slice(0, typed);
   painter.text(text, { ...fonts.body, wrap: true }, left, top + 60, width, frame.height - 150, [0.12, 0.12, 0.14, 1]);
+}
+
+/** A large photo opened for a few seconds and closed again — the kind of big change that becomes a "moment". */
+function drawPhoto(painter: Painter, time: number, width: number, bottom: number): void {
+  if (time < 17_500 || time >= 21_000) return;
+  const frame = { height: Math.min(720, bottom - 120), left: width / 2 - 560, top: 60, width: 1_120 };
+  drawWindow(painter, frame, 'Photos — Lisbon, 07.jpg', true);
+  const left = frame.left + 1;
+  const top = frame.top + 40;
+  const pictureWidth = frame.width - 2;
+  const pictureHeight = frame.height - 41;
+  painter.pushClip(left, top, pictureWidth, pictureHeight);
+  painter.fillRectangle(left, top, pictureWidth, pictureHeight, [0.98, 0.72, 0.5, 1]);
+  painter.fillRectangle(left, top, pictureWidth, pictureHeight * 0.55, [0.99, 0.82, 0.62, 1]);
+  painter.fillEllipse(left + pictureWidth * 0.68, top + pictureHeight * 0.42, 70, 70, [1, 0.95, 0.82, 1]);
+  for (let roof = 0; roof < 9; roof += 1) {
+    const roofLeft = left + roof * (pictureWidth / 9);
+    const roofTop = top + pictureHeight * (0.52 + ((roof * 37) % 5) * 0.03);
+    painter.fillRectangle(roofLeft, roofTop, pictureWidth / 9 + 1, pictureHeight, [0.62 + (roof % 3) * 0.08, 0.32 + (roof % 2) * 0.06, 0.24, 1]);
+    for (let window = 0; window < 3; window += 1) painter.fillRectangle(roofLeft + 22 + window * 34, roofTop + 40, 16, 22, [0.98, 0.9, 0.7, 0.85]);
+  }
+  painter.fillRectangle(left, top + pictureHeight * 0.86, pictureWidth, pictureHeight * 0.14, [0.18, 0.32, 0.46, 1]);
+  painter.popClip();
 }
 
 function drawPreview(painter: Painter, frame: Rectangle, time: number): void {
