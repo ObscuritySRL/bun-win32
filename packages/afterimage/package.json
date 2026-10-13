@@ -26,9 +26,31 @@
   "exports": {
     ".": "./index.ts"
   },
-  "files": ["DESIGN.md", "README.md", "build.ts", "eye/*.ts", "index.ts", "memory/*.ts", "shared/*.ts", "!**/*.test.ts"],
+  "files": [
+    "DESIGN.md",
+    "README.md",
+    "build.ts",
+    "eye/*.ts",
+    "index.ts",
+    "memory/*.ts",
+    "shared/*.ts",
+    "!**/*.test.ts"
+  ],
   "homepage": "https://github.com/ObscuritySRL/bun-win32#readme",
-  "keywords": ["bun", "d3d11", "desktop-duplication", "dxgi", "ffi", "history", "rewind", "screen", "time-travel", "typescript", "win32", "windows"],
+  "keywords": [
+    "bun",
+    "d3d11",
+    "desktop-duplication",
+    "dxgi",
+    "ffi",
+    "history",
+    "rewind",
+    "screen",
+    "time-travel",
+    "typescript",
+    "win32",
+    "windows"
+  ],
   "license": "MIT",
   "main": "./index.ts",
   "module": "index.ts",

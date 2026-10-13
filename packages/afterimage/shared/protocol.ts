@@ -39,6 +39,7 @@ export interface MemoryStats {
   fingerprintMilliseconds: number;
   frames: number;
   oldestEpoch: number;
+  reducedPercent: number;
   storedBytes: number;
   tiles: number;
   uniqueTiles: number;
@@ -48,10 +49,10 @@ export interface MemoryStats {
 export interface TimelineSlice {
   /** Absolute index of `epochs[0]` — frame indices are never reused, so eviction never shifts them. */
   firstFrame: number;
-  changed: Uint32Array;
-  cursorX: Int32Array;
-  cursorY: Int32Array;
-  epochs: Float64Array;
+  changed: Uint32Array<ArrayBuffer>;
+  cursorX: Int32Array<ArrayBuffer>;
+  cursorY: Int32Array<ArrayBuffer>;
+  epochs: Float64Array<ArrayBuffer>;
   gaps: Gap[];
 }
 
@@ -70,10 +71,12 @@ export type EyeMessage =
   | { type: 'close' }
   | { type: 'export'; frame: number; region: TileRegion | null; request: number; target: 'clipboard' | 'png' }
   | { type: 'forget' }
+  | { type: 'init'; options: WorkerOptions }
   | { type: 'open'; display: number }
   | { type: 'pause' }
   | { type: 'quit' }
   | { type: 'regionStep'; direction: -1 | 1; frame: number; region: TileRegion; request: number }
+  | { type: 'release'; view: 0 | 1 }
   | { type: 'resume' }
   | { type: 'seek'; frame: number; request: number }
   | { type: 'stage'; milliseconds: number };
@@ -81,12 +84,12 @@ export type EyeMessage =
 export type MemoryMessage =
   | { type: 'appended'; display: number; slice: TimelineSlice }
   | { type: 'error'; message: string }
-  | { type: 'exported'; bitmap: Uint8Array | null; height: number; path: string | null; request: number; width: number }
+  | { type: 'exported'; bitmap: Uint8Array<ArrayBuffer> | null; height: number; path: string | null; request: number; width: number }
   | { type: 'forgotten' }
   | { type: 'opened'; display: number; frame: number; slice: TimelineSlice; view: 0 | 1 }
-  | { type: 'ready'; bootMilliseconds: number; displays: DisplayInfo[] }
+  | { type: 'ready'; adapter: number; bootMilliseconds: number; displays: DisplayInfo[] }
   | { type: 'recording'; reason: string | null; state: 'paused' | 'recording' | 'unavailable' }
-  | { type: 'shown'; changedTiles: Uint32Array; composeMilliseconds: number; frame: number; request: number; view: 0 | 1 }
+  | { type: 'shown'; changedTiles: Uint32Array<ArrayBuffer>; composeMilliseconds: number; frame: number; request: number; view: 0 | 1 }
   | { type: 'staged'; milliseconds: number }
   | { type: 'stats'; stats: MemoryStats }
   | { type: 'stepped'; frame: number; request: number };
